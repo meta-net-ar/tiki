@@ -50,7 +50,7 @@
                                     <input type="hidden" name="page_ref_id" value={$structure_tree.page_ref_id}>
                                     <input type="hidden" name="watch_object" value={$structure_tree.page_ref_id}>
                                     <input type="hidden" name="watch_action" value="add">
-                                    <button type="submit" name="page" value={$structure_tree.pageName} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the Sub-Structure{/tr}" class="tips input-group-text">
+                                    <button type="submit" name="page" value={$structure_tree.pageName} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the Sub-Structure{/tr}" class="tips input-group-text" aria-label="{tr}Monitor the Sub-Structure{/tr}">
                                         {icon name="watch"}
                                     </button>
                                 </form>

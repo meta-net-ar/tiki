@@ -22,10 +22,10 @@
     <exclude-pattern>*/lib/equation/*</exclude-pattern>
     <exclude-pattern>*/lib/ical/*</exclude-pattern>
     <exclude-pattern>*/lib/openlayers/*</exclude-pattern>
-    <exclude-pattern>*/lib/sheet/excel/*</exclude-pattern>
-    <exclude-pattern>*/lib/sheet/include/*</exclude-pattern>
-    <exclude-pattern>*/lib/sheet/ole.php</exclude-pattern>
-    <exclude-pattern>*/lib/sheet/ole/*</exclude-pattern>
+    <exclude-pattern>*/lib/Sheet/excel/*</exclude-pattern>
+    <exclude-pattern>*/lib/Sheet/include/*</exclude-pattern>
+    <exclude-pattern>*/lib/Sheet/ole.php</exclude-pattern>
+    <exclude-pattern>*/lib/Sheet/ole/*</exclude-pattern>
     <exclude-pattern>*/lib/soap/nusoap/*</exclude-pattern>
     <exclude-pattern>*/lib/tar.class.php</exclude-pattern>
     <exclude-pattern>*/lib/tikihelp/js/*</exclude-pattern>

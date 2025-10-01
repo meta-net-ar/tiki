@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -182,6 +182,15 @@ class ObjectLib extends TikiLib
                         $href = "tiki-admin_content_templates.php?templateId=$itemId";
                         break;
 
+                    case 'structure':
+                        $structlib = TikiLib::lib('struct');
+                        $info = $structlib->s_get_page_info($itemId);
+
+                        $description = '';  // Structures don't have descriptions
+                        $name = $info['pageName'];
+                        $href = 'tiki-index.php?page_ref_id=' . $itemId;
+                        break;
+
                     case 'surveys':
                     case 'survey':
                         $surveylib = TikiLib::lib('survey');
@@ -217,6 +226,8 @@ class ObjectLib extends TikiLib
     {
         return [
             'article',
+            'article_topic',
+            'article_type',
             'blog',
             'calendar',
             'directory',
@@ -228,9 +239,11 @@ class ObjectLib extends TikiLib
             'perspective',
             'poll',
             'quiz',
+            'structure',
             'tracker',
             'survey',
             'trackeritem',
+            'sheet',
             'user',
             'wiki page',
             'template',
@@ -240,6 +253,9 @@ class ObjectLib extends TikiLib
     public function getSelectorType($type)
     {
         $supported = [
+            'article' => 'article',
+            'article_topic' => 'article_topic',
+            'article_type' => 'article_type',
             'blog' => 'blog',
             'calendar' => 'calendar',
             'category' => 'category',
@@ -248,11 +264,13 @@ class ObjectLib extends TikiLib
             'forum' => 'forum',
             'group' => 'group',
             'poll' => 'poll',
+            'structure' => 'structure',
             'tracker' => 'tracker',
             'tracker_field' => 'trackerfield',
             'survey' => 'survey',
             'trackerfield' => 'trackerfield',
             'user' => 'user',
+            'sheet' => 'sheet',
             'wiki_page' => 'wiki page',
             'wiki page' => 'wiki page',
             'template' => 'template',
@@ -500,7 +518,7 @@ class ObjectLib extends TikiLib
             case 'wiki page':
                 $tikilib = TikiLib::lib('tiki');
                 $info = $tikilib->get_page_info($object);
-                return ['title' => $object ?? "", 'data' => isset($info['data']) ? $info['data'] : "", 'is_html' => isset($info['is_html']) ? $info['is_html'] : ""];
+                return ['title' => $object ?? "", 'data' => $info['data'] ?? "", 'is_html' => $info['is_html'] ?? ""];
 
             case 'article':
                 $artlib = TikiLib::lib('art');
@@ -601,6 +619,12 @@ class ObjectLib extends TikiLib
             if ($activity != null) {
                 return true;
             }
+        } elseif ($type === 'structure') {
+            $structlib = TikiLib::lib('struct');
+            $info = $structlib->s_get_page_info($objectId);
+            if ($info) {
+                return true;
+            }
         }
         return false;
     }
@@ -688,7 +712,6 @@ class ObjectLib extends TikiLib
                     $info['heading'],
                     $info['body'],
                     $info['publishDate'],
-                    $info['expireDate'],
                     $info['author'],
                     $info['articleId'],
                     $info['image_x'],
@@ -699,6 +722,7 @@ class ObjectLib extends TikiLib
                     $info['subtitle'],
                     $info['linkto'],
                     $info['image_caption'],
+                    $info['image_alt'],
                     $info['lang'],
                     $info['ispublished']
                 );
@@ -754,6 +778,12 @@ class ObjectLib extends TikiLib
                     $info['smiley'],
                     $info['object'],
                 );
+                break;
+            case 'structure':
+                $structlib = TikiLib::lib('struct');
+                $info = $structlib->s_get_page_info($object);
+                $info = array_merge($info, $data);
+                $structlib->update_structure($info['page_ref_id'], $info);
                 break;
             default:
                 // No default
@@ -861,11 +891,15 @@ class ObjectLib extends TikiLib
                 return TikiLib::lib('user')->clean_user($id);
             case 'calendar':
                 $info = TikiLib::lib('calendar')->get_calendar($id);
-                return isset($info['name']) ? $info['name'] : "";
+                return $info['name'] ?? "";
             case 'calendar event':
             case 'calendaritem':
                 $info = TikiLib::lib('calendar')->get_item($id);
                 return $this->getFormattedTitle($type, $id, $info['name'] ?? '', $format);
+            case 'structure':
+                $structlib = TikiLib::lib('struct');
+                $info = $structlib->s_get_page_info($id);
+                return ! empty($info['page_alias']) ? $info['page_alias'] : $info['pageName'];
         }
 
         $title = $this->table('tiki_objects')->fetchOne(
@@ -942,7 +976,7 @@ class ObjectLib extends TikiLib
                 if (isset($item[$key])) {
                     $values[$value_key] = $item[$key];
                     return $item[$key];
-                } elseif (substr($key, 0, 5) == 'meta.') {
+                } elseif (str_starts_with($key, 'meta.')) {
                     $values[$value_key] = $metadata[$item['object_type'] . ':' . $item['object_id']][substr($key, 5)] ?? '';
                 } elseif (! $format || $format == '{title}') {
                     $values[$value_key] = '';
@@ -1012,7 +1046,7 @@ class ObjectLib extends TikiLib
                     $key = $matches[1];
                     if (isset($item[$key])) {
                         return $item[$key];
-                    } elseif (substr($key, 0, 5) == 'meta.') {
+                    } elseif (str_starts_with($key, 'meta.')) {
                         return $metadata[substr($key, 5)] ?? '';
                     } elseif (! $format || $format == '{title}') {
                         return tr('empty');
@@ -1048,7 +1082,7 @@ class ObjectLib extends TikiLib
      */
     public function get_wiki_content($type, $objectId)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $comment_info = TikiLib::lib('comments')->get_comment((int)$objectId);
             return $comment_info['data'];
         }
@@ -1088,7 +1122,7 @@ class ObjectLib extends TikiLib
      */
     public function get_verbose_type($type)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $isComment = true;
             $type = substr($type, 0, strlen($type) - 8);
         } else {
@@ -1157,6 +1191,7 @@ class ObjectLib extends TikiLib
             // newsletters can't be categorized, although there's some code in tiki-admin_newsletters.php
             // 'newsletter' => ?,
             // 'events' => ?,
+            'structure' => 'tiki_p_view',
         ];
     }
 

@@ -2,6 +2,8 @@
 $imagePath: "../../../img/";
 $imagePathToIcons: "../../../img/icons/";
 
+@import "tiki-mod-since_last_visit";
+
 .trackerfilter_loader{
     display: none;
     position: fixed;
@@ -249,6 +251,7 @@ ol.bbb-recordings {
     float: left;
     position: absolute;
     opacity: .7;
+    z-index: 1;
 }
 
 // .unsavedChangesInEditor {
@@ -431,17 +434,6 @@ div.tiki_plugin {
 
 .icon_edit_section img.icon {
     margin-top: -1px !important;
-}
-
-// /* CKeditor contrast */
-// body.wikitext {
-//     background: $body-bg;
-//     color: @text-color;
-// }
-
-// /* for autocomplete menus to appear infront of ckeditor 3.6 dialogs this needs to be !important sadly */
-.ui-menu {
-    z-index: 10100 !important;
 }
 
 // /* Structure selection popup on wiki pages */
@@ -1121,4 +1113,86 @@ h6:hover .heading-link {
 // Autotoc
 #all-toc.hidden.sticky-top {
     height: 80vh !important;
+}
+
+// /* wikiplugin viewtextfile */
+.viewtextfile-viewer-container {
+    min-width: 480px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+}
+
+.viewtextfile-content-wrapper {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f1f1;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.viewtextfile-info-button {
+    top: 10px;
+    right: 10px;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.3s;
+    text-align: end;
+}
+
+.viewtextfile-content-wrapper > .viewtextfile-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin-top: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    font-family: "Calibri", sans-serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    padding: 40px;
+}
+
+.wp_wysiwyg-wrapper {
+    position: relative;
+
+    .edit_button {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        display: none;
+        z-index: 9;
+    }
+    .wp_wysiwyg:hover ~ .edit_button, .wp_wysiwyg ~ .edit_button:hover {
+        display: block;
+    }
+}
+
+.inline-editor + .note-editor .note-statusbar {
+    display: none;
+}
+.inline-editor + .note-editor.highlight {
+    border-color: var(--bs-primary);
+}
+
+@media (max-width: 768px) {
+    .viewtextfile-viewer-container {
+        width: 100% !important;
+        height: auto;
+        min-width: unset;
+        padding: 10px;
+    }
+    .viewtextfile-content-wrapper {
+        padding: 0;
+    }
+    .viewtextfile-content-wrapper > .viewtextfile-content {
+        padding: 20px;
+    }
 }

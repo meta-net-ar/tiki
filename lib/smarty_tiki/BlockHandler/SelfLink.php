@@ -66,6 +66,7 @@ class SelfLink extends Base
             } else {
                 $anchor = '';
             }
+            $dataAttributes = '';
             if (empty($params['_disabled'])) {
                 if (! isset($params['_sort_arg'])) {
                     $params['_sort_arg'] = 'sort';
@@ -82,7 +83,7 @@ class SelfLink extends Base
                 }
                 // Complete _script path if needed (not empty, not an anchor, ...)
                 if (! empty($params['_script']) && $params['_script'][0] != '#' && $params['_script'] != 'javascript:void(0)' && stripos($params['_script'], 'mailto:') !== 0) {
-                    if ($_SERVER['PHP_SELF'][0] == '/' && strpos($params['_script'], '/') === false) {
+                    if ($_SERVER['PHP_SELF'][0] == '/' && ! str_contains($params['_script'], '/')) {
                         $self_dir = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
                         $params['_script'] = ($self_dir == '/' ? '' : $self_dir) . '/' . $params['_script'];
                     }
@@ -91,7 +92,6 @@ class SelfLink extends Base
                     }
                 }
 
-                $dataAttributes = '';
                 if (! empty($params['data'])) {
                     parse_str($params['data'], $attrs);
 
@@ -198,7 +198,7 @@ class SelfLink extends Base
                     . $dataAttributes;
 
                 if (! empty($params['_rel'])) {
-                    if (strpos($params['_rel'], 'box') !== false) {
+                    if (str_contains($params['_rel'], 'box')) {
                         $rel = 'data-box="box" ';
                     } else {
                         $rel = 'rel="' . str_replace('"', '\"', $params['_rel']) . '" ';
@@ -208,7 +208,7 @@ class SelfLink extends Base
                 }
                 $link .= $rel;
                 foreach ($params as $k => $v) {
-                    if (strlen($k) > 3 && substr($k, 0, 3) == '_on' && ! empty($v)) {
+                    if (strlen($k) > 3 && str_starts_with($k, '_on') && ! empty($v)) {
                         $link .= htmlentities(substr($k, 1)) . '="' . $v . '" '; // $v should be already htmlentitized in the template
                         unset($params[$k]);
                     }

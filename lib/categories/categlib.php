@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -753,12 +753,12 @@ class CategLib extends ObjectLib
 
         $invalidTypes = [];
         // Get valid object types from the context map
-        $validObjectTypes = array_keys($contextMap);
+        $validObjectTypes = array_keys($contextMapMap);
         // Filter $requiredResult based on valid object types
         $requiredResult = array_filter($requiredResult, function ($res) use ($validObjectTypes, &$invalidTypes) {
             $check = in_array($res['type'], $validObjectTypes);
             if (! $check) {
-                array_push($invalidTypes, $res);
+                $invalidTypes[] = $res;
             }
             return $check;
         });
@@ -777,6 +777,8 @@ class CategLib extends ObjectLib
         } else {
             $count = count($requiredResult);
         }
+
+        $result = $requiredResult;
 
         $ret = [];
         $objs = [];
@@ -826,7 +828,7 @@ class CategLib extends ObjectLib
         }
         return [
             "data" => $ret,
-            "cant" => $count,
+            "count" => $count,
         ];
     }
 
@@ -929,7 +931,7 @@ class CategLib extends ObjectLib
         // return the maxRecord data result and data count plus the actual total count as a single array
         return [
             "data" => $result,
-            "cant" => $count,
+            "count" => $count,
             "countall" => $countall,
         ];
     }
@@ -1022,7 +1024,7 @@ class CategLib extends ObjectLib
      * Removes the object with the given identifer from the category with the given identifier
      * @param $catObjectId
      * @param $categId
-     * @return bool|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return bool|TikiDb_Pdo_Result
      * @throws Exception
      */
     public function remove_object_from_category($catObjectId, $categId)
@@ -1034,7 +1036,7 @@ class CategLib extends ObjectLib
      * Removes the object with the given identifier from the categories specified in the $categIds array. The array contains category identifiers.
      * @param $catObjectId
      * @param $categIds
-     * @return bool|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return bool|TikiDb_Pdo_Result
      * @throws Exception
      */
     public function remove_object_from_categories($catObjectId, $categIds)
@@ -1140,22 +1142,38 @@ class CategLib extends ObjectLib
 
             $categories = [];
             $roots = [];
-            $query = "select *, (select count(*) from tiki_categories_roles_available cr where tc.categId = cr.categId ) as num_roles from `tiki_categories` tc;";
+            $query = "SELECT tc.*, (select count(*) from tiki_categories_roles_available cr where tc.categId = cr.categId ) as num_roles FROM tiki_categories tc";
+
+            if ($prefs['category_browse_count_objects'] === 'y') {
+                $query = "
+                    SELECT 
+                        tc.*,
+                        COUNT(DISTINCT cr.categRoleId) AS num_roles,
+                        COUNT(DISTINCT tco.catObjectId) AS objects
+                    FROM
+                        `tiki_categories` tc
+                    LEFT JOIN
+                        `tiki_category_objects` tco ON tc.categId = tco.categId
+                     LEFT JOIN `tiki_categories_roles_available` cr
+                              ON tc.categId = cr.categId
+                    GROUP BY
+                        tc.categId
+                ";
+            }
+
             $result = $this->query($query, []);
             while ($res = $result->fetchRow()) {
                 $id = $res["categId"];
-                if ($prefs['category_browse_count_objects'] === 'y') {
-                    $query = "select count(*) from `tiki_category_objects` where `categId`=?";
-                    $res['objects'] = $this->getOne($query, [$id]);
-                } else {
+
+                if ($prefs['category_browse_count_objects'] !== 'y') {
                     $res['objects'] = null;
                 }
+
                 $res['children'] = [];
                 $res['descendants'] = [];
                 if ($localized) {
                     $res['name'] = tr($res['name']);
                 }
-
                 $categories[$id] = $res;
             }
 
@@ -1212,7 +1230,7 @@ class CategLib extends ObjectLib
             $cachelib->cacheItem('roots', serialize($roots), 'allcategs'); // Used in get_category_descendants()
         }
 
-        $type = is_null($filter) ? 'all' : (isset($filter['type']) ? $filter['type'] : 'self');
+        $type = is_null($filter) ? 'all' : ($filter['type'] ?? 'self');
         if ($type != 'all') {
             $kept = [];
             if ($type != 'roots') {
@@ -1531,7 +1549,7 @@ class CategLib extends ObjectLib
         }
         if ($types == '*') {
             $typesallowed = array_keys($typetitles);
-        } elseif (strpos($types, '+')) {
+        } elseif (str_contains($types, '+')) {
             $alltypes = preg_split('/\+/', $types);
             foreach ($alltypes as $t) {
                 if (isset($typetokens["$t"])) {
@@ -1545,7 +1563,6 @@ class CategLib extends ObjectLib
         } elseif (isset($typetitles["$types"])) {
             $typesallowed = [$types];
         }
-        $out = $smarty->fetch("categobjects_title.tpl");
         foreach ($catids as $id) {
             if (! $this->user_has_perm_on_object($user, $id, 'category', 'tiki_p_view_category')) {
                 continue;
@@ -1557,7 +1574,7 @@ class CategLib extends ObjectLib
             $acats = $andcat = [];
             foreach ($objectcat["data"] as $obj) {
                 $type = $obj["type"];
-                if (substr($type, 0, 7) == 'tracker') {
+                if (str_starts_with($type, 'tracker')) {
                     $type = 'tracker';
                 }
                 if (($types == '*') || in_array($type, $typesallowed)) {

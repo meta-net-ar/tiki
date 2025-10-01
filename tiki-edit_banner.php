@@ -15,14 +15,14 @@ $inputConfiguration = [
             'removeZone'                  => 'string',        //post
             'save'                        => 'bool',          //post
             'create_zone'                 => 'bool',          //post
-            'fromTimeMeridian'            => 'int',           //post
+            'fromTimeMeridian'            => 'string',        //post
             'fromTimeHour'                => 'digits',        //post
-            'toTimeMeridian'              => 'int',           //post
+            'toTimeMeridian'              => 'string',        //post
             'toTimeHour'                  => 'digits',        //post
-            'fromDate_Month'              => 'string',        //post
+            'fromDate_Month'              => 'int',           //post
             'fromDate_Day'                => 'digits',        //post
             'fromDate_Year'               => 'digits',        //post
-            'toDate_Month'                => 'string',        //post
+            'toDate_Month'                => 'int',           //post
             'toDate_Day'                  => 'digits',        //post
             'toDate_Year'                 => 'digits',        //post
             'fromTimeMinute'              => 'digits',        //post
@@ -69,19 +69,12 @@ if (isset($_REQUEST["bannerId"]) && $_REQUEST["bannerId"] > 0) {
     $info = $bannerlib->get_banner($_REQUEST["bannerId"]);
 
     if (! $info) {
-        $smarty->assign('msg', tra("Banner not found"));
-
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Banner not found"), \Laminas\Http\Response::STATUS_CODE_404);
     }
 
     // Check user is admin or the client
     if (($user != $info["client"]) && ($tiki_p_admin_banners != 'y')) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this banner"));
-
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this banner"), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     $fromTime = substr($info["hourFrom"], 0, 2) . ":" . substr($info["hourFrom"], 2, 2);
@@ -180,8 +173,8 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     }
     $fromDate = mktime(0, 0, 0, $_REQUEST["fromDate_Month"], $_REQUEST["fromDate_Day"], $_REQUEST["fromDate_Year"]);
     $toDate = mktime(0, 0, 0, $_REQUEST["toDate_Month"], $_REQUEST["toDate_Day"], $_REQUEST["toDate_Year"]);
-    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"] . '';
-    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"] . '';
+    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"];
+    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"];
     $smarty->assign('fromDate', $fromDate);
     $smarty->assign('toDate', $toDate);
     $smarty->assign('fromTime', $_REQUEST["fromTimeHour"] . ':' . $_REQUEST["fromTimeMinute"]);
@@ -304,10 +297,7 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
 

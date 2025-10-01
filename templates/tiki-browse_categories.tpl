@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title}{if $parentId ne 0}{tr}Category:{/tr} {$p_info.name}{else}{tr}Categories{/tr}{/if}{/title}
 
 {if $parentId and $p_info.description}
@@ -132,7 +133,7 @@
     </div>
 {/if}
 
-{if $cant_pages > 0}
+{if $pages_count > 0}
     {tabset name='browse-categories'}
         {tab name="{tr}Categories{/tr}"}
             {if $parentId ne '0'}
@@ -190,7 +191,7 @@
                 </div>
             </div>
 
-            {pagination_links cant=$cant_pages step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
         {/tab}
     {/tabset}
 {else}

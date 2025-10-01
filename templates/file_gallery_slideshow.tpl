@@ -25,7 +25,7 @@
 {/if}
 
         <div id="images" class="hidden">
-            {if $cant eq 0}
+            {if $count eq 0}
                 <p style="font-style:italic; margin-left:10px">
                     {tr}There are no images to display{/tr}
                 </p>
@@ -37,11 +37,11 @@
                                 data-box="shadowbox[slideshow];type=img"
                                 {if ($caption)}
                                     {if ($caption eq 'd')}
-                                        {assign var="itemcaption" value="{$file.description}"}
+                                        {$itemcaption="{$file.description}"}
                                     {elseif ($caption eq 'n')}
-                                        {assign var="itemcaption" value="{$file.name}"}
+                                        {$itemcaption="{$file.name}"}
                                     {elseif ($caption eq 'f')}
-                                        {assign var="itemcaption" value="{$file.filename}"}
+                                        {$itemcaption="{$file.filename}"}
                                     {/if}
                                     title="{$itemcaption}">{$itemcaption}
                                 {/if}

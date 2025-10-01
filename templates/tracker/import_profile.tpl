@@ -15,7 +15,7 @@
         </div>
         <div class="submit text-center">
             {if !$modal}
-                <a href="tiki-list_trackers.php" class="btn btn-link">{tr}Cancel{/tr}</a>
+                <a href="tiki-list_trackers.php" class="btn btn-link" role="button">{tr}Cancel{/tr}</a>
             {/if}
             <input type="submit" class="btn btn-primary" value="{tr}Import{/tr}">
         </div>
@@ -27,11 +27,11 @@
                 $.tikiModal();
                 if (feedback.length) {
                     for(i in feedback) {
-                        $.notify(feedback[i]);
+                        showMessage(feedback[i], "success");
                     }
                     document.location = document.location + '';
                 } else {
-                    $.notify(tr("Error, profile not applied"));
+                    showMessage(tr("Error, profile not applied"), "error");
                 }
             }, 'json');
             return false;

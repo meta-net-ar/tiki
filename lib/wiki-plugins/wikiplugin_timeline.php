@@ -12,87 +12,94 @@ function wikiplugin_timeline_info()
         'documentation' => 'PluginTimeline',
         'description' => tra('Display a timeline'),
         'prefs' => [ 'wikiplugin_timeline' ],
+        'filter' => 'wikicontent',
+        'format' => 'html',
         'iconname' => 'history',
         'introduced' => 8,
         'tags' => [ 'experimental' ],
         'params' => [
-            'scope' => [
+            'lower' => [
                 'required' => false,
-                'name' => tr('Scope'),
-                'description' => tr('Display the event list items represented in the page. (%0all%1, %0center%1, or
-                    a custom CSS selector)', '<code>', '</code>'),
-                'since' => '8.0',
-                'filter' => 'text',
-                'default' => 'center',
+                'name' => tra('Lower Bound'),
+                'description' => tr('The initial start date for the axis of the timeline.
+                    If not provided, the latest date present in the items set is taken as end date.
+                    Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '3.0',
+                'filter' => 'datetime',
+                'default' => '',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
-            'width' => [
+            'upper' => [
                 'required' => false,
-                'name' => tra('Width'),
-                'description' => tr('Width of the timeline as CSS units (default: %0)', '<code>100%</code>'),
-                'since' => '8.0',
-                'filter' => 'text',
-                'default' => '100%',
+                'name' => tra('Upper Bound'),
+                'description' => tr('The initial end date for the axis of the timeline.
+                    If not provided, the latest date present in the items set is taken as end date.
+                    Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '3.0',
+                'filter' => 'datetime',
+                'default' => '',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
+            ],
+            'max' => [
+                'required' => false,
+                'name' => tra('Max Bound'),
+                'description' => tr('TSet a maximum Date for the visible range.
+                    It will not be possible to move beyond this maximum.Date must be provided
+                    in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '29.0',
+                'filter' => 'datetime',
+                'default' => '',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
+            ],
+            'min' => [
+                'required' => false,
+                'name' => tra('Min Bound'),
+                'description' => tr('TSet a minimum Date for the visible range.
+                    It will not be possible to move beyond this minimum.Date must be provided
+                    in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '29.0',
+                'filter' => 'datetime',
+                'default' => '',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
+            ],
+            'scale' => [
+                'required' => false,
+                'name' => tra('Primary Scale Unit'),
+                'description' => tra("Set a fixed scale for the time axis of the Timeline. Choose from 'millisecond',
+                    'second', 'minute', 'hour', 'weekday', 'week', 'day', 'month', 'year'"),
+                'since' => '29.0',
+                'filter' => 'alpha',
+                'default' => 'month',
+            ],
+            'step' => [
+                'required' => false,
+                'name' => tra('Secondary Scale Unit'),
+                'description' => tra("Set a fixed step size for the time axis. Only applicable when used together with scale parameter. Choose for example 1, 2, 5, or 10"),
+                'since' => '29.0',
+                'filter' => 'number',
+                'default' => '1',
             ],
             'height' => [
                 'required' => false,
-                'name' => tra('Height'),
-                'description' => tr('Height of the timeline as CSS units (default: %0)', '<code>400px</code>'),
-                'since' => '8.0',
+                'name' => tra('Timeline height'),
+                'description' => tr(
+                    'Height of the timeline band as a CSS unit (for example 250px, 75%,...)',
+                    '<code>250p</code>'
+                ),
+                'since' => '9.0',
                 'filter' => 'text',
-                'default' => '400px',
+                'default' => ''
             ],
-            //these two parameters don't seem to be used so commenting out to avoid confusion for users
-/*          'lower' => array(
-                'required' => true,
-                'name' => tra('Lower Bound'),
-                'description' => tra('Date from which element should be displayed. Date must be provided in YYYY-MM-DD HH:mm:ss format.'),
-                'filter' => 'datetime',
-                'default' => '',
-                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
-            ),
-            'upper' => array(
-                'required' => true,
-                'name' => tra('Upper Bound'),
-                'description' => tra('Date until which element should be displayed. Date must be provided in YYYY-MM-DD HH:mm:ss format.'),
-                'filter' => 'datetime',
-                'default' => '',
-                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
-            ),*/
-            'scale1' => [
+            'orientation' => [
                 'required' => false,
-                'name' => tra('Primary Scale Unit'),
-                'description' => tra('Unit of time to use for the primary scale (default is Month)'),
-                'since' => '8.0',
-                'filter' => 'alpha',
-                'default' => 'month',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Hour'), 'value' => 'hour'],
-                    ['text' => tra('Day'), 'value' => 'day'],
-                    ['text' => tra('Week'), 'value' => 'week'],
-                    ['text' => tra('Month'), 'value' => 'month'],
-                    ['text' => tra('Year'), 'value' => 'year'],
-                    ['text' => tra('Decade'), 'value' => 'decade'],
-                    ['text' => tra('Century'), 'value' => 'century'],
-                ]
-            ],
-            'scale2' => [
-                'required' => false,
-                'name' => tra('Secondary Scale Unit'),
-                'description' => tra('Unit of time to use for the secondary scale'),
-                'since' => '8.0',
-                'filter' => 'alpha',
-                'default' => '',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Hour'), 'value' => 'hour'],
-                    ['text' => tra('Day'), 'value' => 'day'],
-                    ['text' => tra('Week'), 'value' => 'week'],
-                    ['text' => tra('Month'), 'value' => 'month'],
-                    ['text' => tra('Year'), 'value' => 'year'],
-                    ['text' => tra('Decade'), 'value' => 'decade'],
-                    ['text' => tra('Century'), 'value' => 'century'],
-                ]
+                'name' => tra('Timeline orientation'),
+                'description' => tr(
+                    "Orientation of the timeline axis and items. When orientation is a string, the value is applied
+                    to both items and axis. Can be 'top', 'bottom' (default), 'both' or 'none'."
+                ),
+                'since' => '29.0',
+                'filter' => 'text',
+                'default' => 'bottom'
             ],
         ],
     ];
@@ -101,41 +108,30 @@ function wikiplugin_timeline_info()
 function wikiplugin_timeline($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
-
-    $default = ['scale1' => 'month', 'width' => '100%', 'height' => '400px'];
+    $default = ['scale' => 'hour', 'width' => '100%', 'height' => '400px'];
     $params = array_merge($default, $params);
-
-    $width = smarty_modifier_escape($params['width']);
-    $height = smarty_modifier_escape($params['height']);
-    $scope = smarty_modifier_escape(wp_timeline_getscope($params));
+    $start = isset($params['lower']) ? strtotime($params['lower']) : null;
+    $end = isset($params['upper']) ? strtotime($params['upper']) : null;
+    $max = isset($params['max']) ? strtotime($params['max']) : null;
+    $min = isset($params['min']) ? strtotime($params['min']) : null;
+    $step = ! empty($params['step']) ? ($params['step']) : '1';
 
     $headerlib = TikiLib::lib('header');
-    $headerlib->add_jsfile('lib/simile_tiki/tiki-timeline.js');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/vis-timeline/dist/vis-timeline-graph2d.min.css');
 
-    $headerlib->add_jq_onready(
-        '// TODO set up datasource - get data from {list} output or calendar events
-                    var ttl_eventData = { events: [], dateTimeFormat: ""};
-                    setTimeout( function(){
-                        ttlInit("ttl_timeline", ttl_eventData,"' . $params['scale1'] . '","' . ($params['scale2'] ?? '') . '");
-                    }, 1000);
-                    '
-    );
-    return '<div class="timeline-container" data-marker-filter="' . $scope . '" style="width: ' . $width . '; height: ' . $height . ';"></div>';
-}
+    $js = "var data = []; const options = {};";
+    $js .= ! empty($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
+    $js .= ! empty($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
+    $js .= ! empty($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
+    $js .= ! empty($max) ? "let max = new Date(" . $max * 1000 . "); options.max = max;" : "";
+    $js .= ! empty($min) ? "let min = new Date(" . $min * 1000 . "); options.min = min;" : "";
+    $js .= ! empty($params['scale']) ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
+    $js .= ! empty($params['orientation']) ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
+    $js .= "const container = document.getElementById('timeline-container');\n";
+    $js .= "const items = new DataSet(data);";
+    $js .= "const timeline = new Timeline(container, items, options);";
 
-function wp_timeline_getscope($params)
-{
-    $scope = 'center';
-    if (isset($params['scope'])) {
-        $scope = $params['scope'];
-    }
+    $headerlib->add_js_module('import { Timeline, DataSet } from "timeline";' . $js);
 
-    switch ($scope) {
-        case 'center':
-            return '#tiki-center .eventlist';
-        case 'all':
-            return '.eventlist';
-        default:
-            return $scope;
-    }
+    return $smarty->fetch('wiki-plugins/wikiplugin_timeline.tpl');
 }

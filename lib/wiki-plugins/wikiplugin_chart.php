@@ -142,9 +142,9 @@ function wikiplugin_chart($data, $params)
             break;
 
         default:
-            $params['independant'] = isset($independant) ? $independant : 'horizontal';
-            $params['horizontal'] = isset($horizontal) ? $horizontal : 'bottom';
-            $params['vertical'] = isset($vertical) ? $vertical : 'left';
+            $params['independant'] = $independant ?? 'horizontal';
+            $params['horizontal'] = $horizontal ?? 'bottom';
+            $params['vertical'] = $vertical ?? 'left';
 
             if (! isset($x)) {
                 return "<b>missing x parameter for plugin</b><br />";
@@ -159,9 +159,9 @@ function wikiplugin_chart($data, $params)
             break;
     }
 
-    $params['series[color]'] = isset($color) ? $color : '';
-    $params['series[style]'] = isset($style) ? $style : '';
-    $params['series[label]'] = isset($label) ? $label : '';
+    $params['series[color]'] = $color ?? '';
+    $params['series[style]'] = $style ?? '';
+    $params['series[label]'] = $label ?? '';
 
     if (function_exists('imagepng')) {
         if (! isset($width)) {
@@ -196,13 +196,13 @@ function wikiplugin_chart($data, $params)
     }
 
     if (function_exists('pdf_new')) {
-        $params['format'] = isset($format) ? $format : 'A4';
-        $params['orientation'] = isset($orientation) ? $orientation : 'landscape';
+        $params['format'] = $format ?? 'A4';
+        $params['orientation'] = $orientation ?? 'landscape';
 
         $disp = '<a href="' . _wikiplugin_chart_uri($params, 'PDF') . '">' . $disp . '</a>';
     } elseif (function_exists('ps_new')) {
-        $params['format'] = isset($format) ? $format : 'A4';
-        $params['orientation'] = isset($orientation) ? $orientation : 'landscape';
+        $params['format'] = $format ?? 'A4';
+        $params['orientation'] = $orientation ?? 'landscape';
 
         $disp = '<a href="' . _wikiplugin_chart_uri($params, 'PS') . '">' . $disp . '</a>';
     }

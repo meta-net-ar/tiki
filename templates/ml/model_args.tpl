@@ -15,25 +15,25 @@
                     <input class="form-control" type="text" name="args[{$arg.name|escape}]" value="{$arg.value|escape}" {if !empty($arg.required)}required{/if}>
                 {elseif $arg.input_type eq 'rubix'}
                     {if strstr($arg.arg_type,  'Tokenizers')}
-                        {assign var="classes" value=$tokenizers}
+                        {$classes=$tokenizers}
                     {elseif strstr($arg.arg_type, 'Trees')}
-                        {assign var="classes" value=$trees}
+                        {$classes=$trees}
                     {elseif strstr($arg.arg_type, 'Kernels')}
-                        {assign var="classes" value=$kernels}
+                        {$classes=$kernels}
                     {elseif strstr($arg.arg_type, 'NeuralNet\Optimizers')}
-                        {assign var="classes" value=$neuralnet_optimizers}
+                        {$classes=$neuralnet_optimizers}
                     {elseif strstr($arg.arg_type, 'NeuralNet\CostFunctions')}
-                        {assign var="classes" value=$neuralnet_cost_functions}
+                        {$classes=$neuralnet_cost_functions}
                     {elseif strstr($arg.arg_type, 'NeuralNet\ActivationFunctions')}
-                        {assign var="classes" value=$neuralnet_activation_functions}
+                        {$classes=$neuralnet_activation_functions}
                     {elseif strstr($arg.arg_type, 'NeuralNet\Initializers')}
-                        {assign var="classes" value=$neuralnet_initializers}
+                        {$classes=$neuralnet_initializers}
                     {elseif strstr($arg.arg_type, 'Learner')}
-                        {assign var="classes" value=$learners}
+                        {$classes=$learners}
                     {elseif strstr($arg.arg_type, 'Metrics')}
-                        {assign var="classes" value=$metrics}
+                        {$classes=$metrics}
                     {else}
-                        {assign var="classes" value=[]}
+                        {$classes=[]}
                     {/if}
                     {if !empty($classes.path)}
                         <select class="form-select ml-class" name="args[{$arg.name|escape}][class]" data-path="{$arg.name|escape}" data-href="{service controller=ml action=model_args}" {if !empty($arg.required)}required{/if}>

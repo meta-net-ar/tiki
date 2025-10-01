@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+
 function wikiplugin_playscorm_info()
 {
     return [
@@ -105,7 +108,7 @@ function wikiplugin_playscorm($data, $params)
     $localname = "scorm$fileId";
     $sitepath = parse_url($base_url);
 
-    if (substr($moodle_url, -1) == '/') {
+    if (str_ends_with($moodle_url, '/')) {
         $moodle_url = substr($moodle_url, 0, -1);
     }
 
@@ -129,8 +132,7 @@ function wikiplugin_playscorm($data, $params)
     $fileurl = '';
     if ($needrefresh) {
         $fileurl = $base_url . "tiki-download_file.php?fileId=" . $fileId;
-        require_once 'lib/auth/tokens.php';
-        $tokenlib = AuthTokens::build($prefs);
+        $tokenlib = Tokens::build($prefs);
         $token = $tokenlib->createToken(
             $tikiroot . "tiki-download_file.php",
             ['fileId' => $fileId],

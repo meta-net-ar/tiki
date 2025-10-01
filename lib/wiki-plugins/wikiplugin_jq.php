@@ -45,8 +45,8 @@ function wikiplugin_jq($data, $params)
     $headerlib = TikiLib::lib('header');
     extract($params, EXTR_SKIP);
 
-    $nojquery = isset($nojquery) ? $nojquery : tr('<!-- jq plugin inactive: JavaScript off -->');
-    $notonready = isset($notonready) ? $notonready : false;
+    $nojquery = $nojquery ?? tr('<!-- jq plugin inactive: JavaScript off -->');
+    $notonready = $notonready ?? false;
     if (! empty($lang) && $lang != $prefs['language']) {
         return;
     }

@@ -17,8 +17,8 @@ class ArticlePut implements ActionInterface
 
     public function __construct(array $params)
     {
-        $this->topicId = isset($params['topic']) ? (int)$params['topic'] : 0;
-        $this->type = isset($params['type']) ? (int)$params['type'] : null;
+        $this->topicId = (int)($params['topic'] ?? 0);
+        $this->type = $params['type'] ?? null;
     }
 
     public function getName()
@@ -57,8 +57,6 @@ class ArticlePut implements ActionInterface
         $authorName = $userm;
         $body = '';
         $publishDate = $tikilib->now;
-        $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $publishDate));
-        $expireDate = $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1);
         $subId = 0;
         $type = $this->type;
         $useImage = 'n';
@@ -72,11 +70,12 @@ class ArticlePut implements ActionInterface
         $subtitle = '';
         $linkto = '';
         $image_caption = '';
+        $image_alt = '';
         $lang = '';
         $rating = 7;
         $isfloat = 'n';
 
-        $subid = $artlib->replace_submission($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $expireDate, $userm, $subId, $image_x, $image_y, $type, $topline, $subtitle, $linkto, $image_caption, $lang, $rating, $isfloat);
+        $subid = $artlib->replace_submission($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $userm, $subId, $image_x, $image_y, $type, $topline, $subtitle, $linkto, $image_caption, $image_alt, $lang, $rating, $isfloat);
 
         $perms = TikiLib::lib('tiki')->get_user_permission_accessor($user, 'topic', $this->topicId);
         if ($perms->autoapprove_submission) {

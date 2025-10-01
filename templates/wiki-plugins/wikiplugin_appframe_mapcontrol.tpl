@@ -1,4 +1,4 @@
-<a id="{$mapcontrol.id|escape}" href="#" title="{$mapcontrol.label|escape}">{icon _id=$mapcontrol.icon title=$mapcontrol.label class=$mapcontrol.class}</a>
+<a id="{$mapcontrol.id|escape}" href="#" title="{$mapcontrol.label|escape}" role="button">{icon _id=$mapcontrol.icon title=$mapcontrol.label class=$mapcontrol.class}</a>
 {jq}
 $('#appframe .map-container').on('initialized', function () {
     var container = this

@@ -13,7 +13,17 @@
             {if $prefs.feature_webmail eq 'y' and $tiki_p_use_webmail eq 'y' and $tiki_p_use_group_webmail eq 'y'}
                 {button href="tiki-webmail.php" _class="btn btn-primary" _text="{tr}Webmail{/tr}"}
             {/if}
-            {button href="tiki-carddav.php/addressbooks/{$user}/webmail" _class="btn btn-primary" _text="{tr}CardDAV{/tr}"}
+            {if $prefs.feature_webmail eq 'y'}
+                {button
+                    href="tiki-carddav.php/addressbooks/{$user}/webmail"
+                    _class="btn btn-primary"
+                    _text="{tr}CardDAV{/tr}"}
+            {else}
+                {button
+                    href="tiki-webmail.php?page=settings#Webmail%20settings"
+                    _class="btn btn-warning"
+                    _text="{tr}Enable Webmail{/tr}"}
+            {/if}
         {/if}
     </div>
 </div>
@@ -102,7 +112,7 @@
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
 <table class="table table-striped table-hover">
     <tr>
-        {assign var=numbercol value=4}
+        {$numbercol=4}
         <th>
             <a href="tiki-contacts.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'firstName_desc'}firstName_asc{else}firstName_desc{/if}">{tr}First Name{/tr}</a>
         </th>
@@ -118,18 +128,18 @@
         {foreach from=$exts item=ext key=k}
             {if $ext.show eq 'y'}
                 <th>
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <a>{$ext.tra}</a>
                 </th>
             {/if}
         {/foreach}
 
         {if $view eq 'list'}
-            {assign var=numbercol value=$numbercol+1}
+            {$numbercol=$numbercol+1}
             <th>{tr}Groups{/tr}</th>
         {/if}
 
-        {assign var=numbercol value=$numbercol+1}
+        {$numbercol=$numbercol+1}
         <th></th>
     </tr>
 
@@ -214,7 +224,7 @@
                                             <input type="hidden" name="find" value="{$find}">
                                             <input type="hidden" name="initial" value="{$setInitial}">
                                             <input type="hidden" name="remove" value="{$channels[user].contactId}">
-                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$channels[user].email}Are you sure you want to delete %0?{/tr}')">
+                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$channels[user].email}Are you sure you want to delete %0?{/tr}')" aria-label="{tr}Delete{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </button>
                                         </form>
@@ -232,7 +242,7 @@
 </table>
 </div>
 
-{pagination_links cant=$total_contact step=$maxRecords offset=$offset clean='y'}{/pagination_links}
+{pagination_links count=$total_contact step=$maxRecords offset=$offset clean='y'}{/pagination_links}
 
 {literal}
 <script type="text/javascript">
@@ -306,7 +316,7 @@
 {/literal}
 
 {foreach from=$exts item=ext key=k}
-    extmenu_add('{$k|escape}', '{$ext.tra|escape}', '{$info.ext[$ext.id]|escape:quotes}', '{$ext.public|escape}');
+    extmenu_add('{$k|escape}', '{$ext.tra|escape}', '{$ext.art|escape}', '{$ext.public|escape}');
 {/foreach}
 
 {literal}

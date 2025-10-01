@@ -23,7 +23,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function unassign_user_module($moduleId, $user)
     {
@@ -35,7 +35,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function up_user_module($moduleId, $user)
     {
@@ -47,7 +47,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function down_user_module($moduleId, $user)
     {
@@ -60,7 +60,7 @@ class UserModulesLib extends TikiLib
      * @param $user
      * @param $position
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function set_column_user_module($moduleId, $user, $position)
     {
@@ -74,7 +74,7 @@ class UserModulesLib extends TikiLib
      * @param $order
      * @param $user
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function assign_user_module($moduleId, $position, $order, $user)
     {
@@ -147,7 +147,7 @@ class UserModulesLib extends TikiLib
     /**
      * @param $user
      *
-     * @return bool|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function create_user_assigned_modules($user)
     {
@@ -185,7 +185,7 @@ class UserModulesLib extends TikiLib
                 $result2 = $this->query($query, $bindvars);
             }
         }
-        return isset($result2) ? $result2 : false;
+        return $result2 ?? false;
     }
     // Return the list of modules that can be assigned by the user
     public function get_user_assignable_modules($user)
@@ -232,7 +232,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return bool|TikiDb_Adodb_Result|TikiDb_Pdo_Result
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function swap_up_user_module($moduleId, $user)
     {
@@ -245,7 +245,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return bool|TikiDb_Adodb_Result|TikiDb_Pdo_Result
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function swap_down_user_module($moduleId, $user)
     {
@@ -259,7 +259,7 @@ class UserModulesLib extends TikiLib
      * @param $user
      * @param $op
      *
-     * @return bool|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function swap_adjacent($moduleId, $user, $op)
     {
@@ -291,7 +291,7 @@ class UserModulesLib extends TikiLib
      * @param $moduleId
      * @param $user
      *
-     * @return TikiDb_Adodb_Result|TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function move_module($moduleId, $user)
     {
@@ -302,10 +302,10 @@ class UserModulesLib extends TikiLib
         return $this->set_column_user_module($moduleId, $user, ($res['position'] == 'right' ? 'left' : 'right'));
     }
     /// Add a module to all the user who have assigned module and who don't have already this module
-    public function add_module_users($moduleId, $name, $title, $position, $order, $cache_time, $rows, $groups, $params, $type)
+    public function add_module_users($moduleId, $name, $position, $order, $type)
     {
         // for the user who already has this module, update only the type
-        $this->query('update `tiki_user_assigned_modules` set `type`=? where `moduleId`=?', [$type,$name]);
+        $this->query('update `tiki_user_assigned_modules` set `type`=? where `moduleId`=?', [$type,$moduleId]);
         // for the user who doesn't have this module
         $query = "select distinct t1.`user` from `tiki_user_assigned_modules` as t1 left join `tiki_user_assigned_modules` as t2 on t1.`user`=t2.`user` and t2.`moduleId`=? where t2.`moduleId` is null";
         $result = $this->query($query, [$moduleId]);

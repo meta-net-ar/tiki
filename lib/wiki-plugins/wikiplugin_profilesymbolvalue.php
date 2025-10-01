@@ -46,10 +46,10 @@ function wikiplugin_profilesymbolvalue_info()
 
 function wikiplugin_profilesymbolvalue($data, $params)
 {
-    $domain = isset($params['domain']) ? $params['domain'] : '';
-    $profile = isset($params['profile']) ? $params['profile'] : '';
-    $ref = isset($params['reference']) ? $params['reference'] : '';
-    $package = isset($params['package']) ? $params['package'] : '';
+    $domain = $params['domain'] ?? '';
+    $profile = $params['profile'] ?? '';
+    $ref = $params['reference'] ?? '';
+    $package = $params['package'] ?? '';
 
     $smarty = TikiLib::lib('smarty');
     return smarty_function_profilesymbolvalue([

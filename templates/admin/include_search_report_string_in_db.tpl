@@ -180,6 +180,6 @@
                 {/foreach}
             </table>
         </div>
-        <p><a href="javascript:void(0)" class="btn btn-primary btn-sm" title="{tr}Back to first level results{/tr}" onClick="document.getElementById('string_in_db_search').value='{$searchStringAgain|escape}'; document.getElementById('string_in_db_search_button').click();">{tr}Back to first level results{/tr}</a></p>
+        <p><a href="javascript:void(0)" class="btn btn-primary btn-sm" title="{tr}Back to first level results{/tr}" onClick="document.getElementById('string_in_db_search').value='{$searchStringAgain|escape}'; document.getElementById('string_in_db_search_button').click();" role="button">{tr}Back to first level results{/tr}</a></p>
     {/if}
 {/if}

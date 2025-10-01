@@ -56,6 +56,7 @@
                     {preference name=users_prefs_tasks_maxRecords}
                     {preference name=users_prefs_diff_versions}
                     {preference name=users_prefs_remember_closed_rboxes}
+                    {preference name=users_prefs_notify_oneself}
                 </div>
                 </fieldset>
                 <fieldset>
@@ -179,6 +180,7 @@
                 {preference name=feature_groupalert}
                 {preference name=feature_webmail}
                 {preference name=feature_notify_users_mention}
+                {preference name=users_prefs_switch_user_notification}
             </fieldset>
         {/tab}
         {tab name="{tr}User Files{/tr}"}

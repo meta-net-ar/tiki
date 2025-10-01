@@ -107,6 +107,14 @@ function wikiplugin_fancytable_info()
                  'since' => '27.2',
                  'filter' => 'text',
                  'default' => '',
+             ],
+             'desc' => [
+                'required' => false,
+                'name' => tra('Description'),
+                'since' => '27.2',
+                'filter' => 'text',
+                'description' => tr('Table description.'),
+                'default' => ''
              ]
         ],
         $tsparams
@@ -138,9 +146,9 @@ function wikiplugin_fancytable($data, $params)
     $pluginremove = [];
     static $iFancytable = 0;
     ++$iFancytable;
-    extract($params, EXTR_SKIP);
     $msg = '';
 
+    extract($params, EXTR_SKIP);
     // Check if sorting is desired
     $sortDesired = isset($sortable) && $sortable != 'n';
 
@@ -177,7 +185,6 @@ function wikiplugin_fancytable($data, $params)
     } else {
         $sort = false;
     }
-
     // Check if sort is disabled or failed to build
     if (! $sort && $sortDesired) {
         if ($prefs['feature_jquery_tablesorter'] === 'n') {
@@ -187,7 +194,9 @@ function wikiplugin_fancytable($data, $params)
             $msg = '<em>' . tra('Unable to load the jQuery Sortable Tables feature.') . '</em>';
         }
     }
-
+    if (! empty($desc)) {
+        $desc = '<caption>' . $desc . '</caption>';
+    }
     // Prepare table attributes
     $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y';
     $style = $sort ? ' style="visibility:hidden"' : '';
@@ -203,7 +212,7 @@ function wikiplugin_fancytable($data, $params)
     // Process header
     if (isset($head)) {
         $tdhdr = ! empty($headclass) ? "\r\t\t\t" . '<th class="' . $headclass . '"' : "\r\t\t\t<th";
-        //replace tiki tags, plugins, and other enclosing characters with hash strings before creating table so that any
+        //replace tiki tags, plugins and other enclosing characters with hash strings before creating table so that any
         //pipes (| or ~|~) inside aren't mistaken for cell dividers
         if (TikiLib::lib('parser')->option['is_markdown']) {
             $head = TikiLib::lib('parser')->parse_data($head);
@@ -261,7 +270,7 @@ function wikiplugin_fancytable($data, $params)
         }
     }
     // Finalize table output
-    $wret .= "\r" . '</table></div>' . "\r" . $msg;
+    $wret .= "\r" . '</table></div>' . "\r" . $desc . $msg;
     return $wret;
 }
 

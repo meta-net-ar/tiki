@@ -78,6 +78,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\Div(), 'handle'];
             case 'duration_short':
                 return [new \SmartyTiki\Modifier\DurationShort(), 'handle'];
+            case 'debug_print_tree':
+                return [new \SmartyTiki\Modifier\DebugPrintTree(), 'handle'];
             case 'duration':
                 return [new \SmartyTiki\Modifier\Duration(), 'handle'];
             case 'escape':
@@ -230,6 +232,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\YesNo(), 'handle'];
             case 'zone_is_empty':
                 return [$this, 'smartyModifierZoneIsEmpty'];
+            case 'safe_html':
+                return [$this, 'smartyModifierSafeHtml'];
         }
         return null;
     }
@@ -417,6 +421,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'queued_tasks_banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\QueuedTasksBanner();
+                break;
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;
@@ -449,6 +456,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
+                break;
+            case 'inline_audio_player':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InlineAudioPlayer();
                 break;
             case 'initials_filter_links':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
@@ -614,12 +624,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'show_short':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
-                break;
-            case 'svn_lastup':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnLastup();
-                break;
-            case 'svn_rev':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnRev();
                 break;
             case 'syntax':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Syntax();
@@ -1068,5 +1072,34 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smartyModifierStrtotime($datetime, $baseTimestamp = null)
     {
         return strtotime($datetime, $baseTimestamp);
+    }
+
+    /**
+     * @param string|null $string The HTML string to sanitize.
+     * @return string The sanitized, safe HTML.
+    */
+    public function smartyModifierSafeHtml(?string $string): string
+    {
+        if (empty($string)) {
+            return '';
+        }
+
+        // Use a static instance to ensure the expensive purifier setup runs only once per request.
+        static $purifier = null;
+        if ($purifier === null) {
+            $config = \HTMLPurifier_HTML5Config::createDefault();
+
+            // Define a strict security policy based on a whitelist of allowed elements and attributes.
+            $config->set('HTML.Allowed', 'a[href|title],b,strong,i,em,br,p,u');
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
+
+            // Add defense-in-depth attributes for all links.
+            $config->set('HTML.TargetBlank', true);
+            $config->set('HTML.Nofollow', true);
+
+            $purifier = new \HTMLPurifier($config);
+        }
+
+        return $purifier->purify($string);
     }
 }

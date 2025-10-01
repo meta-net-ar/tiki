@@ -88,10 +88,10 @@ class CheckSchemaNamingConvention
      */
     protected function checkFilename($filename)
     {
-        $firstUlPos = strpos($filename, "_");
-        if ($firstUlPos === false) {
+        if (! str_contains($filename, '_')) {
             return false;
         }
+        $firstUlPos = strpos($filename, "_");
         $lastUlPos = strrpos($filename, "_");
 
         $datepart = substr($filename, 0, $firstUlPos);

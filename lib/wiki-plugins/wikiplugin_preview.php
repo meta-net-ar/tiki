@@ -84,11 +84,11 @@ function wikiplugin_preview($data, $params)
         return;
     }
 
-    $fileId = isset($params['fileId']) ? (int)$params['fileId'] : 0;
-    $animation = isset($params['animation']) ? (int)$params['animation'] : 0;
+    $fileId = (int)($params['fileId'] ?? 0);
+    $animation = (int)($params['animation'] ?? 0);
     $width = isset($params['width']) ? (int)$params['width'] : null;
     $height = isset($params['height']) ? (int)$params['height'] : null;
-    $range = isset($params['range']) ? $params['range'] : null;
+    $range = $params['range'] ?? null;
 
     $smartyLib = TikiLib::lib('smarty');
 
@@ -104,7 +104,7 @@ function wikiplugin_preview($data, $params)
     if (! isset($_REQUEST[$requestUniqueIdentifier])) {
         // generate the html output
         $urlParts = parse_url($_SERVER['REQUEST_URI']);
-        $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+        $path = $urlParts['path'] ?? '/';
         if (isset($urlParts['query'])) {
             parse_str($urlParts['query'], $pageParams);
         } else {
@@ -156,11 +156,11 @@ function wikiplugin_preview($data, $params)
         ob_end_clean();
     } // Be sure output buffering is turned off
 
-    /** @var Cachelib $cacheLib */
+    /** @var \Tiki\Cache\CacheLib $cacheLib */
     $cacheLib = TikiLib::lib('cache');
 
     $cacheName = $fileMd5 . $requestUniqueIdentifier;
-    $previewPage = isset($_GET['previewPage']) ? $_GET['previewPage'] : null;
+    $previewPage = $_GET['previewPage'] ?? null;
 
     if ($previewPage) {
         $cacheName .= "_" . $previewPage;

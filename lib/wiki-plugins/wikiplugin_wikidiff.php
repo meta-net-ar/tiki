@@ -124,13 +124,6 @@ function wikiplugin_wikidiff_info()
 function wikiplugin_wikidiff($data, $params)
 {
     global $prefs;
-    // TODO refactor: defaults for plugins?
-    $defaults = [];
-    $plugininfo = wikiplugin_wikidiff_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
 
     $tikilib = TikiLib::lib('tiki');
     $perms = $tikilib->get_perm_object($params['object_id'], $params['object_type']);

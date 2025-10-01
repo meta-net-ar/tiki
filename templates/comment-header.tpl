@@ -1,9 +1,9 @@
 <header class="card-header clearfix postbody-title media-overflow-visible"> {*the card-header class cut off dropdowns so need media-overflow-visible class in BS3. Also true for card-header in BS4? *}
     {if $prefs.feature_comments_locking neq 'y' or
         ( $comment.locked neq 'y' and $thread_is_locked neq 'y' )}
-        {assign var='this_is_locked' value='n'}
+        {$this_is_locked='n'}
     {else}
-        {assign var='this_is_locked' value='y'}
+        {$this_is_locked='y'}
     {/if}
 
     {if $thread_style != 'commentStyle_headers' and $this_is_locked eq 'n' and isset($comment.threadId) and $comment.threadId > 0}

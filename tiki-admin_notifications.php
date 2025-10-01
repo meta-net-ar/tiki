@@ -65,7 +65,15 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
         $save = false;
     }
     if ($save and isset($_REQUEST['event']) and isset($watches[$_REQUEST['event']])) {
-        $result = $tikilib->add_user_watch($login, $_REQUEST["event"], $watches[$_REQUEST['event']]['object'], $watches[$_REQUEST['event']]['type'], $watches[$_REQUEST['event']]['label'], $watches[$_REQUEST['event']]['url'], isset($email) ? $email : null);
+        $result = $tikilib->add_user_watch(
+            $login,
+            $_REQUEST["event"],
+            $watches[$_REQUEST['event']]['object'],
+            $watches[$_REQUEST['event']]['type'],
+            $watches[$_REQUEST['event']]['label'],
+            $watches[$_REQUEST['event']]['url'],
+            $email ?? null
+        );
         if (! $result) {
             Feedback::error(tra('The user has no email set. No notifications will be sent.'));
         } else {
@@ -93,18 +101,14 @@ if (
     && $access->checkCsrf(true)
 ) {
     $i = 0;
-    $i = 0;
     foreach ($_REQUEST['checked'] as $id) {
-        if (strpos($id, 'user') === 0) {
+        if (str_starts_with($id, 'user')) {
             $result = $tikilib->remove_user_watch_by_id(substr($id, 4));
-            if ($result && $result->numRows()) {
-                $i++;
-            }
         } else {
             $result = $tikilib->remove_group_watch_by_id(substr($id, 5));
-            if ($result && $result->numRows()) {
-                $i++;
-            }
+        }
+        if ($result && $result->numRows()) {
+            $i++;
         }
     }
     $checkedCount = count($_REQUEST['checked']);
@@ -112,7 +116,7 @@ if (
         $msg = $i == 1 ? tr('One mail notification events deleted') : tr('%0 mail notifications events deleted', $i);
         Feedback::success(tr($msg));
     } elseif ($i < $checkedCount) {
-        Feedback::error('%0 of %1 selected mail notification events deleted', $i, $checkedCount);
+        Feedback::error(tr('%0 of %1 selected mail notification events deleted', $i, $checkedCount));
     }
 }
 if (! isset($_REQUEST["sort_mode"])) {
@@ -139,7 +143,7 @@ $smarty->assign_by_ref('watches', $watches);
 $smarty->assign_by_ref('maxRecords', $maxRecords);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $tikilib->list_watches($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant', $channels['cant']);
+$smarty->assign_by_ref('count', $channels['count']);
 $smarty->assign_by_ref('channels', $channels["data"]);
 if ($prefs['feature_trackers'] == 'y') {
     $trklib = TikiLib::lib('trk');

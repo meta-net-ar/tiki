@@ -88,10 +88,7 @@ if (isset($_REQUEST['addtopic'])) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
             $data = '';

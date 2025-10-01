@@ -82,9 +82,9 @@ class ContactLib extends TikiLib
             $con = trim($con);
 
             $query = "select count(*) from `tiki_webmail_contacts` where `email`=?";
-            $cant = $this->getOne($query, [$con]);
+            $count = $this->getOne($query, [$con]);
 
-            if (! $cant) {
+            if (! $count) {
                 $ret[] = $con;
             }
         }
@@ -114,7 +114,7 @@ class ContactLib extends TikiLib
     public function parse_nicknames($dirs)
     {
         for ($i = 0, $icount_dirs = count($dirs); $i < $icount_dirs; $i++) {
-            if (! strstr($dirs[$i], '@') && ! empty($dirs[$i])) {
+            if (! str_contains($dirs[$i], '@') && ! empty($dirs[$i])) {
                 $query = "select `email` from `tiki_webmail_contacts` where `nickname`=?";
                 $result = $this->query($query, [$dirs[$i]]);
                 if ($result->numRows()) {
@@ -438,6 +438,7 @@ class ContactLib extends TikiLib
     public function modify_ext($user, $fieldId, $new_values)
     {
         if (is_array($new_values)) {
+            $query = '';
             foreach ($new_values as $f => $v) {
                 if ($query != '') {
                     $query .= ', ';

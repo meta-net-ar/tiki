@@ -139,7 +139,7 @@ class DCSLib extends TikiLib
                 . ' LEFT JOIN ( SELECT `contentId`, `data`, `publishDate` FROM `tiki_programmed_content` ) AS `tpcd` ON ( `tc`.`contentId` = `tpcd`.`contentId` AND `tpcd`.`publishDate` = `tpca`.`actual` ))'
             . " $mid ORDER BY " . $this->convertSortMode($sort_mode);
 
-        $query_cant = "select count(*) from `tiki_content` $mid";
+        $query_count = "select count(*) from `tiki_content` $mid";
 
         $result = $this->query(
             $query,
@@ -158,7 +158,7 @@ class DCSLib extends TikiLib
             $offset
         );
 
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -167,7 +167,7 @@ class DCSLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -198,14 +198,14 @@ class DCSLib extends TikiLib
             $where .= ' AND `contentId`=?';
         }
 
-        $querycant = 'SELECT count(*) FROM `tiki_programmed_content`' . $where;
-        $cant = $this->getOne($querycant, $bindvars);
+        $query_count = 'SELECT count(*) FROM `tiki_programmed_content`' . $where;
+        $count = $this->getOne($query_count, $bindvars);
 
-        if (! $cant) {
+        if (! $count) {
             return '';
         }
 
-        $x = mt_rand(0, $cant - 1);
+        $x = mt_rand(0, $count - 1);
         $query = 'SELECT * FROM `tiki_programmed_content`' . $where;
         $result = $this->fetchAll($query, $bindvars, 1, $x);
 
@@ -244,14 +244,14 @@ class DCSLib extends TikiLib
         }
 
         $query = "select * from `tiki_programmed_content` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_programmed_content` $mid";
+        $query_count = "select count(*) from `tiki_programmed_content` $mid";
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         $retval = [];
         $retval["data"] = $this->convert_results($result);
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -261,13 +261,13 @@ class DCSLib extends TikiLib
     public function listAllProgrammedContent()
     {
         $query = "select * from `tiki_programmed_content`";
-        $query_cant = "select count(*) from `tiki_programmed_content`";
+        $query_count = "select count(*) from `tiki_programmed_content`";
         $result = $this->fetchAll($query);
-        $cant = $this->getOne($query_cant);
+        $count = $this->getOne($query_count);
 
         $retval = [];
         $retval["data"] = $this->convert_results($result);
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 

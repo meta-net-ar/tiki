@@ -164,10 +164,10 @@ class FileHelper
      */
     public static function isOfficeDocument($mimeType)
     {
-        return strpos($mimeType, 'application/vnd.openxmlformats-officedocument') !== false ||
-            strpos($mimeType, 'application/vnd.ms') !== false ||
+        return str_contains($mimeType, 'application/vnd.openxmlformats-officedocument') ||
+            str_contains($mimeType, 'application/vnd.ms') ||
             $mimeType == 'application/msword' ||
-            strpos($mimeType, 'application/vnd.oasis.opendocument.') !== false;
+            str_contains($mimeType, 'application/vnd.oasis.opendocument.');
     }
 
     /**

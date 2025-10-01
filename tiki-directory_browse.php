@@ -113,7 +113,7 @@ if (is_array($categ_info) && isset($categ_info['allowSites']) && $categ_info['al
     $smarty->assign_by_ref('sort_mode', $sort_mode);
     $smarty->assign('find', $find);
     $items = $dirlib->dir_list_sites($_REQUEST['parent'], $offset, $prefs['directory_links_per_page'], $sort_mode, '', 'y');
-    $smarty->assign_by_ref('cant_pages', $items["cant"]);
+    $smarty->assign_by_ref('pages_count', $items["count"]);
     $smarty->assign_by_ref('items', $items["data"]);
 }
 include_once('tiki-section_options.php');

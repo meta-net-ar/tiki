@@ -62,7 +62,7 @@
 'help' => 'Packages'
 ]
 ]}
-    <a class="js-admin-bar link-admin-bar float-sm-end me-auto btn btn-link">{icon name='cog'}</a>
+    <a class="js-admin-bar link-admin-bar float-sm-end me-auto btn btn-link" role="button">{icon name='cog'}</a>
     <div class="sliding-panel-admin-bar js-sliding-panel-admin-bar card-header  invisible">
         <div class="card-header left"></div>
         <div class="container-fluid container-sliding-panel d-flex flex-column h-100 justify-content-center">
@@ -74,7 +74,7 @@
                             <div><label class="col-form-control me-md-3 text-start">Admin Features </label> </div>
                             <div class="d-flex">
                                 <input type="text" name="lm_criteria" value="{$smarty.request.lm_criteria|escape}" class="form-control form-control-sm me-2 col-md-auto" placeholder="Search preferences...">
-                                <button type="submit" class="btn btn-primary btn-sm">
+                                <button type="submit" class="btn btn-primary btn-sm" aria-label="{tr}Search{/tr}">
                                     <span class="icon icon-search fas fa-search fa-fw "></span>
                                 </button>
                             </div>
@@ -88,7 +88,7 @@
                                         {if ! $js}
                                         <ul>
                                             <li>{/if}
-                                                <a class="btn btn-link" data-bs-toggle="dropdown" href="#">
+                                                <a class="btn btn-link" data-bs-toggle="dropdown" href="#" role="button">
                                                     {icon name="history"} Recent Actions </a>
                                                 <div class="dropdown-menu" role="menu">
                                                     {foreach $recent_prefs as $p}
@@ -104,7 +104,7 @@
                                         {if ! $js}
                                         <ul>
                                             <li>{/if}
-                                                <a class="btn btn-link" data-bs-toggle="dropdown" href="#">
+                                                <a class="btn btn-link" data-bs-toggle="dropdown" href="#" role="button">
                                                     {icon name='menu-extra'} Quick Links </a>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item" href="tiki-wizard_admin.php?stepNr=0&amp;url=index.php">
@@ -157,6 +157,11 @@
                                                     {icon name="calendar"} {tr}Scheduler{/tr}
                                                 </a>
                                             {/if}
+                                            {if $prefs.feature_queued_tasks eq "y"}
+                                                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                                    {icon name="clock-o"} {tr}Queued Tasks{/tr}
+                                                </a>
+                                            {/if}
                                             {if $prefs.feature_sefurl_routes eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_routes.php">
                                                     {icon name="random"} {tr}Custom Routes{/tr}
@@ -186,9 +191,9 @@
                         {foreach from=$main_admin_icons key=page item=info}
 
                             {if !empty($info.disabled)}
-                                {assign var=class value="admbox advanced btn btn-primary disabled"}
+                                {$class="admbox advanced btn btn-primary disabled"}
                             {else}
-                                {assign var=class value="admbox basic btn btn-primary"}
+                                {$class="admbox basic btn btn-primary"}
                                 <div class="swiper-slide">
                                     {* TODO: Buttons are forced to be squares, not fluid. Labels which exceed 2 lines will be cut. *}
                                     <a href="{if !empty($info.url)}{$info.url}{else}tiki-admin.php?page={$page}{/if}" alt="{$info.title} {$info.description}" class="d-flex flex-column justify-content-center align-items-center btn-primary  {if !empty($info.disabled)}disabled-clickable{/if}" title="{$info.title|escape}{if !empty($info.disabled)} ({tr}Disabled{/tr}){/if}|{$info.description}">
@@ -214,8 +219,7 @@
 
 
 {literal}
-    <link rel="stylesheet" href="vendor_bundled/vendor/nolimits4web/swiper/dist/css/swiper.css" type="text/css">
-    <script type="text/javascript" src="vendor_bundled/vendor/nolimits4web/swiper/dist/js/swiper.min.js"></script>
+
     <style type="text/css">
         @media screen and (prefers-reduced-motion: reduce) {
             body {

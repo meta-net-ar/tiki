@@ -1,21 +1,21 @@
 {if !empty($track_profile_changes)}
     {foreach $track_profile_changes as $profile_changes}
         {if $profile_changes|is_array}
-            {assign var="type" value=$profile_changes["type"]}
-            {assign var="new_value" value="n"}
-            {assign var="old_value" value="n"}
-            {assign var="description" value=""}
+            {$type=$profile_changes["type"]}
+            {$new_value="n"}
+            {$old_value="n"}
+            {$description=""}
 
             {if !empty($profile_changes["new"])}
-                {assign var="new_value" value=$profile_changes["new"]}
+                {$new_value=$profile_changes["new"]}
             {/if}
 
             {if !empty($profile_changes["old"])}
-                {assign var="old_value" value=$profile_changes["old"]}
+                {$old_value=$profile_changes["old"]}
             {/if}
 
             {if !empty($profile_changes["description"])}
-                {assign var="description" value=$profile_changes["description"]}
+                {$description=$profile_changes["description"]}
             {/if}
 
             {if $type == "permission"}

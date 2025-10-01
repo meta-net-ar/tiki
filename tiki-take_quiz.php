@@ -18,9 +18,7 @@ if ($prefs['feature_categories'] == 'y') {
 $access->check_feature('feature_quizzes');
 
 if (! isset($_REQUEST["quizId"])) {
-    $smarty->assign('msg', tra("No quiz indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No quiz indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $tikilib->get_perm_object($_REQUEST['quizId'], 'quiz');
 
@@ -33,9 +31,7 @@ if ($user) {
     if ($quiz_info["canRepeat"] == 'n') {
         // Check if user has taken this quiz
         if ($quizlib->user_has_taken_quiz($user, $_REQUEST["quizId"])) {
-            $smarty->assign('msg', tra("You cannot take this quiz twice"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You cannot take this quiz twice"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
 }
@@ -49,9 +45,7 @@ if (isset($_REQUEST["timeleft"])) {
         if ($quiz_info["canRepeat"] == 'n') {
             // Check if user has taken this quiz
             if ($quizlib->user_has_taken_quiz($user, $_REQUEST["quizId"])) {
-                $smarty->assign('msg', tra("You cannot take this quiz twice"));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You cannot take this quiz twice"), \Laminas\Http\Response::STATUS_CODE_401);
             } else {
                 $quizlib->user_takes_quiz($user, $_REQUEST["quizId"]);
             }
@@ -61,9 +55,7 @@ if (isset($_REQUEST["timeleft"])) {
     // Verify time limit if appropiate
     if ($quiz_info["timeLimited"] == 'y') {
         if ($elapsed > $quiz_info["timeLimit"] * 60) {
-            $smarty->assign('msg', tra("The quiz time limit was exceeded. The quiz score cannot be computed"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The quiz time limit was exceeded. The quiz score cannot be computed"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
     // Now for each quiz question verify the points the user did get

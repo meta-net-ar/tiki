@@ -1,12 +1,19 @@
-// Darkly 5.3.3 -- This overrides and supplements node_modules/bootswatch/dist/darkly/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Darkly 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/darkly/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/darkly/_variables.scss"; // Bootswatch theme variables file
+
 //
 // Color system
-//
+
+$gray-800: #343a40; // !default;
 
 $yellow-800: shade-color($yellow, 60%);  // default
+
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $blue;  // default
 //$secondary:     $gray-700;  // default
@@ -49,8 +56,10 @@ $danger-border-subtle:         shade-color($danger, 40%);  // default
 $light-border-subtle:          $gray-700;  // default
 $dark-border-subtle:           $gray-800;  // default
 
-// Prefix for :root CSS variables
-$prefix:                      bs-;  // default
+// Options
+$enable-dark-mode:            false;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 
@@ -63,30 +72,25 @@ $body-emphasis-color:          $white;  // default
 $border-color:                 $gray-700;  // default
 
 // Links
-
 //$link-color: #0FEBB4; // $success !default; #00C795
 
-// Fonts
-
-// stylelint-disable-next-line value-keyword-case
+// Typography
 $font-family-sans-serif:      system-ui, sans-serif; // Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- $gray-600 !default;
+//$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- $gray-600 !default;
 $mark-bg:                     $yellow-800;
+$blockquote-footer-color:     #A3A3A3; // $gray-600 !default;
 
 // Tables
-
+// Buttons
 // Forms
-
 $input-bg:                          var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
 $input-color:                       $body-color; // $gray-800 !default;
-$input-border-color:                var(--#{$prefix}body-bg);
+//$input-border-color:                var(--#{$prefix}body-bg);
 
 // Form validation
 $form-feedback-valid-color:         $success; // !default;
 $form-feedback-invalid-color:       $danger; // !default;
-// scss-docs-end form-feedback-variables
 
-// scss-docs-start form-validation-colors
 $form-valid-color:                  $form-feedback-valid-color; // !default;
 $form-valid-border-color:           $form-feedback-valid-color; // !default;
 $form-invalid-color:                $form-feedback-invalid-color; // !default;
@@ -98,13 +102,21 @@ $form-invalid-border-color:         $form-feedback-invalid-color; // !default;
 
 // Dropdowns
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color);  // default
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
+//$nav-link-color:                    var(--#{$prefix}link-color);  // default
+//$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
 
 // Navbar
-$navbar-light-color:                $link-color; //rgba($gray-900, .7);  // default
+$navbar-light-color:                rgba($white, .9); // $link-color; //rgba($gray-900, .7);  // default
+$navbar-light-brand-color: $white;
+$navbar-light-active-color: $white;
+$navbar-dark-color: rgba($white, .6); // #fff;
+$navbar-dark-brand-color: $navbar-dark-color;
 
 // Pagination
+$pagination-bg: #007558;
+$pagination-focus-color: #3B3B3B;
+$pagination-active-color: #3B3B3B;
+
 // Cards
 // Accordion (added for Tiki)
 $accordion-button-active-bg: #444 !important;

@@ -31,4 +31,4 @@
 </table>
 </div>
 
-{pagination_links cant=$cant step=$numrows offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$numrows offset=$offset}{/pagination_links}

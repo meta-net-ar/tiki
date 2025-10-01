@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Wiki\WikiLibOutput;
+
 $section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
@@ -52,9 +55,7 @@ if (! isset($_REQUEST["source"])) {
 }
 // Get the page from the request var or default it to HomePage
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 } else {
     $page = $_REQUEST["page"];
     $smarty->assign_by_ref('page', $_REQUEST["page"]);
@@ -74,9 +75,7 @@ if (empty($info)) {
     TikiLib::lib('wiki')->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page not found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page not found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $tikilib->get_perm_object($_REQUEST['page'], 'wiki page', $info);
@@ -133,7 +132,7 @@ $smarty->assign('history_pagesize', $history_pagesize);
 
 // fetch page history, but omit the actual page content (to save memory)
 $history = $histlib->get_page_history($page, false, $history_offset, $paginate ? $history_pagesize : -1);
-$smarty->assign('history_cant', $histlib->get_nb_history($page) - 1);
+$smarty->assign('history_count', $histlib->get_nb_history($page) - 1);
 
 if ($prefs['flaggedrev_approval'] == 'y') {
     $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
@@ -169,7 +168,7 @@ if ($prefs['flaggedrev_approval'] == 'y') {
 }
 
 if (! isset($_REQUEST['show_all_versions'])) {
-    $_SESSION['show_all_versions'] = isset($_SESSION['show_all_versions']) ? $_SESSION['show_all_versions'] : 'y';
+    $_SESSION['show_all_versions'] = $_SESSION['show_all_versions'] ?? 'y';
 } else {
     $_SESSION['show_all_versions'] = $_REQUEST['show_all_versions'] === 'n' ? 'n' : 'y';
 }
@@ -231,7 +230,7 @@ $history_sessions = [];
 reset($history);
 foreach ($history as &$h) { // as $h has been used by reference before it needs to be so again (it seems)
     $history_versions[] = (int)$h['version'];
-    $history_sessions[] = isset($h['session']) ? (int)$h['session'] : 0;
+    $history_sessions[] = (int)($h['session'] ?? 0);
 }
 $history_versions = array_reverse($history_versions);
 $history_sessions = array_reverse($history_sessions);
@@ -240,7 +239,7 @@ $history_sessions[] = 0;
 $smarty->assign_by_ref('history', $history);
 
 // for pagination
-$smarty->assign('ver_cant', count($history_versions));
+$smarty->assign('ver_count', count($history_versions));
 
 if (isset($_REQUEST['clear_versions'])) {
     unset($_REQUEST['clear_versions']);
@@ -343,12 +342,12 @@ if (isset($source)) {
         $source = $rversion;
     }
     if ($source == $info["version"] || $source == 0) {
-        $smarty->assign('sourced', $info["data"]);
+        $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($info["data"]));
         $smarty->assign('source', $info['version']);
     } else {
         $version = $histlib->get_version($page, $source);
         if ($version) {
-            $smarty->assign('sourced', $version["data"]);
+            $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($version["data"]));
             $smarty->assign('source', $source);
         }
     }
@@ -431,7 +430,9 @@ if ($prefs['feature_multilingual'] == 'y') {
             }
         }
         // Build URI / Redirect
-        $diff_style = isset($_REQUEST['diff_style']) ? rawurlencode($_REQUEST['diff_style']) : rawurlencode($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style']);
+        $diff_style = rawurlencode(
+            $_REQUEST['diff_style'] ?? ($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style'])
+        );
         $comment = rawurlencode("Updating from $page at version {$info['version']}");
         if ($newver == 0) {
             $newver = $info['version'];

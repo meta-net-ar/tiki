@@ -22,7 +22,6 @@ class HtmlSelectDuration extends Base
 {
     public function handle($params, Template $template)
     {
-        $smarty = \TikiLib::lib('smarty');
         $html_result = '';
         $default = ['prefix' => 'Duration_', 'default_unit' => 'week', 'default' => '', 'default_value' => '', 'id' => ''];
         $params = array_merge($default, $params);
@@ -45,8 +44,8 @@ class HtmlSelectDuration extends Base
         }
         $id = ! empty($params['id']) ? ' id="' . $params['id'] . '" ' : '';
         $html_result .= '<div class="row"><div class="col-sm-5">';
-        $html_result .= '<input ' . $id . 'name="' . $params['prefix'] . '" type="text" value="' . $params['default'] . '" class="form-control"></div>';
-        if (strstr($params['prefix'], '[]')) {
+        $html_result .= '<input ' . $id . 'name="' . $params['prefix'] . '" type="number" value="' . $params['default'] . '" class="form-control"></div>';
+        if (str_contains($params['prefix'], '[]')) {
             $prefix = str_replace('[]', '_unit[]', $params['prefix']);
         } else {
             $prefix = $params['prefix'] . '_unit';

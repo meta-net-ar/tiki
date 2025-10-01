@@ -146,12 +146,6 @@ This configuration must be kept synchronized with the configuration for other We
           <match url="^images/(.*)$" ignoreCase="false" />
           <action type="Rewrite" url="img/icons/{R:1}" />
         </rule>
-        <!--The rule cannot be converted into an equivalent IIS format because of unsupported flags: E-->
-        <!--#If your website is a checkout-->
-        <rule name="Imported Rule 7" stopProcessing="true">
-          <match url=".*/\.svn/.*" ignoreCase="false" />
-          <action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
-        </rule>
         <rule name="Imported Rule 8" stopProcessing="true">
           <match url="(.*)" ignoreCase="false" />
           <conditions logicalGrouping="MatchAny">

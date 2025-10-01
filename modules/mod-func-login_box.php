@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -43,6 +43,12 @@ function module_login_box_info()
                 'description' => tra('Show the register link') . ' (y/n)',
                 'filter' => 'alpha',
             ],
+            'register_page' => [
+                'name' => tra('Register Page'),
+                'description' => tra('Page to redirect when the register link is clicked. If not given, the default register page is used.'),
+                'filter' => 'pagename',
+                'profile_reference' => 'wiki_page',
+            ],
             'forgot' => [
                 'name' => tra('Show I Forgot'),
                 'description' => tra('Show the "I forgot my password" link') . ' (y/n)',
@@ -51,6 +57,11 @@ function module_login_box_info()
             'remember' => [
                 'name' => tra('Show Remember me'),
                 'description' => tra('Show the "Remember me" checkbox') . ' (y/n)',
+                'filter' => 'alpha',
+            ],
+            'allowNone' => [
+                'name' => tra('Allow None'),
+                'description' => tra('Allow user selection field to be empty (without any users selected) when enabled.') . ' (y/n)',
                 'filter' => 'alpha',
             ],
             'show_user_avatar' => [
@@ -99,8 +110,12 @@ function module_login_box($mod_reference, &$module_params)
         Laminas\Session\Container::getDefaultManager()->start();
     }
 
+    if ($prefs['auth_webauthn_enabled'] === 'y') {
+        TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-webauthn.js');
+    }
+
     $smarty->assign('module_logo_instance', $module_logo_instance);
-    $smarty->assign('mode', isset($module_params['mode']) ? $module_params['mode'] : 'module');
+    $smarty->assign('mode', $module_params['mode'] ?? 'module');
     $smarty->assign('login_text_explanation', $tikilib->get_preference('login_text_explanation'));
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
@@ -115,6 +130,8 @@ function module_login_box($mod_reference, &$module_params)
             if (! $permsPrevious->admin) {
                 $can_switch_user = 'n';
             }
+            // restore the current "switched to" user's permissions
+            unset($permsContext);
         } else {
             $can_switch_user = 'n';
         }
@@ -153,5 +170,11 @@ function module_login_box($mod_reference, &$module_params)
     }
     if (! isset($module_params['groups'])) {
         $module_params['groups'] = '';
+    }
+    if (! isset($module_params['allowNone'])) {
+        $module_params['allowNone'] = 'y';
+    }
+    if (! isset($module_params['show_user_avatar'])) {
+        $module_params['show_user_avatar'] = 'y';
     }
 }

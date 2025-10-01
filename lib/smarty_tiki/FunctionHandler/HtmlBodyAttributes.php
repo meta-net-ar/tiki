@@ -16,13 +16,14 @@ use Smarty\Template;
 
 class HtmlBodyAttributes extends Base
 {
+    // Used in the template to create the html_body_attributes tag which can take a class as parameter and returns the attributes for a standard tiki page body tag
     public function handle($params, Template $template)
     {
         global $section, $prefs, $page, $section_class, $user;
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';
-        $class = 'tiki' . (isset($params['class']) ? ' ' . $params['class'] : '');
+        $class = 'tiki' . ' ' . $params['class'] ?? '';
 
         //filename of script called (i.e. tiki-index, tiki-user_information, tiki-view_forum, etc), then sanitize chars
         $script_filename = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME);
@@ -116,10 +117,6 @@ class HtmlBodyAttributes extends Base
 
         if (getCookie('hide_zone_right')) {
             $class .= ' hide_zone_right';
-        }
-
-        if ($prefs['wiki_make_ordered_list_items_display_unique_numbers'] === 'y') {
-            $class .= ' uol'; // add class to display all the ordered lists sub-items indented with unique numbering like "1.2", "1.2.1", etc.
         }
 
         if (! empty($onload)) {

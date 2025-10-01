@@ -53,12 +53,24 @@ if (isset($_POST["actionId"]) && ! empty($_POST["page"])) {
 }
 
 if (isset($_REQUEST["clean"])) {
-    $access->checkCsrf();
-    $date = strtotime("-" . $_REQUEST["months"] . " months");
-    $clearedLogs = $logslib->clean_logs($date);
+    // Check if months is valid
+    if (! isset($_REQUEST["months"]) || ! is_numeric($_REQUEST["months"]) || intval($_REQUEST["months"]) < 1) {
+        Feedback::error(['mes' => tr('You must enter a valid number of months (positive integer).')]);
+    } else {
+        $months = intval($_REQUEST["months"]);
 
-    if ($clearedLogs->numrows > 0) {
-        Feedback::success(['mes' => tr('%0 logs have been cleared.', $clearedLogs->numrows)]);
+        $smarty->assign('confirmation_text', tr('Please confirm action'));
+        $smarty->assign('confirm_detail', tr('You are about to delete all logs older than %0 months. This action cannot be undone.', $months));
+        $access->checkCsrf();
+
+        $date = strtotime("-" . $months . " months");
+        $clearedLogs = $logslib->clean_logs($date);
+
+        if ($clearedLogs->numrows > 0) {
+            Feedback::success(['mes' => tr('%0 logs have been cleared.', $clearedLogs->numrows)]);
+        } else {
+            Feedback::note(['mes' => tr('No logs older than %0 months were found.', $months)]);
+        }
     }
 }
 
@@ -91,9 +103,8 @@ foreach ($list['data'] as &$row) {
         $row['log_pretty'] = print_r(unserialize($row['log']), true);
     }
 }
-$smarty->assign_by_ref('cant', $list['cant']);
+$smarty->assign_by_ref('count', $list['count']);
 $smarty->assign('list', $list['data']);
-$smarty->assign('api_tiki', $api_tiki);
 $urlquery['sort_mode'] = $sort_mode;
 $urlquery['find'] = $find;
 $smarty->assign_by_ref('urlquery', $urlquery);

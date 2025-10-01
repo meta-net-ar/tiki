@@ -8,16 +8,13 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\TikiInit;
+
+use Tiki\Lib\TikiDate;
 
 require_once('tiki-setup.php');
 
 $access->check_feature('feature_calendar');
 $access->check_permission('tiki_p_view_events');
-
-// Initialization
-TikiInit::appendIncludePath("lib/ical/");
-include_once('lib/ical/iCal.php');
 
 // list calendars //
 $calendarlib = TikiLib::lib('calendar');
@@ -65,15 +62,15 @@ if (isset($_REQUEST['start_date_Month'])) {
 $endDate = new TikiDate();
 $endDate->setDate($startTime);
 if ($calendarViewMode['casedefault'] == 'month') {
-     $stopTime = $endDate->addMonths(1);
+    $endDate->addMonths(1);
 } elseif ($calendarViewMode['casedefault'] == 'quarter') {
-    $stopTime = $endDate->addMonths(3);
+    $endDate->addMonths(3);
 } elseif ($calendarViewMode['casedefault'] == 'semester') {
-    $stopTime = $endDate->addMonths(6);
+    $endDate->addMonths(6);
 } elseif ($calendarViewMode['casedefault'] == 'year') {
-    $stopTime = $endDate->addMonths(12);
+    $endDate->addMonths(12);
 } else {
-    $stopTime = $endDate->addMonths(1);
+    $endDate->addMonths(1);
 }
 $stopTime = $endDate->getTime();
 
@@ -139,9 +136,7 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
         fclose($fh);
         echo trim($csv);
     } else {
-        // create ical
-
-        $userlb = TikiLib::get('Users');
+        // create ical with sabre/dav
 
         $vcalendar = new Sabre\VObject\Component\VCalendar();
 
@@ -218,8 +213,6 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
     die;
 }
 
-
-$smarty->assign('iCal', $iCal);
 
 // Display the template
 $smarty->display("tiki.tpl");

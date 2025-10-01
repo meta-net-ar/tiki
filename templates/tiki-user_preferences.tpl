@@ -8,7 +8,7 @@
 {/if}
 {if $tiki_p_admin_users eq 'y'}
     <div class="t_navbar btn-group mb-3">
-        {assign var=thisuser value=$userinfo.login}
+        {$thisuser=$userinfo.login}
         {button href="tiki-assignuser.php?assign_user=$thisuser" _type="link" _text="{tr}Assign Group{/tr}"}
         {button href="tiki-user_information.php?view_user=$thisuser" _type="link" _text="{tr}User Information{/tr}"}
     </div>
@@ -100,10 +100,19 @@
                         <label class="col-form-label col-md-4" for="location">
                             {tr}Location{/tr}
                         </label>
-                        <div class="col-md-8 mb-5" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location">
-                            <div class="map-container" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location"></div>
-                        </div>
-                        <input type="hidden" name="location" id="location" value="{$location|escape}">
+                        {if $prefs.geo_enabled eq 'n'}
+                            <div class="col-md-8 mb-5 w-full" style="height: auto">
+                                <p class="ml-2 text-warning">{tr}Geolocation features are not enabled.{/tr}</p>
+                                {if $tiki_p_admin eq 'y'}
+                                    <a href="tiki-admin.php?page=maps" class="ml-2 text-primary text-decoration-none">{tr}Enable{/tr}</a>
+                                {/if}
+                            </div>
+                        {else}
+                            <div class="col-md-8 mb-5" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location">
+                                <div class="map-container" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location"></div>
+                            </div>
+                            <input type="hidden" name="location" id="location" value="{$location|escape}">
+                        {/if}
                     </div>
                     <div class="tiki-form-group row">
                         <label class="col-form-label col-md-4" for="homePage">
@@ -244,7 +253,7 @@
                             </label>
                             <div class="col-md-8">
                                 <select id="mytheme" name="mytheme" class="form-select">
-                                    {assign var="userwatch_themeoption" value="{$userwatch_theme}{if $userwatch_themeOption}/{$userwatch_themeOption}{/if}"}
+                                    {$userwatch_themeoption="{$userwatch_theme}{if $userwatch_themeOption}/{$userwatch_themeOption}{/if}"}
                                     <option value="" class="text-muted bg-info">{tr}Site theme{/tr} ({$prefs.theme}{if !empty($prefs.theme_option)}/{$prefs.theme_option}{/if})</option>
                                     {foreach from=$available_themesandoptions key=theme item=theme_name}
                                         <option value="{$theme|escape}" {if $userwatch_themeoption eq $theme}selected="selected"{/if}>{$theme_name|ucwords}</option>
@@ -366,6 +375,58 @@
                             </select>
                         </div>
                     </div>
+                    {if $prefs.cookie_consent_feature eq 'y'}
+                    <div class="tiki-form-group row">
+                        <label class="col-form-label col-md-4" for="cookie_consent">
+                            {tr}Cookie consent{/tr}
+                        </label>
+                        <div class="col-md-8">
+                            <div class="d-flex flex-wrap gap-3">
+                                {* Accept All checkbox *}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="acceptAllCheck" name="cookie_consent_update" value="acceptAll">
+                                    <label class="form-check-label" for="acceptAllCheck">
+                                        {tr}Accept All{/tr}
+                                    </label>
+                                </div>
+                                {* Decline Non-Essential checkbox *}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="declineUnnecessaryCheck" name="cookie_consent_update" value="declineNonEssential">
+                                    <label class="form-check-label" for="declineUnnecessaryCheck">
+                                        {tr}Decline Non-Essential{/tr}
+                                    </label>
+                                </div>
+                                {* Customized checkbox *}
+                                <div class="form-check" id="customizedAction" style="display: none;">
+                                    <input class="form-check-input" type="checkbox" id="customizedCheck" name="cookie_consent_update" value="customized">
+                                    <label class="form-check-label" for="customizedCheck">
+                                        {tr}Customized{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="customConsentSection" class="tiki-form-group row mt-3">
+                        <div class="col-md-8 offset-md-4">
+                            {foreach from=$cookieCategories key=category item=description}
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        id="toggle{$category|capitalize}"
+                                        name="cookie_consent_{$category}"
+                                        {if $category == 'essential'}checked disabled
+                                        {elseif $cookieConsentPrefs.action eq 'acceptAll' || $cookieConsentPrefs.categories[$category] === true}checked{/if}>
+                                    <label class="form-check-label" for="toggle{$category|capitalize}">
+                                        {tr}{$category|capitalize}{/tr}
+                                        <span class="ms-2" data-bs-toggle="tooltip" data-bs-placement="right" title="{$description}">
+                                            <i class="icon icon-help fas fa-question-circle"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>
+                    {/if}
                     <div class="tiki-form-group row clearfix">
                         <label class="col-form-label col-md-4" for="display_timezone">
                             {tr}Displayed timezone{/tr}
@@ -392,7 +453,7 @@
                             {/if}
                         </div>
                     </div>
-    
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="display_12hr_clock" id="display_12hr_clock" {if $user_prefs.display_12hr_clock eq 'y'}checked="checked"{/if}>
                         <label class="form-check-label" for="display_12hr_clock">
@@ -407,7 +468,7 @@
                             </label>
                         </div>
                     {/if}
-    
+
                     {if $prefs.feature_messages eq 'y' and $tiki_p_messages eq 'y'}
                         <legend>{tr}User Messages{/tr}</legend>
                         <div class="tiki-form-group row clearfix">
@@ -528,7 +589,7 @@
                             </div>
                         </div>
                     {/if}
-    
+
                     <div class="row justify-content-end mb-2">
                         <div class="col-md-8">
                         {if $prefs.feature_wiki eq 'y'}
@@ -626,7 +687,7 @@
                             {button _text="{tr}Reset{/tr}" _onclick="if (confirm('{tr}This will reset the visibility of all the tips, notices and warning remarks boxes you have closed.{/tr}')) {ldelim}deleteCookie('rbox');{rdelim}return false;" _class='btn-sm'}
                         </div>
                     </div>
-    
+
                     {if $prefs.webmonetization_enabled eq 'y'}
                         <legend>{tr}Web Monetization{/tr}</legend>
                         <div class="tiki-form-group row clearfix">
@@ -646,7 +707,7 @@
                             </div>
                         </div>
                     {/if}
-    
+
                     <div class="submit text-center">
                         <input type="submit" class="btn btn-primary" name="new_prefs" value="{tr}Save changes{/tr}">
                     </div>
@@ -666,6 +727,11 @@
                                     {tr}Leave "New password" and "Confirm new password" fields blank to keep current password{/tr}
                                 {/remarksbox}
                             {/if}
+                        {/if}
+                        {if $intertiki_no_password_change_warning neq ''}
+                            {remarksbox type="tip" title="{tr}Information{/tr}" close="n"}
+                                {tr}{$intertiki_no_password_change_warning}{/tr}
+                            {/remarksbox}
                         {/if}
                         <div class="tiki-form-group row">
                             <label class="col-md-4 col-form-label" for="username-autocomplete">
@@ -740,40 +806,77 @@
             {remarksbox type="error" title="{tr}Two-factor authentication is required{/tr}" close="n"}{tr}Your access to the site is restricted until you enable <strong>Two-factor authentication</strong>. Please enable Two-factor authentication to keep using normally the site.{/tr}{/remarksbox}
         {/if}
         {remarksbox type="tip"}
-        {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
-            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®.{/tr}
+            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. 
+            When enabled, Tiki will prompt you for a TOTP code generated by any authenticator app 
+            (FreeOTP, Authy, Google Authenticator, etc.).{/tr}
         {/remarksbox}
         {if $tfaSecret }
             <form action="tiki-user_preferences.php" method="post">
                 {ticket}
                 <div class="tiki-form-group row">
                     <div class="col-md-5">
-                        <img class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
-                    </div>
-                    <div class="col-md-7 align-content-center">
-                        <div class="d-flex align-items-center" style="height: 100%">
-                            <div class="well">
-                                {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr}
-                                <div style="margin-top: 20px" class="tiki-form-group">
-                                    <label for="exampleInputEmail1">Pin Code</label>
-                                    <input type="text" class="form-control" name="tfaPin">
-                                </div>
+                        <img id="tfaQrCodeImage" class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
+                        {if $imageType eq 'svg+xml'}
+                            {assign var="fileExtension" value="svg"}
+                        {else}
+                            {assign var="fileExtension" value="png"} 
+                        {/if}
+                        {capture assign="downloadFileName"}tfa_qr_code.{$fileExtension}{/capture}
+                      
+
+                        <div class="mt-1 d-flex justify-content-center align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-secondary" id="downloadQrCode">
+                                {tr}Download QR Code{/tr}
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" id="showSecret">
+                                {tr}Show Secret Code{/tr}
+                            </button>
+                        </div>
+                    
+                        <div id="secretContainer" class="d-none mt-3 text-center">
+                            <strong>{tr}Secret Code:{/tr}</strong>
+                            <span id="secretField">{$tfaSecret}</span>
+
+                            <div class="mt-2">
+                                <small class="text-secondary">{tr}Save this secret code in a safe place. It is required to restore your Two-Factor Authentication if you lose your device.{/tr}</small>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-7">
+                        <div class="d-flex mt-4">
+                            <div class="well">
+                                {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>
+                                
+                                <div class="well mt-3">
+                                    {tr}Scan this QR code with your TOTP authenticator app (FreeOTP, Google Authenticator, etc.). For security, consider saving this QR code or secret key as a backup so you can restore it if you lose or change your device.{/tr}
+                                </div>
+
+                                <div style="margin-top: 20px" class="tiki-form-group">
+                                    <label for="authCode">{tr}2FA Code{/tr}</label>
+                                    <input type="text" class="form-control" name="tfaPin" id="authCode" placeholder="{tr}Enter the 6-digit code from your authenticator app{/tr}">                                
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" value="{$tfaSecret}" hidden name="tfaSecret">
+                        <div class="submit d-flex justify-content-end mt-2">
+                            <input type="submit" class="btn btn-primary btn-md" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
+                        </div>
+                    </div>
                 </div>
-                <input type="text" value="{$tfaSecret}" hidden name="tfaSecret">
-                <div class="submit text-center">
-                    <input type="submit" class="btn btn-secondary btn-sm" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
-                </div>
+                
             </form>
         {else}
             <form action="tiki-user_preferences.php" method="post">
                 {ticket}
-                <div class="submit text-center">
-                    <input type="submit" class="btn btn-danger btn-sm" name="removetwofactor" value="{tr}Disable Two-Factor Auth{/tr}">
-                    <a href="tiki-user_preferences.php?tfagenerate=true" class="btn btn-secondary btn-sm">{tr}Regenerate Two-Factor Auth{/tr}</a>
-                </div>
+                {if $twoFactorSecret}
+                    <div class="submit text-center">
+                        <input type="submit" class="btn btn-danger btn-sm" name="removetwofactor" value="{tr}Disable Two-Factor Auth{/tr}">
+                    </div>
+                {else}
+                    <div class="submit text-center">
+                        <input type="submit" class="btn btn-secondary btn-sm" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
+                    </div>
+                {/if}
             </form>
         {/if}
         {/tab}
@@ -804,3 +907,25 @@
         {/if}
     {/if}
 {/tabset}
+
+{jq}
+    $('#downloadQrCode').on('click', function() {
+        const dataUrl = $('#tfaQrCodeImage').attr('src');
+        if (!dataUrl || !dataUrl.includes(';base64,')) {
+            alert('No valid QR code data found. Please generate a new code first.');
+            return;
+        }
+        downloadBase64ImageAsFile(dataUrl);
+    });
+
+    $('#showSecret').on('click', function() {
+        const secretContainer = $('#secretContainer');
+        if (secretContainer.is(':visible')) {
+            secretContainer.hide();
+            $(this).text('{tr}Show Secret Code{/tr}');
+        } else {
+            secretContainer.show();
+            $(this).text('{tr}Hide Secret Code{/tr}');
+        }
+    });
+{/jq}

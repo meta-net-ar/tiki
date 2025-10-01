@@ -45,7 +45,7 @@
             {/foreach}
         </table>
     </div>
-    {pagination_links cant=$discounts.cant step=$discounts.max offset=$discounts.offset}{/pagination_links}
+    {pagination_links count=$discounts.count step=$discounts.max offset=$discounts.offset}{/pagination_links}
 {/tab}
 
 {capture name=tabtitle}{if empty($info.id)}{tr}Create{/tr}{else}{tr}Edit{/tr}{/if}{/capture}

@@ -60,12 +60,10 @@ function wikiplugin_redirect($data, $params)
     extract($params, EXTR_SKIP);
     $areturn = '';
 
-    if (! isset($page)) {
-        $areturn = "REDIRECT plugin: No page specified!<br />";
+    if (! isset($page) && ! isset($url)) {
+        $areturn = "REDIRECT plugin: No page or url specified!<br />";
     }
-    if (! isset($url)) {
-        $areturn .= "REDIRECT plugin: No url specified!<br />";
-    }
+
     if (isset($page)) {
         $location = $page;
     } elseif (isset($url)) {
@@ -118,11 +116,11 @@ function wikiplugin_redirect($data, $params)
 
         // Make it possible to edit the plugin in wysiwyg
         // Do not redirect if the page is being edited
-        $isEditMode = (strpos($_SERVER['SCRIPT_NAME'], 'tiki-editpage.php') !== false) || (isset($_REQUEST['controller']) && $_REQUEST['controller'] == 'edit');
-        if ($isEditMode == false) {
+        $isEditMode = (str_contains($_SERVER['SCRIPT_NAME'], 'tiki-editpage.php')) || (isset($_REQUEST['controller']) && $_REQUEST['controller'] == 'edit');
+        if (! $isEditMode) {
             // Auto login to remote Tiki functionality
             if (! empty($autologin_remotetiki)) {
-                if (substr($autologin_remotetiki, -1) == '/') {
+                if (str_ends_with($autologin_remotetiki, '/')) {
                     $autologin_remotetiki = rtrim($autologin_remotetiki, '/');
                 }
                 if (! empty($page)) {

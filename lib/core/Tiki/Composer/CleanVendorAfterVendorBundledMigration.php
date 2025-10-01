@@ -118,7 +118,6 @@ class CleanVendorAfterVendorBundledMigration
                         || file_exists($oldVendorFolder . '/bombayworks/zendframework1/library/Zend/Config.php')) //ZF1
                     && (file_exists($oldVendorFolder . '/smarty/smarty/libs/Smarty.class.php') //Smarty
                         || file_exists($oldVendorFolder . '/smarty/smarty/distribution/libs/Smarty.class.php')) //Smarty
-                    && file_exists($oldVendorFolder . '/adodb/adodb/adodb.inc.php') //Adodb
                 ) {
                     rename($oldVendorFolder . '/autoload.php', $oldVendorFolder . '/autoload-disabled.php');
                     self::cleanTemplates($rootFolder, $fs);

@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Theme\ThemeLib;
+
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
@@ -50,11 +53,11 @@ if ($prefs['feature_fixed_width'] === 'y') {
 $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
 
 //3) Always add bundled font-awesome css for the default icon fonts
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/@fortawesome/fontawesome-free/all.css');
+$headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 
 // 3a) Optionally add bundled Bootstrap-icons CSS for the optional Bootstrap icons
 if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/bootstrap-icons.css');
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
 }
 
 //4) Add Addon custom css first, so it can be overridden by themes
@@ -123,7 +126,7 @@ if (
     || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
 ) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
     $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
-    if (strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
+    if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') && ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
         /* Force the admin layout on admin pages */
         $prefs['site_layout_admin'] = 'admin';
         /* Force the admin layout on setup/management pages too */
@@ -136,7 +139,7 @@ if (
         }
         $smarty->assign('admin_icons', $admin_icons);
     }
-    if (! strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
+    if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
         $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
     }
 } else {
@@ -146,7 +149,7 @@ if (
 //7) include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css
 if (! empty($theme_option_active)) {
     $main_theme_path = $themelib->get_theme_path($theme_active);
-    $main_theme_custom_css = "{$main_theme_path}css/custom.css";
+    $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
     if (is_readable($main_theme_custom_css)) {
         $headerlib->add_cssfile($main_theme_custom_css, 53);
     }
@@ -160,7 +163,7 @@ if (is_readable($custom_css)) {
     $headerlib->add_cssfile($custom_css, 53);
 }
 if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {    // if favicons are disabled in preferences, skip the lot of it.
-    $favicon_path = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'favicon-16x16.png', 'favicons/');
+    $favicon_path = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'favicon-16x16.png', 'favicons');
     if ($favicon_path) {  // if there is a 16x16 png favicon in the theme folder, then find and display others if they exist
         $headerlib->add_link('icon', $favicon_path, '16x16', 'image/png');
         $favicon_path = (dirname($favicon_path)); // get_theme_path makes a lot of system calls, so just remember what dir to look in.

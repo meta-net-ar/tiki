@@ -9,9 +9,7 @@ require_once('../tiki-setup.php');
 $access->check_feature('feature_tikitests');
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_play_tikitests != 'y') {
-    $smarty->assign('msg', tra('You do not have permission to do that'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $smarty->assign('tidy', extension_loaded("tidy"));
@@ -51,9 +49,7 @@ if (isset($_REQUEST['action'])) {
         if (isset($_REQUEST['filename'])) {
             $ok = delete_test($_REQUEST['filename']);
             if (! $ok) {
-                $smarty->assign('msg', tra("There was an error deleting the file"));
-                $smarty->display("error.tpl");
-                die();
+                Feedback::errorAndDie(tra("There was an error deleting the file"), \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
     }

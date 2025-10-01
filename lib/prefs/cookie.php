@@ -31,7 +31,7 @@ function prefs_cookie_list()
             'type' => 'text',
             'size' => 35,
             'perspective' => false,
-            'default' => isset($GLOBALS['tikiroot']) ? $GLOBALS['tikiroot'] : '' ,
+            'default' => $GLOBALS['tikiroot'] ?? '',
         ],
         'cookie_consent_feature' => [
             'name' => tra('Cookie Consent'),
@@ -41,17 +41,6 @@ function prefs_cookie_list()
             'help' => 'Cookie-Consent',
             'default' => 'n',
             'tags' => ['experimental'],
-        ],
-        'cookie_consent_name' => [
-            'name' => tra('Cookie consent name'),
-            'description' => tra('Name of the cookie to record the user\'s consent if the user agrees.'),
-            'type' => 'text',
-            'size' => 35,
-            'default' => 'tiki_cookies_accepted',
-            'tags' => ['experimental'],
-            'dependencies' => [
-                'cookie_consent_feature',
-            ],
         ],
         'cookie_consent_expires' => [
             'name' => tra('Cookie consent expiration'),
@@ -72,40 +61,6 @@ function prefs_cookie_list()
             'type' => 'textarea',
             'size' => 6,
             'default' => tra('This website would like to place cookies on your computer to improve the quality of your experience of the site. To find out more about the cookies, see our ((privacy notice)).'),
-            'tags' => ['experimental'],
-            'dependencies' => [
-                'cookie_consent_feature',
-            ],
-        ],
-        'cookie_consent_question' => [
-            'name' => tra('Cookie consent question'),
-            'description' => tra('Specific question next to the checkbox for agreement. Leave empty to not display a checkbox.'),
-            'hint' => tra('Wiki-parsed'),
-            'type' => 'text',
-            'size' => 35,
-            'default' => tra('I accept cookies from this site.'),
-            'tags' => ['experimental'],
-            'dependencies' => [
-                'cookie_consent_feature',
-            ],
-        ],
-        'cookie_consent_button' => [
-            'name' => tra('Cookie consent button'),
-            'description' => tra('Label on the agreement button.'),
-            'type' => 'text',
-            'size' => 35,
-            'default' => tra('Continue'),
-            'tags' => ['experimental'],
-            'dependencies' => [
-                'cookie_consent_feature',
-            ],
-        ],
-        'cookie_consent_alert' => [
-            'name' => tra('Cookie consent alert'),
-            'description' => tra('Alert displayed when user tries to access or use a feature requiring cookies.'),
-            'type' => 'text',
-            'size' => 35,
-            'default' => tra('Sorry, cookie consent required'),
             'tags' => ['experimental'],
             'dependencies' => [
                 'cookie_consent_feature',
@@ -146,18 +101,6 @@ function prefs_cookie_list()
             'tags' => ['experimental'],
             'dependencies' => [
                 'cookie_consent_feature',
-            ],
-        ],
-        'cookie_consent_analytics' => [
-            'name' => tra('Cookie consent for analytics'),
-            'description' => tra('Make it possible for users to opt in to essential cookies, such as "remember login", "timezone" etc without opting in to third party cookies such as those for Google Analytics and other external services.'),
-            'hint' => tra('Makes the checkbox opt in to accept "non-essential" cookies'),
-            'type' => 'flag',
-            'default' => 'n',
-            'tags' => ['experimental'],
-            'dependencies' => [
-                'cookie_consent_feature',
-                'cookie_consent_question',
             ],
         ],
         'cookie_refresh_rememberme' => [

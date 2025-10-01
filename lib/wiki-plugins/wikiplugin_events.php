@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 function wikiplugin_events_info()
 {
     return [
@@ -261,7 +264,7 @@ function wikiplugin_events($data, $params)
         $start = $start ?? 0;
         $smarty->assign('maxEvents', $max);
         $smarty->assign_by_ref('offset', $start);
-        $smarty->assign_by_ref('cant', $events['cant']);
+        $smarty->assign_by_ref('count', $events['count']);
     }
 
     // attendees

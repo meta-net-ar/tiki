@@ -18,7 +18,7 @@ $inputConfiguration = [
             'type'                        => 'string',        //get
             'offset'                      => 'int',           //get
             'find'                        => 'string',        //post
-            'deep'                        => 'bool',          //get
+            'deep'                        => 'string',          //get
             'watch_event'                 => 'word',          //get
             'watch_action'                => 'word',          //get
             'watch_object'                => 'int',           //get
@@ -104,9 +104,7 @@ if ($_REQUEST['parentId']) {
 
     $p_info = $categlib->get_category($_REQUEST['parentId']);
     if (empty($p_info)) {
-        $smarty->assign('msg', tra('Incorrect parameter'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Incorrect parameter'), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if ($prefs["feature_multilingual"] === "y") {
         $p_info["name"] = tra($p_info["name"]);
@@ -121,10 +119,7 @@ if ($_REQUEST['parentId']) {
 $smarty->assign('father', $father);
 
 if (! $canView) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view this page.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 //watches
 if ($prefs['feature_user_watches'] == 'y') {
@@ -167,7 +162,6 @@ $eyes_curr = add_watch_icons(
     $_REQUEST['parentId'],
     $deep,
     $user,
-    null
 );
 $smarty->assign_by_ref('eyes_curr', $eyes_curr);
 
@@ -181,7 +175,6 @@ foreach ($ctall as &$c) {
         $c['categId'],
         $deep,
         $user,
-        $c['name']
     );
     $c['eyes'] = $eyes;
 }
@@ -199,7 +192,7 @@ $fetchCountIcon = smarty_function_icon(
 
 $tree_nodes = [];
 foreach ($ctall as $c) {
-    if ($prefs['category_browse_count_objects'] === 'y' || isset($_REQUEST['deep'])) {
+    if ($prefs['category_browse_count_objects'] === 'y' || $deep == 'on') {
         // display correct count of objects depending on browse in and find filters -- luci Thu 05 Sep 2013 10:15:50 PM UTC
         $objectcount = $categlib->list_category_objects(
             $c['categId'],
@@ -212,7 +205,7 @@ foreach ($ctall as $c) {
             (! empty($_REQUEST['and'])) ? true : false
         );
         $countString = '<span class="object-count badge rounded-pill text-bg-info px-3 float-end">' .
-            $objectcount['cant'] . '</span>';
+            $objectcount['count'] . '</span>';
     } elseif ($prefs['feature_search'] === 'y') {   // fall back to unified search if not category_browse_count_objects
         $countString = '<a class="object-count badge badge-pill badge-info bg-info float-end" data-categid="' .
             $c['categId'] . '">' . $fetchCountIcon . '</a>';
@@ -290,7 +283,7 @@ if ($deep == 'on') {
 
 
 $smarty->assign_by_ref('objects', $objects['data']);
-$smarty->assign_by_ref('cant_pages', $objects['cant']);
+$smarty->assign_by_ref('pages_count', $objects['count']);
 $smarty->assign_by_ref('maxRecords', $maxRecords);
 include_once('tiki-section_options.php');
 
@@ -331,7 +324,7 @@ if (isset($_GET['plain'])) {                // used by profile repositories to l
  * @param $user
  * @return bool|string
  */
-function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $deep, $user, $name)
+function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $deep, $user)
 {
     global $prefs;
     if (! $user || $prefs["feature_user_watches"] != 'y') {
@@ -341,7 +334,6 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     $categlib = TikiLib::lib('categ');
     $smarty = TikiLib::lib('smarty');
 
-    $section = 'categories';
     $nodesc = count($descendants);
     $watch_desc = 'n';
     $watch_this = 'n';
@@ -429,8 +421,6 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
         if ($usercatwatch['object'] == $categid) {
             $watch_this = 'y';
             break;
-        } else {
-            $watch_this = 'n';
         }
     }
     if ($categid == 0) {
@@ -442,12 +432,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     }
     //group watches
     if ($prefsgroups == 'y' && ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y')) {
-        $objName = '';
-        if ($categid == 0) {
-            $objName = 'Top';
-        } else {
-            $objName = $categlib->get_category_path_string_with_root($categid);
-        }
+        $objName = $categid == 0 ? 'Top' : $categlib->get_category_path_string_with_root($categid);
         $eyesgroup = '<a href="tiki-object_watches.php?' . 'objectId=' . $categid
             . '&amp;watch_event=category_changed&amp;objectType=Category&amp;objectName=' . urlencode($objName)
             . '&amp;objectHref=tiki-browse_categories.php?parentId=' . $categid . '&amp;deep=' . $deep . '">'

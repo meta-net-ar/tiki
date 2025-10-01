@@ -502,13 +502,6 @@ function wikiplugin_files($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
-    // set defaults for all params
-    $plugininfo = wikiplugin_files_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
     $filter = '';
     extract($params, EXTR_SKIP);
 
@@ -521,7 +514,7 @@ function wikiplugin_files($data, $params)
     }
 
     $files = [];
-    if (isset($categId) && strstr($categId, ':')) {
+    if (isset($categId) && str_contains($categId, ':')) {
         $categId = explode(':', $categId);
     }
     static $iplugin = 0;
@@ -584,7 +577,7 @@ function wikiplugin_files($data, $params)
             $creatorparam = empty($creator) ? '' : "&amp;find_creator=" . urlencode($creator);
             return "~np~<a onclick=\"javascript:window.open('tiki-list_file_gallery.php?galleryId=$galleryId[0]&amp;sort_mode=" . $sort . "&amp;caption=" . $caption . $creatorparam . $windowtitle . "&amp;slideshow','','menubar=no,width=" . $slidewidth . ",height=" . $slideheight . ",resizable=yes'); return false\" href=\"#\">" . tra($data) . '</a>~/np~';
         }
-        $find = isset($_REQUEST['find']) ? $_REQUEST['find'] : '';
+        $find = $_REQUEST['find'] ?? '';
         // If we have set recursive == y, then always look recursively
         // Otherwise, we still want to search recursively when showfindisrecursive == y
         if ($recursive == 'y') {
@@ -623,7 +616,7 @@ function wikiplugin_files($data, $params)
         foreach ($objects['data'] as $og) {
             $gal_info = $filegallib->get_file_gallery($og['itemId']);
             $fs = $filegallib->get_files(0, $max, $sort, '', $og['itemId'], false, $withsubgals == 'y', false, true, false, $show_parentName == 'y', true, $recursive, '', false, false, false, $filter);
-            if ($fs['cant']) {
+            if ($fs['count']) {
                 for ($i = 0, $count_fs_data = count($fs['data']); $i < $count_fs_data; ++$i) {
                     $fs['data'][$i]['gallery'] = $gal_info['name'];
                     $fs['data'][$i]['galleryId'] = $gal_info['galleryId'];
@@ -650,6 +643,19 @@ function wikiplugin_files($data, $params)
             if ($info = wikiplugin_files_check_perm_file($id)) {
                 $files[] = $info;
             }
+        }
+        $gal_info = $filegallib->default_file_gallery();
+    } else {
+        $fs = $filegallib->get_files(0, $max, $sort, null, null, false, true);
+        foreach ($fs['data'] as $file) {
+            if (isset($file['isgal']) && $file['isgal'] == 1) {
+                continue;
+            }
+            $file['p_download_files'] = $file['perms']['tiki_p_download_files'];
+            $file['p_view_file_gallery'] = $file['perms']['tiki_p_view_file_gallery'];
+            $file['p_admin_file_galleries'] = $file['perms']['tiki_p_admin_file_galleries'];
+            $file['p_edit_gallery_file'] = $file['perms']['tiki_p_edit_gallery_file'];
+            $files[] = $file;
         }
         $gal_info = $filegallib->default_file_gallery();
     }

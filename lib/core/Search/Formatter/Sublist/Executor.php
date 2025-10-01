@@ -59,7 +59,7 @@ class Executor
         }
     }
 
-    /** @array typically a raw array or a Search_Formatter_Transform_DynamicLoaderWrapper */
+    /** @array typically a raw array or a Tiki\Search\Formatter\Transform\DynamicLoaderWrapper */
     private static function checkFieldIsAvailable(string $fieldName, array|\ArrayObject $record)
     {
         $arrayObject = is_array($record) ? new ArrayObject($record) : $record;
@@ -117,7 +117,7 @@ class Executor
                             return $val;
                         }
                     };
-                    if (substr($type, 0, 6) === 'parent') {
+                    if (str_starts_with($type, 'parent')) {
                         $record = $this->record;
                         $subtype = substr($type, 7);
                         while (substr($subtype, 0, 6) === 'parent') {
@@ -242,7 +242,7 @@ class Executor
                     if ($count == count($mapping)) {
                         if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                             if ($this->record->isMultiple()) {
-                                // might be ArrayObject (Search_Formatter_Transform_DynamicLoaderWrapper) where array auto-creation doesn't work
+                                // might be ArrayObject (Tiki\Search\Formatter\Transform\DynamicLoaderWrapper) where array auto-creation doesn't work
                                 $arr = $this->data[$i][$j][$key] ?? [];
                                 $arr[] = $entry;
                                 $this->data[$i][$j][$key] = $arr;

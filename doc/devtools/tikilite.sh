@@ -20,7 +20,7 @@
 #
 #To Update
 #
-#   1. Do a svn up in your TikiLite directory
+#   1. Do a git pull in your TikiLite directory
 #   2. Execute sh doc/devtools/tikilite.sh script again 
 #
 # ############################################################
@@ -44,7 +44,7 @@ LANG_DEF="en"
 THEME_DEF="yeti"
 
 echo "Removing languages except defined..."
-find lang/* -type d | grep -v $LANG_DEF | grep -v \.svn | xargs -- rm -rf
+find lang/* -type d | grep -v $LANG_DEF | xargs -- rm -rf
 
 #echo "Removing iCal..."
 #rm -rf lib/calendar/iCal
@@ -56,7 +56,7 @@ find lang/* -type d | grep -v $LANG_DEF | grep -v \.svn | xargs -- rm -rf
 #find lib/pdflib/fonts -type f -name "*.afm" | grep -v php_Helvetica | grep -v php_Courier | xargs -- rm -f
 
 echo "Removing themes except defined..."
-find themes/* -type d | grep -v $THEME_DEF | grep -v default | grep -v base_files | grep -v css | grep -v js | grep -v \.svn | grep -v templates | xargs -- rm -rf
+find themes/* -type d | grep -v $THEME_DEF | grep -v default | grep -v base_files | grep -v css | grep -v js | grep -v templates | xargs -- rm -rf
 #find styles/ -type f -name "*.css" | grep -v $THEME_DEF | grep -v design | grep -v layout | grep -v lite | xargs -- rm -f
 
 #echo "Removing SQL..."

@@ -231,7 +231,7 @@ class Query extends Base
                 }
             }
 
-            if (strpos($php_self, '/') === 0) {
+            if (str_starts_with($php_self, '/')) {
                 $php_self = "/" . ltrim($php_self, "/");
             }
             switch ($params['_type']) {

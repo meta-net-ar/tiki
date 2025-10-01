@@ -35,13 +35,8 @@ if (isset($_REQUEST["view_user"])) {
         if ($tiki_p_admin == 'y') {
             $userwatch = $_REQUEST["view_user"];
         } else {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to view other users data"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to view other users data"), \Laminas\Http\Response::STATUS_CODE_401);
         }
-    } else {
-        $userwatch = $user;
     }
 }
 $smarty->assign('userwatch', $userwatch);
@@ -55,10 +50,7 @@ if (isset($_FILES['userfile1'])) {
         try {
             $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
         } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
         }
 
         $avatarlib = TikiLib::lib('avatar');
@@ -97,7 +89,7 @@ $smarty->assign_by_ref('avatars', $avatars);
 $smarty->assign('numav', count($avatars));
 $smarty->assign('yours', mt_rand(0, count($avatars)));
 
-$avatar = $tikilib->get_user_avatar($userwatch);
+$avatar = $tikilib->get_user_avatar($userwatch, '', 'large');
 $smarty->assign('avatar', $avatar);
 
 // Get full user picture if it is set

@@ -163,5 +163,11 @@ function prefs_login_list()
             'default' => 'y',
             'tags' => ['advanced'],
         ],
+        'login_placeholders_enable' => [
+            'name' => tra('Enable placeholders feature for username and password fields'),
+            'description' => tra('Show placeholder text from username and password fields in the login form. Enable this if you want to show the placeholder text.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
     ];
 }

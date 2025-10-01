@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -20,7 +20,7 @@ $sort_mode = 'created_desc';
 // TODO avoid altering $_POST variable directly
 if (isset($_POST['trkset']) && $access->checkCsrf()) {
     $tikilib->set_preference('t_use_db', $_POST['t_use_db']);
-    if (substr($_POST['t_use_dir'], -1) != '\\' && substr($_POST['t_use_dir'], -1) != '/' && $_POST['t_use_dir'] != '') {
+    if (! str_ends_with($_POST['t_use_dir'], '\\') && ! str_ends_with($_POST['t_use_dir'], '/') && $_POST['t_use_dir'] != '') {
         $_POST['t_use_dir'] .= '/';
     }
     $tikilib->set_preference('t_use_dir', $_POST['t_use_dir']);
@@ -37,14 +37,14 @@ if (isset($_POST['action']) && isset($_POST['attId']) && $access->checkCsrf()) {
 
 if (isset($_POST['all2db']) && $access->checkCsrf()) {
     $attachments = $trklib->list_all_attachments();
-    for ($i = 0; $i < $attachments['cant']; $i++) {
+    for ($i = 0; $i < $attachments['count']; $i++) {
         if ($attachments['data'][$i]['path']) {
             $trklib->file_to_db($prefs['t_use_dir'] . $attachments['data'][$i]['path'], $attachments['data'][$i]['attId']);
         }
     }
 } elseif (isset($_POST['all2file']) && $access->checkCsrf()) {
     $attachments = $trklib->list_all_attachments();
-    for ($i = 0; $i < $attachments['cant']; $i++) {
+    for ($i = 0; $i < $attachments['count']; $i++) {
         if (! $attachments['data'][$i]['path']) {
             $trklib->db_to_file($prefs['t_use_dir'] . md5($attachments['data'][$i]['filename']), $attachments['data'][$i]['attId']);
         }
@@ -76,7 +76,7 @@ $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
 $attachments = $trklib->list_all_attachments($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $attachments['cant']);
+$smarty->assign_by_ref('pages_count', $attachments['count']);
 $headerlib->add_cssfile('themes/base_files/feature_css/admin.css');
 $smarty->assign_by_ref('attachments', $attachments['data']);
 

@@ -35,6 +35,7 @@
             <br>
             {preference name=auth_method}
             {preference name=feature_intertiki}
+            {preference name=auth_webauthn_enabled}
             <fieldset>
                 <legend class="h3">{tr}Registration{/tr} &amp; {tr}Log in{/tr}</legend>
                 {preference name=user_must_change_password_set_default_on}
@@ -138,6 +139,7 @@
                     </div>
                 </div>
                 {preference name=user_force_avatar_upload}
+                {preference name=user_default_avatar_style}
                 {preference name=tracker_force_fill}
                 <div class="adminoptionboxchild" id="tracker_force_fill_childcontainer">
                     {preference name=tracker_force_tracker_id}
@@ -151,6 +153,7 @@
                 {preference name=unsuccessful_logins_invalid}
                 {preference name=eponymousGroups}
                 {preference name=desactive_login_autocomplete}
+                {preference name=login_placeholders_enable}
                 {preference name=permission_denied_login_box}
                 {preference name=login_text_explanation}
                 {preference name=login_multiple_forbidden}
@@ -182,13 +185,8 @@
                     <legend class="h3">{tr}Cookie consent{/tr}</legend>
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
-                        {preference name=cookie_consent_name}
                         {preference name=cookie_consent_expires}
                         {preference name=cookie_consent_description}
-                        {preference name=cookie_consent_question}
-                        {preference name=cookie_consent_analytics}
-                        {preference name=cookie_consent_alert}
-                        {preference name=cookie_consent_button}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
                         {preference name=cookie_consent_disable}
@@ -226,6 +224,7 @@
                     {preference name=twoFactorAuthIntervalDays}
                     {preference name=twoFactorAuthType}
                     {preference name=twoFactorAuthEmailTokenLength}
+                    {preference name=twoFactorAuthEmailTokenChars}
                     {preference name=twoFactorAuthEmailTokenTTL}
                     {preference name=twoFactorAuthAllUsers}
                     {preference name=twoFactorAuthIncludedGroup}

@@ -12,7 +12,7 @@ usage()
 {
 cat << EOF
 TIM - Tiki Instance Manager
-usage: $0 -c <command>[:subcommand] -u <user> -g <git branch> -t <svn tag> -i <instance id>
+usage: $0 -c <command>[:subcommand] -u <user> -g <git branch> -i <instance id>
 
 OPTIONS:
    -h      Show this message
@@ -22,7 +22,6 @@ OPTIONS:
    -U      userid on Tiki.org
    -r      GIT Repository
    -g      GIT Branch
-   -t      SVN Tag (Tiki version)
    -p      admin password (simple passwords only)
    -P      Subdirectory path
 EOF
@@ -48,10 +47,7 @@ do
             ;;
         g)
             GITBRANCH="$OPTARG"
-            ;;
-        t)
-            SVNTAG=$(echo "$OPTARG" | sed -e 's/[^a-zA-Z0-9.]//g')
-            ;;
+            ;
         u)
             TUSER=$(echo "$OPTARG" | tr A-Z a-z | sed -e 's/[^a-z]//g')
             if [[ $TUSER == "" ]] ; then TUSER="user"; fi
@@ -93,7 +89,6 @@ debug()
     echo "COMMAND: $COMMAND"
     echo "GITREP: $GITREP"
     echo "GITBRANCH: $GITBRANCH"
-    echo "SVNTAG: $SVNTAG"
     echo "TUSER: $TUSER"
     echo "TUSERID: $TUSERID"
     echo "TPATH: $TPATH"
@@ -153,16 +148,8 @@ update()
     echo "UPDATE" > $INSTANCE_LOCK
     cd $INSTANCE_DIR
 
-    if [[ ! -z $GITBRANCH ]]
-    then
-        log "GIT pull"
-        git pull
-    else
-        log "Doing SVN upgrade (just in case)"
-        svn upgrade
-        log "SVN upping"
-        svn up
-    fi
+    log "GIT pull"
+    git pull
 
     log "Running setup.sh"
     sh setup.sh -u $TIM_USER -g $TIM_GROUP -n fix
@@ -179,7 +166,7 @@ info()
         case $SUBCOMMAND in
             versions)
                 echo "INFO: List of available versions"
-                cd $SVN_CACHE
+                cd $GIT_CACHE
                 VERSIONSLIST=$(ls *.tar.gz | sed -e 's/\.tar\.gz//' | sort -V -r | uniq)
                 echo "LIST: "${VERSIONSLIST}
                 ;;
@@ -256,7 +243,7 @@ info()
 case ${COMMAND} in
     create)
         # TODO: Check INSTANCE_DIR not exists
-        if [[ -z $TUSERID ]] && ([[ -z $SVNTAG ]] || ([[ -z $GITBRANCH ]] && [[ -z $GITREP ]]))
+        if [[ -z $TUSERID ]] && (([[ -z $GITBRANCH ]] && [[ -z $GITREP ]]))
         then
             echo "FAIL: Missing parameters"
             usage
@@ -275,8 +262,6 @@ case ${COMMAND} in
         if [[ ! -z $GITBRANCH ]]
         then
             $PREFIX/tim-create -r "$GITREP" -g "$GITBRANCH" -u "$TUSER" -U "$TUSERID" -i "$ID" &
-        else
-            $PREFIX/tim-create -t "$SVNTAG" -u "$TUSER" -U "$TUSERID" -i "$ID" &
         fi
         exit 0
         ;;

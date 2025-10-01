@@ -32,9 +32,7 @@ $access->check_permission('tiki_p_admin_shoutbox');
 if (isset($_REQUEST["add"])) {
     $access->checkCsrf();
     if (empty($_REQUEST["word"])) {
-        $smarty->assign('msg', tra("You have to provide a word"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You have to provide a word"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $shoutboxlib->add_bad_word($_REQUEST["word"]);
 }
@@ -63,7 +61,7 @@ if (isset($_REQUEST["find"])) {
 }
 $smarty->assign('find', $find);
 $words = $shoutboxlib->get_bad_words($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $words["cant"]);
+$smarty->assign_by_ref('pages_count', $words["count"]);
 // Get users (list of users)
 $smarty->assign_by_ref('words', $words["data"]);
 // disallow robots to index page:

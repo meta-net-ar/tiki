@@ -1,4 +1,48 @@
-// tiki-selectors.less 2017-05-16 made by BarbaraLassalle
+// Lighty theme for Tiki Bootstrap 5.3
+
+// Tiki selectors, originally contributed by Barbara Lassalle, to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+body.tiki.navbar-padding {
+    padding-top: 80px;
+}
+#col1 {
+    background: var(--tiki-lighty-col1-bg); //#fff;
+    margin-bottom: 20px;
+}
+body:not(.tiki-admin) #col1 {
+    padding: 15px;
+}
+#right_modules {
+    margin-right: -15px;
+}
+
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+// Forms
+.form {
+    padding-left: 15px;
+}
+
+// Navs
 .nav {
     >li {
         >a {
@@ -22,6 +66,54 @@
         }
     }
 }
+
+.nav-pills {
+    >li {
+        >a {
+            &:hover {
+                background: #f0f0f0;
+                color: #777;
+            }
+        }
+    }
+}
+.tab-content {
+    >.active {
+        border-top: 3px solid #f0f0f0;
+    }
+}
+
+.nav-tabs {
+    >li {
+        >a {
+            background: #f0f0f0;
+            margin-right: 2px;
+            margin-top: 3px;
+            font-size: 13px;
+            &:hover {
+                border-color: #eeeeee #eeeeee #dddddd;
+                background: #e2d4d4;
+                color: #777;
+            }
+        }
+    }
+}.nav-tabs {
+     >li {
+         >a {
+             background: #f0f0f0;
+             margin-right: 2px;
+             margin-top: 3px;
+             font-size: 13px;
+             &:hover {
+                 border-color: #eeeeee #eeeeee #dddddd;
+                 background: #e2d4d4;
+                 color: #777;
+             }
+         }
+     }
+ }
+
+// Navbar
 .navbar-dark {
     background-color: $tiki-navbar-dark-bg;
     .navbar-collapse {
@@ -40,46 +132,28 @@
 .navbar {
     border: none;
 }
-.nav-tabs {
-    >li {
-        >a {
-            background: #f0f0f0;
-            margin-right: 2px;
-                        margin-top: 3px;
-                        font-size: 13px;
-            &:hover {
-                border-color: #eeeeee #eeeeee #dddddd;
-                background: #e2d4d4;
-                color: #777;
-            }
+
+.navbar-collapse.collapse.in {
+    .navbar-toggle {
+        margin-right: 0;
+    }
+    .navbar-header {
+        border: 1px solid #fff;
+    }
+}
+
+// Make links visible in dark mode (Tiki 26+)
+#col2 .navbar {
+    background: transparent;
+    .nav-link {
+        color: var(--tiki-vert-nav-link-color);
+        &:hover {
+            color: var(--tiki-vert-nav-link-hover-color);
         }
     }
 }
-.nav-pills {
-    >li {
-        >a {
-            &:hover {
-                background: #f0f0f0;
-                color: #777;
-            }
-        }
-    }
-}
-.tab-content {
-    >.active {
-        border-top: 3px solid #f0f0f0;
-    }
-}
-.pager {
-    li {
-        >a {
-            border: 3px solid #f0f0f0;
-        }
-        >span {
-            border: 3px solid #f0f0f0;
-        }
-    }
-}
+
+// Dropdowns
 .dropdown-menu {
 .divider {
         margin: 0;
@@ -101,29 +175,6 @@
 ul.dropdown-menu {
   margin: 0;
   padding:0;
-}
-.navbar-collapse.collapse.in {
-    .navbar-toggle {
-        margin-right: 0;
-    }
-    .navbar-header {
-        border: 1px solid #fff;
-    }
-}
-
-// Make links visible in dark mode (Tiki 26+)
-#col2 .navbar {
-    background: transparent;
-    .nav-link {
-        color: var(--tiki-vert-nav-link-color);
-        &:hover {
-            color: var(--tiki-vert-nav-link-hover-color);
-        }
-    }
-}
-
-#page-bar {
-    padding: 15px 0 0 15px;
 }
 @media screen and (max-width: 767px) {
     .navbar-light {
@@ -192,6 +243,8 @@ ul.dropdown-menu {
         border-bottom: 1px solid #f0f0f0;
     }
 }
+
+// Buttons
 .btn {
   text-transform: uppercase;
 }
@@ -219,6 +272,8 @@ ul.dropdown-menu {
    border:  3px solid #f0f0f0;
   }
 }
+
+// Forms
 .label {
     border-radius: 0;
 }
@@ -229,6 +284,18 @@ ul.dropdown-menu {
   border: 3px solid $input-border;
 }
 
+// Cards
+.card-title {
+    text-transform: uppercase;
+    text-align: center;
+}
+.moduletitle {
+    border-bottom: 1px solid #777;
+    font-size: 15px;
+    color: #777777;
+}
+
+// Tiki-specific
 #loginbox-1 {
     margin: 0;
     padding: 15px 6px 0;
@@ -320,28 +387,7 @@ li.login_link {
         }
     }
 }
-body.tiki.navbar-padding {
-    padding-top: 80px;
-  }
-#col1 {
-    background: var(--tiki-lighty-col1-bg); //#fff;
-    margin-bottom: 20px;
-}
-body:not(.tiki-admin) #col1 {
-    padding: 15px;
-}
-#right_modules {
-    margin-right: -15px;
-}
-.card-title {
-    text-transform: uppercase;
-    text-align: center;
-}
-.moduletitle {
-    border-bottom: 1px solid #777;
-    font-size: 15px;
-    color: #777777;
-}
+
 a.admbox span.title {
     font-size: 12px;
 
@@ -358,12 +404,7 @@ a.admbox span.title {
         padding: 0;
     }
 }
-//.textarea-toolbar {
-//    >div {
-//        background-color: #eeeeee;
-//        border: none;
-//    }
-//}
+
 .edit-zone-footer {
     text-align: center;
     padding-top: 5px;
@@ -500,12 +541,7 @@ ul.social-network {
 #topbar_modules_social {
     float: right;
 }
-// Update: .form-horizontal was dropped with Bootstrap 4, so this hasn't worked for a long time.
-//.admin {
-//    .form-horizontal {
-//        border: 1px solid #f0f0f0;
-//    }
-//}
+
 .filter-menu {
     .btn-primary {
         width: 100%;
@@ -700,10 +736,22 @@ ul.social-network {
     }
 }
 
-// From template.css
-/* This is the content for the template pages */
+    // Freetags
+.pager {
+    li {
+        >a {
+            border: 3px solid #f0f0f0;
+        }
+        >span {
+            border: 3px solid #f0f0f0;
+        }
+    }
+}
 
-/* Fixed-position-background (was "Parallax") */
+    // From template.css
+// /* This is the content for the template pages */
+
+// /* Fixed-position-background (was "Parallax") */
 #fixed-position-background h1 {
     font-family:'Oswald', sans-serif;
     font-size:70px;
@@ -732,7 +780,7 @@ ul.social-network {
     #fixed-position-background h1 {font-size:30px;}
     #fixed-position-background .fixed-position-background {padding-top:100px; padding-bottom:100px;}
 }
-/* Text */
+// /* Text */
 .first-character {
     font-weight:400;
     float: left;
@@ -746,7 +794,7 @@ ul.social-network {
 .sc {
     color: #e2d4d4;
 }
-/* Block images */
+// /* Block images */
 .content {
     position: relative;
 }
@@ -904,7 +952,7 @@ a.socialIcon:hover, .socialHoverClass {
         height: auto;
     }
 }
-/* Contact */
+    // /* Contact */
 .contact .btn-primary {
     width: 100%;
 }
@@ -924,18 +972,23 @@ a.socialIcon:hover, .socialHoverClass {
     border: 3px solid #e2d4d4;
     color: #fff;
 }
-.form {
-    padding-left: 15px;
-}
-/* Other elements */
+
+    // /* Other elements */
 .about {
     padding: 10px 0 10px 0;
     background: #f0f0f0;
     margin: 0;
 }
-.item{
+.item {
     margin: 35px 20px 0;
 }
 #text {
     display: none;
 }
+
+#page-bar {
+    padding: 15px 0 0 15px;
+}
+
+// Dark mode
+// External libraries

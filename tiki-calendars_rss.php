@@ -34,7 +34,6 @@ if (isset($_REQUEST["calendarIds"])) {
     $uniqueid = $feed . "." . implode(".", $calendarIds);
 } else {
     $uniqueid = $feed;
-    $calendarIds = [];
 }
 $output = $rsslib->get_from_cache($uniqueid);
 

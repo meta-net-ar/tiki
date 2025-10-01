@@ -54,15 +54,15 @@ function list_inviteds($offset = 0, $max = -1, $inviter = null, $status = null, 
         $where[] = '1=1';
     }
     $query = ' FROM `tiki_invited` guy LEFT JOIN `tiki_invite` invite ON (guy.`id_invite` = invite.`id`) where ' . implode(' AND ', $where);
-    $query_cant = "SELECT count(*) $query";
+    $query_count = "SELECT count(*) $query";
     $query = "SELECT guy.*, invite.* $query ORDER BY " . $tikilib->convertSortMode($sort_mode); // convertSortMode($sort_mode);
     $result = $tikilib->query($query, $bindvars, $max, $offset);
-    $cant = $tikilib->getOne($query_cant, $bindvars);
+    $count = $tikilib->getOne($query_count, $bindvars);
     $ret = [];
     while ($res = $result->fetchRow()) {
         $ret[] = $res;
     }
-    return ['cant' => $cant, 'data' => $ret];
+    return ['count' => $count, 'data' => $ret];
 }
 
 $auto_query_args = ['max', 'sort_mode', 'offset', 'inviter', 'only_pending', 'only_success'];
@@ -97,6 +97,6 @@ $inviteds = list_inviteds($_REQUEST['offset'], $_REQUEST['maxRecords'], $inviter
 $smarty->assign_by_ref('inviteds', $inviteds['data']);
 $smarty->assign_by_ref('offset', $_REQUEST['offset']);
 $smarty->assign_by_ref('max', $_REQUEST['maxRecords']);
-$smarty->assign_by_ref('cant', $inviteds['cant']);
+$smarty->assign_by_ref('count', $inviteds['count']);
 $smarty->assign('mid', 'tiki-list_invite.tpl');
 $smarty->display('tiki.tpl');

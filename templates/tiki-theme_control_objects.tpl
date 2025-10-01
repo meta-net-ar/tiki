@@ -51,7 +51,7 @@
     <div class="table-responsive themeobj-table">
         <table class="table">
             <tr>
-                <th><button type="submit" class="btn btn-warning btn-sm" name="delete" title="{tr}Delete selected{/tr}">{icon name="delete"}</button></th>
+                <th><button type="submit" class="btn btn-warning btn-sm" name="delete" title="{tr}Delete selected{/tr}" aria-label="{tr}Delete selected{/tr}">{icon name="delete"}</button></th>
                 <th>
                     <a href="tiki-theme_control_objects.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'type_desc'}type_asc{else}type_desc{/if}">
                         {tr}Type{/tr}
@@ -82,4 +82,4 @@
     </div>
 </form>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

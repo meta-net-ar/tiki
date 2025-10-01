@@ -13,8 +13,8 @@
 function upgrade_20200710_feature_templated_groups_tiki($installer)
 {
 
-    $cant = $installer->getOne('SELECT count(*) FROM `users_groups` where isTplGroup = \'y\'');
-    if ($cant > 0) {
+    $count = $installer->getOne('SELECT count(*) FROM `users_groups` where isTplGroup = \'y\'');
+    if ($count > 0) {
         $pref = $installer->getOne('SELECT COUNT(*) FROM `tiki_preferences` WHERE `name` = \'feature_templated_groups\'');
         if ($pref > 0) {
             $installer->query('UPDATE `tiki_preferences` SET `value` = ? WHERE `name` = \'feature_templated_groups\';', 'y');

@@ -43,7 +43,7 @@
         </div>
         <div class="submit">
             {if $referer}
-                <a class="btn btn-primary" href="{$referer}">
+                <a class="btn btn-primary" href="{$referer}" role="button">
                     {tr}Back{/tr}
                 </a>
             {/if}

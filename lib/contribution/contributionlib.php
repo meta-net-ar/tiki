@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -19,7 +19,7 @@ class ContributionLib extends TikiLib
      * @param        $name
      * @param string $description
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function add_contribution($name, $description = '')
     {
@@ -43,7 +43,7 @@ class ContributionLib extends TikiLib
      * @param        $name
      * @param string $description
      *
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function replace_contribution($contributionId, $name, $description = '')
     {
@@ -54,7 +54,7 @@ class ContributionLib extends TikiLib
     /**
      * @param $contributionId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_contribution($contributionId)
     {
@@ -83,8 +83,8 @@ class ContributionLib extends TikiLib
         $query = "select * from `tiki_contributions` $mid order by " . $this->convertSortMode($sort_mode);
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
 
-        $query_cant = "select count(*) from `tiki_contributions` $mid";
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_contributions` $mid";
+        $count = $this->getOne($query_count, $bindvars);
 
         $ret = [];
 
@@ -94,7 +94,7 @@ class ContributionLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }

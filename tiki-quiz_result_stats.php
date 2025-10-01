@@ -23,9 +23,7 @@ require_once('tiki-setup.php');
 $quizlib = TikiLib::lib('quiz');
 $access->check_feature('feature_quizzes');
 if (! isset($_REQUEST["quizId"])) {
-    $smarty->assign('msg', tra("No quiz indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No quiz indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign('individual', 'n');
 
@@ -35,15 +33,11 @@ $quiz_info = $quizlib->get_quiz($_REQUEST["quizId"]);
 $smarty->assign('quizId', $_REQUEST["quizId"]);
 $smarty->assign('quiz_info', $quiz_info);
 if (! isset($_REQUEST["resultId"])) {
-    $smarty->assign('msg', tra("No result indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No result indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign('resultId', $_REQUEST["resultId"]);
 if (! isset($_REQUEST["userResultId"])) {
-    $smarty->assign('msg', tra("No result indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No result indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign('userResultId', $_REQUEST["userResultId"]);
 $ur_info = $quizlib->get_user_quiz_result($_REQUEST["userResultId"]);

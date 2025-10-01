@@ -152,7 +152,7 @@ if ($_REQUEST['view'] == 'list') {
         $pdate = date("U");
     }
     $channels = $minicallib->minical_list_events($user, $offset, $maxRecords, $sort_mode, $find);
-    $smarty->assign_by_ref('cant_pages', $channels["cant"]);
+    $smarty->assign_by_ref('pages_count', $channels["count"]);
     $smarty->assign('channels', $channels["data"]);
 }
 $upcoming = $minicallib->minical_list_events_from_date($user, 0, $minical_upcoming, 'start_asc', '', $pdate_h);

@@ -91,6 +91,7 @@
                     </div>
 
                     <div class="adminoptionboxchild unified_engine_childcontainer mysql">
+                        {preference name="unified_mysql_index_current"}
                         {preference name="unified_mysql_short_field_names"}
                         {preference name="unified_mysql_restore_indexes"}
                     </div>
@@ -105,6 +106,7 @@
                         {preference name="unified_manticore_always_index"}
                     </div>
 
+                    {preference name="unified_check_unused_indexes"}
                     {preference name="unified_search_default_operator"}
                     {preference name=unified_excluded_categories}
                     {preference name=unified_excluded_plugins}

@@ -24,16 +24,12 @@ $access->check_feature('feature_articles');
 $access->check_permission('tiki_p_admin_cms');
 
 if (! isset($_REQUEST["topicid"])) {
-    $smarty->assign('msg', tra("No topic id specified"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No topic id specified"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $topic_info = $artlib->get_topic($_REQUEST["topicid"]);
 if ($topic_info == DB_ERROR) {
-    $smarty->assign('msg', tra("Invalid topic id specified"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Invalid topic id specified"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 $smarty->assign_by_ref('topic_info', $topic_info);
 $errors = false;
@@ -44,10 +40,7 @@ if (isset($_REQUEST["edittopic"])) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
             $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));

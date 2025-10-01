@@ -1,5 +1,5 @@
-{assign var="row" value=$results[0]}
-{assign var="maxRows" value=1}
+{$row=$results[0]}
+{$maxRows=1}
 <style type="text/css">
     .product th {
         text-align:right;

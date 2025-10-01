@@ -20,12 +20,8 @@ if (isset($_REQUEST["view_user"])) {
         if ($tiki_p_admin == 'y') {
             $userwatch = $_REQUEST["view_user"];
         } else {
-            $smarty->assign('msg', tra("You do not have permission to view other users data"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to view other users data"), \Laminas\Http\Response::STATUS_CODE_403);
         }
-    } else {
-        $userwatch = $user;
     }
 }
 $smarty->assign('userwatch', $userwatch);
@@ -135,7 +131,7 @@ if ($prefs['feature_tasks'] == 'y') {
     $mytiki_tasks = $tikilib->get_user_preference($user, 'mytiki_tasks', 'y');
     if ($mytiki_tasks == 'y') {
         $tasks_offset = $offset;
-        $tasks_count = $tasklib->list_tasks($user, 0, -1, null, 'priority_asc', true, false, true)['cant'];
+        $tasks_count = $tasklib->list_tasks($user, 0, -1, null, 'priority_asc', true, false, true)['count'];
         //always reset the offset to the last page when the offset in parameter is greater than the number of pages to have in the pagination
         if ($offset > $tasks_count) {
             $tasks_offset = $tasks_count === 0 ? -1 : ((ceil($tasks_count / $step) - 1) * $step);
@@ -154,7 +150,7 @@ if ($prefs['feature_messages'] == 'y' && $tiki_p_messages == 'y') {
         $smarty->assign_by_ref('unread', $unread);
 
         $msgs_offset = $offset;
-        $msgs_count = TikiLib::lib('message')->list_user_messages($user, 0, -1, 'date_desc', '', 'isRead', 'n', '', 'messages')['cant'];
+        $msgs_count = TikiLib::lib('message')->list_user_messages($user, 0, -1, 'date_desc', '', 'isRead', 'n', '', 'messages')['count'];
         //always reset the offset to the last page when the offset in parameter is greater than the number of pages to have in the pagination
         if ($offset > $msgs_count) {
             $msgs_offset = $msgs_count === 0 ? -1 : ((ceil($msgs_count / $step) - 1) * $step);

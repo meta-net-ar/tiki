@@ -10,7 +10,7 @@ class Api extends Utilities
 
     private function loadObjects($folder)
     {
-        if (strpos($folder, '/') !== false && strpos($folder, '_') === false) {
+        if (str_contains($folder, '/') && ! str_contains($folder, '_')) {
             $package = $folder;
         } else {
             $package = str_replace('_', '/', $folder);

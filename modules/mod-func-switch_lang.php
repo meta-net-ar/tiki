@@ -46,7 +46,7 @@ function module_switch_lang($mod_reference, $module_params)
     $languages = [];
     $langLib = TikiLib::lib('language');
     $languages = $langLib->list_languages(false, 'n');
-    $mode = isset($module_params["mode"]) ? $module_params["mode"] : "droplist";
+    $mode = $module_params["mode"] ?? "droplist";
     $smarty->assign('mode', $mode);
     if ($mode == 'flags' || $mode == 'words' || $mode == 'abrv') {
         include('lang/flagmapping.php');

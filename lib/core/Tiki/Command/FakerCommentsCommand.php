@@ -213,7 +213,7 @@ class FakerCommentsCommand extends Command
                 }
                 $commentDateUnix = $commentDateTime->format('U');
                 if ($prefs['comments_notitle'] === 'y') {
-                    $commentData['title'] = 'Untitled ' . $tikilib->get_long_datetime($commentDateUnix);
+                    $commentData['title'] = 'Untitled';
                 }
 
                 try {

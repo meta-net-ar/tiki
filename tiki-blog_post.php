@@ -47,7 +47,7 @@ $editlib = TikiLib::lib('edit');
 
 $access->check_feature('feature_blogs');
 
-$blogId = isset($_REQUEST['blogId']) ? $_REQUEST['blogId'] : 0;
+$blogId = $_REQUEST['blogId'] ?? 0;
 
 // Now check which blogs the user has permission to post (if any)
 if ($tiki_p_blog_admin == 'y') {
@@ -61,9 +61,7 @@ $smarty->assign_by_ref('blogs', $blogs);
 
 // If user doesn't have permission to post in any blog display error message
 if (count($blogs) == 0) {
-    $smarty->assign('msg', tra("It isn't possible to post in any blog.") . ' <a href="tiki-edit_blog.php" >' . tra("You may need to create a blog first.") . '</a>');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("It isn't possible to post in any blog.") . ' <a href="tiki-edit_blog.php" >' . tra("You may need to create a blog first.") . '</a>', \Laminas\Http\Response::STATUS_CODE_401);
 } elseif ($blogId == 0 && count($blogs) == 1) {
     $blogId = $blogs[0]['blogId'];
 }
@@ -73,7 +71,7 @@ if ($blogId > 0) {
     $smarty->assign_by_ref('blog_data', $blog_data);
 }
 
-$postId = isset($_REQUEST["postId"]) ? $_REQUEST["postId"] : 0;
+$postId = $_REQUEST["postId"] ?? 0;
 
 if ($postId > 0) {
     $data = $bloglib->get_post($_REQUEST["postId"]);
@@ -82,10 +80,7 @@ if ($postId > 0) {
     // If the user owns the weblog then he can edit
     if (! $user || ($data["user"] != $user && $user != $blog_data["user"] && ! ($blog_data['public'] == 'y' && $tikilib->user_has_perm_on_object($user, $_REQUEST['blogId'], 'blog', 'tiki_p_blog_post')))) {
         if ($tiki_p_blog_admin != 'y' && ! $tikilib->user_has_perm_on_object($user, $_REQUEST['blogId'], 'blog', 'tiki_p_blog_admin')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this post"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this post"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
     if (isset($data['wysiwyg']) && ! isset($_POST['wysiwyg'])) {
@@ -209,10 +204,10 @@ if (isset($_POST["preview"])) {
     $post_info['parsed_data'] = $parsed_data;
 
     $post_info['title'] = $_POST['title'];
-    $post_info['excerpt'] = isset($_POST['excerpt']) ? $_POST['excerpt'] : '';
-    $post_info['user'] = isset($data) ? $data['user'] : $user;
+    $post_info['excerpt'] = $_POST['excerpt'] ?? '';
+    $post_info['user'] = $data['user'] ?? $user;
     $post_info['created'] = $publishDate;
-    $post_info['avatar'] = isset($data) ? $data['avatar'] : '';
+    $post_info['avatar'] = $data['avatar'] ?? '';
     $post_info['postId'] = $postId;
 
     if ($prefs['feature_freetags'] == 'y' && isset($_POST['freetag_string'])) {
@@ -240,17 +235,17 @@ if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
     //$edit_data = $imagegallib->capture_images($edit_data);
     $edit_data = $tikilib->convertAbsoluteLinksToRelative($edit_data);
 
-    $title = isset($_POST['title']) ? $_POST['title'] : '';
+    $title = $_POST['title'] ?? '';
 
     if ($postId > 0) {
-        $bloglib->update_post($postId, $_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $data["user"], $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
+        $bloglib->update_post($postId, $_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $data["user"], $title, $_POST['contributions'] ?? '', $blogpriv, $publishDate, $is_wysiwyg);
     } else {
         if ($blog_data['always_owner'] == 'y') {
             $author = $blog_data['user'];
         } else {
             $author = $user;
         }
-        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $author, $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
+        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $author, $title, $_POST['contributions'] ?? '', $blogpriv, $publishDate, $is_wysiwyg);
         $smarty->assign('postId', $postId);
     }
 

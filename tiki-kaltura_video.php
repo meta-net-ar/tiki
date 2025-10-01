@@ -134,9 +134,7 @@ try {
                 break;
 
             case 'default':
-                $smarty->assign('msg', tra('Incorrect param'));
-                $smarty->display('error.tpl');
-                exit;
+                Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
         if (isset($videoId[0])) {

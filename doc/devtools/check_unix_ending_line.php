@@ -44,7 +44,7 @@ $extensions = [
 ];
 
 $message = '';
-$paramList = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
+$paramList = $_SERVER['argv'] ?? [];
 
 $iterator = [];
 foreach ($paramList as $paramFile) {

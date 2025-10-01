@@ -559,8 +559,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-
-
         'feature_shadowbox' => [
             'name' => tra('Shadowbox / ColorBox'),
             'description' => tra('Display images in a modal popup window (also referred to as shadowbox, lightbox or colorbox).'),
@@ -623,6 +621,13 @@ function prefs_feature_list($partial = false)
             'tags' => ['experimental'],
             'admin' => 'webmail',
             'view' => 'tiki-webmail.php',
+            'conflicts' => [
+                'y' => [
+                    'preference' => 'session_storage',
+                    'value' => 'db',
+                    'message' => tra('It is recommended not to set the session storage to database if you use the webmail feature. <a href="https://dev.tiki.org/item8365-Race-condition-Sessions-stored-in-the-database-and-Cypht" class="alert-link">See more details.</a>')
+                ]
+            ]
         ],
         'feature_intertiki' => [
             'name' => tra('Intertiki'),
@@ -687,18 +692,17 @@ function prefs_feature_list($partial = false)
         // TODO: Replace feature_wysiwyg and wysiwyg_optional with a single tri-state preference (allowing either just normal editor (default), just WYSIWYG or both) to clarify and avoid misinterpretation
         'feature_wysiwyg' => [
             'name' => tra('Full WYSIWYG editor'),
-            'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://ckeditor.com">CKEditor</a> is used to provide a word-processor-like editing experience.'),
+            'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://summernote.org">Summernote</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'feature_ajax',
                 'ajax_autosave',
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
-            'tags' => ['deprecated'],
-            'warning' => tra('CKEditor4 is no longer supported.'),
+            'tags' => ['experimental'],
         ],
 
         'feature_kaltura' => [
@@ -709,6 +713,15 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'admin' => 'video',
             'view' => 'tiki-list_kaltura_entries.php?list=media',
+        ],
+        'feature_peertube' => [
+            'name' => tra('PeerTube video management'),
+            'description' => tra('Integration with the PeerTube video platform'),
+            'help' => 'PeerTube',
+            'type' => 'flag',
+            'default' => 'n',
+            'admin' => 'video',
+            'view' => 'tiki-list_peertube_entries.php?list=videos',
         ],
         'feature_friends' => [
             'name' => tra('Friendship Network'),
@@ -1736,17 +1749,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
         ],
-        'feature_editcss' => [
-            'name' => tra('Edit CSS'),
-            'description' => tra('Edit CSS files directly in the browser.'),
-            'type' => 'flag',
-            'help' => 'Edit-CSS',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'perspective' => false,
-            'tags' => ['experimental'],
-            'default' => 'n',
-            'view' => 'tiki-edit_css.php',
-        ],
         'feature_theme_control' => [
             'name' => tra('Theme Control'),
             'description' => tra('Assign different themes to various sections, categories, and objects.'),
@@ -1757,30 +1759,6 @@ function prefs_feature_list($partial = false)
             ],
             'default' => 'n',
             'view' => 'tiki-theme_control.php',
-        ],
-        'feature_view_tpl' => [
-            'name' => tra('Tiki template viewing'),
-            'type' => 'flag',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'help' => 'View-Templates',
-            'keywords' => tra('template'),
-            'tags' => ['experimental'],
-            'perspective' => false,
-            'default' => 'n',
-        ],
-        'feature_edit_templates' => [
-            'name' => tra('Edit templates'),
-            'type' => 'flag',
-            'help' => 'Edit-Templates',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'keywords' => tra('template'),
-            'perspective' => false,
-            'dependencies' => [
-                'feature_view_tpl',
-            ],
-            'default' => 'n',
-            'view' => 'tiki-edit_templates.php',
-            'tags' => ['experimental'],
         ],
         'feature_custom_html_head_content' => [
             'name' => tra('Custom HTML head content'),
@@ -1905,27 +1883,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-        'feature_jquery_autocomplete' => [
-            'name' => tra('jQuery Autocomplete'),
-            'description' => tra('Provides various dropdown menus on many text input boxes for page names, user names, groups, tags, etc.'),
-            'type' => 'flag',
-            'help' => 'JQuery#Autocomplete',
-            'dependencies' => [
-                'feature_jquery_ui',
-            ],
-            'conflicts' => [
-                'elementplus_autocomplete',
-            ],
-            'default' => 'n',   // autocomplete on pages in QuickEdit (more coming soon)
-            'tags' => ['deprecated'],
-        ],
-        'feature_jquery_reflection' => [
-            'name' => tra('Reflection'),
-            'description' => tra('Creates a reflection under an image. Used in Plugin Img with the parameter "class=reflect"'),
-            'type' => 'flag',
-            'help' => 'JQuery#Reflection',
-            'default' => 'n',       // reflection effects on images
-        ],
         'feature_jquery_ui' => [
             'name' => tra('JQuery UI'),
             'description' => tra('Include jQuery UI library. Enables a number of interface features.'),
@@ -1990,6 +1947,7 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'help' => 'JQuery#TableSorter',
             'default' => 'n',   // sortable tables ([will] override existing)
+            'tags' => ['experimental'],
         ],
         'feature_jquery_tagcanvas' => [
             'name' => tra('TagCanvas'),
@@ -2655,15 +2613,6 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['experimental'],
         ],
-        'feature_accounting' => [
-            'name' => tra('Accounting'),
-            'description' => tra('Double-entry accounting system'),
-            'help' => 'Accounting',
-            'type' => 'flag',
-            'default' => 'n',
-            'view' => 'tiki-accounting_books.php',
-            'tags' => ['experimental'],
-        ],
         'feature_syntax_highlighter' => [
             'name' => tra('Code editor (CodeMirror)'),
             'description' => tra('CodeMirror code editor, which provides syntax highlighting'),
@@ -2757,14 +2706,6 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'help' => 'Inline-comments',
             'tags' => ['experimental'],
-        ],
-        'feature_equal_height_rows_js' => [
-            'name' => tra('Enable JavaScript plugin for equal-height rows'),
-            'description' => tra('Enable responsive rows, the contained elements of which have the same height.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'help' => "https://github.com/Sam152/Javascript-Equal-Height-Responsive-Rows",
-            'tags' => ['advanced'],
         ],
         'feature_conditional_formatting' => [
             'name' => tra('Conditional formatting'),
@@ -2935,6 +2876,15 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'view' => 'tiki-admin_schedulers.php',
             'default' => 'y',
+            'tags' => ['advanced'],
+        ],
+        'feature_queued_tasks' => [
+            'name' => tra('Queued Tasks'),
+            'description' => tra('Enables the execution of tasks in the background.'),
+            'help' => 'Queued Tasks',
+            'type' => 'flag',
+            'view' => 'tiki-admin_queued_tasks.php',
+            'default' => 'n',
             'tags' => ['advanced'],
         ],
         'feature_absolute_to_relative_links' => [

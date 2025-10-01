@@ -60,7 +60,7 @@
                                                 {ticket}
                                                 <input type="hidden" name="action" value="remove">
                                                 <input type="hidden" name="id" value="{$persp.perspectiveId}">
-                                                <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this perspective?{/tr}')">
+                                                <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this perspective?{/tr}')" aria-label="{tr}Delete{/tr}">
                                                     {icon name='delete' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                                 </button>
                                             </form>
@@ -73,7 +73,7 @@
                 {/foreach}
             </table>
         </div>
-        {pagination_links offset=$offset step=$prefs.maxRecords cant=$count}{/pagination_links}
+        {pagination_links offset=$offset step=$prefs.maxRecords count=$count}{/pagination_links}
     {/tab}
 
     {if $tiki_p_perspective_create eq 'y'}
@@ -107,7 +107,7 @@
                                     <div class="w-100">
                                     {preference name=$name source=$perspective_info.preferences}
                                     </div>
-                                    <button type="button" class="btn btn-link text-danger" onclick="$('.{$name}').closest('.wrapper').remove()">{icon name='delete'}</button>
+                                    <button type="button" class="btn btn-link text-danger" onclick="$('.{$name}').closest('.wrapper').remove()" aria-label="{tr}Delete{/tr}">{icon name='delete'}</button>
                                 </div>
                             {/foreach}
                     </fieldset>

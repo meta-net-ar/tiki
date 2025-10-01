@@ -10,11 +10,11 @@ $inputConfiguration = [
         'delete'                   => 'word',                //post
         'duplicate'                => 'bool',                //post
         'toGroup'                  => 'word',                //post
-        'objectPerm'               => 'word',                //post
+        'objectPerm'               => 'string',              //post
         ],
         'staticKeyFiltersForArrays' => [
             'filterGroup'           => 'groupname',          //post
-            'groupPerm'             => 'bool',               //post
+            'groupPerm'             => 'string',             //post
         ],
     ],
 ];
@@ -92,6 +92,10 @@ if ($del || $dup) {
     if (! empty($_REQUEST['groupPerm'])) {
         foreach ($_REQUEST['groupPerm'] as $perm) {
             $perm = json_decode($perm, true);
+            //Check that $perm is an array before accessing keys
+            if (! is_array($perm) || ! isset($perm['perm'], $perm['group'])) {
+                continue;
+            }
             if ($del) {
                 $userlib->remove_permission_from_group($perm['perm'], $perm['group']);
                 $feedbacks[] = tra('Remove permission %0 from %1', '', false, [$perm['perm'], $perm['group']]);
@@ -239,7 +243,7 @@ foreach ($types as $type) {
             $objects = $bloglib->list_blogs();
 
             foreach ($objects['data'] as $object) {
-                $objectName = isset($object['name']) ? $object['name'] : null;
+                $objectName = $object['name'] ?? null;
                 $r = list_perms($object['blogId'], $type, $objectName, $filterGroup);
                 if (count($r['special']) > 0) {
                     $res[$type]['objects'][] = ['objectId' => $r['objectId'], 'special' => $r['special'], 'objectName' => $objectName, 'objectType' => $type];
@@ -254,7 +258,7 @@ foreach ($types as $type) {
             $sheetlib = TikiLib::lib('sheet');
             $objects = $sheetlib->list_sheets();
             foreach ($objects['data'] as $object) {
-                $r = list_perms($object['sheetId'], $type, isset($object['name']) ? $object['name'] : null, $filterGroup);
+                $r = list_perms($object['sheetId'], $type, $object['name'] ?? null, $filterGroup);
                 if (count($r['special']) > 0) {
                     $res[$type]['objects'][] = ['objectId' => $r['objectId'], 'special' => $r['special'], 'objectName' => $object['name'], 'objectType' => $type];
                 }

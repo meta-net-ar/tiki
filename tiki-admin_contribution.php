@@ -90,7 +90,7 @@ if (isset($_REQUEST['setting']) && $access->checkCsrf()) {
 if (isset($_REQUEST['add']) && isset($_REQUEST['new_contribution_name']) && $access->checkCsrf()) {
     $result = $contributionlib->add_contribution(
         $_REQUEST['new_contribution_name'],
-        isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+        $_REQUEST['description'] ?? ''
     );
     if ($result && $result->numRows()) {
         Feedback::success(tr('Contribution added'));
@@ -107,7 +107,7 @@ if (
     $result = $contributionlib->replace_contribution(
         $_REQUEST['contributionId'],
         $_REQUEST['name'],
-        isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+        $_REQUEST['description'] ?? ''
     );
     if ($result && $result->numRows()) {
         Feedback::success(tr('Contribution modified'));

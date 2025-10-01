@@ -4,11 +4,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
         'loadprevious'                    => 'word',              //post
-        'emailslist'                      => 'word',              //post
+        'emailslist'                      => 'xss',              //post
         'emailslist_format'               => 'word',              //post
         'emailsubject'                    => 'word',              //post
         'emailcontent'                    => 'xss',               //post
@@ -45,7 +48,7 @@ function parsemails_csv($bloc)
         $r['lastname'] = trim($l[0]);
         $r['firstname'] = trim($l[1]);
         $r['email'] = trim($l[2]);
-        if (strpos($r['email'], '@') !== false) {
+        if (str_contains($r['email'], '@')) {
             $results[] = $r;
         }
     }
@@ -63,14 +66,13 @@ function parsemails_all($bloc)
     $bloc = str_replace("\n\r", "\n", $bloc);
     $bloc = str_replace("\r", "\n", $bloc);
     $mails = preg_split('/[^a-zA-Z0-9@._-]/', $bloc);
-
     $results = [];
     foreach ($mails as $m) {
         $m = trim($m);
-        if (strpos($m, '@') === false) {
+        if (! str_contains($m, '@')) {
             continue;
         }
-        if (strpos($m, '.') === false) {
+        if (! str_contains($m, '.')) {
             continue;
         }
         $r = [];
@@ -126,7 +128,6 @@ if (isset($_REQUEST['send'])) {
     $_text = str_replace("\r", "\n", $_text);
 
     $mails = $_REQUEST["emailslist"];
-
     switch ($_REQUEST['emailslist_format']) {
         case 'all':
             $emails = parsemails_all($mails);

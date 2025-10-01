@@ -15,7 +15,6 @@ use SplObjectStorage;
 use SplObserver;
 use TWVersion;
 use Exception;
-use TikiDb_Pdo_Result;
 
 /**
  * @see Patch
@@ -118,12 +117,11 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
         $TWV = new TWVersion();
-        $dbversion_tiki = $TWV->version;
 
         // If a Mysql data file exists, use that. Very fast
         //  If data file is missing or the batch loader is not available, use the single insert method
-        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.sql';
-        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.data';
+        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.sql';
+        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.data';
         if (file_exists($secdbData)) {
             // A MySQL datafile exists
             $truncateTable = true;
@@ -306,7 +304,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $statements = self::splitSqlStatements($command);
 
         $this->queries['currentFile'] = basename($file);
-        array_push($this->queries['files'], $file);
+        $this->queries['files'][] = $file;
         $this->queries['total'] += count($statements);
 
         $status = true;
@@ -342,7 +340,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
      * @param bool $reporterrors
      * @param string $patch
      * @param bool $countQueries
-     * @return TikiDb_Pdo_Result or false if the query failed
+     * @return Tiki\TikiDb\PdoResult or false if the query failed
      */
     public function query($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = true, $patch = '', $countQueries = true)
     {
@@ -453,11 +451,11 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $patchesFilesNames = [];
         foreach ($patches as $key => $patch) {
             if (file_exists($patchDir . $key . ".sql")) {
-                array_push($patchesFilesNames, $key . ".sql");
+                $patchesFilesNames[] = $key . ".sql";
             } elseif (file_exists($patchDir . $key . ".yml")) {
-                array_push($patchesFilesNames, $key . ".yml");
+                $patchesFilesNames[] = $key . ".yml";
             } else {
-                array_push($patchesFilesNames, $key . ".php");
+                $patchesFilesNames[] = $key . ".php";
             }
         }
         return $patchesFilesNames;

@@ -21,18 +21,14 @@ $trklib = TikiLib::lib('trk');
 $access->check_feature('feature_trackers');
 
 if (! isset($_REQUEST['trackerId'])) {
-    $smarty->assign('msg', tra('No tracker indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if ($tracker_info = $trklib->get_tracker($_REQUEST['trackerId'])) {
     if ($t = $trklib->get_tracker_options($_REQUEST['trackerId'])) {
         $tracker_info = array_merge($tracker_info, $t);
     }
 } else {
-    $smarty->assign('msg', tra('Incorrect param'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $admin_perm = $tiki_p_admin_trackers;
@@ -41,10 +37,7 @@ if ($tiki_p_admin_trackers != 'y' && ! empty($_REQUEST['trackerId'])) {
     $admin_perm = $perms['tiki_p_admin_trackers'];
 }
 if ($admin_perm != 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You don't have permission to use this feature"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You don't have permission to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 $auto_query_args = [
     'trackerId',

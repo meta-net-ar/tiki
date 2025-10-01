@@ -30,7 +30,7 @@ usage()
 {
 cat << EOF
 TIM-create - Tiki Instance Creator
-usage: $0 -u <user> -t <svn tag> -g <git branch> -i <instance id>
+usage: $0 -u <user> -g <git branch> -i <instance id>
 
 OPTIONS:
    -h      Show this message
@@ -39,7 +39,6 @@ OPTIONS:
    -U      userid on Tiki.org
    -r      GIT Repository
    -g      GIT branch
-   -t      SVN Tag (Tiki version)
    -P      Subdirectory path
 EOF
 }
@@ -56,9 +55,6 @@ do
             ;;
         g)
             GITBRANCH=$OPTARG
-            ;;
-        t)
-            SVNTAG=$OPTARG
             ;;
         u)
             TUSER=$OPTARG
@@ -79,7 +75,7 @@ do
     esac
 done
 
-if ([[ -z $SVNTAG ]] && [[ -z $GITBRANCH ]] && [[ -z $GITREP ]]) || [[ -z $TUSER ]] || [[ -z $ID ]]
+if ([[ -z $GITBRANCH ]] && [[ -z $GITREP ]]) || [[ -z $TUSER ]] || [[ -z $ID ]]
 then
     usage
     exit 1
@@ -92,7 +88,6 @@ debug()
     echo "COMMAND: $COMMAND"
     echo "GITREP: $GITREP"
     echo "GITBRANCH: $GITBRANCH"
-    echo "SVNTAG: $SVNTAG"
     echo "TUSER: $TUSER"
     echo "ID: $ID"
 }
@@ -126,28 +121,6 @@ create()
 
     log "Starting instance creation"
 
-    # Trunk cache gets updated via cron every now and then
-    # we lock it, so we don't install from a broken tarball
-    if [[ ! -z $SVNTAG ]]
-    then
-        while [[ -e $SVN_CACHE/$SVNTAG.lock ]];
-        do
-            log "Waiting for tarball lock"
-            sleep 5
-        done
-
-        log "Unpacking tarball"
-        tar -C $INSTANCE_DIR -xzf $SVN_CACHE/$SVNTAG.tar.gz
-
-        if echo $BRANCHES | grep ${SVNTAG} > /dev/null;
-        then
-            log "SVN upping because this is $SVNTAG"
-            cd $INSTANCE_DIR
-            svn upgrade
-            svn up
-        fi
-    fi
-
     # GIT
     if [[ ! -z $GITBRANCH ]]
     then
@@ -171,7 +144,6 @@ create()
     log "Creating local.php"
     cat > $INSTANCE_DIR/db/local.php <<EOF
 <?php
-\$dbversion_tiki='$([ ! -z $GITBRANCH ] && echo $GITBRANCH || echo $SVNTAG)';
 \$host_tiki='localhost';
 \$user_tiki='tiki';
 \$pass_tiki='password';
@@ -210,7 +182,7 @@ EOF
     read -r -d '' infotext <<EOT
 This Tiki instance was created on the Tiki show community website
 Creation date: `date -u +%Y-%m-%d_%H-%M-%S`
-Version: $([ ! -z $GITBRANCH ] && echo $GITBRANCH || echo $SVNTAG)
+Version: $([ ! -z $GITBRANCH ] && echo $GITBRANCH)
 Related to Wish: http://dev.tiki.org/item${ID}
 Wish was created by user ${FRIENDLYUSERNAME}http://dev.tiki.org/user${TUSERID}
 Created as http://${SUBDOMAIN}.show.tiki.org/
@@ -229,11 +201,6 @@ Branch: `git branch | grep '*' | sed 's/* //'`
 Commit: `git rev-parse HEAD`
 `git log --max-count=1 | grep Author | sed 's/Author:/Last Changed Author:/'`
 `git log --max-count=1 | grep Date | sed 's/Date:  /Last Changed Date:/'`
-EOT
-else
-    read -r -d '' infotextversion <<EOT
-SVN info
-`svn info`
 EOT
 fi
 

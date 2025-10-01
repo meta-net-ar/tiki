@@ -74,7 +74,7 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
             $level = 3;
         }
         $toggle = $this->getOption('toggle');
-        $inTable = isset($context['inTable']) ? $context['inTable'] : '';
+        $inTable = $context['inTable'] ?? '';
         $name = htmlspecialchars(tra($this->getConfiguration('name')));
         //to distinguish header description display on tiki-view_tracker.php versus when plugin tracker is used
         $desclass = isset($context['pluginTracker']) && $context['pluginTracker'] == 'y' ?

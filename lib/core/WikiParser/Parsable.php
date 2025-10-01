@@ -103,8 +103,8 @@ class WikiParser_Parsable extends ParserLib
         }
 
         // if we removed the syntax plugin then clean up the leftover linefeed
-        if ($found && (strpos($data, "\r\n") === 0 || strpos($data, "\n") === 0)) {
-            $data = substr($data, strpos($data, "\r\n") === 0 ? 2 : 1);
+        if ($found && (str_starts_with($data, "\r\n") || str_starts_with($data, "\n"))) {
+            $data = substr($data, str_starts_with($data, "\r\n") ? 2 : 1);
         }
 
         return $return;
@@ -143,7 +143,7 @@ class WikiParser_Parsable extends ParserLib
             $pluginskiplist = [];
         }
 
-        $is_html = (isset($this->option['is_html']) ? $this->option['is_html'] : false);
+        $is_html = ($this->option['is_html'] ?? false);
         $data = $this->protectSpecialChars($data, $is_html);
 
         $matches = WikiParser_PluginMatcher::match($data);
@@ -155,7 +155,7 @@ class WikiParser_Parsable extends ParserLib
             }
 
             //note parent plugin in case of plugins nested in an include - to suppress plugin edit icons below
-            $plugin_parent = isset($plugin_name) ? $plugin_name : false;
+            $plugin_parent = $plugin_name ?? false;
             $plugin_name = $match->getName();
 
             if (! empty($this->option['indexing'])) {
@@ -164,7 +164,7 @@ class WikiParser_Parsable extends ParserLib
                     // {literal} smarty blocks or {display} and other LIST-plugin syntax gets removed if we don't make it searchable by default
                     $isSearchableByDefault = true;
                 } else {
-                    $isSearchableByDefault = isset($info['searchable_by_default']) ? $info['searchable_by_default'] : false;
+                    $isSearchableByDefault = $info['searchable_by_default'] ?? false;
                 }
                 //We are in an indexing context, check if plugins should be indexed, and strip them out if not
 
@@ -254,7 +254,7 @@ class WikiParser_Parsable extends ParserLib
                     }
 
                     if ($this->option['wysiwyg']) {
-                        $ret = $this->convert_plugin_for_ckeditor($plugin_name, $arguments, tra('Plugin execution pending approval'), $plugin_data, ['icon' => 'img/icons/error.png']);
+                        $ret = $this->convert_plugin_for_html_editor($plugin_name, $arguments, tra('Plugin execution pending approval'), $plugin_data, ['icon' => 'img/icons/error.png']);
                     } else {
                         $smarty->assign('plugin_name', $plugin_name);
                         $smarty->assign('plugin_index', $current_index);
@@ -450,14 +450,13 @@ if ( \$('#$id') ) {
         if (! empty($option)) {
             $this->setOptions($option);
         }
+        $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
+        $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $this->parse_wiki_argvariable($data);
         foreach ($args as &$arg) {
             $this->parse_wiki_argvariable($arg);
         }
-
-        $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
-        $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $outputFormat = 'wiki';
         if (isset($this->option['context_format'])) {
@@ -483,7 +482,7 @@ if ( \$('#$id') ) {
                 $_REQUEST['tr_offset1'] = 0;
             }
             foreach ($args as $arg) {
-                if (substr($arg, 0, 4) == '{$f_') {
+                if (str_starts_with($arg, '{$f_')) {
                     return $name . ': ' . tr(
                         'Pretty tracker reference "%0" could not be replaced in plugin "%1".',
                         str_replace(['{','}'], '', $arg),
@@ -514,9 +513,11 @@ if ( \$('#$id') ) {
             }
         }
 
-        if (! $validationPerformed && ! ($this->option['wysiwyg'] ?? false)) {
+        if (! $validationPerformed) {
             $this->plugin_apply_filters($name, $data, $args);
         }
+
+        $result = '';
 
         if (function_exists($func_name)) {
             $pluginFormat = 'wiki';
@@ -553,14 +554,16 @@ if ( \$('#$id') ) {
             $killtoc = false;
 
             $plugin_result = $this->convert_plugin_output($output, $pluginFormat, $outputFormat);
-            if (($this->option['wysiwyg'] ?? false)) {
-                return $this->convert_plugin_for_ckeditor($name, $args, $plugin_result, $data, $info);
+            if (($this->option['html_editor'] ?? false)) {
+                return $this->convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info);
             } else {
-                return $plugin_result;
+                $result = $plugin_result;
             }
         } elseif (WikiPlugin_Negotiator_Wiki_Alias::findImplementation($name, $data, $args)) {
-            return $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
+            $result = $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
         }
+
+        return $result;
     }
 
     public function stripPlugins($name)

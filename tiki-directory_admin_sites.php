@@ -11,13 +11,17 @@ $inputConfiguration = [
             'siteId'                      => 'int',           //post
             'remove'                      => 'int',           //get
             'name'                        => 'string',        //post
+            'description'                 => 'string',        //post
             'url'                         => 'url',           //post
-            'siteCats'                    => 'string',        //post
             'isValid'                     => 'bool',          //post
             'country'                     => 'string',        //post
             'sort_mode'                   => 'string',        //get
             'offset'                      => 'int',           //get
             'find'                        => 'string',        //get
+            'save'                        => 'bool',          //post
+        ],
+        'staticKeyFiltersForArrays'      => [
+            'siteCats'                    => 'int',           //post
         ],
     ],
 ];
@@ -69,13 +73,12 @@ if ($_REQUEST["siteId"]) {
 $smarty->assign_by_ref('info', $info);
 // Remove a category
 if (isset($_REQUEST["remove"])) {
+    $access->checkCsrf();
     if (is_array($_REQUEST["remove"])) {
-        $access->checkCsrf();
         foreach ($_REQUEST["remove"] as $remid) {
             $dirlib->dir_remove_site($remid);
         }
     } else {
-        $access->checkCsrf();
         $dirlib->dir_remove_site($_REQUEST["remove"]);
     }
 }
@@ -83,22 +86,20 @@ if (isset($_REQUEST["remove"])) {
 if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
     if (empty($_REQUEST["name"])) {
-        $smarty->assign('msg', tra("Must enter a name to add a site"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must enter a name to add a site"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (empty($_REQUEST["url"])) {
-        $smarty->assign('msg', tra("Must enter a url to add a site"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must enter a url to add a site"), \Laminas\Http\Response::STATUS_CODE_400);
     }
-    if ((substr($_REQUEST["url"], 0, 7) <> 'http://') && (substr($_REQUEST["url"], 0, 8) <> 'https://') && (substr($_REQUEST["url"], 0, 6) <> 'ftp://')) {
+    if (
+        (! str_starts_with($_REQUEST["url"], 'http://')) &&
+        (! str_starts_with($_REQUEST["url"], 'https://')) &&
+        (! str_starts_with($_REQUEST["url"], 'ftp://'))
+    ) {
         $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
     }
     if (! isset($_REQUEST["siteCats"]) || count($_REQUEST["siteCats"]) == 0) {
-        $smarty->assign('msg', tra("Must select a category"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must select a category"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (isset($_REQUEST["isValid"]) && $_REQUEST["isValid"] == 'on') {
         $_REQUEST["isValid"] = 'y';
@@ -144,7 +145,7 @@ if ($all) {
 } else {
     $items = $dirlib->dir_list_sites($_REQUEST["parent"], $offset, $maxRecords, $sort_mode, $find, $isValid = '');
 }
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $categs = $dirlib->dir_get_all_categories_accept_sites(0, -1, 'name asc', $find, $_REQUEST["siteId"]);
 $smarty->assign('categs', $categs);

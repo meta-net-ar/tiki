@@ -49,11 +49,12 @@ function wikiplugin_fancylist($data, $params)
     if (isset($params)) {
         extract($params, EXTR_SKIP);
     }
+    $class ??= "";
     if (isset($div)) {
-        $result = '<div class="fancylist' . ($class ? " $class" : "") . '">';
+        $result = '<div class="fancylist' . " $class" . '">';
         $count = 1;
     } else {
-            $result = '<ol class="fancylist' . (isset($class) ? " $class" : "") . '">';
+            $result = '<ol class="fancylist' . " $class" . '">';
     }
     // split data by lines (trimed whitespace from start and end)
     $lines = preg_split("/\n/", trim($data));

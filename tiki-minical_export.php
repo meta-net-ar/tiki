@@ -24,10 +24,7 @@ if (! $user) {
 function _csv($item)
 {
     $item = str_replace('"', '""', $item);
-    //  if (strpos($item, ",") !== FALSE) {
-    $item = '"' . $item . '"';
-    //  }
-    return $item;
+    return '"' . $item . '"';
 }
 $events = $minicallib->minical_list_events($user, 0, -1, 'start_desc', '');
 header("Content-type: text/plain");

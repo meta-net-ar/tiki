@@ -39,9 +39,7 @@ if (! is_dir($tmp_dir)) {
     }
 }
 if ($errors) {
-    $smarty->assign('msg', "Temporary folder is set to $tmp_dir, but it is not accessible by Tiki");
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie("Temporary folder is set to $tmp_dir, but it is not accessible by Tiki", \Laminas\Http\Response::STATUS_CODE_500);
 }
 
 if (isset($_GET['do'])) {
@@ -132,14 +130,10 @@ $smarty->assign_by_ref('dirsWritable', $dirsWritable);
 $smarty->assign('zipPath', '');
 if (isset($_REQUEST['zip']) && isset($_REQUEST['zipPath']) && $tiki_p_admin == 'y') {
     if (empty($_REQUEST['zipPath'])) {
-        $smarty->assign('msg', tra('Error: Zip path cannot be empty'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Error: Zip path cannot be empty'), \Laminas\Http\Response::STATUS_CODE_500);
     }
     if (! $archive = new PclZip($_REQUEST['zipPath'])) {
-        $smarty->assign('msg', tra('Error:') . $archive->errorInfo(true));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Error:') . $archive->errorInfo(true), \Laminas\Http\Response::STATUS_CODE_409);
     }
     foreach ($dirs as $d) {
         if (file_exists($d)) {
@@ -147,9 +141,7 @@ if (isset($_REQUEST['zip']) && isset($_REQUEST['zipPath']) && $tiki_p_admin == '
         }
     }
     if (! $archive->add($dirs2)) {
-        $smarty->assign('msg', tra('Error:') . $archive->errorInfo(true));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Error:') . $archive->errorInfo(true), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $smarty->assign('zipPath', $_REQUEST['zipPath']);
 }

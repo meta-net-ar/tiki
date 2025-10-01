@@ -4,15 +4,17 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Shipping\ShippingLib;
+
 function prefs_shipping_list()
 {
-    require_once __DIR__ . '/../shipping/shippinglib.php';
-    $all = glob('lib/shipping/custom/*.php');
+    $all = glob('lib/Shipping/Provider/Custom/*.php');
 
     $custom_providers = [ '' => tra('None')];
 
     foreach ($all as $file) {
-        if ($file === "lib/shipping/custom/index.php") {
+        if ($file === "lib/Shipping/Provider/Custom/index.php") {
             continue;
         }
         $name = basename($file, '.php');

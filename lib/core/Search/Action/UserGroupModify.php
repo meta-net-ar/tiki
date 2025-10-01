@@ -120,4 +120,9 @@ class Search_Action_UserGroupModify implements Search_Action_Action
     {
         return ! empty($data->operation->text());
     }
+
+    public function requiresConfirm()
+    {
+        return false;
+    }
 }

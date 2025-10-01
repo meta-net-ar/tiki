@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tiki\Cache\CacheLib;
 
 #[AsCommand(
     name: 'cache:clear',
@@ -41,9 +42,8 @@ class CacheClearCommand extends Command
         $all = $input->getOption('all');
         $type = $input->getArgument('cache');
 
-        require_once('lib/cache/cachelib.php');
         require_once('lib/tikilib.php');
-        $cachelib = new \Cachelib();
+        $cachelib = new CacheLib();
 
         if ($all) {
             // Probably there for historical reasons, this ignores the command argument - benoitg 2023-05-08

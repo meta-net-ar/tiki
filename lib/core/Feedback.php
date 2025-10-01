@@ -5,7 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+declare(strict_types=1);
+
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -62,6 +64,27 @@ class Feedback
             $smarty->assign('errortype', $feedback['errortype']);
         }
         $smarty->display(! empty($feedback['tpl']) ? $feedback['tpl'] : 'error.tpl');
+        die;
+    }
+
+    /**
+     * Redirect to a page with error feedback and Die
+     *
+     * @param string $message
+     * @param int $httpCode
+     * @param string|null $errorPage
+     * @return never
+     * @throws Exception
+     */
+
+    public static function errorAndDie(string $message, int $httpCode, ?string $errorPage = null): never
+    {
+        $errorPage = $errorPage ?? "error.tpl";
+        $smarty = TikiLib::lib('smarty');
+        $smarty->assign('errortype', $httpCode);
+        $smarty->assign('msg', $message);
+        http_response_code($httpCode);
+        $smarty->display($errorPage);
         die;
     }
 
@@ -303,7 +326,7 @@ class Feedback
     /**
      * Print any feedback out to a log file
      *
-     * @param \Laminas\Log\Logger $log
+     * @param \Monolog\Logger $log
      * @param bool $clear - remove existing entries from the local storage after sending to log file
      */
     public static function printToLog($log, $clear = false)
@@ -325,10 +348,10 @@ class Feedback
 
                     switch ($type) {
                         case 'error':
-                            $log->err($message);
+                            $log->error($message);
                             break;
                         case 'warning':
-                            $log->warn($message);
+                            $log->warning($message);
                             break;
                         case 'feedback':
                         case 'success':
@@ -339,7 +362,7 @@ class Feedback
                             break;
                     }
                 } else {
-                    $log->err($message);
+                    $log->error($message);
                 }
             }
         }
@@ -417,11 +440,11 @@ class Feedback
             }
 
             if (count($watches)) {
-                $message = "<ul>";
+                $usersList = [];
                 foreach ($watches as $watch) {
-                    $message .= "<li class='fw-bold'><a href='tiki-user_information.php?user=" . $watch['user'] . "'>" . $watch['user'] . "</a></li>";
+                    $usersList[] = "<a href='tiki-user_information.php?user=" . $watch['user'] . "' class='fw-bold'>" . $watch['user'] . "</a>";
                 }
-                $message .= "</ul>";
+                $message = implode(", ", $usersList);
                 self::note([
                     'title' => tr('Notification sent to:'),
                     'mes' => $message,

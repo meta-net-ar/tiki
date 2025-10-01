@@ -248,6 +248,9 @@ function prefs_site_list()
             'hint' => tra('Note: this does not affect the Unified Admin Backend. Only the legacy admin pages when UAB is disabled. An admin theme must be selected first.'),
             'tags' => ['advanced'],
             'options' => $available_admin_layouts,
+            'mandatory_dependencies' => [
+                'theme_admin',
+            ],
         ],
         'site_layout_per_object' => [
             'name' => tr('Enable layout per page, etc.'),
@@ -256,41 +259,41 @@ function prefs_site_list()
             'type' => 'flag',
             'default' => 'n',
         ],
-        'site_piwik_analytics_server_url' => [
-            'name' => tr('Piwik server URL'),
-            'description' => tr('The URL to the Piwik server of this site') . '<br />'
-                    . tr('In Piwik, the selected site (Site Id) must have view permission set for anonymous, or a token authentication parameter can be inserted in the Piwik server URL.'),
+        'site_matomo_analytics_server_url' => [
+            'name' => tr('Matomo server URL'),
+            'description' => tr('The URL to the Matomo server of this site') . '<br />'
+                    . tr('In Matomo, the selected site (Site Id) must have view permission set for anonymous, or a token authentication parameter can be inserted in the Matomo server URL.'),
             'type' => 'text',
             'filter' => 'url',
             'size' => 30,
             'default' => '',
-            'hint' => 'http(s)://yourpiwik.tld/index.php(?token_auth=yourtokencode)',
+            'hint' => 'http(s)://yourMatomo.tld/index.php(?token_auth=yourtokencode)',
         ],
-        'site_piwik_site_id' => [
+        'site_matomo_site_id' => [
             'name' => tra('Site Id'),
-            'description' => tr('The ID of this website in Piwik'),
+            'description' => tr('The ID of this website in Matomo'),
             'type' => 'text',
             'size' => '5',
             'default' => '',
             'dependencies' => [
-                'site_piwik_analytics_server_url',
+                'site_matomo_analytics_server_url',
             ],
         ],
-        'site_piwik_code' => [
-            'name' => tra('Piwik JavaScript tracking code'),
+        'site_matomo_code' => [
+            'name' => tra('Matomo JavaScript tracking code'),
             'description' => tra("Code to be placed on every page of this website just before the </body> tag"),
             'type' => 'textarea',
             'size' => '6',
             'filter' => 'rawhtml_unsafe',
             'default' => '',
             'dependencies' => [
-                'site_piwik_analytics_server_url',
-                'wikiplugin_piwik',
+                'site_matomo_analytics_server_url',
+                'wikiplugin_matomo',
             ],
         ],
-        'site_piwik_group_option' => [
-            'name' => tr('Piwik Groups Option'),
-            'description' => tr('Define option for Piwik groups'),
+        'site_matomo_group_option' => [
+            'name' => tr('Matomo Groups Option'),
+            'description' => tr('Define option for Matomo groups'),
             'type' => 'list',
             'tags' => ['advanced'],
             'options' => [
@@ -300,20 +303,20 @@ function prefs_site_list()
             ],
             'default' => '',
             'dependencies' => [
-                'site_piwik_code',
-                'wikiplugin_piwik',
+                'site_matomo_code',
+                'wikiplugin_matomo',
             ],
         ],
-        'site_piwik_groups' => [
-            'name' => tr('Piwik Available Groups'),
-            'description' => tr('User groups for which piwik will be available'),
+        'site_matomo_groups' => [
+            'name' => tr('Matomo Available Groups'),
+            'description' => tr('User groups for which Matomo will be available'),
             'type' => 'multilist',
             'tags' => ['advanced'],
             'options' => $groups,
             'default' => [''],
             'dependencies' => [
-                'site_piwik_group_option',
-                'wikiplugin_piwik',
+                'site_matomo_group_option',
+                'wikiplugin_matomo',
             ],
         ],
         'site_short_lived_csrf_tokens' => [

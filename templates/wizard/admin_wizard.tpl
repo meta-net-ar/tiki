@@ -63,6 +63,7 @@
                 <input type="submit" class="btn btn-info" name="continue" value="{tr}Start Configuration Wizard{/tr}" />
             </div>
         </div>
+        {if $showChangesWizard}
         <div class="d-flex mb-5">
             <span class="flex-shrink-0 fa-stack fa-lg me-1" alt="{tr}Changes Wizard{/tr}" title="Changes Wizard">
                 {icon name='arrow-circle-up' iclass='fa-stack-2x text-success'}
@@ -87,6 +88,7 @@
             </div>
         </div>
         <hr>
+        {/if}
         <div class="d-flex mb-5">
             <span class="flex-shrink-0 fa-stack fa-lg me-1" alt="{tr}Control Panels{/tr}" title="Control Panels">
                 {icon name='sliders' iclass='fa-stack-2x text-primary'}

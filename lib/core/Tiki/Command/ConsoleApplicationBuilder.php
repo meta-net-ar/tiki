@@ -155,6 +155,7 @@ class ConsoleApplicationBuilder
                 new FilesDeleteoldCommand(),
                 new FilesIndexCommand(),
                 new FilesMoveCommand(),
+                new FilesSubgalleriesCreateCommand(),
                 new IndexRebuildCommand(),
                 new IndexOptimizeCommand(),
                 new IndexCleanupCommand(),
@@ -163,6 +164,7 @@ class ConsoleApplicationBuilder
                 new ListExecuteCommand(),
                 new MailInPollCommand(),
                 new MailQueueSendCommand(),
+                new MigrateMiniCalCommand(),
                 new NotificationDigestCommand(),
                 new ObjectsNotifyMaintainersCommand(),
                 new ObjectsExportCommand(),
@@ -194,6 +196,7 @@ class ConsoleApplicationBuilder
                 new LogDeleteCommand(),
                 new UserUnlockCommand(),
                 new UsersListCommand(),
+                new PagePrintCommand(),
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
@@ -206,10 +209,13 @@ class ConsoleApplicationBuilder
                 new SieveFiltersCommand(),
                 new CalendarSyncCommand(),
                 new SchedulerRunCommand(),
+                new SchedulerMonitorCommand(),
                 new WebmailUnreadPagesCommand(),
                 new WebmailUnreadGlobalCommand(),
+                new TaskQueueProcessCommand(),
                 new Disable2FACommand(),
                 new ForumProcessInboundMail(),
+                new SecurityFileGenerateCommand(),
                 ],
             ],[
             'condition' => 'checkIsOCRAvailable',
@@ -269,21 +275,10 @@ class ConsoleApplicationBuilder
                 ],
             'commands' => [new RedactDBCommand(),],
             ],[
-            'condition' => 'checkIsDevModeAndDatabase',
-            'actions'   => [
-                UnavailableException::CHECK_VCS => self::ACTION_NOT_CALLABLE,
-                UnavailableException::CHECK_DEV => self::ACTION_NOT_PUBLISHED,
-                UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_AVAILABLE,
-                ],
-            'commands'  => [
-                new VendorSecurityCommand(),
-                ],
-            ],[
             'condition' => 'checkIsVCS',
             'actions'   => [UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_CALLABLE],
             'commands'  => [
                 new VCSUpdateCommand(),
-                new SemiAutoMergeCommand(),
                 new DevConfigureCommand(),
                 new DevbuildwsconfsCommand(),
                 ],
@@ -294,6 +289,15 @@ class ConsoleApplicationBuilder
                 ],
             'commands'  => [
                 new PerformanceCheckCommand(),
+                ],
+            ],[
+                'condition' => 'checkOldImageGalleryExists',
+                'actions' => [
+                UnavailableException::CHECK_UPDATED => self::ACTION_NOT_PUBLISHED,
+                UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_CALLABLE,
+                ],
+                'commands' => [
+                new GalleryMigrateCommand(),
                 ],
             ]];
     }
@@ -329,13 +333,13 @@ class ConsoleApplicationBuilder
     }
 
     /**
-     * Check if Tiki is being run as Git or SVN.
+     * Check if Tiki is being run as Git.
      *
-     * @throws CommandUnavailableException When SVN or GIT is not available.
+     * @throws CommandUnavailableException When GIT is not available.
      */
     protected function checkIsVCS(): void
     {
-        if (! (is_dir('.svn') || file_exists('.git'))) {
+        if (! file_exists('.git')) {
             //.git may be a directory (normal case) or a file (in the case of a git workspace)
             throw new UnavailableException(
                 'You must be running Tiki as a VCS see: https://dev.tiki.org/Get-code',
@@ -369,7 +373,7 @@ class ConsoleApplicationBuilder
      */
     protected function checkIsDbRunning(): void
     {
-        if (! DB_RUNNING) {
+        if (! defined('DB_RUNNING') || ! DB_RUNNING) {
             throw new UnavailableException(
                 'Your database must be running and have valid credentials in the local.php file. See http://doc.tiki.org/Installation for more information.',
                 UnavailableException::CHECK_RUNNING
@@ -387,7 +391,7 @@ class ConsoleApplicationBuilder
     {
         // we want to provide the right feedback, so lets check pre-requirements first.
         $this->checkIsDbRunning();
-        if (! DB_STATUS) {
+        if (! defined('DB_STATUS') || ! DB_STATUS) {
             throw new UnavailableException(
                 'Cannot initiate Database. Probably because the database needs updating.',
                 UnavailableException::CHECK_INSTALLED
@@ -397,7 +401,7 @@ class ConsoleApplicationBuilder
 
     /**
      * Checks if tiki-setup.php has completed successfully, without any database errors.
-     * The database has previously been loaded, and much of tiki-check is likely to hae completed. However
+     * The database has previously been loaded, and much of tiki-check is likely to have completed. However
      * it is likely that critical changes were made to Tiki that causes severe database errors.
      *
      * @throws CommandUnavailableException When tiki-setup.php did not complete. (core database errors)
@@ -405,7 +409,7 @@ class ConsoleApplicationBuilder
     protected function checkTikiSetupComplete(): void
     {
         $this->checkIsDatabaseInstalled();
-        if (! DB_TIKI_SETUP) {
+        if (! defined('DB_TIKI_SETUP') || ! DB_TIKI_SETUP) {
             throw new UnavailableException(
                 'Database errors prevented tiki-setup from completing. Try running php console.php database:update',
                 UnavailableException::CHECK_TIKI_SETUP
@@ -425,7 +429,7 @@ class ConsoleApplicationBuilder
         // we want to provide the right feedback, so lets check pre-requirements first.
         $this->checkTikiSetupComplete();
 
-        if (! DB_SYNCHRONAL) {
+        if (! defined('DB_SYNCHRONAL') || ! DB_SYNCHRONAL) {
             throw new UnavailableException(
                 'The database needs to be updated. Solved by: php console.php database:update',
                 UnavailableException::CHECK_UPDATED
@@ -503,6 +507,19 @@ class ConsoleApplicationBuilder
         }
 
         $this->checkDatabaseUpToDate();
+    }
+
+    protected function checkOldImageGalleryExists(): void
+    {
+        $this->checkIsDatabaseInstalled();
+
+        $installer = \Tiki\Installer\Installer::getInstance();
+        if (! $installer->tableExists('tiki_images')) {
+            throw new UnavailableException(
+                'Image Gallery tables not found',
+                UnavailableException::CHECK_UPDATED
+            );
+        }
     }
 
     /**

@@ -124,7 +124,7 @@ if ($output["data"] == "EMPTY") {
     foreach ($tmp["data"] as $data) {
         $data[$titleId] = $showItemId ? tra('Tracker item:') . ' #' . $data[$urlparam] : '';
         $data[$descId] = '';
-        $first_text_field = null;
+        $first_text_field = '';
         $aux_subject = null;
         foreach ($data["field_values"] as $data2) {
             $showEvenIfEmpty = ['s', 'STARS', 'h', 'l', 'W'];   // this duplicates the logic in tiki-view_tracker_item.tpl
@@ -157,7 +157,7 @@ if ($output["data"] == "EMPTY") {
                     // alternative names for subject field:
                     if (($field_name_check == "summary") || ($field_name_check == "name") || ($field_name_check == "title") || ($field_name_check == "topic")) {
                         $aux_subject = $data2["value"];
-                    } elseif ($data2["type"] == 't' && ! isset($first_text_field)) {
+                    } elseif ($data2["type"] == 't' && empty($first_text_field)) {
                         $first_text_field = $data2["name"] . ": " . $data2["value"];
                     }
                 }
@@ -165,7 +165,7 @@ if ($output["data"] == "EMPTY") {
         }
         if (! $showItemId) {
             $data[$titleId] = empty($aux_subject) ? $first_text_field : $aux_subject;
-        } elseif (! isset($aux_subject) && isset($first_text_field)) {
+        } elseif (! isset($aux_subject) && ! empty($first_text_field)) {
             $data[$titleId] .= (empty($data[$titleId]) ? '' : ' - ') . $first_text_field;
         } elseif (isset($aux_subject)) {
             $data[$titleId] .= (empty($data[$titleId]) ? '' : ' - ') . $aux_subject;

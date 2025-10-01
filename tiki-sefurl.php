@@ -28,7 +28,12 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
 {
     global $sefurl_regex_out, $prefs, $base_url, $in_installer;
 
-    if ($prefs['feature_sefurl'] != 'y' || ! empty($in_installer) || empty($tpl_output) || ( preg_match('#^http(|s)://#', $tpl_output) and strpos($tpl_output, $base_url) !== 0 )) {
+    if (
+        $prefs['feature_sefurl'] != 'y'
+        || ! empty($in_installer) || empty($tpl_output)
+        || ( preg_match('#^http(|s)://#', $tpl_output)
+            && ! str_starts_with($tpl_output, $base_url))
+    ) {
         return $tpl_output;
     }
     $cachelib = TikiLib::lib('cache');
@@ -172,7 +177,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
         }
     }
 
-    if (strpos($tpl_output, '?') === false) {   // historically tiki has coped with malformed short urls with no ?
+    if (! str_contains($tpl_output, '?')) {   // historically tiki has coped with malformed short urls with no ?
         $amppos = strpos($tpl_output, '&');     // route.php requires that we no longer do that
         $eqpos = strpos($tpl_output, '=');
         if ($amppos !== false && ($eqpos === false || $eqpos > $amppos)) {
@@ -185,7 +190,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
     }
 
     if ($with_next) {
-        if (strpos($tpl_output, '?') === false) {
+        if (! str_contains($tpl_output, '?')) {
             $tpl_output .= '?';
         } else {
             $tpl_output .= '&amp;';

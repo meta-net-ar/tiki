@@ -5,37 +5,48 @@
         {tr}Pick your profile picture{/tr}
     {/if}
 {/title}
-
-
 {if $user eq $userwatch}
     {include file='tiki-mytiki_bar.tpl'}
 {else}
     <div class="t_navbar">
-        {assign var=thisuserwatch value=$userwatch|escape}
+        {$thisuserwatch=$userwatch|escape}
         {button href="tiki-user_preferences.php?view_user=$thisuserwatch" class="btn btn-primary" _text="{tr}User Preferences{/tr}"}
     </div>
 {/if}
-
 <h2>{if $user eq $userwatch}{tr}Your current profile picture{/tr}{else}{tr}Profile picture{/tr}{/if}</h2>
-{if $avatar}
-    <div class="d-inline-block mb-4">
-        {if isset($user_picture_id)}{tr}Thumbnail{/tr}<br>{/if}
-        {$avatar}
+    <div class="d-flex gap-1 mt-2">
+        {if sizeof($avatars) eq 0 and $avatar}
+            <a class="tips btn btn-sm btn-outline-secondary rounded" href="tiki-pick_avatar.php?reset=y&amp;view_user{$userwatch|escape}" title=":{tr}Reset{/tr}">
+                {icon name='remove'}
+            </a>
+        {/if}
+        <button class="btn btn-sm btn-outline-secondary rounded tips" id="show-avatar-picker" title=":{tr}Choose an avatar{/tr}">{icon name="user-edit"}</button>
     </div>
-    {if isset($user_picture_id)}
-        <div>{tr}Full size{/tr}<br>
-            <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y">
+<div class="d-flex flex-column gap-2 mb-2 mt-4 border-top border-light p-2">
+    {if $avatar}
+        <div class="d-inline-block" id="user-picture">
+            {if isset($user_picture_id)}{tr}Thumbnail{/tr}<br>{/if}
+            {$avatar}
         </div>
+        
+        {if isset($user_picture_id)}
+            <div>{tr}Full size{/tr}<br>
+                <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y" class="w-50 rounded-1" style="max-height: 300px;object-fit:cover">
+            </div>
+        {/if}
+    {else}
+        {tr}no profile picture{/tr}
     {/if}
-{else}
-    {tr}no profile picture{/tr}
-{/if}
+</div>
 
-{if sizeof($avatars) eq 0 and $avatar}
-    <a class="link tips text-danger" href="tiki-pick_avatar.php?reset=y&amp;view_user{$userwatch|escape}" title=":{tr}Reset{/tr}">
-        {icon name='remove'}
-    </a>
-{/if}
+{ticket}
+
+<script type="module">
+    import { showPickerModal, renderAvatars } from 'avatar-generator';
+
+    $('#show-avatar-picker').on('click', showPickerModal);
+    renderAvatars();
+</script>
 
 {if sizeof($avatars) > 0}
 
@@ -53,7 +64,7 @@
             {{section name=ix loop=$avatars}
                 avatars[{$smarty.section.ix.index}] = '{$avatars[ix]}';
                 {if $smarty.section.ix.index eq $yours}
-                    {assign var="yours" value=$avatars[ix]}
+                    {$yours=$avatars[ix]}
                 {/if}
             {/section}}
             var pepe=1;
@@ -110,8 +121,7 @@
         {ticket}
         <legend><strong>{tr}Upload your own profile picture{/tr}</strong></legend>
         {if $user ne $userwatch}<input type="hidden" name="view_user" value="{$userwatch|escape}">{/if}
-        <div class="tiki-form-group row">
-            <label class="col-sm-3 col-form-label">{tr}Select your profile picture{/tr}</label>
+        <div class="tiki-form-group">
             <div class="col-sm-7">
                 <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
                 <input id="userfile1" name="userfile1" type="file" accept="image/*">
@@ -120,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <div class="tiki-form-group row">
+        <div class="tiki-form-group">
             <label class="col-sm-3 col-form-label"></label>
             <div class="col-sm-7">
                 <input type="submit" class="btn btn-primary" name="upload" value="{tr}Upload{/tr}">

@@ -1,7 +1,7 @@
 {title}{tr}Rename page:{/tr} {$page}{/title}
 
 <div class="navbar" role="navigation">
-    {assign var=thispage value=$page|escape:url}
+    {$thispage=$page|escape:url}
     {button href="tiki-index.php?page=$thispage" _icon_name="file" _class="btn navbar-btn" _text="{tr}View page{/tr}"}
 </div>
 

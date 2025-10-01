@@ -53,29 +53,30 @@
             <div class="mb-3 row">
                 <label class="col-sm-2 col-form-label" for="filter-categories">{tr}Categories{/tr}</label>
                 <div class="col-sm-4">
-                    <a class="category-lookup btn btn-secondary mb-1" href="#">{tr}Lookup{/tr}</a>
-                    <div class="form-check d-inline-block ms-4">
+                    <div class="form-check d-inline-block">
                         <label for="filter-deep" class="form-check-label">
                             <input type="checkbox" name="filter~deep" id="filter-deep" class="form-check-input" {if $filter_deep} checked="checked"{/if}> {tr}Deep search{/tr}
                         </label>
                     </div>
-                    <input type="text" name="filter~categories" id="filter-categories" class="category-wizard form-control" value="{$filter_categories|escape}">
+                    <input type="text" name="filter~categories" id="filter-categories" class="category-wizard form-control d-none" value="{$filter_categories|join:' '}">
+                    <select id="filter-categories-ui" class="form-control" multiple>
+                        {foreach from=$categories item=c}
+                            <option value="{$c.categId}"{if in_array($c.categId, $filter_categories)} selected="selected"{/if}>{$c.name}</option>
+                        {/foreach}
+                    </select>
                 </div>
-            </div>
-
-            <div class="category-picker" title="{tr}Select Categories{/tr}" style="display:none;">
-                {$filter_category_picker}
             </div>
         {/if}
         {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and $prefs.search_show_tag_filter eq 'y'}
             <div class="mb-3 row">
                 <label class="col-sm-2 col-form-label" for="filter-tags">{tr}Tags{/tr}</label>
                 <div class="col-sm-4">
-                    <a class="tag-lookup btn btn-secondary mb-1" href="#">{tr}Lookup{/tr}</a>
-                    <input type="text" name="filter~tags" class="tag-wizard" id="filter-tags" value="{$filter_tags|escape}">
-                </div>
-                <div class="tag-picker" title="{tr}Select Tags{/tr}" style="display:none;">
-                    {$filter_tags_picker}
+                    <input type="text" name="filter~tags" class="tag-wizard d-none" id="filter-tags" value="{$filter_tags|join:' '}">
+                    <select id="filter-tags-ui" class="form-control" multiple>
+                        {foreach from=$tags item=tag}
+                            <option value="{$tag.tagId}"{if in_array($tag.tagId, $filter_tags)} selected="selected"{/if}>{$tag.tag}</option>
+                        {/foreach}
+                    </select>
                 </div>
             </div>
         {/if}
@@ -167,71 +168,15 @@
     </div>
 </form>
 {jq}
+    $('#filter-categories-ui').on('change', function () {
+        $('#filter-categories').val($(this).val().join(' '));
+    });
+
+    $('#filter-tags-ui').on('change', function () {
+        $('#filter-tags').val($(this).val().join(' '));
+    });
+
     $('.filter:not(.init)').addClass('init').each(function () {
-
-{{if $prefs.feature_categories eq 'y'}}
-        const categoryInput = $('.category-wizard', this).fancy_filter('init', {
-            map: {{$filter_categmap|json_encode}}
-        });
-
-        $('.category-lookup', this).on("click", () => {
-            $.openModal({
-                title: "{tr}Select Categories{/tr}",
-                content: $('.category-picker', this).html(),
-                buttons: [
-                    {
-                        text: "{tr}Add to filter{/tr}",
-                        onClick: function () {
-                            $(':checked', this).each(function () {
-                                categoryInput.fancy_filter('add', {
-                                    token: $(this).val(),
-                                    label: $(this).parent().text(),
-                                    join: ' or '
-                                });
-                            });
-                            $.closeModal();
-                        }
-                    }
-                ]
-            });
-            return false;
-        });
-{{/if}}
-
-{{if $prefs.feature_freetags eq 'y' and $prefs.search_show_tag_filter eq 'y'}}
-        const tagInput = $('.tag-wizard', this).fancy_filter('init', {
-            map: {{$filter_tagmap}}
-        });
-
-        $('.tag-lookup', this).on("click", () => {
-            $.openModal({
-                title: "{tr}Select Tags{/tr}",
-                content: $('.tag-picker', this).html(),
-                buttons: [
-                    {
-                        text: "{tr}Add to filter{/tr}",
-                        onClick: function () {
-                            $('.highlight', this).each(function () {
-                                tagInput.fancy_filter('add', {
-                                    token: $(this).attr('href'),
-                                    label: $(this).text(),
-                                    join: ' and '
-                                });
-                            });
-                            $.closeModal();
-                        }
-                    }
-                ],
-                open: function () {
-                    $('li a', this).on("click", function () {
-                        $(this).toggleClass('highlight');
-                        return false;
-                    });
-                }
-            })
-            return false;
-        });
-{{/if}}
 
 {{if $prefs.search_show_sort_order eq 'y'}}
         var $invert = $(".sort_invert", this);
@@ -243,7 +188,7 @@
             tofind = tofind.replace(/(:?asc|desc)$/, "");
             if (opts[o].value.search(tofind) === 0) {
                 opts[o].value = "{{$sort_mode}}";
-                $sort_mode.prop("selectedIndex", o).trigger("change.select2");
+                $sort_mode.prop("selectedIndex", o);
                 break;
             }
         }

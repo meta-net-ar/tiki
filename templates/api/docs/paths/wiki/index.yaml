@@ -58,7 +58,7 @@ get:
         - e.g: `filter[categId]=1&filter[lang]=en`
       schema:
         type: array
-    - name: onlyCant
+    - name: onlyCount
       in: query
       description: |
         Only return number of wiki pages without the actual pages. Possible values are:

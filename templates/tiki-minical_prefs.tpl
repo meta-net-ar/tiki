@@ -4,6 +4,8 @@
 
 {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
     {tr}Mini Calendar feature is deprecated in Tiki 27 and will be removed starting from Tiki 28. You are advised to migrate to Tiki Calendars.{/tr}
+    <br>
+    {tr}To migrate: run{/tr} <code>php console.php calendar:migrate:minical --help</code> for more details.
 {/remarksbox}
 
 <div class="t_navbar mb-4">

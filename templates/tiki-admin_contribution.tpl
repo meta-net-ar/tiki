@@ -27,7 +27,7 @@
 <form action="tiki-admin_contribution.php?page=features" method="post">
     {ticket}
     <div class="mb-3 row">
-        <label class="col-sm-6 form-check-label" for=feature_contribution_mandatory">
+        <label class="col-sm-6 form-check-label" for="feature_contribution_mandatory">
             {tr}Contributions are mandatory in wiki pages{/tr}
         </label>
         <div class="col-sm-6">
@@ -72,7 +72,7 @@
         </label>
         <div class="col-sm-6">
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="feature_contribution_display_in_comment" name="feature_contribution_display_in_comment" {if $prefs.feature_contribution_display_in_comment eq 'y'}checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" name="feature_contribution_display_in_comment" {if $prefs.feature_contribution_display_in_comment eq 'y'}checked="checked"{/if}>
             </div>
         </div>
     </div>
@@ -103,9 +103,9 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" for="new_contribution_name">{tr}Description{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="new_contribution_description">{tr}Description{/tr}</label>
         <div class="col-sm-9">
-            <input type="text" name="description" class="form-control" maxlength="250">
+<input type="text" name="description" id="new_contribution_description" class="form-control" maxlength="250">
         </div>
     </div>
     <div class="mb-3 text-center">

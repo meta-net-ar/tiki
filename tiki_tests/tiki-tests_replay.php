@@ -4,25 +4,20 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Diff\DiffUtils;
+
 require_once('../tiki-setup.php');
-require_once('lib/diff/difflib.php');
 
 if ($prefs['feature_tikitests'] != 'y') {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_tikitests');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_play_tikitests != 'y') {
-    $smarty->assign('msg', tra('You do not have permission to do that'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! extension_loaded('http') and ! extension_loaded('curl')) {
-    $smarty->assign('msg', tra('The pecl HTTP extension or the Curl extension is needed to replay the TikiTest'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('The pecl HTTP extension or the Curl extension is needed to replay the TikiTest'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('tidy', extension_loaded('tidy'));
@@ -207,7 +202,7 @@ function verif_url($url, $use_tidy = true)
         $buffer = $new_buffer->saveHTML();
     }
 
-    $tmp = diff2($data, $buffer, "htmldiff");
+    $tmp = DiffUtils::diff2($data, $buffer, "htmldiff");
     if (trim($xpath) != '') {
         $result['html'] = preg_replace(
             ["/<html>/", "/<\/html>/"],
@@ -238,16 +233,12 @@ if (isset($_REQUEST['action'])) {
     $smarty->assign('filename', $_REQUEST['filename']);
     $xml = file_get_contents(TIKI_TESTS_PATH . '/' . $_REQUEST['filename']);
     if ($xml == '') {
-        $smarty->assign('msg', tra('The TikiTest Replay File is Empty'));
-        $smarty->display('error.tpl');
-        die();
+        Feedback::errorAndDie(tra('The TikiTest Replay File is Empty'), \Laminas\Http\Response::STATUS_CODE_409);
     } else {
         $dom = DOMDocument::loadXML($xml);
         $element_test = $dom->getElementsByTagName('test')->item(0);
         if ($element_test == null) {
-            $smarty->assign('msg', tra('The TikiTest Replay File is Empty'));
-            $smarty->display('error.tpl');
-            die();
+            Feedback::errorAndDie(tra('The TikiTest Replay File is Empty'), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 

@@ -9,7 +9,7 @@
             {$totalCount}
         </div>
         <div class="label-text">
-            Likes
+            {tr}Likes{/tr}
         </div>
     </div>
     {/if}
@@ -20,7 +20,7 @@
                 {$totalPoints}
             </div>
             <div class="label-text">
-                Points
+                {tr}Points{/tr}
             </div>
         </div>
     {/if}
@@ -29,25 +29,20 @@
         <div>
             <div class="title">{$choice_label}</div>
             {foreach $buttons as $button}
-                <a class="{if $multilike_many eq 'y'}multilike_many{else}multilike_group{/if}"
-                   data-relation="{$button.relation}"
-                   data-relation_prefix="{$relation_prefix}"
-                   data-target_type="{$type}"
-                   data-user="{$user}"
-                   data-target_id="{$object}"
-                   data-icon_unselected="{$button.icon_unselected}"
-                   data-icon_selected="{$button.icon_selected}"
-                    {if $uses_values}
-                        title="Worth {$button.value} Points"
-                    {/if}
-                    href="#"}
-                >
-                    {if $button.selected eq '0'}
-                        {icon name=$button.icon_unselected}
-                    {else}
-                        {icon name=$button.icon_selected}
-                    {/if}
-                    {$button.label} {if $show_option_totals}<span class="count">({$button.count})</span>{/if}
+                <a class="{if $multilike_many eq 'y'}multilike_many{else}multilike_group{/if}
+                {if $button.selected}selected{/if}
+                {if $has_voted && !$button.selected}disabled{/if}" data-relation="{$button.relation}"
+                    data-relation_prefix="{$relation_prefix}" data-target_type="{$type}" data-user="{$user}"
+                    data-target_id="{$object}" data-icon_unselected="{$button.icon_unselected}"
+                    data-icon_selected="{$button.icon_selected}" {if $uses_values} title="{tr _0=$button.value}Worth %0 Points{/tr}"
+                    {/if} {if $has_voted && !$button.selected} onclick="return false;" style="cursor: not-allowed; opacity: 0.6;" {else} href="#" 
+                {/if} role="button">
+                {if $button.selected eq '0'}
+                    {icon name=$button.icon_unselected}
+                {else}
+                    {icon name=$button.icon_selected}
+                {/if}
+                {$button.label} {if $show_option_totals}<span class="count">({$button.count})</span>{/if}
                 </a>
                 {if $orientation == "vertical"}
                     <br>

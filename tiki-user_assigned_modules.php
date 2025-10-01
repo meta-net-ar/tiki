@@ -13,7 +13,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
         'recreate'             => 'bool',         //post
-        'unassign'             => 'bool',         //post
+        'unassign'             => 'digits',       //post this is the moduleId to unassign
         'assign'               => 'bool',         //post
         'module'               => 'digits',       //post
         'position'             => 'striptags',    //post

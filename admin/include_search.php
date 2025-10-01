@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -157,7 +157,7 @@ if ($tiki_p_admin == 'y') {
     $tikilib = TikiLib::lib('tiki');
     $allTables = $tikilib->listTables();
     foreach ($allTables as $table) {
-        if (substr($table, 0, 6) !== 'index_' || substr($table, 0, 10) == 'index_pref') {
+        if (! str_starts_with($table, 'index_') || str_starts_with($table, 'index_pref')) {
             $tables[] = $table;
         }
     }

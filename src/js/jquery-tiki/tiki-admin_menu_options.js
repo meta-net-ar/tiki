@@ -58,46 +58,48 @@ $(function () {
             new Sortable(el, sortableOptions);
         });
 
-        new Sortable(document.getElementsByClassName("new-option")[0], {
-            group: {
-                name: "shared",
-                pull: "clone",
-                put: false, // Do not allow items to be put into this list
-            },
-            dragClass: "dragging-options",
-            animation: 150,
-            // invertSwap: true,
-            // invertedSwapThreshold: 1,
-            swapThreshold: 0.65,
-            direction: "vertical",
-            forceFallback: true,
-            fallbackOnBody: true,
-            // Called when dragging element changes position
-            onEnd: function (event) {
-                // Sets ids
-                var parentId = $(event.item).parents("li").first().data("id");
-                if (!parentId) parentId = 0;
-                // $(event.item).data('id', 0);
-                $(event.item).data("parent", parentId);
+        document.querySelectorAll(".new-option").forEach((element) => {
+            new Sortable(element, {
+                group: {
+                    name: "shared",
+                    pull: "clone",
+                    put: false, // Do not allow items to be put into this list
+                },
+                dragClass: "dragging-options",
+                animation: 150,
+                // invertSwap: true,
+                // invertedSwapThreshold: 1,
+                swapThreshold: 0.65,
+                direction: "vertical",
+                forceFallback: true,
+                fallbackOnBody: true,
+                // Called when dragging element changes position
+                onEnd: function (event) {
+                    // Sets ids
+                    var parentId = $(event.item).parents("li").first().data("id");
+                    if (!parentId) parentId = 0;
+                    // $(event.item).data('id', 0);
+                    $(event.item).data("parent", parentId);
 
-                // Additional logic
-                var $dropped = $(event.item);
-                $dropped.find(".hidden").removeClass("hidden");
-                $dropped.find(".field-label").prop("readonly", false).attr("placeholder", tr("Label"));
+                    // Additional logic
+                    var $dropped = $(event.item);
+                    $dropped.find(".hidden").removeClass("hidden");
+                    $dropped.find(".field-label").prop("readonly", false).attr("placeholder", tr("Label"));
 
-                $dropped
-                    .find(".icon-edit")
-                    .parent()
-                    .prop("disabled", true)
-                    .attr("title", "|" + tr("Save all options to enable extended properties editing."))
-                    .addClass("tips")
-                    .css("opacity", 0.5)
-                    .parent()
-                    .tiki_popover();
+                    $dropped
+                        .find(".icon-edit")
+                        .parent()
+                        .prop("disabled", true)
+                        .attr("title", "|" + tr("Save all options to enable extended properties editing."))
+                        .addClass("tips")
+                        .css("opacity", 0.5)
+                        .parent()
+                        .tiki_popover();
 
-                $dropped.find(".field-label").trigger("focus");
-                setDirty();
-            },
+                    $dropped.find(".field-label").trigger("focus");
+                    setDirty();
+                },
+            });
         });
 
         $options.on("click", ".option-remove", function () {
@@ -132,8 +134,7 @@ $(function () {
             .find("input,select")
             .on("change", function () {
                 $previewForm.trigger("submit");
-            })
-            .trigger("change.select2");
+            });
 
         $("#col1").tikiModal();
 

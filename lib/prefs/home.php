@@ -45,7 +45,7 @@ function listblog_pref()
     $allblogs = $bloglib->list_blogs(0, -1, 'created_desc', '');
     $listblogs = ['' => 'None'];
 
-    if ($allblogs['cant'] > 0) {
+    if ($allblogs['count'] > 0) {
         foreach ($allblogs['data'] as $blog) {
             $listblogs[ $blog['blogId'] ] = substr($blog['title'], 0, 30);
         }

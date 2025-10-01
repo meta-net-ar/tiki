@@ -47,9 +47,9 @@ class MailinLib extends TikiDb_Bridge
         }
 
         $query = "select * from `tiki_mailin_accounts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_mailin_accounts` $mid";
+        $query_count = "select count(*) from `tiki_mailin_accounts` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -62,7 +62,7 @@ class MailinLib extends TikiDb_Bridge
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -86,9 +86,9 @@ class MailinLib extends TikiDb_Bridge
         }
 
         $query = "select * from `tiki_mailin_accounts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_mailin_accounts` $mid";
+        $query_count = "select count(*) from `tiki_mailin_accounts` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -101,7 +101,7 @@ class MailinLib extends TikiDb_Bridge
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -202,7 +202,7 @@ class MailinLib extends TikiDb_Bridge
     /**
      * @param $accountId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_mailin_account($accountId)
     {
@@ -255,19 +255,5 @@ class MailinLib extends TikiDb_Bridge
     {
         $plaintext = base64_decode($encoded);
         return $plaintext;
-    }
-
-    /**
-     * checkPackage
-     *
-     * @return string
-     */
-    public function checkPackage()
-    {
-        $status = "n";
-        if (file_exists('vendor_bundled/vendor/philippemarcmeyer/fieldslinker/')) {
-            $status = "y";
-        }
-        return $status;
     }
 }

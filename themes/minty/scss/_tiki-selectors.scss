@@ -1,0 +1,139 @@
+// Minty for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+    // Increase navbar height to reinstate Bootswatch style
+.topbar_modules > * {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+// Color contrast adjustments to meet WCAG standards
+.tiki {
+    .btn-link {
+        color: #3A8370;
+    }
+    .badge {
+        color: #212529;
+    }
+    .breadcrumb a {
+        color: #212529;
+    }
+    .breadcrumb-item.active {
+        color: #292929;
+    }
+
+}
+
+.btn.btn-primary,
+.btn.btn-secondary,
+.btn.btn-success,
+.btn.btn-info,
+.btn.btn-warning,
+.btn.btn-danger {
+    color: #212529 !important;
+}
+
+// Forms
+// Navs
+// Navbar
+.navbar-light.bg-light {
+    background: #f3969a !important;
+}
+
+// Make links visible in dark mode
+#col2 .navbar {
+    background: transparent;
+    .nav-link {
+        color: var(--tiki-vert-nav-link-color);
+        &:hover {
+            color: var(--tiki-vert-nav-link-hover-color);
+        }
+    }
+}
+// Dropdowns
+// Pagination
+// Cards
+// Accordion
+// Badges
+// Alerts
+.tiki .alert a,
+.tiki .alert .alert-link {
+    color: inherit;
+}
+
+    // Special color mode rules, in essence for light mode, but for all non-dark modes.
+html:not([data-bs-theme="dark"]) {
+    .btn-outline-primary {
+        color: #3A8370;
+    }
+    .btn-outline-secondary {
+        color: #AE131B;
+    }
+    .btn-outline-success {
+        color: #1D6346;
+    }
+    .btn-outline-danger {
+        color: #D62E00;
+    }
+    .btn-outline-warning {
+        color: #946500;
+    }
+    .btn-outline-info {
+        color: #257483;
+    }
+}
+
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+[data-bs-theme=dark] {
+    .btn.btn-link { color: #449C85; }
+
+    .list-group-item { color: #B8B8B8BF; }
+    .list-group-item-dark { color: #A4ACB2; background-color: #16171D; }
+    .list-group-item-primary { color: #ddd; }
+    .list-group-item-secondary { color: #ddd; }
+    .list-group-item-success { color: #ddd; }
+    .list-group-item-danger { color: #ddd; }
+    .list-group-item-warning { color: #ddd; }
+    .list-group-item-info { color: #ddd; }
+    .list-group-item-light { color: #B7C2C2; }
+    .list-group-item-dark { color: #869198; }
+
+    .pagination .page-item .page-link { color: #59B19F; background: #18342E; }
+    .text-muted { color: #B0AFA6BF; }
+    code { color: #B7B6AE; }
+    .blockquote-footer { color: #8F8F8F; }
+    .figure-caption { color: #8F8F8F; }
+    .form-text { color: #8F8F8F; }
+    .alert-light, .alert-light a:not(.btn), .alert-light .alert-link { color: #A3A3A3; }
+    mark { color: #CCCCCC; }
+}
+
+// External libraries

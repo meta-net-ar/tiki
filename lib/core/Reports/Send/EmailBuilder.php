@@ -47,7 +47,7 @@ class Reports_Send_EmailBuilder
             }
         }
 
-        /** @var \Smarty_Tiki $smarty */
+        /** @var \Tiki\Smarty\SmartyTiki $smarty */
         $smarty = TikiLib::lib('smarty');
 
         $smarty->assign('report_preferences', $report_preferences);

@@ -19,7 +19,7 @@ $inputConfiguration = [
             'where' => 'word',
             'how' => 'word',
             'words' => 'striptags',
-            'sort_mode' => 'word',
+            'sort_mode' => 'alnumdash',
         ],
     ]
 ];
@@ -28,10 +28,10 @@ include_once('lib/directory/dirlib.php');
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_view_directory');
 
-$_REQUEST['words'] = isset($_REQUEST['words']) ? $_REQUEST['words'] : '';
-$_REQUEST['where'] = isset($_REQUEST['where']) ? $_REQUEST['where'] : '';
-$_REQUEST['how'] = isset($_REQUEST['how']) ? $_REQUEST['how'] : '';
-$_REQUEST['parent'] = isset($_REQUEST['parent']) ? $_REQUEST['parent'] : '';
+$_REQUEST['words'] = $_REQUEST['words'] ?? '';
+$_REQUEST['where'] = $_REQUEST['where'] ?? '';
+$_REQUEST['how'] = $_REQUEST['how'] ?? '';
+$_REQUEST['parent'] = $_REQUEST['parent'] ?? '';
 $smarty->assign('words', $_REQUEST['words']);
 $smarty->assign('where', $_REQUEST['where']);
 $smarty->assign('how', $_REQUEST['how']);
@@ -58,7 +58,7 @@ if (isset($_REQUEST['where']) && $_REQUEST['where'] == 'all') {
 } else {
     $items = $dirlib->dir_search_cat($_REQUEST['parent'], $_REQUEST['words'], $_REQUEST['how'], $offset, $maxRecords, $sort_mode);
 }
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 include_once('tiki-section_options.php');
 // Display the template

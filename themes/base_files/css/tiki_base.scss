@@ -80,27 +80,35 @@
     font-size: 1.25rem;
 }
 
-//Cypth select2
-.form-floating {
-    .select2-container--bootstrap-5 {
-        width: 100% !important;
-        .select2-selection {
-            min-height: calc($form-floating-height + .3rem) !important;
-            padding: $form-floating-padding-y $form-floating-padding-x !important;
-            width: 100% !important;
-            > .select2-selection__rendered {
-                margin-top: .4rem !important;
-            }
-        }
-        .floating-select-label { z-index: 1000; }
-    }
-    .form-select {
-        width: 100% !important;
-    }
-}
-
 li.highlight {
     background-color: var(--bs-secondary-bg-subtle);
     transition: all 0.3s ease;
 }
+
+.password-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    input {
+        padding-right: 30px;
+    }
+
+    i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        visibility: hidden; /* Hidden by default */
+    }
+}
+/* --- Force all dropdowns to open upwards ---*/
+.dropdown-menu-bottom {
+    top: auto !important;
+    bottom: 100% !important;
+    margin-bottom: .5rem;
+    margin-top: 0 !important;
+}
+
 /* End of file */

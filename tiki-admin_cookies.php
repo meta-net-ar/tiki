@@ -90,9 +90,7 @@ if (isset($_REQUEST["upload"]) && $access->checkCsrf()) {
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     if (! $_REQUEST['cookie']) {
-        $smarty->assign('msg', tra('You cannot save the cookie with empty cookie content'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You cannot save the cookie with empty cookie content'), \Laminas\Http\Response::STATUS_CODE_400);
     }
     $result = $taglinelib->replace_cookie($_REQUEST["cookieId"], $_REQUEST["cookie"]);
     if ($result && $result->numRows()) {
@@ -122,7 +120,7 @@ if (isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $taglinelib->list_cookies($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

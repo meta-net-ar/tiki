@@ -3,10 +3,10 @@
 
     <div
         {if isset($pagemd5) && $pagemd5}
-            {assign var=cookie_key value="show_attzone$pagemd5"}
+            {$cookie_key="show_attzone$pagemd5"}
             id="attzone{$pagemd5}" class="w-100"
         {else}
-            {assign var=cookie_key value="show_attzone"}
+            {$cookie_key="show_attzone"}
             id="attzone" class="w-100"
         {/if}
         {if (isset($smarty.session.tiki_cookie_jar.$cookie_key) and $smarty.session.tiki_cookie_jar.$cookie_key eq 'y')

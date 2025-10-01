@@ -20,7 +20,7 @@ class NumberFiles implements SuggestionRules
         if ($prefs['fgal_use_db'] === 'y') {
             $filegallib = TikiLib::lib('filegal');
             $files = $filegallib->list_files();
-            $totalFiles = ! empty($files['cant']) ? $files['cant'] : 0;
+            $totalFiles = ! empty($files['count']) ? $files['count'] : 0;
             if ($totalFiles >= self::$totalFiles) {
                 $message = tra('You are using a lot of files, you can move out from the database to file system.');
             }

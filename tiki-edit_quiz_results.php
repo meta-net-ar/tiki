@@ -31,10 +31,7 @@ $auto_query_args = ['quizId', 'resultId', 'sort_mode', 'offset', 'find'];
 $access->check_feature('feature_quizzes');
 
 if (! isset($_REQUEST["quizId"])) {
-    $smarty->assign('msg', tra("No quiz indicated"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No quiz indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $tikilib->get_perm_object($_REQUEST["quizId"], 'quiz');
@@ -44,9 +41,7 @@ $access->check_permission('tiki_p_admin_quizzes');
 $smarty->assign('quizId', $_REQUEST["quizId"]);
 $quiz_info = $quizlib->get_quiz($_REQUEST["quizId"]);
 if (! $quiz_info) {
-    $smarty->assign('msg', tra("The requested quiz was not found. Please check the quiz ID and try again."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("The requested quiz was not found. Please check the quiz ID and try again."), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 
@@ -115,7 +110,7 @@ $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $quizlib->list_quiz_results($_REQUEST["quizId"], $offset, $maxRecords, $sort_mode, $find);
 
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 
 $smarty->assign_by_ref('channels', $channels["data"]);
 

@@ -83,7 +83,7 @@ class Math_Formula_Runner
                     $out = Math_Formula_Currency::tryFromString($out);
                 }
             }
-        } elseif (false !== $value = $this->findVariable(explode('.', $data), $this->variables)) {
+        } elseif (false !== $value = $this->findVariable(explode('.', $data ?? ''), $this->variables)) {
             $out = $value;
         } elseif (isset(self::$cached_variables[$data])) {
             $out = self::$cached_variables[$data];

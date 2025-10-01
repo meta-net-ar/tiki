@@ -29,7 +29,7 @@ class OcrHelper
             return false;
         }
 
-        if (substr(PHP_OS, 0, 3) == 'WIN') {
+        if (str_starts_with(PHP_OS, 'WIN')) {
             return false;
         }
 

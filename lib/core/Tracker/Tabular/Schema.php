@@ -386,7 +386,7 @@ class Schema
         return $writer;
     }
 
-    public function getSource($fileName)
+    public function getSource($fileName, $separator = ",")
     {
         switch ($this->getFormat()) {
             case 'json':
@@ -395,7 +395,7 @@ class Schema
             case 'ical':
                 return new Source\IcalSource($this, $fileName, $this->getEncoding());
             default:
-                return new Source\CsvSource($this, $fileName, ',', $this->getEncoding());
+                return new Source\CsvSource($this, $fileName, $separator, $this->getEncoding());
         }
     }
 
@@ -411,6 +411,9 @@ class Schema
         $headerMapping = [];
 
         foreach ($this->columns as $columnIndex => $column) {
+            if ($column->isExportOnly()) {
+                continue;
+            }
             foreach ($headers as $headerIndex => $header) {
                 if ($this->config['simple_headers'] && $column->getLabel() == $header) {
                     $headerMapping[$columnIndex] = $headerIndex;

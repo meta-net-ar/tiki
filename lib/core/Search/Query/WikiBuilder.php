@@ -124,6 +124,11 @@ class Search_Query_WikiBuilder
         $this->paginationArguments['max'] = max(1, (int) $value);
     }
 
+    public function wpquery_select_fields($query, $value)
+    {
+        $query->setSelectionFields(preg_split('/[, ]+/', $value));
+    }
+
     public function wpquery_filter_editable($query, $editableType, array $arguments)
     {
         $fields = $this->get_fields_from_arguments($arguments);
@@ -471,9 +476,9 @@ class Search_Query_WikiBuilder
             }
         } elseif ($value === 'script') {
             if (isset($arguments['source'])) {
-                $arguments['order'] = isset($arguments['order']) ? $arguments['order'] : 'asc';
-                $arguments['lang']  = isset($arguments['lang']) ? $arguments['lang'] : 'painless';
-                $arguments['type']  = isset($arguments['type']) ? $arguments['type'] : 'number';
+                $arguments['order'] = $arguments['order'] ?? 'asc';
+                $arguments['lang']  = $arguments['lang'] ?? 'painless';
+                $arguments['type']  = $arguments['type'] ?? 'number';
 
                 unset($arguments['mode']);
 
@@ -665,10 +670,10 @@ class Search_Query_WikiBuilder
                         if (count($timestamps) === 2) {
                             $from = $timestamps[0] / 1000;
                             $to = $timestamps[1] / 1000;
-                        } elseif (strpos($filter, '>=') === 0) {
+                        } elseif (str_starts_with($filter, '>=')) {
                             $from = substr($filter, 2) / 1000;
                             $to = 'now';
-                        } elseif (strpos($filter, '<=') === 0) {
+                        } elseif (str_starts_with($filter, '<=')) {
                             $from = '1970-01-01';
                             $to = substr($filter, 2) / 1000;
                         }

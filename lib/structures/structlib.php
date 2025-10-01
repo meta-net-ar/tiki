@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -19,29 +19,6 @@ class StructLib extends TikiLib
         parent::__construct();
 
         $this->displayLanguageOrder = [];
-    }
-    public function s_export_structure($structure_id)
-    {
-        global $exportlib, $tikidomain;
-        global $dbTiki;
-        include_once('lib/wiki/exportlib.php');
-        include_once('lib/tar.class.php');
-        $page_info = $this->s_get_structure_info($structure_id);
-        $page_name = $page_info['pageName'];
-        $zipname   = $page_name . '.zip';
-        $tar = new tar();
-        $pages = $this->s_get_structure_pages($page_info['page_ref_id']);
-        foreach ($pages as $page) {
-            $data = $exportlib->export_wiki_page($page['pageName'], 0);
-            $tar->addData($page['pageName'], $data, $this->now);
-        }
-        $dump = EXPORT_DUMP_PATH;
-        if ($tikidomain) {
-            $dump .= "/$tikidomain";
-        }
-        $tar->toTar("$dump/$page_name.tar", false);
-        header("location: $dump/$page_name.tar");
-        return '';
     }
     public function s_export_structure_tree($structure_id, $level = 0)
     {
@@ -285,23 +262,23 @@ class StructLib extends TikiLib
         global $prefs;
         $ret = null;
 
-        $hide_toc = isset($options['hide_toc']) ? $options['hide_toc'] : 'n';
-        $creator = isset($options['creator']) ? $options['creator'] : tra('system');
-        $creator_msg = isset($options['creator_msg']) ? $options['creator_msg'] : tra('created from structure');
-        $ip_source = isset($options['ip_source']) ? $options['ip_source'] : '0.0.0.0';
-        $description = isset($options['description']) ? $options['description'] : '';
-        $lang = isset($options['lang']) ? $options['lang'] : '';
-        $is_html = isset($options['is_html']) ? $options['is_html'] : false;
-        $hash = isset($options['hash']) ? $options['hash'] : null;
-        $wysiwyg = isset($options['wysiwyg']) ? $options['wysiwyg'] : null;
-        $wiki_authors_style = isset($options['wiki_authors_style']) ? $options['wiki_authors_style'] : '';
+        $hide_toc = $options['hide_toc'] ?? 'n';
+        $creator = $options['creator'] ?? tra('system');
+        $creator_msg = $options['creator_msg'] ?? tra('created from structure');
+        $ip_source = $options['ip_source'] ?? '0.0.0.0';
+        $description = $options['description'] ?? '';
+        $lang = $options['lang'] ?? '';
+        $is_html = $options['is_html'] ?? false;
+        $hash = $options['hash'] ?? null;
+        $wysiwyg = $options['wysiwyg'] ?? null;
+        $wiki_authors_style = $options['wiki_authors_style'] ?? '';
 
         // If the page doesn't exist then create a new wiki page!
         $newpagebody = '';
         if ($hide_toc !== 'y') {
             $newpagebody = tra("Table of contents") . ":" . "{toc}\n\n";
         }
-        $newpagebody .= isset($options['content']) ? $options['content'] : '';
+        $newpagebody .= $options['content'] ?? '';
 
         $created = $this->page_exists($name);
         // If page exists
@@ -675,8 +652,8 @@ class StructLib extends TikiLib
     {
         global $user, $tikilib, $prefs;
         $ret = [];
-        $cant = $this->getOne('select count(*) from `tiki_structures` where `parent_id`=?', [(int) $id]);
-        if ($cant) {
+        $count = $this->getOne('select count(*) from `tiki_structures` where `parent_id`=?', [(int) $id]);
+        if ($count) {
             // TODO : FIX
             $args = [];
             if (! $this->displayLanguageOrder) {
@@ -893,16 +870,16 @@ class StructLib extends TikiLib
         $query  = 'select count(*) ';
         $query .= 'from `tiki_structures` ts, `tiki_pages` tp ';
         $query .= 'where ts.`page_id`=tp.`page_id` and `pageName`=?';
-        $cant = $this->getOne($query, [$pageName]);
-        return $cant;
+        $count = $this->getOne($query, [$pageName]);
+        return $count;
     }
     public function page_id_is_in_structure($pageId)
     {
         $query  = 'select count(*) ';
         $query .= 'from `tiki_structures` ts, `tiki_pages` tp ';
         $query .= 'where ts.`page_id`=tp.`page_id` and `page_id`=?';
-        $cant = $this->getOne($query, [$pageId]);
-        return $cant;
+        $count = $this->getOne($query, [$pageId]);
+        return $count;
     }
     //Is this page the head page for a structure?
     public function get_struct_ref_if_head($pageName)
@@ -1039,6 +1016,10 @@ class StructLib extends TikiLib
 
     public function get_navigation_info($page_ref_id)
     {
+        if (! $page_ref_id || ! is_numeric($page_ref_id)) {
+            error_log("Invalid page_ref_id: " . $page_ref_id);
+            return null;
+        }
         return [
             'prev' => $this->get_neighbor_info($page_ref_id, 'get_prev_page'),
             'next' => $this->get_neighbor_info($page_ref_id, 'get_next_page'),
@@ -1076,7 +1057,8 @@ class StructLib extends TikiLib
                 return null;
             }
         } else {
-            trigger_error('No structlib method found: ' . $fn);
+            // Log the error or handle it gracefully
+            error_log("Method not found: $fn");
             return null;
         }
     }
@@ -1240,9 +1222,9 @@ class StructLib extends TikiLib
             `pageName`,tp.`hits`,`data`,tp.`description`,`lastModif`,`comment`,`version`,
             `user`,`ip`,`flag`,`points`,`votes`,`cache`,`wiki_cache`,`cache_timestamp`,
             `pageRank`,`creator`,`page_size` from `tiki_structures` as ts $join_tables $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_structures` ts $join_tables $mid";
+        $query_count = "select count(*) from `tiki_structures` ts $join_tables $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
         while ($res = $result->fetchRow()) {
             global $user;
@@ -1272,7 +1254,7 @@ class StructLib extends TikiLib
         }
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
     public function get_page_alias($page_ref_id)
@@ -1501,17 +1483,17 @@ class StructLib extends TikiLib
         $smarty = TikiLib::lib('smarty');
         include_once('lib/smarty_tiki/function.sefurl.php');
         $options = [];
-        $cant = 0;
+        $count = 0;
         if (empty($channels)) {
-            return ['cant' => 0, 'data' => []];
+            return ['count' => 0, 'data' => []];
         }
         foreach ($channels as $channel) {
             if (empty($channel['sub'])) {
-                if (isset($options[$cant - 1]['sectionLevel'])) {
-                    $level = $options[$cant - 1]['sectionLevel'];
+                if (isset($options[$count - 1]['sectionLevel'])) {
+                    $level = $options[$count - 1]['sectionLevel'];
                     while ($level-- > $sectionLevel) {
                         $options[] = ['type' => '-', 'sectionLevel' => $level];
-                        ++$cant;
+                        ++$count;
                     }
                 }
             }
@@ -1524,21 +1506,77 @@ class StructLib extends TikiLib
             $option['url'] = smarty_function_sefurl(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id'], 'sefurl' => 'n'], $smarty->getEmptyInternalTemplate());
             $option['canonic'] = '((' . $channel['pageName'] . '))';
             $option['sefurl'] = smarty_function_sefurl(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id']], $smarty->getEmptyInternalTemplate());
-            $option['position'] = $cant + $cumul;
+            $option['position'] = $count + $cumul;
             $option['sectionLevel'] = $sectionLevel;
 
             $option['url'] = str_replace('&amp;', '&', $option['url']);         // as of Tiki 7 menu items get encoded later
             $option['sefurl'] = str_replace('&amp;', '&', $option['sefurl']);
             $option['optionId'] = $channel['page_ref_id'];
 
-            ++$cant;
+            ++$count;
             $options[] = $option;
             if (! empty($channel['sub'])) {
-                $oSub = $this->to_menu($channel['sub'], $structure, $sectionLevel + 1, $cant + $cumul, $params);
-                $cant += $oSub['cant'];
+                $oSub = $this->to_menu($channel['sub'], $structure, $sectionLevel + 1, $count + $cumul, $params);
+                $count += $oSub['count'];
                 $options = array_merge($options, $oSub['data']);
             }
         }
-        return ['data' => $options, 'cant' => $cant];
+        return ['data' => $options, 'count' => $count];
+    }
+
+    /**
+     * Update structure information
+     *
+     * @param int $page_ref_id Structure reference ID
+     * @param array $data Data to update (page_alias, pos, parent_id, structure_id)
+     * @return bool Success status
+     */
+    public function update_structure($page_ref_id, $data)
+    {
+        if (empty($page_ref_id)) {
+            return false;
+        }
+
+        $old_info = $this->s_get_page_info($page_ref_id);
+        if (! $old_info) {
+            return false;
+        }
+
+        $fields = [];
+        $params = [];
+
+        if (isset($data['page_alias'])) {
+            $fields[] = '`page_alias`=?';
+            $params[] = $data['page_alias'];
+        }
+
+        if (isset($data['pos'])) {
+            $fields[] = '`pos`=?';
+            $params[] = (int)$data['pos'];
+        }
+
+        if (isset($data['parent_id'])) {
+            $fields[] = '`parent_id`=?';
+            $params[] = (int)$data['parent_id'];
+        }
+
+        if (isset($data['structure_id'])) {
+            $fields[] = '`structure_id`=?';
+            $params[] = (int)$data['structure_id'];
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $params[] = (int)$page_ref_id;
+        $query = 'UPDATE `tiki_structures` SET ' . implode(', ', $fields) . ' WHERE `page_ref_id`=?';
+
+        $this->query($query, $params);
+
+        // Clear structure cache
+        $cachelib = TikiLib::lib('cache');
+        $cachelib->invalidate('structure_' . $old_info['structure_id']);
+        return true;
     }
 }

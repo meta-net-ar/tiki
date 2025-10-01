@@ -1,0 +1,83 @@
+// Cerulean for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+    // Increase navbar height to reinstate Bootswatch style
+.topbar_modules > * {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+// Links
+// Components
+// Typography
+mark { color: #B3BBC1; }
+.blockquote-footer { color: #6D787E; }
+
+// Tables
+// Buttons
+// Forms
+// Navs
+// Navbar
+// Dropdowns
+// Pagination
+// Cards
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+.list-group-item-action.list-group-item-primary { color: #363636CC; }
+.list-group-item-action.list-group-item-secondary { color: #454545CC; }
+.list-group-item-action.list-group-item-success { color: #454545CC; }
+.list-group-item-action.list-group-item-danger { color: #404040CC; }
+.list-group-item-action.list-group-item-warning { color: #454545CC; }
+.list-group-item-action.list-group-item-info { color: #454545CC; }
+.list-group-item-action.list-group-item-light { color: #525252CC; }
+.list-group-item-action.list-group-item-dark { color: #383838CC; }
+
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+[data-bs-theme=dark] {
+    .figure-caption {
+        color: #9CA4ABBF;
+    }
+    .btn.btn-outline-primary { color: #946DD0; border-color: #946DD0; }
+    .btn.btn-outline-secondary { color: #9072C5; border-color: #9072C5; }
+    .btn.btn-outline-success { color: #0F9544; border-color: #0F9544; }
+    .btn.btn-outline-danger { color: #FB1313; border-color: #FB1313; }
+    .btn.btn-outline-warning { color: #B0740C; border-color: #B0740C; }
+    .btn.btn-outline-info { color: #008BC2; border-color: #008BC2; }
+    .btn.btn-outline-dark { color: #8179A9; border-color: #8179A9; }
+
+    .list-group-item { color: #AAB0B6BF; }
+    .list-group-item-primary { color: #969696CC; }
+    .list-group-item-secondary { color: #9C9C9CCC; }
+    .list-group-item-success { color: #9C9C9CCC; }
+    .list-group-item-danger { color: #999999CC; }
+    .list-group-item-warning { color: #9C9C9CCC; }
+    .list-group-item-info { color: #9C9C9CCC; }
+    .list-group-item-light { color: #BDBDBDCC; }
+    .list-group-item-dark { color: #9E9E9ECC; }
+}
+
+// External libraries

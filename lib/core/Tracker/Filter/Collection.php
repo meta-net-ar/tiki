@@ -157,7 +157,7 @@ class Collection
                 return $filter;
             }
         }
-
+        \Feedback::error(tr('Filter "%0" is invalid for field "%1". The filter "%2" was applied by default.', $mode, $permName, $filter->getMode()));
         throw new Exception\ModeNotSupported($permName, $mode);
     }
 

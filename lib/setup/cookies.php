@@ -70,34 +70,3 @@ function getCookie($name, $section = null, $default = null)
         }
     }
 }
-
-function setCookieSection($name, $value, $section = '', $expire = 0, $path = '', $domain = '', $secure = '')
-{
-    global $feature_no_cookie;
-
-    if (TIKI_API) {
-        return;
-    }
-
-    if ($section) {
-        $valSection = getCookie($section);
-        $name2 = '@' . $name . ':';
-        if ($valSection) {
-            if (preg_match('/' . preg_quote($name2) . '/', $valSection)) {
-                $valSection  = preg_replace('/' . preg_quote($name2) . '[^@;]*/', $name2 . $value, $valSection);
-            } else {
-                $valSection = $valSection . $name2 . $value;
-            }
-            setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
-        } else {
-            $valSection = $name2 . $value;
-            setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
-        }
-    } else {
-        if ($feature_no_cookie) {
-            $_SESSION['tiki_cookie_jar'][$name] = $value;
-        } else {
-            setcookie($name, $value, $expire, $path, $domain, $secure);
-        }
-    }
-}

@@ -86,7 +86,8 @@ if (isset($_REQUEST['id'])) {
 if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     if (isset($_REQUEST['event'])) {
         if (! isset($notification_types[$_REQUEST['event']])) {
-            Feedback::errorPage(tr('Unknown watch type'));
+            Feedback::error(tr('Please select a type to watch'));
+            $access->redirect('tiki-user_watches.php');
         }
         $watch_object = '*';
         $watch_type = $notification_types[$_REQUEST['event']]['type'];
@@ -130,7 +131,7 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
                 $errors += $result ? 0 : 1;
             } else {
                 $tikilib->remove_user_watch($user, 'new_in_category', '*');
-                /** @var  TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+                /** @var  Tiki\TikiDb\PdoResult $result */
                 $result = $tikilib->add_user_watch($user, 'new_in_category', '*', 'category', "tiki-browse_category.php");
                 $errors += $result && $result->numRows() ? 0 : 1;
             }
@@ -143,15 +144,19 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     }
 }
 // no confirmation needed as it is easy to add back a watch
-if (isset($_REQUEST["delete"]) && isset($_REQUEST['checked']) && $access->checkCsrf()) {
-    $checked = is_array($_REQUEST['checked']) ? $_REQUEST['checked'] : [$_REQUEST['checked']];
-    /* CSRL doesn't work if param as passed not in the uri */
-    foreach ($checked as $item) {
-        $result = $tikilib->remove_user_watch_by_id($item);
-        if ($result && $result->numRows()) {
-            Feedback::success(tr('User watch deleted'));
-        } else {
-            Feedback::error(tr('User watch not deleted'));
+if (isset($_REQUEST["delete"]) && $access->checkCsrf()) {
+    if (empty($_REQUEST["checked"])) {
+        Feedback::error(tr("Please, select at least one item to delete"));
+    } else {
+        $checked = is_array($_REQUEST['checked']) ? $_REQUEST['checked'] : [$_REQUEST['checked']];
+        /* CSRL doesn't work if param as passed not in the uri */
+        foreach ($checked as $item) {
+            $result = $tikilib->remove_user_watch_by_id($item);
+            if ($result && $result->numRows()) {
+                Feedback::success(tr('User watch deleted'));
+            } else {
+                Feedback::error(tr('User watch not deleted'));
+            }
         }
     }
 }

@@ -147,20 +147,6 @@ function wikiplugin_trackerquerytemplate_info()
 
 function wikiplugin_trackerquerytemplate($data, $params)
 {
-
-    $params = array_merge(
-        [
-            'tracker' => '',
-            'debug' => '',
-            'byname' => 'y',
-            'render' => 'y',
-            'likefilters' => '',
-            'andfilters' => '',
-            'getlast' => ''
-        ],
-        $params
-    );
-
     if (! empty($params['itemids'])) {
         $itemIds = $params['itemids'];
         unset($params['itemids']);
@@ -324,7 +310,7 @@ class dataToFieldHandler
             }
         }
 
-        if (strpos($data, '$created$')) {
+        if (str_contains($data, '$created$')) {
             $data = str_replace('$created$', $tikilib->get_short_date($tikilib->getOne("SELECT created FROM tiki_tracker_items WHERE itemId = ?", [$this->itemId])), $data);
         }
 

@@ -2,64 +2,12 @@
 // and CSS selectors remaining.
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
-//body.layout_basic {
-//    background-image: linear-gradient(to left bottom, #b860e3, #a75bce, #9756b8, #8751a3, #774b8f, #704689, #694183, #623c7d, #603684, #5d318b, #582b93, #52269b);
-//}
 
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
 .text-dark {
     color: #6D5509 !important;
-}
-
-.btn-primary {
-    color: #fff !important;
-}
-
-.bg-dark {
-    background-color: $dark !important;
-}
-
-.btn-dark {
-    color: #fff;
-    background-color: $dark; // This isn't working.
-    border-color: $dark;
-}
-
-// Button colors copied from Kiwi, then some updated
-.btn.btn-outline-primary {
-    color: #80780A;
-    border-color: #80780A;
-}
-
-.btn.btn-outline-secondary {
-    color: #B35123;
-    border-color: #B35123;
-}
-
-.btn.btn-outline-success {
-    color: #3A833A;
-    border-color: #3A833A;
-}
-.btn.btn-outline-warning {
-    color: #A2630B;
-    border-color: #A2630B;
-}
-.btn.btn-outline-info {
-    color: #6E7425;
-    border-color: #6E7425;
-}
-.btn.btn-outline-danger {
-    color: #D13B00;
-    border-color: #D13B00;
-}
-
-
-.btn.btn-outline-dark {
-    color: #6D5509;
-    border-color: #6D5509;
 }
 
 .breadcrumb-item.active {
@@ -73,51 +21,6 @@
 .invalid-feedback,
 .invalid-tooltip { color: #B45918 !important; } // was $danger
 
-.bg-danger,
-.bg-warning {
-    .card-title {
-        color: #fff;
-    }
-}
-
-.badge.bg-secondary {
-    background-color: #BB5525 !important;
-}
-
-.badge.bg-info {
-    background-color: #D4452B !important;
-}
-
-.badge.bg-success {
-    background-color: #3A833A !important;
-}
-
-.badge.bg-danger {
-    background-color: #D63D00 !important;
-}
-
-.badge.bg-warning {
-    background-color: #A4660E !important;
-}
-
-//.badge.bg-primary,
-.badge.bg-light,
-    //.badge.bg-warning,
-    //.badge.bg-success,
-.badge.bg-info {
-    color: #000;
-}
-
-.page-item.disabled, .list-group-item.disabled {
-    color: $text-muted !important;
-}
-
-// From kiwi
-.text-primary { color: #80780A !important; }
-.text-warning { color: #A0630E !important; }
-.text-success { color: #3A833A !important; }
-.text-info { color: #6E7425 !important; }
-
 .progress-bar.bg-warning,
 .progress-bar.bg-info,
 .progress-bar.bg-success {
@@ -126,4 +29,22 @@
 
 .page-item.disabled, .list-group-item.disabled {
     color: $text-muted !important;
+}
+
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: $secondary;
+}
+
+// Dark color mode
+
+[data-bs-theme=dark] {
+    .blockquote-footer { color: #848D94; }
+    .btn.btn-outline-primary { color: #C659FC; border-color: #C659FC; }
+    .btn.btn-outline-secondary { color: #9D78DE; border-color: #9D78DE; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4C05; border-color: #FF4C05; }
+    .btn.btn-outline-warning { color: #CA7D12; border-color: #CA7D12; }
+    .btn.btn-outline-info { color: #C458FD; border-color: #C458FD; }
+    .btn.btn-outline-dark { color: #C757FF; border-color: #C757FF; }
 }

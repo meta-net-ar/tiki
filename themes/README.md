@@ -1,6 +1,6 @@
 # themes/
 
-This directory is processed at runtime by lib/theme/themelib.php and contains:
+This directory is processed at runtime by Tiki\Lib\Theme\ThemeLib and contains:
 
 * default/, which is the tiki default theme
 * nameofthetheme/ subdirectories,  all tiki themes distributed with tiki, as well as any user created custom ones

@@ -115,6 +115,7 @@
     background: #f09800!important;
 }
 
-//.tiki .dropdown-item {
-//    color: #fff !important;
-//}
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: $secondary;
+}

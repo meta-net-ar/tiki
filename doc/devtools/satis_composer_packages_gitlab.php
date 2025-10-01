@@ -98,7 +98,7 @@ function getPackages($path, &$payload)
 function isVersionless($versionless_package_list, $package_name)
 {
     foreach ($versionless_package_list as $package) {
-        if (strpos($package_name, $package) !== false) {
+        if (str_contains($package_name, $package)) {
             return true;
         }
     }

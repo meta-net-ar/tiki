@@ -62,7 +62,7 @@
                     {icon name='star-half-selected' istyle="{$starhalfselected}"}
                     {icon name='star-empty-selected' istyle="{$staremptyselected}"}
                     {icon name='star-empty' istyle="{$starempty}"}{$endtag}
-            {assign var='previousvote' value=$field.rating_options[i]}
+            {$previousvote=$field.rating_options[i]}
         {/section}
         </span>
         {if !empty($item.itemId)}

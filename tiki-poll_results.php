@@ -181,7 +181,7 @@ if ($tiki_p_view_poll_voters == 'y' && ! empty($_REQUEST['list']) && isset($_REQ
     $smarty->assign_by_ref('offset', $_REQUEST['offset']);
     $list_votes = $tikilib->list_votes('poll' . $_REQUEST['pollId'], $_REQUEST['offset'], $prefs['maxRecords'], $_REQUEST['sort_mode'], $_REQUEST['find'], 'tiki_poll_options', 'title', $vote_from_date, $vote_to_date);
     $smarty->assign_by_ref('list_votes', $list_votes['data']);
-    $smarty->assign_by_ref('cant_pages', $list_votes['cant']);
+    $smarty->assign_by_ref('pages_count', $list_votes['count']);
 }
 $smarty->assign_by_ref('poll_info_arr', $poll_info_arr);
 $smarty->assign_by_ref('start_year', $start_year);

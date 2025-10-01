@@ -1,9 +1,9 @@
 <ul>
     <li>
-        <a href="#">{tr}Edit{/tr}</a>
+        <a href="#" role="button">{tr}Edit{/tr}</a>
         <ul>
             <li>
-                <a href="#">{tr}Cell{/tr}</a>
+                <a href="#" role="button">{tr}Cell{/tr}</a>
                 <ul>
                     <li><a onclick="sheetInstance.setCellRef(); return false;">{tr}Set Reference{/tr}</a></li>
                 </ul>
@@ -48,7 +48,7 @@
             <li><a onclick="sheetInstance.cellFind(); return false;">{tr}Find{/tr}</a></li>
             <li><a onclick="sheetInstance.getTdRange(null, sheetInstance.obj.formula().val()); return false;">{tr}Get Cell Range{/tr}</a></li>
             <li>
-                <a href="#">{tr}Wrap Cell Range{/tr}</a>
+                <a href="#" role="button">{tr}Wrap Cell Range{/tr}</a>
                 <ul>
                     <li><a onclick="sheetInstance.getTdRange(null, sheetInstance.obj.formula().val(), 'SUM'); return false;" title="{tr}Wrap with SUM{/tr}">SUM()</a></li>
                     <li><a onclick="sheetInstance.getTdRange(null, sheetInstance.obj.formula().val(), 'CEILING'); return false;" title="{tr}Wrap with CEILING{/tr}">CEILING()</a></li>
@@ -63,7 +63,7 @@
         </ul>
     </li>
     <li>
-        <a href="#">{tr}View{/tr}</a>
+        <a href="#" role="button">{tr}View{/tr}</a>
         <ul>
             <li>
                 <a menu="menuViewFunctionReference_menuInstance">{tr}Function Reference{/tr}</a>
@@ -98,7 +98,7 @@
         </ul>
     </li>
     <li>
-        <a href="#">{tr}Style{/tr}</a>
+        <a href="#" role="button">{tr}Style{/tr}</a>
         <ul>
             <li><a class="cellStyleToggle" onclick="sheetInstance.cellStyleToggle('styleBold'); return false;">{tr}Bold{/tr}</a></li>
             <li><a class="cellStyleToggle" onclick="sheetInstance.cellStyleToggle('styleItalics'); return false;">{tr}Italics{/tr}</a></li>

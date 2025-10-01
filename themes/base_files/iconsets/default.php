@@ -8,7 +8,7 @@
 //This the default icon set, it associates icon names to icon fonts. It is used as fallback for all other icon sets.
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -502,6 +502,10 @@ function iconset_default()
             'deviantart' => [
                 'id' => 'deviantart',
                 'prepend' => 'fab fa-'
+            ],
+            'diagram' => [
+                'id' => 'diagram-project',
+                'prepend' => 'fa fa-'
             ],
             'difference' => [
                 'id' => 'strikethrough',

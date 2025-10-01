@@ -19,10 +19,16 @@
     position: relative;
 }
 
-h3.card-title {
+// Was h3.card-title
+h3.tiki-card-header-title {
     display: block;
     padding-top: 0;
     margin: 0;
+}
+
+// Class name updated/corrected; not all instances are in modules and some are other heading sizes, etc. - g_c-l
+.card.module h3.tiki-card-header-title {
+    font-size: 1.25rem;
 }
 
 .moduleflip {

@@ -6,9 +6,9 @@ Note: The show content block must be defined at root level to use the include. A
 {block name=title}
     {if !isset($pageLang)}
         {if isset($info.lang)}
-            {assign var='pageLang' value=$info.lang}
+            {$pageLang=$info.lang}
         {else}
-            {assign var='pageLang' value=''}
+            {$pageLang=''}
         {/if}
     {/if}
     {if !isset($hide_page_header) or !$hide_page_header}
@@ -28,6 +28,8 @@ Note: The show content block must be defined at root level to use the include. A
 {/block}
 
 {block name="quicknav"}
+
+    {include file='token_view_actions.tpl'}
     {if !$prefs.wiki_topline_position or $prefs.wiki_topline_position eq 'top' or $prefs.wiki_topline_position eq 'both'}
         {include file='tiki-wiki_topline.tpl'}
     {/if}
@@ -37,7 +39,10 @@ Note: The show content block must be defined at root level to use the include. A
     {if !isset($hide_page_header) or !$hide_page_header}
         {include file='tiki-flaggedrev_approval_header.tpl'}
     {/if}
-
+    {if $prefs.user_localtimezonesync == 'y' and !empty($user)}
+        {include file="user/localtimezonesync.tpl"}
+    {/if}
+    
     {if $print_page ne 'y'}
         {if $prefs.page_bar_position eq 'top'}
             {include file='tiki-page_bar.tpl'}
@@ -125,15 +130,21 @@ Note: The show content block must be defined at root level to use the include. A
         {/if}
 
         <div id="page-data" class="clearfix">
+
             {if $prefs.wiki_page_name_inside eq 'y'}
                 <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>
             {/if}
-            {if isset($pageLang) and ($pageLang eq 'ar' or $pageLang eq 'he')}
-                <div style="direction:RTL; unicode-bidi:embed; text-align: right; {if $pageLang eq 'ar'}font-size: large;{/if}">
+            <div class="content">
+                {if isset($pageLang) and ($pageLang eq 'ar' or $pageLang eq 'he')}
+                    <div style="direction:RTL; unicode-bidi:embed; text-align: right; {if $pageLang eq 'ar'}font-size: large;{/if}">
+                        {$parsed}
+                    </div>
+                {else}
                     {$parsed}
-                </div>
-            {else}
-                {$parsed}
+                {/if}
+            </div>
+            {if $prefs.wysiwyg_inline_editing eq 'y'}
+                <div class="d-none inline-editor-content">{$inline_editor_content}</div>
             {/if}
         </div>
         

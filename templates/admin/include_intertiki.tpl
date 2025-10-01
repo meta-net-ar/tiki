@@ -91,6 +91,7 @@
                                                     class="btn btn-link tips"
                                                     title="{tr}Delete master server:{/tr}{$k}"
                                                     onclick="confirmPopup('{tr}Remove this server?{/tr}')"
+                                                    aria-label="{tr}Delete master server:{/tr}{$k}"
                                                 >
                                                     {icon name='delete'}
                                                 </button>
@@ -145,6 +146,7 @@
                                                         value="{$k|escape:'attr'}"
                                                         title=":{tr}Delete{/tr}"
                                                         onclick="confirmPopup('{tr}Remove this host?{/tr}')"
+                                                        aria-label="{tr}Delete{/tr}"
                                                     >
                                                         {icon name='delete'}
                                                     </button>

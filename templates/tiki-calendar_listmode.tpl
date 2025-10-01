@@ -8,7 +8,7 @@
         </tr>
 
         {foreach from=$listevents item=event}
-            {assign var=calendarId value=$event.calendarId}
+            {$calendarId=$event.calendarId}
             <tr class="{cycle}{if $event.start <= $smarty.now and $event.end >= $smarty.now} selected{/if} vevent">
                 <td class="date">
                     <div class="row">
@@ -52,7 +52,7 @@
                                     </a>
                                 </action>
                                 <action>
-                                    <a class="text-danger" href="#"  onclick="deletecalItem({$event.calitemId}, '{$event.name|escape}')">
+                                    <a class="text-danger" href="#"  onclick="deletecalItem({$event.calitemId}, '{$event.name|escape}')" role="button">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </a>
                                 </action>

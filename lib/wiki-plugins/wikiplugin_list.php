@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/wiki/pluginslib.php';
+
+use Tiki\Lib\Wiki\PluginsLibUtil;
 
 function wikiplugin_list_info()
 {
@@ -92,7 +93,31 @@ function wikiplugin_list_info()
                     ['text' => tra('No'), 'value' => 'n'],
                     ['text' => tra('Yes'), 'value' => 'y']
                 ]
-            ]
+            ],
+            'carousel_height' => [
+                'required' => false,
+                'name' => tra('Carousel Height'),
+                'description' => tra('Set how the carousel height should be handled. Choose "Tallest Image" to match the tallest slide (default), "Variable Height" to let each image define its own height, or "Custom Height" to enter a fixed pixel value.'),
+                'filter' => 'text',
+                'default' => 'tallest',
+                'since' => '29.0',
+                'options' => [
+                    ['text' => tra('Tallest Image'), 'value' => 'tallest'],
+                    ['text' => tra('Variable Height'), 'value' => 'variable'],
+                    ['text' => tra('Custom Height'), 'value' => 'custom'],
+                ],
+            ],
+            'custom_height' => [
+                'required' => false,
+                'name' => tra('Custom Height'),
+                'description' => tra('Specify the fixed height of the carousel in pixels. Enter numbers only, without "px". For example: 400.'),
+                'filter' => 'int',
+                'default' => 500,
+                'depends' => [
+                    'field' => 'carousel_height',
+                    'value' => 'custom',
+                ],
+            ],
         ],
     ];
 }
@@ -124,7 +149,7 @@ function wikiplugin_list($data, $params)
     if ($params['cache'] == 'y') {
         // Exclude any type of admin from caching
         foreach (TikiLib::lib('user')->get_user_permissions($user) as $permission) {
-            if (substr($permission, 0, 12) == 'tiki_p_admin') {
+            if (str_starts_with($permission, 'tiki_p_admin')) {
                 $params['cache'] = 'n';
                 break;
             }
@@ -134,10 +159,6 @@ function wikiplugin_list($data, $params)
     // cache = a means cache even for admins
     if ($params['cache'] == 'a') {
         $params['cache'] = 'y';
-    }
-
-    if (! isset($params['gui'])) {
-        $params['gui'] = 1;
     }
 
     if ($prefs['wikiplugin_list_gui'] === 'y' && $params['gui']) {
@@ -163,6 +184,10 @@ function wikiplugin_list($data, $params)
     } else {
         $cacheName = md5($data . "loggedout");
     }
+
+    // use a different cache for each language
+    $cacheName = $prefs['feature_multilingual'] === 'y' ? "{$prefs['language']}-{$cacheName}" : $cacheName;
+
     if (isset($params['cacheexpiry'])) {
         $cacheExpiry = $params['cacheexpiry'];
     } else {

@@ -17,7 +17,7 @@ $inputConfiguration = [
             'fileId'                      => 'int',           //post
             'galleryId'                   => 'int',           //post
             'name'                        => 'string',        //post
-            'data'                        => 'none',          //post
+            'data'                        => 'string',        //post
             'description'                 => 'xss',           //post
             'edit'                        => 'bool',          //post
         ],
@@ -60,8 +60,12 @@ include_once('tiki-section_options.php');
 
 $gal_info = $filegallib->get_file_gallery($_REQUEST['galleryId']);
 
-$fileType = reset(explode(';', $fileInfo['filetype']));
-$extension = end(explode('.', $fileInfo['filename']));
+$fileTypeParts = explode(';', $fileInfo['filetype']);
+$fileType = reset($fileTypeParts);
+
+$extensionParts = explode('.', $fileInfo['filename']);
+$extension = end($extensionParts);
+
 $supportedExtensions = ['odt', 'ods', 'odp'];
 $supportedTypes = array_map(
     function ($type) use ($mimetypes) {
@@ -71,19 +75,14 @@ $supportedTypes = array_map(
 );
 
 if (! in_array($extension, $supportedExtensions) && ! in_array($fileType, $supportedTypes)) {
-    $smarty->assign('msg', tr('Wrong file type, expected one of %0', implode(', ', $supportedTypes)));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tr('Wrong file type, expected one of %0', implode(', ', $supportedTypes)), \Laminas\Http\Response::STATUS_CODE_500);
 }
 
 $globalperms = Perms::get([ 'type' => 'file', 'object' => $fileInfo['fileId'] ]);
 
 //check permissions
 if (! ($globalperms->admin_file_galleries == 'y' || $globalperms->view_file_gallery == 'y')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view/edit this file'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view/edit this file'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! empty($_REQUEST['name']) || ! empty($fileInfo['name'])) {
@@ -97,7 +96,7 @@ $_REQUEST['name'] = htmlspecialchars(str_replace('.odt', '', $_REQUEST['name']))
 //Upload to file gallery
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['data'])) {
     $_REQUEST['galleryId'] = (int)$_REQUEST['galleryId'];
-    $_REQUEST['description'] = htmlspecialchars(isset($_REQUEST['description']) ? $_REQUEST['description'] : $_REQUEST['name']);
+    $_REQUEST['description'] = htmlspecialchars($_REQUEST['description'] ?? $_REQUEST['name']);
 
     //webodf has to send an encoded string so that all browsers can handle the post-back
     $_REQUEST['data'] = base64_decode($_REQUEST['data']);

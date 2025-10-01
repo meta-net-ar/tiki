@@ -399,7 +399,7 @@ function sendWikiEmailNotification(
             if (empty($not['email'])) {
                 continue;
             }
-            $smarty->assign('watchId', isset($not['watchId']) ? $not['watchId'] : '');
+            $smarty->assign('watchId', $not['watchId'] ?? '');
 
             $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed_subject.tpl");
             $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed.tpl");

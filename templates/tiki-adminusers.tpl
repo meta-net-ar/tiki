@@ -45,7 +45,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
-                            <a href="#" onclick="$('#search').toggle()" class="link">
+                            <a href="#" onclick="$('#search').toggle()" class="link" role="button">
                                 {icon name='add' alt="{tr}more{/tr}"}&nbsp;{tr}More Criteria{/tr}
                             </a>
                         </div>
@@ -101,7 +101,7 @@
                     </div>
                 </form>
             {/if}
-            {if ($cant > $numrows or !empty($initial)) && !$ts.enabled}
+            {if ($count > $numrows or !empty($initial)) && !$ts.enabled}
                 {initials_filter_links}
             {/if}
             <form name="checkform" id="checkform" method="post">
@@ -109,7 +109,7 @@
                     <div class="{if $js}table-responsive{/if} user-table ts-wrapperdiv">
         {/if}
                         {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                        <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$cant|escape}">
+                        <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$count|escape}">
                             {* Note: th element ids here need to match those at /lib/core/Table/Settings/TikiAdminusers.php
                             for tablesorter to work properly *}
                             {if !$ts.ajax}
@@ -316,6 +316,7 @@
                                                         {/if}
                                                     {/strip}
                                                 {/actions}
+                                            </td>
                                         </tr>
                                     {/if}
                                 {sectionelse}
@@ -390,7 +391,7 @@
 
 
         {if !$ts.enabled}
-            {pagination_links cant=$cant step=$numrows offset=$offset}{/pagination_links}
+            {pagination_links count=$count step=$numrows offset=$offset}{/pagination_links}
         {/if}
     {/if}
         {/tab}
@@ -401,7 +402,7 @@
         {if isset($userinfo.userId) && $userinfo.userId}
             {capture assign=add_edit_user_tablabel}{tr}Edit user{/tr} <i>{$userinfo.login|escape}</i>{/capture}
         {else}
-            {assign var=add_edit_user_tablabel value="{tr}Add a New User{/tr}"}
+            {$add_edit_user_tablabel="{tr}Add a New User{/tr}"}
         {/if}
 
         {tab name="{$add_edit_user_tablabel}"}
@@ -414,7 +415,7 @@
             {/if}
             {if isset($userinfo.userId) && $userinfo.userId}
                 <h2>{tr}Edit user{/tr} {$userinfo.login|escape}</h2>
-                {assign var=thisloginescaped value=$userinfo.login|escape:'url'}
+                {$thisloginescaped=$userinfo.login|escape:'url'}
                 {if $userinfo.login ne 'admin' and $userinfo.editable}
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}
@@ -533,7 +534,7 @@
                     {/if}
                     {if $prefs.login_is_email neq 'y'}
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-md-2 col-form-label" for="pass1">{tr}Email{/tr}</label>
+                            <label class="col-sm-3 col-md-2 col-form-label" for="email">{tr}Email{/tr}</label>
                             <div class="col-sm-7 col-md-6">
                                 <input type="text" class="form-control" id="email" name="email" size="30" value="{$userinfo.email|escape}">
                             </div>

@@ -27,10 +27,7 @@ include_once('lib/live_support/lsadminlib.php');
 include_once('lib/live_support/lslib.php');
 $access->check_feature('feature_live_support');
 if ($tiki_p_live_support_admin != 'y' && ! $lsadminlib->user_is_operator($user)) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 $where = '';
 $wheres = [];
@@ -70,7 +67,7 @@ $smarty->assign('find', $find);
 $smarty->assign('where', $where);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $items = $lsadminlib->list_support_requests($offset, $maxRecords, $sort_mode, $find, $where);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $smarty->assign('users', $lsadminlib->get_all_tiki_users());
 $smarty->assign('operators', $lsadminlib->get_all_operators());

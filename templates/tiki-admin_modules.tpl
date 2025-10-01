@@ -1,6 +1,5 @@
 {strip}
 {title help="Modules" admpage="module"}{tr}Admin Modules{/tr}{/title}
-
 <div class="t_navbar mb-4">
     <form action="tiki-admin_modules.php" method="post" style="display: inline">
         {ticket}
@@ -17,7 +16,6 @@
     {if $tiki_p_edit_menu eq 'y'}
         {button href="tiki-admin_menus.php" _icon_name="menu" _type="link" _text="{tr}Admin Menus{/tr}"}
     {/if}
-    {button href="./" _icon_name="disable" _type="link" _text="{tr}Exit Modules{/tr}"}
 </div>
 
 {if !empty($missing_params)}
@@ -93,7 +91,7 @@
                                                 {actions}
                                                     {strip}
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
@@ -107,14 +105,14 @@
                                                             </form>
                                                         </action>
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
                                                                     name="moddown"
                                                                     value="{$module.moduleId}"
                                                                     class="btn btn-link link-list"
-                                                                    {if $module@last} disabled="disabled" class="disabled"{/if}
+                                                                    {if $module@last} disabled="disabled"{/if}
                                                                 >
                                                                     {icon name="down"} {tr}Move down{/tr}
                                                                 </button>
@@ -126,7 +124,7 @@
                                                             </a>
                                                         </action>
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
@@ -247,7 +245,7 @@
             </table>
         </div>
         <br>
-        {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
         {if $um_name eq ''}
             <h2>{tr}Create new custom module{/tr}</h2>
         {else}
@@ -284,7 +282,7 @@
                 </div>
             </div>
             <h3>{tr}Objects that can be included{/tr}</h3>
-            {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
             {if $prefs.feature_polls eq "y"}
                 <div class="tiki-form-group row">
                     <label class="col-sm-2 col-form-label" for='list_polls'>{tr}Polls{/tr}</label>

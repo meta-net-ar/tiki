@@ -57,7 +57,7 @@ class Services_User_Controller
 
         return [
             'result' => $result['data'],
-            'count' => $result['cant'],
+            'count' => $result['count'],
         ];
     }
 
@@ -589,7 +589,7 @@ class Services_User_Controller
                             'fields' => $extraFields
                         ],
                         'modal' => '1',
-                        'userGroups' => str_replace(['\'','&'], ['%39;','%26'], json_encode($userGroups)),
+                        'userGroups' => json_encode($userGroups),
                     ];
                 }
             } else {
@@ -602,7 +602,7 @@ class Services_User_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
@@ -1102,6 +1102,13 @@ class Services_User_Controller
         TikiLib::lib('access')->check_user($user);
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
+            if ($input->isAvatar->bool()) {
+                $avatarLibName = $input->avatarLibName->text();
+                $avatarName = $input->avatarName->text();
+                $avatarType = $input->avatarType->text();
+                TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                return true;
+            }
             if (empty($_FILES['userfile']['name'])) {
                 $errormsg = tra('You must select an avatar to upload.');
                 throw new Services_Exception($errormsg, 400);
@@ -1119,6 +1126,55 @@ class Services_User_Controller
                 "userwatch" => $userwatch,
             ];
         }
+    }
+
+    public function actionLocalTimezoneSync($input)
+    {
+        global $user, $tikilib;
+        $access = TikiLib::lib('access');
+        $clientTz = $input->client_timezone->text();
+        $action = $input->timezone_action->text();
+
+        if ($action === 'never') {
+            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
+                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
+            }
+            $access->redirect($_SERVER['HTTP_REFERER']);
+            return [];
+        }
+
+        if (! empty($_SESSION["temp_timezone"])) {
+            $preferedTz = $_SESSION["temp_timezone"];
+        } else {
+            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        }
+
+        if ($action === 'switch') {
+            $tikilib->set_user_preference($user, 'display_timezone', $clientTz);
+            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        } elseif ($action === 'temporary') {
+            $_SESSION["temp_timezone"] = $clientTz;
+            $preferedTz = $clientTz;
+        }
+
+        $different = $clientTz && $clientTz !== $preferedTz;
+        $result = [
+            'different'      => $different ? true : false,
+            'preferedTimezone' => $preferedTz,
+            'clientTimezone'   => $clientTz,
+        ];
+
+        if ($action === 'switch' || $action === 'temporary') {
+            return $this->redirectAndReturn($result);
+        }
+
+        return $result;
+    }
+
+    private function redirectAndReturn($data = []): array
+    {
+        header("Location:" . $_SERVER['HTTP_REFERER']);
+        return $data;
     }
 
     private function removeUsers(array $users, $page = false, $trackerIds = [], $files = false)
@@ -1265,5 +1321,23 @@ class Services_User_Controller
             }
         }
         return true;
+    }
+
+    public function actionValidateUser($input)
+    {
+        $username = $input->username->text();
+        $password = $input->password->text();
+        $userlib = TikiLib::lib('user');
+        $ret = $userlib->validate_user($username, $password);
+        return $ret[0];
+    }
+
+    public function action_save_column_prefs($input)
+    {
+        global $user;
+        $columns = $input->prefs->value();
+        $tracker_name = $input->trackerName->value();
+        TikiLib::lib('tiki')->set_user_preference($user, 'trk_items_column_pref', $columns);
+        return tr('Your column preference for tracker "%0" is saved.', $tracker_name);
     }
 }

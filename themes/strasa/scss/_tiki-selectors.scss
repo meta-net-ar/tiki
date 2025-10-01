@@ -1,7 +1,25 @@
-// This file is for additional SCSS rules beyond what are in _bootstrap-variables.scss.
+// Strasa for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
 // Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
 $imagePath: "../images/";
 
+// Color system
+// Body
 body {
   background: #214d68 url('#{$imagePath}body-bg_fw.png') repeat-x;
 }
@@ -12,6 +30,17 @@ body.tiki.navbar-padding {
 
 body.fullscreen.tiki.navbar-padding {
   padding-top: 0;
+}
+
+#col2 aside {
+    background: var(--tiki-aside-bg); // #aeebff; //lighten(#42cefb, 15%); // #a7e8fc;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    //    margin-top: 30px;
+    margin-bottom: 20px;
+    margin-left: calc(var(--bs-gutter-x) * -0.5);;
 }
 
 .container,
@@ -29,188 +58,9 @@ body.fullscreen.tiki.navbar-padding {
     color: #343a40;
 }
 
-.navbar .container {
-  background: transparent;
-}
-
-.btn-primary {
-  border-color: #41cbe7 #223845 #223845 #41cbe7
-}
-
-//.layout_basic .top_modules,
-//.layout_classic .top_modules.bg-dark-parent {
-//  color: #ffffff !important;
-//  background: #214d68 url('#{$imagePath}headerbg.jpg') repeat-x 0 100% !important;
-//
-//  a,
-//  .btn-link {
-//    color: #ffffff !important;
-//  }
-//}
-
-//.topbar {
-//  margin-bottom: 20px;
-//}
-
-//.navbar.bg-light,
-//.navbar.bg-dark,
-//.topbar,
-// div:not(.topbar) .navbar-light .navbar-nav > li,
-// .topbar .nav > li,
-.siteloginbar_popup .dropdown-menu {
-//    background: #2498c7 url('#{$imagePath}topbar-left2.png') no-repeat 100% 0;
-//    background-size: auto 100%;
-  background: #2498c7;
-  background: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%),url('#{$imagePath}topbar-left.png') no-repeat auto 100%;
-}
-
-//.bg-light .bg-light,
-//.bg-dark .bg-dark {
-//  background: transparent !important;
-///}
-
-//.navbar-light .navbar-nav > .active,
-//.navbar-light .navbar-nav > .open {
-//  > a,
-//  > a:hover,
-//  > a:focus {
-//    background: transparent;
-//  }
-//}
-
-.navbar-fixed-top .container,
-.navbar-fixed-top .container .navbar-light {
-  background: transparent;
-  border: none;
-}
-
-//.topbar .nav-link,
-//.navbar-dark .nav-link,
-//.navbar-light .nav-link {
-//  color: #fff !important;
-//    &:hover {
-//        color: darken(#fff, 10%) !important;
-//    }
-//}
-
-//input,
-.form-control,
-.jumbotron {
-  border: 1px solid;
-  border-color: #223845 #4d7b9b #4d7b9b #223845;
-}
-
-.wikitext {
-  h1 {
-    color: var(--#{$prefix}body-color); // #000000;
-//    line-height: .9em;
-  }
-
-  h2 {
-    color: #309fc0;
-//    line-height: .9em;
-    border-bottom: solid 1px #3090c0;
-    text-transform: uppercase;
-  }
-
-  h3 {
-    color: #303030;
-    //  line-height: .8em;
-    font-style: italic;
-  }
-
-  h3.card-title {
-    font-style: normal;
-  }
-
-  h4 {
-    border-bottom: dashed 1px #ccf0ff;
-//    color: #3f3f3f;
-  }
-
-  h5 {
-//    color: #6f6f6f;
-    font-style: italic;
-  }
-
-  h6 {
-//    color: #757575;
-  }
-}
-
-.wikitext.nopagetitle {
-  h1 {
-    color: #309fc0;
-    border-bottom: solid 1px #3090c0;
-    text-transform: uppercase;
-  }
-
-  h2 {
-    color: #303030;
-    font-style: italic;
-    border-bottom: none;
-    text-transform: none;
-  }
-
-  h3 {
-    border-bottom: dashed 1px #ccf0ff;
-    color: #3f3f3f;
-    font-style: normal;
-  }
-
-  h4 {
-    color: #6f6f6f;
-    font-style: italic;
-    border-bottom: none;
-  }
-
-  h5 {
-    color: #909090;
-  }
-}
-
-h1.pagetitle > a,
-h1.pagetitle > a:visited,
-h1.pagetitle > a:hover {
-  color: var(--#{$prefix}body-color);
-  text-decoration: none;
-}
-
-h3.card-title {
-  font-size: 1.4rem;
-}
-
-#col2 .content {
-  background: #aeebff; //lighten(#42cefb, 15%); // #a7e8fc;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-    margin-top: 30px;
-  margin-bottom: 20px;
-    margin-left: -15px;
-}
-
 #bottom_modules {
-  background: #2e3035;
-  color: #999999;
-
-  .card-title {
+    background: #2e3035;
     color: #999999;
-  }
-
-  a:hover,
-  a:focus {
-    color: #024c7b;
-  }
-}
-
-.card.module,
-.card.module > .card-header,
-.card.module > .card-body,
-.card.module > .card-footer {
-  border: none;
-  background: transparent;
 }
 
 #footer {
@@ -221,3 +71,143 @@ h3.card-title {
     color: #aeebff;
 }
 
+// Links
+.card-title {
+    color: #999999;
+}
+
+// Components
+// Typography
+.wikitext {
+    h1 {
+        color: var(--#{$prefix}body-color); // #000000;
+    }
+
+    h2 {
+        color: var(--bs-heading-color); //#309fc0;
+        border-bottom: solid 1px #3090c0;
+        text-transform: uppercase;
+    }
+
+    h3 {
+        color: var(--bs-heading-color); //#303030;
+        font-style: italic;
+    }
+
+    h3.card-title {
+        font-style: normal;
+    }
+
+    h4 {
+        border-bottom: dashed 1px #ccf0ff;
+    }
+
+    h5 {
+        font-style: italic;
+    }
+}
+
+.wikitext.nopagetitle {
+    h1 {
+        color: var(--bs-heading-color); //#309fc0;
+        border-bottom: solid 1px #3090c0;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        color: var(--bs-heading-color); // #303030;
+        font-style: italic;
+        border-bottom: none;
+        text-transform: none;
+    }
+
+    h3 {
+        color: var(--bs-heading-color); //#3f3f3f;
+        font-style: normal;
+        border-bottom: dashed 1px #ccf0ff;
+    }
+
+    h4 {
+        color: #6f6f6f;
+        font-style: italic;
+        border-bottom: none;
+    }
+
+    h5 {
+        color: #909090;
+    }
+}
+
+h1.pagetitle > a,
+h1.pagetitle > a:visited,
+h1.pagetitle > a:hover {
+    color: var(--#{$prefix}body-color);
+    text-decoration: none;
+}
+
+// Tables
+// Buttons
+.btn-primary {
+    border-color: #41cbe7 #223845 #223845 #41cbe7
+}
+
+// Forms
+// Navs
+// Navbar
+.navbar .container {
+  background: transparent;
+}
+
+.navbar-fixed-top .container,
+.navbar-fixed-top .container .navbar-light {
+    background: transparent;
+    border: none;
+}
+
+.siteloginbar_popup .dropdown-menu {
+  background: #2498c7;
+  background: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%),url('#{$imagePath}topbar-left.png') no-repeat auto 100%;
+}
+
+.form-control,
+.jumbotron {
+  border: 1px solid;
+  border-color: #223845 #4d7b9b #4d7b9b #223845;
+}
+
+// Dropdowns
+// Pagination
+// Cards
+.card-title {
+  font-size: 1.4rem;
+    color: #757575 !important;
+}
+
+.card.module,
+.card.module > .card-header,
+.card.module > .card-body,
+.card.module > .card-footer {
+    border: none;
+    background: transparent;
+}
+
+// List group ( Darken color to meet WCAG2 )
+.list-group-item.list-group-item-primary {
+    color: #343A40CC;
+}
+.list-group-item.list-group-item-secondary {
+    color: #2E3438BF;
+}
+.list-group-item.list-group-item-info {
+    color: #30363BBF;
+}
+.list-group-item.list-group-item-dark {
+    color: #2E3438BF;
+}
+
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+// External libraries

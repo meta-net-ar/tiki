@@ -4,7 +4,7 @@
 
 <div class="t_navbar btn-group">
     {button href="tiki-admin_html_pages.php" class="btn btn-primary" _icon_name="cog" _text="{tr}Admin HTML pages{/tr}"}
-    {assign var='pname' value=$pageName|escape:"url"}
+    {$pname=$pageName|escape:"url"}
     {button href="tiki-admin_html_pages.php?pageName=$pname" class="btn btn-primary" _icon_name="edit" _text="{tr}Edit this page{/tr}"}
     {button href="tiki-page.php?pageName=$pname" class="btn btn-primary" _icon_name="view" _text="{tr}View page{/tr}"}
 </div>
@@ -86,4 +86,4 @@
     </div>
 </form>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

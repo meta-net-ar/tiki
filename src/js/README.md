@@ -27,7 +27,6 @@ Javascript dependencies are still being moved from composer.  For examples of ho
 1. Dependencies compiled-in.  
     * Ideal from a developer experience, simplest by far, but implies the javascript **using** them is already migrated in src/js.  
     * Applies to specific dependencies used from specific systems (possibly more than one), that will benefit from tree-shaking.
-    * Example: see how @fullcalendar is used, compiled into tiki-calendar.js and wikiplugin-trackercalendar.js
 1. Common, large dependencies used a lot:  Make them available in common-externals, AND define them as externals in vite.config.js so they are not compiled in.  
     * Two variants:  as ESM module if available, or as normal scripts.
     * Js code in src/js and legacy js code can share them.

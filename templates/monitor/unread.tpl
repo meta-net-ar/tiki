@@ -20,12 +20,12 @@
         {/foreach}
         <div class="submit">
             {if $result|count > 0}
-                <a class="btn btn-primary clearall custom-handling" href="{service controller=monitor action=clearall timestamp=$timestamp}">
+                <a class="btn btn-primary clearall custom-handling" href="{service controller=monitor action=clearall timestamp=$timestamp}" role="button">
                     {icon name="check"}
                     {tr}Mark all as read{/tr}
                 </a>
             {/if}
-            <a class="btn btn-secondary show-more custom-handling" href="{$more_link|escape}">{tr}Show More{/tr}</a>
+            <a class="btn btn-secondary show-more custom-handling" href="{$more_link|escape}" role="button">{tr}Show More{/tr}</a>
         </div>
     </div>
 

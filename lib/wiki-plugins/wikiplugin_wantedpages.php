@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/wiki/pluginslib.php';
+
+use Tiki\Lib\Wiki\PluginsLib;
 
 function wikiplugin_wantedpages_info()
 {
@@ -165,31 +166,6 @@ class WikiPluginWantedPages extends PluginsLib
 
         // Grab and handle our Tiki parameters...
         extract($params, EXTR_SKIP);
-        if (! isset($ignore)) {
-            $ignore = '';
-        }
-        if (! isset($splitby)) {
-            $splitby = '+';
-        }
-        if (! isset($skipalias)) {
-            $skipalias = 1;
-        }
-        if (! isset($skipext)) {
-            $skipext = false;
-        }
-        if (! isset($debug)) {
-            $debug = false;
-        }
-        if (! isset($collect)) {
-            $collect = 'from';
-        }
-        if (! isset($table)) {
-            $table = 'sep';
-        }
-        if (! isset($level)) {
-            $level = '';
-        }
-
         // for regexes and external wiki details, see tikilib.php
         if ($level == 'strict') {
             $level_reg = '([A-Za-z0-9_])([\.: A-Za-z0-9_\-])*([A-Za-z0-9_])';
@@ -252,7 +228,7 @@ class WikiPluginWantedPages extends PluginsLib
             } // foreach ignorepage
 
             // if toPage contains colon, and exloding yields two parts => external Wiki
-            if (($skipext) && (strstr($row['toPage'], ':') !== false)) {
+            if (($skipext) && (str_contains($row['toPage'], ':'))) {
                 $parts = explode(':', $row['toPage']);
                 if (count($parts) == 2) {
                     if ($debug == 2) {
@@ -492,7 +468,7 @@ if (! function_exists('is_object_link')) {
     function is_object_link($link)
     {
         $parts = explode(':', $link);
-        if (strstr($link, 'objectlink:') && count($parts) >= 3) {
+        if (str_contains($link, 'objectlink:') && count($parts) >= 3) {
             return true;
         }
         return false;

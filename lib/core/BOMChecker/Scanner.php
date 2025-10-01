@@ -152,7 +152,7 @@ class BOMChecker_Scanner
     {
         $dirPath = str_replace('\\', '/', $dirPath);
 
-        if (substr($dirPath, -1, 1) != '/') {
+        if (! str_ends_with($dirPath, '/')) {
             $dirPath .= '/';
         }
 
@@ -168,7 +168,7 @@ class BOMChecker_Scanner
     protected function getFileExtension($filePath)
     {
         $info = pathinfo($filePath);
-        return isset($info['extension']) ? $info['extension'] : '';
+        return $info['extension'] ?? '';
     }
 
     /**
@@ -185,13 +185,13 @@ class BOMChecker_Scanner
 
         $this->scannedFiles++;
 
-        if (substr($data, 0, 3) == "\xEF\xBB\xBF") {
+        if (str_starts_with($data, "\xEF\xBB\xBF")) {
             return self::BOM_UTF8;
         }
 
         if (
-            (substr($data, 0, 2) == "\xFE\xFF") // UTF-16 big-endian BOM
-            || (substr($data, 0, 2) == "\xFF\xFE") // UTF-16 little-endian BOM
+            (str_starts_with($data, "\xFE\xFF")) // UTF-16 big-endian BOM
+            || (str_starts_with($data, "\xFF\xFE")) // UTF-16 little-endian BOM
         ) {
             return self::BOM_UTF16;
         }

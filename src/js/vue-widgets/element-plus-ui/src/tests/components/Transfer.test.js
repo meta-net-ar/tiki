@@ -184,13 +184,52 @@ describe("Transfer", () => {
         expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
+    test("should correctly reorder items with SortableJS when ordering prop is true", async () => {
+        ElTransfer = {
+            setup() {
+                return () =>
+                    h("div", {}, [
+                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                        h("div", { class: "el-transfer-panel__list" }, [
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                            ),
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                            ),
+                        ]),
+                    ]);
+            },
+        };
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props: { ...props, ordering: true } });
+
+        const sortableList = screen.getByText("list 1").nextElementSibling;
+        const orderedChildren = Array.from(sortableList.children).reverse();
+        sortableList.replaceChildren(...orderedChildren);
+
+        Sortable.mock.calls[0][1].onSort();
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["b", "a"] });
+    });
+
     test("should keep hidden select in sync with el-transfer and call the given emitValueChange prop when the value changes", async () => {
         props.emitValueChange = vi.fn();
         ElTransfer = {
             props: ["data", "filterable", "filter-placeholder", "titles"],
             emits: ["update:modelValue", "change"],
             setup(props, { emit }) {
-                const handleClick = () => emit("change", ["c"]);
+                const handleClick = () => {
+                    emit("update:modelValue", ["c"]);
+                    emit("change", ["c"]);
+                };
                 return () => h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
             },
         };

@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\DateCalc;
+use Tiki\Lib\TikiDate;
+
 if (! defined('ROLE_ORGANIZER')) {
     define('ROLE_ORGANIZER', '6');
 }
@@ -79,8 +83,8 @@ class CalendarLib extends TikiLib
 
         $query = "select tcal.* from `tiki_calendars` as tcal $join where 1=1 $mid order by " . $sort;
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $query_cant = "select count(*) from `tiki_calendars` as tcal $join where 1=1 $mid";
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_calendars` as tcal $join where 1=1 $mid";
+        $count = $this->getOne($query_count, $bindvars);
 
         $res = [];
         while ($r = $result->fetchRow()) {
@@ -92,16 +96,20 @@ class CalendarLib extends TikiLib
             }
             $res2 = $this->query("select `optionName`,`value` from `tiki_calendar_options` where `calendarId`=?", [(int)$k]);
             while ($r2 = $res2->fetchRow()) {
-                if ($r2['optionName'] == 'eventstatus' && isset($r2['value'])) {
+                if ($r2['optionName'] == 'eventstatus') {
                     $eventstatus = json_decode($r2['value']);
                     $r[$r2['optionName']] = $eventstatus;
                     //add translation tag to statuses for display
-                    $r["eventstatusoutput"] = array_map(
-                        function ($status) {
-                            return tra($status);
-                        },
-                        $eventstatus
-                    );
+                    if (is_array($eventstatus)) {
+                        $r["eventstatusoutput"] = array_map(
+                            function ($status) {
+                                return tra($status);
+                            },
+                            $eventstatus
+                        );
+                    } else {
+                        $r["eventstatusoutput"] = [];
+                    }
                 } else {
                     $r[$r2['optionName']] = $r2['value'];
                 }
@@ -128,8 +136,38 @@ class CalendarLib extends TikiLib
             $res["$k"] = $r;
         }
         $retval["data"] = $res;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
+    }
+
+    public function generalParamsOfCalendar($rawcalsData)
+    {
+        global $prefs;
+        $canEditAnything = false;
+        foreach ($rawcalsData as $calendar) {
+            $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
+            $calendars[$calendar['calendarId']] = $calendar;
+            // for week and day views
+            $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
+            $startOfDayHour = $startOfDayUnix / 3600;
+            $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
+            $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+            $endOfDayUnix = (int)($calendar['endday'] ?? 0);
+            $endOfDayHour = $endOfDayUnix / 3600;
+            $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
+            $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+            $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
+        }
+        return  [
+            'firstDayofWeek'   => 0,//$firstDayofWeek,
+            'display_timezone' => $prefs['display_timezone'],
+            'language'         => $prefs['language'],
+            'minHourOfDay'     => $minHourOfDay,
+            'maxHourOfDay'     => $maxHourOfDay,
+            'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
+            'initialDate'      => date("Y-m-d"),
+            'canEditAnything' => $canEditAnything,
+        ];
     }
 
     /**
@@ -237,7 +275,7 @@ class CalendarLib extends TikiLib
     public function get_calendar($calendarId)
     {
         global $prefs;
-        if (substr($calendarId, 0, 1) === 's') {
+        if (str_starts_with($calendarId, 's')) {
             $subscription = $this->get_subscription(substr($calendarId, 1));
             $subscription['startday'] = ! empty($prefs['calendar_start_day']) ? $prefs['calendar_start_day'] : 25200;
             $subscription['endday'] = ! empty($prefs['calendar_end_day']) ? $prefs['calendar_end_day'] : 72000;
@@ -283,7 +321,7 @@ class CalendarLib extends TikiLib
         $res = $this->query("select `calendarId` from `tiki_calendars` where `calendarId`=?", [(int)$calendarId]);
         $cal = $res->fetchRow();
 
-        return empty($cal) ? false : true;
+        return ! empty($cal);
     }
 
     public function get_calendar_options($calendarId)
@@ -414,11 +452,11 @@ class CalendarLib extends TikiLib
         $joinCompl = '';
         $tblRef = 'i.';
 
-        if (substr($sort_mode, 0, 12) == "categoryName") {
+        if (str_starts_with($sort_mode, "categoryName")) {
             $queryCompl = "`tiki_calendar_categories` as compl right join ";
             $joinCompl = " on i.categoryId = compl.calcatid ";
             $tblRef = "compl.";
-        } elseif (substr($sort_mode, 0, 12) == "locationName") {
+        } elseif (str_starts_with($sort_mode, "locationName")) {
             $queryCompl = "`tiki_calendar_locations` as compl right join ";
             $joinCompl = " on i.locationId = compl.callocid ";
             $tblRef = "compl.";
@@ -437,7 +475,7 @@ class CalendarLib extends TikiLib
         }
 
         foreach ($calIds as $calendarId) {
-            if (substr($calendarId, 0, 1) === 's') {
+            if (str_starts_with($calendarId, 's')) {
                 $parserlib = TikiLib::lib('parser');
                 $timezone = TikiLib::lib('tiki')->get_display_timezone();
                 $sub = $this->get_subscription(substr($calendarId, 1));
@@ -636,7 +674,8 @@ class CalendarLib extends TikiLib
         $query = "select i.`calitemId` as `calitemId`, i.`calendarId` as `calendarId`, i.`user` as `user`, i.`start` as `start`, i.`end` as `end`, t.`name` as `calname`, ";
         $query .= "i.`locationId` as `locationId`, l.`name` as `locationName`, i.`categoryId` as `categoryId`, c.`name` as `categoryName`, c.`backgroundColor` as `categoryBackgroundColor`, i.`priority` as `priority`, i.`nlId` as `nlId`, i.`uid` as `uid`, i.`uri` as `uri`, ";
         $query .= "i.`status` as `status`, i.`url` as `url`, i.`lang` as `lang`, i.`name` as `name`, i.`description` as `description`, i.`created` as `created`, i.`lastmodif` as `lastModif`, i.`allday` as `allday`, ";
-        $query .= "t.`customlocations`, t.`customcategories`, t.`customlanguages`, t.`custompriorities`, t.`customsubscription`, t.`customparticipants`, i.`recurrenceId`, i.`recurrenceStart`, r.`uid` as `recurrenceUid`";
+        $query .= "t.`customlocations`, t.`customcategories`, t.`customlanguages`, t.`custompriorities`, t.`customsubscription`, t.`customparticipants`, i.`recurrenceId`, i.`recurrenceStart`, r.`uid` as `recurrenceUid`, ";
+        $query .= "i.`hideParticipants` as `hideParticipants`";
 
         foreach ($customs as $k => $v) {
             $query .= ", i.`$k` as `$v`";
@@ -836,7 +875,7 @@ class CalendarLib extends TikiLib
         $data['user'] = $user;
 
         $realcolumns = ['calitemId', 'calendarId', 'start', 'end', 'locationId', 'categoryId', 'nlId', 'priority', 'uri', 'uid',
-                     'status', 'url', 'lang', 'name', 'description', 'user', 'created', 'lastmodif', 'allday', 'recurrenceId', 'changed', 'recurrenceStart'];
+                     'status', 'url', 'lang', 'name', 'description', 'user', 'created', 'lastmodif', 'allday', 'recurrenceId', 'changed', 'recurrenceStart', 'hideParticipants'];
         foreach ($customs as $custom) {
             $realcolumns[] = $custom;
         }
@@ -924,8 +963,8 @@ class CalendarLib extends TikiLib
         }
 
         if ($prefs['feature_categories'] == 'y') {
-            $catCategories = isset($_REQUEST['cat_categories']) ? $_REQUEST['cat_categories'] : [];
-            $catCatManaged = isset($_REQUEST['cat_managed']) ? $_REQUEST['cat_managed'] : [];
+            $catCategories = $_REQUEST['cat_categories'] ?? [];
+            $catCatManaged = $_REQUEST['cat_managed'] ?? [];
             $this->update_item_categories($calitemId, $catCatManaged, $catCategories, $data['name'], $data['description']);
         }
 
@@ -1144,9 +1183,7 @@ class CalendarLib extends TikiLib
             $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         if ($fields === false || ! array_search('name', $fields)) {
-            $smarty->assign('msg', tra("The file has incorrect syntax or is not a CSV file"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file has incorrect syntax or is not a CSV file"), \Laminas\Http\Response::STATUS_CODE_400);
         }
         $nb = 0;
         while (($data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
@@ -1282,8 +1319,8 @@ class CalendarLib extends TikiLib
 
         $ret = $this->fetchAll($query, $bindvars, $maxrows, $start);
 
-        $query_cant = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " GROUP BY i.calitemId order by " . $this->convertSortMode($order);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " GROUP BY i.calitemId order by " . $this->convertSortMode($order);
+        $count = $this->getOne($query_count, $bindvars);
 
         foreach ($ret as &$res) {
             $res['parsed'] = TikiLib::lib('parser')->parse_data($res['description'], ['is_html' => $prefs['calendar_description_is_html'] === 'y', 'objectType' => 'calendar event', 'objectId' => $res['calitemId'], 'fieldName' => 'description']);
@@ -1291,7 +1328,7 @@ class CalendarLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
@@ -1351,8 +1388,8 @@ class CalendarLib extends TikiLib
 
         $ret = $this->fetchAll($query, $bindvars, $maxrows, $start);
 
-        $query_cant = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " order by " . $this->convertSortMode($order);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " order by " . $this->convertSortMode($order);
+        $count = $this->getOne($query_count, $bindvars);
 
         foreach ($ret as &$res) {
             $res['parsed'] = TikiLib::lib('parser')->parse_data($res['description'], ['is_html' => $prefs['calendar_description_is_html'] === 'y', 'objectType' => 'calendar event', 'objectId' => $res['calitemId'], 'fieldName' => 'description']);
@@ -1360,7 +1397,7 @@ class CalendarLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
@@ -1502,8 +1539,8 @@ class CalendarLib extends TikiLib
 
         $ret = $this->fetchAll($query, $bindvars, $maxrows, $start);
 
-        $query_cant = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " order by " . $this->convertSortMode($order);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_calendar_items` i $ljoin where 1=1 " . $cond . " order by " . $this->convertSortMode($order);
+        $count = $this->getOne($query_count, $bindvars);
 
         foreach ($ret as &$res) {
             $res['parsed'] = TikiLib::lib('parser')->parse_data($res['description'], ['is_html' => $prefs['calendar_description_is_html'] === 'y', 'objectType' => 'calendar event', 'objectId' => $res['calitemId'], 'fieldName' => 'description']);
@@ -1511,14 +1548,14 @@ class CalendarLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
     /**
      * @param $calendarId
      * @param $days
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function cleanEvents($calendarId, $days)
     {
@@ -1564,7 +1601,7 @@ class CalendarLib extends TikiLib
             'date' => $focusDate,
             'weekDay' => TikiLib::date_format('%w', $focusDate) // in (0, 6)
         ];
-        $focus['daysInMonth'] = Date_Calc::daysInMonth($focus['month'], $focus['year']);
+        $focus['daysInMonth'] = DateCalc::daysInMonth($focus['month'], $focus['year']);
         return $focus;
     }
     // Compute the start date (the 1 first of the month of the focus date or the day) and the next start date from the period around a focus date
@@ -1611,7 +1648,7 @@ class CalendarLib extends TikiLib
         } else {
             $previous['month'] -= $nbMonths[$view];
         }
-        $previous['daysInMonth'] = Date_Calc::daysInMonth($previous['month'], $previous['year']);
+        $previous['daysInMonth'] = DateCalc::daysInMonth($previous['month'], $previous['year']);
         if ($previous['day'] > $previous['daysInMonth']) {
             $previous['day'] = $previous['daysInMonth'];
         }
@@ -1637,7 +1674,7 @@ class CalendarLib extends TikiLib
         } else {
             $next['month'] += $nbMonths[$view];
         }
-        $next['daysInMonth'] = Date_Calc::daysInMonth($next['month'], $next['year']);
+        $next['daysInMonth'] = DateCalc::daysInMonth($next['month'], $next['year']);
         if ($next['day'] > $next['daysInMonth']) {
             $next['day'] = $next['daysInMonth'];
         }
@@ -1660,15 +1697,15 @@ class CalendarLib extends TikiLib
         $viewStart = $start;
         $nbBackDays = $start['weekDay'] < $firstWeekDay ? 6 : $start['weekDay'] - $firstWeekDay;
         if ($nbBackDays == 0) {
-            $viewStart['daysInMonth'] = Date_Calc::daysInMonth($viewStart['month'], $viewStart['year']);
+            $viewStart['daysInMonth'] = DateCalc::daysInMonth($viewStart['month'], $viewStart['year']);
         } elseif ($start['day'] - $nbBackDays < 0) {
             $viewStart['month'] = $start['month'] == 1 ? 12 : $start['month'] - 1;
             $viewStart['year'] = $start['month'] == 1 ? $start['year'] - 1 : $start['year'];
-            $viewStart['daysInMonth'] = Date_Calc::daysInMonth($viewStart['month'], $viewStart['year']);
+            $viewStart['daysInMonth'] = DateCalc::daysInMonth($viewStart['month'], $viewStart['year']);
             $viewStart['day'] = $viewStart['daysInMonth'] - $nbBackDays + 1;
             $viewStart['date'] = TikiLib::make_time(0, 0, 0, $viewStart['month'], $viewStart['day'], $viewStart['year']);
         } else {
-            $viewStart['daysInMonth'] = Date_Calc::daysInMonth($viewStart['month'], $viewStart['year']);
+            $viewStart['daysInMonth'] = DateCalc::daysInMonth($viewStart['month'], $viewStart['year']);
             $viewStart['day'] = $viewStart['day'] - $nbBackDays;
             $viewStart['date'] = TikiLib::make_time(0, 0, 0, $viewStart['month'], $viewStart['day'], $viewStart['year']);
         }
@@ -1681,7 +1718,7 @@ class CalendarLib extends TikiLib
                 break;
             }
             $cell[$ilign][$icol] = $loop;
-            $cell[$ilign][$icol]['focus'] = $loop['date'] < $start['date'] || $loop['date'] >= $startNext['date'] ? false : true;
+            $cell[$ilign][$icol]['focus'] = ! ($loop['date'] < $start['date'] || $loop['date'] >= $startNext['date']);
             $cell[$ilign][$icol]['weekDay'] = $weekDay;
             $weekDay = ($weekDay + 1) % 7;
             if ($icol >= 6) {
@@ -1698,7 +1735,7 @@ class CalendarLib extends TikiLib
                 } else {
                     $loop['month'] += 1;
                 }
-                $loop['daysInMonth'] = Date_Calc::daysInMonth($loop['month'], $loop['year']);
+                $loop['daysInMonth'] = DateCalc::daysInMonth($loop['month'], $loop['year']);
             } else {
                 $loop['day'] = $loop['day'] + 1;
             }
@@ -1721,24 +1758,15 @@ class CalendarLib extends TikiLib
             $daysnames[] = tra('Sunday');
             $daysnames_abr[] = tra('SU');
         }
-        array_push(
-            $daysnames,
-            tra('Monday'),
-            tra('Tuesday'),
-            tra('Wednesday'),
-            tra('Thursday'),
-            tra('Friday'),
-            tra('Saturday')
-        );
-        array_push(
-            $daysnames_abr,
-            tra('MO'),
-            tra('TU'),
-            tra('WE'),
-            tra('TH'),
-            tra('FR'),
-            tra('SA')
-        );
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        foreach ($days as $day) {
+            $daysnames[] = tra($day);
+        }
+        $days_abr = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+        foreach ($days_abr as $day_abr) {
+            $daysnames_abr[] = tra($day_abr);
+        }
+
         if ($firstDayofWeek != 0) {
             $daysnames[] = tra('Sunday');
             $daysnames_abr[] = tra('SU');
@@ -2327,7 +2355,7 @@ class CalendarLib extends TikiLib
         if (empty($prefs['calendar_holidays'])) {
             return 0;
         }
-        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2));
+        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2) + 1);
         $dates = [];
         foreach ($events as $event) {
             $start = $event['start'];

@@ -26,6 +26,7 @@ $inputConfiguration = [
             'sort_mode'                   => 'alnumdash',    //get
             'initial'                     => 'alpha',        //get
             'filterGroup'                 => 'groupname',    //get
+            'newuser'                     => 'text',         //post
             'filterEmailNotConfirmed'     => 'alpha',
             'filterNeverLoggedIn'         => 'alpha',
             'filterNotValidated'          => 'alpha',
@@ -242,7 +243,7 @@ function batchImportUsers()
 
     if (count($discarded)) {
         foreach ($discarded as $key => $value) {
-            $df[] = $discarded[$key]['login'] . ' (' . $discarded[$key]['reason'] . ')';
+            $df[] = $value['login'] . ' (' . $value['reason'] . ')';
         }
         Feedback::warning(['mes' => $df, 'title' => tr('%0 users not added', count($discarded))]);
     }
@@ -619,7 +620,7 @@ if ($prefs['userTracker'] === 'y') {
     }
 }
 $smarty->assign_by_ref('users', $users['data']);
-$smarty->assign_by_ref('cant', $users['cant']);
+$smarty->assign_by_ref('count', $users['count']);
 
 if (isset($_REQUEST['add'])) {
     $cookietab = 2;
@@ -637,7 +638,7 @@ if ($ts['enabled'] && ! $ts['ajax']) {
         'TikiAdminusers',
         [
             'id' => $ts['tableid'],
-            'total' => $users['cant'],
+            'total' => $users['count'],
             'columns' => [
                 '#groups' => [
                     'filter' => [

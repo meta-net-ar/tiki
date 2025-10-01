@@ -63,14 +63,6 @@ function wikiplugin_xmlupdate($data, $params)
         return ("<span class='error'>Error: fileId# for the XML file is not set</span>");
     }
 
-    // set default params
-    $plugininfo = wikiplugin_xmlupdate_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
-
     // get the full path address for the fileId from the File Gallery info and the pref for the File Gallery directory folder
     $fileId = $params['fileId'];
     $file = \Tiki\FileGallery\File::id($fileId);

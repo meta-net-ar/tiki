@@ -13,7 +13,7 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 {
     background: var(--tiki-top-bg);
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
-    a:not(.navbar-brand,.dropdown-item,.btn,.sm-sub-link),
+    a:not(.navbar-brand,.dropdown-item,.btn,.sm-sub-link,.alert-link),
     .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
     .nav-link.dropdown-toggle,
     .btn.btn-link,
@@ -38,13 +38,12 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 {
     background: var(--tiki-topbar-bg) !important;
     color: var(--tiki-topbar-text-color);
-    a:not(.navbar-brand,.dropdown-item,.btn,.sm-sub-link),
-    .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
+    a:not(.navbar-brand,.dropdown-item,.btn,.sm-sub-link,.alert-link),
+    .dropdown-toggle, // Moved from tiki-selectors (this and next line)
     .nav-link.dropdown-toggle,
     .btn.btn-link,
     .nav-link,
-    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link
-    {
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link {
         color: var(--tiki-topbar-color);
         &:hover {
             color: var(--tiki-topbar-hover-color);
@@ -52,7 +51,7 @@ body:not(.tiki-admin) .tiki-top-nav-dark
         }
     }
     border: var(--tiki-topbar-border); // Style and color, for example, solid black
-    border-width: var(--tiki-topbar-border-width); // For eaxmple, 1px, or 0px 0px 4px 0px
+    border-width: var(--tiki-topbar-border-width); // For example, 1px, or 0px 0px 4px 0px
     box-shadow: var(--tiki-topbar-box-shadow);
 }
 

@@ -21,7 +21,7 @@
 // Related script:  doc/devtools/prefreport.php
 //
 
-if (isset($_SERVER['REQUEST_METHOD'])) {
+if (PHP_SAPI !== 'cli') {
     die;
 }
 
@@ -62,6 +62,25 @@ $safePaths = [
 
     /* This file is just comments */
     './about.php',
+    './db/preconfiguration.php', // contains comments
+    './lang/ca/language_r.php', // contains comments
+    './lang/en/language_r.php', // contains comments
+
+    /* exception files */
+    '\./tiki-admin_trackers.php', // perform redirection and target file has its own check.
+    '\./tiki-list_users.php', // perform redirection and target file has its own check.
+    '\./tiki-mods.php', // template file (no executable code)
+    '\./tiki-monitor.php', // shows status info
+    '\./tiki-wikiplugin_edit.php', // deprecated file
+    '\./get_strings.php', // deprecated file
+    '\./installer/shell.php', // deprecated file
+    '\./permissioncheck/create_new_htaccess.php', // create new_htaccess file with passwod protection in ./permissioncheck
+    '\./xmlrpc.php', // redirect to tiki-xmlrpc_services.php which has its own check
+    '\./tiki-download_forum_attachment.php', // no need attach permission for download and has its own checks
+
+    /* language files */
+    '\./lang/.*/language_.*\.php', // language files are just definitions
+    '\./lang/.*/.*\.php_example',  // language example files are just definitions
 
     /* The following need to be refactored to a lib */
     '\./tiki-testGD.php',
@@ -134,7 +153,7 @@ function permission_pattern(&$permissionNameIndex) // {{{
 {
     global $major, $minor, $revision;
     $permissionNameIndex = 1;
-    return "/\\$(tiki_p_\w+)\s*(!=|==)=?\s*[\"'](y|n)[\"']/";
+    return "/->check_permission\s*\(\s*['\"](tiki_p_\w+)['\"]\s*\)/";
 }
 // }}}
 
@@ -169,9 +188,45 @@ function includeonly_pattern2() // {{{
 /**
  * @return string
  */
+function includeonly_pattern4() // {{{
+{
+    return "/!\s*str_contains\s*\(\s*\\\$_SERVER\s*\[\s*[\"']SCRIPT_NAME[\"']\s*\]\s*,\s*basename\s*\(\s*__FILE__\s*\)\s*\)/";
+}
+// }}}
+
+/**
+ * @return string
+ */
+function includeonly_pattern5() // {{{
+{
+    return "/str_contains\s*\(\s*\\\$_SERVER\s*\[\s*[\"']SCRIPT_NAME[\"']\s*\]\s*,\s*basename\s*\(\s*__FILE__\s*\)\s*\)/";
+}
+// }}}
+
+/**
+ * @return string
+ */
 function noweb_pattern() // {{{
 {
     return "/if\s*\(\s*isset\s*\(\s*\\\$_SERVER\[\s*[\"']REQUEST_METHOD[\"']\]\s*\)\s*\)\s*die/";
+}
+// }}}
+
+/**
+ * @return string
+ */
+function cli_sapi_pattern() // {{{
+{
+    return "/if\s*\(\s*PHP_SAPI\s*!==\s*'cli'\s*\)\s*{\s*(die(\s*\(\s*(\".*?\"|'.*?')?\s*\))?|return)\s*;/";
+}
+// }}}
+
+/**
+ * @return string
+ */
+function httpResponseCode_pattern() // {{{
+{
+    return "/if\s*\(http_response_code\(\)\s*!==\s*false\)\s*{\s*die\s*\(/";
 }
 // }}}
 
@@ -245,15 +300,15 @@ function analyse_file_path($path) // {{{
 
     $type = 'unknown';
     $name = basename($path);
-    if (strpos($name, '.') !== false) {
+    if (str_contains($name, '.')) {
         $extension = substr($name, strrpos($name, '.') + 1);
     } else {
         $extension = false;
     }
 
-    if (strpos($path, '/CVS/') !== false) {
+    if (str_contains($path, '/CVS/')) {
         $type = 'cvs';
-    } elseif (strpos($path, "./" . SMARTY_COMPILED_TEMPLATES_PATH . "/") === 0) {
+    } elseif (str_starts_with($path, "./" . SMARTY_COMPILED_TEMPLATES_PATH . "/")) {
         $type = 'cache';
     } elseif (regex_match($path, $safePaths)) {
         $type = 'safe';
@@ -262,30 +317,30 @@ function analyse_file_path($path) // {{{
             $type = 'blocker';
         } elseif ($name == 'language.php') {
             $type = 'lang';
-        } elseif (strpos($path, './lib/wiki-plugins') === 0) {
+        } elseif (str_starts_with($path, './lib/wiki-plugins')) {
             $type = 'wikiplugin';
-        } elseif (strpos($path, './lib/') === 0) {
+        } elseif (str_starts_with($path, './lib/')) {
             if (regex_match($path, $thirdpartyLibs)) {
                 $type = '3dparty';
             } else {
                 $type = 'lib';
             }
-        } elseif (strpos($path, './tiki-') === 0) {
+        } elseif (str_starts_with($path, './tiki-')) {
             $type = 'public';
-        } elseif (strpos($path, './modules/') === 0) {
+        } elseif (str_starts_with($path, './modules/')) {
             $type = 'module';
         } else {
             $type = "include";
         }
     } elseif (in_array($extension, ['txt', 'png', 'jpg', 'html', 'css', 'sql', 'gif', 'afm', 'js'])) {
         $type = 'static';
-    } elseif (strpos($path, './' . DEPRECATED_DEVTOOLS_PATH . '/') === 0) {
+    } elseif (str_starts_with($path, './' . DEPRECATED_DEVTOOLS_PATH . '/')) {
         $type = 'script';
-    } elseif (strpos($path, './files/') === 0) {
+    } elseif (str_starts_with($path, './files/')) {
         $type = 'user';
     } elseif ($extension == 'sh') {
         $type = 'system';
-    } elseif (strpos($path, '_htaccess') !== false) {
+    } elseif (str_contains($path, '_htaccess')) {
         $type = 'system';
     } elseif (in_array(basename($path), ['INSTALL', 'README'])) {
         $type = 'doc';
@@ -400,14 +455,133 @@ function perform_includeonly_check(&$file) // {{{
     $pattern = includeonly_pattern($index);
 
     preg_match_all($pattern, get_content($file['path']), $parts);
+
     $pattern = includeonly_pattern2($index);
-
     preg_match_all($pattern, get_content($file['path']), $parts2);
-    $pattern = includeonly_pattern3($index);
 
+    $pattern = includeonly_pattern3($index);
     preg_match_all($pattern, get_content($file['path']), $parts3);
 
-    $file['includeonly'] = count($parts[0]) > 0 || count($parts2[0]) > 0 || count($parts3[0]) > 0;
+    $pattern = includeonly_pattern4($index);
+    preg_match_all($pattern, get_content($file['path']), $parts4);
+
+    $pattern = includeonly_pattern5($index);
+    preg_match_all($pattern, get_content($file['path']), $parts5);
+
+    $file['includeonly'] = count($parts[0]) > 0 || count($parts2[0]) > 0 || count($parts3[0]) > 0 || count($parts4[0]) > 0 || count($parts5[0]) > 0;
+}
+// }}}
+
+/**
+ * @param $file
+ */
+function is_function_declaration_file(&$file) // {{{
+{
+
+    // Initially assume the file is not safe
+    $file['safe_fn_declaration'] = false;
+
+    // Read the file content
+    $content = file_get_contents($file['path']);
+
+    // Get all tokens in the file
+    $tokens = token_get_all($content);
+
+    $isInFunctionDeclaration = false;
+    $hasFunctionDeclaration = false;
+    $allowedTokens = [
+        T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_USE, T_NAME_QUALIFIED,
+        T_REQUIRE, T_REQUIRE_ONCE, T_INCLUDE, T_INCLUDE_ONCE, T_OPEN_TAG
+    ];
+
+    foreach ($tokens as $token) {
+        if (is_array($token)) {
+            list($type, $value) = $token;
+
+            if ($type == T_FUNCTION) {
+                $isInFunctionDeclaration = true;
+                $hasFunctionDeclaration = true;
+                continue;
+            }
+
+            if ($isInFunctionDeclaration && $value == '{') {
+                continue; // Skip tokens inside function declarations
+            }
+
+            if ($isInFunctionDeclaration && $value == '}') {
+                $isInFunctionDeclaration = false; // End of function declaration
+                continue;
+            }
+
+            if (! $isInFunctionDeclaration && ! in_array($type, $allowedTokens)) {
+                // Log the token that caused the file to be marked as unsafe
+                // error_log("Non-allowed token in file {$file['path']}: " . token_name($type) . " - " . $value);
+                return;
+            }
+        } else {
+            if (! $isInFunctionDeclaration && trim($token) !== '' && trim($token) !== ';') {
+                // Log the non-allowed character found outside of a function declaration
+                // error_log("Non-allowed character outside function declaration in file {$file['path']}: " . $token);
+                return;
+            }
+        }
+    }
+
+    if ($hasFunctionDeclaration) {
+        $file['safe_fn_declaration'] = true;
+    }
+}
+// }}}
+
+/**
+ * @param $file
+ */
+function is_class_declaration_file(&$file) // {{{
+{
+    // Initially assume the file is not safe
+    $file['safe_class_declaration'] = false;
+
+    // Read the file content
+    $content = file_get_contents($file['path']);
+
+    // Get all tokens in the file
+    $tokens = token_get_all($content);
+
+    $foundClassDeclaration = false;
+    $inClassDeclaration = false;
+    $foundNonClassTokenOutsideClass = false;
+    $braceCount = 0;
+    $allowedTokens = [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_OPEN_TAG, T_NAMESPACE, T_NAME_QUALIFIED, T_USE, T_STRING];
+
+    foreach ($tokens as $token) {
+        if (is_array($token)) {
+            if (in_array($token[0], [T_CLASS, T_INTERFACE, T_TRAIT])) {
+                $inClassDeclaration = true;
+                $foundClassDeclaration = true;
+                continue;
+            }
+            if ($inClassDeclaration) {
+                if ($token[0] == T_CURLY_OPEN || $token[1] == '{') {
+                    $braceCount++;
+                } elseif ($token[1] == '}') {
+                    $braceCount--;
+                    if ($braceCount === 0) {
+                        $inClassDeclaration = false;
+                    }
+                }
+                continue;
+            }
+            if (! in_array($token[0], $allowedTokens)) {
+                $foundNonClassTokenOutsideClass = true;
+                // error_log("Found non-class token outside of class context at token: " . token_name($token[0]) . " - " . $token[1]);
+                break;
+            }
+        }
+    }
+
+    if (! $foundNonClassTokenOutsideClass && $foundClassDeclaration) {
+        $file['safe_class_declaration'] = true;
+    }
 }
 // }}}
 
@@ -421,7 +595,13 @@ function perform_noweb_check(&$file) // {{{
 
     preg_match_all($pattern, get_content($file['path']), $parts);
 
-    $file['noweb'] = count($parts[0]) > 0;
+    $pattern = cli_sapi_pattern($index);
+    preg_match_all($pattern, get_content($file['path']), $parts1);
+
+    $pattern = httpResponseCode_pattern($index);
+    preg_match_all($pattern, get_content($file['path']), $parts2);
+
+    $file['noweb'] = count($parts[0]) > 0 || count($parts1[0]) > 0 || count($parts2[0]) > 0;
 }
 // }}}
 
@@ -445,12 +625,12 @@ function perform_tikisetup_check(&$file) // {{{
  */
 function perform_extract_skip_check(&$file) // {{{
 {
-    $pattern = "/extract\s*\([^\)]+\)/";
+    $pattern = "/extract\s*\(([\s\S]*?)(?=\);)/";
 
     preg_match_all($pattern, get_content($file['path']), $parts);
 
     foreach ($parts[0] as $extract) {
-        if (strpos($extract, 'EXTR_SKIP') === false) {
+        if (! str_contains($extract, 'EXTR_SKIP')) {
             $file['unsafeextract'] = true;
         }
     }
@@ -471,7 +651,7 @@ function access_check_call($file, $type) // {{{
 
     foreach ($tokens as $key => $token) {
         if (is_array($token)) {
-            if ($token[0] == T_VARIABLE && $token[1] == '$access') {
+            if ($token[0] == T_VARIABLE && ($token[1] == '$access' || $token[1] == '$accesslib')) {
                 if (
                     $tokens[$key + 1][0] == T_OBJECT_OPERATOR
                     && $tokens[$key + 2][0] == T_STRING && $tokens[$key + 2][1] == $type
@@ -633,11 +813,15 @@ foreach ($files as $key => $dummy) {
             perform_includeonly_check($file);
             perform_noweb_check($file);
             perform_tikisetup_check($file);
+            is_function_declaration_file($file);
+            is_class_declaration_file($file);
 
             if (
                 ! $file['noweb']
                 && ! $file['includeonly']
                 && ! count($file['features']) && ! count($file['permissions'])
+                && ! $file['safe_fn_declaration']
+                && ! $file['safe_class_declaration']
             ) {
                 $unsafe[] = $file;
             }
@@ -691,6 +875,7 @@ usort($unsafe, 'sort_cb');
         <th>Not web accessible</th>
         <th>Includes tiki-setup</th>
         <th>Unsafe extract</th>
+        <th>File only declares symbols (functions or classes) do not execute code</th>
         <th>Permissions checked</th>
         <th>Features checked</th>
     </tr>
@@ -725,6 +910,13 @@ usort($unsafe, 'sort_cb');
                 <td>
                     <?php
                     if ($file['unsafeextract']) {
+                        echo 'X';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if ((isset($file['safe_fn_declaration']) && $file['safe_fn_declaration']) || (isset($file['safe_class_declaration']) && $file['safe_class_declaration'])) {
                         echo 'X';
                     }
                     ?>

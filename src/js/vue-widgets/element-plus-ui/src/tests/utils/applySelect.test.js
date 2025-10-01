@@ -84,4 +84,39 @@ describe("applySelect", () => {
         expect(elementPlusUi.getAttribute("filterable")).toBe(expectedBoolean);
         expect(elementPlusUi.getAttribute("allow-create")).toBe(expectedBoolean);
     });
+
+    test("applies the small size to the el-select component if the select element has the form-control-sm class", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+
+        applySelect();
+
+        const givenSelect = document.createElement("select");
+        givenSelect.classList.add("form-control-sm");
+        document.body.appendChild(givenSelect);
+
+        await window.happyDOM.waitUntilComplete();
+
+        const elementPlusUi = document.querySelector("el-select");
+        expect(elementPlusUi.getAttribute("size")).toBe("small");
+    });
+
+    test("applies the remote-source-url attribute to the el-select component if the select element has the data-remote-source-url attribute", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+
+        applySelect();
+
+        const givenSelect = document.createElement("select");
+        const givenRemoteSourceUrl = "http://foo/bar";
+        givenSelect.setAttribute("data-remote-source-url", givenRemoteSourceUrl);
+        document.body.appendChild(givenSelect);
+
+        await window.happyDOM.waitUntilComplete();
+
+        const elementPlusUi = document.querySelector("el-select");
+        expect(elementPlusUi.getAttribute("remote-source-url")).toBe(givenRemoteSourceUrl);
+    });
 });

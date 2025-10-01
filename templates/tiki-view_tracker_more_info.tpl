@@ -24,7 +24,7 @@
                 {/if}
             </table>
             <div class="card">
-                <a href="#" onclick="javascript:window.close();" class="link">{tr}close{/tr}</a>
+                <a href="#" onclick="javascript:window.close();" class="link" role="button">{tr}close{/tr}</a>
             </div>
         </div>
         {if Language::isRTL()}

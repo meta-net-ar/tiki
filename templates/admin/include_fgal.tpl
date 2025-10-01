@@ -35,6 +35,9 @@
                     {preference name='fgal_preserve_filenames'}
                 </div>
                 <div class="mb-sm-3">
+                    {preference name='fgal_filename_to_display_name'}
+                </div>
+                <div class="mb-sm-3">
                     {preference name='fgal_use_dir'}
                     <button role="button" type="submit" class="btn btn-primary" name="move" value="to_fs">
                         {tr}Move files from database to directory{/tr}
@@ -74,6 +77,7 @@
                     {preference name='fgal_delete_after_email'}
                 </div>
                 {preference name='fgal_keep_fileId'}
+                {preference name='fgal_show_modtimedate'}
                 {preference name='feature_use_fgal_for_user_files'}
                 {preference name='feature_use_fgal_for_wiki_attachments'}
                 {preference name='feature_file_galleries_save_draft'}

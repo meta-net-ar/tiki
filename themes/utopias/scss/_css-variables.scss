@@ -1,4 +1,18 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the Utopias theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
@@ -60,14 +74,14 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -164,7 +178,6 @@
     --tiki-card-border-color: #dddddd;
     --tiki-card-header-bg: #f4f4f4;
     --tiki-card-title-color: #555555;
-
 }
 
 [data-bs-theme=dark] {
@@ -175,6 +188,38 @@
     --tiki-card-title-color: #{$body-color-dark};
     body {background-color: #000;}
  //   $card-cap-bg:                       rgba(var(--#{$prefix}body-color-rgb), .03) !default;
+
+    .btn-outline-primary {
+        color: #9FA7AD;
+        border-color: #9FA7AD;
+    }
+    .btn-outline-secondary {
+        color: #8F8F8F;
+        border-color: #8F8F8F;
+    }
+    .btn-outline-success {
+        color: #28A445;
+        border-color: #28A445;
+    }
+    .btn-outline-danger {
+        color: #E36370;
+        border-color: #E36370;
+    }
+    .btn-outline-warning {
+        color: #B88A00;
+        border-color: #B88A00;
+    }
+    .btn-outline-info {
+        color: #18ACC3;
+        border-color: #18ACC3;
+    }
+    .btn-outline-dark {
+        color: #919191;
+        border-color: #919191;
+    }
+    .nav-link {
+        color: #999999;
+    }
 }
 
 :root {

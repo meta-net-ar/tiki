@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -784,11 +784,9 @@ function iconset_legacy()
                 'id' => 'application_side_tree',
             ],
             'thumbs-down' => [
-                'prepend' => 'vendor_bundled/vendor/ckeditor/ckeditor/plugins/smiley/images/',
                 'id' => 'thumbs_down',
             ],
             'thumbs-up' => [
-                'prepend' => 'vendor_bundled/vendor/ckeditor/ckeditor/plugins/smiley/images/',
                 'id' => 'thumbs_up',
             ],
             'title' => [

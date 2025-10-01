@@ -1,3 +1,9 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const element2 = document.getElementById('bottom_modules');
+    if (element2) {
+        element2.setAttribute('data-bs-theme', 'dark');
+    }
+});
 
 $(function(){/* affix the navbar after scroll below header */
 $('#topbar').affix({
@@ -20,15 +26,10 @@ $('#topbar .navbar-nav li>a').on("click", function(){
   var posi = $(link).offset().top+20;
   $('body,html').animate({scrollTop:posi},700);
 });
-
     /* smooth scrolling for nav sections */
     $('#autotoc .nav li>a').on("click", function(){
         var link = $(this).attr('href');
         var posi = $(link).offset().top-50;
         $('body,html').animate({scrollTop:posi},700);
     });
-
-
-
-
 });

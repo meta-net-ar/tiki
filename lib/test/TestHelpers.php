@@ -51,7 +51,7 @@ class TestHelpers
      */
     public function createPage($name, $hits, $data, $lastModif = null, $comment = '', $user = 'admin', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
     {
-        global $tikilib;
+        $tikilib = TikiLib::lib('tiki');
 
         if ($lastModif == null) {
             $lastModif = $tikilib->now;

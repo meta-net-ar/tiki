@@ -1,95 +1,38 @@
+// Variables for TheNews theme
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 //
 // Colors
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #868e96;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-$light: #fff;
-$dark: #000;
-
-
-$blue:    #446e9b;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #e83e8c;  // default
-$red:     #cd0200;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #d47500;  // default
-$green:   #3cb521;  // default
-$teal:    #20c997;  // default
-$cyan:    #3399f3;  // default
-
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
 $primary: #005faa;
 $secondary: #003d99; // #52269c;
-$success: #48ca3b;
+$success: #177D4D;
 $info: #1373c0;
 $warning: #f0ad4e;
-$danger: #df6e1e;
+$danger: #DA2B3C;
+$light: #ffffff;
+$dark: #212529;
 
 $theme-colors: (
-     "primary":             #005faa, //#0099cc,
-     "secondary":           #003d99, // #52269c,
-     "success":             #48ca3b, //#5cb85c,
-     "info":                #1373c0,
-     "warning":             #f0ad4e,
-     "danger":              #df6e1e,
-     "light":               #ffffff,
-     "dark":                #212529
+    "primary":             $primary,
+    "secondary":           $secondary,
+    "success":             $success,
+    "info":                $info,
+    "warning":             $warning,
+    "danger":              $danger,
+    "light":               $light,
+    "dark":                $dark
 );
-
-// scss-docs-start theme-text-variables
-$primary-text-emphasis:   shade-color($primary, 60%);  // default
-$secondary-text-emphasis: shade-color($secondary, 60%);  // default
-$success-text-emphasis:   shade-color($success, 60%);  // default
-$info-text-emphasis:      shade-color($info, 60%);  // default
-$warning-text-emphasis:   shade-color($warning, 60%);  // default
-$danger-text-emphasis:    shade-color($danger, 60%);  // default
-$light-text-emphasis:     $gray-700;  // default
-$dark-text-emphasis:      $gray-700;  // default
-// scss-docs-end theme-text-variables
-
-// scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:       tint-color($primary, 80%);  // default
-$secondary-bg-subtle:     tint-color($secondary, 80%);  // default
-$success-bg-subtle:       tint-color($success, 80%);  // default
-$info-bg-subtle:          tint-color($info, 80%);  // default
-$warning-bg-subtle:       tint-color($warning, 80%);  // default
-$danger-bg-subtle:        tint-color($danger, 80%);  // default
-$light-bg-subtle:         mix($gray-100, $white);  // default
-$dark-bg-subtle:          $gray-400;  // default
-// scss-docs-end theme-bg-subtle-variables
-
-// scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:   tint-color($primary, 60%);  // default
-$secondary-border-subtle: tint-color($secondary, 60%);  // default
-$success-border-subtle:   tint-color($success, 60%);  // default
-$info-border-subtle:      tint-color($info, 60%);  // default
-$warning-border-subtle:   tint-color($warning, 60%);  // default
-$danger-border-subtle:    tint-color($danger, 60%);  // default
-$light-border-subtle:     $gray-200;  // default
-$dark-border-subtle:      $gray-500;  // default
-// scss-docs-end theme-border-subtle-variables
 
 // Options
 $enable-dark-mode:            true;  // default
 $color-mode-type:             data;  // default // `data` or `media-query`
-
-// Prefix for :root CSS variables
-
-$prefix:                      bs-;  // default
-
-// Spacing
 
 // Components
 $component-active-color:      $white;  // default
@@ -108,9 +51,11 @@ $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 $border-radius:               0rem;
 $border-radius-lg:            .2rem;
 $border-radius-sm:            .1rem;
-
+$border-color: #ddd;
 $border-width:                1px;  // default
 $box-shadow-inset:            inset 0 1px 2px rgba($black, .075);  // default
+$component-active-color:      $white;  // default
+$component-active-bg:         $primary;  // default
 
 // Fonts
 $font-family-serif: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif; // 'Source Serif Pro', serif;
@@ -122,16 +67,8 @@ $headings-font-family: inherit;
 $headings-font-weight: 600;
 
 // Tables
-//$table-border-color: #dddddd;
-
 // Buttons
 $btn-border-radius: 5px;
-//$btn-default-color: #ffffff;
-//$btn-default-bg: #3676c4;
-//$btn-default-border: #3676c4;
-
-//$btn-primary-color: #ffffff;
-//$btn-primary-bg: #3676c4;
 $input-btn-border-width:      var(--#{$prefix}border-width);  // default
 
 // Forms
@@ -145,20 +82,36 @@ $input-border-color:                    var(--#{$prefix}border-color);  // defau
 $input-border-width:                    $input-btn-border-width;  // default
 $input-box-shadow:                      $box-shadow-inset;  // default
 
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+// Form validation
+$form-feedback-valid-color:         $success; // !default;
+$form-feedback-invalid-color:       $danger; // !default;
+
+$form-feedback-icon-valid-color:    $form-feedback-valid-color; // !default;
+$form-feedback-icon-invalid-color:  $form-feedback-invalid-color; // !default;
+
+$form-valid-color:                  $form-feedback-valid-color; // !default;
+$form-valid-border-color:           $form-feedback-valid-color; // !default;
+$form-invalid-color:                $form-feedback-invalid-color; // !default;
+$form-invalid-border-color:         $form-feedback-invalid-color; // !default;
+
 
 // Navs
 // Navbar
 //$navbar-dark-color: #efefef; // unintuitive but has to match class of div in tpl
 //$navbar-dark-active-color: $navbar-dark-color;
 //$navbar-dark-active-hover-color: $navbar-dark-active-color;
-//$navbar-dark-bg: #1a1d20; // ditto
+//$tiki-navbar-dark-bg: #1a1d20; // ditto
 //$navbar-dark-hover-color: #ff5c1a;
 //$navbar-nav-link-padding-x: 2rem;
 //
 //$navbar-light-color: #1a1d20;
 //$navbar-light-hover-color: $navbar-dark-hover-color;
 //
-//$navbar-dark-border: darken($navbar-dark-bg, 6.5%);
+//$navbar-dark-border: darken($tiki-navbar-dark-bg, 6.5%);
 //
 //$navbar-dark-hover-color: darken(#fff, 10%);
 //$navbar-dark-hover-bg: #3270bd;
@@ -196,7 +149,7 @@ $dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
 $dropdown-dark-link-active-color:   $dropdown-link-active-color;  // default
 $dropdown-dark-link-active-bg:      $dropdown-link-active-bg;  // default
 $dropdown-dark-link-disabled-color: $gray-500;  // default
-
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 // Jumbotron

@@ -12,5 +12,4 @@ require_once('tiki-setup.php');
 
 $access->check_user($user);
 $access->check_feature('feature_friends');
-
 $smarty->display("tiki-friends.tpl");

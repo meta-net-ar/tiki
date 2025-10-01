@@ -68,9 +68,7 @@ class Tracker_Field_PageSelector extends \Tracker\Field\AbstractItemField
         $ins_id = $this->getInsertId();
 
         return [
-            'value' => isset($requestData[$ins_id])
-                ? $requestData[$ins_id]
-                : $this->getValue(),
+            'value' => $requestData[$ins_id] ?? $this->getValue(),
             'defaultvalue' => $this->getOption('create')
                 ? $this->getOption('create')
                 : $this->getValue(),

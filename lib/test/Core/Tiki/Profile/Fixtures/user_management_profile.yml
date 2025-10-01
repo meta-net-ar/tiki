@@ -1,0 +1,18 @@
+profile:
+  name: "User Management Test Profile"
+  description: "Test profile for user management functionality"
+
+preferences:
+  feature_wiki: "y"
+  user_register_prettytracker: "n"
+  userTracker: "n"
+
+objects:
+  - type: user
+    data:
+      name: "testuser_profile_sample"
+      email: "testuser_profile_sample@example.com"
+      pass: "testpass123"
+      groups: ["Registered"]
+      preferences:
+        realName: "Test User from Profile"

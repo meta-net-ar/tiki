@@ -25,19 +25,6 @@ const vueLifecycles = singleSpaVue({
         if (import.meta.env.MODE === "development") {
             console.log(import.meta.env);
         }
-        // global custom v-select2 directive trigerring change events when select2 events occur on dropdowns
-        app.directive("select2", {
-            mounted(el) {
-                $(el).on("select2:select", () => {
-                    const event = new Event("change", { bubbles: true, cancelable: true });
-                    el.dispatchEvent(event);
-                });
-                $(el).on("select2:unselect", () => {
-                    const event = new Event("change", { bubbles: true, cancelable: true });
-                    el.dispatchEvent(event);
-                });
-            },
-        });
     },
 });
 

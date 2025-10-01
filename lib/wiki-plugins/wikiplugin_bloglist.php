@@ -183,20 +183,8 @@ function wikiplugin_bloglist($data, $params)
     if (! isset($params['sort_mode'])) {
         $params['sort_mode'] = 'created_desc';
     }
-    if (! isset($params['find'])) {
-        $params['find'] = '';
-    }
-    if (! isset($params['author'])) {
-        $params['author'] = '';
-    }
-    if (! isset($params['simpleList'])) {
-        $params['simpleList'] = 'y';
-    }
     if (! isset($params['isHtml'])) {
         $params['isHtml'] = 'n';
-    }
-    if (! isset($params['useExcerpt'])) {
-        $params['useExcerpt'] = 'y';
     }
 
     if (isset($params['dateStart'])) {
@@ -208,9 +196,6 @@ function wikiplugin_bloglist($data, $params)
     $dateStartTS = ! empty($dateStartTS) ? $dateStartTS : 0;
     $dateEndTS = ! empty($dateEndTS) ? $dateEndTS : $tikilib->now;
 
-    if (! isset($params['containerClass'])) {
-        $params['containerClass'] = 'wikiplugin_bloglist';
-    }
     $smarty->assign('container_class', $params['containerClass']);
 
     if (! isset($params['wordBoundary'])) {

@@ -13,9 +13,7 @@
 require_once('tiki-setup.php');
 $access->check_feature('feature_trackers');
 if (! isset($_REQUEST['trackerId'])) {
-    $smarty->assign('msg', tra('No tracker indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 TikiLib::lib('header')->setXRobotsTag($robots);
@@ -25,9 +23,7 @@ $trklib = TikiLib::lib('trk');
 
 $tracker_info = $trklib->get_tracker($_REQUEST['trackerId']);
 if (empty($tracker_info)) {
-    $smarty->assign('msg', tra('No tracker indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 if ($t = $trklib->get_tracker_options($_REQUEST['trackerId'])) {
     $tracker_info = array_merge($tracker_info, $t);
@@ -82,7 +78,7 @@ $filterFields = [];
 $values = [];
 $exactValues = [];
 foreach ($_REQUEST as $key => $val) {
-    if (substr($key, 0, 2) == 'f_' && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
+    if (str_starts_with($key, 'f_') && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
         $fieldId = substr($key, 2);
         $filterFields[] = $fieldId;
         if (isset($_REQUEST["x_$fieldId"]) && $_REQUEST["x_$fieldId"] == 't') {
@@ -192,20 +188,14 @@ if (! empty($_REQUEST['debug'])) {
         $tmpCsv = tempnam($prefs['tmpDir'], 'tracker_' . $_REQUEST['trackerId']) . '.csv';
         /*debug*/$tmpCsv = $prefs['tmpDir'] . '/' . 'tracker_' . $_REQUEST['trackerId'] . '.csv';
         if (! ($fp = fopen($tmpCsv, 'w'))) {
-            $smarty->assign('msg', tra('The file cannot be opened') . ' ' . $tmpCsv);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('The file cannot be opened') . ' ' . $tmpCsv, \Laminas\Http\Response::STATUS_CODE_500);
         }
         if (! ($archive = new ZipArchive())) {
-            $smarty->assign('msg', tra('Problem zip initialisation'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Problem zip initialisation'), \Laminas\Http\Response::STATUS_CODE_500);
         }
         $tmpZip = $prefs['tmpDir'] . '/' . $file;
         if (! ($archive->open($tmpZip, ZIPARCHIVE::OVERWRITE))) {
-            $smarty->assign('msg', tra('The file cannot be opened') . ' ' . $prefs['tmpDir'] . '/' . $file);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('The file cannot be opened') . ' ' . $prefs['tmpDir'] . '/' . $file, \Laminas\Http\Response::STATUS_CODE_500);
         }
 
         header('Content-Type: application/zip');
@@ -266,9 +256,7 @@ if (empty($_REQUEST['itemId'])) {
         if ($tracker_info['useAttachments'] == 'y' && ! empty($_REQUEST['zip'])) {
             foreach ($items['data'] as $v) {
                 if (! $trklib->export_attachment($v['itemId'], $archive)) {
-                    $smarty->assign('msg', tra('Problem zip'));
-                    $smarty->display('error.tpl');
-                    die;
+                    Feedback::errorAndDie(tra('Problem zip'), \Laminas\Http\Response::STATUS_CODE_409);
                 }
             }
         }

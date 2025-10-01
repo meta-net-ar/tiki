@@ -31,9 +31,7 @@ $access->check_feature('feature_wiki');
 
 // Get the page from the request var or default it to HomePage
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 } else {
     $page = $_REQUEST["page"];
     $smarty->assign_by_ref('page', $_REQUEST["page"]);
@@ -44,9 +42,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 // Now check permissions to rename this page
 $access->check_permission(['view', 'rename'], tr('Rename wiki page'), 'wiki page', $page);
@@ -55,22 +51,16 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
     // If the new pagename does match userpage prefix then display an error
     $newName = isset($_REQUEST["confirm"]) ? $_REQUEST['badname'] : $_REQUEST['newpage'];
     if (stristr($newName, $prefs['feature_wiki_userpage_prefix']) == $newName) {
-        $smarty->assign('msg', tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_4009);
     }
 
     $max_pagename_length = $wikilib->max_pagename_length();
     if (mb_strlen($newName) > $max_pagename_length) {
-        $smarty->assign('msg', tra("You have exceeded the number of characters allowed (158 max) for the page name field"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You have exceeded the number of characters allowed (158 max) for the page name field"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (strtolower($newName) == "sandbox") {
-        $smarty->assign('msg', tra("You can’t name a page 'Sandbox' because it is reserved for the Sandbox feature"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You can’t name a page 'Sandbox' because it is reserved for the Sandbox feature"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $smarty->assign('newname', $newName);

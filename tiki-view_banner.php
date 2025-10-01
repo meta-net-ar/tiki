@@ -21,22 +21,15 @@ $access->check_feature('feature_banners');
 $bannerlib = TikiLib::lib('banner');
 
 if (! isset($_REQUEST["bannerId"])) {
-    $smarty->assign('msg', tra("No banner indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No banner indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $info = $bannerlib->get_banner($_REQUEST["bannerId"]);
 if (! $info) {
-    $smarty->assign('msg', tra("Banner not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Banner not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 // Check user is admin or the client
 if (($user != $info["client"]) && ($tiki_p_admin_banners != 'y')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to edit this banner"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to edit this banner"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 $smarty->assign('bannerId', $info["bannerId"]);
 $smarty->assign('created', $info["created"]);

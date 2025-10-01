@@ -203,12 +203,12 @@ class TikiIntegrator
         // Is repository path absolute? (start from www root ('/'))
         $p = '';
         if (
-            (substr($rep["path"], 0, 7) == 'http://')
-            || (substr($rep["path"], 0, 8) == 'https://')
+            (str_starts_with($rep["path"], 'http://'))
+            || (str_starts_with($rep["path"], 'https://'))
         ) {
             // It is remote repository -- just copy configured path
             $p = $rep["path"];
-        } elseif (substr($rep["path"], 0, 1) == '/') {
+        } elseif (str_starts_with($rep["path"], '/')) {
             // Absolute path: prepend web server root
             $p = $_SERVER['DOCUMENT_ROOT'] . $rep["path"];
         } else { // Relative Tiki base path: get tiki root and append repository path
@@ -239,8 +239,8 @@ class TikiIntegrator
         $dirs[] = ['fs' => $tiki_root . "/" . $rep['path'], 'rel' => "/" . $rep['path']];
 
         // Fill array of files to search
-        $ts = preg_replace('|\.css|', '', isset($style) ? $style : '');   // Tiki style w/o '.css' extension
-        $is = preg_replace('|\.css|', '', isset($rep["css_file"]) ? $rep["css_file"] : '');
+        $ts = preg_replace('|\.css|', '', $style ?? '');   // Tiki style w/o '.css' extension
+        $is = preg_replace('|\.css|', '', $rep["css_file"] ?? '');
 
         $files = [];
         $files[] = $ts . '-' . $rep["css_file"];        // matrix-doxygen.css

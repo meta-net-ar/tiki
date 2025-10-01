@@ -1,13 +1,29 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the Superhero theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
+
+// Used for L&F nav color choice and color mode override
 .navbar-nav {
     --bs-navbar-color: rgba(255, 255, 255, 0.75);
 }
 
 @mixin top-nav-light { // Light and Dark are same in this theme.
-    --tiki-top-bg: rgba(171,182,194,1);
-    --tiki-top-color: var(--bs-navbar-color); // rgba(255, 255, 255, 0.75); //  #fff;
-    --tiki-top-hover-color: var(--bs-navbar-hover-color); // #fff;
-    --tiki-top-text-color:var(--tiki-top-color);
+    --tiki-top-bg: rgba(223, 105, 25, 1); // rgba(171,182,194,1); (grey)
+    --tiki-top-color: #000; // rgba(255, 255, 255, 0.75); //  #fff;
+    --tiki-top-hover-color: #2c2b2b; //#fff;
+    --tiki-top-text-color: var(--tiki-top-color);
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
     --tiki-top-border: solid #333;
@@ -56,25 +72,25 @@
     @include topbar-nav-dark;
 }
 
-// Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // color mode
-    .tiki-top-nav-light {                           // light top selector
-        @include top-nav-dark;                      // dark values
-    }
-    .tiki-topbar-nav-light {
-        @include topbar-nav-dark;
-    }
-}
-
-// Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-dark;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-dark;
-    }
-}
+//// Color mode preference trumps L&F admin light navbar option --- Dark and Light color mode support have been removed from this theme because differences were trivial.
+//[data-bs-theme=dark] {                              // color mode
+//    .tiki-top-nav-light {                           // light top selector
+//        @include top-nav-dark;                      // dark values
+//    }
+//    .tiki-topbar-nav-light {
+//        @include topbar-nav-dark;
+//    }
+//}
+//
+//// Color mode preference trumps L&F admin dark navbar option
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-dark;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-dark;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -138,22 +154,22 @@
     }
 }
 
-// Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
-    .tiki .tiki-admin-top-nav-light,
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {               // light top selectors
-        @include admin-nav-dark;                      // dark values
-    }
-}
-// Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // dark values
-    }
-}
+//// Color mode preference trumps L&F admin light navbar option --- Dark and Light color mode support have been removed from this theme because differences were trivial.
+//[data-bs-theme=dark] {                              // dark color mode
+//    .tiki .tiki-admin-top-nav-light,
+//    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+//    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+//        @include admin-nav-dark;                      // dark values
+//    }
+//}
+//// Color mode preference trumps L&F admin dark navbar option
+//[data-bs-theme=light] {                              // light color mode
+//    .tiki .tiki-admin-top-nav-dark,
+//    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+//    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
+//        @include admin-nav-dark;                      // dark values
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
@@ -162,4 +178,12 @@
     --bs-accordion-active-color: #fff;
     --bs-accordion-btn-bg: #2B3E50;
     --bs-accordion-btn-color: #fff;
+}
+
+:root {
+    --tiki-code-bg: #546873;
+    --tiki-input-color: #{$input-color};
+    --tiki-input-bg: #{$input-bg};
+    --tiki-input-select-color: var(--tiki-input-color);
+    --tiki-input-select-bg: var(--tiki-input-bg);
 }

@@ -48,9 +48,7 @@ if (isset($_REQUEST["blogTitle"])) {
     }
 }
 if (! isset($_REQUEST["blogId"])) {
-    $smarty->assign('msg', tra("No blog indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No blog indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $tikilib->get_perm_object($_REQUEST["blogId"], 'blog');
 
@@ -64,9 +62,7 @@ if ($user && $user == $blog_data["user"]) {
 }
 $smarty->assign('ownsblog', $ownsblog);
 if (! $blog_data) {
-    $smarty->assign('msg', tra("Blog not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Blog not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 // We need to figure out in which section and theme we are before any call to tiki-modules.php
@@ -138,8 +134,8 @@ if (isset($_REQUEST["find"])) {
 }
 $smarty->assign('find', $find);
 // Get a list of last changes to the blog database
-$date_min = isset($_REQUEST['date_min']) ? $_REQUEST['date_min'] : '';
-$date_max = isset($_REQUEST['date_max']) ? $_REQUEST['date_max'] : $tikilib->now;
+$date_min = $_REQUEST['date_min'] ?? '';
+$date_max = $_REQUEST['date_max'] ?? $tikilib->now;
 $listpages = $bloglib->list_blog_posts($_REQUEST["blogId"], true, $offset, $blog_data["maxPosts"], $sort_mode, $find, $date_min, $date_max);
 //Keep track of month of last viewed posts for months_links module foldable display
 $_SESSION['blogs_last_viewed_month'] = TikiLib::date_format("%Y-%m", $date_max);
@@ -148,7 +144,7 @@ $maxRecords = $blog_data["maxPosts"];
 $smarty->assign('maxRecords', $maxRecords);
 // If there're more records then assign next_offset
 $smarty->assign_by_ref('listpages', $listpages["data"]);
-$smarty->assign_by_ref('cant', $listpages["cant"]);
+$smarty->assign_by_ref('count', $listpages["count"]);
 if ($user && $prefs['feature_notepad'] == 'y' && $tiki_p_notepad == 'y' && isset($_REQUEST['savenotepad']) && $access->checkCsrf(true)) {
     $post_info = $bloglib->get_post($_POST['savenotepad']);
     $tikilib->replace_note($user, 0, $post_info['title'] ? $post_info['title'] : $tikilib->date_format("%d/%m/%Y [%H:%M]", $post_info['created']), $post_info['data']);

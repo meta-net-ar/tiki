@@ -46,7 +46,7 @@ class SchedulerRunCommand extends Command
         $defaultSchedulers->checkAndUpdate();
 
         $verbosityLevelMap = [
-            LogLevel::ERROR => OutputInterface::OUTPUT_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_QUIET,
             LogLevel::NOTICE => OutputInterface::OUTPUT_NORMAL,
             LogLevel::INFO   => OutputInterface::VERBOSITY_VERY_VERBOSE,
             LogLevel::DEBUG   => OutputInterface::VERBOSITY_DEBUG,

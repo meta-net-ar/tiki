@@ -56,7 +56,7 @@ function wikiplugin_lastmod($data, $params)
         $thispage = $params['page'];
     }
     //set datetime format
-    $format = isset($params['format']) ? $params['format'] : 'long_datetime';
+    $format = $params['format'] ?? 'long_datetime';
     switch ($format) {
         case 'long_date':
             $lastmod = $tikilib->get_long_date($tikilib->page_exists_modtime($thispage), $user);

@@ -4,9 +4,6 @@
         {if $prefs.feature_theme_control eq y}
             {button _text="{tr}Theme Control{/tr}" href="tiki-theme_control.php" _class="btn-sm btn-link tikihelp" _icon_name="file-image-o"}
         {/if}
-        {if $prefs.feature_editcss eq 'y' and $tiki_p_create_css eq 'y'}
-            {button _text="{tr}Edit CSS{/tr}" _class="btn-sm" href="tiki-edit_css.php"}
-        {/if}
         {include file='admin/include_apply_top.tpl'}
     </div>
     {tabset name="admin_look"}
@@ -172,6 +169,7 @@
                     <br>
                     {preference name=module_file}
                     {preference name=module_zone_available_extra}
+                    {preference name=module_sidebar_toggle_small_screen}
                 </fieldset>
             </div>
             <hr>
@@ -255,12 +253,8 @@
                 <div class="admin featurelist">
                     {preference name=feature_shadowbox}
                     {preference name=allowImageLazyLoad}
-                    <div class="adminoptionboxchild" id="feature_shadowbox_childcontainer">
-                        {preference name=jquery_colorbox_theme}
-                    </div>
                     {preference name=feature_jscalendar}
                     {preference name=wiki_heading_links}
-                    {preference name=feature_equal_height_rows_js}
                     {preference name=feature_conditional_formatting}
                     {preference name=feature_draggable_modals}
                     {preference name=feature_resizable_modals}
@@ -487,7 +481,7 @@
                         {tr}Custom color modes{/tr}
                     </p>
                     <div>
-                        {foreach $custom_modes item=mode}
+                        {foreach from=$custom_modes item=mode}
                             <div class="input-group mb-3 w-100" data-mode-name='{$mode.name}' data-mode-icon='{$mode.icon}'>
                                 <code class="d-none">{$mode.css_variables}</code>
                                 <button class="btn btn-primary rounded" style="cursor:default" type="button">{icon name=$mode.icon} {$mode.name} <span style="cursor: pointer;" onclick="edit_custom_mode(this,'{$mode.id}','{$mode.name}','{$mode.icon}')">{icon name='edit'}</span> <span style="cursor: pointer;" class="text-danger" onclick="delete_custom_mode(this,'{$mode.id}','{$mode.name}')">{icon name='trash'}</span></button>
@@ -512,19 +506,6 @@
             <fieldset>
                 <legend class="h3">{tr}Editing{/tr}</legend>
                 {preference name=theme_customizer}
-                {preference name=feature_editcss}
-                {preference name=feature_view_tpl}
-                {if $prefs.feature_view_tpl eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}View Templates{/tr}"}
-                    </div>
-                {/if}
-                {preference name=feature_edit_templates}
-                {if $prefs.feature_edit_templates eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}Edit Templates{/tr}"}
-                    </div>
-                {/if}
             </fieldset>
             <hr>
         {/tab}

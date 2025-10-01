@@ -22,17 +22,13 @@ $access->check_feature('feature_wiki');
 
 // Get the page from the request var or default it to HomePage
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 } else {
     $page = $_REQUEST["page"];
     $smarty->assign_by_ref('page', $_REQUEST["page"]);
 }
 if (! isset($_REQUEST["version"])) {
-    $smarty->assign('msg', tra("No version indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No version indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 } else {
     $version = $_REQUEST["version"];
     $smarty->assign_by_ref('version', $_REQUEST["version"]);
@@ -42,14 +38,10 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 if (! $histlib->version_exists($page, $version)) {
-    $smarty->assign('msg', tra("Non-existent version"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Non-existent version"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $tikilib->get_perm_object($page, 'wiki page', $info);

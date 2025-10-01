@@ -24,15 +24,15 @@
     <input type="hidden" name="pollId" value="{$pollId|escape}">
 
     <div class="tiki-form-group row">
-        <label class="col-sm-3 col-form-label">{tr}Option{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="poll_option_title">{tr}Option{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="title" value="{$title|escape}" maxlength="40" class="form-control">
+            <input type="text" name="title" id="poll_option_title" value="{$title|escape}" maxlength="40" class="form-control">
         </div>
     </div>
     <div class="tiki-form-group row">
-        <label class="col-sm-3 col-form-label">{tr}Position{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="poll_option_position">{tr}Position{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="position" value="{$position|escape}" maxlength="4" class="form-control">
+            <input type="text" name="position" id="poll_option_position" value="{$position|escape}" maxlength="4" class="form-control">
         </div>
     </div>
     <div class="tiki-form-group row">
@@ -44,7 +44,7 @@
 </form>
 <br>
 <h2>{tr}Poll options{/tr}</h2>
-<div class="table-responsive" align="center">
+<div class="table-responsive text-center">
     <table class="table table-striped table-hover">
         <tr>
             <th>{tr}Position{/tr}</th>

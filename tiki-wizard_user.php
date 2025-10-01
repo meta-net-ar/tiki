@@ -43,9 +43,7 @@ require 'tiki-setup.php';
 
 // User preferences screen
 if ($prefs['feature_wizard_user'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_wizard_user");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_wizard_user", \Laminas\Http\Response::STATUS_CODE_401);
 }
 $access->check_user($user);
 

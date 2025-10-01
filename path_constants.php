@@ -18,6 +18,10 @@ Important conventions:
 - Directories path must NOT end with a /
 */
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    return;
+}
+
 const ADMIN_PATH = 'admin';
 const BIN_PATH = 'bin';
 
@@ -83,12 +87,15 @@ const SMARTY_DEFAULT_LAYOUT = 'social';
 /** Where are templates looked for in multitiki sites, etc. */
 const SMARTY_TEMPLATES_PATH_FRAGMENT = 'templates';
 
+/** Path to smarty configs - this is not actually used but needs to be a specific path, even if it doesn't exist because null value for smarty config dir gets converted to root path */
+const SMARTY_CONFIG_PATH = 'temp/configs';
 /** Path to store temporary files.  Use one of the more specific path if possible */
 const TEMP_PATH = 'temp';
 /** Temporary files that must be servable by the webserver */
 const TEMP_HTTP_PUBLIC_PATH = 'temp/public';
 const TEMP_CACHE_PATH = 'temp/cache';
 const TEMP_PUBLIC_PATH = 'temp/public';
+const TEMP_MAIL_DEBUG = 'temp/mail_debug';
 const HTMLPURIFIERCACHE_CACHE_PATH = 'temp/cache/HTMLPurifierCache';
 
 const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
@@ -168,23 +175,25 @@ const GENERATED_ICONSET_PATH = 'public/generated/iconsets';
 
 
 /* BEGIN - VENDOR ASSETS SECTION */
+/** we need this to generate the icons json before js build is done */
+const BOOTSTRAP_ICONS_FONT_SRC_PATH = 'node_modules/bootstrap-icons/font';
 const BOOTSTRAP_ICONS_FONT_PATH = 'public/generated/js/vendor_dist/bootstrap-icons/font';
-const BOOTSTRAP_TOUR_DIST_PATH = 'vendor_bundled/vendor/sorich87/bootstrap-tour/build';
 const CODEMIRROR_DIST_PATH = 'public/generated/js/vendor_dist/codemirror';
 const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
-const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free';
-const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/webfonts';
-const MERMAID_DIST_PATH = 'public/generated/js/vendor_dist/mermaid/dist';
+/** we need this to generate the icons json before js build is done */
+const FONTAWESOME_CSS_SRC_PATH = 'node_modules/@fortawesome/fontawesome-free/css';
+const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css';
+const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/webfonts';
 const MINICART_DIST_PATH = 'public/generated/js/vendor_dist/minicart/dist';
 const OL_PATH = 'public/generated/js/vendor_dist/ol'; // 'ol' was formerly called 'openlayers'
 const OL_LAYERSWITCHER_DIST_PATH = 'public/generated/js/vendor_dist/ol-layerswitcher/dist';
-const PIVOTTABLE_DIST_PATH = 'public/generated/js/vendor_dist/pivottable/dist';
+const PIVOTTABLE_DIST_PATH = 'vendor_bundled/vendor/nicolaskruchten/pivottable/dist';
 const PLOTLYJS_DIST_PATH = 'public/generated/js/vendor_dist/plotly.js/dist';
 const REVEALJS_DIST_PATH = 'public/generated/js/vendor_dist/reveal.js/dist';
 const SUBTOTAL_DIST_PATH = 'public/generated/js/vendor_dist/subtotal/dist';
 const SIGNATURE_PAD_DIST_PATH = 'public/generated/js/vendor_dist/signature_pad/dist';
 const SWAGGER_UI_DIST_PATH = 'public/generated/js/vendor_dist/swagger-ui-dist';
-const SWIPER_DIST_PATH = 'vendor_bundled/vendor/nolimits4web/swiper/dist';
+const SWIPER_DIST_PATH = 'public/generated/js/vendor_dist/swiper';
 const ZXING_DIST_PATH = 'public/generated/js/vendor_dist/@zxing/library';
 
 /* END - VENDOR ASSETS SECTION */

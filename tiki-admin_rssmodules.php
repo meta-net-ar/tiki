@@ -151,7 +151,6 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
             $_REQUEST['article'],
             [
                 'active' => isset($_POST['enable']),
-                'expiry' => $jitPost->expiry->int(),
                 'atype' => $jitPost->type->text(),
                 'custom_atype' => $jitPost->asArray('custom_atype'),
                 'topic' => $jitPost->topic->int(),
@@ -174,9 +173,14 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
     } else {
         $cookietab = 3;
     }
-
-    $config = $rsslib->get_article_generator($_REQUEST['article']);
-    $smarty->assign('articleConfig', $config);
+    try {
+        $config = $rsslib->get_article_generator($_REQUEST['article']);
+    } catch (Exception $e) {
+        $smarty->assign('msg', $e->getMessage());
+        $smarty->display("error.tpl");
+        die;
+    }
+    $smarty->assign('articleConfig', $config ?? []);
     $smarty->assign('ratingOptions', array_map('strval', range(0, 10)));
 
     $sourcecats = $rsslib->get_feed_source_categories($_REQUEST["article"]);
@@ -267,8 +271,8 @@ if ($prefs['feature_multilingual'] == 'y') {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $rsslib->list_rss_modules($offset, $maxRecords, $sort_mode, $find);
-$cant = $channels['cant'];
-$smarty->assign_by_ref('cant', $cant);
+$count = $channels['count'];
+$smarty->assign_by_ref('count', $count);
 $temp_max = count($channels["data"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 // disallow robots to index page:

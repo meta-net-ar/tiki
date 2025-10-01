@@ -26,10 +26,8 @@ $inputConfiguration = [
             'emails'                      => 'email',         //get
             'preview'                     => 'bool',          //post
             'publishDate'                 => 'string',        //post
-            'expireDate'                  => 'string',        //get
             'title'                       => 'string',        //get
             'authorName'                  => 'string',        //post
-            'topicId'                     => 'int',           //post
             'useImage'                    => 'bool',          //post
             'isfloat'                     => 'bool',          //post
             'image_data'                  => 'digits',        //post
@@ -38,6 +36,7 @@ $inputConfiguration = [
             'subtitle'                    => 'string',        //post
             'linkto'                      => 'url',           //post
             'image_caption'               => 'string',        //post
+            'image_alt'                   => 'string',        //post
             'lang'                        => 'string',        //post
             'image_name'                  => 'string',        //get
             'from'                        => 'string',        //get
@@ -74,16 +73,11 @@ if (! empty($_REQUEST['articleId'])) {
     $articleId = $_REQUEST['articleId'];
     $article_data = $artlib->get_article($_REQUEST['articleId']);
     if ($article_data === false) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra('Permission denied'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     if (! $article_data) {
-        $smarty->assign('msg', tra('Article not found'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Article not found'), \Laminas\Http\Response::STATUS_CODE_404);
     }
 } else {
     $articleId = 0;
@@ -137,14 +131,6 @@ if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
 
 $publishDate = $tikilib->now;
 $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $publishDate));
-$expireDate = $tikilib->make_time(
-    $cur_time[3],
-    $cur_time[4],
-    $cur_time[5],
-    $cur_time[1],
-    $cur_time[2],
-    $cur_time[0] + 1
-);
 
 //Use 12- or 24-hour clock for $publishDate time selector based on admin and user preferences
 $userprefslib = TikiLib::lib('userprefs');
@@ -155,6 +141,7 @@ $smarty->assign('topline', '');
 $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
+$smarty->assign('image_alt', '');
 $smarty->assign('lang', $prefs['language']);
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
@@ -188,12 +175,12 @@ $parserlib = TikiLib::lib('parser');
 if (isset($_REQUEST["articleId"]) and $_REQUEST["articleId"] > 0) {
     $cat_lang = $article_data['lang'];
     $publishDate = $article_data['publishDate'];
-    $expireDate = $article_data['expireDate'];
     $smarty->assign('arttitle', $article_data['title']);
     $smarty->assign('topline', $article_data['topline']);
     $smarty->assign('subtitle', $article_data['subtitle']);
     $smarty->assign('linkto', $article_data['linkto']);
     $smarty->assign('image_caption', $article_data['image_caption']);
+    $smarty->assign('image_alt', $article_data['image_alt']);
     $smarty->assign('lang', $article_data['lang']);
     $smarty->assign('authorName', $article_data['authorName']);
     $smarty->assign('topicId', $article_data['topicId']);
@@ -257,11 +244,7 @@ if (
             || empty($user)
             || $article_data['creator_edit'] != 'y')
 ) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to edit this article'));
-
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to edit this article'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (isset($_REQUEST['allowhtml'])) {
@@ -285,7 +268,7 @@ if (isset($_REQUEST['ispublished'])) {
 $errors = false;
 if (empty($_REQUEST['emails']) || $prefs['feature_cms_emails'] != 'y') {
     $emails = '';
-} elseif (! empty($_REQUEST['emails'])) {
+} else {
     $emails = explode(',', $_REQUEST['emails']);
     foreach ($emails as $email) {
         if (! validate_email($email, $prefs['validateEmail'])) {
@@ -314,12 +297,6 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
         $publishDate = $_REQUEST['publishDate'];
     } else {
         $publishDate = $tikilib->now;
-    }
-
-    if (isset($_REQUEST['expireDate'])) {
-        $expireDate = $_REQUEST['expireDate'];
-    } else {
-        $expireDate = $publishDate;
     }
 
     $smarty->assign('reads', '0');
@@ -361,7 +338,6 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
     $smarty->assign('show_author', $type["show_author"]);
     $smarty->assign('show_reads', $type["show_reads"]);
     $smarty->assign('show_pubdate', $type["show_pubdate"]);
-    $smarty->assign('show_expdate', $type["show_expdate"]);
     $smarty->assign('show_linkto', $type["show_linkto"]);
     $smarty->assign('use_ratings', $type["use_ratings"]);
 
@@ -376,6 +352,9 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
     }
     if (! isset($_REQUEST['image_caption'])) {
         $_REQUEST['image_caption'] = '';
+    }
+    if (! isset($_REQUEST['image_alt'])) {
+        $_REQUEST['image_alt'] = '';
     }
     if (! isset($_REQUEST['lang'])) {
         $_REQUEST['lang'] = '';
@@ -394,6 +373,7 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
     $smarty->assign('subtitle', $_REQUEST['subtitle']);
     $smarty->assign('linkto', $_REQUEST['linkto']);
     $smarty->assign('image_caption', $_REQUEST['image_caption']);
+    $smarty->assign('image_alt', $_REQUEST['image_alt']);
     $smarty->assign('lang', $_REQUEST['lang']);
     $smarty->assign('image_name', $_REQUEST['image_name']);
     $smarty->assign('image_type', $_REQUEST['image_type']);
@@ -419,10 +399,7 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
             if (! $fp && isset($_FILES['userfile1']['error'])) {
@@ -511,12 +488,6 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $publishDate = $tikilib->now;
     }
 
-    if (isset($_REQUEST['expireDate'])) {
-        $expireDate = $_REQUEST['expireDate'];
-    } else {
-        $expireDate = $publishDate;
-    }
-
     if (isset($_REQUEST['allowhtml']) && $_REQUEST['allowhtml'] == 'on' || $_SESSION['wysiwyg'] == 'y') {
         $body = $_REQUEST['body'];
         $noparsed = [];
@@ -573,18 +544,13 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $file_name = $_FILES['userfile1']['name'];
             $file_tmp_name = $_FILES['userfile1']['tmp_name'];
             $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
             if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
-                $smarty->assign('msg', tra('Errors detected'));
-                $smarty->display('error.tpl');
-                die();
+                Feedback::errorAndDie(tra('Errors detected'), \Laminas\Http\Response::STATUS_CODE_409);
             }
             $fp = fopen($tmp_dest, 'rb');
             if (! $fp && $_FILES['userfile1']['error']) {
@@ -632,6 +598,9 @@ if (isset($_REQUEST['save']) && empty($errors)) {
     if (! isset($_REQUEST['image_caption'])) {
         $_REQUEST['image_caption'] = '';
     }
+    if (! isset($_REQUEST['image_alt'])) {
+        $_REQUEST['image_alt'] = '';
+    }
     if (! isset($_REQUEST['lang'])) {
         $_REQUEST['lang'] = '';
     }
@@ -648,9 +617,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $multilinguallib = TikiLib::lib('multilingual');
         if ($multilinguallib->updateObjectLang('article', $article_data['articleId'], $_REQUEST['lang'], true)) {
             $_REQUEST['lang'] = $article_data['lang'];
-            $smarty->assign('msg', tra("The language can't be changed as its set of translations has already this language"));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra("The language can't be changed as its set of translations has already this language"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 
@@ -687,7 +654,6 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $heading,
         $body,
         $publishDate,
-        $expireDate,
         $author,
         $articleId,
         $_REQUEST['image_x'],
@@ -697,6 +663,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $_REQUEST['subtitle'],
         $_REQUEST['linkto'],
         $_REQUEST['image_caption'],
+        $_REQUEST['image_alt'],
         $_REQUEST['lang'],
         $_REQUEST['rating'],
         $isfloat,
@@ -833,7 +800,6 @@ if ($prefs['feature_freetags'] == 'y') {
 }
 
 $smarty->assign('publishDate', $publishDate);
-$smarty->assign('expireDate', $expireDate);
 $smarty->assign('siteTimeZone', $prefs['display_timezone']);
 
 include_once('tiki-section_options.php');

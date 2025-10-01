@@ -27,7 +27,7 @@ class ToolbarDialog extends ToolbarItem
                 $label = tra('Wiki Link');
                 $iconname = 'link';
                 $icon = tra('img/icons/page_link.png');
-                $wysiwyg = '';  // cke link dialog now adapted for wiki links
+                $wysiwyg = 'tikilink';
                 $markdown = 'tikilink';
                 $markdown_wysiwyg = 'tikilink';
                 ;
@@ -48,7 +48,7 @@ class ToolbarDialog extends ToolbarItem
 
                 break;
             case 'link':
-                $wysiwyg = 'Link';
+                $wysiwyg = 'link';
                 $label = tra('External Link');
                 $iconname = 'link-external';
                 $iconname = 'external-link-alt';    // for isDialogSupported but will work if not too
@@ -61,7 +61,7 @@ class ToolbarDialog extends ToolbarItem
             case 'tikitable':
                 $iconname = 'table';
                 $icon = tra('img/icons/table.png');
-                $wysiwyg = 'Table';
+                $wysiwyg = 'table';
                 $markdown = 'table';
                 $markdown_wysiwyg = 'table';
                 $label = tra('Table Builder');
@@ -70,7 +70,7 @@ class ToolbarDialog extends ToolbarItem
             case 'replace':
                 $icon = tra('img/icons/text_replace.png');
                 $iconname = 'exchange';
-                $wysiwyg = 'Replace';
+                $wysiwyg = 'replace';
                 $markdown = ''; // TODO
                 $label = tra('Text Replace');
                 $tool_prefs[] = 'feature_wiki_replace';
@@ -173,10 +173,6 @@ class ToolbarDialog extends ToolbarItem
 
     public function getWysiwygToken(): string
     {
-        if (! empty($this->wysiwyg)) {
-            $onClick = str_replace('\'' . $this->domElementId . '\'', 'editor.name', $this->getOnClick());
-            $this->setupCKEditorTool($onClick);
-        }
         return $this->wysiwyg;
     }
 
@@ -231,11 +227,6 @@ class ToolbarDialog extends ToolbarItem
      */
     protected function isDialogSupported(): bool
     {
-        // not for ckeditor (yet)
-        if (! $this->isMarkdown && $this->isWysiwyg) {
-            return false;
-        }
-
         $supported = ['tikilink', 'link'];
 
         if (! $this->isWysiwyg) {   // not working in toast yet TODO

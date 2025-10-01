@@ -64,7 +64,6 @@
             {preference name=jquery_smartmenus_enable}
             {preference name=jquery_ui_modals_draggable}
             {preference name=jquery_ui_modals_resizable}
-            {preference name=tiki_prefix_css}
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Other Extended Features{/tr}</legend>
@@ -109,7 +108,7 @@
 
                 {remarksbox type="info" title="{tr}H5P Info{/tr}"}
                 {tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
-                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">
+                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" role="button" class="btn btn-link">
                         {service controller='h5p' action='cron' token=$prefs.h5p_cron_token}
                     </a>
                 {/remarksbox}

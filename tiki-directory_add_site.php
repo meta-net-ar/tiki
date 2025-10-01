@@ -61,21 +61,22 @@ if (isset($parent_info) && $user) {
 // Now get the path to the parent category
 $path = $dirlib->dir_get_category_path_admin($_REQUEST["parent"]);
 $smarty->assign_by_ref('path', $path);
-// If no site is being edited set it to zero
-$_REQUEST["siteId"] = 0;
-$smarty->assign('siteId', $_REQUEST["siteId"]);
-// If we are editing an existing category then get the category information
-// If not initialize the information to zero
+
+$_REQUEST["siteId"] = $_REQUEST["siteId"] ?? 0;
+$info = [];
 if ($_REQUEST["siteId"]) {
     $info = $dirlib->dir_get_site($_REQUEST["siteId"]);
-} else {
-    $info = [];
+}
+
+if (empty($info)) {
     $info["name"] = '';
     $info["description"] = '';
     $info["url"] = '';
     $info["country"] = 'None';
     $info["isValid"] = 'y';
 }
+
+$smarty->assign('siteId', $_REQUEST["siteId"]);
 $smarty->assign_by_ref('info', $info);
 $smarty->assign('save', 'n');
 // Replace (add or edit) a site
@@ -91,7 +92,7 @@ if (isset($_REQUEST["save"])) {
     if (empty($_REQUEST["url"])) {
         $msg .= tra("Must enter a url to add a site. ");
     } else {
-        if (substr($_REQUEST["url"], 0, 7) <> 'http://' && substr($_REQUEST["url"], 0, 8) <> 'https://') {
+        if (! str_starts_with($_REQUEST["url"], 'http://') && ! str_starts_with($_REQUEST["url"], 'https://')) {
             $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
         }
         if ($dirlib->dir_url_exists($_REQUEST['url'])) {
@@ -160,10 +161,10 @@ if ($all) {
 } else {
     $items = $dirlib->dir_list_sites($_REQUEST["parent"], $offset, $maxRecords, $sort_mode, $find, $isValid = '');
 }
-$cant_pages = ceil($items["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($items["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-if ($items["cant"] > ($offset + $maxRecords)) {
+if ($items["count"] > ($offset + $maxRecords)) {
     $smarty->assign('next_offset', $offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);

@@ -1,4 +1,4 @@
-<a id="asnarf{$snarfParams.iSnarf}" href="#">{tr}{$snarfParams.ajax|escape:html}{/tr}</a>
+<a id="asnarf{$snarfParams.iSnarf}" href="#" role="button">{tr}{$snarfParams.ajax|escape:html}{/tr}</a>
 <div id="snarf{$snarfParams.iSnarf}"></div>
 {jq}
 $('#asnarf{{$snarfParams.iSnarf}}').on("click", function() {

@@ -29,20 +29,12 @@ $inputConfiguration = [
             'publish_Month'                 => 'digits',          //post
             'publish_Day'                   => 'digits',          //post
             'publish_Year'                  => 'digits',          //post
-            'expire_Hour'                   => 'digits',          //post
-            'expire_Minute'                 => 'digits',          //post
-            'expire_Month'                  => 'digits',          //post
-            'expire_Day'                    => 'digits',          //post
-            'expire_Year'                   => 'digits',          //post
             'publish_Meridian'              => 'string',          //post
-            'expire_Meridian'               => 'string',          //post
             'title'                         => 'string',          //post
             'authorName'                    => 'string',          //post
-            'topicId'                       => 'int',             //post
             'useImage'                      => 'bool',            //post
             'isfloat'                       => 'bool',            //post
             'image_data'                    => 'striptags',       //post
-            'type'                          => 'string',          //post
             'topline'                       => 'string',          //post
             'subtitle'                      => 'string',          //post
             'linkto'                        => 'string',          //post
@@ -123,8 +115,6 @@ if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
 }
 
 $publishDate = $tikilib->now;
-$expireDate = $tikilib->make_time(0, 0, 0, $tikilib->date_format("%m"), $tikilib->date_format("%d"), $tikilib->date_format("%Y") + 1);
-
 //Use 12- or 24-hour clock for $publishDate time selector based on admin and user preferences
 $userprefslib = TikiLib::lib('userprefs');
 $smarty->assign('use_24hr_clock', $userprefslib->get_user_clock_pref($user));
@@ -134,6 +124,7 @@ $smarty->assign('topline', '');
 $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
+$smarty->assign('image_alt', '');
 $smarty->assign('lang', $prefs['language']);
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
@@ -167,12 +158,12 @@ if (! empty($_REQUEST['subId'])) {
     $article_data = $artlib->get_submission($_REQUEST['subId']);
 
     $publishDate = $article_data['publishDate'] ?? null;
-    $expireDate = $article_data['expireDate'] ?? null;
     $smarty->assign('arttitle', $article_data['title'] ?? null);
     $smarty->assign('topline', $article_data['topline'] ?? null);
     $smarty->assign('subtitle', $article_data['subtitle'] ?? null);
     $smarty->assign('linkto', $article_data['linkto'] ?? null);
     $smarty->assign('image_caption', $article_data['image_caption'] ?? null);
+    $smarty->assign('image_alt', $article_data['image_alt']);
     $smarty->assign('lang', $article_data['lang'] ?? null);
     $smarty->assign('authorName', $article_data['authorName'] ?? null);
     $smarty->assign('topicId', $article_data['topicId'] ?? null);
@@ -219,10 +210,7 @@ if (! empty($_REQUEST['subId'])) {
         $same_user = false;
     }
     if (($article_perms->edit_submission != 'y' && ! $same_user != $user) or $user == '') {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra('You do not have permission to edit submissions'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You do not have permission to edit submissions'), \Laminas\Http\Response::STATUS_CODE_401);
     }
 }
 
@@ -260,9 +248,6 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
     if (! empty($_REQUEST['publish_Meridian'])) {
         $_REQUEST['publish_Hour'] = date('H', strtotime($_REQUEST['publish_Hour'] . ':00 ' . $_REQUEST['publish_Meridian']));
     }
-    if (! empty($_REQUEST['expire_Meridian'])) {
-        $_REQUEST['expire_Hour'] = date('H', strtotime($_REQUEST['expire_Hour'] . ':00 ' . $_REQUEST['expire_Meridian']));
-    }
 
     $publishDate = $tikilib->make_time(
         $_REQUEST['publish_Hour'],
@@ -271,15 +256,6 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
         $_REQUEST['publish_Month'],
         $_REQUEST['publish_Day'],
         $_REQUEST['publish_Year']
-    );
-
-    $expireDate = $tikilib->make_time(
-        $_REQUEST['expire_Hour'],
-        $_REQUEST['expire_Minute'],
-        0,
-        $_REQUEST['expire_Month'],
-        $_REQUEST['expire_Day'],
-        $_REQUEST['expire_Year']
     );
 
     $smarty->assign('reads', '0');
@@ -331,7 +307,6 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
     $smarty->assign('show_author', $type["show_author"]);
     $smarty->assign('show_reads', $type["show_reads"]);
     $smarty->assign('show_pubdate', $type["show_pubdate"]);
-    $smarty->assign('show_expdate', $type["show_expdate"]);
     $smarty->assign('show_linkto', $type["show_linkto"]);
     $smarty->assign('use_ratings', $type["use_ratings"]);
 
@@ -347,6 +322,9 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
     if (! isset($_REQUEST['image_caption'])) {
         $_REQUEST['image_caption'] = '';
     }
+    if (! isset($_REQUEST['image_alt'])) {
+        $_REQUEST['image_alt'] = '';
+    }
     if (! isset($_REQUEST['lang'])) {
         $_REQUEST['lang'] = '';
     }
@@ -355,6 +333,7 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
     $smarty->assign('subtitle', $_REQUEST['subtitle']);
     $smarty->assign('linkto', $_REQUEST['linkto']);
     $smarty->assign('image_caption', $_REQUEST['image_caption']);
+    $smarty->assign('image_alt', $_REQUEST['image_alt']);
     $smarty->assign('lang', $_REQUEST['lang']);
     $smarty->assign('image_name', $_REQUEST['image_name']);
     $smarty->assign('image_type', $_REQUEST['image_type']);
@@ -376,10 +355,7 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $file_name = $_FILES['userfile1']['name'];
             // Simple check if it's an image file
@@ -451,11 +427,6 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
     if (! empty($_REQUEST['publish_Meridian'])) {
         $_REQUEST['publish_Hour'] = date('H', strtotime($_REQUEST['publish_Hour'] . ':00 ' . $_REQUEST['publish_Meridian']));
     }
-
-    if (! empty($_REQUEST['expire_Meridian'])) {
-        $_REQUEST['expire_Hour'] = date('H', strtotime($_REQUEST['expire_Hour'] . ':00 ' . $_REQUEST['expire_Meridian']));
-    }
-
     $publishDate = $tikilib->make_time(
         $_REQUEST['publish_Hour'],
         $_REQUEST['publish_Minute'],
@@ -463,15 +434,6 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
         $_REQUEST['publish_Month'],
         $_REQUEST['publish_Day'],
         $_REQUEST['publish_Year']
-    );
-
-    $expireDate = $tikilib->make_time(
-        $_REQUEST['expire_Hour'],
-        $_REQUEST['expire_Minute'],
-        0,
-        $_REQUEST['expire_Month'],
-        $_REQUEST['expire_Day'],
-        $_REQUEST['expire_Year']
     );
 
     if (isset($_REQUEST['allowhtml']) && $_REQUEST['allowhtml'] == 'on' || $_SESSION['wysiwyg'] == 'y') {
@@ -512,10 +474,7 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
 
@@ -536,10 +495,7 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
 
     // If page exists
     if (! isset($_REQUEST['topicId'])) {
-        $smarty->assign('msg', tra('You have to create a topic first'));
-
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You have to create a topic first'), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if (! isset($_REQUEST['topline'])) {
         $_REQUEST['topline'] = '';
@@ -552,6 +508,9 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
     }
     if (! isset($_REQUEST['image_caption'])) {
         $_REQUEST['image_caption'] = '';
+    }
+    if (! isset($_REQUEST['image_alt'])) {
+        $_REQUEST['image_alt'] = '';
     }
     if (! isset($_REQUEST['lang'])) {
         $_REQUEST['lang'] = '';
@@ -569,7 +528,6 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
         $heading,
         $body,
         $publishDate,
-        $expireDate,
         $user,
         $subId,
         $_REQUEST['image_x'],
@@ -579,6 +537,7 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
         $_REQUEST['subtitle'],
         $_REQUEST['linkto'],
         $_REQUEST['image_caption'],
+        $_REQUEST['image_alt'],
         $_REQUEST['lang'],
         $_REQUEST['rating'],
         $isfloat
@@ -684,7 +643,6 @@ if ($prefs['feature_freetags'] == 'y') {
 }
 
 $smarty->assign('publishDate', $publishDate);
-$smarty->assign('expireDate', $expireDate);
 $smarty->assign('siteTimeZone', $prefs['display_timezone']);
 $smarty->assign('wikiPageSeparator', $prefs['wiki_page_separator']);
 

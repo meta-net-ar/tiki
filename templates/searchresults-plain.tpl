@@ -40,9 +40,9 @@
     <li>
         <strong>
         {if !empty($result._external)}
-            {object_link type=external id=$result.url title=$result.title}
+            {object_link type=external id=$result.url title=$result.title === "Untitled" && $result.object_type|escape ==="comment" ? "A user comment" : $result.title}
         {else}
-            {object_link type=$result.object_type id=$result.object_id title=$result.title url=$result.url}
+            {object_link type=$result.object_type id=$result.object_id title=$result.title ==="Untitled" && $result.object_type|escape === "comment" ? "A user comment" : $result.title url=$result.url}
         {/if}
 
         {if $prefs.feature_search_show_object_type eq 'y'}

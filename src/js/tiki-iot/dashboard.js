@@ -61,7 +61,7 @@ $(document).ready(function () {
                 }
             }
         } catch (error) {
-            $("body").toastNotification({
+            $.fn.toastNotification({
                 title: tr("Error"),
                 body: error.message,
                 position: "bottom-end",
@@ -70,7 +70,7 @@ $(document).ready(function () {
         }
     };
     socket.onclose = function (event) {
-        $("body").toastNotification({
+        $.fn.toastNotification({
             title: tr("Error"),
             body: tr("WebSocket is closed now."),
             position: "bottom-end",
@@ -79,7 +79,7 @@ $(document).ready(function () {
         $(".realtime-status").removeClass("text-bg-success").addClass("text-bg-warning").text("disconnected");
     };
     socket.onerror = function (error) {
-        $("body").toastNotification({
+        $.fn.toastNotification({
             title: tr("Error"),
             body: tr("WebSocket error observed: ") + error,
             position: "bottom-end",
@@ -161,7 +161,7 @@ $(document).ready(function () {
                     ); //pending sync means the hardware have not yet read the value
                 })
                 .fail(function () {
-                    $("body").toastNotification({
+                    $.fn.toastNotification({
                         title: tr("Error"),
                         body: tr("Failed to update IO status, please try again!"),
                         position: "bottom-end",
@@ -172,7 +172,7 @@ $(document).ready(function () {
                     inputEl.tikiModal("");
                 });
         } catch (error) {
-            $("body").toastNotification({
+            $.fn.toastNotification({
                 title: tr("Error"),
                 body: error.message,
                 position: "bottom-end",

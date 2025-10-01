@@ -1,6 +1,6 @@
 <template>
     <div class="col-auto">
-        <select v-select2 class="form-control" :id="`${props.field.ins_id}Year`" :name="`${props.field.ins_id}Year`" :value="model.year" @change="$emit('update:modelValue', { ...model, ['year']: $event.target.value })">
+        <select class="form-control" :id="`${props.field.ins_id}Year`" :name="`${props.field.ins_id}Year`" :value="model.year" @change="$emit('update:modelValue', { ...model, ['year']: $event.target.value })">
             <option v-for="year in years" :value="year">{{year}}</option>
         </select>
     </div>

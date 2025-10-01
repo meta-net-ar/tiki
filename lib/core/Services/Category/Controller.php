@@ -198,7 +198,7 @@ class Services_Category_Controller
             //now add objects to the category
             if (count($filteredObjects)) {
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $count = isset($return['objects']) ? count($return['objects']) : 0;
+                $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
                         : tr('%0 objects added to category', $count);
@@ -256,7 +256,7 @@ class Services_Category_Controller
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $count = isset($return['objects']) ? count($return['objects']) : 0;
+                $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
                         : tr('%0 objects removed from category', $count);

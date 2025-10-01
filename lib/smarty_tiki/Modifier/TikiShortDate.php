@@ -23,7 +23,7 @@ class TikiShortDate
         $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
 
         if ($prefs['jquery_timeago'] === 'y' && $same === 'y') {
-            TikiLib::lib('header')->add_jq_onready('$("time.timeago").timeago();');
+            TikiLib::lib('header')->add_jq_onready('$("time.timeago").tikiTimeago();');
             return '<time class="timeago" datetime="' . TikiLib::date_format('c', $string, false, 5, false) . '">' . $date . '</time>';
         } else {
             return $date;

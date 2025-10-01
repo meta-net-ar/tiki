@@ -15,7 +15,7 @@ function module_menu_info()
         'params' => [
             'id' => [
                 'name' => tra('Menu'),
-                'description' => tra('Identifier of the menu (from tiki-admin_menus.php)'),
+                'description' => tr('Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1)', '<a href="tiki-admin_menus.php">', '</a>'),
                 'filter' => 'int',
                 'profile_reference' => 'menu',
             ],
@@ -147,6 +147,6 @@ function module_menu($mod_reference, &$module_params)
         }
     }
     $smarty->assign('module_type', 'menu');
-    $show_namespace = isset($module_params['show_namespace']) ? $module_params['show_namespace'] : 'y';
+    $show_namespace = $module_params['show_namespace'] ?? 'y';
     $smarty->assign('show_namespace', $show_namespace);
 }

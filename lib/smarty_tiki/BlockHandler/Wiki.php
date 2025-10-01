@@ -15,7 +15,7 @@ use Smarty\Template;
  * Smarty plugin to display wiki-parsed content
  *
  * Usage: {wiki}wiki text here{/wiki}
- * {wiki isHtml="true" }html text as stored by ckEditor here{/wiki}
+ * {wiki isHtml="true" }html text as stored by the wysiwyg editor here{/wiki}
  */
 class Wiki extends Base
 {

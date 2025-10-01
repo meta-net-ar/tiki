@@ -295,7 +295,7 @@ function wikiplugin_ganttchart($data, $params)
                 $allLevel[$fieldItem['itemId']] = 0;
             }
             if ($levelParam == $fieldItem['permName'] && ! empty($fieldItem['value'])) {
-                $level = isset($allLevel[$fieldItem['value']]) ? $allLevel[$fieldItem['value']] : 0;
+                $level = $allLevel[$fieldItem['value']] ?? 0;
                 $level++;
                 $allLevel[$fieldItem['itemId']] = $level;
                 $listHasChildren[$fieldItem['value']] = true;
@@ -578,9 +578,9 @@ function save($info, $params, $allResources, $allRoles, $notifications = false)
     if (! empty($info) && $access->checkCsrf()) {
         $trackerId = ! empty($info['trackerId']) ? $info['trackerId'] : 0;
         $trackerItemId = ! empty($info['trackerItemId']) ? $info['trackerItemId'] : 0;
-        $info['resourceId'] = isset($info['resourceId']) ? $info['resourceId'] : '';
-        $info['roleId'] = isset($info['roleId']) ? $info['roleId'] : '';
-        $info['effort'] = isset($info['effort']) ? $info['effort'] : '';
+        $info['resourceId'] = $info['resourceId'] ?? '';
+        $info['roleId'] = $info['roleId'] ?? '';
+        $info['effort'] = $info['effort'] ?? '';
 
         if ($trackerId != $params['trackerId']) {
             Feedback::error(tr('You are trying to update a tracker that is not used by this gantt chart'));
@@ -687,7 +687,7 @@ function duplicate(array $info, array $params, array $trackerData, string $level
 
         // CHECK IF CHOSEN GANTT ID EXISTS
         $items = $trackerlib->list_items($trackerId, 0, -1, '', '', [$trackerField['fieldId']], '', '', '', [$ganttId]);
-        if ($items['cant']) {
+        if ($items['count']) {
             Feedback::error(tr('Gantt ID already exists'));
             $error = true;
         }
@@ -808,7 +808,7 @@ function transformDependenciesIdsToIndex($ganttValues, $itemIds)
             foreach ($depends as $itemId) {
                 $itemData = explode(':', $itemId);
                 $itemId = $itemData[0];
-                $itemDays = isset($itemData[1]) ? $itemData[1] : false;
+                $itemDays = $itemData[1] ?? false;
                 $index = array_search($itemId, $itemIds);
                 if ($index) {
                     $index = $index + 1;
@@ -839,8 +839,8 @@ function transformDependenciesIndexToIds($depends, $tasks)
         foreach ($indexes as $value) {
             $itemData = explode(':', $value);
             $index = $itemData[0];
-            $index = isset($tasks[$index - 1]['id']) ? $tasks[$index - 1]['id'] : false;
-            $itemDays = isset($itemData[1]) ? $itemData[1] : false;
+            $index = $tasks[$index - 1]['id'] ?? false;
+            $itemDays = $itemData[1] ?? false;
             if ($index && $itemDays) {
                 $index = $index . ':' . $itemDays;
             }

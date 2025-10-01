@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Package\VendorHelper;
+use Tiki\Lib\Filegals\FileGalLib;
 
 function prefs_fgal_list()
 {
@@ -159,6 +160,19 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'tags' => ['basic'],
+        ],
+        'fgal_filename_to_display_name' => [
+            'name' => tra('Default Display Name Generation'),
+            'type' => 'radio',
+            'default' => FileGalLib::DISPLAY_NAME_PRESERVE,
+            'description' => tra("Controls how Tiki generates a file's default 'Display Name' from its original filename upon upload."),
+            'options' => [
+                FileGalLib::DISPLAY_NAME_PRESERVE => tra('Keep original filename (Recommended)'),
+                FileGalLib::DISPLAY_NAME_TITLECASE => tra('Convert to Title Case (Legacy Behavior)'),
+                FileGalLib::DISPLAY_NAME_SPACE => tra('Replace underscores and hyphens with spaces only'),
+            ],
+            'note' => tra("This affects the title shown to users in lists and pages. It is separate from the 'Preserve filenames' option, which controls the physical filename on the server disk."),
             'tags' => ['basic'],
         ],
         'fgal_search_in_content' => [
@@ -417,6 +431,13 @@ When the limit is reached, no more files can be uploaded. The user will see an e
         ],
         'fgal_show_explorer' => [
             'name' => tra('Show explorer'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
+        'fgal_show_modtimedate' => [
+            'name' => tra('Show modification date and time'),
+            'shorthint' => tra('Displays both date and time for file modifications'),
+            'description' => tra('If checked, the modification date will be shown as date and time instead of just the date.'),
             'type' => 'flag',
             'default' => 'y',
         ],
@@ -696,7 +717,8 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'size' => 4,
             'type' => 'text',
             'filter' => 'int',
-            'default' => '250'
+            'default' => '250',
+            'units' => 'pixels'
         ],
         'fgal_export_diagram_on_image_save' => [
             'name' => tra('Export diagram image on save'),
@@ -705,11 +727,15 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'default' => 'y'
         ],
         'fgal_use_casperjs_to_export_images' => [
-            'name' => tra('Use locally CasperJS to export images'),
-            'description' => tra('If enabled, diagrams can be exported using CasperJS.'),
+            'name' => tra('Enable diagram image export (legacy CasperJS / Headless Chrome)'),
+            'description' => tra(
+                'If enabled, diagrams can be exported as images. Historically tied to CasperJS, this setting now also supports Headless Chrome. '
+            ) . ' <a href="https://doc.tiki.org/Browser+Automation#Common_Settings" target="_blank">'
+            . tra('Learn more...') . '</a>',
             'type' => 'flag',
             'default' => 'n',
             'packages_required' => ['jerome-breton/casperjs-installer' => 'CasperJsInstaller\Installer'],
+            'help' => tra('Browser Automation'),
         ],
         'fgal_use_drawio_services_to_export_images' => [
             'name' => tra('Use draw.io public services to export images'),

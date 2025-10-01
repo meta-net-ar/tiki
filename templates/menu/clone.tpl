@@ -16,7 +16,7 @@
                     {tr}Clone of Menu Id:{/tr} {$info.menuId|escape}
                 {/if}
                 {if $symbol}
-                    <a class="btn btn-link btn-sm tips" title="{tr}Symbol Information{/tr}|{tr}Symbol:{/tr} <strong>{$symbol.object}</strong><br>{tr}Profile Name:{/tr} <strong>{$symbol.profile}</strong><br>{tr}Profile Source:{/tr} <strong>{$symbol.domain}</strong>">
+                    <a class="btn btn-link btn-sm tips" title="{tr}Symbol Information{/tr}|{tr}Symbol:{/tr} <strong>{$symbol.object}</strong><br>{tr}Profile Name:{/tr} <strong>{$symbol.profile}</strong><br>{tr}Profile Source:{/tr} <strong>{$symbol.domain}</strong>" role="button">
                         {icon name="information"}
                     </a>
                 {/if}

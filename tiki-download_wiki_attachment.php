@@ -15,17 +15,12 @@ if (! empty($_REQUEST['attId'])) {
     $info = $tikilib->get_wiki_attachment($_REQUEST['attId']);
 }
 if (empty($info)) {
-    $smarty->assign('msg', tra('Incorrect param') . ' attid');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect param') . ' attid', \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $perms = Perms::get([ 'type' => 'wiki page', 'object' => $info['page'] ]);
 if ((! $perms->view || ! $perms->wiki_view_attachments) && ! $perms->wiki_admin_attachments) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $tikilib->add_wiki_attachment_hit($_REQUEST["attId"]);
@@ -39,8 +34,6 @@ $file = $info["filename"];
 $content = $info["data"];
 
 session_write_close();
-//print("File:$file<br />");
-//die;
 header("Content-type: $type");
 
 TikiLib::lib('header')->setXRobotsTag($robots);

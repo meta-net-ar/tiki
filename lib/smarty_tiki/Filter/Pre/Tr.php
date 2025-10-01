@@ -23,7 +23,7 @@ class Tr implements \Smarty\Filter\FilterInterface
     {
         include_once(__DIR__ . '/../../../init/tra.php');
         $s = tra($matches[1]);
-        if ($s == $matches[1] && strstr($matches[1], '{$')) {
+        if ($s == $matches[1] && str_contains($matches[1], '{$')) {
             // The string to translate is not plain English. It contains a Smarty variable, which may prevent translation at compile time.
             // Leave the whole match ("tr call") intact so block.tr.php can attempt a new translation at runtime.
             return $matches[0];

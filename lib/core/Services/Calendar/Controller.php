@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\TikiDate;
+
 class Services_Calendar_Controller extends Services_Calendar_BaseController
 {
     private CalendarLib $calendarLib;
@@ -129,27 +131,39 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
         $viewend = new DateTime($viewend);
         $viewend = $viewend->getTimestamp();
-
-        if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+        $calendarIdFromModuleOrPlugin = $input->calIds->string();
+        if ($calendarIdFromModuleOrPlugin) {
+            $splitCalendarIdFromModuleOrPlugin = explode(',', $calendarIdFromModuleOrPlugin);
             $listevents = $this->calendarLib->list_raw_items(
-                $_SESSION['CalendarViewGroups'],
+                array_intersect($splitCalendarIdFromModuleOrPlugin, array_keys($calendars)),
                 $user,
                 $viewstart,
                 $viewend,
                 0,
                 -1
             );
-
-            $listevents = Perms::filter(
-                ['type' => 'calendaritem'],
-                'object',
-                $listevents,
-                ['object' => 'calitemId'],
-                ['view_events']
-            );
         } else {
-            $listevents = [];
+            if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+                $listevents = $this->calendarLib->list_raw_items(
+                    array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
+                    $user,
+                    $viewstart,
+                    $viewend,
+                    0,
+                    -1
+                );
+            } else {
+                $listevents = [];
+            }
         }
+
+        $listevents = Perms::filter(
+            ['type' => 'calendaritem'],
+            'object',
+            $listevents,
+            ['object' => 'calitemId'],
+            ['view_events']
+        );
 
         $parserLib = TikiLib::lib('parser');
         $events = [];
@@ -197,6 +211,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 'id'          => $event['calitemId'],
                 'title'       => $event['name'],
                 'extendedProps' => [
+                    'viewable'    => $event['perms']->view_events,
                     'description' => ! empty($event['description']) ? $parserLib->parse_data(
                         $event['description'],
                         [
@@ -206,17 +221,18 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                             'fieldName' => 'description'
                         ]
                     ) : '',
-                    'categoryBackgroundColor' => $event['categoryBackgroundColor'] ? $event['categoryBackgroundColor'] : ''
+                    'categoryBackgroundColor' => $event['categoryBackgroundColor'] ? $event['categoryBackgroundColor'] : '',
+                    'showCopyButton' => $calendars[$event['calendarId']]['copybuttononeachevent'],
+                    'viewable'    => $event['perms']->view_events,
+                    'baseUrl'   => $base_url
                 ],
                 'url'         => $url,
                 'allDay'      => $allDay,
                 'start'       => $start->format(DATE_ATOM),
                 'end'         => $end->format(DATE_ATOM),
                 'editable'    => $event['perms']->change_events,
-                'color'       => '#' . $calendars[$event['calendarId']]['custombgcolor'],
+                'backgroundColor'       => '#' . $calendars[$event['calendarId']]['custombgcolor'],
                 'textColor'   => '#' . $calendars[$event['calendarId']]['customfgcolor'],
-                'showCopyButton' => $calendars[$event['calendarId']]['copybuttononeachevent'],
-                'baseUrl'   => $base_url
             ];
         }
         return $events;
@@ -237,13 +253,15 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $access = TikiLib::lib('access');
         $parserLib = TikiLib::lib('parser');
         $displayTimezone = TikiLib::lib('tiki')->get_display_timezone();
+        $trklib = TikiLib::lib('trk');
         $timezones = TikiDate::getTimeZoneList();
         $timezones = array_keys($timezones);
         $return_url = $input->return_url->url();
+        $trackerItems = [];
 
         $rawcals = $this->calendarLib->list_calendars();
 
-        if ($rawcals['cant'] === 0) {
+        if ($rawcals['count'] === 0) {
             throw new Services_Exception_NotFound(tr('No calendars found'));
         }
 
@@ -347,6 +365,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             $calitem['start'] = $start->getTime();
             $calitem['end']   = $end->getTime();
             $calitem['duration'] = 0;
+
+            $trackerItems = $this->calendarLib->getAttachedTrackerItems($calitemId);
         } else {
             // new event
             $title = tr('Calendar event : %0', tr('New'));
@@ -390,13 +410,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 if ($input->offsetExists('todate')) {
                     // set the correct day clicked on
                     $dateNow->setDate($input->todate->int());
+                    $hour = $dateNow->date->format('H');
                 }
                 $tz = date_default_timezone_get();
                 date_default_timezone_set($displayTimezone);
                 $start = mktime(
                     $hour,
-                    0,
-                    0,
+                    $dateNow->date->format('i'),
+                    $dateNow->date->format('s'),
                     $dateNow->date->format('m'),
                     $dateNow->date->format('d'),
                     $dateNow->date->format('Y')
@@ -515,6 +536,15 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $customPriorityColors = ['fff','fdd','fcc','fbb','faa','f99','e88','d77','c66','b66','a66'];
         $customRoles = ['0' => '','1' => tra('required'),'2' => tra('optional'),'3' => tra('non-participant')];
 
+        if (($calitem['hideParticipants'] ?? false) && ! $this->calendarLib->canAdminCalendar($calendar)) {
+            $calitem['participants'] = array_filter(
+                $calitem['participants'],
+                function ($participant) use ($user) {
+                    return $participant['username'] === $user;
+                }
+            );
+        }
+
         return [
             // collections
             'daynames'                   => $this->daynames,
@@ -550,6 +580,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'displayTimezone'            => $displayTimezone,
             'timezones'                  => $timezones,
             'prefilled'                  => $input->prefill_start->int() ? true : false,
+            // related tracker items
+            'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
         ];
     }
 
@@ -571,10 +603,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
     public function action_view_item(JitFilter $input): array
     {
         global $prefs;
+        $trklib = TikiLib::lib('trk');
 
         $calitemId = $input->calitemId->int();
         $recurrence = [];
+        $trackerItems = [];
         $preview = false;
+        $calendar = null;
+        $calitem = null;
 
         if ($input->act->word() === 'preview') {
             $preview = true;
@@ -619,14 +655,21 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         } elseif ($calitemId) {
             $calitemId = $this->getItemId($input, 'view_events');  // also checks edit perms
             $calitem = $this->calendarLib->get_item($calitemId);
+
+            if (! $calitem) {
+                throw new Services_Exception_NotFound(tr('Event not found.'));
+            }
             $calendar = $this->calendarLib->get_calendar($calitem['calendarId']);
+
+            if (! $calendar) {
+                throw new Services_Exception_NotFound(tr('Event not found.'));
+            }
             if (isset($calitem['recurrenceId']) && $calitem['recurrenceId'] > 0) {
                 $recurrence = new CalRecurrence($calitem['recurrenceId']);
                 $recurrence = $recurrence->toArray();
             }
         } else {
-            Feedback::error(tr('Not found'));
-            $calitem = [];
+            throw new Services_Exception_NotFound(tr('Not found'));
         }
 
         if ($calitem) {
@@ -649,6 +692,12 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $endtime = $tikilib->get_short_time($calitem['end']);
                 $calitem['display_datetimes'] = tr('%0 %1 to %2 %3', $startday, $starttime, $endday, $endtime);
             }
+
+            if ($calitem['hideParticipants'] && ! $this->calendarLib->canAdminCalendar($calendar)) {
+                $calitem['participants'] = [];
+                $calitem['hiddenParticipants'] = true;
+            }
+            $trackerItems = $this->calendarLib->getAttachedTrackerItems($calitemId);
         }
 
         return [
@@ -660,6 +709,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'daynames'             => $this->daynamesPlural,
             'monthnames'           => $this->monthnames,
             'preview'              => $preview,
+            // related tracker items
+            'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
         ];
     }
 
@@ -801,7 +852,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             throw new Services_Exception_NotFound();
         }
 
-        $calperms = Perms::get(['type' => 'calendar', 'object' => $cal_id]);
+        $calperms = Perms::get(['type' => 'calendaritem', 'object' => $item]);
         if (! $calperms->$perm) {
             throw new Services_Exception_Denied();
         }
@@ -850,6 +901,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         if (! empty($calitem['calitemId'])) {
             // store the initial event if it was already created
             $recurrence->setInitialItem($calitem);
+        }
+        if ($calitem['hideParticipants'] ?? false) {
+            $recurrence->setHideParticipants(true);
         }
         return $recurrence;
     }

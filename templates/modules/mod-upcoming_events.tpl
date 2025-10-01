@@ -3,14 +3,14 @@
 html indentation and smarty indentation are independant. Please keep consistent with the general logic *}
 {if count($modUpcomingEvents)}
     {if isset($module_params.date_format)}
-        {assign var=date_format value=$module_params.date_format}
+        {$date_format=$module_params.date_format}
     {else}
-        {assign var=date_format value=$prefs.short_date_format|cat:' '|cat:$prefs.short_time_format}
+        {$date_format=$prefs.short_date_format|cat:' '|cat:$prefs.short_time_format}
     {/if}
 <table border="0" cellpadding="{if isset($module_params.cellpadding)}{$module_params.cellpadding}{else}0{/if}" cellspacing="{if isset($module_params.cellspacing)}{$module_params.cellspacing}{else}0{/if}">
         {section name=ix loop=$modUpcomingEvents}
-            {assign var=date_value value=$modUpcomingEvents[ix].start|tiki_date_format:$date_format}
-            {assign var=calendarId value=$modUpcomingEvents[ix].calendarId}
+            {$date_value=$modUpcomingEvents[ix].start|tiki_date_format:$date_format}
+            {$calendarId=$modUpcomingEvents[ix].calendarId}
 
             {if !$smarty.section.ix.first}
         </td>
@@ -20,10 +20,10 @@ html indentation and smarty indentation are independant. Please keep consistent 
     <tr>
 
             {if $nonums != 'y'}
-        <td class="module">{$smarty.section.ix.index_next})&nbsp;</td>
+        <td>{$smarty.section.ix.index_next})&nbsp;</td>
             {/if}
 
-        <td class="module vevent"{if $showColor eq 'y' and $infocals.$calendarId.custombgcolor ne ''} style="background-color:#{$infocals.$calendarId.custombgcolor}"{/if}>
+        <td class="vevent"{if $showColor eq 'y' and $infocals.$calendarId.custombgcolor ne ''} style="background-color:#{$infocals.$calendarId.custombgcolor}"{/if}>
 
             {if $modUpcomingEvents[ix].allday}
             <abbr class="dtstart" title="{$modUpcomingEvents[ix].start|isodate}">{$modUpcomingEvents[ix].start|tiki_short_date}</abbr>

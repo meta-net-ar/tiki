@@ -63,16 +63,12 @@ if (! empty($_REQUEST['fileId'])) {
     $fileId = $_REQUEST['fileId'];
 
     if (! ($fileInfo = $filegallib->get_file_info($fileId))) {
-        $smarty->assign('msg', tra("Incorrect param"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (empty($_REQUEST['galleryId'][0])) {
         $_REQUEST['galleryId'][0] = $fileInfo['galleryId'];
     } elseif ($_REQUEST['galleryId'][0] != $fileInfo['galleryId']) {
-        $smarty->assign('msg', tra("Could not find the file requested"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("Could not find the file requested"), \Laminas\Http\Response::STATUS_CODE_404);
     }
     include_once('lib/mime/mimetypes.php');
     global $mimetypes;
@@ -124,19 +120,14 @@ if (! empty($_REQUEST['fileId'])) {
 if (isset($_REQUEST['galleryId'][0])) {
     $gal_info = $filegallib->get_file_gallery((int)$_REQUEST['galleryId'][0]);
     if (empty($gal_info)) {
-        $smarty->assign('msg', tra('Incorrect file gallery'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Incorrect file gallery'), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $tikilib->get_perm_object($_REQUEST['galleryId'][0], 'file gallery', $gal_info, true);
     $smarty->assign_by_ref('gal_info', $gal_info);
 }
 
 if (empty($fileId) && $tiki_p_upload_files != 'y' && $tiki_p_admin_file_galleries != 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("Permission denied"));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra("Permission denied"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 if (isset($_REQUEST['galleryId'][1])) {
     foreach ($_REQUEST['galleryId'] as $i => $gal) {
@@ -144,41 +135,30 @@ if (isset($_REQUEST['galleryId'][1])) {
             continue;
         }
         // TODO get the good gal_info
-        $perms = $tikilib->get_perm_object($_REQUEST['galleryId'][$i], 'file gallery', isset($gal_info) ? $gal_info : '', false);
+        $perms = $tikilib->get_perm_object($_REQUEST['galleryId'][$i], 'file gallery', $gal_info ?? '', false);
         $access->check_permission('tiki_p_upload_files');
     }
 }
 if (! empty($fileId)) {
     if (! empty($fileInfo['lockedby']) && $fileInfo['lockedby'] != $user && $tiki_p_admin_file_galleries != 'y') { // if locked must be the locker
-        $smarty->assign('msg', tra(sprintf('The file has been locked by %s', $fileInfo['lockedby'])));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra(sprintf('The file has been locked by %s', $fileInfo['lockedby'])), \Laminas\Http\Response::STATUS_CODE_423);
     }
     if (! ((! empty($user) && ($user == $fileInfo['user'] || $user == $fileInfo['lockedby'])) || $tiki_p_edit_gallery_file == 'y')) { // must be the owner or the locker or have the perms
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this file"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this file"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     if ($gal_info['backlinkPerms'] == 'y' && $filegallib->hasOnlyPrivateBacklinks($fileId)) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this file"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this file"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     if (isset($_REQUEST['lockedby']) && $fileInfo['lockedby'] != $_REQUEST['lockedby']) {
         if (empty($fileInfo['lockedby'])) {
-            $smarty->assign('msg', tra(sprintf('The file has been unlocked meanwhile')));
+            $message = tra('The file has been unlocked meanwhile');
         } else {
-            $smarty->assign('msg', tra(sprintf('The file has been locked by %s', $fileInfo['lockedby'])));
+            $message = tra(sprintf('The file has been locked by %s', $fileInfo['lockedby']));
         }
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_423);
     }
     if ($gal_info['lockable'] == 'y' && empty($fileInfo['lockedby']) && $tiki_p_admin_file_galleries != 'y') {
-        $smarty->assign('msg', tra('You must lock the file before editing it'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You must lock the file before editing it'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -195,7 +175,7 @@ if (! empty($_REQUEST['galleryId'][0]) && $prefs['feature_groupalert'] == 'y') {
 }
 
 if (empty($_REQUEST['returnUrl'])) {
-    include('lib/filegals/max_upload_size.php');
+    include('lib/Filegals/max_upload_size.php');
 }
 
 // Process an upload here
@@ -272,7 +252,7 @@ if ($isUpload) {
 }
 
 $fileparts = (! empty($fileInfo['filename'])) ? pathinfo($fileInfo['filename']) : [];
-$fileInfo['extension'] = isset($fileparts['extension']) ? $fileparts['extension'] : '';
+$fileInfo['extension'] = $fileparts['extension'] ?? '';
 $smarty->assign_by_ref('fileInfo', $fileInfo);
 $smarty->assign('editFileId', (int) $fileId);
 

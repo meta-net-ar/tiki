@@ -91,7 +91,7 @@ $console->setAutoExit(false);
 try {
     $exitCode = $console->run(null, $output);
 } catch (Throwable $e) {
-    $output->writeln('<comment>A error was encountered while running a command</comment>');
+    $output->writeln('<comment>An error was encountered while running a command</comment>');
     TikiLib::lib('errortracking')->captureException($e);
     $output->write('<error>' . $e->getMessage() . '</error> on line ' . $e->getLine() . ' of ' . $e->getFile());
     $exitCode = Command::FAILURE;
@@ -146,7 +146,7 @@ function custom_error_handler($number, $message, $file, $line): void
         }
         // Fatal Errors
         // throw an Error Exception, to be handled by whatever Exception handling logic is available in this context
-        if (in_array($number, [E_USER_ERROR, E_RECOVERABLE_ERROR]) && $error_is_enabled) {
+        if (in_array($number, [E_USER_ERROR, E_RECOVERABLE_ERROR])) {
             throw $exception;
         }
 

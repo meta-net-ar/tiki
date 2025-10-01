@@ -31,6 +31,18 @@ class MultiLike extends Base
         if (empty($config)) {
             return tr("Multivalue configuration not found");
         }
+
+        // Check if the user has already selected for this choice
+        $hasVoted = false;
+        foreach ($config['ids'] as $key => $id) {
+            $relation = $params['relation_prefix'] . "." . $id;
+            if ($relationlib->get_relation_id($relation, "user", $user, $params['type'], $params['object'])) {
+                $hasVoted = true;
+                break;
+            }
+        }
+        $smarty->assign('has_voted', $hasVoted);
+
         $totalCount = 0;
         $totalPoints = 0;
         $buttons = [];
@@ -60,7 +72,12 @@ class MultiLike extends Base
 
             //get existing stats
             $button['count'] = $relationlib->get_relation_count($button['relation'], $params['type'], $params['object']);
-            $totalCount += $button['count'];
+            if ($button['id'] == 'unlike') {
+                $likes = 0;
+            } else {
+                $likes = $button['count'];
+            }
+            $totalCount += $likes;
             if ($button['value']) {
                 $button['points'] = $button['count'] * $button['value'];
                 $totalPoints += $button['points'];
@@ -73,6 +90,10 @@ class MultiLike extends Base
             } else {
                 $button['selected'] = 0;
             }
+
+            // Disable the button if the user has already selected, but not for this option
+            $button['disabled'] = $hasVoted && ! $button['selected'];
+
             $buttons[] = $button;
         }
 

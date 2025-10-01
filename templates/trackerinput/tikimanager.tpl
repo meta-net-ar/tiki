@@ -14,7 +14,7 @@
                 <label>Branch:</label> {$instance->branch}<br/>
                 <label>Revision:</label> {$instance->revision}<br/>
                 <div class="btn-group" role="group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-hover="dropdown" href="#" aria-expanded="false">Actions</a>
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" data-bs-hover="dropdown" href="#" aria-expanded="false" role="button">Actions</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{$instance->weburl}" target="_blank">
                             <span class="icon icon-file-archive-open fas fa-folder-open "></span> Open
@@ -116,9 +116,9 @@
         {/foreach}
     {/if}
     {if in_array('create', $field.available_actions) and !$field.has_created_one}
-        {if !empty($field.source)}{assign var=action value=create_source}{else}{assign var=action value=create}{/if}
+        {if !empty($field.source)}{$action=create_source}{else}{$action=create}{/if}
         <div class="btn-group">
-            <a class="btn btn-primary btn-sm dropdown-toggle" id="createInstance" data-bs-toggle="dropdown" data-bs-hover="dropdown" aria-expanded="false" href="#">
+            <a class="btn btn-primary btn-sm dropdown-toggle" id="createInstance" data-bs-toggle="dropdown" data-bs-hover="dropdown" aria-expanded="false" href="#" role="button">
                 {icon name=create _menu_text='y' _menu_icon='y' alt="{tr}Create new instance{/tr}"}
             </a>
             <div class="dropdown-menu" aria-labelledby="createInstance">

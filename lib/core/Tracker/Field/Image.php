@@ -99,16 +99,12 @@ class Tracker_Field_Image extends Tracker_Field_File
 
         if (! empty($prefs['fgal_match_regex']) && ! empty($_FILES[$ins_id]['name'])) {
             if (! preg_match('/' . $prefs['fgal_match_regex'] . '/', $_FILES[$ins_id]['name'], $reqs)) {
-                $smarty->assign('msg', tra('Invalid imagename (using filters for filenames)'));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra('Invalid imagename (using filters for filenames)'), \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
         if (! empty($prefs['fgal_nmatch_regex']) && ! empty($_FILES[$ins_id]['name'])) {
             if (preg_match('/' . $prefs['fgal_nmatch_regex'] . '/', $_FILES[$ins_id]['name'], $reqs)) {
-                $smarty->assign('msg', tra('Invalid imagename (using filters for filenames)'));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra('Invalid imagename (using filters for filenames)'), \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
 

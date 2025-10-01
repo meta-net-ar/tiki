@@ -1,12 +1,12 @@
-<form action="#" method="get" class="d-flex flex-row flex-wrap align-items-center">
+<form action="#" method="get">
     <input type="hidden" name="trackerId" value="{$trackerId|escape}">
     {if $status}<input type="hidden" name="status" value="{$status}">{/if}
     {if $sort_mode}<input type="hidden" name="sort_mode" value="{$sort_mode}">{/if}
     {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
-    <div class="search_container mb-3">
+    <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             {foreach key=st item=stdata from=$status_types}
-                <div style="display:inline-block;">
+                <div>
                     <div class="{$stdata.class}">
                         {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
                         <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $offset}&amp;offset={$offset}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
@@ -17,31 +17,31 @@
             {/foreach}
         {/if}
 
-        <div style="display:inline-block;padding: 4px 10px;vertical-align:middle">
+        <div class="w-25">
             {if $show_filters eq 'y'}
                 {jq}
                     fields = [];
-                    {{assign var=c value=0}}
+                    {{$c=0}}
                     {{foreach key=fid item=field from=$listfields}
                         {if $field.isSearchable eq 'y' and $field.type ne 'f' and $field.type ne 'j' and $field.type ne 'i'}
                             fields[{$c}] = '{$fid}';
-                            {assign var=c value=$c+1}
+                            {$c=$c+1}
                         {/if}
                     {/foreach}}
                 {/jq}
-                <select name="filterfield" class="form-select" data-placeholder="{tr}Choose a filter{/tr}" onchange="this.form.submit(); {literal}showit = 'show_filterbutton'; if(this.selectedIndex == 0){document.getElementById('filterbutton').style.display = 'none';setSessionVar(showit,'n');}else{ document.getElementById('filterbutton').style.display = 'block'; setSessionVar(showit,'y');}{/literal}">
+                <select name="filterfield" class="form-select" placeholder="{tr}Choose a filter{/tr}" onchange="this.form.submit(); {literal}showit = 'show_filterbutton'; if(this.selectedIndex == 0){document.getElementById('filterbutton').style.display = 'none';setSessionVar(showit,'n');}else{ document.getElementById('filterbutton').style.display = 'block'; setSessionVar(showit,'y');}{/literal}">
                     <option value="">{tr}Choose a filter{/tr}</option>
                     {foreach key=fid item=field from=$listfields}
                         {if $field.isSearchable eq 'y' and $field.type ne 'f' and $field.type ne 'j' and $field.type ne 'i' and ($field.isHidden ne 'y' or $tiki_p_admin_trackers eq 'y')}
                             <option value="{$fid}"{if $fid eq $filterfield} selected="selected"{/if}>{tr}{$field.name|truncate:65|escape}{/tr}</option>
-                            {assign var=filter_button value='y'}
+                            {$filter_button='y'}
                         {/if}
                     {/foreach}
                 </select>
             {/if}
         </div>
-        <div style="display:inline-block" class="mb-3 row">
-            {assign var=cnt value=0}
+        <div class="d-flex gap-2">
+            {$cnt=0}
             {foreach key=fid item=field from=$listfields}
                 {if $field.isSearchable eq 'y' and $field.type ne 'f' and $field.type ne 'j' and $field.type ne 'i'}
                     {if $field.type eq 'c'}
@@ -54,9 +54,9 @@
                     {elseif $field.type eq 'd' or $field.type eq 'D'}
                         <div style="display:{if $filterfield eq $fid}block{else}none{/if};" id="fid{$fid}">
                             <select name="filtervalue[{$fid}]" class="form-select">
-                                {if $field.type eq 'D'}<option value="" />{/if}
+                                {if $field.type eq 'D'}<option value=""></option>{/if}
                                 {foreach from=$field.possibilities key=dropdown_key item=dropdown_value}
-                                    <option value="{$dropdown_key|escape}" {if $fid == $filterfield}{if $filtervalue eq $dropdown_key}{assign var=gotit value=y}selected="selected"{/if}{/if}>{$dropdown_value|tr_if}</option>
+                                    <option value="{$dropdown_key|escape}" {if $fid == $filterfield}{if $filtervalue eq $dropdown_key}{$gotit='y'}selected="selected"{/if}{/if}>{$dropdown_value|tr_if}</option>
                                 {/foreach}
                             </select>
                             {if $field.type eq 'D'}
@@ -81,7 +81,7 @@
                                     </label>
                                 {/foreach}
                             {elseif $field.options_map.inputtype eq 'm'}
-                                {if $prefs.jquery_select2 neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
+                                {if $prefs.elementplus_select neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
                                 <select name="filtervalue[{$fid}][]" multiple="multiple" class="form-select">
                                     {foreach key=ku from=$field.possibilities key=value item=label}
                                         <option value="{$value|escape}" {if is_array($filtervalue) and in_array($value, $filtervalue)}selected="selected"{/if}>{$label|escape}</option>
@@ -122,12 +122,12 @@
                             <input type="text" class="form-control" name="filtervalue[{$fid}]" value="{if $fid == $filterfield}{$filtervalue}{/if}">
                         </div>
                     {/if}
-                    {assign var=cnt value=$cnt+1}
+                    {$cnt=$cnt+1}
                 {/if}
             {/foreach}
         </div>
         {if isset($filter_button) && $filter_button eq 'y'}
-            <div style="display:inline-block" class="mb-3 row">
+            <div>
                 <input id="filterbutton" type="submit" class="btn btn-primary" name="filter" value="{tr}Filter{/tr}" style="display:{if $filterfield}inline{else}none{/if}">
             </div>
         {/if}

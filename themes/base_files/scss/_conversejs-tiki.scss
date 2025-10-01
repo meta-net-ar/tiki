@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .tiki #conversejs, .tiki #conversejs.converse-embedded {
     font-family: $font-family-base;
     color: var(--bs-body-color);
@@ -103,7 +105,7 @@
 
                 .fa-eye, .fa-paperclip, .toggle-smiley, .unencrypted, .toggle-occupants {
                     color: $primary;
-                    &:hover { color: darken($primary, 7.5%)/*, 7.5%*/; }
+                    &:hover { color: color.adjust($primary, $lightness: -7.5%, $space: hsl)/*, 7.5%*/; }
                 }
             }
         }
@@ -111,7 +113,7 @@
         .chat-head {
             &.chat-head-chatbox { background-color: $primary; }
             .chat-title, a.chatbox-btn.fa { color: $primary; }
-            a:hover.chatbox-btn.fa { color: darken($primary, 7.5%)/*, 7.5%*/; }
+            a:hover.chatbox-btn.fa { color: color.adjust($primary, $lightness: -7.5%, $space: hsl)/*, 7.5%*/; }
         }
 
         .chat-body {

@@ -1,6 +1,6 @@
 <template>
     <div class="col-auto">
-        <select v-select2 class="form-control" :id="`${props.field.ins_id}Day`" :name="`${field.ins_id}Day`" :value="model.day" @change="$emit('update:modelValue', { ...model, ['day']: $event.target.value })">
+        <select class="form-control" :id="`${props.field.ins_id}Day`" :name="`${field.ins_id}Day`" :value="model.day" @change="$emit('update:modelValue', { ...model, ['day']: $event.target.value })">
             <option v-for="day in 31" :value="zeroPad(day)">{{day}}</option>
         </select>
     </div>

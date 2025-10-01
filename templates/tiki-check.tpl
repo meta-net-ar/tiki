@@ -1,6 +1,160 @@
 {title help="Server Check"}{tr}Server Check{/tr}{/title}
 
+{* Include the dashboard template *}
+{include file="tiki-check-dashboard.tpl"}
+
+{* Dashboard JavaScript *}
+<script type="text/javascript">
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    if (typeof $ !== 'undefined' && typeof $.fn.tooltip !== 'undefined') {
+        $('[data-toggle="tooltip"]').tooltip({
+            html: true,
+            placement: 'top',
+            trigger: 'hover'
+        });
+    }
+    
+    // Add click handler for View Details links using vanilla JS
+    var viewDetailsLinks = document.querySelectorAll('.critical-issues-summary a[href^="#"]');
+    
+    viewDetailsLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var targetId = this.getAttribute('href').substring(1);
+            
+            var targetElement = document.getElementById(targetId);
+            
+            if (targetElement === null) {
+                return;
+            } else {
+                // Prevent default anchor behavior
+                e.preventDefault();
+                
+                // Calculate proper scroll position with offset for fixed header
+                var headerOffset = calculateHeaderOffset();
+                var elementPosition = targetElement.getBoundingClientRect().top;
+                var offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                // Check if target element is in a collapsed section and expand it
+                var parentSection = targetElement.closest('.showhide_heading');
+                if (parentSection) {
+                    var sectionContent = parentSection.nextElementSibling;
+                    if (sectionContent && sectionContent.style.display === 'none') {
+                        // Trigger click on the heading to expand
+                        parentSection.click();
+                    }
+                }
+                
+                // Smooth scroll to the target element
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Add highlight after scroll completes
+                setTimeout(function() {
+                    targetElement.classList.add('highlight-row');
+                    setTimeout(function() {
+                        targetElement.classList.remove('highlight-row');
+                    }, 2000);
+                }, 800); // Increased delay to let the scroll and expand complete
+            }
+        });
+    });
+});
+
+// Helper function to calculate header offset
+function calculateHeaderOffset() {
+    // Try to find common header elements
+    var headerSelectors = [
+        'header',
+        '.navbar',
+        '.navbar-fixed-top',
+        '.navbar-fixed-bottom',
+        '.topbar',
+        '.header',
+        '#header',
+        '.top-navbar',
+        '.main-header'
+    ];
+    
+    for (var i = 0; i < headerSelectors.length; i++) {
+        var header = document.querySelector(headerSelectors[i]);
+        if (header) {
+            var rect = header.getBoundingClientRect();
+            if (rect.height > 0) {
+                return rect.height + 20; // Add 20px buffer
+            }
+        }
+    }
+    
+    // Fallback to default offset
+    return 80;
+}
+
+// Make functions globally available
+window.runAllChecks = function() {
+    // Show loading state
+    var buttons = document.querySelectorAll('.btn-group-vertical .btn');
+    buttons.forEach(function(button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+    });
+    
+    // Reload page to run all checks
+    setTimeout(function() {
+        window.location.reload();
+    }, 1000);
+};
+
+window.showCriticalIssues = function() {
+    // Scroll to critical issues section or show modal
+    var criticalIssuesSummary = document.querySelector('.critical-issues-summary');
+    if (criticalIssuesSummary) {
+        var targetOffset = criticalIssuesSummary.offsetTop - 100;
+        window.scrollTo({
+            top: targetOffset,
+            behavior: 'smooth'
+        });
+    }
+};
+
+// Auto-refresh dashboard every 5 minutes
+setInterval(function() {
+    // Only refresh if user is on the page
+    if (!document.hidden) {
+        $.get('tiki-check.php?ajax=dashboard', function(data) {
+            $('.dashboard-summary').html(data);
+            // Reinitialize tooltips after AJAX update
+            if (typeof $ !== 'undefined' && typeof $.fn.tooltip !== 'undefined') {
+                $('[data-toggle="tooltip"]').tooltip({
+                    html: true,
+                    placement: 'top',
+                    trigger: 'hover'
+                });
+            }
+        });
+    }
+}, 300000); // 5 minutes
+</script>
+
 <h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
+
+{if ! $is_compatible}
+    {remarksbox type='error' title="{tr}Server Compatibility Issue{/tr}" close='n'}
+        <p>{tr}The server does not meet the minimum requirements for this Tiki version due to the following issues:{/tr}</p>
+        <ul>
+            {foreach from=$server_req key=key item=item}
+                {if $item.fitness_status === FITNESS_STATUS_BAD}
+                    <li>{$key}: {$item.message}</li>
+                {/if}
+            {/foreach}
+        </ul>
+        <p>{tr}Please upgrade your server configuration to meet the Tiki requirements.{/tr}</p>
+        <p><a href="https://doc.tiki.org/Requirements" target="_blank">{tr}View the Tiki Requirements documentation{/tr}</a></p>
+    {/remarksbox}
+{/if}
 
 <div class="table-responsive">
     <table class="table">
@@ -14,18 +168,57 @@
         </thead>
         <tbody>
         {foreach from=$server_req key=key item=item}
-            <tr>
+            <tr id="Server_Properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.value}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
                 <td data-th="{tr}Explanation : {/tr}" class="text">{$item.message}</td>
             </tr>
             {foreachelse}
             {norecords _colspan=2}
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+<h3>{tr}Supported Tiki versions{/tr}</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>{tr}Tiki Version{/tr}</th>
+            <th>{tr}PHP{/tr}</th>
+            <th>{tr}MySQL{/tr}</th>
+            <th>{tr}MariaDB{/tr}</th>
+            <th>{tr}Fitness{/tr}</th>
+            <th>{tr}Explanation{/tr}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach from=$available_tiki_properties key=key item=item}
+            <tr>
+                <th class="text">{$item.name}</th>
+                <td class="text">
+                    {$item.php.min}{if $item.php.max && $item.php.max != $item.php.min} - {$item.php.max}{elseif !$item.php.max}+{/if}
+                </td>
+                <td class="text">
+                    {$item.mysql.min}{if $item.mysql.max && $item.mysql.max != $item.mysql.min} - {$item.mysql.max}{elseif !$item.mysql.max}+{/if}
+                </td>
+                <td class="text">
+                    {$item.mariadb.min}{if $item.mariadb.max && $item.mariadb.max != $item.mariadb.min} - {$item.mariadb.max}{elseif !$item.mariadb.max}+{/if}
+                </td>
+                <td class="text">
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
+                    </span>
+                </td>
+                <td class="text">{$item.message}</td>
+            </tr>
+        {foreachelse}
+            {norecords _colspan=4}
         {/foreach}
         </tbody>
     </table>
@@ -50,15 +243,15 @@
         </thead>
         <tbody>
         {foreach from=$mysql_properties key=key item=item}
-            <tr>
+            <tr id="MySQL_or_MariaDB_Database_Properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
-                <td data-th="{tr}OK:{/tr}" class="text">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                <td data-th="{tr}OK:{/tr}" class="text">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                 <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
             </tr>
         {foreachelse}
@@ -209,6 +402,94 @@
         </table>
     </div>
 
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <tr>
+                <th colspan="4">{tr}Column definition in the database differ from the one from db/tiki.sql{/tr}</th>
+            </tr>
+            {if !empty($diffColDefs)}
+                <tr>
+                    <th>{tr}Table Name{/tr}</th>
+                    <th>{tr}Column{/tr}</th>
+                    <th>{tr}File Definition{/tr}</th>
+                    <th>{tr}Database Definition{/tr}</th>
+                </tr>
+                <tbody>
+                {foreach from=$diffColDefs key=tableName item=details}
+                    <tr>
+                        <td>{$tableName}</td>
+                        <td>
+                            <ul class="list-unstyled">
+                                {$details.columnNames}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="list-unstyled">
+                                {$details.fileDefs|unescape:'html'}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="list-unstyled">
+                                {$details.dbDefs|unescape:'html'}
+                            </ul>
+                        </td>
+                    </tr>
+                {/foreach}
+                </tbody>
+            {else}
+                <td class="text">
+                    <span class="text-success">
+                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    </span>
+                </td>
+            {/if}
+        </table>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <tr>
+                <th colspan="3">{tr}Index definition in the database differs from the one in db/tiki.sql{/tr}</th>
+            </tr>
+            {if !empty($diffIndexDefis)}
+                <tr>
+                    <th>{tr}Table Name{/tr}</th>
+                    <th>{tr}File Definition{/tr}</th>
+                    <th>{tr}Database Definition{/tr}</th>
+                </tr>
+                <tbody>
+                {foreach from=$diffIndexDefis key=tableName item=item}
+                    {if !empty($item.file) || !empty($item.db)}
+                        <tr>
+                            <td>{$tableName}</td>
+                            <td>
+                                {if !empty($item.file)}
+                                    {$item.file|unescape:'html'}
+                                {else}
+                                    <span>Not available</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {if !empty($item.db)}
+                                    {$item.db|unescape:'html'}
+                                {else}
+                                    <span>Not available</span>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/if}
+                {/foreach}
+                </tbody>
+            {else}
+                <td class="text">
+                    <span class="text-success">
+                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    </span>
+                </td>
+            {/if}
+        </table>
+    </div>
+
     {if !empty($dynamicTables)}
         <div class="table-responsive">
             <table class="table table-striped table-hover">
@@ -262,15 +543,15 @@
 </thead>
         <tbody>
         {foreach from=$server_properties key=key item=item}
-            <tr>
+            <tr id="Server_Properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
-                <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                 <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
             </tr>
         {foreachelse}
@@ -334,15 +615,15 @@
         </thead>
 <tbody>
             {foreach from=$apache_properties key=key item=item}
-                <tr>
+                <tr id="Apache_properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
             {foreachelse}
@@ -370,15 +651,15 @@
         </thead>
 <tbody>
             {foreach from=$iis_properties key=key item=item}
-                <tr>
+                <tr id="IIS_properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
             {foreachelse}
@@ -405,15 +686,15 @@
         </thead>
 <tbody>
         {foreach from=$php_properties key=key item=item}
-<tr>
+<tr id="PHP_scripting_language_properties_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
         {foreachelse}
@@ -454,15 +735,15 @@
         <tbody>
 
         {foreach from=$security key=key item=item}
-            <tr>
+            <tr id="Tiki_Security_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness eq 'good'}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
         {foreachelse}
@@ -474,7 +755,36 @@
 </form>
 
 <h2 class="showhide_heading" id="Tiki_Security">{tr}Tiki Security{/tr}<a href="#Tiki_Security" class="heading-link" aria-label="{tr}Tiki Security{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
-{assign var=sensitive_data_box_title value="{tr}Sensitive Data Exposure{/tr}"}
+
+{* Enhanced Security Checks Table *}
+{if $tiki_security}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>{tr}Security Check{/tr}</th>
+            <th>{tr}Status{/tr}</th>
+            <th>{tr}Explanation{/tr}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach from=$tiki_security key=key item=item}
+            <tr id="Tiki_Security_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
+                <th class="text"><span class="only-on-mobile">{tr}Check:{/tr}</span>&nbsp;{$key}</th>
+                <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
+                    </span>
+                </td>
+                <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
+            </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+{/if}
+
+{$sensitive_data_box_title="{tr}Sensitive Data Exposure{/tr}"}
 {if $sensitive_data_detected_files}
 {remarksbox type='error' title="{$sensitive_data_box_title}" close='n'}
     <p>{tr}Tiki detected that there are temporary files in the db folder which may expose credentials or other sensitive information.{/tr}</p>
@@ -521,8 +831,8 @@
                 <tr>
                     <th class="text">Mime type: {$key}</th>
                     <td data-th="{tr}Tiki Fitness:{/tr} " lass="text">
-                        <span class="text-{$fmap[$item.fitness]['class']}">
-                            {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                        <span class="text-{$fmap[$item.fitness_status]['class']}">
+                            {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                         </span>
                     </td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message|escape}</td>
@@ -621,8 +931,8 @@
                 <tr>
                     <th class="text">Requirement: {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
@@ -644,8 +954,8 @@
                 <tr>
                     <th class="text">Requirement: {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
@@ -697,8 +1007,8 @@
                 <tr>
                     <th class="text">Requirement: {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness]['class']}">
-                        {icon name="{$fmap[$item.fitness]['icon']}"}&nbsp;{$item.fitness}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
                     <td data-th="{tr}Message:{/tr}" class="text">&nbsp;{$item.message}</td>
@@ -726,8 +1036,8 @@
                 <th class="text">Package name: {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.status]['class']}">
-                        {icon name="{$fmap[$item.status]['icon']}"} {$item.status}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
                 <td data-th="{tr}Message:{/tr}" class="text">&nbsp;
@@ -758,8 +1068,8 @@
                 <th class="text">Requirement: {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr} " data-th="{tr}Version : {/tr}" class="text">
-                    <span class="text-{$fmap[$item.status]['class']}">
-                        {icon name="{$fmap[$item.status]['icon']}"} {$item.status}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
                 <td data-th="{tr}Message:{/tr}" class="text">&nbsp;{$item.message}</td>
@@ -767,7 +1077,7 @@
         {/foreach}
    </tbody> </table>
 
-{*Additional table style*}
+{*Additional table style - Dashboard and tooltip styles moved to themes/base_files/feature_css/tiki-check.css *}
 <style type="text/css">
 {literal}
 table {
@@ -831,8 +1141,8 @@ td > div {
                         {icon name="{$fmap['bad']['icon']}"} bad
                     </span>
                 {else}
-                    <span class="text-{$fmap[$item.status]['class']}">
-                        {icon name="{$fmap[$item.status]['icon']}"} {$item.status}
+                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 {/if}
             </td>
@@ -843,9 +1153,13 @@ td > div {
     </table>
 {jq}
 var ws, ws_status_update = function(req, status) {
-    $('#js-' + req + ' .js-good, #js-' + req + ' .js-bad').addClass('d-none');
-    $('#js-' + req + ' .js-' + status).removeClass('d-none');
-    $('#js-' + req + ' td').last().text($('#js-' + req + ' td').last().data('message-' + status));
+    document.querySelectorAll('#js-' + req + ' .js-good, #js-' + req + ' .js-bad').forEach(function(el) {
+        el.classList.remove('d-none');
+    });
+    document.querySelectorAll('#js-' + req + ' .js-' + status).forEach(function(el) {
+        el.classList.remove('d-none');
+    });
+    document.querySelectorAll('#js-' + req + ' td').last().textContent = document.querySelectorAll('#js-' + req + ' td').last().getAttribute('data-message-' + status);
 }
 ws_status_update('connectivity', 'bad');
 ws_status_update('message_exchange', 'bad');

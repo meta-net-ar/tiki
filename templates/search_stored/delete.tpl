@@ -8,7 +8,7 @@
     {if $success}
         {remarksbox type=feedback title="{tr}Operation Completed{/tr}"}
             <p>{tr _0=$label}%0 was removed{/tr}</p>
-            <a class="btn btn-success" href="{service controller=search_stored action=list}">{tr}Return to List of Saved Searches{/tr}</a>
+            <a class="btn btn-success" href="{service controller=search_stored action=list}" role="button">{tr}Return to List of Saved Searches{/tr}</a>
         {/remarksbox}
     {else}
         <form method="post" action="{service controller=search_stored action=delete}">

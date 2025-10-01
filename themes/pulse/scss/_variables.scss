@@ -1,13 +1,16 @@
-// Pulse 5.3.3 -- This file contains variables to override or supplement those in node_modules/bootswatch/dist/morph/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Pulse 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/pulse/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/pulse/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-//$primary:       $purple;  // default
+$primary:       $purple;  // default
 $secondary:     #8563BF; // #a991d4;  // default
 $success:       #0D873E; // $green;  // default
 $info:          #007CAD; // $cyan;  // default
@@ -16,13 +19,9 @@ $danger:        #EC0404; //$red;  // default
 //$light:         $gray-200;  // default
 //$dark:          $gray-900;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
-
 // Options
-$prefix: bs-;
-$enable-rounded: false;  // default
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-secondary-color:      rgba($body-color, .75);  // default
@@ -35,18 +34,38 @@ $body-emphasis-color:       $black;  // default
 
 // Components
 $component-active-color:      $white;  // default
-$component-active-bg:         $primary;  // default
+$component-active-bg:         $secondary; // $primary;  // default
 $border-color: #c9c9c9; // darkened for visibility in Tiki
 
 // Typography
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$blockquote-footer-color: #6D767E;
 
 // Tables
 // Forms
 $input-border-color:                    var(--#{$prefix}border-color);  // default
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+// Navs
+$nav-link-color:                    var(--#{$prefix}link-color);  // default
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
+
+// Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);  // default
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);  // default
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);  // default
+$navbar-light-icon-color:           rgba($body-color, .75);  // default
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15);  // default
+$navbar-light-brand-color:          $navbar-light-active-color;  // default
+$navbar-light-brand-hover-color:    $navbar-light-active-color;  // default
+
+$navbar-dark-color: #946DD0;
 
 // Dropdowns
-
 $dropdown-color:                    var(--#{$prefix}body-color);  // default
 $dropdown-bg:                       var(--#{$prefix}body-bg);  // default
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
@@ -74,21 +93,7 @@ $dropdown-dark-link-active-color:   $dropdown-link-active-color;  // default
 $dropdown-dark-link-active-bg:      $dropdown-link-active-bg;  // default
 $dropdown-dark-link-disabled-color: $gray-500;  // default
 $dropdown-dark-header-color:        $gray-500;  // default
-
-// Navs
-$nav-link-color:                    var(--#{$prefix}link-color);  // default
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
-
-// Navbar
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);  // default
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);  // default
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);  // default
-$navbar-light-icon-color:           rgba($body-color, .75);  // default
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
-$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15);  // default
-$navbar-light-brand-color:          $navbar-light-active-color;  // default
-$navbar-light-brand-hover-color:    $navbar-light-active-color;  // default
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Progress bars
 // List group

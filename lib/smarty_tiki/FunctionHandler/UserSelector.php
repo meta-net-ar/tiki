@@ -54,13 +54,15 @@ class UserSelector extends Base
             'style' => '',
             'editable' => $tiki_p_admin,
             'user_selector_threshold' => $prefs['user_selector_threshold'],
-            'allowNone' => 'n',
+            'allowNone' => 'y',
             'noneLabel' => 'None',
             'realnames' => 'y',
             'class' => 'form-control',
+            'lazyload' => 'false'
         ];
 
         $params = array_merge($defaults, $params);
+        $lazyload = filter_var($params['lazyload'], FILTER_VALIDATE_BOOLEAN);
         if (isset($params['size'])) {
             $sz = ' size="' . $params['size'] . '"';
         } else {
@@ -106,104 +108,114 @@ class UserSelector extends Base
         $users = [];
         $ret = '';
         if (! empty($groupNames)) {
-            $ucant = $userlib->count_users_consolidated($groupNames);
+            $userCount = $userlib->count_users_consolidated($groupNames);
         } else {
-            $ucant = $userlib->count_users('');
+            $userCount = $userlib->count_users('');
         }
 
-        if ($prefs['feature_jquery_autocomplete'] == 'y' && ($ucant > $prefs['user_selector_threshold'] or $ucant > $params['user_selector_threshold'])) {
-            $ret .= '<input id="' . $params['id'] . '" type="text" name="' . $params['name'] . '" value="' . htmlspecialchars($params['user']) . '"' . $sz . $ed . ' style="' . $params['style'] . '"' . $class . ' />';
-            if (($params['contact'] == 'true')) {
-                $mode = ('usersandcontacts');
-            } elseif ($prefs['user_show_realnames'] === 'y' && $params['realnames'] === 'y') {
-                $mode = ('userrealname');
-            } else {
-                $mode = ('username');
-            }
-            $headerlib->add_jq_onready('$("#' . $params['id'] . '").tiki("autocomplete", "' . $mode . '", {mustMatch: ' . $params['mustmatch'] . ', multiple: ' . $params['multiple'] . ' });');
-        } else {
-            // get the user list
-            if ($params['group'] !== 'all') {
-                $groupNames[] = $params['group'];
-            }
+        if ($lazyload || ($prefs['feature_elementplus'] == 'y' && $prefs['elementplus_select'] == 'y' && ($userCount > $prefs['user_selector_threshold'] || $userCount > $params['user_selector_threshold']))) {
+            $urlParams = [
+                'listonly' => $params['realnames'] === 'y' ? 'userrealnames' : 'users',
+            ];
 
-            // NOTE: if groupIds are present, the list of users is limited to those groups regardless of group == 'all'
             if (! empty($groupNames)) {
-                $groupNames = array_unique($groupNames);
-                $usrs = [];
-                foreach ($groupNames as $groupName) {
-                    $group_users = $userlib->get_group_users($groupName);
-                    $usrs = array_merge($usrs, $group_users);
-                }
-                $usrs = array_unique($usrs);
-                foreach ($usrs as $usr) {
-                    $users["$usr"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr) : $usr;
-                }
+                $urlParams['groups'] = implode(',', $groupNames);
             }
 
-            if ($params['group'] == 'all' && empty($params['groupIds'])) {
-                $usrs = $tikilib->list_users(0, -1, 'login_asc');
-                foreach ($usrs['data'] as $usr) {
-                    $users["{$usr['login']}"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr['login']) : $usr['login'];
-                }
-            }
+            TikiLib::setExternalContext(true);
+            $remoteUrl = TikiLib::lib('service')->getUrl($urlParams);
 
-            if ($params['realnames'] === 'y') {
-                $dupes = [];
-                foreach (array_count_values($users) as $usr => $c) {
-                    if ($c > 1) {
-                        $dupes[] = $usr;
-                    }
-                }
-                foreach ($users as $usr => &$uname) {
-                    if (in_array($uname, $dupes)) {
-                        if ($prefs['login_is_email'] === 'y' && $prefs['login_is_email_obscure'] === 'y') {
-                            $added = ' (' . substr($usr, strpos($usr, '@')) . ')';
-                        } else {
-                            $added = " ($usr)";
-                        }
-                        $uname .= $added;
-                    }
-                }
+            $options = "";
+            foreach ($params['select'] as $selected) {
+                $options .= "<option value=\"$selected\" selected>$selected</option>";
             }
+            return <<<HTML
+                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}" $mt>{$options}</select>
+HTML;
+        }
 
-            asort($users, SORT_NATURAL | SORT_FLAG_CASE);
+        // get the user list
+        if ($params['group'] !== 'all') {
+            $groupNames[] = $params['group'];
+        }
 
-            if (! empty($params['inputtype']) && $params['inputtype'] === 't') {
-                return smarty_function_jstransfer_list([
-                    'fieldName' => $params['name'] . '[]',
-                    'data' => $users,
-                    'defaultSelected' => $params['select'],
-                    'sourceListTitle' => $params['sourceListTitle'],
-                    'targetListTitle' => $params['targetListTitle'],
-                    'filterable' => $params['filterable'],
-                    'filterPlaceholder' => $params['filterPlaceholder'],
-                    'ordering' => $params['ordering'],
-                    'cardinalityParam' => $params['validationParam'],
-                    'validationMessage' => $params['validationMessage']
-                ], $template);
+        // NOTE: if groupIds are present, the list of users is limited to those groups regardless of group == 'all'
+        if (! empty($groupNames)) {
+            $groupNames = array_unique($groupNames);
+            $usrs = [];
+            foreach ($groupNames as $groupName) {
+                $group_users = $userlib->get_group_users($groupName);
+                $usrs = array_merge($usrs, $group_users);
             }
-
-            $ret .= '<select name="' . $params['name'] . ($params['multiple'] === 'true' ? '[]' : '') . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
-            if ($params['allowNone'] === 'y') {
-                $ret .= '<option value=""' . (empty($params['user']) ? ' selected="selected"' : '') . ' >' . tra($params['noneLabel']) . '</option>';
-            }
-            foreach ($users as $usr => $usersname) {
-                $selected = isset($params['select']) && ($params['select'] === $usr || (is_array($params['select']) && in_array($usr, $params['select'])));
-                if ($params['editable'] == 'y' || $usr == $params['user'] || $selected) {
-                    if (isset($params['select'])) {
-                        $ret .= '<option value="' . htmlspecialchars($usr) . '"' . ($selected ? ' selected="selected"' : '') . ' >' . $usersname . '</option>';
-                    } else {
-                        $ret .= '<option value="' . htmlspecialchars($usr) . '"' . ($usr == $params['user'] ? ' selected="selected"' : '') . ' >' . $usersname . '</option>';
-                    }
-                }
-            }
-            $ret .= '</select>';
-
-            if ($params['multiple'] === 'true' && $params['allowNone'] === 'y') {
-                $ret .= '<input type="hidden" name="' . $params['name'] . '[]" value="">';
+            $usrs = array_unique($usrs);
+            foreach ($usrs as $usr) {
+                $users["$usr"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr) : $usr;
             }
         }
+
+        if ($params['group'] == 'all' && empty($params['groupIds'])) {
+            $usrs = $tikilib->list_users(0, -1, 'login_asc');
+            foreach ($usrs['data'] as $usr) {
+                $users["{$usr['login']}"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr['login']) : $usr['login'];
+            }
+        }
+
+        if ($params['realnames'] === 'y') {
+            $dupes = [];
+            foreach (array_count_values($users) as $usr => $c) {
+                if ($c > 1) {
+                    $dupes[] = $usr;
+                }
+            }
+            foreach ($users as $usr => &$uname) {
+                if (in_array($uname, $dupes)) {
+                    if ($prefs['login_is_email'] === 'y' && $prefs['login_is_email_obscure'] === 'y') {
+                        $added = ' (' . substr($usr, strpos($usr, '@')) . ')';
+                    } else {
+                        $added = " ($usr)";
+                    }
+                    $uname .= $added;
+                }
+            }
+        }
+
+        asort($users, SORT_NATURAL | SORT_FLAG_CASE);
+
+        if (! empty($params['inputtype']) && $params['inputtype'] === 't') {
+            return smarty_function_jstransfer_list([
+                'fieldName' => $params['name'],
+                'data' => $users,
+                'defaultSelected' => $params['select'],
+                'sourceListTitle' => $params['sourceListTitle'],
+                'targetListTitle' => $params['targetListTitle'],
+                'filterable' => $params['filterable'],
+                'filterPlaceholder' => $params['filterPlaceholder'],
+                'ordering' => $params['ordering'],
+                'cardinalityParam' => $params['validationParam'],
+                'validationMessage' => $params['validationMessage']
+            ], $template);
+        }
+
+        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
+        if ($params['allowNone'] === 'y') {
+            $ret .= '<option value=""' . (empty($params['user']) ? ' selected="selected"' : '') . ' >' . tra($params['noneLabel']) . '</option>';
+        }
+        foreach ($users as $usr => $usersname) {
+            $selected = isset($params['select']) && ($params['select'] === $usr || (is_array($params['select']) && in_array($usr, $params['select'])));
+            if ($params['editable'] == 'y' || $usr == $params['user'] || $selected) {
+                if (isset($params['select'])) {
+                    $ret .= '<option value="' . htmlspecialchars($usr) . '"' . ($selected ? ' selected="selected"' : '') . ' >' . $usersname . '</option>';
+                } else {
+                    $ret .= '<option value="' . htmlspecialchars($usr) . '"' . ($usr == $params['user'] ? ' selected="selected"' : '') . ' >' . $usersname . '</option>';
+                }
+            }
+        }
+        $ret .= '</select>';
+
+        if ($params['multiple'] === 'true' && $params['allowNone'] === 'y') {
+            $ret .= '<input type="hidden" name="' . $params['name'] . '" value="">';
+        }
+
         return $ret;
     }
 }

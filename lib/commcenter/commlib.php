@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -119,7 +119,6 @@ class CommLib extends TikiLib
             $info["heading"],
             $info["body"],
             $info["publishDate"],
-            $info["expireDate"],
             $info["author"],
             0,
             $info["image_x"],
@@ -145,9 +144,9 @@ class CommLib extends TikiLib
         }
 
         $query = "select * from `tiki_received_articles` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_received_articles` $mid";
+        $query_count = "select count(*) from `tiki_received_articles` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -156,7 +155,7 @@ class CommLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -185,7 +184,7 @@ class CommLib extends TikiLib
         $result = $this->query($query, [(int)$receivedPageId]);
 
         if (! $result->numRows()) {
-            return false;
+            throw new Exception(tr('No received page found for the given ID: %0', $receivedPageId));
         }
 
         $res = $result->fetchRow();
@@ -199,7 +198,7 @@ class CommLib extends TikiLib
         $result = $this->query($query, [(int)$receivedArticleId]);
 
         if (! $result->numRows()) {
-            return false;
+            throw new Exception(tr('No received article found for the given ID: %0', $receivedArticleId));
         }
 
         $res = $result->fetchRow();
@@ -214,7 +213,6 @@ class CommLib extends TikiLib
         $image_x,
         $image_y,
         $publishDate,
-        $expireDate,
         $heading,
         $body,
         $type,
@@ -225,7 +223,7 @@ class CommLib extends TikiLib
         $hash = md5($title . $heading . $body);
 
         $query = "update `tiki_received_articles` set `title`=?, `authorName`=?, `heading`=?, `body`=?, `size`=?, `hash`=?, `useImage`=?, `image_x`=?, ";
-        $query .= " `image_y`=?, `publishDate`=?, `expireDate`=?, `type`=?, `rating`=?  where `receivedArticleId`=?";
+        $query .= " `image_y`=?, `publishDate`=?, `type`=?, `rating`=?  where `receivedArticleId`=?";
 
         $result = $this->query(
             $query,
@@ -240,7 +238,6 @@ class CommLib extends TikiLib
                 (int)$image_x,
                 (int)$image_y,
                 (int)$publishDate,
-                $expireDate,
                 $type,
                 (int)$rating,
                 (int)$receivedArticleId
@@ -277,7 +274,6 @@ class CommLib extends TikiLib
         $image_y,
         $image_data,
         $publishDate,
-        $expireDate,
         $created,
         $heading,
         $body,
@@ -293,9 +289,9 @@ class CommLib extends TikiLib
         $query = "insert into `tiki_received_articles`(`receivedDate`,`receivedFromSite`," .
                             " `receivedFromUser`,`title`,`authorName`,`size`, `useImage`,`image_name`," .
                             " `image_type`,`image_size`,`image_x`,`image_y`,`image_data`,`publishDate`," .
-                            " `expireDate`,`created`,`heading`,`body`,`hash`,`author`,`type`,`rating`) "
+                            "`created`,`heading`,`body`,`hash`,`author`,`type`,`rating`) "
                             ;
-        $query .= " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        $query .= " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         $result = $this->query(
             $query,
@@ -314,7 +310,6 @@ class CommLib extends TikiLib
                 $image_y,
                 $image_data,
                 (int)$publishDate,
-                (int)$expireDate,
                 (int)$created,
                 $heading,
                 $body,

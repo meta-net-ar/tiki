@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Tiki\Process\Process;
+use Tiki\HeadlessBrowser\Exception\HeadlessException;
+use Tiki\HeadlessBrowser\HeadlessBrowserFactory;
 
 function wikiplugin_chartjs_info()
 {
@@ -111,14 +111,6 @@ function wikiplugin_chartjs($data, $params)
         $params['id'] = "tikiChart$instance";
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_chartjs_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if (empty($params['data_highlights'])) {
         $params['data_highlights'] = $params['data_colors'];
     }
@@ -190,8 +182,22 @@ function wikiplugin_chartjs($data, $params)
     }
 
     // PDF export related logic
-    $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
-    $html_content .= <<<HTML
+    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
+        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
+        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
+        // the PDF export of the chart without using JS modules.
+        $html_content = <<<HTML
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
+<div>
+    $canvas
+</div>
+<script>
+    $script
+</script>
+HTML;
+    } else {
+        $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
+        $html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -202,56 +208,41 @@ function wikiplugin_chartjs($data, $params)
     $script
 </script>
 HTML;
-
+    }
     $scriptHash = md5($script);
     $cacheKey = 'chart_';
     $cacheLib = TikiLib::lib('cache');
+    $base64 = '';
+    $timeout = $params['timeout'] ?? null;
 
-    if (! $cacheLib->isCached($scriptHash, $cacheKey)) {
-        $htmlFile = writeTempFile($html_content, '', true, 'wikiplugin_chart_', '.html');
-        $casperBin = implode(DIRECTORY_SEPARATOR, [TIKI_PATH, 'bin', 'casperjs']);
-        if (! file_exists($casperBin)) {
-            return tr('Tiki needs the jerome-breton/casperjs-installer to convert charts to PNG. If you do not have permission to install this package, ask the site administrator.');
-        }
-
-        $casperjsScript = <<<JS
-var casper = require('casper').create();
-
-casper.start('{$htmlFile}', function() {
-    this.echo(this.captureBase64('png', 'div'));
-});
-
-casper.run();
-JS;
-
-        $casperFile = writeTempFile($casperjsScript, '', true, 'wikiplugin_chart_', '.js');
-
-        $process = new Process([$casperBin, $casperFile, '--ignore-ssl-errors=true']);
-        if (! empty($params['timeout'])) {
-            $process->setTimeout($params['timeout']);
-            $process->setIdleTimeout($params['timeout']);
-        }
-        try {
-            $process->run(null, ['OPENSSL_CONF' => '/etc/ssl']);
-        } catch (ProcessTimedOutException $e) {
-            $logsLib = TikiLib::lib('logs');
-            $logsLib->add_log('Casperjs', $e->getMessage());
-
-            \Feedback::error(tr('Failed to generate chart image using Casperjs. Please check Tiki Action Log for more information.'));
-        } finally {
-            unlink($htmlFile);
-            unlink($casperFile);
-        }
-
-        if ($process->isSuccessful()) {
-            $base64 = $process->getOutput();
+    try {
+        if (! $cacheLib->isCached($scriptHash, $cacheKey)) {
+            $headlessBrowser = HeadlessBrowserFactory::getHeadlessBrowser();
+            $htmlFile = writeTempFile($html_content, '', true, 'wikiplugin_chart_', '.html');
+            $htmlFileUrl = rtrim($base_url, '/') . '/temp/' . basename($htmlFile);
+            $hash = str_replace('wikiplugin_chart_', '', str_replace('.html', '', basename($htmlFile)));
+            $outputPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'wikiplugin_chart_' . $hash . '.png';
+            $htmlFile = realpath($htmlFile);
+            $base64 = $headlessBrowser->getUrlAsImage("file:///$htmlFile", $outputPath, 'body', $timeout);
+            $cacheLib->cacheItem($scriptHash, $base64, $cacheKey);
         } else {
-            return false;
+            $base64 = $cacheLib->getCached($scriptHash, $cacheKey);
+        }
+    } catch (HeadlessException $e) {
+        $logsLib = TikiLib::lib('logs');
+        $logsLib->add_log('HeadlessBrowser', $e->getMessage());
+        Feedback::error($e->getMessage());
+        return; // Early return to show an error message
+    } finally {
+        // This block will always execute even if an exception is thrown or early return
+        // Clean up temporary files
+        if (! empty($htmlFile) && file_exists($htmlFile)) {
+            unlink($htmlFile);
         }
 
-        $cacheLib->cacheItem($scriptHash, $base64, $cacheKey);
-    } else {
-        $base64 = $cacheLib->getCached($scriptHash, $cacheKey);
+        if (! empty($outputPath) && file_exists($outputPath)) {
+            unlink($outputPath);
+        }
     }
 
     $canvas = <<<HTML

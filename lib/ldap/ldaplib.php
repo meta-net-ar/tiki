@@ -17,13 +17,8 @@ class LdapLib extends TikiLib
      */
     public function get_field($dsn, $filter, $field, $all = false)
     {
-        // Force autoloading
-        if (! class_exists('ADOConnection')) {
-            return null;
-        }
-
         // Try to connect
-        $ldaplink = ADONewConnection($dsn);
+        $ldaplink = new PDO($dsn);
         $return = null;
 
         if (! $ldaplink) {
@@ -31,10 +26,13 @@ class LdapLib extends TikiLib
             return $return;
         }
 
-        $ldaplink->SetFetchMode(ADODB_FETCH_ASSOC);
-        $rs = $ldaplink->Execute($filter);
+        $ldaplink->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $stmt = $ldaplink->prepare($filter);
+        $stmt->execute();
+        $rs = $stmt->fetchAll();
+
         if ($rs) {
-            while ($arr = $rs->FetchRow()) {
+            foreach ($rs as $arr) {
                 if (isset($arr[$field])) {
                     // Retrieve field
                     $return[] = $arr[$field];
@@ -46,7 +44,7 @@ class LdapLib extends TikiLib
         }
 
         // Disconnect
-        $ldaplink->Close();
+        $ldaplink = null;
 
         return ($all ? $return : array_shift($return)) ;
     }

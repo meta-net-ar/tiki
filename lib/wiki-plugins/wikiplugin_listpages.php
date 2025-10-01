@@ -318,21 +318,8 @@ function wikiplugin_listpages($data, $params)
         return '';
     }
     $default = [
-        'offset' => 0,
-        'max' => -1,
-        'sort' => 'pageName_asc',
-        'find' => '',
-        'start' => '',
-        'end' => '',
         'length' => -1,
-        'translations' => null,
-        'translationOrphan' => null,
-        'showCheckbox' => 'y',
-        'showNumberOfPages' => 'n',
-        'for_list_pages' => 'y',
         'pagination' => 'n',
-        'exclude_pages' => '',
-        'noheader' => 0,
     ];
     $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
@@ -344,12 +331,26 @@ function wikiplugin_listpages($data, $params)
             $initial = '';
         }
     }
+
+    $ts = Table_Check::setVars('listpages', true);
+    $smarty->assign('ts', $ts);
+    if ($ts['ajax']) {
+        if (! empty($_REQUEST['categPath_ts']) || ! empty($_REQUEST['categ_ts'])) {
+            $req = $_REQUEST['categPath_ts'] ?? $_REQUEST['categ_ts'];
+            $pos = strrpos($req, '::');
+            $catname = ($pos !== false) ? substr($req, $pos + 2) : $req;
+
+            $categlib = TikiLib::lib('categ');
+            $categId = $categlib->get_category_id($catname);
+        }
+    }
+
     if (! empty($categId)) {
-        if (strstr($categId, ':')) {
+        if (str_contains($categId, ':')) {
             $filter['categId'] = explode(':', $categId);
-        } elseif (strstr($categId, '+')) {
+        } elseif (str_contains($categId, '+')) {
             $filter['andCategId'] = explode('+', $categId);
-        } elseif (strstr($categId, '-')) {
+        } elseif (str_contains($categId, '-')) {
             $categories = explode('-', $categId);
             $filter['categId'] = array_shift($categories);
             $filter['notCategId'] = $categories;
@@ -399,16 +400,16 @@ function wikiplugin_listpages($data, $params)
     $only_name = ( isset($showNameOnly) && $showNameOnly == 'y' );
     $only_orphan_pages = ( isset($only_orphan_pages) && $only_orphan_pages == 'y' );
     $for_list_pages = ( isset($for_list_pages) && $for_list_pages == 'y' );
-    $only_cant = false;
+    $only_count = false;
 
-    $listpages = $tikilib->list_pages($offset, $max, $sort, $find, $initial, $exact_match, $only_name, $for_list_pages, $only_orphan_pages, $filter, $only_cant, '', $exclude_pages);
+    $listpages = $tikilib->list_pages($offset, $max, $sort, $find, $initial, $exact_match, $only_name, $for_list_pages, $only_orphan_pages, $filter, $only_count, '', $exclude_pages);
     if (! empty($includetag) || ! empty($excludetag)) {
-        if (preg_match('/;/', $includetag)) {
+        if (str_contains($includetag, ';')) {
             $aIncludetag = explode(';', $includetag);
         } else {
             $aIncludetag[] = $includetag;
         }
-        if (preg_match('/;/', $excludetag)) {
+        if (str_contains($excludetag, ';')) {
             $aExcludetag = explode(';', $excludetag);
         } else {
             $aExcludetag[] = $excludetag;
@@ -419,7 +420,7 @@ function wikiplugin_listpages($data, $params)
         foreach ($listpages['data'] as $page) {
             $bToRemove = true;
             $aListTags = $freetaglib->get_tags_on_object($page['pageName'], 'wiki page');
-            if (! empty($aListTags['cant'])) {
+            if (! empty($aListTags['count'])) {
                 foreach ($aListTags['data'] as $aListTag) {
                     if (in_array($aListTag['tag'], $aExcludetag) && ! empty($aExcludetag[0])) {
                         unset($listpages['data'][$i]);
@@ -460,7 +461,7 @@ function wikiplugin_listpages($data, $params)
     }
 
     // Count how many pages are left after tag filtering
-    $listpages['cant'] = count($listpages['data']);
+    $listpages['count'] = count($listpages['data']);
 
     $smarty->assign_by_ref('checkboxes_on', $showCheckbox);
     $smarty->assign_by_ref('showNumberOfPages', $showNumberOfPages);
@@ -470,7 +471,7 @@ function wikiplugin_listpages($data, $params)
 
     if (! empty($start) || ! empty($end) || $length > 0) {
         foreach ($listpages['data'] as $i => $page) {
-            $listpages['data'][$i]['snippet'] = $tikilib->get_snippet($page['data'], $page['outputType'], ! empty($page['is_html']), '', $length, $start, $end);
+            $listpages['data'][$i]['snippet'] = $tikilib->get_snippet($page['data'], $page['outputType'], ['is_html' => ! empty($page['is_html'])], '', $length, $start, $end);
         }
     }
     if (isset($_REQUEST["page"])) {
@@ -478,11 +479,11 @@ function wikiplugin_listpages($data, $params)
     }
 
     // Count how many pages are left after sorting
-    $smarty->assign("cant", $listpages['cant']);
+    $smarty->assign("count", $listpages['count']);
     // The following two are for tiki-listpages_content.tpl (pagination)
     $smarty->assign("pluginlistpages", 'y');
     $smarty->assign("pagination", $pagination);
-    $smarty->assign("noheader", isset($noheader) ? $noheader : 0);
+    $smarty->assign("noheader", $noheader ?? 0);
     if ($pagination == 'y') {
         // Show only x=$MaxRecords number of page entries on this page.
         for ($x = $offset_pagination; $x < ($offset_pagination + $GLOBALS['maxRecords']) && $x < count($listpages['data']); $x++) {
@@ -497,9 +498,7 @@ function wikiplugin_listpages($data, $params)
 
     // Display an error message if the $showNameAndDescriptionOnly and $showNameOnly options are all entered at the same time
     if (isset($showNameAndDescriptionOnly) && $showNameAndDescriptionOnly == 'y' && isset($showNameOnly) && $showNameOnly == 'y') {
-        $smarty->assign('msg', tra("You cannot specify the showNameOnly and showNameAndDescriptionOnly options simultaneously, You must choose one of them."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You cannot specify the showNameOnly and showNameAndDescriptionOnly options simultaneously, You must choose one of them."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (isset($showNameOnly) && $showNameOnly == 'y') {

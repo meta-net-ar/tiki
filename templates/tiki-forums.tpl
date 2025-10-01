@@ -67,7 +67,7 @@
     {/if}
 {/if}
 <div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
-    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$cant|escape}">
+    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$count|escape}">
         {block name=forumheader}
         <thead>
             <tr>
@@ -104,11 +104,11 @@
         </thead>
         {/block}
         <tbody>
-            {assign var=section_old value=""}
+            {$section_old=""}
             {section name=user loop=$channels}
-                {assign var=section value=$channels[user].section}
+                {$section=$channels[user].section}
                 {if $section ne $section_old}
-                    {assign var=section_old value=$section}
+                    {$section_old=$section}
                     <td class="third info" colspan="{$numbercol}">{tr}{$section|escape}{/tr}</td>
                 {/if}
                 {block name=forumrow}
@@ -194,5 +194,5 @@
     </table>
 </div>
 {if !$ts.enabled}
-    {pagination_links cant=$cant step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 {/if}

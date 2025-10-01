@@ -166,7 +166,6 @@ This is the documentation for subdirectories, with hyperlinks to their respectiv
     * <= lib/vue-mf/
     * <= lib/jquery_tiki/ (lib/jquery_tiki/elfinder can move to to lib/elfinder, it has php files)
     * <= lib/tiki-js.js
-    * <= lib/ckeditor_tiki
   * **lang/**
     * ^= [lang/](lang/README.md)
   * **lib/**
@@ -207,7 +206,7 @@ Some generated files will always be in git (ex:  package manager lock files like
   * Generated from vendor_bundled/composer.json using ``composer -d vendor_bundled update``
 * **package.lock.json**
   * Generated from */package.json using ``npm install``
-* **doc/devtools/codesniffer/standards/TikiIgnore/generate_ignore_list.php**
+* **doc/devtools/codesniffer/standards/TikiIgnore/ignore_list.json**
   * Generated using `cd doc/devtools/codesniffer/standards/TikiIgnore/; php generate_ignore_list.php`.
 
 It is useful to list theme here, so developers that hit merge conflicts can regenerate them instead of spending hours resolving conflicts manually.

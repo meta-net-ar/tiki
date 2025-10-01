@@ -28,7 +28,7 @@ use TikiLib;
 /**
  * @param array $params
  * @param string $content
- * @param Smarty_Tiki $smarty
+ * @param \Tiki\Smarty\SmartyTiki $smarty
  * @param boolean $repeat
  * @return string
  * @throws Exception
@@ -46,9 +46,9 @@ class TextArea extends Base
         }
 
         // some defaults
-        $params['_toolbars'] = isset($params['_toolbars']) ? $params['_toolbars'] : 'y';
-        $params['_simple'] = isset($params['_simple']) ? $params['_simple'] : 'n';
-        $params['_preview'] = isset($params['_preview']) ? $params['_preview'] : 'n';
+        $params['_toolbars'] = $params['_toolbars'] ?? 'y';
+        $params['_simple'] = $params['_simple'] ?? 'n';
+        $params['_preview'] = $params['_preview'] ?? 'n';
 
         if (! isset($params['_wysiwyg'])) {
             if ($params['_simple'] === 'n') {
@@ -66,14 +66,16 @@ class TextArea extends Base
             }
         }
 
-        $params['_is_html'] = isset($params['_is_html']) ? $params['_is_html'] : $is_html;
+        $params['_is_html'] = $params['_is_html'] ?? $is_html;
 
-        $params['name'] = isset($params['name']) ? $params['name'] : 'edit';
-        $params['id'] = isset($params['id']) ? $params['id'] : 'editwiki';
-        $params['area_id'] = isset($params['area_id']) ? $params['area_id'] : $params['id'];    // legacy param for toolbars?
-        $params['class'] = isset($params['class']) ? $params['class'] : 'wikiedit form-control';
-        $params['comments'] = isset($params['comments']) ? $params['comments'] : 'n';
-        $params['autosave'] = isset($params['autosave']) ? $params['autosave'] : 'y';
+        $params['name'] = $params['name'] ?? 'edit';
+        $params['id'] = $params['id'] ?? 'editwiki';
+        $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
+        $params['class'] = $params['class'] ?? 'wikiedit form-control';
+        $params['comments'] = $params['comments'] ?? 'n';
+        $params['autosave'] = $params['autosave'] ?? 'y';
+
+        $smarty->assign('textarea_id', $params['id']);
 
         if (empty($params['syntax'])) { // work out if we have Tiki or Markdown syntax
             $wikiParserParsable = new \WikiParser_Parsable($content);
@@ -83,21 +85,21 @@ class TextArea extends Base
             } else {
                 $params['syntax'] = 'tiki';
             }// to pick the editor
-            if (isset($syntaxPluginResult['editor'])) {
+            if (isset($syntaxPluginResult['editor']) && empty($content) && empty($params['_wysiwyg'])) {
                 $params['_wysiwyg'] = $syntaxPluginResult['editor'] === 'wysiwyg' ? 'y' : 'n';
             }
         }
 
         //codemirror integration
         if ($prefs['feature_syntax_highlighter'] === 'y') {
-            $params['data-codemirror'] = isset($params['codemirror']) ? $params['codemirror'] : '';
+            $params['data-codemirror'] = $params['codemirror'] ?? '';
             $params['data-syntax'] = $params['syntax'];
         }
         //keep params html5 friendly
         unset($params['codemirror']);
 
         // mainly for modules admin - preview is for the module, not the custom module so don;t need to confirmExit
-        $params['_previewConfirmExit'] = isset($params['_previewConfirmExit']) ? $params['_previewConfirmExit'] : 'y';
+        $params['_previewConfirmExit'] = $params['_previewConfirmExit'] ?? 'y';
 
         if (empty($params['section'])) {
             global $section;
@@ -130,7 +132,7 @@ class TextArea extends Base
             ) . "\n";
                 $html = str_replace('class="alert alert-warning alert-dismissible"', 'class="alert alert-warning alert-dismissible" style="display:none;"', $html); // quickfix to stop this box appearing before doc.ready
         }
-        $params['switcheditor'] = isset($params['switcheditor']) ? $params['switcheditor'] : 'y';
+        $params['switcheditor'] = $params['switcheditor'] ?? 'y';
         $smarty->assign('comments', $params['comments']);   // 3 probably removable assigns
         $smarty->assign('switcheditor', $params['switcheditor']);
         $smarty->assign('toolbar_section', $params['section']);
@@ -181,35 +183,15 @@ class TextArea extends Base
                 $html .= '<input type="hidden" name="' . $params['name'] . '" id="' . $as_id . '" value="' . htmlspecialchars($content) . '" />';
                 $html .= '<div id="' . $as_id . '_editor"></div>';
             } else {
-                // legacy tiki/ckeditor wysiwyg
+                $params['_is_html'] = true;
+                $html .= <<<HTML
+                <textarea class="wikiedit d-none" name="{$params['name']}" id="{$as_id}">
+                    {$content}
+                </textarea>
+                <input type="hidden" name="wysiwyg" value="y" />
+                HTML;
 
-                $ckoptions = $wysiwyglib->setUpEditor($params['_is_html'], $as_id, $params, $auto_save_referrer);
-
-                $html .= '<input type="hidden" name="wysiwyg" value="y" />';
-                $html .= '<textarea class="wikiedit" name="' . $params['name'] . '" id="' . $as_id . '" style="visibility:hidden;'; // missing closing quotes, closed in condition
-
-                $smarty->assign('textarea_id', $params['id']);
-
-                if (empty($params['cols'])) {
-                    $html .= 'width:100%;' . (empty($params['rows']) ? 'height:500px;' : '') . '"';
-                } else {
-                    $html .= '" cols="' . $params['cols'] . '"';
-                }
-                if (! empty($params['rows'])) {
-                    $html .= ' rows="' . $params['rows'] . '"';
-                }
-                $html .= '>' . htmlspecialchars($content) . '</textarea>';
-
-                $headerlib->add_jq_onready(
-                    '
-    CKEDITOR.replace( "' . $as_id . '",' . $ckoptions . ');
-    CKEDITOR.on("instanceReady", function(event) {
-    if (typeof ajaxLoadingHide == "function") { ajaxLoadingHide(); }
-    this.instances.' . $as_id . '.resetDirty();
-    });
-        ',
-                    20
-                );  // after dialog tools init (10)
+                $wysiwyglib->setUpEditor($as_id, $params);
             }
         } else {
             // end of if ( $params['_wysiwyg'] == 'y' && $params['_simple'] == 'n')
@@ -225,15 +207,12 @@ class TextArea extends Base
                     $textarea_attributes .= ' ' . $k . '="' . $v . '"';
                 }
             }
-            if (empty($textarea_id)) {
-                $smarty->assign('textarea_id', $params['id']);
-            }
             $smarty->assign('textarea__toolbars', $params['_toolbars']);
             if ($textarea_attributes != '') {
                 $smarty->assign('textarea_attributes', $textarea_attributes);
             }
             $smarty->assign('textarea_syntax', $params['syntax']);
-            $smarty->assign('objectId', isset($params['objectId']) ? $params['objectId'] : null);
+            $smarty->assign('objectId', $params['objectId'] ?? null);
             $smarty->assign_by_ref('textareadata', $content);
             $html .= $smarty->fetch('wiki_edit.tpl');
 
@@ -310,15 +289,6 @@ class TextArea extends Base
             $js_editconfirm .= "
     \$(window).on('beforeunload', function(e) {
         if (window.needToConfirm) {
-            if (typeof CKEDITOR === 'object') {
-                for(var ed in CKEDITOR.instances ) {
-                    if (CKEDITOR.instances.hasOwnProperty(ed)) {
-                        if ( CKEDITOR.instances[ed].checkDirty()) {
-                            editorDirty = true;
-                        }
-                    }
-                }
-            }
             if (editorDirty) {
                 var msg = '" . addslashes(tra('You are about to leave this page. Changes since your last save may be lost. Are you sure you want to exit this page?')) . "';
                 if (e) {

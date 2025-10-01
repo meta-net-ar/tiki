@@ -10,6 +10,7 @@
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverSelect;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use Tiki\Lib\Test\AcceptanceTests\DBRestorerSQLDumps;
 
 class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
 {
@@ -60,7 +61,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
 
     public function restoreDBforThisTest()
     {
-        $dbRestorer = new TikiAcceptanceTestDBRestorerSQLDumps();
+        $dbRestorer = new DBRestorerSQLDumps();
         $error_msg = $dbRestorer->restoreDB($this->current_test_db);
         if ($error_msg != null) {
             $this->markTestSkipped($error_msg);

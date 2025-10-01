@@ -1,54 +1,62 @@
-// This file is for additional SCSS rules beyond what are in _bootstrap-variables.scss.
+// Tuften theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
 // Image path example:
 $imagePath: "../images/";
 // body {
-//	background-image: url('#{$imagePath}bg.jpg');
+//    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// The headings below that are commented are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
-// In the case of CSS selectors that are grouped to share common CSS properties, the category appropriate for most of the selectors is used.
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-//$themeFontPath: "../fonts/";
-//
-//@font-face {
-//	font-family: "et-book";
-//	src: url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot');
-//	src: url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.svg#etbookromanosf') format("svg");
-//	font-weight: normal;
-//	font-style: normal
-//}
-//
-//@font-face {
-//	font-family: "et-book";
-//	src: url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot');
-//	src: url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.svg#etbookromanosf') format("svg");
-//	font-weight: normal;
-//	font-style: italic
-//}
-//
-//@font-face {
-//	font-family: "et-book";
-//	src: url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot');
-//	src: url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.svg#etbookromanosf') format("svg");
-//	font-weight: bold;
-//	font-style: normal
-//}
-///*@font-face {
-//	font-family: ETBembo;
-//	src: url('${themeFontPath}ETBembo-RomanLF.ttf');
-//}
-//
-//@font-face {
-//	font-family: ETBembo;
-//	src: url('${themeFontPath}ETBembo-DisplayItalic.ttf');
-//	font-weight: normal;
-//	font-style: italic;
-//}*/
+    //$themeFontPath: "../fonts/";
+    //
+    //@font-face {
+    //	font-family: "et-book";
+    //	src: url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot');
+    //	src: url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-roman-line-figures/et-book-roman-line-figures.svg#etbookromanosf') format("svg");
+    //	font-weight: normal;
+    //	font-style: normal
+    //}
+    //
+    //@font-face {
+    //	font-family: "et-book";
+    //	src: url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot');
+    //	src: url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.svg#etbookromanosf') format("svg");
+    //	font-weight: normal;
+    //	font-style: italic
+    //}
+    //
+    //@font-face {
+    //	font-family: "et-book";
+    //	src: url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot');
+    //	src: url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.eot?#iefix') format("embedded-opentype"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff') format("woff"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.ttf') format("truetype"), url('#{$themeFontPath}et-book/et-book-bold-line-figures/et-book-bold-line-figures.svg#etbookromanosf') format("svg");
+    //	font-weight: bold;
+    //	font-style: normal
+    //}
+    ///*@font-face {
+    //	font-family: ETBembo;
+    //	src: url('${themeFontPath}ETBembo-RomanLF.ttf');
+    //}
+    //
+    //@font-face {
+    //	font-family: ETBembo;
+    //	src: url('${themeFontPath}ETBembo-DisplayItalic.ttf');
+    //	font-weight: normal;
+    //	font-style: italic;
+    //}*/
 
-// -------------------- Color system -------------------- //
+// Color system
 .text-warning { color: #7C5B09; }
 
-// -------------------- Body (large elements -------------------- //
+// Body (large elements)
 body {
 	counter-reset: sidenote-counter;
 }
@@ -70,7 +78,7 @@ article,
     line-height: 2rem;
 }
 
-// -------------------- Links -------------------- //
+// Links
 .wikitext a:link::selection,
 .wikitext a:link::-moz-selection {
     text-shadow: var(--tiki-wikitext-link-text-shadow); // 0.03em 0 #b4d5fe, -0.03em 0 #b4d5fe, 0 0.03em #b4d5fe, 0 -0.03em #b4d5fe, 0.06em 0 #b4d5fe, -0.06em 0 #b4d5fe, 0.09em 0 #b4d5fe, -0.09em 0 #b4d5fe, 0.12em 0 #b4d5fe, -0.12em 0 #b4d5fe, 0.15em 0 #b4d5fe, -0.15em 0 #b4d5fe;
@@ -80,11 +88,7 @@ article,
 .wikitext a:not(.btn) {
     padding-bottom: 1px;
     text-decoration: underline; //none;
-//    background: linear-gradient(#fffff8, #fffff8), linear-gradient(#fffff8, #fffff8), linear-gradient(#333, #333);
-//    background-size: 0.05em 1px, 0.05em 1px, 1px 1px;
-//    background-repeat: no-repeat, no-repeat, repeat-x;
-//    text-shadow: var(--tiki-wikitext-link-text-shadow); // 0.03em 0 #fffff8, -0.03em 0 #fffff8, 0 0.03em #fffff8, 0 -0.03em #fffff8, 0.06em 0 #fffff8, -0.06em 0 #fffff8, 0.09em 0 #fffff8, -0.09em 0 #fffff8, 0.12em 0 #fffff8, -0.12em 0 #fffff8, 0.15em 0 #fffff8, -0.15em 0 #fffff8;
-//    background-position: 0 93%, 100% 93%, 0  93%;
+
 }
 
 .icon_edit_section a,
@@ -125,10 +129,6 @@ a.btn,
     text-shadow: none;
 }
 
-//.btn.btn-link {
-//    background: none;
-//}
-
 .pager li > a {
     border: 1px solid #ddd;
 }
@@ -136,13 +136,6 @@ a.btn,
 a:hover {
     text-decoration: none;
 }
-
-
-
-//.wikitext a:link::-moz-selection {
-//    text-shadow: 0.03em 0 #b4d5fe, -0.03em 0 #b4d5fe, 0 0.03em #b4d5fe, 0 -0.03em #b4d5fe, 0.06em 0 #b4d5fe, -0.06em 0 #b4d5fe, 0.09em 0 #b4d5fe, -0.09em 0 #b4d5fe, 0.12em 0 #b4d5fe, -0.12em 0 #b4d5fe, 0.15em 0 #b4d5fe, -0.15em 0 #b4d5fe;
-//    background: #b4d5fe;
-//}
 
 a .icon {font-size: 1.2rem;}
 
@@ -199,23 +192,21 @@ div.marginnote > span > a {
     display: none;
 }
 
-// -------------------- Paragraphs -------------------- //
+// Paragraphs
 article p,
 .wikitext p {
     margin-top: 1.4rem;
     margin-bottom: 1.4rem;
-    //	padding-right: 0;
     vertical-align: baseline;
 }
 
 .blockquote p {
-    //	font-size: 1.1rem;
     width: 80%;
     margin-left: 3rem;
 }
 
-// -------------------- Components -------------------- //
-// -------------------- Typography -------------------- //
+// Components
+// Typography
 h1, h2, h3 {
     font-weight: 400;
     line-height: 1;
@@ -223,7 +214,6 @@ h1, h2, h3 {
 
 h1 {
     margin-top: 4rem;
-    //	margin-bottom: 1.5rem;
     font-size: 3.2rem;
 }
 
@@ -243,22 +233,14 @@ h3.popover-header {
     margin-top: 0;
 }
 
-//blockquote,
-//.blockquote {
-//    color: #525252;
-//}
-
 .sans {
     font-family: $font-family-sans-serif; // "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
 }
 
-// -------------------- Tables -------------------- //
+// Tables
 table {
-    // width: 98%;
-    //	text-align: right;
     font-size: 1.2rem;
     line-height: 1.4;
-    //	margin: 1.4rem 1%;
     border-collapse: separate;
     border-spacing: 0 5px;
     -webkit-font-feature-settings: 'tnum'; /* This is technically redundant */
@@ -280,7 +262,7 @@ span.table-label {
     padding-top: 8px;
 }
 
-/* to maintain height relative to table header row */
+// /* to maintain height relative to table header row */
 
 table.booktabs {
     margin: 0 auto;
@@ -290,7 +272,6 @@ table.booktabs {
 }
 
 table.table {
-//    width: auto;
     border-spacing: 0;
     border-top: 2px solid #333333;
     border-bottom: 2px solid #333333;
@@ -319,7 +300,7 @@ table.table {
     padding-top: 0.65ex;
 }
 
-/* add space between thead row and tbody */
+// /* add space between thead row and tbody */
 
 .booktabs td {
     padding-left: 0.5em;
@@ -360,16 +341,16 @@ table.table {
     line-height: 1.6;
 }
 
-// -------------------- Buttons -------------------- //
+// Buttons
 .btn-outline-warning {
     color: #926C0C;
     border-color: #926C0C;
 }
 
-// -------------------- Forms -------------------- //
-// -------------------- Form validation -------------------- //
-// -------------------- Navs -------------------- //
-// -------------------- Navbar -------------------- //
+// Forms
+// Form validation
+// Navs
+// Navbar
 .topbar { margin-bottom: 30px;}
 
 .topbar,
@@ -387,12 +368,7 @@ table.table {
 
 .page-description,  // Properties from Tufte.css
 .sitesubtitle {
-//	font-style: italic;
-//	margin-top: 1rem;
-//	margin-bottom: 1rem;
 	font-size: 1.8rem;
-//	display: block;
-//	line-height: 1;
 }
 
 #col2 .navbar {
@@ -405,12 +381,9 @@ table.table {
     }
 }
 
-// -------------------- Dropdowns -------------------- //
-
-
-// -------------------- Pagination -------------------- //
-// -------------------- Jumbotron -------------------- //
-// -------------------- Cards -------------------- //
+// Dropdowns
+// Pagination
+// Cards
 div:not(#col1) .card.module,
 .blogpost .card {
 	border: none;
@@ -430,24 +403,21 @@ h3.card-title,
 
 .blogpost h2.card-title { margin-bottom: 14px; }
 
-// -------------------- Tooltips -------------------- //
-// -------------------- Popovers -------------------- //
-// -------------------- Toasts -------------------- //
-// -------------------- Badges -------------------- //
-//.badge.bg-secondary {
-//    color: #333333;
-//}
-// -------------------- Modals -------------------- //
-// -------------------- Alerts -------------------- //
-// -------------------- Progress bars -------------------- //
-// -------------------- List group -------------------- //
-// -------------------- Image thumbnails -------------------- //
-// -------------------- Figures -------------------- //
-// -------------------- Breadcrumbs -------------------- //
-// -------------------- Carousel -------------------- //
-// -------------------- Spinners -------------------- //
-// -------------------- Close -------------------- //
-// -------------------- Code -------------------- //
+// Tooltips
+// Popovers
+// Toasts
+// Badges
+// Modals
+// Alerts
+// Progress bars
+// List group
+// Image thumbnails
+// Figures
+// Breadcrumbs
+// Carousel
+// Spinners
+// Close
+// Code
 code {
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
     color: var(--#{$prefix}body-color); //#222;
@@ -471,14 +441,8 @@ pre.code {
     overflow-x: scroll;
 }
 
-// -------------------- Utilities -------------------- //
-// -------------------- Printing -------------------- //
-
-// -------------------- Etc -------------------- //
-
-// -------------------- Tiki-specific -------------------- //
-
-// -------------------- External libraries -------------------- //
+// Tiki-specific
+// External libraries
 // Pivottable
 .tiki table.pvtTable tr th {
     background: url('#{$imagePath}comment-bg2.png');
@@ -607,55 +571,6 @@ label.margin-toggle:not(.sidenote-number) {
 	.footnotearea {
 		margin: 1em 0 1em 3em;
 	}
-	/*
-		label.margin-toggle:not(.sidenote-number) {
-			display: inline;
-		}
-	
-		.sidenote, .marginnote {
-			display: none;
-		}
-	
-		.margin-toggle:checked + .sidenote,
-		.margin-toggle:checked + .marginnote {
-			display: block;
-			float: left;
-			left: 1rem;
-			clear: both;
-			width: 95%;
-			margin: 1rem 2.5%;
-			vertical-align: baseline;
-			position: relative;
-		}
-	
-		label {
-			cursor: pointer;
-		}
-	
-		pre.code {
-			padding: 0;
-		}
-	
-		.table-caption {
-			display: block;
-			float: right;
-			clear: both;
-			width: 98%;
-			margin-top: 1rem;
-			margin-bottom: 0.5rem;
-			margin-left: 1%;
-			margin-right: 1%;
-			vertical-align: baseline;
-			position: relative;
-		}
-	
-		table, table.booktabs {
-			width: 85%;
-		}
-	
-		img {
-			width: 100%;
-		} */
 }
 
 

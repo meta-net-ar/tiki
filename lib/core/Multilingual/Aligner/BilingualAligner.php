@@ -111,7 +111,7 @@ class Multilingual_Aligner_BilingualAligner
         ) {
             //      print "-- _match_current_l1_and_l2_sentences: adding '$new_node' to list of nodes to expand at next iteration\n";
 
-            array_push($this->nodes_at_next_level, $new_node);
+            $this->nodes_at_next_level[] = $new_node;
 
             // For now, assume same cost for links between nodes.
             $this->cost_matrix[$node_to_extend][$new_node] = 'match_cost';
@@ -144,7 +144,7 @@ class Multilingual_Aligner_BilingualAligner
             strcmp($node_to_extend, $new_node) != 0
                 && ! in_array($new_node, $this->nodes_at_next_level)
         ) {
-            array_push($this->nodes_at_next_level, $new_node);
+            $this->nodes_at_next_level[] = $new_node;
 
             // For now, assume same cost for links between nodes.
             $this->cost_matrix[$node_to_extend][$new_node] = 'match_cost';

@@ -24,7 +24,7 @@ class Title extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
-        global $prefs, $tiki_p_view_templates, $tiki_p_edit_templates, $tiki_p_admin;
+        global $prefs, $tiki_p_admin;
         $smarty = \TikiLib::lib('smarty');
 
         if ($repeat || empty($content)) {
@@ -77,20 +77,6 @@ class Title extends Base
 
                 $html .= $prefs['helpurl'] . str_replace("%23", "#", rawurlencode($params['help'])) . '" class="tips btn btn-link" title="' . smarty_modifier_escape($content) . '|' . tra('Help page') . '" target="tikihelp">'
                     . smarty_function_icon(['name' => 'help'], $template)
-                    . "</a>\n";
-            }
-
-            if ($prefs['feature_edit_templates'] == 'y' && $tiki_p_edit_templates == 'y' && ($tpl = $template->getTemplateVars('mid'))) {
-                $html .= '<a href="tiki-edit_templates.php?template=';
-
-                $html .= $tpl . '" class="tips btn btn-link" title="' . tra('View or edit tpl') . '|' . htmlspecialchars($content) . '">'
-                    . smarty_function_icon(['name' => 'edit'], $template)
-                    . "</a>\n";
-            } elseif ($prefs['feature_view_tpl'] == 'y' &&  $tiki_p_view_templates == 'y' && ($tpl = $template->getTemplateVars('mid'))) {
-                $html .= '<a href="tiki-edit_templates.php?template=';
-
-                $html .= $tpl . '" class="tips btn btn-link" title="' . tra('View tpl') . '|' . htmlspecialchars($content) . '">'
-                    . smarty_function_icon(['name' => 'view'], $template)
                     . "</a>\n";
             }
 

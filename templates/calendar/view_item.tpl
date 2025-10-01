@@ -5,7 +5,12 @@
 {/block}
 
 {block name="content"}
-    <h5 class="mb-3">{$calitem.parsedName}</h5>
+    {include 
+        file='calendar_header.tpl'
+        viewlist='listEventView'
+    }
+  
+    <h5 class="mt-3 mb-3">{tr}Title{/tr} : {$calitem.parsedName}</h5>
     <div class="summary mb-4">
         {$thiscustombgcolor = $calendar.custombgcolor}
         {$thiscustomfgcolor = $calendar.customfgcolor}
@@ -205,11 +210,23 @@
         {/if}
     {/if}
     <div class="summary">
-        {$calitem.display_datetimes}
+        <span class="px-3 py-2 rounded" style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};">{tr}Start{/tr} - {tr}End{/tr} : <b>{$calitem.display_datetimes}</b></span>
     </div>
-    <div class="description">
-        {$calitem.parsed|default:"<em>{tr}No description{/tr}</em>"}
+    <div class="row px-3 py-2 rounded">
+        <span class=" col-md-3" style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};">{tr}Description{/tr} : </span><p class="description col-md-6">{$calitem.parsed|default:"<em>{tr}No description{/tr}</em>"}</p>
     </div>
+    {if !empty($trackerItems)}
+        <div class="row px-3 py-2">
+            <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr} : </label>
+            <div class="col-sm-9 mb-0 pt-2">
+                <ul>
+                    {foreach from=$trackerItems item=trackerItem}
+                        <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    {/if}
     <div class="small mt-3">
         <div class="table-responsive">
             <table class="table table-borderless p-0 table-sm{if $preview} table-secondary{/if}">
@@ -289,14 +306,14 @@
                         <th>{tr}Participants:{/tr}</th>
                         <td>
                             <p>
-                                {assign var="emailString" value=""}
+                                {$emailString=""}
                                 {if $calitem.participants|@count}
                                     <ul>
                                     {foreach $calitem.participants as $person}
                                         {if $emailString}
-                                            {assign var="emailString" value="{$emailString}, {$person.email}"}
+                                            {$emailString="{$emailString}, {$person.email}"}
                                         {else}
-                                            {assign var="emailString" value=$person.email}
+                                            {$emailString=$person.email}
                                         {/if}
                                         <li>
                                             {$person.username|userlink}
@@ -305,6 +322,8 @@
                                         {if $person.username eq $user}{$participating = true}{/if}
                                     {/foreach}
                                     </ul>
+                                {elseif $calitem.hiddenParticipants}
+                                    <em class="text-secondary">{tr}Participants list has been hidden at organizer's request{/tr}</em>
                                 {else}
                                     <em class="text-secondary">{tr}No participants{/tr}</em>
                                 {/if}

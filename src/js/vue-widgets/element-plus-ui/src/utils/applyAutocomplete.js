@@ -24,6 +24,16 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
         return;
     }
 
+    const elementPlusInput = document.querySelector(`el-input#${element.getAttribute("element-plus-ref")}`);
+    if (elementPlusInput) {
+        elementPlusInput.remove();
+    }
+
+    const uiRef = element.getAttribute("element-plus-ref");
+    if (uiRef && document.querySelector(`el-autocomplete#${uiRef}`)) {
+        return document.querySelector(`el-autocomplete#${uiRef}`);
+    }
+
     const elementUniqueId = Math.random().toString(36).substring(7);
     const elementPlusUi = document.createElement("el-autocomplete");
     elementPlusUi.setAttribute("id", elementUniqueId);
@@ -46,9 +56,35 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
         }
     });
 
-    if (selectCb) {
-        elementPlusUi.addEventListener("select", selectCb);
-    }
+    elementPlusUi.addEventListener("select", (event) => {
+        element.value = event.detail[0].value;
+        element.dispatchEvent(new Event("change"));
+        if (selectCb) {
+            selectCb(event);
+        }
+    });
+
+    elementPlusUi.addEventListener("pressEnter", () => {
+        const form = element.closest("form");
+        if (!form) return;
+
+        let defaultSubmitButton = form.querySelector('button[type="submit"]:not([disabled]), input[type="submit"]:not([disabled])');
+
+        if (defaultSubmitButton) {
+            defaultSubmitButton.click();
+            return;
+        } else {
+            // If no button exists, count how many inputs types that can block implicit submission
+            const blockingInputCount = form.querySelectorAll(
+                'input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[type="password"], input[type="date"], input[type="month"], input[type="week"], input[type="time"], input[type="datetime-local"], input[type="number"]'
+            ).length;
+
+            if (blockingInputCount <= 1) {
+                // If there's only one or fewer, we can safely submit the form directly.
+                form.submit();
+            }
+        }
+    });
 
     element.setAttribute("element-plus-ref", elementUniqueId);
     element.style.display = "none";

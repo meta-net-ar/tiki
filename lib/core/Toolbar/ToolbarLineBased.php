@@ -16,7 +16,7 @@ class ToolbarLineBased extends ToolbarInline // Will change in the future
             case 'list':
                 $label = tra('Bullet List');
                 $iconname = 'list';
-                $wysiwyg = 'BulletedList';
+                $wysiwyg = 'ul';
                 $syntax = '* text';
                 $markdown = '* text';
                 $markdown_wysiwyg = 'ul';
@@ -24,7 +24,7 @@ class ToolbarLineBased extends ToolbarInline // Will change in the future
             case 'numlist':
                 $label = tra('Numbered List');
                 $iconname = 'list-numbered';
-                $wysiwyg = 'NumberedList';
+                $wysiwyg = 'ol';
                 $syntax = '# text';
                 $markdown = '1. text';
                 $markdown_wysiwyg = 'ol';

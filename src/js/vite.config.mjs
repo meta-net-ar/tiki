@@ -4,7 +4,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import { glob } from "glob";
+import { globSync } from "tinyglobby";
 import path from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
@@ -97,43 +97,46 @@ Currently (2023-09-27), this is problematic for common CSS.  If input module1 an
 
 export default defineConfig(({ command, mode }) => {
     let rollupInput = {};
-    /* Proof of concept.  Inspired by the documentation for input on https://rollupjs.org/configuration-options/#input but needs to be generalized further so it's not only used for jquery-tiki.  But it does work to generate stuff in subdirectories!
 
-    We now need a function that computes everything from the glob - benoitg - 2023-11-10 */
-    Object.assign(
-        rollupInput,
-        Object.fromEntries(
-            glob.sync("src/js/jquery-tiki/**/*.js", { ignore: ["**/node_modules/**"] }).map((file) => {
-                //console.log(path.relative(__dirname, file));
-                return [
-                    // This remove `src/js/jquery-tiki` as well as the file extension from each
-                    // file, so e.g. src/js/jquery-tiki/nested/foo.js becomes src/js/jquery-tiki/nested/foo
-                    "jquery-tiki/" + path.relative("src/js/jquery-tiki", file.slice(0, file.length - path.extname(file).length)),
-                    // This expands the relative paths to absolute paths, so e.g.
-                    resolve(__dirname, path.relative(__dirname, file)),
-                ];
-            })
-        )
-    );
+    addGlobEntries(rollupInput, [
+        { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
+        { prefix: "common-reexported/", src: "src/js/common-reexported" },
+    ]);
+
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
+        "avatar-generator": resolve(__dirname, "avatar-generator/index.js"),
         "color-picker": resolve("node_modules/@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"),
         "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
         "element-plus-ui/autocomplete": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/autocomplete.js"),
         "element-plus-ui/datepicker": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
         "element-plus-ui/fileGalUploader": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
+        "element-plus-ui/fileInput": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileInput.js"),
+        "element-plus-ui/input": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/input.js"),
+        "element-plus-ui/message": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/message.js"),
         "element-plus-ui/select": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),
+        "element-plus-ui/slider": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/slider.js"),
         "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
+        "element-plus-ui/backtop": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/backtop.js"),
+        "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         comments: resolve(__dirname, "vue-mf/comments/src/comments.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
+        "tiki-sentry-browser": resolve(__dirname, "tiki-sentry-browser/sentry-browser.js"),
+        "tiki-figlet": resolve(__dirname, "tiki-figlet/figlet.js"),
         styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
+        "tracker-rules": resolve(__dirname, "vue-mf/tracker-rules/src/tracker-rules.js"),
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
+        "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
+        "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
+        "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
+        "wysiwyg-summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
@@ -160,10 +163,12 @@ export default defineConfig(({ command, mode }) => {
             rollupOptions: {
                 // NOTE: Keep the list alphabetically sorted.
                 external: [
+                    /^common-reexported\/.+/,
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
                     /^@jquery-tiki\/.+/,
                     "@popperjs/core",
+                    "@wysiwyg/summernote",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
@@ -173,14 +178,15 @@ export default defineConfig(({ command, mode }) => {
                     "jquery-ui",
                     "jquery-validation",
                     /^moment\/.+/,
-                    "select2",
                     "pivottablejs",
                     "reveal.js",
                     "sortablejs",
                     "subtotal",
+                    "summernote",
                     "vue",
                 ],
                 input: rollupInput,
+                maxParallelFileOps: 100, // TRy to workaround run watch getting stalled with no error.  See https://github.com/vitejs/vite/issues/19410 and https://github.com/rollup/rollup/issues/5848
                 output: {
                     //dir: "./public/generated/js",
                     //file: "../../../storage/public/vue-mf/kanban/vue-mf-kanban.min.js",
@@ -274,13 +280,20 @@ export default defineConfig(({ command, mode }) => {
                             src: "node_modules/module-name/dist/*",",
                             dest: "vendor_dist/module-name/dist",
                         },
-                    But make sure to look into the dist folder, so we don't add a bunch of useless stiff, but don't miss required support files (such as language files)
+                    But make sure to look into the dist folder, so we don't add a bunch of useless stuff, but don't miss required support files (such as language files)
                     */
 
                     /* jquery_tiki */
                     {
-                        src: "node_modules/@event-calendar/*",
-                        dest: "vendor_dist/@event-calendar",
+                        src: "node_modules/@event-calendar/core/dist/index.css",
+                        dest: "vendor_dist/@event-calendar/core/dist",
+                    },
+                    {
+                        src: "node_modules/boomerangjs/boomerang.js",
+                        dest: "vendor_dist/boomerangjs/",
+                    },{
+                        src: "node_modules/boomerangjs/plugins/rt.js",
+                        dest: "vendor_dist/boomerangjs/plugins",
                     },
                     {
                         src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
@@ -298,6 +311,10 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/bootstrap-icons/font/*",
                         dest: "vendor_dist/bootstrap-icons/font",
                     },
+                    {
+                        src: ["node_modules/timeago/jquery.timeago.js", "node_modules/timeago/locales"],
+                        dest: "vendor_dist/timeago/dist",
+                    },
                     /* module system */
                     {
                         src: "node_modules/es-module-shims/dist/es-module-shims.js",
@@ -306,11 +323,11 @@ export default defineConfig(({ command, mode }) => {
                     /* tiki_themes */
                     {
                         src: "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                        dest: "vendor_dist/@fortawesome/fontawesome-free",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/css",
                     },
                     {
                         src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
-                        dest: "vendor_dist/@fortawesome/webfonts",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/webfonts",
                     },
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
@@ -326,6 +343,8 @@ export default defineConfig(({ command, mode }) => {
                             "node_modules/element-plus/theme-chalk/base.css",
                             "node_modules/element-plus/theme-chalk/el-message.css",
                             "node_modules/element-plus/theme-chalk/el-message-box.css",
+                            "node_modules/element-plus/theme-chalk/el-popper.css",
+                            "node_modules/element-plus/theme-chalk/el-backtop.css",
                         ],
                         dest: "vendor_dist/element-plus/css",
                     },
@@ -348,7 +367,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/chart.js/dist",
                     },
                     {
-                        src: "node_modules/chart.js/dist/chunks/helpers.segment.js*",
+                        src: "node_modules/chart.js/dist/chunks/helpers.dataset.js",
                         dest: "vendor_dist/chart.js/dist/chunks",
                     },
                     {
@@ -392,7 +411,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/converse.js/dist/locales",
                     },
                     {
-                        src: "node_modules/converse.js/dist/emojis.js",
+                        src: "node_modules/converse.js/dist/emoji.json",
                         dest: "vendor_dist/converse.js/dist",
                     },
                     {
@@ -402,6 +421,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/interactjs/dist/*",
                         dest: "vendor_dist/interactjs/dist",
+                    },
+                    {
+                        src: ["node_modules/d3-milestones/build/d3-milestones.css", "node_modules/d3-milestones/build/d3-milestones.min.js"],
+                        dest: "vendor_dist/d3-milestones/build",
                     },
                     {
                         src: "node_modules/dompurify/dist/purify.(es|min)*",
@@ -422,6 +445,22 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/fitvids/dist/fitvids.js",
                         dest: "vendor_dist/fitvids/dist",
+                    },
+                    {
+                        src: ["node_modules/fieldslinker/fieldsLinker.css", "node_modules/fieldslinker/fieldsLinker.js"],
+                        dest: "vendor_dist/fieldslinker",
+                    },
+                    {
+                        src: ["node_modules/glightbox/dist/css/glightbox.min.css"],
+                        dest: "vendor_dist/glightbox/dist",
+                    },
+                    {
+                        src: ["node_modules/plyr/dist/plyr.css"],
+                        dest: "vendor_dist/glightbox/dist",
+                    },
+                    {
+                        src: ["node_modules/plyr/dist/plyr.min.js"],
+                        dest: "vendor_dist/glightbox/dist",
                     },
                     {
                         src: "node_modules/html2canvas-pro/dist/html2canvas-pro.min.js",
@@ -456,14 +495,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery/dist",
                     },
                     {
-                        src: "node_modules/jquery-colorbox/jquery.colorbox-min.js",
-                        dest: "vendor_dist/jquery-colorbox",
-                    },
-                    {
-                        src: "node_modules/jquery-colorbox/example*", // Examples are used as themes in Tiki instead of the default Design of Colorbox.
-                        dest: "vendor_dist/jquery-colorbox",
-                    },
-                    {
                         src: "node_modules/jquery-form/dist/*",
                         dest: "vendor_dist/jquery-form/dist",
                     },
@@ -472,16 +503,16 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-migrate/dist",
                     },
                     {
+                        src: ["node_modules/jquery-tagcanvas/jquery.tagcanvas.min.js"],
+                        dest: "vendor_dist/jquery-tagcanvas",
+                    },
+                    {
                         src: "node_modules/jquery-ui/dist/*",
                         dest: "vendor_dist/jquery-ui/dist",
                     },
                     {
                         src: "node_modules/jquery-validation/dist/*",
                         dest: "vendor_dist/jquery-validation/dist",
-                    },
-                    {
-                        src: "node_modules/mermaid/dist/!(mermaid.js|mermaid.min.js)*.(js|mjs)*",
-                        dest: "vendor_dist/mermaid/dist",
                     },
                     {
                         src: "node_modules/minicart/dist/*.js",
@@ -502,10 +533,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js", "node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
                         dest: "vendor_dist/ol-layerswitcher/dist",
-                    },
-                    {
-                        src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/*.min.js"],
-                        dest: "vendor_dist/pivottable/dist",
                     },
                     {
                         src: "node_modules/plotly.js/dist/topojson*",
@@ -532,18 +559,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/reveal.js/dist",
                     },
                     {
-                        src: "node_modules/select2/dist/js/select2.min.js",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2/dist/css/select2.min.css",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2-bootstrap-5-theme/dist/*.min.css",
-                        dest: "vendor_dist/select2-bootstrap-5-theme/dist",
-                    },
-                    {
                         src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
                         dest: "vendor_dist/signature_pad/dist",
                     },
@@ -558,10 +573,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/subtotal/dist/subtotal.min.js",
                         dest: "vendor_dist/subtotal/dist",
-                    },
-                    {
-                        src: "node_modules/svg-pan-zoom/dist/*.min.js",
-                        dest: "vendor_dist/svg-pan-zoom/dist",
                     },
                     {
                         src: [
@@ -596,6 +607,45 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/vue/dist/vue.esm-browser.js",
                         dest: "vendor_dist/vue/dist",
                     },
+                    {
+                        src: ["node_modules/summernote/dist/summernote-bs5.min.js", "node_modules/summernote/dist/summernote-bs5.min.css"],
+                        dest: "vendor_dist/summernote/dist",
+                    },
+                    {
+                        src: "node_modules/summernote/dist/font/*",
+                        dest: "vendor_dist/summernote/dist/font",
+                    },
+                    {
+                        src: "node_modules/summernote/dist/lang/*.min.js",
+                        dest: "vendor_dist/summernote/dist/lang",
+                    },
+                    {
+                        src: "node_modules/swiper/*.min.js",
+                        dest: "vendor_dist/swiper",
+                    },
+                    {
+                        src: "node_modules/swiper/*.min.css",
+                        dest: "vendor_dist/swiper",
+                    },
+                    /**
+                     * Toast UI Editor: We place the CSS file here because inserting it directly into the toast-index.js file
+                     * causes part of the editor to be styled while another part remains unstyled. Therefore, we preferred to use the CSS file directly
+                     */
+                    {
+                        src: "node_modules/@toast-ui/editor/dist/toastui-editor.css",
+                        dest: "vendor_dist/@toast-ui/editor/dist",
+                    },
+                    {
+                        src: "node_modules/@toast-ui/editor/dist/i18n/*",
+                        dest: "vendor_dist/@toast-ui/editor/dist/i18n/",
+                    },
+                    {
+                        src: [
+                            "node_modules/vis-timeline/dist/vis-timeline-graph2d.esm.js",
+                            "node_modules/vis-timeline/dist/vis-timeline-graph2d.min.css",
+                        ],
+                        dest: "vendor_dist/vis-timeline/dist",
+                    },
                 ],
             }),
             AutoImport({
@@ -618,7 +668,12 @@ export default defineConfig(({ command, mode }) => {
             globals: true,
             environment: "happy-dom",
             coverage: {
-                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/jquery-tiki/ui-utils/handleDatePicker.js"],
+                include: [
+                    "src/js/vue-widgets/**/*.{vue,js}",
+                    "src/js/wysiwyg/**/*.js",
+                    "src/js/avatar-generator/**/*.js",
+                    "src/js/@tiki/ui-utils/handle*.js",
+                ],
                 exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
                 provider: "istanbul",
             },
@@ -630,3 +685,27 @@ export default defineConfig(({ command, mode }) => {
         },
     };
 });
+
+/**
+ * Adds glob-based entries to rollupInput from multiple source folders.
+ * @param {object} rollupInput - The rollupInput object to update.
+ * @param {Array} entries - An array of objects with the following properties:
+ *   - prefix: prefix used for the key names (e.g., "jquery-tiki/")
+ *   - src: path to the source folder to scan (e.g., "src/js/jquery-tiki")
+ */
+function addGlobEntries(rollupInput, entries) {
+    entries.forEach(({ prefix, src }) => {
+        Object.assign(
+            rollupInput,
+            Object.fromEntries(
+                globSync(`${src}/**/*.js`, {
+                    ignore: ["**/node_modules/**", "**/*.test.js"]
+                }).map(file => {
+                    const relativePath = path.relative(src, file.slice(0, file.length - path.extname(file).length));
+                    const fullPath = resolve(__dirname, path.relative(__dirname, file));
+                    return [`${prefix}${relativePath}`, fullPath];
+                })
+            )
+        );
+    });
+}

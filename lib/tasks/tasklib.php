@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -383,7 +383,13 @@ class TaskLib extends TikiLib
                 $values[] = "%" . $find . "%";
                 $values[] = "%" . $find . "%";
             }
-            if ($show_trash == false) {
+            if ($show_trash) {
+                $query .= " OR ";
+                $query .= "( `t_history`.`deleted` IS NOT NULL AND  `t_head`.`last_version` = `t_history`.`task_version` AND `t_head`.`taskId` = `t_history`.`belongs_to` ";
+                $query .= "AND `t_head`.`user` = ? AND `t_head`.`creator` = ? ) ";
+                $values[] = $user;
+                $values[] = $user;
+            } else {
                 $query .= " AND ";
                 $query .= "( `t_history`.`deleted` IS NULL) ";
             }
@@ -401,7 +407,7 @@ class TaskLib extends TikiLib
         // Place the count query before the addition of the order by
         // clause to make the query work in postgres..
         $query_count = "select count(distinct `t_head`.`taskId`) $query";
-        $cant = $this->getOne($query_count, $values);
+        $count = $this->getOne($query_count, $values);
 
         $query .= "ORDER BY $order_str `t_head`.`taskId` desc";
 
@@ -425,7 +431,7 @@ class TaskLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $tasklist;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
 
         $list_tasks_end = microtime(true);
         $list_tasks_time = $list_tasks_end - $list_tasks_start;

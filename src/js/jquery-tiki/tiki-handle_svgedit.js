@@ -1,11 +1,5 @@
 export async function handleDraw(fileId, galleryId, name, imgParams) {
-    const loadingIndicator = $(`
-        <div class="d-flex justify-content-center">
-            <div class="spinner-grow text-dark" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-    `);
+    const loadingIndicator = $($.IMPORT_LOADER_MARKUP);
     $("#tiki_draw").append(loadingIndicator);
     try {
         await import("@jquery-tiki/tiki-svgedit_draw");

@@ -218,4 +218,6 @@ fieldset.dropzone {
 //     background: $panel-success-heading-bg;
 // }
 
-
+.avatar-picker__avatars__item {
+  transition: all 0.3s linear;
+}

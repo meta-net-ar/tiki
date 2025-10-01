@@ -29,35 +29,36 @@ $access->check_permission(['tiki_p_articles_admin_topics']);
 
 if (isset($_REQUEST["addtopic"])) {
     $access->checkCsrf();
-    if (isset($_FILES['userfile1'])) {
-        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $filegallib = TikiLib::lib('filegal');
-            try {
-                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-            } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+    if (empty($_REQUEST["name"])) {
+        Feedback::error(tra("The topic's name can not be empty"));
+    } else {
+        if (isset($_FILES['userfile1'])) {
+            if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+                $filegallib = TikiLib::lib('filegal');
+                try {
+                    $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+                } catch (Exception $e) {
+                    Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
+                }
+                $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+                $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+                fclose($fp);
+                $imgtype = $_FILES['userfile1']['type'];
+                $imgsize = $_FILES['userfile1']['size'];
+                $imgname = $_FILES['userfile1']['name'];
+            } else {
+                Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
             }
-            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-            $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-            fclose($fp);
-            $imgtype = $_FILES['userfile1']['type'];
-            $imgsize = $_FILES['userfile1']['size'];
-            $imgname = $_FILES['userfile1']['name'];
-        } else {
-            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
         }
+        if (! isset($data)) {
+            $data = '';
+            $imgtype = '';
+            $imgsize = '';
+            $imgname = '';
+        }
+        // Store the image
+        $artlib->add_topic($_REQUEST["name"], $imgname, $imgtype, $imgsize, $data);
     }
-    if (! isset($data)) {
-        $data = '';
-        $imgtype = '';
-        $imgsize = '';
-        $imgname = '';
-    }
-    // Store the image
-    $artlib->add_topic($_REQUEST["name"], $imgname, $imgtype, $imgsize, $data);
 }
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $artlib->remove_topic($_REQUEST["remove"]);

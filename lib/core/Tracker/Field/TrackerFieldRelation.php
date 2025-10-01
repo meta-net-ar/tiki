@@ -48,7 +48,11 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
     public function getDistantTrackerId(): ?int
     {
         $filter = $this->getParsedFilter();
-        $distantTrackerId = $filter['tracker_id'];
+        if ($filter) {
+            $distantTrackerId = $filter['tracker_id'];
+        } else {
+            $distantTrackerId = null;
+        }
         return $distantTrackerId;
     }
 
@@ -67,7 +71,7 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
     {
         $length = strlen('.invert');
 
-        if (substr($qualifier, -$length) === '.invert') {
+        if (str_ends_with($qualifier, '.invert')) {
             $qualifier = substr($qualifier, 0, -$length);
         } else {
             $qualifier .= '.invert';
@@ -101,7 +105,7 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
         }
 
         $invertField = $this->getInvertFieldInstance();
-        $isManyToMany = $invertField ? true : false;
+        $isManyToMany = (bool)$invertField;
 
         $relationInfo = new RelationInfoRelation();
         //TODO:  This should be ordered so we always show the non-invert first.  Othewise, the name depends on the order in which the trackers were traversed - benoitg - 2024-08-28.

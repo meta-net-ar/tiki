@@ -3,7 +3,7 @@
         {include file="prefs/shared-help-icon.tpl"}
     </label>
     <div class="col">
-        <input name="{$p.preference|escape}" id="{$p.id|escape}" value="{$p.value|escape}" class="form-control" {* size="{$p.size|default:80|escape}" *} type="password" {$p.params}>
+        <input name="{$p.preference|escape}" id="{$p.id|escape}" value="{$p.value|escape}" class="form-control" {* size="{$p.size|default:80|escape}" *} type="password" {$p.params}{if $p.parameters.disabled} disabled="disabled"{/if}>
         {$p.detail|escape}
         {include file="prefs/shared-form-text.tpl"}
     </div>

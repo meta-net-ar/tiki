@@ -47,8 +47,8 @@ if (! isset($_REQUEST["offset"])) {
 }
 $smarty->assign_by_ref('offset', $offset);
 if (isset($_REQUEST['date_min']) || isset($_REQUEST['date_max'])) {
-    $date_min = isset($_REQUEST['date_min']) ? $_REQUEST['date_min'] : 0;
-    $date_max = isset($_REQUEST['date_max']) ? $_REQUEST['date_max'] : $tikilib->now;
+    $date_min = $_REQUEST['date_min'] ?? 0;
+    $date_max = $_REQUEST['date_max'] ?? $tikilib->now;
 } elseif (isset($_SESSION["thedate"])) {
     $date_min = 0;
     if ($_SESSION["thedate"] < $tikilib->now) {
@@ -66,34 +66,15 @@ if (isset($_REQUEST['date_min']) || isset($_REQUEST['date_max'])) {
 }
 //Keep track of month of last viewed article for article months_links module foldable display
 $_SESSION['cms_last_viewed_month'] = TikiLib::date_format("%Y-%m", $date_max);
-$min_rating = isset($_REQUEST['min_rating']) ? $_REQUEST['min_rating'] : '';
-$max_rating = isset($_REQUEST['max_rating']) ? $_REQUEST['max_rating'] : '';
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$min_rating = $_REQUEST['min_rating'] ?? '';
+$max_rating = $_REQUEST['max_rating'] ?? '';
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('find', $find);
-if (isset($_REQUEST["type"])) {
-    $type = $_REQUEST["type"];
-} else {
-    $type = '';
-}
-if (isset($_REQUEST["topic"])) {
-    $topic = $_REQUEST["topic"];
-} else {
-    $topic = '';
-}
-if (isset($_REQUEST['topicName'])) {
-    $topicName = $_REQUEST['topicName'];
-} else {
-    $topicName = '';
-}
-if (isset($_REQUEST["categId"])) {
-    $categId = $_REQUEST["categId"];
-} else {
-    $categId = '';
-}
+$type = $_REQUEST["type"] ?? '';
+$topic = $_REQUEST["topic"] ?? '';
+$topicName = $_REQUEST['topicName'] ?? '';
+$categId = $_REQUEST["categId"] ?? '';
+
 $smarty->assign_by_ref('categId', $categId);
 if (! isset($_REQUEST['lang'])) {
     $_REQUEST['lang'] = '';

@@ -110,7 +110,7 @@ function wikiplugin_mwtable($data, $params)
     if (substr($data, $soe, strlen($prefix)) == $prefix) {
         $eoe = strpos($data, $suffix, $soe);
         $element = substr($data, $soe + strlen($prefix), $eoe - $soe - strlen($prefix) - strlen($suffix));
-        if (strpos($element, "|")) {
+        if (str_contains($element, "|")) {
             // attributes present
             list($attribs, $text) = explode("|", $element, 2);
             $attributes = _get_attributes($attribs);
@@ -173,7 +173,7 @@ function wikiplugin_mwtable($data, $params)
         $wret .= "<tr>\n";
         foreach ($columns as $column) {
             // each column can have attributes and/or text
-            if (strpos($column, "|")) {
+            if (str_contains($column, "|")) {
                 list($attribs, $text) = explode("|", $column, 2);
                 $attributes = _get_attributes($attribs);
                 _check_class_attribute($attributes, $default_class_headings);
@@ -227,7 +227,7 @@ function wikiplugin_mwtable($data, $params)
             // get cells - skip over prefix of first cell
             $cells = explode($prefix, $row_cells);
         foreach ($cells as $cell) {
-            if (strpos($cell, "|")) {
+            if (str_contains($cell, "|")) {
                 list($attribs, $text) = explode("|", $cell, 2);
                 $attributes = _get_attributes($attribs);
             } else {

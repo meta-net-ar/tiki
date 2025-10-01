@@ -53,14 +53,11 @@ class ToolbarLinkFile extends ToolbarUtilityItem
 
     public function getWysiwygToken(): string
     {
-
-        $this->setupCKEditorTool('$.openModal({show: true, remote: "' . $this->getUrl() . '"});');
-
         return 'linkfile';
     }
 
     public function getOnClick(): string
     {
-        return '';
+        return '$.openModal({show: true, remote: "' . $this->getUrl() . '"});';
     }
 }

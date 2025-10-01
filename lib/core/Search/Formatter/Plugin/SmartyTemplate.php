@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Smarty\SmartyTiki;
+
 class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_Interface
 {
     private $templateFile;
@@ -63,11 +66,41 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
             return $this->wrapEditableByContext($_REQUEST[$this->editableId]);
         }
 
-        $smarty = new Smarty_Tiki();
+        $smarty = new SmartyTiki();
 
         if ($this->changeDelimiters) {
             $smarty->setLeftDelimiter('{{');
             $smarty->setRightDelimiter('}}');
+        }
+        // Format date fields in entries based on column settings, mainly used in PluginList.
+        /**
+            * `$this->data["column"]` is usually set by templates like:
+            * {OUTPUT(template="table")}
+            *     {column field="status" label="Status"}
+            *     {column field="name" label="Name"}
+            * {OUTPUT}
+            *
+            * For fields that are dates (from `$entries->getDateFields()`), we wrap the value in
+            * `<span class='text-nowrap'>` to keep it on one line. If the column doesn't have "mode" set
+            * to "raw", we set it to avoid further formatting.
+        */
+        // Make Date type field elements not wrap
+        if (! empty($this->data['column'])) {
+            foreach ($entries as $key_row => $entry) {
+                if (isset($this->data['column']['field'])) {
+                    $columns = [&$this->data['column']];
+                } else {
+                    $columns = &$this->data['column'];
+                }
+                foreach ($columns as &$column) {
+                    if (in_array($column["field"], $entries->getDateFields())) {
+                        $entries[$key_row][$column["field"]] = "<span class='text-nowrap'>" . $entry[$column["field"]] . "</span>";
+                        if (! isset($column["mode"]) || $column["mode"] !== "raw") {
+                            $column["mode"] = "raw";
+                        }
+                    }
+                }
+            }
         }
 
         foreach ($this->data as $key => $value) {

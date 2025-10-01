@@ -39,9 +39,7 @@ $auto_query_args = [
 $access->check_feature('feature_surveys');
 
 if (! isset($_REQUEST["surveyId"])) {
-    $smarty->assign('msg', tra("No survey indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No survey indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign('surveyId', $_REQUEST["surveyId"]);
 $tikilib->get_perm_object($_REQUEST['surveyId'], 'survey');
@@ -108,14 +106,14 @@ $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $srvlib->list_survey_questions($_REQUEST["surveyId"], $offset, $maxRecords, $sort_mode, $find);
 if (empty($info["position"])) {
-    $info["position"] = $channels["cant"] + 1;
+    $info["position"] = $channels["count"] + 1;
 }
 
 $headerlib->add_jsfile('lib/surveys/tiki-admin_survey_questions.js');
 
 $smarty->assign('types', $srvlib->get_types());
 $smarty->assign_by_ref('info', $info);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 // Fill array with possible number of questions per page
 $positions = [];

@@ -153,7 +153,7 @@ if (isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $nllib->list_newsletters($offset, $maxRecords, $sort_mode, $find, '', ["tiki_p_subscribe_newsletters", "tiki_p_admin_newsletters", "tiki_p_send_newsletters"]);
-$smarty->assign_by_ref('cant', $channels['cant']);
+$smarty->assign_by_ref('count', $channels['count']);
 $smarty->assign_by_ref('channels', $channels["data"]);
 $section = 'newsletters';
 include_once('tiki-section_options.php');

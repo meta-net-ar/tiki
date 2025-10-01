@@ -37,9 +37,7 @@ if (isset($_REQUEST['blogId'])) {
     $tikilib->get_perm_object('blog', $blogId);
 
     if ($tiki_p_blog_admin != 'y') {
-        $smarty->assign('msg', tra('You do not have permission to view the comments for this blog'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You do not have permission to view the comments for this blog'), \Laminas\Http\Response::STATUS_CODE_401);
     }
 } else {
     $access->check_permission('tiki_p_admin_comments');
@@ -287,6 +285,6 @@ $smarty->assign_by_ref('comments', $comments['data']);
 $smarty->assign_by_ref('filters', $filters);
 $smarty->assign_by_ref('filter_names', $filter_names);
 $smarty->assign_by_ref('filter_values', $filter_values);
-$smarty->assign_by_ref('cant', $comments['cant']);
+$smarty->assign_by_ref('count', $comments['count']);
 $smarty->assign('mid', 'tiki-list_comments.tpl');
 $smarty->display('tiki.tpl');

@@ -90,6 +90,7 @@ class Gd extends ImageAbstract
                         $imageData = ob_get_clean();
                         imagedestroy($rasterImage);
                         $this->data = imagecreatefromstring($imageData);
+                        $this->format = 'png';
                         $this->loaded = true;
                     } else {
                         ob_end_clean();

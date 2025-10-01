@@ -16,6 +16,7 @@ $inputConfiguration = [
             'scheduler_status'           => 'string',         //post
             'scheduler_rerun'            => 'bool',           //post
             'scheduler_run_only_once'    => 'bool',           //post
+            'enable_send_notification_override' => 'bool',      //post
             'new_scheduler'              => 'bool',           //post
             'editscheduler'              => 'digits',         //post
             'scheduler_time'             => 'string',         //post
@@ -23,6 +24,9 @@ $inputConfiguration = [
             'numrows'                    => 'digits',         //post
             'logs'                       => 'string',         //post
             'add'                        => 'bool',           //post
+            'filter'                     => 'string',         //get
+            'url'                        => 'url',            //post
+            'output_file'                => 'purifier'        //post
         ],
     ],
 ];
@@ -48,7 +52,8 @@ function saveScheduler()
     $reRun = $reRun == 'on' ? 1 : 0;
     $runOnlyOnce = $_POST['scheduler_run_only_once'] ?? 0;
     $runOnlyOnce = $runOnlyOnce == 'on' ? 1 : 0;
-
+    $enableSendNotificationOverride = $_POST['enable_send_notification_override'] ?? 0;
+    $enableSendNotificationOverride = $enableSendNotificationOverride == 'on' ? 1 : 0;
 
     if (empty($name)) {
         $errors[] = tra('Name is required');
@@ -83,6 +88,16 @@ function saveScheduler()
                 $errors[] = sprintf(tra('%s is required'), $param['name']);
                 $addTask = false;
             }
+
+            $validateMethod = 'validate' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+
+            if (method_exists($class, $validateMethod)) {
+                $validationResult = $class->$validateMethod($_POST[$httpParamName]);
+                if (is_string($validationResult)) {
+                    $errors[] = $validationResult;
+                    $addTask = false;
+                }
+            }
         }
 
         $params = $class->parseParams();
@@ -108,7 +123,7 @@ function saveScheduler()
     if ($addTask) {
         $scheduler = ! empty($_POST['scheduler']) ? $_POST['scheduler'] : null;
 
-        $schedLib->set_scheduler($name, $description, $task, $params, $runTime, $status, $reRun, $runOnlyOnce, $scheduler);
+        $schedLib->set_scheduler($name, $description, $task, $params, $runTime, $status, $reRun, $runOnlyOnce, $scheduler, null, null, $enableSendNotificationOverride);
         if ($scheduler) {
             $feedback = sprintf(tra('Scheduler %s was updated.'), $name);
         } else {
@@ -131,6 +146,7 @@ function saveScheduler()
     $schedulerinfo['run_time'] = $runTime;
     $schedulerinfo['status'] = $status;
     $schedulerinfo['re_run'] = $reRun;
+    $schedulerinfo['enable_send_notification_override'] = $enableSendNotificationOverride;
     $schedulerinfo['params'] = json_decode($params, true);
 
     return $schedulerinfo;
@@ -147,6 +163,7 @@ $auto_query_args = [
     'numrows',
     'scheduler',
     'logs',
+    'filter',
 ];
 
 $schedLib = TikiLib::lib('scheduler');
@@ -168,6 +185,7 @@ if ((isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset(
         $schedulerinfo['run_time'] = '';
         $schedulerinfo['status'] = '';
         $schedulerinfo['re_run'] = '';
+        $schedulerinfo['enable_send_notification_override'] = '';
     } else {
         $scheduler = $_REQUEST['scheduler'];
         $schedulerinfo['params'] = json_decode($schedulerinfo['params'], true);
@@ -195,7 +213,7 @@ if ((isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset(
             $runsCount = $numOfLogs;
         }
 
-        $smarty->assign_by_ref('cant', $runsCount);
+        $smarty->assign_by_ref('count', $runsCount);
         $smarty->assign_by_ref('numOfLogs', $numOfLogs);
 
         // Check if last run is still running and can be stopped.
@@ -221,6 +239,7 @@ if ((isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset(
     $schedulerinfo['run_time'] = $_GET['run_time'] ?? '';
     $schedulerinfo['status'] = $_GET['status'] ?? '';
     $schedulerinfo['re_run'] = $_GET['re_run'] ?? '';
+    $schedulerinfo['enable_send_notification_override'] = $_GET['enable_send_notification_override'] ?? '';
 
     $logger = new Tiki_Log('Schedulers', \Psr\Log\LogLevel::ERROR);
 
@@ -238,6 +257,8 @@ if ((isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset(
 $tasks = $schedLib->get_scheduler(null, null, ['run_only_once' => 0]);
 
 $logger = new Tiki_Log('Webcron', \Psr\Log\LogLevel::ERROR);
+$stalledTasksCount = 0;
+
 foreach ($tasks as $key => $task) {
     $schedulerItem = Scheduler_Item::fromArray($task, $logger);
     if (! $schedulerItem instanceof Scheduler_Item) {
@@ -245,9 +266,24 @@ foreach ($tasks as $key => $task) {
     }
 
     $tasks[$key]['stalled'] = $schedulerItem->isStalled();
+    if ($tasks[$key]['stalled']) {
+        $stalledTasksCount++;
+    }
 }
 
+// Handle filter parameter and apply server-side filtering
+$activeFilter = '';
+if (isset($_REQUEST['filter']) && $_REQUEST['filter'] === 'stalled') {
+    $activeFilter = 'stalled';
+    $tasks = array_filter($tasks, function ($task) {
+        return $task['stalled'] === true;
+    });
+    $tasks = array_values($tasks);
+}
+$smarty->assign('activeFilter', $activeFilter);
+
 $smarty->assign_by_ref('schedulers', $tasks);
+$smarty->assign('stalledTasksCount', $stalledTasksCount);
 
 $jobs = $schedLib->get_jobs();
 $smarty->assign_by_ref('jobs', $jobs);
@@ -257,15 +293,26 @@ if (isset($_REQUEST['add'])) {
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-schedulers.js');
+$smarty->assign('display_timezone', TikiLib::lib('tiki')->get_display_timezone(false));
 $smarty->assign('schedulerinfo', $schedulerinfo);
-$smarty->assign('schedulerruns', isset($schedulerRuns) ? $schedulerRuns : []);
+$smarty->assign('schedulerruns', $schedulerRuns ?? []);
 $smarty->assign('schedulerId', $scheduler);
 $smarty->assign('schedulerTasks', $schedulerTasks);
 $smarty->assign('selectedTask', '');
+$smarty->assign('run_timezone', TikiLib::lib('tiki')->get_display_timezone(false));
 $smarty->assign('schedulerStatus', [
     Scheduler_Item::STATUS_ACTIVE => tra('Active'),
     Scheduler_Item::STATUS_INACTIVE => tra('Inactive'),
 ]);
+
+// Get notification users for display
+$notificationUsers = [];
+try {
+    $notificationUsers = Scheduler_Utils::getSchedulerNotificationUsers();
+} catch (Exception $e) {
+    TikiLib::lib('logs')->add_log('Scheduler error', tr('Failed to get notification users: %0', $e->getMessage()));
+}
+$smarty->assign('notificationUsers', $notificationUsers);
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

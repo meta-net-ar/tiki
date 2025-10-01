@@ -1,11 +1,11 @@
-<div class="activity" data-id="{$activityframe.object.id|escape}">
+<div class="activity mb-3" data-id="{$activityframe.object.id|escape}">
     {if $activity_format eq 'summary' and $activityframe.summary neq 'content'}
         <div class="d-flex" data-href="{service controller=object action=infobox type=$activityframe.object.type object=$activityframe.object.id format=extended}">
             <div class="flex-shrink-0">
                 {$activityframe.activity.user|avatarize:'':'img/noavatar.png'}
             </div>
             <div class="flex-grow-1 ms-3">
-                <h4 class="media-heading">{$activityframe.heading}</h4>
+                <h6 class="media-heading">{$activityframe.heading}</h6>
                 {if $activityframe.activity.type && $activityframe.activity.object}
                     <span class="float-sm-end">
                         {$activityframe.activity.modification_date|tiki_short_datetime}
@@ -23,7 +23,7 @@
                 {$activityframe.activity.user|avatarize:'':'img/noavatar.png'}
             </div>
             <div class="flex-grow-1 ms-3">
-                <h4 class="media-heading">{$activityframe.heading}</h4>
+                <h6 class="media-heading">{$activityframe.heading}</h6>
                 <span class="float-sm-end">
                     {$activityframe.activity.modification_date|tiki_short_datetime}
                 </span>
@@ -31,10 +31,13 @@
             </div>
         </div>
     {else}
-        <span class="float-sm-end">
-            {$activityframe.activity.modification_date|tiki_short_datetime}
-        </span>
-        <strong style="vertical-align: middle;">{$activityframe.activity.user|avatarize:'':'img/noavatar.png'} {$activityframe.heading}</strong>
+        <div class="row mb-2">
+            <div class="col-auto">{$activityframe.activity.user|avatarize:'':'img/noavatar.png'}</div>
+            <div class="col"><h6 class="media-heading">{$activityframe.heading}</h6></div>
+            <span class="col-auto ms-auto">
+                {$activityframe.activity.modification_date|tiki_short_datetime}
+            </span>
+        </div>
         <div class="description">
             {if is_array($activityframe.activity.user_followers) && in_array($user, $activityframe.activity.user_followers)}
                 {tr}This user is your friend!{/tr}
@@ -47,7 +50,7 @@
             {/if}
         </div>
         <div class="content">{$activityframe.content}</div>
-        <div class="footer">
+        <div class="d-flex footer justify-content-end">
             {if $activityframe.comment && $activity_format neq 'extended'}
                 <a class="comment btn btn-sm" href="{service controller=comment action=list type=$activityframe.comment.type objectId=$activityframe.comment.id modal=true}">
                     {tr}Comment{/tr}
@@ -56,19 +59,19 @@
             {/if}
             {if $prefs.feature_friends eq 'y' && $activityframe.likeactive}
                 {if !empty($activityframe.like)}
-                    <a class="like btn btn-sm" href="{service controller=social action=unlike type=$activityframe.object.type id=$activityframe.object.id}">
+                    <a class="like btn btn-secondary btn-sm" href="{service controller=social action=unlike type=$activityframe.object.type id=$activityframe.object.id}">
                         {tr}Unlike{/tr}
                         {if !empty($activityframe.activity.like_list)}({$activityframe.activity.like_list|count}){/if}
                     </a>
                 {else}
-                    <a class="like btn btn-sm" href="{service controller=social action=like type=$activityframe.object.type id=$activityframe.object.id}">
+                    <a class="like btn btn-secondary btn-sm" href="{service controller=social action=like type=$activityframe.object.type id=$activityframe.object.id}">
                         {tr}Like{/tr}
                         {if !empty($activityframe.activity.like_list)}({$activityframe.activity.like_list|count}){/if}
                     </a>
                 {/if}
             {/if}
             {if $tiki_p_admin == 'y'}
-                <a class="delete-activity btn btn-sm" href="{bootstrap_modal controller=managestream action=deleteactivity activityId=$activityframe.activity.object_id}" data-activity-id="{$activityframe.activity.object_id}">
+                <a class="delete-activity btn btn-danger btn-sm" href="{bootstrap_modal controller=managestream action=deleteactivity activityId=$activityframe.activity.object_id}" data-activity-id="{$activityframe.activity.object_id}">
                     {tr}Delete{/tr}
                 </a>
             {/if}

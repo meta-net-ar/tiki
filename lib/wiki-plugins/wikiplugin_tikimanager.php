@@ -18,7 +18,7 @@ function wikiplugin_tikimanager_info()
             'instanceIds' => [
                 'required' => false,
                 'name' => tra('Instance IDs'),
-                'description' => tra('Comma-separted list of instance IDs available to manage. For a full list, use Tiki Manager admin page.'),
+                'description' => tra('Comma-separated list of instance IDs available to manage. For a full list, use Tiki Manager admin page.'),
                 'since' => '25.0',
                 'default' => '',
                 'separator' => ',',
@@ -26,7 +26,7 @@ function wikiplugin_tikimanager_info()
             'showactions' => [
                 'required' => false,
                 'name' => tra('Show actions'),
-                'description' => tra('Comma-separted list of actions shown in the interface. If none are listed, all actions will be available by default.'),
+                'description' => tra('Comma-separated list of actions shown in the interface. If none are listed, all actions will be available by default.'),
                 'since' => '25.0',
                 'default' => '',
                 'separator' => ',',
@@ -34,7 +34,7 @@ function wikiplugin_tikimanager_info()
             'hideactions' => [
                 'required' => false,
                 'name' => tra('Hide actions'),
-                'description' => tra('Comma-separted list of actions hidden from the interface. If none are listed, all actions will be available by default.'),
+                'description' => tra('Comma-separated list of actions hidden from the interface. If none are listed, all actions will be available by default.'),
                 'since' => '25.0',
                 'default' => '',
                 'separator' => ',',

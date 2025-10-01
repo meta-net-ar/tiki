@@ -39,15 +39,15 @@
         {tr}Enter the URL of a web services returning either JSON or YAML. Parameters can be specified by enclosing a name between percentage signs. For example: %name%. %service% and %template% are reserved keywords and cannot be used.{/tr}
         {/remarksbox}
         <div class="mb-3 row">
-            <label class="col-form-label col-sm-4">{tr}URL:{/tr}</label>
+            <label class="col-form-label col-sm-4" for="ws_url">{tr}URL:{/tr}</label>
             <div class="col-sm-8">
-                <input type="text" name="url" size="75" value="{$url|escape}" class="form-control"/>
+                <input type="text" name="url" id="ws_url" size="75" value="{$url|escape}" class="form-control"/>
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="col-form-label col-sm-4">{tr}Type:{/tr}</label>
+            <label class="col-form-label col-sm-4" for="ws_type">{tr}Type:{/tr}</label>
             <div class="col-sm-8">
-                <select name="wstype" class="form-control">
+                <select name="wstype" id="ws_type" class="form-control">
                     {foreach from=$webservicesTypes item=_type}
                         <option value="{$_type}"{if $wstype eq $_type} selected="selected"{/if}>{$_type}</option>
                     {/foreach}
@@ -55,9 +55,9 @@
             </div>
         </div>
         <div id="ws_postbody" class="mb-3 row">
-            <label class="col-form-label col-sm-4"> {tr}Body of POST request{/tr}</label>
+            <label class="col-form-label col-sm-4" for="post_body"> {tr}Body of POST request{/tr}</label>
             <div class="col-sm-8">
-                <textarea name="postbody" class="form-control">{$postbody|escape}</textarea><br>
+                <textarea name="postbody" id="post_body" class="form-control">{$postbody|escape}</textarea><br>
                 {tr}Parameters (%name%):{/tr}
             </div>
             <div class="col-sm-8 offset-sm-4">
@@ -104,6 +104,7 @@
                         <tr>
                             <th>{tr}OIntegrate Version{/tr}</th>
                             <td>{if $response->version}{$response->version|escape}{else}<em>{tr}Not supported{/tr}</em>{/if}
+                            </td>
                         </tr>
                         <tr>
                             <th>{tr}Schema Version{/tr}</th>

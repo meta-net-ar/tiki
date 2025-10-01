@@ -1,5 +1,14 @@
-//   This is the SCSS template for
-/*  the Jqui theme stylesheet for Tiki Wiki CMS Groupware. */
+@charset "UTF-8";
+/*!
+ * The Jqui theme by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+ */
+/*!
+ * Bootstrap  v5.3.7 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 

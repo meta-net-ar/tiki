@@ -1,7 +1,6 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 // CSS is used because Bootstrap partials aren't available for theme variables, etc.
 //body.layout_basic {
@@ -46,3 +45,30 @@
 .badge.bg-danger {
     color: #fff;
 }
+
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: #{$component-active-bg};
+}
+
+// Dark color mode
+[data-bs-theme=dark] {
+    .blockquote-footer { color: #848D94; }
+    .figure-caption { color: #848D94; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #DC6D1E !important; }
+
+    .btn.btn-outline-primary { color: #1C9AB0; border-color: #1C9AB0; }
+    .btn.btn-outline-secondary { color: #0097BD; border-color: #0097BD; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4800; border-color: #FF4800; }
+    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
+    .btn.btn-outline-info { color: #009BA3; border-color: #009BA3; }
+    .btn.btn-outline-dark { color: #139CAE; border-color: #139CAE; }
+
+    .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
+}
+
+//[data-bs-theme=dark].bottom_modules {
+//    color: $body-color-dark;
+//}

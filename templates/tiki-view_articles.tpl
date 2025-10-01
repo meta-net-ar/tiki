@@ -23,7 +23,7 @@
                 {button href="tiki-list_submissions.php" _type="link" class="btn btn-link" _icon_name="view" _text="{tr}View Submissions{/tr}"}
             {/if}
             {if $prefs.feature_user_watches eq 'y' or $prefs.feature_group_watches eq 'y'}
-                <a class="btn btn-sm btn-info dropdown-toggle float-end" data-bs-toggle="dropdown" href="#">
+                <a class="btn btn-sm btn-info dropdown-toggle float-end" data-bs-toggle="dropdown" href="#" role="button">
                     {icon name='menu-extra'}
                 </a>
                 <div class="dropdown-menu dropdown-menu-end">
@@ -38,7 +38,7 @@
                                 <input type="hidden" name="watch_event" value="article_*">
                                 <input type="hidden" name="watch_object" value="*">
                                 <input type="hidden" name="watch_action" value="add">
-                                <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" onclick="confirmPopup()">
+                                <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" aria-label="{tr}Delete{/tr}" onclick="confirmPopup()">
                                     {icon name='watch' _menu_text='y' _menu_icon='y' alt="{tr}Monitor articles{/tr}"}
                                 </button>
                             </form>
@@ -48,7 +48,7 @@
                                 <input type="hidden" name="watch_event" value="article_*">
                                 <input type="hidden" name="watch_object" value="*">
                                 <input type="hidden" name="watch_action" value="remove">
-                                <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" onclick="confirmPopup()">
+                                <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" aria-label="{tr}Delete{/tr}" onclick="confirmPopup()">
                                     {icon name='stop-watching' _menu_text='y' _menu_icon='y' alt="{tr}Stop monitoring articles{/tr}"}
                                 </button>
                             </form>
@@ -98,7 +98,6 @@
                 {if $listpages[ix].show_subtitle eq 'y' and $listpages[ix].subtitle}<div class="articlesubtitle">{$listpages[ix].subtitle|escape}</div>{/if}
                 {if ($listpages[ix].show_author eq 'y')
                     or ($listpages[ix].show_pubdate eq 'y')
-                    or ($listpages[ix].show_expdate eq 'y')
                     or ($listpages[ix].show_reads eq 'y')
                 }
                     <span class="titleb">
@@ -112,21 +111,13 @@
                                      {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {$listpages[ix].author|username}
                                 </span>
                             {/if}
-                            {if $listpages[ix].show_pubdate eq 'y' or $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
+                            {if $listpages[ix].show_pubdate eq 'y' or $listpages[ix].show_reads eq 'y'}
                                 -
                             {/if}
                         {/if}
                         {if $listpages[ix].show_pubdate eq 'y'}
                             <span class="pubdate">
                                  {$listpages[ix].publishDate|tiki_short_datetime}
-                            </span>
-                            {if $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
-                                -
-                            {/if}
-                        {/if}
-                        {if $listpages[ix].show_expdate eq 'y'}
-                            <span class="expdate">
-                                {tr}Expires{/tr} {$listpages[ix].expireDate|tiki_short_datetime}
                             </span>
                             {if $listpages[ix].show_reads eq 'y'}
                                 -
@@ -185,7 +176,7 @@
                                     title="{if $listpages[ix].show_image_caption and $listpages[ix].image_caption}{$listpages[ix].image_caption|escape}{elseif $listpages[ix].topicName}{tr}{$listpages[ix].topicName}{/tr}{else}{tr}Read More{/tr}{/if}">
                                     {$style=''}
                                     <img class="img-thumbnail media-object article-image custom-image"
-                                        alt="{if $listpages[ix].show_image_caption and $listpages[ix].image_caption}{$listpages[ix].image_caption|escape}{elseif $listpages[ix].topicName}{tr}{$listpages[ix].topicName}{/tr}{/if}"
+                                        alt="{if $listpages[ix].show_image_caption and $listpages[ix].image_caption}{$listpages[ix].image_caption|escape}{elseif $listpages[ix].image_alt}{$listpages[ix].image_alt}{elseif $listpages[ix].topicName}{tr}{$listpages[ix].topicName}{/tr}{/if}"
                                         {strip}src="article_image.php?image_type=article&amp;id={$listpages[ix].articleId}
                                         {if $listpages[ix].list_image_x > 0 and ($largefirstimage neq 'y' or not $smarty.section.ix.first)}
                                             &amp;width={$listpages[ix].list_image_x}
@@ -216,7 +207,7 @@
                         {/if}
                     {/if}
                 </div>
-                <div class="articleheadingtext{if $listpages[ix].isfloat eq 'n'} flex-grow-1 ms-3{/if}">{$listpages[ix].parsed_heading}</div>
+                <div class="articleheadingtext{if $listpages[ix].isfloat eq 'n'} flex-grow-1{/if}">{$listpages[ix].parsed_heading}</div>
             </div>
                     {if isset($fullbody) and $fullbody eq "y"}
             <div class="articlebody py-3">{$listpages[ix].parsed_body}</div>
@@ -244,16 +235,16 @@
                     {/if}
                     {if ($prefs.feature_article_comments eq 'y') and ($listpages[ix].perms.tiki_p_read_comments eq 'y') and ($listpages[ix].allow_comments eq 'y')}
                         <li class="list-inline-item">
-                            <a href="{$listpages[ix].articleId|sefurl:article:with_next}{if $prefs.feature_sefurl neq 'y'}&amp;{/if}show_comzone=y{if !empty($urlparam)}&amp;{$urlparam}{/if}#comments"{if $listpages[ix].comments_cant > 0} class="mark"{/if}>
-                                {if $listpages[ix].comments_cant == 0 and $listpages[ix].perms.tiki_p_post_comments == 'y'}
+                            <a href="{$listpages[ix].articleId|sefurl:article:with_next}{if $prefs.feature_sefurl neq 'y'}&amp;{/if}show_comzone=y{if !empty($urlparam)}&amp;{$urlparam}{/if}#comments"{if $listpages[ix].comments_count > 0} class="mark"{/if}>
+                                {if $listpages[ix].comments_count == 0 and $listpages[ix].perms.tiki_p_post_comments == 'y'}
                                     {if !isset($actions) or $actions eq "y"}
                                         {icon name="comment"} {tr}Add Comment{/tr}
                                     {/if}
                                 {elseif $listpages[ix].perms.tiki_p_read_comments eq 'y'}
-                                    {if $listpages[ix].comments_cant == 1}
+                                    {if $listpages[ix].comments_count == 1}
                                         {icon name="comment"} {tr}1 comment{/tr}
                                     {else}
-                                        {icon name="comments"} {$listpages[ix].comments_cant}&nbsp;{tr}comments{/tr}
+                                        {icon name="comments"} {$listpages[ix].comments_count}&nbsp;{tr}comments{/tr}
                                     {/if}
                                 {/if}
                             </a>
@@ -267,7 +258,7 @@
                             {include file='translated-lang.tpl' object_type='article' trads=$listpages[ix].translations articleId=$listpages[ix].articleId}
                         {/if}
                         <div class="btn-group">
-                            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
                                 {icon name="wrench"}
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
@@ -290,7 +281,7 @@
                                     <form action="tiki-list_articles.php" method="post">
                                         {ticket}
                                         <input type="hidden" name="remove" value="{$listpages[ix].articleId}">
-                                        <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$listpages[ix].articleId}Are you sure you want to permanently remove the article with identifier %0?{/tr}')">
+                                        <button type="submit" class="btn btn-link dropdown-item" title=":{tr}Delete{/tr}" aria-label="{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$listpages[ix].articleId}Are you sure you want to permanently remove the article with identifier %0?{/tr}')">
                                             {icon name='remove'} {tr}Remove{/tr}
                                         </button>
                                     </form>
@@ -315,17 +306,17 @@
 
 {if !isset($actions) or $actions eq "y"}
     {if $tiki_p_edit_article eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_cms eq 'y'}
-        <br/><a href="tiki-edit_article.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="alert-link">
+        <br/><a href="tiki-edit_article.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="btn btn-link">
             {icon name="create"} {tr}New Article{/tr}
         </a>
     {/if}
     {if $prefs.feature_submissions == 'y' && $tiki_p_edit_submission == "y" && $tiki_p_edit_article neq 'y' && $tiki_p_admin neq 'y' && $tiki_p_admin_cms neq 'y'}
-        <br/><a href="tiki-edit_submission.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="alert-link">
+        <br/><a href="tiki-edit_submission.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="btn btn-link">
             {icon name="create"} {tr}New Submission{/tr}
         </a>
     {/if}
 {/if}
 
 {if !empty($listpages) && (!isset($usePagination) or $usePagination ne 'n')}
-    {pagination_links cant=$cant step=$maxArticles offset=$offset}{if isset($urlnext)}{$urlnext}{/if}{/pagination_links}
+    {pagination_links count=$count step=$maxArticles offset=$offset}{if isset($urlnext)}{$urlnext}{/if}{/pagination_links}
 {/if}

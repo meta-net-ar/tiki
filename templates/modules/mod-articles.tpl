@@ -31,13 +31,13 @@
     {/modules_list}
     {if $more eq 'y'}
         <div class="more">
-            {assign var=queryArgs value=''}
+            {$queryArgs=''}
             {foreach from=$urlParams item=urlParam key=urlParamKey}
                 {if !empty($urlParam) and !empty($module_params[$urlParamKey])}
                     {if empty($queryArgs)}
-                        {assign var=queryArgs value='?'}
+                        {$queryArgs='?'}
                     {else}
-                        {assign var=queryArgs value="$queryArgs&amp;"}
+                        {$queryArgs="$queryArgs&amp;"}
                     {/if}
                     {capture assign=queryArgs}{$queryArgs}{$urlParam}={$module_params[$urlParamKey]|escape:"url"}{/capture}
                 {/if}

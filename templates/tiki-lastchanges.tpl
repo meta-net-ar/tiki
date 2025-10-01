@@ -1,21 +1,21 @@
 {title admpage="wiki" help="Using Wiki Pages#Displaying_Last_Changes" url="tiki-lastchanges.php?days=$days"}{tr}Last Changes{/tr}{/title}
 
 <div class="t_navbar btn-group mb-4">
-    {if $days eq '1'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '1'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=1" class="btn btn-primary" _text="{tr}Today{/tr}" _class=$thisclass}
-    {if $days eq '2'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '2'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=2" class="btn btn-primary" _text="{tr}Last 2 days{/tr}" _class=$thisclass}
-    {if $days eq '3'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '3'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=3" class="btn btn-primary" _text="{tr}Last 3 days{/tr}" _class=$thisclass}
-    {if $days eq '5'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '5'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=5" class="btn btn-primary" _text="{tr}Last 5 days{/tr}" _class=$thisclass}
-    {if $days eq '7'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '7'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=7" class="btn btn-primary" _text="{tr}Last week{/tr}" _class=$thisclass}
-    {if $days eq '14'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '14'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=14" class="btn btn-primary" _text="{tr}Last 2 weeks{/tr}" _class=$thisclass}
-    {if $days eq '31'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '31'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=31" class="btn btn-primary" _text="{tr}Last month{/tr}" _class=$thisclass}
-    {if $days eq '0'}{assign var=thisclass value='active'}{else}{assign var=thisclass value=''}{/if}
+    {if $days eq '0'}{$thisclass='active'}{else}{$thisclass=''}{/if}
     {button href="tiki-lastchanges.php?days=0" class="btn btn-primary" _text="{tr}All{/tr}" _class=$thisclass}
 </div>
 
@@ -27,7 +27,7 @@
 {/if}
 
 {if $findwhat!=""}
-    {tr}Found{/tr} "<b>{$findwhat|escape}</b>" {tr}in{/tr} {$cant_records|escape} {tr}LastChanges{/tr}
+    {tr}Found{/tr} "<b>{$findwhat|escape}</b>" {tr}in{/tr} {$records_count|escape} {tr}LastChanges{/tr}
 {/if}
 <div class="table-responsive">
 <table class="table">
@@ -63,7 +63,7 @@
                         <a class="tips" href='tiki-pagehistory.php?page={$lastchanges[changes].pageName|escape:"url"}' title=":{tr}History{/tr}">{icon name="history"}</a>&nbsp;{tr}v{/tr}{$lastchanges[changes].version}
                         <a class="link" href='tiki-pagehistory.php?page={$lastchanges[changes].pageName|escape:"url"}&amp;preview={$lastchanges[changes].version|escape:"url"}' title="{tr}View{/tr}">v</a>&nbsp;
                         {if $tiki_p_rollback eq 'y'}
-                            <a class="link" href='tiki-rollback.php?page={$lastchanges[changes].pageName|escape:"url"}&amp;version={$lastchanges[changes].version|escape:"url"}' title="{tr}Roll back{/tr}">b</a>&nbsp;
+                            <a class="link" href='tiki-rollback.php?page={$lastchanges[changes].pageName|escape:"url"}&amp;version={$lastchanges[changes].version|escape:"url"}' title="{tr _0=$lastchanges[changes].version}Revert to version %0{/tr}">b</a>&nbsp;
                         {/if}
                         <a class="link" href='tiki-pagehistory.php?page={$lastchanges[changes].pageName|escape:"url"}&amp;diff={$lastchanges[changes].version|escape:"url"}' title="{tr}Compare{/tr}">c</a>&nbsp;
                         <a class="link" href='tiki-pagehistory.php?page={$lastchanges[changes].pageName|escape:"url"}&amp;diff2={$lastchanges[changes].version|escape:"url"}' title="{tr}Diff{/tr}">d</a>&nbsp;
@@ -81,4 +81,4 @@
     {/section}
 </table>
 </div>
-{pagination_links cant=$cant_records step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$records_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

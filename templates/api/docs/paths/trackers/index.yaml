@@ -34,7 +34,7 @@ get:
                     items:
                       type: integer
                       description: Tracker items count
-              cant:
+              count:
                 type: integer
                 description: Trackers count
 post:

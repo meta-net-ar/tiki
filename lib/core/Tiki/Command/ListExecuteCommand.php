@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use TikiLib;
 use WikiParser_PluginArgumentParser;
 use WikiParser_PluginMatcher;
@@ -51,13 +52,18 @@ class ListExecuteCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        global $prefs;
         $page = $input->getArgument('page');
         $action = $input->getArgument('action');
+        $io = new SymfonyStyle($input, $output);
 
         $tikilib = TikiLib::lib('tiki');
+        if (empty($prefs['fallbackBaseUrl'])) {
+            $io->warning("Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the admin.");
+        }
         if (! $pageInfo = $tikilib->get_page_info($page)) {
-            $output->writeln("Page $page not found.");
-            return (int) false;
+            $io->error("Page $page not found.");
+            return Command::FAILURE;
         }
 
         if ($request = $input->getOption('request')) {
@@ -102,7 +108,7 @@ class ListExecuteCommand extends Command
                             'ListExecute plugin was rejected.' :
                             'ListExecute plugin is pending for approval.';
 
-                        $output->write("<error>$outputMessage</error>");
+                        $io->error($outputMessage);
                         return Command::FAILURE;
                     }
                 }
@@ -111,7 +117,7 @@ class ListExecuteCommand extends Command
 
         TikiLib::lib('parser')->parse_data($pageInfo['data']);
 
-        $output->writeln("Action $action executed on page $page.");
+        $io->success("Action $action executed on page $page.");
         return Command::SUCCESS;
     }
 }

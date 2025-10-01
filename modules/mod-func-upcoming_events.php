@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -131,16 +131,16 @@ function module_upcoming_events($mod_reference, $module_params)
             array_intersect($calIds, $viewable),
             -1,
             'start_asc',
-            isset($module_params['priorDays']) ? (int) $module_params['priorDays'] : 0,
-            isset($module_params['maxDays']) ? (int) $module_params['maxDays'] : 365
+            (int) ($module_params['priorDays'] ?? 0),
+            (int) ($module_params['maxDays'] ?? 365)
         );
     }
 
-    $smarty->assign('modUpcomingEvents', isset($events['data']) ? $events['data'] : []);
-    $smarty->assign('maxlen', isset($module_params["maxlen"]) ? $module_params["maxlen"] : 0);
-    $smarty->assign('showDescription', isset($module_params['showDescription']) ? $module_params['showDescription'] : 'n');
-    $smarty->assign('showEnd', isset($module_params['showEnd']) ? $module_params['showEnd'] : 'n');
-    $smarty->assign('showColor', isset($module_params['showColor']) ? $module_params['showColor'] : 'n');
-    $smarty->assign('tooltip_infos', isset($module_params['tooltip_infos']) ? $module_params['tooltip_infos'] : 'y');
+    $smarty->assign('modUpcomingEvents', $events['data'] ?? []);
+    $smarty->assign('maxlen', $module_params["maxlen"] ?? 0);
+    $smarty->assign('showDescription', $module_params['showDescription'] ?? 'n');
+    $smarty->assign('showEnd', $module_params['showEnd'] ?? 'n');
+    $smarty->assign('showColor', $module_params['showColor'] ?? 'n');
+    $smarty->assign('tooltip_infos', $module_params['tooltip_infos'] ?? 'y');
     TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }

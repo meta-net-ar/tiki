@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Wiki\Document;
+
 $section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
@@ -23,14 +26,11 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 $histlib = TikiLib::lib('hist');
-require_once("lib/diff/difflib.php");
 
 $access->check_feature('feature_wiki');
 $access->check_feature('feature_page_contribution');
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 } else {
     $page = $_REQUEST["page"];
     $smarty->assign_by_ref('page', $page);

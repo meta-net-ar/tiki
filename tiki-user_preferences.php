@@ -4,6 +4,9 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -75,18 +78,22 @@ $modlib = TikiLib::lib('mod');
 $userprefslib = TikiLib::lib('userprefs');
 $perspectivelib = TikiLib::lib('perspective');
 
+// Get cookie consent user preferences
+$cookieConsentPrefs = CookieConsentLib::getConsentPreferences();
+// Get all the existing cookie categories
+$cookieCategories = CookieConsentLib::getCookieCategories();
+
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use PragmaRX\Google2FA\Google2FA;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Tiki\Lib\TikiDate;
 
 // User preferences screen
 if ($prefs['feature_userPreferences'] != 'y' && $prefs['change_password'] != 'y' && $tiki_p_admin_users != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_userPreferences");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_userPreferences", \Laminas\Http\Response::STATUS_CODE_403);
 }
 $access->check_user($user);
 
@@ -108,9 +115,7 @@ if (! empty($_REQUEST['userId'])) {
 if ($userwatch != $user) {
     $access->check_permission('tiki_p_admin_users');
     if (empty($userwatch) || empty($userlib->user_exists($userwatch))) {
-        $smarty->assign('msg', tra("Unknown user"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Unknown user"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 }
 
@@ -127,10 +132,15 @@ $foo1 = str_replace("tiki-user_preferences", "tiki-editpage", $foo["path"]);
 $foo2 = str_replace("tiki-user_preferences", "tiki-index", $foo["path"]);
 $smarty->assign('url_edit', $tikilib->httpPrefix() . $foo1);
 $smarty->assign('url_visit', $tikilib->httpPrefix() . $foo2);
-$smarty->assign('show_mouseover_user_info', isset($prefs['show_mouseover_user_info']) ? $prefs['show_mouseover_user_info'] : $prefs['feature_community_mouseover']);
+$smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
 
 if ($prefs['feature_perspective'] === 'y') {
     $smarty->assign('perspectives', $perspectivelib->list_perspectives());
+}
+
+if ($prefs['cookie_consent_feature'] === "y") {
+    $smarty->assign('cookieConsentPrefs', $cookieConsentPrefs);
+    $smarty->assign('cookieCategories', $cookieCategories);
 }
 
 // form in first tab "Personal Information"
@@ -200,6 +210,31 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
         $tikilib->set_user_preference($userwatch, 'notify_oneself', $_POST["notify_oneself"]);
     }
 
+    if (isset($_POST["cookie_consent_update"])) {
+        // Initialize the preferences array using the consent action from POST data.
+        $preferences = [
+            'consentGiven' => true,
+            'action' => $_POST['cookie_consent_update'],
+            'categories' => []
+        ];
+        // Loop through all defined cookie categories and set their statuses.
+        foreach ($cookieCategories as $category => $description) {
+            if ($_POST['cookie_consent_update'] === 'declineNonEssential') {
+                // When the user declines unnecessary cookies, disable all non-essential categories.
+                $preferences['categories'][$category] = ($category === 'essential');
+            } else {
+                // For "acceptAll" or "customized" actions, enable the category only if the corresponding POST flag is set.
+                // Always ensure the essential category is true.
+                $preferences['categories'][$category] = ($category === 'essential') ? true : (isset($_POST["cookie_consent_$category"]) && $_POST["cookie_consent_$category"] === "on");
+            }
+        }
+        // Store the complete consent preferences as a single JSON cookie via CookieConsentLib.
+        CookieConsentLib::setConsentPreferences($preferences);
+
+        // Save the preferences in the user's settings as a JSON string.
+        $tikilib->set_user_preference($userwatch, 'cookie_consent_user_pref', json_encode($preferences));
+    }
+
     if (isset($_POST["switch_user_notification"])) {
         $tikilib->set_user_preference($userwatch, 'switch_user_notification', $_POST["switch_user_notification"]);
     }
@@ -264,20 +299,15 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
 
     $tikilib->set_user_preference($userwatch, 'remember_closed_rboxes', empty($_POST['remember_closed_rboxes']) ? 'n' : 'y');
 
-    $email_isPublic = isset($_POST['email_isPublic']) ? $_POST['email_isPublic'] : 'n';
+    $email_isPublic = $_POST['email_isPublic'] ?? 'n';
     $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);
     $tikilib->set_user_preference($userwatch, 'mailCharset', $_POST['mailCharset']);
     // Custom fields
     foreach ($customfields as $custpref => $prefvalue) {
-        if (isset($_POST[$customfields[$custpref]['prefName']])) {
-            $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
+        $prefName = $prefvalue['prefName'];
+        if (isset($_POST[$prefName])) {
+            $tikilib->set_user_preference($userwatch, $prefName, $_POST[$prefName]);
         }
-    }
-    // Custom fields
-    foreach ($customfields as $custpref => $prefvalue) {
-        // print $customfields[$custpref]['prefName'];
-        // print $_REQUEST[$customfields[$custpref]['prefName']];
-        $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
     }
 
     if (isset($_POST['mess_maxRecords'])) {
@@ -384,7 +414,11 @@ if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_adm
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
-
+if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] == 'n') {
+    $prefs['change_password'] = 'n';
+    $warning = "New password fields are hidden on Intertiki clients.\nTo update your password, please log in directly to the Intertiki server.";
+    $smarty->assign('intertiki_no_password_change_warning', $warning);
+}
 
 $tfaSecret = $userlib->get_2_factor_secret($userwatch);
 if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
@@ -405,9 +439,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             list($ok, $userwatch, $error) = $userlib->validate_user($userwatch, $pass, false, null, false);
         }
         if (! $ok) {
-            $smarty->assign('msg', tra("Invalid password. Your current password is required to change administrative information"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Invalid password. Your current password is required to change administrative information"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
     if (! empty($_POST['email']) && ($prefs['login_is_email'] != 'y' || $user == 'admin') && $_POST['email'] != $userlib->get_user_email($userwatch)) {
@@ -433,15 +465,11 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
     // If user has provided new password, let's try to change
     if (! empty($_POST["pass1"])) {
         if ($_POST["pass1"] != $_POST["pass2"]) {
-            $smarty->assign('msg', tra("The passwords did not match"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The passwords did not match"), \Laminas\Http\Response::STATUS_CODE_400);
         }
         $polerr = $userlib->check_password_policy($_POST["pass1"]);
         if (strlen($polerr) > 0) {
-            $smarty->assign('msg', $polerr);
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
         if ($prefs['feature_user_encryption'] === 'y') {
@@ -449,7 +477,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             $cryptlib = TikiLib::lib('crypt');
             $cryptlib->onChangeUserPassword($_POST["pass"], $_POST["pass1"]);
         }
-        Feedback::success(sprintf(tra('Password has been changed')));
+        Feedback::success(tra('Password has been changed'));
     }
 }
 
@@ -466,13 +494,17 @@ if (
         );
     } else {
         if (empty($_POST['tfaPin'])) {
-            Feedback::error(tr('Field Pin Code is required.'));
+            Feedback::error(tr('Field 2FA Code is required.'));
         } else {
-            Feedback::error(tr('Invalid Pin Code.'));
+            Feedback::error(tr('Invalid 2FA Code.'));
         }
         header('Location: ' . basename(__FILE__) . '?tfagenerate=true');
         die;
     }
+}
+
+if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == 'email2FA') {
+    $tfaSecret = $userlib->update_2_factor_secret($user, 'y');
 }
 
 if (
@@ -484,7 +516,6 @@ if (
     unset($_SESSION['tfaSecret']);
 }
 
-$force2FA = false;
 $twoFactorSecret = $userlib->get_2_factor_secret($userwatch);
 $force2FA = $userlib->forceTwoFactorAuth($userwatch);
 $smarty->assign('force2FA', $force2FA);
@@ -492,7 +523,7 @@ $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
 $userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
-if ($prefs['twoFactorAuth'] == 'y' && $generate) {
+if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == 'google2FA') {
     $google2fa = new Google2FA();
     if (empty($_SESSION['tfaSecret']) || $_SESSION['tfaSecret'] == $tfaSecret) {
         $_SESSION['tfaSecret'] = $google2fa->generateSecretKey();
@@ -635,8 +666,8 @@ $smarty->assign('usertrackerId', $usertrackerId);
 $smarty->assign('useritemId', $useritemId);
 // Custom fields
 foreach ($customfields as $custpref => $prefvalue) {
-    $customfields[$custpref]['value'] = $tikilib->get_user_preference($userwatch, $customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
-    $smarty->assign($customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
+    $prefvalue['value'] = $tikilib->get_user_preference($userwatch, $prefvalue['prefName'], $prefvalue['value']);
+    $smarty->assign($prefvalue['prefName'], $prefvalue['value']);
 }
 if ($prefs['feature_messages'] == 'y' && $tiki_p_messages == 'y') {
     $unread = $tikilib->user_unread_messages($userwatch);

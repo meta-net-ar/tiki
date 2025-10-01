@@ -71,7 +71,7 @@ if (isset($_REQUEST['blogId'])) {
 }
 
 $posts = $bloglib->list_posts($offset, $maxRecords, $sort_mode, $find, $blogId);
-$smarty->assign_by_ref('cant', $posts["cant"]);
+$smarty->assign_by_ref('count', $posts["count"]);
 $smarty->assign_by_ref('posts', $posts["data"]);
 
 // Display the template

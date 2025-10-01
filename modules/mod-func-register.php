@@ -20,7 +20,7 @@ function module_register_info()
 /**
  * @param $mod_reference
  * @param $module_params
- * @return array|mixed|RegistrationError|string
+ * @return array|mixed|Tiki\Lib\Registration\Error|string
  */
 function module_register($mod_reference, $module_params)
 {

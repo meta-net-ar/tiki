@@ -1,6 +1,12 @@
-/* The Darkshine theme for Tiki Wiki CMS Groupware */
-/* Original author information: */
-/*  __________________________________________________________________
+@charset "UTF-8";
+/*!
+ * The Darkroom theme by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+ */
+/*!
+ * Original author information:
+ *  __________________________________________________________________
   |                                                                 |
   |  Template Info:                                                 |
   |                                                                 |
@@ -13,7 +19,12 @@
   |  www.pureweb.ca                                                 |
   |                                                                 |
   |_________________________________________________________________|
-*/
+ */
+/*!
+ * Bootstrap  v5.3.6 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 

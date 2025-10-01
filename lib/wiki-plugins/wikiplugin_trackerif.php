@@ -47,7 +47,7 @@ function wikiplugin_trackerif($data, $params)
     $values = [];
     $dataelse = '';
 
-    if (strpos($data, '{ELSE}')) {
+    if (str_contains($data, '{ELSE}')) {
         // Else bloc when test does not pass
         $dataelse = substr($data, strpos($data, '{ELSE}') + 6);
         $data = substr($data, 0, strpos($data, '{ELSE}'));
@@ -121,12 +121,12 @@ function wikiplugin_trackerif_test(LDAPFilter $test, array $values)
 
             if (preg_match('/f_([0-9]+)/', $matches[1], $matches_f)) {
                 // Retrieve the field f_*
-                $_a = isset($values[$matches_f[1]]) ? $values[$matches_f[1]] : '';
+                $_a = $values[$matches_f[1]] ?? '';
             }
 
             if (preg_match('/f_([0-9]+)/', $matches[3], $matches_f)) {
                 // Retrieve the field f_*
-                $_b = isset($values[$matches_f[1]]) ? $values[$matches_f[1]] : '';
+                $_b = $values[$matches_f[1]] ?? '';
             }
 
             switch ($matches[2]) {

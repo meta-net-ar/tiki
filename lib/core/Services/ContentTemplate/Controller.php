@@ -61,7 +61,7 @@ class Services_ContentTemplate_Controller
         // Done
         return [
             'data' => $result,
-            'cant' => count($result),
+            'count' => count($result),
             ];
     }
 }

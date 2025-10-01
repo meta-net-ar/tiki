@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Field;
 
+use Tiki\Lib\Diff\DiffUtils;
 use Tracker_Definition;
 
 /**
@@ -164,9 +165,9 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
             if (! empty($context['url'])) {
                 if ($context['url'] == 'sefurl') {
                     $context['url'] = 'item' . $itemId;
-                } elseif (strpos($context['url'], 'itemId') !== false) {
+                } elseif (str_contains($context['url'], 'itemId')) {
                     $context['url'] = preg_replace('/([&|\?])itemId=?[^&]*/', '\\1itemId=' . $itemId, $context['url']);
-                } elseif (isset($context['reloff']) && strpos($context['url'], 'offset') !== false) {
+                } elseif (isset($context['reloff']) && str_contains($context['url'], 'offset')) {
                     $smarty = \TikiLib::lib('smarty');
                     $context['url'] = preg_replace('/([&|\?])tr_offset=?[^&]*/', '\\1tr_offset' . $smarty->tpl_vars['iTRACKERLIST']
                         . '=' . $context['reloff'], $context['url']);
@@ -182,7 +183,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
             // add the html / js for the mouseover popup
             if (isset($context['showpopup']) && $context['showpopup'] == 'y') {
                 // check if trackerplugin has set popup fields using the popup parameter
-                $pluginPopupFields = isset($context['popupfields']) ? $context['popupfields'] : null;
+                $pluginPopupFields = $context['popupfields'] ?? null;
                 $popup = $this->renderPopup($pluginPopupFields);
 
                 if ($popup) {
@@ -246,8 +247,8 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
         if (empty($context['diff_style'])) {
             $context['diff_style'] = 'inlinediff';
         }
-        require_once('lib/diff/difflib.php');
-        $diff = diff2($old, $new, $context['diff_style']);
+
+        $diff = DiffUtils::diff2($old, $new, $context['diff_style']);
         $result = '';
 
         if (is_array($diff)) {
@@ -592,13 +593,13 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
      */
     protected function getData($key, $default = false)
     {
-        return isset($this->itemData[$key]) ? $this->itemData[$key] : $default;
+        return $this->itemData[$key] ?? $default;
     }
 
     /**
      * Get the tracker field object corresponding to this tracker item field object
      */
-    protected function getTrackerFieldInstance(): AbstractTrackerField
+    public function getTrackerFieldInstance(): AbstractTrackerField
     {
         return $this->trackerField;
     }
@@ -623,7 +624,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     public function isMainField(): bool
     {
         //We use this instead of 'isMain' because there is no constraint enforced that there is only one field per tracker set 'isMain'.
-        return ($this->trackerField->getId() == $this->trackerDefinition->getMainFieldId()) ? true : false;
+        return $this->trackerField->getId() == $this->trackerDefinition->getMainFieldId();
     }
 
     protected function renderTemplate($file, $context = [], $data = [])
@@ -696,5 +697,17 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     public function removeValue($value)
     {
         return '';
+    }
+    /**
+     * Determines if a field, when marked as mandatory, should be validated
+     * on the client-side (in browser JavaScript).
+     *
+     * @return bool True if client-side validation should apply, false otherwise.
+     */
+    public function isClientSideMandatory(): bool
+    {
+        // By default, all mandatory fields are validated on the client side.
+        // Specific field types can override this behavior.
+        return true;
     }
 }

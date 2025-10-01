@@ -148,17 +148,16 @@ if (isset($_REQUEST['update_percentage']) && isset($_REQUEST['task_perc'])) {
         $tasklib->update_task_percentage($task, $user, $perc);
     }
 }
-if (isset($_REQUEST['update_tasks'])) {
-    if (($_REQUEST['action'] == 'move_marked_to_trash') && isset($_REQUEST['task'])) {
+if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'move_marked_to_trash')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_task_as_trash($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('was moved to the trash');
@@ -170,16 +169,15 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'open_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'open_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->open_task($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('open / in process');
@@ -191,16 +189,15 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'complete_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'complete_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_complete_task($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('completed (100%)');
@@ -212,13 +209,13 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'remove_marked_from_trash') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'remove_marked_from_trash')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->unmark_task_as_trash($task, $user);
         }
     }
-    if (($_REQUEST['action'] == 'waiting_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'waiting_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->waiting_task($task, $user);
@@ -266,7 +263,7 @@ if (isset($_REQUEST['reload'])) {
         $tikilib->set_user_preference($user, 'tasks_maxRecords', $_REQUEST['tasks_maxRecords']);
     }
 }
-if ($task_admin and isset($_REQUEST["admin_mode"]) and $task_admin) {
+if ($task_admin and isset($_REQUEST["admin_mode"])) {
     $admin_mode = true;
     $_SESSION['admin_mode'] = true;
 }
@@ -346,9 +343,7 @@ if (isset($_REQUEST['show_history'])) {
 if (($_REQUEST['taskId']) && ! isset($_REQUEST['preview'])) {
     $info = $tasklib->get_task($user, $_REQUEST['taskId'], $show_history, $task_admin);
     if (! (isset($info['user']))) {
-        $smarty->assign('msg', tra("Sorry, this task does not exist or you don't have permission to view this task"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Sorry, this task does not exist or you don't have permission to view this task"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if ($show_admin) {
         $user_for_group_list = $info['creator'];
@@ -591,13 +586,13 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         }
         if (($_REQUEST['task_user'] == $user) or ($userlib->user_has_permission($_REQUEST['task_user'], 'tiki_p_tasks_receive') and $userlib->user_has_permission($user, 'tiki_p_tasks_send'))) {
             $taskId = $tasklib->new_task($_REQUEST['task_user'], $user, $public_for_group, $rights_by_creator, $tikilib->now, $save);
+            Feedback::success(tr("Task: %0 created successfully.", $save['title']));
         } else {
             unset($_REQUEST['taskId']);
-            $smarty->assign('msg', tra("Either you don't have permission to send tasks to other users, or the user doesn't have permission to receive tasks!"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Either you don't have permission to send tasks to other users, or the user doesn't have permission to receive tasks!"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
+        $success_message = tr("Task: %0 modified successfully.", $info['title']);
         if ($auto_accepted_status) {
             if ($info['user'] == $user) {
                 $msg_to = $info['creator'];
@@ -613,10 +608,21 @@ if (isset($_REQUEST['save']) && empty($errors)) {
                 $save['accepted_creator'] = null;
             }
         }
+        if (isset($_REQUEST['task_accept'])) {
+            $success_message = tr("Task: %0 accepted.", $info['title']);
+        }
+        if (isset($_REQUEST['task_not_accept'])) {
+            $success_message = tr("Task: %0 NOT accepted.", $info['title']);
+        }
+        if (isset($_REQUEST['move_into_trash'])) {
+            $success_message = tr("Task: %0 moved into trash.", $info['title']);
+        }
+
         $msg_from = $user;
         $tasklib->update_task($info['taskId'], $user, $save, $save_head, $admin_mode);
         $taskId = $info['taskId'];
         $msg_title = tra("Changes on Task") . ': "' . $info['title'] . '" by ' . $user;
+        Feedback::success($success_message);
     }
     $info = $tasklib->get_task($user, $taskId, null, $admin_mode);
     //send email to task user
@@ -656,16 +662,14 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $mail_data .= tra("You must finish your work on") . ": " . $tikilib->date_format($prefs['short_date_format'] . ' ' . $prefs['short_time_format'], $info['end']) . "\n";
         }
         $mail_data .= "\n" . tra("Log in and click the link below") . "\n";
-        $mail_data .= "http://" . $_REQUEST['HTTP_HOST'] . $_REQUEST['REQUEST_URI'] . "?tiki_view_mode=view&taskId=" . $taskId . "\n\n";
+        $mail_data .= "{$base_url}tiki-user_tasks.php?tiki_view_mode=view&taskId={$taskId}\n\n";
         $mail_data .= tra("Please read the task and work on it!");
         $mail->setText($mail_data);
         $mail->send([$email]);
     }
     if (! isset($info['user'])) {
         unset($_REQUEST['taskId']);
-        $smarty->assign('msg', tra("Sorry, there was an error while trying to write data into the database"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Sorry, there was an error while trying to write data into the database"), \Laminas\Http\Response::STATUS_CODE_500);
     }
     if ($send_message and $userlib->user_has_permission($msg_from, 'tiki_p_messages') and $userlib->user_has_permission($msg_to, 'tiki_p_messages')) {
         $msg_body = "__" . tra('Task') . ":__";
@@ -707,12 +711,8 @@ $smarty->assign('created_Day', $tikilib->date_format('%d', $info['created']));
 $smarty->assign('created_Year', $tikilib->date_format('%Y', $info['created']));
 $smarty->assign('created_Hour', $tikilib->date_format('%H', $info['created']));
 $smarty->assign('created_Minute', $tikilib->date_format('%M', $info['created']));
-if ((! isset($info['start'])) || ($info['start'] == null)) {
-    $info['start'] = $tikilib->now;
-    $smarty->assign('start_date', $info['start']);
-} else {
-    $smarty->assign('start_date', $info['start']);
-}
+$info['start'] = $info['start'] ?? $tikilib->now;
+$smarty->assign('start_date', $info['start']);
 if ((! isset($info['end'])) || ($info['end'] == null)) {
     $smarty->assign('end_date', ($info['start'] + 86400));
 } else {
@@ -738,7 +738,7 @@ $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (! $show_form) {
     $tasklist = $tasklib->list_tasks($user, $offset, $maxRecords, $find, $sort_mode, $show_private, $show_submitted, $show_received, $show_shared, false, null, $show_trash, $show_completed, $show_admin);
-    $smarty->assign('cant', $tasklist['cant']);
+    $smarty->assign('count', $tasklist['count']);
     $smarty->assign_by_ref('tasklist', $tasklist["data"]);
 }
 

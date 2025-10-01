@@ -30,9 +30,7 @@ $access->check_feature('feature_notepad');
 $access->check_user($user);
 $access->check_permission('tiki_p_notepad');
 if (! isset($_REQUEST["noteId"])) {
-    $smarty->assign('msg', tra("No note indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No note indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $notepadlib->remove_note($user, $_REQUEST['noteId']);
@@ -41,17 +39,13 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
 }
 $info = $notepadlib->get_note($user, $_REQUEST["noteId"]);
 if (! $info) {
-    $smarty->assign('msg', tra("Note not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Note not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 if (isset($_REQUEST['wikify']) || isset($_REQUEST['over'])) {
     $access->checkCsrf();
     if (empty($_REQUEST['wiki_name'])) {
-        $smarty->assign('msg', tra("No name indicated for wiki page"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("No name indicated for wiki page"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if ($tikilib->page_exists($_REQUEST['wiki_name'])) {
         if (isset($_REQUEST['over'])) {
@@ -59,24 +53,16 @@ if (isset($_REQUEST['wikify']) || isset($_REQUEST['over'])) {
             if ($pageperms["tiki_p_edit"] == 'y') {
                 $tikilib->update_page($_REQUEST['wiki_name'], $info['data'], tra('created from notepad'), $user, '127.0.1.1', $info['name']);
             } else {
-                $smarty->assign('errortype', 401);
-                $smarty->assign('msg', tra("You do not have permission to edit this page."));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
             }
         } else {
-            $smarty->assign('msg', tra("Page already exists"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Page already exists"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
         if ($tiki_p_edit == 'y') {
             $tikilib->create_page($_REQUEST['wiki_name'], 0, $info['data'], $tikilib->now, tra('created from notepad'), $user, $ip = '0.0.0.0', $info['name']);
         } else {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this page."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
 }

@@ -1,13 +1,25 @@
-// This file is for additional SCSS rules beyond what are in variables.scss.
+// Greenvalley theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
 $imagePath: "../images/";
 
-$tiki-topmodules-row-sidemargins: 0;
-$tiki-topbar-row-sidemargins: -15px;
-
-//.header_outer {
-//    margin-top: 24px;
-//}
-
+// Color system
+// Body
 body.fullscreen {
     .header_outer,
     #footer {
@@ -15,11 +27,8 @@ body.fullscreen {
     }
 }
 
-// add media query for medium and large displays
+    // add media query for medium and large displays (?)
 header.fixed-top {
-//    min-height: 175px;
-//    background: url('#{$imagePath}header_background_ltr.jpg') 50% 0 no-repeat;
-//    background-size: cover !important;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
@@ -36,99 +45,17 @@ header.fixed-top {
     border-color: #5cb85c;
 }
 
-.topbar {
-    margin-bottom: 20px;
+body:not(.tiki-admin) .row-middle {
+    background: linear-gradient(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.01)), url('#{$imagePath}page_background_ltr.jpg') repeat;
 }
 
-//.topbar,
-//.navbar-dark,
-//.navbar-fixed-top,
-.accordion-button:not(.collapsed) {        // Accordion active button
-    background: #473119 url('#{$imagePath}menubar-wood.jpg') 50% 50% no-repeat !important;
-    background-size: cover;
-    box-shadow: inset 0 -3px 10px #331a00;
-    border: none;
-    border-radius: 0;
-}
-
-body:not(.tiki-admin) .row-middle::before {
-    content: "";
-    background: url('#{$imagePath}page_background_ltr.jpg') repeat;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
-    opacity: var(--tiki-greenvalley-row-middle-bg-img-opacity);
-}
-
+    // White space moved from above run to the columns so that background image reaches the top of the middle section, esp. noticeable in dark mode.
 .row-middle {
-    position: relative;
-    background: var(--tiki-greenvalley-row-middle-bg-color); // #fff url('#{$imagePath}page_background_ltr.jpg') repeat;
-    margin-top: -20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-//.layout_fixed_top_modules #middle {
-//    background: url('#{$imagePath}page_background_ltr.jpg') repeat;
-//    padding-bottom: 20px;
-//}
-
-.card-primary > .card-heading {
-    min-height: 52px;
-    padding-top: 12px;
-    background: #02913d url('#{$imagePath}box_header_bg.png') repeat-x 55% 100%;
-    text-align: center;
-    border: 1px solid #8bc541;
-}
-
-//.card-title {
-//    font-size: 1.2em;
-//    font-weight: 700;
-//    color: #222;
-//    text-shadow: #666 0 2px 3px;
-//}
-
-//.btn:not(.btn-link) {
-//    box-shadow: 2px 2px 3px 1px rgba(43, 43, 43, 0.65);
-//}
-
-.btn-primary, input[type="reset"], input[type="submit"],
-.accordion-button.collapsed {
-    background: url('#{$imagePath}button_bck.jpg') 100% 50% repeat;
-    //  border: solid 1px rgba(84, 60, 27, 0.64);
- //   -webkit-box-shadow: 2px 2px 3px 1px rgba(43, 43, 43, 0.65);
-//    box-shadow: 2px 2px 3px 1px rgba(43, 43, 43, 0.65);
-    text-shadow: #21201e 0 1px 1px;
-    padding: 0.275rem 0.4rem !important;
-}
-
-.btn-primary:not(.btn-link) {
-    color: #fff;
-    text-shadow: #232121 0 2px 3px;
-}
-
-.btn-primary:hover, input[type="reset"]:hover, input[type="submit"]:hover {
-    color: #a99278;
-    background: url('#{$imagePath}button_bck_hover.jpg') 100% 50% repeat;
-//    -webkit-box-shadow: 1px 1px 2px 1px rgba(84, 60, 27, 0.64);
-//    box-shadow: 1px 1px 2px 1px rgba(84, 60, 27, 0.64);
-    text-shadow: #2b2b2b 0 1px 1px;
-}
-
-.btn-secondary {
-    color: #fff;
-}
-
-#footer .row.mx-0 {
-    margin-left: -15px;
-    margin-right: -15px;
-    padding-bottom: 15px
-}
-
-footer.footer {
-    margin-bottom: 20px;
+    .col1,
+    .col2,
+    .col3 {
+        padding-top: 20px;
+    }
 }
 
 .footer .modules {
@@ -149,6 +76,79 @@ footer.footer {
     }
 }
 
+#footer .row.mx-0 {
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-bottom: 15px
+}
+
+footer.footer {
+    margin-bottom: 20px;
+}
+
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+.btn-primary, input[type="reset"], input[type="submit"],
+.accordion-button.collapsed {
+    background: url('#{$imagePath}button_bck.jpg') 100% 50% repeat;
+    text-shadow: #21201e 0 1px 1px;
+    padding: 0.275rem 0.4rem !important;
+}
+
+.btn-primary:not(.btn-link) {
+    color: #fff;
+    text-shadow: #232121 0 2px 3px;
+}
+
+.btn-primary:hover, input[type="reset"]:hover, input[type="submit"]:hover {
+    color: #a99278;
+    background: url('#{$imagePath}button_bck_hover.jpg') 100% 50% repeat;
+    text-shadow: #2b2b2b 0 1px 1px;
+}
+
+.btn-secondary {
+    color: #fff;
+}
+
+// Forms
+// Navs
+// Navbar
+// Dropdowns
+// Pagination
+// Cards
+.card-primary > .card-heading {
+    min-height: 52px;
+    padding-top: 12px;
+    background: #02913d url('#{$imagePath}box_header_bg.png') repeat-x 55% 100%;
+    text-align: center;
+    border: 1px solid #8bc541;
+}
+
+.postbody-title .title > .card-title a.link,
+.card-primary > .card-heading .blog-postbody-title,
+.card-primary > .card-heading a {
+    color: #ffffff;
+}
+
+// Accordion
+.accordion-button:not(.collapsed) {        // Accordion active button
+    background: #473119 url('#{$imagePath}menubar-wood.jpg') 50% 50% no-repeat !important;
+    background-size: cover;
+    box-shadow: inset 0 -3px 10px #331a00;
+    border: none;
+    border-radius: 0;
+}
+// Badges
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
 .articletitle .titleb {
     color: #996633;
     font-size: 0.9em;
@@ -160,8 +160,11 @@ footer.footer {
     color: $body-color;
 }
 
-.postbody-title .title > .card-title a.link,
-.card-primary > .card-heading .blog-postbody-title,
-.card-primary > .card-heading a {
-    color: #ffffff;
+// Dark mode
+[data-bs-theme="dark"] {
+    body:not(.tiki-admin) .row-middle {
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(21, 25, 29, .95)), url('#{$imagePath}page_background_ltr.jpg') repeat;
+    }
 }
+
+// External libraries

@@ -60,6 +60,7 @@
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
                     {preference name=feature_scheduler}
+                    {preference name=feature_queued_tasks}
                     {preference name=feature_banners}
                     {preference name=feature_contribution}
                     {preference name=feature_copyright}
@@ -115,7 +116,6 @@
                         <fieldset>
                             <legend class="h3"><h4 class="showhide_heading" id="Payment_and_accounting">{tr}Payment and accounting{/tr} <a href="#Payment_and_accounting" class="heading-link" aria-label="{tr}Payment and accounting{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
                             {preference name=feature_credits}
-                            {preference name=feature_accounting}
                             {preference name=payment_feature}
                         </fieldset>
                     </div>
@@ -193,8 +193,6 @@
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="jQuery_plugins_and_add-ons"> {tr}jQuery plugins and add-ons{/tr}  <a href="#jQuery_plugins_and_add" class="heading-link" aria-label="{tr}jQuery {/tr}">{icon name="link"}</a></h4></legend>
-                {preference name=feature_jquery_autocomplete}
-                {preference name=feature_jquery_reflection}
                 <div class="adminoptionbox">
                     {preference name=jquery_smartmenus_enable}
                     <div class="adminoptionboxchild" id="jquery_smartmenus_enable_childcontainer">
@@ -207,12 +205,6 @@
                 {preference name=feature_jquery_ui}
                 {preference name=feature_jquery_validation}
                 {preference name=feature_jquery_zoom}
-                <div class="adminoptionbox">
-                    {preference name=jquery_select2}
-                    <div class="adminoptionboxchild">
-                        {preference name=jquery_select2_sortable label="{tr}Select2 sortable multiselect{/tr}"}
-                    </div>
-                </div>
                 {preference name=jquery_fitvidjs}
                 <div class="adminoptionboxchild" id="jquery_fitvidjs_childcontainer">
                     {preference name=jquery_fitvidjs_additional_domains}
@@ -220,7 +212,6 @@
                 {preference name=jquery_timeago}
                 {preference name=jquery_jqdoublescroll}
                 {preference name=allowImageLazyLoad}
-                {preference name=tiki_prefix_css}
                 <div class="adminoptionboxchild">
                     <fieldset>
                         <legend class="h3"><h4 class="showhide_heading" id="Experimental">{tr}Experimental{/tr} <a href="#Experimental" class="heading-link" aria-label="{tr}Experimental{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>

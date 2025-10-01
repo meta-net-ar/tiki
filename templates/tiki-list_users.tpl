@@ -1,6 +1,6 @@
 {title help="UserList"}{tr}User List{/tr}{/title}
 
-{$cant_users} {if !$find}{tr}users registered{/tr}{else} {tr}Users{/tr} {tr}like{/tr} "{$find}"{/if}
+{$users_count} {if !$find}{tr}users registered{/tr}{else} {tr}Users{/tr} {tr}like{/tr} "{$find}"{/if}
 
 {include file='find.tpl' autocomplete="username"}
 
@@ -46,4 +46,4 @@
     {/section}
 </table>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

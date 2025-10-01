@@ -75,9 +75,9 @@ if (! isset($_REQUEST["initial"])) {
     $contacts = $contactlib->list_contacts_by_letter($user, $offset, $maxRecords, $sort_mode, $_REQUEST["initial"]);
 }
 
-$cant_pages = ceil(count($contacts) / $maxRecords);
+$pages_count = ceil(count($contacts) / $maxRecords);
 
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
 
 if (count($contacts) > ($offset + $maxRecords)) {

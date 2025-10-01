@@ -9,7 +9,7 @@ function prefs_tiki_list()
     return [
         'tiki_version_check_frequency' => [
             'name' => tra('Check frequency'),
-            'description' => tra('How often Tiki should check for updates. This field applies only if "Check for updates automatically" is enabled. '),
+            'description' => tra('How often Tiki should check for updates. This field applies only if "Check for updates automatically" is enabled.'),
             'hint' => tra('Click "Check for Updates Now" to perform an update check.'),
             'type' => 'list',
             'perspective' => false,
@@ -78,15 +78,6 @@ function prefs_tiki_list()
             'default' => 'n',
             'tags' => ['basic'],
         ],
-        'tiki_prefix_css' => [
-            'name' => tra('Prefix CSS'),
-            'description' => tra('Use -prefix-free JavaScript library to add vendor specific css prefixes.'),
-            'type' => 'flag',
-            'perspective' => false,
-            'default' => 'n',
-            'tags' => ['experimental'],
-            'warning' => tra('May be replaced by a server-side option soon.'),
-        ],
         'tiki_same_day_time_only' => [
             'name' => tra('Skip date for same day'),
             'description' => tra('When displaying short date and time, skip date for today. Only time will be displayed.'),
@@ -109,6 +100,13 @@ function prefs_tiki_list()
             'filter' => 'striptags',
             'dependencies' => [ 'session_silent' ],
             'default' => '',
+        ],
+        'tiki_cachecontrol_maxage' => [
+            'name' => tra('Cache-Control Max Age'),
+            'description' => tra('Defines the maximum age (in seconds) for caching assets via the Cache-Control HTTP header.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'default' => '86400',
         ],
         'tiki_cdn' => [
             'name' => tra('Content delivery networks'),

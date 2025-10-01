@@ -34,10 +34,7 @@ if (isset($_FILES['userfile1'])) {
         try {
             $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
         } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
         }
         $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
         $data = '';
@@ -46,9 +43,7 @@ if (isset($_FILES['userfile1'])) {
         }
         fclose($fp);
         if (strlen($data) > 1000000) {
-            $smarty->assign('msg', tra("The file is too large"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file is too large"), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $size = $_FILES['userfile1']['size'];
         $name = $_FILES['userfile1']['name'];
@@ -63,9 +58,7 @@ if (isset($_REQUEST["merge"])) {
     $merge = '';
     $first = true;
     if (! isset($_REQUEST["note"])) {
-        $smarty->assign('msg', tra("No item indicated"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("No item indicated"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     foreach (array_keys($_REQUEST["note"]) as $note) {
         $data_c = $notepadlib->get_note($user, $note);
@@ -73,11 +66,10 @@ if (isset($_REQUEST["merge"])) {
         if ($first) {
             $first = false;
             $merge .= "---------" . tra('merged note:') . $data_c['name'] . "----" . "\n";
-            $merge .= $data;
         } else {
             $merge .= "\n---------" . tra('merged note:') . $data_c['name'] . "----" . "\n";
-            $merge .= $data;
         }
+        $merge .= $data;
     }
     // Now create the merged note
     $tikilib->replace_note($user, 0, $_REQUEST['merge_name'], $merge);
@@ -124,7 +116,7 @@ if (isset($_SESSION['thedate'])) {
     $pdate = $tikilib->now;
 }
 $channels = $notepadlib->list_notes($user, $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-section_options.php');
 include_once('tiki-mytiki_shared.php');

@@ -39,7 +39,7 @@ class Rules
      *
      * @return string
      */
-    public function getJavaScript(string $parentSelector, array $field): string
+    public function getJavaScript(string $parentSelector, array $field, $isInEditContext = false): string
     {
         global $prefs;
 
@@ -70,8 +70,14 @@ class Rules
             $operator = ' || ';
         }
 
+        if ($isInEditContext) {
+            $selectorAttribute = 'name';
+        } else {
+            $selectorAttribute = 'name^';
+        }
+
         foreach ($this->conditions->predicates as $predicate) {
-            $selector = '[name=\'' . $predicate->target_id . '\']' . $conditionQualifier;
+            $selector = "[$selectorAttribute='{$predicate->target_id}']$conditionQualifier";
             $selectors[] = $selector;
             if (
                 in_array($field['type'], ['R', 'M']) ||
@@ -92,10 +98,11 @@ class Rules
 
         foreach ($this->actions->predicates as $predicate) {
             if ($predicate->operator_id !== 'NoOp') {
-                $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
+                $targetSelector = "\$(\"[{$selectorAttribute}='{$predicate->target_id}']\", \$(this).closest(\"form\")).last()";
+
                 $actions[]
                     = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
-                if (strpos($predicate->operator_id, 'Required') === false) {
+                if (! str_contains($predicate->operator_id, 'Required')) {
                     // show/hide etc needs the parent object
                     $actions[] = "    $targetSelector.parents('$parentSelector')" .
                         $this->getPredicateSyntax($predicate, 'Action') . ';';
@@ -113,10 +120,10 @@ class Rules
         if ($this->else->predicates) {
             foreach ($this->else->predicates as $predicate) {
                 if ($predicate->operator_id !== 'NoOp') {
-                    $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
+                    $targetSelector = "\$(\"[{$selectorAttribute}='{$predicate->target_id}']\", \$(this).closest(\"form\")).last()";
                     $else[]
                         = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
-                    if (strpos($predicate->operator_id, 'Required') === false) {
+                    if (! str_contains($predicate->operator_id, 'Required')) {
                         $else[] = "    $targetSelector.parents('$parentSelector')" .
                             $this->getPredicateSyntax($predicate, 'Action') . ';';
                     } else {
@@ -128,10 +135,6 @@ class Rules
             $js .= " else {\n" . implode("\n", $else) . "\n  }\n";
         } else {
             $js .= "\n";
-        }
-
-        if ($prefs['jquery_select2'] === 'y') {
-            $js .= "  \$(document).trigger('change.select2');\n";
         }
 
         if ($actions || $else) {
@@ -159,7 +162,7 @@ class Rules
             $syntax = str_replace('%argument%', $predicate->argument, $syntax);
             $syntax = str_replace('%field%', $predicate->target_id, $syntax);
         } else {
-            if (strpos($syntax, '%argument%') !== false) {
+            if (str_contains($syntax, '%argument%')) {
                 $syntax = str_replace('%argument%', tr('No argument for \"%0\" rule', $predicate->operator_id), $syntax);
             }
         }

@@ -53,7 +53,7 @@ if (! isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 // Get a list of last changes to the Wiki database
 $listpages = $tikilib->list_cache($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $listpages["cant"]);
+$smarty->assign_by_ref('pages_count', $listpages["count"]);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 
 // Display the template

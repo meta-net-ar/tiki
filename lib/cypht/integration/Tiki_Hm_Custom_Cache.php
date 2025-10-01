@@ -88,4 +88,12 @@ class Tiki_Hm_Custom_Cache extends Hm_Cache
     {
         return $this->backend->set($key, $val);
     }
+
+    /**
+     * @return boolean
+     */
+    public function reconnect()
+    {
+        return true;
+    }
 }

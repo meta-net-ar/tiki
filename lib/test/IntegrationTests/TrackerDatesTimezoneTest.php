@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 /**
  * @group integration
  * The purpose of these tests is to ensure consistency between storage, display
@@ -517,7 +520,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         $itemObject = Tracker_Item::newItem(self::$trackerId);
         $processedFields = $itemObject->prepareInput(new JitFilter($input));
         foreach ($processedFields as $k => $f) {
-            $fields[$k]['value'] = isset($f['value']) ? $f['value'] : '';
+            $fields[$k]['value'] = $f['value'] ?? '';
         }
         return self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
     }

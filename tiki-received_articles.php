@@ -16,16 +16,10 @@ $inputConfiguration = [
         'accept'                   => 'bool',              //post
         'Time_Meridian'            => 'digits',            //post
         'Time_Hour'                => 'digits',            //post
-        'expire_Meridian'          => 'digits',            //post
-        'expire_Hour'              => 'digits',            //post
         'Time_Minute'              => 'digits',            //post
         'Date_Month'               => 'digits',            //post
         'Date_Day'                 => 'digits',            //post
         'Date_Year'                => 'digits',            //post
-        'expire_Minute'            => 'digits',            //post
-        'expire_Month'             => 'digits',            //post
-        'expire_Day'               => 'digits',            //post
-        'expire_Year'              => 'digits',            //post
         'title'                    => 'word',              //post
         'authorName'               => 'word',              //post
         'useImage'                 => 'bool',              //post
@@ -57,43 +51,47 @@ $artlib = TikiLib::lib('art');
 $userprefslib = TikiLib::lib('userprefs');
 $smarty->assign('use_24hr_clock', $userprefslib->get_user_clock_pref($user));
 
-if (! isset($_REQUEST["receivedArticleId"])) {
-    $_REQUEST["receivedArticleId"] = 0;
-}
-$smarty->assign('receivedArticleId', $_REQUEST["receivedArticleId"]);
-if ($_REQUEST["receivedArticleId"]) {
-    $info = $commlib->get_received_article($_REQUEST["receivedArticleId"]);
-    $info["topic"] = 1;
-} else {
-    $info = [];
-    $info["title"] = '';
-    $info["authorName"] = '';
-    $info["size"] = 0;
-    $info["useImage"] = 'n';
-    $info["image_name"] = '';
-    $info["image_type"] = '';
-    $info["image_size"] = 0;
-    $info["image_x"] = 0;
-    $info["image_y"] = 0;
-    $info["image_data"] = '';
-    $info["publishDate"] = $tikilib->now;
-    $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $info["publishDate"]));
-    $info["expireDate"] = $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1);
-    $info["created"] = $tikilib->now;
-    $info["heading"] = '';
-    $info["body"] = '';
-    $info["hash"] = '';
-    $info["author"] = '';
-    $info["topic"] = 1;
-    $info["type"] = 'Article';
-    $info["rating"] = 5;
-}
+$info = [
+    "title" => '',
+    "authorName" => '',
+    "size" => 0,
+    "useImage" => 'n',
+    "image_name" => '',
+    "image_type" => '',
+    "image_size" => 0,
+    "image_x" => 0,
+    "image_y" => 0,
+    "image_data" => '',
+    "publishDate" => $tikilib->now,
+    "created" => $tikilib->now,
+    "heading" => '',
+    "body" => '',
+    "hash" => '',
+    "author" => '',
+    "topic" => 1,
+    "type" => 'Article',
+    "rating" => 5,
+];
+
+$articleId = $_REQUEST["receivedArticleId"] ?? 0;
+
+$smarty->assign('receivedArticleId', $articleId);
 $smarty->assign('view', 'n');
 if (isset($_REQUEST["view"])) {
-    $info = $tikilib->get_received_article($_REQUEST["view"]);
+    $articleId = $_REQUEST["view"];
     $smarty->assign('view', 'y');
-    $info["topic"] = 1;
 }
+
+if ($articleId) {
+    try {
+        $info = $commlib->get_received_article($_REQUEST["view"]);
+    } catch (Exception $e) {
+        Feedback::error($e->getMessage());
+        $smarty->assign('receivedArticleId', 0);
+    }
+}
+
+$info["topic"] = 1;
 if (isset($_REQUEST["accept"])) {
     $access->checkCsrf();
     // CODE TO ACCEPT A PAGE HERE
@@ -101,28 +99,19 @@ if (isset($_REQUEST["accept"])) {
     if (! empty($_REQUEST['Time_Meridian'])) {
         $_REQUEST['Time_Hour'] = date('H', strtotime($_REQUEST['Time_Hour'] . ':00 ' . $_REQUEST['Time_Meridian']));
     }
-    if (! empty($_REQUEST['expire_Meridian'])) {
-        $_REQUEST['expire_Hour'] = date('H', strtotime($_REQUEST['expire_Hour'] . ':00 ' . $_REQUEST['expire_Meridian']));
-    }
     $publishDate = $tikilib->make_time($_REQUEST["Time_Hour"], $_REQUEST["Time_Minute"], 0, $_REQUEST["Date_Month"], $_REQUEST["Date_Day"], $_REQUEST["Date_Year"]);
-    $expireDate = $tikilib->make_time($_REQUEST["expire_Hour"], $_REQUEST["expire_Minute"], 0, $_REQUEST["expire_Month"], $_REQUEST["expire_Day"], $_REQUEST["expire_Year"]);
-    $commlib->update_received_article($_REQUEST["receivedArticleId"], $_REQUEST["title"], $_REQUEST["authorName"], $_REQUEST["useImage"], $_REQUEST["image_x"], $_REQUEST["image_y"], $publishDate, $expireDate, $_REQUEST["heading"], $_REQUEST["body"], $_REQUEST["type"], $_REQUEST["rating"]);
+    $commlib->update_received_article($_REQUEST["receivedArticleId"], $_REQUEST["title"], $_REQUEST["authorName"], $_REQUEST["useImage"], $_REQUEST["image_x"], $_REQUEST["image_y"], $publishDate, $_REQUEST["heading"], $_REQUEST["body"], $_REQUEST["type"], $_REQUEST["rating"]);
     $commlib->accept_article($_REQUEST["receivedArticleId"], $_REQUEST["topic"]);
     $smarty->assign('preview', 'n');
     $smarty->assign('receivedArticleId', 0);
 }
 $smarty->assign('preview', 'n');
-$smarty->assign('topic', $info["topic"]);
 if (isset($_REQUEST["preview"])) {
     $smarty->assign('preview', 'y');
     if (! empty($_REQUEST['Time_Meridian'])) {
         $_REQUEST['Time_Hour'] = date('H', strtotime($_REQUEST['Time_Hour'] . ':00 ' . $_REQUEST['Time_Meridian']));
     }
-    if (! empty($_REQUEST['expire_Meridian'])) {
-        $_REQUEST['expire_Hour'] = date('H', strtotime($_REQUEST['expire_Hour'] . ':00 ' . $_REQUEST['expire_Meridian']));
-    }
     $info["publishDate"] = $tikilib->make_time($_REQUEST["Time_Hour"], $_REQUEST["Time_Minute"], 0, $_REQUEST["Date_Month"], $_REQUEST["Date_Day"], $_REQUEST["Date_Year"]);
-    $info["expireDate"] = $tikilib->make_time($_REQUEST["expire_Hour"], $_REQUEST["expire_Minute"], 0, $_REQUEST["expire_Month"], $_REQUEST["expire_Day"], $_REQUEST["expire_Year"]);
     $info["title"] = $_REQUEST["title"];
     $info["authorName"] = $_REQUEST["authorName"];
     $info["receivedArticleId"] = $_REQUEST["receivedArticleId"];
@@ -147,7 +136,6 @@ $smarty->assign('image_size', $info["image_size"]);
 $smarty->assign('image_x', $info["image_x"]);
 $smarty->assign('image_y', $info["image_y"]);
 $smarty->assign('publishDate', $info["publishDate"]);
-$smarty->assign('expireDate', $info["expireDate"]);
 $smarty->assign('created', $info["created"]);
 $smarty->assign('heading', $info["heading"]);
 $smarty->assign('body', $info["body"]);
@@ -174,12 +162,8 @@ if (isset($_REQUEST["save"])) {
     if (! empty($_REQUEST['Time_Meridian'])) {
         $_REQUEST['Time_Hour'] = date('H', strtotime($_REQUEST['Time_Hour'] . ':00 ' . $_REQUEST['Time_Meridian']));
     }
-    if (! empty($_REQUEST['expire_Meridian'])) {
-        $_REQUEST['expire_Hour'] = date('H', strtotime($_REQUEST['expire_Hour'] . ':00 ' . $_REQUEST['expire_Meridian']));
-    }
     $publishDate = $tikilib->make_time($_REQUEST["Time_Hour"], $_REQUEST["Time_Minute"], 0, $_REQUEST["Date_Month"], $_REQUEST["Date_Day"], $_REQUEST["Date_Year"]);
-    $expireDate = $tikilib->make_time($_REQUEST["expire_Hour"], $_REQUEST["expire_Minute"], 0, $_REQUEST["Date_Month"], $_REQUEST["Date_Day"], $_REQUEST["Date_Year"]);
-    $commlib->update_received_article($_REQUEST["receivedArticleId"], $_REQUEST["title"], $_REQUEST["authorName"], $_REQUEST["useImage"], $_REQUEST["image_x"], $_REQUEST["image_y"], $publishDate, $expireDate, $_REQUEST["heading"], $_REQUEST["body"]);
+    $commlib->update_received_article($_REQUEST["receivedArticleId"], $_REQUEST["title"], $_REQUEST["authorName"], $_REQUEST["useImage"], $_REQUEST["image_x"], $_REQUEST["image_y"], $publishDate, $_REQUEST["heading"], $_REQUEST["body"], $_REQUEST["type"], $_REQUEST["rating"]);
     $smarty->assign('receivedArticleId', $_REQUEST["receivedArticleId"]);
     $smarty->assign('title', $_REQUEST["title"]);
     $smarty->assign('authorName', $_REQUEST["authorName"]);
@@ -188,7 +172,6 @@ if (isset($_REQUEST["save"])) {
     $smarty->assign('image_x', $_REQUEST["image_x"]);
     $smarty->assign('image_y', $_REQUEST["image_y"]);
     $smarty->assign('publishDate', $publishDate);
-    $smarty->assign('expireDate', $expireDate);
     $smarty->assign('heading', $_REQUEST["heading"]);
     $smarty->assign('body', $_REQUEST["body"]);
 }
@@ -212,7 +195,7 @@ $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $commlib->list_received_articles($offset, $maxRecords, $sort_mode, $find);
 $smarty->assign_by_ref('channels', $channels["data"]);
-$smarty->assign_by_ref('cant', $channels["cant"]);
+$smarty->assign_by_ref('count', $channels["count"]);
 $topics = $artlib->list_topics();
 $smarty->assign_by_ref('topics', $topics);
 $types = $artlib->list_types();

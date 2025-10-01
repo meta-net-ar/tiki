@@ -12,13 +12,10 @@
         {/if}
 
         <span class="titleb">
-            {if $show_author eq 'y' && ($authorName or $author)} {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"}{if $authorName}{$authorName|escape}{else}{$author|username}{/if}
-                {if $show_pubdate eq 'y' || $show_expdate eq 'y' || $show_reads eq 'y'} - {/if}
+            {if $show_author eq 'y' && ($authorName or $author)} {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {if $authorName}{$authorName|escape}{else}{$author|username}{/if}
+                {if $show_pubdate eq 'y'  || $show_reads eq 'y'} - {/if}
             {/if}
             {if $show_pubdate eq 'y' && $publishDate}{$publishDate|tiki_short_datetime}
-                {if $show_expdate eq 'y' || $show_reads eq 'y'} - {/if}
-            {/if}
-            {if $show_expdate eq 'y' && $expireDate}{tr}Expires{/tr} {$expireDate|tiki_short_datetime}
                 {if $show_reads eq 'y'} - {/if}
             {/if}
             {if $show_reads eq 'y'}({$reads} {tr}Reads{/tr}){/if}
@@ -53,8 +50,7 @@
 
         <div class="{if $isfloat eq 'y'}float-start me-3{else}flex-shrink-0 me-2 ms-2{/if}">
             {capture name=imgTitle}{if $show_image_caption eq 'y' and $image_caption}{$image_caption|escape}{elseif isset($topicName)}{tr}{$topicName}{/tr}{/if}{/capture}
-            {assign var="big_image" value=$prefs.art_header_text_pos eq 'below' && $list_image_x > 0}
-
+            {$big_image = ($prefs.art_header_text_pos == 'below' && $list_image_x > 0)}
             {* Show either a topic name, image OR a custom image (if there is a custom image or a topic). If a topic is set, link to it even if we show a custom image. *}
             {if $topicId}
                 <a href="tiki-view_articles.php?topic={$topicId}" class="{if $useImage eq 'y' and $hasImage neq 'y'}{else}thumbnail{/if}{if $big_image} cboxElement{/if}" title="{if $show_image_caption and $image_caption}{$image_caption|escape}{else}{tr}List all articles of the same topic{/tr}{if $topicName ne ''} ({tr}{$topicName|escape}{/tr}){/if}{/if}"
@@ -63,7 +59,7 @@
                 {if $hasImage eq 'y'}
                 {* display own article image *}
                 <img
-                    alt="{$smarty.capture.imgTitle}"
+                    alt="{$image_alt|escape}"
                     class="article-image img-thumbnail custom-image"
                     src="article_image.php?image_type={if isset($preview) and $imageIsChanged eq 'y'}preview&amp;id={$previewId}{elseif isset($preview) and $subId}submission&amp;id={$subId}{else}article&amp;id={$articleId}{if $image_x > 0}&width={$image_x}{/if}{/if}"
                     {$style=''}
@@ -97,7 +93,7 @@
             {elseif $isfloat eq 'n' and isset($topics[$topicId].image_size) and $topics[$topicId].image_size > 0}
         <div class="flex-grow-1 ms-3">
             {else}
-        <div class="articleheadingtext{if $isfloat eq 'n'}flex-grow-1 ms-3{/if}">
+        <div class="articleheadingtext{if $isfloat eq 'n'} flex-grow-1{/if}">
             {/if}
                 {if $article_attributes}
                     <div class="articleattributes">

@@ -1,22 +1,37 @@
-// Feb12 theme for Tiki
-// This file is for additional SCSS rules beyond what are in variables.scss.
+// Feb12 theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
 // Image path example:
 $imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
 
-// Layout basic (single container) page header
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+.bg-dark .bg-dark { background: transparent !important; }
+
+// Body
+    // Layout basic (single container) page header
 .layout_basic nav.top_modules {
     margin-right: -0.75rem;  // Compensate for padding on row
     margin-left: -0.75rem;
 }
-
 
 .header_container {
     .container:not(.in-navbar) {
         border: none;
     }
 }
-
-// end Classic layout
+    // end Classic layout
 
 header.container {
     margin-top: 30px;
@@ -31,7 +46,7 @@ header.container {
     }
 }
 
-// Toggle - Dark background
+    // Toggle - Dark background
 .bg-dark .toggle_zone {
     color: $navbar-dark-color;
     &:hover {
@@ -39,62 +54,24 @@ header.container {
     }
 }
 
-// Toggle - Light background
+    // Toggle - Light background
 .bg-light .toggle_zone {
     color: $navbar-light-color;
     &:hover {
         color: $navbar-light-hover-color;
     }
 }
-// end Toggle
+    // end Toggle
 
 .navbar-fixed-top .container {
     border: none;
-}
-
-.topbar_modules {
-    padding-left: 2.8rem; // to leave space for column toggle icons
-    padding-right: 2.8rem;
 }
 
 .layout_social .topbar.mx-0 {
     margin-left: -0.75rem !important;
     margin-right: -0.75rem !important;
 }
-//
-//.navbar-dark a,
-//.navbar-dark .navbar-brand,
-//.dropdown-item,
-//.dropdown-item a,
-//.dropdown-item button.btn-link.link-list,
-//.dropdown-menu .tikihelp {
-//    color: $navbar-dark-color;
-//}
-//.navbar-dark a:hover,
-//.navbar-dark .navbar-brand:hover,
-//.navbar-dark .navbar-brand:focus {
-//    color: $navbar-dark-hover-color;
-//    background-color: transparent;
-//}
-//
-//
-//.navbar-dark a:hover,
-//.navbar-dark a:focus {
-//    color: $navbar-dark-hover-color;
-//}
-//
-//.navbar-dark .active a,
-//.navbar-dark .active a:hover,
-//.navbar-dark .active a:focus {
-//    color: $navbar-dark-active-color;
-//}
-//
-//.navbar-dark .disabled a,
-//.navbar-dark .disabled a:hover,
-//.navbar-dark .disabled a:focus {
-//    color: $navbar-dark-disabled-color;
-//    background-color: transparent;
-//}
+
 
 .bg-dark,
 .navbar:not(.bg-dark) .bg-dark,
@@ -118,8 +95,6 @@ header.container {
 .fixed-top .top_modules {
   background: transparent;
 }
-
-.bg-dark .bg-dark { background: transparent !important; }
 
 #topbar_modules .box-search .mb-3 {
     margin-bottom: 0;
@@ -145,6 +120,17 @@ header.container {
   }
 }
 
+.topbar { margin-bottom: 0; }
+
+.topbar + .row,
+.layout_social > .container {
+    background: #ffffff url('#{$imagePath}page.jpg') repeat-x;
+}
+
+.topbar + .row {
+    border-width: 0 1px;
+}
+
 .navbar {
     margin-bottom: 0;
     border: none;
@@ -165,6 +151,8 @@ header.container {
 .side-col-toggle + .col1 + .col3 {
   background-position: 0 -30px;
 }
+
+.side-col-toggle + .col + .col2 { background-position: 0 -30px; }
 
 body.fullscreen {
     background: #ffffff url('#{$imagePath}page.jpg') repeat-x;
@@ -191,8 +179,48 @@ body.fullscreen {
     }
 }
 
-.side-col-toggle + .col + .col2 { background-position: 0 -30px; }
+.footer_liner {
+    a,
+    .btn.btn-link {
+        color: #23527B;
+    }
+}
 
+// Prevent visible double padding.
+.main-footer {
+    padding-left: 0;
+    padding-right: 0;
+    background:var(--tiki-feb12-main-footer-bg); // #A8CCE2;
+}
+
+// Tables
+// Buttons
+.btn-outline-light { color: #696969; border-color: #696969; }
+
+// Forms
+// Form validation
+.valid-feedback { color: #177D4D; }
+.invalid-feedback { color: #D02536; }
+
+// Navs
+.autotoc .dropdown-item {
+    color: $link-color;
+}
+
+// Navbar
+// Dropdowns
+    // Fix bad contrast
+.dropdown-item.text-danger {
+    background: #fff;
+    border-radius: 0;
+    &:hover {
+        color: #fff !important;
+        background-color: #d9534f;
+    }
+}
+
+// Pagination
+// Cards
 .card.module {
     border: none;
     background: none;
@@ -212,53 +240,46 @@ body.fullscreen {
 
 .module legend { font-size: .9rem; }
 
-.topbar { margin-bottom: 0; }
-
-.topbar + .row,
-.layout_social > .container {
-    background: #ffffff url('#{$imagePath}page.jpg') repeat-x;
+html:not([data-bs-theme=dark]) {
+    .form-text { color: #3D4248BF; }
+    .progress-bar {
+        &.bg-success,
+        &.bg-info,
+        &.bg-warning,
+        &.bg-danger {
+            color: #000;
+        }
 }
 
-.topbar + .row {
-    border-width: 0 1px;
+// List group
+.list-group-item { color: #3C4148BF; }
+.list-group-item-primary { color: #34383DBF; }
+.list-group-item-secondary { color: #363A3FBF; }
+.list-group-item-success { color: #34383DBF; }
+.list-group-item-danger { color: #2B2D31BF; }
+.list-group-item-warning { color: #31363ABF; }
+.list-group-item-info { color: #31363ABF; }
+.list-group-item-light { color: #383D42BF; }
+.list-group-item-dark { color: #26282CBF; }
+
+// Figures
+// Breadcrumbs
+// Code
+
+.footer_liner .text-muted { color: #26282CBF; }
 }
 
-//#bottom_modules:has(div) {
-//    background: #A8CCE2;
-//    border-top: none;
-//}
-
-.autotoc .dropdown-item {
-    color: $link-color;
-}
-
-// Fix bad contrast
-.dropdown-item.text-danger {
-    background: #fff;
-    border-radius: 0;
-    &:hover {
-        color: #fff !important;
-        background-color: #d9534f;
+[data-bs-theme=dark] {
+    .figure-caption {
+        color: #9CA4ABBF;
     }
+    .btn.btn-outline-primary { color: #3782C3; border-color: #3782C3; }
+    .btn.btn-outline-secondary { color: #727B83; border-color: #727B83; }
+    .btn.btn-outline-success { color: #3D8A3D; border-color: #3D8A3D; }
+    .btn.btn-outline-danger { color: #D64843; border-color: #D64843; }
+    .btn.btn-outline-warning { color: #B36F0F; border-color: #B36F0F; }
+    .btn.btn-outline-info { color: #2183A1; border-color: #2183A1; }
+    .btn.btn-outline-dark { color: #7A7A7A; border-color: #7A7A7A; }
 }
 
-//blockquote,
-//.blockquote {
-//    color: #4D4D4D
-//}
-
-.progress-bar {
-    &.bg-success,
-    &.bg-info,
-    &.bg-warning,
-    &.bg-danger {
-        color: #000;
-    }
-}
-
-// Prevent visible double padding.
-.main-footer {
-    padding-left: 0;
-    padding-right: 0;
-    background:var(--tiki-feb12-main-footer-bg); // #A8CCE2;
-}
+// External libraries

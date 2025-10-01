@@ -203,7 +203,7 @@ function wikiplugin_trackerprefill($data, $params)
 
     $prefills = [];
     foreach ($params as $param => $value) {
-        if (strstr($param, 'field')) {
+        if (str_contains($param, 'field')) {
             $id = substr($param, strlen('field'));
             $f['fieldId'] = $value;
             $f['value'] = $params["value$id"];

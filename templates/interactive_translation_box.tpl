@@ -7,7 +7,7 @@
                 <span class="slider"></span>
             </label>
         </label>
-        <a  href="#" class="btn text-white-50 tips my-2" title="{tr}Help:{/tr}{tr}Once checked, click on any string to translate it.{/tr}">
+        <a  href="#" class="btn text-white-50 tips my-2" title="{tr}Help:{/tr}{tr}Once checked, click on any string to translate it.{/tr}" role="button">
             {icon name="help"}
         </a>
         {if isset($smarty.session.interactive_translation_mode) && $smarty.session.interactive_translation_mode eq "on"}
@@ -44,6 +44,7 @@
                     <div class="text-center" id="intertrans-empty" style="display: none">
                         {remarksbox type="note" title="{tr}Information{/tr}" close="n"}
                             {tr}Couldn't find any translatable string.{/tr}
+                            <span id="intertrans-string-to-translate"></span>
                         {/remarksbox}
                     </div>
                 </div>

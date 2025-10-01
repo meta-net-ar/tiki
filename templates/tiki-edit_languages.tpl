@@ -188,7 +188,7 @@
                                         </div>
                                     {/if}
 
-                                    {assign var=itemIndex value=$smarty.foreach.translations.index}
+                                    {$itemIndex=$smarty.foreach.translations.index}
                                     {if isset($item.originalTranslation)}
                                         <div class="mb-3 mx-sm-1">
                                             {button _flip_id="diff_$itemIndex" _flip_hide_text="n" _text="{tr}Compare{/tr}" _title=":{tr}Compare the original translation with the database translation{/tr}" _class="btn btn-primary btn-sm tips"}
@@ -229,7 +229,7 @@
             </div>
 
             <div class="card-footer text-center">
-                {pagination_links cant=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
+                {pagination_links count=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
                 tiki-edit_languages.php?edit_language={$edit_language}&action={$action}&maxRecords={$maxRecords}&only_db_translations={$only_db_translations}&only_db_untranslated={$only_db_untranslated}{if isset($find)}&find={$find}{/if}
                 {/strip}{/pagination_links}
             </div>

@@ -6,16 +6,17 @@ stages:
   - package-tiki
   - vendors-security
   - vendors_update
+  - composer-stability
 
 variables:
+  TZ: "UTC"
   MYSQL_ROOT_PASSWORD: secret
   MYSQL_DATABASE: tikitest
   MYSQL_USER: tikiuser
   MYSQL_PASSWORD: tikipass
   ELASTICSEARCH_HOST: elasticsearch
-  #The source for these images is at https://github.com/rjsmelo/docker-ubuntu-php
-  #Would be nice to update them from code, similar to https://medium.com/devops-with-valentine/how-to-build-a-docker-image-and-push-it-to-the-gitlab-container-registry-from-a-gitlab-ci-pipeline-acac0d1f26df
-  BASE_QA_IMAGE: rjsmelo/ubuntu-php:8.1-qa
+  #The source for these images is at https://gitlab.com/tikiwiki/ci-helpers/docker-tikiwiki-ci 
+  BASE_QA_IMAGE: tikiwiki/tikiwiki-ci:8.1-qa
   #DBDiff is sensitive to mysql version.  
   #The schemas dumped for prior tikis on https://gitlab.com/tikiwiki/tikiwiki-ci-databases have explicit COLLATION() statements for each table column.  Later versions of mysql (8.0.11+, but not sure) will not dump the same whits explicit collations.
   #Running php doc/devtools/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into doc/devtool/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
@@ -129,6 +130,13 @@ node_build:
       - .composercache/
     policy: pull-push
 
+composer-ext-check:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php doc/devtools/check_composer_extensions.php
+
 composer:
   stage: build
   needs: []
@@ -187,13 +195,14 @@ phpcs:
         prefix: "phpcs"
         files:
           - phpcs.xml.dist
+          - doc/devtools/codesniffer/standards/TikiIgnore/ignore_list.json
       paths:
         - phpcs.cache
       policy: pull-push
 
 phplint:
   stage: lint
-  image: ${DEPENDENCY_PROXY_PREFIX}rjsmelo/ubuntu-php:${PHP_VERSION}-qa
+  image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
   script:
@@ -207,6 +216,7 @@ phplint:
       - PHP_VERSION: "8.1"
       - PHP_VERSION: "8.2"
       - PHP_VERSION: "8.3"
+      - PHP_VERSION: "8.4"
 
 smarty-lint:
   stage: lint
@@ -279,7 +289,7 @@ translation:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - git log --first-parent --pretty="format:%h" -1 --skip=1 | xargs -I gitHash php -d display_errors=On console.php translation:englishupdate --diff-command="git diff gitHash" --git --audit
+    - git log --first-parent --pretty="format:%h" -1 --skip=1 | xargs -I gitHash php -d display_errors=On console.php translation:englishupdate --audit
   allow_failure: true
 
 translation-standards:
@@ -290,15 +300,15 @@ translation-standards:
   script:
     - php doc/devtools/check_template_translation_standards.php --all
 
-satis-validates:
-  stage: tiki-check
-  needs: []
-  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    - php doc/devtools/check_satis_validation.php
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+#satis-validates:
+#  stage: tiki-check
+#  needs: []
+#  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+#  script:
+#    - php doc/devtools/check_satis_validation.php
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "master"'
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
 
 #This is a non-network check
 composer-validates:
@@ -308,7 +318,7 @@ composer-validates:
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
-    - php doc/devtools/check_composer_dist_urls.php
+    # - php doc/devtools/check_composer_dist_urls.php
 
 #This tests if composer COULD update the current composer.lock (it is coherent and installable).  This is important because a developer wanting to update or add a dependency wouldn't be able to do so without figuring out why a composer.lock cannot be generated even before his changes.
 #What we want to know is if a developer could successfully generate a new composer.lock file to update minor versions, or when adding dependencies.  Not if he could generate a minimal-impact composer.lock file with composer update --lock on stable branches, which is much harder, and not necessary for the master branch.
@@ -484,7 +494,7 @@ console-php-works:
   stage: unit-tests
   needs:
     - composer
-  image: ${DEPENDENCY_PROXY_PREFIX}rjsmelo/ubuntu-php:${PHP_VERSION}-qa
+  image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
       alias: mysql
@@ -501,7 +511,7 @@ console-php-works:
     - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
-    - echo '<?php $dbversion_tiki = "21.0"; $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always
@@ -524,6 +534,8 @@ unit-tests:
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.3"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.4"
+        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
 
 unit-tests-node:
   stage: unit-tests
@@ -534,6 +546,17 @@ unit-tests-node:
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
+
+# This test is only required because we don't have a combined node and php image currently. - benoitg - 2025-03-08
+unit-tests-icon-generator:
+  stage: unit-tests
+  needs:
+    - composer
+    - node_modules
+  image:
+    name: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php console.php build:generateiconlist
 
 #
 # Package this Tiki build
@@ -613,7 +636,7 @@ check-directories:
     - composer require tikiwiki/diagram ^10 --no-progress
     - composer require thiagoalessio/tesseract_ocr ^2.7.0 --no-progress
     - composer require mathjax/mathjax ^2.7 --no-progress
-    - composer require media-alchemyst/media-alchemyst ^0.5.1 --no-progress
+    - composer require tikiwiki/media-alchemyst ^4.2 --no-progress
     - composer require npm-asset/pdfjs-dist ~2.0.487 --no-progress
     - composer require bower-asset/wodo.texteditor ^0.5.9 --no-progress
     - composer require j0k3r/php-readability ^1.1.10 --no-progress
@@ -674,3 +697,36 @@ update_vendor_bundled_dependencies:
       - schedules
     variables:
       - $SCHEDULER == "update_vendor_bundled"
+
+composer-stability:
+  stage: composer-stability
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  needs:
+    - composer
+  script:
+    - php doc/devtools/check_composer_stability.php --ci
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: manual
+  artifacts:
+    when: always  # Always upload artifacts even if job fails
+  allow_failure: true  # Allow job to fail without failing the pipeline
+
+composer-operator-check:
+  stage: composer-stability
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  needs:
+    - composer
+  script:
+  - apt-get update && apt-get install -y jq
+  - chmod +x doc/devtools/check_caret_operator.sh
+  - ./doc/devtools/check_caret_operator.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+  allow_failure: false

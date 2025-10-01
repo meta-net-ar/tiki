@@ -18,7 +18,7 @@ As of 2023-05-27, the community has:
   * 454 of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
-from subversion repository by the following script:
+from git repository by the following script:
   doc/devtools/release.php
 
 Counting the commits is not as trivial as it may sound. If your number of commits

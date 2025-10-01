@@ -101,7 +101,7 @@ class DefaultSchedulers
     private function anyTaskExists(): bool
     {
         $existingTaskCount = $this->scheduler->fetchCount([]);
-        return $existingTaskCount ? true : false;
+        return (bool)$existingTaskCount;
     }
 
     /**

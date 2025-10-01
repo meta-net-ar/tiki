@@ -26,9 +26,9 @@ include_once("tiki-setup.php");
 
 
 //Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["twoFactorForm"])) {
-    $twoFactorForm = 'y';
+$twoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["$twoFactorForm"])) {
+    $twoFactorForm = $_REQUEST["$twoFactorForm"];
 }
 $smarty->assign('twoFactorForm', $twoFactorForm);
 
@@ -39,7 +39,7 @@ try {
         $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
         $isTokenGenerated = $twoFactorAuth->generateCode($tikiUserName);
         if ($prefs['twoFactorAuthType'] === TwoFactorAuth::EMAIL_2FA && ! empty($isTokenGenerated)) {
-            $message = tr("2FA token generated successfully and sent to your email");
+            $message = tr("An email containing your authentication code has been sent. Please enter the code to access the website.");
             Feedback::success($message);
         }
     }

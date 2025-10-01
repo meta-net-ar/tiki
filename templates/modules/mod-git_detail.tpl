@@ -16,6 +16,8 @@ style="{$module_params.style}"
         <span class="date">{tr}from{/tr} {$content.mdate|tiki_short_datetime}</span>
     </div>
 {else}
-    {tr}No Git checkout or unable to determine last update{/tr}
+    <div class="mod-git_detail cvsup">
+        <span class="label">{tr}Tiki version:{/tr} {$content.version}&nbsp;
+    </div>
 {/if}
 {/tikimodule}

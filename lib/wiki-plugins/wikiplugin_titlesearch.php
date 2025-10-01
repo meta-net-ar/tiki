@@ -4,7 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once "lib/wiki/pluginslib.php";
+
+use Tiki\Lib\Wiki\PluginsLib;
+use Tiki\Lib\Wiki\PluginsLibUtil;
 
 function wikiplugin_titlesearch_info()
 {
@@ -92,10 +94,9 @@ class WikiPluginTitleSearch extends PluginsLib
     }
     public function run($data, $params)
     {
-        $wikilib = TikiLib::lib('wiki');
         $tikilib = TikiLib::lib('tiki');
         $aInfoPreset = array_keys($this->aInfoPresetNames);
-        $exclude = ! empty($params['exclude']) ? $params['exclude'] : '';
+        $exclude = $params['exclude'] ?? '';
         $params = $this->getParams($params, true);
         extract($params, EXTR_SKIP);
         if (! $search) {
@@ -135,7 +136,7 @@ class WikiPluginTitleSearch extends PluginsLib
             if (! empty($exclude)) {
                 if (in_array($aPage["pageName"], $exclude)) {
                     unset($aPages["data"][$idPage]);
-                    $aPages["cant"]--;
+                    $aPages["count"]--;
                 }
             }
         }
@@ -146,7 +147,7 @@ class WikiPluginTitleSearch extends PluginsLib
         //
         if (isset($noheader) && ! $noheader) {
             // Create header
-            $count = $aPages["cant"];
+            $count = $aPages["count"];
             if (! $count) {
                 $sOutput  .= tra("No pages found for title search") . " '__" . $search . "__'";
             } elseif ($count == 1) {

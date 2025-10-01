@@ -26,9 +26,9 @@ $inputConfiguration = [
         'find_to_Month'                   => 'int',               //post
         'find_to_Day'                     => 'int',               //post
         'find_to_Year'                    => 'int',               //post
-        'find'                            => 'word',              //post
-        'type'                            => 'word',              //post
-        'topic'                           => 'word',              //post
+        'find'                            => 'string',              //post
+        'type'                            => 'string',              //post
+        'topic'                           => 'string',              //post
         'find_show_categories_multi'      => 'bool',              //post
         'categId'                         => 'int',               //get
         'lang'                            => 'lang',              //get
@@ -58,10 +58,7 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $artperms = Perms::get([ 'type' => 'article', 'object' => $_REQUEST['remove'] ]);
 
     if ($artperms->remove_article != 'y') {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to remove articles"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to remove articles"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $artlib->remove_article($_REQUEST["remove"]);
 }
@@ -71,10 +68,7 @@ if (isset($_REQUEST['submit_mult']) && $access->checkCsrf()) {
             $artperms = Perms::get([ 'type' => 'article', 'object' => $aId ]);
 
             if ($artperms->remove_article != 'y') {
-                $smarty->assign('errortype', 401);
-                $smarty->assign('msg', tra("You do not have permission to remove articles"));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You do not have permission to remove articles"), \Laminas\Http\Response::STATUS_CODE_401);
             }
         }
 
@@ -104,9 +98,8 @@ if (! isset($_REQUEST["offset"])) {
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
-} else {
-    $maxRecords = $maxRecords;
 }
+
 $smarty->assign_by_ref('maxRecords', $maxRecords);
 
 $visible_only = 'y';
@@ -187,7 +180,7 @@ $smarty->assign('find_lang', $_REQUEST['lang']);
 // Get a list of last changes to the Wiki database
 $listpages = $artlib->list_articles($offset, $maxRecords, $sort_mode, $find, $date_min, $date_max, $user, $_REQUEST["type"], $_REQUEST["topic"], $visible_only, '', $filter["categId"], '', '', $_REQUEST['lang']);
 // If there're more records then assign next_offset
-$smarty->assign_by_ref('cant', $listpages['cant']);
+$smarty->assign_by_ref('count', $listpages['count']);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 
 if ($prefs["gmap_article_list"] == 'y') {

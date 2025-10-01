@@ -1,33 +1,33 @@
 {* ----- Start year --- *}
 {if isset($field.options_array[1]) and $field.options_array[1] ne ''}
-    {assign var=start value=$field.options_array[1]}
+    {$start=$field.options_array[1]}
 {elseif isset($prefs.display_start_year)}
-    {assign var=start value=$prefs.display_start_year}
+    {$start=$prefs.display_start_year}
 {else}
-    {assign var=start value='-4'}
+    {$start='-4'}
 {/if}
 {if $field.year > 0 and $field.year < $start}
-    {assign var=start value=$field.year}
+    {$start=$field.year}
 {/if}
 
 {* ----- End year --- *}
 {if isset($field.options_array[2]) and $field.options_array[2] ne ''}
-    {assign var=end value=$field.options_array[2]}
+    {$end=$field.options_array[2]}
 {elseif isset($prefs.display_end_year)}
-    {assign var=end value=$prefs.display_end_year}
+    {$end=$prefs.display_end_year}
 {else}
-    {assign var=end value='+4'}
+    {$end='+4'}
 {/if}
 {if $field.year > $end}
-    {assign var=end value=$field.year}
+    {$end=$field.year}
 {/if}
 
 {if $field.value eq ''}
-    {assign var=time value="--"}
+    {$time="--"}
 {elseif isset($context.timestamp)}
-    {assign var=time value=$context.timestamp}
+    {$time=$context.timestamp}
 {else}
-    {assign var=time value=$field.value}
+    {$time=$field.value}
 {/if}
 {$inForm}
 {if $field.options_array[0] ne 't'}

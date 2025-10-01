@@ -24,7 +24,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxImpressions">{tr}Maximum impressions{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxImpressions" id="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxImpressions" id="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -33,7 +33,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxUserImpressions">{tr}Maximum number of impressions for a user{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxUserImpressions" id="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxUserImpressions" id="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -42,7 +42,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxClicks">{tr}Maximum clicks{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxClicks" id="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxClicks" id="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -285,7 +285,7 @@
                                 <form action="tiki-edit_banner.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="removeZone" value="{$zones[ix].zone}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Remove{/tr}" onclick="confirmPopup('{tr}Do you want to delete this zone{/tr} ?')">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Remove{/tr}" onclick="confirmPopup('{tr}Do you want to delete this zone{/tr} ?')" aria-label="{tr}Remove{/tr}">
                                         {icon name='remove' _menu_icon='y' }
                                     </button>
                                 </form>

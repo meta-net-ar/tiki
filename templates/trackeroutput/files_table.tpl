@@ -28,7 +28,7 @@
                 <td>{$file.lastModif|tiki_short_datetime}</td>
                 {if $showdescriptions}<td>{$file.description|escape}</td>{/if}
                 <td>
-                    <a class="fgalname tips" title="{tr}Actions{/tr}" href="#" {popup fullhtml="1" text={include file='tracker/fileTrackerContextMenu.tpl' menu_icon=$prefs.use_context_menu_icon menu_text=$prefs.use_context_menu_text changes=$smarty.section.changes.index} trigger="click"}>
+                    <a class="fgalname tips" title="{tr}Actions{/tr}" href="#" role="button" {popup fullhtml="1" text={include file='tracker/fileTrackerContextMenu.tpl' menu_icon=$prefs.use_context_menu_icon menu_text=$prefs.use_context_menu_text changes=$smarty.section.changes.index} trigger="click"}>
                         {icon name='wrench' alt="{tr}Actions{/tr}"}
                     </a>
                 </td>

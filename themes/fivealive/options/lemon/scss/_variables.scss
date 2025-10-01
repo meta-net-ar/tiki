@@ -1,75 +1,17 @@
 //Custom styles for the FiveAlive Lemon option theme.
+
+@import "../../../scss/_variables.scss";
+
 $tiki-top-bg: linear-gradient(to right, rgba(240, 219, 64, 1) 0%, rgba(211, 205, 85, 1) 97%);
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 // Color system
-
-// scss-docs-start gray-color-variables
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #6c757d;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-// scss-docs-end gray-color-variables
-
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-);  // default
-// scss-docs-end gray-colors-map
-
-// scss-docs-start color-variables
-$blue:    #0d6efd;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #d63384;  // default
-$red:     #dc3545;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #ffc107;  // default
-$green:   #198754;  // default
-$teal:    #20c997;  // default
-$cyan:    #0dcaf0;  // default
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-);  // default
-// scss-docs-end colors-map
 
 $red-300: tint-color($red, 40%);  // default
 $green-300: tint-color($green, 40%);  // default
 
 $white:    #fff;
 $black:    #000;
-$light: #f9a013;
-$dark: #6D5509; // arbitrary
 
 $primary:       #F0D800; // #ffc805;
 $secondary:     #ffc805; // #ffe405; //#c85a28;
@@ -77,33 +19,42 @@ $success:       #5cb85c;
 $info:          #f5821e;
 $warning:       #f0ad4e;
 $danger:        #D63D00; //#ff5c1a;
-$light:         #ffffff;
-$dark:          #cb9e10;
+$light:         #FCF8A9;
+//$dark:          #cb9e10;
 
 $theme-colors: (
-    "primary":           #F0D800, // #ffc805,
-    "secondary":         #ffc805, //#ffe405, // #c85a28,
-    "success":             #5cb85c,
-    "info":               #f5821e,
-    "warning":             #f0ad4e,
-    "danger":           #D63D00, //   #ff5c1a,
-    "light":            #ffffff,
-    "dark":                #6D5509
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
 );
 
-$bg-light: #f9a013 !important;
+$bg-light: linear-gradient(90deg,rgba(255, 239, 67, 1) 0%, rgba(252, 248, 169, 1) 99%);;
 
 // Options
+$enable-gradients: true;
+$enable-shadows: true;
 
 // Prefix
 $prefix: bs-;
 
+// Typography
+$headings-color: $body-color;
+
 // Body
 $body-color: $gray-800;  // default
 
+// Links
 $link-color: #BB5525; //#c75a28;
 $link-hover-color:               darken($link-color, 15%);
 $link-shade-percentage:                   20%;  // default
+
+// Components
+$component-active-color: #2D7709; // $dark;
 
 // Navs
 $nav-tabs-link-color: #000;
@@ -113,29 +64,15 @@ $nav-tabs-link-active-bg: #b25025; // same as $dropdown-link-hover-bg;
 
 // Navbars
 
-// navbar link hover colors
-$bg-dark-link-hover-color: #f2f2f2;
-$bg-dark-link-hover-bg: #003c4a;
-
 // Typography
 $hr-color: #ffc506;
 $text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
 $headings-font-weight: 700;
 
-$navbar-fixed-top-bg: #e4af00;
-$bg-dark: #ad5b28;
-$bg-light: #ad5b28;
-
-// Cards
-$card-border-color: #e4af00;
-$card-title-color: #252729;
-
 // Tables
 $table-border-color: #a99628;
 $table-accent-bg: #f9f9f9;
 $table-hover-bg: #f5f5f5;
-
-$component-active-bg: $card-border-color; // From Grape
 
 // Forms
 $input-color: var(--#{$prefix}body-color);  // default // #555555;
@@ -177,61 +114,23 @@ $pagination-disabled-color: $text-muted; // #999999;
 $pagination-disabled-bg: #ffffff;
 $pagination-disabled-border-color: #dddddd;
 
-$enable-gradients: true;
-$enable-shadows: true;
+// Cards
+$card-border-color: #e4af00;
+$card-title-color: $link-color;
+$card-cap-color: #000;
 
 // Code
 
-$code-color:                        $body-color; // $pink; default
+$code-color:                     $body-color; // $pink; default
+
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
-$bg-light-alt: #ffc506 !important;
 
-$side-column-heading-color: #8F6D00;
+$tiki-footer_liner-card-inner-border: #ffc506;
+$tiki-footer-accent-color: #ffc506;
+$tiki-footer-btn-secondary-color: #f4f4f4;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
-$top-bg: #e4af00;
-$top-color: #000;
-$top-link-color: #000;
-$top-link-hover-color: #5c5c5c;
-
-$topbar-bg: #ad5b28;
-$bg-dark-info: #fff;
-$navbar-fixed-top-bg: #e4af00;
-$page-header-link-color: #000;
-$topbar-link-color: #000;
-
-$topbar-dark-bg: #2c1c04;
-$top-light-bg: transparent; // #117485;
-$top-light-color: #f9f9f9;
-$top-light-link-color: $top-light-color;
-$topbar-light-bg: #063035;
-$topbar-light-color: #f9f9f9;
-//$topbar-dark-bg: #2c1c04;
-$top-dark-bg: transparent; // #117485; // $top-light-bg; defining the variable with a variable didn't work.
-$top-dark-color: $black;
-$top-dark-link-color: $top-dark-color;
-$top-dark-link-hover-color: $gray-900;
-$topbar-dark-bg: #063035; // $topbar-light-bg;
-$topbar-dark-color: $topbar-light-color;
-
-$navbar-light-color: $top-light-color;
-$navbar-light-link-color: $top-light-color;
-$navbar-light-link-hover-color: #f2f2f2;
-//$navbar-light-link-hover-bg: #003c4a;
-
-$navbar-dark-color: $top-light-color;
-$navbar-dark-link-color: $top-light-color;
-$navbar-dark-link-hover-color: #f2f2f2;
-//$navbar-dark-hover-color: $navbar-light-link-color;
-//$navbar-light-link-hover-bg: #003c4a;
-
-$footer_liner-card-inner-border: #ffc506;
-
-$footer-accent-color: #ffc506;
-$footer-btn-secondary-color: #f4f4f4;
-$footer_liner-border-color: $footer-accent-color;
-
-$topbar-dark-bg: #2c1c04;
-$postbody-title-card-title-color: #fff;
+$tiki-postbody-title-card-title-color: #fff;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.

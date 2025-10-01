@@ -154,7 +154,7 @@ $users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial);
 $ts = Table_Check::setVars('admingroups', true);
 if ($ts['enabled'] && ! $ts['ajax']) {
     //set tablesorter code
-    Table_Factory::build('TikiAdminGroups', ['id' => $ts['tableid'], 'total' => $users['cant']]);
+    Table_Factory::build('TikiAdminGroups', ['id' => $ts['tableid'], 'total' => $users['count']]);
 }
 
 $inc = [];
@@ -274,18 +274,18 @@ if (! empty($_REQUEST["group"])) {
     $smarty->assign('memberslist', $memberslist);
 
     //banned members of a group
-    $bannedOffset = isset($_REQUEST['bannedOffset']) ? $_REQUEST['bannedOffset'] : 0;
-    $bannedMax = isset($_REQUEST['bannedMax']) ? $_REQUEST['bannedMax'] : $prefs['maxRecords'];
+    $bannedOffset = $_REQUEST['bannedOffset'] ?? 0;
+    $bannedMax = $_REQUEST['bannedMax'] ?? $prefs['maxRecords'];
     if (empty($_REQUEST['bannedSort'])) {
         $bannedSort = ['source_itemId' => 'asc'];
-    } elseif (! empty($_REQUEST['bannedSort']) && substr($_REQUEST['bannedSort'], -4) === 'desc') {
+    } elseif (str_ends_with($_REQUEST['bannedSort'], 'desc')) {
         $bannedSort = ['source_itemId' => 'desc'];
     } else {
         $bannedSort = ['source_itemId' => 'asc'];
     }
     $bannedlist = $userlib->get_group_banned_users($_REQUEST['group'], $bannedOffset, $bannedMax, null, $bannedSort);
     $smarty->assign('bannedlist', $bannedlist['data']);
-    $smarty->assign('bannedCount', $bannedlist['cant']);
+    $smarty->assign('bannedCount', $bannedlist['count']);
 
     $userslist = $userlib->list_all_users($_REQUEST['group']);
 
@@ -321,7 +321,7 @@ if (! empty($_REQUEST["group"])) {
             'TikiAdminGroupsBanned',
             [
                 'id' => 'bannedMembers',
-                'total' => $bannedlist['cant'],
+                'total' => $bannedlist['count'],
                 'ajax' => [
                     'requiredparams' => [
                         'group' => $_REQUEST['group']
@@ -451,7 +451,7 @@ if (! empty($groupcolor)) {
 }
 $smarty->assign('groupperms', $groupperms);
 $smarty->assign_by_ref('userChoice', $userChoice);
-$smarty->assign_by_ref('cant_pages', $users["cant"]);
+$smarty->assign_by_ref('pages_count', $users["count"]);
 $smarty->assign('group_info', $re);
 $smarty->assign('isRole', $isRole);
 $smarty->assign('isTplGroup', $isTplGroup);

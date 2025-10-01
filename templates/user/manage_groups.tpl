@@ -25,25 +25,24 @@
             <label for="select_groups" class="col-form-label">
                 {tr}These groups:{/tr}
             </label>
-            <select name="checked_groups[]" multiple="multiple" size="{$countgrps}" class="form-control" id="select_groups" data-usergroups='{$userGroups}'>
+            <select name="checked_groups[]" multiple="multiple" size="{$countgrps}" class="form-control" id="select_groups" data-usergroups="{$userGroups|escape}">
                 {section name=ix loop=$all_groups}
                     {if $all_groups[ix] != 'Anonymous' && $all_groups[ix] != 'Registered'}
                         <option value="{$all_groups[ix]|escape}">{$all_groups[ix]|escape}</option>
                     {/if}
                 {/section}
             </select>
-            {if $prefs.jquery_select2 !== 'y'}
+            {if $prefs.elementplus_select !== 'y'}
                 <div class="form-text">
                     {tr}Use Ctrl+Click or Command+Click to select multiple options{/tr}
                 </div>
             {/if}
             {jq}
 $("input[name=add_remove]").on("change", function () {
-    var userGroups = $("#select_groups").data("usergroups"), mode = false;
+    const userGroups = $("#select_groups").data("usergroups");
+    const mode = $("input[name=add_remove]:checked").val() === "add";
     if ($(this).prop("checked") && userGroups) {
-        if ($(this).val() === "add") {    // filter the group list to ones this user is not in
-            mode = true;
-        }
+        // filter the group list to ones this user is not in
         $("option", "#select_groups").each(function () {
             if ($.inArray($(this).val(), userGroups) > -1) {
                 $(this).prop("disabled", mode).css("opacity", mode ? .3 : 1);
@@ -51,9 +50,45 @@ $("input[name=add_remove]").on("change", function () {
                 $(this).prop("disabled", ! mode).css("opacity", ! mode ? .3 : 1);
             }
         });
-        $("#select_groups").trigger("change.select2");
     }
 }).trigger("change");
+
+$("#select_groups").on("change", function () {
+    const mode = $("input[name=add_remove]:checked").val() === "add";
+    const $defaultGroup = $("#default_group");
+
+    const userGroups = $("#select_groups").data("usergroups");
+    const selectedGroups = $(this).val();
+    let setAndSelectedGroups = [];
+    if (mode) {
+        setAndSelectedGroups = [...userGroups, ...selectedGroups];
+    } else {
+        setAndSelectedGroups = [...selectedGroups];
+    }
+
+    // add or remove selected groups from default group
+    setAndSelectedGroups.forEach(function (group) {
+        const pattern = group;
+        const $matches = $defaultGroup.find("option").filter(function() {
+            // groups can contains single and/or double quotes so use regex
+            return $(this).val() === pattern;
+        });
+
+        if (mode && $matches.length === 0) {
+            $defaultGroup.prepend($("<option>").val(group).text(group));
+        } else if (! mode && $matches.length > 0) {
+            $matches.remove();
+        }
+    });
+
+    if (mode) {
+        $defaultGroup.find("option").each(function () {
+            if (setAndSelectedGroups.indexOf($(this).val()) === -1) {
+                $(this).remove();
+            }
+        });
+    }
+});
             {/jq}
         </div>
         <div class="mb-3 row mx-0" >

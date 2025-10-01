@@ -181,7 +181,7 @@ class DevFixStyleCommand extends Command
         $files = glob($startdir . $pattern, $flags);
         foreach ($files as $key => $fileName) {
             foreach ($excludes as $exclude) {
-                if (strpos($fileName, $exclude)) {
+                if (str_contains($fileName, $exclude)) {
                     unset($files[$key]);
                     break;
                 }
@@ -192,7 +192,7 @@ class DevFixStyleCommand extends Command
             $include = true;
             /** If the directory has not been excluded from processing */
             foreach ($excludes as $exclude) {
-                if (strpos($dir, $exclude) !== false) {
+                if (str_contains($dir, $exclude)) {
                     $include = false;
                     break;
                 }

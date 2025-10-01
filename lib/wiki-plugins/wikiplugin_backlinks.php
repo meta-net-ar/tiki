@@ -4,7 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once "lib/wiki/pluginslib.php";
+
+use Tiki\Lib\Wiki\PluginsLibUtil;
+use Tiki\Lib\Wiki\PluginsLib;
 
 class WikiPluginBackLinks extends PluginsLib
 {
@@ -85,7 +87,7 @@ class WikiPluginBackLinks extends PluginsLib
         //To be able to read prefs
         global $prefs;
         $wikilib = TikiLib::lib('wiki');
-        $exclude = isset($params['exclude']) ? $params['exclude'] : [];
+        $exclude = $params['exclude'] ?? [];
         $params = $this->getParams($params, true);
         $aInfoPreset = array_keys($this->aInfoPresetNames);
         extract($params, EXTR_SKIP);
@@ -160,8 +162,8 @@ class WikiPluginBackLinks extends PluginsLib
         //
         if (! isset($noheader) || ! $noheader) {
             // Create header
-            if (! empty($aPages["cant"])) {
-                $count = $aPages["cant"];
+            if (! empty($aPages["count"])) {
+                $count = $aPages["count"];
             } else {
                 $count = 0;
             }

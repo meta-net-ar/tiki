@@ -11,7 +11,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 if ($prefs['feature_referer_stats'] == 'y') {
     if (isset($_SERVER['HTTP_REFERER'])) {
         $pref = parse_url($_SERVER['HTTP_REFERER']);
-        if (isset($pref['host']) && ! strstr($_SERVER['SERVER_NAME'], $pref['host'])) {
+        if (isset($pref['host']) && ! str_contains($_SERVER['SERVER_NAME'], $pref['host'])) {
             $tikilib->register_referer($pref['host'], $_SERVER['HTTP_REFERER']);
         }
     }

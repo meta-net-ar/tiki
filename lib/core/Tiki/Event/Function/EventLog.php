@@ -30,9 +30,9 @@ class Tiki_Event_Function_EventLog extends Math_Formula_Function
             $includes_or_excludes = explode("&", $element[2]);
         }
         foreach ($includes_or_excludes as $rule) {
-            if (substr($rule, 0, 1) == '+') {
+            if (str_starts_with($rule, '+')) {
                 $includes[] = substr($rule, 1);
-            } elseif (substr($rule, 0, 1) == '-') {
+            } elseif (str_starts_with($rule, '-')) {
                 $excludes[] = substr($rule, 1);
             }
         }

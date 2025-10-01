@@ -180,10 +180,7 @@ function wikiplugin_include($dataIn, $params)
 
     $killtoc = true;
     $params = array_merge([
-        'nopage_text' => '',
-        'pagedenied_text' => '',
         'page_edit_icon' => $prefs['wiki_edit_plugin'],
-        'parse_included_page' => 'n',
         'page_replace_icon' => $prefs['wiki_edit_plugin'],
         'pagenotapproved_text' => tr('There are no approved versions of this page.'),
     ], $params);
@@ -352,7 +349,7 @@ function wikiplugin_include($dataIn, $params)
             if (
                 ! isset($_GET['replaceby'])
                 || (isset($_GET['replaceby']) && (int) $_GET['replaceby'] != $includeId)
-                && (empty($_REQUEST['display']) || $_REQUEST['display'] != 'pdf')
+                && (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF)
             ) {
                 $text .= '<a id="' . $id . '" class="editplugin wikiplugin-include-replace" href="javascript:void(1)" data-index="' . $includeId . '" data-page="' . htmlentities($returnto, ENT_COMPAT) . '" data-ticket="' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '">' .
                     smarty_function_icon(['name' => 'exchange', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
@@ -399,7 +396,7 @@ function wikiplugin_include($dataIn, $params)
         if (isset($perms) && $perms['tiki_p_edit'] === 'y' && strpos($_SERVER['PHP_SELF'], 'tiki-send_newsletters.php') === false) {
             $smarty = TikiLib::lib('smarty');
             $tip = tr('Include Plugin') . ' | ' . tr('Edit the included page:') . ' &quot;' . $page . '&quot;';
-            if (empty($_REQUEST['display']) || $_REQUEST['display'] != 'pdf') {
+            if (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF) {
                 $text .= '<a class="editplugin" ' . // ironically smarty_block_self_link doesn't work for this! ;)
                 smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), $tmp = false) . '>' .
                 smarty_function_icon(['name' => 'edit', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';

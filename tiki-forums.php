@@ -16,7 +16,6 @@ $inputConfiguration = [
             'offset'                      => 'int',               //get
             'find'                        => 'string',            //post
             'numrows'                     => 'int',               //post
-            'find'                        => 'string',            //post
         ],
     ],
 ];
@@ -74,7 +73,7 @@ for ($i = 0; $i < $temp_max; $i++) {
 }
 
 $smarty->assign_by_ref('channels', $channels["data"]);
-$smarty->assign('cant', $channels["cant"]);
+$smarty->assign('count', $channels["count"]);
 include_once('tiki-section_options.php');
 
 //add tablesorter sorting and filtering
@@ -85,7 +84,7 @@ if ($ts['enabled'] && ! $ts['ajax']) {
         'TikiForums',
         [
             'id' => $ts['tableid'],
-            'total' => $channels["cant"],
+            'total' => $channels["count"],
         ]
     );
 }

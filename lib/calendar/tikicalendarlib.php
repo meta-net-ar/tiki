@@ -135,8 +135,8 @@ class TikiCalendarLib extends CalendarLib
                                 if ($res['user'] != '') {
                                     include_once('lib/smarty_tiki/modifier.username.php');
                                     $res['user'] = smarty_modifier_username($res['user']);
-                                    $des = isset($res['description']) ? $res['description'] : '';
-                                    if (! strpos($des, '%s')) {
+                                    $des = $res['description'] ?? '';
+                                    if (! str_contains($des, '%s')) {
                                         $br = ( $des == '' ) ? '' : '<br />';
                                         $res['description'] = '<i>' . tra('by') . ' %s</i>' . $br . $des;
                                     }

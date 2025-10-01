@@ -1,5 +1,18 @@
-// CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
-// Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
+// CSS variables for the Tikinewt theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
@@ -23,6 +36,8 @@
     --tiki-topbar-color: rgba(255, 255, 255, 0.7);
     --tiki-topbar-hover-color: #fff;
     --tiki-topbar-text-color: #fff;
+    --tiki-topbar-border: var(--tiki-main-border-color) solid;
+    --tiki-topbar-border-width: 0px 0px 1px 0px;
 }
 
 @mixin top-nav-light {
@@ -39,6 +54,9 @@
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-border: var(--tiki-main-border-color) solid;
+    --tiki-topbar-border-width: 0px 0px 1px 0px;
+    --sm-collapsible-navbar-color: var(--tiki-topbar-color);
 }
 
 .tiki-top-nav-light {
@@ -68,14 +86,14 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -150,8 +168,12 @@
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 :root {
+    .page-content-top-margin {
+        --tiki-page-content-top-margin: 0px; // Reduced to 0 so borders will meet.
+    }
     --tiki-vert-nav-link-color: $link-color;
     --tiki-vert-nav-link-hover-color: $link-hover-color;
+    --tiki-main-border-color: #{$border-color};
 }
 
 [data-bs-theme="dark"] {
@@ -160,12 +182,16 @@
     --tiki-card-border-color: #{$light-border-subtle-dark};
     --tiki-card-header-bg: #{$dark-bg-subtle-dark};
     --tiki-card-title-color: #{$body-color-dark};
+    --tiki-main-border-color: #8cacbb82;
     .bg-light,
     .navbar.bg-light {
         background: var(--bs-tertiary-bg) !important;
         .nav-link {
             color: $link-color-dark;
         }
+    }
+    .blockquote-footer {
+        color: #879097;
     }
 }
 
@@ -179,4 +205,3 @@
         color: var(--bs-body-color) !important;
     }
 }
-

@@ -30,6 +30,7 @@ class EmailParser extends Manipulator
         $result = [
             'source_id' => $message->getHeaderValue('X-Tiki-Source'),
             'message_id' => $message->getHeaderValue('Message-ID'),
+            'auto_move_reply' => $message->getHeaderValue('X-Auto-Move-Reply'),
             'subject' => $message->getHeaderValue('Subject'),
             'body' => $message->getContent(),
             'from' => $this->getRawAddress($message->getHeader('From')),

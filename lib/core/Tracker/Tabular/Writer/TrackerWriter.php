@@ -132,7 +132,7 @@ class TrackerWriter
 
         $definition = $schema->getDefinition();
 
-        $iterate(function ($line, $info, $columns) use ($utilities, $definition, $schema) {
+        $result = $iterate(function ($line, $info, $columns) use ($utilities, $definition, $schema) {
             try {
                 if (! isset($info['status'])) {
                     $info['status'] = '';
@@ -184,7 +184,7 @@ class TrackerWriter
             $source->importSuccess();
         }
 
-        return true;
+        return $result;
     }
 
     /**

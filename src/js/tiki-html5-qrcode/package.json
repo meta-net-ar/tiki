@@ -1,0 +1,15 @@
+{
+    "name": "tiki-html5-qrcode",
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "lint": "eslint --ext .js --ignore-path .gitignore --fix src",
+        "format": "prettier .  --write"
+    },
+    "engines": {
+        "npm": ">=7.0.0"
+    },
+    "dependencies": {
+        "html5-qrcode": "^2.3.8"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "name": "tracker-rules",
+    "version": "0.1.0",
+    "scripts": {
+        "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+        "format": "prettier .  --write"
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+    },
+    "description": "Tracker rules management within Tiki",
+    "main": "vite.config.js",
+    "author": ""
+}

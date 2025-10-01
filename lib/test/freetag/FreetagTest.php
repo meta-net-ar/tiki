@@ -32,7 +32,7 @@ class FreetagTest extends TikiTestCase
                     2 => ['tag' => 'third'],
                     3 => ['tag' => 'another multiple word tag']
                     ],
-                'cant' => 4,
+                'count' => 4,
                 ];
 
         $tagString = 'first "multiple word tag" third "another Multiple Word tag"';

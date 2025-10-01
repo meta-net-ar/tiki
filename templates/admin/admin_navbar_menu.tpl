@@ -1,7 +1,7 @@
 {* navbar menu for admin_navbar.tpl *}
 <ul class="nav navbar-nav me-auto">
     <li class="nav-item dropdown  me-1">
-        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Access{/tr}</a>
+        <a href="#" role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Access{/tr}</a>
         <ul class="dropdown-menu tiki-admin-top-nav-{$prefs.theme_navbar_color_variant_admin}">
             {if $tiki_p_admin eq "y" and $tiki_p_admin_users eq "y"}
                 <a class="dropdown-item" href="tiki-adminusers.php">{tr}Users{/tr}</a>
@@ -19,7 +19,7 @@
         </ul>
     </li>
     <li class="nav-item dropdown me-1">
-        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Content{/tr}</a>
+        <a href="#" role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Content{/tr}</a>
         <ul class="dropdown-menu{*{if $prefs.theme_navbar_color_variant_admin eq 'dark'} dropdown-menu-dark{/if}*}">
             {if $prefs.feature_articles eq "y"}
                 <a class="dropdown-item" href="tiki-list_articles.php">{tr}Articles{/tr}</a>
@@ -87,7 +87,7 @@
         </ul>
     </li>
     <li class="nav-item dropdown me-1">
-        <a href="#" class="nav-link dropdown-toggle me-2" data-bs-toggle="dropdown">{tr}System{/tr}</a>
+        <a href="#" role="button" class="nav-link dropdown-toggle me-2" data-bs-toggle="dropdown">{tr}System{/tr}</a>
         <ul class="dropdown-menu{*{if $prefs.theme_navbar_color_variant_admin eq 'dark'} dropdown-menu-dark{/if}*}">
             {if $tiki_p_admin eq "y"}
                 <a class="dropdown-item" href="{service controller=managestream action=list}">{tr}Activity Rules{/tr}</a>
@@ -150,7 +150,7 @@
         </ul>
     </li>
     <li class="nav-item dropdown me-1">
-        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Tools{/tr}</a>
+        <a href="#" role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{tr}Tools{/tr}</a>
         <ul class="dropdown-menu{*{if $prefs.theme_navbar_color_variant_admin eq 'dark'} dropdown-menu-dark{/if}*}">
             {if $prefs.feature_actionlog eq "y" and $tiki_p_view_actionlog}
                 <a class="dropdown-item" href="tiki-admin_actionlog.php">{tr}Action Log{/tr}</a>
@@ -162,12 +162,6 @@
                 <a class="dropdown-item" href="tiki-admin_routes.php">{tr}Custom Routes{/tr}</a>
             {/if}
             <a class="dropdown-item" href="tiki-admin_dsn.php">{tr}DSN/Content Authentication{/tr}</a>
-            {if $prefs.feature_editcss eq "y" and $tiki_p_create_css eq "y"}
-                <a class="dropdown-item" href="tiki-edit_css.php">{tr}Edit CSS{/tr}</a>
-            {/if}
-            {if $prefs.feature_view_tpl eq "y" and $prefs.feature_edit_templates eq "y" and $tiki_p_edit_templates eq "y"}
-                <a class="dropdown-item" href="tiki-edit_templates.php">{tr}Edit TPL{/tr}</a>
-            {/if}
             {if $prefs.cachepages eq "y" and $tiki_p_admin eq "y"}
                 <a class="dropdown-item" href="tiki-list_cache.php">{tr}External Pages Cache{/tr}</a>
             {/if}
@@ -201,6 +195,9 @@
             <a class="dropdown-item" href="tiki-syslog.php">{tr}System Logs{/tr}</a>
             {if $prefs.feature_scheduler eq "y" and $tiki_p_admin}
                 <a class="dropdown-item" href="tiki-admin_schedulers.php">{tr}Scheduler{/tr}</a>
+            {/if}
+            {if $prefs.feature_queued_tasks eq "y"}
+                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">{tr}Queued Tasks{/tr}</a>
             {/if}
             {if $prefs.tiki_monitor_performance eq 'y'}
                 <a class="dropdown-item" href="tiki-performance_stats.php">{tr}Performance{/tr}</a>

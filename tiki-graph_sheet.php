@@ -8,6 +8,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\GraphEngine\GDGRenderer;
+use Tiki\Lib\GraphEngine\GridBasedGraphic;
+use Tiki\Lib\GraphEngine\PDFLibGRenderer;
+use Tiki\Lib\GraphEngine\PSGRenderer;
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -31,13 +39,6 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 
 $sheetlib = TikiLib::lib('sheet');
-
-require_once('lib/graph-engine/gd.php');
-require_once('lib/graph-engine/pdflib.php');
-require_once('lib/graph-engine/ps.php');
-require_once('lib/graph-engine/graph.pie.php');
-require_once('lib/graph-engine/graph.bar.php');
-require_once('lib/graph-engine/graph.multiline.php');
 
 /**
  * @param $serie
@@ -63,32 +64,23 @@ $access->check_feature('feature_sheet');
 $access->check_feature('feature_jquery_ui');
 
 if (! isset($_REQUEST['sheetId'])) {
-    $smarty->assign('msg', tra('No sheet specified.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No sheet specified.'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 try {
     $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
 } catch (Exception $e) {
-    $smarty->assign('msg', tra($e->getMessage()));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $objectperms = Perms::get('sheet', $_REQUEST['sheetId']);
 if ($tiki_p_admin != 'y' && ! $objectperms->view_sheet && ! ($user && $info['author'] == $user)) {
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 // This condition will be removed when a php-based renderer will be written
 if (! function_exists('pdf_new') && ! function_exists('imagepng')) {
-    $smarty->assign('msg', tra('No valid renderer found. GD or PDFLib required.'));
-
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No valid renderer found. GD or PDFLib required.'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 // }}}1
 
@@ -96,14 +88,10 @@ $valid_graphs = [ 'PieChartGraphic', 'MultilineGraphic', 'MultibarGraphic', 'Bar
 $valid_renderers = [ 'PNG', 'JPEG', 'PDF', 'PS' ];
 
 if (! empty($_REQUEST['graphic']) && ! in_array($_REQUEST['graphic'], $valid_graphs)) {
-    $smarty->assign('msg', tra('Unknown Graphic.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Unknown Graphic.'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if (! empty($_REQUEST['renderer']) && ! in_array($_REQUEST['renderer'], $valid_renderers)) {
-    $smarty->assign('msg', tra('Unknown Renderer.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Unknown Renderer.'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('sheetId', $_REQUEST["sheetId"]);
@@ -122,29 +110,26 @@ if (isset($_REQUEST['title'])) {
 
     switch ($_REQUEST['renderer']) {
         case 'PNG':
-            $renderer = new GD_GRenderer($_REQUEST['width'], $_REQUEST['height'], 'png');
+            $renderer = new GDGRenderer($_REQUEST['width'], $_REQUEST['height'], 'png');
             $ext = 'png';
             break;
 
         case 'JPEG':
-            $renderer = new GD_GRenderer($_REQUEST['width'], $_REQUEST['height'], 'jpg');
+            $renderer = new GDGRenderer($_REQUEST['width'], $_REQUEST['height'], 'jpg');
             $ext = 'jpg';
             break;
 
         case 'PDF':
-            $renderer = new PDFLib_GRenderer($_REQUEST['format'], $_REQUEST['orientation']);
+            $renderer = new PDFLibGRenderer($_REQUEST['format'], $_REQUEST['orientation']);
             $ext = 'pdf';
             break;
 
         case 'PS':
-            $renderer = new PS_GRenderer($_REQUEST['format'], $_REQUEST['orientation']);
+            $renderer = new PSGRenderer($_REQUEST['format'], $_REQUEST['orientation']);
             $ext = 'ps';
             break;
         default:
-            $smarty->assign('msg', tra('You must select a renderer.'));
-
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('You must select a renderer.'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (file_exists($cache_file) && time() - filemtime($cache_file) < 3600) {
@@ -153,8 +138,8 @@ if (isset($_REQUEST['title'])) {
         exit;
     }
 
-    $handler = new TikiSheetDatabaseHandler($sheetId);
-    $grid = new TikiSheet($_REQUEST['sheetId']);
+    $handler = new DatabaseHandler($sheetId);
+    $grid = new Sheet();
     $grid->import($handler);
 
     $graph = $_REQUEST['graphic'];
@@ -172,10 +157,7 @@ if (isset($_REQUEST['title'])) {
     }
 
     if (! $graph->setData($series)) {
-        $smarty->assign('msg', tra('Invalid Series for current graphic.'));
-
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Invalid Series for current graphic.'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (! empty($_REQUEST['title'])) {
@@ -220,13 +202,13 @@ if (isset($_REQUEST['title'])) {
         $smarty->assign('graph', $graph);
         $smarty->assign('renderer', $_REQUEST['renderer']);
 
-        $handler = new TikiSheetDatabaseHandler($sheetId);
-        $grid = new TikiSheet($_REQUEST['sheetId']);
+        $handler = new DatabaseHandler($sheetId);
+        $grid = new Sheet($_REQUEST['sheetId']);
         $grid->import($handler);
 
         $dataGrid = $grid->getTableHtml(true);
 
-        require_once('lib/sheet/grid.php');
+        require_once('lib/Sheet/grid.php');
         $sheetlib->setup_jquery_sheet();
         $headerlib->add_jq_onready(
             '$("div.tiki_sheet").sheet($.extend($.sheet.tikiOptions, {editable: false}));'
@@ -244,7 +226,7 @@ if (isset($_REQUEST['title'])) {
             $smarty->assign('im_height', $_GET['height']);
         }
 
-        if (is_a($g, 'GridBasedGraphic')) {
+        if (is_a($g, GridBasedGraphic::class)) {
             $smarty->assign('showgridparam', true);
         }
     } else {

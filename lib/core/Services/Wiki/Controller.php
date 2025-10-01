@@ -60,7 +60,7 @@ class Services_Wiki_Controller
             true,
             $input->onlyOrphans->text() == 'y',
             $input->filter->asArray(),
-            $input->onlyCant->text() == 'y'
+            $input->onlyCount->text() == 'y'
         );
     }
 
@@ -891,52 +891,6 @@ class Services_Wiki_Controller
     }
 
     /**
-     * Listpages "perform with checked" action to zip pages
-     *
-     * @param $input
-     * @return array
-     * @throws Exception
-     * @throws Services_Exception
-     * @throws Services_Exception_Denied
-     */
-    public function action_zip($input)
-    {
-        Services_Exception_Denied::checkGlobal('admin');
-        $util = new Services_Utilities();
-        //first pass - show confirm modal popup
-        if ($util->notConfirmPost()) {
-            $util->setVars($input, $this->filters, 'checked');
-            if ($util->itemsCount > 0) {
-                if ($util->itemsCount === 1) {
-                    $msg = tr('Download a zipped file of the following page?');
-                } else {
-                    $msg = tr('Download a zipped file of the following pages?');
-                }
-                return $util->confirm($msg, tra('Zip'));
-            } else {
-                Services_Utilities::modalException(tra('No pages were selected. Please select one or more pages.'));
-            }
-        //after confirm submit - perform action
-        } elseif ($util->checkCsrf()) {
-            $util->setVars($input, $this->filters, 'items');
-            include_once('lib/wiki/xmllib.php');
-            $xmllib = new XmlLib();
-            $zipFile = 'dump/xml.zip';
-            $config['debug'] = false;
-            if ($xmllib->export_pages($util->items, null, $zipFile, $config)) {
-                if (! $config['debug']) {
-                    global $base_url;
-                    return ['url' => $base_url . $zipFile];
-                }
-            } else {
-                Feedback::error(['mes' => $xmllib->get_error()]);
-            }
-            //return to page
-            return Services_Utilities::closeModal();
-        }
-    }
-
-    /**
      * Listpages "perform with checked" action to add page name as title to pages
      *
      * @param $input
@@ -1006,5 +960,45 @@ class Services_Wiki_Controller
             //return to page
             return Services_Utilities::refresh();
         }
+    }
+
+    /**
+     * Perform a plugin execution with specific input data (e.g. for ListExecute plugin)
+     */
+    public function action_execute($input)
+    {
+        $util = new Services_Utilities();
+
+        $page = $input->page->text();
+        $plugin = $input->plugin->string();
+
+        $info = TikiLib::lib('wiki')->get_page_info($page);
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        if ($util->isActionPost()) {
+            // ListExecute plugin needs these
+            $_GET = $_POST = $_REQUEST = $input->asArray();
+        } else {
+            $_GET = $_REQUEST = $input->asArray();
+        }
+
+        $data = TikiLib::lib('parser')->parse_data($info['data'], ['mark_plugins' => [$plugin]]);
+        $start = mb_strpos($data, "~$plugin~");
+        $end = mb_strpos($data, "~/$plugin~");
+        if ($start !== false && $end !== false) {
+            $start += mb_strlen("~$plugin~");
+            $data = mb_substr($data, $start, $end - $start);
+        } else {
+            $data = tr("Plugin not found.");
+        }
+
+        Feedback::sendHeaders();
+        $data .= TikiLib::lib('header')->output_js();
+
+        return [
+            'result' => $data,
+        ];
     }
 }

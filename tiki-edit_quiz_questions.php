@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Quizzes\Helper\QuizUtils;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -22,7 +24,7 @@ $inputConfiguration = [
             'input_data'                  => 'text',           //post
             'useQuestion'                 => 'bool',           //post
             'usequestionid'               => 'int',            //post
-            'sort_mode'                   => 'alpha',          //get
+            'sort_mode'                   => 'text',          //get
             'offset'                      => 'int',            //get
             'find'                        => 'alpha',          //post
         ],
@@ -35,10 +37,7 @@ $auto_query_args = ['quizId', 'questionId', 'sort_mode', 'offset', 'find'];
 $access->check_feature('feature_quizzes');
 
 if (! isset($_REQUEST['quizId'])) {
-    $smarty->assign('msg', tra('No quiz indicated'));
-
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No quiz indicated'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $tikilib->get_perm_object($_REQUEST['quizId'], 'quiz');
@@ -51,9 +50,7 @@ $smarty->assign('individual', 'n');
 
 $quiz_info = $quizlib->get_quiz($_REQUEST['quizId']);
 if (! $quiz_info) {
-    $smarty->assign('msg', tra("The requested quiz was not found. Please check the quiz ID and try again."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("The requested quiz was not found. Please check the quiz ID and try again."), \Laminas\Http\Response::STATUS_CODE_404);
 }
 $smarty->assign('quiz_info', $quiz_info);
 
@@ -64,8 +61,11 @@ if (! isset($_REQUEST['questionId'])) {
 $smarty->assign('questionId', $_REQUEST['questionId']);
 
 $result = $quizlib->get_quiz_question($_REQUEST['questionId']);
-if (! $result) {
+if ($_REQUEST['questionId'] > 0 && ! $result) {
     Feedback::error(tra("The question you are trying to edit was not found. Please verify the question ID or create a new one."));
+}
+
+if (! $result) {
     $info = [];
 
     $info['question'] = '';
@@ -75,26 +75,28 @@ if (! $result) {
     $info = $result;
 }
 
-
 $smarty->assign('question', $info['question']);
 $smarty->assign('type', $info['type']);
 $smarty->assign('position', $info['position']);
 
 if (isset($_REQUEST['remove']) && $access->checkCsrf()) {
     $quizlib->remove_quiz_question($_REQUEST['remove']);
+    Feedback::success(tr('The question has been successfully deleted'));
 }
 
 if (isset($_REQUEST['save'])) {
     $access->checkCsrf();
 
-    $quizlib->replace_quiz_question(
+    $result = $quizlib->replace_quiz_question(
         $_REQUEST['questionId'],
         $_REQUEST['question'],
         $_REQUEST['questionType'],
         $_REQUEST['quizId'],
         $_REQUEST['position']
     );
-
+    if (is_numeric($result) && $result > 0) {
+        Feedback::success(tr('The question has been saved successfully'));
+    }
     $smarty->assign('question', '');
     $smarty->assign('questionId', 0);
 }
@@ -102,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 if (isset($_REQUEST['import'])) {
     $access->checkCsrf();
 
-    $questions = TextToQuestions($_REQUEST['input_data']);
+    $questions = QuizUtils::TextToQuestions($_REQUEST['input_data']);
 
     foreach ($questions as $index => $question) {
         $question_text = $question->getQuestion();
@@ -159,7 +161,7 @@ $channels = $quizlib->list_quiz_questions($_REQUEST['quizId'], $offset, $maxReco
 // $questions = $quizlib->list_all_questions(0, -1, 'position_desc', '');
 // $smarty->assign('questions', $questions["data"]);
 
-$smarty->assign_by_ref('cant_pages', $channels['cant']);
+$smarty->assign_by_ref('pages_count', $channels['count']);
 
 $smarty->assign_by_ref('channels', $channels['data']);
 

@@ -265,7 +265,14 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
         }
         return $localCache[$string];
     }
-
+    /**
+     * Retrieves the default dropdown selection.
+     *
+     * If an option value appears more than once in the definition list
+     * (e.g. "2=Option 2" is duplicated), that value is returned as the default.
+     *
+     * @return string Default option value(s) for the dropdown field.
+     */
     private function getDefaultValue()
     {
         $options = $this->getOption('options');

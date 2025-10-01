@@ -6,16 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('../tiki-setup.php');
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 if ($prefs['feature_tikitests'] != 'y') {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_tikitests');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_edit_tikitests != 'y') {
-    $smarty->assign('msg', tra('You do not have permission to do that'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $smarty->assign('tidy', extension_loaded('tidy'));
@@ -23,8 +21,8 @@ $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
 if (isset($_POST['action']) and isset($_POST['filename']) and trim($_POST['filename']) != '') {
-    setcookie('tikitest_record', '1', 0, '/');
-    setcookie('tikitest_filename', trim($_POST['filename']), 0, '/');
+    CookieConsentLib::tikiSetCookie('tikitest_record', '1', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '/');
+    CookieConsentLib::tikiSetCookie('tikitest_filename', trim($_POST['filename']), CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '/');
     if (isset($_REQUEST['current_session'])) {
         header('Location: ../tiki-index.php');
     } else {

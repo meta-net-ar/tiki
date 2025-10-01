@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Config\Ini;
+
 /**
  *
  */
@@ -31,9 +34,9 @@ class AdminLib extends TikiLib
         }
 
         $query = "select * from `tiki_dsn` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_dsn` $mid";
+        $query_count = "select count(*) from `tiki_dsn` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -42,7 +45,7 @@ class AdminLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -51,7 +54,7 @@ class AdminLib extends TikiLib
      * @param $dsn
      * @param $name
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function replace_dsn($dsnId, $dsn, $name)
     {
@@ -73,7 +76,7 @@ class AdminLib extends TikiLib
     /**
      * @param int $dsnId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function remove_dsn($dsnId)
     {
@@ -137,13 +140,13 @@ class AdminLib extends TikiLib
         }
 
         $query = "select * from `tiki_extwiki` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_extwiki` $mid";
+        $query_count = "select count(*) from `tiki_extwiki` $mid";
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
 
         $retval = [];
         $retval["data"] = $result;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -175,7 +178,7 @@ class AdminLib extends TikiLib
      *
      * @param $extwikiId int Id of the external wiki to be removed
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function remove_extwiki($extwikiId)
     {
@@ -421,7 +424,6 @@ class AdminLib extends TikiLib
             $data = "<html>";
             $data .= "<head>";
             $data .= "<title>" . $res["pageName"] . "</title>";
-            // $data .= "<link rel='StyleSheet' href='styles/" . $prefs['style'] . "' type='text/css'>";
             $data .= '</head>';
             $data .= "<body><a class='wiki' href='" .
                 $prefs['wikiHomePage'] .
@@ -669,7 +671,7 @@ class AdminLib extends TikiLib
         if ($retrieve_all_data || ! isset($system_configuration_identifier)) {
             $system_configuration_identifier = null;
         }
-        $configReader = new Tiki_Config_Ini();
+        $configReader = new Ini();
         $configReader->setFilterSection($system_configuration_identifier);
 
         if (preg_match('/\.ini.php$/', $system_configuration_file)) {

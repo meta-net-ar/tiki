@@ -29,7 +29,7 @@ class Search_MySql_FieldQueryBuilder
                     if ($this->escapeCallback) {
                         $string = call_user_func($this->escapeCallback, $string);
                     }
-                    if (false === strpos($string, ' ') && substr($string, 0, 1) !== '-') {
+                    if (! str_contains($string, ' ') && ! str_starts_with($string, '-')) {
                         return $string;
                     } else {
                         return '"' . $string . '"';

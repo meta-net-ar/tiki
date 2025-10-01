@@ -38,32 +38,6 @@ function prefs_comments_list()
             'type' => 'flag',
             'default' => 'n',
         ],
-        'comments_akismet_filter' => [
-            'name' => tra('Use Akismet to filter comments'),
-            'description' => tra('Prevent comment spam by using the Akismet service to determine if the comment is spam. If comment moderation is enabled, Akismet will indicate if the comment is to be moderated or not. If there is no comment moderation, the comment will be rejected if considered to be spam.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'tags' => ['advanced'],
-            'keywords' => 'askimet', // Let an admin find the preference even if his query has this common typo
-        ],
-        'comments_akismet_apikey' => [
-            'name' => tra('Akismet API Key'),
-            'description' => tra('Key required for the Akismet comment spam prevention.'),
-            'hint' => tr('Obtain this key by registering your site at [%0]', 'http://akismet.com'),
-            'type' => 'text',
-            'filter' => 'word',
-            'tags' => ['advanced'],
-            'default' => '',
-            'keywords' => 'askimet',
-        ],
-        'comments_akismet_check_users' => [
-            'name' => tr('Filter spam for registered users'),
-            'description' => tr('Activate spam filtering for registered users as well. Useful if your site allows anyone to register without screening.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'tags' => ['advanced'],
-            'keywords' => 'askimet',
-        ],
         'comments_allow_correction' => [
             'name' => tr('Allow comments to be edited by their author'),
             'description' => tr('Allow a comment to be modified by its author after posting it, for clarifications, correction of errors, etc.'),

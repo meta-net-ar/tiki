@@ -10,7 +10,7 @@
 {else}
 ~np~{tabset toggle=$toggle params=$params name=$tabsetname|escape}
     {section name=ix loop=$tabs}
-        {tab params=$params name=$tabs[ix]|escape}
+        {tab params=$params name=$tabs[ix]|escape|tra}
             {if isset($tabcontent[ix])}
                 {$tabcontent[ix]}
             {/if}

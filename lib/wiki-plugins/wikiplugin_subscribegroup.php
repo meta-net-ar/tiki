@@ -232,13 +232,13 @@ function wikiplugin_subscribegroup($data, $params)
 
     if (isset($undefgroup) || isset($undefgroup_action)) {
         if ($current_defgroup == $group) {
-            $text = isset($undefgroup) ? $undefgroup : '';
+            $text = $undefgroup ?? '';
             if (! isset($undefgroup_action)) {
                 $undefgroup_action = tra('OK');
             }
             $smarty->assign('action', $undefgroup_action);
         } else {
-            $text = isset($defgroup) ? $defgroup : '';
+            $text = $defgroup ?? '';
             if (! isset($defgroup_action)) {
                 $defgroup_action = tra('OK');
             }
@@ -248,13 +248,13 @@ function wikiplugin_subscribegroup($data, $params)
         if ($groups[$group] == 'included') {
             return tra('Incorrect param');
         }
-        $text = isset($unsubscribe) ? $unsubscribe : tra('Unsubscribe') . '%s';
+        $text = $unsubscribe ?? tra('Unsubscribe') . '%s';
         if (! isset($unsubscribe_action)) {
             $unsubscribe_action = tra('OK');
         }
         $smarty->assign('action', $unsubscribe_action);
     } else {
-        $text = isset($subscribe) ? $subscribe : tra('Subscribe') . '%s';
+        $text = $subscribe ?? tra('Subscribe') . '%s';
         if (! isset($subscribe_action)) {
             $subscribe_action = tra('OK');
         }

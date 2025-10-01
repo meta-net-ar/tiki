@@ -417,7 +417,7 @@ function loadDrawing(editor_instance, app_name, drawing_config) {
     } catch (error) {
         if (Object.keys(drawing_config).length > 0) {
             //if not empty object then we have good corruped data
-            $("body").toastNotification({
+            $.fn.toastNotification({
                 title: tr("Error processing app: ") + app_name,
                 body: error.message,
                 position: "bottom-end",
@@ -459,7 +459,7 @@ export function saveDrawing(el, editor_instance, app_uuid, app_name) {
         });
         return true;
     } catch (error) {
-        $("body").toastNotification({
+        $.fn.toastNotification({
             title: tr("Error"),
             body: error.message,
             position: "bottom-end",
@@ -915,7 +915,7 @@ export function saveDashboardUi(el, app_name, app_uuid) {
         });
         return true;
     } catch (error) {
-        $("body").toastNotification({
+        $.fn.toastNotification({
             title: tr("Error"),
             body: error.message,
             position: "bottom-end",

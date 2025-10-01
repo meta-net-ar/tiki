@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -70,7 +70,7 @@ class Captcha
             $httpClient = TikiLib::lib('tiki')->get_http_client();
             $this->captcha->getService()->setHttpClient($httpClient);
 
-            $this->captcha->getService()->setOption('theme', isset($prefs['recaptcha_theme']) ? $prefs['recaptcha_theme'] : 'clean');
+            $this->captcha->getService()->setOption('theme', $prefs['recaptcha_theme'] ?? 'clean');
 
             $this->captcha->setOption('ssl', true);
 
@@ -81,7 +81,7 @@ class Captcha
             $params = [
                 'privkey' => $prefs['recaptcha_privkey'],
                 'pubkey' => $prefs['recaptcha_pubkey'],
-                'theme' => isset($prefs['recaptcha_theme']) ? $prefs['recaptcha_theme'] : 'clean',
+                'theme' => $prefs['recaptcha_theme'] ?? 'clean',
             ];
 
             if ($type === 'recaptcha20') {
@@ -223,6 +223,19 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
         if (is_null($input)) {
             $input = $_REQUEST;
         }
+
+        // Check session for previously validated captcha
+        $captchaId = null;
+        if (isset($input['captcha']) && isset($input['captcha']['id'])) {
+            $captchaId = $input['captcha']['id'];
+
+            // Check if this captcha ID was already validated
+            $validatedKey = 'captcha_validated_' . $captchaId;
+            if (isset($_SESSION[$validatedKey]) && $_SESSION[$validatedKey] === true) {
+                return true;
+            }
+        }
+
         if (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
             // Temporary workaround of zend/http client uses arg_separator.output for making POST request body
             // which fails with Google recaptcha services if used with '&amp;' value
@@ -232,7 +245,6 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
             ini_set('arg_separator.output', '&');
             $result = $this->captcha->isValid($input);
             ini_set('arg_separator.output', $oldVal);
-            return $result;
         } else {
             if (isset($input['captcha'])) {
                 $captchaInput = $input['captcha'];
@@ -240,9 +252,15 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
                 global $jitPost;
                 $captchaInput = $jitPost->captcha->asArray();
             }
-
-            return $this->captcha->isValid($captchaInput);
+            $result = $this->captcha->isValid($captchaInput);
         }
+
+        // Store validation result in session if successful
+        if ($result && $captchaId) {
+            $validatedKey = 'captcha_validated_' . $captchaId;
+            $_SESSION[$validatedKey] = true;
+        }
+        return $result;
     }
 
     /**

@@ -313,7 +313,7 @@ class Services_Group_Controller
                 }
                 $extras = [];
                 $oldIncluded = $userlib->get_included_groups($input['olgroup'], false);
-                $oldIncludes = array_diff($oldIncluded, isset($input['include_groups']) ? $input['include_groups']->toArray() : []);
+                $oldIncludes = array_diff($oldIncluded, $groups = $input['include_groups']?->toArray() ?? []);
                 $oldGroups = $userlib->get_group_info(array_values($oldIncludes));
                 $parentGroupsIds = array_map(function ($item) {
                     return $item["id"];
@@ -327,7 +327,7 @@ class Services_Group_Controller
 
 
 
-                if (! empty($input['isTplGroup']) && $children["cant"] > 0) {
+                if (! empty($input['isTplGroup']) && $children["count"] > 0) {
                     $names = [];
                     foreach ($children["data"] as $child) {
                         $names[] = $child["groupName"];
@@ -373,7 +373,7 @@ class Services_Group_Controller
                 $params['color'],
                 $params['isRole'],
                 $params['isTplGroup'],
-                isset($params['include_groups']) ? $params['include_groups'] : []
+                $params['include_groups'] ?? []
             );
 
 
@@ -468,7 +468,7 @@ class Services_Group_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
@@ -563,7 +563,7 @@ class Services_Group_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Feedback::error(tra('Invalid password.'));
@@ -667,7 +667,7 @@ class Services_Group_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Feedback::error(tra('Invalid password.'));
@@ -709,9 +709,9 @@ class Services_Group_Controller
         $extra = new JitFilter($extra);
         $extra->replaceFilters($this->filters);
         $extra = $extra->asArray();
-        $extra['home'] = isset($extra['home']) ? $extra['home'] : '';
-        $extra['theme'] = isset($extra['theme']) ? $extra['theme'] : '';
-        $extra['color'] = isset($extra['color']) ? $extra['color'] : '';
+        $extra['home'] = $extra['home'] ?? '';
+        $extra['theme'] = $extra['theme'] ?? '';
+        $extra['color'] = $extra['color'] ?? '';
         $extra['defcat'] = ! empty($extra['defcat']) ? $extra['defcat'] : 0;
         $extra['userChoice'] = isset($extra['userChoice']) && $extra['userChoice'] == 'on' ? 'y' : '';
         $extra['expireAfter'] = empty($extra['expireAfter']) ? 0 : $extra['expireAfter'];

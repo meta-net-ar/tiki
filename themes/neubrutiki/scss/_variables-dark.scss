@@ -45,7 +45,7 @@ $dark-border-subtle-dark:           $gray-800 !default;
 $body-color-dark:                   $gray-500 !default;
 $body-bg-dark:                      $gray-900 !default;
 $body-secondary-color-dark:         rgba($body-color-dark, .75) !default;
-$body-secondary-bg-dark:            $gray-800 !default;
+$body-secondary-bg-dark:            $gray-800; // !default;
 $body-tertiary-color-dark:          rgba($body-color-dark, .5) !default;
 $body-tertiary-bg-dark:             mix($gray-800, $gray-900, 50%) !default;
 $body-emphasis-color-dark:          $white !default;
@@ -85,3 +85,5 @@ $accordion-icon-active-color-dark:  $primary-text-emphasis-dark !default;
 $accordion-button-icon-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
 $accordion-button-active-icon-dark:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
 // scss-docs-end sass-dark-mode-vars
+
+//$card-bg: $body-secondary-bg-dark; // IDK why the standard rule didn't work.

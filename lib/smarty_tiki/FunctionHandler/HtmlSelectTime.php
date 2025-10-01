@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use Tiki\Lib\TikiDate;
 
 /**
  * Smarty {html_select_time} function handler
@@ -40,7 +41,7 @@ class HtmlSelectTime extends Base
         $minute_interval    = 1;
         $second_interval    = 1;
         $hour_minmax        = '0-23';
-        $tikidate = new \TikiDate();
+        $tikidate = new TikiDate();
         /* Should the select boxes be part of an array when returned from PHP?
        e.g. setting it to "birthday", would create "birthday[Hour]",
        "birthday[Minute]", "birthday[Seconds]" & "birthday[Meridian]".
@@ -55,7 +56,7 @@ class HtmlSelectTime extends Base
         $minute_empty = null;
         $second_empty = null;
         $all_empty = null;
-        $class = 'form-control date';
+        $class = 'form-control date-time-selector-field';
 
         extract($params);
         if (! empty($all_empty)) {
@@ -64,12 +65,12 @@ class HtmlSelectTime extends Base
 
         if (! isset($time) or ! $time) {
             $time = $tikilib->now;
-        } elseif (is_string($time) && strpos($time, ':') !== false) {
+        } elseif (is_string($time) && str_contains($time, ':')) {
             $e = explode(':', $time, 3);
             $time = $tikilib->make_time(
-                isset($e[0]) ? $e[0] : 0,
-                isset($e[1]) ? $e[1] : 0,
-                isset($e[2]) ? $e[2] : 0,
+                $e[0] ?? 0,
+                $e[1] ?? 0,
+                $e[2] ?? 0,
                 $tikilib->date_format('%m'),
                 $tikilib->date_format('%d'),
                 $tikilib->date_format('%Y')
@@ -193,7 +194,7 @@ class HtmlSelectTime extends Base
             }
 
             //minute intervals less than 10 are followed by a '0', here we ensure that they are selectable
-            if (strlen($selected) == 1) {
+            if (strlen((string) $selected) == 1) {
                 $selected = '0' . $selected;
             }
 

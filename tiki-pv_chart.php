@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\GraphEngine\GDGRenderer;
+use Tiki\Lib\GraphEngine\MultilineGraphic;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -14,11 +18,9 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 $access->check_feature('feature_stats');
 $access->check_permission('tiki_p_view_stats');
-require_once("lib/graph-engine/gd.php");
-require_once("lib/graph-engine/graph.multiline.php");
 
 //Define the object
-$renderer = new GD_GRenderer(450, 300);
+$renderer = new GDGRenderer(450, 300);
 $graph = new MultilineGraphic();
 $graph->setTitle(tra('Pageviews'));
 //Set some data

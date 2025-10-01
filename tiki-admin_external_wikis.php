@@ -16,7 +16,6 @@ $inputConfiguration = [
             'save'            => 'bool',       //post
             'remove'          => 'int',       //post
             'extwiki'         => 'text',       //post
-            'save'            => 'bool',       //post
             'find'            => 'text',       //post
             'sort_mode'       => 'text',       //get
             'offset'          => 'digits',     //get
@@ -58,17 +57,25 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         return $i['id'];
     }, $items);
 
-    $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->raw(), $items);
-    $info = [
-        'name' => '',
-        'extwiki' => '',
-        'indexname' => '',
-        'groups' => [],
-    ];
-    if ($result) {
-        Feedback::success(tr('External wiki saved'));
+    if (empty($_REQUEST['name']) || empty($_REQUEST["extwiki"])) {
+        Feedback::error(tr('extwiki or name field is empty ! The external wiki has not been created'));
+        $info['name'] = $_REQUEST['name'];
+        $info['extwiki'] = $_REQUEST['extwiki'];
+        $info['indexname'] = $jitRequest->indexname->raw();
+        $info['groups'] = $items;
     } else {
-        Feedback::error(tr('External wiki not saved'));
+        $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->raw(), $items);
+        $info = [
+            'name' => '',
+            'extwiki' => '',
+            'indexname' => '',
+            'groups' => [],
+        ];
+        if ($result) {
+            Feedback::success(tr('External wiki saved'));
+        } else {
+            Feedback::error(tr('External wiki not saved'));
+        }
     }
     $smarty->assign('info', $info);
     $smarty->assign('name', '');
@@ -92,7 +99,7 @@ if (isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $adminlib->list_extwiki($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

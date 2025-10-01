@@ -41,5 +41,4 @@ TikiLib::events()->trigger('tiki.webhook.received', [
     'webhook' => $webhook
 ]);
 
-http_response_code(200);
 echo "ok";

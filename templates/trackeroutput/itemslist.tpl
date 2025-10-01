@@ -55,7 +55,7 @@
     {if !empty($data.addItemText)}
         {$forcedParam[$data.otherFieldPermName]=$data.parentItemId}
         <div class="mt-2">
-            <a class="btn btn-secondary btn-sm itemslist-btn" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId forced=$forcedParam}">
+            <a class="btn btn-secondary btn-sm itemslist-btn" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId forced=$forcedParam}" role="button">
                 {icon name='create' _menu_text='y' _menu_icon='y' ititle="{$data.addItemText}" alt="{$data.addItemText}"}
             </a>
         </div>

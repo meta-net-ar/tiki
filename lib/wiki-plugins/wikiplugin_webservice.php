@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\OIntegrate\OIntegrate;
+
 function wikiplugin_webservice_info()
 {
     return [
@@ -67,8 +70,6 @@ function wikiplugin_webservice_info()
 
 function wikiplugin_webservice($data, $params)
 {
-    require_once 'lib/ointegratelib.php';
-
     if (isset($params['bodyname']) && ! empty($params['bodyname'])) {
         $params[ $params['bodyname'] ] = $data;
         unset($params['bodyname']);

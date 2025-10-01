@@ -58,14 +58,6 @@ function wikiplugin_wysiwyg_info()
 
 function wikiplugin_wysiwyg($data, $params)
 {
-    // TODO refactor: defaults for plugins?
-    $defaults = [];
-    $plugininfo = wikiplugin_wysiwyg_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     global $tiki_p_edit, $page, $prefs, $user;
     static $execution = 0;
 
@@ -77,7 +69,7 @@ function wikiplugin_wysiwyg($data, $params)
     }
 
     $contentIsHTML = ! ($params['use_html'] !== 'y');
-    $html = TikiLib::lib('edit')->parseToWysiwyg($data, true, $contentIsHTML, ['page' => $sourcepage]);
+    $html = TikiLib::lib('edit')->parseToWysiwyg($data, true, $contentIsHTML, ['page' => $sourcepage, 'html_editor' => true]);
 
     if (TikiLib::lib('tiki')->user_has_perm_on_object($user, $sourcepage, 'wiki page', 'tiki_p_edit')) {
         $class = "wp_wysiwyg";
@@ -88,8 +80,8 @@ function wikiplugin_wysiwyg($data, $params)
         $params['_wysiwyg'] = 'y';
         $params['is_html'] = $contentIsHTML;
         $params['_is_html'] = $contentIsHTML;    // needed for toolbars
+        $params['area_id'] = $exec_key;
         //$params['comments'] = true;
-        $ckoption = TikiLib::lib('wysiwyg')->setUpEditor($contentIsHTML, $exec_key, $params, '');
 
         if ($prefs['namespace_enabled'] == 'y' && $prefs['namespace_force_links'] == 'y') {
             $namespace = TikiLib::lib('wiki')->get_namespace($sourcepage);
@@ -103,14 +95,22 @@ function wikiplugin_wysiwyg($data, $params)
 
         $smarty = TikiLib::lib('smarty');
 
-        $html = "<div id='$exec_key' class='{$class}'$style data-initial='$namespace' data-html='{$params['use_html']}' data-ticket='"
+        $html = "<div id='$exec_key' class='{$class}'$style data-initial='$namespace' data-index='$execution' data-html='{$params['use_html']}' data-ticket='"
             . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . "'>" . $html . '</div>';
 
-        $js = '$("#' . $exec_key . '").wysiwygPlugin("' . $execution . '", "' . $sourcepage . '", ' . $ckoption . ');';
+        $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
+        $tools = addslashes($tools);
 
-        TikiLib::lib('header')
-            ->add_jsfile('lib/ckeditor_tiki/tiki-ckeditor.js')
-            ->add_jq_onready($js);
+        ['lang' => $lang, 'filePath' => $langFilePath] = TikiLib::lib('wysiwyg')->getEditorLang();
+
+        TikiLib::lib('header')->add_js_module(<<<JS
+            import('@jquery-tiki/plugins/wysiwyg').then((module) => {
+                module.default('{$exec_key}', JSON.parse('{$tools}'), '{$sourcepage}', {
+                    lang: '{$lang}',
+                    langFilePath: '{$langFilePath}',
+                });
+            })
+        JS);
     }
     return $html;
 }

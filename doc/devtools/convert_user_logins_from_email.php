@@ -32,7 +32,7 @@ $allUsers = $userTable->fetchAll(
 
 // keep new logins to check for duplicates
 $newLogins = ['admin'];
-/** @var TikiDb_Pdo_Result $ret */
+/** @var Tiki\TikiDb\PdoResult $ret */
 $ret = null;
 
 foreach ($allUsers as $aUser) {

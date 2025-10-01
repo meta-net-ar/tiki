@@ -158,8 +158,6 @@ function wikiplugin_trackeritemcopy($data, $params)
                     $updateFieldValues[] = $itemLinkId;
                 }
 
-                //print_r(array($trackerId, $updateFieldIds, $updateFieldValues, $copyFieldIds, $itemIds, $linkFieldId, $itemLinkId, $copies));
-
                 for ($i = 0, $count_updateFieldIds = count($updateFieldIds); $i < $count_updateFieldIds; $i++) {
                     $ins_fields["data"][] = [
                         'options_array' => $fieldOptionsArray[$updateFieldIds[$i]],
@@ -186,7 +184,7 @@ function wikiplugin_trackeritemcopy($data, $params)
                     foreach ($ins_fields["data"] as $h) {
                         if ($h["value"] == '-randomstring-') {
                             $h["value"] = $trklib->genPass();
-                        } elseif (substr($h["value"], 0, 2) == 'f_') {
+                        } elseif (str_starts_with($h["value"], 'f_')) {
                             $sourceFieldId = (int) trim(substr($h["value"], 2));
                             $h["value"] = $trklib->get_item_value($trackerId, $itemId, $sourceFieldId);
                         }

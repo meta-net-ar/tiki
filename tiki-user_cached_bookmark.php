@@ -16,9 +16,7 @@ $access->check_feature('feature_user_bookmarks', '', 'community');
 $access->check_user($user);
 
 if (! isset($_REQUEST['urlid'])) {
-    $smarty->assign('msg', tra('No URL indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No URL indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 // Get a list of last changes to the Wiki database
 $info = $bookmarklib->get_url($_REQUEST['urlid']);

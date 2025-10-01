@@ -38,7 +38,7 @@
         <table class="table">
             <tr>
                 <td> {* th changed to td to prevent ARIA empty header error *}
-                    <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
+                    <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" aria-label="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
                         {icon name="delete"}
                     </button>
                 </td>
@@ -69,4 +69,4 @@
         </table>
     </div>
 </form>
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

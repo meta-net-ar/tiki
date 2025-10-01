@@ -1054,16 +1054,6 @@ function wikiplugin_trackerlist($data, $params)
     $smarty->assign('iTRACKERLIST', $iTRACKERLIST);
 
     $default = [
-        'calendarfielddate' => '',
-        'wiki' => '',
-        'calendarviewmode' => 'month',
-        'calendarstickypopup' => 'n',
-        'calendarbeginmonth' => 'y',
-        'calendarviewnavbar' => 'y',
-        'calendartitle' => '',
-        'calendardelta' => '',
-        'calendarpopup' => 'y',
-        'force_compile' => 'n',
         'editable' => [],
         'editableall' => 'n',
     ];
@@ -1394,12 +1384,12 @@ function wikiplugin_trackerlist($data, $params)
                 isset($_REQUEST['filterfield']) ? preg_split('/\s*:\s*/', $_REQUEST['filterfield']) : '',
                 isset($_REQUEST['filtervalue']) ? preg_split('/\s*:\s*/', $_REQUEST['filtervalue']) : '',
                 isset($_REQUEST['status']) ? preg_split('/\s*:\s*/', $_REQUEST['status']) : '',
-                isset($_REQUEST['initial']) ? $_REQUEST['initial'] : '',
+                $_REQUEST['initial'] ?? '',
                 isset($_REQUEST['exactvalue']) ? preg_split('/\s*:\s*/', $_REQUEST['exactvalue']) : '',
                 $filter
             );
             if (isset($items['data'][0]['itemId'])) {
-                $_REQUEST['cant'] = $items['cant'];
+                $_REQUEST['count'] = $items['count'];
                 $_REQUEST['itemId'] = $items['data'][0]['itemId'];
             }
         }
@@ -1541,7 +1531,7 @@ function wikiplugin_trackerlist($data, $params)
         }
         $smarty->assign_by_ref('allowtableexpansion', $allowtableexpansion);
 
-        $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y' ? true : false;
+        $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y';
         $smarty->assign_by_ref('sticky', $sticky);
         if (! isset($sortchoice)) {
             $sortchoice = '';
@@ -1639,27 +1629,15 @@ function wikiplugin_trackerlist($data, $params)
         if (isset($_REQUEST["tr_sort_mode$iTRACKERLIST"])) {
             $sort_mode = $_REQUEST["tr_sort_mode$iTRACKERLIST"];
         } elseif (! isset($sort_mode)) {
-            // TODO refactor using \TrackerLib::get_default_sort_order
-            if (! empty($tracker_info['defaultOrderKey']) && is_numeric($tracker_info['defaultOrderKey'])) {
-                if ($tracker_info['defaultOrderKey'] == -1) {
-                    $sort_mode = 'lastModif';
-                } elseif ($tracker_info['defaultOrderKey'] == -2) {
-                    $sort_mode = 'created';
-                } elseif ($tracker_info['defaultOrderKey'] == -3) {
-                    $sort_mode = 'itemId';
-                } else {
-                    $sort_mode = 'f_' . $tracker_info['defaultOrderKey'];
-                }
-                if (isset($tracker_info['defaultOrderDir'])) {
-                    $sort_mode .= "_" . $tracker_info['defaultOrderDir'];
-                } else {
-                    $sort_mode .= "_asc";
-                }
-            } else {
-                $sort_mode = '';
-            }
-        } elseif ($sort_mode != 'created_asc' && $sort_mode != 'lastModif_asc' && $sort_mode != 'created_desc' && $sort_mode != 'lastModif_desc' && ! preg_match('/f_[0-9]+_(asc|desc)/', $sort_mode)) {
-            return tra('Incorrect param') . ' sort_mode';
+            $sort_mode = '';
+        }
+        $valid_static_modes = ['created_asc', 'created_desc', 'lastModif_asc', 'lastModif_desc'];
+        if (! empty($sort_mode) && ! in_array($sort_mode, $valid_static_modes) && ! preg_match('/^f_[1-9]\d*_(asc|desc)$/', $sort_mode)) {
+            $invalid_sort_mode_value = htmlspecialchars($sort_mode, ENT_QUOTES);
+            Feedback::warning(sprintf(tra('The provided sort mode "%s" is invalid. Falling back to the default sorting order.'), $invalid_sort_mode_value));
+            $sort_mode = $trklib->get_default_sort_order($tracker_info['trackerId']);
+        } elseif (empty($sort_mode)) {
+            $sort_mode = $trklib->get_default_sort_order($tracker_info['trackerId']);
         }
 
         $tr_sort_mode = $sort_mode;
@@ -1756,7 +1734,7 @@ function wikiplugin_trackerlist($data, $params)
         }
 
         if (isset($itemId)) {
-            if (is_string($itemId) && strstr($itemId, ':')) {   // JB Tiki7: This doesn't quite make sense as itemId is an array
+            if (is_string($itemId) && str_contains($itemId, ':')) {   // JB Tiki7: This doesn't quite make sense as itemId is an array
                 $itemId = explode(':', $itemId);                //           Probably just some redundant code TOKIL
             }
             $filter['tti.`itemId`'] = $itemId;
@@ -1774,7 +1752,7 @@ function wikiplugin_trackerlist($data, $params)
                     $fvs = $filtervalue;
                     unset($filtervalue);
                     for ($i = 0, $count_ff = count($filterfield); $i < $count_ff; ++$i) {
-                        $filtervalue[] = isset($fvs[$i]) ? $fvs[$i] : '';
+                        $filtervalue[] = $fvs[$i] ?? '';
                     }
                 }
                 if (! empty($exactvalue)) {
@@ -2106,12 +2084,12 @@ function wikiplugin_trackerlist($data, $params)
                 // and we must take params from tracker definition because no explicit options have been defined
                 if ($tsServer) {
                     //format from plugin: type:text|type:dropdown;option:1=Open;option:2=Closed|type:text|type:nofilter|type:nofilter|type:nofilter
-                    if (! empty($tsfilters) && strpos($tsfilters, 'dropdown') !== false) {
+                    if (! empty($tsfilters) && str_contains($tsfilters, 'dropdown')) {
                         $tsfiltersArray = explode('|', $tsfilters);
                         $adjustCol = (isset($showstatus) && $showstatus == 'y' && $definition->isEnabled('showStatus')) ? -1 : 0;
                         foreach ($tsfiltersArray as $col => &$tsfilterField) {
                             // only consider dropdown definitions without explicit option
-                            if (strpos($tsfilterField, 'dropdown') !== false && strpos($tsfilterField, 'option') === false) {
+                            if (str_contains($tsfilterField, 'dropdown') && ! str_contains($tsfilterField, 'option')) {
                                 //content from options (json object): {"options":["1=Open"," 2=Closed]} - note there can be whitespaces - it should not but there can be - yet another fix required
                                 if ($allfields['data'][$col + $adjustCol]['type'] == 'd') {
                                     $options = $allfields['data'][$col + $adjustCol]['options'];
@@ -2135,19 +2113,19 @@ function wikiplugin_trackerlist($data, $params)
                 $ts = new Table_Plugin();
                 $ts->setSettings(
                     $ts_id,
-                    isset($server) ? $server : null,
+                    $server ?? null,
                     $sortable,
-                    isset($sortList) ? $sortList : null,
-                    isset($tsortcolumns) ? $tsortcolumns : null,
-                    isset($tsfilters) ? $tsfilters : null,
-                    isset($tsfilteroptions) ? $tsfilteroptions : null,
-                    isset($tspaginate) ? $tspaginate : null,
-                    isset($tscolselect) ? $tscolselect : null,
+                    $sortList ?? null,
+                    $tsortcolumns ?? null,
+                    $tsfilters ?? null,
+                    $tsfilteroptions ?? null,
+                    $tspaginate ?? null,
+                    $tscolselect ?? null,
                     $GLOBALS['requestUri'],
-                    $items['cant'],
-                    isset($tstotals) ? $tstotals : null,
-                    isset($tstotalformat) ? $tstotalformat : null,
-                    isset($tstotaloptions) ? $tstotaloptions : null
+                    $items['count'],
+                    $tstotals ?? null,
+                    $tstotalformat ?? null,
+                    $tstotaloptions ?? null
                 );
                 //loads the jquery tablesorter code
                 if (is_array($ts->settings)) {
@@ -2163,7 +2141,7 @@ function wikiplugin_trackerlist($data, $params)
                 }
             }
             //handle certain tablesorter sorts
-            if (isset($sortcol) && $items['cant'] > 1) {
+            if (isset($sortcol) && $items['count'] > 1) {
                 $fieldtype = $items['data'][0]['field_values'][$sortcol + $adjustCol]['type'];
                 //convert categoryId sort to category name sort when tablesorter server side sorting is used
                 if ($fieldtype === 'e') {
@@ -2179,11 +2157,11 @@ function wikiplugin_trackerlist($data, $params)
             }
             /*** end second tablesorter section ***/
 
-            if (isset($silent) && $silent == 'y' && empty($items['cant'])) {
+            if (isset($silent) && $silent == 'y' && empty($items['count'])) {
                 return;
             }
 
-            if (isset($items['cant']) && $items['cant'] == 1 && isset($goIfOne) && ($goIfOne == 'y' || $goIfOne == 1)) {
+            if (isset($items['count']) && $items['count'] == 1 && isset($goIfOne) && ($goIfOne == 'y' || $goIfOne == 1)) {
                 header('Location: tiki-view_tracker_item.php?itemId=' . $items['data'][0]['itemId'] . '&amp;trackerId=' . $items['data'][0]['trackerId']);
                 die;
             }
@@ -2201,7 +2179,7 @@ function wikiplugin_trackerlist($data, $params)
                     }
                     if ($definition->isEnabled('showLastComment')) {
                         $l = $trklib->list_last_comments($items['data'][$itkey]['trackerId'], $items['data'][$itkey]['itemId'], 0, 1);
-                        $items['data'][$itkey]['lastComment'] = ! empty($l['cant']) ? $l['data'][0] : '';
+                        $items['data'][$itkey]['lastComment'] = ! empty($l['count']) ? $l['data'][0] : '';
                     }
                 }
             }
@@ -2219,7 +2197,7 @@ function wikiplugin_trackerlist($data, $params)
                     if (empty($passfields[$fieldId])) {
                         continue;
                     }
-                    if (strstr($fieldId, "/")) {
+                    if (str_contains($fieldId, "/")) {
                         list($fieldId, $oper) = preg_split('/ *\/ */', $fieldId);
                         $oper = strtolower($oper);
                         if ($oper == 'average') {
@@ -2338,15 +2316,15 @@ function wikiplugin_trackerlist($data, $params)
             }
             $smarty->assign('tpl', $tpl);
 
-            if (! empty($itemId) && $showpagination == 'y' && ! empty($_REQUEST['cant'])) {
+            if (! empty($itemId) && $showpagination == 'y' && ! empty($_REQUEST['count'])) {
                 $smarty->assign('max', 1);
-                $smarty->assign('count_item', $_REQUEST['cant']);
+                $smarty->assign('count_item', $_REQUEST['count']);
                 $smarty->assign('offset_arg', 'reloff');
                 $smarty->assign("tr_offset$iTRACKERLIST", $_REQUEST['reloff']);
             } else {
                 $smarty->assign_by_ref('max', $max);
-                $smarty->assign_by_ref('item_count', $items['cant']);
-                $smarty->assign_by_ref('count_item', $items['cant']);
+                $smarty->assign_by_ref('item_count', $items['count']);
+                $smarty->assign_by_ref('count_item', $items['count']);
                 $smarty->assign('offset_arg', "tr_offset$iTRACKERLIST");
             }
             $smarty->assign_by_ref('items', $items["data"]);

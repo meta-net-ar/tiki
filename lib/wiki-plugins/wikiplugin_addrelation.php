@@ -92,12 +92,12 @@ function wikiplugin_addrelation_info()
 function wikiplugin_addrelation($data, $params)
 {
     global $user;
-    if (isset($params['source_object']) && false !== strpos($params['source_object'], ':')) {
+    if (isset($params['source_object']) && str_contains($params['source_object'], ':')) {
         list($source_object['type'], $source_object['object']) = explode(':', $params['source_object'], 2);
     } else {
         $source_object = current_object();
     }
-    if (isset($params['target_object']) && false !== strpos($params['target_object'], ':')) {
+    if (isset($params['target_object']) && str_contains($params['target_object'], ':')) {
         list($target_object['type'], $target_object['object']) = explode(':', $params['target_object'], 2);
     } else {
         $target_object = current_object();

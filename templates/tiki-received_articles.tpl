@@ -7,16 +7,16 @@
         <span class="titleb">{tr}By:{/tr} {$authorName} {$publishDate|tiki_short_datetime:'On:'} (0 {tr}Reads{/tr})</span>
     </header>
     <div class="articleheading">
-        <table cellpadding="0" cellspacing="0">
+        <table>
             <tr>
-                <td valign="top">
+                <td>
                     {if $useImage eq 'y'}
                         <img alt="{tr}Article image{/tr}" src="received_article_image.php?id={$receivedArticleId}">
                     {else}
                         <img alt="{tr}Topic image{/tr}" src="article_image.php?image_type=topic&amp;id={$topic}">
                     {/if}
                 </td>
-                <td valign="top">
+                <td>
                     <span class="articleheading">{$parsed_heading}</span>
                 </td>
             </tr>
@@ -69,26 +69,10 @@
             <label class="col-form-label col-sm-3">{tr}Rating{/tr}</label>
             <div class="col-sm-7">
                 <select name='rating' class="form-control">
-                    <option value="10" {if $rating eq 10}selected="selected"{/if}>10</option>
-                    <option value="9.5" {if $rating eq "9.5"}selected="selected"{/if}>9.5</option>
-                    <option value="9" {if $rating eq 9}selected="selected"{/if}>9</option>
-                    <option value="8.5" {if $rating eq "8.5"}selected="selected"{/if}>8.5</option>
-                    <option value="8" {if $rating eq 8}selected="selected"{/if}>8</option>
-                    <option value="7.5" {if $rating eq "7.5"}selected="selected"{/if}>7.5</option>
-                    <option value="7" {if $rating eq 7}selected="selected"{/if}>7</option>
-                    <option value="6.5" {if $rating eq "6.5"}selected="selected"{/if}>6.5</option>
-                    <option value="6" {if $rating eq 6}selected="selected"{/if}>6</option>
-                    <option value="5.5" {if $rating eq "5.5"}selected="selected"{/if}>5.5</option>
-                    <option value="5" {if $rating eq 5}selected="selected"{/if}>5</option>
-                    <option value="4.5" {if $rating eq "4.5"}selected="selected"{/if}>4.5</option>
-                    <option value="4" {if $rating eq 4}selected="selected"{/if}>4</option>
-                    <option value="3.5" {if $rating eq "3.5"}selected="selected"{/if}>3.5</option>
-                    <option value="3" {if $rating eq 3}selected="selected"{/if}>3</option>
-                    <option value="2.5" {if $rating eq "2.5"}selected="selected"{/if}>2.5</option>
-                    <option value="2" {if $rating eq 2}selected="selected"{/if}>2</option>
-                    <option value="1.5" {if $rating eq "1.5"}selected="selected"{/if}>1.5</option>
-                    <option value="1" {if $rating eq 1}selected="selected"{/if}>1</option>
-                    <option value="0.5" {if $rating eq "0.5"}selected="selected"{/if}>0.5</option>
+                    {$ratings=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
+                    {foreach from=$ratings item=val}
+                        <option value="{$val}" {if $rating == $val}selected="selected"{/if}>{$val}</option>
+                    {/foreach}
                 </select>
             </div>
         </div>
@@ -121,7 +105,7 @@
         </div>
         <div class="tiki-form-group row">
             <label class="col-form-label col-sm-3">{tr}Image size:{/tr}</label>
-            <div class="col-sm-7 form-control-plaintext">
+            <div class="col-sm-7">
                 {$image_size}
             </div>
         </div>
@@ -170,9 +154,11 @@
             <label class="col-form-label col-sm-3">{tr}Accept Article{/tr}</label>
             <div class="col-sm-7">
                 <select name="topic">
-                    {section name=t loop=$topics}
-                        <option value="{$topics[t].topicId|escape}" {if $topic eq $topics[t].topicId}selected="selected"{/if}>{$topics[t].name}</option>
-                    {/section}
+                    {foreach from=$topics key=topicKey item=topicItem}
+                        <option value="{$topicItem.topicId|escape}" {if $topic eq $topicItem.topicId}selected="selected"{/if}>
+                            {$topicItem.name}
+                        </option>
+                    {/foreach}
                 </select>
                 <input type="submit" class="btn btn-primary btn-sm" name="accept" value="{tr}Accept{/tr}">
             </div>
@@ -224,7 +210,7 @@
                             <input type="hidden" name="offset" value="{$offset}">
                             <input type="hidden" name="sort_mode" value="{$sort_mode}">
                             <input type="hidden" name="remove" value="{$channels[user].receivedArticleId}">
-                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()">
+                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                 {icon name='remove'}
                             </button>
                         </form>
@@ -235,5 +221,5 @@
             {/section}
         </table>
     </div>
-    {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 </div>

@@ -115,6 +115,21 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                             'op' => '!=='
                         ],
                     ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of users based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'inputtype',
+                            'value' => 'm',
+                            'pref' => 'elementplus_select'
+                        ],
+                    ],
                     'filterable' => [
                         'name' => tr('Filterable'),
                         'description' => tr('Allow the user to filter items within the transfer list'),
@@ -332,30 +347,45 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                     return $group['groupName'];
                 }, $groups);
                 $selected_groups = [];
-                $users = $userlib->get_members($groups);
-                foreach ($users as $group => &$usrs) {
-                    if (array_intersect($value, $usrs)) {
-                        $selected_groups[] = $group;
+                $users = [];
+                $templateData = [];
+                if ($this->trackerField->getOption('lazyload')) {
+                    foreach ($value as $v) {
+                        $selected_groups = array_unique(array_merge($selected_groups, $userlib->get_user_groups($v)));
                     }
-                    if ($this->getOption('showRealname')) {
-                        $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
-                    } else {
-                        $usrs = array_combine($usrs, $usrs);
+                    TikiLib::setExternalContext(true);
+                    $templateData['remote_url'] = TikiLib::lib('service')->getUrl([
+                        'groups' => implode(',', $selected_groups),
+                        'listonly' => $this->trackerField->getOption('showRealname') ? 'userrealnames' : 'users',
+                    ]);
+                } else {
+                    $users = $userlib->get_members($groups);
+                    foreach ($users as $group => &$usrs) {
+                        if (array_intersect($value, $usrs)) {
+                            $selected_groups[] = $group;
+                        }
+                        if ($this->getOption('showRealname')) {
+                            $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
+                        } else {
+                            $usrs = array_combine($usrs, $usrs);
+                        }
                     }
                 }
-                return $this->renderTemplate('trackerinput/userselector_grouped.tpl', $context, [
+                $templateData = array_merge($templateData, [
                     'groups' => $groups,
                     'users' => $users,
                     'selected_users' => $value,
                     'selected_groups' => $selected_groups,
+                    'lazyload' => $this->trackerField->getOption('lazyload'),
                 ]);
+                return $this->renderTemplate('trackerinput/userselector_grouped.tpl', $context, $templateData);
             } else {
                 return smarty_function_user_selector(
                     [
                         'user' => $name,
                         'id'  => (! empty($context['id']) ? $context['id'] : 'user_selector_' . $this->getConfiguration('fieldId')),
                         'select' => $value,
-                        'name' => $this->getInsertId(),
+                        'name' => $this->getHTMLFieldName(),
                         'multiple' => ( $this->getOption('multiple') ? 'true' : 'false' ),
                         'editable' => 'y',
                         'allowNone' => 'y',
@@ -369,7 +399,8 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'targetListTitle' => $this->getOption('targetListTitle'),
                         'ordering' => $this->getOption('ordering'),
                         'cardinalityParam' => $this->getConfiguration('validationParam'),
-                        'validationMessage' => $this->getConfiguration('validationMessage')
+                        'validationMessage' => $this->getConfiguration('validationMessage'),
+                        'lazyload' => $this->getOption('lazyload'),
                     ],
                     $smarty->getEmptyInternalTemplate()
                 );
@@ -840,7 +871,11 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
     private function canChangeValue()
     {
         $groupsCanChangeValue = $this->getOption('canChangeGroupIds');
-        if ($groupsCanChangeValue) {
+
+        if (is_string($groupsCanChangeValue)) {
+            $groupsCanChangeValue = [$groupsCanChangeValue];
+        }
+        if ($groupsCanChangeValue && is_array($groupsCanChangeValue)) {
             global $user;
 
             foreach ($groupsCanChangeValue as $groupId) {

@@ -120,7 +120,6 @@ class Account
         } elseif ($perms->admin) {
             return $this->adminAllowed;
         } else {
-            $userlib = TikiLib::lib('user');
             return $perms->send_mailin;
         }
     }
@@ -262,9 +261,6 @@ class Account
 
     public function check()
     {
-        global $prefs;
-
-        $logs = TikiLib::lib('logs');
         $messages = $this->source->getMessages();
 
         foreach ($messages as $message) {

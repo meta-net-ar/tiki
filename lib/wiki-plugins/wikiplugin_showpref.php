@@ -36,7 +36,7 @@ function wikiplugin_showpref($data, $params)
     $file = 'global';
     $lib_path = 'lib/prefs';
     $extension_path = '';
-    if (substr($name, 0, 3) == 'tp_') {
+    if (str_starts_with($name, 'tp_')) {
         $midpos = strpos($name, '_', 3);
         if ($midpos) {
             $paths = \Tiki\Package\ExtensionManager::getPaths();

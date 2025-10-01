@@ -8,7 +8,7 @@ use Tiki\Installer\Installer;
 
 /**
  * Class TikiDb, a singleton representing the entire Tiki database,
- * Implemented by TikiDb_Pdo and TikiDb_Adodb
+ * Implemented by Tiki\TikiDb\PdoDb
  */
 abstract class TikiDb
 {
@@ -98,12 +98,12 @@ abstract class TikiDb
      * @param int $offset
      * @param bool $reporterrors
      * @param $options additional sql options
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     abstract public function query($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = self::ERR_DIRECT, array $options = []);
     /**
-     * same as above but return the PDO statement or Adodb result, so it can be scrolled in a memory-efficient way
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * same as above but return the PDO statement result, so it can be scrolled in a memory-efficient way
+     * @return Tiki\TikiDb\PdoResult
      */
     abstract public function scrollableQuery($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = self::ERR_DIRECT, array $options = []);
 

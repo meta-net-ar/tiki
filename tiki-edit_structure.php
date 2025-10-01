@@ -45,16 +45,12 @@ require_once('tiki-setup.php');
 $structlib = TikiLib::lib('struct');
 $access->check_feature(['feature_wiki','feature_wiki_structure']);
 if (! isset($_REQUEST["page_ref_id"])) {
-    $smarty->assign('msg', tra("No structure indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No structure indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $page_info = $structlib->s_get_page_info($_REQUEST["page_ref_id"]);
 if (! isset($page_info)) {
-    $smarty->assign('msg', tra("Invalid page_ref_id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Invalid page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $access->check_permission('tiki_p_view', tra('View this wiki page'), 'wiki page', $page_info['pageName']);
@@ -66,9 +62,7 @@ if (isset($_REQUEST['move_to'])) {
 
 $structure_info = $structlib->s_get_structure_info($_REQUEST["page_ref_id"]);
 if (! isset($structure_info)) {
-    $smarty->assign('msg', tra("Invalid page_ref_id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Invalid page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('page_ref_id', $_REQUEST["page_ref_id"]);
@@ -79,10 +73,7 @@ $perms = Perms::get((['type' => 'wiki page', 'object' => $structure_info["pageNa
 $tikilib->get_perm_object($structure_info["pageName"], 'wiki page', $page_info);    // global perms still needed for logic in categorize.tpl
 
 if (! $perms->view) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view this page.'));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if ($perms->edit_structures) {
@@ -152,10 +143,7 @@ if ($editable === 'y') {
     }
 
     if (! isset($structure_info) or ! isset($page_info)) {
-        $smarty->assign('msg', tra("Invalid structure_id or page_ref_id"));
-
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Invalid structure_id or page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $smarty->assign('alert_exists', 'n');
@@ -341,7 +329,7 @@ if (isset($_REQUEST["recategorize"]) && $prefs['feature_wiki_categorize_structur
                 }
             } else {
                 // page that is added is categorized
-                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || isset($_REQUEST["cat_categorize"]) && $_REQUEST["cat_categorize"] != 'on') {
+                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || $_REQUEST["cat_categorize"] != 'on') {
                     if ($_REQUEST["cat_override"] == "on") {
                         $categlib->uncategorize_object($cat_type, $cat_objid);
                     } else {

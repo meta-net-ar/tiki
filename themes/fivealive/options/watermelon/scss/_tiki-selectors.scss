@@ -8,106 +8,24 @@
     background: linear-gradient(to bottom,  #c51e3c 0%,#e71e40 100%);
 }
 
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
-// (Everything below was copied from Grape and may need color adjusting.
-.text-danger {
-    color: $danger !important; // #B85B19 !important; // $danger !important;
-}
-.text-dark {
-    color: #6D5509 !important;
-}
-
-.btn.btn-primary {
-    color: #ffffff;
-}
-
-.bg-dark {
-    background-color: $dark !important;
-}
-
-.btn-dark {
-    color: #fff;
-    background-color: $dark; // This isn't working.
-    border-color: $dark;
-}
-
-// Button colors copied from Kiwi, then some updated
-.btn.btn-outline-primary {
-    color: #80780A;
-    border-color: #80780A;
-}
-
-.btn.btn-outline-secondary {
-    color: #B35123;
-    border-color: #B35123;
-}
-
-.btn.btn-outline-success {
-    color: #3A833A;
-    border-color: #3A833A;
-}
-.btn.btn-outline-warning {
-    color: #A2630B;
-    border-color: #A2630B;
-}
-.btn.btn-outline-info {
-    color: #6E7425;
-    border-color: #6E7425;
-}
-
-.btn.btn-outline-dark {
-    color: #6D5509;
-    border-color: #6D5509;
-}
-
 .breadcrumb-item.active {
     color: $text-muted !important;
 }
 
-.valid-feedback,
-.valid-tooltip { color: #2A8442 !important; }
-
-.was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label,
-.invalid-feedback,
-.invalid-tooltip { color: #B45918 !important; }
-
-.bg-danger,
-.bg-warning {
-    .card-title {
-        color: #fff;
-    }
+// Progress bars
+.progress-bar {
+    --bs-progress-bar-bg: #{$info};
 }
 
-.badge.bg-secondary {
-    background-color: #BB5525 !important;
+// Dark color mode
+[data-bs-theme=dark] {
+    .btn.btn-outline-primary { color: #F05670; border-color: #F05670; }
+    .btn.btn-outline-secondary { color: #E35F7B; border-color: #E35F7B; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4800; border-color: #FF4800; }
+    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
+    .btn.btn-outline-info { color: #E26077; border-color: #E26077; }
+    .btn.btn-outline-dark { color: #AC8811; border-color: #E26077; }
+
+    .blockquote-footer { color: #848D94; }
 }
-
-.badge.bg-info {
-    background-color: #D4452B !important;
-}
-
-.badge.bg-primary,
-.badge.bg-light,
-.badge.bg-warning,
-.badge.bg-success,
-.badge.bg-info,
-.badge.bg-danger,
-.progress-bar.bg-success,
-.progress-bar.bg-warning,
-.progress-bar.bg-danger {
-    color: #000;
-}
-
-.page-item.disabled, .list-group-item.disabled {
-    color: $text-muted !important;
-}
-
-//.bg-light {
-//    background: #fdde9f !important;
-//}
-
-// From kiwi
-.text-primary { color: #80780A !important; }
-.text-warning { color: #A0630E !important; }
-.text-success { color: #3A833A !important; }
-.text-info { color: #6E7425 !important; }

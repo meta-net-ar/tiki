@@ -1,0 +1,18 @@
+{
+  "name": "toast-ui",
+  "version": "1.0.0",
+  "main": "toast-index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "_comments": [
+    "We moved the Toast-UI editor here to simplify maintenance, as it has many dependencies. Therefore, we preferred to retrieve its files directly from node_modules, since placing it in common_external would have made maintenance more difficult."
+  ],
+  "dependencies": {
+    "@toast-ui/editor": "^3.2.2"
+  }
+}

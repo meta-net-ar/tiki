@@ -44,11 +44,11 @@ require_once 'tiki-setup.php';
 require_once('admin/include_credits.php');
 $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
+$accesslib = TikiLib::lib('access');
+$accesslib->check_permission('tiki_p_admin');
 
 if ($tiki_p_admin_users != 'y') {
-    $smarty->assign('msg', tra('You do not have the permission that is needed to use this feature'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have the permission that is needed to use this feature'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (isset($_REQUEST['use_credit']) && $use_credit_userid = $tikilib->get_user_id($_POST['userfilter'])) {

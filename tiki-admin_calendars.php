@@ -51,6 +51,7 @@ $inputConfiguration = [
             'show'                  => 'bool',    //post
             'subscription'          => 'none',    //post
         ],
+        'save' => 'text',
     ],
 ];
 $section = 'admin';
@@ -69,17 +70,13 @@ if (empty($_REQUEST["calendarId"])) {
     if ($calendarlib->calendarExists($_REQUEST['calendarId'])) {
         $info = $calendarlib->get_calendar($_REQUEST['calendarId']);
         if (empty($info)) {
-            $smarty->assign('msg', tra('Incorrect param'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
         }
         if (! $calendarlib->canAdminCalendar($info)) {
             $access->display_error('', tra('Permission denied') . ": " . 'tiki_p_admin_calendar', '403');
         }
     } else {
-        $smarty->assign('msg', tra('Incorrect param'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -98,12 +95,10 @@ $subscription_default = [
 
 if (! empty($_REQUEST['subscriptionId'])) {
     $subscription = $calendarlib->get_subscription($_REQUEST['subscriptionId']);
-    if ($subscription['user'] == $user) {
-        $smarty->assign('subscription', $subscription);
-    } else {
+    if ($subscription['user'] != $user) {
         $subscription = $subscription_default;
-        $smarty->assign('subscription', $subscription);
     }
+    $smarty->assign('subscription', $subscription);
 } else {
     $subscription = $subscription_default;
     $smarty->assign('subscription', $subscription);
@@ -132,7 +127,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $customflags["customparticipants"] = $_REQUEST["customparticipants"];
     $customflags["customcategories"] = $_REQUEST["customcategories"];
     $customflags["custompriorities"] = $_REQUEST["custompriorities"];
-    $customflags["customsubscription"] = isset($_REQUEST["customsubscription"]) ? $_REQUEST["customsubscription"] : 'n';
+    $customflags["customsubscription"] = $_REQUEST["customsubscription"] ?? 'n';
     if (isset($info)) {
         $objectperms = Perms::get('calendar', $info['calendarId']);
 
@@ -144,7 +139,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $customflags["private"] = 'y';
         }
     }
-    $customflags['customstatus'] = isset($_REQUEST['customstatus']) ? $_REQUEST['customstatus'] : 'y';
+    $customflags['customstatus'] = $_REQUEST['customstatus'] ?? 'y';
     $options = $_REQUEST['options'];
     if (array_key_exists('customcolors', $options) && strPos($options['customcolors'], '-') > 0) {
         $customColors = explode('-', $options['customcolors']);
@@ -215,7 +210,11 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     } else {
         // if it is an update
         if (isset($info)) {
-            $options["eventstatus"] = $info["eventstatus"];
+            if (! empty($info["eventstatus"])) {
+                $options["eventstatus"] = $info["eventstatus"];
+            } else {
+                $options["eventstatus"] = $defaultstatus;
+            }
         } else {
             $options["eventstatus"] = $defaultstatus;
         }
@@ -414,7 +413,7 @@ $info["eventstatusoutput"] = array_map(
     function ($status) {
         return tra($status);
     },
-    $info["eventstatus"]
+    $info["eventstatus"] ?? []
 );
 $smarty->assign("eventstatusoutput", $info["eventstatusoutput"]);
 $smarty->assign_by_ref('info', $info);
@@ -440,7 +439,7 @@ $calendars = $calendarlib->list_calendars($offset, $maxRecords, $sort_mode, $fin
 foreach (array_keys($calendars["data"]) as $i) {
     $calendars["data"][$i]["individual"] = $userlib->object_has_one_permission($i, 'calendar');
 }
-$smarty->assign_by_ref('cant', $calendars['cant']);
+$smarty->assign_by_ref('count', $calendars['count']);
 $smarty->assign_by_ref('calendars', $calendars["data"]);
 
 $subscriptions = $calendarlib->get_subscriptions($user, $offset, $maxRecords, $sort_mode, $find);

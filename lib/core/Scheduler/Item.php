@@ -20,6 +20,8 @@ class Scheduler_Item
     public $run_only_once;
     public $creation_date;
     public $user_run_now;
+    public $enable_send_notification_override;
+    public $stalled_notification_sent_at;
     private $logger;
 
     public const STATUS_ACTIVE = 'active';
@@ -64,7 +66,8 @@ class Scheduler_Item
             $this->run_only_once,
             $this->id,
             $this->creation_date,
-            $this->user_run_now
+            $this->user_run_now,
+            $this->enable_send_notification_override ?? 0
         );
 
         if ($id) {
@@ -135,17 +138,33 @@ class Scheduler_Item
         $schedLib = TikiLib::lib('scheduler');
         $schedLib->setSchedulerRunStalled($this->id, $runId);
 
-        if (is_null($notify)) {
-            $notify = $tikilib->get_preference('scheduler_notify_on_stalled', 'y') === 'y';
+        if ($this->enable_send_notification_override) {
+            $notify = true;
+        } else {
+            if (is_null($notify)) {
+                $notify = $tikilib->get_preference('scheduler_notify_on_stalled', 'y') === 'y';
+            }
         }
 
         if (! $notify) {
             return;
         }
 
-        $users = Scheduler_Utils::getSchedulerNotificationUsers('scheduler_users_to_notify_on_stalled');
+        // Check if notification was already sent within the last 24 hours
+        $now = time();
+        $twentyFourHoursAgo = $now - 86400; // 24 hours in seconds
+
+        if (isset($this->stalled_notification_sent_at) && strtotime($this->stalled_notification_sent_at) > $twentyFourHoursAgo) {
+            return; // Notification already sent within 24 hours
+        }
+
+        $users = Scheduler_Utils::getSchedulerNotificationUsers();
 
         Tiki\Notifications\Email::sendSchedulerNotification('scheduler_stalled_notification_subject.tpl', 'scheduler_stalled_notification.tpl', $this, $users);
+
+        // Mark notification as sent with current timestamp
+        $schedLib->updateSchedulerField($this->id, 'stalled_notification_sent_at', date('Y-m-d H:i:s', $now));
+        $this->stalled_notification_sent_at = date('Y-m-d H:i:s', $now);
     }
 
     /**
@@ -183,15 +202,25 @@ class Scheduler_Item
         $schedLib = TikiLib::lib('scheduler');
         $schedLib->setSchedulerRunHealed($this->id, $lastRun['id'], $message);
 
-        if (is_null($notify)) {
-            $notify = $tikilib->get_preference('scheduler_notify_on_healing', 'y') === 'y';
+        // Reset the stalled notification sent timestamp when job is healed
+        $schedLib->updateSchedulerField($this->id, 'stalled_notification_sent_at', null);
+        $this->stalled_notification_sent_at = null;
+
+        if ($this->enable_send_notification_override) {
+            $notify = true;
+        } else {
+            if (is_null($notify)) {
+                $notify = $tikilib->get_preference('scheduler_notify_on_stalled', 'y') === 'y';
+            }
         }
 
-        if ($notify) {
-            $users = Scheduler_Utils::getSchedulerNotificationUsers('scheduler_users_to_notify_on_healed');
-
-            Tiki\Notifications\Email::sendSchedulerNotification('scheduler_healed_notification_subject.tpl', 'scheduler_healed_notification.tpl', $this, $users);
+        if (! $notify) {
+            return true;
         }
+
+        $users = Scheduler_Utils::getSchedulerNotificationUsers();
+
+        Tiki\Notifications\Email::sendSchedulerNotification('scheduler_healed_notification_subject.tpl', 'scheduler_healed_notification.tpl', $this, $users);
 
         $this->reduceLogs();
 

@@ -65,6 +65,18 @@ class FilesMoveCommand extends Command
             throw new \Exception(tra('File Move: Destination path required'));
         }
 
+        $destinationPath = rtrim($destinationPath, '/') . '/';
+
+        if (! is_dir($destinationPath)) {
+            $output->writeln("<error>File Move: Destination path $destinationPath is not a directory</error>");
+            return Command::FAILURE;
+        }
+
+        if (! is_writable($destinationPath)) {
+            $output->writeln("<error>File Move: Destination path $destinationPath is not writable</error>");
+            return Command::FAILURE;
+        }
+
         $files = $filegallib->get_files_info_from_gallery_id($galleryId);
         if (! $files) {
             if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {

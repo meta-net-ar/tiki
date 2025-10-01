@@ -55,18 +55,6 @@ class EnglishUpdateCommand extends Command
                 'e',
                 InputOption::VALUE_REQUIRED,
                 'Email address to send a message to if untranslated strings are found. Must be used in conjunction with "audit".'
-            )
-            ->addOption(
-                'diff-command',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Set a shell command to return the diff (ex. in case of a based git repository) override svn default diff. Options revision and lag will be ignored.'
-            )
-            ->addOption(
-                'git',
-                null,
-                InputOption::VALUE_NONE,
-                'Set this if diff-command is based on git'
             );
     }
 
@@ -88,15 +76,6 @@ class EnglishUpdateCommand extends Command
      * @var array
      */
     private $languages;
-    /**
-     *
-     * Seperates svn diff output into changes made in PHP and TPL files
-     *
-     * @param $content string raw svn diff output
-     * @param string $diff git or svn depending on the version control used to generate the diff.
-     *
-     * @return array with [0] containing PHP and [1] containing TPL strings
-     */
 
     /**
      * Run git diff command
@@ -125,7 +104,7 @@ class EnglishUpdateCommand extends Command
     }
 
 
-    private function separatePhpTpl($content, $diff = 'svn')
+    private function separatePhpTpl($content, $diff = '')
     {
 
         if ($diff === 'git') {
@@ -333,15 +312,10 @@ class EnglishUpdateCommand extends Command
             $output->writeln(' --email, only available when running in --audit mode.');
             return Command::INVALID;
         }
-        $scm = null;
 
-        if (empty($scm)) {//detect if is svn or git repo
-            if (file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . '.git')) {
-                $scm = 'git';
-            } else {
-                $output->writeln('<error>SCM not found in this tiki installation</error>');
-                return Command::FAILURE;
-            }
+        if (! file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . '.git')) {
+            $output->writeln('<error>SCM not found in this tiki installation</error>');
+            return Command::FAILURE;
         }
 
         $lag = $input->getOption('lag');
@@ -459,7 +433,7 @@ class EnglishUpdateCommand extends Command
                         // if the original string is in the language file
                         if (preg_match('/^"' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?".*/m', $file, $match)) {
                             // if the replacement string does not already exist
-                            if (! strpos($file, "\n\"" . $entry['+'] . '"')) {
+                            if (! str_contains($file, "\n\"" . $entry['+'] . '"')) {
                                 // then replace the original string with an exact copy and a 'updated' copy on the next line
                                 $replace = preg_replace('/"' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?"/', '"' . $entry['+'] . '"', $match[0], 1);
                                 $file = str_replace($match[0], $match[0] . "\n" . $replace, $file);
@@ -477,7 +451,7 @@ class EnglishUpdateCommand extends Command
                         if ($langNow == 'en') {
                             if (preg_match('/^\/\/ "' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?".*/m', $file, $match)) {
                                 // if the replacement string does not already exist
-                                if (! strpos($file, "\n\"" . $entry['+'] . '"')) {
+                                if (! str_contains($file, "\n\"" . $entry['+'] . '"')) {
                                     // then replace the original string with an exact copy and a 'updated' copy on the next line
                                     $replace = preg_replace('/\/\/ "' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?"/', '"' . $entry['+'] . '"', $match[0], 1);
                                     $file = str_replace($match[0], $match[0] . "\n" . $replace, $file);

@@ -66,10 +66,8 @@ if (! isset($_REQUEST["nlId"])) {
 }
 $smarty->assign('nlId', $_REQUEST["nlId"]);
 $newsletters = $nllib->list_newsletters(0, -1, 'created_desc', '', '', ["tiki_p_admin_newsletters", "tiki_p_send_newsletters"], 'n');
-if (! $newsletters['cant']) {
-    $smarty->assign('msg', tra("No newsletters available."));
-    $smarty->display("error.tpl");
-    die;
+if (! $newsletters['count']) {
+    Feedback::errorAndDie(tra("No newsletters available."), \Laminas\Http\Response::STATUS_CODE_404);
 }
 if (isset($_REQUEST['cancel'])) {
     unset($_REQUEST['editionId']);
@@ -242,7 +240,7 @@ if (
 
 $newsletterfiles = [];
 if (isset($_REQUEST['newsletterfile'])) {
-    $newsletterfiles_post = isset($_REQUEST['newsletterfile']) && is_array($_REQUEST['newsletterfile']) ? $_REQUEST['newsletterfile'] : [];
+    $newsletterfiles_post = is_array($_REQUEST['newsletterfile']) ? $_REQUEST['newsletterfile'] : [];
     foreach ($newsletterfiles_post as $k => $id) {
         $f = [];
         if ((strlen($id) == 32) && preg_match('/^[0-9a-f]{32}$/', $id)) { // this is a valid md5 hash, so the file was just saved at preview time
@@ -383,7 +381,7 @@ if (isset($_REQUEST["save"])) {
     // Now send the newsletter to all the email addresses and save it in sent_newsletters
     $info['datatxt'] = $_REQUEST['datatxt'];
     $smarty->assign('presend', 'y');
-    $subscribers = isset($subscribers) ? $subscribers : $nllib->get_all_subscribers($_REQUEST["nlId"], "");
+    $subscribers = $subscribers ?? $nllib->get_all_subscribers($_REQUEST["nlId"], "");
     $smarty->assign('nlId', $_REQUEST["nlId"]);
     $smarty->assign('datatxt', $_REQUEST["datatxt"]);
     $parsed = '';
@@ -429,8 +427,8 @@ if (isset($_REQUEST["save"])) {
     $smarty->assign('dataparsed', $parsed);
     $smarty->assign('subject', $_REQUEST["subject"]);
     $smarty->assign('data', $_REQUEST["data"]);
-    $cant = count($subscribers);
-    $smarty->assign('subscribers', $cant);
+    $count_subscribers = count($subscribers);
+    $smarty->assign('subscribers', $count_subscribers);
     $smarty->assign_by_ref('subscribers_list', $subscribers);
     $smarty->assign_by_ref('info', $info);
     if (! empty($_REQUEST['replyto'])) {
@@ -569,7 +567,7 @@ if (isset($_REQUEST['resume'])) {
 
 // Article Clipping
 $articleClip = '';
-if (isset($nl_info) && $nl_info["allowArticleClip"] == 'y' && empty($articleClip)) {
+if (isset($nl_info) && $nl_info["allowArticleClip"] == 'y') {
     if ($nl_info["autoArticleClip"] == 'y' || isset($_REQUEST["clipArticles"])) {
         $articleClip = $nllib->clip_articles($_REQUEST["nlId"]);
         // prevent clearing of keyed in info if any
@@ -630,18 +628,18 @@ $smarty->assign_by_ref('ed_find', $ed_find);
 $smarty->assign_by_ref('dr_find', $dr_find);
 $editions = $nllib->list_editions($_REQUEST["nlId"], $ed_offset, $maxRecords, $ed_sort_mode, $ed_find, false);
 $drafts = $nllib->list_editions($_REQUEST["nlId"], $dr_offset, $maxRecords, $dr_sort_mode, $dr_find, true);
-$ed_cant_pages = ceil($editions["cant"] / $maxRecords);
-$dr_cant_pages = ceil($drafts["cant"] / $maxRecords);
-$smarty->assign_by_ref('ed_cant_pages', $ed_cant_pages);
+$ed_count_pages = ceil($editions["count"] / $maxRecords);
+$dr_count_pages = ceil($drafts["count"] / $maxRecords);
+$smarty->assign_by_ref('ed_count_pages', $ed_count_pages);
 $smarty->assign('ed_actual_page', 1 + ($ed_offset / $maxRecords));
-$smarty->assign_by_ref('dr_cant_pages', $dr_cant_pages);
+$smarty->assign_by_ref('dr_count_pages', $dr_count_pages);
 $smarty->assign('dr_actual_page', 1 + ($dr_offset / $maxRecords));
-if ($editions["cant"] > ($ed_offset + $maxRecords)) {
+if ($editions["count"] > ($ed_offset + $maxRecords)) {
     $smarty->assign('ed_next_offset', $ed_offset + $maxRecords);
 } else {
     $smarty->assign('ed_next_offset', -1);
 }
-if ($drafts["cant"] > ($dr_offset + $maxRecords)) {
+if ($drafts["count"] > ($dr_offset + $maxRecords)) {
     $smarty->assign('dr_next_offset', $dr_offset + $maxRecords);
 } else {
     $smarty->assign('dr_next_offset', -1);
@@ -659,8 +657,8 @@ if ($dr_offset > 0) {
 }
 $smarty->assign_by_ref('editions', $editions["data"]);
 $smarty->assign_by_ref('drafts', $drafts["data"]);
-$smarty->assign_by_ref('cant_editions', $editions["cant"]);
-$smarty->assign_by_ref('cant_drafts', $drafts["cant"]);
+$smarty->assign_by_ref('count_editions', $editions["count"]);
+$smarty->assign_by_ref('count_drafts', $drafts["count"]);
 $smarty->assign('url', "tiki-send_newsletters.php");
 
 $templates = $templateslib->list_templates('newsletters', 0, -1, 'name_asc', '');

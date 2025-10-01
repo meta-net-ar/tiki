@@ -75,7 +75,7 @@ if (isset($_REQUEST['create'], $_REQUEST['name']) && $globalperms->create_perspe
 }
 
 $maxRecords = $prefs['maxRecords'];
-$offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+$offset = $_REQUEST['offset'] ?? 0;
 $smarty->assign('offset', $offset);
 $smarty->assign('count', $tikilib->getOne('SELECT COUNT(*) FROM tiki_perspectives'));
 

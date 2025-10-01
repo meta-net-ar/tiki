@@ -4,7 +4,7 @@
         <div class="col-sm-8 col-md-9">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="#">Menu</a>
+                    <a class="navbar-brand" href="#" role="button">Menu</a>
                     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-label="{tr}Toggle navigation{/tr}">
                         <span class="navbar-toggler-icon"></span>
                     </button>

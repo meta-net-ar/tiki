@@ -26,5 +26,5 @@ function module_num_submissions($mod_reference, $module_params)
     $smarty = TikiLib::lib('smarty');
     $artlib = TikiLib::lib('art');
     $ranking = $artlib->list_submissions(0, -1, 'created_desc', '', '');
-    $smarty->assign('modNumSubmissions', $ranking["cant"]);
+    $smarty->assign('modNumSubmissions', $ranking["count"]);
 }

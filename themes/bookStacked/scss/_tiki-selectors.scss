@@ -1,4 +1,10 @@
-// This file is for additional SCSS rules beyond what are in _variables.scss.
+// BookStacked for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
 $imagePath: "../images/";
@@ -6,22 +12,20 @@ $imagePath: "../images/";
 //	background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// The headings below that are commented are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
-// In the case of CSS selectors that are grouped to share common CSS properties, the category appropriate for most of the selectors is used.
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-// -------------------- Color system -------------------- //
-// -------------------- Body (large elements -------------------- //
+// Color system
+// Body
 body:not(.tiki-admin) .col1 {
     padding: 16px 48px;
     margin-bottom: 24px;
     min-height: 60vh;
 
-    background-color: var(--tiki-main-content-bg); // #fff;
-//    box-shadow: 0 1px 6px -1px rgba(0,0,0,.1);
-//    border-radius: 3px;
-//    border: 1px solid transparent;
+    background-color: var(--tiki-main-content-bg);
     .col1top-outer-wrapper {
-        background-color: var(--bs-body-bg); // #f2f2f2;
+        background-color: var(--bs-body-bg);
         margin: -16px -48px 0 -48px;
 
     }
@@ -55,10 +59,6 @@ body:not(.tiki-admin) .col1 {
 }
 
 @media screen and (min-width: 1000px) {
-//    .tri-layout-mobile-tabs {
-//        display: none
-//    }
-//
     .col2 > *, .col3 > * {
         opacity: .6;
         transition: opacity ease-in-out 120ms
@@ -102,13 +102,12 @@ body:not(.tiki-admin) .col1 {
     }
 }
 
+// Links
+// Components
+// Typography
+.blockquote-footer { color: #5C717F; } // Variable not effective. :-(
 
-
-// -------------------- Links -------------------- //
-// -------------------- Paragraphs -------------------- //
-// -------------------- Components -------------------- //
-// -------------------- Typography -------------------- //
-// -------------------- Tables -------------------- //
+// Tables
 thead, tbody, tfoot, tr, td, th {
     border-width: var(--bs-border-width);
 }
@@ -118,8 +117,24 @@ thead, tbody, tfoot, tr, td, th {
     color: var(--bs-body-color);
 }
 
-// -------------------- Buttons -------------------- //
-// -------------------- Forms -------------------- //
+// Buttons
+.btn.btn-outline-secondary { color: #666E75; border-color: #666E75; }
+.btn.btn-outline-warning { color: #8A6700; border-color: #8A6700; }
+.btn.btn-outline-info { color: #07768D; border-color: #07768D; }
+.btn.btn-outline-light { color: #616A98; border-color: #616A98; }
+
+[data-bs-theme=dark] {
+    .btn.btn-outline-primary { color: #479EDC; border-color: #479EDC; }
+    .btn.btn-outline-secondary { color: #8F979E; border-color: #8F979E; }
+    .btn.btn-outline-success { color: #20B16D; border-color: #20B16D; }
+    .btn.btn-outline-danger { color: #E6707C; border-color: #E6707C; }
+    .btn.btn-outline-warning { color: #BD8E00; border-color: #BD8E00; }
+    .btn.btn-outline-info { color: #0AA3C2; border-color: #0AA3C2; }
+    .btn.btn-outline-light { color: #8C93B5; border-color: #8C93B5; }
+    .btn.btn-outline-dark { color: #8F979E; border-color: #8F979E; }
+}
+
+// Forms
 .searchresults li {
     padding: 8px;
 }
@@ -127,9 +142,8 @@ thead, tbody, tfoot, tr, td, th {
     background: var(--bs-secondary-bg-subtle);
 }
 
-// -------------------- Form validation -------------------- //
-// -------------------- Navs -------------------- //
-// -------------------- Navbar -------------------- //
+// Navs
+// Navbar
 nav:not(.bg-light,.bg-dark) {
     .nav-link {
         color: var(--bs-link-color);
@@ -138,10 +152,20 @@ nav:not(.bg-light,.bg-dark) {
         }
     }
 }
-// -------------------- Dropdowns -------------------- //
-// -------------------- Pagination -------------------- //
-// -------------------- Jumbotron -------------------- //
-// -------------------- Cards -------------------- //
+
+[data-bs-theme=dark] {
+    .navbar-light {
+        .nav-link,
+        .dropdown-toggle,
+        a.nav-link.dropdown-toggle {
+            color: #B6D9F1
+        }
+    }
+}
+
+// Dropdowns
+// Pagination
+// Cards
 .col2,
 .col3 {
     .module.card {
@@ -154,31 +178,115 @@ nav:not(.bg-light,.bg-dark) {
     }
 }
 
-// -------------------- Tooltips -------------------- //
-// -------------------- Popovers -------------------- //
-// -------------------- Toasts -------------------- //
-// -------------------- Badges -------------------- //
-// -------------------- Modals -------------------- //
-// -------------------- Alerts -------------------- //
+// Accordion
+// Badges
+// Alerts
 .alert {
     border-width: 0 0 0 5px;
 }
 
-// -------------------- Progress bars -------------------- //
-// -------------------- List group -------------------- //
-// -------------------- Image thumbnails -------------------- //
-// -------------------- Figures -------------------- //
-// -------------------- Breadcrumbs -------------------- //
-// -------------------- Carousel -------------------- //
-// -------------------- Spinners -------------------- //
-// -------------------- Close -------------------- //
-// -------------------- Code -------------------- //
-// -------------------- Utilities -------------------- //
-// -------------------- Printing -------------------- //
+// Progress bars
+// List group
+html:not([data-bs-theme=dark]) {
+.list-group-item.list-group-item-action { color: #424242BF; }
+.list-group-item.list-group-item-action.list-group-item-primary { color: #363636BF; }
+.list-group-item.list-group-item-action.list-group-item-secondary { color: #3B3B3BBF; }
+.list-group-item.list-group-item-action.list-group-item-success { color: #383838BF; }
+.list-group-item.list-group-item-action.list-group-item-danger { color: #363636BF; }
+.list-group-item.list-group-item-action.list-group-item-warning { color: #3B3B3BBF; }
+.list-group-item.list-group-item-action.list-group-item-info { color: #383838BF; }
+.list-group-item.list-group-item-action.list-group-item-light { color: #474747BF; }
+.list-group-item.list-group-item-action.list-group-item-dark { color: #333333BF; }
+}
 
-// -------------------- Etc -------------------- //
+// Figures
+//.figure-caption { color: $text-muted; }
 
-// -------------------- Tiki-specific -------------------- //
+// Breadcrumbs
+// Code
 
-// -------------------- External libraries -------------------- //
+// Tiki-specific
 
+// To have Smartmenus in side columns in large displays open downward as in small displays
+// The properties of these classes need to be used on the top ul: sm-nav navbar-nav me-auto nav  flex-column
+@media (min-width: 768px) {
+    .tiki .col2,
+    .tiki .col3 {
+        .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-nav-link {
+            grid-area: link / link / link / link-split-toggler;
+            border-radius: var(--sm-collapsible-nav-link-border-radius);
+            padding: var(--sm-collapsible-nav-link-padding-y) var(--sm-collapsible-nav-link-padding-x);
+            background: var(--sm-collapsible-nav-link-bg);
+            color: var(--sm-collapsible-nav-link-color);
+            font-family: var(--sm-font-family);
+            font-size: var(--sm-font-size);
+            font-weight: var(--sm-collapsible-nav-link-font-weight);
+            line-height: var(--sm-line-height);
+            text-decoration: none;
+        }
+        .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--vertical .sm-sub-toggler::after {
+           // margin-top: 0;
+           // transform: rotate(225deg);
+            --sm-sub-toggler-icon-size: 0.7rem;
+            --sm-sub-toggler-icon-spacing: 0.4rem;
+            --sm-sub-toggler-split-icon-spacing: 0px;
+            content: "+";
+            display: inline-block;
+            margin-left: var(--sm-sub-toggler-icon-spacing);
+            width: var(--sm-sub-toggler-icon-size);
+            height: var(--sm-sub-toggler-icon-size);
+            line-height: var(--sm-sub-toggler-icon-size);
+            text-align: center;
+        }
+        .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub .sm-sub-toggler::after,
+        .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--vertical .sm-sub-toggler::after {
+            margin-top: 0;
+            transform: rotate(-45deg);
+        }
+        .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after {
+            margin-top: calc(0.5 * var(--sm-collapsible-sub-toggler-icon-size)) !important;
+            transform: rotate(-45deg);
+        }
+        .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after,
+        .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after {
+            margin-top: calc(0.5 * var(--sm-collapsible-sub-toggler-icon-size)) !important;
+            transform: rotate(-225deg);
+        }
+        .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub {
+            z-index: inherit; // 1001;
+            left: 0px; //93.7109px;
+            top: 0px; // -0.834028px;
+            --sm-height: inherit; // 120.3085708618164px;
+            grid-area: sub; // none;
+            position: static; // absolute;
+            min-width: var(--sm-sub-min-width);
+        }
+        .sm-nav-item {
+            display: grid;
+            grid-template: "link link-split-toggler" auto
+                            "sub sub" auto / 1fr auto;
+            position: relative;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            line-height: inherit;
+        }
+        .sm-sub {
+            grid-area: sub;
+            display: none;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            line-height: inherit;
+        }
+        .sm-sub.sm-show, .sm-sub.sm-hiding {
+            display: block;
+        }
+        .sm-sub.dropdown-menu.sm-show {
+
+        }
+    }
+}
+    .sm-navbar--vertical:not(.sm-navbar--collapsible-only) .sm-nav {}
+
+// External libraries

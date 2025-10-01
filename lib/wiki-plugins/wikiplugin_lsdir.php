@@ -96,7 +96,7 @@ function wikiplugin_lsdir($data, $params)
 
     // make sure dir has starting slash
     if (! empty($dir)) {
-        if (substr($dir, 0, 1) != '/') {
+        if (! str_starts_with($dir, '/')) {
             $dir = '/' . $dir;
         }
     }

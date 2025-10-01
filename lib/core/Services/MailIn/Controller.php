@@ -93,7 +93,6 @@ class Services_MailIn_Controller
                 'trackers' => $trackers,
                 'accountId' => $accountId,
                 'mailinTypes' => $mailinlib->list_available_types(),
-                'checkPackage' => $mailinlib->checkPackage(),
                 'info' => $info ?: [
                     'account' => '',
                     'username' => '',

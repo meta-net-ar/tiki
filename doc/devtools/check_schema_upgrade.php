@@ -118,7 +118,7 @@ class CheckSchemaUpgrade
             $tikiVersion = new TWVersion();
 
             //
-            // Run upgrade from previous major (from latest SVN)
+            // Run upgrade from previous major
             //
             $this->printMessage('Loading database 1 from previous major version');
             $this->writeLocalConfig($this->oldDb);
@@ -231,10 +231,10 @@ class CheckSchemaUpgrade
         $options = $this->getOpts();
 
         $this->previousMajor = $this->getOption($options, 'm', 'major');
-        $this->verbose = $this->getOption($options, 'v', 'verbose') === false ? true : false;
-        $this->ignorePreferenceChanges = $this->getOption($options, 'p', 'preferences') === false ? false : true;
-        $this->useInnoDB = strtolower($this->getOption($options, 'e', 'engine')) === 'myisam' ? false : true;
-        $this->removeColumnCollateKey = $this->getOption($options, 'c', 'keep-collate') === false ? false : true;
+        $this->verbose = $this->getOption($options, 'v', 'verbose') === false;
+        $this->ignorePreferenceChanges = ! ($this->getOption($options, 'p', 'preferences') === false);
+        $this->useInnoDB = ! (strtolower($this->getOption($options, 'e', 'engine')) === 'myisam');
+        $this->removeColumnCollateKey = ! ($this->getOption($options, 'c', 'keep-collate') === false);
 
         $this->oldDbRaw = $this->getOption($options, null, 'db1');
         $result = $this->parseDbRaw($this->oldDbRaw);
@@ -333,7 +333,6 @@ class CheckSchemaUpgrade
         $TWV = new TWVersion();
 
         $local = '<?php' . "\n"
-            . '$dbversion_tiki = "' . $TWV->getBaseVersion() . '";' . "\n"
             . '$host_tiki = "' . $dbConfig['host'] . '";' . "\n"
             . '$user_tiki = "' . $dbConfig['user'] . '";' . "\n"
             . '$pass_tiki = "' . $dbConfig['pass'] . '";' . "\n"
@@ -430,7 +429,7 @@ class CheckSchemaUpgrade
         $dbUrl = sprintf(self::DB_URL_TEMPLATE, $major);
         $dbContent = file_get_contents($dbUrl);
         /** @noinspection SyntaxError */
-        if (! empty($dbContent) && strpos($dbContent, 'CREATE TABLE `tiki_schema`') !== false) { //check that looks like a sql file
+        if (! empty($dbContent) && str_contains($dbContent, 'CREATE TABLE `tiki_schema`')) { //check that looks like a sql file
             $sql = $dbContent;
             file_put_contents($cachedDbFile, $dbContent);
             return $sql;

@@ -46,7 +46,7 @@
             </p>
         </form>
         <form class="file-uploader-result" method="post" action="{service controller=file action=uploader galleryId=$galleryId}">
-            <ul class="list-unstyled" data-adddescription="{$addDecriptionOnUpload}"></ul>
+            <ul class="list-unstyled" data-adddescription="{$addDecriptionOnUpload}" data-changefilename="{$changeFileNameOnUpload}"></ul>
 
             <div class="submit">
                 {ticket}

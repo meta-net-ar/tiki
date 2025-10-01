@@ -57,7 +57,7 @@
         </table>
     </div>
     <p>
-        <a class="btn btn-info" href="{bootstrap_modal controller=api_token action=new size='modal-lg'}">
+        <a class="btn btn-info" href="{bootstrap_modal controller=api_token action=new size='modal-lg'}" role="button">
             {icon name="create"} {tr}Create Token{/tr}
         </a>
     </p>

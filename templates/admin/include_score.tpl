@@ -79,8 +79,8 @@
                                 <input type="text" size="10" name="events[{$event['event']}][{$key}][score]" value="{$score->score}">
                             </td>
                             <td class="text-end">
-                                {if $hide_advanced}<a class="advanced" href="#">{icon name='ellipsis-h'}</a>{/if}
-                                <a class="delete-row" href="#">{icon name='delete'}</a>
+                                {if $hide_advanced}<a class="advanced" href="#" role="button">{icon name='ellipsis-h'}</a>{/if}
+                                <a class="delete-row" href="#" role="button">{icon name='delete'}</a>
                             </td>
                         </tr>
                         <tr class="advanced-row {if $hide_advanced eq 1}hide{/if}">
@@ -119,7 +119,7 @@
                     {/foreach}
                 </select>
             </div>
-            <a id="addEventBtn" href="#" class="btn btn-primary">{tr}Add a Scoring Event{/tr}</a>
+            <a id="addEventBtn" href="#" class="btn btn-primary" role="button">{tr}Add a Scoring Event{/tr}</a>
         </div>
     </fieldset>
 

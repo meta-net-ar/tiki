@@ -8,11 +8,11 @@
                         <label for="{$field.id|escape}">{$field.name|tr_if}</label>
                         {if !empty($field.textInput)}
                             {if $field.type == 'f'}
-                                <a href="#" class="tikihelp" title="{tr}Date selector : Apply a range of time between two dates{/tr}.">
+                                <a href="#" role="button" class="tikihelp" title="{tr}Date selector : Apply a range of time between two dates{/tr}.">
                                     {icon name="information"}
                                 </a>
                             {else}
-                                <a href="#" class="tikihelp" title="{tr}Only full word matches shown by default: Use wildcards (*) to get partial matches also. E.g. searching for 'foo' will miss foobar in the results, but 'foo*' will include it{/tr}.">
+                                <a href="#" role="button" class="tikihelp" title="{tr}Only full word matches shown by default: Use wildcards (*) to get partial matches also. E.g. searching for 'foo' will miss foobar in the results, but 'foo*' will include it{/tr}.">
                                     {icon name="information"}
                                 </a>
                             {/if}

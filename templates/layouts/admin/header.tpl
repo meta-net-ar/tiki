@@ -50,7 +50,7 @@
     {/capture}
     {if isset($structure) and $structure eq 'y'} {* get the alias name if item is a wiki page and it is in a structure *}
         {section loop=$structure_path name=ix}
-        {assign var="aliasname" value={$structure_path[ix].page_alias}}
+        {$aliasname={$structure_path[ix].page_alias}}
         {/section}
     {/if}
     {if $prefs.site_title_location eq 'only'}
@@ -98,12 +98,6 @@
 {/strip}{/capture}
 {* --- tiki block --- *}
 <title>{$header_title}</title>
-
-{* --- GlitchTip reporting script should be load before any other JS to capture issues/failures on other JS scripts --- *}
-{if $prefs.error_tracking_enabled_js eq 'y' and  !empty($prefs.error_tracking_dsn)}
-    <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/sentry--browser/build/bundle.min.js"></script>
-    <script type="text/javascript">Sentry.init({ dsn: "{$prefs.error_tracking_dsn}", sampleRate: {if isset($prefs.error_tracking_sample_rate) and is_numeric($prefs.error_tracking_sample_rate)}{$prefs.error_tracking_sample_rate}{else}1{/if}});</script>
-{/if}
 
 {if $headerlib} 
     {$headerlib->output_headers()}

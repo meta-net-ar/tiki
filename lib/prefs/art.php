@@ -66,11 +66,6 @@ function prefs_art_list()
             'type' => 'flag',
             'default' => 'y',
         ],
-        'art_list_expire' => [
-            'name' => tra('Expiration date'),
-            'type' => 'flag',
-            'default' => 'n',
-        ],
         'art_list_visible' => [
             'name' => tra('Visible'),
             'type' => 'flag',

@@ -171,13 +171,6 @@ function wikiplugin_memberlist($data, $params)
 
     $groups = (array)$params['groups'];
 
-    $defaults = [];
-    $plugininfo = wikiplugin_memberlist_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if ($prefs['feature_user_watches'] == 'y') {
         if (! empty($user)) {
             if (isset($_REQUEST['watch'])) {
@@ -434,7 +427,7 @@ function wikiplugin_memberlist_add($groups, $adds, $asdefault = false, $mail = f
                             if ($mail == 'true') {
                                 $added_user[$name] = $_SESSION['u_info']['login'];
                                 $par_data['gname'] = $group;
-                                $par_data['app_data'] = isset($_POST['text_area']) ? $_POST['text_area'] : '';
+                                $par_data['app_data'] = $_POST['text_area'] ?? '';
                             }
                         }
                     }
@@ -456,7 +449,7 @@ function wikiplugin_memberlist_remove($groups, $removes, $mail = false, $params 
                     if ($mail == 'true') {
                         $removed_user[$name] = $_SESSION['u_info']['login'];
                         $par_data['gname'] = $group;
-                        $par_data['app_data'] = isset($_POST['text_area']) ? $_POST['text_area'] : '';
+                        $par_data['app_data'] = $_POST['text_area'] ?? '';
                     }
                 }
             }

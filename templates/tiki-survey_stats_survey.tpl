@@ -11,7 +11,7 @@
             {ticket}
             <input type="hidden" name="surveyId" value="{$surveyId}">
             <input type="hidden" name="clear" value="{$surveyId}">
-            <button type="submit" class="btn btn-primary" onclick="confirmPopup('{tr}Are you sure you want to clear all statistics and data for this survey?{/tr}')">
+            <button type="submit" class="btn btn-primary" onclick="confirmPopup('{tr}Are you sure you want to clear all statistics and data for this survey?{/tr}')" aria-label="{tr}Clear Stats{/tr}">
                 {icon name='trash' _menu_text='y' _menu_icon='y' alt="{tr}Clear Stats{/tr}"}
             </button>
         </form>

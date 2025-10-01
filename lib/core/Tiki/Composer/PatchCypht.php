@@ -23,7 +23,7 @@ class PatchCypht
         $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
         $io = $event->getIO();
 
-        if (substr($vendors, -1, 1) !== DIRECTORY_SEPARATOR) {
+        if (! str_ends_with($vendors, DIRECTORY_SEPARATOR)) {
             if (DIRECTORY_SEPARATOR == "/") {
                 $vendors .= DIRECTORY_SEPARATOR;
             } else {
@@ -51,6 +51,15 @@ class PatchCypht
             mkdir($fixDS('temp/cypht/users'), 0777);
         }
 
+        // copy assets
+        $publicPath = realpath(__DIR__ . $fixDS('/../../../../public/generated'));
+        $assetsPath = $publicPath . '/assets';
+        if (! is_dir($assetsPath)) {
+            mkdir($assetsPath, 0755);
+        }
+        $fs->copy($vendors . $fixDS('jason-munro/cypht/assets'), $assetsPath);
+
+
         // generate Cypht config
         $php_binary = preg_replace("/(?<!\\\) /", '\ ', PHP_BINARY);
         $cypthFolder = $fixDS('jason-munro/cypht');
@@ -60,7 +69,7 @@ class PatchCypht
         file_put_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript, $contents);
         $output = `cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}`;
 
-        if (! is_string($output)  || ! strstr($output, 'dynamic.php file written')) {
+        if (! is_string($output)  || ! str_contains($output, 'dynamic.php file written')) {
             $io->write('Could not build Cypht package configuration. Check the output below and make sure minimum PHP version is available and executable as CLI.');
             if ($output === false) {
                 $io->write('The pipe cannot be established.');
@@ -78,7 +87,7 @@ class PatchCypht
 
         // css custom pacthes, keep the bootstrap-icons path relative to lib/cypht as Tiki might be running in a subdirectory and absolute web paths don't work here
         $css = file_get_contents($cypht . 'site.css');
-        $css = str_replace('url("./fonts/bootstrap-icons', 'url("../../' . NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/fonts/bootstrap-icons', $css);
+        $css = str_replace('url("./fonts/bootstrap-icons', 'url("../../' . BOOTSTRAP_ICONS_FONT_PATH . '/fonts/bootstrap-icons', $css);
         file_put_contents($cypht . 'site.css', $css);
 
         // js custom pacthes

@@ -8,6 +8,7 @@
 namespace I18n;
 
 use Language_Exception;
+use Tiki\Lib\Theme\ThemeLib;
 
 require_once('lib/tikilib.php');
 require_once('lib/init/typography.php');
@@ -145,7 +146,7 @@ class LanguageTranslator
     {
         //This is just because the class isn't fully migrated, we need to load it as as side effect - benoitg - 2024-04-10
         \TikiLib::lib('theme');
-        $themePath = \ThemeLib::getThemePath(null, null, null, true);
+        $themePath = ThemeLib::getThemePath(null, null, null, true);
         $themeLangFragment = "lang/$this->lang/language.php";
         $themeLangPath = $themePath . '/' . $themeLangFragment;
         if (file_exists($themeLangPath)) {
@@ -189,9 +190,7 @@ class LanguageTranslator
                 return [
                 $content,
                 $this->argReplace(
-                    $lang[$new_content] . ( isset($lang[$lastCharacter])
-                        ? $lang[$lastCharacter]
-                        : $lastCharacter ),
+                    $lang[$new_content] . ($lang[$lastCharacter] ?? $lastCharacter),
                     $args
                 ),
                     true

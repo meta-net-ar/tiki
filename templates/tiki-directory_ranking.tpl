@@ -28,9 +28,9 @@
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="text" colspan="4"><i>{tr}Directory Categories:{/tr}{assign var=fsfs value=1}
+            <td class="text" colspan="4"><i>{tr}Directory Categories:{/tr}{$fsfs=1}
                 {section name=ii loop=$items[user].cats}
-                {if $fsfs}{assign var=fsfs value=0}{else}, {/if}
+                {if $fsfs}{$fsfs=0}{else}, {/if}
                 {$items[user].cats[ii].path}
                 {/section}</i>
             </td>
@@ -40,4 +40,4 @@
         {/section}
     </table>
 </div>
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}

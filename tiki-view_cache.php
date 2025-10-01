@@ -23,22 +23,18 @@ $access->check_feature('cachepages', '', 'textarea');
 if (isset($_REQUEST['url'])) {
     $id = $tikilib->get_cache_id($_REQUEST['url']);
     if (! $id) {
-        $smarty->assign('msg', tra("No cache information available"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("No cache information available"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $_REQUEST["cacheId"] = $id;
 }
 if (! isset($_REQUEST["cacheId"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 // Get a list of last changes to the Wiki database
 $info = $tikilib->get_cache($_REQUEST["cacheId"]);
 $ggcacheurl = 'http://google.com/search?q=cache:' . urlencode(strstr($info['url'], 'http://'));
 // test if url ends with .txt : formatting for text
-if (substr($info["url"], -4, 4) == ".txt") {
+if (str_ends_with($info["url"], ".txt")) {
     $info["data"] = "<pre>" . $info["data"] . "</pre>";
 }
 // disallow robots to index page:

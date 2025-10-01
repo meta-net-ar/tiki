@@ -1,73 +1,55 @@
+// Variables for DarkShine theme, including overrides of Bootstrap SCSS variables as well as any Tiki SCSS variables
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #6c757d;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
+$black: $gray-900;  // #000;  // default
 
 $red:     #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
 $green:   #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guidelines
 
 $primary: #C04402; // #CF4A02; // #fd7931;
 $secondary: #A75A01; // #B25F01; // #feb768;
-$success: #1B7E2B; // #1D872E; // #24a238;
+$success: #177D4D; // #1D872E; // #24a238;
 $info: #0071C7; // 0089f0;
 $warning: #717113; // #d0d024;
 $danger: #CD322D; // #D4403A; // #d9534f;
+$light: #f3f3f3;
+$dark:  #000000;
 
-$black: $gray-900;
 
 $theme-colors: (
-     "primary":        #C04402, // #CF4A02, // #fd7931,
-     "secondary":      #A75A01, // #B25F01, // #feb768,
-     "success":        #1B7E2B, // #1D872E, // #24a238,
-     "info":           #0071C7, // #0089f0,
-     "warning":        #717113, // #d0d024,
-     "danger":         #CD322D, // #D4403A, // #d9534f,
-    "light":           #f3f3f3, // body bg
-     "dark":           #000000
+    "primary":        $primary, // #CF4A02, // #fd7931,
+    "secondary":      $secondary, // #B25F01, // #feb768,
+    "success":        $success, //#1B7E2B, // #1D872E, // #24a238,
+    "info":           $info, // #0089f0,
+    "warning":        $warning, // #d0d024,
+    "danger":         $danger, // #D4403A, // #d9534f,
+    "light":          $light, // body bg
+    "dark":           $dark
 );
-
-$green-300: tint-color($green, 40%);  // default // Bootstrap 53
-$red-300: tint-color($red, 40%);  // default // Bootstrap 53
 
 $min-contrast-ratio:   3;
 
 // Options
 $enable-gradients:            true;
-// Prefix for :root CSS variables
-
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
-
-// Gradient
-// Spacing
-// Position
 
 // Body
 $body-bg: #f3f3f3;// (Actually, container bg, whereas actual body bg is #90140c;)
 $body-color: #212529;
-
-// Utilities maps
 
 // Links
 $link-color: #600000;
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 $link-hover-color: shift-color($link-color, $link-shade-percentage); // !default;
 
-// Paragraphs
-// Grid breakpoints
-// Grid containers
-// Grid columns
-// Container padding
 // Components
 $component-active-color: #140000;
 $component-active-bg: #fd7c32;
@@ -77,26 +59,27 @@ $border-color:                #896b6b; //$gray-300;  // default
 $font-family-sans-serif:  Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif; // Arial, sans-serif;
 $font-family-base: $font-family-sans-serif;
 $font-size-base:              1.15rem; // Increased slightly with this change in font.
-
 $headings-color: #8a0700;
 $blockquote-footer-color: #485060;
 
 // Tables
 $table-border-color:          var(--#{$prefix}border-color);
 
-// Buttons + Forms
 // Buttons
 // Forms
 $input-bg: var(--#{$prefix}body-bg);
 $input-border-color:                    var(--#{$prefix}border-color);
-$input-group-addon-bg: #E9ECEF;
+$input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
 $form-text-color: var(--#{$prefix}secondary-color);  // default; // #485060;
 
-// Form validation
-$form-feedback-valid-color: #1B7E2B;
-$form-feedback-invalid-color: #C9312C;
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
-// Z-index master list
+// Form validation
+//$form-feedback-valid-color: #177D4D; No effect
+//$form-feedback-invalid-color: #D42537; No effect
+
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color); // #600000; // var(--#{$prefix}link-color); //#fff;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
@@ -119,17 +102,14 @@ $navbar-dark-brand-color:           $navbar-dark-active-color;  // default
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color;  // default
 
 // Tabs
-//$nav-tabs-border-color: lighten( $body-bg, 90% );
-//$nav-tabs-link-hover-border-color: lighten( $nav-tabs-border-color, 10% );
-//$nav-tabs-active-link-hover-bg: darken( $nav-tabs-border-color, 10% );
 $nav-tabs-link-active-bg: #C04802; // Actually a gradient is used but this value fixes contrast error
 
 // Dropdowns
 $dropdown-color:                    var(--#{$prefix}body-color);
 $dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-// Pagination
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
-// Placeholders
+// Pagination
 // Cards
 // Accordion
 $accordion-color:                         var(--#{$prefix}body-color);
@@ -139,42 +119,33 @@ $accordion-button-active-color: #000;
 //$accordion-border-width:                  $border-width;  // default
 $accordion-border-color:                  rgba($black, .125);  // default
 
-// Tooltips
-// Popovers
-// Toasts
 // Badges
 // Modals
 // Alerts
 // Progress bars
 // List group
-// Image thumbnails
 // Figures
 $figure-caption-color:              var(--#{$prefix}secondary-color); // #485060;
 
 // Breadcrumbs
 $breadcrumb-active-color: #687078;
-// Carousel
-// Spinners
+
 // Close
 $close-font-weight: bold;
 $close-color: #000000;
 $close-text-shadow: 0 1px 0 #ffffff;
 
-// Offcanvas
 // Code
 $code-color: #c7254e;
-//$kbd-bg: #f9f2f4;
-
 $kbd-color:                         var(--#{$prefix}body-color); // !default;
 $kbd-bg:                            var(--#{$prefix}body-bg);
-//$kbd-color: #ffffff;
-//$kbd-bg: #333333;
 
 $pre-bg: #f5f5f5;
 $pre-color: $gray-900;
 $pre-border-color: #cccccc;
 $pre-scrollable-max-height: 340px;
 
-// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
-$top-navbar-bg: linear-gradient(to bottom, #040404 0%,#060606 2%,#121212 55%,#0f0f0f 57%,#030303 59%,#000000 61%,#000000 100%);
-$top-navbar-link-hover-bg: linear-gradient(to bottom, #545454 0%,#4e4e4e 5%,#3d3d3d 51%,#3a3a3a 53%,#303030 54%,#2d2d2d 56%,#111111 97%,#0e0e0f 98%,#4a0000 100%);;
+// - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
+
+$tiki-top-navbar-bg: linear-gradient(to bottom, #040404 0%,#060606 2%,#121212 55%,#0f0f0f 57%,#030303 59%,#000000 61%,#000000 100%);
+$top-navbar-link-hover-bg: linear-gradient(to bottom, #545454 0%,#4e4e4e 5%,#3d3d3d 51%,#3a3a3a 53%,#303030 54%,#2d2d2d 56%,#111111 97%,#0e0e0f 98%,#4a0000 100%);

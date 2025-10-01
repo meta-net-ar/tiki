@@ -28,9 +28,7 @@ $access->check_permission('tiki_p_admin');
 $query = "show tables like 'tiki_sql_query_logs'";
 $result = $tikilib->query($query, []);
 if (! $result->numRows()) {
-    $smarty->assign('msg', tra('This feature is disabled') . ': log_sql');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': log_sql', \Laminas\Http\Response::STATUS_CODE_401);
 }
 // let look at the log even if not active for older logs
 //if ($prefs['log_sql'] != 'y') {
@@ -43,7 +41,7 @@ if (isset($_REQUEST['clean'])) {
     $logslib->clean_logsql();
 }
 $auto_query_args = ['offset', 'numrows', 'find', 'sort_mode'];
-$numrows = (isset($_REQUEST['numrows'])) ? $_REQUEST['numrows'] : (isset($_REQUEST['maxRecords']) ? $_REQUEST['maxRecords'] : $prefs['maxRecords']);
+$numrows = $_REQUEST['numrows'] ?? $_REQUEST['maxRecords'] ?? $prefs['maxRecords'];
 $smarty->assign_by_ref('numrows', $numrows);
 $smarty->assign_by_ref('maxRecords', $numrows);
 $offset = (isset($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
@@ -54,6 +52,6 @@ $find = (isset($_REQUEST['find'])) ? $_REQUEST['find'] : '';
 $smarty->assign_by_ref('find', $find);
 $logs = $logslib->list_logsql($sort_mode, $offset, $numrows, $find);
 $smarty->assign_by_ref('logs', $logs['data']);
-$smarty->assign_by_ref('cant', $logs['cant']);
+$smarty->assign_by_ref('count', $logs['count']);
 $smarty->assign('mid', 'tiki-sqllog.tpl');
 $smarty->display('tiki.tpl');

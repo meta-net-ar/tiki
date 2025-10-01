@@ -55,7 +55,7 @@
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
                 <input type="submit" class="btn btn-primary" value="{$button_label}" onclick="needToConfirm=false;">
                 {if $can_remove and $prefs.tracker_legacy_insert eq 'y'}
-                    <a class="btn btn-danger" href="tiki-view_tracker.php?trackerId={$trackerId|escape}&amp;remove={$itemId|escape}" title="Delete">
+                    <a class="btn btn-danger" href="tiki-view_tracker.php?trackerId={$trackerId|escape}&amp;remove={$itemId|escape}" title="Delete" role="button">
                         {tr}Delete{/tr}
                     </a>
                 {/if}

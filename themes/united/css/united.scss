@@ -1,17 +1,25 @@
-/* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
-/* Original Bootswatch information:
- * bootswatch v5.3.3
- * Homepage: http://bootswatch.com
- * Copyright 2012-2022 Thomas Park
+@charset "UTF-8";
+/*!
+ * Bootswatch United theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Bootswatch v5.3.7 (https://bootswatch.com)
+ * Theme: united
+ * Copyright 2012-2025 Thomas Park
  * Licensed under MIT
  * Based on Bootstrap
- *
- * Adapted by the Tiki Community for Tiki Wiki CMS Groupware
 */
+/*!
+ * Bootstrap  v5.3.7 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
+@import "../scss/variables"; // 2. (This is moved above the functions file to have effect, maybe a quirk of the Bootswatch file arrangement.) The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
-@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/united/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
@@ -27,7 +35,9 @@
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 
-// Additional for Tiki
+// ----------------------------- Overrides and adjustments ----------------------------- //
+
+
 .siteloginbar_poppedup .list-unstyled li { background: none !important; }
 
 // Increase navbar height to reinstate Bootswatch style
@@ -36,3 +46,36 @@
     margin-bottom: .5rem;
 }
 
+[data-bs-theme=dark] {
+    .btn-outline-primary {
+        color: #EB6433;
+        border-color: #EB6433;
+    }
+    .btn-outline-secondary {
+        color: #958A83;
+        border-color: #958A83;
+    }
+    .btn-outline-success {
+        color: #31A042;
+        border-color: #31A042;
+    }
+    .btn-outline-danger {
+        color: #E66056;
+        border-color: #E66056;
+    }
+    .btn-outline-warning {
+        color: #BA830D;
+        border-color: #BA830D;
+    }
+    .btn-outline-info {
+        color: #16A0B6;
+        border-color: #16A0B6;
+    }
+    .btn-outline-dark {
+        color: #CC6B9D;
+        border-color: #CC6B9D;
+    }
+//    .nav-link {
+//        color: #999999;
+//    }
+}

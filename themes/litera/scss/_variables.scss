@@ -1,13 +1,12 @@
-// Litera 5.2.0 -- This is a copy of node_modules/bootswatch/dist/litera/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Litera 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/litera/_variables.scss";
-
-$theme: "litera";  // default
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/litera/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
 
 
 $primary:       #2B70E9; // $blue;  // default
@@ -19,13 +18,14 @@ $danger:        #D4403A; // $red;  // default
 //$light:         $gray-100;  // default
 //$dark:          $gray-800;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 // Options
-// Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
+// Body
 // Links
 $link-color: #2B70E9;
 

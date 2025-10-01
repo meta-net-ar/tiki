@@ -127,6 +127,11 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         }
     }
 
+    public function requiresConfirm()
+    {
+        return false;
+    }
+
     private function executeOnItem($object_id, $data)
     {
         $field = $data->field->word();

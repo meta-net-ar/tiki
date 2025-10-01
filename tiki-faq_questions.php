@@ -38,10 +38,7 @@ $access->check_feature('feature_faqs');
 $access->check_permission('tiki_p_admin_faqs');
 
 if (! isset($_REQUEST["faqId"])) {
-    $smarty->assign('msg', tra("No questions group indicated"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No questions group indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $smarty->assign('faqId', $_REQUEST["faqId"]);
@@ -83,9 +80,7 @@ if (isset($_REQUEST["useq"])) {
 
 if (isset($_REQUEST["save"])) {
     if (! $_REQUEST['question']) {
-        $smarty->assign('msg', tra("You can not create a FAQ question without a question "));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You can not create a FAQ question without a question "), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $access->checkCsrf();
@@ -136,7 +131,7 @@ $channels = $faqlib->list_faq_questions($_REQUEST["faqId"], 0, -1, $sort_mode, $
 $allq = $faqlib->list_all_faq_questions(0, -1, 'position_asc,questionId_asc', $_REQUEST["filter"]);
 $smarty->assign_by_ref('allq', $allq["data"]);
 
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 
 $smarty->assign_by_ref('channels', $channels["data"]);
 

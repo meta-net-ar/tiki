@@ -127,30 +127,27 @@ function wikiplugin_box_info()
 
 function wikiplugin_box($data, $params)
 {
-//  global $tikilib;
     $parserlib = TikiLib::lib('parser');
-
-    // Remove first <ENTER> if exists...
-    // if (substr($data, 0, 2) == "\r\n") $data = substr($data, 2);
-
     extract($params, EXTR_SKIP);
-    $bg   = (isset($bg)) ? " background: $bg;" : "";
-    $align = (isset($align)) ? " text-align: $align;" : "";
-    $id = (isset($id)) ? " id=\"$id\" " : '';
-    $class = (isset($class)) ? ' ' . $class : ' ';
-    $w = (isset($width)) ? " width: $width;" : "";
-    $f = (isset($float) && ($float == "left" || $float == "right")) ? " float:$float" : "";
-    $c = (isset($clear)) ? " clear:both;" : "";
-    $style = (isset($style)) ? "$style;" : "";
+    $bg   = isset($bg) ? " background: $bg;" : "";
+    $align = " text-align: $align;";
+    $id = ! empty($id) ? " id=\"$id\" " : '';
+    $class = ! empty($class) ? " $class" : ' ';
+    $w = isset($width) ? " width: $width;" : "";
+    $f = ($float == "left" || $float == "right") ? " float:$float;" : "";
+    $c = ! empty($clear) ? " clear:both;" : "";
+    $style = ! empty($style) ? "$style;" : "";
+
     if (empty($float)) {
-        $begin = "<div class='card$class' $id style='$bg margin:0; $w $c $style $align'>";
+        $append = "margin:0;";
     } else {
-        $begin = "<div class='card$class' $id style='$bg $f; margin:1em; margin-$float:0; $w $c $style $align'>";
+        $append = "margin:1em; margin-$float:0; $f";
     }
+    $begin = "<div class='card$class' $id style='$bg $append $w $c $style $align'>";
 
     $isMarkdown = $parserlib->option['is_markdown'];
 
-    if (isset($title) && ! empty($title)) {
+    if (! empty($title)) {
         if ($isMarkdown) {
             $title = $parserlib->parse_data($title);
             $title = str_replace(['<p>', '</p>'], '', $title);

@@ -10,7 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to err & die if called directly.
 //smarty is not there - we need setup
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -116,10 +116,10 @@ if ($view == 'admin') {
 
         if (isset($_REQUEST['edit_mode'])) {
             // We are in the edit file gallery page
-            $fgal_options[$k_gal]['value'] = isset($gal_info[$k_gal]) ? $gal_info[$k_gal] : null;
+            $fgal_options[$k_gal]['value'] = $gal_info[$k_gal] ?? null;
         } else {
             // normal gallery view
-            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : (isset($prefs[$k_prefs]) ? $prefs[$k_prefs] : null);
+            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : ($prefs[$k_prefs] ?? null);
         }
     }
 }

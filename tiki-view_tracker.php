@@ -70,16 +70,12 @@ if (! empty($_REQUEST['itemId'])) {
 }
 $_REQUEST["itemId"] = 0;
 $smarty->assign('itemId', $_REQUEST["itemId"]);
-if (! isset($_REQUEST["trackerId"])) {
-    $smarty->assign('msg', tra("No tracker indicated"));
-    $smarty->display("error.tpl");
-    die;
+if (empty($_REQUEST["trackerId"]) || ! filter_var($_REQUEST["trackerId"], FILTER_VALIDATE_INT)) {
+    Feedback::errorAndDie(tra("No tracker specified or tracker ID is invalid."), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $trackerDefinition = Tracker_Definition::get($_REQUEST['trackerId']);
 if (! $trackerDefinition) {
-    $smarty->assign('msg', tra("No tracker indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("The specified tracker does not exist or may have been deleted."), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $tracker_info = $trackerDefinition->getInformation();
@@ -189,15 +185,14 @@ if (isset($_REQUEST['status'])) {
     $_REQUEST['status'] = 'o';
 }
 foreach ($status_raw as $let => $sta) {
-    if ((isset(${$sta['perm']}) and ${$sta['perm']} == 'y') or ($my or $ours)) {
+    if (isset($sta['perm']) || ($my || $ours)) {
         if (in_array($let, $sts)) {
             $sta['class'] = 'statuson';
-            $sta['statuslink'] = str_replace($let, '', implode('', $sts));
         } else {
             $sta['class'] = 'statusoff';
-            $sta['statuslink'] = implode('', $sts) . $let;
         }
-        $status_types["$let"] = $sta;
+        $sta['statuslink'] = $let;
+        $status_types[$let] = $sta;
     }
 }
 $smarty->assign('status_types', $status_types);
@@ -422,10 +417,7 @@ if (isset($_REQUEST["save"])) {
     if ($itemObject->canModify()) {
         $captchalib = TikiLib::lib('captcha');
         if (empty($user) && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
-            $smarty->assign('msg', $captchalib->getErrors());
-            $smarty->assign('errortype', 'no_redirect_login');
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($captchalib->getErrors(), \Laminas\Http\Response::STATUS_CODE_502);
         }
         // Check field values for each type and presence of mandatory ones
         $mandatory_missing = [];
@@ -556,7 +548,7 @@ if (isset($tracker_info['useComments']) && $tracker_info['useComments'] == 'y' &
         }
         if (isset($tracker_info['showLastComment']) && $tracker_info['showLastComment'] == 'y') {
             $l = $trklib->list_last_comments($items['data'][$itkey]['trackerId'], $items['data'][$itkey]['itemId'], 0, 1);
-            $items['data'][$itkey]['lastComment'] = ! empty($l['cant']) ? $l['data'][0] : '';
+            $items['data'][$itkey]['lastComment'] = ! empty($l['count']) ? $l['data'][0] : '';
         }
     }
 }
@@ -579,7 +571,7 @@ $smarty->assign('tracker_info', $tracker_info);
 $smarty->assign('fields', $fields['data']);
 $smarty->assign('ins_fields', $ins_fields['data']);
 $smarty->assign_by_ref('items', $items["data"]);
-$smarty->assign_by_ref('item_count', $items['cant']);
+$smarty->assign_by_ref('item_count', $items['count']);
 $smarty->assign_by_ref('listfields', $listfields);
 $smarty->assign('fields_count', count($xfields['data']));
 $users = $userlib->list_all_users();
@@ -598,7 +590,7 @@ if ($tiki_p_export_tracker == 'y') {
             $smarty->assign_by_ref('displayedFields', $_REQUEST['displayedFields']);
         }
     }
-    $smarty->assign('recordsMax', $items['cant']);
+    $smarty->assign('recordsMax', $items['count']);
     $smarty->assign('recordsOffset', 1);
 }
 include_once('tiki-section_options.php');
@@ -619,7 +611,7 @@ if (isset($tracker_info['useRatings']) && $tracker_info['useRatings'] == 'y' && 
 }
 
 // Generate validation js
-if ($prefs['feature_jquery'] == 'y' && $prefs['feature_jquery_validation'] == 'y') {
+if ($prefs['feature_jquery_validation'] == 'y') {
     $validatorslib = TikiLib::lib('validators');
     $validationjs = $validatorslib->generateTrackerValidateJS($trackerDefinition);
     $smarty->assign('validationjs', $validationjs);
@@ -628,6 +620,7 @@ if ($prefs['feature_jquery'] == 'y' && $prefs['feature_jquery_validation'] == 'y
 $userprefslib = TikiLib::lib('userprefs');
 $smarty->assign('use_24hr_clock', $userprefslib->get_user_clock_pref($user));
 
+$smarty->assign('trk_items_col_pref', $userprefslib->get_user_tracker_items_col_pref($user));
 // Display the template
 $smarty->assign('mid', 'tiki-view_tracker.tpl');
 $smarty->display("tiki.tpl");

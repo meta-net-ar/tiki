@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\CSVHandler;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 function wikiplugin_sheet_info()
 {
     return [
@@ -140,12 +145,11 @@ function wikiplugin_sheet($data, $params)
 //  $urlHeight .= (isset($width)) ? "&width=$width" : '';
     $urlHeight = (isset($height)) ? "&height=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
     $urlHeight .= (isset($width)) ? "&width=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
-    $editable = isset($editable) && $editable == 'n' ? false : true;
-    $subsheets = isset($subsheets) && $subsheets == 'n' ? false : true;
+    $editable = ! (isset($editable) && $editable == 'n');
+    $subsheets = ! (isset($subsheets) && $subsheets == 'n');
     $class = (isset($class)) ? " $class" : '';
 
     $sheetlib = TikiLib::lib("sheet");
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
     static $index = 0;
@@ -195,7 +199,7 @@ EOF;
         }
     }
 
-    $sheet = new TikiSheet();
+    $sheet = new Sheet();
 
     if (empty($url)) {
         $info;
@@ -213,8 +217,7 @@ EOF;
         }
 
         // Build required objects
-        $db = new TikiSheetDatabaseHandler($id);
-        //$out = new TikiSheetOutputHandler($data);
+        $db = new DatabaseHandler($id);
 
         // Fetch sheet from database
         $sheet->import($db);
@@ -235,8 +238,8 @@ EOF;
         $file = file_get_contents($url);
         $pathInfo = pathinfo($url);
         if ($pathInfo['extension'] == 'csv') {
-            $handler = new TikiSheetCSVHandler($url);
-            $grid = new TikiSheet();
+            $handler = new CSVHandler($url);
+            $grid = new Sheet();
             $grid->import($handler);
             $ret = $grid->getTableHtml(true, null, false);
         } else {
@@ -247,7 +250,7 @@ EOF;
         $ret = ($sheet->getTableHtml($subsheets));
     }
 
-    if (strpos($ret, '<table ') === false) {
+    if (! str_contains($ret, '<table ')) {
         return '~np~' . $ret . '~/np~'; // return a single cell raw
     }
 

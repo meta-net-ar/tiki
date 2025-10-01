@@ -13,12 +13,20 @@ function capLock(e, el){
 $(document).ready(function () {
     var twoFAType = "{{$prefs.twoFactorAuthType}}";
     var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
+    var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
+    var moduleLogoInstance = "{{$module_logo_instance}}";
+    var login_error = "{{$error_login}}";
+
+    if (login_error == {{TWO_FA_INCORRECT}}) {
+        displayFeedback("error", "{tr}Invalid two-factor authenticator code{/tr}");
+    }
 
     function show2FactorInputElement(btn, event) {
         const btnStep = parseInt(btn.attr('step')) + 1;
         btn.attr('step', btnStep);
         $(event.currentTarget).find('fieldset').children().not('#two_factor_div').hide();
         $(event.currentTarget).find('#two_factor_div').show();
+        $(event.currentTarget).find('div#webauthn_div').hide();
         $(btn).parent().show();
     }
 
@@ -31,15 +39,10 @@ $(document).ready(function () {
                 if (!res) {
                     $(event.currentTarget).off('submit').submit();
                 } else {
-                    const isForce2FA = await checkIsForce2FAForUser(username);
-                    if (isForce2FA) {
-                        if (twoFAType === 'google2FA') {
-                            show2FactorInputElement(btn, event);
-                        } else {
-                            generate2FACode(username, btn, event);
-                        }
+                    if (twoFAType === 'google2FA') {
+                        show2FactorInputElement(btn, event);
                     } else {
-                        $(event.currentTarget).off('submit').submit();
+                        generate2FACode(username, btn, event);
                     }
                 }
             },
@@ -70,29 +73,12 @@ $(document).ready(function () {
 
     function displayFeedback(type, message) {
         const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
-        $("#tikifeedback").html(
+        $("#login_feeback").html(
             `<div class="alert ${feedbackClass} alert-dismissible">
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`
         );
-    }
-
-    function checkIsForce2FAForUser(username) {
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: $.service("two_fa_auth", "CheckForceTwoFactorAuth"),
-                type: 'POST',
-                data: { username: username },
-                success: function (data) {
-                    resolve(data);
-                },
-                error: function (req, status, error) {
-                    displayFeedback("error", error);
-                    reject(error);
-                }
-            });
-        });
     }
 
     function getTwoFactorSecretGoogle2FA(username) {
@@ -117,54 +103,109 @@ $(document).ready(function () {
         });
     }
 
+    function validateUserCredentials(username, password) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: $.service("user", "ValidateUser"),
+                type: 'POST',
+                data: { username: username, password: password },
+                success: function (res) {
+                    resolve(res);
+                },
+                error: function (req, status, error) {
+                    displayFeedback("error", error);
+                    reject(error);
+                }
+            });
+        });
+    }
+
     $("#loginbox-{{$module_logo_instance}}").on("submit", async function (event) {
         event.preventDefault();
-        var isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
-        var isNormalLogin = "{{$create2FaCodeNormalLogin}}";
+        var isWebAuthnIsChoosen = $("#webauthn_checkbox_login").is(':checked') && isWebauthnEnabled === 'y';
+        var isWebauthnPassed = $("#webauthn_checkbox_login").attr('is_passed');
+        if (isWebAuthnIsChoosen && isWebauthnPassed === 'n') {
+            await $.fn.loginWebAuth.loginStart(event, moduleLogoInstance, 'login');
+        }
 
+        var isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
+        var isNormalLogin = $(this).data('normalLogin');
         if (isNormalLogin === 'y') {
             var btn = $("button.submit", this);
             var btnStep = parseInt(btn.attr('step')) + 1;
             btn.attr('step', btnStep);
         }
 
-        var username = $("#login-user_{{$module_logo_instance}}").val();
-        var password = $("#login-pass_{{$module_logo_instance}}").val();
         var btn = $("button.submit", this);
-        var btnStep = parseInt(btn.attr('step'));
+        const originalBtnHtml = btn.html();
 
-        if (isNormalLogin === 'y') {
-            $(this).off('submit').submit();
-            return false;
-        }
+        const spinnerHtml = `
+            <div class="spinner-border spinner-border-sm text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+            </div>
+        `;
 
-        if (username && password) {
-            if (is2FAEnabled === 'y') {
-                var twoFASecret = await getTwoFactorSecretGoogle2FA(username);
-                if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === 'google2FA')) {
-                    $(this).off('submit').submit();
-                    return false;
-                }
-                await handleEmail2FA(username, btn, event);
-            } else {
-                $(this).off('submit').submit();
+        // Replace the button text with the spinner and disable the button
+        btn.html(spinnerHtml + tr("Logging in..."));
+        btn.prop("disabled", true);
+
+        try {
+            const isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
+            const isNormalLogin = "{{$create2FaCodeNormalLogin}}";
+
+            if (isNormalLogin === 'y') {
+                let btnStep = parseInt(btn.attr('step')) + 1;
+                btn.attr('step', btnStep);
             }
-        } else {
-            $("#login-user_{{$module_logo_instance}}").trigger("focus");
-            return false;
+
+            const username = $("#login-user_{{$module_logo_instance}}").val();
+            const password = $("#login-pass_{{$module_logo_instance}}").val();
+            let btnStep = parseInt(btn.attr('step'));
+
+            if (isNormalLogin === 'y') {
+                $(this).off('submit').submit();
+                return false;
+            }
+
+            if ((username && password) || isWebauthnPassed === 'y' || isWebAuthnIsChoosen) {
+                if (is2FAEnabled === 'y') {
+                    const twoFASecret = await getTwoFactorSecretGoogle2FA(username);
+
+                    // Step 1: Validate user credentials if needed
+                    if (btnStep === 1) {
+                        const isValidateUser = await validateUserCredentials(username, password);
+                        if (!isValidateUser) {
+                            displayFeedback("error", tr("Invalid username or password"));
+                            return false;
+                        }
+                    }
+
+                    // If step > 1, or no user screen, or 2FA is effectively "n", just submit
+                    if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === 'google2FA')) {
+                        $(this).off('submit').submit();
+                        return false;
+                    }
+                    await handleEmail2FA(username, btn, event);
+
+                } else {
+                    // No 2FA => submit directly
+                    $(this).off('submit').submit();
+                }
+            } else {
+                // Missing user/pass
+                $("#login-user_{{$module_logo_instance}}").trigger("focus");
+                return false;
+            }
+
+        } catch (error) {
+            displayFeedback("error", tr("An unexpected error occurred"));
+        } finally {
+            // Restore the button HTML and re-enable the button
+            btn.html(originalBtnHtml);
+            btn.prop("disabled", false);
         }
     });
 });
-if (jqueryTiki.no_cookie) {
-    $('.box-login_box input').each(function(){
-        $(this).on("change", function() {
-            if (jqueryTiki.no_cookie && ! jqueryTiki.cookie_consent_alerted && $(this).val()) {
-                alert(jqueryTiki.cookie_consent_alert);
-                jqueryTiki.cookie_consent_alerted = true;
-            }
-        });
-    });
-}
 $("#switchbox-{{$module_logo_instance}} .submit").on("click", function () {
     if ($("#login-switchuser_{{$module_logo_instance}}").val()) {
         confirmPopup('{tr}Switch user?{/tr}')
@@ -179,14 +220,14 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
 });
 {/jq}
 {if !isset($tpl_module_title)}{* Left for performance, since tiki-login_scr.php includes this template directly. *}
-    {assign var=tpl_module_title value="{tr}Log in{/tr}"}
-    {if !isset($module_params)}{assign var=module_params value=' '}{/if}
+    {$tpl_module_title="{tr}Log in{/tr}"}
+    {if !isset($module_params)}{$module_params=' '}{/if}
     {if isset($nobox)}{$module_params.nobox = $nobox}{/if}
     {if isset($style)}{$module_params.style = $style}{/if}
 {/if}
 {tikimodule error=$module_params.error flip=$module_params.flip title=$tpl_module_title name="login_box" decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle style=$module_params.style}
-    {if $mode eq "header"}<div class="siteloginbar{if $user} logged-in{/if}">{/if}
-    {if $user}
+    {if $mode eq "header"}<div class="siteloginbar{if $user and $user neq 'anonymous'} logged-in{/if}">{/if}
+    {if $user and $user neq 'anonymous'}
         {if empty($mode) or $mode eq "module"}
             <div class="mb-3 mx-0">{tr}Logged in as:{/tr} <span class="d-inline-block col-12 text-truncate">&nbsp;{$user|userlink}</span></div>
             <div class="text-center">
@@ -217,6 +258,15 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                     {ticket}
                     <fieldset>
                         <legend class="fs-5">{tr}Switch User{/tr}</legend>
+                        {if empty($login_module.can_revert)}
+                            <div class="col-md-12 col-sm-12">
+                                <div class="checkbox">
+                                    <label class="col-form-label">
+                                        <input class="form-check-input" type="checkbox" name="keep_login_box_visible"> {tr}Keep login box visible{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        {/if}
                         <div class="mb-3 mx-0">
                             <label class="col-form-label" for="login-switchuser_{$module_logo_instance}">
                                 {if $prefs.login_is_email eq 'y'}
@@ -238,9 +288,9 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                             </label>
                             <input type="hidden" name="su" value="1" class="form-control" />
                             {if $prefs.feature_help eq 'y'}
-                                {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Enter a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
+                                {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
-                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$login_module.can_switch_user class='form-control'}
+                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$login_module.can_switch_user class='form-control' allowNone=$module_params.allowNone}
                         </div>
                         <div class="text-center">
                             <button
@@ -258,12 +308,17 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
             <span style="white-space: nowrap">{$user|userlink}</span> <a href="tiki-logout.php" title="{tr}Log out{/tr}">{tr}Log out{/tr}</a>
         {elseif $mode eq "popup"}
             <div class="siteloginbar_popup dropdown float-sm-end me-auto" role="group">
-                <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}{$user|avatarize:n:n:n:n}{/if}
-                    {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
-                    {if (!isset($module_params.show_user_avatar) || $module_params.show_user_avatar neq 'y') and (!isset($module_params.show_user_name) || $module_params.show_user_name neq 'y')}{tr}Log out{/tr}{/if}
-                    <span class="sr-only">{tr}Toggle dropdown{/tr}</span>
-                </button>
+                {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}
+                    <div class="dropdown-toggle login_link mod-login-avatar" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {$user|avatarize:n:n:n:n}
+                    </div>
+                {else}
+                    <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
+                        {if (!isset($module_params.show_user_avatar) || $module_params.show_user_avatar neq 'y') and (!isset($module_params.show_user_name) || $module_params.show_user_name neq 'y')}{tr}Log out{/tr}{/if}
+                        <span class="sr-only">{tr}Toggle dropdown{/tr}</span>
+                    </button>
+                {/if}
                 {if empty($module_params.menu_id)}
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="tiki-user_information.php" title="{tr}My Account{/tr}">
@@ -309,7 +364,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
     {else}
         <div id="login_form_div">
-        {assign var='close_tags' value=''}
+        {$close_tags=''}
         {if $mode eq "popup"}
             <div class="siteloginbar_popup dropdown btn-group float-sm-end drop-left">
                 <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -322,6 +377,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         <form name="loginbox" class="form{if $mode eq "header"} d-flex flex-row flex-wrap align-items-top{/if}" id="loginbox-{$module_logo_instance}" action="{$login_module.login_url|escape}"
                 method="post"
                 {if $prefs.desactive_login_autocomplete eq 'y'} autocomplete="off"{/if}
+                data-normalLogin="{{$create2FaCodeNormalLogin}}"
         >
         {ticket}
         {capture assign="close_tags"}</form>{$close_tags}{/capture}
@@ -336,16 +392,18 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             {remarksbox type='errors' title="{tr}Error{/tr}"}
                 {if $error_login == -5}{tr}Invalid username or password{/tr}
                 {elseif $error_login == -3}{tr}Invalid username or password{/tr}
+                {elseif $error_login == -13}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
         {/if}
+        <div id="login_feeback"></div>
         {if !empty($prefs.login_text_explanation) && !($mode eq "popup")}
         <div class="login-description my-2 {if $mode eq 'header'}mx-2{/if}">
             <label> {wiki} {$login_text_explanation} {/wiki}</label>
         </div>
         {/if}
         <div class="user my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
-            {if !isset($module_logo_instance)}{assign var=module_logo_instance value=' '}{/if}
+            {if !isset($module_logo_instance)}{$module_logo_instance=' '}{/if}
             <label class="form-label" for="login-user_{$module_logo_instance}">
                 {if $prefs.login_is_email eq 'y'}
                     {tr}Email{/tr}
@@ -361,7 +419,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 {/if}
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
-                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if}/>
+                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}/>
                 {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
@@ -369,7 +427,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         </div>
         <div class="pass my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none {else} block {/if};">
             <label class="form-label" for="login-pass_{$module_logo_instance}">{tr}Password{/tr}</label>
-            <input onkeypress="capLock(event, this)" type="password" name="pass" class="form-control" id="login-pass_{$module_logo_instance}" autocomplete="{if $prefs.desactive_login_autocomplete eq 'y'}new-password{else}current-password{/if}">
+            <input onkeypress="capLock(event, this)" type="password" name="pass" class="form-control" id="login-pass_{$module_logo_instance}" autocomplete="{if $prefs.desactive_login_autocomplete eq 'y'}new-password{else}current-password{/if}" {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Password{/tr}"{/if}>
             {if $module_params.show_forgot eq 'y' && $prefs.forgotPass eq 'y'}
                 <a class="mt-1 d-block" href="tiki-remind_password.php" title="{tr}Click here if you've forgotten your password{/tr}">{tr}I forgot my password{/tr}</a>
             {/if}
@@ -377,14 +435,25 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 {icon name='error' istyle="vertical-align:middle"} {tr}CapsLock is on.{/tr}
             </div>
         </div>
+        {if $prefs.auth_webauthn_enabled eq 'y'}
+            <div id="webauthn_div" class="my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
+                {include file='webauthn.tpl' form='login'}
+            </div>
+        {/if}
         <input type="hidden" name="login_mode" value="{$mode}" />
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
-        <div id="two_factor_div" class="my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
-            <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor Authenticator Code:{/tr}</label>
+        <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
+            <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
+            {if $prefs.twoFactorAuthType eq 'email2FA'}
+                <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
+                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+            {else}
+                <small class="text-muted">{tr}Please type the 6 digit security code (TOTP) provided by your authenticator application{/tr}</small>
+            {/if}
         </div>
         {/if}
-        {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n')}
+        {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n') and $create2FaCodeNormalLogin ne 'y'}
             {if $prefs.rememberme eq 'always'}
                 <input type="hidden" name="rme" id="login-remember-module-input_{$module_logo_instance}" value="on" />
             {else}
@@ -424,14 +493,14 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
 
         <div class="my-2 {if $mode eq 'header'}mx-2{/if} text-center" {if $mode eq 'header'}style="margin-top: 2.4rem !important;"{/if}>
-            <button class="btn btn-primary button submit" type="submit" name="login" step="1">{tr}Log in{/tr} {* <i class="fa fa-arrow-circle-right"></i> *}</button>
+            <button class="btn btn-primary button submit" type="submit" id="loginSubmit" name="login" step="1">{tr}Log in{/tr} {* <i class="fa fa-arrow-circle-right"></i> *}</button>
         </div>
         {if $module_params.show_register eq 'y' or $prefs.twoFactorAuth eq 'y'}
             <div {if $mode eq 'header'}class="text-end" style="display:inline;"{/if}>
                 {strip}
                     <div {if $mode eq 'header'}style="display: inline-block"{/if}><ul class="{if $mode neq 'header'}list-unstyled{else}list-inline{/if}">
                         {if $module_params.show_register eq 'y' && $prefs.allowRegister eq 'y'}
-                            <li class="register{if $mode eq 'popup'} dropdownx-item{/if} list-item"><a href="tiki-register.php{if !empty($prefs.registerKey)}?key={$prefs.registerKey|escape:'url'}{/if}" title="{tr}Click here to register{/tr}"{if !empty($prefs.registerKey)} rel="nofollow"{/if}>{tr}Register{/tr}</a></li>
+                            <li class="register list-item"><a href="{if !empty($module_params.register_page)}{$module_params.register_page|escape:'url'}{else}tiki-register.php{if !empty($prefs.registerKey)}?key={$prefs.registerKey|escape:'url'}{/if}{/if}" title="{tr}Click here to register{/tr}"{if !empty($prefs.registerKey)} rel="nofollow"{/if}>{tr}Register{/tr}</a></li>
                         {/if}
                         {if $prefs.twoFactorAuth eq 'y'}
                             {if $mode eq 'header' && $module_params.show_forgot eq 'y' && $prefs.forgotPass eq 'y'}
@@ -489,7 +558,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         <div class="social-buttons">
             {foreach from=$prefs.socnets_enabledProviders  key=k  item=pNum}
                 {$providerName = $socnetsAll[$pNum]}
-                {if $prefs["socnets_`$providerName`_loginEnabled"] eq 'y' and $mode neq "header" and empty($user)}
+                {if $prefs["socnets_`$providerName`_loginEnabled"] eq 'y' and $mode neq "header" and empty($user) and $user neq 'anonymous'}
                 {button _icon_name="{$providerName|lower}" _text="{tr}Log in via {/tr}{$providerName}" _class="btn btn-social btn-{$providerName|lower}" _script="tiki-login_hybridauth.php" _auto_args=provider provider="{$providerName}"  _title="{tr}Log in via {/tr}{$providerName}"}
                 {/if}
             {/foreach}

@@ -46,39 +46,6 @@ function add_feedback($name, $message, $st, $num = null)
 }
 
 /**
- * simple_set_toggle
- *
- * @param mixed $feature
- * @access public
- * @return void
- * @throws Exception
- */
-function simple_set_toggle($feature)
-{
-    global $prefs;
-    $logslib = TikiLib::lib('logs');
-    $tikilib = TikiLib::lib('tiki');
-    if (isset($_REQUEST[$feature]) && $_REQUEST[$feature] == 'on') {
-        if ((! isset($prefs[$feature]) || $prefs[$feature] != 'y')) {
-            // not yet set at all or not set to y
-            if ($tikilib->set_preference($feature, 'y')) {
-                add_feedback($feature, tr('%0 enabled', $feature), 1, 1);
-                $logslib->add_action('feature', $feature, 'system', 'enabled');
-            }
-        }
-    } else {
-        if ((! isset($prefs[$feature]) || $prefs[$feature] != 'n')) {
-            // not yet set at all or not set to n
-            if ($tikilib->set_preference($feature, 'n')) {
-                add_feedback($feature, tr('%0 disabled', $feature), 0, 1);
-                $logslib->add_action('feature', $feature, 'system', 'disabled');
-            }
-        }
-    }
-    TikiLib::lib('cache')->invalidate('allperms');
-}
-
-/**
  * simple_set_value
  *
  * @param mixed $feature
@@ -264,6 +231,9 @@ if (isset($_POST['lm_preference']) && $access->checkCsrf()) {
 }
 
 if (isset($_REQUEST['lm_criteria'])) {
+    if ($_REQUEST['lm_criteria'] == '') {
+        Feedback::error(tra('Your search request is empty'), \Laminas\Http\Response::STATUS_CODE_400);
+    }
     set_time_limit(0);
     try {
         $smarty->assign('lm_criteria', $_REQUEST['lm_criteria']);
@@ -324,17 +294,17 @@ if (isset($_REQUEST['page'])) {
             $admin_icon = array_merge([ 'disabled' => false, 'description' => ''], $admin_icon);
         }
         if (isset($admin_icons[$adminPage])) {
-            $admin_icon = $admin_icons[$adminPage];
+            $current_admin_icon = $admin_icons[$adminPage];
 
-            $admintitle = $admin_icon['title'];
-            $description = isset($admin_icon['description']) ? $admin_icon['description'] : '';
-            $helpUrl = isset($admin_icon['help']) ? $admin_icon['help'] : '';
+            $admintitle = $current_admin_icon['title'];
+            $description = $current_admin_icon['description'] ?? '';
+            $helpUrl = $current_admin_icon['help'] ?? '';
         }
     }
     $helpDescription = tr("Help on %0 Config", $admintitle);
 
     $smarty->assign('include', $adminPage);
-    if (substr($adminPage, 0, 3) == 'tp_' && ! file_exists("admin/include_$adminPage.tpl")) {
+    if (str_starts_with($adminPage, 'tp_') && ! file_exists("admin/include_$adminPage.tpl")) {
         $packageAdminTplFile = $utilities->getExtensionFilePath("templates/admin/include_$adminPage.tpl");
         if (! file_exists($packageAdminTplFile)) {
             $smarty->assign('include', 'extension_package_missing_page');
@@ -440,7 +410,6 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
                 || file_exists(__DIR__ . '/vendor/bombayworks/zendframework1/library/Zend/Config.php')) //ZF1
             && (file_exists(__DIR__ . '/vendor/smarty/smarty/libs/Smarty.class.php') //Smarty
                 || file_exists(__DIR__ . '/vendor/smarty/smarty/distribution/libs/Smarty.class.php')) //Smarty
-            && file_exists(__DIR__ . '/vendor/adodb/adodb/adodb.inc.php') //Adodb
         )
     ) {
         $vendorAutoloadIgnored = false;
@@ -471,6 +440,16 @@ $smarty->assign('missing_patches', $installer->missingPatches());
 $smarty->assign('installer_not_locked', $installer->checkInstallerLocked());
 $smarty->assign('db_engine_type', getCurrentEngine());
 
+if (empty($_GET)) {
+    $where = ! empty($prefs['mailer_queue_max_retries']) ? 'where attempts > ' . $prefs['mailer_queue_max_retries'] : '';
+    if (! empty($where)) {
+        $maxRetries = count(\TikiDb::get()->fetchAll('SELECT messageId, message FROM tiki_mail_queue ' . $where));
+        if ($maxRetries) {
+            $smarty->assign('mailer_queue_requires_update', $maxRetries);
+        }
+    }
+}
+
 $composerWrapper = new ComposerCli($tikipath);
 $smarty->assign('composer_options_diff', $composerWrapper->compareDistRequiredOptions());
 
@@ -482,9 +461,17 @@ if ($prefs['feature_wiki_attachments'] === 'y' && $prefs['feature_use_fgal_for_w
 $unifiedsearch = \TikiLib::lib('unifiedsearch');
 $smarty->assign('search_index_outdated', $unifiedsearch->isOutdated());
 
+if (! empty($prefs['unified_check_unused_indexes']) && $prefs['unified_check_unused_indexes'] === 'y') {
+    $currentEngine = $unifiedsearch->getCurrentEngineDetails();
+    $unusedIndices = $unifiedsearch->listAllUnusedIndexes($currentEngine);
+    $smarty->assign('unusedIndices', $unusedIndices);
+}
+
 if ($prefs['feature_scheduler'] === 'y') {
     $schedulerUtils = new \Scheduler_Utils();
     $smarty->assign('isSchedulerRunConfigured', $schedulerUtils->isSchedulerRunConfigured());
+} else {
+    $smarty->assign('isSchedulerRunConfigured', true);
 }
 
 if (! $unifiedsearch->rebuildInProgress()) {
@@ -500,7 +487,7 @@ if (! $unifiedsearch->rebuildInProgress()) {
         $removeIndexErrorsCallback = function ($item) {
             if ($item['type'] == 'error') {
                 foreach ($item['mes'] as $me) {
-                    if (strpos($me, 'stream_socket_client') !== false) {
+                    if (str_contains($me, 'stream_socket_client')) {
                         return true;
                     }
                 }
@@ -525,6 +512,4 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
-
-
 $smarty->display('tiki.tpl');

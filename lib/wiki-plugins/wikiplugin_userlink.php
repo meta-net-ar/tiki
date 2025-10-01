@@ -33,6 +33,6 @@ function wikiplugin_userlink($data, $params)
     $path = 'lib/smarty_tiki/modifier.userlink.php';
     include_once($path);
     $func = 'smarty_modifier_userlink';
-    $content = $func(isset($params['user']) ? $params['user'] : $user, '', '', $data);
+    $content = $func($params['user'] ?? $user, '', '', $data);
     return '~np~' . $content . '~/np~';
 }

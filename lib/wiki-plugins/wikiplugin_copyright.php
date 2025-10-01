@@ -40,7 +40,7 @@ function wikiplugin_copyright($data, $params)
 
     $copyrights = $copyrightslib->list_copyrights($_REQUEST['page']);
 
-    for ($i = 0; $i < $copyrights['cant']; $i++) {
+    for ($i = 0; $i < $copyrights['count']; $i++) {
         $notice = str_replace("~title~", $copyrights['data'][$i]['title'], $data);
 
         $notice = str_replace("~year~", $copyrights['data'][$i]['year'], $notice);

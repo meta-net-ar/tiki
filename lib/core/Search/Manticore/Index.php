@@ -57,7 +57,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             return;
         }
 
-        if (empty($this->index) || strstr($this->index, 'pref_')) {
+        if (empty($this->index) || str_contains($this->index, 'pref_')) {
             return;
         }
 
@@ -403,6 +403,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $search;
     }
 
+    public function getIndexTableName()
+    {
+        return $this->index;
+    }
+
     public function find(\Search_Query_Interface $query, $resultStart, $resultCount)
     {
         $builder = new QueryBuilder($this);
@@ -677,6 +682,14 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $this->providedMappings;
     }
 
+    public function isDateField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping['types']) && in_array('timestamp', $mapping['types'])) {
+            return true;
+        }
+        return false;
+    }
     public function isTextField($field)
     {
         $mapping = $this->getFieldMapping($field);

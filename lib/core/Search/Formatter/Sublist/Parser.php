@@ -7,9 +7,9 @@
 
 namespace Search\Formatter\Sublist;
 
+use Tiki\WikiParser\PluginMatcherMatch;
 use WikiParser_PluginArgumentParser;
 use WikiParser_PluginMatcher;
-use WikiParser_PluginMatcher_Match;
 
 class Parser
 {
@@ -20,7 +20,7 @@ class Parser
         $this->argparser = new WikiParser_PluginArgumentParser();
     }
 
-    public function parse(WikiParser_PluginMatcher_Match $match)
+    public function parse(PluginMatcherMatch $match)
     {
         $args = $this->argparser->parse($match->getArguments());
 

@@ -95,7 +95,7 @@ class FgalBrowse extends Base
             // Get list of files in the gallery
             $files = $filegallib->get_files($params['_offset'], $params['_maxRecords'], $params['_sort_mode'], $params['_find'], $params['_id']);
             $smarty->assign_by_ref('files', $files['data']);
-            $smarty->assign('cant', $files['cant']); ///FIXME
+            $smarty->assign('count', $files['count']); ///FIXME
 
             foreach ($params as $k => $v) {
                 if ($k[0] == '_') {

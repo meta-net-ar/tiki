@@ -67,18 +67,14 @@ $nlId = 0;
 $offset = 0;
 
 if (! isset($_REQUEST["nlId"])) {
-    $smarty->assign('msg', tr('No newsletter indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tr('No newsletter indicated'), \Laminas\Http\Response::STATUS_CODE_409);
 }
     $nlId = (int)$_REQUEST["nlId"];
     $info = $nllib->get_newsletter($nlId);
     $tikilib->get_perm_object($nlId, 'newsletter');
 
 if (empty($info)) {
-    $smarty->assign('msg', tr('Newsletter does not exist'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Newsletter does not exist'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $access->check_permission('tiki_p_admin_newsletters');
 
@@ -160,7 +156,7 @@ if (isset($_REQUEST["addemail"]) && $_REQUEST["addemail"] == "y") {
         $errorCount = 0;
 if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     if (isset($_REQUEST["email"]) && $_REQUEST["email"] != "") {
-        if (strpos($_REQUEST["email"], ',')) {
+        if (str_contains($_REQUEST["email"], ',')) {
                     $emails = explode(',', $_REQUEST["email"]);
             foreach ($emails as $e) {
                 if ($userlib->user_exists(trim($e))) {
@@ -351,7 +347,7 @@ if (isset($_REQUEST["offset"])) {
         $smarty->assign('find', $find);
         $smarty->assign_by_ref('sort_mode', $sort_mode);
         $channels = $nllib->list_newsletter_subscriptions($nlId, $offset, $maxRecords, $sort_mode, $find);
-        $smarty->assign_by_ref('cant_pages', $channels["cant"]);
+        $smarty->assign_by_ref('count_pages', $channels["count"]);
         $smarty->assign_by_ref('channels', $channels["data"]);
         $sort_mode_g = (isset($_REQUEST["sort_mode_g"])) ? $_REQUEST["sort_mode_g"] : 'groupName_asc';
         $smarty->assign_by_ref('sort_mode_g', $sort_mode_g);
@@ -360,11 +356,11 @@ if (isset($_REQUEST["offset"])) {
         $find_g = (isset($_REQUEST["find_g"])) ? $_REQUEST["find_g"] : '';
         $smarty->assign('find_g', $find_g);
         $groups_g = $nllib->list_newsletter_groups($nlId, $offset_g, $maxRecords, $sort_mode_g, $find_g);
-        $cant_pages_g = ceil($groups_g["cant"] / $maxRecords);
-        $smarty->assign_by_ref('cant_pages_g', $cant_pages_g);
+        $count_pages_g = ceil($groups_g["count"] / $maxRecords);
+        $smarty->assign_by_ref('count_pages_g', $count_pages_g);
         $smarty->assign('actual_page_g', 1 + ($offset_g / $maxRecords));
 
-if ($groups_g["cant"] > ($offset_g + $maxRecords)) {
+if ($groups_g["count"] > ($offset_g + $maxRecords)) {
             $smarty->assign('next_offset_g', $offset_g + $maxRecords);
 } else {
             $smarty->assign('next_offset_g', -1);
@@ -377,13 +373,13 @@ if ($offset_g > 0) {
 }
 
         $smarty->assign_by_ref('groups_g', $groups_g["data"]);
-        $smarty->assign("nb_groups", $groups_g["cant"]);
+        $smarty->assign("nb_groups", $groups_g["count"]);
         $included_n = $nllib->list_newsletter_included($nlId, 0, -1);
         $smarty->assign('included_n', $included_n);
         $smarty->assign('nb_included', count($included_n));
         $pages = $nllib->list_newsletter_pages($nlId, 0, -1);
         $smarty->assign('pages', $pages['data']);
-        $smarty->assign('nb_pages', $pages['cant']);
+        $smarty->assign('nb_pages', $pages['count']);
 
         $groups = $userlib->list_all_groups();
         $smarty->assign_by_ref('groups', $groups);

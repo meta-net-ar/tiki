@@ -41,7 +41,7 @@
                                                 <form action="tiki-index_p.php" method="post" >
                                                     {ticket}
                                                     <input type="hidden" name="savenotepad" value=1>
-                                                    <button type="submit" title="{tr}Save to notepad{/tr}" name="page" value={$page|escape:"url"} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                                                    <button type="submit" title="{tr}Save to notepad{/tr}" name="page" value={$page|escape:"url"} class="tips btn btn-link btn-sm px-0 pt-0 pb-0"  aria-label="{tr}Save to notepad{/tr}">
                                                         {icon name='floppy' alt="{tr}Save{/tr}"}
                                                     </button>
                                                 </form>

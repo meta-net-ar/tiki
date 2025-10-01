@@ -43,9 +43,7 @@ $inputConfiguration = [
 include_once('tiki-setup.php');
 if (! empty($_REQUEST['objectType']) && $_REQUEST['objectType'] != 'global') {
     if (! isset($_REQUEST['objectName']) || empty($_REQUEST['objectId'])) {
-        $smarty->assign('msg', tra('Not enough information to display this page'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Not enough information to display this page'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -88,14 +86,11 @@ if ($_REQUEST['objectType'] == 'wiki page') {
 }
 
 if (! ($tiki_p_admin_objects == 'y' || (isset($$perm) && $$perm == 'y') || (isset($special_perm) && $special_perm == 'y'))) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to assign permissions for this object'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to assign permissions for this object'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! isset($_REQUEST['referer'])) {
-    if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'tiki-objectpermissions.php') === false) {
+    if (isset($_SERVER['HTTP_REFERER']) && ! str_contains($_SERVER['HTTP_REFERER'], 'tiki-objectpermissions.php')) {
         $_REQUEST['referer'] = $_SERVER['HTTP_REFERER'];
     } else {
         unset($_REQUEST['referer']);
@@ -228,7 +223,7 @@ if (isset($_REQUEST['group'])) {
 
 // Process the form to assign a new permission to this object
 if (isset($_REQUEST['assign']) && ! isset($_REQUEST['quick_perms']) && $access->checkCsrf(true)) {
-    if (isset($_REQUEST['perm']) && ! empty($_REQUEST['perm'])) {
+    if (! empty($_REQUEST['perm'])) {
         foreach ($_REQUEST['perm'] as $group => $gperms) {
             foreach ($gperms as $perm) {
                 if ($tiki_p_admin_objects != 'y' && ! $userlib->user_has_perm_on_object($user, $_REQUEST['objectId'], $_REQUEST['objectType'], $perm)) {
@@ -249,8 +244,9 @@ if (isset($_REQUEST['assign']) && ! isset($_REQUEST['quick_perms']) && $access->
     $groupNames = array_unique(array_merge(array_keys($newPerms), array_keys($oldPerms)));
     $changed = [];
     foreach ($groupNames as $groupName) {
-        $newPerms[$groupName] = ! isset($newPerms[$groupName]) ? [] : $newPerms[$groupName];
-        $oldPerms[$groupName] = ! isset($oldPerms[$groupName]) ? [] : $oldPerms[$groupName];
+        // https://www.php.net/manual/en/migration74.new-features.php#migration74.new-features.core.null-coalescing-assignment-operator
+        $newPerms[$groupName] ??= [];
+        $oldPerms[$groupName] ??= [];
         $changed['added'][$groupName] = array_diff($newPerms[$groupName], $oldPerms[$groupName]);
         $changed['deleted'][$groupName] = array_diff($oldPerms[$groupName], $newPerms[$groupName]);
     }
@@ -377,6 +373,11 @@ if (! empty($_SESSION['perms_clipboard'])) {
         $permissionApplier->apply($set);
         $smarty->assign('perms_clipboard_source', '');
     }
+}
+
+if (! empty($_POST['preference_update'])) {
+    $tikilib->set_preference('permission_scope_behavior', $_POST['permission_scope_behavior']);
+    TikiLib::lib('cache')->invalidate('allperms');
 }
 
 // Prepare display

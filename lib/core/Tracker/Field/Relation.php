@@ -181,7 +181,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
             $data = array_unique($data);
             if (empty($data) && $this->getValue()) {
                 $data = array_filter(array_map(function ($line) {
-                    if (! strstr($line, ':')) {
+                    if (! str_contains($line, ':')) {
                         return null;
                     } else {
                         return trim($line);
@@ -517,7 +517,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
             $field = $trklib->get_field_info($args['sourcefield']);
             $handler = $trklib->get_field_handler($field);
             $relation = $handler->getOption(TrackerFieldRelation::OPT_RELATION);
-            if (substr($relation, -7) === '.invert') {
+            if (str_ends_with($relation, '.invert')) {
                 $straight = false;
             } else {
                 $straight = true;
@@ -541,14 +541,14 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
             }
             if ($fieldId = $definition->getRelationField($relation)) {
                 $itemId = $args['sourceobject'];
-                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId));
+                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId, false));
                 $other = $args['type'] . ':' . $args['object'];
-                if (! in_array($other, $value)) {
-                    if ($action == 'add') {
+                if ($action == 'add') {
+                    if (! in_array($other, $value)) {
                         $value[] = $other;
-                    } else {
-                        $value = array_diff($value, [$other]);
                     }
+                } else {
+                    $value = array_diff($value, [$other]);
                 }
                 if ($value != $old_value) {
                     $value = implode("\n", $value);
@@ -572,14 +572,14 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
             }
             if ($fieldId = $definition->getRelationField($relation)) {
                 $itemId = $args['object'];
-                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId));
+                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId, false));
                 $other = $args['sourcetype'] . ':' . $args['sourceobject'];
-                if (! in_array($other, $value)) {
-                    if ($action == 'add') {
+                if ($action == 'add') {
+                    if (! in_array($other, $value)) {
                         $value[] = $other;
-                    } else {
-                        $value = array_diff($value, [$other]);
                     }
+                } else {
+                    $value = array_diff($value, [$other]);
                 }
                 if ($value != $old_value) {
                     $value = implode("\n", $value);

@@ -58,7 +58,7 @@ class Services_ActivityStream_ManageController
         $removed = false;
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
-            /** @var TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+            /** @var Tiki\TikiDb\PdoResult */
             $result = $this->lib->deleteRule($id);
             if ($result->numRows()) {
                 if ($result->numRows() == 1) {
@@ -92,7 +92,7 @@ class Services_ActivityStream_ManageController
 
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
-            /** @var TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+            /** @var Tiki\TikiDb\PdoResult */
             $result = $this->lib->deleteActivity($id);
             if ($result->numRows()) {
                 Feedback::success(tr('Activity (id:' . (string) $id . ') deleted'));
@@ -334,7 +334,7 @@ $customArguments
      * @param $id
      * @param array $data
      * @param $ruleField
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result|integer $id    For a new item, $id will be the ID integer,
+     * @return Tiki\TikiDb\PdoResult|integer $id    For a new item, $id will be the ID integer,
      *                                                                  otherwise a result class
      * @throws Services_Exception_FieldError
      */

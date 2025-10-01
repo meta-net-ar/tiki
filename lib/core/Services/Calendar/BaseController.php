@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\TikiDate;
+
 class Services_Calendar_BaseController
 {
     protected $daynamesPlural;

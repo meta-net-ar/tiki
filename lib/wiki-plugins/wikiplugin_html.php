@@ -50,11 +50,6 @@ function wikiplugin_html_info()
 
 function wikiplugin_html($data, $params)
 {
-
-    if (! isset($params['wiki'])) {
-        $params['wiki'] = 0;
-    }
-
     // strip out sanitation which may have occurred when using nested plugins
     $html = str_replace('<x>', '', $data);
 

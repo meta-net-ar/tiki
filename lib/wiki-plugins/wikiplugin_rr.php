@@ -373,27 +373,56 @@ function wikiplugin_rr_info()
 
 function wikiplugin_rr($data, $params)
 {
-    global $smarty, $trklib, $tikilib, $prefs, $dbversion_tiki, $tikidomainslash, $user, $tiki_p_edit;
+    global $smarty, $trklib, $tikilib, $prefs, $tikidomainslash, $user, $tiki_p_edit;
 
     include_once(TIKI_CONFIG_PATH . '/tiki-db.php'); // to set up multitiki etc if there ($tikidomain)
 
     # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers.
     $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
-    if ($dbversion_tiki >= 7.0) {
-        // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
-        if (
-            stripos($data, '&lt;') !== false ||
-                    stripos($data, '&gt;') !== false ||
-                    stripos($data, '&quot;') !== false
-        ) { // add more bad entities here
-            $data = $tikilib->htmldecode($data);
+    // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
+    if (
+        stripos($data, '&lt;') !== false ||
+        stripos($data, '&gt;') !== false ||
+        stripos($data, '&quot;') !== false
+    ) { // add more bad entities here
+        $data = $tikilib->htmldecode($data);
+    }
+
+    // Apply default parameters if not set
+    $pluginInfo = wikiplugin_rr_info();
+    foreach ($pluginInfo['params'] as $paramKey => $paramDefinition) {
+        if (isset($paramDefinition['default']) && ! array_key_exists($paramKey, $params)) {
+            $defaultValue = $paramDefinition['default'];
+
+            // Apply filter if defined
+            if (isset($paramDefinition['filter'])) {
+                switch ($paramDefinition['filter']) {
+                    case 'int':
+                        $defaultValue = (int)$defaultValue;
+                        break;
+                    // Add other filter cases as needed
+                }
+            }
+
+            $params[$paramKey] = $defaultValue;
         }
     }
 
-    if ($params["security"] == 0) {
-        /* do nothing: i.e. don't check for security in the command sent to R*/
-    } else {        /* default: check for security in the commands sent to R*/
+    // Ensure only 0 or 1 are accepted
+    if (! in_array($params['security'], ["0", "1", 0, 1], true)) {
+        return displayRrErrorBox(
+            "error",
+            tra("Invalid 'security' parameter. Only 0 or 1 are allowed."),
+            tra("Set 'security=0' to disable command checking (use with caution), or 'security=1' to enable strict command validation.")
+        );
+    }
+
+    // Ensure 'security' is treated as an integer
+    $securityFlag = (int) $params['security'];
+
+    if ($securityFlag === 1) {
+        /* Security is enabled (1 or default): check R commands for disallowed content */
         $rejected = checkCommands($data);
         if (count($rejected) > 0) {
             return displayRrErrorBox("errors", tra("Blocked commands found: ") . implode(', ', $rejected), tra("Use Plugin RR instead and validate your plugin call, or contact a site admin to have the plugin call validated for you."));
@@ -427,9 +456,9 @@ function wikiplugin_rr($data, $params)
         // Moved the hashing after the attId recognition attempt, in order to include the filename (if any) in the hash process
         // so that if a new filename is passed through attId (and/or itemId), a new R script is generated and processed accordingly
         // to avoid the former caching issues when dynamically passing a different attId to the same cached R custom script
-        $sha1 = md5($data . $md5lastModif . $params . $output . $style);
+        $sha1 = md5(json_encode($data) . $md5lastModif . json_encode($params) . json_encode($output) . json_encode($style));
     } else {
-        $sha1 = md5($data . $params . $output . $style);
+        $sha1 = md5(json_encode($data) . json_encode($params) . json_encode($output) . json_encode($style));
     }
 
     if (isset($params["echo"])) {
@@ -573,11 +602,7 @@ function wikiplugin_rr($data, $params)
 
         if (empty($info['filetype']) || $info['filetype'] == 'application/x-octetstream' || $info['filetype'] == 'application/octet-stream') {
             include_once('lib/mime/mimelib.php');
-            if ($dbversion_tiki < 9.0) {
-                    $info['filetype'] = tiki_get_mime($filepath, 'application/octet-stream'); # Old code not working after Tiki9 r42542: http://code.tiki.org/Commit+42542.
-            } else {
-                    $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
-            }
+            $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
         }
 
         $type = $info["filetype"];
@@ -608,10 +633,8 @@ function wikiplugin_rr($data, $params)
     } else {
         // do nothing
     }
-    if ($dbversion_tiki >= 7.0) {
-        # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
-        $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
-    }
+    # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
+    $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
     // Find age of previous cache
     $cache_last_modif = @filemtime($r_html);
@@ -734,12 +757,7 @@ function wikiplugin_rr($data, $params)
                 $ret .= ' <input type="hidden" name="rrefresh" value="y" >';
             }
         }
-        if ($dbversion_tiki >= 13.0) {
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
-        } else {
-            // Maybe this should be an input tag with maybe still the image
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<img src=img/icons/arrow_refresh.png alt=Refresh Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></a> </form>';
-        }
+        $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
     }
 
     // Surround plugin with actual div and class, for styling purpose
@@ -748,20 +766,11 @@ function wikiplugin_rr($data, $params)
     // Check for Tiki version, to apply parsing of content or not (behavior changed in Tiki7, it seems)
     // Right now, the behavior seems the almost the same one on 7+ and <7, but just in case, I leave this version check in place,
     // since some changes are expected sooner or later..., so I leave this as an easy place holder (and proof-of-concept of working version check
-    if ($dbversion_tiki >= 7.0) {
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } else {    // case for Tiki versions earlier than 7.0, where content is parsed by default
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, []);
-            // return $ret;
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } // end of check for Tiki version
+    if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
+        return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
+    } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
+        return $ret;
+    }
 }
 
 
@@ -996,7 +1005,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
     }
     $cont = file_get_contents($rst);
 
-    if (strpos($cont, '<html>') === false) {
+    if (! str_contains($cont, '<html>')) {
         if (! $fd = fopen($rst, 'w')) {
             $runR_errors = ['error' => true, 'type' => 'error', 'title' => 'Can not open cached file' , 'body' => $err];
             return;
@@ -1219,7 +1228,7 @@ function checkCommands($input)
     $found = [];
 
     foreach ($banned as $suspected) {
-        if (false !== strpos($input, $suspected)) {
+        if (str_contains($input, $suspected)) {
             // okay, we found something forbidden, now we need a regular expression to check if it is a function call like 'name  (', 'name =' or 'name.' !
             // Strictly speaking, this would be pattern '/\b' . preg_quote($suspected,'/') . '([\W]*\(|[\W]*\=|[\W]*\.)/'; but let's also forbid 'name .' until confirmation
             $pattern = '/\b' . preg_quote($suspected, '/') . '([\W]*\(|[\W]*\=|[\W]*\.)/';

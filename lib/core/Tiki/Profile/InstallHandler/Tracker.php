@@ -222,9 +222,9 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
                 }
 
                 if ($value != $default) {
-                    if (strstr($optionKey, 'allow_')) {
+                    if (str_contains($optionKey, 'allow_')) {
                         $allow[] = str_replace('allow_', '', $optionKey);
-                    } elseif (strstr($optionKey, 'show_')) {
+                    } elseif (str_contains($optionKey, 'show_')) {
                         $show[] = str_replace('show_', '', $optionKey);
                     } elseif (isset($conversions[$optionKey]) && method_exists($conversions[$optionKey], 'reverse')) {
                         $data[$optionKey] = $conversions[$optionKey]->reverse($value);

@@ -49,7 +49,7 @@
         },
         mounted() {
             if (jqueryTiki.jquery_timeago) {
-                $("time.timeago").timeago()
+                $("time.timeago").tikiTimeago()
             }
         },
         setup() {

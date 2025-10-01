@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tiki\Installer\Installer;
 use Tiki\Installer\Patch;
+use Tiki\Cache\CacheLib;
 use TikiMail;
 
 #[AsCommand(
@@ -122,8 +123,7 @@ class UpdateCommand extends Command
             }
 
             // tiki-setup.php may not have been run yet, so load the minimum required libs to be able to clear the caches
-            require_once('lib/cache/cachelib.php');
-            $cachelib = new \Cachelib();
+            $cachelib = new CacheLib();
             $cachelib->empty_cache();
         } else {
             $output->writeln('<error>Database not found.</error>');

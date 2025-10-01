@@ -18,16 +18,12 @@ if (empty($_REQUEST['attId']) && ! empty($_REQUEST['itemId']) && ! empty($_REQUE
 }
 
 if (empty($_REQUEST['attId'])) {
-    $smarty->assign('msg', tra('Incorrect param'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $info = $trklib->get_item_attachment($_REQUEST['attId']);
 if (empty($info)) {
-    $smarty->assign('msg', tra('Incorrect param'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $itemInfo = $trklib->get_tracker_item($info["itemId"]);
 $itemUsers = $trklib->get_item_creators($itemInfo['trackerId'], $itemInfo['itemId']);
@@ -42,10 +38,7 @@ if (isset($info['user']) && $info['user'] == $user) {
     ||  (! $globalperms->admin_trackers && ! $itemPerms->view_trackers)
     ||  (! $globalperms->admin_trackers && ! $itemPerms->tracker_view_attachments)
 ) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $trklib->add_item_attachment_hit($_REQUEST["attId"]);
@@ -59,12 +52,9 @@ $file = $info["filename"];
 $content = $info["data"];
 
 session_write_close();
-//print("File:$file<br />");
-//die;
 TikiLib::lib('header')->setXRobotsTag($robots);
 header("Content-type: $type");
 if (isset($_REQUEST["display"])) {
-//die;
     header("Content-Disposition: inline; filename=\"" . urlencode($file) . "\"");
 } else {
     header("Content-Disposition: attachment; filename=\"$file\"");

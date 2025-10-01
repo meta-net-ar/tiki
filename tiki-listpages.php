@@ -4,6 +4,8 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\OIntegrate\Response;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -87,9 +89,7 @@ if (
 
 if ($prefs['feature_multilingual'] == 'y' && isset($_REQUEST['lang']) && isset($_REQUEST['term_srch'])) {
     $multilinguallib = TikiLib::lib('multilingual');
-    if (isset($_REQUEST['term_srch'])) {
-        $multilinguallib->storeCurrentTermSearchLanguageInSession($_REQUEST['lang']);
-    }
+    $multilinguallib->storeCurrentTermSearchLanguageInSession($_REQUEST['lang']);
     $smarty->assign('template_name', $_REQUEST['create_new_pages_using_template_name']);
 }
 
@@ -134,10 +134,9 @@ if (! empty($multiprint_pages)) {
     // for the information as the number of
     // days to get in the log 1,3,4,etc
     // it will default to 1 recovering information for today
-    if (isset($_REQUEST['maxRecords'])) {
+    if (! empty($_REQUEST['maxRecords'])) {
         $maxRecords = $_REQUEST['maxRecords'];
-    } else {
-        $maxRecords = $maxRecords;
+        $smarty->assign('maxRecords', $maxRecords);
     }
     if (! isset($_REQUEST['sort_mode'])) {
         $sort_mode = $prefs['wiki_list_sortorder'] . '_' . $prefs['wiki_list_sortdirection'];
@@ -168,7 +167,7 @@ if (! empty($multiprint_pages)) {
 
     if ($prefs['feature_multilingual'] == 'y') {
         $smarty->assign('find_lang', '');
-        if (((! isset($_REQUEST['lang']) ) || (isset($_REQUEST['lang']) && $_REQUEST['lang'] != ''))) {
+        if (((! isset($_REQUEST['lang']) ) || ($_REQUEST['lang'] != ''))) {
             $filter = setLangFilter($filter);
         }
         $smarty->assign('find_langOrphan', '');
@@ -297,10 +296,10 @@ if (! empty($multiprint_pages)) {
 
     $smarty->assign('show_actions', $show_actions);
     // If there're more records then assign next_offset
-    $cant_pages = ceil($listpages['cant'] / $maxRecords);
-    $smarty->assign_by_ref('cant_pages', $cant_pages);
+    $pages_count = ceil($listpages['count'] / $maxRecords);
+    $smarty->assign_by_ref('pages_count', $pages_count);
     $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-    if ($listpages['cant'] > ($offset + $maxRecords)) {
+    if ($listpages['count'] > ($offset + $maxRecords)) {
         $smarty->assign('next_offset', $offset + $maxRecords);
     } else {
         $smarty->assign('next_offset', -1);
@@ -350,7 +349,7 @@ if (! empty($multiprint_pages)) {
     }
 
     $smarty->assign_by_ref('listpages', $listpages['data']);
-    $smarty->assign_by_ref('cant', $listpages['cant']);
+    $smarty->assign_by_ref('count', $listpages['count']);
     include_once('tiki-section_options.php');
 
     // Exact match and single result, go to page directly
@@ -420,10 +419,10 @@ if (! empty($multiprint_pages)) {
         if ($remperm || $prefs['feature_wiki_multiprint'] === 'y') {
             array_unshift($cols, 'checkbox');
         }
-        if (strpos($sort_mode, '_desc') !== false) {
+        if (str_contains($sort_mode, '_desc')) {
             $pos = strlen($sort_mode) - 5;
             $sortdir = 1;
-        } elseif (strpos($sort_mode, '_asc') !== false) {
+        } elseif (str_contains($sort_mode, '_asc')) {
             $pos = strlen($sort_mode) - 4;
             $sortdir = 0;
         }
@@ -433,7 +432,7 @@ if (! empty($multiprint_pages)) {
 
         $settings = [
             'id' => $ts['tableid'],
-            'total'     => $listpages['cant'],
+            'total'     => $listpages['count'],
             'vars'  => [
                 'show_actions' => $show_actions,
             ],
@@ -464,9 +463,9 @@ if (! empty($multiprint_pages)) {
     }
 
     if ($access->is_serializable_request()) {
-        $autocomplete_is_enabled = $prefs['feature_jquery_autocomplete'] == 'y' || $prefs['elementplus_autocomplete'] == 'y';
-        if (isset($_REQUEST['listonly']) && ($prefs['feature_jquery'] == 'y' && $autocomplete_is_enabled)) {
-            $pages = [];
+        $autocomplete_is_enabled = $prefs['elementplus_autocomplete'] == 'y';
+        $pages = [];
+        if (isset($_REQUEST['listonly']) && ($autocomplete_is_enabled)) {
             foreach ($listpages['data'] as $page) {
                 if (isset($_REQUEST['nonamespace'])) {
                     $pages[] = [
@@ -501,7 +500,6 @@ if (! empty($multiprint_pages)) {
             }
             $access->output_serialized($pages);
         } else {
-            $pages = [];
             $wikilib = TikiLib::lib('wiki');
             foreach ($listpages['data'] as $page) {
                 $pages[] = [
@@ -516,8 +514,7 @@ if (! empty($multiprint_pages)) {
                         'lang' => $page['lang'],
                 ];
             }
-            require_once 'lib/ointegratelib.php';
-            $response = OIntegrate_Response::create(['list' => $pages], '1.0');
+            $response = Response::create(['list' => $pages], '1.0');
             $response->addTemplate('smarty', 'tikiwiki', 'templates/smarty-tikiwiki-1.0-shortlist.txt');
             $response->schemaDocumentation = 'http://dev.tiki.org/WebserviceListpages';
             $response->send();
@@ -544,7 +541,7 @@ function setLangFilter($filter)
     $smarty = TikiLib::lib('smarty');
 
     $lang = $multilinguallib->currentPageSearchLanguage();
-    if (isset($_REQUEST['listonly']) && $prefs['feature_jquery_autocomplete'] == 'y' && strlen($lang) > 2) {
+    if (isset($_REQUEST['listonly']) && $prefs['elementplus_autocomplete'] == 'y' && strlen($lang) > 2) {
         $lang = substr($lang, 0, 2);        // for autocomplete - use only language filter, not culture as well
     }
     // Without this condition, default listing is empty and language filter shows any language

@@ -37,24 +37,19 @@ if (isset($_REQUEST['del'])) {
     if ($tiki_p_admin == 'y' || $tiki_p_unassign_freetags == 'y') {
         $freetaglib->delete_object_tag($_REQUEST['itemit'], $_REQUEST['typeit'], $_REQUEST['tag']);
     } else {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra('Permission denied'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
 $smarty->assign('metatag_robots', 'NOINDEX, FOLLOW');
 
 if ($freetaglib->count_tags() == 0) {
-    $smarty->assign('msg', tra("Nothing tagged yet") . '.');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Nothing tagged yet") . '.', \Laminas\Http\Response::STATUS_CODE_400);
 }
 if (! isset($_REQUEST['tag']) && $prefs['freetags_preload_random_search'] == 'y') {
     $tag = $freetaglib->get_tag_suggestion('', 1);
     if (! empty($tag[0])) {
         $_REQUEST['tag'] = $tag[0];
-        if (strstr($tag[0], ' ')) {
+        if (str_contains($tag[0], ' ')) {
             $_REQUEST['tag'] = '"' . $_REQUEST['tag'] . '"';
         }
     }
@@ -79,7 +74,7 @@ if (! isset($_REQUEST["offset"])) {
 }
 $smarty->assign_by_ref('offset', $offset);
 if (! isset($_REQUEST["type"])) {
-    $type = isset($_REQUEST['old_type']) ? $_REQUEST['old_type'] : '';
+    $type = $_REQUEST['old_type'] ?? '';
 } else {
     $type = $_REQUEST["type"];
 }
@@ -100,7 +95,7 @@ $smarty->assign('broaden', $broaden);
 $tagArray = $freetaglib->parse_tag((isset($_REQUEST['tag'])) ? $_REQUEST['tag'] : '');
 $tagString = '';
 foreach ($tagArray as $t_ar) {
-    if (strstr($t_ar, ' ')) {
+    if (str_contains($t_ar, ' ')) {
         $tagString .= '"' . $t_ar . '" ';
     } else {
         $tagString .= $t_ar . ' ';
@@ -159,9 +154,9 @@ if ($broaden == 'y') {
 $objects = $freetaglib->get_objects_with_tag_combo($tagArray, $type, $view_user, $offset, $maxRecords, $query_sort_mode, $find, $broaden, $objectId);
 
 $smarty->assign_by_ref('objects', $objects["data"]);
-$smarty->assign('cantobjects', count($objects['data']));
-$cant = $objects['cant'];
-$smarty->assign('cant', $objects['cant']);
+$smarty->assign('objects_count', count($objects['data']));
+$count = $objects['count'];
+$smarty->assign('count', $objects['count']);
 
 include_once('tiki-section_options.php');
 

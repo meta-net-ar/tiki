@@ -96,7 +96,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <a id="add_row" href="javascript:void(0);" class="btn btn-primary btn-block tips" title=":{tr}Add a new row{/tr}">
+                <a id="add_row" href="javascript:void(0);" class="btn btn-primary btn-block tips" title=":{tr}Add a new row{/tr}" role="button">
                     {icon name="add"} {tr}Add row{/tr}
                 </a>
             </div>

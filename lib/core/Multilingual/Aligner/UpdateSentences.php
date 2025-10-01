@@ -4,10 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-include_once __DIR__ . '/../../../diff/Diff.php';
-include_once __DIR__ . '/../../..//diff/difflib.php';
-include_once __DIR__ . '/../../..//diff/Renderer.php';
-include_once __DIR__ . '/../../..//diff/renderer_unified.php';
+
+use Tiki\Lib\Diff\TextDiff;
+use Tiki\Lib\Diff\Renderer\Unified;
+
 include_once __DIR__ . '/SentenceAlignments.php';
 include_once __DIR__ . '/SentenceSegmentor.php';
 include_once __DIR__ . '/MockMTWrapper.php';
@@ -115,9 +115,9 @@ class Multilingual_Aligner_UpdateSentences
     public function text_diff($unchangedSentence_array, $changedSentence_array)
     {
         $changed_diff_unchanged = [];
-        $diff = new Text_Diff($unchangedSentence_array, $changedSentence_array);
+        $diff = new TextDiff($unchangedSentence_array, $changedSentence_array);
         $context = count($unchangedSentence_array);
-        $renderer = new Text_Diff_Renderer_unified($context);
+        $renderer = new Unified($context);
         $arr = $renderer->render($diff);
         $kk = 0;
         $body = 0;

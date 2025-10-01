@@ -48,7 +48,7 @@ function wikiplugin_perspective($data, $params)
     global $prefs;
 
     $dataelse = '';
-    if (strpos($data, '{ELSE}')) {
+    if (str_contains($data, '{ELSE}')) {
         $dataelse = substr($data, strpos($data, '{ELSE}') + 6);
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }

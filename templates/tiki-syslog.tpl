@@ -1,9 +1,7 @@
 {title help="System Log"}{tr}Tiki Logs{/tr}{/title}
 
 <div class="t_navbar mb-4">
-    {if $api_tiki == 'adodb'}
-        <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
-    {/if}
+    <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
     {if $prefs.feature_actionlog == 'y'}
         <a href="tiki-admin_actionlog.php#Report" class="btn btn-link" title="{tr}Export through Action Log{/tr}">{icon name="upload"} {tr}Export through Action Log{/tr}</a>
     {/if}
@@ -14,16 +12,19 @@
 <form method="get" action="tiki-syslog.php" class="mb-4">
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label" for="months">{tr}Clean logs older than{/tr}</label>
-        <div class="col-sm-8 d-flex flex-row flex-wrap align-items-center">
-            <input type="text" name="months" class="form-control me-4"> {tr}months{/tr}
-            <input type="submit" class="btn btn-primary btn-sm ms-4" value="{tr}Clean{/tr}" name="clean">
+        <div class="col-sm-8 d-flex flex-row flex-wrap align-items-center m-1">
+        <div class="d-flex align-items-center">
+            <input type="number" name="months" min="1" step="1" required class="form-control me-2" placeholder="{tr}Enter number of months{/tr}">
+            <span class="ms-2">{tr}months{/tr}</span>
+        </div>
+            <input type="submit" class="btn btn-primary btn-sm ms-4 mt-1" value="{tr}Clean{/tr}" name="clean">
         </div>
     </div>
 </form>
 
 {include file='find.tpl'}
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
 <div class="table-responsive syslog-table">
     <table class="table">
@@ -42,7 +43,7 @@
             <tr>
                 <td class="id">{$list[ix].actionId}</td>
                 <td class="text">{$list[ix].action|escape}</td>
-                <td class="date"><span title="{$list[ix].lastModif|tiki_long_datetime}">{$list[ix].lastModif|tiki_short_datetime}</span></td>
+                <td class="date"><span title="{$list[ix].lastModif|tiki_long_datetime}">{$list[ix].lastModif|tiki_date_format:"%Y-%m-%d %H:%M:%S"}</span></td>
                 <td class="username">{$list[ix].user|userlink}</td>
                 <td class="text"><textarea class="form-control" readonly="readonly">{$list[ix].comment|escape:'html'}</textarea></td>
                 <td class="text">{$list[ix].ip|escape:"html"}</td>
@@ -76,4 +77,4 @@
     </table>
 </div>
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}

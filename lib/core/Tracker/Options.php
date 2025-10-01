@@ -91,19 +91,19 @@ class Tracker_Options
                         foreach ($commaItems as $item) {
                             // one word quoted. ex: "bananas" or option1="bananas"
                             if (preg_match('/^(").*\1$|^.*=(").*\2$/', trim($item))) {
-                                array_push($optionItems, $item);
-                            } elseif (strpos($item, '"') !== false) {
+                                $optionItems[] = $item;
+                            } elseif (str_contains($item, '"')) {
                                 if ($commaItem == '') {
                                     $commaItem = $item;
                                 } else {
                                     $commaItem = $commaItem . ',' . $item;
-                                    array_push($optionItems, $commaItem);
+                                    $optionItems[] = $commaItem;
                                     $commaItem = '';
                                 }
                             } elseif ($commaItem !== '') {
                                 $commaItem = $commaItem . ',' . $item;
                             } else {
-                                array_push($optionItems, $item);
+                                $optionItems[] = $item;
                             }
                         }
                         $optionItems = array_map('trim', $optionItems);

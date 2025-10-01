@@ -188,7 +188,7 @@ class CheckSqlEngineConversion
     {
         $options = $this->getOpts();
 
-        $this->verbose = $this->getOption($options, 'v', 'verbose') === false ? true : false;
+        $this->verbose = $this->getOption($options, 'v', 'verbose') === false;
 
         $this->oldDbRaw = $this->getOption($options, null, 'db1');
         $result = $this->parseDbRaw($this->oldDbRaw);
@@ -287,7 +287,6 @@ class CheckSqlEngineConversion
         $TWV = new TWVersion();
 
         $local = '<?php' . "\n"
-            . '$dbversion_tiki = "' . $TWV->getBaseVersion() . '";' . "\n"
             . '$host_tiki = "' . $dbConfig['host'] . '";' . "\n"
             . '$user_tiki = "' . $dbConfig['user'] . '";' . "\n"
             . '$pass_tiki = "' . $dbConfig['pass'] . '";' . "\n"

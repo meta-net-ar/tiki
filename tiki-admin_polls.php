@@ -138,7 +138,7 @@ if ((isset($_REQUEST["save"]) || isset($_REQUEST["add"])) && $access->checkCsrf(
                             }
                         }
                     } else {
-                        $oid = isset($_REQUEST['optionsId']) && isset($_REQUEST['optionsId'][$i]) ? $_REQUEST['optionsId'][$i] : null;
+                        $oid = $_REQUEST['optionsId'][$i] ?? null;
                         $result = $polllib->replace_poll_option($pid, $oid, $option, $position++);
                         if ($result && $result->numRows()) {
                             $optionSuccess++;
@@ -239,7 +239,7 @@ if (isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $polllib->list_polls($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 if ($prefs['poll_list_categories'] == 'y') {
     foreach ($channels['data'] as $key => $channel) {
         $channels['data'][$key]['categories'] = $polllib->get_poll_categories($channel['pollId']);

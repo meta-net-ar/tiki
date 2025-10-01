@@ -65,7 +65,7 @@ if ($output["data"] == "EMPTY") {
                 'is_html' => ($data['wysiwyg'] == 'y' ? 1 : 0)
             ]
         );
-        $data['sefurl'] = filter_out_sefurl(sprintf($readrepl, $data['postId'], $data['blogId']), 'blogpost', $data['title']);
+        $data['sefurl'] = filter_out_sefurl(sprintf($readrepl, $data['postId']), 'blogpost', $data['title']);
         $tmp[] = $data;
     }
     $changes["data"] = $tmp;

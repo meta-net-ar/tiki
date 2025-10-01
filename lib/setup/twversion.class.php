@@ -37,10 +37,6 @@ class TWVersion
      */
     public $star;
     /**
-     * @var string Is this a Subversion version or a package?
-     */
-    public $svn;
-    /**
      * @var string Is this a Git version or a package?
      */
     public $git;
@@ -50,12 +46,9 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '29.0vcs';
+        $this->version  = '30.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
-
-        // Check for Subversion or not
-        $this->svn  = is_dir('.svn') ? 'y' : 'n';
 
         // Check for Git or not
         $this->git  = is_dir('.git') ? 'y' : 'n';
@@ -127,6 +120,7 @@ class TWVersion
                 37 => 'Alnilam',         // 26.x
                 38 => 'Miaplacidus',     // 27.x
                 39 => 'Castor',          // 28.x
+                40 => 'Bellatrix',       // 29.x
         ];
     }
 
@@ -363,6 +357,7 @@ class TWVersion
                 '21.9',
                 '21.10',
                 '21.11',
+                '21.12',
                 '22.0alpha',
                 '22.0beta',
                 '22.0RC1',
@@ -386,6 +381,8 @@ class TWVersion
                 '24.5',
                 '24.6',
                 '24.7',
+                '24.8',
+                '24.9',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -405,10 +402,20 @@ class TWVersion
                 '27.0RC1',
                 '27.0',
                 '27.1',
+                '27.2',
+                '27.3',
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
                 '28.0',
+                '28.1',
+                '28.2',
+                '28.3',
+                '28.4',
+                '29.0alpha',
+                '29.0beta',
+                '29.0RC1',
+                '29.0',
             ];
     }
 
@@ -453,7 +460,7 @@ class TWVersion
             $relements = explode('.', $line);
             if (isset($relements[0]) && is_numeric($relements[0])) { // Avoid issues with empty lines
                 $line = rtrim($line);
-                $count = array_push($this->releases, $line);
+                $this->releases[] = $line;
                 if ($relements[0] == $velements[0]) {
                     $this->latestMinorRelease = $line;
                 } elseif ($relements[0] > $velements[0]) {

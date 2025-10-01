@@ -150,15 +150,6 @@ function wikiplugin_ajaxload($data, $params)
         return WikiParser_PluginOutput::userError(tr('Parameter "URL" is missing'));
     }
 
-    $plugininfo = wikiplugin_ajaxload_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $default[$key] = $param['default'];
-        }
-    }
-    $params = array_merge($default, $params);
-
     if ($params['id']) {
         $id = $params['id'];
     } else {
@@ -188,7 +179,7 @@ function wikiplugin_ajaxload($data, $params)
                     (! empty($parts['port']) ? ':' . $parts['port'] : '') .
                     (! empty($parts['path']) ? pathinfo($parts['path'], PATHINFO_DIRNAME) : '');
 
-                if (substr($base, -1) !== '/') {
+                if (! str_ends_with($base, '/')) {
                     $base .= '/';
                 }
 

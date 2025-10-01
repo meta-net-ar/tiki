@@ -41,7 +41,7 @@ parameters:
     - lib/test
 
     # DEPRECATED code
-    - lib/sheet
+    - lib/Sheet
     - lib/wiki-plugins/wikiplugin_sheet.php
     - lib/core/Tiki/Profile/InstallHandler/Sheet.php 
     - tiki-export_sheet.php
@@ -73,7 +73,7 @@ parameters:
     #File specific globals
     - 
       message: '#Variable \$tikilib might not be defined.#'
-      path: 'lib/auth/tokens.php'
+      path: 'lib/Auth/Tokens.php'
     
     #todo: https://github.com/phpstan/phpstan-deprecation-rules
     #TODO:  Add extensions for Symfony, etc.

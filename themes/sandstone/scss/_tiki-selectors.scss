@@ -1,0 +1,91 @@
+// Sandstone for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+    // Increase navbar height to reinstate Bootswatch style
+.topbar_modules > * {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+// Forms
+// Navs
+.nav-tabs .nav-link, .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
+    color: $nav-link-color; // #8e8c84;
+}
+.nav-pills .nav-link {
+    color: $nav-link-color; //#8e8c84;
+}
+
+// Navbar
+// Dropdowns
+// Pagination
+.page-link.active, .active > .page-link {
+    color: #504F49;
+}
+
+// Cards
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+[data-bs-theme=dark] {
+    .btn-outline-primary { --bs-btn-color: #E66B19; --bs-btn-border-color: #E66B19; }
+    .btn-outline-secondary { --bs-btn-color: #dee2e6; }
+    .btn-outline-success { --bs-btn-color: #46A046; --bs-btn-border-color: ; }
+    .btn-outline-danger { --bs-btn-color: #DD6864; --bs-btn-border-color: #DD6864; }
+    .btn-outline-warning { --bs-btn-color: #C79500; --bs-btn-border-color: #C79500; }
+    .btn-outline-info { --bs-btn-color: #29A2C7; --bs-btn-border-color: #29A2C7; }
+    .btn-outline-light { --bs-btn-color: #f6f6f6; --bs-btn-border-color: #f6f6f6; }
+    .btn-outline-dark { --bs-btn-color: #26491BE; --bs-btn-border-color: #26491BE; }
+    .list-group-item-dark { color: #3D4248; }
+
+     .list-group-item { color: #959791; }
+    .list-group-item-dark { color: #A4ACB2; background-color: #16171D; }
+    .list-group-item-primary { color: #ddd; background-color: #65542A; }
+    .list-group-item-secondary { color: #ddd; background-color: #4B4F63; }
+    .list-group-item-success { color: #ddd; background-color: #395B39; }
+    .list-group-item-danger { color: #ddd; background-color: #AC2A2A; }
+    .list-group-item-warning { color: #ddd; background-color: #6A4C2F; }
+    .list-group-item-info { color: #ddd; background-color: #34636F; }
+    .list-group-item-light { color: #424D4D; background-color: #FEFBF1; }
+
+    .navbar-dark .nav-link { color: #B1B1AA; }
+    .navbar-dark .nav-link.active { color: #C4C4C4; }
+    .breadcrumb { background: #232315; border-color: #8c8478; }
+    nav .nav-link { color: #A7A7A0; }
+    .nav-tabs .nav-link, .page-link { background-color: #2F2B1D; border-color: #8c8478; }
+    .nav-pills .nav-link.active, .nav-pills .nav-link:hover, .nav-pills .nav-link:focus { color: #C7C6C1; background-color: #5D4E2D; }
+    .page-link { color: #9D9D95; }
+    .text-muted { color: #B0AFA6BF; }
+    code { color: #B7B6AE; }
+}
+
+// External libraries

@@ -23,6 +23,11 @@
     right: 10px; */
 }
 
+// Make Smartmenus dropdowns open on top of, not under, other navbars
+.tiki .sm-navbar {
+    --sm-navbar-z-index: inherit !important;
+}
+
 /* Smartmenus navbars (Megamenu static) */
 .mega-menu-static {
     position: relative;

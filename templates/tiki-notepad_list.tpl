@@ -78,7 +78,7 @@
                                             {ticket}
                                             <input type="hidden" name="noteId" value="{$channels[user].noteId}">
                                             <input type="hidden" name="remove" value="1">
-                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to delete this note?{/tr}')">
+                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to delete this note?{/tr}')" aria-label="{tr}Remove{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </button>
                                         </form>
@@ -102,7 +102,7 @@
         </div>
     </form>
 
-    {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 {/if}
 
 <h2>{tr}Upload file{/tr}</h2>

@@ -27,14 +27,14 @@
         {$metatag_description = $post_info.parsed_data|strip_tags:false|truncate:200|escape}
     {else}
         {if not empty($post_info) and not empty($post_info.title)}
-            {assign var='tmp_post_info_title' value=$post_info.title}
+            {$tmp_post_info_title=$post_info.title}
         {else}
-            {assign var='tmp_post_info_title' value=''}
+            {$tmp_post_info_title=''}
         {/if}
         {if not empty($blog_data) and not empty($blog_data.title)}
-            {assign var='tmp_blog_data_title' value=$blog_data.title}
+            {$tmp_blog_data_title=$blog_data.title}
         {else}
-            {assign var='tmp_blog_data_title' value=''}
+            {$tmp_blog_data_title=''}
         {/if}
         {$metatag_description = $tmp_post_info_title|cat:' - '|cat:$tmp_blog_data_title|escape}
     {/if}
@@ -114,7 +114,7 @@
     {/capture}
     {if isset($structure) and $structure eq 'y'} {* get the alias name if item is a wiki page and it is in a structure *}
         {section loop=$structure_path name=ix}
-        {assign var="aliasname" value={$structure_path[ix].page_alias}}
+        {$aliasname={$structure_path[ix].page_alias}}
         {/section}
     {/if}
     {if $prefs.site_title_location eq 'only'}
@@ -231,12 +231,6 @@
             title='{$prefs.feed_tracker_title|cat:" - "|cat:$tracker.name|escape|default:"{tr}RSS Tracker{/tr}"}'
             href="tiki-tracker_rss.php?ver={$prefs.feed_default_version|escape:'url'}&trackerId={$tracker.trackerId}">
     {/foreach}
-{/if}
-
-{** GlitchTip reporting script should be load before any other JS to capture issues/failures on other JS scripts *}
-{if $prefs.error_tracking_enabled_js eq 'y' and  !empty($prefs.error_tracking_dsn)}
-    <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/sentry--browser/build/bundle.min.js"></script>
-    <script type="text/javascript">Sentry.init({ dsn: "{$prefs.error_tracking_dsn}", sampleRate: {if isset($prefs.error_tracking_sample_rate) and is_numeric($prefs.error_tracking_sample_rate)}{$prefs.error_tracking_sample_rate}{else}1{/if}});</script>
 {/if}
 
 {if ($prefs.feature_blogs eq 'y' and $prefs.feature_blog_sharethis eq 'y') or ($prefs.feature_articles eq 'y' and $prefs.feature_cms_sharethis eq 'y') or ($prefs.feature_wiki eq 'y' and $prefs.feature_wiki_sharethis eq 'y')}

@@ -1,17 +1,24 @@
-// This file is for additional SCSS rules beyond what are in _variables.scss.
+// Cerulean for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
-$imagePath: "../images/";
+//$imagePath: "../images/";
 // body {
-//	background-image: url('#{$imagePath}bg.jpg');
+//    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// The headings below that are commented are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
-// In the case of CSS selectors that are grouped to share common CSS properties, the category appropriate for most of the selectors is used.
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-// -------------------- Color system -------------------- //
-// -------------------- Body (large elements -------------------- //
-// -------------------- Links -------------------- //
+// Color system
+// Body
+// Links
 .pagetitle a:not(.btn) {
     color: var(--bs-body-color);
 }
@@ -20,9 +27,9 @@ $imagePath: "../images/";
     font-weight: bold;
 }
 
-// -------------------- Paragraphs -------------------- //
-// -------------------- Components -------------------- //
-// -------------------- Typography -------------------- //
+// Paragraphs
+// Components
+// Typography
 .display-1 {
     font-family: "Bebas Neue", sans-serif;
     letter-spacing: .05rem;
@@ -33,8 +40,15 @@ h1, h2, h3, h4, h5, h6,
     letter-spacing: .05rem;
 }
 
-// -------------------- Tables -------------------- //
 
+@media (min-width: 768px) {
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
+        --sm-font-family: #{$headings-font-family};
+        text-transform: uppercase;
+    }
+}
+
+// Tables
 div.table-responsive,
 .tiki .col1 .table-responsive,
 .ec-scrollgrid.table-bordered, // Calendar
@@ -49,7 +63,8 @@ div.table-responsive,
 table.table {
     border: 4px solid #000;
 }
-// -------------------- Buttons -------------------- //
+
+// Buttons
 .btn:not(.btn-link) {
     &.btn-primary,
     &.btn-secondary,
@@ -65,7 +80,7 @@ table.table {
     }
 }
 
-// Keep "More" button horizontally aligned with other buttons in pagebar
+    // Keep "More" button horizontally aligned with other buttons in pagebar
 .btn-bar > .btn-group {
     margin-bottom: 0 !important;
 }
@@ -104,39 +119,46 @@ table.table {
      border-color: #066B7F;
  }
 
-// Titled buttons are sometimes a feature of neubrutalism but I don't think it works so great here.
-//.btn-bar,
-//.t_navbar,
-//.fc-toolbar {
-//    & .btn:nth-child(1) { transform: rotate(2deg); }
-//    & .btn:nth-child(2) { transform: rotate(-1deg); }
-//    & .btn:nth-child(3) { transform: rotate(2deg); }
-//    & .btn:nth-child(4) { transform: rotate(-2deg); }
-//    & .btn:nth-child(5) { transform: rotate(-1deg); }
-//    & .btn:nth-child(6) { transform: rotate(2deg); }
-//    & .btn:nth-child(7) { transform: rotate(0deg); }
-//    & .btn:nth-child(8) { transform: rotate(-1deg); }
-//    & .btn:nth-child(9) { transform: rotate(2deg); }
-//}
+    // Tilted buttons are sometimes a feature of neubrutalism but I don't think it works so great here.
+    //.btn-bar,
+    //.t_navbar,
+    //.fc-toolbar {
+    //    & .btn:nth-child(1) { transform: rotate(2deg); }
+    //    & .btn:nth-child(2) { transform: rotate(-1deg); }
+    //    & .btn:nth-child(3) { transform: rotate(2deg); }
+    //    & .btn:nth-child(4) { transform: rotate(-2deg); }
+    //    & .btn:nth-child(5) { transform: rotate(-1deg); }
+    //    & .btn:nth-child(6) { transform: rotate(2deg); }
+    //    & .btn:nth-child(7) { transform: rotate(0deg); }
+    //    & .btn:nth-child(8) { transform: rotate(-1deg); }
+    //    & .btn:nth-child(9) { transform: rotate(2deg); }
+    //}
 
-// -------------------- Forms -------------------- //
-// -------------------- Form validation -------------------- //
-// -------------------- Navs -------------------- //
+// Forms
+    // Form validation
+    // Modifying the variable values didn't work, for some reason.
+.valid-feedback {
+    color: #157045;
+}
+.invalid-feedback {
+    color: #BF2231;
+}
+
+// Navs
 .nav-link {
     font-family: "Bebas Neue", cursive;
     letter-spacing: .05rem;
 }
 
-// -------------------- Navbar -------------------- //
+// Navbar
 .admin-content .bg-light {
     border: none !important;
     box-shadow: none !important;
 }
 
-// -------------------- Dropdowns -------------------- //
-// -------------------- Pagination -------------------- //
-// -------------------- Jumbotron -------------------- //
-// -------------------- Cards -------------------- //
+// Dropdowns
+// Pagination
+// Cards
 .tiki_blogs .card.blogpost,
 .article,
 .table {
@@ -155,20 +177,24 @@ table.table {
         padding: 1rem !important;
     }
     .card-footer { //,
- //   .articletrailer {
+///   .articletrailer {
         border-top: $card-border-width solid $card-border-color;
     }
 }
 
+.card,
 .card.module {
     background: var(--tiki-card-bg);
     color: var(--tiki-card-color);
-    a {
-        color: var(--tiki-card-link-color);
-    }
-    &:hover {
-        color: var(--tiki-card-link-hover-color);
-    }
+//    a {
+//        color: var(--tiki-card-link-color);
+//    }
+//    &:hover {
+//        color: var(--tiki-card-link-hover-color);
+//    }
+//    &.no-decorations {
+//        box-shadow: none;
+//    }
 }
 
 .table-responsive.ts-wrapperdiv {
@@ -179,47 +205,230 @@ table.table {
     padding: 1rem;
 }
 
-.col2 .modules .card.module {
-    &:nth-child(1) .card-header { background: #cbffa8; }
-    &:nth-child(2) .card-header { background: #a8b5ff; }
-    &:nth-child(3) .card-header { background: #ffa8e1; }
-    &:nth-child(4) .card-header { background: #a8ffc6; }
-    &:nth-child(5) .card-header { background: #dca8ff; }
-    &:nth-child(6) .card-header { background: #ffb0a8; }
-    &:nth-child(7) .card-header { background: #a8f8ff; }
-    &:nth-child(8) .card-header { background: #ffe3a8; }
+[data-bs-theme=light] {
+    .col2 .modules .card.module {
+        &:nth-child(1) .card-header {
+            --tiki-card-bg: #cbffa8;
+        }
+
+        &:nth-child(2) .card-header {
+            --tiki-card-bg: #a8b5ff;
+        }
+
+        &:nth-child(3) .card-header {
+            --bs-card-cap-bg: #ffa8e1;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #a8ffc6;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #dca8ff;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #ffb0a8;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #a8f8ff;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #ffe3a8;
+        }
+    }
+
+    .col3 .modules .card.module {
+        &:nth-child(1) .card-header {
+            background: #ffe3a8;
+        }
+
+        &:nth-child(2) .card-header {
+            background: #a8f8ff;
+        }
+
+        &:nth-child(3) .card-header {
+            background: #ffb0a8;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #dca8ff;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #a8ffc6;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #ffa8e1;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #a8b5ff;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #cbffa8;
+        }
+    }
+
+    .main-footer .bottom_modules .card.module {
+        //    div:nth-child(5) .card.module .card-header { background: #3D4D32; }
+        &:nth-child(1) .card-header {
+            background: #dca8ff;
+        }
+
+        &:nth-child(2) .card-header {
+            background: #ffa8e1;
+        }
+
+        &:nth-child(3) .card-header {
+            background: #a8ffc6;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #a8f8ff;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #cbffa8;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #a8b5ff;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #ffb0a8;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #ffe3a8;
+        }
+    }
+
+    .col2 .modules .card.module .card-title,
+    .col3 .modules .card.module .card-title,
+    .main-footer .bottom_modules .card.module .card-title {
+        color: #000; // Not color mode responsive, because backgrounds aren't.
+    }
 }
 
-.col3 .modules .card.module {
-    &:nth-child(8) .card-header { background: #cbffa8; }
-    &:nth-child(7) .card-header { background: #a8b5ff; }
-    &:nth-child(6) .card-header { background: #ffa8e1; }
-    &:nth-child(5) .card-header { background: #a8ffc6; }
-    &:nth-child(4) .card-header { background: #dca8ff; }
-    &:nth-child(3) .card-header { background: #ffb0a8; }
-    &:nth-child(2) .card-header { background: #a8f8ff; }
-    &:nth-child(1) .card-header { background: #ffe3a8; }
+[data-bs-theme=dark] {
+    .col2 .modules .card.module {
+        &:nth-child(1) .card-header {
+            --tiki-card-bg: #5B734C;
+        }
+
+        &:nth-child(2) .card-header {
+            --tiki-card-bg: #4C5173;
+        }
+
+        &:nth-child(3) .card-header {
+            --bs-card-cap-bg: #734C65;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #4C7359;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #382B41;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #452F2D;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #5F8C8F;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #393326;
+        }
+    }
+
+    .col3 .modules .card.module {
+        &:nth-child(1) .card-header {
+            background: #393326;
+        }
+
+        &:nth-child(2) .card-header {
+            background: #5F8C8F;
+        }
+
+        &:nth-child(3) .card-header {
+            background: #452F2D;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #382B41;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #324D3B;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #4D3244;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #32364D;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #3D4D32;
+        }
+    }
+
+    .main-footer .bottom_modules .card.module {
+        //    div:nth-child(5) .card.module .card-header { background: #3D4D32; }
+        &:nth-child(1) .card-header {
+            background: #382B41;
+        }
+
+        &:nth-child(2) .card-header {
+            background: #4D3244;
+        }
+
+        &:nth-child(3) .card-header {
+            background: #324D3B;
+        }
+
+        &:nth-child(4) .card-header {
+            background: #5F8C8F;
+        }
+
+        &:nth-child(5) .card-header {
+            background: #3D4D32;
+        }
+
+        &:nth-child(6) .card-header {
+            background: #32364D;
+        }
+
+        &:nth-child(7) .card-header {
+            background: #452F2D;
+        }
+
+        &:nth-child(8) .card-header {
+            background: #BFAA7E;
+        }
+    }
+
+    .col2 .modules .card.module .tiki-card-header-title,
+    .col3 .modules .card.module .tiki-card-header-title,
+    .main-footer .bottom_modules .card.module .tiki-card-header-title {
+        --bs-heading-color: #EBEEEF;
+    }
 }
 
-.main-footer .bottom_modules .card.module  {
-//    div:nth-child(5) .card.module .card-header { background: #cbffa8; }
-    &:nth-child(6) .card-header { background: #a8b5ff; }
-    &:nth-child(2) .card-header { background: #ffa8e1; }
-    &:nth-child(3) .card-header { background: #a8ffc6; }
-    &:nth-child(1) .card-header { background: #dca8ff; }
-    &:nth-child(7) .card-header { background: #ffb0a8; }
-    &:nth-child(4) .card-header { background: #a8f8ff; }
-    &:nth-child(8) .card-header { background: #ffe3a8; }
-    &:nth-child(5) .card-header { background: #cbffa8; }
-}
 
-.col2 .modules .card.module .card-title,
-.col3 .modules .card.module .card-title,
-.main-footer .bottom_modules .card.module .card-title {
-    color: #000; // Not color mode responsive, because backgrounds aren't.
-}
-
-// -------------------- Accordions -------------------- //
+// Accordion
 .accordion-header .accordion-button {
     font-size: 1.8rem !important;
 }
@@ -231,22 +440,15 @@ table.table {
     border-radius: $card-border-radius;
 }
 
-
-
-
-// -------------------- Tooltips -------------------- //
-// -------------------- Popovers -------------------- //
-// -------------------- Toasts -------------------- //
-// -------------------- Badges -------------------- //
-// -------------------- Modals -------------------- //
-// -------------------- Alerts -------------------- //
+// Badges
+// Alerts
 .alert .position-absolute.end-0 {  // Move inward to clear border and shadow
     right: 10px !important;
 }
 
-// -------------------- Progress bars -------------------- //
-// -------------------- List group -------------------- //
-// -------------------- Image thumbnails -------------------- //
+// Progress bars
+// List group
+// Image thumbnails
 .thumbnailcontener .thumbimagesub img.cboxElement,
 .thumbimagesub img.cboxElement,
 .regImage,                                        // Blog post images
@@ -268,9 +470,10 @@ article.article {                                 // Articles
 .thumbnailframe {
     height: inherit !important;
 }
-// -------------------- Figures -------------------- //
-// -------------------- Breadcrumbs -------------------- //
-// -------------------- Carousel -------------------- //
+
+// Figures
+// Breadcrumbs
+// Carousel
  // CSS carousel
 input:checked + .slide-container .slide {
     border: 4px solid #000 !important;
@@ -281,18 +484,9 @@ input:checked + .slide-container .slide {
     padding-right: 8px;
 }
 
-// -------------------- Spinners -------------------- //
-// -------------------- Close -------------------- //
-// -------------------- Code -------------------- //
-// -------------------- Utilities -------------------- //
-// -------------------- Printing -------------------- //
-
-// -------------------- Etc -------------------- //
-
-
-
-// -------------------- Tiki-specific -------------------- //
-// UAB
+// Code
+/// Tiki-specific
+    // UAB
 .admin-nav nav {
     padding-right: 6px; // Make room for accordion shadow.
 }
@@ -302,10 +496,7 @@ input:checked + .slide-container .slide {
     border-left: none !important;
 }
 
-// -------------------- External libraries -------------------- //
-
-// -------------------- Dark mode -------------------- //
-
+// Dark mode
 [data-bs-theme=dark] {
     .popover-body { background: #{$body-secondary-bg-dark}; }
     .btn-link { color: #83b5fd !important; }
@@ -315,3 +506,54 @@ input:checked + .slide-container .slide {
         color: #83b5fd !important;
     }
 }
+
+[data-bs-theme=dark] {
+    --tiki-card-bg: #{$body-secondary-bg-dark};
+    //    .popover-body { background: #{$body-secondary-bg-dark}; }
+    --tiki-card-color: var(--bs-body-color);
+    .bg-light,
+    .navbar.bg-light {
+        background: var(--bs-tertiary-bg) !important;
+        .nav-link {
+            color: $link-color-dark;
+        }
+    }
+    .btn-outline-primary {
+        color: #3F8BFD;
+        border-color: #3F8BFD;
+    }
+    .btn-outline-secondary {
+        color: #848D94;
+        border-color: #848D94;
+    }
+    .btn-outline-success {
+        color: #1D9F63;
+        border-color: #1D9F63;
+    }
+    .btn-outline-danger {
+        color: #E36370;
+        border-color: #E36370;
+    }
+    .btn-outline-warning {
+        color: #BD8E00;
+        border-color: #BD8E00;
+    }
+    .btn-outline-info {
+        color: #0898B4;
+        border-color: #0898B4;
+    }
+    .blockquote-footer {
+        color: #808D93;
+    }
+    .valid-feedback {
+        color: #1EA465;
+    }
+    .invalid-feedback {
+        color: #E36370;
+    }
+    .figure-caption {
+        color: #808D93;
+    }
+}
+
+// External libraries

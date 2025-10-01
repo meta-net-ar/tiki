@@ -49,13 +49,19 @@ class Services_File_Controller
 
         $util = new Services_Utilities();
         if ($util->isActionPost()) {
-            if ($input->offsetExists('description')) {
+            if ($input->offsetExists('description') || $input->offsetExists('newfilename')) {
                 $files = $input->asArray('file');
                 $descriptions = $input->asArray('description');
-
+                $newfilenames = $input->asArray('newfilename');
                 foreach ($files as $c => $file) {
                     $fileInfo = $filegallib->get_file_info($file);
-
+                    if (isset($newfilenames[$c])) {
+                        $filegallib->update_file($fileInfo['fileId'], [
+                            'newfilename' => $newfilenames[$c],
+                            'filename' => $fileInfo['filename'],
+                            'lastModifUser' => $fileInfo['asuser'],
+                        ]);
+                    }
                     if (isset($descriptions[$c])) {
                         $filegallib->update_file($fileInfo['fileId'], [
                             'name' => $fileInfo['filename'],
@@ -78,6 +84,7 @@ class Services_File_Controller
             'addDecriptionOnUpload' => $input->addDecriptionOnUpload->int(),
             'admin_trackers'        => $perms->admin_trackers,
             'requireTitle'          => $input->requireTitle->text(),
+            'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
         ];
 
@@ -95,8 +102,16 @@ class Services_File_Controller
         }
 
         $gal_info = $this->checkTargetGallery($input);
-        $fileId = $input->update->int() ? $input->fileId->int() : false;
-        $asuser = $input->user->text();
+
+        if (($input->update->int() || $input->upload->int()) && $input->fileId->int()) {
+            $fileId = $input->fileId->int();
+        } else {
+            $fileId = false;
+        }
+
+        if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
+            $asuser = $input->asArray('user')[0];
+        }
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
         $directoryPattern = $input->directoryPattern->text();
@@ -155,6 +170,9 @@ class Services_File_Controller
             $title = $name;
         }
 
+        if ($directory = $input->directory->text()) {
+            $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
+        }
 
         /* The above if/else sets $type using finfo_file(). The following uses finfo_buffer(), which gives a type different from that obtained from finfo_file() in the case of Outlook .msg files on PHP 5.6. In this case, finfo_file()'s result is better. It is not impossible that the technique below would give better results in other cases.
         See https://stackoverflow.com/questions/45243973/fileinfo-finfo-buffer-results-differ-from-finfo-file
@@ -175,7 +193,8 @@ class Services_File_Controller
             throw new Services_Exception(tr($message), 406);
         }
         $util = new Services_Utilities();
-        if ($util->isActionPost()) {
+        // skip unsetting the CSRF ticket as multiple files might be dropped in the dropzone
+        if ($util->isActionPost(false)) {
             if ($fileId) {
                 // if we are updating a file, we need to get the missing file info from the database
                 $size = $size ?: $fileInfo['filesize'];
@@ -203,8 +222,11 @@ class Services_File_Controller
         $cat_desc = null;
         $cat_name = $name;
         $cat_href = "tiki-download_file.php?fileId=$fileId";
-        $_REQUEST['cat_categories'] = $categories;
-        $_REQUEST["cat_categorize"] = 'on';
+
+        if ($categories) {
+            $_REQUEST['cat_categories'] = $categories;
+            $_REQUEST["cat_categorize"] = 'on';
+        }
         include('categorize.php');
 
         $filegallib = TikiLib::lib('filegal');
@@ -661,7 +683,7 @@ class Services_File_Controller
         $offset = $input->offset->int();
         $maxRecords = $input->maxRecords->int();
         $sort_mode = $input->sort_mode->text() ?: 'created_desc';
-        $find = isset($input->find) ? $input->find->text() : null;
+        $find = $input->find?->text() ?? null;
 
         $perms = Perms::get('file gallery', $galleryId);
 
@@ -678,7 +700,7 @@ class Services_File_Controller
             'galleryId' => $galleryId,
             'offset' => $offset,
             'maxRecords' => $maxRecords,
-            'count' => $result['cant'],
+            'count' => $result['count'],
             'result' => $result['data'],
         ];
     }
@@ -692,7 +714,7 @@ class Services_File_Controller
         $maxRecords = $input->maxRecords->int();
         $sort_mode = $input->sort_mode->text() ?: 'created_desc';
         $user = $input->user->text() ?: '';
-        $find = isset($input->find) ? $input->find->text() : null;
+        $find = $find = $input->find?->text() ?? null;
 
         $perms = Perms::get('file gallery', $galleryId);
 
@@ -709,7 +731,7 @@ class Services_File_Controller
             'parentId' => $galleryId,
             'offset' => $offset,
             'maxRecords' => $maxRecords,
-            'count' => $result['cant'],
+            'count' => $result['count'],
             'result' => $result['data'],
         ];
     }
@@ -914,11 +936,22 @@ class Services_File_Controller
 
     private function checkTargetGallery($input)
     {
-        if ($input->fileId->int()) {
+        // The file uploader sends galleryId as an array, while elFinder and older methods send it as an integer. This logic handles all cases.
+
+        // First, check for the array format used by the file uploader.
+        $galleryIdFromInput = $input->galleryId->asArray();
+        if (! empty($galleryIdFromInput) && is_array($galleryIdFromInput) && isset($galleryIdFromInput[0])) {
+            $galleryId = (int) $galleryIdFromInput[0];
+        } elseif ($input->galleryId->int()) {
+            // Second, check for an integer format, used by elFinder and other parts of Tiki.
+            $galleryId = $input->galleryId->int();
+        } elseif ($input->fileId->int()) {
+            // Third, fall back to the context of an existing file (for editing).
             $fileInfo = TikiLib::lib('filegal')->get_file_info($input->fileId->int());
             $galleryId = $fileInfo ? $fileInfo['galleryId'] : $this->defaultGalleryId;
         } else {
-            $galleryId = $input->galleryId->int() ?: $this->defaultGalleryId;
+            // Finally, if no gallery is specified in any of the above contexts, use the system default.
+            $galleryId = $this->defaultGalleryId;
         }
 
         // Patch for uninitialized utilities.

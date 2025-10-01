@@ -52,7 +52,7 @@
                             <option value="{$groups[ix].groupName|escape}" {if $groups[ix].selected eq 'y'}selected="selected"{/if}>{$groups[ix].groupName|escape}</option>
                         {/section}
                     </select>
-                    {if $prefs.jquery_select2 ne 'y'}
+                    {if $prefs.elementplus_select ne 'y'}
                         {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}
                     {/if}
                     {if $prefs.modallgroups eq 'y'}
@@ -93,18 +93,40 @@
                             {foreach from=$params key=name item=param}
                                 <div class="admin2cols adminoptionbox clearfix">
                                     <label for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)} <span class="attention">({tr}required{/tr})</span>{/if}</label>
-                                    {if isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
+                                    {if isset($name) and $name eq 'id' and $assign_info.name eq 'Menu'}
+                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control" aria-label="{tr}Select Menu{/tr}">
+                                            <option value="" disabled {if !isset($param.value)}selected{/if}>{tr}Select Menu{/tr}</option>
+                                            {foreach from=$channels item=channel}
+                                                {$menuId=$channel.menuId}
+                                                {$truncatedDescription=$channel.description|truncate:30:"..."}
+                                                <option value="{$menuId|escape}" {if isset($param.value) && $param.value eq $menuId}selected="selected"{/if}>
+                                                    {$channel.name|escape} ({$menuId|escape}){if $channel.description} - {$truncatedDescription|escape}{/if}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                    {elseif isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
                                         <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control">
                                             <option value="horiz" {if isset($param.value) && $param.value eq 'horiz'}selected="selected"{/if}>horiz</option>
                                             <option value="vert" {if isset($param.value) && $param.value eq 'vert'}selected="selected"{/if}>vert</option>
                                         </select>
                                     {elseif isset($name) and $name eq 'device'}
                                         <select multiple="multiple" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}][]" class="form-control">
-                                            <option value="MOBILE" {if isset($param.value) && in_array("MOBILE", $param.value)}selected="selected"{/if}>Mobile</option>
-                                            <option value="TABLET" {if isset($param.value) && in_array("TABLET", $param.value)}selected="selected"{/if}>Tablet</option>
-                                            <option value="LAPTOP" {if isset($param.value) && in_array("LAPTOP", $param.value)}selected="selected"{/if}>Laptop</option>
-                                            <option value="DESKTOP" {if isset($param.value) && in_array("DESKTOP", $param.value)}selected="selected"{/if}>Desktop</option>
-                                            <option value="PRINT" {if isset($param.value) && in_array("PRINT", $param.value)}selected="selected"{/if}>Print</option>
+                                            <option value="HIDE_ALL" {if isset($param.value) && in_array("HIDE_ALL", $param.value)}selected="selected"{/if}>Hidden on all</option>
+                                            <option value="HIDE_XS" {if isset($param.value) && in_array("HIDE_XS", $param.value)}selected="selected"{/if}>Hidden only on xs (<576px)</option>
+                                            <option value="HIDE_SM" {if isset($param.value) && in_array("HIDE_SM", $param.value)}selected="selected"{/if}>Hidden only on sm (576px–767px)</option>
+                                            <option value="HIDE_MD" {if isset($param.value) && in_array("HIDE_MD", $param.value)}selected="selected"{/if}>Hidden only on md (768px–991px)</option>
+                                            <option value="HIDE_LG" {if isset($param.value) && in_array("HIDE_LG", $param.value)}selected="selected"{/if}>Hidden only on lg (992px–1199px)</option>
+                                            <option value="HIDE_XL" {if isset($param.value) && in_array("HIDE_XL", $param.value)}selected="selected"{/if}>Hidden only on xl (1200px–1399px)</option>
+                                            <option value="HIDE_XXL" {if isset($param.value) && in_array("HIDE_XXL", $param.value)}selected="selected"{/if}>Hidden only on xxl (≥1400px)</option>
+                                            <option value="SHOW_ALL" {if isset($param.value) && in_array("SHOW_ALL", $param.value)}selected="selected"{/if}>Visible on all</option>
+                                            <option value="SHOW_XS" {if isset($param.value) && in_array("SHOW_XS", $param.value)}selected="selected"{/if}>Visible only on xs (<576px)</option>
+                                            <option value="SHOW_SM" {if isset($param.value) && in_array("SHOW_SM", $param.value)}selected="selected"{/if}>Visible only on sm (576px–767px)</option>
+                                            <option value="SHOW_MD" {if isset($param.value) && in_array("SHOW_MD", $param.value)}selected="selected"{/if}>Visible only on md (768px–991px)</option>
+                                            <option value="SHOW_LG" {if isset($param.value) && in_array("SHOW_LG", $param.value)}selected="selected"{/if}>Visible only on lg (992px–1199px)</option>
+                                            <option value="SHOW_XL" {if isset($param.value) && in_array("SHOW_XL", $param.value)}selected="selected"{/if}>Visible only on xl (1200px–1399px)</option>
+                                            <option value="SHOW_XXL" {if isset($param.value) && in_array("SHOW_XXL", $param.value)}selected="selected"{/if}>Visible only on xxl (≥1400px)</option>
+                                            <option value="SHOW_PRINT" {if isset($param.value) && in_array("SHOW_PRINT", $param.value)}selected="selected"{/if}>Print only (Hide on screen)</option>
+                                            <option value="SHOW_SCREEN" {if isset($param.value) && in_array("SHOW_SCREEN", $param.value)}selected="selected"{/if}>Screen only (Hide on print)</option>
                                         </select>
 
                                     {elseif $param.type eq 'textarea'}
@@ -113,7 +135,7 @@
                                         <input type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" value="{$param.value|escape}"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>
                                     {/if}
                                     <div class="description mb-3">
-                                        {$param.description|escape}
+                                        {$param.description}
                                         {if !empty($param.default)} - {tr}Default:{/tr} {$param.default|escape}{/if}
                                     </div>
                                 </div>

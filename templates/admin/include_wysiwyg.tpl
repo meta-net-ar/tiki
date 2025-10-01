@@ -1,4 +1,4 @@
-{remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}WYSIWYG means What You See Is What You Get, and is handled in Tiki by <a class="alert-link" href="http://ckeditor.com/">CKEditor</a>{/tr}.{/remarksbox}
+{remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}WYSIWYG means What You See Is What You Get, and is handled in Tiki by <a class="alert-link" href="https://summernote.org">Summernote</a>{/tr}.{/remarksbox}
 <form action="tiki-admin.php?page=wysiwyg" method="post" class="admin">
     {ticket}
     <div class="t_navbar mb-4 clearfix">
@@ -31,12 +31,10 @@
         {preference name=markdown_wysiwyg_usage_statistics}
     </fieldset>
     <fieldset>
-        <legend class="h3">{tr}Legacy CKEditor WYSIWYG{/tr}</legend>
+        <legend class="h3">{tr}WYSIWYG Editor powered by Summernote{/tr}</legend>
         {preference name=wysiwyg_htmltowiki}
         {preference name=wysiwyg_inline_editing}
-        {preference name=wysiwyg_toolbar_skin}
         {preference name="wysiwyg_fonts"}
-        {preference name="wysiwyg_extra_plugins"}
     </fieldset>
     <fieldset>
         <legend class="heading">{tr}Related features{/tr}</legend>

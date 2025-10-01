@@ -29,7 +29,9 @@ function _shown() {
     const textArea = document.getElementById(toolbarObject.value.domElementId);
     const selection = getTASelection(textArea);
 
-    $(pageInputRef.value.$el).tiki("autocomplete", "pagename");
+    if (window.elementPlus?.autocomplete) {
+        autocomplete(pageInputRef.value.$el, 'pagename');
+    }
 
     let parts = selection.match(/\((.*?)\((.*?)\|(.*?)\)\)/);
     if (! parts) {

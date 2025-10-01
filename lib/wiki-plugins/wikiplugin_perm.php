@@ -99,7 +99,7 @@ function wikiplugin_perm($data, $params)
         $objectPerms = null;
     }
 
-    if (strpos($data, '{ELSE}')) {
+    if (str_contains($data, '{ELSE}')) {
         $dataelse = substr($data, strpos($data, '{ELSE}') + 6);
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     } else {

@@ -83,7 +83,7 @@ get:
                       type: array
                       items:
                         type: string
-                    permcant:
+                    permCount:
                       type: integer
                     included:
                       type: array
@@ -93,7 +93,7 @@ get:
                       type: array
                       items:
                         type: string
-              cant:
+              count:
                 type: integer
 post:
   description: Create a group

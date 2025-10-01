@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so it's better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     die;
 }
@@ -25,7 +25,7 @@ class Tiki_Wsdl
 
         $context = null;
 
-        if ($prefs['use_proxy'] == 'y' && ! strpos($wsdlUri, 'localhost')) {
+        if ($prefs['use_proxy'] == 'y' && ! str_contains($wsdlUri, 'localhost')) {
             // Use proxy
             $context = stream_context_create(
                 [

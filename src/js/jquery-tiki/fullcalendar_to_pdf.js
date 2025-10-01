@@ -4,9 +4,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 import moment from "moment";
-import { jsPDF } from "jspdf";
+import { jsPDF } from "common-reexported/jspdf";
 
-$.fn.addFullCalendarPrint = function (buttonId, calendar) {
+$.fn.addEventCalendarPrint = function (buttonId, calendar) {
     let viewContainer = $(this);
     var calendarId = "#" + $(this).attr("id");
     if (!viewContainer) {
@@ -19,14 +19,14 @@ $.fn.addFullCalendarPrint = function (buttonId, calendar) {
     $(buttonId).off("click");
     $(buttonId).on("click", function (event) {
         event.preventDefault();
-        var elementToPrint = $(calendarId + " .ec-view");
+        var elementToPrint = $(calendarId + " .ec");
         $("html, body").animate({ scrollTop: 0 }, 0);
         setTimeout(function () {
             html2canvas(elementToPrint[0], {
                 scrollY: 0,
                 scrollX: 0,
             }).then(function (canvas) {
-                var date = moment(calendar.getDate());
+                var date = moment(calendar.date);
                 var monthName = date.format("MMMM");
                 var year = date.format("YYYY");
                 var imgData = canvas.toDataURL("image/jpeg", 1.0);

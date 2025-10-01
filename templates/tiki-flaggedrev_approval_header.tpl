@@ -20,6 +20,7 @@
                         {/if}
                         <div class="submit row">
                           <input type="hidden" name="revision" value="{$revision_displayed|escape}">
+                          <input type="hidden" name="page" value="{$page|escape}">
                           <div class="col-md-6">
                             <input type="submit" class="btn btn-primary btn-sm" name="approve" value="{tr}Approve current revision{/tr}">
                           </div>

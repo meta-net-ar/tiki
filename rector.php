@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+if (PHP_SAPI !== 'cli') {
+    return;
+}
+
 /*
 
 To run rector (https://getrector.com/documentation) on a file or directory, run:

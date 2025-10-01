@@ -5,11 +5,11 @@
         <h6 class="py-3 text-muted border-bottom">
             {tr}Move to tracker item{/tr}
             <span class="close-tracker-selector float-end">
-                <a href="#">&times;</a>
+                <a href="#" role="button">&times;</a>
             </span>
         </h6>
         {foreach from=$fields_data item=field_data}
-            <a href="#" class="object_selector_trigger" data-tracker="{$field_data['tracker_id']}" data-field="{$field_data['field_id']}">{$field_data['name']}</a>
+            <a href="#" class="object_selector_trigger" data-tracker="{$field_data['tracker_id']}" data-field="{$field_data['field_id']}" role="button">{$field_data['name']}</a>
 
             {object_selector _id="file_tracker_{$field_data['tracker_id']}" _name=tracker_item_selector type=trackeritem tracker_id=$field_data['tracker_id']}
         {/foreach}
@@ -33,8 +33,4 @@
     $(document).on('ready.object_selector', function (event, container) {
         $(container).find('.basic-selector').addClass('d-none');
     });
-
-    if (jqueryTiki.select2) {
-        $('#tracker_selector .object-selector').find('.form-select').tiki('select2');
-    }
 {/jq}

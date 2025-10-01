@@ -32,7 +32,7 @@ class RelationLib extends TikiDb_Bridge
      */
     public function get_relations_from($type, $object, $relation = '', $orderBy = '', $max = -1)
     {
-        if (substr($relation, -7) === '.invert') {
+        if (str_ends_with($relation, '.invert')) {
             return $this->get_relations_to($type, $object, substr($relation, 0, -7), $orderBy, $max);
         }
 
@@ -67,7 +67,7 @@ class RelationLib extends TikiDb_Bridge
     public function getObjectRelations(string $type, string $object, string $relation, bool $invert = false): array
     {
         $straight = true;
-        if (substr($relation, -7) === '.invert') {
+        if (str_ends_with($relation, '.invert')) {
             $straight = false;
             $relation = substr($relation, 0, -7);
         }
@@ -180,7 +180,7 @@ class RelationLib extends TikiDb_Bridge
      */
     public function get_relations_to($type, $object, $relation = '', $orderBy = '', $max = -1)
     {
-        if (substr($relation, -7) === '.invert') {
+        if (str_ends_with($relation, '.invert')) {
             return $this->get_relations_from($type, $object, substr($relation, 0, -7), $orderBy, $max);
         }
 
@@ -215,7 +215,7 @@ class RelationLib extends TikiDb_Bridge
 
         $relation = TikiFilter::get('attribute_type')->filter($relation);
 
-        if (substr($relation, -7) === '.invert') {
+        if (str_ends_with($relation, '.invert')) {
             return $this->add_relation(substr($relation, 0, -7), $target_type, $target_object, $src_type, $src_object, $ignoreExisting, $src_field_id, $metadata_item_id);
         }
 
@@ -267,7 +267,7 @@ class RelationLib extends TikiDb_Bridge
     {
         $relation = TikiFilter::get('attribute_type')->filter($relation);
 
-        if (substr($relation, -7) === '.invert') {
+        if (str_ends_with($relation, '.invert')) {
             return $this->get_relation_id(substr($relation, 0, -7), $target_type, $target_object, $src_type, $src_object);
         }
 
@@ -487,7 +487,7 @@ class RelationLib extends TikiDb_Bridge
         $relation = TikiFilter::get('attribute_type')->filter($relation);
 
         if ($relation) {
-            if (substr($relation, -1) == '.') {
+            if (str_ends_with($relation, '.')) {
                 $relation .= '%';
             }
 

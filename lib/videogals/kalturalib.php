@@ -6,14 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Kaltura\Client\Client;
 use Kaltura\Client\Configuration;
-use Kaltura\Client\Enum\UiConfCreationMode;
-use Kaltura\Client\Enum\UiConfObjType;
 use Kaltura\Client\Type\FilterPager;
 use Kaltura\Client\Type\MediaEntry;
 use Kaltura\Client\Type\MediaEntryFilter;
 use Kaltura\Client\Type\MixEntry;
 use Kaltura\Client\Type\MixEntryFilter;
-use Kaltura\Client\Type\UiConf;
 use Kaltura\Client\Type\UiConfFilter;
 
 class KalturaLib
@@ -69,7 +66,7 @@ class KalturaLib
     {
         if (! $this->kconfig) {
             global $prefs;
-            $this->kconfig = new Configuration($prefs['kaltura_partnerId']);
+            $this->kconfig = new Configuration();
             $this->kconfig->setServiceUrl($prefs['kaltura_kServiceUrl']);
         }
 

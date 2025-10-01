@@ -21,7 +21,7 @@
         <td style="text-align:left">
             {if !isset($showWizardPageTitle) or $showWizardPageTitle neq 'y'}
                 <h1 class="adminWizardPageTitle">{$pageTitle}</h1>
-                {assign var="showWizardPageTitle" value="y" scope="root"}
+                {$showWizardPageTitle="y" scope="root"}
             {/if}
         </td>
         <td style="text-align:right">

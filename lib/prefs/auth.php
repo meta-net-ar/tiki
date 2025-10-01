@@ -26,6 +26,14 @@ function prefs_auth_list()
             ],
             'default' => 'tiki',
         ],
+        'auth_webauthn_enabled' => [
+            'name' => tra('Enable WebAuthn'),
+            'description' => tra('Allow users to log in using WebAuthn.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'view' => 'tiki-webauthn.php'
+        ],
         'auth_token_access' => [
             'name' => tra('Token access'),
             'description' => tra('With the presentation of a token, allow access to the content with elevated rights. The primary use of this authentication method is to grant temporary access to content to an external service.'),

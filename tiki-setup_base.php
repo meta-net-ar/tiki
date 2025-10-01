@@ -9,12 +9,14 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
 
 use Tiki\Command\ConsoleSetupException;
+use Tiki\TikiDb\PdoDb;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 require_once('tiki-filter-base.php');
 
@@ -25,7 +27,7 @@ if (empty($_SERVER['REQUEST_URI'])) {
     $_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
 }
 if (empty($_SERVER['SERVER_NAME'])) {
-    $_SERVER['SERVER_NAME'] = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'] ?? '';
 }
 
 
@@ -92,8 +94,7 @@ $needed_prefs = [
     'pass_chr_special' => 'n',
     'cookie_consent_feature' => 'n',
     'cookie_consent_disable' => 'n',
-    'cookie_consent_analytics' => 'n',
-    'cookie_consent_name' => 'tiki_cookies_accepted',
+    'cookie_consent_name' => CookieConsentLib::COOKIE_CONSENT_NAME,
     'allocate_memory_php_execution' => '',
     'allocate_time_php_execution' => '',
     'https_port' => '443',
@@ -121,6 +122,7 @@ if (! $tikilib->getOne("SELECT COUNT(*) FROM `information_schema`.`character_set
 $tikilib->get_preferences($needed_prefs, true, true);
 global $systemConfiguration;
 $prefs = $systemConfiguration->preference->toArray() + $prefs;
+$systemConfiguration->setReadOnly();
 
 // Initialize ErrorTracking instance (Sentry/GlitchTip) as early as possible
 TikiLib::lib('errortracking')->init();
@@ -158,7 +160,7 @@ $patterns['hash'] = "/^[a-z0-9]*$/"; // for hash reqId in live support
 $patterns['url'] = "/^(https?:\/\/)?[^<>\"]*$/";
 
 // IIS always sets the $_SERVER['HTTPS'] value (on|off)
-$noSSLActive = ! isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'off');
+$noSSLActive = ! isset($_SERVER['HTTPS']) || ($_SERVER['HTTPS'] == 'off');
 if (isset($prefs['session_protected']) && $prefs['session_protected'] == 'y' && $noSSLActive && php_sapi_name() != 'cli') {
     header("Location: https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
     exit;
@@ -187,16 +189,14 @@ if (isset($prefs['session_storage']) && $prefs['session_storage'] == 'db') {
         $db->getReal();
     }
 
-    if ($db instanceof TikiDb_AdoDb) {
-        require_once('lib/tikisession-adodb.php');
-    } elseif ($db instanceof TikiDb_Pdo) {
+    if ($db instanceof TikiDb_Pdo) {
         require_once('lib/tikisession-pdo.php');
     }
 } elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && TikiLib::lib("memcache")->isEnabled()) {
     require_once('lib/tikisession-memcache.php');
 }
 
-if (! isset($prefs['session_cookie_name']) || empty($prefs['session_cookie_name'])) {
+if (empty($prefs['session_cookie_name'])) {
     $prefs['session_cookie_name'] = session_name();
 }
 
@@ -220,24 +220,6 @@ if (empty($tikidomain)) {
     $tikidomain = "";
 }
 
-if ($prefs['cookie_consent_feature'] === 'y' && empty($_COOKIE[$prefs['cookie_consent_name']]) && $prefs['cookie_consent_disable'] !== 'y') {
-    // No consent yet
-    $feature_no_cookie = true;
-    $feature_no_cookie_analytics = true;
-} else {
-    // Cookie consent not implemented or consent given or consent forced with preference cookie_consent_disable
-    $feature_no_cookie = false;
-    if ($prefs['cookie_consent_analytics'] === 'y') {
-        if (! empty($_COOKIE[$prefs['cookie_consent_name'] . '_analytics']) && $_COOKIE[$prefs['cookie_consent_name'] . '_analytics'] === 'y') {
-            $feature_no_cookie_analytics = false;
-        } else {
-            $feature_no_cookie_analytics = true;
-        }
-    } else {
-        $feature_no_cookie_analytics = false;
-    }
-}
-
 $start_session = true;
 $extra_cookie_name = session_name() . 'CV';
 if ($prefs['session_silent'] == 'y' && empty($_COOKIE[session_name()]) && empty($_COOKIE[$extra_cookie_name])) {
@@ -254,10 +236,10 @@ if ($cdn_pref) {
         exit;
     }
 }
-if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-realtime.php') === false) {
+if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 'tiki-realtime.php')) {
     ini_set('session.cookie_path', str_replace("\\", "/", $tikiroot));
-    if ($start_session) {
-        // enabing silent sessions mean a session is only started when a cookie is presented
+    if ($start_session && ini_get('session.use_cookies')) {
+    // enabing silent sessions mean a session is only started when a cookie is presented
         $session_params = session_get_cookie_params();
         if (isset($prefs['session_protected']) && $prefs['session_protected'] == 'y') {
             $session_params['secure'] = true;
@@ -266,6 +248,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
             $session_params['secure'] = true;
             $session_params['samesite'] = 'None';
         }
+
         session_set_cookie_params([
             'lifetime' => $session_params['lifetime'],
             'path' => $tikiroot,
@@ -294,7 +277,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
                  * This is an extremely rare occurence that is hard to reproduce by nature.
                  */
                 if (isset($_SESSION['extra_validation'])) {
-                    $cookie = isset($_COOKIE[$extra_cookie_name]) ? $_COOKIE[$extra_cookie_name] : null;
+                    $cookie = $_COOKIE[$extra_cookie_name] ?? null;
 
                     if ($cookie !== $_SESSION['extra_validation']) {
                         TikiLib::lib('logs')->add_log('system', 'session cookie validation failed');
@@ -317,9 +300,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
                     unset($sequence);
                 }
             }
-        } catch (Laminas\Session\Exception\ExceptionInterface $e) {
-            // Ignore
-        } catch (Laminas\Stdlib\Exception\InvalidArgumentException $e) {
+        } catch (Laminas\Session\Exception\ExceptionInterface | Laminas\Stdlib\Exception\InvalidArgumentException $e) {
             // Ignore
         }
 
@@ -399,7 +380,7 @@ $vartype['name'] = 'string';
 $vartype['reqId'] = '+hash';
 $vartype['days'] = '+int';
 $vartype['max'] = '+int';
-$vartype['maxRecords'] = '+int';
+$vartype['maxRecords'] = 'intSign';
 $vartype['numrows'] = '+int';
 $vartype['rows'] = '+int';
 $vartype['cols'] = '+int';
@@ -459,7 +440,7 @@ function varcheck(&$array, $category)
             } elseif (isset($vartype["$rq"])) {
                 $has_sign = false;
                 // Variable allowed to be empty?
-                if ('+' == substr($vartype[$rq], 0, 1)) {
+                if (str_starts_with($vartype[$rq], '+')) {
                     if ($rv == "") {
                         // $return[] = tra("Notice: this variable may not be empty:") . ' <font color="red">$' . $category . '["' . $rq . '"]</font>';
                         continue;
@@ -742,7 +723,7 @@ try {
                 'ticket'                      => 'alnumdash',
                 'confirmForm'                 => 'alpha',
                 //cookie
-                $prefs['cookie_consent_name'] => 'alnum',
+                CookieConsentLib::COOKIE_CONSENT_NAME => 'alnum',
                 'local_tz'                    => 'text',
                 'local_tzoffset'              => 'int',
                 'PHPSESSID'                   => 'alnum',

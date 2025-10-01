@@ -14,12 +14,12 @@
         <input type="hidden" name="params[{$paramName}Actions]" id="action" value="{$pluginArgs[$paramName|cat:'Action']}">
         <div class="btn-container d-flex gap-4 align-items-center flex-wrap">
             <div>
-                <button class="btn btn-light"  data-bs-toggle="collapse" data-bs-target="#fields{$paramName}" aria-expanded="false" aria-controls="fields{$paramName}" type="button">
+                <button class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#fields{$paramName}" aria-expanded="false" aria-controls="fields{$paramName}" type="button" aria-label="{tr}Add{/tr}">
                     {icon name="plus"}
                 </button>
             </div>
             <div class="buttons d-flex gap-2 flex-wrap">
-                <span class="d-none delete-icon" role="button">{icon name="delete"}</span>
+                <span class="d-none delete-icon" role="button" aria-label="{tr}Delete{/tr}">{icon name="delete"}</span>
             </div>
         </div>
     </div>

@@ -56,10 +56,6 @@ class Search_Action_Delete implements Search_Action_Action
     public function execute(JitFilter $data)
     {
         global $access;
-        if (substr(php_sapi_name(), 0, 3) !== 'cli') {
-            // TODO: this probably needs to be handled in accesslib itself
-            $access->checkCsrf(tr('Are you sure you want to permanently delete these objects?'));
-        }
 
         $object_type = $data->object_type->text();
         $object_id = $data->object_id->int();
@@ -92,6 +88,11 @@ class Search_Action_Delete implements Search_Action_Action
     public function requiresInput(JitFilter $data)
     {
         return false;
+    }
+
+    public function requiresConfirm()
+    {
+        return true;
     }
 
     private function executeOnItem($object_id, $object_type)

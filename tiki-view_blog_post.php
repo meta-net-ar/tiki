@@ -42,18 +42,14 @@ $auto_query_args = [
 $access->check_feature('feature_blogs');
 
 if (empty($_REQUEST["postId"])) {
-    $smarty->assign('msg', tra('No post indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No post indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 } else {
     $postId = $_REQUEST['postId'];
 }
 
 $post_info = $bloglib->get_post($postId);
 if (! $post_info) {
-    $smarty->assign('msg', tra("Post not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Post not found"), \Laminas\Http\Response::STATUS_CODE_404);
 } else {
     $bloglib->add_blog_post_hit($postId);
 }
@@ -64,9 +60,7 @@ $_SESSION['blogs_last_viewed_month'] = TikiLib::date_format("%Y-%m", $post_info[
 
 $blog_data = $bloglib->get_blog($blogId);
 if (! $blog_data) {
-    $smarty->assign('msg', tra("Blog not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Blog not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $tikilib->get_perm_object($postId, 'blog post');
@@ -84,16 +78,10 @@ if ($user && $user == $post_info["user"]) {
 }
 
 if ($ownspost == 'n' && $ownsblog == 'n' && $tiki_p_blog_admin != 'y' && $post_info["priv"] == 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to view this blog post while it is marked as private"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to view this blog post while it is marked as private"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 if ($ownspost == 'n' && $ownsblog == 'n' && $tiki_p_blog_admin != 'y' && $post_info['created'] > $tikilib->now) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $allowprivate = 'n';

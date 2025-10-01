@@ -11,6 +11,8 @@
 require_once('tiki-setup.php');
 $access->check_feature('feature_mailin');
 include_once('tiki-mailin-code.php');
-$smarty->assign('content', $content);
+require_once('tiki-setup.php');
+global $mailin_results;
+$smarty->assign('results', $mailin_results ?? []);
 $smarty->assign('mid', 'tiki-mailin.tpl');
 $smarty->display("tiki.tpl");

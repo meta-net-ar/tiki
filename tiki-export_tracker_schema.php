@@ -16,26 +16,29 @@ $trklib = TikiLib::lib('trk');
 $definitions = Tracker_Definition::getAll();
 
 if (empty($definitions)) {
-    $smarty->assign('msg', tra('No tracker found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No tracker found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $requestedTrackerIds = $_REQUEST["trackerIds"] ?? [];
 $smarty->assign('requestedTrackerIds', $requestedTrackerIds);
 if (! is_array($requestedTrackerIds)) {
-    $smarty->assign('msg', tra('The trackerIds parameter must be an array of (possibly just one) tracker ids'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('The trackerIds parameter must be an array of (possibly just one) tracker ids'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $skipAttributes = ! empty($_REQUEST["skipAttributes"]) ?? false;
 $skipRelations = ! empty($_REQUEST["skipRelations"]) ?? false;
-$includePermNames = empty($_REQUEST["includePermNames"]) ? false : true;
+$includePermNames = ! empty($_REQUEST["includePermNames"]);
+
+$skipAttributesChecked = $skipAttributes ? 'checked' : '';
+$skipRelationsChecked = $skipRelations ? 'checked' : '';
+$includePermNamesChecked = $includePermNames ? 'checked' : '';
+
+$smarty->assign('skipAttributesChecked', $skipAttributesChecked);
+$smarty->assign('skipRelationsChecked', $skipRelationsChecked);
+$smarty->assign('includePermNamesChecked', $includePermNamesChecked);
 
 $availableTrackers = [];
-$goback = count($requestedTrackerIds) > 1 ? 'trackers' : 'tracker';
-$smarty->assign('goback', $goback);
+
 foreach ($definitions as $tracker) {
     if (is_object($tracker) && method_exists($tracker, 'getID') && method_exists($tracker, 'getInformation')) {
         $tikilib->get_perm_object($tracker->getID(), 'tracker', $tracker->getInformation());
@@ -45,23 +48,24 @@ foreach ($definitions as $tracker) {
         Feedback::error("Invalid tracker detected: " . var_export($tracker, true));
     }
 }
-
+$urlParameterStringToGoBackToListOfTrackers = '';
 if (! $requestedTrackerIds) {
     //If no specific trackers were requested, add them all
     $trackerIds = array_keys($availableTrackers);
 } else {
     $trackerIds = $requestedTrackerIds;
+    for ($i = 0; $i < count($requestedTrackerIds); $i++) {
+        $urlParameterStringToGoBackToListOfTrackers .= "trackerIds[]=" . $requestedTrackerIds[$i] . "&";
+    }
+    //Remove the last &
+    $urlParameterStringToGoBackToListOfTrackers = substr_replace($urlParameterStringToGoBackToListOfTrackers, "", -1);
 }
-
-$headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/svg-pan-zoom/dist/svg-pan-zoom.min.js");
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-export_tracker_schema.js');
 
-$idTracker = isset($_REQUEST["trackerIds"]) ? $_REQUEST["trackerIds"][0] : '';
-$smarty->assign('idTracker', $idTracker);
 $smarty = TikiLib::lib('smarty');
 require_once("export-tracker_schema.php");
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames);
-$mermaidOutput = renderMermaid($mermaidText);
+$mermaidOutput = handleMermaid($mermaidText);
 if (isset($_REQUEST['export'])) {
     $export = $_REQUEST['export'];
 } else {
@@ -70,6 +74,7 @@ if (isset($_REQUEST['export'])) {
 
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames, true);
 $smarty->assign('export', $export);
+$smarty->assign('urlParameterStringToGoBackToListOfTrackers', $urlParameterStringToGoBackToListOfTrackers);
 $smarty->assign('textPlain', $mermaidText);
 $smarty->assign('contentmain', $mermaidOutput);
 $smarty->assign('mid', 'tiki-export_tracker_schema.tpl');

@@ -29,21 +29,21 @@
             {if $txt}<div class="alert alert-info newsletter_text">{$txt|escape|nl2br}</div>{/if}
         {/if}
         <div class="newsletter_trailer">
-            {assign var="sent" value=$edition.users}
+            {$sent=$edition.users}
             {tr _0=$sent}The newsletter was sent to %0 email addresses{/tr}<br>
             {$edition.sent|tiki_short_datetime}
         </div>
     {/if}
 
-    {assign var=view_editions value='y'}
-    {assign var=cur value='ed'}
-    {assign var=bak value='dr'}
-    {assign var=sort_mode value=$ed_sort_mode}
-    {assign var=sort_mode_bak value='sent_desc'}
-    {assign var=offset value=$ed_offset}
-    {assign var=offset_bak value=0}
-    {assign var=find value=$ed_find}
-    {assign var=find_bak value=''}
+    {$view_editions='y'}
+    {$cur='ed'}
+    {$bak='dr'}
+    {$sort_mode=$ed_sort_mode}
+    {$sort_mode_bak='sent_desc'}
+    {$offset=$ed_offset}
+    {$offset_bak=0}
+    {$find=$ed_find}
+    {$find_bak=''}
     {include file='sent_newsletters.tpl'}
 
     {if $edition_errors}

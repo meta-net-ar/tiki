@@ -153,11 +153,8 @@ tiki:
     - send_mailin
     - admin_mailin
     - admin_rssmodules
-    - create_css
     - detach_translation
     - edit_languages
-    - view_templates
-    - edit_templates
     - view_actionlog
     - view_actionlog_owngroups
     - ratings_view_results
@@ -268,14 +265,6 @@ webmail:
     - use_group_webmail
 xmpp:
     - xmpp_chat
-accounting:
-    - acct_create_book
-    - acct_manage_accounts
-    - acct_book
-    - acct_view
-    - acct_book_stack
-    - acct_book_import
-    - acct_manage_template
 payment:
     - payment_admin
     - payment_view

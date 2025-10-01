@@ -11,7 +11,6 @@
 
 -----------------------------------------------------------
 {tr}Publish Date:{/tr} {$mail_current_publish_date|tiki_short_datetime:"":"n"}
-{tr}Expiration Date:{/tr} {$mail_current_expiration_date|tiki_short_datetime:"":"n"}
 
 {if !empty($watchId)}{tr}If you don't want to receive these notifications follow this link:{/tr}
 {mailurl}tiki-user_watches.php?id={$watchId}{/mailurl}{/if}
@@ -24,7 +23,6 @@
 {tr}Title:{/tr} {$mail_old_title}
 
 {tr}Publish Date:{/tr} {$mail_old_publish_date|tiki_short_datetime:"":"n"}
-{tr}Expiration Date:{/tr} {$mail_old_expiration_date|tiki_short_datetime:"":"n"}
 ***********************************************************
 {tr}Content{/tr}
 ***********************************************************

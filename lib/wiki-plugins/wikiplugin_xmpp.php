@@ -173,14 +173,6 @@ function wikiplugin_xmpp($data, $params)
     $servicelib = TikiLib::lib('service');
     $smarty = TikiLib::lib('smarty');
 
-    $defaults = [];
-    $plugininfo = wikiplugin_xmpp_info();
-
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if (empty($params['room'])) {
         Feedback::error(tr('PluginXMPP Error: No room specified'));
         return '';

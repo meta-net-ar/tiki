@@ -25,9 +25,7 @@ if (! empty($_REQUEST['nlId'])) {
     $smarty->assign('nlId', $_REQUEST["nlId"]);
     $nl_info = $nllib->get_newsletter($_REQUEST["nlId"]);
     if (empty($nl_info)) {
-        $smarty->assign('msg', tra('Newsletter does not exist'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Newsletter does not exist'), \Laminas\Http\Response::STATUS_CODE_404);
     }
     $smarty->assign_by_ref('nl_info', $nl_info);
 }
@@ -37,9 +35,7 @@ $access->check_permission_either(['tiki_p_view_newsletter']);
 
 if (isset($_REQUEST['remove']) && ! empty($_REQUEST['nlId']) && $access->checkCsrf()) {
     if (! $tikilib->user_has_perm_on_object($user, $_REQUEST['nlId'], 'newsletter', 'tiki_p_admin_newsletters')) {
-        $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_403);
     }
     $nllib->remove_edition($_REQUEST["nlId"], $_REQUEST["remove"]);
 }
@@ -50,7 +46,7 @@ if (! empty($_REQUEST['error'])) {
     $smarty->assign_by_ref('edition_info', $edition_info);
 }
 if (! empty($_REQUEST['deleteError'])) {
-    $edition_errors = $nllib->remove_edition_errors($_REQUEST['deleteError']);
+    $nllib->remove_edition_errors($_REQUEST['deleteError']);
 }
 if (! isset($_REQUEST["ed_sort_mode"])) {
     $ed_sort_mode = 'sent_desc';
@@ -63,11 +59,7 @@ if (! isset($_REQUEST["ed_offset"])) {
     $ed_offset = $_REQUEST["ed_offset"];
 }
 $smarty->assign_by_ref('ed_offset', $ed_offset);
-if (isset($_REQUEST["ed_find"])) {
-    $ed_find = $_REQUEST["ed_find"];
-} else {
-    $ed_find = '';
-}
+$ed_find = $_REQUEST["ed_find"] ?? '';
 $smarty->assign('ed_find', $ed_find);
 $smarty->assign_by_ref('ed_sort_mode', $ed_sort_mode);
 if (isset($_REQUEST["nlId"])) {
@@ -75,10 +67,10 @@ if (isset($_REQUEST["nlId"])) {
 } else {
     $channels = $nllib->list_editions(0, $ed_offset, $maxRecords, $ed_sort_mode, $ed_find, false, 'tiki_p_view_newsletter');
 }
-$cant_pages = ceil($channels["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($channels["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($ed_offset / $maxRecords));
-if ($channels["cant"] > ($ed_offset + $maxRecords)) {
+if ($channels["count"] > ($ed_offset + $maxRecords)) {
     $smarty->assign('next_offset', $ed_offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);

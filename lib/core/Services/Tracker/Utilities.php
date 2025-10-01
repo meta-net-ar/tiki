@@ -9,11 +9,11 @@ class Services_Tracker_Utilities
     public function insertItem($definition, $item)
     {
         $newItem = $this->replaceItem($definition, 0, $item['status'], $item['fields'], $item['processedFields'] ?? [], [
-            'validate' => isset($item['validate']) ? $item['validate'] : true,
+            'validate' => $item['validate'] ?? true,
             'skip_categories' => false,
-            'bulk_import' => isset($item['bulk_import']) ? $item['bulk_import'] : false,
+            'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
-            'deleted_files' => isset($item['deletedFiles']) ? $item['deletedFiles'] : []
+            'deleted_files' => $item['deletedFiles'] ?? []
         ]);
 
         return $newItem;
@@ -22,11 +22,11 @@ class Services_Tracker_Utilities
     public function updateItem($definition, $item)
     {
         return $this->replaceItem($definition, $item['itemId'], $item['status'], $item['fields'], $item['processedFields'] ?? [], [
-            'validate' => isset($item['validate']) ? $item['validate'] : true,
+            'validate' => $item['validate'] ?? true,
             'skip_categories' => false,
-            'bulk_import' => isset($item['bulk_import']) ? $item['bulk_import'] : false,
+            'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
-            'deleted_files' => isset($item['deletedFiles']) ? $item['deletedFiles'] : []
+            'deleted_files' => $item['deletedFiles'] ?? []
         ]);
     }
 
@@ -175,10 +175,10 @@ class Services_Tracker_Utilities
             'n',
             ($isFirst ? 'y' : 'n'),
             'y',
-            isset($data['isHidden']) ? $data['isHidden'] : 'n',
+            $data['isHidden'] ?? 'n',
             isset($data['isMandatory']) ? ($data['isMandatory'] ? 'y' : 'n') : ($isFirst ? 'y' : 'n'),
             $trklib->get_last_position($data['trackerId']) + 10,
-            isset($data['options']) ? $data['options'] : '',
+            $data['options'] ?? '',
             $data['description'],
             '',
             null,
@@ -193,8 +193,8 @@ class Services_Tracker_Utilities
             null,
             null,
             false,
-            isset($data['visibleInViewMode']) ? $data['visibleInViewMode'] : 'y',
-            isset($data['visibleInEditMode']) ? $data['visibleInEditMode'] : 'y',
+            $data['visibleInViewMode'] ?? 'y',
+            $data['visibleInEditMode'] ?? 'y',
         );
     }
 
@@ -203,7 +203,16 @@ class Services_Tracker_Utilities
         $definition = Tracker_Definition::get($trackerId);
 
         //$fieldId = 0 when is a new field, e.g. when importing tracker structure
-        $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        try {
+            $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        } catch (RuntimeException $e) {
+            if ($fieldId > 0) {
+                // importing tracker field keeping the fieldId
+                $field = [];
+            } else {
+                throw $e;
+            }
+        }
         $trklib = TikiLib::lib('trk');
         $trklib->replace_tracker_field(
             $trackerId,
@@ -717,5 +726,42 @@ EXPORT;
 
         $currency = new Math_Formula_Currency($data['amount'], $data['currency'], $rates);
         return $currency->convertTo($defaultCurrency)->getAmount();
+    }
+
+    public static function parseTsvContentToCsv($filename)
+    {
+        $fileContent = file_get_contents($_FILES[$filename]['tmp_name']);
+        $rows = explode("\n", $fileContent);
+        $csvRows = [];
+
+        foreach ($rows as $row) {
+            if (trim($row) === '') {
+                continue;
+            }
+            // since field may have comma or quotes or tab in it
+            $fields = str_getcsv($row, "\t", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
+            if (str_ends_with($row, "\t")) {
+                $fields[] = '';
+            }
+            $pFields = []; // escape processed fields
+
+            foreach ($fields as $field) {
+                $field = $field ?? '';
+                $hasCommaOrQuoteOrTab = (
+                    strpos($field, ',') !== false ||
+                    strpos($field, '"') !== false ||
+                    strpos($field, "\t") !== false
+                );
+
+                if ($hasCommaOrQuoteOrTab) {
+                    $pFields[] = '"' . str_replace('"', '""', $field) . '"';
+                } else {
+                    $pFields[] = $field;
+                }
+            }
+            $csvRows[] = implode(',', $pFields);
+        }
+        $_FILES[$filename]['tmp_name'] = tempnam(sys_get_temp_dir(), 'modified_');
+        file_put_contents($_FILES[$filename]['tmp_name'], implode("\n", $csvRows));
     }
 }

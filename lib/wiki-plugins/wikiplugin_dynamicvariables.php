@@ -56,8 +56,8 @@ function wikiplugin_dynamicvariables($data, $params)
     global $prefs;
     $tikilib = TikiLib::lib('tiki');
 
-    $layout = isset($params['layout']) ? $params['layout'] : '';
-    $linesep = isset($params['linesep']) ? $params['linesep'] : '';
+    $layout = $params['layout'];
+    $linesep = $params['linesep'] ?? '';
 
     if (! isset($linesep)) {
         $linesep = '<br>';

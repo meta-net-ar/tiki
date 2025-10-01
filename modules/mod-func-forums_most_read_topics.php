@@ -29,7 +29,7 @@ function module_forums_most_read_topics($mod_reference, $module_params)
     include_once('lib/rankings/ranklib.php');
 
     if (isset($module_params['forumId'])) {
-        if (strstr($module_params['forumId'], ':')) {
+        if (str_contains($module_params['forumId'], ':')) {
             $forumId = explode(':', $module_params['forumId']);
         } else {
             $forumId = $module_params['forumId'];

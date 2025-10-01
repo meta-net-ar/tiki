@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -133,9 +133,9 @@ class Table_Check
             foreach ($ret as $key => $pipe) {
                 $key = trim($key);
                 $pipe = trim($pipe);
-                $ret[$key] = strpos($pipe, ';') !== false ? explode(';', $pipe) : $pipe;
+                $ret[$key] = str_contains($pipe, ';') ? explode(';', $pipe) : $pipe;
                 if (! is_array($ret[$key])) {
-                    if (strpos($ret[$key], ':') !== false) {
+                    if (str_contains($ret[$key], ':')) {
                         $colon = explode(':', $ret[$key]);
                         unset($ret[$key]);
                         if (trim($colon[1]) == 'nofilter') {
@@ -148,7 +148,7 @@ class Table_Check
                     foreach ($ret[$key] as $key2 => $subparam) {
                         $key2 = trim($key);
                         $subparam = trim($subparam);
-                        if (strpos($subparam, ':') !== false) {
+                        if (str_contains($subparam, ':')) {
                             $colon = explode(':', $subparam);
                             unset($ret[$key][$key2]);
                             if (in_array($colon[0], ['expand', 'option'])) {

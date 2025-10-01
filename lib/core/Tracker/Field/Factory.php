@@ -36,9 +36,9 @@ class Tracker_Field_Factory
                 foreach (glob("$path/[!_]*.php") as $file) {
                     if (
                         $file === "$path/index.php" ||
-                        strstr($file, "Interface") ||
-                        strstr($file, "Abstract") ||
-                        strstr($file, "TrackerField")
+                        str_contains($file, "Interface") ||
+                        str_contains($file, "Abstract") ||
+                        str_contains($file, "TrackerField")
                     ) {
                         continue;
                     }

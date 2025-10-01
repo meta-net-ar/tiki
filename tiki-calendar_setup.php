@@ -10,17 +10,19 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
 
+use Tiki\Lib\DateCalc;
+
 global $tikiroot;
 
 /***
  * @var int $trunc
- * @var \Smarty_Tiki    $smarty
+ * @var \Tiki\Smarty\SmartyTiki  $smarty
  * @var \TikiLib    $tikilib
  *
  *
  */
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -31,15 +33,14 @@ global $prefs;
 if (! ($prefs['feature_calendar'] == 'y' || $prefs['feature_action_calendar'] == 'y')) {
     if (isset($_SERVER['SCRIPT_NAME'])) {
         if ($_SERVER['SCRIPT_NAME'] == "tiki-calendar.php") {
-            $smarty->assign('msg', tra("This feature is disabled") . ": feature_calendar");
+            Feedback::errorAndDie(tra("This feature is disabled") . ": feature_calendar", \Laminas\Http\Response::STATUS_CODE_401);
         } elseif ($_SERVER['SCRIPT_NAME'] == "tiki-action_calendar.php") {
-            $smarty->assign('msg', tra("This feature is disabled") . ": feature_action_calendar");
+            Feedback::errorAndDie(tra("This feature is disabled") . ": feature_action_calendar", \Laminas\Http\Response::STATUS_CODE_401);
         } else {
-            $smarty->assign('msg', tra("This feature is disabled"));
+            Feedback::errorAndDie(tra("This feature is disabled"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Unable to access the feature"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $calendarlib = TikiLib::lib('calendar');
@@ -71,9 +72,7 @@ if (
     (int)$focusYear <= 0 || ! is_numeric($focusDay)
 ) {
     $_SESSION['CalendarFocusDate'] = $tikilib->now;
-    $smarty->assign('msg', tra('Invalid date format'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Invalid date format'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 list($focus_day, $focus_month, $focus_year) = [
         $focusDay,
@@ -145,7 +144,7 @@ $calendarGroupByItem = $_SESSION['CalendarGroupByItem'];
 $firstDayofWeek = $calendarlib->firstDayofWeek();
 
 $strRef = tra("%H:%M %Z");
-if (strstr($strRef, "%h") || strstr($strRef, "%g")) {
+if (str_contains($strRef, "%h") || str_contains($strRef, "%g")) {
     $timeFormat12_24 = "12";
 } else {
     $timeFormat12_24 = "24";
@@ -157,9 +156,7 @@ $smarty->assign('short_format_day', tra('%m/%d'));
 $focus_day_limited = min($focus_day, 28);
 
 if (! function_exists('cal_days_in_month')) {
-    $smarty->assign('msg', tra('Your PHP installation does not have calendar enabled.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Your PHP installation does not have calendar enabled.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $focus_prev = $calendarlib->focusPrevious($focus, $calendarViewMode['casedefault']);
 $focus_next = $calendarlib->focusNext($focus, $calendarViewMode['casedefault']);
@@ -253,7 +250,7 @@ if (
 
             // $tikilib->make_time() used with timezones doesn't support day = 0
             // This supposes that $viewstart's day == 1, as defined above
-            $viewstart_d = Date_Calc::daysInMonth($viewstart_m, $viewstart_y) - ( $TmpWeekday - 1 );
+            $viewstart_d = DateCalc::daysInMonth($viewstart_m, $viewstart_y) - ( $TmpWeekday - 1 );
 
             $viewstart = $tikilib->make_time(0, 0, 0, $viewstart_m, $viewstart_d, $viewstart_y);
         }
@@ -345,7 +342,7 @@ if (
 
             // $tikilib->make_time() used with timezones doesn't support day = 0
             // This supposes that $viewstart's day == 1, as defined above
-            $viewstart_d = Date_Calc::daysInMonth($viewstart_m, $viewstart_y) - ( $wd - $viewstart_d );
+            $viewstart_d = DateCalc::daysInMonth($viewstart_m, $viewstart_y) - ( $wd - $viewstart_d );
         } else {
             $viewstart_d -= $wd;
         }
@@ -437,19 +434,18 @@ switch ($prefs['calendar_view_mode']) {
 }
 
 $smarty->assign(
-    'fullCalendarParams',
+    'eventCalendarParams',
     [
         'firstDayofWeek'   => $firstDayofWeek,
         'display_timezone' => $prefs['display_timezone'],
         'language'         => $prefs['language'],
-        'minHourOfDay'     => $minHourOfDay,
-        'maxHourOfDay'     => $maxHourOfDay,
+        'minHourOfDay'     => $minHourOfDay ? $minHourOfDay : "00:00:00",
+        'maxHourOfDay'     => $maxHourOfDay ? $maxHourOfDay : "23:00:00",
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
         'initialDate'      => "$focus_year-$focus_month-$focus_day",
     ]
 );
-
 
 if (empty($myurl)) {
     $myurl = 'tiki-calendar.php';

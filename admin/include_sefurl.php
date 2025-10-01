@@ -47,7 +47,7 @@ if (isset($enabledFileName)) {
             }
             $referenceIdLine = fgets($referenceFile);
             $enabledIdLine = fgets($enabledFile);
-            if (! strstr($enabledIdLine, 'This line is used to check that this configuration file is up to date.')) {
+            if (! str_contains($enabledIdLine, 'This line is used to check that this configuration file is up to date.')) {
                 $configurationFile = 'unexpected';
             } elseif ($referenceIdLine == $enabledIdLine) { // Do not warn if the Id line of each file is identical. Id lines contain configuration file revision.
                 $configurationFile = 'current';

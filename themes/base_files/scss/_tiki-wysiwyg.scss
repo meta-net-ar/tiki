@@ -1,0 +1,20 @@
+.note-editor--admin {
+    & + div #plugins-container, & + div #tools {
+        height: 60vh;
+        overflow-y: auto;
+    }
+
+    .note-btn-group:empty {
+        width: 35.797px;
+        height: 31.781px;
+    }
+
+    .note-toolbar > .note-btn-group {
+        padding: 0.5rem;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+}
+
+.note-editor .note-btn-group .emoji-picker {
+    margin-top: 2rem;
+}

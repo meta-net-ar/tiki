@@ -16,6 +16,7 @@
  *                 see http://info.tiki.org/HTMLentities for examples of HTML entities
  */
 
+use Tiki\Lib\Wiki\ConvertToTiki9;
 
 /**
  * @param $installer
@@ -28,7 +29,7 @@ function upgrade_999999991_decode_pages_sources_tiki($installer)
     $categlib = TikiLib::lib('categ');
     $wikilib = TikiLib::lib('wiki');
 
-    $converter = new convertToTiki9();
+    $converter = new ConvertToTiki9();
     $converter->convertPages();
     $converter->convertModules();
 }

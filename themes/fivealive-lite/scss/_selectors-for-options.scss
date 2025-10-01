@@ -5,8 +5,6 @@ $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
-$blog-post-title-color: $tiki-top-color;
-$post-card-header-bg: $tiki-top-bg;
 
 // This is reduced from the amount in tiki_base.css - maybe that needs to be changed, too.
 body.layout_social.tiki.navbar-padding {
@@ -14,75 +12,19 @@ body.layout_social.tiki.navbar-padding {
     padding-bottom: 0;
 }
 
-#page-header {
-    h1,
-    h2,
-    h3 a,
-    a,
-    a:hover {
-        color: $tiki-top-link-color; // #f8f8f8; //#101010;
-        font-weight: bold;
-        text-decoration: none;
-        text-transform: uppercase;
-    }
-
-    h3 {
-        border-radius: 3px;
-        font-size: 34px;
-        padding: 12px 10px 6px 10px;
-    }
-}
-
-//.middle_outer {
-//    -webkit-box-shadow: inset 0 28px 0 0 $tiki-topbar-dark-bg;
-//    -moz-box-shadow: inset 0 28px 0 0 $tiki-topbar-dark-bg;
-//    box-shadow: inset 0 28px 0 0 $tiki-topbar-dark-bg;
-//}
-//
-//.fullscreen .middle_outer {
-//    -webkit-box-shadow: inset 0 3px 0 0 $primary;
-//    box-shadow: inset 0 3px 0 0 $primary;
-//    border-top: none;
-//}
-
-.middle .topbar {
-    font-size: .925rem;
-}
-
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
 .tiki .wiki.external + .icon-link-external, // wikitext
 .tiki .wiki.external .icon-link-external,
 .editable-inline .icon { // Tracker inline editing
-    color: $link-color;
+    color: var(--#{$prefix}link-color); // $link-color;
 }
-
-//nav.fixed-top {
-//    border-bottom: 5px solid #000000;
-//}
-
-//.navbar.navbar-dark.bg-dark.fixed-top,
-//.navbar.navbar-dark.bg-dark.fixed-top .navbar {
-//    padding: 0;
-//}
-
-.postbody-title {
-    background: $tiki-top-bg !important;
-    color: $tiki-top-color;
-    a { color: $tiki-top-link-color; }
-    a:hover { color: $tiki-top-link-hover-color; }
-}
-
-.btn-outline-dark {
-    color: $dark;
-    outline-color: $dark;
-}
-
-// Typography
 
 hr {
     border-top: 1px solid $hr-color;
 }
 
+// Typography
+// Tables
 .table th,
 .table td {
     border-top: 1px solid $table-border-color;
@@ -96,10 +38,6 @@ hr {
     border-top: 2px solid $table-border-color;
 }
 
-.table .table {
-    background-color: #ffffff;
-}
-
 .table .table-bordered {
     border: 1px solid $table-border-color;
 }
@@ -109,169 +47,15 @@ hr {
     border: 1px solid $table-border-color;
 }
 
-.table .table-striped > tbody > tr:nth-child(odd) > td,
-.table .table-striped > tbody > tr:nth-child(odd) > th {
-    background-color: $table-accent-bg;
+// Forms
+.form-check-input:checked {
+    background-color: $info; // #0d6efd;
+    border-color: $info; // #0d6efd;
 }
 
-.table .table-hover > tbody > tr:hover > td,
-.table .table-hover > tbody > tr:hover > th {
-    background-color: $table-hover-bg;
+.form-range::-webkit-slider-thumb {
+    background-color: $info;
 }
-
-.form-control {
-    color: $input-color;
-    background-color: $input-bg;
-    background-image: none;
-    border: 1px solid $input-border-color;
-}
-
-
-//.navbar-dark .navbar-collapse,
-//.navbar-dark .navbar-form {
-//   border-color: transparent;
-//}
-//
-//.navbar .navbar {
-//    background: transparent !important;
-//}
-///
-//.dropdown-menu {
-//    background-color: $dropdown-bg; //#005064;
-//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-//}
-
-//.tiki .dropdown-item,
-//.tiki .dropdown-item a,
-//.tiki .dropdown-item .btn.btn-link {
-//    color: $dropdown-link-color;
-//    &:hover,
-//    &:focus {
-//        color: $dropdown-link-hover-color;
-//        background: $dropdown-link-hover-bg;
-//    }
-//    &:active,
-//    &.active {
-//        color: $dropdown-link-hover-color;
-//        background: $dropdown-link-active-bg;
-//    }
-//    &.disabled,
-//    &:disabled {
-//        color: $dropdown-link-disabled-color;
-//    }
-//    .dropdown-header {
-//        color: $dropdown-header-color;
-//    }
-//    .dropdown-divider {
-//        background: $dropdown-divider-bg;
-//    }
-//}
-//
-//.nav-pills > li.active > a,
-//.nav-pills > li.active > a:hover,
-//.nav-pills > li.active > a:focus {
-//    color: #ffffff;
-//    background-color: $nav-pills-link-active-bg; //#0b8a98;
-//}
-
-// Pagination
-.pagination > li > a:hover,
-.pagination > li > span:hover,
-.pagination > li > a:focus,
-.pagination > li > span:focus {
-    color: $pagination-hover-color; //#18a3bb;
-    background-color: $pagination-hover-bg; //#eeeeee;
-    border-color: $pagination-hover-border-color; //#dddddd;
-}
-
-.pagination > .active > a,
-.pagination > .active > span,
-.pagination > .active > a:hover,
-.pagination > .active > span:hover,
-.pagination > .active > a:focus,
-.pagination > .active > span:focus {
-    color: #ffffff;
-    background-color: $pagination-active-bg; //#0b8a98;
-    border-color: $pagination-active-border-color; //#0b8a98;
-}
-
-.pagination > .disabled > span,
-.pagination > .disabled > span:hover,
-.pagination > .disabled > span:focus,
-.pagination > .disabled > a,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > a:focus {
-    color: $pagination-disabled-color; //#999999;
-    background-color: $pagination-disabled-bg; //#ffffff;
-    border-color: $pagination-disabled-border-color; //#dddddd;
-}
-
-// Cards
-.col2,
-.col3 {
-    .card-header {
-        border-bottom: 1px solid $card-border-color;
-    }
-}
-
-header.page-header {
-    margin-top: 0;
-    margin-bottom: 0;
-    border-bottom: none;
-}
-
-///header.page-header a:not(.dropdown-item),
-///header.page-header a.btn-link {
-///    color: $page-header-link-color !important; // This needs to be a variable because Kiwi uses black: $page-header-link-color.
-///}
-
-.form-control, select,
-input[type="text"],
-input[type="password"],
-input[type="file"],
-input[type="email"],
-input[type="search"],
-input[type="number"],
-input#login-pass,
-textarea,
-.adminoptionbox option {
-    color: $input-color;
-    background-color: $input-bg; //#ddf8f9;
-    // border-color: $input-border-top-color $input-border-right-color $input-border-bottom-color $input-border-left-color; //#b4f3fb #ffffff #ffffff #b4f3fb;
-}
-
-//input[type="checkbox"].preffilter-toggle-round:checked + label::before {
-//    background: darken($input-bg, 8%);
-//}
-
-
-//#footer {
-//    background: black;
-//    color: #f4f4f4;
-//    padding: 1px 0 2px 0;
-//}
-
-//.footer {
-//    border-top: 1px solid $footer-accent-color; //#19a5be;
-//    border-bottom: 1px solid $footer-accent-color; //#19a5be;
-//}
-
-//.footer_liner {
-//    .card {
-//        background-color: transparent;
-//        border: none;
-//    }
-//    .card-header {
-//        color: #ffffff;
-//        border-bottom: 1px dotted $footer-accent-color; //#19a5be;
-//    }
-//    legend,
-//    a:not(.btn),
-//    a:not(.btn):visited {
-//        color: #a9a9a9; //$footer-accent-color; //#19a5be;
-//    }
-//}
-
 
 .nav-tabs .nav-link {
     color: $nav-tabs-link-color; //#ffffff;
@@ -289,25 +73,6 @@ textarea,
     font-size: 20px;
 }
 
-.blogpost .card-header {
-    background: $post-card-header-bg;
-}
-
-header.header .sitetitle,
-header.header .sitesubtitle {
-    //  color: #0b8a98;
-    text-shadow: none;
-}
-
-.searchresults blockquote em,
-.highlight
-    //.btn-secondary.highlight a,
-    //.btn-secondary a.highlight
-{
-    background: #f2dede;
-    color: #a94442;
-    border-color: #ebccd1;
-}
 
 // /* Auto TOC */
 #autotoc .nav-link.active,
@@ -321,29 +86,25 @@ header.header .sitesubtitle {
     border-left-color: $secondary !important;
 }
 
-//#autotoc * {
-//    color: $autotoc-color; //#ffffff;
-//}
+// Pagination
+:root {
+    .page-link.active, .active > .page-link {
+        --bs-pagination-active-bg: #{$secondary};
+        --bs-pagination-active-border-color: #{$secondary};
+    }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        --bs-nav-pills-link-active-bg: #{$secondary};
+    }
+}
 
-//#autotoc .nav > li > a:hover,
-//#autotoc .nav .nav > li > a:hover,
-//#autotoc .nav > li > a:focus {
-//    color: $autotoc-nav-li-link-hover-color; //#f2f2f2;
-//    background: $autotoc-nav-li-link-hover-bg; //#2e1f39;
-//}
-//
-//#autotoc .nav {
-//    > li {
-//        .active, &.open > a {
-//            color: $autotoc-nav-li-link-hover-color;
-//            background: $autotoc-nav-li-link-hover-bg;
-//        }
-//    }
-//}
-//
-//#autotoc .nav .dropdown-item {
-//    color: $autotoc-color;}
-//
+// Cards
+.col2,
+.col3 {
+    .card-header {
+        border-bottom: 1px solid $card-border-color;
+    }
+}
+
 #col2 .card-title,
 #col3 .card-title,
 a.flipmoduletitle,
@@ -352,59 +113,21 @@ a.flipmoduletitle,
     color: $side-column-heading-color; //#169FB6;
 }
 
-footer#footer {
-    .footer_liner {
-        border-top: 1px solid $footer-border-color;
-        border-bottom: 1px solid $footer-border-color;
-        .card-header {
-            border-bottom: 1px dotted $footer_liner-card-inner-border;
-        }
-    }
-}
-
-.btn-dark {
-    color: $light;
-    background: $dark;
-    border-color: $dark;
-}
-
 .page-item.disabled,
 .list-group-item.disabled {
     color: $text-muted !important;
 }
 
-@scope (.tiki .main-footer) to (.navbar-dark,.navbar-light) {
-    .footer_liner {
-        background: #000000;
-        color: #fff; // $footer-color; // #696969;
-    }
-    a,
-    a:visited,
-    .dropdown-item {
-        color: $footer-link-color !important;
-    }
-    .btn-link {
-        color: $footer-link-color;
-    }
-}
-
 .tiki .main-footer {
     padding: 1px 0 2px 0;
-    border-top: 1px solid $footer-border-color; //#ebdc14;
-    border-bottom: 1px solid $footer-border-color; // #ebdc14;
-    .card-title {
-        color: #fff;
-    }
-    legend {
-        color: $footer-link-color;
-    }
-    .card {
-        background-color: transparent;
-        border: none;
-        --bs-card-title-color: #fff;
-        --bs-card-color: #fff;
-    }
+    background: #000000;
 }
+
+.footer_liner {
+    border-top: 1px solid $tiki-footer-border-color;
+    border-bottom: 1px solid $tiki-footer-border-color;
+}
+
 
 
 .footer_liner {
@@ -412,9 +135,23 @@ footer#footer {
     .card-header {
         border: none;
     }
-
-    h3.card-header {
-        color: #ffffff;
-        border-bottom: 1px dotted $footer-border-color;
+    .card {
+        background-color: transparent;
+        border: none;
+        --bs-card-title-color: #fff;
+        --bs-card-color: #fff;
     }
+    .card-header {
+        color: #fff;
+        border-bottom: 1px dotted $tiki-footer-border-color;
+        border-bottom: 1px dotted $footer_liner-card-inner-border;
+    }
+    .module-title,
+    .module-title a {
+        color: $white;
+    }
+}
+
+[data-bs-theme=dark].bottom_modules {
+    color: $body-color-dark;
 }

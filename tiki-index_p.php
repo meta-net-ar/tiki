@@ -49,9 +49,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 require_once 'lib/wiki/renderlib.php';
@@ -75,15 +73,13 @@ if (! in_array($page, $_SESSION["breadCrumb"])) {
     if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION["breadCrumb"]);
     }
-
-    array_push($_SESSION["breadCrumb"], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION["breadCrumb"]);
 
     unset($_SESSION["breadCrumb"][$pos]);
-    array_push($_SESSION["breadCrumb"], $page);
 }
+$_SESSION["breadCrumb"][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);

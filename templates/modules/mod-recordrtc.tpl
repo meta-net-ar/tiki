@@ -12,10 +12,10 @@
                 </select>
             </div>
             <div class="mb-3 row">
-                <button id="btn-start-recording" class="btn btn-primary">
+                <button id="btn-start-recording" class="btn btn-primary start-recording">
                     <span class="icon fa fa-video"></span> {tr}Start recording{/tr}
                 </button>
-                <button id="btn-stop-recording" class="btn btn-danger" style="display:none">
+                <button class="btn btn-danger stop-recording d-none">
                     <span class="icon fa fa-stop"></span> {tr}Stop recording{/tr}
                 </button>
                 <video style="display:none;" controls autoplay playsinline></video>

@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/diff.php';
+
+use Tiki\Lib\WikiDiff\Engine;
 
 class QuantifyLib extends TikiLib
 {
@@ -32,7 +33,7 @@ class QuantifyLib extends TikiLib
         $oldData = $this->segmentData($oldData);
         $newData = $this->segmentData($newData);
 
-        $engine = new _WikiDiffEngine($oldData, $newData);
+        $engine = new Engine($oldData, $newData);
 
         $added = 0;
         $removed = 0;

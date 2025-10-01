@@ -85,7 +85,7 @@ class UserWizardUserTracker extends Wizard
                 if (! is_array($userWizardDetailsFieldIds)) {
                     $userWizardDetailsFieldIds = explode(':', $userWizardDetailsFieldIds);
                 }
-                $userTrackerData = wikiplugin_tracker('', ['trackerId' => $re['usersTrackerId'], 'fields' => $userWizardDetailsFieldIds, 'showdesc' => 'n', 'showmandatory' => 'y', 'embedded' => 'n', 'action' => 'Save_User_Details', 'registration' => 'n', 'userField' => $re['usersFieldId']]);
+                $userTrackerData = TikiLib::lib('parser')->invokePlugin('tracker', '', ['trackerId' => $re['usersTrackerId'], 'fields' => $userWizardDetailsFieldIds, 'showdesc' => 'n', 'showmandatory' => 'y', 'embedded' => 'n', 'action' => 'Save_User_Details', 'registration' => 'n', 'userField' => $re['usersFieldId']]);
                 $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
 
 
@@ -165,7 +165,7 @@ class UserWizardUserTracker extends Wizard
                 if (! is_array($userWizardDetailsFieldIds)) {
                     $userWizardDetailsFieldIds = explode(':', $userWizardDetailsFieldIds);
                 }
-                $userTrackerData = wikiplugin_tracker('', ['trackerId' => $re['usersTrackerId'], 'fields' => $userWizardDetailsFieldIds, 'showdesc' => 'n', 'showmandatory' => 'y', 'embedded' => 'n', 'action' => 'Save_User_Details', 'registration' => 'n', 'userField' => $re['usersFieldId']]);
+                $userTrackerData = TikiLib::lib('parser')->invokePlugin('tracker', '', ['trackerId' => $re['usersTrackerId'], 'fields' => $userWizardDetailsFieldIds, 'showdesc' => 'n', 'showmandatory' => 'y', 'embedded' => 'n', 'action' => 'Save_User_Details', 'registration' => 'n', 'userField' => $re['usersFieldId']]);
                 $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
 
                 $utid = $userlib->get_tracker_usergroup($user);

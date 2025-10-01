@@ -202,27 +202,27 @@ class PreferencesExportCommand extends Command
                 $entry = $fields;
 
                 $entry['preference'] = $name;
-                $entry['name'] = isset($raw['name']) ? $raw['name'] : '';
-                $entry['description'] = isset($raw['description']) ? $raw['description'] : '';
-                $entry['filter'] = isset($raw['filter']) ? $raw['filter'] : '';
-                $entry['help'] = isset($raw['help']) ? $raw['help'] : '';
+                $entry['name'] = $raw['name'] ?? '';
+                $entry['description'] = $raw['description'] ?? '';
+                $entry['filter'] = $raw['filter'] ?? '';
+                $entry['help'] = $raw['help'] ?? '';
                 $entry['dependencies'] = ! empty($raw['dependencies']) ? implode(',', (array) $raw['dependencies']) : '';
-                $entry['type'] = isset($raw['type']) ? $raw['type'] : '';
-                $entry['options'] = isset($raw['options']) ? implode(',', $raw['options']) : '';
-                $entry['admin'] = isset($raw['admin']) ? $raw['admin'] : '';
-                $entry['module'] = isset($raw['module']) ? $raw['module'] : '';
-                $entry['view'] = isset($raw['view']) ? $raw['view'] : '';
-                $entry['permission'] = isset($raw['permission']) ? implode(',', $raw['permission']) : '';
-                $entry['plugin'] = isset($raw['plugin']) ? $raw['plugin'] : '';
-                $entry['extensions'] = isset($raw['extensions']) ? implode(',', $raw['extensions']) : '';
-                $entry['tags'] = isset($raw['tags']) ? implode(',', $raw['tags']) : '';
-                $entry['parameters'] = isset($raw['parameters']) ? implode(',', $raw['parameters']) : '';
-                $entry['detail'] = isset($raw['detail']) ? $raw['detail'] : '';
-                $entry['warning'] = isset($raw['warning']) ? $raw['warning'] : '';
-                $entry['hint'] = isset($raw['hint']) ? $raw['hint'] : '';
-                $entry['shorthint'] = isset($raw['shorthint']) ? $raw['shorthint'] : '';
-                $entry['perspective'] = isset($raw['perspective']) ? $raw['perspective'] ? 'true' : 'false' : '';
-                $entry['separator'] = isset($raw['separator']) ? $raw['separator'] : '';
+                $entry['type'] = $raw['type'] ?? '';
+                $entry['options'] = implode(',', $raw['options'] ?? []);
+                $entry['admin'] = $raw['admin'] ?? '';
+                $entry['module'] = $raw['module'] ?? '';
+                $entry['view'] = $raw['view'] ?? '';
+                $entry['permission'] = implode(',', $raw['permission'] ?? []);
+                $entry['plugin'] = $raw['plugin'] ?? '';
+                $entry['extensions'] = implode(',', $raw['extensions'] ?? []);
+                $entry['tags'] = implode(',', $raw['tags'] ?? []);
+                $entry['parameters'] = implode(',', $raw['parameters'] ?? []);
+                $entry['detail'] = $raw['detail'] ?? '';
+                $entry['warning'] = $raw['warning'] ?? '';
+                $entry['hint'] = $raw['hint'] ?? '';
+                $entry['shorthint'] = $raw['shorthint'] ?? '';
+                $entry['perspective'] = ($_REQUEST['perspective'] ?? '') ? 'true' : 'false';
+                $entry['separator'] = $raw['separator'] ?? '';
                 $data[] = $entry;
             }
         }
@@ -249,7 +249,7 @@ class PreferencesExportCommand extends Command
     public function set_default_values(&$data, $prefs)
     {
         foreach ($data as & $row) {
-            $row['default'] = isset($prefs[$row['preference']]) ? $prefs[$row['preference']] : '';
+            $row['default'] = $prefs[$row['preference']] ?? '';
 
             if (is_array($row['default'])) {
                 $row['default'] = implode($row['separator'], $row['default']);

@@ -122,14 +122,6 @@
                                             </action>
                                         {/if}
 
-                                        {if $prefs.feature_wiki_export eq 'y' and $channels[ix].admin_structure eq 'y'}
-                                            <action>
-                                                <a href="tiki-admin_structures.php?export={$channels[ix].page_ref_id|escape:"url"}">
-                                                    {icon name="export" _menu_text='y' _menu_icon='y' alt="{tr}Export pages{/tr}"}
-                                                </a>
-                                            </action>
-                                        {/if}
-
                                         {if $pdf_export eq 'y'}
                                             <action>
                                                 <a href="tiki-print_multi_pages.php?printstructures=%255B%2522{$channels[ix].page_ref_id}%2522%255D&amp;display=pdf&amp;print=pdf">
@@ -151,7 +143,7 @@
                                                 <form action="tiki-admin_structures.php" method="post">
                                                     {ticket}
                                                     <input type="hidden" name="remove" value="{$channels[ix].page_ref_id}">
-                                                    <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()">
+                                                    <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                                     </button>
                                                 </form>
@@ -195,7 +187,7 @@
                 <div class="mb-3 row mx-0">
                     <label for="batchaction" class="col-form-label">{tr}Perform action with selected{/tr}</label>
                     <div class="input-group col-sm-6">
-                        <select name="batchaction" class="form-control">
+                        <select name="batchaction" id="batchaction" class="form-control">
                             <option value="" selected>{tr}...{/tr}</option>
                             <option value="delete">{tr}Delete{/tr}</option>
                             <option value="delete_with_page">{tr}Delete with the pages{/tr}</option>
@@ -206,7 +198,7 @@
             </form>
         {/if}
 
-        {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {if $tiki_p_edit_structures == 'y'}

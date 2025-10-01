@@ -33,38 +33,27 @@ class Search_Action_EmailAction implements Search_Action_Action
 
     public function execute(JitFilter $data)
     {
-        global $prefs;
-
-        require_once 'lib/mail/maillib.php';
-
         try {
-            $mail = tiki_get_admin_mail();
+            $mail = new TikiMail();
 
             if ($replyto = $this->dereference($data->replyto->raw())) {
                 $mail->setReplyTo($replyto[0]);
             }
 
+            $recipients = [];
             foreach ($data->to->raw() as $to) {
                 if (is_array($to)) {
                     foreach ($to as $user_email) {
                         if ($user_email = $this->dereference($user_email)) {
                             foreach ($user_email as $name => $email) {
-                                if (! is_numeric($name)) {
-                                    $mail->addTo($email, $name);
-                                } else {
-                                    $mail->addTo($email);
-                                }
+                                $recipients[] = $email;
                             }
                         }
                     }
                 } else {
                     if ($to = $this->dereference($to)) {
                         foreach ($to as $name => $email) {
-                            if (! is_numeric($name)) {
-                                $mail->addTo($email, $name);
-                            } else {
-                                $mail->addTo($email);
-                            }
+                            $recipients[] = $email;
                         }
                     }
                 }
@@ -72,24 +61,16 @@ class Search_Action_EmailAction implements Search_Action_Action
 
             foreach ($data->cc->raw() as $cc) {
                 if ($cc = $this->dereference($cc)) {
-                    foreach ($cc as $name => $email) {
-                        if (! is_numeric($name)) {
-                            $mail->addCc($email, $name);
-                        } else {
-                            $mail->addCc($email);
-                        }
+                    foreach ($cc as $email) {
+                        $recipients[] = $email;
                     }
                 }
             }
 
             foreach ($data->bcc->raw() as $bcc) {
                 if ($bcc = $this->dereference($bcc)) {
-                    foreach ($bcc as $name => $email) {
-                        if (! is_numeric($name)) {
-                            $mail->addBcc($email, $name);
-                        } else {
-                            $mail->addBcc($email);
-                        }
+                    foreach ($bcc as $email) {
+                        $recipients[] = $email;
                     }
                 }
             }
@@ -108,16 +89,7 @@ class Search_Action_EmailAction implements Search_Action_Action
 
             $mail->setSubject(strip_tags($subject));
 
-            $bodyPart = new \Laminas\Mime\Message();
-            $bodyMessage = new \Laminas\Mime\Part($content);
-            $bodyMessage->type = \Laminas\Mime\Mime::TYPE_HTML;
-            if ($prefs['default_mail_charset']) {
-                $bodyMessage->setCharset($prefs['default_mail_charset']);
-            }
-
-            $messageParts = [
-                $bodyMessage
-            ];
+            $mail->setHtml($content);
 
             if (! empty($data->pdf_page_attachment->text())) {
                 $pageName = $data->pdf_page_attachment->text();
@@ -125,13 +97,7 @@ class Search_Action_EmailAction implements Search_Action_Action
                 $pdfContent = $this->getPDFAttachment($pageName);
 
                 if ($pdfContent) {
-                    $attachment = new \Laminas\Mime\Part($pdfContent);
-                    $attachment->type = 'application/pdf';
-                    $attachment->filename = $fileName;
-                    $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
-                    $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
-
-                    $messageParts[] = $attachment;
+                    $mail->addAttachment($pdfContent, $fileName, 'application/pdf');
                 } else {
                     return false;
                 }
@@ -185,47 +151,15 @@ class Search_Action_EmailAction implements Search_Action_Action
             foreach ($fileIds as $fileId) {
                 $file = $this->getFileAttachment($fileId);
                 if ($file) {
-                    $type = $file['filetype'];
-                    $fileName = $file['filename'];
-                    $attachment = new \Laminas\Mime\Part($file['contents']);
-                    $attachment->type = $type;
-                    $attachment->filename = $fileName;
-                    $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
-                    $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
-
-                    $messageParts[] = $attachment;
+                    $mail->addAttachment($file['contents'], $file['filename'], $file['filetype']);
                 } else {
                     return false;
                 }
             }
 
-            $bodyPart->setParts($messageParts);
-            $mail->setBody($bodyPart);
-
-            if ($prefs['zend_mail_queue'] == 'y') {
-                $query = "INSERT INTO `tiki_mail_queue` (message) VALUES (?)";
-                $bindvars = [serialize($mail)];
-                TikiLib::lib('tiki')->query($query, $bindvars, -1, 0);
-            } else {
-                tiki_send_email($mail);
-            }
-
-            if ($prefs['log_mail'] == 'y') {
-                $logslib = TikiLib::lib('logs');
-                foreach ($data->to->text() as $email) {
-                    $logslib->add_log('mail', tr('EmailAction - send to %0, subject - %1', $email, $subject));
-                }
-            }
-
-            return true;
+            $isSent = $mail->send($recipients);
+            return $isSent;
         } catch (Exception $e) {
-            if ($prefs['log_mail'] == 'y') {
-                $logslib = TikiLib::lib('logs');
-                foreach ($data->to->text() as $email) {
-                    $logslib->add_log('mail error', tr("EmailAction - can't send new message"));
-                }
-            }
-
             throw new Search_Action_Exception(tr('Error sending email: %0', $e->getMessage()));
         }
     }
@@ -236,6 +170,11 @@ class Search_Action_EmailAction implements Search_Action_Action
     }
 
     public function requiresInput(JitFilter $data)
+    {
+        return false;
+    }
+
+    public function requiresConfirm()
     {
         return false;
     }
@@ -269,8 +208,8 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return [];
         }
-        if (strpbrk($email_or_username, ',;') !== false) {
-            $list = preg_split('/\s*[,;]\s*/', $email_or_username);
+        if (strpbrk($email_or_username, ',; ') !== false) {
+            $list = preg_split('/\s*[,;\s]\s*/', $email_or_username);
             $res = [];
             foreach ($list as $email_or_username) {
                 $res = array_merge($res, $this->dereference($email_or_username));
@@ -289,7 +228,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             return array_map(function ($email) {
                 return trim($email, ",;\n\r\t ");
             }, $m[0]);
-        } elseif (strstr($email_or_username, '@')) {
+        } elseif (str_contains($email_or_username, '@')) {
             return [$email_or_username];
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
@@ -305,7 +244,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             return null;
         }
         $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        if (str_contains($email_or_username, '@')) {
             return null;
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
@@ -319,36 +258,18 @@ class Search_Action_EmailAction implements Search_Action_Action
 
     private function getPDFAttachment($pageName)
     {
-
         if (! Perms::get('wiki page', $pageName)->view) {
             return [];
         }
 
-        require_once('tiki-setup.php');
-        require_once 'lib/pdflib.php';
-        $generator = new PdfGenerator();
-        if (! empty($generator->error)) {
-            Feedback::error($generator->error);
+        try {
+            $exporter = new \Tiki\PagePdfExporter();
+            $pageInfo = $exporter->validatePageAccess($pageName);
+            $pageInfo['pageName'] = $pageName; // Ensure pageName is set
+            return $exporter->generatePdfFromWikiPage($pageInfo);
+        } catch (\Exception $e) {
+            Feedback::error($e->getMessage());
             return false;
-        } else {
-            $params = [ 'page' => $pageName ];
-
-            // If the page doesn't exist then display an error
-            if (! ($info = TikiLib::lib('tiki')->get_page_info($pageName))) {
-                Feedback::error(sprintf(tra('Page %s cannot be found'), $pageName));
-                return false;
-            }
-
-            $pdata = TikiLib::lib('parser')->parse_data($info["data"], [
-                'page' => $pageName,
-                'is_html' => $info["is_html"],
-                'print' => 'y',
-                'namespace' => $info["namespace"]
-            ]);
-            //replacing bootstrap classes for print version.
-            $pdata = str_replace(['col-sm','col-md','col-lg'], 'col-xs', $pdata);
-
-            return $generator->getPdf('tiki-print.php', $params, $pdata);
         }
     }
 

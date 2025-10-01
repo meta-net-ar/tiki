@@ -7,6 +7,8 @@
 
 namespace Search\Manticore;
 
+use Exception;
+
 class QueryBuffer
 {
     private $client;
@@ -61,7 +63,22 @@ class QueryBuffer
     private function realFlush()
     {
         $query = $this->prefix . implode(', ', $this->buffer);
-        $this->client->prepareAndExecuteWithRetry($query);
+        try {
+            $this->client->prepareAndExecuteWithRetry($query);
+        } catch (Exception $e) {
+            // one failing shouldn't prevent the whole batch from processing, try to execute individually
+            if (count($this->buffer) > 1) {
+                foreach ($this->buffer as $row) {
+                    $query = $this->prefix . $row;
+                    try {
+                        $this->client->prepareAndExecuteWithRetry($query);
+                    } catch (Exception $e) {
+                        // ignore individual ones, raise the first one
+                    }
+                }
+            }
+            throw $e;
+        }
         $this->clear();
     }
 

@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Laminas\Text\Figlet\Figlet;
-
 function wikiplugin_figlet_info(): array
 {
     return [
@@ -19,7 +17,7 @@ function wikiplugin_figlet_info(): array
         'body' => tra('Content'),
         'params' => [
             'font' => [
-                'required' => false,
+                'required' => true,
                 'name' => tra('Font face'),
                 'description' => tra('Path to "fif" font file. Find more fonts here http://www.figlet.org/fontdb.cgi'),
                 'filter' => 'text',
@@ -29,6 +27,7 @@ function wikiplugin_figlet_info(): array
                 'name' => tra('Output width'),
                 'description' => tra('Defines the maximum width of the output string in characters.'),
                 'filter' => 'int',
+                'default' => 100,
             ]
         ]
     ];
@@ -39,26 +38,36 @@ function wikiplugin_figlet_info(): array
  * @param array  $params
  *
  * @return string html
+ * @throws Exception
  */
-function wikiplugin_figlet(string $data, array $params): string
+function wikiplugin_figlet(string $data, array $params): string | WikiParser_PluginOutput
 {
     if (empty($data)) {
         return '';
     }
+    $fontPath = $params['font'] ?? null;
+    $width = $params['width'] ?? 500;
 
-    $string = new Figlet();
-    /**
-     * @TODO erase the default font
-     */
-    //If we have a font set up in $params
-    if (! empty($params['font'])) {
-        $string->setFont($params['font']);
+    if (empty($fontPath)) {
+        return WikiParser_PluginOutput::error(tr('Error'), tr('The %0 parameter is missing', 'font'));
     }
-    //else keep the default font-face
-
-    if (! empty($params['width'])) {
-        $string->setOutputWidth($params['width']);
+    if (! is_file($fontPath)) {
+        return WikiParser_PluginOutput::error(tr('Error'), tr('%0 is not a file', $fontPath));
     }
-
-    return "<pre>" . $string->render($data) . "</pre>";
+    $uniqueId = 'elem_' . uniqid();
+    $jsData = json_encode($data);
+    $jsFontPath = json_encode($fontPath);
+    static $figlet_module_imported = false;
+    $script = '';
+    if (! $figlet_module_imported) {
+        $script .= <<<JS_IMPORT
+import { generateFiglet } from "@tiki-figlet";
+JS_IMPORT;
+        $figlet_module_imported = true;
+    }
+    $script .= <<<JS_CALL
+generateFiglet($jsFontPath, "$width", "$uniqueId", $jsData);
+JS_CALL;
+    TikiLib::lib('header')->add_js_module($script);
+    return "<pre id='$uniqueId'></pre>";
 }

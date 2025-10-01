@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Search\Formatter\Sublist\Parser as SublistParser;
+use Tiki\WikiParser\PluginMatcherMatch;
 
 /** This mostly deals with the OUTPUT block of Pluginlist, as opposed to class Search_Formatter which mostly deals with the FORMAT block.
  */
@@ -25,6 +26,7 @@ class Search_Formatter_Builder
     private $tsOn;
     private $tsettings;
     private $actions;
+    private $additionalOutputData;
     private $isDownload;
     private $downloadName;
     public function __construct()
@@ -57,6 +59,11 @@ class Search_Formatter_Builder
     public function setDownload($isDownload)
     {
         $this->isDownload = $isDownload;
+    }
+
+    public function setAdditionalOutputData(array $data)
+    {
+        $this->additionalOutputData = $data;
     }
 
     public function apply($matches, $params = null)
@@ -178,7 +185,7 @@ class Search_Formatter_Builder
         $this->subFormatters[$arguments['name']] = $plugin;
     }
 
-    private function handleFilter(WikiParser_PluginMatcher_Match $match): void
+    private function handleFilter(PluginMatcherMatch $match): void
     {
         $arguments = $this->parser->parse($match->getArguments());
 
@@ -206,11 +213,11 @@ class Search_Formatter_Builder
     }
 
     /**
-     * @param WikiParser_PluginMatcher_Match $output
+     * @param \Tiki\WikiParser\PluginMatcherMatch $output
      *
      * @throws Exception
      */
-    private function handleOutput(WikiParser_PluginMatcher_Match $output, $params): void
+    private function handleOutput(PluginMatcherMatch $output, $params): void
     {
         global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
         $smarty = TikiLib::lib('smarty');
@@ -259,8 +266,28 @@ class Search_Formatter_Builder
                 $outputData[$k] = $this->paginationArguments[$k];
             }
             $outputData['actions'] = $this->actions;
-            if (strstr($arguments['template'], 'table')) {
-                $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y' ? true : false;
+            if ($this->additionalOutputData) {
+                $outputData = array_merge($outputData, $this->additionalOutputData);
+            }
+            if (isset($params['button_label'])) { // custom label on submit button for list actions (used by PluginListExecute)
+                $outputData['label'] = $params['button_label'];
+            }
+            if (! empty($params['carousel_height'])) {
+                if ($params['carousel_height'] === 'custom') {
+                    if (! empty($params['custom_height']) && is_numeric($params['custom_height'])) {
+                        $outputData['carousel']['height'] = (int) $params['custom_height'];
+                    } else {
+                        $outputData['carousel']['height'] = 'tallest';
+                    }
+                } else {
+                    $outputData['carousel']['height'] = $params['carousel_height'];
+                }
+            } else {
+                $outputData['carousel']['height'] = 'tallest';
+            }
+
+            if (str_contains($arguments['template'], 'table')) {
+                $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y';
                 if (isset($arguments['downloadable'])) {
                     $outputData['downloadable'] = true;
                     $this->downloadName = $arguments['downloadable'];
@@ -298,6 +325,9 @@ class Search_Formatter_Builder
                     $outputData[$k] = $this->paginationArguments[$k];
                 }
                 $outputData['actions'] = $this->actions;
+                if ($this->additionalOutputData) {
+                    $outputData = array_merge($outputData, $this->additionalOutputData);
+                }
                 $data = $tikilib->get_page_info($arguments['tplwiki']);
                 $wikicontent = $data['data'];
                 $plugin = new Search_Formatter_Plugin_SmartyTemplate($wikitpl);
@@ -338,23 +368,23 @@ class Search_Formatter_Builder
             $ts = new Table_Plugin();
             $ts->setSettings(
                 $this->id,
-                isset($args['server']) ? $args['server'] : 'n',
-                isset($args['sortable']) ? $args['sortable'] : 'y',
-                isset($args['sortList']) ? $args['sortList'] : null,
-                isset($args['tsortcolumns']) ? $args['tsortcolumns'] : null,
-                isset($args['tsfilters']) ? $args['tsfilters'] : null,
-                isset($args['tsfilteroptions']) ? $args['tsfilteroptions'] : null,
-                isset($args['tspaginate']) ? $args['tspaginate'] : null,
-                isset($args['tscolselect']) ? $args['tscolselect'] : null,
+                $args['server'] ?? 'n',
+                $args['sortable'] ?? 'y',
+                $args['sortList'] ?? null,
+                $args['tsortcolumns'] ?? null,
+                $args['tsfilters'] ?? null,
+                $args['tsfilteroptions'] ?? null,
+                $args['tspaginate'] ?? null,
+                $args['tscolselect'] ?? null,
                 $GLOBALS['requestUri'],
                 $this->count,
-                isset($args['tstotals']) ? $args['tstotals'] : null,
-                isset($args['tstotalformat']) ? $args['tstotalformat'] : null,
-                isset($args['tstotaloptions']) ? $args['tstotaloptions'] : null,
-                isset($args['showProcessing']) ? $args['showProcessing'] : null,
-                isset($args['ignoreCase']) ? $args['ignoreCase'] : null,
-                isset($args['sortLocaleCompare']) ? $args['sortLocaleCompare'] : null,
-                isset($args['tsoutput']) ? $args['tsoutput'] : null
+                $args['tstotals'] ?? null,
+                $args['tstotalformat'] ?? null,
+                $args['tstotaloptions'] ?? null,
+                $args['showProcessing'] ?? null,
+                $args['ignoreCase'] ?? null,
+                $args['sortLocaleCompare'] ?? null,
+                $args['tsoutput'] ?? null
             );
             if (is_array($ts->settings)) {
                 $ts->settings['ajax']['offset'] = 'offset';

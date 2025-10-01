@@ -166,6 +166,19 @@ function wikiplugin_trackerfilter_info()
                     ['text' => tra('No'), 'value' => 'n']
                 ]
             ],
+            'useCssTruncate' => [
+                'required' => false,
+                'name' => tra('Use CSS-based truncation'),
+                'description' => tra('Enable visual truncation using CSS.'),
+                'since' => '29.0',
+                'default' => 'n',
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
         ],
         $list['params']
     );
@@ -194,8 +207,11 @@ function wikiplugin_trackerfilter($data, $params)
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
     $iTrackerFilter++;
-    $default = ['noflipflop' => 'y', 'action' => 'Filter', 'line' => 'n', 'displayList' => 'n', 'export_action' => '',
-                     'export_itemid' => 'y', 'export_status' => 'n', 'export_created' => 'n', 'export_modif' => 'n', 'export_charset' => 'UTF-8', 'status' => 'opc'];
+    $default = [
+        'action' => 'Filter',
+        'export_itemid' => 'y',
+        'status' => 'opc',
+    ];
 
     if (isset($_REQUEST['reset_filter'])) {
         wikiplugin_trackerFilter_reset_filters($iTrackerFilter);
@@ -247,9 +263,6 @@ function wikiplugin_trackerfilter($data, $params)
                         return true;
                     });'
     );
-    if ($prefs['jquery_select2'] === 'y') {
-        $headerlib->add_css('@media (min-width: 768px) { .tiki #col1 .trackerfilter form .table-responsive { overflow-x: visible; overflow-y: visible; }} /* jquery_select2 specific: edit this in wikiplugin_trackerfilter.php */');
-    } // TODO: move the CSS to less and add class html attribute in wikiplugin_trackerfilter.tpl instead
 
     if (! empty($_REQUEST['tracker_filters']) && count($_REQUEST['tracker_filters']) > 0) {
         foreach ($_REQUEST['tracker_filters'] as $tf_vals) {
@@ -301,7 +314,7 @@ function wikiplugin_trackerfilter($data, $params)
 
     if (empty($_REQUEST['filter']) && empty($export_action)) { // look if not coming from an initial and not exporting
         foreach ($_REQUEST as $key => $val) {
-            if (substr($key, 0, 2) == 'f_') {
+            if (str_starts_with($key, 'f_')) {
                 $_REQUEST['filter'] = 'y';
                 break;
             }
@@ -338,7 +351,7 @@ function wikiplugin_trackerfilter($data, $params)
         wikiplugin_trackerfilter_build_trackerlist_filter($_REQUEST, $formats, $ffs, $values, $exactValues, $tracker_definition);
         // echo '<pre>BUILD_FILTER'; print_r($ffs); print_r($exactValues); echo '</pre>';
 
-        $params['fields'] = isset($fields) ? $fields : [];
+        $params['fields'] = $fields ?? [];
         if (empty($params['trackerId'])) {
             $params['trackerId'] = $trackerId;
         }
@@ -370,7 +383,8 @@ function wikiplugin_trackerfilter($data, $params)
         wikiplugin_trackerFilter_save_session_filters($params, $iTrackerFilter);
         $smarty->assign('urlquery', wikiplugin_trackerFilter_build_urlquery($params));
         include_once('lib/wiki-plugins/wikiplugin_trackerlist.php');
-        $dataRes .= wikiplugin_trackerlist($data, $params);
+        $smarty->assign('useCssTruncate', $useCssTruncate);
+        $dataRes .= TikiLib::lib('parser')->invokePlugin('trackerlist', $data, $params);
     } else {
         $data = '';
     }
@@ -456,7 +470,7 @@ function wikiplugin_trackerfilter_build_trackerlist_filter($input, $formats, &$f
     $trklib = TikiLib::lib('trk');
 
     foreach ($input as $key => $val) {
-        if (substr($key, 0, 2) == 'f_' && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
+        if (str_starts_with($key, 'f_') && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
             if (! is_array($val)) {
                 $val = urldecode($val);
             }
@@ -542,7 +556,7 @@ function wikiplugin_trackerFilter_reset_filters($iTrackerFilter = 0)
     unset($_REQUEST['tracker_filters']);
 
     foreach ($_REQUEST as $key => $val) {
-        if (substr($key, 0, 2) == 'f_') {
+        if (str_starts_with($key, 'f_')) {
             unset($_REQUEST[$key]);
         }
     }
@@ -550,7 +564,7 @@ function wikiplugin_trackerFilter_reset_filters($iTrackerFilter = 0)
 
 function wikiplugin_trackerFilter_get_session_filters_key($iTrackerFilter = 0)
 {
-    $trackerId = isset($_REQUEST['trackerId']) ? $_REQUEST['trackerId'] : 0;
+    $trackerId = $_REQUEST['trackerId'] ?? 0;
     if (! empty($_REQUEST['page'])) {
         return 'f_' . $_REQUEST['page'] . '_' . $iTrackerFilter;
     }

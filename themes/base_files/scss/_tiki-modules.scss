@@ -1,6 +1,9 @@
 // Redundant for .module.card, but needed when nobox=y.
 .module {
     position: relative;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
 }
 
 header.container,
@@ -77,8 +80,8 @@ li.archivedate {
 // /***** Boxes *****/
 // ** Modules **/
 // When the module title is a link, make it the card-title color.
-.card.module .card-title a {
-    color: var(--bs-card-title-color);
+.card.module .tiki-card-header-title a {
+    color: var(--bs-card-cap-color);
 }
 
 .minichatdiv {
@@ -269,7 +272,8 @@ li.login_link ul li a {
 }
 
 .siteloginbar_popup img {
-    height: 24px;
+    border-radius: var(--bs-border-radius);
+    height: 2.5rem;
 }
 
 .navbar-form .siteloginbar_poppedup .form-control,
@@ -450,4 +454,22 @@ header.fixed-top {
         .q23 { width: 50%; }
         .tips em { display: block; word-break: break-word; }
     }
+}
+
+// admin toogle
+.modules-admin-toggle-container {
+    width: 100%;
+    height: 35px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+  }
+  
+#toggleSwitch_modules {
+    margin: 0;
+}
+
+.tiki-header-top {
+    --tiki-fixed-top-border-top-width: 0px;
+    --tiki-fixed-top-border-bottom-width: 5px;
 }

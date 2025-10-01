@@ -4,7 +4,7 @@ namespace Tiki\Lib\core\Toolbar;
 
 abstract class ToolbarUtilityItem extends ToolbarItem
 {
-    abstract protected function getOnClick(): string;
+    abstract public function getOnClick(): string;
 
     // same toolbar item for non wysiwyg markdown
     public function getMarkdownHtml(): string

@@ -1,9 +1,13 @@
-// Vapor 5.3.3 -- This file is to override and add top variables in  node_modules/bootswatch/dist/vapor/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-@import "../../../node_modules/bootswatch/dist/vapor/_variables.scss";
-//
+// Vapor 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
+
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/vapor/_variables.scss"; // Bootswatch theme variables file
+
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $yellow-800: shade-color($yellow, 60%) !default;
 
@@ -14,19 +18,22 @@ $info:         #0879BF; // $blue !default;
 $warning:       #946F00; // $yellow !default;
 $danger:        #E02E3A; // $red !default;
 $light:         #0F6D75; // #11828D; // #44d9e8 !default; Darkened for acceptable contrast behind link color
-//$dark:          $gray-900 !default;
+$dark:          $gray-900; // !default;
 
 //$min-contrast-ratio:   1.2 !default;
 
 // Options
-// Prefix for :root CSS variables
-
-$variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix !default;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // $enable-rounded:              false !default;
 
 // Body
+$body-secondary-color:      #2bdbc5; // rgba($body-color, .99);  // default
+$body-secondary-bg:         #2b144d;
+$body-tertiary-color:       rgba($body-color, .65);  // default
+$body-tertiary-bg:          #250f46;
+$body-emphasis-color:       #6cf8e7;
 
 // Links
 
@@ -47,29 +54,18 @@ $mark-bg:                     $yellow-800;
 $input-bg: #30115e;  // Copied from Bootswatch demo page.
 
 // Navs
-
 // Dropdowns
-
 // Pagination
-
 // Cards
-
 // Tooltips
-
 $tooltip-bg:                        $dark !default;
 
 // Popovers
-
 // Toasts
-
 // Modals
-
 // Progress bars
-
 // List group
-
 // Breadcrumbs
-
 // Code
 $code-color:                        $pink;
 

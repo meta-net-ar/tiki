@@ -84,12 +84,12 @@
         </tr>
         {section name=changes loop=$listpages}
             {if $actual eq $listpages[changes].publishDate}
-                {assign var=class value=third}
+                {$class=third}
             {else}
                 {if $actual > $listpages[changes].publishDate}
-                    {assign var=class value=odd}
+                    {$class=odd}
                 {else}
-                    {assign var=class value=even}
+                    {$class=even}
                 {/if}
             {/if}
             <tr class="{$class}">
@@ -111,7 +111,7 @@
                                     <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                     <input type="hidden" name="contentId" value="{$offset}">
                                     <input type="hidden" name="remove" value="{$listpages[changes].pId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()" aria-label="{tr}Delete{/tr}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </button>
                                 </form>
@@ -126,4 +126,4 @@
     </table>
 </div>
 
-{pagination_links cant=$cant step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}

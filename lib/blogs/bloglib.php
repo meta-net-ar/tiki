@@ -54,7 +54,7 @@ class BlogLib extends TikiDb_Bridge
         $result = $this->fetchAll($query, $bindvars);
 
         $ret = [];
-        $cant = 0;
+        $count = 0;
         $nb = 0;
         $i = 0;
 
@@ -72,7 +72,7 @@ class BlogLib extends TikiDb_Bridge
         $result = Perms::filter(['type' => 'blog'], 'object', $result, ['object' => 'blogId'], $perm);
 
         foreach ($result as $res) {
-            ++$cant;
+            ++$count;
             if ($maxRecords == - 1 || ($i >= $offset && $nb < $maxRecords)) {
                 $ret[] = $res;
                 ++$nb;
@@ -82,7 +82,7 @@ class BlogLib extends TikiDb_Bridge
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -108,7 +108,7 @@ class BlogLib extends TikiDb_Bridge
             $join = '';
             $where = '';
         }
-        array_push($bindvars, $blogId);
+        $bindvars[] = $blogId;
         if (! empty($where)) {
             $where = '1=1 ' . $where . ' AND ';
         }
@@ -235,7 +235,7 @@ class BlogLib extends TikiDb_Bridge
 
         $authorized_blogs = $this->list_blogs(0, -1, 'created_desc', '', $ref);
         $permit_blogs = [];
-        for ($i = 0; $i < $authorized_blogs["cant"]; $i++) {
+        for ($i = 0; $i < $authorized_blogs["count"]; $i++) {
             $permit_blogs[] = $authorized_blogs["data"][$i]['blogId'];
         }
 
@@ -297,9 +297,9 @@ class BlogLib extends TikiDb_Bridge
         }
 
         $query = "select * from `tiki_blog_posts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_blog_posts` $mid";
+        $query_count = "select count(*) from `tiki_blog_posts` $mid";
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         foreach ($result as $res) {
@@ -309,18 +309,18 @@ class BlogLib extends TikiDb_Bridge
                 continue;
             }
             $query = "select `title` from `tiki_blogs` where `blogId`=?";
-            $cant_com = $this->getOne(
+            $com_count = $this->getOne(
                 "select count(*) from `tiki_comments` where `object`=? and `objectType` = ?",
                 [(string) $res["postId"],'blog']
             );
-            $res["comments"] = $cant_com;
+            $res["comments"] = $com_count;
             $res["blogTitle"] = $this->getOne($query, [(int)$blogId]);
             $res["size"] = strlen($res["data"]);
             $ret[] = $res;
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -632,9 +632,9 @@ class BlogLib extends TikiDb_Bridge
         }
 
         $query = "select tbp.*,tb.title as blogTitle from `tiki_blog_posts` as tbp, `tiki_blogs` as tb $join $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_blog_posts` as tbp, `tiki_blogs` as tb $join $mid";
+        $query_count = "select count(*) from `tiki_blog_posts` as tbp, `tiki_blogs` as tb $join $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -660,7 +660,7 @@ class BlogLib extends TikiDb_Bridge
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -719,7 +719,7 @@ class BlogLib extends TikiDb_Bridge
             }
         }
 
-        return ['data' => $ret, 'cant' => count($ret)];
+        return ['data' => $ret, 'count' => count($ret)];
     }
 
     /**
@@ -756,9 +756,9 @@ class BlogLib extends TikiDb_Bridge
         }
 
         $query = "select * from `tiki_blog_posts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_blog_posts` $mid";
+        $query_count = "select count(*) from `tiki_blog_posts` $mid";
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         $result = Perms::filter(['type' => 'blog post'], 'object', $result, ['object' => 'postId'], ['read_blog', 'blog_post_view_ref']);
@@ -772,7 +772,7 @@ class BlogLib extends TikiDb_Bridge
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -790,7 +790,7 @@ class BlogLib extends TikiDb_Bridge
      * @access public
      * @return int postId
      */
-    public function blog_post(int $blogId, string $data, string $excerpt, string $user, string $title = '', string $contributions = '', string $priv = 'n', $created = 0, bool $is_wysiwyg = false)
+    public function blog_post(int $blogId, string $data, string $excerpt, string $user, string $title = '', $contributions = '', string $priv = 'n', $created = 0, bool $is_wysiwyg = false)
     {
         // update tiki_blogs and call activity functions
         global $prefs;
@@ -946,7 +946,15 @@ class BlogLib extends TikiDb_Bridge
             if ($blogId) {
                 $param .= "&amp;del=" . strlen($res['data']);
             }
-            $logslib->add_action('Removed', $blogId, 'blog', $param);
+            $removedActionId = $logslib->add_action('Removed', $blogId, 'blog', $param);
+            $getActions = $logslib->getActionLogDetails('Posted', $blogId, 'blog');
+            if (! empty($getActions['actionId']) && $removedActionId) {
+                $createdActionId = $getActions['actionId'];
+                $getContribIds = $logslib->get_action_params($createdActionId, 'contribution');
+                if (count($getContribIds) > 0) {
+                    $logslib->insert_params($removedActionId, 'contribution', $getContribIds);
+                }
+            }
         }
         if ($blogId) {
             $tikilib->remove_object('post', (int)$postId);
@@ -1162,9 +1170,9 @@ class BlogLib extends TikiDb_Bridge
         }
 
         $query = "select * from `tiki_blog_posts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_blog_posts` $mid";
+        $query_count = "select count(*) from `tiki_blog_posts` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -1173,7 +1181,7 @@ class BlogLib extends TikiDb_Bridge
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -1262,10 +1270,7 @@ class BlogLib extends TikiDb_Bridge
         $smarty = TikiLib::lib('smarty');
 
         if (! $this->blog_exists($blogId)) {
-            $msg = tra('Blog cannot be found');
-            $smarty->assign('msg', $msg);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Blog cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
         }
     }
 
@@ -1308,7 +1313,7 @@ class BlogLib extends TikiDb_Bridge
            word boundary. The truncate function asks if words can be broken.
            The same question is asked inversely so the supplied parameter needs
            to be reversed to remain accurate. */
-        $breakword = ($wordBoundary == 'y') ? false : true;
+        $breakword = ! ($wordBoundary == 'y');
 
         $etc = ($ellipsis == 'y') ? ' ... ' : ' ';
         $numBlogs = count($blogItems["data"]);

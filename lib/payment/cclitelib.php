@@ -83,7 +83,7 @@ class CCLiteLib extends TikiDb_Bridge
 
     public function get_invoice($ipn_data)
     {
-        return isset($ipn_data['invoice']) ? $ipn_data['invoice'] : 0;
+        return $ipn_data['invoice'] ?? 0;
     }
 
     public function get_amount($ipn_data)

@@ -315,6 +315,7 @@ function wp_map_plugin_searchlayer($body, $args)
     $load_delay = $args->load_delay->int();
     $popup_width = $args->popup_width->text();  // plain numeric xx for pixels or xx% for percentage (only on dialog popups)
     $popup_height = $args->popup_height->text();
+    $popup_tpl = $args->popup_tpl->text();
 
     $args->replaceFilter('fields', 'word');
     $fields = $args->asArray('fields', ',');
@@ -326,7 +327,7 @@ function wp_map_plugin_searchlayer($body, $args)
     unset($args['fields']);
     unset($args['sort_mode']);
     unset($args['load_delay']);
-    unset($args['popup_width'], $args['popup_height']);
+    unset($args['popup_width'], $args['popup_height'], $args['popup_tpl']);
 
     $args->setDefaultFilter('text');
 
@@ -345,6 +346,9 @@ function wp_map_plugin_searchlayer($body, $args)
 
     $fieldList = '';
     if (! empty($fields)) {
+        $fields = array_map(function ($field) {
+            return str_replace('tracker_field_', '', $field);
+        }, $fields);
         $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '"/>';
     }
 
@@ -360,11 +364,12 @@ function wp_map_plugin_searchlayer($body, $args)
     } else {
         $popup_config = '';
     }
+    $popup_fields = implode(',', $fields);
 
     $escapedLayer = smarty_modifier_escape($layer);
     $escapedSuffix = smarty_modifier_escape($suffix);
     return <<<OUT
-<form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay"{$popup_config}>
+<form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay" data-popup-fields="$popup_fields" data-popup-tpl="$popup_tpl"{$popup_config}>
     <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm" /></p>
 
 </form>

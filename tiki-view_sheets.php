@@ -4,6 +4,10 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\CSVHandler;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -19,7 +23,7 @@ $inputConfiguration = [
             'page'         => 'page',    //get
             'height'       => 'int',     //get
             'parse'        => 'word',    //get
-            's'            => 'word',    //get
+            's'            => 'string',  //get
             'readdate'     => 'int',     //get
             'relate'       => 'int',     //get
             'trackerId'    => 'int',     //get
@@ -50,9 +54,7 @@ if (! isset($_REQUEST['file']) && ! isset($_REQUEST['fileId'])) {
     try {
         $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
     } catch (Exception $e) {
-        $smarty->assign('msg', tra($e->getMessage()));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -65,12 +67,10 @@ if ($user && $user == $info['author']) {
 }
 
 if (! $sheetlib->user_can_view($_REQUEST['sheetId'])) {
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$smarty->assign('page', isset($_REQUEST['page']) ? $_REQUEST['page'] : '');
+$smarty->assign('page', $_REQUEST['page'] ?? '');
 $smarty->assign('objectperms', $objectperms);
 
 if (isset($_REQUEST['height'])) {
@@ -95,16 +95,12 @@ $smarty->assign('description', $info['description']);
 
 // Start permissions
 if ($_REQUEST['parse'] == 'edit' && ! $sheetlib->user_can_edit($_REQUEST['sheetId'])) {
-    $smarty->assign('msg', tra('Permission denied') . ': feature_sheet');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied') . ': feature_sheet', \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 //check to see if we are to do something other than view a file, which is not allowed
 if ($_REQUEST['parse'] != 'y' && ( isset($_REQUEST['file']) || isset($_REQUEST['fileId']) )) {
-    $smarty->assign('msg', tra('Files are read only at this time'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Files are read only at this time'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if ($prefs['feature_contribution'] == 'y') {
@@ -177,8 +173,8 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
     $filegallib = TikiLib::lib('filegal');
     $access->check_feature('feature_file_galleries');
     $fileInfo = $filegallib->get_file_info($_REQUEST['fileId']);
-    $handler = new TikiSheetCSVHandler($fileInfo);
-    $grid = new TikiSheet();
+    $handler = new CSVHandler($fileInfo);
+    $grid = new Sheet();
     $grid->import($handler);
     $tableHtml[0] = $grid->getTableHtml();
     $smarty->assign('notEditable', 'true');
@@ -188,14 +184,14 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
     }
 } else {
     //Database sheet
-    $handler = new TikiSheetDatabaseHandler($_REQUEST['sheetId']);
+    $handler = new DatabaseHandler($_REQUEST['sheetId']);
     //We make sheet able to look at other date save
     if (isset($_REQUEST['readdate']) && ! empty($_REQUEST['readdate'])) {
         $smarty->assign('read_date', $_REQUEST['readdate']);
         $handler->setReadDate($_REQUEST['readdate']);
     }
 
-    $grid = new TikiSheet();
+    $grid = new Sheet();
     $grid->import($handler);
 
     //ensure that sheet isn't being edited, then parse values if needed
@@ -207,7 +203,7 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
 
     $smarty->assign('parseValues', $grid->parseValues);
 
-    $tableHtml[0] = $grid->getTableHtml(true, isset($_REQUEST['readdate']) ? $_REQUEST['readdate'] : null);
+    $tableHtml[0] = $grid->getTableHtml(true, $_REQUEST['readdate'] ?? null);
 
     if (! empty($relatedTrackersAsHtml)) {
         $tableHtml[0] .= $relatedTrackersAsHtml;

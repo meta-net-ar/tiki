@@ -4,8 +4,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/wiki/pluginslib.php';
+
+use Tiki\Lib\Wiki\PluginsLib;
+use Tiki\Lib\Wiki\PluginsLibUtil;
+
 require_once 'lib/wiki-plugins/wikiplugin_tikidocfromcode.php';
+
 class WikiPluginPluginManager extends PluginsLib
 {
     public function getDefaultArguments()
@@ -82,7 +86,7 @@ class WikiPluginPluginManager extends PluginsLib
         //$aPlugins and $all now has the complete list of plugin or module file names - the code below modifies $aPlugins
         //if necessary based on user settings
         if (! empty($plugin)) {
-            if (strpos($plugin, '|') !== false) {
+            if (str_contains($plugin, '|')) {
                 $aPlugins = [];
                 $userlist = explode('|', $plugin);
                 foreach ($userlist as $useritem) {
@@ -94,7 +98,7 @@ class WikiPluginPluginManager extends PluginsLib
                         $aPlugins[] = $file;
                     }
                 }
-            } elseif (strpos($plugin, '-') !== false) {
+            } elseif (str_contains($plugin, '-')) {
                 $userrange = explode('-', $plugin);
                 $begin = array_search($filepath . $userrange[0] . '.php', $aPlugins);
                 $end = array_search($filepath . $userrange[1] . '.php', $aPlugins);

@@ -77,17 +77,17 @@
                             <div class="friendship-actions float-sm-end">
                                 {if !empty($relation.remove)}
                                     <a class="float-sm-end remove-friend btn btn-primary" href="{service controller=social action=remove_friend friend=$other_user}"
-                                        title="{$relation.remove}" data-confirm="{tr _0=$other_user}Do you really want to remove %0?{/tr}">
+                                        title="{$relation.remove}" data-confirm="{tr _0=$other_user}Do you really want to remove %0?{/tr}" role="button">
                                         {icon name='delete'}
                                     </a>
                                 {/if}
                                 {if !empty($relation.add)}
-                                    <a class="float-sm-end add-friend btn btn-primary" title="{$relation.add}" href="{service controller=social action=add_friend username=$other_user}">
+                                    <a class="float-sm-end add-friend btn btn-primary" title="{$relation.add}" href="{service controller=social action=add_friend username=$other_user}" role="button">
                                         {icon name='add'}
                                     </a>
                                 {/if}
                                 {if !empty($relation.approve)}
-                                    <a class="float-sm-end approve-friend btn btn-primary" title="{$relation.approve}" href="{service controller=social action=approve_friend friend=$other_user}">
+                                    <a class="float-sm-end approve-friend btn btn-primary" title="{$relation.approve}" href="{service controller=social action=approve_friend friend=$other_user}" role="button">
                                         {icon name='ok'}
                                     </a>
                                 {/if}
@@ -101,7 +101,7 @@
 
     </div>
         {if $add_friend_button}
-            <a class="add-friend btn btn-primary btn-sm mx-auto" href="{service controller=social action=add_friend username=$other_user}">
+            <a class="add-friend btn btn-primary btn-sm mx-auto" href="{service controller=social action=add_friend username=$other_user}" role="button">
                 {$add_friend_button}
             </a>
         {/if}

@@ -187,6 +187,13 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                                 "null_value" => 0.0,
                                 "ignore_malformed" => true,
                             ],
+                            "facet" => $this->connection->getVersion() >= 5 ?
+                            [
+                                "type" => "keyword",
+                                "ignore_above" => 1000,
+                            ] : [
+                                "type" => "string",
+                            ],
                         ],
                     ];
                     if ($entry instanceof Search_Type_SimpleText) {
@@ -373,7 +380,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $builder = new Search_Elastic_OrderBuilder($this);
             $orderPart = $builder->build($query->getSortOrder());
 
-            $builder = new Search_Elastic_FacetBuilder($this->facetCount, $this->connection->getVersion() >= 2.0, $this->connection->getVersion() >= 8.0);
+            $builder = new Search_Elastic_FacetBuilder($this->facetCount, $this->connection->getVersion() >= 2.0, $this->connection->getVersion() >= 8.0, $this);
             $facetPart = $builder->build($query->getFacets());
 
             if ($this->connection->getVersion() >= 6.0 && $query->getSortOrder()->hasField(Search\Query\Order::FIELD_SCORE)) {
@@ -394,6 +401,14 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 $postFilterPart = ["post_filter" => [
                     'fquery' => $postFilterPart,
                 ]];
+            }
+
+            if ($selectFields = $query->getSelectionFields()) {
+                $sourcePart = [
+                    "_source" => $selectFields,
+                ];
+            } else {
+                $sourcePart = [];
             }
 
             $indices = [$this->index];
@@ -446,6 +461,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 $facetPart,
                 $rescorePart,
                 $postFilterPart,
+                $sourcePart,
                 [
                     "from" => $resultStart,
                     "size" => $resultCount,
@@ -542,7 +558,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                     $index = $indicesMap[$index];
                 } else {
                     foreach ($indicesMap as $candidate) {
-                        if (0 === strpos($index, $candidate . '_')) {
+                        if (str_starts_with($index, $candidate . '_')) {
                             $indicesMap[$index] = $candidate;
                             $index = $candidate;
                             break;
@@ -663,7 +679,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                     $data[$key] = $correctQueryImploded;
                 } else {
                     foreach ($wrongKeywords as $index => $wrongKeyword) {
-                        if (strpos($value, $wrongKeyword) !== false) {
+                        if (str_contains($value, $wrongKeyword)) {
                             $data[$key] = str_replace($wrongKeyword, $correctKeywords[$index], $value);
                         }
                     }
@@ -798,10 +814,27 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         return new stdClass();
     }
 
+    public function isDateField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping->type) && in_array($mapping->type, ['date', 'datetime'])) {
+            return true;
+        }
+        return false;
+    }
     public function isTextField($field)
     {
         $mapping = $this->getFieldMapping($field);
         if (! empty($mapping->type) && in_array($mapping->type, ['text', 'keyword'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasFacetField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping->type) && $mapping->type == 'text' && isset($mapping->fields->facet)) {
             return true;
         }
         return false;

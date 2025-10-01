@@ -1,4 +1,4 @@
-{assign var=hasPopup value='n'}
+{$hasPopup='n'}
 {capture name=popup}
     <div class="card">
         <div class="table-responsive">

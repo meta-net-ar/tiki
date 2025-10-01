@@ -2,7 +2,7 @@
 
 {block name="navigation"}
     {include file='tracker_actions.tpl'}
-    <a class="btn btn-primary" href="{service controller=tracker action=select_tracker}">{tr}Select Tracker{/tr}</a>
+    <a class="btn btn-primary" href="{service controller=tracker action=select_tracker}" role="button">{tr}Select Tracker{/tr}</a>
 {/block}
 
 {block name="title"}

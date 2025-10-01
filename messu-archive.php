@@ -158,7 +158,7 @@ $items = $messulib->list_user_messages(
     $priority,
     'archive'
 );
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $cellsize = 200;
 $percentage = 1;

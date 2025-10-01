@@ -199,9 +199,6 @@ class DatabaseQueryLog
                 }
             }
         }
-        //echo "<pre>";
-        //var_dump($log[3]);
-        //echo "</pre>";
         return $log;
     }
 

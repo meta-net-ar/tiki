@@ -6,18 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class TikiDb_Initializer
 {
-    private $connectors = [
-        'pdo' => 'TikiDb_Initializer_Pdo',
-        'adodb' => 'TikiDb_Initializer_Adodb',
-    ];
     private $preferred;
     private $initializeCallback;
 
-    public function setPreferredConnector($connector)
+    public function setPreferredConnector()
     {
-        if (isset($this->connectors[$connector])) {
-            $this->preferred = $connector;
-        }
+        $this->preferred = $this->getInitializer();
     }
 
     public function setInitializeCallback($callback)
@@ -27,14 +21,8 @@ class TikiDb_Initializer
 
     public function getConnection(array $credentials)
     {
-        if ($connector = $this->getInitializer($this->preferred)) {
+        if ($connector = $this->getInitializer()) {
             return $this->initialize($connector, $credentials);
-        }
-
-        foreach (array_keys($this->connectors) as $name) {
-            if ($connector = $this->getInitializer($name)) {
-                return $this->initialize($connector, $credentials);
-            }
         }
     }
 
@@ -49,13 +37,9 @@ class TikiDb_Initializer
         }
     }
 
-    private function getInitializer($name)
+    private function getInitializer()
     {
-        if (! isset($this->connectors[$name])) {
-            return false;
-        }
-
-        $connector = new $this->connectors[$name]();
+        $connector = new TikiDb_Initializer_Pdo();
         if ($connector->isSupported()) {
             return $connector;
         }

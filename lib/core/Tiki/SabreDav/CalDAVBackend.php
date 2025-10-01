@@ -408,11 +408,10 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $this->ensureCalendarAccess($calendarId, $instanceId, null, 'view_calendar', 'read');
 
         $objects = TikiLib::lib('calendar')->get_events($calendarId);
-        $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
 
         $result = [];
         $recurrences = [];
-        foreach ($filtered as $row) {
+        foreach ($objects as $row) {
             if ($row['recurrenceId']) {
                 $recurrences[] = $row['recurrenceId'];
                 continue;
@@ -476,7 +475,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             $rec = null;
         }
 
-        $perms = Perms::get('event', $row['calitemId']);
+        $perms = Perms::get('calendaritem', $row['calitemId']);
         if (! $perms->view_events) {
             throw new DAV\Exception\Forbidden(tra('Permission denied') . ": " . 'tiki_p_view_events');
         }
@@ -529,7 +528,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 return str_replace("calendar-object-", "", $uri);
             }, $chunk);
             $objects = TikiLib::lib('calendar')->get_events($calendarId, $itemIdsOrUris);
-            $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
+            $filtered = Perms::filter([ 'type' => 'calendaritem' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
             $recurrences = [];
             foreach ($filtered as $row) {
                 if ($row['recurrenceId']) {
@@ -691,6 +690,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 $rec = $data['rec'];
             }
             $data['calitemId'] = $item['calitemId'];
+
             $rec->updateDetails($data);
             $rec->setUser($userToSet);
             $rec->save($data['updateManuallyChangedEvents'] ?? true);
@@ -923,7 +923,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
 
         $objects = TikiLib::lib('calendar')->get_events($calendarId, [], $componentType, $start, $end);
-        $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
+        $filtered = Perms::filter([ 'type' => 'calendaritem' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
 
         if ($requirePostFilter) {
             foreach ($filtered as $key => $row) {
@@ -977,7 +977,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $user = PrincipalBackend::mapUriToUser($principalUri);
         $row = TikiLib::lib('calendar')->find_by_uid($user, $uid);
         if ($row) {
-            $perms = Perms::get('event', $row['calitemId']);
+            $perms = Perms::get('calendaritem', $row['calitemId']);
             if ($perms->view_events) {
                 if ($row['recurrenceId']) {
                     $rec = new \CalRecurrence($row['recurrenceId']);
@@ -1404,7 +1404,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                     );
                     $data = [
                         'access' => $sharee->access,
-                        'share_name' => isset($sharee->properties['{DAV:}displayname']) ? $sharee->properties['{DAV:}displayname'] : null,
+                        'share_name' => $sharee->properties['{DAV:}displayname'] ?? null,
                         'share_invite_status' => $sharee->inviteStatus ?: $oldSharee->inviteStatus,
                     ];
                     $calendarlib->update_calendar_instance($calendarId, $share_href, $data);
@@ -1425,7 +1425,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 'timezone' => $calendar['timezone'] ?? '',
                 'transparent' => 1,
                 'share_href' => $sharee->href,
-                'share_name' => isset($sharee->properties['{DAV:}displayname']) ? $sharee->properties['{DAV:}displayname'] : null,
+                'share_name' => $sharee->properties['{DAV:}displayname'] ?? null,
                 'share_invite_status' => $sharee->inviteStatus ?: \Sabre\DAV\Sharing\Plugin::INVITE_NORESPONSE,
             ];
             $calendarlib->create_calendar_instance($data);

@@ -6,7 +6,7 @@
 
 {block name="navigation"}
     <div class="navbar">
-        <a class="btn btn-primary" href="{service controller=workspace action=list_templates}" title="{tr}List{/tr}">
+        <a class="btn btn-primary" role="button" href="{service controller=workspace action=list_templates}" title="{tr}List{/tr}">
             {icon name="list"} {tr}Workspace Templates{/tr}
         </a>
     </div>

@@ -18,7 +18,6 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
             'author' => 'Anonymous',
             'heading' => '',
             'publication_date' => time(),
-            'expiration_date' => time() + 3600 * 24 * 365,
             'type' => 'Article',
             'topic' => 0,
             'topline' => '',
@@ -66,7 +65,6 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
             $data['heading'],
             $data['body'],
             $dateConverter->convert($data['publication_date']),
-            $dateConverter->convert($data['expiration_date']),
             'admin',
             0,
             0,
@@ -127,7 +125,6 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
                 'body' => "wikicontent:$bodypage",
                 'type' => $writer->getReference('article_type', $article['type']),
                 'publication_date' => $article['publishDate'],
-                'expiration_date' => $article['expireDate'],
                 'topline' => $article['topline'],
                 'subtitle' => $article['subtitle'],
                 'link_to' => $article['linkto'],
@@ -170,7 +167,7 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
         if (! empty($article)) {
             $artlib = TikiLib::lib('art');
             $article = $artlib->list_articles(0, -1, 'articleId_desc', $article);
-            $count = isset($article['cant']) ? $article['cant'] : 0;
+            $count = $article['count'] ?? 0;
             if (
                 $count == 1
                 && ! empty($article['data'][0]['articleId'])

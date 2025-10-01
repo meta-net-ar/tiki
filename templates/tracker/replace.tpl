@@ -8,7 +8,7 @@
 
 <form method="post" action="{service controller=tracker action=replace}">
     {accordion}
-        {accordion_group title="{tr}General{/tr}"}
+        {accordion_group title="{tr}General{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="name">{tr}Name{/tr}</label>
                 <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" required="required">
@@ -33,18 +33,24 @@
                 <input class="form-control" type="text" name="permName" id="permName" value="{$info.permName|escape}">
                 {tr}Required for Advanced Shopping Cart and some other tracker features, do not change this unless you are sure.{/tr}
             </div>
-            {jq}$("#name").on("change", function() {
-    if ($("#name").val()) {
-        if (! $("#fieldPrefix").val()) {
-            $("#fieldPrefix").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-        }
-        if (! $("#permName").val()) {
-            $("#permName").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-        }
-    }
-});{/jq}
+            {jq}
+                $("#name").on("change", function() {
+                    if ($("#name").val()) {
+                        const prefix = $("#fieldPrefix")
+                        if (! prefix.val()) {
+                            prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                            prefix.next('el-input').attr("value", prefix.val());
+                        }
+                        const permName = $("#permName")
+                        if (! permName.val()) {
+                            permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                            permName.next('el-input').attr("value", permName.val());
+                        }
+                    }
+                });
+            {/jq}
         {/accordion_group}
-        {accordion_group title="{tr}Features{/tr}"}
+        {accordion_group title="{tr}Features{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="allowOffline" value="1"
                     {if $info.allowOffline eq 'y'} checked="checked"{/if}>
@@ -124,8 +130,17 @@
                     </div>
                 {/foreach}
             </fieldset>
+            {if $prefs.ajax_inline_edit eq 'y'}
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="allowInlineEditing" id="allowInlineEditing" value="1"
+                        {if $info.allowInlineEditing eq 'y' or (empty($info.allowInlineEditing) and $prefs.ajax_inline_edit_trackerlist eq 'y')} checked="checked"{/if}>
+                    <label class="form-check-label" for="allowInlineEditing">
+                        {tr}Allow inline editing{/tr}
+                    </label>
+                </div>
+            {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Display{/tr}"}
+        {accordion_group title="{tr}Display{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label class="col-form-label" for="logo">{tr}Logo{/tr}</label>
                 <input class="form-control" type="text" name="logo" id="logo" value="{$info.logo|escape}">
@@ -229,8 +244,15 @@
                 <label for="showPopup">{tr}List detail popup{/tr}</label>
                 {object_selector_multi type=trackerfield tracker_id=$info.trackerId _simplevalue=$info.showPopup _separator="," _simplename="showPopup"}
             </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="allowChooseFieldsToDisplay" value="1"
+                    {if $info.allowChooseFieldsToDisplay eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="allowChooseFieldsToDisplay">
+                    {tr}Allow user to choose fields to display{/tr}
+                </label>
+            </div>
         {/accordion_group}
-    {accordion_group title="{tr}Section Format{/tr}"}
+    {accordion_group title="{tr}Section Format{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     <label for="sectionFormat">{tr}Section format{/tr}</label>
                     <select name="sectionFormat" id="sectionFormat" class="form-select">
@@ -271,7 +293,7 @@
                     </div>
                 </div>
     {/accordion_group}
-        {accordion_group title="{tr}Status{/tr}"}
+        {accordion_group title="{tr}Status{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="newItemStatus">{tr}New item status{/tr}</label>
                 <select name="newItemStatus" id="newItemStatus" class="form-select">
@@ -323,7 +345,7 @@
 
             </div>
         {/accordion_group}
-        {accordion_group title="{tr}Notifications{/tr}"}
+        {accordion_group title="{tr}Notifications{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="outboundEmail">{tr}Copy activity to email{/tr}</label>
                 <input name="outboundEmail" id="outboundEmail" value="{$info.outboundEmail|escape}" class="email_multi form-control" size="60">
@@ -383,7 +405,7 @@
                 </div>
             {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Permissions{/tr}"}
+        {accordion_group title="{tr}Permissions{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="userCanSeeOwn" id="userCanSeeOwn" value="1"
                                            {if $info.userCanSeeOwn eq 'y'}checked="checked"{/if}>
@@ -464,8 +486,12 @@
                 </div>
             </div>
             <div class="form-check">
+                {$adminOnlyViewEditItem_is_checked = 'n'}
+                {if $info.adminOnlyViewEditItem eq 'y'|| (empty($info.adminOnlyViewEditItem) && $prefs.tracker_adminonlyviewedititem_by_default eq 'y')} {* No value in $info.adminOnlyViewEditItem means tracker creation *}
+                    {$adminOnlyViewEditItem_is_checked = 'y'}
+                {/if}
                 <input type="checkbox" class="form-check-input" name="adminOnlyViewEditItem" id="adminOnlyViewEditItem" value="1"
-                        {if $info.adminOnlyViewEditItem eq 'y'} checked="checked"{/if}>
+                    {if $adminOnlyViewEditItem_is_checked eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="adminOnlyViewEditItem">
                     {tr}Restrict non admins to wiki page access only{/tr}
                 </label>
@@ -504,7 +530,7 @@
             </fieldset>
         {/accordion_group}
         {if $prefs.feature_categories eq 'y'}
-            {accordion_group title="{tr}Categories{/tr}"}
+            {accordion_group title="{tr}Categories{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     {include file='categorize.tpl' notable=y auto=y}
                 </div>
@@ -566,14 +592,15 @@
             {/accordion_group}
         {/if}
         {if $prefs.tracker_tabular_enabled eq 'y' and $remoteTabulars}
-            {accordion_group title="{tr}Remote synchronization{/tr}"}
+            {accordion_group title="{tr}Remote synchronization{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
-                    <label for="tabularSync">{tr}Choose import-export format{/tr}</label>
-                    <select name="tabularSync" id="tabularSync" class="form-control">
+                    <label for="tabularSync">{tr}Choose import-export format(s){/tr}</label>
+                    <select name="tabularSync" id="tabularSync" class="form-control" multiple="multiple">
                         <option value="">{tr}None{/tr}</option>
+                        {assign var="tabularSyncArray" value=","|explode:$info.tabularSync}
                         {foreach item=tabular from=$remoteTabulars}
                             <option value="{$tabular.tabularId|escape}"
-                                {if $tabular.tabularId eq $info.tabularSync} selected="selected"{/if}>
+                                {if in_array($tabular.tabularId, $tabularSyncArray)} selected="selected"{/if}>
                                 {$tabular.name|escape}
                             </option>
                         {/foreach}
@@ -598,9 +625,18 @@
                         </a>
                     </label>
                     <div style="width: 100%">
-                        {if empty($info.tabularSyncLastImport)}{assign var="tabularSyncLastImport" value="0"}{else}{assign var="tabularSyncLastImport" value=$info.tabularSyncLastImport}{/if}
+                        {if empty($info.tabularSyncLastImport)}{$tabularSyncLastImport="0"}{else}{$tabularSyncLastImport=$info.tabularSyncLastImport}{/if}
                         {jscalendar date=$tabularSyncLastImport fieldname="tabularSyncLastImport" showtime='y' timezone=$displayTimezone}
                     </div>
+                </div>
+                <div class="mb-3 form-check depends" data-on="tabularSyncModifiedField">
+                    <input type="checkbox" class="form-check-input" name="tabularSyncLastImportSkipUpdate" id="tabularSyncLastImportSkipUpdate" value="1" {if !empty($info.tabularSyncLastImportSkipUpdate) && $info.tabularSyncLastImportSkipUpdate eq 'y'} checked="checked"{/if}>
+                    <label for="tabularSyncLastImportSkipUpdate">
+                        {tr}Skip last import time update{/tr}
+                        <a class="tikihelp text-info" title="{tr}Choice:{/tr} {tr}By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
                 </div>
             {/accordion_group}
         {/if}

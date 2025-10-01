@@ -13,7 +13,7 @@ function prefs_log_list()
             'type' => 'flag',
             'warning' => tra('May impact performance'),
             'help' => 'System-Log',
-            'default' => 'n',
+            'default' => 'y',
         ],
         'log_tpl' => [
             'name' => tra('Smarty template usage indicator'),
@@ -26,10 +26,23 @@ function prefs_log_list()
         ],
         'log_sql' => [
             'name' => tra('Log SQL'),
-            'description' => tra('All SQL queries will be registered in the database in the tiki_sql_query_logs table. '),
+            'description' => tra('All SQL queries will be registered in the database in the tiki_sql_query_logs table.'),
             'warning' => tra('Do not enable this feature all the time. It can be very resource intensive and will impact performance.'),
             'type' => 'flag',
             'default' => 'n',
+        ],
+        'log_failed_logins' => [
+            'name' => tra('Log failed logins'),
+            'description' => tra('Failed logins will be logged with respective login error code.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
+        'log_file_path' => [
+            'name' => tra('Log file'),
+            'description' => tra('Full path to the file to log entries.'),
+            'warning' => tra('Make sure that the path you insert is writable and exists.'),
+            'type' => 'text',
+            'default' => '',
         ],
         'log_sql_perf_min' => [
             'name' => tra('Log queries using more than'),

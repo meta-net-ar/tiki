@@ -178,25 +178,10 @@ function wikiplugin_rss($data, $params)
     $rsslib = TikiLib::lib('rss');
     $params = array_merge(
         [
-            'max' => 10,
-            'date' => 0,
-            'desc' => 0,
-            'author' => 0,
-            'icon' => '',
-            'showtitle' => 1,
             'ticker' => 0,
-            'desclen' => 0,
-            'refresh' => 60,
         ],
         $params
     );
-
-    $pluginInfo = wikiplugin_rss_info();
-    foreach ($pluginInfo['params'] as $key => $param) {
-        if (isset($param['default']) && ! isset($params[$key])) {
-            $params[$key] = $param['default'];
-        }
-    }
 
     if (empty($params['id']) && empty($params['url'])) {
         return WikiParser_PluginOutput::argumentError([ 'id or url' ]);

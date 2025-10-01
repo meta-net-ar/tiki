@@ -7,7 +7,7 @@
 require_once(__DIR__ . '/../debug/Tracer.php');
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
         header("location: index.php");
         exit;
 }
@@ -18,7 +18,7 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 class MultilingualLib extends TikiLib
 {
     /**
-     * @var \TikiDb_Pdo_Result
+     * @var Tiki\TikiDb\PdoResult
      */
     public $query;
     public $mtEnabled = 'y';
@@ -472,7 +472,7 @@ class MultilingualLib extends TikiLib
         if (preg_match('/[?&]no_bl=/', $url)) {
             $url = preg_replace('/([?&])no_bl=[yn]{0,1}/', '$1no_bl=$no_bl_value', $url);
         } elseif (! preg_match('/[?&]lang=/', $url)) {
-            if (strstr($url, '?')) {
+            if (str_contains($url, '?')) {
                 $url .= '&no_bl=$no_bl_value';
             } else {
                 $url .= '?no_bl=$no_bl_value';

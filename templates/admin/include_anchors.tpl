@@ -78,7 +78,7 @@
                                 <div class="my-1 mx-4">
                                     <form method="post" action="tiki-admin.php" class="d-flex justify-content-center my-md-0 ms-auto">
                                         <input type="hidden" name="filters">
-                                        <div class="input-group">
+                                        <div class="input-group search-prefs-container">
                                             <input type="text" role="search" aria-label="{tr}Search Admin Preferences{/tr}" name="lm_criteria" value="{$lm_criteria|escape}" class="form-control form-control-sm" placeholder="{tr}Search preferences{/tr}...">
                                             <button type="submit" aria-label="{tr}Search{/tr}" class="btn btn-primary btn-sm"{if $indexNeedsRebuilding} class="tips" title="{tr}Configuration search{/tr}|{tr}Note: The search index needs rebuilding, this will take a few minutes.{/tr}"{/if}>{icon name="search"}</button>
                                         </div>
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <h2 class="text-bg-secondary fs-6 py-2 px-3 mb-0">{icon name="sliders-h"} <span class="ms-1 narrow-hide">Configure</span></h2>
+                            <h2 class="text-bg-secondary fs-6 py-2 px-3 mb-0">{icon name="sliders-h"} <span class="ms-1 narrow-hide">{tr}Configure{/tr}</span></h2>
                             {foreach $admin_icons as $section => $secInfo}
                                 <div class="accordion-item tips right" title="{$secInfo.title}|{$secInfo.description}">
                                     <div class="accordion-header" id="flush-heading-{$section}">
@@ -344,14 +344,6 @@
                                             {/if}
                                             <a class="dropdown-item" href="tiki-admin_dsn.php">
                                                 {icon name="key"} <span class="ms-1">{tr}DSN/Content Authentication{/tr}</span> </a>
-                                            {if $prefs.feature_editcss eq "y" and $tiki_p_create_css eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_css.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit CSS{/tr}</span> </a>
-                                            {/if}
-                                            {if $prefs.feature_view_tpl eq "y" and $prefs.feature_edit_templates eq "y" and $tiki_p_edit_templates eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_templates.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit TPL{/tr}</span> </a>
-                                            {/if}
                                             {if $prefs.cachepages eq "y" and $tiki_p_admin eq "y"}
                                                 <a class="dropdown-item" href="tiki-list_cache.php">
                                                     {icon name="external-link-square-alt"} <span class="ms-1">{tr}External Pages Cache{/tr}</span> </a>
@@ -401,6 +393,10 @@
                                             {if $prefs.feature_scheduler eq "y" and $tiki_p_admin}
                                                 <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                                     {icon name="calendar-check"} <span class="ms-1">{tr}Scheduler{/tr}</span> </a>
+                                            {/if}
+                                            {if $prefs.feature_queued_tasks eq "y"}
+                                                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                                    {icon name="calendar-check"} <span class="ms-1">{tr}Queued Tasks{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.tiki_monitor_performance eq 'y'}
                                                 <a class="dropdown-item" href="tiki-performance_stats.php">

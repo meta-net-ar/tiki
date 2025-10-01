@@ -91,7 +91,7 @@ if (isset($_POST['save']) && $access->checkCsrf()) {
             $_POST['date_toDay'],
             $_POST['date_toYear']
         );
-        $sections = isset($_POST['section']) ? array_keys($_POST['section']) : [];
+        $sections = array_keys($_POST['section'] ?? []);
         $replaced = [];
         $resultRows = 0;
         // Handle case when many IPs are banned
@@ -295,8 +295,8 @@ if (isset($_REQUEST['export']) || isset($_REQUEST['csv'])) {
     die();
 }
 
-$smarty->assign('cant', $items['cant']);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign('count', $items['count']);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $smarty->assign('sections', $sections_enabled);
 // disallow robots to index page:

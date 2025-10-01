@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 /**
  *
  */
@@ -54,6 +57,7 @@ class CalRecurrence extends TikiLib
     private $organizers;
     private $participants;
     private $processItip;
+    private $hideParticipants;
 
     /**
      * @param $param
@@ -214,6 +218,9 @@ class CalRecurrence extends TikiLib
         }
         if (isset($data['process_itip'])) {
             $this->setProcessItip($data['process_itip']);
+        }
+        if ($data['hideParticipants'] ?? false) {
+            $this->setHideParticipants(true);
         }
     }
 
@@ -522,7 +529,8 @@ class CalRecurrence extends TikiLib
                 'changed'      => 0,
                 'organizers'   => $this->getOrganizers(),
                 'participants' => $this->getParticipants(),
-                'process_itip'  => $this->getProcessItip()
+                'process_itip'  => $this->getProcessItip(),
+                'hideParticipants' => $this->getHideParticipants(),
             ];
 
             $initial = $this->getInitialItem();
@@ -633,24 +641,26 @@ class CalRecurrence extends TikiLib
                     'changed'      => 0,
                     'organizers'   => $this->getOrganizers(),
                     'participants' => $this->getParticipants(),
-                    'process_itip'  => $this->getProcessItip()
+                    'process_itip'  => $this->getProcessItip(),
+                    'hideParticipants' => $this->getHideParticipants(),
                 ];
                 TikiLib::lib('calendar')->set_item($user, null, $data, [], true);
             } elseif ($found['changed'] == 0 || $updateManuallyChangedEvents) {
                 // update with changes
                 foreach ($changedFields as $field) {
-                    if (substr($field, 0, 1) != "_") {
+                    if (! str_starts_with($field, "_")) {
                         $found[$field] = $this->$field;
                     }
                 }
                 $changedFieldsOfEvent = $this->compareFieldsOfEvent($found, $this);
                 foreach ($changedFieldsOfEvent as $field) {
-                    if (substr($field, 0, 1) == "_") {
+                    if (str_starts_with($field, "_")) {
                         $found['start'] = $vevent->DTSTART->getDateTime()->getTimeStamp();
                         $found['end'] = $vevent->DTEND->getDateTime()->getTimeStamp();
                         $found['organizers'] = $this->getOrganizers();
                         $found['participants'] = $this->getParticipants();
                         $found['process_itip'] = $this->getProcessItip();
+                        $found['hideParticipants'] = $this->getHideParticipants();
                         if ($found['changed']) {
                             $found['recurrenceStart'] = $found['start'];
                         }
@@ -998,6 +1008,9 @@ class CalRecurrence extends TikiLib
         }
         if (! empty($this->getRecurenceDstTimezone())) {
             $data['X-Tiki-Dst-Timezone'] = $this->getRecurenceDstTimezone();
+        }
+        if ($this->getHideParticipants()) {
+            $data['X-Tiki-HideParticipants'] = 1;
         }
 
         $weekdays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -1716,5 +1729,15 @@ class CalRecurrence extends TikiLib
     public function setProcessItip($value)
     {
         $this->processItip = $value;
+    }
+
+    public function setHideParticipants($value)
+    {
+        $this->hideParticipants = $value;
+    }
+
+    public function getHideParticipants()
+    {
+        return $this->hideParticipants;
     }
 }

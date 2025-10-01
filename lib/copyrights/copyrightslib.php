@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -15,9 +15,9 @@ class CopyrightsLib extends TikiLib
     public function list_copyrights($page)
     {
         $query = 'select * from `tiki_copyrights` WHERE `page`=? order by ' . $this->convertSortMode('copyright_order_asc');
-        $query_cant = 'select count(*) from `tiki_copyrights` WHERE `page`=?';
+        $query_count = 'select count(*) from `tiki_copyrights` WHERE `page`=?';
         $result = $this->query($query, [$page]);
-        $cant = $this->getOne($query_cant, [$page]);
+        $count = $this->getOne($query_count, [$page]);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -26,7 +26,7 @@ class CopyrightsLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 

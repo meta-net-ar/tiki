@@ -6,7 +6,7 @@
         {foreach from=$p.options key=value item=label}
             <div class="form-check form-check-inline">
                 <label class="col-form-label me-3">
-                    <input class="form-check-inline" type="checkbox" name="{$p.preference|escape}[]" value="{$value|escape}"{if is_array($p.value) and in_array($value, $p.value)} checked="checked"{/if} {$p.params}>
+                    <input class="form-check-inline" type="checkbox" name="{$p.preference|escape}[]" value="{$value|escape}"{if is_array($p.value) and in_array($value, $p.value)} checked="checked"{/if} {$p.params}{if $p.parameters.disabled} disabled="disabled"{/if}>
                     {$label|escape}
                 </label>
             </div>

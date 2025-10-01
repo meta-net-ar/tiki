@@ -218,5 +218,12 @@ div.ts-wrapperdiv {
         .btn-group {
             align-items:center;
         }
+        &.ts-pager-top {
+            min-width: 35%;
+        }
     }
+}
+
+.pagesize + el-select {
+    width: 100%;
 }

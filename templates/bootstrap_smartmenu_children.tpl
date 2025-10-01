@@ -24,14 +24,14 @@
                 {if $menu_info.use_items_icons eq "y" && $item.icon}
                     <span class="me-2">{icon name=$item.icon}</span>
                 {/if}
-                <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
+                <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>
             </ul>
         {else}
-            <a class="sm-sub-link" href="{$item.sefurl|escape}">
+            <a class="sm-sub-link dropdown-item" href="{$item.sefurl|escape}">
                 {if $menu_info.use_items_icons eq "y" && $item.icon}
                     <span class="me-2">{icon name=$item.icon}</span>
                 {/if}
-                <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
+                <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>
             </a>
         {/if}
     </li>

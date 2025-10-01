@@ -67,7 +67,7 @@ get:
                 type: integer
               history:
                 type: object
-              cant:
+              count:
                 type: integer
               item_info:
                 $ref: schemas-TrackerItem.yaml

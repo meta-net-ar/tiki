@@ -40,10 +40,7 @@ $access->check_permission('tiki_p_admin_dynamic');
 $dcslib = TikiLib::lib('dcs');
 
 if (! isset($_REQUEST["contentId"])) {
-    $smarty->assign('msg', tra("No content id indicated"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No content id indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('contentId', $_REQUEST["contentId"]);
@@ -136,7 +133,7 @@ $smarty->assign('find', $find);
 
 // Get a list of last changes to the Wiki database
 $listpages = $dcslib->list_programmed_content($_REQUEST["contentId"], $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant', $listpages["cant"]);
+$smarty->assign_by_ref('count', $listpages["count"]);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 
 // disallow robots to index page:

@@ -2,7 +2,7 @@
     {title}{tr}Your account has been validated.{/tr}{/title}
     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}{tr}You have to choose a password to use this account.{/tr}{/remarksbox}
 {else}
-    {assign var='new_user_validation' value='n'}
+    {$new_user_validation='n'}
 {/if}
 <div class="row">
     <div class="col-md-10 offset-md-1">
@@ -17,11 +17,18 @@
                 {if $new_user_validation eq 'y'}
                     <input type="hidden" name="new_user_validation" value="y">
                 {/if}
+                {if !empty($timestamp)}
+                    <input type="hidden" name="apass" value="{$password|escape}">
+                    <input type="hidden" name="timestamp" value="{$timestamp|escape}">
+                {/if}
+                {if !empty($secure_token)}
+                    <input type="hidden" name="token" value="{$secure_token|escape}">
+                {/if}
                 <div class="card-header text-center">
                     {if $new_user_validation neq 'y'}
-                        <h3 class="card-title">{tr}Change password{/tr}</h3>
+                        <h3 class="tiki-card-header-title">{tr}Change password{/tr}</h3>
                     {else}
-                        <h3 class="card-title">{tr}Set password{/tr}</h3>
+                        <h3 class="tiki-card-header-title">{tr}Set password{/tr}</h3>
                     {/if}
                 </div>
                 <div class="card-body">

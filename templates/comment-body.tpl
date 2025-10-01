@@ -126,7 +126,7 @@
                 $.tikiModal(tr('Loading...'));
                 $.get('tiki-ajax_services.php?controller=rating&action=vote&' + vals, function() {
                     $.tikiModal();
-                    $.notify(tr('Thanks for deliberating!'));
+                    showMessage(tr('Thanks for deliberating!'), "success");
                     if ($('div.ratingDeliberationResultTable').length) document.location = document.location + '';
                 });
                 return false;

@@ -32,8 +32,6 @@ function check_bin_version()
  *
  * @param $localPath string Path of the checkout
  * @return bool true if at least 1 versioned file has been modified, added or removed, false otherwise
- *
- * @see Similar function svn_files_identical()
  */
 function has_uncommited_changes($localPath)
 {
@@ -118,7 +116,7 @@ function update_working_copy($localPath, $ignore_externals = false)
  */
 function get_revision($path)
 {
-    if (substr($path, 0, 4) === "http") {
+    if (str_starts_with($path, "http")) {
         `git fetch`;
     }
     return trim(`git rev-parse HEAD`);
@@ -203,7 +201,7 @@ function checkoutBranch($branch, $newBranch = false)
         $output = `git checkout $branch 2>&1`;
     }
 
-    if (strpos($output, 'fatal') !== false || strpos($output, 'error') !== false) {
+    if (str_contains($output, 'fatal') || str_contains($output, 'error')) {
         error("Failed to " . ($newBranch ? "create and " : "") . "checkout branch $branch: $output\n");
         return false;
     }
@@ -306,7 +304,7 @@ function tag_exists($tag, $remote = false)
     $searchedTag = `git tag --list '$tag'`;
     $searchedTag = ! empty($searchedTag) ? trim($searchedTag) : '';
 
-    return ! empty($searchedTag) ? true : false;
+    return ! empty($searchedTag);
 }
 
 /**

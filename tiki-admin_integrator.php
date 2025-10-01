@@ -31,13 +31,13 @@ $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);
 
 // Setup local variables from request or set default values
-$repID = isset($_REQUEST['repID']) ? $_REQUEST['repID'] : 0;
-$name = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-$path = isset($_REQUEST['path']) ? $_REQUEST['path'] : '';
-$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
-$cssfile = isset($_REQUEST['cssfile']) ? $_REQUEST['cssfile'] : '';
+$repID = $_REQUEST['repID'] ?? 0;
+$name = $_REQUEST['name'] ?? '';
+$path = $_REQUEST['path'] ?? '';
+$start = $_REQUEST['start'] ?? '';
+$cssfile = $_REQUEST['cssfile'] ?? '';
 $expiration = ! empty($_REQUEST['expiration']) ? $_REQUEST['expiration'] : 0;
-$description = isset($_REQUEST['description']) ? $_REQUEST['description'] : '';
+$description = $_REQUEST['description'] ?? '';
 $vis = isset($_REQUEST['vis']) ? ($_REQUEST['vis'] == 'on' ? 'y' : 'n') : 'n';
 $cacheable = isset($_REQUEST['cacheable']) ? ($_REQUEST['cacheable'] == 'on' ? 'y' : 'n') : 'n';
 
@@ -49,15 +49,11 @@ if (isset($_REQUEST['save'])) {
     // ... and all mandatory paramaters r OK
     if (strlen($name) > 0) {
         if (! is_int($expiration) || $expiration < 0) {
-            $smarty->assign("msg", tra("Cache expiration must be an integer and greater than 0."));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra("Cache expiration must be an integer and greater than 0."), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $integrator->add_replace_repository($repID, $name, $path, $start, $cssfile, $vis, $cacheable, $expiration, $description);
     } else {
-        $smarty->assign('msg', tra("Repository name can't be an empty"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("Repository name can't be an empty"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -93,10 +89,7 @@ if (isset($_REQUEST['action'])) {
             exit;
 
         default:
-            $smarty->assign('msg', tra('Requested action is not supported on repository'));
-            $smarty->display('error.tpl');
-            die;
-            break;
+            Feedback::errorAndDie(tra('Requested action is not supported on repository'), \Laminas\Http\Response::STATUS_CODE_500);
     }
 }
 

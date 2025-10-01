@@ -3,10 +3,10 @@
     {tikimodule error=$module_params.error title=$tpl_module_title name="switch_lang_admin" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
         {if $mode eq 'flags'}
             {section name=ix loop=$languages}
-                {assign var='val' value=$languages[ix].value|escape}
-                {assign var='langname' value=$languages[ix].name|escape}
-                {assign var='flag' value=$languages[ix].flag|escape}
-                {assign var='class' value=$languages[ix].class|escape}
+                {$val=$languages[ix].value|escape}
+                {$langname=$languages[ix].name|escape}
+                {$flag=$languages[ix].flag|escape}
+                {$class=$languages[ix].class|escape}
                 {if $flag neq ''}
                     {icon href="tiki-switch_lang.php?languageAdmin=$val" alt="$langname" title="$langname" _id="img/flags/$flag.png" height=11 class="icon $class"}
                 {else}

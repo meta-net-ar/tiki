@@ -19,7 +19,7 @@ class Tracker implements ActionInterface
      */
     public function __construct(array $params)
     {
-        $this->tracker = isset($params['trackerId']) ? intval($params['trackerId']) : 0;
+        $this->tracker = intval($params['trackerId'] ?? 0);
         $this->attachments = $params['attachments'];
     }
 

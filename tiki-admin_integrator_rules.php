@@ -36,25 +36,24 @@ require_once('lib/integrator/integrator.php');
 $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);
 // Setup local variables from request or set default values
-$repID = (isset($_REQUEST["repID"]) && strlen($_REQUEST["repID"]) > 0) ? $_REQUEST["repID"] : 0;
-$ruleID = (isset($_REQUEST["ruleID"]) && strlen($_REQUEST["ruleID"]) > 0) ? $_REQUEST["ruleID"] : 0;
-$ord = (isset($_REQUEST["ord"]) && strlen($_REQUEST["ord"]) > 0) ? $_REQUEST["ord"] : 0;
-$srcrep = (isset($_REQUEST["srcrep"]) && strlen($_REQUEST["srcrep"]) > 0) ? $_REQUEST["srcrep"] : 0;
-$srch = isset($_REQUEST["srch"]) ? $_REQUEST["srch"] : '';
-$repl = isset($_REQUEST["repl"]) ? $_REQUEST["repl"] : '';
-$description = isset($_REQUEST["description"]) ? $_REQUEST["description"] : '';
-$rxmod = isset($_REQUEST["rxmod"]) ? $_REQUEST["rxmod"] : '';
-$file = isset($_REQUEST["file"]) ? $_REQUEST["file"] : '';
-$type = isset($_REQUEST["type"]) ? ($_REQUEST["type"] == 'on' ? 'y' : 'n') : 'n';
-$casesense = isset($_REQUEST["casesense"]) ? ($_REQUEST["casesense"] == 'on' ? 'y' : 'n') : 'n';
-$code = isset($_REQUEST["code"]) ? ($_REQUEST["code"] == 'on' ? 'y' : 'n') : 'n';
-$html = isset($_REQUEST["html"]) ? ($_REQUEST["html"] == 'on' ? 'y' : 'n') : 'n';
-$all = isset($_REQUEST["all"]) ? ($_REQUEST["all"] == 'on' ? 'y' : 'n') : 'n';
-$enabled = isset($_REQUEST["enabled"]) ? ($_REQUEST["enabled"] == 'on' ? 'y' : 'n') : 'n';
+$repID  = ($_REQUEST['repID'] ?? '') ?: 0;
+$ruleID = ($_REQUEST['ruleID'] ?? '') ?: 0;
+$ord    = ($_REQUEST['ord'] ?? '') ?: 0;
+$srcrep = ($_REQUEST['srcrep'] ?? '') ?: 0;
+$srch = $_REQUEST["srch"] ?? '';
+$repl = $_REQUEST["repl"] ?? '';
+$description = $_REQUEST["description"] ?? '';
+$rxmod = $_REQUEST["rxmod"] ?? '';
+$file = $_REQUEST["file"] ?? '';
+$type     = ($_REQUEST['type'] ?? '') === 'on' ? 'y' : 'n';
+$casesense = ($_REQUEST['casesense'] ?? '') === 'on' ? 'y' : 'n';
+$code     = ($_REQUEST['code'] ?? '') === 'on' ? 'y' : 'n';
+$html     = ($_REQUEST['html'] ?? '') === 'on' ? 'y' : 'n';
+$all      = ($_REQUEST['all'] ?? '') === 'on' ? 'y' : 'n';
+$enabled  = ($_REQUEST['enabled'] ?? '') === 'on' ? 'y' : 'n';
+
 if (! isset($_REQUEST["repID"]) || $repID <= 0) {
-    $smarty->assign('msg', tra("No repository"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No repository"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 // Create instance of integrator
 $integrator = new TikiIntegrator();
@@ -68,9 +67,7 @@ if (isset($_REQUEST["save"])) {
     if (strlen($srch) > 0) {
         $integrator->add_replace_rule($repID, $ruleID, $ord, $srch, $repl, $type, $casesense, $rxmod, $enabled, $description);
     } else {
-        $smarty->assign('msg', tra("Search is mandatory field"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Search is mandatory field"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 // Check if 'preview' button pressed ...
@@ -103,10 +100,8 @@ if (isset($_REQUEST["preview"])) {
         $rep = $integrator->get_repository($repID);
         // Check if file given and present at configured location
         $f = $integrator->get_rep_file($rep, $file);
-        if ((substr($rep["path"], 0, 7) != 'http://') && (substr($rep["path"], 0, 8) != 'https://') && ! file_exists($f)) {
-            $smarty->assign('msg', tra("File not found ") . $f);
-            $smarty->display("error.tpl");
-            die;
+        if ((! str_starts_with($rep["path"], 'http://')) && (! str_starts_with($rep["path"], 'https://')) && ! file_exists($f)) {
+            Feedback::errorAndDie(tra("File not found ") . $f, \Laminas\Http\Response::STATUS_CODE_404);
         }
         // Get file content to string
         $data = @file_get_contents($f);
@@ -158,10 +153,7 @@ if (isset($_REQUEST["action"])) {
             break;
 
         default:
-            $smarty->assign('msg', tra("Requested action in not supported on repository"));
-            $smarty->display("error.tpl");
-            die;
-            break;
+            Feedback::errorAndDie(tra("Requested action in not supported on repository"), \Laminas\Http\Response::STATUS_CODE_500);
     }
 }
 // Get repository name

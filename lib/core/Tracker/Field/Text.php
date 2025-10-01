@@ -91,6 +91,16 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                             1 => tr('Yes'),
                         ],
                     ],
+                    'is_password' => [
+                        'name' => tr('Display as password'),
+                        'description' => tr('If enabled, the field will hide its value and provide a toggle to show it. The value will not be searchable.'),
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -105,11 +115,18 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function renderInput($context = [])
     {
+        if (! empty($this->trackerField->getOption('is_password'))) {
+            $value = $this->getValue();
+            return '<input type="password" name="' . $this->getHTMLFieldName() . '" value="' . htmlspecialchars($value) . '" class="form-control">';
+        }
         return $this->renderTemplate('trackerinput/text.tpl', $context);
     }
 
     public function renderInnerOutput($context = [])
     {
+        if (! empty($this->trackerField->getOption('is_password'))) {
+            return '******';
+        }
         $pre = '';
         $post = '';
 

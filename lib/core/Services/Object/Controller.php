@@ -36,6 +36,7 @@ class Services_Object_Controller
             'content' => $this->{'infobox_' . $type}($input),
             'plain' => $input->plain->int(),
             'format' => $input->format->word(),
+            'show_title' => $input->popupTpl->text() ? false : true,
         ];
     }
 
@@ -58,11 +59,24 @@ class Services_Object_Controller
             throw new Services_Exception('Permission denied', 403);
         }
 
-        $fields = [];
-        foreach ($definition->getPopupFields() as $fieldId) {
-            if ($itemObject->canViewField($fieldId) && $field = $definition->getField($fieldId)) {
-                $fields[] = $field;
+        $input->replaceFilter('popupFields', 'word');
+        $fields = $input->asArray('popupFields', ',');
+        $fields = array_filter($fields, function ($f) {
+            return ! empty($f) && $f !== 'undefined';
+        });
+        if (empty($fields)) {
+            foreach ($definition->getPopupFields() as $fieldId) {
+                if ($itemObject->canViewField($fieldId) && $field = $definition->getField($fieldId)) {
+                    $fields[] = $field;
+                }
             }
+        } else {
+            $fields = array_map(function ($field) use ($definition) {
+                return $definition->getField($field);
+            }, $fields);
+            $fields = array_filter($fields, function ($field) use ($itemObject) {
+                return $field && $itemObject->canViewField($field['fieldId']);
+            });
         }
 
         $smarty = TikiLib::lib('smarty');
@@ -71,7 +85,21 @@ class Services_Object_Controller
         $smarty->assign('can_modify', $itemObject->canModify());
         $smarty->assign('can_remove', $itemObject->canRemove());
         $smarty->assign('mode', $input->mode->text() ? $input->mode->text() : '');  // default divs mode
-        return $smarty->fetch('object/infobox/trackeritem.tpl');
+        if ($tpl = $input->popupTpl->text()) {
+            foreach ($fields as $field) {
+                $value = $trklib->field_render_value(['field' => $field, 'item' => $item, 'process' => 'y', 'showlinks' => 'n']);
+                $smarty->assign($field['permName'], $value);
+                $smarty->assign('tracker_field_' . $field['permName'], $value);
+                $smarty->assign('f_' . $field['fieldId'], $value);
+            }
+            try {
+                return $smarty->fetch($tpl);
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        } else {
+            return $smarty->fetch('object/infobox/trackeritem.tpl');
+        }
     }
 
     private function infobox_activity($input)

@@ -21,7 +21,7 @@ class GoalEventLib
                     $tikilib = TikiLib::lib('tiki');
 
                     $user = $args['user'];
-                    $group = isset($args['group']) ? $args['group'] : null;
+                    $group = $args['group'] ?? null;
 
                     if ($eventName == 'tiki.goal.reached') {
                         $groups = $group ? [$group] : [];

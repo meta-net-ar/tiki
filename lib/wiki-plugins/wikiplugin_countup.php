@@ -370,12 +370,8 @@ function wikiplugin_countup($data, $params)
         . (isset($numberFontColor) ? "color: $numberFontColor;" : ""
     );
 
-    if (! isset($speed)) {
-        $speed = 0.2;
-    }
-    if (! isset($delay)) {
-        $delay = 1;
-    }
+    $speed ??= 0.2;
+    $delay ??= 1;
     $cleanedTitle = preg_replace('/[^A-Za-z0-9_]/', '', $title); // Remove white spaces and some specials chars to prevent bug when calling the update function and  getting the counter DOM elemnt by id.
     $js = '
         //Number counter update function

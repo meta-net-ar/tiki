@@ -38,6 +38,6 @@ function module_blog_last_comments($mod_reference, $module_params)
     $comments = $bloglib->list_blog_post_comments('y', $mod_reference["rows"]);
 
     $smarty->assign('comments', $comments['data']);
-    $smarty->assign('moretooltips', isset($module_params['moretooltips']) ? $module_params['moretooltips'] : 'n');
-    $smarty->assign('nodate', isset($module_params['nodate']) ? $module_params['nodate'] : 'n');
+    $smarty->assign('moretooltips', $module_params['moretooltips'] ?? 'n');
+    $smarty->assign('nodate', $module_params['nodate'] ?? 'n');
 }

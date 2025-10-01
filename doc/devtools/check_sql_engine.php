@@ -71,7 +71,7 @@ class CheckSqlEngine
         for ($i = 0; $i < $query_count - 1; $i++) {
             $cur_query = preg_replace('/\s*/m', '', $queries[$i]);
             $next_query = preg_replace('/\s*/m', '', $queries[$i + 1]);
-            if (substr($cur_query, -1) === "'" and substr($next_query, 0, 1) === "'") {
+            if (str_ends_with($cur_query, "'") and str_starts_with($next_query, "'")) {
                 array_splice($queries, $i, 2, $queries[$i] . ";" . $queries[$i + 1]);
                 $query_count--;
             }

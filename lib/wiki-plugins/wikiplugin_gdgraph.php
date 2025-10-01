@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-// plugin that uses lib/graph-engine/ to produce simple bar charts on screen
+// plugin that uses Tiki\Lib\GraphEngine to produce simple bar charts on screen
 // Usage
 // {GDGRAPH(various parameters)}
 //  x,y data
@@ -147,14 +147,6 @@ function wikiplugin_gdgraph($data, $params)
         return ("<span class='error'>missing or wrong graph type parameter - only barvert and barhoriz available at present</span>");
     }
 
-    // set default params
-    $plugininfo = wikiplugin_gdgraph_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'] ?? '';
-    }
-    $params = array_merge($default, $params);
-
     // check axestext values
     if (($params['axestext'] !== 'Normal-Text' && $params['axestext'] !== 'Large-Text')) {
         return ("<span class='error'>wrong axestext parameter - only Normal-Text or Large-Text are allowed</span>");
@@ -193,7 +185,7 @@ function wikiplugin_gdgraph($data, $params)
     }
 
 // -------------------------------------------------------
-// Construct separate XY data strings from the array data to suit the graph-engine libraries - and check that at least one y value is non-zero.
+// Construct separate XY data strings from the array data to suit the Tiki\Lib\GraphEngine libraries - and check that at least one y value is non-zero.
 // The XY data strings should each contain the same number
 // of data elements.
     $ynonzero = false;

@@ -68,6 +68,9 @@ class EditLib_ParseToWysiwyg_LinkTest extends TikiTestCase
          */
         $tikilib = TikiLib::lib('tiki');
         $tikilib::lib('admin')->replace_extwiki(0, 'http://tikiwiki.org/tiki-index.php?page=$page', $this->ext1);
+
+        $this->clearParserExternalCache();
+
         $p = $tikilib::lib('parser');
 
 
@@ -443,5 +446,14 @@ class EditLib_ParseToWysiwyg_LinkTest extends TikiTestCase
         $ex = '<a id="anchor"></a>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
+    }
+
+    /**
+     * Clear the static cache in the parser's get_wiki_link_replacement method
+     */
+    private function clearParserExternalCache(): void
+    {
+        $parser = TikiLib::lib('parser');
+        $parser->clearExternalWikiCache();
     }
 }

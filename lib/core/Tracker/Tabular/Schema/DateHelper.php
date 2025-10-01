@@ -48,6 +48,10 @@ class DateHelper
                 return date($format, $unix);
             },
             function (&$info, $value) use ($permName, $format) {
+                if (is_null($value)) {
+                    $info['fields'][$permName] = $value;
+                    return;
+                }
                 $date = date_create_from_format($format, $value);
                 if (! $date) {
                     $date = date_create_from_format($format . '.v', $value);
@@ -56,7 +60,7 @@ class DateHelper
                     $timestamp = $date->getTimestamp();
                 } else {
                     $tz = date_default_timezone_get();
-                    if (substr($format, -1, 1) == 'e') {
+                    if (str_ends_with($format, 'e')) {
                         // use default user's or Tiki timezone for this import
                         date_default_timezone_set(\TikiLib::lib('tiki')->get_display_timezone());
                     } else {

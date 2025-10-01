@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tiki\Lib\Auth\Tokens;
 
 #[AsCommand(
     name: 'tokens:clear',
@@ -20,9 +21,8 @@ class TokensClearCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         global $prefs;
-        require_once 'lib/auth/tokens.php';
 
-        $tokenlib = \AuthTokens::build($prefs);
+        $tokenlib = Tokens::build($prefs);
         $affectedRows = $tokenlib->deleteExpired();
 
         $output->writeln(tr('%0 tokens deleted.', $affectedRows->numrows), OutputInterface::VERBOSITY_VERBOSE);

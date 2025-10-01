@@ -1,7 +1,7 @@
 {title admpage="wiki" url='tiki-pagehistory.php?page='|cat:$page|escape}{tr}History:{/tr} {$page}{/title}
 
 <div class="t_navbar mb-4">
-    {assign var=thispage value=$page|escape:url}
+    {$thispage=$page|escape:url}
     {button href="{$page|sefurl}" _class="btn-info" _text="{tr}View published page{/tr}" _icon_name="view"}
     {if $editable}
         {button href="tiki-editpage.php?page=$thispage" class="btn btn-primary" _text="{tr}Edit published page{/tr}" _icon_name="edit"}
@@ -22,15 +22,15 @@
     {if $info.version ne $preview and $tiki_p_rollback eq 'y'}
         <div class="d-flex flex-column">
             {self_link _script="tiki-pagehistory.php" page=$page source=$preview _title="{tr}View source of this version{/tr}"}{tr}View source of this version{/tr}{/self_link}
-            {self_link _script="tiki-rollback.php" page=$page version=$preview _title="{tr}Roll back{/tr}"}{tr}Roll back to this version{/tr}{/self_link}
+            {self_link _script="tiki-rollback.php" page=$page version=$preview _title="{tr _0=$element.version}Revert to version %0{/tr}"}{tr}Revert to this version{/tr}{/self_link}
         </div>
     {/if}
     <div>
         {if !isset($noHistory)}
             {if isset($show_all_versions) and $show_all_versions eq "n"}
-                {pagination_links cant=$ver_cant offset=$smarty.request.preview_idx offset_arg="preview_idx" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
+                {pagination_links count=$ver_count offset=$smarty.request.preview_idx offset_arg="preview_idx" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
             {else}
-                {pagination_links cant=$ver_cant offset=$smarty.request.preview_idx offset_arg="preview_idx" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
+                {pagination_links count=$ver_count offset=$smarty.request.preview_idx offset_arg="preview_idx" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
             {/if}
         {/if}
     </div>
@@ -82,15 +82,15 @@
     </h2>
     {if $info.version ne $source and $tiki_p_rollback eq 'y'}
         <div class="d-flex flex-column">
-            {self_link _script="tiki-rollback.php" page=$page version=$source _title="{tr}Roll back{/tr}"}{tr}Roll back to this version{/tr}{/self_link}
+            {self_link _script="tiki-rollback.php" page=$page version=$source _title="{tr}Revert{/tr}"}{tr}Revert to this version{/tr}{/self_link}
         </div>
     {/if}
     <div>
         {if !isset($noHistory)}
             {if isset($show_all_versions) and $show_all_versions eq "n"}
-                {pagination_links cant=$ver_cant offset=$smarty.request.source_idx offset_arg="source_idx" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
+                {pagination_links count=$ver_count offset=$smarty.request.source_idx offset_arg="source_idx" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
             {else}
-                {pagination_links cant=$ver_cant offset=$smarty.request.source_idx offset_arg="source_idx" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
+                {pagination_links count=$ver_count offset=$smarty.request.source_idx offset_arg="source_idx" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
             {/if}
         {/if}
     </div>
@@ -123,99 +123,102 @@
             {tr}History{/tr}
         </h2>
     {/if}
-    <form id="pagehistory" action="tiki-pagehistory.php?page={$page}">
+    <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="multi mb-4 d-flex align-items-end justify-content-between flex-wrap gap-2">
         <input type="hidden" name="page" value="{$page|escape}">
         <input type="hidden" name="history_offset" value="{$history_offset}">
 
-        <div class="multi mb-4 d-flex align-items-end justify-content-between flex-wrap gap-2">
-            {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
-                <div class="translation w-50">
-                    <label for="tra_lang" class="form-label">{tr}Translation{/tr}</label>
-                    <select name="tra_lang" class="form-select">
-                        {section name=ix loop=$languages}
-                            <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
-                        {/section}
-                    </select>
-                </div>
+        {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
+            <div class="translation w-50">
+                <label for="tra_lang" class="form-label">{tr}Translation{/tr}</label>
+                <select name="tra_lang" class="form-select">
+                    {section name=ix loop=$languages}
+                        <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
+                    {/section}
+                </select>
+            </div>
 
-                <div class="d-flex flex-grow-0 gap-2">
-                    <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
-                    {if $show_translation_history}
-                        <input type="hidden" name="show_translation_history" value="1">
-                        {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}
-                    {else}
-                        {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info"}
-                    {/if}
-                </div>
-
-            {/if}
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-sm-6">
-                <input type="checkbox" name="paginate" id="paginate"{if $paginate} checked="checked"{/if}>
-                <label for="paginate">{tr}Enable pagination{/tr}</label>
-                {if $paginate}
-                    <input type="text" name="history_pagesize" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
-                    <label for="history_pagesize">{tr}rows per page{/tr}</label>
+            <div class="d-flex flex-grow-0 gap-2">
+                <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
+                {if $show_translation_history}
+                    <input type="hidden" name="show_translation_history" value="1">
+                    {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}
+                {else}
+                    {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info"}
                 {/if}
             </div>
-            <div class="col-sm-6">
-            {if ($prefs.default_wiki_diff_style ne "old") and $history}
-                <div class="input-group">
-                    <select class="form-select" name="diff_style">
-                        <optgroup label="{tr}Simple{/tr}">
-                            {foreach  $diff_styles.options as $value => $label}
-                                {if $value == 'htmldiff' || $value == 'sidediff'}
+        {/if}
+    </form>
+
+        <div class="row mb-4">
+            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+                <input type="hidden" name="page" value="{$page|escape}">
+                <input type="hidden" name="history_offset" value="{$history_offset}">
+
+                    <input type="checkbox" name="paginate" id="paginate"{if $paginate} checked="checked"{/if}>
+                    <label for="paginate">{tr}Enable pagination{/tr}</label>
+                    {if $paginate}
+                        <input type="text" name="history_pagesize" role="search" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
+                        <label for="history_pagesize">{tr}rows per page{/tr}</label>
+                    {/if}
+            </form>
+            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+                <input type="hidden" name="page" value="{$page|escape}">
+                <input type="hidden" name="history_offset" value="{$history_offset}">
+
+                {if ($prefs.default_wiki_diff_style ne "old") and $history}
+                    <div class="input-group">
+                        <select class="form-select" name="diff_style">
+                            <optgroup label="{tr}Simple{/tr}">
+                                {foreach  $diff_styles.options as $value => $label}
+                                    {if $value == 'htmldiff' || $value == 'sidediff'}
+                                        <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                                            {tr}{$label}{/tr}
+                                        </option>
+                                    {/if}
+                                {/foreach}
+                            </optgroup>
+                            <optgroup label="{tr}Advanced{/tr}">
+                                {foreach  $diff_styles.options as $value => $label}
+                                    {if $value == 'htmldiff' || $value == 'sidediff'}
+                                        {continue}
+                                    {/if}
                                     <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
                                         {tr}{$label}{/tr}
                                     </option>
-                                {/if}
-                            {/foreach}
-                        </optgroup>
-                        <optgroup label="{tr}Advanced{/tr}">
-                            {foreach  $diff_styles.options as $value => $label}
-                                {if $value == 'htmldiff' || $value == 'sidediff'}
-                                    {continue}
-                                {/if}
-                                <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
-                                    {tr}{$label}{/tr}
-                                </option>
-                            {/foreach}
-                        </optgroup>
-                    </select>
-                        {jq}
-    $("form#pagehistory")
-        .each(function store_original_values(i, form){
-            form.originals = {};
+                                {/foreach}
+                            </optgroup>
+                        </select>
+                            {jq}
+        $("form#pagehistory")
+            .each(function store_original_values(i, form){
+                form.originals = {};
 
-            $(form).find(':input').each(function(i, input){
-                var name = $(input).attr('name');
-                var value = $(input).val();
-                form.originals[name] = value;
+                $(form).find(':input').each(function(i, input){
+                    var name = $(input).attr('name');
+                    var value = $(input).val();
+                    form.originals[name] = value;
+                });
+            })
+            .on("submit", function submit_changed_values(evt){
+                var always = ['page', 'oldver'];
+                var originals = this.originals || {};
+
+                $(this).find(':input:enabled').each(function(i, input){
+                    var name = $(input).attr('name');
+                    var value = $(input).val();
+
+                    if(always.indexOf(name) === -1 && originals[name] === value) {
+                        $(input).attr('disabled', 'disabled')
+                                .prop('disabled', 'disabled');
+                    }
+                });
             });
-        })
-        .on("submit", function submit_changed_values(evt){
-            var always = ['page', 'oldver'];
-            var originals = this.originals || {};
-
-            $(this).find(':input:enabled').each(function(i, input){
-                var name = $(input).attr('name');
-                var value = $(input).val();
-
-                if(always.indexOf(name) === -1 && originals[name] === value) {
-                    $(input).attr('disabled', 'disabled')
-                            .prop('disabled', 'disabled');
-                }
-            });
-        });
-                        {/jq}
-                </div>
-                <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
-                {/if}
-            </div>
+                            {/jq}
+                    </div>
+                    <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
+                    {/if}
         </div>
-            <div>
+        <div>
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                 <table class="table table-condensed table-hover table-striped">
                     <tr>
@@ -245,7 +248,7 @@
                         </th>
                         {if $prefs.markdown_enabled eq 'y'}
                             <th>
-                                <a href="#"  class="tips" title="Syntax|Markdown">
+                                <a href="#"  class="tips" title="Syntax|Markdown" role="button">
                                     <svg aria-hidden="true" height="16" width="16">
                                         <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
                                     </svg>
@@ -434,10 +437,10 @@
                                                 {/self_link}
                                             </action>
                                         {/if}
-                                        {if $tiki_p_rollback eq 'y' && $lock neq true}
+                                        {if $tiki_p_rollback eq 'y' && $lock neq true && $current neq $element.version}
                                             <action>
                                                 {self_link _script="tiki-rollback.php" page=$page version=$element.version _icon_name="undo" _menu_text='y' _menu_icon='y'}
-                                                    {tr}Roll back{/tr}
+                                                    {tr _0=$element.version}Revert to version %0{/tr}
                                                 {/self_link}
                                             </action>
                                         {/if}
@@ -489,13 +492,13 @@
             </div>
             {if $paginate}
                 {if isset($smarty.request.history_offset)}
-                    {pagination_links cant=$history_cant offset=$smarty.request.history_offset offset_arg="history_offset" step=$history_pagesize}
+                    {pagination_links count=$history_count offset=$smarty.request.history_offset offset_arg="history_offset" step=$history_pagesize}
                     {/pagination_links}
                 {else}
-                    {pagination_links cant=$history_cant offset_arg="history_offset" step=$history_pagesize}
+                    {pagination_links count=$history_count offset_arg="history_offset" step=$history_pagesize}
                     {/pagination_links}
                 {/if}
             {/if}
+            </form>
         </div>
-    </form>
 {/if}

@@ -5,11 +5,87 @@
     {/if}
 
 </div>
+
+{* Add alert for stalled tasks *}
+{if $stalledTasksCount > 0}
+    <div class="alert alert-warning mb-4">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <span class="fa fa-exclamation-circle fa-2x"></span>
+            </div>
+            <div>
+                <h5 class="alert-heading mb-1">{tr}Scheduler Notice{/tr}</h5>
+                <p class="mb-0">
+                    {tr _0=$stalledTasksCount}There are %0 stalled tasks that may need your attention.{/tr}
+                    <a href="tiki-admin_schedulers.php?filter=stalled" class="alert-link">{tr}View stalled tasks{/tr}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{/if}
+
+{* Show active filter banner if a filter is applied *}
+{if $activeFilter}
+    <div class="alert alert-info mb-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <span class="fa fa-filter me-2"></span>
+                {tr}Showing stalled tasks only{/tr}
+            </div>
+            <div>
+                <a href="tiki-admin_schedulers.php" class="btn btn-sm btn-outline-secondary">
+                    <span class="fa fa-times me-1"></span>
+                    {tr}Clear filter{/tr}
+                </a>
+            </div>
+        </div>
+    </div>
+{/if}
+
 {tabset name='tabs_admin_schedulers'}
 
 {* ---------------------- tab with list -------------------- *}
 {if $schedulers|count > 0}
     {tab name="{tr}Schedulers{/tr}"}
+        {* Notification Users Overview Section *}
+        <div class="mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">
+                    <span class="fa fa-bell me-2 text-muted"></span>
+                    {tr}Notification Recipients{/tr}
+                </h5>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#notificationUsersCollapse" aria-expanded="false">
+                    <span class="fa fa-chevron-down"></span>
+                </button>
+            </div>
+            <div class="collapse" id="notificationUsersCollapse">
+                <div class="mt-2">
+                    {if isset($notificationUsers) && $notificationUsers|count > 0}
+                        <div class="list-unstyled">
+                            {foreach from=$notificationUsers item=user}
+                                <div class="mb-1">
+                                    <span class="fa fa-envelope me-2 text-muted"></span>
+                                    <span title="{$user.login|escape}">{$user.email|escape}</span>
+                                </div>
+                            {/foreach}
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            {tr}These users will be notified when any scheduler is stalled or healed.{/tr}
+                            <a href="tiki-admin.php?page=general#Scheduler" class="text-decoration-none ms-1">{tr}You can edit this in settings{/tr}</a>
+                        </small>
+                    {else}
+                        <div class="text-center py-2">
+                            <small class="text-muted">
+                                {tr}No notification users configured.{/tr}
+                                <br>
+                                <a href="tiki-admin.php?page=general#Scheduler" class="text-decoration-none">{tr}Configure in General settings{/tr}</a>
+                            </small>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+
         <div id="admin_schedulers-div">
             <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
                 {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
@@ -143,10 +219,20 @@
     <div class="row">
         <div class="offset-sm-2 col-sm-10">
             {remarksbox type="note" title="{tr}Information{/tr}"}
-            {tr}Use CRON format to enter the values in "Run Time":<br>Minute, Hour, Day of Month, Month, Day of Week<br>Eg. every 5 minutes: */5 * * * *{/tr}
+            {tr}Use CRON format to enter the values in "Run Time":<br>Minute, Hour, Day of Month, Month, Day of Week<br>Eg. every 5 minutes: */5 * * * *{/tr}<br>
+            {tr _0=$run_timezone}"Run time" must be in the %0 time zone.{/tr}
             {/remarksbox}
         </div>
     </div>
+    {if $schedulerinfo.task == 'ConsoleCommandTask' and empty($prefs.fallbackBaseUrl) }
+        <div class="row">
+           <div class="offset-sm-2 col-sm-10">
+               {remarksbox type="warning" title="{tr}Warning{/tr}"}
+               {tr}Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the <a target="_blank" href="tiki-admin.php?page=general">admin</a>.{/tr}
+               {/remarksbox}
+           </div>
+       </div>
+       {/if}
     <form class="form" action="tiki-admin_schedulers.php" method="post"
             enctype="multipart/form-data" name="RegForm" autocomplete="off">
         {ticket}
@@ -216,6 +302,16 @@
                 </div>
             </div>
         </div>
+        <div class="tiki-form-group row">
+            <label class="col-sm-2 form-check-label" for="enable_send_notification_override">{tr}Always send notifications for this job (override global settings){/tr}</label>
+            <div class="col-sm-10">
+                <div class="form-check">
+                    <input type="checkbox" id="enable_send_notification_override" class="form-check-input" name="enable_send_notification_override"
+                        {if isset($schedulerinfo.enable_send_notification_override) && $schedulerinfo.enable_send_notification_override}checked{/if}>
+                    <div class="form-text">{tr}If checked, notifications will always be sent when this job is stalled or healed.{/tr}</div>
+                </div>
+            </div>
+        </div>
 
         <div class="tiki-form-group row">
             <div class="col-sm-10 offset-sm-3">
@@ -252,8 +348,20 @@
                     {section name=run loop=$schedulerruns}
                         <tr>
                             <td>{$schedulerruns[run].id}</td>
-                            <td>{$schedulerruns[run].start_time|tiki_short_datetime}</td>
-                            <td>{if $schedulerruns[run].end_time ne null}{$schedulerruns[run].end_time|tiki_short_datetime}{/if}</td>
+                            <td>
+                                {$schedulerruns[run].start_time|tiki_short_datetime} ({$display_timezone})
+                                {if $display_timezone ne 'UTC'}
+                                    <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                {/if}
+                            </td>
+                            <td>
+                                {if $schedulerruns[run].end_time ne null}
+                                    {$schedulerruns[run].end_time|tiki_short_datetime} ({$display_timezone})
+                                    {if $display_timezone ne 'UTC'}
+                                        <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    {/if}
+                                {/if}
+                            </td>
                             <td>
                                 {if $schedulerruns[run].status eq 'running'}
                                     <span class="badge bg-warning">{tr}Running{/tr}</span>
@@ -280,7 +388,7 @@
                     </tbody>
                 </table>
             </div>
-            {pagination_links cant=$cant step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
+            {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
         {/tab}
     {/if}
 
@@ -424,5 +532,13 @@
                 validate_cron_runtime: true
             }
         }
+    });
+
+    $('#notificationUsersCollapse').on('show.bs.collapse', function() {
+        $(this).prev().find('.fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+
+    $('#notificationUsersCollapse').on('hide.bs.collapse', function() {
+        $(this).prev().find('.fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
     });
 {/jq}

@@ -86,7 +86,7 @@ class Services_Scheduler_Controller
         $message = tr('Execution output:') . '<br><br>';
 
         // Prevent feedback collection during scheduler run from UI
-        $feedback = isset($_SESSION['tikifeedback']) ? $_SESSION['tikifeedback'] : [];
+        $feedback = $_SESSION['tikifeedback'] ?? [];
 
         $result = $schedulerTask->execute($user);
 

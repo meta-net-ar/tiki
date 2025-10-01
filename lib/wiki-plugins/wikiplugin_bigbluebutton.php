@@ -124,12 +124,6 @@ function wikiplugin_bigbluebutton($data, $params)
             ],
         ];
 
-        $pluginInfo = wikiplugin_bigbluebutton_info();
-        foreach ($pluginInfo['params'] as $key => $param) {
-            if (isset($param['default']) && ! isset($params[$key])) {
-                $params[$key] = $param['default'];
-            }
-        }
         $smarty->assign('bbb_params', Tiki_Security::get()->encode($params));
 
         if (! $bigbluebuttonlib->roomExists($meeting)) {

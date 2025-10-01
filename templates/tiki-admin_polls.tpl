@@ -15,9 +15,9 @@
 {tabset}
 
     {if $pollId eq '0'}
-        {assign var='title' value="{tr}Create poll{/tr}"}
+        {$title="{tr}Create poll{/tr}"}
     {else}
-        {assign var='title' value="{tr}Edit poll{/tr}"}
+        {$title="{tr}Edit poll{/tr}"}
     {/if}
     {tab name=$title}
         <h2>{$title}</h2>
@@ -80,7 +80,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Votes older than x days are not considered{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="voteConsiderationSpan">{tr}Votes older than x days are not considered{/tr}</label>
                 <div class="col-sm-7">
                     <input type="number" id="voteConsiderationSpan" name="voteConsiderationSpan" size="5" value="{$info.voteConsiderationSpan|escape}" class="form-control">
                     <div class="small-hint">
@@ -105,12 +105,12 @@
         {/if}
         <div class="{if $js}table-responsive{/if} poll-table"> {* table-responsive class cuts off css drop-down menus *}
             <table class="table table-striped table-hover">
-                {assign var=numbercol value=8}
+                {$numbercol=8}
                 <tr>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='pollId' title="{tr}ID{/tr}"}{tr}ID{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='title' title="{tr}Title{/tr}"}{tr}Title{/tr}{/self_link}</th>
-                    {if $prefs.poll_list_categories eq 'y'}<th>{tr}Categories{/tr}</th>{assign var=numbercol value=$numbercol+1}{/if}
-                    {if $prefs.poll_list_objects eq 'y'}<th>{tr}Objects{/tr}</th>{assign var=numbercol value=$numbercol+1}{/if}
+                    {if $prefs.poll_list_categories eq 'y'}<th>{tr}Categories{/tr}</th>{$numbercol=$numbercol+1}{/if}
+                    {if $prefs.poll_list_objects eq 'y'}<th>{tr}Objects{/tr}</th>{$numbercol=$numbercol+1}{/if}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='active' title="{tr}Active{/tr}"}{tr}Active{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='votes' title="{tr}Votes{/tr}"}{tr}Votes{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate' title="{tr}Publish{/tr}"}{tr}Publish{/tr}{/self_link}</th>
@@ -183,7 +183,7 @@
                 {/section}
             </table>
         </div>
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {tab name="{tr}Add poll to pages{/tr}"}
@@ -191,9 +191,9 @@
         <form action="tiki-admin_polls.php" method="post">
             {ticket}
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Poll{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_template">{tr}Poll{/tr}</label>
                 <div class="col-sm-7 mb-2">
-                    <select name="poll_template" class="form-control">
+                    <select name="poll_template" id="poll_template" class="form-control">
                         {section name=ix loop=$channels}
                             {if $channels[ix].active eq 't'}
                                 <option value="{$channels[ix].pollId|escape}"{if !empty($smarty.section.ix.first)} selected="selected"{/if}>{tr}{$channels[ix].title}{/tr}</option>
@@ -204,15 +204,15 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Title{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_title">{tr}Title{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="title" class="form-control">
+                    <input type="text" name="title" id="poll_title" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Wiki pages{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_pages">{tr}Wiki pages{/tr}</label>
                 <div class="col-sm-7">
-                    <select name="pages[]" multiple="multiple" class="form-control">
+                    <select name="pages[]" id="poll_pages" multiple="multiple" class="form-control">
                         {section name=ix loop=$listPages}
                             <option value="{$listPages[ix].pageName|escape}">{tr}{$listPages[ix].pageName|escape}{/tr}</option>
                         {/section}
@@ -222,9 +222,9 @@
             </div>
             {if $prefs.feature_wiki_usrlock eq 'y'}
                 <div class="mb-3 row">
-                    <label class="col-sm-3 col-form-label">{tr}Lock the pages{/tr}</label>
+                    <label class="col-sm-3 col-form-label" for="lock_pages">{tr}Lock the pages{/tr}</label>
                     <div class="col-sm-7">
-                        <input type="checkbox" class="form-control" name="locked">
+                        <input type="checkbox" class="form-control" name="locked" id="lock_pages">
                     </div>
                 </div>
             {/if}

@@ -93,9 +93,7 @@ try {
                 break;
 
             case 'default':
-                $smarty->assign('msg', tra('Invalid action'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('Invalid action'), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 
@@ -113,8 +111,8 @@ try {
     $page = ($offset / $page_size) + 1;
 
     if ($_REQUEST['list'] == 'mix' or ! isset($_REQUEST['list'])) {
+        $kalturaadminlib = TikiLib::lib('kalturaadmin');
         if ($_REQUEST['view'] != 'browse') {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
 
             for ($i = 0; $i < $kmixlist->totalCount; $i++) {
@@ -139,12 +137,11 @@ try {
                 }
             }
         } else {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
         }
 
         $smarty->assign('klist', $kmixlist->objects);
-        $smarty->assign('cant', $kmixlist->totalCount);
+        $smarty->assign('count', $kmixlist->totalCount);
         $smarty->assign('entryType', 'mix');
         $smarty->assign('view', $_REQUEST['view']);
         $smarty->assign('modifiedAt', $modifiedAt);
@@ -164,7 +161,7 @@ try {
                 }
             }
             $smarty->assign('klist', $kmedialist->objects);
-            $smarty->assign('cant', $kmedialist->totalCount);
+            $smarty->assign('count', $kmedialist->totalCount);
         }
         $smarty->assign('entryType', 'media');
         $smarty->assign('view', $jitRequest->view->alpha());

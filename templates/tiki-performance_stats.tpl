@@ -25,7 +25,7 @@
         {/foreach}
     </table>
 </div>
-{pagination_links cant=$cant_pages step=25 offset=$average_stat_offset offset_arg="average_stat_offset"}{/pagination_links}
+{pagination_links count=$pages_count step=25 offset=$average_stat_offset offset_arg="average_stat_offset"}{/pagination_links}
 
 <h5>{tr}Maximum time taken by request{/tr}</h5>
 <div class="table-responsive">
@@ -45,4 +45,4 @@
         {/foreach}
     </table>
 </div>
-{pagination_links cant=$cant_pages step=25 offset=$maximum_stat_offset offset_arg="maximum_stat_offset"}{/pagination_links}
+{pagination_links count=$pages_count step=25 offset=$maximum_stat_offset offset_arg="maximum_stat_offset"}{/pagination_links}

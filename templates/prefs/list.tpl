@@ -12,6 +12,7 @@
             id="{$p.id|escape}"
             data-tiki-admin-child-block=".{$p.preference|escape}_childcontainer"
             data-tiki-admin-child-mode="{$mode|escape}"
+            {if $p.parameters.disabled}disabled="disabled"{/if}
         >
             {foreach from=$p.options key=value item=label}
                 <option value="{$value|escape}"{if $value eq $p.value} selected="selected"{/if} {$p.params}>

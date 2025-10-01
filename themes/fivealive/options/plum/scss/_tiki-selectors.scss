@@ -3,19 +3,36 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 
-.header_outer,
-.layout_basic #top_modules,
+//.header_outer,
+//.layout_basic #top_modules,
 .postbody-title,
-.tiki > .navbar.fixed-top.bg-dark,
+//.tiki > .navbar.fixed-top.bg-dark,
     //.topbar, .navbar-dark, .topbar .navbar-dark .navbar-nav > li, .topbar .nav > li,
 .bg-dark {
     /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5e028e+0,8f06c4+100 */
-    background: #5e028e !important; /* Old browsers */
-    background: linear-gradient(to right,  #300149 0%,#15001F 100%) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+//    background: #5e028e !important; /* Old browsers */
+    background: linear-gradient(to right,  #300149 0%,#15001F 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
-.bg-dark { background-color: #15001f !important; }
+// Progress bars
+.progress-bar {
+    --bs-progress-bar-bg: #{$info};
+}
 
-//.card-header {
-//    color: $white !important;
-//}
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: $secondary;
+}
+
+// Dark color mode
+
+[data-bs-theme=dark] {
+    .blockquote-footer { color: #848D94; }
+    .btn.btn-outline-primary { color: #C659FC; border-color: #C659FC; }
+    .btn.btn-outline-secondary { color: #9D78DE; border-color: #9D78DE; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4C05; border-color: #FF4C05; }
+    .btn.btn-outline-warning { color: #CA7D12; border-color: #CA7D12; }
+    .btn.btn-outline-info { color: #C458FD; border-color: #C458FD; }
+    .btn.btn-outline-dark { color: #C757FF; border-color: #C757FF; }
+}

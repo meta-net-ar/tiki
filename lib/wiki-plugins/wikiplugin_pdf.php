@@ -296,7 +296,7 @@ function wikiplugin_pdf_info()
 function wikiplugin_pdf($data, $params)
 {
     //return if not printing PDF
-    if (! empty($_GET['display']) && strstr($_GET['display'], 'pdf') == '') {
+    if (! defined('TIKI_DISPLAY_CONTAINS_PDF') || ! TIKI_DISPLAY_CONTAINS_PDF) {
         return;
     }
     //included globals to check mpdf selection as pdf generation engine
@@ -309,6 +309,10 @@ function wikiplugin_pdf($data, $params)
     $paramList = '';
     //creating string of data paramaters set by user
     foreach ($params as $paramName => $param) {
+        if (str_contains($param, '\'')) {
+            // encode single quotes as html
+            $param = str_replace('\'', '&#039;', $param);
+        }
         $paramList .= $paramName . "='" . $param . "' ";
     }
     return "<pdfsettings " . $paramList . "></pdfsettings>";

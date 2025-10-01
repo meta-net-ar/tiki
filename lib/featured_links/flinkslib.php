@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -22,7 +22,7 @@ class FlinksLib extends TikiLib
      * @param int    $position
      * @param string $type
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function add_featured_link($url, $title, $description = '', $position = 0, $type = 'f')
     {
@@ -35,7 +35,7 @@ class FlinksLib extends TikiLib
     /**
      * @param $url
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_featured_link($url)
     {
@@ -50,7 +50,7 @@ class FlinksLib extends TikiLib
      * @param int    $position
      * @param string $type
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function update_featured_link($url, $title, $description, $position = 0, $type = 'f')
     {
@@ -61,7 +61,7 @@ class FlinksLib extends TikiLib
     /**
      * @param $url
      *
-     * @return bool|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function add_featured_link_hit($url)
     {

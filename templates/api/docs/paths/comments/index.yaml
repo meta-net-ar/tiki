@@ -46,7 +46,7 @@ get:
                 type: string
               parentId:
                 type: integer
-              cant:
+              count:
                 type: integer
               offset:
                 type: integer

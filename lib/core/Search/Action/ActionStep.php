@@ -80,6 +80,11 @@ class Search_Action_ActionStep implements Search_Action_Step
         return $this->action->requiresInput(new JitFilter($params));
     }
 
+    public function requiresConfirm()
+    {
+        return $this->action->requiresConfirm();
+    }
+
     public function changeObject($data)
     {
         if (method_exists($this->action, 'changeObject')) {

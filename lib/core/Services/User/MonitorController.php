@@ -131,10 +131,6 @@ class Services_User_MonitorController
 
         $result = $query->search($searchlib->getIndex());
 
-        if (! $result->count()) {
-            throw new Services_Exception(tr('No notifications.'), 404);
-        }
-
         // Hacking around the horrible code generating urls in pagination
         $_GET = [
             'critical' => $critical, 'high' => $high, 'low' => $low,

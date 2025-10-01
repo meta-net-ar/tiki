@@ -46,7 +46,7 @@ class Icon extends \Smarty\FunctionHandler\Base
 
         if (empty($tc_theme)) {
             $current_theme = ! empty($prefs['theme']) ? $prefs['theme'] : '';
-            $current_theme_option = isset($prefs['theme_option']) ? $prefs['theme_option'] : '';
+            $current_theme_option = $prefs['theme_option'] ?? '';
         } else {
             $current_theme = $tc_theme;
             $current_theme_option = ! empty($tc_theme_option) ? $tc_theme_option : '';
@@ -124,7 +124,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 if (! empty($params['href'])) { //use href if not empty
                     $a_href = 'href="' . $params['href'] . '"';
                 } else {
-                    $a_href = '';
+                    $a_href = 'href=""';
                 }
 
                 if (isset($params['data-toggle'])) { //add data-toggle if set
@@ -154,7 +154,7 @@ class Icon extends \Smarty\FunctionHandler\Base
         } //ICONSET END
 
         // Handle _ids that contains the real filename and path
-        if (strpos($params['_id'], '/') !== false || strpos($params['_id'], '.') !== false) {
+        if (str_contains($params['_id'], '/') || str_contains($params['_id'], '.')) {
             if (($icons_basedir = dirname($params['_id'])) == '') {
                 $icons_basedir = $basedirs[0];
             }
@@ -198,7 +198,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                         $img_file = $v . $icons_extension;
                         $v = $icons_basedir . $img_file;
                         $themelib = \TikiLib::lib('theme');
-                        $v2 = $themelib->get_theme_path($current_theme, $current_theme_option, $img_file, 'icons/');
+                        $v2 = $themelib->get_theme_path($current_theme, $current_theme_option, $img_file, 'icons');
 
                         if (! empty($v2)) {
                             $params['file'] = $v2;
@@ -248,7 +248,7 @@ class Icon extends \Smarty\FunctionHandler\Base
         }
 
         if ($notag) {
-            $html = (isset($params['path_prefix']) ? $params['path_prefix'] : '') . $params['file'];
+            $html = ($params['path_prefix'] ?? '') . $params['file'];
         } else {
             // use 'alt' as 'title' if not set
             if (! isset($params['title'])) {
@@ -292,10 +292,37 @@ class Icon extends \Smarty\FunctionHandler\Base
                     break;
                 case 'img':
                 default:
+                    // temporarily add the dirname here as allowed smarty resource for HtmlImage smarty function
+                    $temporaryDirname = false;
+                    $protocol = str_contains($params['file'], '://');
+                    if ($protocol === false) {
+                        if (! empty($params['basedir'])) {
+                            $dirname = dirname($params['basedir'] . $params['file']);
+                        } else {
+                            $dirname = dirname($params['file']);
+                        }
+                        $dirname = $smarty->_realpath($dirname);
+                        $currentDir = $smarty->getTemplateDir();
+                        if (! in_array($dirname, $currentDir)) {
+                            $smarty->addTemplateDir($dirname);
+                            $temporaryDirname = $dirname;
+                        }
+                    }
                     try {
                         $html = $smartyFunctionHtmlImageHandler->handle($params, $smarty->getEmptyInternalTemplate());
                     } catch (\Smarty\Exception $e) {
                         $html = '<span class="icon error" title="' . tra('Error:') . ' ' . $e->getMessage() . '">?</span>';
+                    }
+                    // remove temporary dirname as it might be abused later
+                    if ($temporaryDirname) {
+                        $currentDir = $smarty->getTemplateDir();
+                        $last = array_key_last($currentDir);
+                        if ($last !== null && str_starts_with($currentDir[$last], $temporaryDirname)) {
+                            unset($currentDir[$last]);
+                            $smarty->setTemplateDir($currentDir);
+                            // manually clear the security resource dir as a bug prevents them from auto-update
+                            $smarty->security_policy->clearResourceDir();
+                        }
                     }
             }
 

@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -24,7 +24,7 @@ class Table_Code_WidgetOptionsMath extends Table_Code_WidgetOptions
     protected function getOptionArray()
     {
         if (parent::$math) {
-            $format = isset(parent::$s['math']['format']) ? parent::$s['math']['format'] : '###0.00';
+            $format = parent::$s['math']['format'] ?? '###0.00';
             $m[] = 'math_data : \'tsmath\'';
             $m[] = 'math_mask : ' . '\'' . $format . '\'';
             $m[] = 'math_event : \'tablesorter-ready\'';

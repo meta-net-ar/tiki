@@ -28,9 +28,7 @@ $access->check_feature('feature_forums');
 
 // forumId must be received
 if (! isset($_REQUEST["forumId"])) {
-    $smarty->assign('msg', tra("No forum indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No forum indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $smarty->assign('forumId', $_REQUEST["forumId"]);
@@ -122,8 +120,8 @@ if (isset($_REQUEST["find"])) {
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $items = $commentslib->list_reported($_REQUEST['forumId'], $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign('cant', $items['cant']);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign('count', $items['count']);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 
 $smarty->assign_by_ref('items', $items["data"]);
 

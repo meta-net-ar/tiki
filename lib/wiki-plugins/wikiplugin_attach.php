@@ -165,13 +165,10 @@ function wikiplugin_attach_info()
 function wikiplugin_attach($data, $params)
 {
     global $atts;
-    global $mimeextensions;
     global $user, $section, $section_class;
 
     $wikilib = TikiLib::lib('wiki');
     $tikilib = TikiLib::lib('tiki');
-    $pluginlib = TikiLib::lib('pluginslib');
-
     extract($params, EXTR_SKIP);
 
     $loop = [];
@@ -189,7 +186,7 @@ function wikiplugin_attach($data, $params)
             $tracker_info = $trklib->get_tracker($atts_item_name);
             $tracker_options = $trklib->get_tracker_options($atts_item_name);
             if (! is_array($tracker_info) || ! is_array($tracker_options)) {
-                return $pluginlib->error(tr('No tracker found matching id %0', $atts_item_name));
+                throw new Exception(tr('No tracker found matching id %0', $atts_item_name));
             }
 
             // Merge the two arrays
@@ -197,7 +194,7 @@ function wikiplugin_attach($data, $params)
 
             $attextra = 'n';
 
-            if (strstr($tracker_info["orderAttachments"], '|')) {
+            if (str_contains($tracker_info["orderAttachments"], '|')) {
                 $attextra = 'y';
             }
 
@@ -207,7 +204,7 @@ function wikiplugin_attach($data, $params)
         }
 
         // See if we're being called from a wiki page.
-        if ($section_class && strstr($section_class, 'wiki_page')) {
+        if ($section_class && str_contains($section_class, 'wiki_page')) {
             $atts_item_name = $_REQUEST["page"];
             $atts = $wikilib->list_wiki_attachments($atts_item_name, 0, -1, 'created_desc', '');
         }
@@ -217,7 +214,7 @@ function wikiplugin_attach($data, $params)
     $old_atts = $atts;
     $url = '';
 
-    if (isset($all) && (int)$all > 0) {
+    if ($all) {
         $atts = $wikilib->list_all_attachments(0, -1, 'page_asc', '');
     } elseif (! empty($page)) {
         if (! $tikilib->page_exists($page)) {
@@ -229,41 +226,41 @@ function wikiplugin_attach($data, $params)
         }
     }
 
-    if (! array_key_exists("cant", $atts)) {
+    if (! array_key_exists("count", $atts)) {
         if (array_key_exists("data", $atts)) {
-            $atts['cant'] = count($atts["data"]);
+            $atts['count'] = count($atts["data"]);
         } else {
-            $atts['cant'] = 0;
+            $atts['count'] = 0;
             $atts["data"] = "";
         }
     }
 
-    if (! isset($num)) {
+    if (empty($num)) {
         $num = 0;
     }
-    if (! isset($id)) {
+    if (empty($id)) {
         $id = 0;
     } else {
         $num = 0;
     }
 
-    if (isset($file)) {
+    if (! empty($file)) {
         $name = $file;
     }
 
-    if (isset($name)) {
+    if (! empty($name)) {
         $id = 0;
         $num = 0;
     } else {
         $name = '';
     }
 
-    if (! $atts['cant']) {
+    if (! $atts['count']) {
         return "''" . tra('No such attachment on this page') . "''";
-    } elseif ($num > 0 and $num < ($atts['cant'] + 1)) {
+    } elseif ($num > 0 and $num < ($atts['count'] + 1)) {
         $loop[] = $num;
     } else {
-        $loop = range(1, $atts['cant']);
+        $loop = range(1, $atts['count']);
     }
 
     $out = [];
@@ -273,61 +270,48 @@ function wikiplugin_attach($data, $params)
 
     foreach ($loop as $n) {
         $n--;
-        if ((! $name and ! $id) or $id == $atts['data'][$n]['attId'] or $name == $atts['data'][$n]['filename']) {
+        $attachment = $atts['data'][$n];
+        if ((! $name and ! $id) or $id == $attachment['attId'] or $name == $attachment['filename']) {
             $link = "";
-            if (isset($bullets) && $bullets) {
+            if ($bullets) {
                 $link .= "<li>";
             }
+            $description = (! empty($showdesc) && ! empty($attachment['comment']))
+                ? $attachment['comment']
+                : $attachment['filename'];
 
-            if (isset($image) and $image) {
-                $link .= '<img src="tiki-download_wiki_attachment.php?attId=' . $atts['data'][$n]['attId'] . $url . '" class="wiki"';
-                $link .= ' alt="';
-                if (empty($showdesc) || empty($atts['data'][$n]['comment'])) {
-                    $link .= $atts['data'][$n]['filename'];
-                } else {
-                    $link .= $atts['data'][$n]['comment'];
-                }
-                if (isset($dls)) {
-                    $link .= " " . $atts['data'][$n]['hits'];
-                }
-                $link .= '"/>';
+            if (! empty($dls)) {
+                $description .= ' ' . $attachment['hits'];
+            }
+
+            if ($image) {
+                $link .= '<img src="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '" class="wiki"';
+                $link .= ' alt="' . $description . '"/>';
             } else {
-                $link .= '<a href="tiki-download_wiki_attachment.php?attId=' . $atts['data'][$n]['attId'] . $url . '&amp;download=y" class="wiki"';
-                $link .= ' title="';
-
-                if (empty($showdesc) || empty($atts['data'][$n]['comment'])) {
-                    $link .= $atts['data'][$n]['filename'];
-                } else {
-                    $link .= $atts['data'][$n]['comment'];
-                }
-                if (isset($dls)) {
-                    $link .= " " . $atts['data'][$n]['hits'];
-                }
-
-                $link .= '">';
-                if (isset($icon)) {
-                    $smarty = TikiLib::lib('smarty');
-                    $iconhtml = smarty_modifier_iconify($atts['data'][$n]['filename']);
+                $link .= '<a href="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '&amp;download=y" class="wiki"';
+                $link .= ' title="' . $description . '">';
+                if (! empty($icon)) {
+                    $iconhtml = smarty_modifier_iconify($attachment['filename']);
                     $link .= $iconhtml . '&nbsp';
                 }
 
-                if (! empty($showdesc) && ! empty($atts['data'][$n]['comment'])) {
-                    $link .= strip_tags($atts['data'][$n]['comment']);
+                if (! empty($showdesc) && ! empty($attachment['comment'])) {
+                    $link .= strip_tags($attachment['comment']);
                 } elseif (! empty($inline) && ! empty($data)) {
                     $link .= $data;
                 } else {
-                    $link .= strip_tags($atts['data'][$n]['filename']);
+                    $link .= strip_tags($attachment['filename']);
                 }
 
                 $link .= '</a>';
 
-                $pageall = strip_tags($atts['data'][$n]['page']);
-                if (isset($all)) {
+                $pageall = strip_tags($attachment['page']);
+                if ($all) {
                     $link .= " attached to " . '<a title="' . $pageall . '" href="' . $pageall . '" class="wiki">' . $pageall . '</a>';
                 }
             }
 
-            if (isset($bullets) && $bullets) {
+            if ($bullets) {
                 $link .= "</li>";
             }
 
@@ -335,7 +319,7 @@ function wikiplugin_attach($data, $params)
         }
     }
 
-    if (isset($bullets) && $bullets) {
+    if ($bullets) {
         $separator = "\n";
     } else {
         $separator = "<br />\n";
@@ -351,7 +335,7 @@ function wikiplugin_attach($data, $params)
         $data = implode($separator, $out);
     }
 
-    if (isset($bullets) && $bullets) {
+    if ($bullets) {
         $data = "<ul>" . $data . "</ul>";
     }
 

@@ -51,7 +51,7 @@ class Poll extends Base
                 } else {
                     $comments_count = 0;
                 }
-                $smarty->assign('comments_cant', $comments_count);
+                $smarty->assign('comments_count', $comments_count);
 
                 if ($tiki_p_view_poll_results == 'y') {
                     $smarty->assign('ownurl', 'tiki-poll_results.php?pollId=' . $id);

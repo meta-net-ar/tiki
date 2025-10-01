@@ -45,7 +45,7 @@ class Email2FA implements TwoFactorAuthInterface
         }
 
         $tokenLength = intval($prefs['twoFactorAuthEmailTokenLength'] ?? 6);
-        $token = $this->generateRandomString($tokenLength);
+        $token = $this->generateRandomString($tokenLength, $prefs['twoFactorAuthEmailTokenChars'] ?? '');
 
         if ($isEmail) {
             try {
@@ -119,7 +119,7 @@ class Email2FA implements TwoFactorAuthInterface
         $tokenTTL = intval($prefs['twoFactorAuthEmailTokenTTL'] ?? 30) * 60;
 
         if (time() - $created > $tokenTTL) {
-            $errMsg = tr('2FA token has been expired. Please request a new one from login page.');
+            $errMsg = tr('2FA token has expired. Please request a new one from login page.');
             throw new TwoFactorAuthException($errMsg);
         }
 
@@ -132,9 +132,26 @@ class Email2FA implements TwoFactorAuthInterface
         return true;
     }
 
-    private function generateRandomString($length = 6)
+    private function generateRandomString($length = 6, $chars = '')
     {
-        $list = ['aeiou', 'AEIOU', 'bcdfghjklmnpqrstvwxyz', 'BCDFGHJKLMNPQRSTVWXYZ', '0123456789'];
+        if (! empty($chars)) {
+            $list = [];
+            if (preg_match_all('/(.)-(.)/', $chars, $m)) {
+                foreach ($m[0] as $k => $_) {
+                    $class = '';
+                    for ($i = ord($m[1][$k]); $i <= max(ord($m[1][$k]), ord($m[2][$k])); $i++) {
+                        $class .= chr($i);
+                    }
+                    $list[] = $class;
+                }
+                $chars = str_replace($m[0], '', $chars);
+            }
+            if ($chars) {
+                $list[] = $chars;
+            }
+        } else {
+            $list = ['aeiou', 'AEIOU', 'bcdfghjklmnpqrstvwxyz', 'BCDFGHJKLMNPQRSTVWXYZ', '0123456789'];
+        }
         shuffle($list);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {

@@ -49,9 +49,7 @@ function module_user_tasks($mod_reference, $module_params)
             if (strlen($_REQUEST["modTasksTitle"]) > 2) {
                 $tasklib->new_task($user, $user, null, null, date('U'), ['title' => $_REQUEST["modTasksTitle"]]);
             } else {
-                $smarty->assign('msg', tra("The task title must have at least 3 characters"));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("The task title must have at least 3 characters"), \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
         $smarty->assign('ownurl', $_SERVER["REQUEST_URI"]);

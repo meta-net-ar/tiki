@@ -23,12 +23,12 @@
             <div class="row align-items-end">
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Version{/tr}
-                        <input type="text" name="version" value="{if !empty($filter.version)}{$filter.version|escape}{/if}" class="form-control">
+                        <input type="number" name="version" value="{if isset($filter.version)}{$filter.version|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Field ID{/tr}
-                        <input type="text" name="fieldId" value="{if !empty($fieldId)}{$fieldId|escape}{/if}" class="form-control">
+                        <input type="number" name="fieldId" value="{if !empty($fieldId)}{$fieldId|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">
@@ -75,18 +75,18 @@
             {$last_version = 0}
             {foreach from=$history item=hist}
                 {if $hist.value neq $hist.new or $hist.version == 0}
-                    {assign var='fieldId' value=$hist.fieldId}
-                    {assign var='field_value' value=$field_option[$fieldId]}
-                    {if $field_value.visibleInHistoryMode eq 'y' or $hist.version == 0}
+                    {$fieldId=$hist.fieldId}
+                    {$field_value=$field_option[$fieldId]}
+                    {if is_array($field_value) and ($field_value.visibleInHistoryMode eq 'y' or $hist.version == 0)}
                         <tr>
                             <td class="id"><strong>{$hist.version|escape}</strong></td>
                             <td class="date"><strong>{if not empty($hist.lastModif)}{$hist.lastModif|tiki_short_datetime}{/if}</strong></td>
                             <td class="username"><strong>{$hist.user|username}</strong></td>
                             <td class="text">
-                                {if $fieldId ne -1}{$fieldId}{/if}
+                                {if $fieldId ne HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}{$fieldId}{/if}
                             </td>
                             <td class="text">
-                                {if $fieldId eq -1}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
+                                {if $fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
                             </td>
                             {if empty($diff_style)}
                                 {if !empty($field_value.fieldId)}
@@ -109,6 +109,6 @@
         </table>
     </div>
 
-    {pagination_links cant=$cant offset=$offset step=$prefs.maxRecords}
+    {pagination_links count=$count offset=$offset step=$prefs.maxRecords}
     {/pagination_links}
 {/block}

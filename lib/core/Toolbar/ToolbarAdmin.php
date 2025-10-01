@@ -18,12 +18,6 @@ class ToolbarAdmin extends ToolbarUtilityItem
 
     public function getWysiwygToken(): string
     {
-        global $prefs;
-        if (! empty($this->wysiwyg)) {
-            if ($prefs['feature_wysiwyg'] == 'y') {
-                $this->setupCKEditorTool($this->getOnClick());
-            }
-        }
         return $this->wysiwyg;
     }
 

@@ -40,7 +40,7 @@ class TrackerHeader extends Base
             --$last;
         }
         if (! empty($title)) { // new header
-            array_push($trackerheaderStack, $level);
+            $trackerheaderStack[] = $level;
             $output .= "<!--PUSH" . count($trackerheaderStack) . " -->";
             $id = "trackerHeader_$iTrackerHeader";
             $div_id = "block_$id";

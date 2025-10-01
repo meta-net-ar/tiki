@@ -21,7 +21,7 @@
             {jq}
                 $("#preview_diff_style").on("change", function(){
                     ajaxLoadingShow($("#autosave_preview .wikitext"));
-                    setCookie("preview_diff_style", $(this).val(), "preview", "session");
+                    setCookie("preview_diff_style", $(this).val(), "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
                     $.get($.service("edit", "preview"), {
                         editor_id: 'editwiki',
                         autoSaveId: autoSaveId,
@@ -50,7 +50,7 @@
                 }
             }
         }).on('resizeend', function (event) {
-            setCookie("wiki", $('#autosave_preview').height(), "preview", "session");
+            setCookie("wiki", $('#autosave_preview').height(), "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
         });
     {/jq}
     <h2>{tr}Preview:{/tr} {$page|escape}</h2>

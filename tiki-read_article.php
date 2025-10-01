@@ -32,9 +32,7 @@ $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_articles');
 if (! isset($_REQUEST["articleId"])) {
-    $smarty->assign('msg', tra("No article indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No article indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $parserlib = TikiLib::lib('parser');
@@ -45,26 +43,17 @@ if ($article_data === false) {
     if (! $user) {
         $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
     }
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 if (! $article_data) {
-    $smarty->assign('msg', tra("Article not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 if (($article_data['publishDate'] > $tikilib->now) && ($article_data['author'] != $user && $tiki_p_admin != 'y' && $tiki_p_admin_cms != 'y') && ($article_data['type'] != 'Event')) {
-    $smarty->assign('msg', tra("Article is not published yet"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article is not published yet"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if ($article_data['ispublished'] == 'n' && $tiki_p_edit_article != 'y') {
-    $smarty->assign('msg', tra("Article is not published yet"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article is not published yet"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if (isset($_REQUEST['switchlang']) && $_REQUEST['switchlang'] == 'y' && $prefs['feature_multilingual'] == 'y' && $prefs['feature_sync_language'] == 'y' && ! empty($article_data["lang"]) && $prefs['language'] != $article_data["lang"]) {
@@ -101,6 +90,7 @@ $smarty->assign('show_subtitle', $article_data["show_subtitle"]);
 $smarty->assign('linkto', $article_data["linkto"]);
 $smarty->assign('show_linkto', $article_data["show_linkto"]);
 $smarty->assign('image_caption', $article_data["image_caption"]);
+$smarty->assign('image_alt', $article_data["image_alt"]);
 $smarty->assign('show_image_caption', $article_data["show_image_caption"]);
 $smarty->assign('lang', $article_data["lang"]);
 $smarty->assign('authorName', $article_data["authorName"]);
@@ -182,9 +172,7 @@ if ($prefs["article_custom_attributes"] == 'y') {
 }
 $smarty->assign('body', $article_data["body"]);
 $smarty->assign('publishDate', $article_data["publishDate"]);
-$smarty->assign('expireDate', $article_data["expireDate"]);
 $smarty->assign('show_pubdate', $article_data["show_pubdate"]);
-$smarty->assign('show_expdate', $article_data["show_expdate"]);
 $smarty->assign('edit_data', 'y');
 $body = $article_data["body"];
 $heading = $article_data["heading"];

@@ -121,7 +121,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                             if ($img_condition_status != true) {
                                                 // if match not found yet, examine more specific conditions
                                                 if (! empty($section)) {    // if we have a section name
-                                                    if (substr($img_condition_name, 0, 8) == 'section_') {
+                                                    if (str_starts_with($img_condition_name, 'section_')) {
                                                         if (strlen($img_condition_name) > 8) {
                                                             $img_condition_part = substr($img_condition, 8); // get part after "section_"
                                                             $img_condition_part = strtolower($img_condition_part);

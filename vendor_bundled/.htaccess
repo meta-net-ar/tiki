@@ -22,7 +22,6 @@
     RewriteRule "^(vendor/jquery/).*/.*\.(swf|html)$" "-" [PT,L]
     RewriteRule "^(vendor/studio-42/).*/.*\.(wav|html)$" "-" [PT,L]
     RewriteRule "^(vendor/twbs/).*/.*\.html$" "-" [PT,L]
-    RewriteRule "^(vendor/ckeditor).*/.*\.html$" "-" [PT,L]
     RewriteRule "^(vendor/npm-asset/converse\.js/).*/.*\.html$" "-" [PT,L]
     RewriteRule "^(vendor/npm-asset/reveal.js/).*/.*\.html$" "-" [PT,L]
     RewriteRule "^(vendor/svg-edit/).*/.*\.xml$" "-" [PT,L]

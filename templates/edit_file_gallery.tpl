@@ -224,6 +224,21 @@ if ($(this).val() != '') {
                     </div>
                 </div>
                 <div class="tiki-form-group row">
+                    <label class="col-sm-4 col-form-label">{tr}Default Display Name Generation{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="display_name_generation" id="dng_default" value="" {if $gal_info.display_name_generation|default:'' eq ''}checked{/if}>
+                            <label class="form-check-label" for="dng_default">{tr}Use site-wide default{/tr} ({$prefs.fgal_filename_to_display_name|default:'preserve'})</label>
+                        </div>
+                        {foreach from=$displayNameGenerationOptions key=value item=label}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="display_name_generation" id="dng_{$value}" value="{$value}" {if $gal_info.display_name_generation eq $value}checked{/if}>
+                                <label class="form-check-label" for="dng_{$value}">{$label}</label>
+                            </div>
+                        {/foreach}
+                    </div>
+                </div>
+                <div class="tiki-form-group row">
                     <label for="visible" class="col-sm-4">{tr}Gallery is visible to non-admin users{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
@@ -261,7 +276,7 @@ if ($(this).val() != '') {
                         <label for="archives" class="col-sm-4 col-form-label">{tr}Maximum number of archives for each file{/tr}</label>
                         <div class="col-sm-8">
                             <div class="form-control-plaintext">
-                                <input type="text" id="archives" name="archives" value="{$gal_info.archives|escape}" class="form-control">
+                                <input type="number" id="archives" name="archives" value="{$gal_info.archives|escape}" class="form-control">
                                 <span class="form-text">{tr}Use:{/tr} 0={tr}unlimited,{/tr} -1={tr}none{/tr}.</span>
 
                             </div>
@@ -298,7 +313,7 @@ if ($(this).val() != '') {
                             <label for="quota" class="col-sm-4 col-form-label">{tr}Quota{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="input-group col-sm-4">
-                                    <input type="text" class="form-control" id="quota" name="quota" value="{$gal_info.quota}" size="5">
+                                    <input type="number" class="form-control" id="quota" name="quota" value="{$gal_info.quota}" size="5">
                                     <span class="input-group-text"> {tr}Mb{/tr}</span>
                                 </div>
                                 <span class="form-text">{tr}0 for unlimited{/tr}</span>
@@ -342,8 +357,8 @@ if ($(this).val() != '') {
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="text" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|escape}" class="form-control text-end">
-                                <span>&nbsp;px</span>
+                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|escape}" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
                             <span class="form-text">{tr}If an image is wider than this, it will be resized.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
                         </div>
@@ -354,8 +369,8 @@ if ($(this).val() != '') {
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="text" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|escape}" class="form-control text-end">
-                                <span>&nbsp;px</span>
+                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|escape}" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
                             <span class="form-text">{tr}If an image is higher than this, it will be resized.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
                         </div>
@@ -450,13 +465,13 @@ if ($(this).val() != '') {
                 <div class="tiki-form-group row">
                     <label for="max_desc" class="col-sm-4 col-form-label">{tr}Max description display size{/tr}</label>
                     <div class="col-sm-8">
-                        <input type="text" id="max_desc" name="max_desc" value="{$max_desc|escape}" class="form-control">
+                        <input type="number" id="max_desc" name="max_desc" value="{$max_desc|escape}" class="form-control">
                     </div>
                 </div>
                 <div class="tiki-form-group row">
                     <label for="maxRows" class="col-sm-4 col-form-label">{tr}Max rows per page{/tr}</label>
                     <div class="col-sm-8">
-                        <input type="text" id="maxRows" name="maxRows" value="{$maxRows|escape}" class="form-control">
+                        <input type="number" id="maxRows" name="maxRows" value="{$maxRows|escape}" class="form-control">
                     </div>
                 </div>
             {/tab}

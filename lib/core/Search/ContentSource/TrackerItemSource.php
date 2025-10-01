@@ -59,6 +59,17 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         $fieldPermissions = [];
 
         foreach (self::getIndexableHandlers($definition, $item) as $handler) {
+            if ($handler) {
+                $fieldType = $handler->getConfiguration('type');
+                if ($fieldType === 't') {
+                    $optionsJson = $handler->getConfiguration('options');
+                    $optionsArray = json_decode($optionsJson, true);
+                    if (is_array($optionsArray) && ! empty($optionsArray['is_password'])) {
+                        // This is a password field. Skip it. Do not index it.
+                        continue;
+                    }
+                }
+            }
             if ($this->indexer) {
                 $this->indexer->errorContext = 'Field ' . $handler->getConfiguration('fieldId') . ' / ' . $handler->getConfiguration('name');
             }

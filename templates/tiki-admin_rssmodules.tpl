@@ -35,13 +35,14 @@
                         value="y"
                         class="btn btn-secondary float-sm-end tips"
                         title=":{tr}Please be patient, this may take a while{/tr}"
+                        aria-label="{tr}Please be patient, this may take a while{/tr}"
                 >
                     {icon name="refresh" _menu_text='y' _menu_icon='y' alt="{tr}Refresh all feeds{/tr}"}
                 </button>
             </form>
         {/if}
         <h2>{tr}External Feeds{/tr}</h2>
-        <div class="table-responsive" align="center">
+        <div class="table-responsive text-center">
             {if $channels or ($find ne '')}
                 {include file='find.tpl'}
             {/if}
@@ -137,15 +138,15 @@
                 {/section}
             </table>
 
-            {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
         </div>
     {/tab}
 
     {if $rssId > 0}
-        {assign var="feedEditLabel" value="{tr}Edit Feed{/tr}"}
+        {$feedEditLabel="{tr}Edit Feed{/tr}"}
     {else}
-        {assign var="feedEditLabel" value="{tr}Create Feed{/tr}"}
+        {$feedEditLabel="{tr}Create Feed{/tr}"}
     {/if}
     {tab name=$feedEditLabel}
         <h2>{$feedEditLabel}
@@ -159,27 +160,27 @@
             {ticket}
             <input type="hidden" name="rssId" value="{$rssId|escape}">
             <div class="mb-3 row">
-                <label for="name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
+                <label for="feed_name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="name" value="{$name|escape}" class="form-control">
+                    <input type="text" name="name" id="feed_name" value="{$name|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="url" class="col-form-label col-sm-3">{tr}URL{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="url" name="url" value="{$url|escape}" class="form-control">
+                    <input type="url" name="url" id="url" value="{$url|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea name="description" rows="4" class="form-control">{$description|escape}</textarea>
+                    <textarea name="description" id="description" rows="4" class="form-control">{$description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="refreshMinutes" class="col-form-label col-sm-3">{tr}Refresh rate{/tr}</label>
                 <div class="col-sm-9">
-                    <select class="form-select" name="refreshMinutes">
+                    <select class="form-select" name="refreshMinutes" id="refreshMinutes">
                         {foreach [1, 5, 10, 15, 20, 30, 45, 60, 90, 120, 360, 720, 1440] as $min}
                             <option value="{$min|escape}" {if $refreshSeconds eq ($min*60)}selected="selected"{/if}>{($min*60)|duration}</option>
                         {/foreach}
@@ -262,27 +263,12 @@
                     </div>
                 {/if}
                 <div class="mb-3 row">
-                    <label for="article_expiry" class="col-form-label col-sm-3">{tr}Expiration{/tr}</label>
-                    <div class="col-sm-9">
-                        <div class="input-group">
-                            <input
-                                id="article_expiry"
-                                type="text"
-                                name="expiry"
-                                class="form-control"
-                                value="{$articleConfig.expiry|escape}"
-                            >
-                            <span class="input-group-text">{tr}days{/tr}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
                     <label for="article_future_publish" class="col-form-label col-sm-3">{tr}Publish in the future{/tr}</label>
                     <div class="col-sm-9">
                         <div class="input-group">
                             <input
                                 id="article_future_publish"
-                                type="text"
+                                type="number"
                                 name="future_publish"
                                 class="form-control"
                                 value="{$articleConfig.future_publish|escape}"
@@ -349,13 +335,16 @@
                         <p class="font-italic">{tr}No source categories detected for this feed{/tr}</p>
                     {else}
                         <table>
+                            <thead>
                             <tr>
-                                <th>{tr}Source Category{/tr}
+                                <th>{tr}Source Category{/tr}</th>
                                 <th>{tr}Type{/tr}</th>
                                 <th>{tr}Topic{/tr}</th>
                                 <th>{tr}Rating{/tr}</th>
-                                <th>{tr}Priority (10 is highest){/tr}</th>
+                                <th>{tr _0="<small>" _1="</small>"}Priority %0(10 is highest)%1{/tr}</th>
                             </tr>
+                            </thead>
+                            <tbody>
                             {foreach $sourcecats as $sourcecat => $settings}
                                 <tr>
                                     <td>
@@ -365,7 +354,7 @@
                                         <select name="custom_atype[{$sourcecat|escape}]">
                                             <option value="" selected>{tr}Default{/tr}</option>
                                             {foreach from=$types item=t}
-                                                <option value="{$t.type|escape}"{if $t.type eq $article_custom_info[$sourcecat].atype} selected="selected"{/if}>{$t.type|escape}</option>
+                                                <option value="{$t.type|escape}" {if isset($article_custom_info[$sourcecat]) && $article_custom_info[$sourcecat].atype eq $t.type} selected="selected" {/if}>{$t.type|escape}</option>
                                             {/foreach}
                                         </select>
                                     </td>
@@ -374,7 +363,7 @@
                                             <option value="" selected>{tr}Default{/tr}</option>
                                             <option value="0" {if $article_custom_info[$sourcecat].topic === "0"} selected="selected"{/if}>{tr}None{/tr}</option>
                                             {foreach from=$topics item=t}
-                                                <option value="{$t.topicId|escape}"{if $t.topicId eq $article_custom_info[$sourcecat].topic} selected="selected"{/if}>{$t.name|escape}</option>
+                                                <option value="{$t.topicId|escape}"{if isset($article_custom_info[$sourcecat]) && $article_custom_info[$sourcecat].topic eq $t.topicId} selected="selected"{/if}>{$t.name|escape}</option>
                                             {/foreach}
                                         </select>
                                     </td>
@@ -382,19 +371,20 @@
                                         <select name="custom_rating[{$sourcecat|escape}]">
                                             <option value="" selected>{tr}Default{/tr}</option>
                                             {foreach from=$ratingOptions item=v}
-                                                <option value="{$v|escape}"{if $v === $article_custom_info[$sourcecat].rating} selected="selected"{/if}>{$v|escape}</option>
+                                                <option value="{$v|escape}"{if isset($article_custom_info[$sourcecat]) && $article_custom_info[$sourcecat].rating === $v} selected="selected"{/if}>{$v|escape}</option>
                                             {/foreach}
                                         </select>
                                     </td>
                                     <td>
                                         <select name="custom_priority[{$sourcecat|escape}]">
                                             {foreach from=$ratingOptions item=v}
-                                                <option value="{$v|escape}"{if $v === $article_custom_info[$sourcecat].priority} selected="selected"{/if}>{$v|escape}</option>
+                                                <option value="{$v|escape}"{if isset($article_custom_info[$sourcecat]) && $article_custom_info[$sourcecat].priority  === $v} selected="selected"{/if}>{$v|escape}</option>
                                             {/foreach}
                                         </select>
                                     </td>
                                 </tr>
                             {/foreach}
+                            </tbody>
                         </table>
                     {/if}
                 </fieldset>

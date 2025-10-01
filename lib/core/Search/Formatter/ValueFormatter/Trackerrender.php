@@ -36,26 +36,27 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
     public function render($name, $value, array $entry)
     {
         if ($name === 'tracker_status') {
+            $options  = TikiLib::lib('trk')->get_tracker_options($entry['tracker_id']);
             switch ($value) {
                 case 'o':
                     $status = 'open';
-                    $istatus = tra('Open');
+                    $istatus = $options['altOpenStatus'] ?: tra('Open');
                     break;
                 case 'p':
                     $status = 'pending';
-                    $istatus = tra('Pending');
+                    $istatus = $options['altPendingStatus'] ?: tra('Pending');
                     break;
                 default:
                 case 'c':
                     $status = 'closed';
-                    $istatus = tra('Closed');
+                    $istatus = $options['altClosedStatus'] ?: tra('Closed');
                     break;
             }
 
             $smarty = TikiLib::lib('smarty');
             return smarty_function_icon(['name' => 'status-' . $status, 'iclass' => 'tips', 'ititle' => ':'
                 . $istatus ], $smarty->getEmptyInternalTemplate());
-        } elseif (substr($name, 0, 14) !== 'tracker_field_' && $name !== 'title') {
+        } elseif (! str_starts_with($name, 'tracker_field_') && $name !== 'title') {
             return $value;
         }
 

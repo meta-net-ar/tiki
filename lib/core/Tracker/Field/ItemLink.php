@@ -72,6 +72,21 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 14,
                     ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of items based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown',
+                            'pref' => 'elementplus_select'
+                        ],
+                    ],
                     'displayFieldsList' => [
                         'name' => tr('Multiple Fields'),
                         'description' => tr('Display the values from multiple fields instead of a single one.'),
@@ -142,6 +157,19 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         'depends' => [
                             'field' => 'displayFieldsListType',
                             'value' => 'transfer'
+                        ],
+                    ],
+                    'displayFieldsListSort' => [
+                        'name' => tr('Default Sort Order'),
+                        'description' => tr('Sort the items in the dropdown list.'),
+                        'filter' => 'alpha',
+                        'options' => [
+                            'itemId' => tr('Item ID'),
+                            'formatted' => tr('Formatted Value'),
+                        ],
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown'
                         ],
                     ],
                     'trackerListOptions' => [
@@ -405,8 +433,20 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             return $template;
         }
 
+        if ($this->trackerField->getOption('lazyload')) {
+            $list = [];
+            foreach ($this->getValue() as $value) {
+                if ($value) {
+                    $list[$value] = $this->getItemLabel($value);
+                }
+            }
+        } else {
+            $list = $this->getPossibleItemValues();
+        }
+
         $data = [
-            'list' => $this->getPossibleItemValues(),
+            'list' => $list,
+            'listFields' => implode(',', $this->trackerField->getOption('displayFieldsList')),
             'displayFieldsListType' => $this->trackerField->getOption('displayFieldsListType'),
             'createTrackerItems' => $trackerPerms->create_tracker_items,
         ];
@@ -729,7 +769,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $handler = $factory->getHandler($field, $item);
 
                 foreach ($handler->getDocumentPart($typeFactory) as $key => $field) {
-                    if (strpos($key, 'tracker_field') === 0) {
+                    if (str_starts_with($key, 'tracker_field')) {
                         $key = $baseKey . substr($key, strlen('tracker_field'));
                         $out[$key] = $field;
                     }
@@ -919,6 +959,9 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                     $this->trackerField->getOption('displayFieldsListFormat')
                 );
                 $list = $this->handleDuplicates($list);
+                if ($this->getOption('displayFieldsListSort') == 'formatted') {
+                    natsort($list);
+                }
             }
         } else {
             $list = TikiLib::lib('trk')->get_all_items(
@@ -1192,9 +1235,18 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $baseKey = $this->getBaseKey();
 
+        static $map = [];
+        if (! $map) {
+            $list = $this->getPossibleItemValues();
+            foreach ($list as $id => $label) {
+                $map[crc32($id)] = $id;
+            }
+        }
+
         return [
             Search_Query_Facet_Term::fromField($baseKey)
                 ->setLabel($this->getConfiguration('name'))
+                ->setValueMap($map)
                 ->setRenderCallback([$this, 'getItemValue']),
         ];
     }
@@ -1355,13 +1407,13 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $remoteSchema = null;
             $definition = Tracker_Definition::get($this->trackerField->getOption('trackerId'));
             if ($definition) {
-                $tabular = null;
-                $tabularId = $definition->getConfiguration('tabularSync');
-                if ($tabularId) {
-                    $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
-                }
-                if ($tabular) {
-                    $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                try {
+                    $tabulars = $definition->getSynchronizedTabulars();
+                    if ($tabulars) {
+                        $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabulars[0]);
+                    }
+                } catch (Exception $e) {
+                    Feedback::error($e->getMessage());
                 }
             }
 
@@ -1390,7 +1442,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                                 }
                             }
                             $items = TikiLib::lib('trk')->list_items($remoteSchema->getDefinition()->getConfiguration('trackerId'), 0, 1, '', '', array_keys($remoteItem), '', '', '', array_values($remoteItem), '', null, true, true);
-                            if ($items['cant'] > 0) {
+                            if ($items['count'] > 0) {
                                 $info['fields'][$permName] = $items['data'][0]['itemId'];
                             } else {
                                 $remoteInfo = [

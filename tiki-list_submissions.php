@@ -15,7 +15,6 @@ $inputConfiguration = [
         'remove'                   => 'int',                //post
         'approve'                  => 'int',                 //post
         'submit_mult'              => 'string',              //post
-        'deleteexpired'            => 'bool',                //post
         'maxRecords'               => 'int',                 //post
         'sort_mode'                => 'word',                //get
         'offset'                   => 'int',                 //get
@@ -68,10 +67,7 @@ if (isset($_REQUEST['submit_mult']) && count($_REQUEST["checked"]) > 0 &&  $acce
         }
     }
 }
-if (isset($_REQUEST["deleteexpired"]) && $access->checkCsrf()) {
-    $access->check_permission('tiki_p_remove_submission');
-    $artlib->delete_expired_submissions();
-}
+
 // This script can receive the threshold
 // for the information as the number of
 // days to get in the log 1,3,4,etc
@@ -135,7 +131,7 @@ if ($prefs['feature_multilingual'] == 'y') {
 }
 
 $listpages = $artlib->list_submissions($offset, $maxRecords, $sort_mode, $find, $pdate, $_REQUEST['type'], $_REQUEST['topic'], $_REQUEST['lang']);
-$smarty->assign_by_ref('cant_pages', $listpages["cant"]);
+$smarty->assign_by_ref('pages_count', $listpages["count"]);
 include_once('tiki-section_options.php');
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 

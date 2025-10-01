@@ -16,7 +16,7 @@ class Search_Action_ReportingTransform
     public function __invoke($entry)
     {
         $identifier = "{$entry['object_type']}:{$entry['object_id']}";
-        $entry['report_status'] = isset($this->data[$identifier]) ? $this->data[$identifier] : 'none';
+        $entry['report_status'] = $this->data[$identifier] ?? 'none';
         return $entry;
     }
 }

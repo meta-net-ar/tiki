@@ -74,4 +74,52 @@ class SlugManager
 
         return $impl->degenerate($slug);
     }
+
+
+    /**
+     *  Generate multiple slug variations based on given options.
+     *
+     * @param string $slug The original slug or page name.
+     * @param array  $slug_options List of formats to generate ['dash', 'underscore', 'urlencode'].
+     *
+     * @return array
+     */
+    public function generateSlugsVariations(string $slug, array $slug_options = []): array
+    {
+        if (empty($slug_options)) {
+            $slug_options = array_keys($this->generators);
+        }
+        $slug_variations = [];
+        foreach ($slug_options as $option) {
+            $impl = $this->generators[$option];
+            switch ($option) {
+                case 'dash':
+                    // Convert spaces or underscores to dashes
+                    $slug_variations[$option] = $impl->generate($this->degenerate('underscore', $slug));
+                    break;
+                case 'underscore':
+                    // Convert spaces or dashes to underscores
+                    $slug_variations[$option] = $impl->generate($this->degenerate('dash', $slug));
+                    break;
+                case 'urlencode':
+                    // URL-encoded version
+                    $slug_variations[$option] = $impl->generate($this->degenerate('urlencode', $slug));
+                    break;
+            }
+        }
+
+        return $slug_variations;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    public function normalizeToDash(string $value): string
+    {
+        // Replace spaces, plus signs, and underscores with dashes
+        $normalized = preg_replace('/[\s+_]/', '-', $value);
+        return trim($normalized, '-');
+    }
 }

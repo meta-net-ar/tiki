@@ -10,6 +10,7 @@
                     {if ! $p.available}disabled="disabled"{/if} {$p.params}
                     data-tiki-admin-child-block="#{$p.preference|escape}_childcontainer"
                     data-tiki-admin-child-mode="{$mode|escape}"
+                    {if $p.parameters.disabled}disabled="disabled"{/if}
                 >
             </div>
 

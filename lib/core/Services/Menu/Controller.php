@@ -229,7 +229,7 @@ class Services_Menu_Controller
         //get preference information
         $feature_prefs = [];
         foreach ($prefs as $k => $v) {  // attempt to filter out non-feature prefs (still finds 133!)
-            if (strpos($k, 'feature') !== false && preg_match_all('/_/m', $k, $m) === 1) {
+            if (str_contains($k, 'feature') && preg_match_all('/_/m', $k, $m) === 1) {
                 $feature_prefs[] = $k;
             }
         }
@@ -257,7 +257,7 @@ class Services_Menu_Controller
                 $oldOptions = $this->menulib->list_menu_options($menuId);
                 //Get position from current menu
                 if ($oldOptions) {
-                    $position = (int)$oldOptions['cant'] + 1;
+                    $position = (int)$oldOptions['count'] + 1;
                 } else {
                     $position = 1;
                 }

@@ -1,7 +1,10 @@
-// Cosmo 5.3.3 -- This overrides and adds to node_modules/bootswatch/dist/cosmo/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Cosmo 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/cosmo/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/cosmo/_variables.scss"; // Bootswatch theme variables file
+
 //
 // Color system
 //
@@ -22,11 +25,12 @@ $danger:        $red;  // default
 //$light:         $gray-100;  // default
 //$dark:          $gray-800;  // default
 
-$green-300: tint-color($green, 40%);  // default // Bootstrap 53
-$red-300: tint-color($red, 40%);  // default // Bootstrap 53
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 // Options
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 // Links
@@ -61,8 +65,8 @@ $form-invalid-border-color:         $form-feedback-invalid-color; // !default;
 
 // Navbar
 // Accordion (added for TIki)
-$accordion-button-active-bg:             $blue;
-$accordion-button-active-color:          #fff;
+//$accordion-button-active-bg:             $blue;
+//$accordion-button-active-color:          #fff;
 
 // Alerts
 // Progress bars

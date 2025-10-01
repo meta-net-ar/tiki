@@ -4,7 +4,7 @@
         <div class="text-end">
             {if $file_id and $template ne $file_id }
                 {if $slide_page ne 'tiki-slideshow.php'}
-                    <a class="btn btn-link" target="_blank" href="tiki-editdiagram.php?fileId={$file_id}">{icon name="pencil"} Edit diagram</a>
+                    <a class="btn btn-link" target="_blank" role="button" href="tiki-editdiagram.php?fileId={$file_id}">{icon name="pencil"} Edit diagram</a>
                 {/if}
             {else}
             <form id="edit-diagram-{$index}" target="_blank" action="tiki-editdiagram.php" method="post">
@@ -16,7 +16,7 @@
                     <input type="hidden" value="{$index}" name="index">
                     <input type="hidden" value="{if !$compressXml}false{else}true{/if}" name="compressXml">
                     <input type="hidden" value="{$compressXmlParam}" name="compressXmlParam">
-                <a class="btn btn-link" href="javascript:void(0)" onclick="$('#edit-diagram-{$index}').trigger('submit')">{icon name="pencil"} Edit diagram</a>
+                <a class="btn btn-link" role="button" href="javascript:void(0)" onclick="$('#edit-diagram-{$index}').trigger('submit')">{icon name="pencil"} Edit diagram</a>
             </form>
             {/if}
         </div>

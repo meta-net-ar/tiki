@@ -78,8 +78,7 @@ if ($output["data"] == "EMPTY") {
         //  $prev_page_p = TikiLib::lib('parser')->parse_data($prev_page[$descId], array('print'=>true));
 
         // do a diff between both pages
-        //  require_once('lib/diff/difflib.php');
-        //  $diff = diff2($prev_page_p , $curr_page_p, "unidiff");
+        //  $diff = \Tiki\Lib\Diff\DiffUtils::diff2($prev_page_p , $curr_page_p, "unidiff");
 
 
         //  foreach ($diff as $part) {

@@ -1,72 +1,17 @@
 //Custom styles for the FiveAlive Kiwi option theme.
+
+@import "../../../scss/_variables.scss";
+
 $tiki-top-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
-
-@import "../../../scss/variables";
 // Color system
-
-// scss-docs-start gray-color-variables
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #6c757d;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-// scss-docs-end gray-color-variables
-
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-);  // default
-// scss-docs-end gray-colors-map
-
-// scss-docs-start color-variables
-$blue:    #0d6efd;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #d63384;  // default
-$red:     #dc3545;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #ffc107;  // default
-$green:   #198754;  // default
-$teal:    #20c997;  // default
-$cyan:    #0dcaf0;  // default
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-);  // default
-// scss-docs-end colors-map
 
 $red-300: tint-color($red, 40%);  // default
 $green-300: tint-color($green, 40%);  // default
+
+$white:    #fff;
+$black:    #000;
 
 $primary:       #ebdc14;
 $secondary:     #5E7F34; //#648737;
@@ -78,14 +23,14 @@ $light:         #ffffff;
 $dark:          #817804; //#a59705;
 
 $theme-colors: (
-    "primary":           #ebdc14,
-    "secondary":         #5E7F34, //#648737,
-    "success":           #5cb85c,
-    "info":              #96a032,
-    "warning":           #f0ad4e,
-    "danger":            #D13B00, //  #ff5c1a,
-    "light":             #ffffff,
-    "dark":              #817804 //  #a59705
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
 );
 
 // The following are default values from node_modules/bootstrap/scss/variables.scss - change as needed for theme child option (or to match values in parent theme).
@@ -96,22 +41,23 @@ $color-contrast-dark:             $gray-900;
 $color-contrast-light:            $white;
 
 // Options
+$enable-gradients: true;
+$enable-shadows: true;
 
 // Prefix
 $prefix: bs-;
 
 // Body
-$body-color: $black;
+$body-bg:                   $white;  // default
+$body-color: #212529;
 
-// $bg-light: #a59705; //#a59705 !important;  (Changing tactics for Bootstrap 5)
-
+// Links
 $link-color: #52702E; // #638637;
 $link-hover-color: #a59705;
-$link-hover-color:               darken($link-color, 15%);
-$link-hover-decoration:       none;
 $link-shade-percentage:                   20%;  // default
 
-$btn-link-disabled-color:     $gray-600;
+// Components
+$component-active-bg: $secondary;
 
 // Navs
 $nav-tabs-link-color: #000;
@@ -121,19 +67,10 @@ $nav-tabs-link-active-bg: #638637;
 
 // Navbars
 
-// navbar link hover colors
-$bg-dark-link-hover-color: #f2f2f2;
-//$bg-dark-link-hover-bg: #638637;
-
 // Typography
 $hr-color: #a59705;
-$text-success: #288040 !important;
-$text-danger: #d63d00 !important;
 $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #5b6269;
 $headings-font-weight: 700;
-
-$card-border-color: #332f02;
-$card-title-color: #252729;
 
 // Tables
 $table-border-color: #dbd11a;
@@ -152,19 +89,6 @@ $input-border-left-color: #f5fb86;
 // Form validation
 
 // Dropdowns
-$dropdown-bg: #baba25;
-$dropdown-border-color: rgba(0, 0, 0, 0.15);
-$dropdown-link-color: #000;
-$dropdown-link-hover-color: lighten(#000, 10%);
-$dropdown-link-hover-bg: #638637;
-$dropdown-link-active-color: $dropdown-link-color;
-$dropdown-link-active-bg: $dropdown-link-hover-bg;
-$dropdown-link-disabled-color: #f2f2f2;
-$dropdown-header-color: #ffffff;
-$dropdown-divider-bg: $dropdown-bg;
-
-$dropdown-dark-color: #fff;
-$dropdown-dark-bg: #8a8309;
 
 // Pagination
 $nav-pills-link-active-bg: #5E7F34; //#638637;
@@ -180,89 +104,36 @@ $pagination-disabled-color: #999999;
 $pagination-disabled-bg: #ffffff;
 $pagination-disabled-border-color: #dddddd;
 
-$enable-gradients: true;
-$enable-shadows: true;
+// Cards
+$card-cap-bg: $tiki-top-bg;
+$card-cap-color: #fff;
+$card-border-color: #e77d4f;
+//$card-title-color: $white;
 
 // Code
-
 $code-color:                     $body-color; //    $pink;  default
+
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
-//$bg-light-alt: #117485 !important;
 
-$side-column-heading-color: #7E7615; // #332f02;
-$page-header-link-color: #000;
+$tiki-footer_liner-card-inner-border: #ebdc14;
+$tiki-footer-accent-color: #ebdc14;
+$tiki-footer-btn-secondary-color: #f4f4f4;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
-$top-bg: #96a032;
-$top-color: #242424;
-$top-link-color: $gray-900;
-$top-link-hover-color: $gray-800;
-$topbar-bg: #063065;
-$topbar-link-color: #fff;
-
-$topbar-dark-bg: #332f02;
-$top-light-bg: transparent; // #117485;
-$top-light-color: $gray-900;
-$top-light-link-color: $top-light-color;
-$topbar-light-bg: #063035;
-$topbar-light-color: #f9f9f9;
-
-$top-dark-bg: transparent; // #117485; // $top-light-bg; defining the variable with a variable didn't work.
-$top-dark-color: $black;
-$top-dark-link-color: $top-dark-color;
-//$topbar-dark-bg: #063035; // $topbar-light-bg;
-$topbar-dark-color: $topbar-light-color;
-
-$navbar-light-color: $top-light-color;
-$navbar-light-link-color: $top-light-color;
-$navbar-light-link-hover-color: lighten($top-light-color,10%);
-//$navbar-light-link-hover-bg: #003c4a;
-
-$navbar-dark-color: $white;
-$navbar-dark-link-color: $white;
-$navbar-dark-link-hover-color: #f2f2f2;
-//$navbar-dark-hover-color: $navbar-light-link-hover-color;
-//$navbar-light-link-hover-bg: #003c4a;
-
-
-$footer_liner-card-inner-border: #ebdc14;
-
-$footer-accent-color: #ebdc14;
-$footer-btn-secondary-color: #f4f4f4;
-$footer_liner-border-color: $footer-accent-color;
-
-$bg-dark: #797922;
-
-$postbody-title-card-title-color: #fff;
-
-// These variables need to be defined for the files to compile. The specific variables for the child theme's button colors are defined
-// at the bottom of the file but by default they use the child theme's theme-colors. There appears to be redundancy in defining colors but each line is necessary.
-// There are unique names for the child theme button colors to avoid any conflict with the general theme colors.
-
-
-$box-shadow-sm:               0 .125rem .25rem rgba($black, .075);  // default
-$box-shadow:                  0 .5rem 1rem rgba($black, .15);  // default
-$box-shadow-lg:               0 1rem 3rem rgba($black, .175);  // default
-$btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075);  // default
-$enable-gradients:               false;
-$enable-shadows:              false;
-$input-btn-focus-width:       .2rem;  // default
-$btn-focus-width:             $input-btn-focus-width;  // default
-
-
-$bg-dark-info: #00DAE6;
+$tiki-postbody-title-card-title-color: #fff;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
     --tiki-top-bg: #{$tiki-top-bg}; // linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
-    --tiki-top-color: #{$navbar-light-link-color};
-    --tiki-top-hover-color: #{$navbar-light-link-hover-color};
-    --tiki-top-text-color: #{$navbar-light-link-hover-color};
+    --tiki-top-color: #{$gray-800};
+    --tiki-top-hover-color: #f2f2f2;
+    --tiki-top-text-color: var(--tiki-top-hover-color);
     --tiki-top-border: solid #000;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #{$topbar-light-bg};
+    --tiki-topbar-bg: #063035;
     --tiki-topbar-color: #fff;
     --tiki-topbar-hover-color: darken(#fff, 8%);
     --tiki-topbar-text-color: darken(#fff, 8%);
@@ -270,17 +141,17 @@ $bg-dark-info: #00DAE6;
 
 @mixin top-nav-dark {
     --tiki-top-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
-    --tiki-top-color: #{$top-dark-link-color};
-    --tiki-top-hover-color: #{$top-link-hover-color};
-    --tiki-top-text-color: #{$top-link-hover-color};
+    --tiki-top-color: #{$black};
+    --tiki-top-hover-color: #{$gray-800};
+    --tiki-top-text-color: #{$gray-800};
     --tiki-top-border: solid #000;
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: #{$topbar-dark-bg};
-    --tiki-topbar-color: #{$navbar-dark-link-color};
-    --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
-    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-bg: #332f02;
+    --tiki-topbar-color: #{$white};
+    --tiki-topbar-hover-color: #f2f2f2;
+    --tiki-topbar-text-color: #f2f2f2;
 }
 
 .tiki-top-nav-light {
@@ -333,8 +204,8 @@ header.navbar.fixed-top {
 // Light navbar minus top nav
 @mixin admin-nav-light {
     --tiki-admin-top-nav-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
-    --tiki-admin-top-nav-color: #{$navbar-light-link-color};
-    --tiki-admin-top-nav-hover-color: #{$navbar-light-link-hover-color};
+    --tiki-admin-top-nav-color: #{$gray-800};
+    --tiki-admin-top-nav-hover-color: #f2f2f2;
     --tiki-admin-top-nav-hover-bg: none ;
     --tiki-admin-aside-nav-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
@@ -394,7 +265,7 @@ header.navbar.fixed-top {
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 .accordion {
-    --bs-accordion-active-bg: #063035; // #{$top-dark-bg};
+    --bs-accordion-active-bg: #063035; // #{$tiki-top-bg-dark};
     --bs-accordion-active-color: #fff;
     --bs-accordion-btn-bg: #{$primary}; // no $bg-light
 }

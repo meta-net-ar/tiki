@@ -27,7 +27,6 @@ $inputConfiguration = [
              'frequency'              => 'int',            //post
              'author'                 => 'string',         //post
              'allowArticleClip'       => 'bool',           //post
-             'emptyClipBlocksSend'    => 'bool',           //post
              'sort_mode_g'            => 'string',         //get
              'offset'                 => 'string',         //get
              'find'                   => 'string',         //get
@@ -231,7 +230,7 @@ if ($prefs["feature_articles"] == 'y') {
 }
 $smarty->assign('articleTypes', $articleTypes);
 
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('count_pages', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-section_options.php');
 // disallow robots to index page:

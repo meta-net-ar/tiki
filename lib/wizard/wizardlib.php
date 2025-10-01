@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -136,7 +136,7 @@ class WizardLib extends TikiLib
             if ($isUserStep) {
                 $stepNr = (int)$_GET['stepNr'];
             } else {
-                $stepNr = isset($_POST['wizard_step']) ? (int)$_POST['wizard_step'] : 0;
+                $stepNr = (int)($_POST['wizard_step'] ?? 0);
             }
 
             $stepBack = false;
@@ -197,6 +197,8 @@ class WizardLib extends TikiLib
                     // Do not show page, if it doesn't return a boolean
                     if ($show === true) {
                         $template = $pages[$stepNr]->getTemplate();
+                        $showChangesWizard = $this->showChangesWizard();
+                        $smarty->assign('showChangesWizard', $showChangesWizard);
                         $smarty->assign('wizardBody', $smarty->fetch($template));
                         $next = false;
                     }
@@ -217,10 +219,7 @@ class WizardLib extends TikiLib
             // Set the page title
             $smarty->assign('pageTitle', $pages[$stepNr]->pageTitle());
         } catch (Exception $e) {
-            $error = $e->getMessage();
-            $smarty->assign('msg', $error);
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 
@@ -228,5 +227,30 @@ class WizardLib extends TikiLib
     {
         $hide = $showOnLogin === 'y' ? 'n' : 'y';
         $this->set_preference('wizard_admin_hide_on_login', $hide);
+    }
+
+    /**
+     * Check if tiki get an upgrade to show changes wizard
+     * show the wizard if the branch is not stable or the version has changed
+     * @return bool
+     */
+    private function showChangesWizard()
+    {
+        $tikilib = TikiLib::lib('tiki');
+        $TWV = new TWVersion();
+
+        // We always display the changes wizard in the master branch
+        if ($TWV->branch !== 'stable') {
+            return true;
+        }
+
+        $tikiCurrentVersion = $TWV->version;
+        $tikiInstallVersion = $tikilib->get_preference('tiki_install_version');
+
+        if (! empty($tikiInstallVersion) && $tikiCurrentVersion === $tikiInstallVersion) {
+            return false;
+        }
+
+        return true;
     }
 }

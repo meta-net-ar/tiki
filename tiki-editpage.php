@@ -13,6 +13,7 @@
 // with a call to header(), then you will not see the traces
 // If you want to see the traces, set value below to true.
 // WARNING: DO NOT COMMIT WITH TRUE!!!!
+
 $dieInsteadOfForwardingWithHeader = false;
 global $prefs;
 require_once('lib/debug/Tracer.php');
@@ -42,7 +43,6 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
 {
     global $prefs, $need_lang;
     $editlib = TikiLib::lib('edit');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
     if (! $page_info) {
@@ -121,7 +121,6 @@ function execute_module_translation()
 
 function possibly_set_pagedata_to_pretranslation_of_source_page()
 {
-    global $tracer;
     $multilinguallib = TikiLib::lib('multilingual');
     $smarty = TikiLib::lib('smarty');
     $editlib = TikiLib::lib('edit');
@@ -147,33 +146,37 @@ $smarty->assign('translation_mode', $translation_mode);
 // If page is blank (from quickedit module or wherever) tell user -- instead of editing the default page
 // Dont get the page from default HomePage if not set (surely this would always be an error?)
 if (empty($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("You must specify a page name, it will be created if it doesn't exist."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You must specify a page name, it will be created if it doesn't exist."), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $max_pagename_length = TikiLib::lib('wiki')->max_pagename_length();
 if (mb_strlen($_REQUEST["page"]) > $max_pagename_length) {
     //$_REQUEST["page"] = substr($_REQUEST["page"], 0, $max_pagename_length);
-    $smarty->assign('msg', tra(tr("You have exceeded the number of characters allowed (158 max) for the page name field")));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra(tr("You have exceeded the number of characters allowed (158 max) for the page name field")), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if (strtolower($_REQUEST["page"]) == 'sandbox' && $prefs['feature_sandbox'] !== 'y') {
-    $smarty->assign('msg', tra("You can’t name a page 'Sandbox' because it is reserved for the Sandbox feature"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You can’t name a page 'Sandbox' because it is reserved for the Sandbox feature"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $page = $_REQUEST["page"];
+if (isset($_GET['quickedit'])) {
+    // Normalize before checking input by replacing prefs[wiki_url_scheme] symbols ("-", "_", and "+") with space.
+    // This ensures page names like "Marc Andre" and "Marc-Andre" are treated as the same,
+    // preventing slug duplication when regenerating.
+    $normalized = preg_replace('/[\s+_-]/', ' ', $page);
+    if ($page_by_slug = $tikilib->getPageBySlug($normalized)) {
+        Feedback::errorAndDie(
+            tr('Cannot create page "%0", A page "%1" with the same slug variation already exists.', $page, '<strong>' . $page_by_slug . '</strong>'),
+            \Laminas\Http\Response::STATUS_CODE_409
+        );
+    }
+}
 
 if (isset($_REQUEST["description"])) {
     $max_pagedescription_length = 201;
     if (mb_strlen($_REQUEST["description"]) > $max_pagedescription_length) {
-        $smarty->assign('msg', tra("The description of the page should not exceed 200 characters."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("The description of the page should not exceed 200 characters."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -182,7 +185,13 @@ if ($prefs['namespace_enabled'] === 'y') {
     if (isset($_REQUEST['current_page_id'])) {
         $s_page_info = $structlib->s_get_page_info($_REQUEST['current_page_id']);
         $s_suffix = '';
-        if (isset($prefs['namespace_separator']) && ! empty($prefs['namespace_separator']) && strpos($s_page_info['pageName'], $prefs['namespace_separator']) !== false) {
+        if (
+            ! empty($prefs['namespace_separator'])
+            && str_contains(
+                $s_page_info['pageName'],
+                $prefs['namespace_separator']
+            )
+        ) {
             $split = explode($prefs['namespace_separator'], $s_page_info['pageName']);
             $s_suffix = reset($split);
         }
@@ -195,7 +204,7 @@ if (! empty($s_suffix)) {
 if ($prefs['namespace_enabled'] == 'y' && isset($_REQUEST['namespace'])) {
     // Only prepend the namespace separator, if the page is missing a namespace
     $ns = $_REQUEST['namespace'] . $prefs['namespace_separator'];
-    if (strpos($page, $ns, 0) === false) {
+    if (! str_contains($page, $ns)) {
         $page = $ns . $page;
     }
 }
@@ -211,7 +220,7 @@ if ($editlib->isNewTranslationMode() || $editlib->isUpdateTranslationMode()) {
 $editlib->make_sure_page_to_be_created_is_not_an_alias($page, $info);
 guess_new_page_attributes_from_parent_pages($page, $info);
 
-if ($translation_mode === 'n' && isset($info['page_id']) ? translationsToThisPageAreInProgress($info['page_id']) : false) {
+if ($translation_mode === 'n' && isset($info['page_id']) && translationsToThisPageAreInProgress($info['page_id'])) {
     $smarty->assign('prompt_for_edit_or_translate', 'y');
     include_once('modules/mod-func-translation.php');
     execute_module_translation();
@@ -228,9 +237,7 @@ $smarty->assign('page', $page);
 // Permissions - first is it a new page to be inserted into structure?
 if (isset($_REQUEST["current_page_id"]) && empty($info)) {
     if (empty($_REQUEST['page'])) {
-        $smarty->assign('msg', tra("You must specify a page name, it will be created if it doesn't exist."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You must specify a page name, it will be created if it doesn't exist."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $structure_info = $structlib->s_get_structure_info($_REQUEST['current_page_id']);
@@ -240,10 +247,7 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
         (($tiki_p_edit_structures != 'y' &&
             ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures')))
     ) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this page."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     $smarty->assign('current_page_id', $_REQUEST["current_page_id"]);
@@ -263,18 +267,12 @@ if ($tiki_p_edit !== 'y' && (! empty($info) || empty($structure_info))) {
         $cachelib->cacheItem($cacheName, http_build_query($_REQUEST, '', '&'), 'edit');
         $smarty->assign('urllogin', "tiki-editpage.php?cache=$cacheName");
     }
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to edit this page."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
 }
 // Anti-bot feature: if enabled, anon user must type in a code displayed in an image
 if (isset($_REQUEST['save']) && (! $user || $user === 'anonymous') && $prefs['feature_antibot'] === 'y') {
     if (! $captchalib->validate()) {
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->assign('msg', $captchalib->getErrors());
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie($captchalib->getErrors(), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -310,12 +308,12 @@ if (isset($_REQUEST['cancel_edit'])) {
     } else {
         $url = $wikilib->sefurl($page);
         if (! empty($_REQUEST['page_ref_id'])) {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
         }
     }
 
     if ($prefs['feature_multilingual'] === 'y' && $prefs['feature_best_language'] === 'y' && isset($info['lang']) && $info['lang'] !== $prefs['language']) {
-        $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+        $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
     }
 
     if ($dieInsteadOfForwardingWithHeader) {
@@ -369,8 +367,8 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
     $editpageconflict = 'n';
     $beingEdited = 'n';
     $semUser = '';
-    $u = $user ? $user : 'anonymous';
-    if (! empty($page) && ($page !== 'sandbox' || $page === 'sandbox' && $tiki_p_admin === 'y')) {
+    $u = $user ?: 'anonymous';
+    if (! empty($page) && ($page !== 'sandbox' || $tiki_p_admin === 'y')) {
         if (! isset($_REQUEST['save'])) {
             if (
                 $serviceLib->internal('semaphore', 'is_set', ['object_id' => $page]) &&
@@ -399,6 +397,7 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
         $msg .= '&conflictoverride=y">' . tra('Override lock and carry on with edit') . '</a>';
         $smarty->assign('msg', $msg);
         $smarty->assign('errortitle', tra('Page is currently being edited'));
+        $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_423);
         $smarty->display("error.tpl");
         die;
     }
@@ -448,7 +447,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
     $mimelib = new mime();
     $output = $mimelib->decode($data);
     $parts = [];
-    parse_output($output, $parts, 0);
+    parse_output($output, $parts);
     $last_part = '';
     $last_part_ver = 0;
     usort($parts, 'compare_import_versions');
@@ -467,7 +466,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             } else {
                 $description = '';
             }
-            $pageLang = isset($part["lang"]) ? $part["lang"] : "";
+            $pageLang = $part["lang"] ?? "";
             $authorid = urldecode($part["author_id"]);
             if (isset($part["hits"])) {
                 $hits = urldecode($part["hits"]);
@@ -499,9 +498,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
                                 $multilinguallib = TikiLib::lib('multilingual');
                                 if ($multilinguallib->updateObjectLang('wiki page', $info['page_id'], $pageLang, true)) {
                                     $pageLang = $info['lang'];
-                                    $smarty->assign('msg', tra("The language can't be changed as its set of translations has already this language"));
-                                    $smarty->display("error.tpl");
-                                    die;
+                                    Feedback::errorAndDie(tra("The language can't be changed as its set of translations has already this language"), \Laminas\Http\Response::STATUS_CODE_401);
                                 }
                             }
                         }
@@ -562,7 +559,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             $url = $wikilib->sefurl($page);
         }
         if ($prefs['feature_best_language'] === 'y') {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
         }
 
 
@@ -570,7 +567,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
 
             if ($flaggedrevisionlib->page_requires_approval($page)) {
-                $url .= (strpos($url, '?') === false ? '?' : '&') . 'latest=1';
+                $url .= (! str_contains($url, '?') ? '?' : '&') . 'latest=1';
             }
         }
         if ($dieInsteadOfForwardingWithHeader) {
@@ -601,9 +598,7 @@ if (($prefs['feature_wiki_pictures'] === 'y') && (isset($tiki_p_upload_picture))
                         // This is never being reached, because right now getimagesize fails for
                         // any unsafe file (SVG). Doesn't hurt, as support is already done for future
                         // safety issues.
-                        $smarty->assign('msg', $e->getMessage());
-                        $smarty->display("error.tpl");
-                        die();
+                        Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
                     }
                     move_uploaded_file($_FILES['picfile' . $i]['tmp_name'], "$wiki_up/$picname");
                     chmod("$wiki_up/$picname", 0644); // seems necessary on some system (see move_uploaded_file doc on php.net)
@@ -620,9 +615,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
             if ($ret['ok']) {
                 $wikilib->wiki_attach_file($page, $_FILES['userfile2']['name'], $_FILES['userfile2']['type'], $_FILES['userfile2']['size'], ($prefs['w_use_db'] === 'dir') ? '' : $ret['data'], $_REQUEST["attach_comment"], $user, $ret['fhash']);
             } else {
-                    $smarty->assign('msg', $ret['error']);
-                    $smarty->display("error.tpl");
-                    die();
+                Feedback::errorAndDie($ret['error'], \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
     } else {
@@ -651,7 +644,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
 
 
 // Suck another page and append to the end of current
-$suck_url = isset($_REQUEST["suck_url"]) ? $_REQUEST["suck_url"] : '';
+$suck_url = $_REQUEST["suck_url"] ?? '';
 
 if (isset($_REQUEST["parsehtml"])) {
     $parsehtml = $_REQUEST["parsehtml"] === 'on' ? 'y' : 'n';
@@ -674,9 +667,7 @@ if (isset($_REQUEST['do_suck']) && strlen($suck_url) > 0) {
     //   At least one export filter for wiki already coded :) -- PDF exporter...
     $sdta = $tikilib->httprequest($suck_url);
     if (error_get_last()) {
-        $smarty->assign('msg', tra("Can't import remote HTML page"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Can't import remote HTML page"), \Laminas\Http\Response::STATUS_CODE_403);
     }
     // Need to parse HTML?
     if ($parsehtml === 'y') {
@@ -691,9 +682,7 @@ if ($prefs['feature_wiki_userpage'] === 'y' && $tiki_p_admin !== 'y' && $page ==
 }
 
 if (strtolower($_REQUEST["page"]) === 'sandbox' && $prefs['feature_sandbox'] !== 'y') {
-    $smarty->assign('msg', tra("The Sandbox is disabled"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("The Sandbox is disabled"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (! isset($_REQUEST["comment"])) {
@@ -706,17 +695,15 @@ if (isset($info['wiki_cache'])) {
     $smarty->assign('wiki_cache', $prefs['wiki_cache']);
 }
 
-if (isset($info["flag"]) ? $info["flag"] === 'L' : false && ! $wikilib->is_editable($page, $user, $info)) {
-    $smarty->assign('msg', tra("The page cannot be edited because it is locked"));
-    $smarty->display("error.tpl");
-    die;
+if (! empty($info["flag"]) && $info["flag"] === 'L' && ! $wikilib->is_editable($page, $user, $info)) {
+    Feedback::errorAndDie(tra("The page cannot be edited because it is locked"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $smarty->assign('editable', 'y');
 $smarty->assign('show_page', 'n');
 $smarty->assign('comments_show', 'n');
 
-$smarty->assign_by_ref('data', $info);
+$smarty->assign('data', $info);
 $smarty->assign('footnote', '');
 $smarty->assign('has_footnote', 'n');
 $parserlib = TikiLib::lib('parser');
@@ -754,7 +741,7 @@ if (isset($_REQUEST["wikiHeaderTpl"]) && ! isset($_REQUEST['preview']) && ! isse
     $smarty->assign('wikiHeaderTpl', $smarty->fetch("wiki:{$_REQUEST['wikiHeaderTpl']}"));
 }
 if ((isset($_REQUEST["template_name"]) || isset($_REQUEST["templateId"])) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $templateLang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : null;
+    $templateLang = $_REQUEST['lang'] ?? null;
 
     if (isset($_REQUEST["templateId"])) {
         $templateId = $_REQUEST["templateId"];
@@ -867,15 +854,15 @@ if (isset($prefs['feature_references']) && $prefs['feature_references'] === 'y')
             }
 
             $smarty->assign('key_exists', $key_exists);
-            $smarty->assign('referencesCant', $references['cant']);
+            $smarty->assign('referencesCount', $references['count']);
             $smarty->assign('references', $references['data']);
 
-            if ($references['cant'] < 1 && $lib_references['cant'] < 1) {
+            if ($references['count'] < 1 && $lib_references['count'] < 1) {
                 $smarty->assign('display', 'none');
             } else {
                 $smarty->assign('display', 'block');
             }
-            $smarty->assign('libReferencesCant', $lib_references['cant']);
+            $smarty->assign('libReferencesCount', $lib_references['count']);
             $smarty->assign('libReferences', $lib_references['data']);
             $smarty->assign('use_references', $use_references);
             $smarty->assign('edit_references', $edit_references);
@@ -968,9 +955,7 @@ if (isset($_REQUEST["lang"])) {
         $multilinguallib = TikiLib::lib('multilingual');
         if ($multilinguallib->updateObjectLang('wiki page', $info['page_id'], $_REQUEST["lang"], true)) {
             $pageLang = $info['lang'];
-            $smarty->assign('msg', tra("The language can't be changed as its set of translations has already this language"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The language can't be changed as its set of translations has already this language"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
     $pageLang = $_REQUEST["lang"];
@@ -984,8 +969,7 @@ if (isset($_REQUEST["lang"])) {
 
 $smarty->assign('lang', $pageLang);
 if ($prefs['feature_urgent_translation'] === 'y') {
-    $urgent_allowed = true;
-    $smarty->assign('urgent_allowed', $urgent_allowed);
+    $smarty->assign('urgent_allowed', true);
 }
 if (isset($_REQUEST['translation_critical'])) {
     $smarty->assign('translation_critical', 1);
@@ -1027,18 +1011,6 @@ if (! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
             if ($edit_data == 'ajax error') {
                 unset($_REQUEST['save']);   // don't save an ajax error
             }
-        } else {
-            $parsed = $parserlib->parse_data(
-                $edit_data,
-                [
-                    'absolute_links' => true,
-                    'noheaderinc' => true,
-                    'suppress_icons' => true,
-                    'wysiwyg' => true,
-                    'is_html' => true,
-                    'process_wiki_paragraphs' => false
-                 ]
-            );
         }
     }
     if (isset($info['pageName'])) {
@@ -1073,11 +1045,11 @@ $smarty->assign_by_ref('parsed', $parsed);
  * @param $parts
  * @param $i
  */
-function parse_output(&$obj, &$parts, $i)
+function parse_output(&$obj, &$parts)
 {
     if (! empty($obj['parts'])) {
         foreach ($obj['parts'] as $index => $part) {
-            parse_output($part, $parts, $index);
+            parse_output($part, $parts);
         }
     } elseif ($obj['type'] === 'application/x-tikiwiki') {
         $aux["body"] = $obj['body'];
@@ -1148,7 +1120,7 @@ if ($prefs['site_layout_per_object'] == 'y') {
     $attributes = $attributelib->get_attributes('wiki page', $page);
     $smarty->assign('object_layout', [
         'available' => TikiLib::lib('theme')::listUserSelectableLayouts(),
-        'current' => isset($attributes['tiki.object.layout']) ? $attributes['tiki.object.layout'] : null,
+        'current' => $attributes['tiki.object.layout'] ?? null,
     ]);
 }
 
@@ -1160,9 +1132,7 @@ if (
         && ! $summary_needed
 ) {
     if (strtolower($_REQUEST["page"]) == 'sandbox' && $prefs['feature_sandbox'] === 'y') {
-        $smarty->assign('msg', tra("The Sandbox page cannot be saved because Sandbox is a page where you can practice editing etc. and use the preview feature to check how the page looks. No version is stored for this page."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("The Sandbox page cannot be saved because Sandbox is a page where you can practice editing etc. and use the preview feature to check how the page looks. No version is stored for this page."), \Laminas\Http\Response::STATUS_CODE_409);
     } else {
        // $access->checkCsrf();
         // Check if all Request values are delivered, and if not, set them
@@ -1261,9 +1231,7 @@ if (
                 $infoCurrent = $tikilib->get_page_info($editlib->targetPageName);
                 if ($multilinguallib->insertTranslation('wiki page', $infoSource['page_id'], $infoSource['lang'], $infoCurrent['page_id'], $pageLang)) {
                     $pageLang = $info['lang'];
-                    $smarty->assign('msg', tra("The language can't be changed as its set of translations has already this language"));
-                    $smarty->display("error.tpl");
-                    die;
+                    Feedback::errorAndDie(tra("The language can't be changed as its set of translations has already this language"), \Laminas\Http\Response::STATUS_CODE_409);
                 }
             }
 
@@ -1323,7 +1291,7 @@ if (
                 $description,
                 $minor,
                 $pageLang,
-                isset($_REQUEST['allowhtml']) ? $_REQUEST['allowhtml'] : $is_html,
+                $_REQUEST['allowhtml'] ?? $is_html,
                 $hash,
                 null,
                 $_REQUEST['wysiwyg'],
@@ -1512,14 +1480,14 @@ if (
             $url = $wikilib->sefurl($page);
         }
         if ($prefs['feature_multilingual'] === 'y' && $prefs['feature_best_language'] === 'y' && isset($info['lang']) && $info['lang'] !== $prefs['language']) {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
         }
 
         if ($prefs['flaggedrev_approval'] == 'y' && $tiki_p_wiki_approve == 'y') {
             $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
 
             if ($flaggedrevisionlib->page_requires_approval($page)) {
-                $url .= (strpos($url, '?') === false ? '?' : '&') . 'latest=1';
+                $url .= (! str_contains($url, '?') ? '?' : '&') . 'latest=1';
             }
         }
 
@@ -1574,7 +1542,6 @@ if ($prefs['feature_polls'] === 'y' and $prefs['feature_wiki_ratings'] === 'y' &
         $smarty->assign('poll_template', $_REQUEST['poll_template']);
     }
 }
-$diff_style = $_REQUEST['diff_style'] ?? $prefs['default_wiki_diff_style'];
 if ($prefs['feature_multilingual'] === 'y') {
     $languages = [];
     $langLib = TikiLib::lib('language');
@@ -1586,26 +1553,19 @@ if ($prefs['feature_multilingual'] === 'y') {
 
         if ($tikilib->page_exists($page)) {
             // Display an error if the page already exists
-            $smarty->assign(
-                'msg',
-                tra("That page already exists. Go back and choose a different name.") . "<P>" . tra("The page name is") . ": '$page'"
-            );
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("That page already exists. Go back and choose a different name.") . "<P>" . tra("The page name is") . ": '$page'", \Laminas\Http\Response::STATUS_CODE_400);
         }
 
         $multilinguallib = TikiLib::lib('multilingual');
         $sourceInfo = $tikilib->get_page_info($editlib->sourcePageName);
         if ($multilinguallib->getTranslation('wiki page', $sourceInfo['page_id'], $_REQUEST['lang'])) {
             // Display an error if the page already exists
-            $smarty->assign('msg', tra("The translation set already contains a page in this language."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The translation set already contains a page in this language."), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
     $histlib = TikiLib::lib('hist');
     if ($editlib->isTranslationMode()) {
-        $diff_style = $_REQUEST['diff_style'] ?? 'default'; // Provide a default value or handle it accordingly
+        $diff_style = $_REQUEST['diff_style'] ?? $prefs['default_wiki_diff_style']; // Provide a default value or handle it accordingly
         histlib_helper_setup_diff(
             $editlib->sourcePageName,
             $editlib->oldSourceVersion,
@@ -1619,7 +1579,6 @@ if ($prefs['feature_multilingual'] === 'y') {
 }
 $diff_styles = \TikiLib::lib('prefs')->getPreference('default_wiki_diff_style');
 $smarty->assign('diff_styles', $diff_styles);
-$smarty->assign('diff_style', $diff_style);
 $cat_type = 'wiki page';
 $cat_objid = $_REQUEST["page"];
 $cat_lang = $pageLang;
@@ -1649,7 +1608,7 @@ if ($prefs['feature_categories'] === 'y') {
     } else {
         $smarty->assign('categIds', []);
     }
-    if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! $tikilib->page_exists($_REQUEST["page"])) { // default the categs the page you come from for a new page
+    if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! $tikilib->page_exists($_REQUEST["page"])) { // default the categs the page you come from for a new page
         if (preg_match('/page=([^\&]+)/', $_SERVER['HTTP_REFERER'], $ms)) {
             $p = $ms[1];
         } else {
@@ -1704,7 +1663,7 @@ if ($prefs['wiki_feature_copyrights'] === 'y' && $tiki_p_edit_copyrights === 'y'
     include_once('lib/copyrights/copyrightslib.php');
     $copyrightslib = new CopyrightsLib();
     $copyrights = $copyrightslib->list_copyrights($_REQUEST["page"]);
-    if ($copyrights['cant']) {
+    if ($copyrights['count']) {
         $smarty->assign_by_ref('copyrights', $copyrights['data']);
     }
 }
@@ -1748,7 +1707,6 @@ if (
             $prefs['feature_wiki_icache'] === 'y' ||
             $prefs['feature_contribution'] === 'y' ||
             $prefs['feature_wiki_structure'] === 'y' ||
-            $prefs['wiki_feature_copyrights'] === 'y' ||
             ($tiki_p_admin_wiki === 'y' && $prefs['wiki_authors_style_by_page'] === 'y')) ||    // end not sandbox
         ($prefs['feature_wiki_description'] === 'y' || $prefs['metatag_pagedesc'] === 'y') ||
         $prefs['feature_wiki_footnotes'] === 'y' ||

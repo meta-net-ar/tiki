@@ -34,13 +34,13 @@ Here is where we store our custom tags/functions.
 
 Here is where we store our custom block tags.
 
-* #### `lib/smrty_tiki/Compile`
+* #### `lib/smarty_tiki/Compile`
 
 Here is where we store our custom [compiler tags](https://smarty-php.github.io/smarty/5.x/api/extending/tags/#compiler-tags) and modifies. This directory contains subdirectories: 
 
 -`Tag`: for compiler tags.
 
--`Modifier`: for compiler modifiers, but don't have this directory as     currently we don't have cusftom compiler modifiers.
+-`Modifier`: for compiler modifiers.
 
 * #### `lib/smarty_tiki/Modifier`
 Here is where we store our custom modifiers proper to Tiki and not native PHP functions.
@@ -84,8 +84,8 @@ The use of an Extension to organize custom tags and modifiers changes the way of
 #### `Runtime tags`
 * In the directory `lib/smarty_tiki/FunctionHandler`, create a class that extends `Smarty\FunctionHandler\Base` class, with name of the class the name of the custom tag. That class must be in the namespace `SmartyTiki\FunctionHandler`.
 * The created class must implement the `handle()` method of the class `Smarty\FunctionHandler\Base`. The `handle()` method requires two parameters: the first is `$params` which represents all attributes from the template as an associative array, and the second is `$template` which is a `Smarty\Template` object representing the template where tag was used.
-For example of implementation, please look into the directory `lib/smarty_tiki/FunctionHandler`, there are custom tags alredy implemented and use in Tiki, you can inspire on them.
-* After you implemneted the cusotm tag class, to use it in the template you need first to add it to the Tiki custom Smarty Extension (`SmartyTiki\Extension\SmartyTikiExtension`). To do that: open the file `lib/smarty_tiki/Extension/SmartyTikiExtension.php`, then look for the function `getFunctionHandler()` and then in the `switch (){}` statement, add a  block case of the form:
+For example of implementation, please look into the directory `lib/smarty_tiki/FunctionHandler`, there are custom tags already implemented and used in Tiki, you can get inspiration from them.
+* After you implement the custom tag class, to use it in the template you need first to add it to the Tiki custom Smarty Extension (`SmartyTiki\Extension\SmartyTikiExtension`). To do that: open the file `lib/smarty_tiki/Extension/SmartyTikiExtension.php`, then look for the function `getFunctionHandler()` and then in the `switch (){}` statement, add a  block case of the form:
  ```
  case 'tagName':
     $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TagName();
@@ -108,7 +108,7 @@ replacing tagName with the name of the tag you created.
 ### `Custom block tags`
 
 In the directory `lib/smarty_tiki/BlockHandler`, create a class that extends `Smarty\BlockHandler\Base` class. That class must be in the namespace `SmartyTiki\BlockHandler`.
-* The created class must implement the `handle()` method of the class `Smarty\BlockHandler\Base`. The `handle` method requires the following parmeters in the given order: $params, $content, Template $template, &$repeat. See [custom blocks doc](https://smarty-php.github.io/smarty/5.x/api/extending/block-tags/) for details about the type and details of these parameters.
+* The created class must implement the `handle()` method of the class `Smarty\BlockHandler\Base`. The `handle` method requires the following parameters in the given order: \$params, \$content, Template \$template, \&$repeat. See [custom blocks doc](https://smarty-php.github.io/smarty/5.x/api/extending/block-tags/) for details about the type and details of these parameters.
 For example of implementation, please look into the directory `lib/smarty_tiki/BlockHandler`, there are custom block tags alredy implemented and use in Tiki.
 * After you implemneted the cusotm block tag class, to use it in the template you need first to add it to the Tiki custom Smarty Extension (`SmartyTiki\Extension\SmartyTikiExtension`). To do that: open the file `lib/smarty_tiki/Extension/SmartyTikiExtension.php`, then look for the function getBlockHandler and then in the `switch (){}` statement, add a case block of the form:
  ```
@@ -133,8 +133,9 @@ case 'modifier_name':
 replacing `modifier_name` with the name of the modifier and `modifierName` with the name of the created class.
 
 #### `Custom modifiers which are PHP native functions`
-* In the class `SmartyTiki\Extension\SmartyTikiExtension`, add a new function which its name starts with `smartyModifier` to differentiate modifier function from the Extension handler function, and ends with the name of the modifier you want to create in camel case format that accepts as its first parameter the value on which the modifier is to operate. The rest of the parameters are optional, depending on what kind of operation is to be performed. The function has to return the result of its processing.
-* Add the modifier to Tiki custom Extension: In the same class, in the function `getModifierCallBack()`, then in the `switch(){}` statement add a `case` block of the from:
+In the file `lib/smarty_tiki/Extension/SmartyTikiExtension.php`
+* In the class `SmartyTiki\Extension\SmartyTikiExtension`, add a new function which name starts with `smartyModifier` to differentiate modifier function from the Extension handler function, and ends with the name of the modifier you want to create in camel case format that accepts as its first parameter the value on which the modifier is to operate. The rest of the parameters are optional, depending on what kind of operation is to be performed. The function has to return the result of its processing.
+* Add the modifier to Tiki custom Extension: In the same class, in the function `getModifierCallback()`, then in the `switch(){}` statement add a `case` block of the from:
 ```
 case 'modifier_name':
     return [$this, 'smartyModifierModifierName'];

@@ -208,7 +208,7 @@ class Services_ApiBridge
         $path = $this->jitRequest->path->xss();
         $base = $tikipath . 'templates/api/docs';
         $real = realpath($base . '/' . str_replace('-', '/', $path) . '.yaml');
-        if (empty($path) || ! strstr(dirname($real), $base)) {
+        if (empty($path) || ! str_contains(dirname($real), $base)) {
             $real = $base . '/index.yaml';
         }
         if (is_file($real)) {

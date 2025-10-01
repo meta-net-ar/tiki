@@ -42,6 +42,7 @@ class JsTransferList extends Base
         $params = array_merge($defaultParams, $params);
         $params['defaultSelected'] = array_map('strval', $params['defaultSelected']);
         $language = TikiLib::lib('tiki')->get_language();
+        $id = uniqid('transfer-list-');
 
         $minItems = '';
         $maxItems = '';
@@ -52,10 +53,17 @@ class JsTransferList extends Base
             $maxItems = $cardinality['maximum'] ?? '';
         }
 
-        TikiLib::lib('header')->add_js_module("import '@vue-widgets/el-transfer';");
+        $headerlib = TikiLib::lib('header');
+        $headerlib->add_js_module("import '@vue-widgets/el-transfer';");
+
+        $headerlib->add_js_module(<<<JS
+            import('@tiki/ui-utils').then(({ handleTransferList }) => {
+                handleTransferList('{$id}', '{$params['fieldName']}');
+            });
+        JS);
 
         return "
-        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' field-name=" . json_encode($params["fieldName"]) . " filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
+        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' id='{$id}' field-name='{$params['fieldName']}' filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
         </el-transfer>";
     }
 }

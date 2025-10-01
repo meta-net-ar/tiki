@@ -23,7 +23,6 @@
                     <th>{tr}Articles{/tr}</th>
                     <th>{tr}Author rating{/tr}</th>
                     <th>{tr}Show before publish date{/tr}</th>
-                    <th>{tr}Show after expire date{/tr}</th>
                     <th>{tr}Heading only{/tr}</th>
                     <th>{tr}Comments{/tr}</th>
                     <th>{tr}Comment can rate article{/tr}</th>
@@ -40,9 +39,6 @@
                     </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_pre_publ[{$types[user].type|escape}]" {if $types[user].show_pre_publ eq 'y'}checked="checked"{/if}>
-                    </td>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_post_expire[{$types[user].type|escape}]" {if $types[user].show_post_expire eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="heading_only[{$types[user].type|escape}]" {if $types[user].heading_only eq 'y'}checked="checked"{/if}>
@@ -67,7 +63,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>{tr}Show expire date{/tr}</th>
                     <th>{tr}Show reads{/tr}</th>
                     <th>{tr}Show size{/tr}</th>
                     <th>{tr}Show topline{/tr}</th>
@@ -78,9 +73,6 @@
                     <td colspan="3"></td> {* th changed to td to prevent ARIA empty header error  *}
                 </tr>
                 <tr>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_expdate[{$types[user].type|escape}]" {if $types[user].show_expdate eq 'y'}checked="checked"{/if}>
-                    </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_reads[{$types[user].type|escape}]" {if $types[user].show_reads eq 'y'}checked="checked"{/if}>
                     </td>
@@ -115,31 +107,53 @@
             </table>
         </div>
         {if $prefs.article_custom_attributes eq 'y'}
-            <div class="table-responsive article-types mb-4">
-                <table class="table table-striped table-hover">
+        <div class="table-responsive article-types mb-4">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
                         <th>{tr}Custom attribute{/tr}</th>
-                        <td></td> {* th changed to td to prevent ARIA empty header error *}
+                        <th class="text-end">{tr}Action{/tr}</th>
                     </tr>
+                </thead>
+                <tbody>
                     {foreach from=$types[user].attributes item=att key=attname}
                         <tr>
                             <td>{$attname|escape}</td>
-                            <td class="action">
-                                <a class="tips" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
+                            <td class="text-end">
+                                <a id="remove_attr-{$attname}" class="btn btn-sm btn-outline-danger tips" title=":{tr}Remove{/tr}" aria-label="{tr}Remove custom attribute{/tr} {$attname|escape}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
                                     {icon name='remove' alt="{tr}Remove{/tr}"}
                                 </a>
                             </td>
                         </tr>
+                    {foreachelse}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted fst-italic py-3">
+                                {tr}No custom attributes defined for this type.{/tr}
+                            </td>
+                        </tr>
                     {/foreach}
+                </tbody>
+                <tfoot>
                     <tr>
-                        <td><input type="text" name="new_attribute[{$types[user].type|escape}]" aria-label="{tr}Custom attribute{/tr}" value="" class="form-control"></td>
-                        <td>&nbsp;</td>
+                        <td colspan="2" class="p-2">
+                            <label for="new_attribute_{$types[user].type|escape}" class="visually-hidden">{tr}Add new custom attribute{/tr}</label>
+                            <input type="text" id="new_attribute_{$types[user].type|escape}" name="new_attribute[{$types[user].type|escape}]" class="form-control" placeholder="{tr}Add new custom attribute and click Save below{/tr}">
+                        </td>
                     </tr>
-                </table>
-            </div>
+                </tfoot>
+            </table>
+        </div>
         {/if}
         <div class="text-center my-3">
             <input type="submit" class="btn btn-primary" name="update_type" value="{tr}Save{/tr}">
         </div>
     {/section}
 </form>
+{jq}
+    $(document).on("click", "[id^='remove_attr-']", function(e){
+        const confirmed = confirm("Are you sure you want to permanently remove this ?");
+        if (!confirmed) {
+            e.preventDefault();
+        }
+    });
+{/jq}

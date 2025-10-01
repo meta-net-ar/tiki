@@ -15,7 +15,7 @@
                 <select id="contributions" name="contributions[]" multiple="multiple" size="5" class="form-select">
                     {section name=ix loop=$contributions}
                         <option value="{$contributions[ix].contributionId|escape}"{if $contributions[ix].selected eq 'y'} selected="selected"{/if} >{if $contributions[ix].contributionId > 0}{$contributions[ix].name|escape}{/if}</option>
-                        {assign var="help" value=$help|cat:$contributions[ix].name|cat:": "|cat:$contributions[ix].description|cat:"<br>"}
+                        {$help=$help|cat:$contributions[ix].name|cat:": "|cat:$contributions[ix].description|cat:"<br>"}
                     {/section}
                 </select>
                 <a title="{tr}Help{/tr}" {popup text=$help|replace:'"':"'" width=500}>{icon name='help'}</a>

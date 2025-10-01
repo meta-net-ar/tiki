@@ -20,9 +20,9 @@ if ($prefs['wiki_page_regex'] == 'strict') {
 
 // find out the page name if url=tiki-index_x.php (can be needed in module)
 if (
-    strstr($_SERVER['SCRIPT_NAME'], 'tiki-index.php')
-        || strstr($_SERVER['SCRIPT_NAME'], 'tiki-index_p.php')
-        || strstr($_SERVER['SCRIPT_NAME'], 'tiki-index_raw.php')
+    str_contains($_SERVER['SCRIPT_NAME'], 'tiki-index.php')
+        || str_contains($_SERVER['SCRIPT_NAME'], 'tiki-index_p.php')
+        || str_contains($_SERVER['SCRIPT_NAME'], 'tiki-index_raw.php')
 ) {
     $check = false;
     $userDefaultHomepage = $userlib->get_user_default_homepage($user);
@@ -65,7 +65,7 @@ if (
     // If the HomePage does not exist, create it
     if ($check && ! empty($_REQUEST['page']) && ! $tikilib->page_exists($_REQUEST['page'])) {
         $homePageLang = $prefs['language'];
-        $profilesLink = 'tiki-admin.php?profile=&categories%5B%5D=28.x&categories%5B%5D=Featured+profiles' .
+        $profilesLink = 'tiki-admin.php?profile=&categories%5B%5D=29.x&categories%5B%5D=Featured+profiles' .
                                         '&repository=http%3a%2f%2fprofiles.tiki.org%2fprofiles&page=profiles&preloadlist=y&list=List#step2';
 
         // Default HomePage content

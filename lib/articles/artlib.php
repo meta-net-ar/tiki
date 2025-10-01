@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -40,7 +40,6 @@ class ArtLib extends TikiLib
             $data['heading'],
             $data['body'],
             $data['publishDate'],
-            $data['expireDate'],
             $data['author'],
             0,
             $data['image_x'],
@@ -50,6 +49,7 @@ class ArtLib extends TikiLib
             $data['subtitle'],
             $data['linkto'],
             $data['image_caption'],
+            $data['image_alt'],
             $data['lang'],
             $data['rating'],
             $data['isfloat']
@@ -173,43 +173,15 @@ class ArtLib extends TikiLib
         }
     }
 
-    public function delete_expired_submissions($maxrows = 1000)
-    {
-        $tiki_submissions = TikiDb::get()->table('tiki_submissions');
-
-        $expired = $tiki_submissions->fetchColumn(
-            'subId',
-            ['expireDate' => $tiki_submissions->lesserThan($this->now)],
-            $maxrows
-        );
-
-        $transaction = $this->begin();
-
-        foreach ($expired as $subId) {
-            $tiki_submissions->delete(['subId' => $subId]);
-
-            $this->remove_object('submission', $subId);
-        }
-
-        $transaction->commit();
-
-
-        return true;
-    }
-
     /**
      * @return int
      * @throws Exception If a problem occurs while replacing a submission
     */
-    public function replace_submission($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $expireDate, $user, $subId, $image_x, $image_y, $type, $topline, $subtitle, $linkto, $image_caption, $lang, $rating = 0, $isfloat = 'n')
+    public function replace_submission($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $user, $subId, $image_x, $image_y, $type, $topline, $subtitle, $linkto, $image_caption, $image_alt, $lang, $rating = 0, $isfloat = 'n')
     {
         global $tiki_p_autoapprove_submission, $prefs;
         $smarty = TikiLib::lib('smarty');
         $tikilib = TikiLib::lib('tiki');
-
-        if ($expireDate < $publishDate) {
-            $expireDate = $publishDate;
-        }
 
         if (empty($imgdata)) {
             $imgdata = '';
@@ -238,7 +210,6 @@ class ArtLib extends TikiLib
             'heading' => $heading,
             'body' => $body,
             'publishDate' => (int) $publishDate,
-            'expireDate' => (int) $expireDate,
             'author' => $user,
             'type' => $type,
             'rating' => (float) $rating,
@@ -246,6 +217,7 @@ class ArtLib extends TikiLib
             'subtitle' => $subtitle,
             'linkto' => $linkto,
             'image_caption' => $image_caption,
+            'image_alt' => $image_alt,
             'lang' => $lang,
         ];
 
@@ -322,15 +294,12 @@ class ArtLib extends TikiLib
         throw new Exception("Failed to insert the new article. Invalid Id");
     }
 
-    public function replace_article($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $expireDate, $user, $articleId, $image_x, $image_y, $type, $topline, $subtitle, $linkto, $image_caption, $lang, $rating = 0, $isfloat = 'n', $emails = '', $from = '', $list_image_x = '', $list_image_y = '', $ispublished = 'y', $fromurl = false)
+    public function replace_article($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $user, $articleId, $image_x, $image_y, $type, $topline = '', $subtitle = '', $linkto = '', $image_caption = '', $image_alt = '', $lang = '', $rating = 0, $isfloat = 'n', $emails = '', $from = '', $list_image_x = '', $list_image_y = '', $ispublished = 'y', $fromurl = false)
     {
 
         $tikilib = TikiLib::lib('tiki');
         $smarty = TikiLib::lib('smarty');
 
-        if ($expireDate < $publishDate) {
-            $expireDate = $publishDate;
-        }
         if (empty($imgdata) || $useImage === 'n') { // remove image data if not using it
             $imgdata = '';
         }
@@ -358,7 +327,6 @@ class ArtLib extends TikiLib
             'heading' => $heading,
             'body' => $body,
             'publishDate' => (int) $publishDate,
-            'expireDate' => (int) $expireDate,
             'author' => $user,
             'type' => $type,
             'rating' => (float) $rating,
@@ -366,6 +334,7 @@ class ArtLib extends TikiLib
             'subtitle' => $subtitle,
             'linkto' => $linkto,
             'image_caption' => $image_caption,
+            'image_alt' => $image_alt,
             'lang' => $lang,
             'ispublished' => $ispublished,
         ];
@@ -385,7 +354,6 @@ class ArtLib extends TikiLib
             $smarty->assign('mail_action', 'Edit');
             $smarty->assign('mail_old_title', $oldArticle['title']);
             $smarty->assign('mail_old_publish_date', $oldArticle['publishDate']);
-            $smarty->assign('mail_old_expiration_date', $oldArticle['expireDate']);
             $smarty->assign('mail_old_data', $oldArticle['heading'] . "\n----------------------\n" . $oldArticle['body']);
         } else {
             $info['created'] = (int) $this->now;
@@ -491,7 +459,6 @@ class ArtLib extends TikiLib
             $smarty->assign('mail_postid', $articleId);
             $smarty->assign('mail_user', $user);
             $smarty->assign('mail_current_publish_date', $publishDate);
-            $smarty->assign('mail_current_expiration_date', $expireDate);
             $smarty->assign('mail_current_data', $heading . "\n----------------------\n" . $body);
             sendEmailNotification($nots, 'watch', 'user_watch_article_post_subject.tpl', $_SERVER['SERVER_NAME'], 'user_watch_article_post.tpl');
             if (is_array($emails) && ! empty($from) && $from != $prefs['sender_email']) {
@@ -639,7 +606,7 @@ class ArtLib extends TikiLib
         return true;
     }
 
-    public function edit_type($type, $use_ratings, $show_pre_publ, $show_post_expire, $heading_only, $allow_comments, $comment_can_rate_article, $show_image, $show_avatar, $show_author, $show_pubdate, $show_expdate, $show_reads, $show_size, $show_topline, $show_subtitle, $show_linkto, $show_image_caption, $creator_edit)
+    public function edit_type($type, $use_ratings, $show_pre_publ, $heading_only, $allow_comments, $comment_can_rate_article, $show_image, $show_avatar, $show_author, $show_pubdate, $show_reads, $show_size, $show_topline, $show_subtitle, $show_linkto, $show_image_caption, $creator_edit)
     {
         if ($use_ratings == 'on') {
             $use_ratings = 'y';
@@ -651,12 +618,6 @@ class ArtLib extends TikiLib
             $show_pre_publ = 'y';
         } else {
             $show_pre_publ = 'n';
-        }
-
-        if ($show_post_expire == 'on') {
-            $show_post_expire = 'y';
-        } else {
-            $show_post_expire = 'n';
         }
 
         if ($heading_only == 'on') {
@@ -699,12 +660,6 @@ class ArtLib extends TikiLib
             $show_pubdate = 'y';
         } else {
             $show_pubdate = 'n';
-        }
-
-        if ($show_expdate == 'on') {
-            $show_expdate = 'y';
-        } else {
-            $show_expdate = 'n';
         }
 
         if ($show_reads == 'on') {
@@ -750,7 +705,6 @@ class ArtLib extends TikiLib
         $query = "update `tiki_article_types` set
             `use_ratings` = ?,
             `show_pre_publ` = ?,
-            `show_post_expire` = ?,
             `heading_only` = ?,
             `allow_comments` = ?,
             `comment_can_rate_article` = ?,
@@ -758,7 +712,6 @@ class ArtLib extends TikiLib
             `show_avatar` = ?,
             `show_author` = ?,
             `show_pubdate` = ?,
-            `show_expdate` = ?,
             `show_reads` = ?,
             `show_size` = ?,
             `show_topline` = ?,
@@ -773,7 +726,6 @@ class ArtLib extends TikiLib
             [
                 $use_ratings,
                 $show_pre_publ,
-                $show_post_expire,
                 $heading_only,
                 $allow_comments,
                 $comment_can_rate_article,
@@ -781,7 +733,6 @@ class ArtLib extends TikiLib
                 $show_avatar,
                 $show_author,
                 $show_pubdate,
-                $show_expdate,
                 $show_reads,
                 $show_size,
                 $show_topline,
@@ -908,9 +859,6 @@ class ArtLib extends TikiLib
         if (! isset($fields['publishDate'])) {
             $fields['publishDate']  = $i++;
         }
-        if (! isset($fields['expireDate'])) {
-            $fields['expireDate']       = $i++;
-        }
         if (! isset($fields['user'])) {
             $fields['user']                 = $i++;
         }
@@ -934,6 +882,9 @@ class ArtLib extends TikiLib
         }
         if (! isset($fields['image_caption'])) {
             $fields['image_caption'] = $i++;
+        }
+        if (! isset($fields['image_alt'])) {
+            $fields['image_alt'] = $i++;
         }
         if (! isset($fields['lang'])) {
             $fields['lang']                 = $i++;
@@ -983,9 +934,6 @@ class ArtLib extends TikiLib
             if (! isset($data[$fields['publishDate']])) {
                 $data[$fields['publishDate']]       = $tikilib->now;
             }
-            if (! isset($data[$fields['expireDate']])) {
-                $data[$fields['expireDate']]        = $tikilib->now + 365 * 24 * 60 * 60;
-            }
             if (! isset($data[$fields['user']])) {
                 $data[$fields['user']]                  = $user;
             }
@@ -1009,6 +957,9 @@ class ArtLib extends TikiLib
             }
             if (! isset($data[$fields['image_caption']])) {
                 $data[$fields['image_caption']] = '';
+            }
+            if (! isset($data[$fields['image_alt']])) {
+                $data[$fields['image_alt']] = '';
             }
             if (! isset($data[$fields['lang']])) {
                 $data[$fields['lang']]                  = $prefs['language'];
@@ -1035,7 +986,6 @@ class ArtLib extends TikiLib
                 $data[$fields['heading']],
                 $data[$fields['body']],
                 $data[$fields['publishDate']],
-                $data[$fields['expireDate']],
                 $data[$fields['user']],
                 0,
                 $data[$fields['image_x']],
@@ -1045,6 +995,7 @@ class ArtLib extends TikiLib
                 $data[$fields['subtitle']],
                 $data[$fields['linkto']],
                 $data[$fields['image_caption']],
+                $data[$fields['image_alt']],
                 $data[$fields['lang']],
                 $data[$fields['rating']],
                 $data[$fields['isfloat']],
@@ -1111,13 +1062,9 @@ class ArtLib extends TikiLib
 
     public function get_most_recent_article_id()
     {
-        $maxRecords = 1;
-        $sort_mode = 'publishDate_desc';
-        $date_min = 0;
         $date_max = $this->now;
         $query = 'SELECT `tiki_articles`.`articleId` FROM `tiki_articles` INNER JOIN `tiki_article_types` on `tiki_articles`.`type` = `tiki_article_types`.`type` ' .
-                 'WHERE `tiki_articles`.`publishDate`>=\'0\' AND (`tiki_articles`.`publishDate`<=? OR `tiki_article_types`.`show_pre_publ`=\'y\') AND ' .
-                 '(`tiki_articles`.`expireDate`>? OR `tiki_article_types`.`show_post_expire`=\'y\') AND `tiki_articles`.`ispublished`=\'y\' ' .
+                 'WHERE `tiki_articles`.`publishDate`>=\'0\' AND (`tiki_articles`.`publishDate`<=? OR `tiki_article_types`.`show_pre_publ`=\'y\')  AND `tiki_articles`.`ispublished`=\'y\' ' .
                  'ORDER BY `publishDate` DESC';
         $bindvars = [ $date_max, $date_max ];
         $id = $this->getOne($query, $bindvars);
@@ -1161,7 +1108,7 @@ class ArtLib extends TikiLib
             $invert = '';
             $connect = ' or ';
             // parameter list negated?
-            if (substr($type, 0, 1) == '!') {
+            if (str_starts_with($type, '!')) {
                 $type = substr($type, 1);
                 $invert = '!';
                 $connect = ' and ';
@@ -1191,7 +1138,7 @@ class ArtLib extends TikiLib
             $invert = '';
             $connect = ' or ';
             // parameter list negated?
-            if (substr($topicId, 0, 1) == '!') {
+            if (str_starts_with($topicId, '!')) {
                 $topicId = substr($topicId, 1);
                 $invert = '!';
                 $connect = ' and ';
@@ -1220,7 +1167,7 @@ class ArtLib extends TikiLib
         if ($topic) {
             $invert = '';
             // parameter list negated?
-            if (substr($topic, 0, 1) == '!') {
+            if (str_starts_with($topic, '!')) {
                 $topic = substr($topic, 1);
                 $invert = '!';
             }
@@ -1250,10 +1197,7 @@ class ArtLib extends TikiLib
             if ($override_dates) {
                 $condition = "`tiki_articles`.`publishDate`>=? and `tiki_articles`.`publishDate`<=?";
             } else {
-                $bindvars[] = (int)$this->now;
-                $condition = "`tiki_articles`.`publishDate`>=? and (`tiki_articles`.`publishDate`<=? or `tiki_article_types`.`show_pre_publ`='y')"
-                                        . " and (`tiki_articles`.`expireDate`>? or `tiki_article_types`.`show_post_expire`='y')"
-                                        ;
+                $condition = "`tiki_articles`.`publishDate`>=? and (`tiki_articles`.`publishDate`<=? or `tiki_article_types`.`show_pre_publ`='y')";
             }
             $mid .= ( $mid ? ' and ' : ' where ' ) . $condition;
         }
@@ -1281,8 +1225,8 @@ class ArtLib extends TikiLib
         }
 
         if ($min_rating || $max_rating) {
-            $min_rating = isset($min_rating) ? $min_rating : '0.0';
-            $max_rating = isset($max_rating) ? $max_rating : '10.0';
+            $min_rating = $min_rating ?? '0.0';
+            $max_rating = $max_rating ?? '10.0';
             $mid2 .= ' and (`tiki_articles`.`rating` >= ? and `tiki_articles`.`rating` <= ? )';
             $bindvars[] = $min_rating;
             $bindvars[] = $max_rating;
@@ -1312,7 +1256,6 @@ class ArtLib extends TikiLib
         $query = "select distinct `tiki_articles`.*,
             `tiki_article_types`.`use_ratings`,
             `tiki_article_types`.`show_pre_publ`,
-            `tiki_article_types`.`show_post_expire`,
             `tiki_article_types`.`heading_only`,
             `tiki_article_types`.`allow_comments`,
             `tiki_article_types`.`comment_can_rate_article`,
@@ -1320,7 +1263,6 @@ class ArtLib extends TikiLib
             `tiki_article_types`.`show_avatar`,
             `tiki_article_types`.`show_author`,
             `tiki_article_types`.`show_pubdate`,
-            `tiki_article_types`.`show_expdate`,
             `tiki_article_types`.`show_reads`,
             `tiki_article_types`.`show_size`,
             `tiki_article_types`.`show_topline`,
@@ -1341,7 +1283,6 @@ class ArtLib extends TikiLib
                     'topicId',
                     'topicName',
                     'publishDate',
-                    'expireDate',
                     'created',
                     'author',
                     'rating',
@@ -1350,8 +1291,8 @@ class ArtLib extends TikiLib
             );
 
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $query_cant = "select distinct count(*) from `tiki_articles` $fromSql $join $mid $mid2";
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select distinct count(*) from `tiki_articles` $fromSql $join $mid $mid2";
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
         $articleIds = array_map(
             function ($res) {
@@ -1386,16 +1327,13 @@ class ArtLib extends TikiLib
                     if (($res['show_pre_publ'] != 'y') and ($this->now < $res['publishDate']) && ! $override_dates) {
                         $res['disp_article'] = 'n';
                     }
-                    if (($res['show_post_expire'] != 'y') and ($this->now > $res['expireDate']) && ! $override_dates) {
-                        $res['disp_article'] = 'n';
-                    }
                     $ret[] = $res;
                 }
             }
         }
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
@@ -1457,9 +1395,9 @@ class ArtLib extends TikiLib
         }
 
         $query = "select * from `tiki_submissions` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_submissions` $mid";
+        $query_count = "select count(*) from `tiki_submissions` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -1482,18 +1420,17 @@ class ArtLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
     public function get_article($articleId, $checkPerms = true)
     {
-        global $user, $prefs;
+        global $user;
         $query = "select `tiki_articles`.*,
                                 `users_users`.`avatarLibName`,
                                 `tiki_article_types`.`use_ratings`,
                                 `tiki_article_types`.`show_pre_publ`,
-                                `tiki_article_types`.`show_post_expire`,
                                 `tiki_article_types`.`heading_only`,
                                 `tiki_article_types`.`allow_comments`,
                                 `tiki_article_types`.`comment_can_rate_article`,
@@ -1501,7 +1438,6 @@ class ArtLib extends TikiLib
                                 `tiki_article_types`.`show_avatar`,
                                 `tiki_article_types`.`show_author`,
                                 `tiki_article_types`.`show_pubdate`,
-                                `tiki_article_types`.`show_expdate`,
                                 `tiki_article_types`.`show_reads`,
                                 `tiki_article_types`.`show_size`,
                                 `tiki_article_types`.`show_topline`,
@@ -1651,7 +1587,7 @@ class ArtLib extends TikiLib
         $allAttributes = $attributelib->get_attributes($type, $articleId);
         $ret = [];
         foreach ($allAttributes as $k => $att) {
-            if (substr($k, 0, 13) == 'tiki.article.') {
+            if (str_starts_with($k, 'tiki.article.')) {
                 $ret[$k] = $att;
             }
         }

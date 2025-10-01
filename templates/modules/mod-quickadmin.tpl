@@ -36,7 +36,7 @@
                             <form method="post" action="tiki-admin.php" class="d-flex flex-row flex-wrap align-items-center my-2 my-md-0 ms-auto">
                                 <div class="input-group">
                                     <input type="text" name="lm_criteria" value="{if ! empty($smarty.request.lm_criteria)}{$smarty.request.lm_criteria|escape}{/if}" class="form-control form-control-sm" placeholder="Search preferences...">
-                                    <button type="submit" class="btn btn-primary btn-sm">
+                                    <button type="submit" class="btn btn-primary btn-sm" aria-label="{tr}Search{/tr}">
                                         <span class="icon icon-search fas fa-search fa-fw "></span>
                                     </button>
                                 </div>
@@ -98,6 +98,11 @@
                         {if $prefs.feature_scheduler eq "y"}
                             <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                 {icon name="calendar"} {tr}Scheduler{/tr}
+                            </a>
+                        {/if}
+                        {if $prefs.feature_queued_tasks eq "y"}
+                            <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                {icon name="clock-o"} {tr}Queued Tasks{/tr}
                             </a>
                         {/if}
                         {if $prefs.feature_sefurl_routes eq "y"}

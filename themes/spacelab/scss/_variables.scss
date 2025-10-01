@@ -1,45 +1,49 @@
-// Spacelab 5.2.0 -- This is a copy of node_modules/bootswatch/dist/spacelab/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-@import "../../../node_modules/bootswatch/dist/spacelab/_variables.scss";
-//
+// Spacelab 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
+
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/spacelab/_variables.scss"; // Bootswatch theme variables file
+
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $blue !default;
-$secondary:     #949494; // $gray-500 !default;
-$success:       #38A81F; // $green !default;
+$secondary:     #737373; // #949494; // $gray-500 !default;  Darkened for Tiki to meet WCAG guidelines
+$success:       #2D8619; // #38A81F; // $green !default;  Darkened for Tiki to meet WCAG guidelines
 $info:          #0C77D4; //$cyan !default;  Darkened for Tiki to meet WCAG guidelines
 $warning:       #B36200; // $yellow !default;
 //$danger:        $red !default;
 //$light:         $gray-200 !default;
 //$dark:          $gray-800 !default;
 
-$green-300: tint-color($green, 40%); // !default;
-$red-300: tint-color($red, 40%); // !default;
+// Options
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-color:                #595959; // $gray-600 !default; Darkened for Tiki to meet WCAG guidelines
+$body-secondary-color:      rgba($body-color, .85);
 
 // Links
 $link-color: #0C77D4;
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
 
-// Fonts
-// stylelint-disable-next-line value-keyword-case
+// Typography
 $font-family-sans-serif:      system-ui, sans-serif; // "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $headings-color:              null !default;
+$blockquote-footer-color: #757575;
 
 // Forms
 $input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;
+$form-text: #757575;
+
+// Figures
+$figure-caption-color: #757575;
 
 // Popovers
-//$popover-header-color:              $headings-color !default;
-
 // Navbar
-//$navbar-dark-color:                 rgba($white, .75); // !default;
-//$navbar-dark-hover-color:           $white !default;
-//$navbar-light-color:                rgba($black, .4) !default;
-
 // Code
 $code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
 

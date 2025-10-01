@@ -21,50 +21,6 @@ div.mb-3 label.error {
     font-weight: normal !important;
 }
 
-// Select2
-.select2-container.select2-container--open {
-    display: inline-block;
-    // make sure the dropdown appears on top of jquery-ui dialogs
-    z-index: 2001;
-}
-/* Fixes hidden placeholder on select2 multiple when first initialization */
-.select2-container .select2-selection__rendered > *:first-child.select2-search--inline {
-    width: 100% !important;
-}
-.select2-container .select2-selection__rendered > *:first-child.select2-search--inline .select2-search__field {
-    width: 100% !important;
-}
-/* Fixes select2 multiple selection choices overflow */
-.select2-container .select2-selection--multiple .select2-selection__choice {
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-/* Fixes select2 multiple search when select2 continer opened/closed */
-.select2-container .select2-selection--multiple .select2-selection__choice + .select2-search {
-  width: 0;
-}
-
-.select2-container.select2-container--open .select2-selection--multiple .select2-selection__choice + .select2-search {
-  width: auto;
-}
-
-/* Fixes 'clear' button overlap though must load after select2 bootstrap4 theme to take precedence */
-.select2-container--bootstrap4 .select2-selection--multiple .select2-selection__clear {
-  position: relative !important;
-  float: right;
-}
-
-// Cypht
-.inline-cypht {
-    .select2-container {
-        margin-bottom: 10px;
-    }
-}
-
 // elFinder tiki overrides
 
 .tiki .elfinder-workzone,

@@ -14,14 +14,6 @@
     {/remarksbox}
 {/if}
 
-{if isset($composer_installed_errors)}
-    {remarksbox type="warning" title="{tr}Composer errors{/tr}"}
-
-    {tr}Composer returned some errors:{/tr}<br />
-        <pre>{$composer_installed_errors}</pre>
-    {/remarksbox}
-{/if}
-
 {if not empty($composer_environment_warning)}
     {remarksbox type="warning" title="{tr}Issues with composer environment{/tr}"}
 
@@ -100,6 +92,7 @@
                             {if $entry.state == 'replaced'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -112,6 +105,7 @@
                             {elseif $entry.state == 'deprecated'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -124,6 +118,7 @@
                             {else}
                                 <a class="tips"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -246,6 +241,7 @@
                         {if $entry.state == 'replaced'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -268,7 +264,7 @@
                                 <button class="btn btn-primary" name="auto-install-package" value="{$entry.key}">{tr}Install{/tr}</button>
                             </form>
                             {/if}
-                            <button type="button" data-bs-toggle="collapse" data-package-name="{$entry.name}" data-collapse-key="collapse-{$entry.key}" href="#collapse-{$entry.key}" role="button" aria-expanded="false" aria-controls="collapse-{$entry.name}" class="btn btn-light collapse-package-detail">{tr}Info{/tr}</button>
+                            <button type="button" data-bs-toggle="collapse" data-package-name="{$entry.name}" data-collapse-key="collapse-{$entry.key}" href="#collapse-{$entry.key}" aria-expanded="false" aria-controls="collapse-{$entry.name}" class="btn btn-light collapse-package-detail">{tr}Info{/tr}</button>
                         </td>
                     </tr>
                     <tr class="collapse border bg-body-tertiary" id="collapse-{$entry.key}">

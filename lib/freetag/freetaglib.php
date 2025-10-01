@@ -40,7 +40,7 @@
  */
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -150,14 +150,14 @@ class FreetagLib extends ObjectLib
         }
 
         $query = 'SELECT DISTINCT o.*';
-        $query_cant = 'SELECT COUNT(*)';
+        $query_count = 'SELECT COUNT(*)';
 
         $query_end = ' FROM `tiki_objects` o, `tiki_freetagged_objects` fto, `tiki_freetags` t'
                                 . ' WHERE fto.`tagId` = t.`tagId` AND o.`objectId` = fto.`objectId` AND `tag` = ? ' . $mid
                                 . ' ORDER BY o.' . $this->convertSortMode($sort_mode);
 
         $query      .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
@@ -166,9 +166,9 @@ class FreetagLib extends ObjectLib
             $ret[] = $row;
         }
 
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -203,7 +203,7 @@ class FreetagLib extends ObjectLib
         }
 
         if (count($tagArray) == 0) {
-            return ['data' => [], 'cant' => 0];
+            return ['data' => [], 'count' => 0];
         }
 
         $bindvals = $tagArray;
@@ -266,7 +266,7 @@ class FreetagLib extends ObjectLib
                 }
                 $tag_sql .= ')';
             } else {
-                return ['data' => [], 'cant' => 0];
+                return ['data' => [], 'count' => 0];
             }
         }
 
@@ -292,7 +292,7 @@ class FreetagLib extends ObjectLib
         // counting only the distinct tags. It should also work for an individual user.
 
         $query = 'SELECT DISTINCT o.*';
-        $query_cant = 'SELECT COUNT(DISTINCT o.`objectId`)';
+        $query_count = 'SELECT COUNT(DISTINCT o.`objectId`)';
 
         $query_end = ' FROM `tiki_objects` o, `tiki_freetagged_objects` fto, `tiki_freetags` t'
                                 . ' WHERE fto.`tagId` = t.`tagId` AND o.`objectId` = fto.`objectId`'
@@ -304,10 +304,10 @@ class FreetagLib extends ObjectLib
         // Not a neat fix the o. prefix is ugly.    So changed default order instead.
 
         $query .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
         $ret = [];
         $permMap = TikiLib::lib('object')->map_object_type_to_permission();
@@ -353,10 +353,10 @@ class FreetagLib extends ObjectLib
                 }
                 $ret[] = $row;
             } else {
-                --$cant;
+                --$count;
             }
         }
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -391,7 +391,7 @@ class FreetagLib extends ObjectLib
         }
 
         $query = 'SELECT DISTINCT o.* ';
-        $query_cant = 'SELECT COUNT(*) ';
+        $query_count = 'SELECT COUNT(*) ';
 
         $query_end = ' FROM `tiki_freetagged_objects` fto, `tiki_freetags` t, `tiki_objects` o'
                                 . ' WHERE t.`tagId` = ? AND fto.`tagId` = t.`tagId`'
@@ -400,7 +400,7 @@ class FreetagLib extends ObjectLib
                                 ;
 
         $query .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
@@ -409,9 +409,9 @@ class FreetagLib extends ObjectLib
             $ret[] = $row;
         }
 
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -463,13 +463,13 @@ class FreetagLib extends ObjectLib
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
         $ret = [];
-        $cant = 0;
+        $count = 0;
         while ($row = $result->fetchRow()) {
             $ret[] = $row;
-            $cant++;
+            $count++;
         }
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -1652,7 +1652,7 @@ class FreetagLib extends ObjectLib
             $tags['data'][]['tag'] = $this->normalize_tag($tag);
         }
 
-        $tags['cant'] = count($tags['data']);
+        $tags['count'] = count($tags['data']);
 
         return $tags;
     }

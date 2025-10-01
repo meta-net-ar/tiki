@@ -9,8 +9,8 @@
         </li>
     {/foreach}
 </ol>
-<a class="add-kaltura-media btn btn-primary btn-sm" href="{service controller=kaltura action=upload targetName="{$field.html_name}"}">{tr}Add Media{/tr}</a>
-<a class="list-kaltura-media btn btn-primary btn-sm" href="{bootstrap_modal controller=kaltura action=list targetName="{$field.html_name}"}">{tr}List Media{/tr}</a>
+<a class="add-kaltura-media btn btn-primary btn-sm" href="{service controller=kaltura action=upload targetName="{$field.html_name}"}" role="button">{tr}Add Media{/tr}</a>
+<a class="list-kaltura-media btn btn-primary btn-sm" href="{bootstrap_modal controller=kaltura action=list targetName="{$field.html_name}"}" role="button">{tr}List Media{/tr}</a>
 {foreach from=$data.extras item=entryId}
     <input type="hidden" name="{$field.html_name|escape}" value="{$entryId|escape}">
 {/foreach}

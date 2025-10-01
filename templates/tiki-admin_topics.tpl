@@ -11,14 +11,14 @@
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label" for="name">{tr}Name{/tr}</label>
         <div class="col-sm-10">
-            <input type="text" name="name" id="name" class="form-control">
+            <input type="text" name="name" id="name" class="form-control" required>
         </div>
     </div>
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label" for="image">{tr}Image{/tr}</label>
         <div class="col-sm-10">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input class="form-control" name="userfile1" type="file" accept="image/*">
+            <input class="form-control" name="userfile1" id="image" type="file" accept="image/*" required>
         </div>
     </div>
     <div class="mb-3 row">
@@ -74,7 +74,7 @@
                                     <form action="tiki-admin_topics.php" method="post">
                                         {ticket}
                                         <input type="hidden" name="activate" value="{$topics[user].topicId}">
-                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to activate this topic?{/tr}')">
+                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to activate this topic?{/tr}')" aria-label="{tr}Activate{/tr}">
                                             {icon name="toggle-on" _menu_text='y' _menu_icon='y' alt="{tr}Activate{/tr}"}
                                         </button>
                                     </form>
@@ -84,8 +84,8 @@
                                     <form action="tiki-admin_topics.php" method="post">
                                         {ticket}
                                         <input type="hidden" name="deactivate" value="{$topics[user].topicId}">
-                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to de-activate this topic?{/tr}')">
-                                            {icon name="toggle-off" _menu_text='y' _menu_icon='y' alt="{tr}De-activate{/tr}"}
+                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to deactivate this topic?{/tr}')" aria-label="{tr}Deactivate{/tr}">
+                                            {icon name="toggle-off" _menu_text='y' _menu_icon='y' alt="{tr}Deactivate{/tr}"}
                                         </button>
                                     </form>
                                 </action>
@@ -99,7 +99,7 @@
                                 <form action="tiki-admin_topics.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="remove" value="{$topics[user].topicId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this topic?{/tr}')">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this topic?{/tr}')" aria-label="{tr}Remove{/tr}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </button>
                                 </form>
@@ -108,7 +108,7 @@
                                 <form action="tiki-admin_topics.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="removeall" value="{$topics[user].topicId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this topic AND all the articles related?{/tr}')">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Are you sure you want to remove this topic AND all the articles related?{/tr}')" aria-label="{tr}Remove with articles{/tr}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove with articles{/tr}"}
                                     </button>
                                 </form>

@@ -356,7 +356,7 @@ function delete_ref(ref_id){
             </ul>
 
             {if $use_references eq 1}
-                {if $libReferencesCant gt 0}
+                {if $libReferencesCount gt 0}
                     {tr}Library References:{/tr}<br>
                     <select name="lib_ref" id="lib_ref">
                         {section name=i loop=$libReferences}
@@ -368,7 +368,7 @@ function delete_ref(ref_id){
                     <br><span id="u_lib_status"></span>
                 {/if}
             {/if}
-            {if $edit_references eq 1 && $libReferencesCant gt 0}
+            {if $edit_references eq 1 && $libReferencesCount gt 0}
                 <br><a href="tiki-references.php" target="_blank">{tr}Edit Library References{/tr}</a>
             {/if}
 

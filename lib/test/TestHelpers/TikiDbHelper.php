@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Test\TestHelpers;
 
-use TikiAcceptanceTestDBRestorerSQLDumps;
+use Tiki\Lib\Test\AcceptanceTests\DBRestorerSQLDumps;
 
 class TikiDbHelper
 {
@@ -14,7 +14,7 @@ class TikiDbHelper
 
     public static function refreshDb($database = self::EMPTY_DB): void
     {
-        $dbRestorer = new TikiAcceptanceTestDBRestorerSQLDumps();
+        $dbRestorer = new DBRestorerSQLDumps();
         $dbRestorer->restoreDBDump($database);
     }
 }

@@ -822,7 +822,7 @@ import { defaults as defaultControls } from "ol/control";
                             object = feature.get("object");
 
                         if (!type && !object) {
-                            (type = "trackeritem"), (object = feature.get("itemId"));
+                            ((type = "trackeritem"), (object = feature.get("itemId")));
                         }
 
                         switch ($(container).data("popup-style")) {
@@ -1429,6 +1429,12 @@ import { defaults as defaultControls } from "ol/control";
                                             if (!feature.get("popup_config")) {
                                                 feature.set("popup_config", $(form).data("popup-config"));
                                             }
+                                            if (!feature.get("popup_fields")) {
+                                                feature.set("popup_fields", $(form).data("popup-fields"));
+                                            }
+                                            if (!feature.get("popup_tpl")) {
+                                                feature.set("popup_tpl", $(form).data("popup-tpl"));
+                                            }
 
                                             initial = wkt.writeFeature(feature) + feature.get("color");
 
@@ -1511,6 +1517,12 @@ import { defaults as defaultControls } from "ol/control";
                                                     }
                                                     if (!feature.get("popup_config")) {
                                                         feature.set("popup_config", $(form).data("popup-config"));
+                                                    }
+                                                    if (!feature.get("popup_fields")) {
+                                                        feature.set("popup_fields", $(form).data("popup-fields"));
+                                                    }
+                                                    if (!feature.get("popup_tpl")) {
+                                                        feature.set("popup_tpl", $(form).data("popup-tpl"));
                                                     }
                                                     // for some reason geometry needs to be in 900913 projection to correctly appear
                                                     // in the "Editable" vector layer, even though layer.projection === "EPSG:4326"
@@ -1756,6 +1768,12 @@ import { defaults as defaultControls } from "ol/control";
                 if (!feature.get("popup_config") && options.form) {
                     feature.set("popup_config", $(options.form).data("popup-config"));
                 }
+                if (!feature.get("popup_fields") && options.form) {
+                    feature.set("popup_fields", $(options.form).data("popup-fields"));
+                }
+                if (!feature.get("popup_tpl") && options.form) {
+                    feature.set("popup_tpl", $(options.form).data("popup-tpl"));
+                }
 
                 feature.setStyle(
                     new ol.style.Style({
@@ -1898,16 +1916,17 @@ import { defaults as defaultControls } from "ol/control";
                     $.service("object", "infobox", {
                         type: options.type,
                         object: options.object,
+                        popupFields: options.feature.get("popup_fields"),
+                        popupTpl: options.feature.get("popup_tpl"),
                     }),
                     function (data) {
                         var content = $("<body>").append(data);
 
                         content.find(".svgImage").css("text-align", "center").css("margin", "auto");
 
-                        // re-colorbox *box images
-                        $("a[rel*='box'][rel*='type=img'], a[rel*='box'][rel!='type=']", content).colorbox({
-                            photo: true,
-                        });
+                        if (jqueryTiki.colorbox) {
+                            applyGlightbox();
+                        }
 
                         if (options.callback) {
                             options.callback.call(options.element, options.event, content);

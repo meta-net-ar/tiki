@@ -26,8 +26,8 @@ function tiki_invited()
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
-    $invite = (int)isset($_REQUEST['invite']) ? $_REQUEST['invite'] : 0;
-    $email = isset($_REQUEST['email']) ? $_REQUEST['email'] : null;
+    $invite = (int)($_REQUEST['invite'] ?? 0);
+    $email = $_REQUEST['email'] ?? null;
 
     if (($invite <= 0) || empty($email)) {
         die("invalid request");

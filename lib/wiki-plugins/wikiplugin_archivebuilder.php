@@ -83,7 +83,7 @@ function wikiplugin_archivebuilder($data, $params)
         $label = tra('Download archive');
 
         $urlParts = parse_url($_SERVER['REQUEST_URI']);
-        $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+        $path = $urlParts['path'] ?? '/';
         if (isset($urlParts['query'])) {
             parse_str($urlParts['query'], $archiveParams);
         } else {
@@ -154,7 +154,7 @@ function wikiplugin_archivebuilder_trackerfiles($basepath, $trackerItem)
 
     $attachments = [];
 
-    /** @var FileGalLib $fileGal */
+    /** @var Tiki\Lib\Filegals\FileGalLib $fileGal */
     $fileGal = TikiLib::lib('filegal');
     /** @var Tracker_Definition $definition */
     $definition = $fields = $item->getDefinition();

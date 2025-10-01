@@ -39,6 +39,7 @@
                 <hr>
                 {preference name=module_file}
                 {preference name=module_zone_available_extra}
+                {preference name=module_sidebar_toggle_small_screen}
             </fieldset>
         </div>
 

@@ -2,12 +2,12 @@
     {tikimodule error=$module_params.error title=$tpl_module_title name="who_is_there" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
     {if $count}
         {if $cluster}
-            {foreach from=$logged_cluster_users item=cant key=tikihost}
+            {foreach from=$logged_cluster_users item=count key=tikihost}
                 <div>
-                    {$cant}
-                    {if $cant>1}
+                    {$count}
+                    {if $count>1}
                         {tr}online users{/tr}
-                    {elseif $cant>0}
+                    {elseif $count>0}
                         {tr}online user{/tr}
                     {/if}
                     {tr}on host{/tr} {$tikihost}

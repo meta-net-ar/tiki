@@ -76,7 +76,7 @@ function upgrade_20101230_create_top_modules_tiki($installer)
     // add quickadmin but prefs feature_sitemycode, sitemycode stay and will need manual upgrading
     if ($prefs['feature_sitemycode'] === 'y') {
         $sitemycode = $installer->getOne("SELECT `value` FROM `tiki_preferences` WHERE `name` = 'sitemycode'");
-        if (strpos($sitemycode, 'quickadmin') !== false) {
+        if (str_contains($sitemycode, 'quickadmin')) {
             $installer->query(
                 "INSERT INTO `tiki_modules` (name,position,ord,cache_time,params,`groups`) VALUES" .
                 " ('quickadmin','t',3,7200,'nobox=y','a:1:{i:0;s:6:\"Admins\";}');"

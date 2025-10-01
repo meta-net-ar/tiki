@@ -1,7 +1,7 @@
 <div class="blogactions">
     <div class="btn-group">
         {if ! $js}<ul><li>{/if}
-        <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#"title="{tr}Blog actions{/tr}">
+        <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#"title="{tr}Blog actions{/tr}" role="button">
             {icon name="menu-extra"}
         </a>
         <div class="dropdown-menu">
@@ -48,9 +48,9 @@
                 </a>
             {/if}
             {if $prefs.sefurl_short_url eq 'y'}
-                <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
+                <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();" role="button">
                         {icon name="link"} {tr}Get a short URL{/tr}
-                        {assign var="hasPageAction" value="1"}
+                        {$hasPageAction="1"}
                 </a>
             {/if}
             {if $tiki_p_admin eq 'y' || $tiki_p_assign_perm_blog eq 'y'}

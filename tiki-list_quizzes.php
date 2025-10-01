@@ -51,7 +51,7 @@ for ($i = 0; $i < $temp_max; $i++) {
     $channels["data"][$i]["individual_tiki_p_view_user_stats"] = $quizperms->view_user_stats ? 'y' : 'n';
     $channels["data"][$i]["individual_tiki_p_admin_quizzes"] = $quizperms->admin_quizzes ? 'y' : 'n';
 }
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-section_options.php');
 // Display the template

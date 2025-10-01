@@ -51,7 +51,7 @@
                             <input type="hidden" name="sort_mode" value={$sort_mode}>
                             <input type="hidden" name="edit_mode" value=1>
                             <input type="hidden" name="sheetId" value={$sheet.sheetId}>
-                            <button type="submit" name="offset" value={$offset} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                            <button type="submit" name="offset" value={$offset} class="tips btn btn-link btn-sm px-0 pt-0 pb-0" aria-label="{tr}Configure{/tr}">
                                 {icon name='cog' _menu_text='y' _menu_icon='y' alt="{tr}Configure{/tr}"}
                             </button>
                         </form>
@@ -63,7 +63,7 @@
                             <input type="hidden" name="sort_mode" value="{$sort_mode}">
                             <input type="hidden" name="removesheet" value="y">
                             <input type="hidden" name="sheetId" value="{$sheet.sheetId}">
-                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0 gallink" onclick="confirmPopup('{tr}Are you sure you want to delete this spreadsheet?{/tr}')">
+                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0 gallink" onclick="confirmPopup('{tr}Are you sure you want to delete this spreadsheet?{/tr}')" aria-label="{tr}Delete{/tr}">
                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                             </button>
                         </form>

@@ -13,7 +13,7 @@ use Tracker\Field\AbstractItemField;
  * Letter key: ~math~
  *
  */
-class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\IndexableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
+class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\IndexableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface
 {
     private static $runner;
     /**
@@ -146,7 +146,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
             $providedFields = $this->replaceBaseKeyInArrayValues($mirrorProvidedFields);
         }
         $baseKey = $this->getBaseKey();
-        array_push($providedFields, $this->getBaseKey());
+        $providedFields[] = $this->getBaseKey();
         return $providedFields;
     }
 
@@ -164,6 +164,21 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
     public function getGlobalFields(): array
     {
         return [];
+    }
+
+    /***
+     * Generate facets for search results
+     *
+     * @return array
+     */
+    public function getFacets()
+    {
+        $baseKey = $this->getBaseKey();
+
+        return [
+            Search_Query_Facet_Term::fromField($baseKey)
+                ->setLabel($this->getConfiguration('name'))
+        ];
     }
 
     /**
@@ -358,7 +373,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                 } elseif ($item) {
                     $item[$mirrorFieldId] = $this->getData($this->getConfiguration('permName'));
                 }
-                //var_dump($mirrorFieldInfo, $item);
                 $handler = TikiLib::lib('trk')->get_field_handler($mirrorFieldInfo, $item);
                 $this->mirrorFieldBaseKey = $handler->getBaseKey();
             }

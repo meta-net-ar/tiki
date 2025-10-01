@@ -29,7 +29,7 @@ class ServiceInline extends Base
 
         try {
             $extensionPackage = '';
-            if (strpos($controller, ".") !== false) {
+            if (str_contains($controller, ".")) {
                 $parts = explode(".", $controller);
                 if (count($parts) == 3) {
                     $extensionPackage = $parts[0] . "." . $parts[1];

@@ -229,18 +229,18 @@ See above details about each error or failure.
             $status = $log_entry['status'] ?? 'fail';
 
             if ($status === 'fail') {
-                array_push($issues['failures'], $test);
+                $issues['failures'][] = $test;
             } elseif ($status === 'error') {
-                array_push($issues['errors'], $test);
+                $issues['errors'][] = $test;
             } elseif ($status === 'pass') {
-                array_push($issues['pass'], $test);
+                $issues['pass'][] = $test;
             }
         }
 
         /* If a test was started by never ended, flag it as a failure */
         if ($this->last_test_started != null) {
             if (! in_array($this->last_test_started, $issues['failures'])) {
-                array_push($issues['failures'], $this->last_test_started);
+                $issues['failures'][] = $this->last_test_started;
             }
         }
 
@@ -249,8 +249,6 @@ See above details about each error or failure.
 
     public function compareTwoTestRuns($baseline_issues, $current_issues)
     {
-        global $tracer;
-
         $diffs = ['failures_introduced' => [], 'failures_fixed' => [],
             'errors_introduced' => [], 'errors_fixed' => []];
 
@@ -260,13 +258,13 @@ See above details about each error or failure.
         $baseline_errors = $baseline_issues['errors'];
         foreach ($baseline_failures as $a_baseline_failure) {
             if (in_array($a_baseline_failure, $current_pass)) {
-                array_push($diffs['failures_fixed'], $a_baseline_failure);
+                $diffs['failures_fixed'][] = $a_baseline_failure;
             }
         }
 
         foreach ($current_failures as $a_current_failure) {
             if (! in_array($a_current_failure, $baseline_failures) && ! in_array($a_current_failure, $baseline_errors)) {
-                array_push($diffs['failures_introduced'], $a_current_failure);
+                $diffs['failures_introduced'][] = $a_current_failure;
             }
         }
 
@@ -274,13 +272,13 @@ See above details about each error or failure.
         $current_errors = $current_issues['errors'];
         foreach ($baseline_errors as $a_baseline_error) {
             if (in_array($a_baseline_error, $current_pass)) {
-                array_push($diffs['errors_fixed'], $a_baseline_error);
+                $diffs['errors_fixed'][] = $a_baseline_error;
             }
         }
 
         foreach ($current_errors as $a_current_error) {
             if (! in_array($a_current_error, $baseline_errors) && ! in_array($a_current_error, $baseline_failures)) {
-                array_push($diffs['errors_introduced'], $a_current_error);
+                $diffs['errors_introduced'][] = $a_current_error;
             }
         }
 

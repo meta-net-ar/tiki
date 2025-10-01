@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 function wikiplugin_cookieconsent_info()
 {
     global $prefs;
@@ -17,14 +19,6 @@ function wikiplugin_cookieconsent_info()
         'introduced' => 10,
         'iconname' => 'information',
         'params' => [
-            'no_consent_message' => [
-                'required' => false,
-                'name' => tra('No Cookie Message'),
-                'description' => tra('Message displayed if user has not consented to accepting cookies.'),
-                'since' => '10.0',
-                'default' => tra($prefs['cookie_consent_alert']),
-                'filter' => 'text',
-            ],
             'element' => [
                 'required' => false,
                 'name' => tra('Containing Element'),
@@ -56,24 +50,16 @@ function wikiplugin_cookieconsent_info()
 
 function wikiplugin_cookieconsent($body, $params)
 {
-    global $prefs, $feature_no_cookie_analytics;
+    global $prefs;
 
     if ($prefs['cookie_consent_feature'] !== 'y') {
         return $body;
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_cookieconsent_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $class = $params['element_class'];
 
-    if ($feature_no_cookie_analytics) {
-        $body = $params['no_consent_message'];
+    if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+        $body = '';
         $class .= ($class ? ' ' : '') . $params['no_consent_class'];
     }
 

@@ -89,7 +89,7 @@
             </table>
         </div>
 
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {tab name="{tr}Create/Edit Newsletters{/tr}"}
@@ -103,9 +103,9 @@
             <input type="hidden" name="nlId" value="{$info.nlId|escape}">
             <input type="hidden" name="author" value="{$user|escape}">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label"> {tr}Name:{/tr} </label>
+                <label class="col-sm-3 col-form-label" for="newsletter_name"> {tr}Name:{/tr} </label>
                 <div class="col-sm-9">
-                        <input class="form-control" type="text" name="name" value="{$info.name|escape}">
+                        <input class="form-control" type="text" name="name" id="newsletter_name" value="{$info.name|escape}">
                 </div>
             </div>
             <div class="mb-3 row">

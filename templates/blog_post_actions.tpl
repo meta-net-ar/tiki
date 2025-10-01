@@ -1,6 +1,6 @@
 <div class="actions blogpostactions float-end btn-group">
     {if ! $js}<ul><li>{/if}
-    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#"title="{tr}Blog post actions{/tr}">
+    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#"title="{tr}Blog post actions{/tr}" role="button">
         {icon name="menu-extra"}
     </a>
     <div class="dropdown-menu">
@@ -41,7 +41,7 @@
                     //Create your sharelet with desired properties and set button element to false
                     var object{/literal}{$postId}{literal} = SHARETHIS.addEntry({}, {button:false});
                     //Output your customized button
-                    document.write('<a class="dropdown-item" id="share{/literal}{$postId}{literal}" href="#">{/literal}{icon name="sharethis"} {tr}ShareThis{/tr}{literal}</a>');
+                    document.write('<a class="dropdown-item" id="share{/literal}{$postId}{literal}" href="#" role="button">{/literal}{icon name="sharethis"} {tr}ShareThis{/tr}{literal}</a>');
                     //Tie customized button to ShareThis button functionality.
                     var element{/literal}{$postId}{literal} = document.getElementById("share{/literal}{$postId}{literal}");
                     object{/literal}{$postId}{literal}.attachButton(element{/literal}{$postId}{literal});

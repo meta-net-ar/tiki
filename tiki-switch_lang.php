@@ -30,7 +30,7 @@ if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_l
 
     foreach ($nopage1 as $valpage) {
         $valpage_dec = urldecode($valpage);
-        if (strstr($orig_url_dec, $valpage_dec)) {
+        if (str_contains($orig_url_dec, $valpage_dec)) {
             $orig_url = $prefs['tikiIndex'];
         }
     }
@@ -45,20 +45,20 @@ if ($item_path == '/') {
     $orig_url = $prefs['tikiIndex'];
 }
 
-if ($prefs['feature_sefurl'] == 'y' && ! strstr($orig_url, '.php')) {
+if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
     if (preg_match('/cat[0-9]+-?/', $orig_url)) {
         include_once('tiki-sefurl.php');
         $orig_url = filter_out_sefurl(preg_replace('#(.*)\/cat([0-9]+)(.*)#', '$1/tiki-browse_categories.php?parentId=$2$3', $orig_url), 'category');
     } elseif (preg_match('/article[0-9]+-?/', $orig_url)) {
         $orig_url = preg_replace('#\/article([0-9]+)(.*)#', '/tiki-read_article.php?articleId=$1', $orig_url);
     } else {
-        if (strpos($orig_url, '?') !== false) {
+        if (str_contains($orig_url, '?')) {
             $orig_url = preg_replace('#\/([^\/\?]+)\?(.*)?$#', '/tiki-index.php?page=$1&$2', $orig_url);
         } else {
             $orig_url = preg_replace('#\/([^\/\?]+)$#', '/tiki-index.php?page=$1', $orig_url);
         }
     }
-} elseif (! strstr($orig_url, '.php')) {
+} elseif (! str_contains($orig_url, '.php')) {
     $orig_url = preg_replace('#\/([^\/\?]+)(\?.*)?$#', '/tiki-index.php?page=$1', $orig_url);
     $params = parse_url($orig_url);
     if (empty($params['query'])) {
@@ -66,10 +66,10 @@ if ($prefs['feature_sefurl'] == 'y' && ! strstr($orig_url, '.php')) {
     }
 }
 
-if (strstr($orig_url, 'tiki-index.php') || strstr($orig_url, 'tiki-read_article.php')) {
+if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-read_article.php')) {
     $multilinguallib = TikiLib::lib('multilingual');
     $orig_url = urldecode($orig_url);
-    if (($txt = strstr($orig_url, '?')) == false) {
+    if (! ($txt = strstr($orig_url, '?'))) {
         $txt = '';
     } else {
         $txt = substr($txt, 1);
@@ -115,7 +115,14 @@ if (strstr($orig_url, 'tiki-index.php') || strstr($orig_url, 'tiki-read_article.
     }
 
     if ($item_query) {
-        if ($prefs['feature_sefurl'] != 'y' && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-read_article.php')) {
+        if (
+            $prefs['feature_sefurl'] != 'y'
+            && ! str_contains($_SERVER['HTTP_REFERER'], 'tiki-index.php')
+            && ! str_contains(
+                $_SERVER['HTTP_REFERER'],
+                'tiki-read_article.php'
+            )
+        ) {
             $orig_url = $orig_url . "&" . $item_query;
         }
     }

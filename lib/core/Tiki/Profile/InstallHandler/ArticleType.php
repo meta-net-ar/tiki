@@ -17,13 +17,11 @@ class Tiki_Profile_InstallHandler_ArticleType extends Tiki_Profile_InstallHandle
 
         $defaults = [
             'show_pre_publication' => 'n',
-            'show_post_expire' => 'n',
             'show_heading_only' => 'n',
             'show_image' => 'n',
             'show_avatar' => 'n',
             'show_author' => 'n',
             'show_publication_date' => 'n',
-            'show_expiration_date' => 'n',
             'show_reads' => 'n',
             'show_size' => 'n',
             'show_topline' => 'n',
@@ -72,7 +70,6 @@ class Tiki_Profile_InstallHandler_ArticleType extends Tiki_Profile_InstallHandle
             $data['name'],
             $converter->convert($data['allow_ratings']),
             $converter->convert($data['show_pre_publication']),
-            $converter->convert($data['show_post_expire']),
             $converter->convert($data['show_heading_only']),
             $converter->convert($data['allow_comments']),
             $converter->convert($data['allow_comments_rating_article']),
@@ -80,7 +77,6 @@ class Tiki_Profile_InstallHandler_ArticleType extends Tiki_Profile_InstallHandle
             $converter->convert($data['show_avatar']),
             $converter->convert($data['show_author']),
             $converter->convert($data['show_publication_date']),
-            $converter->convert($data['show_expiration_date']),
             $converter->convert($data['show_reads']),
             $converter->convert($data['show_size']),
             $converter->convert($data['show_topline']),
@@ -114,7 +110,6 @@ class Tiki_Profile_InstallHandler_ArticleType extends Tiki_Profile_InstallHandle
             'heading_only' => 'show_heading_only',
             'comment_can_rate_article' => 'allow_comments_rating_article',
             'show_pubdate' => 'show_publication_date',
-            'show_expdate' => 'show_expiration_date',
             'show_linkto' => 'show_link_to',
             'creator_edit' => 'allow_creator_edit',
         ];

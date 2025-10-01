@@ -8,6 +8,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+/**
+ * TIKI_PRINTING is always true when tiki-print.php is used.
+ * TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+ * TIKI_PRINTING_PDF => TIKI_PRINTING, but not the reverse.
+ */
+define('TIKI_PRINTING', true);
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && str_contains($_GET['display'], 'pdf'));
+
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
 
@@ -29,9 +39,7 @@ $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_cms_print');
 if (! isset($_REQUEST["articleId"])) {
-    $smarty->assign('msg', tra("No article indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No article indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $parserlib = TikiLib::lib('parser');
@@ -42,26 +50,17 @@ if ($article_data === false) {
     if (! $user) {
         $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
     }
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 if (! $article_data) {
-    $smarty->assign('msg', tra("Article not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 if (($article_data['publishDate'] > $tikilib->now) && ($article_data['author'] != $user && $tiki_p_admin != 'y' && $tiki_p_admin_cms != 'y') && ($article_data['type'] != 'Event')) {
-    $smarty->assign('msg', tra("Article is not published yet"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article is not published yet"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if ($article_data['ispublished'] == 'n' && $tiki_p_edit_article != 'y') {
-    $smarty->assign('msg', tra("Article is not published yet"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Article is not published yet"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if (isset($_REQUEST['switchlang']) && $_REQUEST['switchlang'] == 'y' && $prefs['feature_multilingual'] == 'y' && $prefs['feature_sync_language'] == 'y' && ! empty($article_data["lang"]) && $prefs['language'] != $article_data["lang"]) {
@@ -165,9 +164,7 @@ if ($prefs["article_custom_attributes"] == 'y') {
 }
 $smarty->assign('body', $article_data["body"]);
 $smarty->assign('publishDate', $article_data["publishDate"]);
-$smarty->assign('expireDate', $article_data["expireDate"]);
 $smarty->assign('show_pubdate', $article_data["show_pubdate"]);
-$smarty->assign('show_expdate', $article_data["show_expdate"]);
 $smarty->assign('edit_data', 'y');
 $body = $article_data["body"];
 $heading = $article_data["heading"];
@@ -254,7 +251,7 @@ $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 
 // Allow PDF export by installing a Mod that define an appropriate function
-if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
+if (TIKI_PRINTING_PDF) {
     require_once 'lib/pdflib.php';
     $page = $article_data["title"];
     $smarty->assign('print_page', 'n');

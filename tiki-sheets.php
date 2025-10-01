@@ -37,16 +37,11 @@ if (! isset($_REQUEST["sheetId"])) {
     $info = [];
     $smarty->assign('headtitle', tra('Spreadsheets'));
 } else {
-    if (isset($_REQUEST['edit_mode']) && $_REQUEST['edit_mode'] == 1) {
-        $cookietab = 2;
-    }
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         try {
             $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
         } catch (Exception $e) {
-            $smarty->assign('msg', tra($e->getMessage()));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_404);
         }
     }
     if ($tiki_p_admin == 'y' || $tiki_p_admin_sheet == 'y' || $tikilib->user_has_perm_on_object($user, $_REQUEST['sheetId'], 'sheet', 'tiki_p_view_sheet')) {
@@ -95,7 +90,7 @@ if (isset($_REQUEST["edit_mode"]) && $_REQUEST["edit_mode"]) {
         $smarty->assign('title', $info["title"]);
         $smarty->assign('description', $info["description"]);
         $smarty->assign('creator', $info['author']);
-        $smarty->assign('parentSheetId', isset($info['parentSheetId']) ? $info['parentSheetId'] : 0);
+        $smarty->assign('parentSheetId', $info['parentSheetId'] ?? 0);
         $info = $sheetlib->get_sheet_layout($_REQUEST["sheetId"]);
         $smarty->assign('className', $info["className"]);
         $smarty->assign('headerRow', $info["headerRow"]);
@@ -132,7 +127,7 @@ if (isset($_REQUEST["edit"])) {
         $_REQUEST["sheetId"],
         $_REQUEST["title"],
         $_REQUEST["description"],
-        isset($_REQUEST['creator']) ? $_REQUEST['creator'] : $user,
+        $_REQUEST['creator'] ?? $user,
         $_REQUEST['parentSheetId'],
         $_REQUEST
     );
@@ -169,7 +164,7 @@ if (! isset($_REQUEST["offset"])) {
 $smarty->assign_by_ref('offset', $offset);
 // Get the list of sheets available for this user (or public galleries)
 $sheets = $sheetlib->list_sheets($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $sheets["cant"]);
+$smarty->assign_by_ref('pages_count', $sheets["count"]);
 $smarty->assign_by_ref('sheets', $sheets["data"]);
 
 include_once('tiki-section_options.php');

@@ -2,7 +2,7 @@
     {foreach from=$headers item=header key=key}
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading{$unique}-{$key}">
-                <button class="accordion-button {if $key neq 0} collapsed{/if} text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{$unique}-{$key}" {if $key eq 0} aria-expanded="true" {else} aria-expanded="false" {/if} aria-controls="collapse{$unique}-{$key}">
+                <button class="accordion-button {if $key neq 0} collapsed{/if} text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{$unique}-{$key}" {if $key eq 0} aria-expanded="true" {else} aria-expanded="false" {/if} aria-controls="collapse{$unique}-{$key}" aria-label="{tr}Toggle {$header} section{/tr}">
                     {if (array_key_exists($key, $icons))}<span class="accordion-icon fas fa-{$icons.$key}"></span>{/if}{$header}
                 </button>
             </h2>

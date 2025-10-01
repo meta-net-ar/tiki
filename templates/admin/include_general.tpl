@@ -32,53 +32,50 @@
                 {preference name=default_mail_charset}
                 {preference name=mail_crlf}
                 {preference name=mail_apply_css}
-                {preference name=zend_mail_handler}
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer amazonSes">
-                    {preference name=zend_mail_amazon_ses_key}
-                    {preference name=zend_mail_amazon_ses_secret}
-                    {preference name=zend_mail_amazon_ses_region}
-                    {preference name=zend_mail_amazon_ses_version}
+                {preference name=mailer_handler}
+                <div class="adminoptionboxchild mailer_handler_childcontainer amazonSes">
+                    {preference name=mailer_amazon_ses_key}
+                    {preference name=mailer_amazon_ses_secret}
+                    {preference name=mailer_amazon_ses_region}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer elasticEmail">
-                    {preference name=zend_mail_elastic_email_username}
-                    {preference name=zend_mail_elastic_email_key}
+                <div class="adminoptionboxchild mailer_handler_childcontainer elasticEmail">
+                    {preference name=mailer_elastic_email_key}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer mailgun">
-                    {preference name=zend_mail_mailgun_domain}
-                    {preference name=zend_mail_mailgun_key}
-                    {preference name=zend_mail_mailgun_api_endpoint}
+                <div class="adminoptionboxchild mailer_handler_childcontainer mailgun">
+                    {preference name=mailer_mailgun_domain}
+                    {preference name=mailer_mailgun_key}
+                    {preference name=mailer_mailgun_region}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer mandrill">
-                    {preference name=zend_mail_mandrill_key}
+                <div class="adminoptionboxchild mailer_handler_childcontainer mandrill">
+                    {preference name=mailer_mandrill_key}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer postage">
-                    {preference name=zend_mail_postage_key}
+                <div class="adminoptionboxchild mailer_handler_childcontainer postmark">
+                    {preference name=mailer_postmark_key}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer postmark">
-                    {preference name=zend_mail_postmark_key}
+                <div class="adminoptionboxchild mailer_handler_childcontainer sendGrid">
+                    {preference name=mailer_send_grid_key}
+                    {preference name=mailer_send_grid_region}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer sendGrid">
-                    {preference name=zend_mail_send_grid_username}
-                    {preference name=zend_mail_send_grid_key}
+                <div class="adminoptionboxchild mailer_handler_childcontainer sparkPost">
+                    {preference name=mailer_spark_post_key}
+                    {preference name=mailer_spark_post_region}
                 </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer sparkPost">
-                    {preference name=zend_mail_spark_post_key}
-                </div>
-                <div class="adminoptionboxchild zend_mail_handler_childcontainer smtp">
-                    {preference name=zend_mail_smtp_server}
-                    {preference name=zend_mail_smtp_auth}
-                    <div class="adminoptionboxchild zend_mail_smtp_auth_childcontainer login plain crammd5">
+                <div class="adminoptionboxchild mailer_handler_childcontainer smtp">
+                    {preference name=mailer_smtp_server}
+                    {preference name=mailer_smtp_auth}
+                    <div class="adminoptionboxchild mailer_smtp_auth_childcontainer login plain crammd5">
                         <p>{tr}These values will be stored in plain text in the database:{/tr}</p>
-                        {preference name=zend_mail_smtp_user}
-                        {preference name=zend_mail_smtp_pass}
+                        {preference name=mailer_smtp_user}
+                        {preference name=mailer_smtp_pass}
                     </div>
-                    {preference name=zend_mail_smtp_port}
-                    {preference name=zend_mail_smtp_security}
-                    {preference name=zend_http_sslverifypeer}
-                    {preference name=zend_mail_smtp_helo}
+                    {preference name=mailer_smtp_port}
+                    {preference name=mailer_smtp_security}
+                    {preference name=http_sslverifypeer}
+                    {preference name=mailer_smtp_helo}
                 </div>
-                {preference name=zend_mail_queue}
-                {preference name=zend_mail_redirect}
+                {preference name=mailer_queue_max_retries}
+                {preference name=mailer_queue}
+                {preference name=mailer_redirect}
                 <div class="adminoptionbox mb-3 row clearfix">
                     <label for="testMail" class="col-sm-3 col-form-label">{tr}Email to send a test mail{/tr}</label>
                     <div class="col-sm-7">
@@ -98,6 +95,10 @@
                 {preference name=newsletter_external_client}
             </fieldset>
             <fieldset>
+                <legend class="h3">{tr}Email token reset{/tr}</legend>
+                {preference name=resetpasswordlink_expiry}
+            </fieldset>
+            <fieldset>
                 <legend class="h3">{tr}Logging and reporting{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=error_reporting_level}
@@ -112,6 +113,8 @@
                 </div>
                 {preference name=log_mail}
                 {preference name=log_sql}
+                {preference name=log_failed_logins}
+                {preference name=log_file_path}
                 <div class="adminoptionboxchild" id="log_sql_childcontainer">
                     {preference name=log_sql_perf_min}
                 </div>
@@ -151,15 +154,23 @@
                 {preference name=scheduler_stalled_timeout}
                 {preference name=scheduler_notify_on_stalled}
                 <div class="adminoptionboxchild" id="scheduler_notify_on_stalled_childcontainer">
+                    {preference name=scheduler_notify_admins}
                     {preference name=scheduler_users_to_notify_on_stalled}
                 </div>
                 {preference name=scheduler_healing_timeout}
-                {preference name=scheduler_notify_on_healing}
-                <div class="adminoptionboxchild" id="scheduler_notify_on_healing_childcontainer">
-                    {preference name=scheduler_users_to_notify_on_healed}
-                </div>
                 {preference name=scheduler_keep_logs}
                 {preference name=scheduler_last_run_warning_minutes}
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}Headless Browser Integration{/tr}</legend>
+                {preference name=headlessbrowser_integration_type}
+                <div class="adminoptionbox headlessbrowser_integration_type_childcontainer chrome">
+                    {preference name=headlessbrowser_chrome_path}
+                </div>
+            </fieldset>
+            <fieldset id="QueuedTasks">
+                <legend>{tr}Queued Tasks{/tr}</legend>
+                {preference name=feature_queued_tasks}
             </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>
@@ -202,10 +213,11 @@
                 {preference name=feature_loadbalancer}
                 {preference name=feature_port_rewriting}
                 {preference name=access_control_allow_origin}
-                {preference name=zend_http_use_curl}
+                {preference name=http_use_curl}
                 {preference name=feature_realtime}
                 <div class="adminoptionboxchild" id="feature_realtime_childcontainer">
                     {preference name=realtime_port}
+                    {preference name=realtime_full_base_url}
                 </div>
                 {preference name=php_cli_path}
             </fieldset>

@@ -51,7 +51,7 @@ class BackupFilesCommand extends Command
         $tikilib = \TikiLib::lib('tiki');
 
         $path = $input->getArgument('path');
-        if (substr($path, -1) == '/') {
+        if (str_ends_with($path, '/')) {
             $path = substr($path, 0, strlen($path) - 1);
         }
 
@@ -94,16 +94,16 @@ class BackupFilesCommand extends Command
                 $storage[] = $res['value'];
             }
             foreach ($storage as $dir) {
-                if (strpos($dir, '..') !== false) {
+                if (str_contains($dir, '..')) {
                     $output->writeln('<error>Warning: Unable to backup storage directory ' . $dir . ' (please use absolute path)</error>');
                     continue;
                 }
                 if (! empty($dir) && $input->getOption('storageonly') && substr($dir, 0, 1) != '/') {
                     $dir = $root . '/' . $dir;
-                } elseif (! $dir || substr($dir, 0, 1) != '/') {
+                } elseif (! $dir || ! str_starts_with($dir, '/')) {
                     continue;
                 }
-                if (substr($dir, -1) == '/') {
+                if (str_ends_with($dir, '/')) {
                     $dir = substr($dir, 0, strlen($dir) - 1);
                 }
                 if (! is_dir($dir)) {

@@ -62,7 +62,7 @@
             <a href='tiki-live_support_admin.php?removeuser={$online_operators[ix].user|escape}'>{icon name='trash' alt="{tr}Del{/tr}" title="{tr}Del{/tr}"}</a>
             <form action="tiki-live_support_admin.php" method="post" >
                 {ticket}
-                <button type="submit" name="offline" value={$online_operators[ix].user|escape} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                <button type="submit" name="offline" value={$online_operators[ix].user|escape} class="tips btn btn-link btn-sm px-0 pt-0 pb-0" aria-label="{tr}Refresh{/tr}">
                     {icon name="stop-watching" _menu_text='y' _menu_icon='y' alt="{tr}Refresh{/tr}"} {tr}offline{/tr}
                 </button>
             </form>
@@ -96,7 +96,7 @@
                         <b>{$offline_operators[ix].user|escape}</b>
                     </td>
                     <td>
-                        <table >
+                        <table>
                             <tr>
                                 <td>{tr}Accepted requests:{/tr}</td>
                                 <td>{$offline_operators[ix].accepted_requests}</td>
@@ -112,7 +112,7 @@
                             <form action="tiki-live_support_admin.php" method="post">
                                 {ticket}
                                 <input type="hidden" name="removeuser" value="{$offline_operators[ix].user}">
-                                <button type="submit" class="btn btn-link px-0 pt-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()">
+                                <button type="submit" class="btn btn-link px-0 pt-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()" aria-label="{tr}Delete{/tr}">
                                 {icon name='trash' _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                 </button>
                             </form>

@@ -12,8 +12,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
         'interactive_translation_mode'    => 'word',              //get
-        'source'                          => 'word',              //get
-        'trans'                           => 'word',              //get
+        'source'                          => 'text',              //get
+        'trans'                           => 'text',              //get
         ],
     ],
 ];

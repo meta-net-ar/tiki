@@ -27,7 +27,6 @@ class PopupLink extends Base
         $block = $params['block'];
 
         if ($repeat === false) {
-            if ($prefs['feature_jquery'] == 'y') {
                 $headerlib->add_js(
                     <<<JS
                     \$(function() {
@@ -49,19 +48,18 @@ class PopupLink extends Base
                 });
                 JS
                 );
-            }
+        }
 
             $href = ' href="javascript:void(0)"';
 
-            if (isset($params['class'])) {
-                if ($params['class'] == 'button') {
-                    $html = '<a id="' . $linkId . '"' . $href . '>' . $content . '</a>';
-                    $html = '<span class="button">' . $html . '</span>';
-                } else {
-                    $html = '<a id="' . $linkId . '"' . $href . '" class="' . $class . '">' . $content . '</a>';
-                }
+        if (isset($params['class'])) {
+            if ($params['class'] == 'button') {
+                $html = '<a id="' . $linkId . '"' . $href . '>' . $content . '</a>';
+                $html = '<span class="button">' . $html . '</span>';
+            } else {
+                $html = '<a id="' . $linkId . '"' . $href . '" class="' . $class . '">' . $content . '</a>';
             }
-            return $html;
         }
+        return $html;
     }
 }

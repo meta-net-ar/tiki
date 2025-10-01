@@ -1,23 +1,39 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the United theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
+
+// Used for L&F nav color choice and color mode override
 @mixin top-nav-light {
     --tiki-top-bg: rgb(233, 84, 32);
-    --tiki-top-color: #fff;
-    --tiki-top-hover-color: rgba(255, 255, 255, 0.75);
-    --tiki-top-text-color: rgba(255, 255, 255, 0.75);
-    --bs-navbar-brand-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-top-color: #000;
+    --tiki-top-hover-color: rgba(30, 30, 30, 0.75);
+    --tiki-top-text-color: var(--tiki-top-color);
+    --bs-navbar-brand-color: var(--tiki-top-color);
+    --bs-navbar-brand-hover-color: var(--tiki-top-hover-color);
 }
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: rgb(233, 84, 32);
-    --tiki-topbar-color: rgba(255, 255, 255, 0.55);
-    --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
-    --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
+    --tiki-topbar-color: #000;
+    --tiki-topbar-hover-color: rgba(30, 30, 30, 0.75);
+    --tiki-topbar-text-color: var(--tiki-topbar-color);;
 }
 
 @mixin top-nav-dark {
     --tiki-top-bg: rgb(119, 41, 93);
-    --tiki-top-color: rgba(255, 255, 255, 0.55);
+    --tiki-top-color: rgba(255, 255, 255, 0.65);
     --tiki-top-hover-color: #fff;
     --tiki-top-text-color: #fff;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
@@ -26,7 +42,7 @@
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: #672250; // rgb(119, 41, 93); Darkened for visual interest
-    --tiki-topbar-color: rgba(255, 255, 255, 0.55);
+    --tiki-topbar-color: rgba(255, 255, 255, 0.65);
     --tiki-topbar-hover-color: #fff;
     --tiki-topbar-text-color: #fff;
 }
@@ -147,3 +163,30 @@
 }
 
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
+
+// These rules are here because this theme doesn't have a _tiki-selectors.scss file.
+[data-bs-theme=dark] {
+    .highlight,
+    mark {
+        background-color: #493813;
+    }
+    .blockquote-footer,
+    .figure-caption {
+        color: #878F97;
+    }
+    .text-body-secondary {
+        color: #B6B0AABF;
+    }
+    .list-group-item-action,
+    .text-muted,
+    .form-text,
+    .breadcrumb-item.active {
+        color: #B4AEA7BF;
+    }
+    .list-group-item.list-group-item-light {
+        color: #C2BDB7BF;
+    }
+    .page-item.disabled {
+        color: #A39D99;
+    }
+}

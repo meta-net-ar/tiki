@@ -7,7 +7,7 @@
 {block name="navigation"}
     <div class="nav d-inline-flex">
         {permission name=admin_trackers}
-            <a class="btn btn-link" href="{service controller=tabular action=manage}">{icon name=list} {tr}Manage{/tr}</a>
+            <a class="btn btn-link" href="{service controller=tabular action=manage}" role="button">{icon name=list} {tr}Manage{/tr}</a>
         {/permission}
     </div>
 {/block}

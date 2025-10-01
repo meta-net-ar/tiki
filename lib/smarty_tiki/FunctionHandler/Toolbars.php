@@ -44,6 +44,10 @@ class Toolbars extends Base
             $params['area_id'] = 'editwiki';
         }
 
+        if (isset($params['inline']) && $params['inline']) {
+            $hidden = array_merge($hidden, ['switcheditor', 'admintoolbar', 'autosave', 'source']);
+        }
+
         $list = ToolbarsList::fromPreference($params, $hidden);
         if (isset($params['_wysiwyg']) && $params['_wysiwyg'] == 'y') {
             return $list->getWysiwygArray();

@@ -10,9 +10,9 @@
 function upgrade_20100207_repair_file_galleries_tiki($installer)
 {
 
-    $cant = $installer->getOne('SELECT COUNT(*) FROM `tiki_file_galleries` WHERE `parentId` = -1 and `type` <> \'system\'');
+    $count = $installer->getOne('SELECT COUNT(*) FROM `tiki_file_galleries` WHERE `parentId` = -1 and `type` <> \'system\'');
 
-    if ($cant > 0) {
+    if ($count > 0) {
         $sysId = $installer->getOne('SELECT `galleryId` FROM `tiki_file_galleries` WHERE `type` = \'system\'');
         $pref = $installer->getOne('SELECT COUNT(*) FROM `tiki_preferences` WHERE `name` = \'fgal_root_id\'');
         if ($pref > 0) {

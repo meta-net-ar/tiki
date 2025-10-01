@@ -20,7 +20,7 @@ class TwoFactorAuthController
             $email2FA->generateCode($input->username->text());
             return [
                 'success' => true,
-                'message' => tr('2FA token generated successfully and sent to your email')
+                'message' => tr('An email containing your authentication code has been sent. Please enter the code to access the website.')
             ];
         } catch (TwoFactorAuthException $e) {
             return [

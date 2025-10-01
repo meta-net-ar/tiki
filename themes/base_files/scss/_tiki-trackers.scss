@@ -26,7 +26,7 @@
     padding-right: 1.5em;
     margin-bottom: 1em;
     font-size: 0.9em;
-    img, span { margin-right: 6px; }
+    & > img, > span, > button { margin-right: 6px; }
 }
 
 @media (min-width: 768px) {
@@ -39,6 +39,60 @@
 
 .tracker-item-files {
     padding-left: 15px;
+    
+    li {
+        display: flex !important;
+        align-items: center;
+        gap: 0.5rem;
+    }
+}
+
+.play-audio.loading {
+    position: relative;
+}
+
+.play-audio.loading::after {
+    content: '';
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--bs-primary);
+    animation: spin 1s ease-out infinite;
+}
+
+.audio-timer {
+    width: 0%;
+    position: relative;
+    transition: width 0.5s ease;
+    margin-left: -0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    .end-line {
+        width: 100%;
+        height: 5px;
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+    }
+}
+
+.audio-timer.show {
+    width: 50%;
+    margin-left: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 #tracker_selector {
@@ -151,3 +205,25 @@
     display: none;
 }
 
+/* 
+ * Multi-line text truncation using old -webkit- properties for broader browser compatibility.
+ * Only -webkit-box, -webkit-line-clamp, -webkit-box-orient, and overflow are required.
+ * This approach is used intentionally for better support across browsers as of 2025.
+ * See: https://css-tricks.com/almanac/properties/l/line-clamp/ for more details.
+ */
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    line-height: 1.8em;
+    max-height: 3.6em;
+    white-space: normal;
+  }
+
+  .truncate-text a {
+    display: inline;
+  }

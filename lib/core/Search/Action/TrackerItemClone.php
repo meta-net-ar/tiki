@@ -71,6 +71,11 @@ class Search_Action_TrackerItemClone implements Search_Action_Action
         return false;
     }
 
+    public function requiresConfirm()
+    {
+        return false;
+    }
+
     public function changeObject($data)
     {
         if (empty($this->cloned_object_id)) {

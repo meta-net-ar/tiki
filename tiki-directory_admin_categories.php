@@ -121,7 +121,7 @@ $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
 $items = $dirlib->dir_list_categories($_REQUEST["parent"], $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $groups = $userlib->list_all_groups();
 $smarty->assign_by_ref('groups', $groups);

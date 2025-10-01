@@ -345,7 +345,7 @@ class MonitorLib
         }
 
         $sendTo = [];
-        $args['stream'] = isset($args['stream']) ? (array) $args['stream'] : [];
+        $args['stream'] = (array) ($args['stream'] ?? []);
 
         foreach ($results as $row) {
             // Add entries to the named streams, each user will have a few of those
@@ -403,7 +403,7 @@ class MonitorLib
         // For multilingual targets, collect all targets in the set as the event
         // is bound for a single page, but needs to be displayed for all other pages
         // as well to explain why the notification occurs.
-        if (substr($type, -6) == ' trans') {
+        if (str_ends_with($type, ' trans')) {
             $title = tr('translations of %0', $title);
             $fetchTargets = $this->getMultilingualTargets($realType, $objectId);
             $isTranslation = true;
@@ -437,7 +437,7 @@ class MonitorLib
             $object = $tikilib->get_user_id($object);
         }
 
-        if (substr($type, -6) == ' trans') {
+        if (str_ends_with($type, ' trans')) {
             $type = substr($type, 0, -6);
         }
 

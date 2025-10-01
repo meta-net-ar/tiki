@@ -217,8 +217,7 @@ Duplicated footnote reference[^second].
 </blockquote>
 </blockquote>
 <ul>
-<li>Create a list by starting a line with <code>+</code>, <code>-</code>, or <code>*</code>
-</li>
+<li>Create a list by starting a line with <code>+</code>, <code>-</code>, or <code>*</code></li>
 <li>Sub-lists are made by indenting 2 spaces:
 <ul>
 <li>Marker character change forces new list start:
@@ -241,8 +240,7 @@ Duplicated footnote reference[^second].
 <li>Consectetur adipiscing elit</li>
 <li>Integer molestie lorem at massa</li>
 <li>You can use sequential numbers...</li>
-<li>...or keep all the numbers as <code>1.</code>
-</li>
+<li>...or keep all the numbers as <code>1.</code></li>
 </ol>
 <p>Start numbering with offset:</p>
 <ol start="57">
@@ -314,7 +312,12 @@ line 3 of code
 <li class="footnote" id="fn:second" role="doc-endnote"><p>Footnote text.&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:second" role="doc-backlink">↩</a>&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:second__2" role="doc-backlink">↩</a></p></li>
 <li class="footnote" id="fn:text-of-inline-footn" role="doc-endnote"><p>Text of inline footnote&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:text-of-inline-footn" role="doc-backlink">↩</a></p></li></ol></div>
 ';
-
-        return $res;
+    /**
+     * Different operating systems use different line-ending characters.
+     * By converting \r\n to \n, this code ensures that the string $res
+     * has consistent line endings regardless of the platform it was created on.
+     * Consistent line endings can simplify the parsing of text and reduce the likelihood of bugs in text-handling functions.
+     */
+        return str_replace("\r\n", "\n", $res);
     }
 }

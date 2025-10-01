@@ -2,7 +2,7 @@
 
 <div class="t_navbar mb-4 clearfix">
     {if $type eq 'wiki page'}
-        {assign var=thisname value=$name|escape:'url'}
+        {$thisname=$name|escape:'url'}
         {button href="tiki-index.php?page=$thisname&no_bl=y" _text="{tr}View Page{/tr}" _icon_name="view" _class="btn btn-link"}
     {else}
         {button href="tiki-read_article.php?articleId=$id" _text="{tr}View Article{/tr}" _icon_name="view" _class="btn btn-link"}

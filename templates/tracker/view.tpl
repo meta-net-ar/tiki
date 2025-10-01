@@ -7,7 +7,7 @@
 {block name="navigation"}
     <div class="navbar">
         {if $canModify}
-            <a class="btn btn-primary" href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$itemId}">{icon name="edit"} {tr}Edit{/tr}</a>
+            <a class="btn btn-primary" href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$itemId}" role="button">{icon name="edit"} {tr}Edit{/tr}</a>
         {/if}
         {include file="tracker_actions.tpl"}
     </div>

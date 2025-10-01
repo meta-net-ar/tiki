@@ -112,35 +112,25 @@
         <label class="col-sm-3 col-form-label">{tr}Author rating{/tr}</label>
         <div class="col-sm-7">
             <select name='rating' class="form-control">
-                <option value="10" {if $rating eq 10}selected="selected"{/if}>10</option>
-                <option value="9.5" {if $rating eq "9.5"}selected="selected"{/if}>9.5</option>
-                <option value="9" {if $rating eq 9}selected="selected"{/if}>9</option>
-                <option value="8.5" {if $rating eq "8.5"}selected="selected"{/if}>8.5</option>
-                <option value="8" {if $rating eq 8}selected="selected"{/if}>8</option>
-                <option value="7.5" {if $rating eq "7.5"}selected="selected"{/if}>7.5</option>
-                <option value="7" {if $rating eq 7}selected="selected"{/if}>7</option>
-                <option value="6.5" {if $rating eq "6.5"}selected="selected"{/if}>6.5</option>
-                <option value="6" {if $rating eq 6}selected="selected"{/if}>6</option>
-                <option value="5.5" {if $rating eq "5.5"}selected="selected"{/if}>5.5</option>
-                <option value="5" {if $rating eq 5}selected="selected"{/if}>5</option>
-                <option value="4.5" {if $rating eq "4.5"}selected="selected"{/if}>4.5</option>
-                <option value="4" {if $rating eq 4}selected="selected"{/if}>4</option>
-                <option value="3.5" {if $rating eq "3.5"}selected="selected"{/if}>3.5</option>
-                <option value="3" {if $rating eq 3}selected="selected"{/if}>3</option>
-                <option value="2.5" {if $rating eq "2.5"}selected="selected"{/if}>2.5</option>
-                <option value="2" {if $rating eq 2}selected="selected"{/if}>2</option>
-                <option value="1.5" {if $rating eq "1.5"}selected="selected"{/if}>1.5</option>
-                <option value="1" {if $rating eq 1}selected="selected"{/if}>1</option>
-                <option value="0.5" {if $rating eq "0.5"}selected="selected"{/if}>0.5</option>
-                <option value="0" {if $rating eq "0"}selected="selected"{/if}>0</option>
+                {$ratings=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
+                {foreach from=$ratings item=val}
+                    <option value="{$val}" {if $rating == $val}selected="selected"{/if}>{$val}</option>
+                {/foreach}
             </select>
+
         </div>
     </div>
     <div class="mb-3 row" id='show_image_1' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own Image{/tr}</label>
         <div class="col-sm-7">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input name="userfile1" type="file" accept="image/*" onchange="document.getElementById('useImage').checked = true;">
+            <input name="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-3 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
+        <div class="col-sm-7">
+            <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
         </div>
     </div>
     {if $hasImage eq 'y'}
@@ -176,21 +166,21 @@
             <input type="checkbox" name="isfloat" {if $isfloat eq 'y'}checked='checked'{/if}>
         </div>
     </div>
-    <div class="mb-3 row" d='show_image_4' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
+    <div class="mb-3 row" id='show_image_4' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own image size x{/tr} *</label>
         <div class="col-sm-7">
-            <input type="text" name="image_x" value="{$image_x|escape}" class="form-control">
-            <div class="form-text">
-                {tr}pixels{/tr}
+            <div class="input-group">
+                <input type="number" name="image_x" value="{$image_x|escape}" class="form-control">
+                <span class="input-group-text">{tr}pixels{/tr}</span>
             </div>
         </div>
     </div>
     <div class="mb-3 row" id='show_image_5' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own image size y{/tr} *</label>
         <div class="col-sm-7">
-            <input type="text" name="image_y" value="{$image_y|escape}" class="form-control">
-            <div class="form-text">
-                {tr}pixels{/tr}
+            <div class="input-group">
+                <input type="number" name="image_y" value="{$image_y|escape}" class="form-control">
+                <span class="input-group-text">{tr}pixels{/tr}</span>
             </div>
         </div>
     </div>
@@ -215,7 +205,6 @@
     {/if}
 
     {include file='categorize.tpl'}
-
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label">{tr}Heading{/tr}</label>
         <div class="col-sm-7">
@@ -239,18 +228,6 @@
             {tr}at{/tr}
             <span dir="ltr">
                 {html_select_time prefix="publish_" time=$publishDate display_seconds=false use_24_hours=$use_24hr_clock}
-                &nbsp;
-                {$siteTimeZone}
-            </span>
-        </div>
-    </div>
-    <div class="mb-3 row" id='show_expdate' {if $types.$type.show_expdate eq 'y' || $types.$type.show_post_expire ne 'y'}style="display:;"{else}style="display:none;"{/if}>
-        <label class="col-sm-3 col-form-label">{tr}Expiration Date{/tr}</label>
-        <div class="col-sm-7">
-            {html_select_date prefix="expire_" time=$expireDate start_year="-10" end_year="+10" field_order=$prefs.display_field_order}
-            {tr}at{/tr}
-            <span dir="ltr">
-                {html_select_time prefix="expire_" time=$expireDate display_seconds=false use_24_hours=$use_24hr_clock}
                 &nbsp;
                 {$siteTimeZone}
             </span>
@@ -288,12 +265,12 @@
         </div>
     {/if}
 
-    {include file='freetag.tpl'}
+    {include file='freetag.tpl' labelColClass="col-md-3" inputColClass="col-md-7"}
 
     {if isset($all_attributes)}
         {foreach from=$all_attributes item=att key=attname}
-        {assign var='attid' value=$att.itemId|replace:'.':'_'}
-        {assign var='attfullname' value=$att.itemId}
+        {$attid=$att.itemId|replace:'.':'_'}
+        {$attfullname=$att.itemId}
         <div class="mb-3 row" id={$attid} {if $types.$type.$attid eq 'y'}style="display:;"{else}style="display:none;"{/if}>
             <label class="col-sm-3 col-form-label">{$attname|escape}</label>
             <div class="col-sm-7">
@@ -304,8 +281,8 @@
     {/if}
 
 
-    <div align="center">
-        {if $prefs.feature_antibot eq 'y'}<br><div align="center">{include file='antibot.tpl' antibot_table='y'}</div><br>{/if}
+    <div>
+        {if $prefs.feature_antibot eq 'y'}<br><div>{include file='antibot.tpl' antibot_table='y'}</div><br>{/if}
         <input type="submit" class="wikiaction btn btn-primary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
         <input type="submit" class="wikiaction btn btn-primary" name="submitarticle" value="{tr}Submit Article{/tr}" onclick="needToConfirm=false;">
         {if $tiki_p_autoapprove_submission eq 'y'}

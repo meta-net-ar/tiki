@@ -44,7 +44,7 @@ class Truncate
             if (! $middle) {
                 return $func($string, 0, $length) . $etc;
             } else {
-                return $func($string, 0, $length / 2) . $etc . $func($string, -$length / 2);
+                return $func($string, 0, intval($length / 2)) . $etc . $func($string, intval(-$length / 2));
             }
         } else {
             return $string;

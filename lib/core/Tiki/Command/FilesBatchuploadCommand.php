@@ -89,6 +89,12 @@ class FilesBatchuploadCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Path to files to upload'
             )
+            ->addOption(
+                'keepSource',
+                'k',
+                InputOption::VALUE_NONE,
+                'Keep the source files after upload'
+            )
         ;
     }
 
@@ -158,11 +164,12 @@ class FilesBatchuploadCommand extends Command
                     'fileUser' => $input->getOption('fileUser'),
                     'fileGroup' => $input->getOption('fileGroup'),
                     'fileMode' => $input->getOption('fileMode'),
+                    'keepSource' => $input->getOption('keepSource'),
                     'filesPath' => $filesPath,
             ]);
 
             foreach ($feedback as $message) {
-                if (strpos($message, '<span class="text-danger">') !== false) {
+                if (str_contains($message, '<span class="text-danger">')) {
                     $error = true;
                 } else {
                     $error = false;

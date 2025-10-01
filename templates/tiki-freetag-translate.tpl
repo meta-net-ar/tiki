@@ -93,7 +93,7 @@ $('#scblink').on("click", function(e){
                                 {/if}
                             {/foreach}
                         {else}
-                            {assign var=btag value=$tag[$blank]}
+                            {$btag=$tag[$blank]}
 
                             <td colspan="{if in_array('',$languageList)}{($languageList|@count) - 1}{else}{$languageList|@count}{/if}">
                                 <div class="col-sm-3">

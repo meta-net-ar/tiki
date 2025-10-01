@@ -23,12 +23,17 @@ class Escape
 {
     public function handle($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
     {
+        // Handle null values at the start to avoid repetition
+        if ($string === null) {
+            $string = '';
+        }
+
         switch ($esc_type) {
             case 'html':
                 if (is_array($string)) {
                     $string = implode(',', $string);
                 }
-                $return = htmlspecialchars($string ?? '', ENT_QUOTES, $char_set, $double_encode);
+                $return = htmlspecialchars($string, ENT_QUOTES, $char_set, $double_encode);
 
                 // Convert back sanitization tags into real tags to avoid them to be displayed
                 $return = str_replace('&lt;x&gt;', '<x>', $return);
@@ -38,7 +43,7 @@ class Escape
                 return $return;
 
             case 'htmlall':
-                $return = htmlentities($string ?? '', ENT_QUOTES, $char_set);
+                $return = htmlentities($string, ENT_QUOTES, $char_set);
                 if (! strlen($return) && strlen($string)) { // Bug php when there is non utf8 characters in the string(http://bugs.php.net/bug.php?id=43549, http://bugs.php.net/bug.php?id=43294)
                     $return = htmlentities($string, ENT_QUOTES);
                 }
@@ -49,7 +54,7 @@ class Escape
                 return $return;
 
             case 'url':
-                return rawurlencode($string ?? '');
+                return rawurlencode($string);
 
             case 'urlpathinfo':
                 return str_replace('%2F', '/', rawurlencode($string));

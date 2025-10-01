@@ -100,7 +100,7 @@ foreach ($sections as $skey => $sval) {
     }
 }
 
-$view_mode = isset($_REQUEST['view_mode']) ? $_REQUEST['view_mode'] : '';
+$view_mode = $_REQUEST['view_mode'] ?? '';
 if ($view_mode === 'sheet' && $section !== 'sheet') {
     $view_mode = '';
     $_REQUEST['view_mode'] = '';
@@ -158,7 +158,7 @@ if ($section == 'global') {
 
 if (! empty($_REQUEST['delete_tool']) && ! empty($_REQUEST['tool_name'])) { // input from the tool edit form
     ToolbarItem::deleteTool($_REQUEST['tool_name']);
-    if (strpos($_REQUEST['tool_name'], $current) !== false) {
+    if (str_contains($_REQUEST['tool_name'], $current)) {
         $current = str_replace($_REQUEST['tool_name'], '', $current);
         $current = str_replace(',,', ',', $current);
         $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
@@ -212,17 +212,17 @@ foreach ($qtlist as $name) {
     }
     $tag->setDomElementId('dummy');
 
-    $wys = strlen($tag->getWysiwygToken(false)) ? 'qt-wys' : '';
-    $wyswik = strlen($tag->getWysiwygWikiToken('dummy', false)) ? 'qt-wyswik' : '';
+    $wys = strlen($tag->getWysiwygToken()) ? 'qt-wys' : '';
+    $wyswik = strlen($tag->getWysiwygWikiToken()) ? 'qt-wyswik' : '';
     $test_html = $tag->getWikiHtml();
     $wiki = strlen($test_html) > 0 ? 'qt-wiki' : '';
-    $wiki = strpos($test_html, 'qt-sheet') !== false ? 'qt-sheet' : $wiki;
+    $wiki = str_contains($test_html, 'qt-sheet') ? 'qt-sheet' : $wiki;
     $cust = ToolbarItem::isCustomTool($name) ? 'qt-custom' : '';
     $avail = $tag->isAccessible() ? '' : 'qt-noaccess';
     $icon = $tag->getIconHtml();
     $margins = $test_html === '||' ? 'mx-auto' : '';
 
-    if (strpos($name, 'wikiplugin_') !== false) {
+    if (str_contains($name, 'wikiplugin_')) {
         $plug = 'qt-plugin';
         $label = substr($name, 11);
         $qt_p_list[] = $name;
@@ -235,8 +235,8 @@ foreach ($qtlist as $name) {
     }
 
     $label = htmlspecialchars($label);
-    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken(false) . '" />';
-    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax('dummy')) . '" />';
+    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken() . '" />';
+    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax()) . '" />';
     $label .= '<input type="hidden" name="type" value="' . $tag->getType() . '" />';
     $label .= '<input type="hidden" name="label" value="' . $tag->getLabel() . '" />';
 
@@ -254,10 +254,10 @@ foreach ($qtlist as $name) {
     } elseif ($view_mode === 'wysiwyg_wiki') {
         $visible = ! empty($wyswik);
     } elseif ($view_mode === 'sheet') {
-        $visible = (strpos($wiki, 'qt-sheet') !== false);
+        $visible = (str_contains($wiki, 'qt-sheet'));
     }
 
-    $text_label = $tag->getLabel($name);
+    $text_label = $tag->getLabel();
 
     $qtelement[$name] = [
         'name' => $name,

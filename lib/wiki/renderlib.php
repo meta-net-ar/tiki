@@ -215,6 +215,12 @@ class WikiRenderer
 
             $headerlib = TikiLib::lib('header');
             $links = [];
+
+            $wikilib = TikiLib::lib('wiki');
+            $selfHref = $wikilib->sefurl($this->page);
+
+            $links[] = '<link rel="alternate" href="' . $selfHref . '" hreflang="' . $this->info['lang'] . '">';
+
             foreach ($this->trads as $trad) {
                 if ($trad['lang'] != $this->info['lang']) {
                     $links[] = '<link rel="alternate" href="tiki-index.php?page=' . $trad['objName'] . '" hreflang="' . $trad['lang'] . '">';
@@ -456,9 +462,9 @@ class WikiRenderer
             if (! empty($galleryId)) {
                 $files = $filegallib->get_files(0, -1, '', '', $galleryId);
             } else {
-                $files = ['data' => [], 'cant' => 0];
+                $files = ['data' => [], 'count' => 0];
             }
-            $this->smartyassign('atts_count', $files['cant']);
+            $this->smartyassign('atts_count', $files['count']);
             return;
         }
 
@@ -470,7 +476,7 @@ class WikiRenderer
 
         $atts = $wikilib->list_wiki_attachments($this->page, 0, -1, $this->sortMode, '');
         $this->smartyassign('atts', $atts["data"]);
-        $this->smartyassign('atts_count', $atts['cant']);
+        $this->smartyassign('atts_count', $atts['count']);
     }
 
     private function setupFootnotes()
@@ -588,7 +594,7 @@ class WikiRenderer
         }
         //global $description;
         $crumbsLocal[] = new Breadcrumb(
-            isset($this->info['prettyName']) ? $this->info['prettyName'] : $crumbpage,
+            $this->info['prettyName'] ?? $crumbpage,
             $this->info['description'],
             TikiLib::lib('wiki')->sefurl($this->page),
             '',

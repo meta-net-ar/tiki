@@ -89,16 +89,16 @@ class TreeTable extends Base
             return $_emptyDataMessage;
         }
 
-        $_checkbox = empty($_checkbox) ? '' : $_checkbox;
-        $_checkboxTitles = empty($_checkboxTitles) ? '' : $_checkboxTitles;
-        $_openall = isset($_openall) ? $_openall : 'n';
-        $_showSelected = isset($_showSelected) ? $_showSelected : 'n';
-        $_selectAllHiddenToo = isset($_selectAllHiddenToo) ? $_selectAllHiddenToo : 'n';
-        $_checkboxColumnIndex = empty($_checkboxColumnIndex) ? 0 : $_checkboxColumnIndex;
-        $_valueColumnIndex = empty($_valueColumnIndex) ? 0 : $_valueColumnIndex;
+        $_checkbox = $_checkbox ?? '';
+        $_checkboxTitles = $_checkboxTitles ?? '';
+        $_openall = $_openall ?? 'n';
+        $_showSelected = $_showSelected ?? 'n';
+        $_selectAllHiddenToo = $_selectAllHiddenToo ?? 'n';
+        $_checkboxColumnIndex = $_checkboxColumnIndex ?? 0;
+        $_valueColumnIndex = $_valueColumnIndex ?? 0;
 
-        if (is_string($_checkbox) && strpos($_checkbox, ',') !== false) {
-            $_checkbox = preg_split('/,/', trim($_checkbox));
+        if (is_string($_checkbox) && str_contains($_checkbox, ',')) {
+            $_checkbox = explode(',', trim($_checkbox));
         }
 
         if (! empty($_checkbox) && ! is_array($_checkbox)) {
@@ -107,8 +107,8 @@ class TreeTable extends Base
         }
 
         if (! empty($_checkboxColumnIndex)) {
-            if (is_string($_checkboxColumnIndex) && strpos($_checkboxColumnIndex, ',') !== false) {
-                $_checkboxColumnIndex = preg_split('/,/', trim($_checkboxColumnIndex));
+            if (is_string($_checkboxColumnIndex) && str_contains($_checkboxColumnIndex, ',')) {
+                $_checkboxColumnIndex = explode(',', trim($_checkboxColumnIndex));
             }
             if (count($_checkbox) != count($_checkboxColumnIndex)) {
                 return 'Number of items in _checkboxColumnIndex doesn not match items in _checkbox';
@@ -116,8 +116,8 @@ class TreeTable extends Base
         }
         if (! empty($_checkboxTitles)) {
             if (is_string($_checkboxTitles)) {
-                if (strpos($_checkboxTitles, ',') !== false) {
-                    $_checkboxTitles = preg_split('/,/', trim($_checkboxTitles));
+                if (str_contains($_checkboxTitles, ',')) {
+                    $_checkboxTitles = explode(',', trim($_checkboxTitles));
                 } else {
                     $_checkboxTitles = [trim($_checkboxTitles)];
                 }
@@ -127,7 +127,7 @@ class TreeTable extends Base
             }
         }
 
-        $_columnsContainHtml = isset($_columnsContainHtml) ? $_columnsContainHtml : 'n';
+        $_columnsContainHtml = $_columnsContainHtml ?? 'n';
 
         $html = '';
         $nl = "\n";
@@ -184,12 +184,6 @@ class TreeTable extends Base
         }
 
         $class = empty($class) ? 'table table-striped' : $class;    // treetable
-
-        /*
-    if ($prefs['feature_jquery_tablesorter'] == 'y' && strpos($class, 'sortable') === false) {
-         //$class .= ' sortable';
-    }
-*/
 
         if ($_listFilter == 'y' && count($_data) > $_filterMinRows) {
             $html .= smarty_function_listfilter(
@@ -472,7 +466,7 @@ $("#' . $id . '_showSelected").on("click", function () {
         }
 
         if ($sort) {
-            if (strpos($sort, 'sort') === false) {
+            if (! str_contains($sort, 'sort')) {
                 $sort = 'asort';
             }
             $sort($arrTemp);

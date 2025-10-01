@@ -1,10 +1,10 @@
 {if $module_params.accordion == 'y'}
-    {assign var="unique" value="modZoneAccordion"}
-    {assign var="header" value=$tpl_module_title}
-    {assign var="isOpen" value=$module_params.isOpen}
-    {assign var="icon" value=$module_params.icon}
-    {assign var="zone" value=$module_params.name}
-    {assign var="zoneclass" value=$module_params.zoneclass}
+    {$unique="modZoneAccordion"}
+    {$header=$tpl_module_title}
+    {$isOpen=$module_params.isOpen}
+    {$icon=$module_params.icon}
+    {$zone=$module_params.name}
+    {$zoneclass=$module_params.zoneclass}
     
     {if $module_params.error}
         <div class="alert alert-danger" role="alert">

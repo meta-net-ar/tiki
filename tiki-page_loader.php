@@ -31,8 +31,7 @@ $refresh = 1000 * $_REQUEST["refresh"];
         </script>
     </head>
 
-    <body onload = "window.setInterval('location.reload()','<?php
-    echo $refresh ?>');">
+    <body onload = "window.setInterval(function() { location.reload(); }, <?php echo $refresh ?>);">
 
     </body>
 </html>

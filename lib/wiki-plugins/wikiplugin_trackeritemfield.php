@@ -125,12 +125,9 @@ function wikiplugin_trackeritemfield($data, $params)
     static $memoItemId = 0;
     static $memoTrackerId = 0;
     static $memoStatus = 0;
-    static $memoUserTracker = false;
     static $memoItemObject = null;
 
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
-    $smarty = TikiLib::lib('smarty');
     $trklib = TikiLib::lib('trk');
 
     extract($params, EXTR_SKIP);
@@ -230,7 +227,7 @@ function wikiplugin_trackeritemfield($data, $params)
             $dataelse = '';
     }
     if (! empty($status)) {
-        if (! strstr($status, $memoStatus)) {
+        if (! str_contains($status, $memoStatus)) {
             return $dataelse;
         }
     }

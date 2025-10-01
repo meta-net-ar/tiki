@@ -39,22 +39,12 @@ function wikiplugin_agentinfo($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $asetup = '';
-
-    if (! isset($info)) {
-        $info = 'IP';
-    }
-
-    if ($info == 'IP') {
-        $asetup = $tikilib->get_ip_address();
-    }
-
     if ($info == 'SVRSW' && isset($_SERVER['SERVER_SOFTWARE'])) {
         $asetup = $_SERVER["SERVER_SOFTWARE"];
-    }
-
-    if ($info == 'BROWSER' && isset($_SERVER['HTTP_USER_AGENT'])) {
+    } elseif ($info == 'BROWSER' && isset($_SERVER['HTTP_USER_AGENT'])) {
         $asetup = $_SERVER["HTTP_USER_AGENT"];
+    } else {
+        $asetup = $tikilib->get_ip_address();
     }
 
     return $asetup;

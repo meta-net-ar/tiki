@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -31,7 +31,7 @@ class PerformanceStatsLib extends TikiLib
 
     /**
      * Clear all performance records from the database
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function clearPerformanceRecords()
     {
@@ -44,7 +44,7 @@ class PerformanceStatsLib extends TikiLib
      * @param int $offset
      * @param string $find
      * @param string $order
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function getRequestsBasedOnAverageRequestTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC', string $orderType = '')
     {
@@ -61,7 +61,7 @@ class PerformanceStatsLib extends TikiLib
      * @param int $offset
      * @param string $find
      * @param string $order
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function getRequestsBasedOnMaximumProcessingTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC')
     {

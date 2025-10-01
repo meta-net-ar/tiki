@@ -41,7 +41,7 @@
                     <input type="hidden" name="offset" value="{$offset}">
                     <input type="hidden" name="sort_mode" value="{$sort_mode}">
                     <input type="hidden" name="remove" value="{$words[user].word}">
-                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr}Are you sure you want to delete this word?{/tr}')">
+                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr}Are you sure you want to delete this word?{/tr}')" aria-label="{tr}Delete{/tr}">
                         {icon name='remove'}
                     </button>
                 </form>
@@ -53,4 +53,4 @@
 </table>
 </div>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

@@ -25,7 +25,7 @@ class Preference extends Base
         if (isset($params['source'])) {
             $source = $params['source'];
         }
-        $get_pages = isset($params['get_pages']) && $params['get_pages'] != 'n' ? true : false;
+        $get_pages = isset($params['get_pages']) && $params['get_pages'] != 'n';
 
         if ($info = $prefslib->getPreference($params['name'], true, $source, $get_pages)) {
             if (isset($info['hide']) && $info['hide'] === true) {
@@ -85,6 +85,17 @@ class Preference extends Base
                 $info['tags'] = [];
             }
 
+            $info['parameters']['disabled'] = false;
+
+            if (! empty($info['mandatory_dependencies'])) {
+                foreach ($info['mandatory_dependencies'] as $dep) {
+                    if (empty($prefs[$dep])) {
+                        $info['parameters']['disabled'] = true;
+                        break;
+                    }
+                }
+            }
+
             $smarty->assign('p', $info);
 
             /* Allows having preference Lisa show only if its parent preference Homer is *un*checked (rather than checked), by setting mode=invert on Homer.
@@ -118,7 +129,7 @@ class Preference extends Base
                 'tagstring' => 'modified basic all',
                 'separator' => null,
             ];
-            if (strpos($_SERVER["SCRIPT_NAME"], 'tiki-edit_perspective.php') !== false) {
+            if (str_contains($_SERVER["SCRIPT_NAME"], 'tiki-edit_perspective.php')) {
                 $info['hint'] = tra('Drag this out of the perspective and resave the perspective.');
             }
 

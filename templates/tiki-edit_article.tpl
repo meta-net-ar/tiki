@@ -82,7 +82,7 @@
                                         <li>
                                             {section loop=$translations name=t}
                                                 {if $articleId != $translations[t].objId}
-                                                    {$translations[t].lang|escape}: <a href="tiki-edit_article.php?articleId={$translations[t].objId|escape}" class="alert-link">{$translations[t].objName|escape}</a><br>
+                                                    {$translations[t].lang|escape}: <a href="tiki-edit_article.php?articleId={$translations[t].objId|escape}" class="btn btn-link">{$translations[t].objName|escape}</a><br>
                                                 {/if}
                                             {/section}
                                         </li>
@@ -177,12 +177,6 @@
                     {jscalendar date=$publishDate fieldname="publishDate" showtime='y' timezone=$displayTimezone}
                 </div>
             </div>
-            <div class="mb-3 row clearfix">
-                <label class="col-form-label col-md-4">{tr}Expiration Date{/tr}</label>
-                <div class="col-md-8">
-                    {jscalendar date=$expireDate fieldname="expireDate" showtime='y' timezone=$displayTimezone}
-                </div>
-            </div>
         {/tab}
         {tab name="{tr}Image{/tr}"}
             <h2>{tr}Image{/tr}</h2>
@@ -190,12 +184,12 @@
                 <input type="hidden" name="MAX_FILE_SIZE" value="{$prefs.article_image_file_size_max}">
                 <label for="userfile1" class="col-form-label col-md-4">{tr}Own Image{/tr}</label>
                 <div class="col-md-8">
-                    <input class="form-control" name="userfile1" id="userfile1" type="file" accept="image/*" onchange="document.getElementById('useImage').checked = true;">
+                    <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
                     <span class="form-text">{tr}If not the topic image{/tr} - {tr}Max file size : {$prefs.article_image_file_size_max/1000} KB{/tr}</span>
                 </div>
             </div>
             {if $hasImage eq 'y'}
-                <div class="mb-3 row">
+                <div class="mb-3">
                     <label class="col-md-4 col-form-label">{tr}Current Image{/tr}</label>
                     <div class="thumbnail col-md-8">
                         {if $imageIsChanged eq 'y'}
@@ -206,20 +200,26 @@
                     </div>
                 </div>
             {/if}
-            <div class="mb-3{if $types.$type.show_image_caption neq 'y'}hidden{/if}">
+            <div class="mb-3">
+                <label class="col-md-4 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
+                </div>
+            </div>
+            <div class="mb-3 {if $types.$type.show_image_caption neq 'y'}hidden{/if}">
                 <label class="col-md-4 col-form-label" for="image_caption">{tr}Image caption{/tr}</label>
                 <div class="col-md-8">
                     <input type="text" class="form-control" name="image_caption" id="image_caption" value="{$image_caption|escape}" >
                     <div class="form-text">{tr}Default will use the topic name{/tr}</div>
                 </div>
             </div>
-            <div class="form-check{if $types.$type.show_image neq 'y'}hidden{/if} offset-md-4">
+            <div class="form-check{if $types.$type.show_image neq 'y'} hidden{/if}">
                 <label class="form-check-label">
                     <input type="checkbox" class="form-check-input" name="useImage" id="useImage"{if $useImage eq 'y'}checked='checked'{/if} >
                     {tr}Use own image{/tr}
                 </label>
             </div>
-            <div class="form-check{if $types.$type.show_image neq 'y'}hidden{/if} offset-md-4">
+            <div class="form-check{if $types.$type.show_image neq 'y'} hidden{/if} mb-3">
                 <label class="form-check-label">
                     <input type="checkbox" class="form-check-input" name="isfloat"{if $isfloat eq 'y'}checked='checked'{/if}>
                     {tr}Float text around image{/tr}
@@ -228,17 +228,17 @@
             <fieldset class="{if $types.$type.show_image neq 'y'}hidden{/if}">
                 <legend>{tr}Read Article{/tr}</legend>
                 <span class="form-text">{tr}Maximum dimensions of custom image in view mode{/tr}</span>
-                <div class="mb-3 row">
+                <div class="mb-3 row col-md-8">
                     <label for="image_x" class="col-form-label col-md-4">{tr}Width{/tr}</label>
                     <div class="input-group col-sm-3">
-                        <input type="text" class="form-control" name="image_x" id="image_x"{if $image_x > 0} value="{$image_x|escape}"{/if}>
+                        <input type="number" class="form-control" name="image_x" id="image_x"{if $image_x > 0} value="{$image_x|escape}"{/if}>
                         <span class="input-group-text">{tr}pixels{/tr}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="mb-3 row col-md-8">
                     <label for="image_y" class="col-form-label col-md-4">{tr}Height{/tr}</label>
                     <div class="input-group col-sm-3">
-                        <input type="text" class="form-control" name="image_y" id="image_y"{if $image_y > 0} value="{$image_y|escape}"{/if}>
+                        <input type="number" class="form-control" name="image_y" id="image_y"{if $image_y > 0} value="{$image_y|escape}"{/if}>
                         <span class="input-group-text">{tr}pixels{/tr}</span>
                     </div>
                 </div>
@@ -246,17 +246,17 @@
             <fieldset class="{if $types.$type.show_image neq 'y'}hidden{/if}">
                 <legend>{tr}View Articles{/tr}</legend>
                 <span class="form-text">{tr}Maximum dimensions of custom image in list mode{/tr}</span>
-                <div class="mb-3 row">
+                <div class="mb-3 row col-md-8">
                     <label for="list_image_x" class="col-form-label col-sm-4">{tr}Width{/tr}</label>
                     <div class="input-group col-sm-3">
-                        <input type="text" class="form-control" name="list_image_x" id="list_image_x"{if $list_image_x > 0} value="{$list_image_x|escape}"{/if}>
+                        <input type="number" class="form-control" name="list_image_x" id="list_image_x"{if $list_image_x > 0} value="{$list_image_x|escape}"{/if}>
                         <span class="input-group-text">{tr}pixels{/tr}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="mb-3 row col-md-8">
                     <label for="list_image_y" class="col-form-label col-sm-4">{tr}Height{/tr}</label>
                     <div class="input-group col-sm-3">
-                        <input type="text" class="form-control" name="list_image_y" id="list_image_y"{if $list_image_y > 0} value="{$list_image_y|escape}"{/if}>
+                        <input type="number" class="form-control" name="list_image_y" id="list_image_y"{if $list_image_y > 0} value="{$list_image_y|escape}"{/if}>
                         <span class="input-group-text">{tr}pixels{/tr}</span>
                     </div>
                 </div>
@@ -281,19 +281,19 @@
                     </div>
                 </div>
             {/if}
-            <div class="mb-3{if $types.$type.show_topline neq 'y'}hidden{/if}">
+            <div class="mb-3{if $types.$type.show_topline neq 'y'} hidden{/if}">
                 <label for="topline" class="col-form-label col-md-4">{tr}Topline{/tr}</label>
                 <div class="col-md-8">
                     <input type="text" name="topline" id="topline" value="{$topline|escape}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3{if $types.$type.show_subtitle neq 'y'}hidden{/if}">
+            <div class="mb-3{if $types.$type.show_subtitle neq 'y'} hidden{/if}">
                 <label for="subtitle" class="col-form-label col-md-4">{tr}Subtitle{/tr}</label>
                 <div class="col-md-8">
                     <input type="text" name="subtitle" id="subtitle" value="{$subtitle|escape}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3{if $types.$type.show_linkto neq 'y'}hidden{/if}">
+            <div class="mb-3{if $types.$type.show_linkto neq 'y'} hidden{/if}">
                 <label for="linkto" class="col-form-label col-md-4">{tr}Source{/tr}</label>
                 <div class="col-md-8">
                     <input type="url" name="linkto" id="linkto" value="{$linkto|escape}" class="form-control" placeholder="https://...">
@@ -305,7 +305,7 @@
                     {/if}
                 </div>
             </div>
-            <div class="mb-3{if $types.$type.use_ratings neq 'y'}hidden{/if}">
+            <div class="mb-3{if $types.$type.use_ratings neq 'y'} hidden{/if}">
                 <label for="rating" class="col-md-4 col-form-label">{tr}Author rating{/tr}</label>
                 <div class="col-md-4">
                     <select name="rating" id="rating" class="form-control">
@@ -317,7 +317,7 @@
                 </div>
             </div>
            {if $prefs.geo_locate_article eq 'y'}
-                <div class="mb-3 row clearfix">
+                <div class="mb-3 clearfix">
                     <label class="col-form-label col-md-4">{tr}Location{/tr}</label>
                     <div class="col-md-8">
                         <div class="map-container" data-geo-center="{defaultmapcenter}" data-target-field="geolocation"></div>
@@ -326,7 +326,7 @@
                 </div>
             {/if}
             {if $prefs.feature_cms_templates eq 'y' and $tiki_p_use_content_templates eq 'y' and $templates|@count ne 0}
-                <div class="mb-3 row clearfix">
+                <div class="mb-3 clearfix">
                     <label for="templateId" class="col-form-label col-md-4">{tr}Apply content template{/tr}</label>
                     <div class="col-md-8">
                         <select class="form-select" name="templateId" id="templateId" onchange="javascript:document.getElementById('editpageform').submit();">
@@ -339,8 +339,8 @@
                 </div>
             {/if}
             {if $prefs.feature_cms_emails eq 'y'}
-                <div class="mb-3 row">
-                    <label for="emails" class="col-md-4">{tr}Email{/tr}</label>
+                <div class="mb-3">
+                    <label for="emails" class="col-md-4 col-form-label">{tr}Email{/tr}</label>
                     <div class="col-md-8">
                         <input type="text" name="emails" id="emails" value="{$emails|escape}" class="form-control">
                         <span class="form-text">{tr}Email addresses to be sent notifications (comma-separated){/tr}</span>
@@ -362,8 +362,8 @@
                 <fieldset>
                     <legend>{tr}Attributes{/tr}</legend>
                     {foreach from=$all_attributes item=att key=attname}
-                        {assign var='attid' value=$att.itemId|replace:'.':'_'}
-                        {assign var='attfullname' value=$att.itemId}
+                        {$attid=$att.itemId|replace:'.':'_'}
+                        {$attfullname=$att.itemId}
                         <div class="mb-3 row" id={$attid}{if $types.$type.$attid eq 'y'}style="display:;"{else}style="display:none;"{/if}>
                             <label class="col-form-label col-md-4" for="{$attfullname|escape}">{$attname|escape}</label>
                             <div class="col-md-8">

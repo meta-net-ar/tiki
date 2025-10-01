@@ -70,7 +70,7 @@ for ($i = 0; $i < $temp_max; $i++) {
         $channels["data"][$i]["individual"] = 'n';
     }
 }
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-section_options.php');
 

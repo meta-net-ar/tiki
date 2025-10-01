@@ -74,14 +74,7 @@ if (isset($_REQUEST['theme'])) {
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);
 if ($tiki_p_view != 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign(
-        'msg',
-        tra("Permission denied. You cannot view this page.")
-    );
-
-    $smarty->display("error_raw.tpl");
-    die;
+    Feedback::errorAndDie(tra("Permission denied. You cannot view this page."), \Laminas\Http\Response::STATUS_CODE_401, "error_raw.tpl");
 }
 
 // BreadCrumbNavigation here
@@ -95,15 +88,13 @@ if (! in_array($page, $_SESSION["breadCrumb"])) {
     if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION["breadCrumb"]);
     }
-
-    array_push($_SESSION["breadCrumb"], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION["breadCrumb"]);
 
     unset($_SESSION["breadCrumb"][$pos]);
-    array_push($_SESSION["breadCrumb"], $page);
 }
+$_SESSION["breadCrumb"][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);
@@ -148,6 +139,7 @@ if (isset($_REQUEST['pdf'])) {
     set_time_limit(777);
 
     $_POST["html"] = urldecode($_POST["html"] ?? '');
+    $referer = array_key_exists('HTTP_REFERER', $_SERVER) ? $_SERVER['HTTP_REFERER'] : 'tiki-index.php';
 
     if (isset($_POST["html"])) {
         $generator = new PdfGenerator(PdfGenerator::MPDF);
@@ -164,7 +156,7 @@ if (isset($_REQUEST['pdf'])) {
                 str_replace(
                     'tiki-slideshow.php?',
                     'tiki-index.php?',
-                    $_SERVER['HTTP_REFERER']
+                    $referer
                 )
             );
         }
@@ -260,6 +252,7 @@ if (isset($_REQUEST['pdf'])) {
 }
 $smarty->assign('pages', $pages);
 $smarty->assign_by_ref('parsed', $pdata);
+$smarty->assign_by_ref('version', $info["version"]);
 $smarty->assign_by_ref('lastModif', $info["lastModif"]);
 
 if (empty($info["user"])) {
@@ -285,10 +278,6 @@ $headerlib->add_cssfile(
 $headerlib->add_css(<<<CSS
     .reveal span {
         font-weight: bold;
-    }
-
-    .reveal #ss-options span.select2-selection__choice__value {
-        font-family: "Source Sans Pro", Helvetica, sans-serif;
     }
 
     .reveal .controls {
@@ -715,8 +704,7 @@ function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator
         foreach ($headingsTags as $slide) {
             if ($firstSlide == 0) {
                 //checking if first slide has pluginSlideShowSlide instance, then concat with main text, otherwise ignore
-                $sectionCheck = strpos($slide, '<sslide');
-                if ($sectionCheck == true) {
+                if (str_contains($slide, '<sslide')) {
                     $slideContent .= str_replace("sslide", "section", $slide);
                 } else {
                     $slideContent .= slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $slidePluginHeadingLevelSlideSeparator);

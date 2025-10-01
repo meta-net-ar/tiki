@@ -39,8 +39,6 @@ $searchtext = '';
 $replacetext = '';
 if (! empty($_REQUEST['replacetext'])) {
     $replacetext = $_REQUEST['replacetext'];
-} else {
-    $replacetext = '';
 }
 if (! empty($_REQUEST['searchtext'])) {
     $searchtext = $_REQUEST['searchtext'];
@@ -127,7 +125,7 @@ if (isset($_REQUEST['search']) && $searchtext) {
             $r["searchreplace"][] = ($r["page_id"] . ":" . $r["version"] . ":" . $curpos);
         }
     }
-    $smarty->assign('cant', $results['cant']);
+    $smarty->assign('count', $results['count']);
     $smarty->assign('results', $results['data']);
 }
 

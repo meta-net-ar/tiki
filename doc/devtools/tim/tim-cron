@@ -9,12 +9,14 @@ setup()
 
 setup
 
-for BRANCH in $BRANCHES;
-do
-    cd $SVN_CACHE/$BRANCH/
-    svn upgrade > /dev/null
-    svn up > /dev/null || (svn cleanup; svn up;) > /dev/null
-    touch $SVN_CACHE/$BRANCH.lock
-    tar -czf $SVN_CACHE/tmp_$BRANCH.tgz . && mv $SVN_CACHE/tmp_$BRANCH.tgz $SVN_CACHE/$BRANCH.tar.gz
-    /bin/rm $SVN_CACHE/$BRANCH.lock
+for BRANCH in $BRANCHES; do
+    cd $GIT_CACHE/$BRANCH/
+
+    git fetch --all > /dev/null
+    git reset --hard origin/$BRANCH > /dev/null
+    git clean -fd > /dev/null
+
+    touch $GIT_CACHE/$BRANCH.lock
+    tar -czf $GIT_CACHE/tmp_$BRANCH.tgz . && mv $GIT_CACHE/tmp_$BRANCH.tgz $GIT_CACHE/$BRANCH.tar.gz
+    /bin/rm $GIT_CACHE/$BRANCH.lock
 done

@@ -142,6 +142,7 @@ body.fullscreen.tiki.navbar-padding {
 
 .tiki .popover {
     p:last-child { margin-bottom: 0; }
+    z-index: 999999;
 }
 
 .tiki .popover {
@@ -292,6 +293,20 @@ body.fullscreen.tiki.navbar-padding {
     .side-col-toggle-container { display: none; }
 }
 
+@media (max-width: 992px) {
+    .hide_zone_left #col2 #left_modules,
+    .hide_zone_right #col3 #right_modules {
+      display: none;
+    }
+    #col2 .side-col-toggle-small-screen,
+    #col3 .side-col-toggle-small-screen {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .side-col-toggle-small-screen {
+        background-image: linear-gradient(to bottom,  transparent, rgba(150,150,150,.25) calc(50% - 1px), var(--bs-border-color) calc(50%), transparent calc(50% + 1px));
+    }
+}
 @media (min-width: 992px) {
     .hide_zone_left #col2, // When hidden we simply do not display the columns
     .hide_zone_right #col3 {

@@ -38,6 +38,7 @@ $inputConfiguration = [
             'offset'               => 'int',         //get
             'edit_module'          => 'bool',        //post
             'moduleId'             => 'int',         //post
+            'menuId'               => 'int',         //get
         ],'staticKeyFiltersForArrays' => [
             'assign_params'        => 'striptags',   //post
             'groups'               => 'groupname',   //post
@@ -46,7 +47,7 @@ $inputConfiguration = [
 ];
 
 $section = 'admin';
-require_once('tiki-setup.php');
+require_once 'tiki-setup.php';
 
 $dcslib = TikiLib::lib('dcs');
 $bannerlib = TikiLib::lib('banner');
@@ -124,6 +125,15 @@ if (! empty($_REQUEST['edit_assign'])) {
     $smarty->assign_by_ref('info', $info);
     if (! $info['name']) {
         $smarty->assign('assign_selected', $_REQUEST['edit_assign']);
+    }
+
+    if (! empty($_REQUEST['menuId']) && $info['name'] === 'menu') {
+        $params = [];
+        if (! empty($info['params'])) {
+            parse_str($info['params'], $params);
+        }
+        $params['id'] = $_REQUEST['menuId'];
+        $info['params'] = http_build_query($params, '', '&');
     }
 
     $modinfo = $modlib->get_module_info($info['name']);
@@ -292,32 +302,30 @@ if (isset($_REQUEST['preview'])) {
         try {
             $data = $smarty->fetch('modules/user_module.tpl');
         } catch (Exception $e) {
-            $smarty->assign(
-                'msg',
+            Feedback::errorAndDie(
                 tr(
                     'There is a problem with your custom module "%0": ' . '<br><br><em>' . $e->getMessage()
                     . '</em><br><br>' . '<span class="button"><a href="tiki-admin_modules.php?um_edit='
                     . $_REQUEST['assign_name'] . '&cookietab=2#editcreate">' . tr('Click here to edit the module')
                     . '</a></span>',
                     $_REQUEST['assign_name']
-                )
+                ),
+                \Laminas\Http\Response::STATUS_CODE_409
             );
-            $smarty->display('error.tpl');
-            die;
         }
     } else {
         $phpfile = 'modules/mod-' . $_REQUEST['assign_name'] . '.php';
         $phpfuncfile = 'modules/mod-func-' . $_REQUEST['assign_name'] . '.php';
         $template = 'modules/mod-' . $_REQUEST['assign_name'] . '.tpl';
         if ($file = $tikilib->safeFileExistsInPath($phpfile, MODULES_PATH)) {
-            include($file);
+            include $file;
         } elseif ($file = $tikilib->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             if (isset($_REQUEST['assign_params']['rows'])) {
                 $module_rows = $_REQUEST['assign_params']['rows'];
             } else {
                 $module_rows = 10;
             }
-            include_once($file);
+            include_once $file;
             $function = 'module_' . $_REQUEST['assign_name'];
             $assign_param = $_REQUEST['assign_params'] ?? [];
             if (function_exists($function)) {
@@ -351,7 +359,7 @@ if (isset($_REQUEST['preview'])) {
     $smarty->assign_by_ref('assign_order', $_REQUEST['assign_order']);
     $smarty->assign_by_ref('assign_cache', $_REQUEST['assign_cache']);
     $grps = '';
-    $module_groups = ! isset($_REQUEST['groups']) ? [] : $_REQUEST['groups'];
+    $module_groups = $_REQUEST['groups'] ?? [];
     foreach ($module_groups as $amodule) {
         $grps = $grps . ' $amodule ';
     }
@@ -381,14 +389,14 @@ if (isset($_REQUEST['assign']) && $access->checkCsrf()) {
     }
     $smarty->assign_by_ref('assign_type', $_REQUEST['assign_type']);
     $grps = '';
-    $module_groups = ! isset($_REQUEST['groups']) ? [] : $_REQUEST['groups'];
+    $module_groups = $_REQUEST['groups'] ?? [];
     foreach ($module_groups as $amodule) {
         $grps = $grps . " $amodule ";
     }
     $smarty->assign('module_groups', $grps);
     if (empty($missing_params)) {
         $result = $modlib->assign_module(
-            isset($_REQUEST['moduleId']) ? $_REQUEST['moduleId'] : 0,
+            $_REQUEST['moduleId'] ?? 0,
             $assign_name,
             '',
             $_REQUEST['assign_position'],
@@ -481,27 +489,27 @@ $maxRecords = $prefs['maxRecords'];
 
 $polls = $polllib->list_active_polls($offset, $maxRecords, 'publishDate_desc', '');
 $smarty->assign('polls', $polls['data']);
-$maximum = max($maximum, $polls['cant']);
+$maximum = max($maximum, $polls['count']);
 
 $contents = $dcslib->list_content($offset, $maxRecords, 'contentId_desc', '');
 $smarty->assign('contents', $contents['data']);
-$maximum = max($maximum, $contents['cant']);
+$maximum = max($maximum, $contents['count']);
 
 $rsss = $rsslib->list_rss_modules($offset, $maxRecords, 'name_desc', '');
 $smarty->assign('rsss', $rsss['data']);
-$maximum = max($maximum, $rsss['cant']);
+$maximum = max($maximum, $rsss['count']);
 
 $menus = $menulib->list_menus($offset, $maxRecords, 'menuId_desc', '');
 $smarty->assign('menus', $menus['data']);
-$maximum = max($maximum, $menus['cant']);
+$maximum = max($maximum, $menus['count']);
 
 $banners = $bannerlib->list_zones();
 $smarty->assign('banners', $banners['data']);
-$maximum = max($maximum, $banners['cant']);
+$maximum = max($maximum, $banners['count']);
 
 $wikistructures = $structlib->list_structures('0', '100', 'pageName_asc', '');
 $smarty->assign('wikistructures', $wikistructures['data']);
-$maximum = max($maximum, $wikistructures['cant']);
+$maximum = max($maximum, $wikistructures['count']);
 
 $smarty->assign('maxRecords', $maxRecords);
 $smarty->assign('offset', $offset);
@@ -540,6 +548,7 @@ $prefs['feature_left_column'] = 'fixed';
 $prefs['feature_right_column'] = 'fixed';
 $prefs['module_zones_pagebottom'] = 'fixed';
 $prefs['module_zones_bottom'] = 'fixed';
+$prefs['module_sidebar_toggle_small_screen'] = 'fixed';
 
 $headerlib->add_css(
     '.module:hover {' . ' cursor: move;' . ' background-color: #ffa;' . ' }'
@@ -557,30 +566,62 @@ if ($prefs['feature_jquery_validation'] === 'y') {
             ],
             'um_data' => [
                 'required' => true,
-                'remote' => [
-                    'url' => 'validate-ajax.php',
-                    'type' => 'post',
-                    'data' => [
-                        'validator' => 'smarty',
-                        'input' => 'inputFunction',
-                        'parameter' => 'parameterFunction',
-                    ],
-                ],
             ],
         ],
         'submitHandler' => 'submitHandlerFunction',
     ];
+
+    // Add remote validator only if eval is allowed
+    if ($prefs['smarty_enable_string_eval'] === 'y') {
+        $rules['rules']['um_data']['remote'] = [
+            'url' => 'validate-ajax.php',
+            'type' => 'post',
+            'data' => [
+                'validator' => 'smarty',
+                'input' => 'inputFunction',
+                'parameter' => 'parameterFunction',
+            ],
+        ];
+    }
+
     $validationjs = '$("form[name=editusr]").validate(' . json_encode($rules) . ')';
     $validationjs = str_replace('"inputFunction"', 'function() { return $("#um_data").val(); }', $validationjs);
     $validationjs = str_replace('"parameterFunction"', 'function() { return $("#um_parse").val(); }', $validationjs);
-    $validationjs = str_replace('"submitHandlerFunction"', 'function(form, event){return process_submit(form, event);}', $validationjs);
+    $validationjs = str_replace(
+        '"submitHandlerFunction"',
+        'function(form, event){return process_submit(form, event);}',
+        $validationjs
+    );
+
     TikiLib::lib('header')->add_jq_onready($validationjs);
 }
+
 
 $sameurl_elements = ['offset', 'sort_mode', 'where', 'find'];
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+
+if (! isset($_REQUEST['sort_mode'])) {
+    $sort_mode = 'name_desc';
+} else {
+    $sort_mode = $_REQUEST['sort_mode'];
+}
+
+if (isset($_REQUEST['find'])) {
+    $find = $_REQUEST['find'];
+} else {
+    $find = '';
+}
+
+$channels = $menulib->list_menus($offset, $maxRecords, $sort_mode, $find);
+foreach ($channels['data'] as $i => $channel) {
+    if ($userlib->object_has_one_permission($channel['menuId'], 'menus')) {
+        $channels['data'][$i]['individual'] = 'y';
+    }
+}
+
+$smarty->assign('channels', $channels['data']);
 
 if (! empty($_REQUEST['edit_module'])) {    // pick up ajax calls
     // the strings below are used to display the tab titles in the edit module box
@@ -594,7 +635,9 @@ if (! empty($_REQUEST['edit_module'])) {    // pick up ajax calls
     if (getCookie('show_col3') === 'n') {
         unset($headerlib->css[100][array_search('#c1c2 #wrapper #col1.marginright { margin-right: 0; }', $headerlib->css[100])]);
     }
-
+    $smarty->assign('padding_top_layout', true);
+    $smarty->assign('layout_has_modules', true);
+    $smarty->assign('theme_navbar_fixed_topbar_offset', $prefs["theme_navbar_fixed_topbar_offset"] + 35);
     $smarty->assign('mid', 'tiki-admin_modules.tpl');
     $smarty->display('tiki.tpl');
 }

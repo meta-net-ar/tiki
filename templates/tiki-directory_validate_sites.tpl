@@ -51,7 +51,7 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
                                         <input type="hidden" name="offset" value="{$offset}">
                                         <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                         <input type="hidden" name="remove" value="{$items[user].siteId}">
-                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$items[user].name}Are you sure you want to delete %0?{/tr}')">
+                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$items[user].name}Are you sure you want to delete %0?{/tr}')" aria-label="{tr}Delete{/tr}">
                                             {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                         </button>
                                     </form>
@@ -62,9 +62,9 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
-                    <td colspan="6"><i>{tr}Directory Categories:{/tr}{assign var=fsfs value=1}
+                    <td colspan="6"><i>{tr}Directory Categories:{/tr}{$fsfs=1}
                         {section name=ii loop=$items[user].cats}
-                            {if $fsfs}{assign var=fsfs value=0}{else}, {/if}
+                            {if $fsfs}{$fsfs=0}{else}, {/if}
                                 {$items[user].cats[ii].path}
                             {/section}</i>
                     </td>
@@ -104,4 +104,4 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
         }
     });
 {/jq}
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

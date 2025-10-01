@@ -39,8 +39,8 @@
             auto_save('editwiki', autoSaveId);
             if ($('#autosave_preview:visible').length === 0) {
                 if (!ajaxPreviewWindow) {
-                    setCookie("preview_diff_style", "", "preview", "session");
-                    $("#preview_diff_style").val("").trigger("change.select2");
+                    setCookie("preview_diff_style", "", "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
+                    $("#preview_diff_style").val("");
                     $('#autosave_preview').slideDown('slow', function(){ ajax_preview( 'editwiki', autoSaveId, true );});
                 }
             } else {
@@ -173,7 +173,7 @@
                 </div>
             {/if}
             <div id="diff_history">
-                {include file='pagehistory.tpl' cant=0}
+                {include file='pagehistory.tpl' count=0}
                 {if $diff_summaries}
                     <div class="wikitext" id="diff_versions">
                         <ul>
@@ -185,7 +185,7 @@
                                         {tr}Version:{/tr} <em>{tr}No diff yet{/tr}</em> - <em>{tr}No comment{/tr}</em>
                                     {/if}
                                     {if count($diff_summaries) gt 1}
-                                        {assign var=diff_version value=$diff.version}
+                                        {$diff_version=$diff.version}
                                         {icon name="next" onclick="\$('input[name=oldver]').val($diff_version);\$('#editpageform').trigger('submit');return false;" title=":{tr}View{/tr}" style="cursor: pointer"}
                                     {/if}
                                 </li>
@@ -247,29 +247,37 @@
             {/if}
             {tabset name='tabs_editpage' cookietab=1}
                 {tab name="{tr}Edit page{/tr}"}
-                {if $prefs.wiki_description_edit_tab_input eq 'y'}
-                {if $page|lower neq 'sandbox'}
-                {if $prefs.feature_wiki_description eq 'y' or $prefs.metatag_pagedesc eq 'y'}
-                    <div class="mb-3 row">
-                        {if $prefs.metatag_pagedesc eq 'y'}
-                            <label for="description" class="col col-auto col-form-label">{tr}Description (used for metatags){/tr}</label>
-                        {else}
-                            <label for="description" class="col col-auto col-form-label">{tr}Description{/tr}</label>
+                    {if $prefs.wiki_description_edit_tab_input eq 'y'}
+                        {if $page|lower neq 'sandbox'}
+                            {if $prefs.feature_wiki_description eq 'y' or $prefs.metatag_pagedesc eq 'y'}
+                                <div class="mb-3 row">
+                                    {if $prefs.metatag_pagedesc eq 'y'}
+                                        <label for="description" class="col col-auto col-form-label">{tr}Description (used for metatags){/tr}</label>
+                                    {else}
+                                        <label for="description" class="col col-auto col-form-label">{tr}Description{/tr}</label>
+                                    {/if}
+                                    <div class="col flex-grow-1">
+                                        <input class="form-control" type="text" id="description" name="description" maxlength="200" value="{$description|escape}">
+                                        <small id="description-limit-msg" class="text-danger" style="display:none;">
+                                            {tr}You have reached the number of characters allowed (200 max) for the description field{/tr}
+                                        </small>
+                                        {jq}
+                                            $("#description").on("keyup", function () {
+                                                var length = $(this).val().length;
+                                                if(length >= 200) {
+                                                    $("#description-limit-msg").show();
+                                                } else {
+                                                    $("#description-limit-msg").hide();
+                                                }
+                                            });
+                                        {/jq}
+                                        <div id="description-limit-msg" class="form-text" style="display: none;">
+                                            {tr}The recommended maximum length for the description is 200 characters.{/tr}
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
                         {/if}
-                        <div class="col flex-grow-1">
-                            <input class="form-control" type="text" id="description" name="description" maxlength="200" value="{$description|escape}">
-                            {jq}
-                                $("#description").on("keyup", function () {
-                                var length = $(this).val().length;
-                                if(length == 200) {
-                                alert("You have reached the number of characters allowed (200 max) for the description field");
-                                }
-                                });
-                            {/jq}
-                        </div>
-                    </div>
-                {/if}
-                    {/if}
                     {/if}
                     {if $translation_mode == 'y'}
                         <div class="translation_message">
@@ -289,22 +297,6 @@
                             {/if}
                     {/if}
                     {if $page|lower neq 'sandbox'}
-                        <fieldset class="edit-zone-footer my-3">
-                            <label for="comment">{tr}Describe the change you made{/tr} {help url='Editing-Wiki-Pages' desc="{tr}Edit comment: Enter some text to describe the changes you are currently making{/tr}"}</label>
-                            <input class="form-control wikiedit" type="text" id="comment" name="comment" value="{$commentdata|escape}" maxlength="255">
-                            {if isset($show_watch) && $show_watch eq 'y'}
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="watch" name="watch" value="1"{if $watch_checked eq 'y'} checked="checked"{/if}>
-                                    <label class="form-check-label" for="watch">{tr}Monitor this page{/tr}</label>
-                                </div>
-                            {/if}
-                        </fieldset>
-                        {if $prefs.feature_contribution eq 'y'}
-                            <fieldset>
-                                <legend>{tr}Contributions{/tr}</legend>
-                                {include file='contribution.tpl'}
-                            </fieldset>
-                        {/if}
                         {if (!isset($wysiwyg) || $wysiwyg neq 'y') and $prefs.feature_wiki_pictures eq 'y' and $tiki_p_upload_picture eq 'y' and $prefs.feature_filegals_manager neq 'y'}
                             <fieldset>
                                 <legend>{tr}Upload picture{/tr}</legend>
@@ -312,7 +304,7 @@
                                 <input type="hidden" name="hasAlreadyInserted" value="">
                                 <input type="hidden" name="prefix" value="img/wiki_up/{if $tikidomain}{$tikidomain}/{/if}">
                                 <input name="picfile1" type="file" accept="image/*" class="form-control" onchange="insertImgFile('editwiki','picfile1','hasAlreadyInserted','img')">
-                                <a href="#" onclick="needToConfirm = false; addImgForm(event)">{tr}Add another image{/tr}</a>
+                                <a href="#" onclick="needToConfirm = false; addImgForm(event)" role="button">{tr}Add another image{/tr}</a>
                             </fieldset>
                         {/if}
                     {/if}
@@ -413,9 +405,9 @@
                             </div>
                             {if $prefs.ajax_autosave eq "y"}
                                 {jq}
-    $("input[name=allowhtml]").on("change", function() {
-    auto_save( "editwiki", autoSaveId );
-    });
+                                    $("input[name=allowhtml]").on("change", function() {
+                                    auto_save( "editwiki", autoSaveId );
+                                    });
                                 {/jq}
                             {/if}
                         {else}
@@ -439,14 +431,6 @@
                                     <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">
                                     <input class="form-control me-2" id="userfile1" name="userfile1" type="file">
                                     <input type="submit" class="wikiaction btn btn-primary" name="attach" value="{tr}Import{/tr}" onclick="javascript:needToConfirm=false; insertImgFile('editwiki','userfile2','hasAlreadyInserted2','file', 'page2', 'attach_comment'); return true;">
-                                </div>
-                            </div>
-                        {/if}
-                        {if $prefs.feature_wiki_export eq 'y' and $tiki_p_export_wiki eq 'y'}
-                            <div class="mb-3 row">
-                                <label for="" class="col-md-4 col-form-label">{tr}Export page{/tr}</label>
-                                <div class="col-md-8">
-                                    <a href="tiki-export_wiki_pages.php?page={$page|escape:"url"}&amp;all=1" class="btn btn-primary">{icon name="export"} {tr}Export all versions{/tr}</a>
                                 </div>
                             </div>
                         {/if}
@@ -578,11 +562,16 @@
                                 {/if}
                                 <div class="col-md-8">
                                     <input class="form-control" type="text" id="description" name="description" maxlength="200" value="{$description|escape}">
+                                    <small id="description-limit-msg" class="text-danger" style="display:none;">
+                                        {tr}You have reached the number of characters allowed (200 max) for the description field{/tr}
+                                    </small>
                                     {jq}
                                         $("#description").on("keyup", function () {
                                             var length = $(this).val().length;
-                                            if(length == 200) {
-                                                alert("You have reached the number of characters allowed (200 max) for the description field");
+                                            if(length >= 200) {
+                                                $("#description-limit-msg").show();
+                                            } else {
+                                                $("#description-limit-msg").hide();
                                             }
                                         });
                                     {/jq}
@@ -626,8 +615,8 @@
                                     {foreach from=$poll_rated item=rating}
                                         <div>
                                             <a href="tiki-admin_poll_options.php?pollId={$rating.info.pollId}">{$rating.info.title}</a>
-                                            {assign var=thispage value=$page|escape:"url"}
-                                            {assign var=thispoll_rated value=$rating.info.pollId}
+                                            {$thispage=$page|escape:"url"}
+                                            {$thispoll_rated=$rating.info.pollId}
                                             {button href="?page=$thispage&amp;removepoll=$thispoll_rated" _text="{tr}Disable{/tr}"}
                                         </div>
                                     {/foreach}
@@ -807,6 +796,18 @@
                     {/if}
                 {/if}
             {/tabset}
+            {if $page|lower neq 'sandbox'}
+                <fieldset class="edit-zone-footer my-3">
+                    <label for="comment">{tr}Describe the change you made{/tr} {help url='Editing-Wiki-Pages' desc="{tr}Edit comment: Enter some text to describe the changes you are currently making{/tr}"}</label>
+                    <input class="form-control wikiedit" type="text" id="comment" name="comment" value="{$commentdata|escape}" maxlength="255">
+                </fieldset>
+                {if $prefs.feature_contribution eq 'y'}
+                    <fieldset>
+                        <legend>{tr}Contributions{/tr}</legend>
+                        {include file='contribution.tpl'}
+                    </fieldset>
+                {/if}
+            {/if}
         </div>
         <div class="row d-flex justify-content-center">
             {if $page|lower ne 'sandbox'}

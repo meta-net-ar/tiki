@@ -14,7 +14,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
             ->setIcon('img/icons/help.png')
             ->setIconName('help')
             ->setType('Helptool')
-            ->setWysiwygToken('tikihelp')
+            ->setWysiwygToken('help')
             ->setMarkdownSyntax('tikihelp')
             ->setMarkdownWysiwyg('tikihelp')
             ->setClass('qt-help');
@@ -60,10 +60,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
 
     public function getWysiwygToken(): string
     {
-
-        $this->setupCKEditorTool($this->getWysiwygJs());
-
-        return 'tikihelp';
+        return 'help';
     }
 
     public function getMarkdownWysiwyg(): string
@@ -74,7 +71,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
         return parent::getMarkdownWysiwyg();
     }
 
-    private function getWysiwygJs(bool $isMarkdown = false): string
+    public function getWysiwygJs(bool $isMarkdown = false): string
     {
         global $section;
 
@@ -91,14 +88,14 @@ class ToolbarHelptool extends ToolbarUtilityItem
             $params['sheet'] = 1;
         }
 
-        // multiple ckeditors share the same toolbar commands, so area_id (editor.name) must be added when clicked
+        // multiple editor could share the same toolbar commands, so area_id must be added when clicked
         $params['areaId'] = $this->domElementId;
 
         $this->setLabel(tra('WYSIWYG Help'));
 
         return '$.openModal({show: true, remote: "' . $servicelib->getUrl($params) . '"});';
     }
-    protected function getOnClick(): string
+    public function getOnClick(): string
     {
         // set by markdown wysiwyg
         return $this->onClick;

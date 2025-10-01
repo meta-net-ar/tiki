@@ -8,6 +8,20 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\TaskQueue\Tasks\PdfGenerationTask;
+use Tiki\TaskQueue\QueueManager;
+
+/**
+ * TIKI_PRINTING is always true when tiki-print.php is used.
+ * TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+ * TIKI_PRINTING_PDF => TIKI_PRINTING, but not the reverse.
+ * TIKI_DISPLAY_CONTAINS_PDF is true when the display parameter contains 'pdf' anywhere in its value.
+ */
+define('TIKI_PRINTING', true);
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && str_contains($_GET['display'], 'pdf'));
+
 $section_class = "tiki_wiki_page print";
 $inputConfiguration = [
     [
@@ -50,9 +64,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 $smarty->assign('page_id', $info['page_id']);
 
@@ -60,12 +72,12 @@ $smarty->assign('page_id', $info['page_id']);
 $tikilib->get_perm_object($page, 'wiki page', $info);
 $access->check_permission('tiki_p_view', '', 'wiki page', $page);
 // check if the user can export to pdf (including sub request to print system)
-if (($_REQUEST['display'] ?? '') == 'pdf') {
+if (TIKI_PRINTING_PDF) {
     $access->check_permission('tiki_p_export_pdf', '', 'wiki page', $page);
 }
 $pdfExportSubRequest = false;
 if (($_REQUEST['pdf_token'] ?? '') != '') {
-    /** @var Cachelib $cachelib */
+    /** @var \Tiki\Cache\CacheLib $cachelib */
     $cachelib = TikiLib::lib('cache');
     $pdfTokenValue = $cachelib->getCached($_REQUEST['pdf_token'], 'pdfprint_');
     if ($pdfTokenValue !== false && $page == $pdfTokenValue) {
@@ -74,7 +86,7 @@ if (($_REQUEST['pdf_token'] ?? '') != '') {
 }
 
 // check if user can print and disable the jQuery TableSorter feature if it is enabled.
-if (! $pdfExportSubRequest && ($_REQUEST['display'] ?? '') != 'pdf') {
+if (! $pdfExportSubRequest && ! TIKI_PRINTING_PDF) {
     $access->check_permission('tiki_p_print', '', 'wiki page', $page);
     $prefs['feature_jquery_tablesorter'] = 'n';
 }
@@ -151,7 +163,7 @@ if (empty($info["user"])) {
 }
 $smarty->assign_by_ref('lastVersion', $info["version"]);
 $smarty->assign_by_ref('lastUser', $info["user"]);
-$crumbs[] = new Breadcrumb(isset($crumbpage) ? $crumbpage : $page, $info["description"], 'tiki-index.php?page=' . urlencode($page), '', '');
+$crumbs[] = new Breadcrumb($crumbpage ?? $page, $info["description"], 'tiki-index.php?page=' . urlencode($page), '', '');
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
@@ -162,11 +174,11 @@ $smarty->assign('print_page', 'y');
 $smarty->assign('urlprefix', $base_url); // Obsolete, use base_url instead. This is for compatibility purposes only.
 $smarty->assign('global_extend_layout', 'layouts/internal/layout_empty.tpl');
 $smarty->assign('mid', 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl');
-$smarty->assign('display', isset($_REQUEST['display']) ? $_REQUEST['display'] : '');
+$smarty->assign('display', $_REQUEST['display'] ?? '');
 $smarty->assign('phpErrors', []);
 
 // Allow PDF export by installing a Mod that define an appropriate function
-if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
+if (TIKI_PRINTING_PDF) {
     // Detect if we have a PDF export mod installed
     $smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
     $smarty->assign('pdf_warning', 'n');
@@ -185,30 +197,60 @@ if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
             try {
                 // Allow to mark a subrequest to tiki-print as being part of the pdf export (when using external services)
                 $pdfToken = md5($page . time() . uniqid('', true));
-                /** @var Cachelib $cachelib */
+                /** @var \Tiki\Cache\CacheLib $cachelib */
                 $cachelib = TikiLib::lib('cache');
                 $cachelib->cacheItem($pdfToken, $page, 'pdfprint_');
+                if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {
+                    $taskParams = [];
+                    $taskParams['params']['page'] = $page;
+                    $taskParams['params']['pdf_type'] = 'cms';
+                    $taskParams['params']['pdata'] = $pdata;
+                    $taskParams['params']['get_pdf'] = [
+                        'file' => 'tiki-print.php',
+                        'array_params' => [
+                            'page' => $page,
+                            'pdf_token' => $pdfToken
+                        ]
+                    ];
+                    $queueManager = new QueueManager();
+                    $task = new PdfGenerationTask($taskParams);
+                    $queuedTask = $queueManager->queueTask($task);
+                    $taskId = $queuedTask->getId();
+                    if (! empty($taskId)) {
+                        QueuedTaskBanner::note([
+                            'id' => $taskId,
+                            'page' => 'pdf_generation',
+                            'status' => 'Pending',
+                            'mes' => tr("Your pdf generation task (#{$taskId}) has been queued successfully and will be executed shortly. You can view the status and output on the <a target='_blank' href='tiki-admin_queued_tasks.php'>Queued Tasks</a> page.")
+                        ]);
+                    } else {
+                        Feedback::error(tr("Failed to add pdf generation into queue"));
+                    }
+                    $smarty->assign('print_page', 'n');
+                    $access->redirect($page);
+                } else {
+                    $pdf = $generator->getPdf('tiki-print.php', ['page' => $page, 'pdf_token' => $pdfToken], $pdata);
 
-                $pdf = $generator->getPdf('tiki-print.php', ['page' => $page, 'pdf_token' => $pdfToken], $pdata);
+                    // cleanup subrequest token for pdf export
+                    $cachelib->invalidate($pdfToken, 'pdfprint_');
 
-                // cleanup subrequest token for pdf export
-                $cachelib->invalidate($pdfToken, 'pdfprint_');
-
-                $length = strlen($pdf);
-                header('Cache-Control: private, must-revalidate');
-                header('Pragma: private');
-                header("Content-Description: File Transfer");
-                $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
-                $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
-                header('Content-disposition: attachment; filename="' . $page . '.pdf"');
-                header("Content-Type: application/pdf");
-                header("Content-Transfer-Encoding: binary");
-                header('Content-Length: ' . $length);
-                TikiLib::lib('header')->setXRobotsTag($robots);
-                echo $pdf;
+                    $length = strlen($pdf);
+                    header('Cache-Control: private, must-revalidate');
+                    header('Pragma: private');
+                    header("Content-Description: File Transfer");
+                    $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
+                    $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
+                    header('Content-disposition: attachment; filename="' . $page . '.pdf"');
+                    header("Content-Type: application/pdf");
+                    header("Content-Transfer-Encoding: binary");
+                    header('Content-Length: ' . $length);
+                    TikiLib::lib('header')->setXRobotsTag($robots);
+                    echo $pdf;
+                }
             } catch (\Exception $e) {
                 $smarty->assign('print_page', 'n');
                 $smarty->assign('msg', tra($e->getMessage()));
+                $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
                 $smarty->display('error.tpl');
                 die;
             }

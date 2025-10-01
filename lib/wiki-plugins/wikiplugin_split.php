@@ -127,15 +127,15 @@ function wikiplugin_split($data, $params, $pos)
 
     // Remove first <ENTER> if exists...
     // it may be here if present after {SPLIT()} in original text
-    if (substr($data, 0, 2) == "\r\n") {
+    if (str_starts_with($data, "\r\n")) {
         $data2 = substr($data, 2);
     } else {
         $data2 = $data;
     }
 
     extract($params, EXTR_SKIP);
-    $fixedsize = (! isset($fixedsize) || $fixedsize == 'y' || $fixedsize == 1 ? true : false);
-    $joincols  = (! isset($joincols)  || $joincols == 'y' || $joincols == 1 ? true : false);
+    $fixedsize = ! isset($fixedsize) || $fixedsize == 'y' || $fixedsize == 1;
+    $joincols  = ! isset($joincols)  || $joincols == 'y' || $joincols == 1;
     // Split data by rows and cells
 
     $smarty = TikiLib::lib('smarty');
@@ -166,7 +166,7 @@ function wikiplugin_split($data, $params, $pos)
                 $tdsize[$i] = 0;
             } else {
                 $tdsize[$i] = trim($tdsize[$i]);
-                if (strstr($tdsize[$i], '%')) {
+                if (str_contains($tdsize[$i], '%')) {
                     $percent = true;
                 }
             }
@@ -197,7 +197,7 @@ function wikiplugin_split($data, $params, $pos)
             $idx = 1;
             foreach ($r as $i) {
                 // Remove first <ENTER> if exists
-                if (substr($i, 0, 2) == "\r\n") {
+                if (str_starts_with($i, "\r\n")) {
                     $i = substr($i, 2);
                 }
                 // Generate colspan for last element if needed
@@ -243,7 +243,7 @@ function wikiplugin_split($data, $params, $pos)
         foreach ($rows as $r) {
             $result .= '<td ' . (($fixedsize && isset($tdsize)) ? ' width="' . $tdsize[$idx] . (strstr($tdsize[$idx], '%') ? '' : '%') . '"' : '') . '>';
             foreach ($r as $i) {
-                if (substr($i, 0, 2) == "\r\n") {
+                if (str_starts_with($i, "\r\n")) {
                     $i = substr($i, 2);
                     $ind += 2;
                 }
@@ -292,7 +292,7 @@ function wikiplugin_split_cell($data, $pos, $cell)
         } else {
             $end = $pos + strpos(substr($data, $pos), $matches[1]);
             $start_next_tag = $end + strlen($matches[1]);
-            if (substr($matches[1], 0, 3) == '@@@' || $matches[1] == '---') {
+            if (str_starts_with($matches[1], '@@@') || $matches[1] == '---') {
                 if (! $cell) {
                     break;
                 }

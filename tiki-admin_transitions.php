@@ -11,11 +11,11 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'from'              => 'bool',           //post
-            'to'                  => 'bool',         //post
+            'from'              => 'int',           //post
+            'to'                  => 'int',         //post
             'label'                => 'string',      //post
             'preserve'             => 'bool',        //post
-            'transition_mode'            => 'bool'  //post
+            'transition_mode'            => 'string'  //post
           ],
         'staticKeyFiltersForArrays' => [
             'cat_categories'        => 'word',       //post

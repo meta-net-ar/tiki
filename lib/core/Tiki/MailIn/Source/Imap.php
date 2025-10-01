@@ -6,62 +6,143 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\MailIn\Source;
 
+use Tiki\MailIn\Exception\MailInException;
 use Tiki\MailIn\Exception\TransportException;
-use Laminas\Mail\Storage\Imap as ZendImap;
-use Laminas\Mail\Exception\ExceptionInterface as ZendMailException;
+use Hm_IMAP;
+use ZBateson\MailMimeParser\MailMimeParser;
 
-class Imap extends Pop3
+class Imap implements SourceInterface
 {
-    protected function connect()
+    protected $host;
+    protected $port;
+    protected $username;
+    protected $password;
+
+    protected $ssl;
+    private $mailMimeParser;
+    protected $connection = null;
+
+    public function __construct($host, $port, $username, $password, $ssl = false)
+    {
+        $this->host = $host;
+        $this->port = $port;
+        $this->username = $username;
+        $this->password = $password;
+        $this->ssl = $ssl;
+        $this->mailMimeParser = new MailMimeParser();
+    }
+
+    public function test()
     {
         try {
-            $imap = new ZendImap([
-                'host' => $this->host,
-                'port' => $this->port,
-                'user' => $this->username,
-                'password' => $this->password,
-                'ssl' => $this->port == 993,
-            ]);
-
-            return $imap;
-        } catch (ZendMailException $e) {
-            throw new TransportException(tr("Login failed for IMAP account on %0:%1 for user %2", $this->host, '******', $this->username));
+            $imap = $this->connect();
+            $imap->disconnect();
+            return true;
+        } catch (TransportException $e) {
+            return false;
         }
     }
+
+    /**
+     * @return \Generator
+     * @throws TransportException
+     */
     public function getMessages()
     {
-        $imap = $this->connect();
+        $imap = null;
         $toDelete = [];
-        foreach ($imap as $i => $source) {
-            /* @var $source \Laminas\Mail\Storage\Message */
-            $message = new Message($i, function () use ($i, &$toDelete) {
-                $toDelete[] = $i;
-            });
-            $from = $source->from ?: $source->{'return-path'};
-            if (! empty($source->{'message-id'})) {
-                $message->setMessageId(str_replace(['<', '>'], '', $source->{'message-id'}));
+        try {
+            $imap = $this->connect();
+            list($total, $results) = $imap->get_mailbox_page('INBOX', 'ARRIVAL', false, 'ALL');
+            foreach ($results as $uid => $result) {
+                $message = new Message($uid, function () use ($uid, &$toDelete) {
+                    $toDelete[] = $uid;
+                });
+                $rawEmailContent = $imap->get_message_content($uid, 0);
+                $zbMessage = $this->mailMimeParser->parse($rawEmailContent, true);
+                $from = $zbMessage->getHeaderValue('From');
+                if (! $from) {
+                    $from = $zbMessage->getHeaderValue('Return-Path');
+                }
+                $message->setMessageId($zbMessage->getHeaderValue('Message-Id'));
+                $message->setRawFrom($from);
+                $message->setSubject($zbMessage->getHeaderValue('Subject'));
+                $message->setRecipient($zbMessage->getHeaderValue('To'));
+                $message->setHtmlBody($zbMessage->getHtmlContent());
+                $message->setBody($zbMessage->getTextContent());
+                $message->setContent($rawEmailContent);
+                $this->handleAttachments($message, $zbMessage);
+
+                yield $message;
             }
-            $message->setRawFrom($from);
-            $message->setSubject($source->subject);
-            $message->setRecipient($source->to);
-            $message->setHtmlBody($this->getBody($source, 'text/html'));
-            $message->setBody($this->getBody($source, 'text/plain'));
-            $content = '';
-            foreach ($source->getHeaders() as $header) {
-                $content .= $header->toString() . "\r\n";
-            }
-            $content .= "\r\n" . $source->getContent();
-            $message->setContent($content);
-            $this->handleAttachments($message, $source);
-            yield $message;
+        } catch (TransportException $e) {
+            $imap?->disconnect();
         }
         if ($toDelete) {
-            $toDelete = array_reverse($toDelete);
-
-            foreach ($toDelete as $i) {
-                $imap->removeMessage($i);
-            }
+            $this->deleteMessages($imap, $toDelete);
         }
-        $imap->close();
+        $imap->disconnect();
+    }
+
+    public function deleteMessages($imap, $uids)
+    {
+        if ($imap->message_action('DELETE', $uids)['status']) {
+            $imap->message_action('EXPUNGE', $uids);
+            return true;
+        }
+    }
+
+    /**
+     * @param $message Message
+     * @param $zbMessage
+     */
+    private function handleAttachments($message, $zbMessage)
+    {
+
+        foreach ($zbMessage->getAllAttachmentParts() as $attachmentPart) {
+            $filename = $attachmentPart->getFilename();
+
+            if (empty($filename)) {
+                $filename = $attachmentPart->getHeaderValue('Content-ID');
+                if (empty($contentId)) {
+                    $filename = 'unnamed_attachment_' . uniqid();
+                }
+            }
+
+            $contentId = $attachmentPart->getHeaderValue('Content-ID') ?: uniqid();
+
+            $message->addAttachment(
+                $contentId,
+                $filename,
+                $attachmentPart->getContentType(),
+                $attachmentPart->getSize(),
+                $attachmentPart->getContent()
+            );
+        }
+    }
+    /**
+     * @throws TransportException
+     */
+    public function connect(): Hm_IMAP
+    {
+        try {
+            $config = [
+                'server'    => $this->host,
+                'port'      => $this->port,
+                'tls'       => stripos($this->ssl, 'TLS') !== false,
+                'type'      => 'imap',
+                'username'  => $this->username ,
+                'password'  => $this->password,
+                'use_cache' => true,
+            ];
+            $imap = new Hm_IMAP();
+            $authenticate = $imap->connect($config);
+            if (! $authenticate) {
+                throw new MailInException();
+            }
+            return $imap;
+        } catch (MailInException $e) {
+            throw new TransportException(tr("Login failed for IMAP account on %0:%1 for user %2", $this->host, '******', $this->username));
+        }
     }
 }

@@ -1,0 +1,63 @@
+/* Timeago tooltip styles */
+.tooltip {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.tooltip-inner {
+    background-color: rgba(33, 37, 41, 0.95);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    text-align: center;
+}
+
+/* Arrow styling */
+.tooltip.bs-tooltip-top .arrow::before,
+.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
+    border-top-color: rgba(33, 37, 41, 0.95);
+}
+
+/* Hover effect */
+time.timeago {
+    border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+    transition: border-color 0.2s ease;
+}
+
+time.timeago:hover {
+    border-bottom-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Mobile touch feedback */
+@media (hover: none) {
+    time.timeago {
+        border-bottom: none;
+    }
+    
+    time.timeago:active {
+        opacity: 0.7;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .tooltip-inner {
+        background-color: rgba(255, 255, 255, 0.95);
+        color: #212529;
+    }
+
+    .tooltip.bs-tooltip-top .arrow::before,
+    .tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
+        border-top-color: rgba(255, 255, 255, 0.95);
+    }
+
+    time.timeago {
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+    }
+
+    time.timeago:hover {
+        border-bottom-color: rgba(255, 255, 255, 0.4);
+    }
+}

@@ -8,6 +8,8 @@
  * @licence Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
  */
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 require_once('check_composer_exists.php');
 
 $inputConfiguration = [
@@ -186,9 +188,7 @@ if ($prefs['feature_wiki_structure'] == 'y') {
         }
     }
 } elseif (! empty($_REQUEST['page_ref_id'])) {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_wiki_structure');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_wiki_structure', \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (! empty($page_ref_id)) {
@@ -219,15 +219,19 @@ if ($prefs['tracker_wikirelation_redirectpage'] == 'y' && ! isset($_REQUEST['adm
     }
 }
 
-// Inline Ckeditor editor
+// Inline wysiwyg editor
 if (
     $prefs['wysiwyg_inline_editing'] == 'y' && $page &&
         (   ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit')) ||
             ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit_inline')) )
 ) {
-    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);      // init ckeditor
+    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);
+    $inlineEditorContent = TikiLib::lib('edit')->parseToWysiwyg($info['data'], false, false, ['wysiwyg' => true, 'html_editor' => true]);
+    $smarty->assign('inline_editor_content', $inlineEditorContent);
 } elseif (getCookie('wysiwyg_inline_edit', 'preview')) {
-    setCookieSection('wysiwyg_inline_edit', 0, 'preview');  // kill cookie if pref off or no perms
+    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);      // init ckeditor
+} elseif (CookieConsentLib::getCookie('wysiwyg_inline_edit', 'preview')) {
+    CookieConsentLib::tikiSetCookie('wysiwyg_inline_edit', 0, CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, 'preview'); // kill cookie if pref off or no perms
 }
 
 // Process page display options
@@ -255,10 +259,7 @@ if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
             }
         } catch (Exception $e) {
             // Wrong date format
-            $msg = tra('Invalid date format');
-            $smarty->assign('msg', $msg);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 
@@ -271,9 +272,7 @@ if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
         } catch (Exception $e) {
             // Unknown version
             $msg = tra('This version does not exist');
-            $smarty->assign('msg', $msg);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_404);
         }
     } else {
         $info = $tikilib->get_page_info($page);
@@ -286,9 +285,20 @@ if (empty($info)) {
     // will result in a existing page. This will also help search engines to update the right location of a page.
     $slugManager = TikiLib::lib('slugmanager');
     foreach ($slugManager->getOptions() as $slugger => $desc) {
-        $infoForSlug = $tikilib->get_page_info($slugManager->degenerate($slugger, $originalPageRequested));
-        if ($infoForSlug) {
-            $access->redirect($infoForSlug['pageSlug'], '', 301);
+        $degeneratedSlug = $slugManager->degenerate($slugger, $originalPageRequested);
+        // Prevent redirection to the same page
+        if ($degeneratedSlug === $originalPageRequested) {
+            continue;
+        }
+        $infoForSlug = $tikilib->get_page_info($degeneratedSlug);
+        if (! empty($infoForSlug) && isset($infoForSlug['pageSlug'])) {
+            // Prevent redirection loop by ensuring the new slug is different
+            if ($infoForSlug['pageSlug'] !== $originalPageRequested) {
+                $access->redirect($infoForSlug['pageSlug'], '', 301);
+                exit;
+            } else {
+                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']);
+            }
         }
     }
 }
@@ -365,9 +375,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                         foreach ($items as $i) {
                             $msg .= '<br /><a href="tiki-index.php?page=' . urlencode($newPage) . '&itemId=' . $i . '">' . $i . '</a>';
                         }
-                        $smarty->assign('msg', $msg);
-                        $smarty->display('error.tpl');
-                        die;
+                        Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
                     } elseif (count($items)) {
                         $suffix = $items[0];
                     } else {
@@ -376,9 +384,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
 
                         if (! $suffix) {
                             $msg = tra('There are no items in the tracker with this title');
-                            $smarty->assign('msg', $msg);
-                            $smarty->display('error.tpl');
-                            die;
+                            Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
                         }
                     }
                 }
@@ -465,12 +471,6 @@ if (
 ) {
     $tikilib->check_duplicate_alias($info['data'], $page);
 }
-//Uncomment if we decide to translate wiki markup. For now we are going
-//with translating rendered html content
-//$translatedWikiMarkup = '';
-//if (isset($_REQUEST['machine_translate_to_lang'])) {
-//  $translatedWikiMarkup = generate_machine_translated_markup($info, $_REQUEST['machine_translate_to_lang']);
-//}
 
 if (isset($_REQUEST['approve'], $_REQUEST['revision']) && $_REQUEST['revision'] <= $info['version']) {
     $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
@@ -561,13 +561,12 @@ if (! in_array($page, $_SESSION['breadCrumb'])) {
     if (count($_SESSION['breadCrumb']) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION['breadCrumb']);
     }
-    array_push($_SESSION['breadCrumb'], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION['breadCrumb']);
     unset($_SESSION['breadCrumb'][$pos]);
-    array_push($_SESSION['breadCrumb'], $page);
 }
+$_SESSION['breadCrumb'][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);
@@ -759,41 +758,40 @@ if ($prefs['feature_forums'] && $prefs['feature_wiki_discuss'] == 'y' && $prefs[
     $comments_data = tra('Use this thread to discuss the page:') . " [tiki-index.php?page=" . rawurlencode($page) . "|$page]";
     $threadId = $commentslib->check_for_topic($page, $prefs['wiki_forum_id']);
     $comments_coms = $commentslib->get_forum_topics($prefs['wiki_forum_id'], 0, -1);
-    $discuss_replies_cant = 0;
+    $discuss_replies_count = 0;
     foreach ($comments_coms as $topic) {
         if ($topic['threadId'] == $threadId) {
-            $discuss_replies_cant = $topic['replies'];
+            $discuss_replies_count = $topic['replies'];
             break;
         }
     }
-    $smarty->assign('discuss_replies_cant', $discuss_replies_cant);
+    $smarty->assign('discuss_replies_count', $discuss_replies_count);
 }
 
 if (strtolower($_REQUEST["page"]) === 'sandbox') {
     $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 }
+
+// Check if the user is allowed to see wiki actions
+$showWikiActions = true; // Default to showing for all users
+if (! empty($prefs['wiki_page_actions_groups'])) {
+    $allowedGroups = (array)$prefs['wiki_page_actions_groups'];
+
+    if (! empty($allowedGroups)) {
+        $userGroups = Perms::get()->getGroups();
+
+        // Check if any user groups are in allowed groups (case-insensitive)
+        $showWikiActions = (bool)array_uintersect(
+            $userGroups,
+            $allowedGroups,
+            'strcasecmp'
+        );
+    }
+}
+$smarty->assign('show_wiki_actions', $showWikiActions);
 $smarty->assign('info', $info);
 $smarty->assign('mid', 'tiki-show_page.tpl');
-
 $smarty->display('tiki-show_page.tpl');
-
-// xdebug_dump_function_profile(XDEBUG_PROFILER_CPU);
-// debug: print all objects
-
-
-/**
- * generate machine translation of markup
- * @param $pageInfo
- * @param $targetLang
- * @return string
- */
-function generate_machine_translated_markup($pageInfo, $targetLang)
-{
-    make_sure_machine_translation_is_enabled();
-    $pageContent = $pageInfo['data'];
-    $sourceLang = $pageInfo['lang'];
-    return translate_text($pageContent, $sourceLang, $targetLang);
-}
 
 /**
  * generate machine translation of content

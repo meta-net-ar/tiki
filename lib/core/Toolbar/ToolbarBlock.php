@@ -18,7 +18,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'center':
                 $label = tra('Align Center');
                 $iconname = 'align-center';
-                $wysiwyg = 'JustifyCenter';
+                $wysiwyg = 'paragraph';
                 if ($prefs['feature_use_three_colon_centertag'] == 'y') {
                     $syntax = ":::text:::";
                 } else {
@@ -28,7 +28,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'rule':
                 $label = tra('Horizontal Bar');
                 $iconname = 'horizontal-rule';
-                $wysiwyg = 'HorizontalRule';
+                $wysiwyg = 'hr';
                 $syntax = '---';
                 $markdown = '***';
                 $markdown_wysiwyg = 'hr';
@@ -36,13 +36,13 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'pagebreak':
                 $label = tra('Page Break');
                 $iconname = 'page-break';
-                $wysiwyg = 'PageBreak';
+                $wysiwyg = '';
                 $syntax = $prefs['wiki_page_separator'];
                 break;
             case 'box':
                 $label = tra('Box');
                 $iconname = 'box';
-                $wysiwyg = 'Box';
+                $wysiwyg = '';
                 $syntax = '^text^';
                 break;
             case 'email':
@@ -54,6 +54,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
                 $label = tra('Block quote');
                 $iconname = 'quote-left';
                 $markdown_wysiwyg = 'quote';
+                $wysiwyg = 'style';
                 break;
             case 'h1':
             case 'h2':
@@ -72,7 +73,6 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'toc':
                 $label = tra('Table of contents');
                 $iconname = 'book';
-                $wysiwyg = 'TOC';
                 $syntax = '{maketoc}';
                 break;
             case 'task':

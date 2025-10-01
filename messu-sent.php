@@ -41,9 +41,7 @@ if (isset($_POST["archive"])) {
         $i = 0;
         foreach (array_keys($_POST["msg"]) as $msg) {
             if (($prefs['messu_archive_size'] > 0) && ($tmp + $i >= $prefs['messu_archive_size'])) {
-                $smarty->assign('msg', tra("Archive is full. Delete some messages from archive first."));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("Archive is full. Delete some messages from archive first."), \Laminas\Http\Response::STATUS_CODE_507);
             }
             $result = $messulib->archive_message($user, $msg, 'sent');
             $i = $i + $result->numRows();
@@ -117,7 +115,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
 // What are we paginating: items
 $items = $messulib->list_user_messages($user, $offset, $maxRecords, $sort_mode, $find, $_REQUEST["flag"], $_REQUEST["flagval"], $_REQUEST['priority'], 'sent');
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $cellsize = 200;
 $percentage = 1;

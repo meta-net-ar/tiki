@@ -70,7 +70,7 @@ $res = $tm->make_tree(0, $tree_nodes);
 $smarty->assign('tree', $res);
 // }}}
 
-$filter = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : [];
+$filter = $_REQUEST['filter'] ?? [];
 $smarty->assign('filter', $filter);
 
 if (count($filter)) {

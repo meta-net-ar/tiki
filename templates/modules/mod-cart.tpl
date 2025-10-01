@@ -32,8 +32,8 @@
                             </td>
                         {else}
                             <td style="white-space: nowrap">
-                                <a href="#" onclick="$(this).nextAll('input').val('').parents('form').first().trigger('submit');return false;" class="icon item_remove">{icon name='trash'}</a>
-                                <a href="#" onclick="var $input = $(this).nextAll('input').first();$input.val(parseInt($input.val()) + 1).parents('form').first().trigger('submit');return false;" class="icon item_plus">{icon name='add'}</a>
+                                <a href="#" role="button" onclick="$(this).nextAll('input').val('').parents('form').first().trigger('submit');return false;" class="icon item_remove">{icon name='trash'}</a>
+                                <a href="#" role="button" onclick="var $input = $(this).nextAll('input').first();$input.val(parseInt($input.val()) + 1).parents('form').first().trigger('submit');return false;" class="icon item_plus">{icon name='add'}</a>
                                 <input type="text" name="cart[{$item.code|escape}]" style="width:2em;text-align: right;" value="{$item.quantity|escape}">
                                 <a href="'#" class='icon item_minus' onclick="var $input = $(this).prevAll('input').first();$input.val(parseInt($input.val()) - 1).parents('form').first().trigger('submit');return false;">{icon name='minus'}</a>
                             </td>

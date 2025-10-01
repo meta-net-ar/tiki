@@ -95,16 +95,23 @@ if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
     $ext_result = [];
     foreach ($exts as $ext) {
-        $ext_result[$ext['fieldId']] = isset($_REQUEST['ext_' . $ext['fieldId']]) ? $_REQUEST['ext_' . $ext['fieldId']] : '';
+        $ext_result[$ext['fieldId']] = $_REQUEST['ext_' . $ext['fieldId']] ?? '';
     }
-    $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'], $ext_result);
-    $info["firstName"] = '';
-    $info["lastName"] = '';
-    $info["email"] = '';
-    $info["nickname"] = '';
-    $info["groups"] = [];
-    $smarty->assign('info', $info);
-    $smarty->assign('contactId', 0);
+    if (empty($_REQUEST["firstName"])) {
+        $feedback = tra('You must specify the contact name.');
+        Feedback::error($feedback);
+    } else {
+        $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'] ?? [], $ext_result);
+        $feedback = sprintf(tra('Contact %s was created.'), $_REQUEST['firstName']);
+        Feedback::success($feedback);
+        $info["firstName"] = '';
+        $info["lastName"] = '';
+        $info["email"] = '';
+        $info["nickname"] = '';
+        $info["groups"] = [];
+        $smarty->assign('info', $info);
+        $smarty->assign('contactId', 0);
+    }
 }
 
 $sort_mode = $_REQUEST["sort_mode"] ?? 'email_asc';
@@ -122,8 +129,8 @@ $smarty->assign_by_ref('offset', $offset);
 $smarty->assign('find', $find);
 
 $contacts = $contactlib->list_contacts($user, $offset, $maxRecords, $sort_mode, $find, true, $initial);
-$cant = $contactlib->list_contacts($user, -1, -1, $sort_mode, $find, true, $initial);
-$cant = is_array($cant) ? count($cant) : 0;
+$count = $contactlib->list_contacts($user, -1, -1, $sort_mode, $find, true, $initial);
+$count = is_array($count) ? count($count) : 0;
 
 $_SESSION['UserContactsView'] = $_REQUEST['view'] ??
 ($_SESSION['UserContactsView'] ?? $userlib->get_user_preference($user, 'user_contacts_default_view'));
@@ -178,7 +185,7 @@ $smarty->assign('groups', $groups);
 $smarty->assign('initial', range('a', 'z'));
 $smarty->assign('setInitial', $initial);
 $smarty->assign('maxRecords', $maxRecords);
-$smarty->assign('total_contact', $cant);
+$smarty->assign('total_contact', $count);
 
 include_once('tiki-section_options.php');
 

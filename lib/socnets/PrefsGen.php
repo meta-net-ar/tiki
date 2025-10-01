@@ -245,7 +245,7 @@ class PrefsGen
             $value2['dependencies'][1] = self::$socPrefix . $providerName . $value2['dependencies'][1];
             $value2['description'] = 'What ' . $providerName . " " . $value2['description'];
             $value2['default'] = (strlen($providerName) < 5) ? substr($providerName, 0, strlen($providerName)) . "_" : substr($providerName, 0, 4) . "_";
-        } elseif (substr($key2, 0, 12) === '_autocreate_') {
+        } elseif (str_starts_with($key2, '_autocreate_')) {
             $value2['dependencies'][0] = self::$socPrefix . $providerName . $value2['dependencies'][0];
             $value2['dependencies'][1] = self::$socPrefix . $providerName . $value2['dependencies'][1];
             $value2['description'] = 'Let ' . $providerName . " " . $value2['description'];

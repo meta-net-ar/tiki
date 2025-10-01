@@ -7,7 +7,7 @@
 //this script may only be included - so its better to die if called directly.
 use Tiki\Lib\core\Scheduler\Output\SchedulerRunOutput;
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -54,9 +54,10 @@ class SchedulersLib extends TikiLib
      * @param int|null $scheduler_id The scheduler id (optional)
      * @param int|null $creation_date schedule created date
      * @param string $user_run_now user that request a run now in background
+     * @param int $enable_send_notification_override 0 or 1 to enable notification override for this job
      * @return int    The scheduler id
      */
-    public function set_scheduler($name, $description, $task, $params, $run_time, $status, $re_run, $run_only_once, $scheduler_id = null, $creation_date = null, $user_run_now = null)
+    public function set_scheduler($name, $description, $task, $params, $run_time, $status, $re_run, $run_only_once, $scheduler_id = null, $creation_date = null, $user_run_now = null, $enable_send_notification_override = 0)
     {
 
         $values = [
@@ -69,12 +70,13 @@ class SchedulersLib extends TikiLib
             're_run' => $re_run ? 1 : 0,
             'run_only_once' => $run_only_once ? 1 : 0,
             'user_run_now' => $user_run_now,
+            'enable_send_notification_override' => $enable_send_notification_override ? 1 : 0,
         ];
 
         $schedulersTable = $this->table('tiki_scheduler');
 
         if (! $scheduler_id) {
-            $values["creation_date"] = isset($creation_date) ? $creation_date : time();
+            $values["creation_date"] = $creation_date ?? time();
             return $schedulersTable->insert($values);
         } else {
             $schedulersTable->update($values, ['id' => $scheduler_id]);
@@ -145,6 +147,26 @@ class SchedulersLib extends TikiLib
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
         return $schedulersRunTable->fetchOne('status', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
+    }
+
+    /**
+     * Get failed runs
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getFailedRuns($timeBack)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+
+        return $schedulersRunTable->fetchAll(
+            ['start_time', 'end_time', 'output', 'scheduler_id'],
+            [
+                'start_time' => $schedulersRunTable->greaterThan($timeBack),
+                'status' => 'failed'
+            ]
+        );
     }
 
     /**
@@ -291,5 +313,17 @@ class SchedulersLib extends TikiLib
     {
         $schedulerTable = $this->table('tiki_scheduler');
         $schedulerTable->update(['status' => Scheduler_Item::STATUS_ACTIVE], ['id' => $scheduler_id]);
+    }
+
+    /**
+     * Update a field in the schedular table
+     * @param $scheduler_id
+     * @param $field
+     * @param $value
+     */
+    public function updateSchedulerField($scheduler_id, $field, $value)
+    {
+        $schedulerTable = $this->table('tiki_scheduler');
+        return $schedulerTable->update([$field => $value], ['id' => $scheduler_id]);
     }
 }

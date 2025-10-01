@@ -29,7 +29,7 @@ function prefs_display_list()
             'units' => tra('year(s)'),
             'type' => 'text',
             'size' => 6,
-            'default' => '-3',
+            'default' => '-20',
         ],
         'display_end_year' => [
             'name' => tra('End year'),
@@ -38,7 +38,7 @@ function prefs_display_list()
             'units' => tra('year(s)'),
             'type' => 'text',
             'size' => 6,
-            'default' => '+1',
+            'default' => '+20',
         ],
     ];
 }

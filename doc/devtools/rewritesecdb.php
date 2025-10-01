@@ -56,8 +56,8 @@ function md5CheckDir($root, $dir, $version, &$queries)
     while (false !== ($e = $d->read())) {
         $entry = $dir . '/' . $e;
         if (is_dir($entry)) {
-            // do not descend and no CVS/Subversion files
-            if ($e != '..' && $e != '.' && $e != 'CVS' && $e != '.svn') {
+            // do not descend
+            if ($e != '..' && $e != '.') {
                 md5CheckDir($root, $entry, $version, $queries);
             }
         } else {

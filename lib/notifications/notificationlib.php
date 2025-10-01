@@ -18,9 +18,9 @@ class NotificationLib extends TikiLib
         }
 
         $query = "select * from `tiki_user_watches` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_user_watches` $mid";
+        $query_count = "select count(*) from `tiki_user_watches` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -29,7 +29,7 @@ class NotificationLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 

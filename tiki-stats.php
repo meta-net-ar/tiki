@@ -8,6 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+// TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -20,6 +24,7 @@ $inputConfiguration = [
         'endDate_Year'         => 'digits',       //get
         'endDate_Month'        => 'digits',       //get
         'endDate_Day'          => 'digits',       //get
+        'display'              => 'striptags'
         ],
         'catchAllUnset' => null
     ],
@@ -94,18 +99,6 @@ $smarty->assign_by_ref('quiz_stats', $quiz_stats);
 if ($prefs['feature_trackers'] == 'y') {
     // Retrieve trackers statistics and prepare extracted data for display.
     $tracker_stats = $statslib->trackerStats();
-    $tracker_stat_data = [];
-    foreach ($tracker_stats as $key => $stat) {
-        if (isset($stat->result[0])) {
-            $tracker_stat_data = $stat->result[0];
-            $extractedTrackerStatsData[$key] = [
-                'dataLengthMb' => $tracker_stat_data['Data_length'] / 1024 / 1024, // Get data lenght in Mb.
-                'rowCount' => $tracker_stat_data['Rows'] + 1 // Number of records + 1, because it starts with 0 index when counting.
-            ];
-        }
-    }
-
-    $tracker_stats = $extractedTrackerStatsData;
 } else {
     $tracker_stats = false;
 }
@@ -130,6 +123,28 @@ $best_objects_stats_lastweek = $statslib->best_overall_object_stats(20, 7);
 $smarty->assign_by_ref('best_objects_stats_lastweek', $best_objects_stats_lastweek);
 $best_objects_stats_between = $statslib->best_overall_object_stats(20, 0, $start_date, $end_date);
 $smarty->assign_by_ref('best_objects_stats_between', $best_objects_stats_between);
-
 $smarty->assign('mid', 'tiki-stats.tpl');
-$smarty->display("tiki.tpl");
+if (TIKI_PRINTING_PDF) {
+    $smarty->assign('display', $_REQUEST['display']);
+    $smarty->assign('print_page', 'y');
+    $pdata = $smarty->fetch("tiki.tpl");
+    $generator = new PdfGenerator();
+    if (! empty($generator->error)) {
+        Feedback::error($generator->error);
+        $access->redirect($_SERVER['HTTP_REFERER']);
+    } else {
+        $pdf = $generator->getPdf('tiki-stats.php', ['display' => 'print'], $pdata);
+        header('Cache-Control: private, must-revalidate');
+        header('Pragma: private');
+        header("Content-Description: File Transfer");
+        header('Content-disposition: attachment; filename="stats.pdf"');
+        header("Content-Type: application/pdf");
+        header("Content-Transfer-Encoding: binary");
+        header('Content-Length: ' . strlen($pdf));
+        echo $pdf;
+    }
+} else {
+    $smarty->assign('display', '');
+    $smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
+    $smarty->display("tiki.tpl");
+}

@@ -39,9 +39,7 @@ if (! isset($_REQUEST["assign_user"]) || ($tiki_p_admin != 'y' && $tiki_p_admin_
     $smarty->assign_by_ref('userChoice', $userChoice);
 } else {
     if (! $userlib->user_exists($_REQUEST['assign_user'])) {
-        $smarty->assign('msg', tra("User doesn't exist"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("User doesn't exist"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $userChoice = '';
     $smarty->assign_by_ref('assign_user', $_REQUEST['assign_user']);
@@ -88,8 +86,7 @@ if (isset($_REQUEST["action"])) {
             if (! $userlib->group_exists($_REQUEST["group"])) {
                 Feedback::error(tr('Invalid group'));
             } elseif (
-                $tiki_p_admin_users == 'y'
-                || ($tiki_p_admin_users == 'y' && array_key_exists($_REQUEST["group"], $groups))
+                $tiki_p_admin_users == 'y' || array_key_exists($_REQUEST["group"], $groups)
             ) {
                 $result = $userlib->assign_user_to_group($_REQUEST["assign_user"], $_REQUEST["group"]);
                 if ($result && $result->numRows()) {
@@ -143,7 +140,7 @@ $user_info = $userlib->get_user_info($assign_user, true);
 $smarty->assign_by_ref('user_info', $user_info);
 if (! empty($_REQUEST['save']) && $access->checkCsrf()) {
     foreach ($_REQUEST as $r => $v) {
-        if (strpos($r, 'new_') === 0) {
+        if (str_starts_with($r, 'new_')) {
             $g = substr($r, 4);
             if ($_REQUEST['new_' . $g] != $_REQUEST['old_' . $g]) {
                 $t = strtotime($_REQUEST['new_' . $g]);
@@ -212,7 +209,7 @@ foreach ($users['data'] as $key => $gr) {
     }
 }
 
-$smarty->assign_by_ref('cant_pages', $users["cant"]);
+$smarty->assign_by_ref('pages_count', $users["count"]);
 
 // Get users (list of users)
 $smarty->assign_by_ref('users', $users["data"]);

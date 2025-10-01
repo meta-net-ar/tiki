@@ -1,4 +1,20 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the Minty theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
+
+// Used for L&F nav color choice and color mode override
 // The light background is changed from the original for more color variety in Tiki's themes.
 @mixin top-nav-light {
     --tiki-top-bg: #f3969a;
@@ -18,18 +34,18 @@
 
 @mixin top-nav-dark {
     --tiki-top-bg: rgba(120, 194, 173, 1);
-    --tiki-top-color: rgba(255, 255, 255, 0.8);
-    --tiki-top-hover-color: #fff;
-    --tiki-top-text-color: #fff;
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
+    --tiki-top-color: #303030; // rgba(255, 255, 255, 0.8);
+    --tiki-top-hover-color: rgb(#303030, 0.9); // #fff;
+    --tiki-top-text-color: #303030; //#fff;
+    --bs-navbar-brand-color: #303030; //#{$navbar-dark-brand-color};
+    --bs-navbar-brand-hover-color: #303030; //#{$navbar-dark-brand-hover-color};
 }
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: rgba(120, 194, 173, 1);
-    --tiki-topbar-color: rgba(255, 255, 255, 0.8);
-    --tiki-topbar-hover-color: #fff;
-    --tiki-topbar-text-color: #fff;
+    --tiki-topbar-color: #303030; //rgba(255, 255, 255, 0.8);
+    --tiki-topbar-hover-color: rgb(#303030, 0.9); //#fff;
+    --tiki-topbar-text-color:  #303030; //#fff;
 }
 
 .tiki-top-nav-light {
@@ -127,6 +143,10 @@
     --tiki-vert-nav-link-color: $link-color;
     --tiki-vert-nav-link-hover-color: $link-hover-color;
 }
+
+ .table-danger {
+     --bs-table-color: #121212;
+ }
 
 [data-bs-theme="dark"] {
     --tiki-vert-nav-link-color: rgba(var(--bs-link-color-rgb));

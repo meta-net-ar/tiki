@@ -1,17 +1,25 @@
-/* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
-/* Original Bootswatch information:
- * bootswatch v5.2.0
- * Homepage: http://bootswatch.com
- * Copyright 2012-2022 Thomas Park
+@charset "UTF-8";
+/*!
+ * Bootswatch Spacelab theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Bootswatch v5.3.7 (https://bootswatch.com)
+ * Theme: spacelab
+ * Copyright 2012-2025 Thomas Park
  * Licensed under MIT
  * Based on Bootstrap
- *
- * Adapted by the Tiki Community for Tiki Wiki CMS Groupware
 */
+/*!
+ * Bootstrap  v5.3.7 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
+@import "../scss/variables"; // 2. (This is moved above the functions file to have effect, maybe a quirk of the Bootswatch file arrangement.) The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
-@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/spacelab/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
@@ -27,6 +35,9 @@
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 
+
+// ----------------------------- Overrides and adjustments ----------------------------- //
+
 .topbar .navbar {
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -37,24 +48,7 @@
     margin-bottom: .5rem;
 }
 
-// Replicate navbar color used on Bootswatch sample page, in that case for bg-primary
-//.tiki .navbar-dark.bg-dark {
-//    background-image: linear-gradient(#6d94bf, #446e9b 50%, #3e648d) !important;
-//    -webkit-filter: none;
-//    filter: none;
-//    border: 1px solid #345578;
-//    nav#topbar_modules,
-//    #topbar_modules .navbar.navbar-dark.bg-dark {
-//        background: transparent !important;
-//        background-image: none !important;
-//        border: none !important;
-//    }
-//}
-
 .tiki .navbar-light.bg-light {
-//    background: linear-gradient(white, #eee 50%, #e4e4e4) !important;
-//    -webkit-filter: none;
-//    filter: none;
     border: 1px solid #d5d5d5;
     nav#topbar_modules,
     #topbar_modules .navbar.navbar-light.bg-light {
@@ -63,17 +57,31 @@
         border: none !important;
     }
 }
-//.navbar {
-//    --bs-navbar-color: #{$link-color};
-//}
 
-//.navbar:not(.bg-dark,.bg-light) {
-//    .nav-link {
-//        color: var(--bs-link-color);
-//        &:hover,
-//        &:active,
-//        & .highlighted {
-//            color: var(--bs-link-hover-color);
-//        }
-//    }
-//}
+.list-group-item.list-group-item-action {
+    color: #454545BF;
+}
+.list-group-item.list-group-item-action.list-group-item-primary {
+    color: #363636BF;
+}
+.list-group-item.list-group-item-action.list-group-item-secondary {
+    color: #3B3B3BBF;
+}
+.list-group-item.list-group-item-action.list-group-item-success {
+    color: #3B3B3BBF;
+}
+.list-group-item.list-group-item-action.list-group-item-danger {
+    color: #333333BF;
+}
+.list-group-item.list-group-item-action.list-group-item-warning {
+    color: #3B3B3BBF;
+}
+.list-group-item.list-group-item-action.list-group-item-info {
+    color: #363636BF;
+}
+.list-group-item.list-group-item-action.list-group-item-light {
+    color: #3B3B3BBF;
+}
+.list-group-item.list-group-item-action.list-group-item-dark {
+    color: #333333BF;
+}

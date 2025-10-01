@@ -17,9 +17,7 @@ global $dbTiki;
 $copyrightslib = new CopyrightsLib();
 
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $smarty->assign('page', $_REQUEST["page"]);

@@ -92,5 +92,11 @@ function prefs_module_list()
             'filter' => 'alpha',
             'default' => [],
         ],
+        'module_sidebar_toggle_small_screen' => [
+            'name' => tra('Sidebar toggle button for small screens'),
+            'type' => 'flag',
+            'description' => tr("Allows you to add sidebar toggle to small screens."),
+            'default' => 'n',
+        ],
     ];
 }

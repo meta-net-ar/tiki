@@ -87,35 +87,35 @@
         {*
         <div class="ganttButtonBar noprint">
             <div class="buttons">
-                <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo"><span class="teamworkIcon">&#39;</span></button>
-                <button onclick="$('#workSpace').trigger('redo.gantt');return false;" class="button textual icon requireCanWrite" title="redo"><span class="teamworkIcon">&middot;</span></button>
+                <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo" aria-label="{tr}undo{/tr}"><span class="teamworkIcon">&#39;</span></button>
+                <button onclick="$('#workSpace').trigger('redo.gantt');return false;" class="button textual icon requireCanWrite" title="redo" aria-label="{tr}redo{/tr}"><span class="teamworkIcon">&middot;</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanAdd"></span>
-                <button onclick="$('#workSpace').trigger('addAboveCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert above"><span class="teamworkIcon">l</span></button>
-                <button onclick="$('#workSpace').trigger('addBelowCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert below"><span class="teamworkIcon">X</span></button>
+                <button onclick="$('#workSpace').trigger('addAboveCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert above" aria-label="{tr}insert above{/tr}"><span class="teamworkIcon">l</span></button>
+                <button onclick="$('#workSpace').trigger('addBelowCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert below" aria-label="{tr}insert below{/tr}"><span class="teamworkIcon">X</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanInOutdent"></span>
-                <button onclick="$('#workSpace').trigger('outdentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="un-indent task"><span class="teamworkIcon">.</span></button>
-                <button onclick="$('#workSpace').trigger('indentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="indent task"><span class="teamworkIcon">:</span></button>
+                <button onclick="$('#workSpace').trigger('outdentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="un-indent task" aria-label="{tr}un-indent task{/tr}"><span class="teamworkIcon">.</span></button>
+                <button onclick="$('#workSpace').trigger('indentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="indent task" aria-label="{tr}indent task{/tr}"><span class="teamworkIcon">:</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanMoveUpDown"></span>
-                <button onclick="$('#workSpace').trigger('moveUpCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move up"><span class="teamworkIcon">k</span></button>
-                <button onclick="$('#workSpace').trigger('moveDownCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move down"><span class="teamworkIcon">j</span></button>
+                <button onclick="$('#workSpace').trigger('moveUpCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move up" aria-label="{tr}move up{/tr}"><span class="teamworkIcon">k</span></button>
+                <button onclick="$('#workSpace').trigger('moveDownCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move down" aria-label="{tr}move down{/tr}"><span class="teamworkIcon">j</span></button>
                 <span class="ganttButtonSeparator requireCanDelete"></span>
-                <button onclick="$('#workSpace').trigger('deleteFocused.gantt');return false;" class="button textual icon delete requireCanWrite" title="Delete"><span class="teamworkIcon">&cent;</span></button>
+                <button onclick="$('#workSpace').trigger('deleteFocused.gantt');return false;" class="button textual icon delete requireCanWrite" title="Delete" aria-label="{tr}Delete{/tr}"><span class="teamworkIcon">&cent;</span></button>
                 <span class="ganttButtonSeparator"></span>
                 <button onclick="$('#workSpace').trigger('expandAll.gantt');return false;" class="button textual icon " title="EXPAND_ALL"><span class="teamworkIcon">6</span></button>
                 <button onclick="$('#workSpace').trigger('collapseAll.gantt'); return false;" class="button textual icon " title="COLLAPSE_ALL"><span class="teamworkIcon">5</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="$('#workSpace').trigger('zoomMinus.gantt'); return false;" class="button textual icon " title="zoom out"><span class="teamworkIcon">)</span></button>
-                <button onclick="$('#workSpace').trigger('zoomPlus.gantt');return false;" class="button textual icon " title="zoom in"><span class="teamworkIcon">(</span></button>
+                <button onclick="$('#workSpace').trigger('zoomMinus.gantt'); return false;" class="button textual icon " title="zoom out" aria-label="{tr}zoom out{/tr}"><span class="teamworkIcon">)</span></button>
+                <button onclick="$('#workSpace').trigger('zoomPlus.gantt');return false;" class="button textual icon " title="zoom in" aria-label="{tr}zoom in{/tr}"><span class="teamworkIcon">(</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="print_chart();return false;" class="button textual icon " title="Print"><span class="teamworkIcon">p</span></button>
+                <button onclick="print_chart();return false;" class="button textual icon " title="Print" aria-label="{tr}Print{/tr}"><span class="teamworkIcon">p</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="ge.gantt.showCriticalPath=!ge.gantt.showCriticalPath; ge.redraw();return false;" class="button textual icon requireCanSeeCriticalPath" title="CRITICAL_PATH"><span class="teamworkIcon">&pound;</span></button>
+                <button onclick="ge.gantt.showCriticalPath=!ge.gantt.showCriticalPath; ge.redraw();return false;" class="button textual icon requireCanSeeCriticalPath" title="CRITICAL_PATH" aria-label="CRITICAL_PATH"><span class="teamworkIcon">&pound;</span></button>
                 <span class="ganttButtonSeparator requireCanSeeCriticalPath"></span>
                 <button onclick="ge.splitter.resize(.1);return false;" class="button textual icon" ><span class="teamworkIcon">F</span></button>
                 <button onclick="ge.splitter.resize(50);return false;" class="button textual icon" ><span class="teamworkIcon">O</span></button>
                 <button onclick="ge.splitter.resize(100);return false;" class="button textual icon"><span class="teamworkIcon">R</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="$('#workSpace').trigger('fullScreen.gantt');return false;" class="button textual icon" title="fullscreen" id="fullscrbtn"><span class="teamworkIcon">@</span></button>
+                <button onclick="$('#workSpace').trigger('fullScreen.gantt');return false;" class="button textual icon" title="fullscreen" aria-label="{tr}fullscreen{/tr}" id="fullscrbtn"><span class="teamworkIcon">@</span></button>
                 <button onclick="ge.element.toggleClass('colorByStatus' );return false;" class="button textual icon"><span class="teamworkIcon">&sect;</span></button>
                 {/literal}{if $ganttIdField}{literal}<button onclick="duplicateGantt();" class="btn btn-outline-primary" title="{tr}Duplicate{/tr}">{tr}Duplicate{/tr}</button>{/literal}{/if}{literal}
                 <button onclick="saveGanttOnServer();" id="ganttSaveProject" class="btn btn-primary requireWrite" title="{tr}Save{/tr}">{tr}Save{/tr}</button>

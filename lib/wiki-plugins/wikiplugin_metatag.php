@@ -48,7 +48,7 @@ function wikiplugin_metatag($data, $params)
             $content = '';
         }
         $headerlib->add_meta($name, $content);
-    } elseif (strpos($data, '|') !== false) {
+    } elseif (str_contains($data, '|')) {
         // split data by lines (trimed whitespace from start and end)
         $lines = preg_split("/\n/", trim($data));
 

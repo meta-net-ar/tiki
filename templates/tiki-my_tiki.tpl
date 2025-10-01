@@ -46,7 +46,7 @@
                             {/section}
                         </table>
                     </div>
-                    {pagination_links cant=$user_pages_count step=$step offset=$pages_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$user_pages_count step=$step offset=$pages_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -78,7 +78,7 @@
                             {/section}
                         </table>
                     </div>
-                    {pagination_links cant=$user_articles_count step=$step offset=$articles_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$user_articles_count step=$step offset=$articles_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -111,10 +111,10 @@
                         </table>
                     </div>
                     <ul class="nav nav-pills float-end">
-                        <li><a href="#">{tr}Records{/tr} <span class="badge bg-secondary">{$user_items|@count}</span></a>&nbsp;</li>
-                        <li><a href="#">{tr}Comments{/tr} <span class="badge bg-secondary">{$nb_item_comments}</span></a></li>
+                        <li><a href="#">{tr}Records{/tr} <span class="badge bg-secondary" role="button">{$user_items|@count}</span></a>&nbsp;</li>
+                        <li><a href="#">{tr}Comments{/tr} <span class="badge bg-secondary" role="button">{$nb_item_comments}</span></a></li>
                     </ul>
-                    {pagination_links cant=$user_items_count step=$step offset=$user_items_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$user_items_count step=$step offset=$user_items_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -148,7 +148,7 @@
                             {/section}
                         </table>
                     </div>
-                    {pagination_links cant=$msgs_count step=$step offset=$msgs_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$msgs_count step=$step offset=$msgs_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -174,7 +174,7 @@
                         {/section}
                     </table>
                     </div>
-                    {pagination_links cant=$tasks_count step=$step offset=$tasks_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$tasks_count step=$step offset=$tasks_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -204,7 +204,7 @@
                             {/section}
                         </table>
                     </div>
-                    {pagination_links cant=$forum_topics_count step=$step offset=$forum_topics_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$forum_topics_count step=$step offset=$forum_topics_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -234,7 +234,7 @@
                             {/section}
                         </table>
                     </div>
-                    {pagination_links cant=$forum_replies_count step=$step offset=$forum_replies_offset clean='y'}{/pagination_links}
+                    {pagination_links count=$forum_replies_count step=$step offset=$forum_replies_offset clean='y'}{/pagination_links}
                 </div>
             {/tab}
         {/if}
@@ -289,7 +289,7 @@
                                 {/section}
                             </table>
                         </div>
-                        {pagination_links cant=$user_posts_count step=$step offset=$posts_offset clean='y'}{/pagination_links}
+                        {pagination_links count=$user_posts_count step=$step offset=$posts_offset clean='y'}{/pagination_links}
                     </div>
                 </div>
             {/tab}

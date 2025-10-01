@@ -80,3 +80,27 @@
 .text-warning { color: #A0630E !important; }
 .text-success { color: #3A833A !important; }
 .text-info { color: #6E7425 !important; }
+
+
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: #{$component-active-bg};
+}
+
+// Dark color mode
+
+[data-bs-theme=dark] {
+    .blockquote-footer, .figure-caption { color: #848D94; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #FF4800 !important; }
+
+    .btn.btn-outline-primary { color: #A79D0C; border-color: #A79D0C; }
+    .btn.btn-outline-secondary { color: #71983E; border-color: #71983E; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4800; border-color: #FF4800; }
+    .btn.btn-outline-warning { color: #C87B0E; border-color: #C87B0E; }
+    .btn.btn-outline-info { color: #8B932F; border-color: #8B932F; }
+    .btn.btn-outline-dark { color: #9A9004; border-color: #9A9004; }
+
+    .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
+}

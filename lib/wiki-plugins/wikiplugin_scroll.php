@@ -67,10 +67,10 @@ function wikiplugin_scroll($data, $params)
 
 // margin requierd for ilayer scrolling on mozilla
     $margin = 40;
-    if (substr($width, -1) == "x") {
+    if (str_ends_with($width, "x")) {
         $width_w = substr($width, 0, -2);
         $height_h = substr($height, 0, -2);
-    } elseif (substr($width, -1) == "%") {
+    } elseif (str_ends_with($width, "%")) {
         return ("<b>Warning the value of the height parameters must be set using px  (ex: 600px ) for plugin</b><br/>");
     } else {
         return ("<b>Warning the value of the width parameters must be set using px  (ex: 600px ) for plugin</b><br/>");

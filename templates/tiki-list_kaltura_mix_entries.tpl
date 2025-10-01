@@ -1,4 +1,4 @@
-{if $cant > 0}
+{if $count > 0}
     <div class="table-responsive">
         <table class="table" id="selectable">
             <tr>
@@ -16,7 +16,7 @@
 
                         {include file='tiki-list_kaltura_entries_actions.tpl'}
 
-                        <td class="text"><a href="#" title="{tr}Thumbnail{/tr}" {popup fullhtml="1" text=$smarty.capture.actions}><img class="athumb" src="{$item->thumbnailUrl}" alt="{$item->description}" height="80" width="120"></a></td>
+                        <td class="text"><a href="#" title="{tr}Thumbnail{/tr}" {popup fullhtml="1" text=$smarty.capture.actions} role="button"><img class="athumb" src="{$item->thumbnailUrl}" alt="{$item->description}" height="80" width="120"></a></td>
                         <td class="text"><a href="tiki-kaltura_video.php?{$entryType}Id={$item->id}">{icon name='clipboard-list'}{$item->name}</a></td>
                         <td class="text">{$item->createdAt}</td>
                         <td class="text">{$item->tags}</td>
@@ -27,7 +27,7 @@
                             {/if}
                         </td>
                         {include file='tiki-list_kaltura_entries_add_info.tpl'}
-                        <td class="text"><a href="#" title="{tr}Information{/tr}" {popup trigger="onmouseover" fullhtml="1" sticky=true text=$smarty.capture.add_info left=true}>{icon name='information' class='' title=''}</a></td>
+                        <td class="text"><a href="#" title="{tr}Information{/tr}" {popup trigger="onmouseover" fullhtml="1" sticky=true text=$smarty.capture.add_info left=true} role="button">{icon name='information' class='' title=''}</a></td>
                     </tr>
                 {/if}
             {/foreach}

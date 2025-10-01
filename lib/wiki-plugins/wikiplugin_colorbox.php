@@ -25,15 +25,6 @@ function wikiplugin_colorbox_info()
                 'since' => '5.0',
                 'profile_reference' => 'file_gallery',
                 ],
-            'galId' => [
-                'required' => false,
-                'name' => tra('Image Gallery ID'),
-                'description' => tra('ID number of the image gallery that contains the images to be displayed'),
-                'filter' => 'digits',
-                'accepted' => 'ID',
-                'default' => '',
-                'since' => '5.0'
-                ],
             'fileId' => [
                 'required' => false,
                 'name' => tra('File ID Filter'),
@@ -130,10 +121,8 @@ function wikiplugin_colorbox_info()
 }
 function wikiplugin_colorbox($data, $params)
 {
-    global $user, $prefs;
+    global $user, $prefs, $base_url;
     static $iColorbox = 0;
-    $default = ['showfilename' => 'n', 'showtitle' => 'n', 'thumb' => 'y', 'showallthumbs' => 'n', 'parsedescriptions' => 'n'];
-    $params = array_merge($default, $params);
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
 
@@ -188,9 +177,11 @@ function wikiplugin_colorbox($data, $params)
                 $str .= preg_replace('/[\n\r]/', '', nl2br($file['description']));
             }
         }
+        $file['mediaType'] = explode('/', $file['filetype'])[0] ?? '';
         $file['elTitle'] = $str;
     }
     $smarty->assign('iColorbox', $iColorbox++);
+    $smarty->assign('base_url', $base_url);
     $smarty->assign_by_ref('colorboxFiles', $files);
     $smarty->assign_by_ref('params', $params);
     return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_colobox.tpl') . '~/np~';

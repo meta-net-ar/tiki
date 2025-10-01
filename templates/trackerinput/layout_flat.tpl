@@ -24,9 +24,9 @@
                 </label>
             {/if}
             <br>
-            {assign var="maxItems" value=$prefs.tracker_item_select_feature*1}
+            {$maxItems=$prefs.tracker_item_select_feature*1}
             {if !empty($field.type) and $field.type == 'e' and $field.options|json_decode|count > 0}
-                {assign var="feildOption" value=$field.options|json_decode}
+                {$feildOption=$field.options|json_decode}
             {/if}
             {if ((!empty($field.type)
                 and ($field.type eq 'M'  or ($field.type eq 'r' and $field.options_map.selectMultipleValues eq 1))
@@ -69,18 +69,12 @@ if ($('.multi-toggle-selection').length > 0) {
         const trackerFieldContainer = $('#trackerinput_' + fieldId);
         const allCheckboxes = trackerFieldContainer.find('input[type="checkbox"][name="' + elmName + '"]');
         const selectField = trackerFieldContainer.find("select[name='" + elmName + "']");
-        const isSelect2 = selectField.data('select2');
         if (mode === 'select') {
             if (allCheckboxes && allCheckboxes.length) {
                 allCheckboxes.prop('checked', true);
             }
             if (selectField && selectField.length) {
-                if (isSelect2) {
-                    var allValues = selectField.find('option').map(function() { return this.value }).get();
-                    selectField.val(allValues).trigger('change');
-                } else {
-                    selectField.find('option').prop('selected', true);
-                }
+                selectField.find('option').prop('selected', true);
             }
             btn.val("{tr}Invert Selection{/tr}").data('mode', 'invert');
             btn.attr('title', "{tr}Invert Selection{/tr}");
@@ -92,16 +86,9 @@ if ($('.multi-toggle-selection').length > 0) {
                 });
             }
             if (selectField && selectField.length) {
-                if (isSelect2) {
-                    var selectedValues = selectField.val() || [];
-                    var allOptions = selectField.find('option').map(function() { return this.value }).get();
-                    var invertedSelection = allOptions.filter(option => !selectedValues.includes(option));
-                    selectField.val(invertedSelection).trigger('change');
-                } else {
-                    selectField.find('option').each(function() {
-                        $(this).prop('selected', !$(this).prop('selected'));
-                    });
-                }
+                selectField.find('option').each(function() {
+                    $(this).prop('selected', !$(this).prop('selected'));
+                });
             }
             btn.val("{tr}Select All{/tr}").data('mode', 'select');
             btn.attr('title', "{tr}Select All{/tr}");

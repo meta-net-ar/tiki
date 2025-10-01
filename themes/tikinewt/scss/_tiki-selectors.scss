@@ -1,63 +1,65 @@
-// This file is for additional LESS rules beyond what are in variables.scss.
+// Tikinewt for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
 // Image path example:
-// $imagePath: "../images/";
+//$imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
-//
 
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-//.container { background: #fff; }
-
-.bg-dark .container { background: $dark; }
-
+// Color system
+// Body
 body > .container {
-    border: solid #aaaaaa;
+    border: solid var(--tiki-main-border-color);
     border-width: 0 1px;
 }
 
 body > .container, // basic layout (bootstrap)
 .header_container > .container,
 .header_container.container {
-    border: solid #aaaaaa;
-    border-width: 1px 1px 0 1px;
-    margin-top: 20px;
-}
-
-body > .container {
-    .topbar {
-        margin-bottom: 20px;}
-}
+    border: solid var(--tiki-main-border-color); // $border-color;
+    border-width: 0 1px;
 
 .middle_outer > .container {
-    border: solid #aaaaaa;
+    border: solid var(--tiki-main-border-color);
     border-width: 0 1px;
 }
 
 .footer_liner > .container {
- //   border: solid #aaaaaa; fix for Bootstrap53
     border-width: 0 1px 1px 1px;
 }
 
-header.container {
-    //  border: 1px solid #aaaaaa;
-    //  border-bottom: none;
-    margin-top: 20px;
-    background: #e9ecef;
+#col1 {
+    border: var(--tiki-main-border-color) solid;
+    border-width: 0 0 1px 0;
 }
 
-#col1 {
-//    background: #f3f6f9; fix for Bootstrap53
-    //  margin: 8px 3px 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border: 1px solid #8cacbb;
-    margin-bottom: 10px;
+#col1, #col2, #col3 {
+    padding-top: 20px;
+}
+
+#col2 {
+    border: var(--tiki-main-border-color) solid;
+    border-width: 0 1px 1px 0;
+}
+
+#col3 {
+    border: var(--tiki-main-border-color) solid;
+    border-width: 0 0 1px 1px;
 }
 
 .layout_classic .page-header,
 header.fixed-top {
-    border-bottom: 1px solid #aaa;
+    border-bottom: 1px solid var(--tiki-main-border-color);
 }
 
 #topbar_modules {
@@ -70,7 +72,6 @@ header.fixed-top {
     .box-search .mb-3 {
         margin-bottom: 0;
     }
-//    background: $navbar-default-bg;
 }
 
 #topbar_modules .navbar {
@@ -78,14 +79,15 @@ header.fixed-top {
 }
 
 .layout_social .container.middle {
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
+    border: solid var(--tiki-main-border-color);
+    border-width: 0 1px 1px 1px;
 }
 
 #col2 .navbar {
     background: transparent;
     .nav-link {
         color: var(--tiki-vert-nav-link-color); //#214D73;
+    }
         &:hover {
             color: var(--tiki-vert-nav-link-hover-color);
         }
@@ -93,15 +95,13 @@ header.fixed-top {
 }
 
 footer .container {
- //   background: #c7d0d9; fix for Bootstrap53
-    border: solid #8cacbb;
+    border: solid var(--tiki-main-border-color);
     border-width: 0 1px 1px 1px;
 }
 
 #bottom_modules { padding-top: 15px; }
 
 body.fullscreen {
- //   background: #f3f6f9; fix for Bootstrap53
     #col1,
     .middle_outer > .container,
     .middle > .row,
@@ -115,28 +115,13 @@ body.fullscreen {
     }
 }
 
-h3.card-title {
-    font-size: 1.15rem;
-    margin-bottom: 0;
-}
+.bg-dark .container { background: $dark; }
 
-// So form submit buttons with icons and text used in popover actions can look just like links
-.popover button.btn-link.link-list,
-.popover button.btn-link.link-list .icon {
-    font-size: $popover-font-size;
-}
-
-// Dark mode
-.card {
-    border-color: var(--tiki-card-border-color); //$light-border-subtle-dark;
-    .card-header {
-        background: var(--tiki-card-header-bg); ///$dark-bg-subtle-dark;
-        .card-title {
-            color: var(--tiki-card-title-color); // $body-color-dark;
-        }
-    }
-}
-
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
 // Use theme colors for active state - inspired by Morph theme
 .btn:not(.btn-link) {
     color: #fff;
@@ -199,3 +184,83 @@ h3.card-title {
     color: #506925;
     background-color: #d9e3f1;
 }
+
+.btn {
+    //    color: #6c839b;
+
+    &:focus {
+        color: $gray-700;
+    }
+
+    &:hover,
+    &:focus,
+    &:active,
+    &:active:focus {
+        color: $gray-700;
+    }
+
+    @each $color, $value in $theme-colors {
+        &-#{$color} {
+
+            &:active,
+            &:active:focus {
+                @if ($color == secondary or $color == light) {
+                    color: $gray-700;
+                    background-color: $gray-200;
+                } @else {
+                    color: $white;
+                    background-color: $value;
+                }
+            }
+        }
+    }
+}
+
+
+// Forms
+// Navs
+// Navbar
+// Dropdowns
+// Pagination
+// Cards
+h3.card-title {
+    font-size: 1.15rem;
+    margin-bottom: 0;
+}
+
+.card {
+    border-color: var(--tiki-card-border-color); //$light-border-subtle-dark;
+    .card-header {
+        background: var(--tiki-card-header-bg); ///$dark-bg-subtle-dark;
+        .card-title {
+            color: var(--tiki-card-title-color); // $body-color-dark;
+        }
+    }
+}
+
+// Accordion
+// Popovers
+    // So form submit buttons with icons and text used in popover actions can look just like links
+.popover button.btn-link.link-list,
+.popover button.btn-link.link-list .icon {
+    font-size: $popover-font-size;
+}
+
+// Badges
+.badge.bg-success {
+    color: #3B3B3B;
+}
+
+.badge.bg-danger {
+    color: #171717;
+}
+
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+// External libraries

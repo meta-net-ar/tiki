@@ -28,8 +28,7 @@ class Services_IotApps_Controller
         global $access;
         $access->check_permission('tiki_p_manage_iot_apps');
         $payload = $input->payload->json();
-        $uuid = Uuid::uuid4();
-        $app_uuid  = $uuid->toString();
+        $app_uuid  = \Tiki\Utilities\Identifiers::generateUUID();
         $trackerId = intval($payload['tracker-id']);
         $name = $payload['app-name'];
         try {

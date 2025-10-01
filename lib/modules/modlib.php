@@ -5,7 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\Wiki\ConvertToTiki9;
 use Tiki\Profiling\Timer;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 /**
  *
@@ -55,7 +57,7 @@ class ModLib extends TikiLib
      * @param      $data
      * @param null $parse
      *
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function replace_user_module($name, $title, $data, $parse = null, $tgt_mod = null)
@@ -83,7 +85,7 @@ class ModLib extends TikiLib
             $cachelib->invalidate("user_modules_$name");
 
             $wikilib = TikiLib::lib('wiki');    // used to require lib/wiki/wikilib.php where convertToTiki9 lives
-            $converter = new convertToTiki9();
+            $converter = new ConvertToTiki9();
             $converter->saveObjectStatus($name, 'tiki_user_modules', 'new9.0+');
 
             return $result;
@@ -134,7 +136,7 @@ class ModLib extends TikiLib
         }
         if ($type == "D" || $type == "P") {
             $usermoduleslib = TikiLib::lib('usermodules');
-            $usermoduleslib->add_module_users($moduleId, $name, $title, $position, $order, $cache_time, $rows, $groups, $params, $type);
+            $usermoduleslib->add_module_users($moduleId, $name, $position, $order, $type);
         }
         return $moduleId;
     }
@@ -193,7 +195,7 @@ class ModLib extends TikiLib
     /**
      * @param $moduleId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_up($moduleId)
     {
@@ -204,7 +206,7 @@ class ModLib extends TikiLib
     /**
      * @param $moduleId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_down($moduleId)
     {
@@ -217,7 +219,7 @@ class ModLib extends TikiLib
      *
      * @param $moduleId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_left($moduleId)
     {
@@ -230,7 +232,7 @@ class ModLib extends TikiLib
      *
      * @param $moduleId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_right($moduleId)
     {
@@ -305,8 +307,8 @@ class ModLib extends TikiLib
         // Now add all the system modules
         $h = opendir(TEMPLATES_MODULES_PATH);
         while (($file = readdir($h)) !== false) {
-            if (substr($file, 0, 4) == 'mod-' && preg_match("/\.tpl$/", $file)) {
-                if (! strstr($file, "nocache")) {
+            if (str_starts_with($file, 'mod-') && preg_match("/\.tpl$/", $file)) {
+                if (! str_contains($file, "nocache")) {
                     $name = substr($file, 4, strlen($file) - 8);
 
                     $all_modules[] = $name;
@@ -320,7 +322,7 @@ class ModLib extends TikiLib
     /**
      * @param $name
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function remove_user_module($name)
@@ -347,8 +349,8 @@ class ModLib extends TikiLib
         $query = "select * from `tiki_user_modules` order by " . $this->convertSortMode($sort_mode);
 
         $result = $this->query($query, []);
-        $query_cant = "select count(*) from `tiki_user_modules`";
-        $cant = $this->getOne($query_cant, []);
+        $query_count = "select count(*) from `tiki_user_modules`";
+        $count = $this->getOne($query_count, []);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -357,7 +359,7 @@ class ModLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -374,7 +376,7 @@ class ModLib extends TikiLib
         $h = opendir($dircache);
         $i = 0;
         while (($file = readdir($h)) !== false) {
-            if (substr($file, 0, 4) == 'mod-') {
+            if (str_starts_with($file, 'mod-')) {
                 $file = "$dircache/$file";
                 $result = unlink($file);
                 if ($result) {
@@ -521,6 +523,11 @@ class ModLib extends TikiLib
         global $section, $page, $prefs, $user;
         $tikilib = TikiLib::lib('tiki');
 
+        if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
+            if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
+                return true;
+            }
+        }
         // TODO: Check this if it behaves well on other "Admin" pages when UAB is enabled
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
@@ -649,8 +656,7 @@ class ModLib extends TikiLib
 
         if ($prefs['cookie_consent_feature'] == 'y' && $prefs['cookie_consent_disable'] !== 'y') {      // check if consent required to show
             if (! empty($params['cookie_consent']) && $params['cookie_consent'] === 'y') {
-                global $feature_no_cookie_analytics;
-                if ($feature_no_cookie_analytics) {
+                if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
                     return false;
                 }
             }
@@ -827,7 +833,7 @@ class ModLib extends TikiLib
             if ($dh = opendir(MODULES_PATH)) {
                 while (($file = readdir($dh)) !== false) {
                     if (preg_match("/^mod-func-.*\.php$/", $file)) {
-                        array_push($files, $file);
+                        $files[] = $file;
                     }
                 }
                 closedir($dh);
@@ -906,8 +912,8 @@ class ModLib extends TikiLib
                     'section' => 'appearance',
                 ],
                 'decorations' => [
-                    'name' => tra('Title, background, etcs'),
-                    'description' => 'y|n ' . tra('Show module decorations'),
+                    'name' => tra('Backgrounds and Borders (if specified by the theme)'),
+                    'description' => 'y|n ' . tra('Default: "y". "n": show only title and content.'),
                     'section' => 'appearance',
                 ],
                 'notitle' => [
@@ -1006,7 +1012,7 @@ class ModLib extends TikiLib
                 ],
                 'flip' => [
                     'name' => tra('Flip'),
-                    'description' => tra('y|yc|n Users can open and close the module. y: module initially open. yc: module initially closed. n: module always open (default).'),
+                    'description' => tra('y|yc|n Users can open and close the module. "y": module initially open. "yc": module initially closed. "n": module always open (default).'),
                     'filter' => 'alpha',
                     'section' => 'appearance',
                 ],
@@ -1109,10 +1115,10 @@ class ModLib extends TikiLib
                 'error' => '',
                 'flip' => ( $prefs['user_flip_modules'] == 'module' ) ? 'n' : $prefs['user_flip_modules'],
             ];
-            $module_params = isset($mod_reference['params']) ? (array) $mod_reference['params'] : [];
+            $module_params = (array) ($mod_reference['params'] ?? []);
             $module_params = array_merge($defaults, $module_params); // not sure why style doesn't get set sometime but is used in the tpl
 
-            $mod_reference = array_merge(['moduleId' => null, 'ord' => 0, 'position' => 0, 'rows' => 10], $mod_reference);
+            $mod_reference = array_merge(['moduleId' => null, 'ord' => 0, 'position' => 0, 'rows' => 10, 'cache_time' => 0], $mod_reference);
 
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
@@ -1201,7 +1207,7 @@ class ModLib extends TikiLib
 
                 if ($this->is_admin_mode() && $timer) {
                     $elapsed = round($timer->stop('module'), 3);
-                    $data = isset($data) ? $data : '';
+                    $data = $data ?? '';
                     $data = preg_replace('/<div /', '<div title="Module Execution Time ' . $elapsed . 's" ', $data, 1);
                 }
 
@@ -1597,7 +1603,7 @@ function zone_is_empty($zoneName)
     }
 
     foreach ($moduleZones[$key] as $module) {
-        $data = (string) (isset($module['data']) ? $module['data'] : '');
+        $data = (string) ($module['data'] ?? '');
         if (! empty($data)) {
             return false;
         }

@@ -16,4 +16,6 @@ interface Search_Action_Action
     public function execute(JitFilter $data);
 
     public function requiresInput(JitFilter $data);
+
+    public function requiresConfirm();
 }

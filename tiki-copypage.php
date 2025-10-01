@@ -33,9 +33,7 @@ $access->check_feature('feature_wiki');
 
 // Get the page from the request var or default it to HomePage
 if (! isset($_REQUEST["page"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 } else {
     $page = $_REQUEST["page"];
     $smarty->assign_by_ref('page', $_REQUEST["page"]);
@@ -45,9 +43,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $tikilib->get_perm_object($page, 'wiki page', $info);
@@ -62,9 +58,7 @@ if (! empty($_REQUEST["version"]) && $_REQUEST["version"] <> "last") {
 }
 // If the page doesn't exist then display an error
 if (! $tikilib->page_exists($page)) {
-    $smarty->assign('msg', tra("Page cannot be found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $smarty->assign('tiki_p_add_object', $userlib->user_has_permission($user, 'tiki_p_add_object'));
@@ -75,9 +69,7 @@ if (isset($_REQUEST["copy"]) || isset($_REQUEST["confirm"])) {
     // If the new pagename does match userpage prefix then display an error
     $newName = isset($_REQUEST["confirm"]) ? $_REQUEST['badname'] : $_REQUEST['newpage'];
     if (stristr($newName, $prefs['feature_wiki_userpage_prefix']) == $newName) {
-        $smarty->assign('msg', tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_409);
     }
     $dupCateg = isset($_REQUEST['dupCateg']) && $_REQUEST['dupCateg'] === 'y';
     $dupTags = isset($_REQUEST['dupTags']) && $_REQUEST['dupTags'] === 'y';
@@ -98,8 +90,7 @@ if (isset($_REQUEST["copy"]) || isset($_REQUEST["confirm"])) {
                 header('location: tiki-index.php?page=' . urlencode($newName));
             }
         } else {
-            $smarty->assign('msg', tra("Cannot copy page because maybe new page name already exists"));
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie(tra("Cannot copy page because maybe new page name already exists"), \Laminas\Http\Response::STATUS_CODE_409);
         }
         die;
     }

@@ -13,6 +13,8 @@
     * find_show_categories  : If value = 'y' adds categories dropdown with categories array values
     * find_show_categories_multi : If value = 'y' adds categories dropdown with categories array values with multi selector
     * find_categId          : categories selected value
+    * find_show_objects_multi : If value = 'y' adds trackers dropdown with trackers array values with multi selector
+    * find_objectId        : trackers selected value
     * find_show_num_rows    : If value = 'y' adds maxRecords field. Value: maxRecords
     * find_show_date_range  : If value = 'y' adds date range to filter within
     * find_show_orphans     : If value = 'y' adds a checkbox orphan
@@ -47,12 +49,12 @@
                 {/jq}
             </div>
             {if !empty($find_show_sub) and $find_show_sub eq 'y'}
-                <div class="input-group">
-                    <label class="control-label col-sm-8 findsub" for="find_sub" >
+                <div class="form-group row mt-3">
+                    <label class="control-label col-sm-5 findsub" for="find_sub" >
                         {tr}Search child file galleries{/tr}
                     </label>
-                    <div class="col-sm-4" >
-                        <input type="checkbox" name="find_sub" id="find_sub" {if $find_sub eq 'y'}checked="checked"{/if}/>
+                    <div class="col-sm-7">
+                        <input type="checkbox" name="find_sub" id="find_sub" class="form-check-input" {if $find_sub eq 'y'}checked="checked"{/if}/>
                     </div>
                 </div>
             {/if}
@@ -157,7 +159,7 @@
             </div>
         {/if}
         {if ((isset($find_show_categories) && $find_show_categories eq 'y') or (isset($find_show_categories_multi) && $find_show_categories_multi eq 'y')) and $prefs.feature_categories eq 'y' and !empty($categories)}
-            <div class="mb-3 row mx-0 category_find">
+            <div class="mb-3 row  category_find">
                 {if $find_show_categories_multi eq 'n' || $findSelectedCategoriesNumber <= 1}
                     <label class="col-sm-5 col-form-label" for="findcategory">
                         {tr}Category{/tr}
@@ -239,23 +241,25 @@
         {if !empty($find_durations)}
             {foreach key=key item=duration from=$find_durations}
                 <div class="mb-3 row">
-                    <label class="find_duration col-form-label col-sm-6">
+                    <label class="find_duration col-form-label col-sm-5">
                         {tr}{$duration.label}{/tr}
                     </label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-7">
                         {html_select_duration prefix=$duration.prefix default=$duration.default default_unit=$duration.default_unit}
                     </div>
                 </div>
             {/foreach}
         {/if}
         {if !empty($show_find_orphans) and $show_find_orphans eq 'y'}
-            <div class="mb-3 find-orphans" style="margin-top: -15px;">
-                <div class="form-check offset-sm-3">
-                    <label class="find_orphans col-form-label" style="padding-left: 0; font-weight: bold;" for="find_orphans">
+            <div class="mb-3 find-orphans">
+                <div class="form-group row">
+                    <label for="find_orphans" class="col-sm-5 col-form-label font-weight-bold">
                         {tr}Orphans{/tr}
-                        <input type="checkbox" style="margin-left: 30px;" name="find_orphans" id="find_orphans"
-                            {if isset($find_orphans) and $find_orphans eq 'y'}checked="checked"{/if}>
                     </label>
+                    <div class="col-sm-7">
+                        <input type="checkbox" name="find_orphans" id="find_orphans" class="form-check-input"
+                               {if isset($find_orphans) and $find_orphans eq 'y'}checked="checked"{/if}>
+                    </div>
                 </div>
             </div>
         {/if}
@@ -272,12 +276,12 @@
             </div>
         {/if}
         {if isset($find_show_num_rows) && $find_show_num_rows eq 'y'}
-            <div class="mb-3 row mx-0">
+            <div class="mb-3 row">
                 <label class="col-sm-5 col-form-label" for="findnumrows">
                     {tr}Displayed rows{/tr}
                 </label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxRecords" id="findnumrows" value="{$maxRecords|escape}"
+                    <input type="number" name="maxRecords" id="findnumrows" value="{$maxRecords|escape}"
                            class="form-control">
                 </div>
             </div>
@@ -294,8 +298,24 @@
                 {/if}
             </div>
         {/if}
+        {if ($find_show_objects_multi eq 'y')}
+            <div class="mb-3 row mx-0 findfilter">
+                
+                <label class="col-form-label col-sm-5">
+                    {tr}Filtered trackers{/tr}
+                </label>
+                <div class="col-sm-7">
+                    <select name="filterTracker[]" class="form-control form-control-sm" multiple>
+                        <option value=''>{tr}Objects :{/tr}</option>
+                        {foreach item=object from=$findAllObjects}
+                            <option value="{$object[$objectId]}" {if in_array($object[$objectId], $find_objectId)} selected="selected"{/if}>{$object['name']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        {/if}
         {if (!isset($map_only) or $map_only ne 'y') or (isset($gmapbuttons) && $gmapbuttons)}
-        <div class="mx-3">
+        <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-info" name="search">{tr}Find{/tr}</button>
         </div>
         {/if}

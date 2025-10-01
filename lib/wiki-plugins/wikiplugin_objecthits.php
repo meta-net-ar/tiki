@@ -57,9 +57,6 @@ function wikiplugin_objecthits_info()
 function wikiplugin_objecthits($data, $params)
 {
     $tikilib = TikiLib::lib('tiki');
-    $default = ['days' => 0, 'since' => '', 'type' => 'wiki'];
-    $params = array_merge($default, $params);
-
     $statslib = TikiLib::lib('stats');
 
     extract($params, EXTR_SKIP);

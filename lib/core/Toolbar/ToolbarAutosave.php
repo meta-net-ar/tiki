@@ -9,6 +9,7 @@ class ToolbarAutosave extends ToolbarItem
         $this->setLabel(tra('Auto Save'))
             ->setIconName('save')
             ->setIcon(tra('img/icons/disk.png'))
+            ->setWysiwygToken('autosave')
             ->setMarkdownSyntax('autosave')
             ->setMarkdownWysiwyg('autosave')
             ->setType('Autosave')

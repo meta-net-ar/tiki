@@ -18,9 +18,7 @@ $access->check_feature('feature_notepad');
 $access->check_user($user);
 $access->check_permission('tiki_p_notepad');
 if (! isset($_REQUEST["noteId"])) {
-    $smarty->assign('msg', tra("No note indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No note indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 TikiLib::lib('header')->setXRobotsTag($robots);

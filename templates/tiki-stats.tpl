@@ -1,7 +1,7 @@
 {title help="Stats"}{tr}Stats{/tr}{/title}
 
 {tabset}
-    {tab name="{tr}Tiki Statistics{/tr}"}
+    {tab name="{tr}Tiki Statistics{/tr}" print={$print_page == 'y' ? 'y' : 'n'}}
         <div class="t_navbar mb-4">
             {button href="#site_stats" _type="link" class="btn btn-link" _icon_name="home" _text="{tr}Site{/tr}"}
             {if $wiki_stats}
@@ -44,7 +44,24 @@
                 {button href="#tracker_stats" _type="link" class="btn btn-link" _icon_name="sort-numeric-asc" _text="{tr}Trackers{/tr}"}
             {/if}
         </div>
-
+        {if $pdf_export eq 'y' and $tiki_p_export_pdf eq 'y'}
+            <div class="text-end">
+                <div class="btn-group">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Stats Actions{/tr}" role="button">
+                        {icon name="menu-extra"}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <h6 class="dropdown-header">
+                            {tr}Stats actions{/tr}
+                        </h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="?{query display='pdf'}">
+                           {icon name="pdf"} {tr}PDF{/tr}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {/if}
         <h2 id="site_stats">{tr}Site Stats{/tr}</h2>
         {cycle values="odd,even" print=false advance=false}
         <div class="table-responsive">
@@ -379,7 +396,7 @@
                             <td>
                             {$data.dataLengthMb} Mb
                             </td>
-                            <td>
+                            <td style="text-align:right;">
                             {$data.rowCount}
                             </td>
                         </tr>
@@ -449,12 +466,12 @@
         {/if}
     {/tab}
 
-    {if $prefs.site_piwik_analytics_server_url || $prefs.site_piwik_site_id}
-        {tab name="{tr}Piwik Analytics{/tr}"}
-            <h2 id="site_stats">{tr}Piwik Analytics Dashboard{/tr}</h2>
-            {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Defaul dashboard is set to Piwik default dashboard. You can customize the modules to be displayed using the Dashboard setting; Create new dashboard.{/tr}{/remarksbox}
+    {if $prefs.site_matomo_analytics_server_url || $prefs.site_matomo_site_id}
+        {tab name="{tr}Matomo Analytics{/tr}"}
+            <h2 id="site_stats">{tr}Matomo Analytics Dashboard{/tr}</h2>
+            {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Default dashboard is set to Matomo default dashboard. You can customize the modules to be displayed using the Dashboard setting; Create new dashboard.{/tr}{/remarksbox}
             <div id="dashboard">
-                {wikiplugin _name=piwik moduleToWidgetize="Dashboard,index" period="month" _height="880" _scrolling="yes"}{/wikiplugin}
+                {wikiplugin _name=matomo moduleToWidgetize="Dashboard,index" period="month" _height="880" _scrolling="yes"}{/wikiplugin}
             </div>
         {/tab}
     {/if}
@@ -466,5 +483,4 @@
             {*{wikiplugin _name=googleanalytics account=$prefs.site_google_analytics_account}{/wikiplugin}*}
         {/tab}
     {/if}
-
 {/tabset}

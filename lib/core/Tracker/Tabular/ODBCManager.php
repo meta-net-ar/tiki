@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Tabular;
 
+use TikiLib;
+
 class ODBCManager
 {
     public $orig_handler;
@@ -33,6 +35,7 @@ class ODBCManager
     public function fetch($row, $pk = null, $id = null)
     {
         $this->handleErrors();
+        $row = $this->fillFieldsFromConfig($row);
         $conn = $this->getConnection();
         if ($pk) {
             $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
@@ -41,12 +44,15 @@ class ODBCManager
             $result = odbc_fetch_array($rs);
         } else {
             $sql = "SELECT * FROM {$this->config['table']} WHERE " . implode(' AND ', array_map(function ($k, $v) {
-                return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+                return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
             }, array_keys($row), $row));
             $rs = odbc_prepare($conn, $sql);
             $params = array_filter(array_values($row));
             odbc_execute($rs, $params);
             $result = odbc_fetch_array($rs);
+        }
+        if ($result) {
+            $result = $this->reverseMapFieldsFromConfig($result);
         }
         $this->stopErrorHandler();
         return $result;
@@ -56,17 +62,52 @@ class ODBCManager
     {
         $this->handleErrors();
         $conn = $this->getConnection();
-        $select = implode('", "', $fields);
+        if (! empty($this->config['value_mappings'])) {
+            $fields = array_merge($fields, array_keys($this->config['value_mappings']));
+        }
+        foreach ($fields as $k => $v) {
+            if (! strstr($v, '.')) {
+                $fields[$k] = $this->config['table'] . '.' . $v;
+            }
+        }
+        $select = implode('", "', str_replace('.', '"."', $fields));
         $sql = "SELECT \"{$select}\" FROM {$this->config['table']}";
+        if (! empty($this->config['join_tables'])) {
+            foreach ($this->config['join_tables'] as $table => $joinFields) {
+                $sql .= " LEFT JOIN \"" . addslashes($table) . "\" ON " . implode(' AND ', array_map(function ($k, $v) use ($table) {
+                    return "\"" . addslashes($table) . "\".\"" . addslashes($k) . "\" = \"{$this->config['table']}\".\"" . addslashes($v) . "\"";
+                }, array_keys($joinFields), array_values($joinFields)));
+            }
+        }
+        $sql .= " WHERE 1=1";
+        $bind = [];
         if ($modifiedField && $lastImport) {
-            $sql .= " WHERE \"{$modifiedField}\" >= ?";
+            $sql .= " AND \"{$modifiedField}\" >= ?";
+            $bind[] = $lastImport;
+        }
+        if (! empty($this->config['permanent_values'])) {
+            foreach ($this->config['permanent_values'] as $field => $value) {
+                if ($value == 'not null') {
+                    $sql .= " AND \"$field\" IS NOT NULL";
+                } else {
+                    $sql .= " AND \"$field\" = ?";
+                    $bind[] = $value;
+                }
+            }
+        }
+        if ($bind) {
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, [$lastImport]);
+            if ($rs) {
+                odbc_execute($rs, $bind);
+            }
         } else {
             $rs = odbc_exec($conn, $sql);
         }
-        while ($row = odbc_fetch_array($rs)) {
-            yield $row;
+        if ($rs) {
+            while ($row = odbc_fetch_array($rs)) {
+                $row = $this->reverseMapFieldsFromConfig($row);
+                yield $row;
+            }
         }
         $this->stopErrorHandler();
     }
@@ -84,30 +125,44 @@ class ODBCManager
             $exists = false;
             $id = null;
         }
+        $joinFields = [];
         if ($exists) {
+            $row = $this->fillFieldsFromConfig($row);
+            $joinFields = $this->removeJoinFields($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
+                unset($chunk[$pk]);
+                if (empty($chunk)) {
+                    continue;
+                }
                 $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                     return "\"{$k}\" = ?";
                 }, array_keys($chunk))) . " WHERE \"{$pk}\" = ?";
                 $rs = odbc_prepare($conn, $sql);
-                $params = array_map(function ($v) {
-                    return empty($v) && $v !== '0' ? null : $v;
-                }, array_values($chunk));
-                $params[] = $id;
-                odbc_execute($rs, $params);
-                if (odbc_error()) {
-                    $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                if ($rs) {
+                    $params = array_map(function ($v) {
+                        return empty($v) && $v !== '0' && $v !== 0 ? null : $v;
+                    }, array_values($chunk));
+                    $params[] = $id;
+                    odbc_execute($rs, $params);
+                    if (odbc_error()) {
+                        $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                    }
                 }
             }
             $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
             $rs = odbc_prepare($conn, $sql);
             odbc_execute($rs, [$id]);
             $result = odbc_fetch_array($rs);
+            if (! $result) {
+                $result = [];
+            }
             $result = ['is_new' => false, 'entry' => $result];
         } else {
             if ($fullRow) {
                 $row = $fullRow;
             }
+            $row = $this->fillFieldsFromConfig($row);
+            $joinFields = $this->removeJoinFields($row);
             $row = array_filter($row, function ($val) {
                 if (is_bool($val) || is_int($val) || is_float($val)) {
                     return true;
@@ -119,15 +174,57 @@ class ODBCManager
             });
             $sql = "INSERT INTO {$this->config['table']}(\"" . implode('", "', array_keys($row)) . "\") VALUES (" . implode(", ", array_fill(0, count(array_keys($row)), '?')) . ")";
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, array_values($row));
-            if (odbc_error()) {
-                $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+            if ($rs) {
+                odbc_execute($rs, array_values($row));
+                if (odbc_error()) {
+                    $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+                }
+                $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
+                $rs = odbc_prepare($conn, $sql);
+                odbc_execute($rs, []);
+                $result = odbc_fetch_array($rs);
+                if (! $result) {
+                    $result = [];
+                }
+                $result = ['is_new' => true, 'entry' => $result];
+            } else {
+                $result = ['is_new' => true, 'entry' => []];
             }
-            $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
-            $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, []);
-            $result = odbc_fetch_array($rs);
-            $result = ['is_new' => true, 'entry' => $result];
+        }
+        $result['entry'] = $this->reverseMapFieldsFromConfig($result['entry']);
+        if ($joinFields) {
+            $tableFields = [];
+            foreach ($joinFields as $k => $v) {
+                $parts = explode('.', $k);
+                $table = array_shift($parts);
+                $field = array_shift($parts);
+                $tableFields[$table][$field] = $v;
+            }
+            foreach ($tableFields as $table => $fields) {
+                if (! empty($this->config['join_tables'][$table])) {
+                    foreach ($this->config['join_tables'][$table] as $remote => $local) {
+                        $idVal = $result['entry'][$local] ?? null;
+                        if ($idVal) {
+                            $sql = "SELECT * FROM \"" . addslashes($table) . "\" WHERE \"" . addslashes($remote) . "\" = ?";
+                            $rs = odbc_prepare($conn, $sql);
+                            odbc_execute($rs, [$idVal]);
+                            $result = odbc_fetch_array($rs);
+                            if ($result) {
+                                $sql = "UPDATE \"" . addslashes($table) . "\" SET " . implode(', ', array_map(function ($k) {
+                                    return "\"{$k}\" = ?";
+                                }, array_keys($fields))) . " WHERE \"" . addslashes($remote) . "\" = ?";
+                                $rs = odbc_prepare($conn, $sql);
+                                odbc_execute($rs, array_merge(array_values($fields), [$idVal]));
+                            } else {
+                                $fields[$remote] = $idVal;
+                                $sql = "INSERT INTO \"" . addslashes($table) . "\" (\"" . implode('","', array_keys($fields)) . "\") VALUES (" . implode(',', array_fill(0, count($fields), '?')) . ")";
+                                $rs = odbc_prepare($conn, $sql);
+                                odbc_execute($rs, array_values($fields));
+                            }
+                        }
+                    }
+                }
+            }
         }
         $this->stopErrorHandler();
         return $result;
@@ -139,16 +236,17 @@ class ODBCManager
             return $row;
         }
         $this->handleErrors();
+        $row = $this->fillFieldsFromConfig($row);
         $conn = $this->getConnection();
         foreach (array_chunk($row, 50, true) as $chunk) {
             $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                 return "\"{$k}\" = ?";
             }, array_keys($chunk))) . " WHERE " . implode(' AND ', array_map(function ($k, $v) {
-                return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+                return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
             }, array_keys($existing), $existing));
             $rs = odbc_prepare($conn, $sql);
             $params = array_map(function ($v) {
-                return empty($v) && $v !== '0' ? null : $v;
+                return empty($v) && $v !== '0' && $v !== 0 ? null : $v;
             }, array_values($chunk));
             $params = array_merge($params, array_filter(array_values($existing)));
             odbc_execute($rs, $params);
@@ -160,12 +258,13 @@ class ODBCManager
             $existing[$k] = $v;
         }
         $sql = "SELECT * FROM {$this->config['table']} WHERE " . implode(' AND ', array_map(function ($k, $v) {
-            return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+            return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
         }, array_keys($existing), $existing));
         $rs = odbc_prepare($conn, $sql);
         $params = array_filter(array_values($existing));
         odbc_execute($rs, $params);
         $result = odbc_fetch_array($rs);
+        $result = $this->reverseMapFieldsFromConfig($result);
         $result = ['is_new' => false, 'entry' => $result];
         $this->stopErrorHandler();
         return $result;
@@ -190,8 +289,12 @@ class ODBCManager
         $conn = $this->getConnection();
         $sql = "SELECT \"{$field}\" FROM {$this->config['table']} WHERE \"{$field}\" = ?";
         $rs = odbc_prepare($conn, $sql);
-        odbc_execute($rs, [$value]);
-        $exists = odbc_num_rows($rs) > 0;
+        if ($rs) {
+            odbc_execute($rs, [$value]);
+            $exists = odbc_num_rows($rs) > 0;
+        } else {
+            $exists = false;
+        }
         $this->stopErrorHandler();
         return $exists;
     }
@@ -200,10 +303,16 @@ class ODBCManager
     {
         $this->handleErrors();
         $conn = $this->getConnection();
-        $sql = "SELECT MAX(CAST(\"$field\" AS INT)) as last from {$this->config['table']} WHERE ISNUMERIC(\"$field\") = 1";
+        if (stristr($this->config['dsn'], 'mysql') || stristr($this->config['dsn'], 'mariadb')) {
+            $sql = "SELECT MAX(CAST(\"$field\" AS SIGNED)) as last from {$this->config['table']} WHERE \"$field\" REGEXP '^[0-9]+$'";
+        } else {
+            $sql = "SELECT MAX(CAST(\"$field\" AS INT)) as last from {$this->config['table']} WHERE ISNUMERIC(\"$field\") = 1";
+        }
         $rs = odbc_prepare($conn, $sql);
-        odbc_execute($rs, []);
-        $result = odbc_fetch_array($rs);
+        if ($rs) {
+            odbc_execute($rs, []);
+            $result = odbc_fetch_array($rs);
+        }
         $this->stopErrorHandler();
         if (empty($result['last'])) {
             return 1;
@@ -214,7 +323,11 @@ class ODBCManager
 
     private function getConnection()
     {
-        return odbc_connect($this->config['dsn'], $this->config['user'], $this->config['password']);
+        $conn = odbc_connect($this->config['dsn'], $this->config['user'], $this->config['password']);
+        if (stristr($this->config['dsn'], 'mysql') || stristr($this->config['dsn'], 'mariadb')) {
+            odbc_exec($conn, "SET sql_mode = 'ANSI_QUOTES'");
+        }
+        return $conn;
     }
 
     private function getCatalog()
@@ -229,7 +342,7 @@ class ODBCManager
     private function handleErrors()
     {
         $this->orig_handler = set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            $this->errors[] = $errstr;
+            $this->errors[] = "$errstr on line $errline of $errfile";
         });
     }
 
@@ -239,5 +352,234 @@ class ODBCManager
         if ($this->errors) {
             throw new \Exception(implode(' ', $this->errors));
         }
+    }
+
+    private function fillFieldsFromConfig(array $row): array
+    {
+        if (! empty($this->config['permanent_values'])) {
+            foreach ($this->config['permanent_values'] as $field => $value) {
+                if ($value != 'not null') {
+                    $row[$field] = $value;
+                }
+            }
+        }
+        if (! empty($this->config['value_mappings'])) {
+            $found = [];
+            $temp_values = [];
+            foreach ($this->config['value_mappings'] as $field => $mapping) {
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $login = $row[$field] ?? null;
+                    if (! $login) {
+                        continue;
+                    }
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['loginField']}\" = ?");
+                    if ($rs) {
+                        $id = null;
+                        odbc_execute($rs, [$login]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $id = $result[$mapping['valueField']] ?? null;
+                        }
+                        if (! $id) {
+                            $fields = [$mapping['loginField'], $mapping['realnameField']];
+                            if (isset($mapping['additionalFields']) && is_array($mapping['additionalFields'])) {
+                                $fields = array_merge($fields, array_keys($mapping['additionalFields']));
+                            }
+                            $rs = odbc_prepare($conn, "INSERT INTO {$mapping['table']} (\"" . implode('","', $fields) . "\") values (" . implode(',', array_fill(0, count($fields), '?')) . ")");
+                            if ($rs) {
+                                $name = TikiLib::lib('tiki')->get_user_preference($login, 'realName', '');
+                                $values = [$login, $name];
+                                if (isset($mapping['additionalFields']) && is_array($mapping['additionalFields'])) {
+                                    $values = array_merge($values, array_values($mapping['additionalFields']));
+                                }
+                                odbc_execute($rs, $values);
+                                $rs = odbc_exec($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = @@IDENTITY");
+                                if ($result = odbc_fetch_array($rs)) {
+                                    $id = $result[$mapping['valueField']] ?? null;
+                                }
+                            }
+                        }
+                        $row[$field] = $id;
+                    }
+                    continue;
+                }
+                if (isset($mapping['~replace~']) && ! isset($found[$mapping['~replace~']]) && isset($row[$mapping['~replace~']])) {
+                    $found[$mapping['~replace~']] = false;
+                }
+                $match_or_all = function ($replace, $local) {
+                    if ($replace == $local) {
+                        return true;
+                    }
+                    if ('~all:' . $replace . '~' == $local) {
+                        return true;
+                    }
+                    if (preg_match('/^~all:(.*)~$/', $local, $m)) {
+                        $replace_arr = preg_split('/\s*,\s*/', $replace);
+                        $local_arr = preg_split('/\s*,\s*/', $m[1]);
+                        sort($replace_arr);
+                        sort($local_arr);
+                        if ($replace_arr == $local_arr) {
+                            return true;
+                        }
+                    } elseif (str_contains($replace, ',')) {
+                        if (in_array($local, preg_split('/\s*,\s*/', $replace))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+                foreach ($mapping as $remote => $local) {
+                    if (isset($row[$field]) && $match_or_all($row[$field], $local)) {
+                        $temp_values[$field] = $remote;
+                        $found[$field] = true;
+                        break;
+                    }
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $match_or_all($row[$mapping['~replace~']], $local)) {
+                        $temp_values[$field] = $remote;
+                        if (empty($found[$mapping['~replace~']])) {
+                            $temp_values[$mapping['~replace~']] = $remote == '-1' ? '0' : '';
+                        }
+                        $found[$mapping['~replace~']] = true;
+                        break;
+                    }
+                }
+            }
+            foreach ($temp_values as $field => $val) {
+                $row[$field] = $val;
+            }
+            foreach ($found as $orig_field => $exists) {
+                if ($exists) {
+                    foreach ($this->config['value_mappings'] as $field => $mapping) {
+                        if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~'] && ! isset($row[$field])) {
+                            $row[$field] = ($row[$orig_field] === '-1' || $row[$orig_field] === '0') ? '0' : '';
+                            foreach ($mapping as $remote => $local) {
+                                if (preg_match("/^~([^:]*)~$/", $local, $m) && ! isset($row[$m[1]])) {
+                                    $row[$m[1]] = '';
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                }
+                foreach ($this->config['value_mappings'] as $field => $mapping) {
+                    if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
+                        foreach ($mapping as $remote => $local) {
+                            if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                                $row[$m[1]] = $row[$orig_field];
+                                $row[$field] = $remote;
+                                $row[$orig_field] = '';
+                                $found[$orig_field] = true;
+                            }
+                        }
+                        if (! isset($row[$field])) {
+                            $row[$field] = '';
+                        }
+                    }
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if ($exists) {
+                    continue;
+                }
+                foreach ($this->config['value_mappings'] as $field => $mapping) {
+                    if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
+                        foreach ($mapping as $remote => $local) {
+                            if (preg_match("/^~([^:]*)~$/", $local, $m)) {
+                                $row[$m[1]] = $row[$orig_field];
+                                $row[$field] = $remote;
+                                $row[$orig_field] = '';
+                                $found[$orig_field] = true;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if (! $exists && isset($row[$orig_field])) {
+                    $row[$orig_field] = '';
+                }
+            }
+        }
+        return $row;
+    }
+
+    private function reverseMapFieldsFromConfig(array $row): array
+    {
+        $userslib = TikiLib::lib('user');
+        if (! empty($this->config['value_mappings'])) {
+            $temp_values = [];
+            foreach ($this->config['value_mappings'] as $field => $mapping) {
+                if (! isset($row[$field])) {
+                    continue;
+                }
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = ?");
+                    if ($rs) {
+                        odbc_execute($rs, [$row[$field]]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $login = $result[$mapping['loginField']] ?? null;
+                            $name = $result[$mapping['realnameField']] ?? '';
+                            if ($login && ! $userslib->user_exists($login)) {
+                                $pass = TikiLib::lib('tiki')->genPass();
+                                $userslib->add_user($login, $pass, '');
+                                $userslib->set_user_preference($login, 'realName', $name);
+                            }
+                            $row[$field] = $login;
+                        }
+                    }
+                    continue;
+                }
+                foreach ($mapping as $remote => $local) {
+                    if ($row[$field] == $remote) {
+                        if (preg_match("/^~(.+?)(:.*)?~$/", $local, $m)) {
+                            if (isset($row[$m[1]])) {
+                                $local = $row[$m[1]];
+                            } elseif ($m[1] == 'all' && ! empty($m[2])) {
+                                $local = explode(',', substr($m[2], 1));
+                            } else {
+                                $local = '';
+                            }
+                        }
+                        if (! empty($mapping['~replace~'])) {
+                            if (! isset($temp_values[$mapping['~replace~']])) {
+                                $temp_values[$mapping['~replace~']] = [];
+                            }
+                            if (is_array($local)) {
+                                $temp_values[$mapping['~replace~']] = array_merge($temp_values[$mapping['~replace~']], $local);
+                            } else {
+                                $temp_values[$mapping['~replace~']][] = $local;
+                            }
+                        } else {
+                            if (! isset($temp_values[$field])) {
+                                $temp_values[$field] = [];
+                            }
+                            if (is_array($local)) {
+                                $temp_values[$field] = array_merge($temp_values[$field], $local);
+                            } else {
+                                $temp_values[$field][] = $local;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            foreach ($temp_values as $field => $val) {
+                $row[$field] = implode(',', array_unique($val));
+            }
+        }
+        return $row;
+    }
+
+    private function removeJoinFields(array &$row): array
+    {
+        $joinFields = [];
+        foreach ($row as $k => $v) {
+            if (strstr($k, '.')) {
+                $joinFields[$k] = $v;
+                unset($row[$k]);
+            }
+        }
+        return $joinFields;
     }
 }

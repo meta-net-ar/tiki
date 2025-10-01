@@ -27,12 +27,15 @@ function module_git_detail_info()
  */
 function module_git_detail($mod_reference, $module_params)
 {
-    /** @var Smarty_Tiki $smarty */
+    /** @var \Tiki\Smarty\SmartyTiki $smarty */
     $smarty = TikiLib::lib('smarty');
     /** @var GitLib $gitlib */
     $gitlib = TikiLib::lib('git');
     $error = '';
     $content = [];
+    include_once('lib/setup/twversion.class.php');
+    $TWV = new TWVersion();
+    $version = $TWV->getVersion();
 
     try {
         $content = $gitlib->get_info();
@@ -42,6 +45,16 @@ function module_git_detail($mod_reference, $module_params)
         $error = $e->getMessage();
     } catch (Throwable $e) {
         $error = $e->getMessage();
+    }
+
+    if (empty($content)) {
+        $content = [
+            'version' => $version,
+            'commit' => 'N/A',
+            'date' => 'N/A',
+            'branch' => 'N/A',
+            'remote' => 'N/A',
+        ];
     }
 
     $smarty->assign('error', $error);

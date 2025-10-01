@@ -210,8 +210,6 @@ function get_default_prefs()
             'feature_sefurl_paths' => [''], //empty string needed to keep preference from setting unexpectedly
             'feature_sefurl_routes' => 'n',
 
-            'feature_lastup' => 'y',
-
             'terminology_profile_installed' => 'n',
 
             // Web Monetization
@@ -235,11 +233,9 @@ function get_default_prefs()
 
     $_SESSION['tmpDir'] = $prefs['tmpDir'];
 
-    $prefs['feature_lastup'] = 'y';
-
     // Be sure we have a default value for user prefs
     foreach ($prefs as $p => $v) {
-        if (substr($p, 0, 12) == 'users_prefs_') {
+        if (str_starts_with($p, 'users_prefs_')) {
             $prefs[substr($p, 12)] = $v;
         }
     }
@@ -289,11 +285,16 @@ function initialize_prefs($force = false)
         // Unserialize serialized preferences
         foreach ($serializedPreferences as $serializedPreference) {
             if (! empty($modified[$serializedPreference]) && ! is_array($modified[$serializedPreference])) {
-                $unserialized = @unserialize($modified[$serializedPreference]);
-                if ($unserialized === false) {
-                    Feedback::error(tr('Preference %0 failed to unserialize. Value was "%1"', $serializedPreference, $modified[$serializedPreference]));
+                $modifiedValue = $modified[$serializedPreference];
+                if (is_string($modifiedValue) && is_array(json_decode($modifiedValue, true)) && json_last_error() === JSON_ERROR_NONE) {
+                    $modified[$serializedPreference] = json_decode($modifiedValue, true);
                 } else {
-                    $modified[$serializedPreference] = $unserialized;
+                    $unserialized = @unserialize($modifiedValue);
+                    if ($unserialized === false) {
+                        Feedback::error(tr('Preference %0 failed to unserialize. Value was "%1"', $serializedPreference, $modifiedValue));
+                    } else {
+                        $modified[$serializedPreference] = $unserialized;
+                    }
                 }
             }
         }

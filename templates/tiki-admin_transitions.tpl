@@ -84,27 +84,6 @@
                         }
                     }
                 });
-            } else {
-                $('#transition-group-auto')
-                    .tiki('autocomplete','groupname')
-                    .keypress( function( e ) {
-                        if( e.which !== 13 ) {
-                            return;
-                        }
-                        e.preventDefault();
-                        if( $(this).val() === '' ) {
-                            return;
-                        }
-                        $('#transition-group-list').append(
-                            $('<li/>').text( $(this).val() )
-                                .append( $('<input type="hidden" name="groups[]">').val( $(this).val() ) )
-                                .append( $('{{icon name=remove class=removeitem}}') )
-                        );
-                        $(this).val('');
-                    } );
-                $('#transition-group-list .removeitem').on( 'click', function( e ) {
-                    $(this).parent().remove();
-                } );
             }
         {/jq}
     {/tab}
@@ -117,7 +96,7 @@
             {$headerlib->add_jsfile('lib/dracula/graffle.js')}
             {$headerlib->add_jsfile('lib/dracula/graph.js')}
             <div id="graph-canvas" class="graph-canvas" data-graph-nodes="{$graph_nodes|escape}" data-graph-edges="{$graph_edges|escape}"></div>
-            <a href="#" id="graph-draw" class="button">{tr}Draw Transition Diagram{/tr}</a>
+            <a href="#" id="graph-draw" class="button" role="button">{tr}Draw Transition Diagram{/tr}</a>
             {jq}
             $('#graph-draw').on("click", function( e ) {
                 $(this).hide();
@@ -159,7 +138,7 @@
                                                     {ticket}
                                                     <input type="hidden" name="action" value="remove">
                                                     <input type="hidden" name="transitionId" value="{$trans.transitionId}">
-                                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Do you want to remove this transition ?{/tr}')">
+                                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Do you want to remove this transition ?{/tr}')" aria-label="{tr}Remove{/tr}">
                                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                                     </button>
                                                 </form>
@@ -193,7 +172,7 @@
                     <legend>{tr}General{/tr}</legend>
                     <div class="tiki-form-group row mt-0">
                         <label class="col-form-label" for="new-transition-name">{tr}Label{/tr}</label>
-                        <input type="text" name="label" {if $selected_transition}value="{$selected_transition.name|escape}"{/if} class="form-control">
+                        <input type="text" name="label" id="new-transition-name" {if $selected_transition}value="{$selected_transition.name|escape}"{/if} class="form-control">
                     </div>
                     <div class="form-check">
                         <label class="form-check-label">
@@ -289,7 +268,7 @@
                         </div>
                         <div class="tiki-form-group row">
                             <label for="guard-count" class="col-form-label">{tr}Count{/tr}</label>
-                            <input type="text" name="count" class="form-control">
+                            <input type="text" name="count" id="guard-count" class="form-control">
                         </div>
                     </fieldset>
                     <div class="mb-3 row mt-2">

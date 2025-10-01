@@ -19,12 +19,10 @@ class Quotabar extends Base
     public function handle($params, Template $template)
     {
         extract($params, EXTR_SKIP);
-        if (! isset($length)) {
-            $length = 100;
-        }
-        if (! isset($value)) {
-            $value = $length;
-        }
+
+        $length = isset($length) ? (int) $length : 100;
+        $value = isset($value) ? (int) $value : $length;
+
         if (empty($value)) {
             $ret = "<img src='img/leftbarlight.gif' alt='&lt;' /><img alt='-' src='img/mainbarlight.gif' height='14' width='$length' /><img src='img/rightbarlight.gif' alt='&gt;' />";
         } elseif ($value >= $length) {

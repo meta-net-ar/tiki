@@ -13,6 +13,7 @@ use PDOException;
 class PdoClient
 {
     protected const QUERY_RETRIES = 1;
+    protected const CONNECT_SLEEP_RETRY_SECONDS = 20;
 
     protected $dsn;
     protected $port;
@@ -158,7 +159,7 @@ class PdoClient
 
     public function parseDistributedIndexDefinition($name)
     {
-        if (strstr($name, ':')) {
+        if (str_contains($name, ':')) {
             $parts = explode(':', $name);
             $host = trim($parts[0]);
             if (count($parts) > 2) {
@@ -218,6 +219,9 @@ class PdoClient
                 $fields[$table] = $this->describe($table);
             }
         }
+        if (count($fields) == 1) {
+            return array_keys(array_shift($fields));
+        }
         $common = [];
         $result = array_shift($fields);
         if (! $result) {
@@ -231,7 +235,7 @@ class PdoClient
                 if ($opts['types'] != $tableFields[$field]['types']) {
                     continue 2;
                 }
-                if (strstr($table, ':') && ($field == 'deep_categories' || $field == 'categories')) {
+                if (str_contains($table, ':') && ($field == 'deep_categories' || $field == 'categories')) {
                     continue 2;
                 }
             }
@@ -342,7 +346,7 @@ class PdoClient
     public function document($index, $type, $id): ResultSet
     {
         $stmt = $this->prepareAndExecute("SELECT * FROM $index WHERE object_type = :object_type AND object_id = :object_id", ['object_type' => $type, 'object_id' => $id]);
-        return new ResultSet($stmt->fetch());
+        return new ResultSet($stmt->fetch(), 1, 0, 1);
     }
 
     public function optimize($index)
@@ -478,7 +482,7 @@ class PdoClient
             }
             return $result;
         } catch (PDOException $e) {
-            if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+            if ($retry && str_contains($e->getMessage(), 'unknown local table')) {
                 if ($stmt) {
                     $stmt->closeCursor();
                 }
@@ -522,7 +526,7 @@ class PdoClient
         fwrite($this->log, $query . ";\n");
     }
 
-    protected function connect()
+    protected function connect($retry = false)
     {
         $dsn = rtrim($this->dsn, '/');
         $parsed = parse_url($dsn);
@@ -536,11 +540,17 @@ class PdoClient
         $dsn = "mysql:host=" . $parsed['host'] . ";port=" . $this->port;
 
         try {
-            $this->pdo = new PDO($dsn);
+            $this->pdo = new PDO($dsn, null, null, [PDO::ATTR_PERSISTENT => true]);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new Exception(tr("Error connecting to Manticore service: %0", $e->getMessage()));
+            if (str_contains($e->getMessage(), "Connection refused") && $retry) {
+                // deals with Manticore restarts during rebuilds - e.g. due to memory limits
+                sleep(self::CONNECT_SLEEP_RETRY_SECONDS);
+                $this->connect();
+            } else {
+                throw new Exception(tr("Error connecting to Manticore service: %0", $e->getMessage()));
+            }
         }
     }
 
@@ -549,8 +559,8 @@ class PdoClient
         try {
             $stmt->execute($params);
         } catch (PDOException $e) {
-            if (strstr($e->getMessage(), "server has gone away")) {
-                $this->connect();
+            if (str_contains($e->getMessage(), "server has gone away")) {
+                $this->connect(true);
                 if ($tries < self::QUERY_RETRIES) {
                     $this->executeWithRetry($stmt, $params, $tries + 1);
                 }

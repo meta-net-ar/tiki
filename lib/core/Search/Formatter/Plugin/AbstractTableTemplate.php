@@ -51,7 +51,7 @@ abstract class Search_Formatter_Plugin_AbstractTableTemplate implements Search_F
     {
         $fields = [];
         foreach ($this->fields as $field => $arguments) {
-            $fields[$field] = isset($arguments['default']) ? $arguments['default'] : null;
+            $fields[$field] = $arguments['default'] ?? null;
         }
         return $fields;
     }

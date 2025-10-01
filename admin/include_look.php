@@ -5,7 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+
+use Tiki\Lib\Theme\ThemeLib;
+
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -40,12 +43,12 @@ $smarty->assign('themePrefs', $themePrefs);
 $default_themes_modes = [];
 $custom_themes_modes = [];
 try {
-     $default_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='n'", null, -1, -1, 'exception');
-     $custom_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='y'", null, -1, -1, 'exception');
+    $default_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='n'", null, -1, -1, 'exception');
+    $custom_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='y'", null, -1, -1, 'exception');
 } catch (Exception $e) {
     $smarty->assign('color_mode_error', true);
     //$message = '<span title="' . tra("You need to update your database to start using color modes on your website") . '">' . tra("Your database needs to be updated") . '<i class="bi bi-question"></i></span>';
-   //$smarty->assign('message', $message);
+    //$smarty->assign('message', $message);
 }
 
 $smarty->assign('default_modes', $default_themes_modes);
@@ -62,46 +65,45 @@ if (empty($thumbfile)) {
 $smarty->assign('thumbfile', $thumbfile);
 
 // hash of themes and their options and their thumbnail images
-if ($prefs['feature_jquery'] == 'y') {
-    $js = 'var theme_options = {';
-    foreach ($themes as $theme => $value) {
-        $js .= "\n'$theme':['" . $themelib->get_thumbnail_file($theme, '') . '\',{';
-        $options = $themelib->list_theme_options($theme);
-        if ($options) {
-            foreach ($options as $option) {
-                $js .= "'$option':'" . $themelib->get_thumbnail_file($theme, $option) . '\',';
-            }
-            $js = substr($js, 0, strlen($js) - 1) . '}';
-        } else {
-            $js .= '}';
+$js = 'var theme_options = {';
+foreach ($themes as $theme => $value) {
+    $js .= "\n'$theme':['" . $themelib->get_thumbnail_file($theme, '') . '\',{';
+    $options = $themelib->list_theme_options($theme);
+    if ($options) {
+        foreach ($options as $option) {
+            $js .= "'$option':'" . $themelib->get_thumbnail_file($theme, $option) . '\',';
         }
-        $js .= '],';
+        $js = substr($js, 0, strlen($js) - 1) . '}';
+    } else {
+        $js .= '}';
     }
-    $js = substr($js, 0, strlen($js) - 1);
-    $js .= '};';
+    $js .= '],';
+}
+$js = substr($js, 0, strlen($js) - 1);
+$js .= '};';
 
-    //Setup theme layouts array matching themes and theme:options with their respective layouts
-    $js .= 'var theme_layouts = ';
-    foreach ($themes as $theme => $value) {
-        $theme_layouts[$theme] = ThemeLib::listUserSelectableLayouts($theme);
-        $options = $themelib->list_theme_options($theme);
-        if ($options) {
-            foreach ($options as $option) {
-                $theme_layouts[$theme . ':' . $option] = ThemeLib::listUserSelectableLayouts($theme, $option);
-            }
+//Setup theme layouts array matching themes and theme:options with their respective layouts
+$js .= 'var theme_layouts = ';
+foreach ($themes as $theme => $value) {
+    $theme_layouts[$theme] = ThemeLib::listUserSelectableLayouts($theme);
+    $options = $themelib->list_theme_options($theme);
+    if ($options) {
+        foreach ($options as $option) {
+            $theme_layouts[$theme . ':' . $option] = ThemeLib::listUserSelectableLayouts($theme, $option);
         }
     }
-    //encode $theme_layouts into json to allow js below to fetch layouts based on theme selected by user
-    $theme_layouts_js = json_encode($theme_layouts);
-    $js .= $theme_layouts_js . ";";
+}
+//encode $theme_layouts into json to allow js below to fetch layouts based on theme selected by user
+$theme_layouts_js = json_encode($theme_layouts);
+$js .= $theme_layouts_js . ";";
 
-    // JS to handle theme/option changes client-side
-    // the var (theme_options) has to be declared in the same block for AJAX call scope
-    $none = json_encode(tr('None'));
-    // get the Tiki default layout from path_constants.php and pass it below to the JS
-    $default_layout = SMARTY_DEFAULT_LAYOUT;
-    $headerlib->add_js(
-        <<<JS
+// JS to handle theme/option changes client-side
+// the var (theme_options) has to be declared in the same block for AJAX call scope
+$none = json_encode(tr('None'));
+// get the Tiki default layout from path_constants.php and pass it below to the JS
+$default_layout = SMARTY_DEFAULT_LAYOUT;
+$headerlib->add_js(
+    <<<JS
 $js
 
 var css_vars_list = {
@@ -1094,9 +1096,6 @@ function edit_custom_mode(el,id,name,icon){
                 optionDropDown.attr('disabled',true);
             }
             optionDropDown.trigger("change");
-            if (jqueryTiki.select2) {
-                optionDropDown.trigger("change:select2");
-            }
         }).trigger("change");
         optionDropDown.on("change", function() {
             if (showPreview !== undefined) {
@@ -1153,5 +1152,4 @@ function edit_custom_mode(el,id,name,icon){
     setupThemeLayouts(\$('.tab-content select[name=theme_admin]'), \$('.tab-content select[name=theme_option_admin]'), \$('.tab-content select[name=site_layout_admin]') );
 });
 JS
-    );
-}
+);

@@ -14,9 +14,6 @@ function prefs_elementplus_list()
             'default' => 'y',
             'dependencies' => [
                 'feature_elementplus'
-            ],
-            'conflicts' => [
-                'feature_jquery_autocomplete'
             ]
         ],
         'elementplus_select' => [

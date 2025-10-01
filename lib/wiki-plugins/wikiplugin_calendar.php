@@ -99,28 +99,78 @@ function wikiplugin_calendar($data, $params)
     if (empty($params['viewnavbar'])) {
         $params['viewnavbar'] = 'n';
     }
+    $pluginCalendarIds = implode(',', $params['calIds']);
 
-    $module_reference = [
-        'moduleId' => null,
-        'name' => 'calendar_new',
-        'params' => [ 'calIds' => $params['calIds'],
-                            'viewnavbar' => $params['viewnavbar'],
-                            'viewlist' => $params['viewlist'],
-                            'viewmode' => $params['viewmode'],
-                            'nobox' => 'y' ],
-        'position' => null,
-        'ord' => null,
-    ];
+    $rawcals = $calendarlib->list_calendars();
 
-    $modlib = TikiLib::lib('mod');
+    switch ($params['viewmode']) {
+        case 'week':
+            $initialView = 'timeGridWeek';
+            break;
+        case 'day':
+            $initialView = 'timeGridDay';
+            break;
+        case 'month':
+            $initialView = 'dayGridMonth';
+            break;
+        default:
+            $initialView = 'dayGridMonth';
+    }
+    $viewstart = $_REQUEST['todate'] ?? $tikilib->now;
+    $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+
+    $defaultCalendarId = $params['calIds'][0];
+    $calendars = [];
+
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+    $calendarInitialParams['initialView'] = $initialView;
+    $smarty->assign(
+        'eventCalendarParams',
+        $calendarInitialParams
+    );
+
+    if ($calendarInitialParams['canEditAnything']) {
+        TikiLib::lib('header')
+            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
+            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    }
+
+    $smarty->assign('pluginCalendarIds', $pluginCalendarIds);
+    $smarty->assign('displayedcals', $params['calIds']);
+    $thiscal = [];
+    $checkedCalIds = [];
+
+    if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
+        $defaultCalendarId = $_REQUEST["calIds"][0];
+    }
+
+    $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
+    $smarty->assign('calendars', $calendars);
+    $smarty->assign('viewlist', $params['viewlist']);
+
     $out = '';
-    if ($params['viewlist'] == 'table' || $params['viewlist'] == 'both') {
-        $out .= $modlib->execute_module($module_reference);
-    }
     if ($params['viewlist'] == 'list' || $params['viewlist'] == 'both') {
-        $module_reference['params']['viewlist'] = 'list';
-        $out .= "<div>" . $modlib->execute_module($module_reference) . "</div>";
-    }
+        $module_reference = [
+            'moduleId' => null,
+            'name' => 'calendar_new',
+            'params' => [ 'calIds' => $params['calIds'],
+                                'viewnavbar' => $params['viewnavbar'],
+                                'viewlist' => $params['viewlist'],
+                                'viewmode' => $params['viewmode'],
+                                'nobox' => 'y' ],
+            'position' => null,
+            'ord' => null,
+        ];
 
-    return "<div>$out</div>";
+        $modlib = TikiLib::lib('mod');
+        $out = '';
+        if ($params['viewlist'] == 'list' || $params['viewlist'] == 'both') {
+            $module_reference['params']['viewlist'] = 'list';
+            $out .= "<div>" . $modlib->execute_module($module_reference) . "</div>";
+        }
+    }
+    $smarty->assign('out', $out);
+    $smarty->assign('viewnavbar', $params['viewnavbar']);
+
+    return $smarty->fetch('wiki-plugins/wikiplugin_calendar.tpl');
 }

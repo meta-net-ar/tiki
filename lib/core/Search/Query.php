@@ -432,7 +432,7 @@ class Search_Query implements Search_Query_Interface
 
         foreach ($this->foreignQueries as $indexName => $query) {
             $resultset->applyTransform(function ($entry) use ($query, $indexName) {
-                if (isset($entry['_index']) && ($entry['_index'] == $indexName || strstr($entry['_index'], $indexName))) {
+                if (isset($entry['_index']) && ($entry['_index'] == $indexName || str_contains($entry['_index'], $indexName))) {
                     foreach ($query->transformations as $trans) {
                         if (is_callable($trans)) {
                             $entry = $trans($entry);
@@ -445,7 +445,17 @@ class Search_Query implements Search_Query_Interface
         }
 
         $resultset = $this->processReturnOnlyResultsFromList($resultset);
-
+        // Add the list of date fields to the result set
+        foreach ($resultset as $row => $entry) {
+            $tabDateField = [];
+            foreach ($entry as $column => $value) {
+                if ($index->isDateField($column)) {
+                    $tabDateField[] = $column;
+                }
+            }
+            $resultset->setDateFields($tabDateField);
+            break;
+        }
         return $resultset;
     }
 

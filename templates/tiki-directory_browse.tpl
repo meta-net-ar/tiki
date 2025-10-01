@@ -125,12 +125,12 @@
                         (<a class="dirsitelink" href="tiki-view_cache.php?url={$items[ix].url}" target="_blank">{tr}Cache{/tr}</a>)
                     {/if}
                     <div class="description form-text">{$items[ix].description}</div>
-                    {assign var=fsfs value=1}
+                    {$fsfs=1}
                     <span class="dirsitecats text-info">
                         {tr}Directory Categories:{/tr}
                         {section name=ii loop=$items[ix].cats}
                             {if $fsfs}
-                                {assign var=fsfs value=0}{else},&nbsp;
+                                {$fsfs=0}{else},&nbsp;
                             {/if}
                             <a class="dirsublink" href="tiki-directory_browse.php?parent={$items[ix].cats[ii].categId}">{$items[ix].cats[ii].path|escape}</a>
                         {/section}
@@ -140,7 +140,7 @@
                 </div>
             {/section}
         </div>
-        {pagination_links cant=$cant_pages step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
     {elseif !empty($parent)}
         {tr}No records.{/tr}
     {/if}

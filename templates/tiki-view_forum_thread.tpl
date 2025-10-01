@@ -54,7 +54,7 @@
 &nbsp;
         <div class="btn-group">
             {if ! $js}<ul><li>{/if}
-            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}">
+            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}" role="button">
                 {icon name="menu-extra"}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
@@ -82,7 +82,7 @@
                 {if $prefs.sefurl_short_url eq 'y'}
                     <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                         {icon name="link"} {tr}Get a short URL{/tr}
-                        {assign var="hasPageAction" value="1"}
+                        {$hasPageAction="1"}
                     </a>
                 {/if}
                 {if $prefs.feature_forum_topics_archiving eq 'y' && $tiki_p_admin_forum eq 'y'}
@@ -125,14 +125,14 @@
 
 
 {if $openpost eq 'y'}
-    {assign var="postclass" value="forumpostopen"}
+    {$postclass="forumpostopen"}
 {else}
-    {assign var="postclass" value="forumpost"}
+    {$postclass="forumpost"}
 {/if}
 
 <section class="top_post">
-    {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and $prefs.freetags_show_middle eq 'y'
-        and !$thread_info.topic.threadId}
+    {if $prefs.feature_freetags eq 'y' and isset($tiki_p_view_freetags) and $tiki_p_view_freetags eq 'y' and $prefs.freetags_show_middle eq 'y'
+        and !$thread_info.threadId}
         {include file='freetag_list.tpl'}
         <div class="text-end mb-4">
             {wikiplugin _name="addfreetag" object="forum post:$comments_parentId"}{/wikiplugin}
@@ -234,5 +234,5 @@
             {/foreach}
         </table>
     </div>
-    {pagination_links cant=$atts.cant offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
+    {pagination_links count=$atts.count offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
 {/if}

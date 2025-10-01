@@ -48,7 +48,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
 $items = $dirlib->dir_list_all_valid_sites($offset, $maxRecords, $sort_mode, $find);
 $smarty->assign_by_ref('items', $items["data"]);
-$smarty->assign_by_ref('cant', $items["cant"]);
+$smarty->assign_by_ref('count', $items["count"]);
 include_once('tiki-section_options.php');
 $smarty->assign('mid', 'tiki-directory_ranking.tpl');
 $smarty->display("tiki.tpl");

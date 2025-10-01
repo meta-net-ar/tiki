@@ -6,8 +6,7 @@ class ToolbarSpacer extends ToolbarItem
 {
     public function __construct()
     {
-        $this->setWysiwygToken('|')
-            ->setIcon('img/trans.png')
+        $this->setIcon('img/trans.png')
             ->setType('Spacer');
     }
 
@@ -16,7 +15,7 @@ class ToolbarSpacer extends ToolbarItem
         return '||';
     }
 
-    protected function getOnClick(): string
+    public function getOnClick(): string
     {
         return '';
     }

@@ -8,6 +8,7 @@ function wikiplugin_customsearch_info()
 {
     return [
         'name' => tra('Custom Search'),
+        'validate' => ['wiki', 'tpl'],
         'documentation' => 'PluginCustomSearch',
         'description' => tra('Create a custom search form for searching or listing items on the site'),
         'prefs' => ['wikiplugin_customsearch', 'wikiplugin_list', 'feature_search'],
@@ -133,7 +134,7 @@ function wikiplugin_customsearch_info()
             'trimlinefeeds' => [
                 'required' => false,
                 'name' => tra('Trim Linefeeds'),
-                'description' => tra('Remove the linefeeds added after each input which casues the wiki parser to add extra paragraphs.'),
+                'description' => tra('Remove the linefeeds added after each input which causes the wiki parser to add extra paragraphs.'),
                 'since' => '14.1',
                 'options' => [
                     ['text' => tra(''), 'value' => ''],
@@ -214,13 +215,6 @@ function wikiplugin_customsearch($data, $params)
     } else {
         $recalllastsearch = 0;
     }
-
-    $defaults = [];
-    $plugininfo = wikiplugin_customsearch_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
 
     if (! isset($_REQUEST["offset"])) {
         $offset = 0;
@@ -483,7 +477,7 @@ window.customsearch_$id = customsearch$id;
         } elseif ($recalllastsearch && isset($_SESSION["customsearch_$id"][$fieldid])) {
             $default = $_SESSION["customsearch_$id"][$fieldid];
         } elseif (! empty($arguments['_default'])) {
-            if (strpos($arguments['_default'], ',') !== false) {
+            if (str_contains($arguments['_default'], ',')) {
                 $default = explode(',', $arguments['_default']);
             } else {
                 $default = $arguments['_default'];
@@ -722,7 +716,7 @@ function cs_design_setbasic($element, $fieldid, $fieldname, $arguments)
     $element->setAttribute('id', $fieldid);
     $element->setAttribute('name', $fieldname);
     foreach ($arguments as $k => $v) {
-        if (substr($k, 0, 1) != '_') {
+        if (! str_starts_with($k, '_')) {
             $element->setAttribute($k, $v);
         }
     }
@@ -1161,20 +1155,20 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
     $picker = '<div class="row col-sm-6">' . smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate()) . '</div>';
 
     $script .= "
-$('input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]').on('change', function() {
-    updateDateRange_$fieldid();
-});
-function updateDateRange_$fieldid() {
-    const from = $('input[name=\"$from_fieldname\"]').val();
-    const to = $('input[name=\"$to_fieldname\"]').val();
-    const val = (from && to) ? from + ',' + to : '';
-    customsearch$id.add('$fieldid', {
-        config: " . json_encode($arguments) . ",
-        name: 'daterange',
-        value: val
+    $(document).on('change', 'input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]', function() {
+        updateDateRange_$fieldid();
     });
-}
-updateDateRange_$fieldid();
+    function updateDateRange_$fieldid() {
+        const from = $('input[name=\"$from_fieldname\"]').val();
+        const to = $('input[name=\"$to_fieldname\"]').val();
+        const val = (from && to) ? from + ',' + to : '';
+        customsearch$id.add('$fieldid', {
+            config: " . json_encode($arguments) . ",
+            name: 'daterange',
+            value: val
+        });
+    }
+    updateDateRange_$fieldid();
 ";
     return $picker;
 }

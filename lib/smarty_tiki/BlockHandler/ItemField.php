@@ -16,7 +16,7 @@ class ItemField extends Base
     {
         include_once('lib/wiki-plugins/wikiplugin_trackeritemfield.php');
         if (! $repeat) { // only on closing tag
-            if (($res = wikiplugin_trackeritemfield($content, $params)) !== false) {
+            if (($res = \TikiLib::lib('parser')->invokePlugin('trackeritemfield', $content, $params)) !== false) {
                 if (is_a($res, 'WikiParser_PluginOutput')) {
                     $res = $res->toHtml();
                 }

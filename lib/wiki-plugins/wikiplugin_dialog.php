@@ -45,6 +45,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('Css class names to apply to the buttons. Use comma-separated values for multiple buttons.'),
                 'since' => '28.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'buttonsActions' => [
                 'required' => false,
@@ -52,6 +53,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('JavaScript to perform on button click. Use comma-separated values for multiple buttons'),
                 'since' => '28.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'actions' => [
                 'required' => false,
@@ -181,36 +183,32 @@ function wikiplugin_dialog_info()
 
 function wikiplugin_dialog($data, $params)
 {
+    // to avoid invisible stray spaces in class and action names.
+    $buttonsLabel = array_map('trim', explode(',', $params['buttons']));
+    $buttonsClasses = array_map('trim', explode(',', $params['buttonsClassNames']));
+    $buttonsAction = array_map('trim', explode(',', $params['buttonsActions']));
+    $actions = array_map('trim', explode(',', $params['actions']));
 
-    $defaults = [];
-    $plugininfo = wikiplugin_dialog_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-
-    $params = array_merge($defaults, $params);
-
-    $buttonsLabel = explode(',', $params['buttons']);
-    $buttonsClasses = explode(',', $params['buttonsClassNames']);
-    $buttonsAction = explode(',', $params['buttonsActions']);
-    $actions = explode(',', $params['actions']);
-
-    if (count($buttonsClasses) > count($buttonsLabel) || count($buttonsAction) > count($buttonsLabel)) {
-        trigger_error('Buttons parameters do not match with the specified buttons', E_USER_WARNING);
+    // If some button parameters are missing, we trigger a warning.
+    if (count($buttonsClasses) < count($buttonsLabel) || count($buttonsAction) < count($buttonsLabel)) {
+        trigger_error('Some button parameters are missing for the specified buttons', E_USER_WARNING);
     }
 
     $buttons = [];
 
+    // Here the length of the buttonsLabel array is used to determine how many buttons to create.
     for ($i = 0; $i < count($buttonsLabel); $i++) {
-        if (! $buttonsLabel[$i]) {
+        $label = $buttonsLabel[$i];
+        if (strlen($label) === 0) {
             continue;
         }
 
-        $action = $buttonsAction[$i] ?: $actions[$i];
+        $className = $buttonsClasses[$i] ?? '';
+        $action = $buttonsAction[$i] ?? ($actions[$i] ?? '');
 
         $buttons[] = [
-            'label' => $buttonsLabel[$i],
-            'className' => $buttonsClasses[$i],
+            'label' => $label,
+            'className' => $className,
             'action' => $action
         ];
     }

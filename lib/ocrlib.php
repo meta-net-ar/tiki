@@ -367,7 +367,7 @@ class ocrLib extends TikiLib
             } else {
                 global $prefs;
                 $directory = $prefs['fgal_use_dir'];                // lets make sure there is a slash following the directory name
-                if (substr($directory, -1) !== '/') {
+                if (! str_ends_with($directory, '/')) {
                     $directory = $directory . '/';
                 }
                 $fileContent = @file_get_contents($directory . $file['path']);

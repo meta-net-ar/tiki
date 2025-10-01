@@ -17,6 +17,7 @@ class Services_Attribute_Controller
      *  ->attribute string      lowercase letters and two dots
      *  ->type string           object type
      *  ->object mixed          id or name of object
+     *  ->fieldId int           optionalfieldId
      *
      * @return array value=>string containing the value
      * @throws Exception
@@ -27,6 +28,8 @@ class Services_Attribute_Controller
         $attribute = $input->attribute->text();
         $type = $input->type->text();
         $object = $input->object->text();
+        $fieldId = $input->fieldId->int();
+        $fieldId = $fieldId == 0 ? null : $fieldId;
         $value = '';
 
         // ensure the target, source, and relation info are passed to the service
@@ -35,12 +38,103 @@ class Services_Attribute_Controller
         }
 
         if ($object) {      // for objects yet to be created we don't get an object id, so don't set any attributes
-            $value = TikiLib::lib('attribute')->get_attribute($type, $object, $attribute);
+            $value = TikiLib::lib('attribute')->get_attribute($type, $object, $attribute, $fieldId);
         }
 
         //return the attribute value if there were no errors
         return [
             'value' => $value,
         ];
+    }
+
+    public function action_set($input)
+    {
+        $type = $input->type->text();
+        $itemId = $input->itemId->text();
+        $value = $input->value->text();
+        $comment = $input->comment->text();
+        $attribute = $input->attribute->text();
+        $fieldId = $input->fieldId->int();
+        $fieldId = $fieldId == 0 ? null : $fieldId;
+
+        // Check if required infos are passed to the service
+        if (! $type || ! $itemId || ! $attribute) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check view permissions of requested object
+        $perms = Perms::get($type, $itemId);
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+
+        $attributeLib = TikiLib::lib('attribute');
+        $attributeLib->set_attribute(
+            $type,
+            $itemId,
+            $attribute,
+            $value,
+            $comment,
+            $fieldId
+        );
+    }
+
+    public function action_find_objects_with($input): array
+    {
+        $attribute = $input->attribute->text();
+        $value = $input->value->text();
+        $fieldId = $input->fieldId->int();
+        $fieldId = $fieldId == 0 ? null : $fieldId;
+
+        // Check if info are passed to the service
+        if (! $attribute || ! $value) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check global view permissions for requested objects
+        $perms = Perms::get();
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+        $attributeLib = TikiLib::lib('attribute');
+        $ojects = $attributeLib->find_objects_with(
+            $attribute,
+            $value,
+            $fieldId
+        );
+
+        return [
+            'objects' => $ojects,
+        ];
+    }
+
+    public function action_get_attribute($input)
+    {
+        $type = $input->type->text();
+        $itemId = $input->itemId->text();
+        $attribute = $input->attribute->text();
+        $fieldId = $input->fieldId->int();
+        $fieldId = $fieldId == 0 ? null : $fieldId;
+
+        // Check if info are passed to the service
+        if (! $type || ! $itemId || ! $attribute) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check view permissions of request object
+        $perms = Perms::get($type, $itemId);
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+
+        $attributeLib = TikiLib::lib('attribute');
+        $result = $attributeLib->get_attribute(
+            $type,
+            $itemId,
+            $attribute,
+            $fieldId
+        );
+
+        return $result;
     }
 }

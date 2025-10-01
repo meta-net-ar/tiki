@@ -49,9 +49,9 @@ require_once('lib/wizard/pages/admin_wizard.php');
 $pages[] = new AdminWizard();
 
 // If $useDefaultPrefs is set, the "profiles wizard" should be run. Otherwise the "admin wizard".
-$useDefaultPrefs = isset($_REQUEST['use-default-prefs']) ? true : false;
+$useDefaultPrefs = isset($_REQUEST['use-default-prefs']);
 // If $useChangesWizard is set, the "Changes Wizard" should be run. Otherwise the "admin wizard".
-$useChangesWizard = isset($_REQUEST['use-changes-wizard']) ? true : false;
+$useChangesWizard = isset($_REQUEST['use-changes-wizard']);
 if ($useDefaultPrefs) {
     // Store the default prefs selection in the wizard bar
     $smarty->assign('useDefaultPrefs', $useDefaultPrefs);
@@ -59,73 +59,41 @@ if ($useDefaultPrefs) {
     require_once('lib/wizard/pages/profiles_featured_site_confs.php');
     $pages[] = new ProfilesWizardFeaturedSiteConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
-    $pages[] = new ProfilesWizardUsefulMicroConfs();
+    // require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
+    // $pages[] = new ProfilesWizardUsefulMicroConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
-    $pages[] = new ProfilesWizardUsefulChangesInDisplay();
+    // require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
+    // $pages[] = new ProfilesWizardUsefulChangesInDisplay();
 
-    require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
-    $pages[] = new ProfilesWizardUsefulNewTechConfs();
+    // require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
+    // $pages[] = new ProfilesWizardUsefulNewTechConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
-    $pages[] = new ProfilesWizardUsefulAdminConfs();
+    // require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
+    // $pages[] = new ProfilesWizardUsefulAdminConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_common_confs.php');
-    $pages[] = new ProfilesWizardDemoCommonConfs();
+    // require_once('lib/wizard/pages/profiles_demo_common_confs.php');
+    // $pages[] = new ProfilesWizardDemoCommonConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
-    $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
+    // $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
-    $pages[] = new ProfilesWizardDemoProjectManagement();
+    // require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
+    // $pages[] = new ProfilesWizardDemoProjectManagement();
 
-    require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
-    $pages[] = new ProfilesWizardHighlySpecializedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
+    // $pages[] = new ProfilesWizardHighlySpecializedConfs();
 
-    require_once('lib/wizard/pages/profiles_completed.php');
-    $pages[] = new AdminWizardProfilesCompleted();
+    // require_once('lib/wizard/pages/profiles_completed.php');
+    // $pages[] = new AdminWizardProfilesCompleted();
 } elseif ($useChangesWizard) {
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);
-
-/*
-    require_once('lib/wizard/pages/changes_ui.php');
-    $pages[] = new ChangesWizardUI();
-
-    require_once('lib/wizard/pages/changes_novice_admin_assistance.php');
-    $pages[] = new ChangesWizardNoviceAdminAssistance();
-
-    require_once('lib/wizard/pages/changes_trackers.php');
-    $pages[] = new ChangesWizardTrackers();
-
-    require_once('lib/wizard/pages/changes_permissions_and_logs.php');
-    $pages[] = new ChangesWizardPermissionsAndLogs();
-
-    require_once('lib/wizard/pages/changes_others.php');
-    $pages[] = new ChangesWizardOthers();
-
-    require_once('lib/wizard/pages/changes_new_in_13.php');
-    $pages[] = new ChangesWizardNewIn13();
-
-    require_once('lib/wizard/pages/changes_new_in_14.php');
-    $pages[] = new ChangesWizardNewIn14();
-
-    require_once('lib/wizard/pages/changes_new_in_15.php');
-    $pages[] = new ChangesWizardNewIn15();
-
-    require_once('lib/wizard/pages/changes_new_in_16.php');
-    $pages[] = new ChangesWizardNewIn16();
-
-    require_once('lib/wizard/pages/changes_new_in_17.php');
-    $pages[] = new ChangesWizardNewIn17();
-*/
 
     require_once('lib/wizard/pages/changes_new_in_26.php');
     $pages[] = new ChangesWizardNewIn26();
@@ -246,9 +214,6 @@ foreach ($pages as $page) {
         $url .= '&amp;use-changes-wizard=1';
     }
     $cnt = $stepNr + 1;
-//  if ($stepNr == 1 && $useChangesWizard) {
-//      $toc .= '<div class="list-group-item font-italic">' . tra("New in Tiki 12 (LTS)") . '</div>';
-//  }
     if ($cnt <= 9) {
         $cnt = '&nbsp;&nbsp;' . $cnt;
     }

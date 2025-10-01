@@ -8,6 +8,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+// TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+// TIKI_PRINTING_ALL is true when displaying all content for printing (?display=print_all).
+define('TIKI_PRINTING_ALL', isset($_REQUEST['display']) && $_REQUEST['display'] === 'print_all');
+
 $section = 'forums';
 $inputConfiguration = [
     [
@@ -49,24 +55,18 @@ if (! isset($_REQUEST['comments_parentId']) && isset($_REQUEST['threadId'])) {
     $_REQUEST['comments_parentId'] = $_REQUEST['threadId'];
 }
 if (! isset($_REQUEST['comments_parentId'])) {
-    $smarty->assign('msg', tra("No thread indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No thread indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $thread_info = $commentslib->get_comment($_REQUEST['comments_parentId']);
 if (empty($thread_info['object']) || $thread_info['objectType'] != 'forum') {
-    $smarty->assign('msg', tra('Incorrect thread'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect thread'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $forumId = $thread_info['object'];
 $forum_info = $commentslib->get_forum($forumId);
 if (empty($forum_info)) {
-    $smarty->assign('msg', tra('Incorrect thread'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Incorrect thread'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $pageCache = Tiki_PageCache::create()
@@ -158,12 +158,10 @@ $smarty->assign('comments_parentId', $comments_parentId);
 if (isset($_REQUEST["comments_grandParentId"])) {
     $smarty->assign('comments_grandParentId', $_REQUEST["comments_grandParentId"]);
 }
-if (isset($_REQUEST["comments_reply_threadId"])) {
-    $smarty->assign('comments_reply_threadId', $_REQUEST["comments_reply_threadId"]);
-} else {
+if (! isset($_REQUEST["comments_reply_threadId"])) {
     $_REQUEST["comments_reply_threadId"] = $comments_parentId;
-    $smarty->assign('comments_reply_threadId', $_REQUEST["comments_reply_threadId"]);
 }
+$smarty->assign('comments_reply_threadId', $_REQUEST["comments_reply_threadId"]);
 $smarty->assign('forumId', $forumId);
 if (isset($_REQUEST['lock'])) {
     $access->checkCsrf();
@@ -201,12 +199,10 @@ if ($tiki_p_admin_forum == 'y') {
 
 $access->check_permission(['tiki_p_forum_read'], '', 'thread', $comments_parentId);
 
-if (isset($_REQUEST['display'])) {
-    if ($_REQUEST['display'] == 'pdf') {
-        $access->check_permission(['tiki_p_export_pdf'], '', 'thread', $comments_parentId);
-    } else {
-        $access->check_permission(['tiki_p_print'], '', 'thread', $comments_parentId);
-    }
+if (TIKI_PRINTING_PDF) {
+    $access->check_permission(['tiki_p_export_pdf'], '', 'thread', $comments_parentId);
+} else {
+    $access->check_permission(['tiki_p_print'], '', 'thread', $comments_parentId);
 }
 
 $smarty->assign('topics_next_offset', $_REQUEST['topics_offset'] + 1);
@@ -273,15 +269,11 @@ if (empty($thread_info)) { // this should be moved up as $thread_info could be n
     //thread might be missing due to a successful delete of a post
     if (! empty($_SESSION['tikifeedback'][0]['deleted_forumId'])) {
         $forumId = $_SESSION['tikifeedback'][0]['deleted_forumId'];
-    } elseif (! empty($forumId)) {
-        Feedback::error(tr('Thread %0 does not exist.', $comments_parentId));
     }
-    if (! empty($forumId)) {
-        TikiLib::lib('access')->redirect('tiki-view_forum.php?forumId=' . $forumId);
+    if (empty($forumId)) {
+        Feedback::errorAndDie(tr('Thread %0 does not exist.', $comments_parentId), \Laminas\Http\Response::STATUS_CODE_409);
     } else {
-        $smarty->assign('msg', tr('Thread %0 does not exist.', $comments_parentId));
-        $smarty->display("error.tpl");
-        die;
+        TikiLib::lib('access')->redirect('tiki-view_forum.php?forumId=' . $forumId);
     }
 }
 
@@ -302,12 +294,11 @@ $comments_vars = [
 
 $comments_prefix_var = 'forum:';
 $comments_objectId = $comments_prefix_var . $forumId;
-//$comments_object_var = 'forumId';
-if (! empty($forum_info["inbound_pop_server"])) {
+if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info["inbound_imap_server"])) {
     $commentslib->process_inbound_mail($forumId);
 }
 
-if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'print_all') {
+if (TIKI_PRINTING_ALL) {
     $_REQUEST['comments_per_page'] = 0; // unlimited
 }
 $forum_mode = 'y';
@@ -407,8 +398,8 @@ if ($prefs['feature_forum_parse'] == 'y') {
     $smarty->assign_by_ref('plugins', $plugins);
 }
 if (! empty($_REQUEST['view_atts']) && $_REQUEST['view_atts'] == 'y') {
-    $fa_offset = isset($_REQUEST['fa_offset']) ? $_REQUEST['fa_offset'] : 0;
-    $fa_maxRecords = isset($_REQUEST['fa_maxRecords']) ? $_REQUEST['fa_maxRecords'] : $prefs['maxRecords'];
+    $fa_offset = $_REQUEST['fa_offset'] ?? 0;
+    $fa_maxRecords = $_REQUEST['fa_maxRecords'] ?? $prefs['maxRecords'];
     $atts = $commentslib->get_all_thread_attachments($comments_parentId, $fa_offset, $fa_maxRecords);
     $atts['offset'] = $fa_offset;
     $atts['maxRecords'] = $fa_maxRecords;
@@ -433,7 +424,7 @@ if (isset($_REQUEST['display'])) {
     // Display the forum messages
     $smarty->assign('mid', 'tiki-print_forum_thread.tpl');
     // Allow PDF export by installing a Mod that define an appropriate function
-    if ($_REQUEST['display'] == 'pdf') {
+    if (TIKI_PRINTING_PDF) {
         $pdata = $smarty->fetch("tiki-print_forum_thread.tpl");
         $generator = new PdfGenerator();
         if (! empty($generator->error)) {

@@ -29,7 +29,7 @@
             ({tr}Votes:{/tr} {$menu_info.votes})
         {/if}
     </div>
-    {if $prefs.feature_poll_comments and $comments_cant and !isset($module_params)}
+    {if $prefs.feature_poll_comments and $comments_count and !isset($module_params)}
         <br>
         {include file='comments_button.tpl'}
     {/if}

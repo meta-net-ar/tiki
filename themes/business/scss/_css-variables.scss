@@ -1,12 +1,22 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the Business theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
 @import "variables";
-$imagePath: "../images/";
-// CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
-// Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
-    --tiki-top-bg: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%); //#{$navbar-dark-bg};
+    --tiki-top-bg: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%); //#{$tiki-navbar-dark-bg};
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
     --tiki-top-text-color: #{$navbar-dark-hover-color};
@@ -78,9 +88,9 @@ $imagePath: "../images/";
 // Light navbar minus top nav
 @mixin admin-nav-light {
     --tiki-admin-top-nav-bg: linear-gradient(to bottom, #e8e8e8 0%, #f2f2f2 50%, #f2f2f2 100%);
-    --tiki-admin-top-nav-color: ; // --wastiki-top-color
-    --tiki-admin-top-nav-color: ; // --tiki-top-color
-    --tiki-admin-top-nav-hover-color: ; // --tiki-topbar-hover-color
+    --tiki-admin-top-nav-color: #{$navbar-light-color};
+    --tiki-admin-top-nav-color: #{$navbar-light-color};
+    --tiki-admin-top-nav-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;
     --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #e8e8e8 0%, #f2f2f2 50%, #f2f2f2 100%);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);

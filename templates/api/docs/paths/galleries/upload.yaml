@@ -13,6 +13,9 @@ post:
             galleryId:
               type: integer
               description: The gallery ID where the file will be uploaded
+            fileId:
+              type: integer
+              description: The file ID to update. Provide this to upload a new version and replace the current file. If omitted, a new file will be created instead.
             data:
               type: file
               description: file path to upload

@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -18,7 +18,7 @@ class HtmlPagesLib extends TikiLib
     /**
      * @param $pageName
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_html_page($pageName)
     {
@@ -46,9 +46,9 @@ class HtmlPagesLib extends TikiLib
         }
 
         $query = "select `pageName`,`refresh`,`created`,`type` from `tiki_html_pages` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_html_pages` $mid";
+        $query_count = "select count(*) from `tiki_html_pages` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -57,7 +57,7 @@ class HtmlPagesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -82,9 +82,9 @@ class HtmlPagesLib extends TikiLib
         }
 
         $query = "select * from `tiki_html_pages_dynamic_zones` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_html_pages_dynamic_zones` $mid";
+        $query_count = "select count(*) from `tiki_html_pages_dynamic_zones` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -93,7 +93,7 @@ class HtmlPagesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -178,7 +178,7 @@ class HtmlPagesLib extends TikiLib
      * @param $zone
      * @param $content
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function replace_html_page_content($pageName, $zone, $content)
     {
@@ -190,7 +190,7 @@ class HtmlPagesLib extends TikiLib
      * @param $pageName
      * @param $zone
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_html_page_content($pageName, $zone)
     {

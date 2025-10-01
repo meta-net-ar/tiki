@@ -193,9 +193,7 @@ function wikiplugin_memberpayment($data, $params, $offset)
     $smarty->assign('iPluginMemberpayment', $iPluginMemberpayment);
     $smarty->assign('returnurl', ! empty($params['returnurl']) ? $params['returnurl'] : '');
     $params['price'] = (float)$params['price'];
-    $default = [ 'currentuser' => 'n', 'inputtitle' => '', 'inputtitleonly' => 'n', 'howtitle' => '',
-                    'howtitleonly' => 'n', 'paytitle' => '', 'paytitleonly' => 'n', 'hideperiod' => 'n',
-                    'periodslabel' => 'Number of periods:'];
+    $default = [ 'inputtitle' => '', 'howtitle' => '', 'paytitle' => ''];
     $params = array_merge($default, $params);
     $smarty->assign('hideperiod', $params['hideperiod']);
     $smarty->assign('periodslabel', $params['periodslabel']);
@@ -228,7 +226,7 @@ function wikiplugin_memberpayment($data, $params, $offset)
             }
             $smarty->assign('wp_member_postperiods', $periods);
             $oneuser = $params['currentuser'] == 'y' ? [$user] : explode('|', $_POST['wp_member_users']);
-            $oneuser = count($oneuser) == 1 ? true : false;
+            $oneuser = count($oneuser) == 1;
             if ($oneuser) {
                 $extendinfo = $userlib->get_extend_until_info($user, $params['group'], $periods);
                 $paidterm = $extendinfo['interval'];

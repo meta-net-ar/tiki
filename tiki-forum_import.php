@@ -96,9 +96,7 @@ if (isset($_POST["step4"])) {
             $smarty->assign('failed', 'false');
         }
     } else {                                        // Error
-        $smarty->assign('msg', tra("Form error - no import method selected for some reason."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Form error - no import method selected for some reason."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $smarty->assign('step', 'import');
@@ -126,9 +124,7 @@ if (isset($_POST["step4"])) {
                 $smarty->assign('noforumsF', 'false');
         }
     } else {                                        // Error
-        $smarty->assign('msg', tra("Form error - no import method selected for some reason."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Form error - no import method selected for some reason."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $toForums = $import->list_forums(0, -1, 'created_asc', '');
@@ -146,9 +142,7 @@ if (isset($_POST["step4"])) {
     $smarty->assign('server', $_POST["server"]);
 } elseif (isset($_POST["step1"])) {
     if (! isset($_POST["import"])) {
-        $smarty->assign('msg', tra("Form error - no import method selected for some reason."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Form error - no import method selected for some reason."), \Laminas\Http\Response::STATUS_CODE_409);
     } elseif ($_POST["import"] == 'same') {     // Same db and server
     } elseif ($_POST["import"] == 'other') {    // Different db & server
     } elseif ($_POST["import"] == 'sql') {      // Import from SQL file
@@ -161,9 +155,7 @@ if (isset($_POST["step4"])) {
          * temporary flatfiles.
          */
         if (! isset($_REQUEST["server"])) {
-            $smarty->assign('msg', tra("Form error - no server-side filename entered for selected import method."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Form error - no server-side filename entered for selected import method."), \Laminas\Http\Response::STATUS_CODE_409);
         }
 
         $server = basename($_REQUEST["server"]);
@@ -184,9 +176,7 @@ if (isset($_POST["step4"])) {
             $smarty->assign('passed', 'false');
         }
     } else {    // Error
-        $smarty->assign('msg', tra("Form error - no import method selected for some reason."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Form error - no import method selected for some reason."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
 
@@ -196,7 +186,7 @@ if (isset($_POST["step4"])) {
     $smarty->assign('fi_prefix', $_POST["prefix"]);
 } else {
     $smarty->assign('step', 'new');
-    $smarty->assign('tmpdir', isset($prefs['tmpDir']) ? $prefs['tmpDir'] : '');
+    $smarty->assign('tmpdir', $prefs['tmpDir'] ?? '');
     $smarty->assign('fi_types', $import->fi_types);
     $smarty->assign('fi_prefixes', $import->fi_prefixes);
 }

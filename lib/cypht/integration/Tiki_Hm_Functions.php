@@ -81,7 +81,7 @@ class Tiki_Hm_Functions
                 $values[] = 1;
             }
             $values = array_filter($values, function ($val) use ($cond) {
-                $type = isset($cond['type']) ? $cond['type'] : 'tracker';
+                $type = $cond['type'] ?? 'tracker';
                 $not = $type[0] == '!';
                 if ($not) {
                     $type = substr($type, 1);
@@ -107,7 +107,7 @@ class Tiki_Hm_Functions
                 }
                 return $not ? ! $comparison : $comparison;
             });
-            $filtered[] = $values ? true : false;
+            $filtered[] = (bool)$values;
         }
         if ($filter['operator'] == 'ALLOF') {
             $pass = count(array_filter($filtered)) == count($filtered);

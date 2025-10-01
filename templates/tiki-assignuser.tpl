@@ -1,4 +1,4 @@
-{assign var=escuser value=$assign_user|escape:url}
+{$escuser=$assign_user|escape:url}
 {title}{tr _0=$assign_user}Assign User %0 to Groups{/tr}{/title}
 
 <div class="t_navbar btn-group mb-3">
@@ -124,4 +124,4 @@
     </div>
     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}" />
 </form>
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

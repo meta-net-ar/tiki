@@ -32,7 +32,7 @@ class Tiki_Version_Upgrade
         } else {
             // Do not encourage people to leave an LTS which is still supported. Just inform them
             $current = $this->old;
-            $current_major = (strstr($current, '.', true) != false) ? strstr($current, '.', true) : $current;
+            $current_major = strstr($current, '.', true) ?: $current;
             if (in_array($current_major, ['21', '24'])) {    // Keep list of LTS up to date or write method isLTS, whichever is less work
                 $current = "$current LTS";
                 $parts[] = tr('Version %0 is still supported. However, an upgrade to %1 is available.', $current, (string) $this->new);

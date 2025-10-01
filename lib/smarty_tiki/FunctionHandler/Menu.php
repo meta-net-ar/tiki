@@ -107,22 +107,30 @@ class Menu extends Base
 
             if (! empty($channels['data'])) {
                 // Builds Menus nested tree of options
+                $formattedCategGroups = array_reduce(
+                    $categGroups,
+                    function ($accumulatedGroups, $item) {
+                        return $accumulatedGroups + $item;
+                    },
+                    []
+                );
                 foreach ($channels['data'] as $element) {
                     $attribute = \TikiLib::lib('attribute')->get_attribute('menu', $element["optionId"], 'tiki.menu.templatedgroupid');
-                    if ($attribute && $catName = $categGroups[$attribute]) {
+                    if ($attribute) {
+                        if (! array_key_exists($attribute, $formattedCategGroups) || empty($formattedCategGroups[$attribute])) {
+                            continue;
+                        }
+                        $catName = $formattedCategGroups[$attribute];
                         $element["name"] = str_replace("--groupname--", $catName, $element["name"]);
-                        $element["url"] = str_replace("--groupname--", $catName, $element["name"]);
+                        $element["url"] = str_replace("--groupname--", $catName, $element["url"]);
                         $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
                         $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
-                    } elseif ($attribute && ! $categGroups[$attribute]) {
-                        continue;
                     }
-
                     if ($element['type'] !== '-') {
                         $level = $element['sectionLevel'];
                         // Creates new branch at level 0
                         if ($level === 0) {
-                            array_push($structured, $element);
+                            $structured[] = $element;
                             continue;
                         }
 
@@ -138,7 +146,7 @@ class Menu extends Base
 
                         // Pushes the element at the end of selected element children.
                         if (! empty($branch['children'])) {
-                            array_push($branch['children'], $element);
+                            $branch['children'][] = $element;
                         } else {
                             $branch['children'] = [$element];
                         }
@@ -188,7 +196,7 @@ class Menu extends Base
         $tikilib = TikiLib::lib('tiki');
         $menulib = TikiLib::lib('menu');
         $cachelib = TikiLib::lib('cache');
-        $cacheName = isset($prefs['mylevel']) ? $prefs['mylevel'] : 0;
+        $cacheName = $prefs['mylevel'] ?? 0;
         $cacheName .= '_' . $prefs['language'] . '_' . md5(implode("\n", $tikilib->get_user_groups($user)));
 
         extract($params, EXTR_SKIP);
@@ -220,16 +228,16 @@ class Menu extends Base
             $menu_info = ['type' => 'd', 'menuId' => $structureId, 'structure' => 'y'];
         } elseif (! empty($id)) {
             $menu_info = $menulib->get_menu($id);
-            $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', isset($prefs['mylevel']) ? $prefs['mylevel'] : 0);
+            $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', $prefs['mylevel'] ?? 0);
             $channels = $menulib->sort_menu_options($channels);
         } else {
             return '<span class="alert-warning">menu function: Menu or Structure ID not set</span>';
         }
-        if (strpos($_SERVER['SCRIPT_NAME'], 'tiki-register') === false) {
+        if (! str_contains($_SERVER['SCRIPT_NAME'], 'tiki-register')) {
             $cachelib->cacheItem($cacheName, serialize([$menu_info, $channels]), $cacheType);
         }
         if (! isset($setSelected) || $setSelected !== 'n') {
-            $channels = $menulib->setSelected($channels, isset($sectionLevel) ? $sectionLevel : '', isset($toLevel) ? $toLevel : '', $params);
+            $channels = $menulib->setSelected($channels, $sectionLevel ?? '', $toLevel ?? '', $params);
         }
 
         foreach ($channels['data'] as &$item) {

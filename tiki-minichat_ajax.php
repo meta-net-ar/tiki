@@ -52,7 +52,7 @@ function initchannelssession($chans)
 if (isset($_REQUEST['msg'])) {
     $msg = $_REQUEST['msg'];
     $msg = strtr($msg, "\n\r\t", "   ");
-    $msgon = isset($_REQUEST['msgon']) ? $_REQUEST['msgon'] : null;
+    $msgon = $_REQUEST['msgon'] ?? null;
     if (empty($msg)) {
         $msgon = null;
     }
@@ -60,7 +60,7 @@ if (isset($_REQUEST['msg'])) {
     $msg = '';
     $msgon = null;
 }
-if (substr($msg, 0, 1) == '/') {
+if (str_starts_with($msg, '/')) {
     $words = explode(' ', $msg);
     switch ($words[0]) {
         case '/join':
@@ -69,7 +69,7 @@ if (substr($msg, 0, 1) == '/') {
             if (! isset($_SESSION['minichat_channels'])) {
                 initchannelssession($chans);
             }
-            $k = array_search($words[1], $_SESSION['minichat_channels']);
+            $k = in_array($words[1], $_SESSION['minichat_channels']);
             if ($k === false) {
                 $_SESSION['minichat_channels'][] = $words[1];
             }
@@ -83,7 +83,7 @@ foreach ($chans as $chan) {
     $closed = false;
     if (($msgon == $channel) && (! is_null($channel))) {
         $time = time();
-        if (substr($msg, 0, 1) == '/') {
+        if (str_starts_with($msg, '/')) {
             $words = explode(' ', $msg);
             switch ($words[0]) {
                 case '/part':

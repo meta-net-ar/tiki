@@ -107,7 +107,7 @@ class GitLib extends TikiLib
             $file = fopen($filename, 'r');
             while (! feof($file)) {
                 $line = fgets($file);
-                if (strpos($line, $branch)) {
+                if (str_contains($line, $branch)) {
                     fclose($file);
                     return substr($line, 0, 40);
                 }

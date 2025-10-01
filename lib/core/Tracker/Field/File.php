@@ -112,10 +112,7 @@ class Tracker_Field_File extends \Tracker\Field\AbstractItemField
             if ($prefs['t_use_db'] == 'n') {
                 $fhash = md5($file_name . $tikilib->now);
                 if (file_put_contents($prefs['t_use_dir'] . $fhash, $value) === false) {
-                    $smarty = TikiLib::lib('smarty');
-                    $smarty->assign('msg', tra('Cannot write to this file:') . $fhash);
-                    $smarty->display("error.tpl");
-                    die;
+                    Feedback::errorAndDie(tra('Cannot write to this file:') . $fhash, \Laminas\Http\Response::STATUS_CODE_500);
                 }
                 $value = '';
             } else {

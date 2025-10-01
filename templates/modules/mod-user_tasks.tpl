@@ -1,5 +1,5 @@
 {if isset($modTasks)}
-{if !isset($tpl_module_title)}{assign var=tpl_module_title value="<a href='tiki-user_tasks.php'>{tr}My Tasks{/tr}</a>"}{/if}
+{if !isset($tpl_module_title)}{$tpl_module_title="<a href='tiki-user_tasks.php'>{tr}My Tasks{/tr}</a>"}{/if}
 {tikimodule error=$module_params.error title=$tpl_module_title name="user_tasks" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
 <div class="module">
 <form action="{$ownurl}" method="post" id="modNewTaskForm">

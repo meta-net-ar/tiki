@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
+use Tiki\Lib\TikiDate;
+
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
@@ -17,8 +22,7 @@ $smarty->assign('js', 1);
 //for use in setting tags for css menus as fallback for action dropdowns
 $smarty->assign('libeg', '');
 $smarty->assign('liend', '');
-    $plus_one_year = ($tikilib->now + 365 * 24 * 3600) * 1000;      // ms
-$prefs['feature_jquery'] = 'y'; // just in case
+$plus_one_year = ($tikilib->now + 365 * 24 * 3600) * 1000;      // ms
 
 // load translations lang object from /lang/xx/language.js if there
 if (file_exists('lang/' . $prefs['language'] . '/language.js')) {
@@ -99,7 +103,7 @@ $headerlib->add_js(
     '
 try {
     var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setCookie("local_tz", timezone);
+    setCookie("local_tz", timezone, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
 } catch (e) {}
 
 // this is used by tiki-confirm.js checkTimeout, so needs to be always set
@@ -117,7 +121,7 @@ if (! timezone) {
     var allTimeZoneCodes = ' . json_encode(array_map("strtoupper", $tz)) . ';
     var now_string = now.toString();
     var offsethours = - now.getTimezoneOffset() / 60;
-    setCookie("local_tzoffset", offsethours);
+    setCookie("local_tzoffset", offsethours, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
     var m = now_string.match(/[ \(]([A-Z]{3,6})[ \)]?[ \d]*$/);    // try three or more char tz first at the end or just before the year
     if (!m) {
         m = now_string.match(/[ \(]([A-Z]{1,6})[ \)]?[ \d]*$/);    // might be a "military" one if not
@@ -132,36 +136,49 @@ if (! timezone) {
     // Etc/GMT+ is equivalent to GMT-
     if (m.substring(0,4) == "GMT + ") {
         m = "Etc / GMT - " + m.substring(4);
-        setCookie("local_tz", m);
+        setCookie("local_tz", m, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
     }
     if (m.substring(0,4) == "GMT - ") {
         m = "Etc / GMT + " + m.substring(4);
-        setCookie("local_tz", m);
+        setCookie("local_tz", m, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
     }
     if (inArray(m, allTimeZoneCodes)) {
-        setCookie("local_tz", m);
+        setCookie("local_tz", m, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
     }
 }
 ',
     2
 );
 
-$jqueryTiki['ui'] = $prefs['feature_jquery_ui'] === 'y' ? true : false;
+// Extract cookie consent constants from the CookieConsentLib
+// Create a ReflectionClass instance for the CookieConsentLib class
+$reflection = new ReflectionClass(CookieConsentLib::class);
+
+// Get all the constants defined in the CookieConsentLib class
+$constants = $reflection->getConstants();
+
+// Generate JavaScript content with the constants
+$jsContent = "window.tikiCookieConstants = Object.freeze({\n";
+foreach ($constants as $name => $value) {
+    $jsContent .= "    $name: " . json_encode($value) . ",\n";
+}
+$jsContent .= "});\n";
+// Add the JavaScript content to the header
+$headerlib->add_js($jsContent);
+
+$jqueryTiki['ui'] = $prefs['feature_jquery_ui'] === 'y';
 $jqueryTiki['ui_theme'] = $prefs['feature_jquery_ui_theme'];
 $jqueryTiki['tooltips'] = true;
-$jqueryTiki['autocomplete'] = $prefs['feature_jquery_autocomplete'] === 'y' ? true : false;
-$jqueryTiki['smartmenus'] = $prefs['jquery_smartmenus_enable'] === 'y' ? true : false;
+$jqueryTiki['smartmenus'] = $prefs['jquery_smartmenus_enable'] === 'y';
 $jqueryTiki['smartmenus_collapsible_behavior'] = $prefs['jquery_smartmenus_collapsible_behavior'];
-$jqueryTiki['smartmenus_open_close_click'] = $prefs['jquery_smartmenus_open_close_click'] === 'y' ? true : false;
-$jqueryTiki['reflection'] = $prefs['feature_jquery_reflection'] === 'y' ? true : false;
-$jqueryTiki['tablesorter'] = $prefs['feature_jquery_tablesorter'] === 'y' ? true : false;
-$jqueryTiki['colorbox'] = $prefs['feature_shadowbox'] === 'y' ? true : false;
-$jqueryTiki['cboxCurrent'] = "{current} / {total}";
-$jqueryTiki['sheet'] = $prefs['feature_sheet'] === 'y' ? true : false;
-$jqueryTiki['carousel'] = $prefs['feature_jquery_carousel'] === 'y' ? true : false;
-$jqueryTiki['validate'] = $prefs['feature_jquery_validation'] === 'y' ? true : false;
-$jqueryTiki['zoom'] = $prefs['feature_jquery_zoom'] === 'y' ? true : false;
-$jqueryTiki['url_fragment_guesser'] = ($prefs['url_fragment_guesser'] ?? 'n') === 'y' ? true : false;
+$jqueryTiki['smartmenus_open_close_click'] = $prefs['jquery_smartmenus_open_close_click'] === 'y';
+$jqueryTiki['tablesorter'] = $prefs['feature_jquery_tablesorter'] === 'y';
+$jqueryTiki['colorbox'] = $prefs['feature_shadowbox'] === 'y';
+$jqueryTiki['sheet'] = $prefs['feature_sheet'] === 'y';
+$jqueryTiki['carousel'] = $prefs['feature_jquery_carousel'] === 'y';
+$jqueryTiki['validate'] = $prefs['feature_jquery_validation'] === 'y';
+$jqueryTiki['zoom'] = $prefs['feature_jquery_zoom'] === 'y';
+$jqueryTiki['url_fragment_guesser'] = ($prefs['url_fragment_guesser'] ?? 'n') === 'y';
 
 // Default effect
 $jqueryTiki['effect'] = $prefs['jquery_effect'];
@@ -174,32 +191,29 @@ $jqueryTiki['effect_tabs_direction'] = $prefs['jquery_effect_tabs_direction'];
 $jqueryTiki['effect_tabs_speed'] = $prefs['jquery_effect_tabs_speed'] === 'normal' ? '400' : $prefs['jquery_effect_tabs_speed'];
 $jqueryTiki['home_file_gallery'] = $prefs['home_file_gallery'];
 
-$jqueryTiki['autosave'] = $prefs['ajax_autosave'] === 'y' ? true : false;
-$jqueryTiki['sefurl'] = $prefs['feature_sefurl'] === 'y' ? true : false;
-$jqueryTiki['ajax'] = $prefs['feature_ajax'] === 'y' ? true : false;
-$jqueryTiki['syntaxHighlighter'] = $prefs['feature_syntax_highlighter'] === 'y' ? true : false;
-$jqueryTiki['select2'] = $prefs['jquery_select2'] === 'y' ? true : false;
-$jqueryTiki['select2_sortable'] = $prefs['jquery_select2_sortable'] === 'y' ? true : false;
+$jqueryTiki['autosave'] = $prefs['ajax_autosave'] === 'y';
+$jqueryTiki['sefurl'] = $prefs['feature_sefurl'] === 'y';
+$jqueryTiki['ajax'] = $prefs['feature_ajax'] === 'y';
+$jqueryTiki['syntaxHighlighter'] = $prefs['feature_syntax_highlighter'] === 'y';
 $jqueryTiki['mapTileSets'] = $tikilib->get_preference('geo_tilesets', ['openstreetmap'], true);
 $jqueryTiki['infoboxTypes'] = Services_Object_Controller::supported();
-$jqueryTiki['googleStreetView'] = $prefs['geo_google_streetview'] === 'y' ? true : false;
-$jqueryTiki['googleStreetViewOverlay'] = $prefs['geo_google_streetview_overlay'] === 'y' ? true : false;
+$jqueryTiki['googleStreetView'] = $prefs['geo_google_streetview'] === 'y';
+$jqueryTiki['googleStreetViewOverlay'] = $prefs['geo_google_streetview_overlay'] === 'y';
 $jqueryTiki['googleMapsAPIKey'] = $prefs['gmap_key'];
-$jqueryTiki['structurePageRepeat'] = $prefs['page_n_times_in_a_structure'] === 'y' ? true : false;
+$jqueryTiki['structurePageRepeat'] = $prefs['page_n_times_in_a_structure'] === 'y';
 $jqueryTiki['no_cookie'] = false;
-$jqueryTiki['cookie_consent_analytics'] = $prefs['cookie_consent_analytics'] === 'y' ? true : false;
 $jqueryTiki['language'] = $prefs['language'];
-$jqueryTiki['useInlineComment'] = $prefs['feature_inline_comments'] === 'y' ? true : false;
-$jqueryTiki['useInlineAnnotations'] = $prefs['comments_inline_annotator'] === 'y' ? true : false;
+$jqueryTiki['useInlineComment'] = $prefs['feature_inline_comments'] === 'y';
+$jqueryTiki['useInlineAnnotations'] = $prefs['comments_inline_annotator'] === 'y';
 $jqueryTiki['helpurl'] = $prefs['feature_help'] === 'y' ? $prefs['helpurl'] : '';
 $jqueryTiki['shortDateFormat'] = $prefs['short_date_format_js'];
 $jqueryTiki['shortTimeFormat'] = $prefs['short_time_format_js'];
-$jqueryTiki['changeMonth'] = $prefs['change_month'] === 'y' ? true : false;
-$jqueryTiki['changeYear'] = $prefs['change_year'] === 'y' ? true : false;
+$jqueryTiki['changeMonth'] = $prefs['change_month'] === 'y';
+$jqueryTiki['changeYear'] = $prefs['change_year'] === 'y';
 $jqueryTiki['username'] = $user;
 $jqueryTiki['userRealName'] = TikiLib::lib('user')->clean_user($user);
 $jqueryTiki['userAvatar'] = $base_url . TikiLib::lib('userprefs')->get_public_avatar_path($user);
-$jqueryTiki['autoToc_inline'] = $prefs['wiki_inline_auto_toc'] === 'y' ? true : false;
+$jqueryTiki['autoToc_inline'] = $prefs['wiki_inline_auto_toc'] === 'y';
 $jqueryTiki['autoToc_pos'] = $prefs['wiki_toc_pos'];
 $jqueryTiki['autoToc_offset'] = $prefs['wiki_toc_offset'];
 $jqueryTiki['autoToc_tabs'] = $prefs['wiki_toc_tabs'];
@@ -211,9 +225,18 @@ $jqueryTiki['display_start_year'] = $prefs['display_start_year'];
 $jqueryTiki['display_end_year'] = $prefs['display_end_year'];
 $jqueryTiki['display_field_order'] = $prefs['display_field_order'];
 $jqueryTiki['tiki_same_day_time_only'] = $prefs['tiki_same_day_time_only'];
-$jqueryTiki['jquery_timeago'] = $prefs['jquery_timeago'] === 'y' ? true : false;
+$jqueryTiki['jquery_timeago'] = $prefs['jquery_timeago'] === 'y';
 $jqueryTiki['short_date_format'] = $prefs['short_date_format'];
 $jqueryTiki['short_time_format'] = $prefs['short_time_format'];
+$jqueryTiki['cookie_consent_dom_id'] = $prefs['cookie_consent_dom_id'];
+$jqueryTiki['cookie_consent_mode'] = $prefs['cookie_consent_mode'];
+$jqueryTiki['cookie_consent_expires'] = $prefs['cookie_consent_expires'];
+$jqueryTiki['cookie_consent_name'] = CookieConsentLib::COOKIE_CONSENT_NAME;
+$jqueryTiki['cookie_consent_categories'] = json_encode(array_keys(CookieConsentLib::getCookieCategories()));
+$jqueryTiki['cookie_consent_value'] = json_encode(CookieConsentLib::getConsentPreferences(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$jqueryTiki['BUILTIN_COOKIE_CATEGORY_ESSENTIAL'] = json_encode(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL);
+$jqueryTiki['wiki_url_scheme'] = $prefs['wiki_url_scheme'];
+
 //set at 4 hours if empty
 $jqueryTiki['securityTimeout'] = ! empty($prefs['site_security_timeout']) ? $prefs['site_security_timeout']
     : TikiLib::lib('access')->getDefaultTimeout();
@@ -283,6 +306,10 @@ var syntaxHighlighter = {
 EOT;
 }
 
+if (in_array('y', [$prefs['feature_draggable_modals'], ! empty($prefs['feature_resizable_modals']) ? $prefs['feature_resizable_modals'] : 'n'])) {
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
+}
+
 if ($prefs['feature_draggable_modals'] === 'y') {
     $js .= <<< 'EOT'
 $(document).on("shown.bs.modal", function(event) {
@@ -292,6 +319,7 @@ $(document).on("shown.bs.modal", function(event) {
     interact(`#${draggableId}`).draggable({
         inertia: true,
         autoScroll: true,
+        allowFrom: '.modal-header',
         listeners: {
             move: (e) => {
                 const target = e.target;
@@ -306,15 +334,20 @@ EOT;
     $headerlib->add_css('.modal-header {cursor: grab}');
 }
 
-if ($prefs['feature_resizable_modals'] === 'y') {
+if (! empty($prefs['feature_resizable_modals']) && $prefs['feature_resizable_modals'] === 'y') {
     $js .= <<< 'EOT'
 $(document).on("tiki.modal.redraw", function(event) {
     let $modalContent = $(event.target);
     if (!$modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    $modalContent.find(".modal-body").css({ "overflow": "auto" });
-    
+
+    const modalBody = $modalContent.find(".modal-body")[0];
+
+    const initialWidth = parseFloat(getComputedStyle($modalContent[0]).width.slice(0, -2));
+    const initialHeight = parseFloat(getComputedStyle($modalContent[0]).height.slice(0, -2));
+    const initialOverflow = getComputedStyle(modalBody).overflow;
+
     const modalId = 'modal' + Math.random().toString(36).substring(7);
     $modalContent.attr("id", modalId);
     interact(`#${modalId}`).resizable({
@@ -329,6 +362,12 @@ $(document).on("tiki.modal.redraw", function(event) {
                 height += e.deltaRect.top + e.deltaRect.bottom;
                 target.style.width = `${width}px`;
                 target.style.height = `${height}px`;
+
+                if (width < initialWidth || height < initialHeight) {
+                    modalBody.style.overflow = "auto";
+                } else {
+                    modalBody.style.overflow = initialOverflow;
+                }
             }
         }
     });
@@ -337,7 +376,12 @@ EOT;
 }
 
 if ($prefs['feature_realtime'] === 'y') {
-    $ws_url = json_encode(preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    $websocket_full_base_url = $prefs['realtime_full_base_url'];
+    if (empty($websocket_full_base_url)) {
+        $ws_url = json_encode(preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    } else {
+        $ws_url = json_encode($websocket_full_base_url);
+    }
     $session_token = session_id();
 
     $js .= <<<EOT
