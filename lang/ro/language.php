@@ -2437,7 +2437,7 @@ $lang = array(
 "Last pages" => "Ultimele pagini",
 "Create item" => "Create item",
 "Select Tracker" => "Select Tracker",
-"Move to trackers..." => 'Move to trackers...'
+"Move to trackers..." => "Move to trackers...",
 // "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine" => "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine",
 );
 

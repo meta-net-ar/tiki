@@ -105,24 +105,24 @@ function wikiplugin_appframe($data, $params)
     $minHeight = (int) ($params['min'] ?? 300);
     $maxHeight = (int) ($params['max'] ?? -1);
     $fullPage = 0;
-    if (isset($params['fullpage']) && $params['fullpage'] == 'y') {
+    if ($params['fullpage'] == 'y') {
         $fullPage = 1;
     }
     $fullscreen = 0;
-    if (isset($params['fullscreen']) && $params['fullscreen'] == 'y') {
+    if ($params['fullscreen'] == 'y') {
         $fullscreen = 1;
     }
 
-    $absolute = (int)(isset($params['absolute']) && $params['absolute'] == 'y');
-    $top = $params['top'] ?? 0;
+    $absolute = (int)($params['absolute'] == 'y');
+    $top = $params['top'];
 
     $headerlib = TikiLib::lib('header');
 
-    if (isset($params['hideleft']) && $params['hideleft'] == 'y') {
+    if ($params['hideleft'] == 'y') {
         $headerlib->add_js('$("body").addClass("hide_zone_left");');
     }
 
-    if (isset($params['hideright']) && $params['hideright'] == 'y') {
+    if ($params['hideright'] == 'y') {
         $headerlib->add_js('$("body").addClass("hide_zone_right");');
     }
 

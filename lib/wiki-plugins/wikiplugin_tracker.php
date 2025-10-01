@@ -360,7 +360,7 @@ function wikiplugin_tracker_info()
                 'description' => tr('Text for the "previous" button label.'),
                 'since'       => '18.4',
                 'filter'      => 'text',
-                'default'     => tr(''),
+                'default'     => '',
                 'advanced' => true,
             ],
             'itemId'                   => [
@@ -724,12 +724,6 @@ function wikiplugin_tracker($data, $params)
         return;
     }
     $smarty->assign('trackerEditFormId', $iTRACKER);
-    $default = ['overwrite'            => 'n', 'embedded' => 'n', 'showtitle' => 'n', 'showdesc' => 'n',
-                'showfieldsdesc'       => 'y', 'sort' => 'n', 'showmandatory' => 'y', 'status' => '',
-                'transactionFinalStep' => '', 'registration' => BooleanEnglishLetter::No->value, 'chosenGroup' => 'Registered',
-                'validateusers'        => '', 'emailformat' => 'text', 'ajax' => 'n',
-                'rules' => 'n', 'rulesparent' => '.tracker-field-group:first'];
-    $params = array_merge($default, $params);
     $item = [];
 
     extract($params, EXTR_SKIP);

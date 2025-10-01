@@ -394,6 +394,10 @@
                                                 <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                                     {icon name="calendar-check"} <span class="ms-1">{tr}Scheduler{/tr}</span> </a>
                                             {/if}
+                                            {if $prefs.feature_queued_tasks eq "y"}
+                                                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                                    {icon name="calendar-check"} <span class="ms-1">{tr}Queued Tasks{/tr}</span> </a>
+                                            {/if}
                                             {if $prefs.tiki_monitor_performance eq 'y'}
                                                 <a class="dropdown-item" href="tiki-performance_stats.php">
                                                     {icon name="admin_performance"} <span class="ms-1">{tr}Performance{/tr}</span> </a>

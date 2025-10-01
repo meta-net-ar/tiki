@@ -279,13 +279,6 @@ function wikiplugin_paypal($data, $params)
     $unique = 'wppaypal-' . ++$id;
     $smarty = TikiLib::lib('smarty');
 
-    // process default
-    $plugininfo = wikiplugin_paypal_info();
-    foreach ($plugininfo['params'] as $key => $p) {
-        $default[$key] = $p['default'];
-    }
-    $params = array_merge($default, $params);
-
     // check required params
     if (empty($params['business'])) {
         $access = TikiLib::lib('access');

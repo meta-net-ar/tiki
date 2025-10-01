@@ -42,6 +42,18 @@ describe("applyAutocomplete", () => {
         expect(expectedAutoCompleteElement.getAttribute("source-list")).toBe(JSON.stringify(givenSourceList));
     });
 
+    test("should not generate a new autocomplete element if one already exists for the given input element", () => {
+        const givenInput = document.createElement("input");
+        document.body.appendChild(givenInput);
+        const givenRemoteSourceUrl = "https://foo.bar";
+
+        const firstAutoCompleteElement = applyAutocomplete(givenInput, givenRemoteSourceUrl);
+
+        const secondAutoCompleteElement = applyAutocomplete(givenInput, givenRemoteSourceUrl);
+
+        expect(firstAutoCompleteElement).toBe(secondAutoCompleteElement);
+    });
+
     test("given a select callback is provided, it should get fired when the autocomplete element emits a select event", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);

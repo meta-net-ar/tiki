@@ -51,7 +51,7 @@
         {if !isset($firstWizardPage)}
             <input type="submit" class="btn btn-outline-dark" name="back" value="{tr}Back{/tr}" />
         {/if}
-            <input type="submit" class="btn btn-dark" name="{if isset($firstWizardPage)}use-default-prefs{else}continue{/if}" value="{if isset($lastWizardPage)}{tr}Finish{/tr}{elseif isset($firstWizardPage)}{tr}Start the Wizardry{/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}"/>
+            <input type="submit" class="btn btn-dark" style="{if $useDefaultPrefs}display:none{/if}" name="{if isset($firstWizardPage)}use-default-prefs{else}continue{/if}" value="{if isset($lastWizardPage)}{tr}Finish{/tr}{elseif isset($firstWizardPage)}{tr}Start the Wizardry{/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}"/>
         </div>
             <input type="submit" class="btn btn-outline-danger btn-sm" name="close" value="{tr}Close{/tr}"/>
     </div>

@@ -43,8 +43,9 @@
     "clean": "concurrently \"npm:clean:*\"",
     "test": "vitest --config=src/js/vite.config.mjs --coverage",
     "testci": "vitest --config=src/js/vite.config.mjs --coverage --run",
-    "postinstall": "patch-package --patch-dir=src/js/patches --error-on-fail",
-    "patch": "patch-package --patch-dir=src/js/patches --error-on-fail"
+    "postinstall": "patch-package --patch-dir=src/js/patches --error-on-fail && npx husky install",
+    "patch": "patch-package --patch-dir=src/js/patches --error-on-fail",
+    "prepare": "husky"
   },
   "engines": {
     "npm": ">=9.0.0 <11",
@@ -63,6 +64,8 @@
     "single-spa-vue": "https://github.com/single-spa/single-spa-vue/releases"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@stylistic/eslint-plugin": "^5.0.0",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^6.0.0",
@@ -76,6 +79,7 @@
     "eslint-plugin-prettier": "^5.5.1",
     "eslint-plugin-vue": "^10.2.0",
     "happy-dom": "^18.0.1",
+    "husky": "^9.1.7",
     "npm-run-all2": "^8.0.4",
     "patch-package": "^8.0.0",
     "prettier": "^3.6.1",

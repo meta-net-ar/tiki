@@ -16,7 +16,8 @@ class WikiPlugin_CodeTest extends PHPUnit\Framework\TestCase
      */
     public function testWikiPluginCode($data, $expectedOutput, $params = []): void
     {
-        $this->assertEquals($expectedOutput, wikiplugin_code($data, $params));
+        $result = TikiLib::lib('parser')->invokePlugin('code', $data, $params);
+        $this->assertEquals($expectedOutput, $result);
     }
 
     public static function provider(): array

@@ -42,13 +42,9 @@ function wikiplugin_alink($data, $params)
     $tikilib = TikiLib::lib('tiki');
     extract($params, EXTR_SKIP);
 
-    if (! isset($aname)) {
-        return ("<b>missing parameter for aname</b><br />");
-    }
-
     $aname = $tikilib->urlFragmentString($aname);
 
-    if (isset($pagename) && $pagename) {
+    if ($pagename) {
         // Stolen, with some modifications, from tikilib.php line 4717-4723
         if ($desc = $tikilib->page_exists_desc($pagename)) {
         // to choose the best page language

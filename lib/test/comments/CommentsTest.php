@@ -45,7 +45,6 @@ class CommentsTest extends TikiTestCase
             'sender_email' => 'noreply@example.com',
             'feature_user_watches' => 'n',
             'feature_group_watches' => 'n',
-            'comments_akismet_filter' => 'n',  // Added missing preference
             'feature_comments_moderation' => 'n',  // Added missing preference
             'feature_file_galleries' => 'n',  // Added missing preference
         ];

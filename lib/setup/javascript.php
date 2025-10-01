@@ -376,7 +376,12 @@ EOT;
 }
 
 if ($prefs['feature_realtime'] === 'y') {
-    $ws_url = json_encode(preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    $websocket_full_base_url = $prefs['realtime_full_base_url'];
+    if (empty($websocket_full_base_url)) {
+        $ws_url = json_encode(preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    } else {
+        $ws_url = json_encode($websocket_full_base_url);
+    }
     $session_token = session_id();
 
     $js .= <<<EOT

@@ -65,37 +65,23 @@ function wikiplugin_translationof($data, $params)
     global $tracer;
     $smarty = TikiLib::lib('smarty');
     extract($params, EXTR_SKIP);
-
-    $anchor_text = $orig_page ?? '';
-    if (isset($translation_page) && $translation_page != '') {
-        $anchor_text = $translation_page;
-    }
-
-    if (isset($orig_page)) {
-        $orig_page = urlencode($orig_page);
-    } else {
-        $orig_page = '';
-    }
-
+    $anchor_text = $translation_page ?: $orig_page;
+    $translation_page = urlencode($translation_page);
+    $orig_page = urlencode($orig_page);
     $translation_name_arg = '';
-    if (isset($translation_page)) {
-        $translation_page = urlencode($translation_page);
+    if (! empty($translation_page)) {
         $translation_name_arg = "&translation_name=$translation_page";
     }
 
     $translation_lang_arg = '';
-    if (isset($translation_lang)) {
+    if (! empty($translation_lang)) {
         $translation_lang_arg = "&target_lang=$translation_lang";
     }
 
-    $tracer->trace('wikiplugin_translationof', "** \$translation_lang=" . ($translation_lang ?? ''));
+    $tracer->trace('wikiplugin_translationof', "** \$translation_lang=" . ($translation_lang));
 
-
-    $link = 'javascript:void(0)';
     $popup_html = "<a href=\"tiki-edit_translation.php?page=$orig_page$translation_lang_arg$translation_name_arg#new_translation\">" . tr("Translate this link") . "</a>";
     $popup_params = [ 'text' => $popup_html, 'sticky' => true, 'trigger' => 'mouseover'];
     $mouseover = ' ' . smarty_function_popup($popup_params, $smarty->getEmptyInternalTemplate());
-    $html = "<a href=\"tiki-index.php?page=$orig_page\" $mouseover>$anchor_text</a>";
-
-    return $html;
+    return "<a href=\"tiki-index.php?page=$orig_page\" $mouseover>$anchor_text</a>";
 }

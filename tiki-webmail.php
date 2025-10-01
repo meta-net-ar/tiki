@@ -108,6 +108,14 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         }
         if (isset($_POST['msg_text'])) {
             $msg_text = $_POST['msg_text'];
+            // Remove common email preheader techniques not well handled by PDF generators
+            $patterns = [
+              '/<span[^>]*mcnPreviewText[^>]*>.*?<\/span>/is',
+              '/<div[^>]*max-height:\s*0[^>]*>.*?<\/div>/is',
+              '/<div[^>]*style="[^"]*max-height:\s*0[^"]*"[^>]*>.*?<\/div>/is',
+              '/(?:͏|‌|\x{034F}|\x{200C}|\x{200B}|\x{FEFF})/u', // Remove invisible Unicode chars
+            ];
+            $msg_text = preg_replace($patterns, '', $msg_text);
         }
         if (isset($_POST['header_cc'])) {
             $header_cc = $_POST['header_cc'];

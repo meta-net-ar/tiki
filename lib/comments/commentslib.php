@@ -3415,58 +3415,7 @@ class Comments extends TikiLib
             return 'y';
         }
 
-        if ($prefs['comments_akismet_filter'] == 'y') {
-            $isSpam = $this->check_is_spam($info);
-
-            if ($prefs['feature_comments_moderation'] == 'y') {
-                return $isSpam ? 'n' : 'y';
-            } else {
-                return $isSpam ? false : 'y';
-            }
-        } else {
-            return ($prefs['feature_comments_moderation'] == 'y') ? 'n' : 'y';
-        }
-    }
-
-    /**
-     * @param array $info
-     * @return bool
-     */
-    private function check_is_spam(array $info)
-    {
-        global $prefs, $user;
-
-        if ($prefs['comments_akismet_filter'] != 'y') {
-            return false;
-        }
-
-        if ($user && $prefs['comments_akismet_check_users'] != 'y') {
-            return false;
-        }
-
-        try {
-            $tikilib = TikiLib::lib('tiki');
-
-            $url = $tikilib->tikiUrl();
-            $httpClient = $tikilib->get_http_client();
-            $akismet = new ZendService\Akismet\Akismet($prefs['comments_akismet_apikey'], $url, $httpClient);
-
-            return $akismet->isSpam(
-                [
-                    'user_ip' => $tikilib->get_ip_address(),
-                    'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-                    'referrer' => $_SERVER['HTTP_REFERER'],
-                    'comment_type' => 'comment',
-                    'comment_author' => $info['author'],
-                    'comment_author_email' => $info['email'],
-                    'comment_author_url' => $info['website'],
-                    'comment_content' => $info['content'],
-                ]
-            );
-        } catch (Exception $e) {
-            Feedback::error(tr('Cannot perform spam check: %0', $e->getMessage()));
-            return false;
-        }
+        return ($prefs['feature_comments_moderation'] == 'y') ? 'n' : 'y';
     }
 
     // Check if a particular topic exists.

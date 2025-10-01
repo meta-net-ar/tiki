@@ -196,6 +196,9 @@
             {if $prefs.feature_scheduler eq "y" and $tiki_p_admin}
                 <a class="dropdown-item" href="tiki-admin_schedulers.php">{tr}Scheduler{/tr}</a>
             {/if}
+            {if $prefs.feature_queued_tasks eq "y"}
+                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">{tr}Queued Tasks{/tr}</a>
+            {/if}
             {if $prefs.tiki_monitor_performance eq 'y'}
                 <a class="dropdown-item" href="tiki-performance_stats.php">{tr}Performance{/tr}</a>
             {/if}

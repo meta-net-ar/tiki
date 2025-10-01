@@ -70,12 +70,6 @@ function wikiplugin_semanticsearch_info()
 function wikiplugin_semanticsearch($data, $params)
 {
     global $prefs;
-    $defaults = [];
-    $plugininfo = wikiplugin_semanticsearch_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
 
     if (empty($params['searchformwiki']) && empty($params['searchformtpl'])) {
         $params['searchformtpl'] = 'templates/search_customsearch/default_form.tpl';

@@ -100,6 +100,11 @@
                                 {icon name="calendar"} {tr}Scheduler{/tr}
                             </a>
                         {/if}
+                        {if $prefs.feature_queued_tasks eq "y"}
+                            <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                {icon name="clock-o"} {tr}Queued Tasks{/tr}
+                            </a>
+                        {/if}
                         {if $prefs.feature_sefurl_routes eq "y"}
                             <a class="dropdown-item" href="tiki-admin_routes.php">
                                 {icon name="random"} {tr}Custom Routes{/tr}

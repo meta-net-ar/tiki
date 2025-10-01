@@ -8,7 +8,7 @@
 
 <form method="post" action="{service controller=tracker action=replace}">
     {accordion}
-        {accordion_group title="{tr}General{/tr}"}
+        {accordion_group title="{tr}General{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="name">{tr}Name{/tr}</label>
                 <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" required="required">
@@ -33,22 +33,24 @@
                 <input class="form-control" type="text" name="permName" id="permName" value="{$info.permName|escape}">
                 {tr}Required for Advanced Shopping Cart and some other tracker features, do not change this unless you are sure.{/tr}
             </div>
-            {jq}$("#name").on("change", function() {
-    if ($("#name").val()) {
-        const prefix = $("#fieldPrefix")
-        if (! prefix.val()) {
-            prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-            prefix.next('el-input').attr("value", prefix.val());
-        }
-        const permName = $("#permName")
-        if (! permName.val()) {
-            permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-            permName.next('el-input').attr("value", permName.val());
-        }
-    }
-});{/jq}
+            {jq}
+                $("#name").on("change", function() {
+                    if ($("#name").val()) {
+                        const prefix = $("#fieldPrefix")
+                        if (! prefix.val()) {
+                            prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                            prefix.next('el-input').attr("value", prefix.val());
+                        }
+                        const permName = $("#permName")
+                        if (! permName.val()) {
+                            permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                            permName.next('el-input').attr("value", permName.val());
+                        }
+                    }
+                });
+            {/jq}
         {/accordion_group}
-        {accordion_group title="{tr}Features{/tr}"}
+        {accordion_group title="{tr}Features{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="allowOffline" value="1"
                     {if $info.allowOffline eq 'y'} checked="checked"{/if}>
@@ -138,7 +140,7 @@
                 </div>
             {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Display{/tr}"}
+        {accordion_group title="{tr}Display{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label class="col-form-label" for="logo">{tr}Logo{/tr}</label>
                 <input class="form-control" type="text" name="logo" id="logo" value="{$info.logo|escape}">
@@ -250,7 +252,7 @@
                 </label>
             </div>
         {/accordion_group}
-    {accordion_group title="{tr}Section Format{/tr}"}
+    {accordion_group title="{tr}Section Format{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     <label for="sectionFormat">{tr}Section format{/tr}</label>
                     <select name="sectionFormat" id="sectionFormat" class="form-select">
@@ -291,7 +293,7 @@
                     </div>
                 </div>
     {/accordion_group}
-        {accordion_group title="{tr}Status{/tr}"}
+        {accordion_group title="{tr}Status{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="newItemStatus">{tr}New item status{/tr}</label>
                 <select name="newItemStatus" id="newItemStatus" class="form-select">
@@ -343,7 +345,7 @@
 
             </div>
         {/accordion_group}
-        {accordion_group title="{tr}Notifications{/tr}"}
+        {accordion_group title="{tr}Notifications{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="outboundEmail">{tr}Copy activity to email{/tr}</label>
                 <input name="outboundEmail" id="outboundEmail" value="{$info.outboundEmail|escape}" class="email_multi form-control" size="60">
@@ -403,7 +405,7 @@
                 </div>
             {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Permissions{/tr}"}
+        {accordion_group title="{tr}Permissions{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="userCanSeeOwn" id="userCanSeeOwn" value="1"
                                            {if $info.userCanSeeOwn eq 'y'}checked="checked"{/if}>
@@ -528,7 +530,7 @@
             </fieldset>
         {/accordion_group}
         {if $prefs.feature_categories eq 'y'}
-            {accordion_group title="{tr}Categories{/tr}"}
+            {accordion_group title="{tr}Categories{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     {include file='categorize.tpl' notable=y auto=y}
                 </div>
@@ -590,7 +592,7 @@
             {/accordion_group}
         {/if}
         {if $prefs.tracker_tabular_enabled eq 'y' and $remoteTabulars}
-            {accordion_group title="{tr}Remote synchronization{/tr}"}
+            {accordion_group title="{tr}Remote synchronization{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     <label for="tabularSync">{tr}Choose import-export format(s){/tr}</label>
                     <select name="tabularSync" id="tabularSync" class="form-control" multiple="multiple">

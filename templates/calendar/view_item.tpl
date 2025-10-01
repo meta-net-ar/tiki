@@ -215,6 +215,18 @@
     <div class="row px-3 py-2 rounded">
         <span class=" col-md-3" style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};">{tr}Description{/tr} : </span><p class="description col-md-6">{$calitem.parsed|default:"<em>{tr}No description{/tr}</em>"}</p>
     </div>
+    {if !empty($trackerItems)}
+        <div class="row px-3 py-2">
+            <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr} : </label>
+            <div class="col-sm-9 mb-0 pt-2">
+                <ul>
+                    {foreach from=$trackerItems item=trackerItem}
+                        <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    {/if}
     <div class="small mt-3">
         <div class="table-responsive">
             <table class="table table-borderless p-0 table-sm{if $preview} table-secondary{/if}">

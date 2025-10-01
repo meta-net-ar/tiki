@@ -91,6 +91,7 @@
                         <div id="feedback" role="alert">
                             {feedback}
                         </div>
+                        {queued_tasks_banner}
                         {block name=quicknav}{/block}
                         {block name=title}{/block}
                         {block name=navigation}{/block}
@@ -111,6 +112,7 @@
                                 <div id="feedback" role="alert">
                                     {feedback}
                                 </div>
+                                {queued_tasks_banner}
                                 {block name=quicknav}{/block}
                             </div>
                             <div class="d-none d-lg-flex">
@@ -158,6 +160,7 @@
                                 <div id="feedback" role="alert">
                                     {feedback}
                                 </div>
+                                {queued_tasks_banner}
                                 {block name=quicknav}{/block}
                             </div>
                         </div>
@@ -196,6 +199,7 @@
                         <div id="feedback" role="alert">
                             {feedback}
                         </div>
+                        {queued_tasks_banner}
                         {block name=quicknav}{/block}
                     </div>
                     <div class="d-none d-lg-block">

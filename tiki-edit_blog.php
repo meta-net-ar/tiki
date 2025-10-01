@@ -13,10 +13,10 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'blogId'                      => 'int',          //post
-            'heading'                     => 'int',           //post
-            'post_heading'                => 'bool',          //post
+            'heading'                     => 'xss',           //post
+            'post_heading'                => 'xss',           //post
             'save'                        => 'bool',          //post
-            'preview'                     => 'int',           //post
+            'preview'                     => 'bool',          //post
             'public'                      => 'bool',          //post
             'allow_comments'              => 'bool',          //post
             'show_avatar'                 => 'bool',          //post

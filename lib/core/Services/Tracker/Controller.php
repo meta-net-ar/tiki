@@ -1340,9 +1340,10 @@ class Services_Tracker_Controller
                 $permName = $f['permName'];
                 $fieldValue = $f['value'] ?? '';
                 if ($f['type'] === 'a') {
-                    foreach ((array) $fieldValue as & $value) {
-                        $value = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($value);
-                    }
+                    $convert = fn($v) => TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($v);
+                    $fieldValue = is_array($fieldValue)
+                        ? array_map($convert, $fieldValue) // apply conversion to each element
+                        : $convert($fieldValue); // apply conversion to the single value
                 }
                 $fields[$permName] = $fieldValue;
             }
@@ -2155,6 +2156,10 @@ class Services_Tracker_Controller
 
     public function action_replace($input)
     {
+        // This variable indicates which accordion_group to activate in the Smarty .tpl file
+        // when the user uses this method. By default, its value is set to 1.
+        $accordion_pos = $input->accordion_pos->int() ?? 1;
+
         $trackerId = $input->trackerId->int();
         $confirm = $input->confirm->int();
 
@@ -2229,6 +2234,7 @@ class Services_Tracker_Controller
         }
 
         return [
+            'accordion_pos' => $accordion_pos,
             'title' => $trackerId ? tr('Edit') . " " . tr('%0', $definition->getConfiguration('name')) : tr('Create Tracker'),
             'trackerId' => $trackerId,
             'info' => $info,
@@ -2646,7 +2652,7 @@ class Services_Tracker_Controller
         $export_yaml = $profileTrackerInstallHandler->dumpExport($trackerId, $profileObject);
 
         include_once 'lib/wiki-plugins/wikiplugin_code.php';
-        $export_yaml = wikiplugin_code($export_yaml, ['caption' => 'YAML', 'colors' => 'yaml']);
+        $export_yaml = TikiLib::lib('parser')->invokePlugin('code', $export_yaml, ['caption' => 'YAML', 'colors' => 'yaml']);
         $export_yaml = preg_replace('/~[\/]?np~/', '', $export_yaml);
 
         return [
@@ -3243,26 +3249,36 @@ class Services_Tracker_Controller
             throw new Services_Exception_NotFound();
         }
 
+        /** @var Tracker_Field_EmailFolder $fieldHandler */
         $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
 
         if (! method_exists($fieldHandler, 'getFolders')) {
             throw new ServicesExceptionBadRequest(tr('Incorrect field type'));
         }
 
+        $trackerField = $fieldHandler->getTrackerFieldInstance();
         $folders = [];
 
-        foreach ($fieldHandler->getFolders() as $name => $label) {
-            if (empty($name)) {
-                continue;
+        if ($trackerField->getOption('useFolders')) {
+            foreach ($fieldHandler->getFolders() as $name => $label) {
+                if (empty($name)) {
+                    continue;
+                }
+                $folders[] = [
+                    'name' => $name,
+                    'label' => $label,
+                ];
             }
+        } else {
             $folders[] = [
-                'name' => $name,
-                'label' => $label,
+                'name' => 'inbox',
+                'label' => $trackerField->getOption('inboxName'),
             ];
         }
 
         return [
             'folders' => $folders,
+            'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
 }

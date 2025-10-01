@@ -1,17 +1,17 @@
 diff --git a/node_modules/element-plus/es/components/tooltip/src/content2.mjs b/node_modules/element-plus/es/components/tooltip/src/content2.mjs
-index b02ab74..9ba9119 100644
+index 00f7e8c..d4235dc 100644
 --- a/node_modules/element-plus/es/components/tooltip/src/content2.mjs
 +++ b/node_modules/element-plus/es/components/tooltip/src/content2.mjs
-@@ -64,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
+@@ -66,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
      const ariaHidden = ref(true);
      const onTransitionLeave = () => {
        onHide();
--      isFocusInsideContent() && tryFocus(document.body);
-+      isFocusInsideContent() && tryFocus(document.activeElement.parentElement);
+-      isFocusInsideContent() && focusElement(document.body, { preventScroll: true });
++      isFocusInsideContent() && focusElement(document.activeElement.parentElement, { preventScroll: true });
        ariaHidden.value = true;
      };
      const stopWhenControlled = () => {
-@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
+@@ -103,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
        var _a;
        const popperContent = (_a = contentRef.value) == null ? void 0 : _a.popperContentRef;
        const activeElement = (event == null ? void 0 : event.relatedTarget) || document.activeElement;

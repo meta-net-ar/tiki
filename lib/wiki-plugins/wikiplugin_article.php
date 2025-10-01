@@ -55,15 +55,12 @@ function wikiplugin_article($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $artlib = TikiLib::lib('art');
     $smarty = TikiLib::lib('smarty');
-
     extract($params, EXTR_SKIP);
 
     if (empty($Id)) {
         $Id = $artlib->get_most_recent_article_id();
     }
-    if (! isset($Field)) {
-        $Field = 'heading';
-    }
+
 
     if (
         $tiki_p_admin_cms == 'y' || $tikilib->user_has_perm_on_object($user, $Id, 'article', 'tiki_p_edit_article')

@@ -23,8 +23,16 @@ export function observeSelectElementMutations(select, elementPlusUi) {
                     $(elementPlusUi).removeAttr("is-invalid");
                 }
             } else if (mutation.attributeName) {
+                let attributeValue = mutation.target.getAttribute(mutation.attributeName);
                 const attributeName = mutation.attributeName.replace("data-", "");
-                $(elementPlusUi).attr(attributeName, mutation.target.getAttribute(mutation.attributeName));
+                // skip "display: none;" value in the style attribute change
+                if (mutation.attributeName === "style") {
+                    attributeValue = mutation.target
+                        .getAttribute(mutation.attributeName)
+                        .replace(/display:\s*none;?/g, "")
+                        .trim();
+                }
+                $(elementPlusUi).attr(attributeName, attributeValue);
             }
         });
     }).observe(select, { childList: true, attributes: true });

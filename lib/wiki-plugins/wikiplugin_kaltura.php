@@ -106,14 +106,6 @@ function wikiplugin_kaltura($data, $params)
 
     $instance++;
 
-    $defaults = [];
-    $plugininfo = wikiplugin_kaltura_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $defaults[$key] = $param['default'];
-        }
-    }
-
     if (empty($params['id'])) {
         $html = '<span class="alert-warning">' . tra('Media ID is required to display the video') . '</span>';
         return $html;
@@ -139,7 +131,6 @@ function wikiplugin_kaltura($data, $params)
     }
 
     $kalturalib = TikiLib::lib('kalturauser');
-    $params = array_merge($defaults, $params);
     $params['session'] = $kalturalib->getSessionKey();
     $params['media_url'] = $kalturalib->getMediaUrl($params['id'], $params['player_id']);
 

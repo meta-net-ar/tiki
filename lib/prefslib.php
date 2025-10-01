@@ -1000,6 +1000,10 @@ class PreferencesLib
         if (str_starts_with($name, 'trackerfield_')) {
             $pages[] = ['trackers', 3]; // trackerfields are also included in tracker admin dynamically
         }
+        if (str_starts_with($name, 'socnets_')) {
+            $pages[] = ['socialnetworks', 4]; // socnets preferences are used in social networks admin panels
+            $pages[] = ['socnets', 4];
+        }
 
         return $pages;
     }

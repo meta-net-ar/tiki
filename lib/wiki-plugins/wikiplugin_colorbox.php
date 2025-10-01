@@ -123,12 +123,6 @@ function wikiplugin_colorbox($data, $params)
 {
     global $user, $prefs, $base_url;
     static $iColorbox = 0;
-    $pluginInfo = wikiplugin_colorbox_info();
-    foreach ($pluginInfo['params'] as $key => $param) {
-        if (isset($param['default']) && ! isset($params[$key])) {
-            $params[$key] = $param['default'];
-        }
-    }
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
 

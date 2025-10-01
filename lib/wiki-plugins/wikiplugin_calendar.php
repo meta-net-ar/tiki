@@ -99,26 +99,9 @@ function wikiplugin_calendar($data, $params)
     if (empty($params['viewnavbar'])) {
         $params['viewnavbar'] = 'n';
     }
-
-    $slotDuration = '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT);
+    $pluginCalendarIds = implode(',', $params['calIds']);
 
     $rawcals = $calendarlib->list_calendars();
-    TikiLib::lib('header')
-        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-        ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
-    $rawcals['data'] = Perms::filter(
-        ['type' => 'calendar'],
-        'object',
-        $rawcals['data'],
-        [ 'object' => 'calendarId' ],
-        'view_calendar'
-    );
-
-    if (empty($rawcals['data'])) {
-        Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
-    }
-
-    $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $params['calIds']));
 
     switch ($params['viewmode']) {
         case 'week':
@@ -135,56 +118,24 @@ function wikiplugin_calendar($data, $params)
     }
     $viewstart = $_REQUEST['todate'] ?? $tikilib->now;
     $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
-    $listevents = $calendarlib->list_raw_items(
-        $params['calIds'],
-        $user,
-        $viewstart,
-        $viewend,
-        0,
-        -1
-    );
 
-    $listevents = Perms::filter(
-        ['type' => 'calendaritem'],
-        'object',
-        $listevents,
-        ['object' => 'calitemId'],
-        ['view_events']
-    );
     $defaultCalendarId = $params['calIds'][0];
     $calendars = [];
-    $canEditAnything = false;
 
-    foreach ($rawcals['data'] as $calendar) {
-        $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-        $calendars[$calendar['calendarId']] = $calendar;
-        // for week and day views
-        $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-        $startOfDayHour = $startOfDayUnix / 3600;
-        $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-        $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-        $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-        $endOfDayHour = $endOfDayUnix / 3600;
-        $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-        $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
-
-        $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-    }
-
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+    $calendarInitialParams['initialView'] = $initialView;
     $smarty->assign(
         'eventCalendarParams',
-        [
-            'firstDayofWeek'   => 0,//$firstDayofWeek,
-            'display_timezone' => $prefs['display_timezone'],
-            'language'         => $prefs['language'],
-            'minHourOfDay'     => $minHourOfDay,
-            'maxHourOfDay'     => $maxHourOfDay,
-            'slotDuration'     => $slotDuration,
-            'initialView'      => $initialView,
-            'initialDate'      => date("Y-m-d"),
-        ]
+        $calendarInitialParams
     );
 
+    if ($calendarInitialParams['canEditAnything']) {
+        TikiLib::lib('header')
+            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
+            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    }
+
+    $smarty->assign('pluginCalendarIds', $pluginCalendarIds);
     $smarty->assign('displayedcals', $params['calIds']);
     $thiscal = [];
     $checkedCalIds = [];

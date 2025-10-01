@@ -142,6 +142,7 @@ body.fullscreen.tiki.navbar-padding {
 
 .tiki .popover {
     p:last-child { margin-bottom: 0; }
+    z-index: 999999;
 }
 
 .tiki .popover {

@@ -22,7 +22,7 @@ function wikiplugin_img_info()
             'type' => [
                 'required' => true,
                 'name' => tra('Image Source'),
-                'description' => tra('Choose where to get the image from'),
+                'description' => tra('Choose where to get the image from (Useful only in the Plugin Helper GUI)'),
                 'since' => '11.0',
                 'doctype' => 'id',
                 'default' => '',
@@ -37,7 +37,7 @@ function wikiplugin_img_info()
                 ],
             ],
             'fileId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('File ID'),
                 'type' => 'image',
                 'area' => 'fgal_picker_id',
@@ -66,7 +66,7 @@ function wikiplugin_img_info()
                 'parentparam' => ['name' => 'type', 'value' => 'id'],
             ],
             'src' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Image Source'),
                 'description' => tra('Full URL to the image to display.'),
                 'since' => '3.0',
@@ -76,7 +76,7 @@ function wikiplugin_img_info()
                 'parentparam' => ['name' => 'type', 'value' => 'src'],
             ],
             'randomGalleryId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Gallery ID'),
                 'description' => tra('Numeric ID of a file gallery. Displays a random image from that gallery.'),
                 'since' => '5.0',
@@ -88,7 +88,7 @@ function wikiplugin_img_info()
                 'profile_reference' => 'file_gallery',
             ],
             'fgalId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('File Gallery ID'),
                 'description' => tra('Numeric ID of a file gallery. Displays all images from that gallery.'),
                 'since' => '8.0',
@@ -100,7 +100,7 @@ function wikiplugin_img_info()
                 'profile_reference' => 'file_gallery',
             ],
             'attId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Attachment ID'),
                 'description' => tr(
                     'Numeric ID of an image attached to a wiki page (or a comma- or %0-separated list).',
@@ -613,14 +613,6 @@ function wikiplugin_img($data, $params)
     $imgdata['checkItemPerms']  = 'y';  // ditto
     $imgdata['noDrawIcon']  = 'y';
 
-    $pluginInfo = wikiplugin_img_info();
-    $skipDefaultAssignmentKeys = ['id', 'quality', 'lazyLoad', 'absoluteLinks'];
-    foreach ($pluginInfo['params'] as $key => $param) {
-        if (isset($param['default']) && ! isset($imgdata["$key"])  && ! in_array($key, $skipDefaultAssignmentKeys)) {
-            $imgdata["$key"] = $param['default'];
-        }
-    }
-
     $params = array_map(function ($param) {
         return str_replace('"', '&quot;', $param);
     }, $params);
@@ -640,18 +632,6 @@ function wikiplugin_img($data, $params)
         //apply mandatory settings, overriding user settings
         if (! empty($imgdata['mandatory'])) {
             $imgdata = apply_default_and_mandatory($imgdata, 'mandatory');
-        }
-    }
-
-    // Before it was possible to specify many image types at once and Tiki will guess which one to use.
-    // Now there is "type" field that clearly identifies image type.
-    // Code below leaves image param that is related to "type", removing all others,  this way code is not confused if
-    // several parameters are passed
-    if (! empty($imgdata['type'])) {
-        foreach ($pluginInfo['params']['type']['options'] as $type) {
-            if (! empty($type['value']) && $type['value'] != $imgdata['type'] && ! empty($imgdata[$type['value']])) {
-                $imgdata[$type['value']] = null;
-            }
         }
     }
 
@@ -692,6 +672,7 @@ function wikiplugin_img($data, $params)
         unset($params['id']);
     }
 
+
     //////////////////////////////////////////////////// Error messages and clean javascript //////////////////////////////
     // Must set at least one image identifier
     $set = ! empty($imgdata['fileId']) + ! empty($imgdata['src']) + ! empty($imgdata['attId'])
@@ -699,19 +680,40 @@ function wikiplugin_img($data, $params)
     if ($set == 0) {
         return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('No image specified. One of the following parameters must be set: fileId, randomGalleryId, fgalId, attId or src.'));
     } elseif ($set > 1) {
-        return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('Use one and only one of the following parameters: fileId, randomGalleryId, fgalId, attId or src.'));
+        // Image source handling policy:
+        // If multiple image sources are provided (src, fileId, attId, fgalId, randomGalleryId),
+        // automatically select the first non-empty source in the defined priority order.
+        // After saving, display a warning message
+        // All other sources are ignored to avoid ambiguity.
+        $chosenSource = null;
+        $repeated = [];
+        foreach ($pluginInfo['params']['type']['options'] as $type) {
+            $key = $type['value'];
+            if (! empty($imgdata[$key])) {
+                $repeated[] = $key;
+                if (! empty($chosenSource)) {
+                    $imgdata[$key] = null;
+                } else {
+                    $chosenSource = $key;
+                }
+            }
+        }
+        $warningMessage = tr(
+            'Plugin Image: Multiple image sources detected (%0) . Only one is allowed. Using the first defined: %1',
+            implode(',', $repeated),
+            $chosenSource
+        );
+        Feedback::warning($warningMessage);
     }
     // Clean up src URLs to exclude javascript
-    $imgdata['src'] = $imgdata['src'] ?? '';
-    $imgdata['src'] = str_replace(' ', '', $imgdata['src']);
-    if (stristr($imgdata['src'], 'javascript:')) {
-        $imgdata['src'] = '';
-    }
-    if (str_contains($imgdata['src'], 'javascript:')) {
-        $imgdata['src']  = '';
+    if (! empty($imgdata['src'])) {
+        $imgdata['src'] = str_replace(' ', '', $imgdata['src']);
+        if (stristr($imgdata['src'], 'javascript:')) {
+            $imgdata['src'] = '';
+        }
     }
 
-    if (! isset($data) or ! $data) {
+    if (empty($data)) {
         $data = '&nbsp;';
     }
 
@@ -751,7 +753,7 @@ function wikiplugin_img($data, $params)
             $params[$id] = trim($value);
             $params['fgalId'] = '';
             $params['type'] = $id;
-            $pluginResult = wikiplugin_img($data, $params);
+            $pluginResult = TikiLib::lib('parser')->invokePlugin('img', $data, $params);
             $repl .= WikiPlugin_Helper::resultString($pluginResult);
         }
         if (str_contains($repl, $notice)) {
@@ -791,7 +793,16 @@ function wikiplugin_img($data, $params)
         $imgdata['file'] = \Tiki\FileGallery\File::id($imgdata['fileId']);
     }
 
-    if (empty($imgdata['src'])) {
+    if (! empty($imgdata['src'])) {
+        if ($absolute_links && ! preg_match('|^[a-zA-Z]+:\/\/|', $imgdata['src'])) {
+            global $base_host, $url_path;
+            $src = $base_host . ( $imgdata['src'][0] == '/' ? '' : $url_path ) . $imgdata['src'];
+        } elseif ($tikidomain && ! preg_match('|^https?:|', $imgdata['src'])) {
+            $src = preg_replace("~" . DEPRECATED_IMG_WIKI_UP_PATH . " /~", DEPRECATED_IMG_WIKI_UP_PATH . "/$tikidomain/", $imgdata['src']);
+        } else {
+            $src = $imgdata['src'];
+        }
+    } else {
         if (! empty($imgdata['fileId'])) {
             $src = smarty_modifier_sefurl($imgdata['fileId'], 'file');
 
@@ -803,13 +814,6 @@ function wikiplugin_img($data, $params)
         } else {                    //only attachments left
             $src = $attachpath . $imgdata['attId'];
         }
-    } elseif ($absolute_links && ! preg_match('|^[a-zA-Z]+:\/\/|', $imgdata['src'])) {
-        global $base_host, $url_path;
-        $src = $base_host . ( $imgdata['src'][0] == '/' ? '' : $url_path ) . $imgdata['src'];
-    } elseif ($tikidomain && ! preg_match('|^https?:|', $imgdata['src'])) {
-        $src = preg_replace("~" . DEPRECATED_IMG_WIKI_UP_PATH . " /~", DEPRECATED_IMG_WIKI_UP_PATH . "/$tikidomain/", $imgdata['src']);
-    } else {
-        $src = $imgdata['src'];
     }
 
     $browse_full_image = $src;

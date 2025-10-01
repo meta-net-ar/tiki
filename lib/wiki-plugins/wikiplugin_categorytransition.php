@@ -45,10 +45,9 @@ function wikiplugin_categorytransition_info()
 function wikiplugin_categorytransition($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
-
     extract($params, EXTR_SKIP);
 
-    if (empty($params['objType'] || $params['objId'])) {
+    if (empty($objType) || empty($objId)) {
         Feedback::error(tra('The parameter objType and/or objId are missing'));
         return;
     }

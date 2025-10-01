@@ -50,7 +50,7 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
      */
     public function testWikiPluginTranslationOf($data, $expectedOutput, $params = [], $message = ""): void
     {
-        $this->assertEquals($expectedOutput, wikiplugin_translationof($data, $params), $message);
+        $this->assertEquals($expectedOutput, TikiLib::lib('parser')->invokePlugin('translationof', $data, $params), $message);
     }
 
     public static function provider(): array

@@ -19,7 +19,7 @@ $inputConfiguration = [
             'where' => 'word',
             'how' => 'word',
             'words' => 'striptags',
-            'sort_mode' => 'word',
+            'sort_mode' => 'alnumdash',
         ],
     ]
 ];

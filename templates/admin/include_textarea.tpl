@@ -431,7 +431,7 @@
                                 {elseif $token eq '__NEW__'}
                                     <div class="mb-3 row d-none param">
                                         <div class="col-sm-6">
-                                            <input class="form-control sparam-name d-none" type="text" name="sparams[__NEW__][token]" value="" placeholder="{tr}Name{/tr}">
+                                            <input class="form-control sparam-name d-none" type="text" name="sparams[__NEW__][token]" value="" placeholder="{tr}Name{/tr}" data-required="true">
                                         </div>
                                         <div class="col-sm-5">
                                             <input class="form-control sparam-default d-none" type="text" name="sparams[__NEW__][default]" value="" placeholder="{tr}Default Value{/tr}">
@@ -458,7 +458,7 @@
                                             {tr}Parameter{/tr}
                                         </label>
                                         <div class="col-sm-7">
-                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="input[{$token|escape}][token]" id="input[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
+                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="input[{$token|escape}][token]" id="input[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}" data-required="true">
                                         </div>
                                         <div class="col-sm-1">
                                             {icon name='delete' class='text-danger delete-param tips btn btn-link' title="{tr}Delete this parameter's documentation{/tr}"}
@@ -469,7 +469,7 @@
                                             {tr}Name{/tr}
                                         </label>
                                         <div class="col-sm-8">
-                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="input[{$token|escape}][name]" id="input[{$token|escape}][name]" value="{$detail.name|escape}">
+                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="input[{$token|escape}][name]" id="input[{$token|escape}][name]" value="{$detail.name|escape}" data-required="true">
                                         </div>
                                     </div>
                                     <div class="mb-3 row">
@@ -543,7 +543,7 @@
                                                 {tr}Parameter{/tr}
                                             </label>
                                             <div class="col-sm-5">
-                                                <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="bodyparam[{$token|escape}][token]" id="bodyparam[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
+                                                <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="bodyparam[{$token|escape}][token]" id="bodyparam[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}" data-required="true">
                                             </div>
                                             <div class="col-sm-1">
                                                 {icon name='delete' class='text-danger delete-param tips btn btn-link' title="{tr}Delete this body parameter{/tr}"}

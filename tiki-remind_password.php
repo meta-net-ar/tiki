@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\BruteForce\BruteForce;
+
 require_once('tiki-setup.php');
 $access->check_feature('forgotPass');
 $smarty->assign('showmsg', 'n');
@@ -24,6 +26,12 @@ if (isset($_REQUEST["user"])) {
         Feedback::errorAndDie(tra("Invalid username or activation code. Maybe this code has already been used."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
+
+// Initialize BruteForce for later use
+if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+    $bruteForce = new BruteForce();
+}
+
 if (isset($_REQUEST["remind"])) {
     // Duration before the password reset link becomes invalid
     $resetTime = $prefs['resetpasswordlink_expiry'];
@@ -50,6 +58,20 @@ if (isset($_REQUEST["remind"])) {
             $smarty->assign('showfrm', 'n');
 
             $smarty->assign('msg', $emailResetMessage);
+
+            // Check bruteforce protection for failed username attempt
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                if (! $bruteForce->isOperationAllowed('forgot_password', ['ip' => $tikilib->get_ip_address()])) {
+                    $nextAllowedTime = $bruteForce->getNextAllowedTime('forgot_password', ['ip' => $tikilib->get_ip_address()]);
+                    $waitTime = $nextAllowedTime - time();
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many forgot password attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many forgot password attempts. Please try again in %d seconds.'), $waitTime);
+                    }
+                    $smarty->assign('msg', $waitMessage);
+                }
+            }
         } else {
             $info = $userlib->get_user_info($_REQUEST["name"]);
             if (empty($info['email'])) { //only renew if i can mail the pass
@@ -70,6 +92,20 @@ if (isset($_REQUEST["remind"])) {
             $smarty->assign('showfrm', 'n');
 
             $smarty->assign('msg', $emailResetMessage);
+
+            // Check bruteforce protection for failed email attempt
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                if (! $bruteForce->isOperationAllowed('forgot_password', ['ip' => $tikilib->get_ip_address()])) {
+                    $nextAllowedTime = $bruteForce->getNextAllowedTime('forgot_password', ['ip' => $tikilib->get_ip_address()]);
+                    $waitTime = $nextAllowedTime - time();
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many forgot password attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many forgot password attempts. Please try again in %d seconds.'), $waitTime);
+                    }
+                    $smarty->assign('msg', $waitMessage);
+                }
+            }
         }
     } else {
         $showmsg = 'e';

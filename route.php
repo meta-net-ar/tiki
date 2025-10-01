@@ -104,6 +104,13 @@ function tiki_route($path)
 
     tiki_route_attempt_prefix('faq', 'tiki-view_faq.php', 'faqId');
     tiki_route_attempt_prefix('file', 'tiki-list_file_gallery.php', 'galleryId');
+    tiki_route_attempt(
+        '|^filedetails(\d+)-(\d+)$|',
+        'tiki-list_file_gallery.php',
+        function ($parts) {
+            return ['galleryId' => $parts[1], 'fileId' => $parts[2], 'view' => 'page'];
+        }
+    );
     tiki_route_attempt_prefix('forum', 'tiki-view_forum.php', 'forumId');
     tiki_route_attempt('|^forumthread(\d+)(\-.*)?$|', 'tiki-view_forum_thread.php', tiki_route_single(1, 'comments_parentId'));
     tiki_route_attempt_prefix(
@@ -134,12 +141,29 @@ function tiki_route($path)
     tiki_route_attempt_prefix('newsletter', 'tiki-newsletters.php', 'nlId', ['info' => '1']);
     tiki_route_attempt_prefix('nl', 'tiki-newsletters.php', 'nlId', ['info' => '1']);
     tiki_route_attempt_prefix('poll', 'tiki-poll_form.php', 'pollId');
+    tiki_route_attempt_prefix('pollresults', 'tiki-poll_results.php', 'pollId');
     tiki_route_attempt_prefix('quiz', 'tiki-take_quiz.php', 'quizId');
     tiki_route_attempt_prefix('survey', 'tiki-take_survey.php', 'surveyId');
     tiki_route_attempt_prefix('tracker', 'tiki-view_tracker.php', 'trackerId');
     tiki_route_attempt_prefix('trackerfields', 'tiki-admin_tracker_fields.php', 'trackerId');
     tiki_route_attempt_prefix('sheet', 'tiki-view_sheets.php', 'sheetId');
     tiki_route_attempt_prefix('user', 'tiki-user_information.php', 'userId');
+    tiki_route_attempt(
+        '|^profile-(.+)$|',
+        'tiki-user_information.php',
+        function ($parts) {
+            return ['view_user' => urldecode($parts[1])];
+        }
+    );
+
+    tiki_route_attempt(
+        '|^assign-user-(.+)$|',
+        'tiki-assignuser.php',
+        function ($parts) {
+            return ['assign_user' => urldecode($parts[1])];
+        }
+    );
+    tiki_route_attempt_prefix('item', 'tiki-view_tracker_item.php', 'itemId');
     tiki_route_attempt('|^userinfo$|', 'tiki-view_tracker_item.php', function () {
         return ['view' => ' user'];
     });

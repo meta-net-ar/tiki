@@ -143,6 +143,33 @@
 
                 {preference name=http_header_content_type_options}
 
+                {preference name=http_header_access_control_allow_credentials}
+
+                {preference name=http_header_access_control_allow_methods}
+                <div class="adminoptionboxchild" id="http_header_access_control_allow_methods_childcontainer">
+                    {preference name=http_header_access_control_allow_methods_value}
+                </div>
+
+                {preference name=http_header_access_control_allow_headers}
+                <div class="adminoptionboxchild" id="http_header_access_control_allow_headers_childcontainer">
+                    {preference name=http_header_access_control_allow_headers_value}
+                </div>
+
+                {preference name=http_header_cross_origin_embedder_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_embedder_policy_childcontainer">
+                    {preference name=http_header_cross_origin_embedder_policy_value}
+                </div>
+
+                {preference name=http_header_cross_origin_resource_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_resource_policy_childcontainer">
+                    {preference name=http_header_cross_origin_resource_policy_value}
+                </div>
+
+                {preference name=http_header_cross_origin_opener_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_opener_policy_childcontainer">
+                    {preference name=http_header_cross_origin_opener_policy_value}
+                </div>
+
                 {preference name=http_header_content_security_policy}
                 <div class="adminoptionboxchild" id="http_header_content_security_policy_childcontainer">
                     {preference name=http_header_content_security_policy_value}
@@ -194,12 +221,6 @@
             </div>
 
             {preference name=feature_comments_moderation}
-            {preference name=comments_akismet_filter}
-            <div class="adminoptionboxchild" id="comments_akismet_filter_childcontainer">
-                {preference name=comments_akismet_apikey}
-                {preference name=comments_akismet_check_users}
-            </div>
-
             {preference name=useRegisterPasscode}
             <div class="adminoptionboxchild" id="useRegisterPasscode_childcontainer">
                 {preference name=registerPasscode}
@@ -503,6 +524,15 @@
             <div class="adminoptionboxchild" id="auth_webhooks_childcontainer">
                 {service_inline controller=webhook action=list}
             </div>
+        {/tab}
+        {tab name='{tr}Attack Protection{/tr}' key='attack_protection'}
+            <fieldset>
+                <legend class="h3">{tr}Brute Force Protection{/tr}</legend>
+                {preference name=bruteforce_protection}
+                {preference name=bruteforce_initial_delay}
+                {preference name=bruteforce_growth_rate}
+                {preference name=bruteforce_forget_time}
+            </fieldset>
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

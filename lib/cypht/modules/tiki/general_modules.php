@@ -494,7 +494,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
             if (isset($this->request->post['tracker_id'])) {
                 $searchArgs['field_id'] = $this->request->post['field_id'];
             }
-            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs, avoidSubQueries: $this->request->post['is_manual_search'] ?? false));
+            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs));
             return;
         }
 

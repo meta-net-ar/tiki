@@ -1773,6 +1773,7 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Webservices','tiki-admin_webservices.php',1280,'feature_webservices','tiki_p_admin_webservices','', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','References','tiki-references.php',255,'feature_wiki,feature_references','tiki_p_edit_references','', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'Custom Routes', 'tiki-admin_routes.php', 1290, 'feature_sefurl_routes', 'tiki_p_admin', '', 0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'Queued Tasks', 'tiki-admin_queued_tasks.php', 1271, 'feature_queued_tasks', 'tiki_p_admin', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Webauthn', 'tiki-webauthn.php', 1300, 'auth_webauthn_enabled', '', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Tiki Share','tiki-ajax_services.php?controller=share&action=index', 47, 'feature_share', '', 'Registered', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'List Shared URLs','tiki-ajax_services.php?controller=share&action=index', 49, 'feature_share', '', 'Registered', 0);
@@ -3004,7 +3005,7 @@ CREATE TABLE `users_users` (
   `valid` varchar(32) default NULL,
   `unsuccessful_logins` int(14) default 0,
   `waiting` char(1) default NULL,
-  `twoFactorSecret` varchar(16) default NULL,
+  `twoFactorSecret` varchar(32) default NULL,
   `last_mfa_date` bigint DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
@@ -4087,6 +4088,34 @@ CREATE TABLE `tiki_custom_color_modes` (
 ) ENGINE=MyISAM;
 
 INSERT INTO `tiki_custom_color_modes` (`name`, `icon`) VALUES ('light', 'sun'), ('dark','moon'), ('auto', 'circle-half');
+
+DROP TABLE IF EXISTS `tiki_bruteforce_attempts`;
+CREATE TABLE `tiki_bruteforce_attempts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `operation` VARCHAR(50) NOT NULL,
+  `properties` TEXT NOT NULL,
+  `properties_hash` CHAR(64) NOT NULL,
+  `attempt_time` bigint NOT NULL,
+  `attempt_count` INT NOT NULL,
+  INDEX `idx_operation_hash` (`operation`, `properties_hash`),
+  INDEX `idx_attempt_time` (`attempt_time`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `tiki_queued_tasks`;
+CREATE TABLE `tiki_queued_tasks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `owner` INT(11) NOT NULL,
+  `type` VARCHAR(20) NOT NULL,
+  `params` LONGTEXT NULL DEFAULT NULL,
+  `status` ENUM('Pending','InProgress','Completed','Failed') NOT NULL DEFAULT 'Pending',
+  `result` LONGTEXT NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `started_at` TIMESTAMP NULL DEFAULT NULL,
+  `ended_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_status` (`status`),
+  INDEX `idx_owner` (`owner`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_webauthn_credentials`;
 CREATE TABLE `tiki_webauthn_credentials` (

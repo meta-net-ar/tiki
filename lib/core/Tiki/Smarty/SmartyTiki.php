@@ -285,7 +285,36 @@ class SmartyTiki extends Smarty
             } else {
                 $content_type_options = $prefs['http_header_content_type_options'];
             }
-
+            if (! isset($prefs['http_header_access_control_allow_credentials'])) {
+                $access_control_allow_credentials = false;
+            } else {
+                $access_control_allow_credentials = $prefs['http_header_access_control_allow_credentials'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_methods'])) {
+                $access_control_allow_methods = false;
+            } else {
+                $access_control_allow_methods = $prefs['http_header_access_control_allow_methods'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_headers'])) {
+                $access_control_allow_headers = false;
+            } else {
+                $access_control_allow_headers = $prefs['http_header_access_control_allow_headers'];
+            }
+            if (! isset($prefs['http_header_cross_origin_embedder_policy'])) {
+                $cross_origin_embedder_policy = false;
+            } else {
+                $cross_origin_embedder_policy = $prefs['http_header_cross_origin_embedder_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_resource_policy'])) {
+                $cross_origin_resource_policy = false;
+            } else {
+                $cross_origin_resource_policy = $prefs['http_header_cross_origin_resource_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_opener_policy'])) {
+                $cross_origin_opener_policy = false;
+            } else {
+                $cross_origin_opener_policy = $prefs['http_header_cross_origin_opener_policy'];
+            }
             if (! isset($prefs['http_header_content_security_policy'])) {
                 $content_security_policy = false;  // prevent smarty E_NOTICE
             } else {
@@ -314,6 +343,73 @@ class SmartyTiki extends Smarty
             }
             if ($content_type_options == 'y') {
                 header('X-Content-Type-Options: nosniff');
+            }
+            if ($access_control_allow_credentials === 'y') {
+                header('Access-Control-Allow-Credentials: true');
+            }
+            if ($access_control_allow_methods === 'y') {
+                $header_value = trim($prefs['http_header_access_control_allow_methods_value']);
+                if ($access_control_allow_credentials === 'y' && $header_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Methods when http_header_access_control_allow_credential is enabled"));
+                    header_remove('Access-Control-Allow-Methods');
+                } else {
+                    header('Access-Control-Allow-Methods: ' . $header_value);
+                }
+            }
+            if ($access_control_allow_headers === 'y') {
+                $headers_value = trim($prefs['http_header_access_control_allow_headers_value']);
+                if ($access_control_allow_credentials === 'y' && $headers_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Headers when Access-Control-Allow-Credentials is enabled."));
+                    header_remove('Access-Control-Allow-Headers');
+                } else {
+                    header('Access-Control-Allow-Headers: ' . $headers_value);
+                }
+            }
+            if ($cross_origin_embedder_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'])) {
+                    case 'require-corp':
+                        header('Cross-Origin-Embedder-Policy: require-corp');
+                        break;
+                    case 'credentialless':
+                        header('Cross-Origin-Embedder-Policy: credentialless');
+                        break;
+                    case 'unsafe-none':
+                    default:
+                        header_remove('Cross-Origin-Embedder-Policy');
+                        break;
+                }
+            }
+            if ($cross_origin_resource_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_resource_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Resource-Policy: same-origin');
+                        break;
+                    case 'same-site':
+                        header('Cross-Origin-Resource-Policy: same-site');
+                        break;
+                    case 'cross-origin':
+                        header('Cross-Origin-Resource-Policy: cross-origin');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($cross_origin_opener_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_opener_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Opener-Policy: same-origin');
+                        break;
+                    case 'same-origin-allow-popups':
+                        header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+                        break;
+                    case 'same-origin-plus-coep':
+                        header('Cross-Origin-Opener-Policy: same-origin-plus-coep');
+                        break;
+                    case 'unsafe-none':
+                    default:
+                        header_remove('Cross-Origin-Opener-Policy');
+                        break;
+                }
             }
             if ($content_security_policy == 'y') {
                 $header_value = $prefs['http_header_content_security_policy_value'];

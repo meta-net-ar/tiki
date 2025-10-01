@@ -188,6 +188,45 @@ if ($prefs['smarty_enable_string_eval'] == 'y') {
         'message' => $risky_message
     ];
 }
+
+
+function rebuild_security_database_logic()
+{
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(0);
+
+    global $tikilib;
+
+    require_once('lib/setup/twversion.class.php');
+    $version = new TWVersion();
+    $current_version = $version->version;
+
+    $tikilib->query("TRUNCATE TABLE `tiki_secdb`");
+
+    $query = "INSERT IGNORE INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`, `severity`) VALUES (?, ?, ?, 0)";
+    $allowed_extensions = ['php', 'js', 'tpl', 'css', 'sql'];
+
+    $directory = new RecursiveDirectoryIterator('.', RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::UNIX_PATHS);
+    $iterator = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::LEAVES_ONLY);
+
+    foreach ($iterator as $file) {
+        if ($file->isDir()) {
+            continue;
+        }
+
+        $ext = strtolower($file->getExtension());
+        if (in_array($ext, $allowed_extensions)) {
+            $pathname = './' . $file->getPathname();
+            if (substr($pathname, 0, 4) === '././') {
+                $pathname = substr($pathname, 2);
+            }
+
+            $md5val = md5_file($file->getPathname());
+            $tikilib->query($query, [$pathname, $md5val, $current_version]);
+        }
+    }
+}
+
 // Check if any of the mail-in accounts uses "Allow anonymous access"
 if ($prefs['feature_mailin'] == 'y') {
     $mailinlib = TikiLib::lib('mailin');
@@ -295,15 +334,39 @@ $secdb_severity = [
     //4000 File upload
     4000 => tra('File upload')
 ];
-// dir walk & check functions
-/**
- * @param $dir
- * @param $result
- * @param $vcs_diff
- */
+
+function fast_check_dir($dir, &$result)
+{
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(0);
+
+    global $tikilib;
+
+    $query = "select count(*) from `tiki_secdb` where `filename`=?";
+    $d = dir($dir);
+    while (false !== ($e = $d->read())) {
+        $entry = $dir . '/' . $e;
+        if (is_dir($entry)) {
+            if ($e != '..' && $e != '.' && $entry != './' . SMARTY_COMPILED_TEMPLATES_PATH && $entry != './' . TEMP_PATH) {
+                fast_check_dir($entry, $result);
+            }
+        } elseif (preg_match('/\.(sql|css|tpl|js|php)$/', $e)) {
+            if (! is_readable($entry)) {
+                $result[$entry] = ['status' => 'error', 'message' => tra('File is not readable. Unable to check.')];
+            } else {
+                $count = $tikilib->getOne($query, [$entry]);
+                if ($count == 0) {
+                    $result[$entry] = ['status' => 'error', 'message' => tra('This is not a recognized Tiki file. It may have been added maliciously.')];
+                }
+            }
+        }
+    }
+    $d->close();
+}
+
 function md5_check_dir($dir, &$result, $vcs_diff = [])
 {
- // save all suspicious files in $result
+// save all suspicious files in $result
     global $tikilib, $tiki_versions;
     $c_tiki_versions = count($tiki_versions);
     $query = "select * from `tiki_secdb` where `filename`=?";
@@ -316,14 +379,14 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
             }
         } elseif (preg_match('/\.(sql|css|tpl|js|php)$/', $e)) {
             if (! is_readable($entry)) {
-                $result[$entry] = tra('File is not readable. Unable to check.');
+                $result[$entry] = ['status' => 'error', 'message' => tra('File is not readable. Unable to check.')];
             } else {
                 $md5val = md5_file($entry);
                 $dbresult = $tikilib->query($query, [$entry]);
                 $is_tikifile = false;
                 $is_tikiver = [];
                 $valid_tikiver = [];
-                // we could avoid the following with a second sql, but i think, this is faster.
+
                 while ($res = $dbresult->FetchRow()) {
                     $is_tikifile = true; // we know the filename ... probably modified
                     if ($res['md5_value'] == $md5val) {
@@ -339,16 +402,16 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
                         }
                     }
                 }
+
                 if (! $is_tikifile) {
                     if ($vcs_diff && isset($vcs_diff[substr($entry, 2)]) && $vcs_diff[substr($entry, 2)] !== 'unversioned') {
-                        $result[$entry] = tra('This Tiki file differs from the VCS repository version. Check if this file was uploaded and if it is dangerous.');
+                        $result[$entry] = ['status' => 'error', 'message' => tra('This Tiki file differs from the VCS repository version. Check if this file was uploaded and if it is dangerous.')];
                     } else {
-                        $result[$entry] = tra('This is not a Tiki file. Check if this file was uploaded and if it is dangerous.');
+                        $result[$entry] = ['status' => 'error', 'message' => tra('This is not a Tiki file. Check if this file was uploaded and if it is dangerous.')];
                     }
                 } elseif (count($is_tikiver) == 0) {
-                    $result[$entry] = tra('This is a modified File. Cannot check version. Check if it is dangerous.');
+                    $result[$entry] = ['status' => 'error', 'message' => tra('This is a modified File. Cannot check version. Check if it is dangerous.')];
                 } else {
-                    // check if we have a most recent valid version
                     $most_recent = false;
                     for ($i = $c_tiki_versions; $i > 0; $i--) { // search $valid_tikiver top to down to find the most recent version
                         if (isset($valid_tikiver[$i])) {
@@ -358,9 +421,11 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
                             break;
                         }
                     }
-                    // use result of most_recent to decide
+
                     if (! $most_recent) {
-                        $result[$entry] = tra('This file is from another Tiki version: ') . implode(' ' . tra('or') . ' ', $is_tikiver);
+                        $result[$entry] = ['status' => 'warning', 'message' => tra('This file is from another Tiki version: ') . implode(' ' . tra('or') . ' ', $is_tikiver)];
+                    } else {
+                        $result[$entry] = ['status' => 'ok', 'message' => tra('OK')];
                     }
                 }
             }
@@ -368,8 +433,15 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
     }
     $d->close();
 }
-// if check installation is pressed, walk through all files and compute md5 sums
-if (isset($_POST['check_files'])) {
+
+if (isset($_POST['check_files_fast'])) {
+    $result = [];
+    fast_check_dir(".", $result);
+    $smarty->assign('filecheck', true);
+    $smarty->assign_by_ref('tikifiles', $result);
+}
+
+if (isset($_POST['check_files_deep'])) {
     global $tiki_versions;
     require_once('lib/setup/twversion.class.php');
     $version = new TWVersion();
@@ -386,7 +458,7 @@ if (isset($_POST['check_files'])) {
 
     $result = TikiLib::lib('tiki')->allocate_extra(
         'secdb_check',
-        function () use ($result, $git_diff) {
+        function () use (&$result, $git_diff) {
             md5_check_dir(".", $result, $git_diff);
             return $result;
         }
@@ -426,58 +498,81 @@ define('S_IXOTH', '1');
  */
 function check_dir_perms($dir, &$result)
 {
+    @ini_set('memory_limit', '512M');
+    @set_time_limit(0);
+
+    $excluded_dirs = [
+        './node_modules',
+        './vendor',
+        './temp',
+        './templates_c',
+        './img/wiki_up',
+        './files',
+    ];
     static $depth = 0;
     $depth++;
-    $d = dir($dir);
+    $d = @dir($dir);
+
+    if (! $d) {
+        $depth--;
+        return;
+    }
+
     while (false !== ($e = $d->read())) {
         $entry = $dir . '/' . $e;
         if ($e != '..' && ($e != '.' || $depth == 1)) {
-            $result[$entry]['w'] = is_writable($entry);
-            $result[$entry]['r'] = is_readable($entry);
-            $result[$entry]['t'] = filetype($entry);
-            $s = stat($entry);
-            if (function_exists('posix_getpwuid')) {
-                $t = posix_getpwuid($s['uid']);
-                $result[$entry]['u'] = $t['name'];
-                $t = posix_getgrgid($s['gid']);
-                $result[$entry]['g'] = $t['name'];
-            } else {
-                $result[$entry]['u'] = $s['uid'];
-                $result[$entry]['g'] = $s['gid'];
-            }
-            $m = (int)$s['mode'];
-            if ($m >= 32768) {
-                $m -= 32768; // clear file type indicators
-            }
-            if ($m >= 16384) {
-                $m -= 16384;
-            }
-            if ($m >= 8192) {
-                $m -= 8192;
-            }
-            if ($m >= 4096) {
-                $m -= 4096;
-            }
-            $result[$entry]['p'] = $m;
-            $result[$entry]['suid'] = ($m >= S_ISUID && ($m -= S_ISUID) >= 0);
-            $result[$entry]['sgid'] = ($m >= S_ISGID && ($m -= S_ISGID) >= 0);
-            $result[$entry]['sticky'] = ($m >= S_ISVTX && ($m -= S_ISVTX) >= 0);
-            $result[$entry]['ur'] = ($m >= S_IRUSR && ($m -= S_IRUSR) >= 0);
-            $result[$entry]['uw'] = ($m >= S_IWUSR && ($m -= S_IWUSR) >= 0);
-            $result[$entry]['ux'] = ($m >= S_IXUSR && ($m -= S_IXUSR) >= 0);
-            $result[$entry]['gr'] = ($m >= S_IRGRP && ($m -= S_IRGRP) >= 0);
-            $result[$entry]['gw'] = ($m >= S_IWGRP && ($m -= S_IWGRP) >= 0);
-            $result[$entry]['gx'] = ($m >= S_IXGRP && ($m -= S_IXGRP) >= 0);
-            $result[$entry]['or'] = ($m >= S_IROTH && ($m -= S_IROTH) >= 0);
-            $result[$entry]['ow'] = ($m >= S_IWOTH && ($m -= S_IWOTH) >= 0);
-            $result[$entry]['ox'] = ($m >= S_IXOTH && ($m -= S_IXOTH) >= 0);
-            if ($result[$entry]['t'] == 'dir' && $e != '.') {
-                check_dir_perms($entry, $result);
+            $result[$entry]['w'] = @is_writable($entry);
+            $result[$entry]['r'] = @is_readable($entry);
+            $result[$entry]['t'] = @filetype($entry);
+            $s = @stat($entry);
+
+            if ($s) {
+                if (function_exists('posix_getpwuid')) {
+                    $t = @posix_getpwuid($s['uid']);
+                    $result[$entry]['u'] = $t['name'] ?? $s['uid'];
+                    $t = @posix_getgrgid($s['gid']);
+                    $result[$entry]['g'] = $t['name'] ?? $s['gid'];
+                } else {
+                    $result[$entry]['u'] = $s['uid'];
+                    $result[$entry]['g'] = $s['gid'];
+                }
+                $m = (int)$s['mode'];
+                if ($m >= 32768) {
+                    $m -= 32768;
+                }
+                if ($m >= 16384) {
+                    $m -= 16384;
+                }
+                if ($m >= 8192) {
+                    $m -= 8192;
+                }
+                if ($m >= 4096) {
+                    $m -= 4096;
+                }
+                $result[$entry]['p'] = $m;
+                $result[$entry]['suid'] = ($m >= S_ISUID && ($m -= S_ISUID) >= 0);
+                $result[$entry]['sgid'] = ($m >= S_ISGID && ($m -= S_ISGID) >= 0);
+                $result[$entry]['sticky'] = ($m >= S_ISVTX && ($m -= S_ISVTX) >= 0);
+                $result[$entry]['ur'] = ($m >= S_IRUSR && ($m -= S_IRUSR) >= 0);
+                $result[$entry]['uw'] = ($m >= S_IWUSR && ($m -= S_IWUSR) >= 0);
+                $result[$entry]['ux'] = ($m >= S_IXUSR && ($m -= S_IXUSR) >= 0);
+                $result[$entry]['gr'] = ($m >= S_IRGRP && ($m -= S_IRGRP) >= 0);
+                $result[$entry]['gw'] = ($m >= S_IWGRP && ($m -= S_IWGRP) >= 0);
+                $result[$entry]['gx'] = ($m >= S_IXGRP && ($m -= S_IXGRP) >= 0);
+                $result[$entry]['or'] = ($m >= S_IROTH && ($m -= S_IROTH) >= 0);
+                $result[$entry]['ow'] = ($m >= S_IWOTH && ($m -= S_IWOTH) >= 0);
+                $result[$entry]['ox'] = ($m >= S_IXOTH && ($m -= S_IXOTH) >= 0);
+
+                if ($result[$entry]['t'] == 'dir' && $e != '.' && ! in_array($entry, $excluded_dirs)) {
+                    check_dir_perms($entry, $result);
+                }
             }
         }
     }
+    $d->close();
     $depth--;
 }
+
 if (isset($_REQUEST['check_file_permissions'])) {
     $fileperms = [];
     check_dir_perms('.', $fileperms);
@@ -511,6 +606,20 @@ if (isset($_REQUEST['check_file_permissions'])) {
     $smarty->assign_by_ref('apachewritable', $apachewritable);
     $smarty->assign('permcheck', true);
 }
+
+if (isset($_POST['rebuild_secdb_confirmation'])) {
+    try {
+        rebuild_security_database_logic();
+        $access->redirect('tiki-admin_security.php?rebuild_status=success');
+    } catch (Exception $e) {
+        $smarty->assign('rebuild_error_message', tra('An error occurred during the database rebuild:') . ' ' . htmlspecialchars($e->getMessage()));
+    }
+}
+
+if (isset($_GET['rebuild_status']) && $_GET['rebuild_status'] === 'success') {
+    $smarty->assign('rebuild_success_message', tra('The security database has been successfully rebuilt.'));
+}
+
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $smarty->assign('mid', 'tiki-admin_security.tpl');

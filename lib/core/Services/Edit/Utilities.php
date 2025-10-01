@@ -92,7 +92,7 @@ class Services_Edit_Utilities
 
                 if ($plugin == 'include' && $params['replace'] == 1) {
                     include_once('lib/wiki-plugins/wikiplugin_include.php');
-                    $text = wikiplugin_include(null, $params);
+                    $text = TikiLib::lib('parser')->invokePlugin('include', null, $params);
                     $match->replaceWith($text);
                 } else {
                     $match->replaceWithPlugin($plugin, $params, $content);

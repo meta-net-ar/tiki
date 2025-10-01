@@ -246,12 +246,12 @@ class TikiLib extends TikiDb_Bridge
                 $config["proxy_user"] = $prefs['proxy_user'];
                 $config["proxy_pass"] = $prefs['proxy_pass'];
             }
-        } elseif (function_exists('curl_init') && $prefs['http_use_curl'] === 'y') {
+        } elseif (function_exists('curl_init') && ($prefs['http_use_curl'] ?? 'n') === 'y') {
             // Laminas\Http\Client defaults to sockets, which aren't allowed in all environments so use curl when available if selected
             $config['adapter'] = 'Laminas\Http\Client\Adapter\Curl';
         }
 
-        if ($prefs['http_sslverifypeer'] == 'y') {
+        if (($prefs['http_sslverifypeer'] ?? 'n') === 'y') {
             $config['sslverifypeer'] = true;
         } else {
             $config['sslverifypeer'] = false;

@@ -56,14 +56,6 @@ function wikiplugin_cookieconsent($body, $params)
         return $body;
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_cookieconsent_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $class = $params['element_class'];
 
     if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {

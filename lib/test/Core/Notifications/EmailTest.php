@@ -99,7 +99,7 @@ class EmailTest extends TestCase
 
         $this->assertEquals($messageId2, $headers2['Message-Id']);
         $this->assertEquals($messageId, $headers2['In-Reply-To']);
-        $this->assertEquals($md5Header . ' ' . $messageId, $headers2['References']);
+        $this->assertEquals($md5Header . ',' . $messageId, $headers2['References']);
 
         //3rd post in same thread (no reply):
         $messageId3 = '';
@@ -142,7 +142,7 @@ class EmailTest extends TestCase
 
         $this->assertEquals($messageId4, $headers4['Message-Id']);
         $this->assertEquals($messageId2, $headers4['In-Reply-To']);
-        $this->assertEquals($md5Header . ' ' . $messageId . ' ' . $messageId2, $headers4['References']);
+        $this->assertEquals($md5Header . ',' . $messageId . ',' . $messageId2, $headers4['References']);
     }
 
     /**
@@ -209,7 +209,7 @@ class EmailTest extends TestCase
 
         $this->assertEquals($messageId2, $headers2['Message-Id']);
         $this->assertEquals($messageId, $headers2['In-Reply-To']);
-        $this->assertEquals($md5Header . ' ' . $messageId, $headers2['References']);
+        $this->assertEquals($md5Header . ',' . $messageId, $headers2['References']);
 
         //3rd comment (no reply to other comment):
         $messageId3 = '';
@@ -251,6 +251,6 @@ class EmailTest extends TestCase
 
         $this->assertEquals($messageId4, $headers4['Message-Id']);
         $this->assertEquals($messageId2, $headers4['In-Reply-To']);
-        $this->assertEquals($md5Header . ' ' . $messageId . ' ' . $messageId2, $headers4['References']);
+        $this->assertEquals($md5Header . ',' . $messageId . ',' . $messageId2, $headers4['References']);
     }
 }

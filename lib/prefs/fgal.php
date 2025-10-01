@@ -434,6 +434,13 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'type' => 'flag',
             'default' => 'y',
         ],
+        'fgal_show_modtimedate' => [
+            'name' => tra('Show modification date and time'),
+            'shorthint' => tra('Displays both date and time for file modifications'),
+            'description' => tra('If checked, the modification date will be shown as date and time instead of just the date.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
         'fgal_show_path' => [
             'name' => tra('Show path'),
             'type' => 'flag',
@@ -720,11 +727,15 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'default' => 'y'
         ],
         'fgal_use_casperjs_to_export_images' => [
-            'name' => tra('Use locally CasperJS to export images'),
-            'description' => tra('If enabled, diagrams can be exported using CasperJS.'),
+            'name' => tra('Enable diagram image export (legacy CasperJS / Headless Chrome)'),
+            'description' => tra(
+                'If enabled, diagrams can be exported as images. Historically tied to CasperJS, this setting now also supports Headless Chrome. '
+            ) . ' <a href="https://doc.tiki.org/Browser+Automation#Common_Settings" target="_blank">'
+            . tra('Learn more...') . '</a>',
             'type' => 'flag',
             'default' => 'n',
             'packages_required' => ['jerome-breton/casperjs-installer' => 'CasperJsInstaller\Installer'],
+            'help' => tra('Browser Automation'),
         ],
         'fgal_use_drawio_services_to_export_images' => [
             'name' => tra('Use draw.io public services to export images'),

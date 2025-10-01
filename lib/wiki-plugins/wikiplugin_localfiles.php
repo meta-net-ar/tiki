@@ -60,12 +60,6 @@ function wikiplugin_localfiles($data, $params)
 {
     // TODO refactor: defaults for plugins?
     $smartylib = TikiLib::lib('smarty');
-    $defaults = [];
-    $plugininfo = wikiplugin_localfiles_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
     $files = [];
     if (! is_array($params['path'])) {
         if ($params['list'] === 'y' && file_exists($params['path']) && is_dir($params['path'])) {

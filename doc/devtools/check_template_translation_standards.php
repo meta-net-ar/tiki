@@ -18,6 +18,8 @@ $input = new ArgvInput();
 $file = $input->getParameterOption(['--file']);
 $all = $input->hasParameterOption(['--all']);
 $templates = getAllTemplateFiles($dir);
+$langDir = $dir . '/../../lang';
+$translationFiles = getAllTranslationFiles($langDir);
 
 if (empty($file) && empty($all)) {
     error('Params not found. ' . PHP_EOL . 'Valid params: --file [file], --all');
@@ -41,6 +43,23 @@ if (! empty($file)) {
         exit(1);
     } else {
         info(basename($file) . ' ' . color('OK', 'green'));
+    }
+}
+
+if (! empty($translationFiles)) {
+    $message = '';
+    foreach ($translationFiles as $file) {
+        $check = checkTranslationFile($file);
+        if (isset($check)) {
+            $message .= $check . PHP_EOL;
+        }
+    }
+    if (! empty($message)) {
+        info(color('The following translation files have issues in the following lines in red:', 'yellow'));
+        info(trim($message, PHP_EOL));
+        exit(1);
+    } else {
+        important('All translation files OK');
     }
 }
 
@@ -93,5 +112,60 @@ function check($file)
         if (! empty($lineNumber)) {
             return color($message . ':', 'blue') . color(substr($lineNumber, 0, -1), 'red');
         }
+    }
+}
+
+// Get all PHP translation files in the specified directory and its subdirectories
+function getAllTranslationFiles($dir)
+{
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir)
+    );
+
+    $files = [];
+    foreach ($iterator as $file) {
+        if ($file->isFile() && strtolower($file->getFilename()) === 'language.php') {
+            $files[] = $file->getPathname();
+        }
+    }
+
+    return $files;
+}
+
+function checkTranslationFile($file)
+{
+    if (! file_exists($file)) {
+        return null;
+    }
+
+    $message = realpath($file);
+    $lineNumber = '';
+    $fileHandler = fopen($file, "r");
+
+    if ($fileHandler) {
+        $i = 0;
+        while (($line = fgets($fileHandler)) !== false) {
+            $i++;
+            $lineTrim = trim($line);
+
+            // Skip empty lines and comment lines
+            if ($lineTrim === '' || str_starts_with($lineTrim, '//') || str_starts_with($lineTrim, '#')) {
+                continue;
+            }
+
+            // Ensure that key => value pairs use only double quotes.
+            // Invalid examples: 'key' => "value", "key" => 'value', 'key' => 'value'
+            // Only the correct format is: "key" => "value",
+            if (preg_match('/^(\s*)"[^"]*"\s*=>\s*"[^"]*"(?!,)\s*$/', $lineTrim) || preg_match('/(\'[^\']*\'\s*=>\s*".*?")|(".*?"\s*=>\s*\'[^\']*\')|(\'[^\']*\'\s*=>\s*\'[^\']*\')/', $lineTrim)) {
+                $lineNumber .= $i . ",";
+            }
+        }
+        fclose($fileHandler);
+    }
+
+    if (! empty($lineNumber)) {
+        // Remove trailing comma
+        $lineNumber = rtrim($lineNumber, ',');
+        return color($message . ':', 'blue') . color($lineNumber, 'red');
     }
 }

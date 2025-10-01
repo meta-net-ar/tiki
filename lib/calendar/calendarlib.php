@@ -140,6 +140,36 @@ class CalendarLib extends TikiLib
         return $retval;
     }
 
+    public function generalParamsOfCalendar($rawcalsData)
+    {
+        global $prefs;
+        $canEditAnything = false;
+        foreach ($rawcalsData as $calendar) {
+            $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
+            $calendars[$calendar['calendarId']] = $calendar;
+            // for week and day views
+            $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
+            $startOfDayHour = $startOfDayUnix / 3600;
+            $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
+            $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+            $endOfDayUnix = (int)($calendar['endday'] ?? 0);
+            $endOfDayHour = $endOfDayUnix / 3600;
+            $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
+            $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+            $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
+        }
+        return  [
+            'firstDayofWeek'   => 0,//$firstDayofWeek,
+            'display_timezone' => $prefs['display_timezone'],
+            'language'         => $prefs['language'],
+            'minHourOfDay'     => $minHourOfDay,
+            'maxHourOfDay'     => $maxHourOfDay,
+            'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
+            'initialDate'      => date("Y-m-d"),
+            'canEditAnything' => $canEditAnything,
+        ];
+    }
+
     /**
      * @param $name
      * @return mixed

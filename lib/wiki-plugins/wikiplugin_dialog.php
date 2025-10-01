@@ -183,17 +183,6 @@ function wikiplugin_dialog_info()
 
 function wikiplugin_dialog($data, $params)
 {
-
-    $defaults = [];
-    $plugininfo = wikiplugin_dialog_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default']) && ! isset($params[$key])) {
-            $params[$key] = $param['default'];
-        }
-    }
-
-    $params = array_merge($defaults, $params);
-
     // to avoid invisible stray spaces in class and action names.
     $buttonsLabel = array_map('trim', explode(',', $params['buttons']));
     $buttonsClasses = array_map('trim', explode(',', $params['buttonsClassNames']));

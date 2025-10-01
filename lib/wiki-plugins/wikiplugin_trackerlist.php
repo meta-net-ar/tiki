@@ -1054,16 +1054,6 @@ function wikiplugin_trackerlist($data, $params)
     $smarty->assign('iTRACKERLIST', $iTRACKERLIST);
 
     $default = [
-        'calendarfielddate' => '',
-        'wiki' => '',
-        'calendarviewmode' => 'month',
-        'calendarstickypopup' => 'n',
-        'calendarbeginmonth' => 'y',
-        'calendarviewnavbar' => 'y',
-        'calendartitle' => '',
-        'calendardelta' => '',
-        'calendarpopup' => 'y',
-        'force_compile' => 'n',
         'editable' => [],
         'editableall' => 'n',
     ];

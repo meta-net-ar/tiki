@@ -57,12 +57,6 @@ function wikiplugin_cclite($data, $params)
                 . '{REMARKSBOX}';
     }
 
-    $default = [ 'mode' => 'summary', 'registry' => '' ];
-    if (is_array($default['registry']) && ! empty($default['registry'])) {
-        $default['registry'] = $default['registry'][0];
-    }
-    $params = array_merge($default, $params);
-
     switch ($params['mode']) {
         case 'recent':
             $result = $cclitelib->cclite_send_request('recent');

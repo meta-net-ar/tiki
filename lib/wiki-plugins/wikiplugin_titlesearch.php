@@ -94,10 +94,9 @@ class WikiPluginTitleSearch extends PluginsLib
     }
     public function run($data, $params)
     {
-        $wikilib = TikiLib::lib('wiki');
         $tikilib = TikiLib::lib('tiki');
         $aInfoPreset = array_keys($this->aInfoPresetNames);
-        $exclude = ! empty($params['exclude']) ? $params['exclude'] : '';
+        $exclude = $params['exclude'] ?? '';
         $params = $this->getParams($params, true);
         extract($params, EXTR_SKIP);
         if (! $search) {

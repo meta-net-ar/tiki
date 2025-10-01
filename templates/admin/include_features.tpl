@@ -60,6 +60,7 @@
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
                     {preference name=feature_scheduler}
+                    {preference name=feature_queued_tasks}
                     {preference name=feature_banners}
                     {preference name=feature_contribution}
                     {preference name=feature_copyright}

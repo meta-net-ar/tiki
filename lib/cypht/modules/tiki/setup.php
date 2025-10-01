@@ -129,7 +129,8 @@ add_handler('message_list', 'check_path_redirect', true, 'core', 'load_user_data
 add_handler('compose', 'tiki_presave_sent', true, 'smtp', 'imap_save_sent', 'before');
 add_handler('compose', 'tiki_mark_as_answered', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 'after');
-add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
+add_handler('compose', 'tiki_delete_draft', true, 'tiki', 'tiki_save_sent', 'after');
+add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_delete_draft', 'after');
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_handler('compose', 'tiki_compose_from_draft', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
@@ -320,8 +321,9 @@ return [
     'lookup' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'tracker_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'sort_mode' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'limit' => FILTER_VALIDATE_INT,
     'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'auto_move' => FILTER_VALIDATE_BOOLEAN,
-    'is_manual_search' => FILTER_VALIDATE_BOOLEAN,
   ]
 ];

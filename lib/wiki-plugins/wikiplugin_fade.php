@@ -97,13 +97,7 @@ function wikiplugin_fade_info()
 function wikiplugin_fade($body, $params)
 {
     static $id = 0;
-    //set defaults
-    $plugininfo = wikiplugin_fade_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    //apply user parameter settings
-    $params = array_merge($default, $params);
+
     //validate speed parameters
     $params['show_speed'] = validate_speed($params['show_speed']);
     $params['hide_speed'] = validate_speed($params['hide_speed']);

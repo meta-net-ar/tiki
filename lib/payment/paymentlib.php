@@ -257,14 +257,11 @@ class PaymentLib extends TikiDb_Bridge
                     'tiki-payment.php',
                     [
                         'invoice' => $info['paymentRequestId'],
-                        'TOKEN' => wikiplugin_getaccesstoken(
-                            '',
-                            [
-                                'entry' => 'tiki-payment.php',
-                                'keys' => ['invoice'],
-                                'values' => [$info['paymentRequestId']]
-                            ]
-                        ),
+                        'TOKEN' => TikiLib::lib('parser')->invokePlugin('getaccesstoken', '', [
+                            'entry' => 'tiki-payment.php',
+                            'keys' => ['invoice'],
+                            'values' => [$info['paymentRequestId']]
+                        ]),
                     ]
                 );
             }

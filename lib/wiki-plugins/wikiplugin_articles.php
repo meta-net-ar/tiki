@@ -330,13 +330,22 @@ function wikiplugin_articles_info()
 
 function wikiplugin_articles($data, $params)
 {
-    global $prefs, $tiki_p_read_article, $tiki_p_articles_read_heading, $pageLang;
+    global $prefs, $pageLang;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
     $artlib = TikiLib::lib('art');
-    $default = ['max' => $prefs['maxRecords'], 'start' => 0, 'usePagination' => 'n', 'topicId' => '', 'topic' => '', 'sort' => 'publishDate_desc', 'type' => '', 'lang' => '', 'quiet' => 'n', 'categId' => '', 'largefirstimage' => 'n', 'urlparam' => '', 'actions' => 'n', 'translationOrphan' => '', 'headerLinks' => 'n', 'showtable' => 'n', 'useLinktoURL' => 'n'];
+
+    if (! isset($params['topic'])) {
+        $params['topic'] = '';
+    }
+    if (! isset($params['headerLinks'])) {
+        $params['headerLinks'] = 'n';
+    }
+    if (! isset($params['showtable'])) {
+        $params['showtable'] = 'n';
+    }
+
     $auto_args = ['lang', 'topicId', 'topic', 'sort', 'type', 'lang', 'categId'];
-    $params = array_merge($default, $params);
 
     extract($params, EXTR_SKIP);
     $filter = [];
@@ -347,13 +356,8 @@ function wikiplugin_articles($data, $params)
 
     $urlnext = '';
     if ($usePagination == 'y') {
-        //Set offset when pagniation is used
-        if (! isset($_REQUEST["offset"])) {
-            $start = 0;
-        } else {
-            $start = $_REQUEST["offset"];
-        }
-
+        //Set offset when pagination is used
+        $start = $_REQUEST["offset"] ?? 0;
         foreach ($auto_args as $arg) {
             if (! empty($$arg)) {
                 $paramsnext[$arg] = $$arg;
@@ -368,9 +372,6 @@ function wikiplugin_articles($data, $params)
     $smarty->assign_by_ref('urlnext', $urlnext);
     $smarty->assign_by_ref('useLinktoURL', $useLinktoURL);
 
-    if (! isset($containerClass)) {
-        $containerClass = 'wikiplugin_articles';
-    }
     $smarty->assign('container_class', $containerClass);
 
     $dateStartTS = 0;
@@ -378,47 +379,29 @@ function wikiplugin_articles($data, $params)
 
     // if a period of time is set, date start and end are ignored
     if (isset($periodQuantity)) {
-        switch ($periodUnit) {
-            case 'hour':
-                $periodUnit = 3600;
-                break;
-            case 'day':
-                $periodUnit = 86400;
-                break;
-            case 'week':
-                $periodUnit = 604800;
-                break;
-            case 'month':
-                $periodUnit = 2628000;
-                break;
-            default:
-                break;
-        }
+        $periodQuantity = match ($periodQuantity) {
+            'hour' => 3600,
+            'day' => 86400,
+            'week' => 604800,
+            'month' => 2628000,
+        };
 
         if (is_int($periodUnit)) {
             $dateStartTS = $tikilib->now - ($periodQuantity * $periodUnit);
             $dateEndTS = $tikilib->now;
         }
     } else {
-        if (isset($dateStart)) {
-            $dateStartTS = strtotime($dateStart);
-        }
-
-        if (isset($dateEnd)) {
-            $dateEndTS = strtotime($dateEnd);
-        }
+        $dateStartTS = strtotime($dateStart);
+        $dateEndTS = strtotime($dateEnd);
     }
 
-    if (isset($fullbody) && $fullbody == 'y') {
+    if ($fullbody == 'y') {
         $smarty->assign('fullbody', 'y');
     } else {
         $smarty->assign('fullbody', 'n');
         $fullbody = 'n';
     }
     $smarty->assign('largefirstimage', $largefirstimage);
-    if (! isset($overrideDates)) {
-        $overrideDates = 'n';
-    }
 
     if (! empty($translationOrphan)) {
         $filter['translationOrphan'] = $translationOrphan;
@@ -448,7 +431,7 @@ function wikiplugin_articles($data, $params)
 
     if (! is_array($categId) || count($categId) == 0) {
         $categIds = '';
-    } elseif (is_array($categId) && count($categId) == 1) {
+    } elseif (count($categId) == 1) {
         // For performance reasons, if there is only one value, the SQL query should not return IN () as it does with arrays
         // So we send a single value instead of a single-value array
         $categIds = $categId[0];
@@ -498,13 +481,6 @@ function wikiplugin_articles($data, $params)
     $topics = $artlib->list_topics();
     $smarty->assign_by_ref('topics', $topics);
 
-    if (empty($topicId)) {
-        $topicId = '';
-    }
-    if (empty($type)) {
-        $type = '';
-    }
-
     if (! empty($topic) && ! str_contains($topic, '!') && ! str_contains($topic, '+')) {
         $smarty->assign_by_ref('topic', $topic);
     } elseif (! empty($topicId) &&  is_numeric($topicId)) {
@@ -553,10 +529,9 @@ function wikiplugin_articles($data, $params)
     $smarty->assign_by_ref('actions', $actions);
     $smarty->assign('headerLinks', $headerLinks);
 
-    if (isset($titleonly) && $titleonly == 'y') {
+    if ($titleonly == 'y') {
         return "~np~ " . $smarty->fetch('tiki-view_articles-titleonly.tpl') . " ~/np~";
     } else {
         return "~np~ " . $smarty->fetch('tiki-view_articles.tpl') . " ~/np~";
     }
-    //return str_replace("\n","",$smarty->fetch('tiki-view_articles.tpl')); // this considers the hour in the header like a link
 }

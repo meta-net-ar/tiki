@@ -423,14 +423,6 @@ function wikiplugin_trackercalendar($data, $params)
         return WikiParser_PluginOutput::userError(tr('Fields not found.'));
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_trackercalendar_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
-
     $views = [];
     if ($params['amonth'] === 'y') {
         $views[] = 'dayGridMonth';

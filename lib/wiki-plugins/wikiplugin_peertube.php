@@ -114,7 +114,7 @@ function wikiplugin_peertube($data, $params)
         return '';
     }
 
-    $html = wikiplugin_oembed('', $params);
+    $html = TikiLib::lib('parser')->invokePlugin('oembed', '', $params);
 
     return trim($html, '~/np');
 }

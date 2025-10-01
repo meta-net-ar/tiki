@@ -166,31 +166,6 @@ class WikiPluginWantedPages extends PluginsLib
 
         // Grab and handle our Tiki parameters...
         extract($params, EXTR_SKIP);
-        if (! isset($ignore)) {
-            $ignore = '';
-        }
-        if (! isset($splitby)) {
-            $splitby = '+';
-        }
-        if (! isset($skipalias)) {
-            $skipalias = 1;
-        }
-        if (! isset($skipext)) {
-            $skipext = false;
-        }
-        if (! isset($debug)) {
-            $debug = false;
-        }
-        if (! isset($collect)) {
-            $collect = 'from';
-        }
-        if (! isset($table)) {
-            $table = 'sep';
-        }
-        if (! isset($level)) {
-            $level = '';
-        }
-
         // for regexes and external wiki details, see tikilib.php
         if ($level == 'strict') {
             $level_reg = '([A-Za-z0-9_])([\.: A-Za-z0-9_\-])*([A-Za-z0-9_])';

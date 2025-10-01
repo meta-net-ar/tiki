@@ -207,8 +207,11 @@ function wikiplugin_trackerfilter($data, $params)
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
     $iTrackerFilter++;
-    $default = ['noflipflop' => 'y', 'action' => 'Filter', 'line' => 'n', 'displayList' => 'n', 'export_action' => '',
-                     'export_itemid' => 'y', 'export_status' => 'n', 'export_created' => 'n', 'export_modif' => 'n', 'export_charset' => 'UTF-8', 'status' => 'opc', 'useCssTruncate' => 'n'];
+    $default = [
+        'action' => 'Filter',
+        'export_itemid' => 'y',
+        'status' => 'opc',
+    ];
 
     if (isset($_REQUEST['reset_filter'])) {
         wikiplugin_trackerFilter_reset_filters($iTrackerFilter);
@@ -381,7 +384,7 @@ function wikiplugin_trackerfilter($data, $params)
         $smarty->assign('urlquery', wikiplugin_trackerFilter_build_urlquery($params));
         include_once('lib/wiki-plugins/wikiplugin_trackerlist.php');
         $smarty->assign('useCssTruncate', $useCssTruncate);
-        $dataRes .= wikiplugin_trackerlist($data, $params);
+        $dataRes .= TikiLib::lib('parser')->invokePlugin('trackerlist', $data, $params);
     } else {
         $data = '';
     }

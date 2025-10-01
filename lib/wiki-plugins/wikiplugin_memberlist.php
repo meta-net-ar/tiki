@@ -171,13 +171,6 @@ function wikiplugin_memberlist($data, $params)
 
     $groups = (array)$params['groups'];
 
-    $defaults = [];
-    $plugininfo = wikiplugin_memberlist_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if ($prefs['feature_user_watches'] == 'y') {
         if (! empty($user)) {
             if (isset($_REQUEST['watch'])) {

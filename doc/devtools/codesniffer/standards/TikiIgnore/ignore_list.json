@@ -6730,6 +6730,7 @@
             "Search_Query_WikiBuilder::wpquery_pagination_sort_jsvar": true,
             "Search_Query_WikiBuilder::wpquery_pagination_sort_arg": true,
             "Search_Query_WikiBuilder::wpquery_pagination_max": true,
+            "Search_Query_WikiBuilder::wpquery_select_fields": true,
             "Search_Query_WikiBuilder::wpquery_group_boost": true,
             "Search_Query_WikiBuilder::wpquery_index_federated": true,
             "Search_Query_WikiBuilder::get_fields_from_arguments": true

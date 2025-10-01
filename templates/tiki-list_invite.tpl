@@ -1,30 +1,53 @@
 {title}{tr}Invitations list{/tr}{/title}
 
-<div class="t_avbar">
-    {button href="tiki-invite.php" class="btn btn-primary" _text="{tr}Invite{/tr}"}
-    {if $tiki_p_admin eq 'y'}{button href="tiki-adminusers.php" _text="{tr}Admin users{/tr}"}{/if}
+<div class="t_navbar mb-4">
+    {button href="tiki-invite.php" class="btn btn-primary" _type="link" _icon_name="group" _text="{tr}Invite{/tr}"}
+    {if $tiki_p_admin eq 'y'}
+        {button href="tiki-adminusers.php" class="btn btn-primary" _type="link" _icon_name="user" _text="{tr}Add Users{/tr}"}
+    {/if}
 </div>
 
+<hr>
+
 <div class="clearfix">
-    <form class="text-center" action="tiki-list_invite.php" method="post">
+    <form action="tiki-list_invite.php" method="post">
         {if $tiki_p_admin eq 'y'}
-            <label>
-                {tr}Inviter:{/tr}
-                <input type="text" name="inviter" value="{$inviter|escape}">
-            </label>
+            <div class="mb-3 row">
+                <label class="col-form-label col-sm-5" for="inviter">{tr}Inviter{/tr}</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inviter" name="inviter" value="{$inviter|escape}">
+                </div>
+            </div>
         {/if}
-        <label>
-            {tr}Only successful invitations:{/tr}
-            <input type="checkbox" name="only_success"{if $only_success eq 'y'} checked="checked"{/if}>
-        </label>
-        <label>
-            {tr}Only pending invitations:{/tr}
-            <input type="checkbox" name="only_pending"{if $only_pending eq 'y'} checked="checked"{/if}>
-        </label>
-        <br>
-        <input type="submit" class="btn btn-info btn-sm" name="filter" value="{tr}Filter{/tr}">
+
+        <div class="mb-3 row">
+            <div class="offset-sm-5 col-sm-7">
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" name="only_success" type="checkbox" {if $only_success eq 'y'} checked="checked"{/if}>{tr}Only successful invitations{/tr}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="offset-sm-5 col-sm-7">
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" name="only_pending" type="checkbox" {if $only_pending eq 'y'} checked="checked"{/if}>{tr}Only pending invitations{/tr}
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-sm-7 offset-sm-5">
+                <input type="submit" class="btn btn-primary btn-sm" name="filter" value="{tr}Filter{/tr}">
+            </div>
+        </div>
     </form>
 </div>
+
+<hr>
 
 {tr}Number of invitations:{/tr} {$count}
 {if $count > 0}

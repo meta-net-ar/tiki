@@ -171,7 +171,8 @@ function module_translation($mod_reference, $module_params)
             $smarty->assign('mod_translation_quantification', $numeric);
             $smarty->assign(
                 'mod_translation_gauge',
-                wikiplugin_gauge(
+                TikiLib::lib('parser')->invokePlugin(
+                    'gauge',
                     '',
                     [
                             'value' => $numeric,

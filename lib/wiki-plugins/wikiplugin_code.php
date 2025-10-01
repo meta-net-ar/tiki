@@ -139,8 +139,6 @@ function wikiplugin_code($data, $params)
     static $code_count;
 
     $defaults = [
-        'wrap' => '1',
-        'mediawiki' => '0',
         'ishtml' => false
     ];
 

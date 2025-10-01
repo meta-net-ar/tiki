@@ -371,7 +371,7 @@ if (isset($_REQUEST['export']) && isset($_REQUEST['export_type'])) {
     foreach ($toExport as $captionName => $export) {
         $export = preg_replace('/^---\n/', '', $export);
         $export = "{CODE(caption=>$captionName,wrap=>0)}\n" . $export . "{CODE}\n";
-        $export = wikiplugin_code($export, ['caption' => $captionName, 'colors' => 'tiki'], null, []);
+        $export = TikiLib::lib('parser')->invokePlugin('code', $export, ['caption' => $captionName, 'colors' => 'tiki']);
 
         $exportedContent[] = preg_replace('/~[\/]?np~/', '', $export);
     }

@@ -599,7 +599,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     /**
      * Get the tracker field object corresponding to this tracker item field object
      */
-    protected function getTrackerFieldInstance(): AbstractTrackerField
+    public function getTrackerFieldInstance(): AbstractTrackerField
     {
         return $this->trackerField;
     }
@@ -697,5 +697,17 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     public function removeValue($value)
     {
         return '';
+    }
+    /**
+     * Determines if a field, when marked as mandatory, should be validated
+     * on the client-side (in browser JavaScript).
+     *
+     * @return bool True if client-side validation should apply, false otherwise.
+     */
+    public function isClientSideMandatory(): bool
+    {
+        // By default, all mandatory fields are validated on the client side.
+        // Specific field types can override this behavior.
+        return true;
     }
 }

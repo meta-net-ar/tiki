@@ -170,13 +170,6 @@ function wikiplugin_googlechart($data, $params)
     $unique = 'wpdialog_' . ++$id;
     $headerlib = TikiLib::lib('header');
 
-    $defaults = [];
-    $plugininfo = wikiplugin_googlechart_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if ($id === 1 && (empty($params['credentials']) || ! is_readable($params['credentials']))) {
         return tra('googlechart: No credentials file.');
     }

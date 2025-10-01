@@ -1,0 +1,13 @@
+#!/bin/sh
+# commit message file path
+msg_file="$1"
+msg=$(cat "$msg_file")
+
+# regex Tiki tags
+regex='^(Revert:? \"?)?((\[(BP|DB|DOC|ENH|FIX|KIL|MOD|MRG|NEW|REF|REL|REM|SEC|TRA|UI|UPD|UX)\]){1,5} +[^\[\]: ]+( +[^\[\]: ]+)*(:( +[^\[\]: ]+)+)?|[^\[\]: ]+( +[^\[\]: ]+)*(:( +[^\[\]: ]+)+)?)\"?$'
+
+if ! echo "$msg" | grep -qP "$regex"; then
+  echo "❌ Error: your commit message is not properly formatted. It should start with at least one of the Tiki commit tags (e.g., [ENH], [FIX], [NEW], [UI][UX], …) and use spaces where appropriate."
+  echo "For details see: https://dev.tiki.org/Commit-Tags"
+  exit 1
+fi

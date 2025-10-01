@@ -550,7 +550,7 @@
                         {remarksbox type=confirm title="{if isset($smarty.post.update)}{tr}Upgrade complete{/tr}{else}{tr}Installation complete{/tr}{/if}" close="n"}
                             <p>{tr}Your database has been configured and Tiki is ready to run!{/tr}
                                 {if isset($smarty.post.scratch, $defaultpass)}
-                                    {tr _0="<strong>{$defaultpass}</strong>"}Your default administrator password is %0.{/tr}
+                                    {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
                                 {/if}
                                 {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                             </p>
@@ -894,7 +894,7 @@
 
                     <p>
                         {if $install_type eq 'scratch' && isset($defaultpass)}
-                            {tr _0="<strong>{$defaultpass}</strong>"}Your default administrator password is %0.{/tr}
+                            {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
                         {/if}
                         {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                     </p>

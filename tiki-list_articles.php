@@ -26,9 +26,9 @@ $inputConfiguration = [
         'find_to_Month'                   => 'int',               //post
         'find_to_Day'                     => 'int',               //post
         'find_to_Year'                    => 'int',               //post
-        'find'                            => 'word',              //post
-        'type'                            => 'word',              //post
-        'topic'                           => 'word',              //post
+        'find'                            => 'string',              //post
+        'type'                            => 'string',              //post
+        'topic'                           => 'string',              //post
         'find_show_categories_multi'      => 'bool',              //post
         'categId'                         => 'int',               //get
         'lang'                            => 'lang',              //get
@@ -98,9 +98,8 @@ if (! isset($_REQUEST["offset"])) {
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
-} else {
-    $maxRecords = -1;
 }
+
 $smarty->assign_by_ref('maxRecords', $maxRecords);
 
 $visible_only = 'y';

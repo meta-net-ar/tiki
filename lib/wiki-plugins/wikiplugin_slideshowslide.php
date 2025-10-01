@@ -166,16 +166,14 @@ function wikiplugin_slideshowslide($data, $params)
     if (! str_contains($_SERVER['PHP_SELF'], 'tiki-slideshow.php')) {
         return $data;
     }
-    $defaults = [];
+
     $plugininfo = wikiplugin_slideshowslide_info();
     foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
         //separating digits filter parameters
         if (isset($param['filter']) && ($param['filter'] == "digits")) {
             $slideshowslideDigitsParams[] = $key;
         }
     }
-    $params = array_merge($defaults, $params);
     $slideShowSlideParams = ["data-background-color" => 'bgColor',"data-background-image" => 'backgroundUrl',"data-background-size" => 'parallaxBackgroundSize',"data-background-horizontal" => 'parallaxBackgroundHorizontal',"data-background-vertical" => 'parallaxBackgroundVertical',"data-background-video" => 'backgroundVideoUrl',"data-background-transitionspeed" => 'transitionSpeed',"data-background-transition" => 'backgroundTransition'];
     $slideSettings = '';
     foreach ($slideShowSlideParams as $key => $param) {

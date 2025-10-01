@@ -161,10 +161,6 @@ function wikiplugin_list($data, $params)
         $params['cache'] = 'y';
     }
 
-    if (! isset($params['gui'])) {
-        $params['gui'] = 1;
-    }
-
     if ($prefs['wikiplugin_list_gui'] === 'y' && $params['gui']) {
         TikiLib::lib('header')
             ->add_jsfile('lib/jquery_tiki/pluginedit_list.js');

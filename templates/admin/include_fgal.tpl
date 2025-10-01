@@ -77,6 +77,7 @@
                     {preference name='fgal_delete_after_email'}
                 </div>
                 {preference name='fgal_keep_fileId'}
+                {preference name='fgal_show_modtimedate'}
                 {preference name='feature_use_fgal_for_user_files'}
                 {preference name='feature_use_fgal_for_wiki_attachments'}
                 {preference name='feature_file_galleries_save_draft'}

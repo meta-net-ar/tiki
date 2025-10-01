@@ -168,8 +168,7 @@ function wikiplugin_mail($data, $params)
     $tikilib = TikiLib::lib('tiki');
     static $ipluginmail = 0;
     $smarty->assign_by_ref('ipluginmail', $ipluginmail);
-    $default = ['showuser' => 'y', 'showuserdd' => 'n', 'showrealnamedd' => 'n', 'showgroupdd' => 'n', 'group' => [], 'recurse' => 'y', 'recurseuser' => 0,
-        'popup' => 'n', 'label_name' => tra('Send mail'), 'mail_subject' => '', 'bypass_preview' => 'n', 'debug' => 'n'];
+    $default = ['group' => []];
     $params = array_merge($default, $params);
     $default = ['mail_subject' => '', 'mail_mess' => '', 'mail_user_dd' => '', 'mail_group_dd' => []];
     $_REQUEST = array_merge($default, $_REQUEST);

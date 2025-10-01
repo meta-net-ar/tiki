@@ -40,7 +40,7 @@ function wikiplugin_banner_info()
 
 function wikiplugin_banner($data, $params)
 {
-    global $tikilib, $prefs;
+    global $prefs;
     if ($prefs['feature_banners'] != 'y') {
         return;
     }

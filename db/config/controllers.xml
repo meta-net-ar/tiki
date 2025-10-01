@@ -103,5 +103,6 @@
         <service id="tiki.controller.webauthn" class="Tiki\Services\Webauthn\WebauthnController"/>
         <service id="tiki.controller.two_fa_auth" class="Tiki\Services\TwoFactorAuth\TwoFactorAuthController"/>
         <service id="tiki.controller.iotapps" class="Services_IotApps_Controller"/>
+        <service id="tiki.controller.queued_tasks" class="Tiki\Services\QueueManager\QueueManagerController"/>
     </services>
 </container>

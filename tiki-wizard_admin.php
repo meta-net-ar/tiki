@@ -59,38 +59,38 @@ if ($useDefaultPrefs) {
     require_once('lib/wizard/pages/profiles_featured_site_confs.php');
     $pages[] = new ProfilesWizardFeaturedSiteConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
-    $pages[] = new ProfilesWizardUsefulMicroConfs();
+    // require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
+    // $pages[] = new ProfilesWizardUsefulMicroConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
-    $pages[] = new ProfilesWizardUsefulChangesInDisplay();
+    // require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
+    // $pages[] = new ProfilesWizardUsefulChangesInDisplay();
 
-    require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
-    $pages[] = new ProfilesWizardUsefulNewTechConfs();
+    // require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
+    // $pages[] = new ProfilesWizardUsefulNewTechConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
-    $pages[] = new ProfilesWizardUsefulAdminConfs();
+    // require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
+    // $pages[] = new ProfilesWizardUsefulAdminConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_common_confs.php');
-    $pages[] = new ProfilesWizardDemoCommonConfs();
+    // require_once('lib/wizard/pages/profiles_demo_common_confs.php');
+    // $pages[] = new ProfilesWizardDemoCommonConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
-    $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
+    // $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
-    $pages[] = new ProfilesWizardDemoProjectManagement();
+    // require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
+    // $pages[] = new ProfilesWizardDemoProjectManagement();
 
-    require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
-    $pages[] = new ProfilesWizardHighlySpecializedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
+    // $pages[] = new ProfilesWizardHighlySpecializedConfs();
 
-    require_once('lib/wizard/pages/profiles_completed.php');
-    $pages[] = new AdminWizardProfilesCompleted();
+    // require_once('lib/wizard/pages/profiles_completed.php');
+    // $pages[] = new AdminWizardProfilesCompleted();
 } elseif ($useChangesWizard) {
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);

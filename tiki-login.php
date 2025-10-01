@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\BruteForce\BruteForce;
 use Tiki\TwoFactorAuth\TwoFactorAuth;
 use Tiki\TwoFactorAuth\Exception\TwoFactorAuthException;
 
@@ -40,6 +41,7 @@ if (empty($_POST['user'])) {
 require_once('tiki-setup.php');
 global $prefs;
 
+$bruteForce = new BruteForce();
 // Refresh not logged in since 30 days user's accounts list
 $userlib = TikiLib::lib('user');
 $userlib->refresh_locked_users_list();
@@ -151,9 +153,9 @@ if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] != 
 }
 
 //Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
+$twoFactorForm = $prefs['twoFactorAuth'];
 if (isset($_REQUEST["$twoFactorForm"])) {
-    $twoFactorForm = 'y';
+    $twoFactorForm = $_REQUEST["$twoFactorForm"];
 }
 $smarty->assign('twoFactorForm', $twoFactorForm);
 
@@ -365,6 +367,9 @@ if (
 }
 
 if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, null, 'page'))) {
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $bruteForce->success('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+    }
     $userlib->set_unsuccessful_logins($requestedUser, 0);
     if ($prefs['feature_invite'] == 'y') {
         // tiki-invite, this part is just here to add groups to users which just registered after received an
@@ -518,7 +523,23 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             }
         }
     }
-} else {    // if ($isvalid) = false
+} else {
+    // if ($isvalid) = false - check and record bruteforce attempts
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $isOperationAllowed = $bruteForce->isOperationAllowed('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+        if ($requestedUser && ! $isOperationAllowed) {
+            $nextAllowedTime = $bruteForce->getNextAllowedTime('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+            $waitTime = $nextAllowedTime - time();
+            if ($waitTime > 60) {
+                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+            } else {
+                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d seconds.'), $waitTime);
+            }
+            $smarty->assign('msg', $waitMessage);
+            $smarty->display('error.tpl');
+            die;
+        }
+    }
     // check if site is closed
     if ($prefs['site_closed'] === 'y') {
         unset($bypass_siteclose_check);

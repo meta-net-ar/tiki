@@ -183,7 +183,7 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
                 $data[$id]['videos'][$videoId]['uploaded'] = $videoEntry['snippet']['publishedAt'];
                 $data[$id]['videos'][$videoId]['description'] = $videoEntry['snippet']['description'];
                 $params['movie'] = $videoId;
-                $pluginstr = wikiplugin_youtube('', $params);
+                $pluginstr = TikiLib::lib('parser')->invokePlugin('youtube', '', $params);
                 $len = strlen($pluginstr);
                 //need to take off the ~np~ and ~/np~ at the beginning and end of the string returned by wikiplugin_youtube
                 $data[$id]['videos'][$videoId]['xhtml'] = substr($pluginstr, 4, $len - 4 - 5);

@@ -105,7 +105,7 @@ class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableIn
 
         foreach ($videoIds as $id) {
             $params = array_merge($otherParams, ['id' => $id]);
-            $out   .= wikiplugin_peertube('', $params);
+            $out   .= \TikiLib::lib('parser')->invokePlugin('peertube', '', $params);
         }
 
         return $out;

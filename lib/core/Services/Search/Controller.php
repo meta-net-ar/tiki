@@ -6,6 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Search\SearchIndexRebuilder;
+use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\TaskQueue\Exception\QueueManagerException;
+use Tiki\TaskQueue\Tasks\RebuildIndexTask;
+use Tiki\TaskQueue\QueueManager;
 
 class Services_Search_Controller
 {
@@ -39,36 +44,17 @@ class Services_Search_Controller
         if ($input->getlaststats->int()) {
             $stat = $prefs['unified_last_rebuild_stats_' . $prefs['unified_engine']];
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Apply 'Search index rebuild memory limit' setting if available
-            if (! empty($prefs['allocate_memory_unified_rebuild'])) {
-                $memory_limiter = new Tiki_MemoryLimit($prefs['allocate_memory_unified_rebuild']);
+            $searchIndexRebuilder = new SearchIndexRebuilder();
+            $stat = $searchIndexRebuilder->executeOrQueueIndexRebuild($input->loggit->int());
+
+            // If it was queued, return early
+            if ($stat === null) {
+                return [
+                    'title' => tr('Rebuild Index'),
+                    'showForm' => false,
+                    'isAjax' => $access->is_xml_http_request()
+                ];
             }
-
-            $stat = $unifiedsearchlib->rebuild($input->loggit->int());
-
-            TikiLib::lib('cache')->invalidateAll('search_valueformatter');
-
-            // Also rebuild admin index
-            TikiLib::lib('prefs')->rebuildIndex();
-
-            // Back up original memory limit if possible
-            if (isset($memory_limiter)) {
-                unset($memory_limiter);
-            }
-
-            //clean error messages related with search index
-            $removeIndexErrorsCallback = function ($item) {
-                if ($item['type'] == 'error') {
-                    foreach ($item['mes'] as $me) {
-                        if (str_contains($me, 'does not exist in the current index')) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            };
-
-            Feedback::removeIf($removeIndexErrorsCallback);
         }
 
         $num_queries_after = $num_queries;
@@ -125,7 +111,7 @@ class Services_Search_Controller
             $loggerInstance->info("Execution time: " . $executionTime);
         }
 
-        if ($num_queries) {
+        if ($num_queries && $prefs['feature_queued_tasks'] ?? 'n' !== 'y') {
             $msg = '<ul>';
             $msg .= '<li>' . tr('Execution time:') . ' ' . $executionTime . '</li>';
             $msg .= '<li>' . tr('Current Memory usage:') . ' ' . FormatterHelper::formatMemory(memory_get_usage()) . '</li>';

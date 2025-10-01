@@ -17,7 +17,7 @@ $inputConfiguration = [
             'fileId'                      => 'int',           //post
             'galleryId'                   => 'int',           //post
             'name'                        => 'string',        //post
-            'data'                        => 'none',          //post
+            'data'                        => 'string',        //post
             'description'                 => 'xss',           //post
             'edit'                        => 'bool',          //post
         ],

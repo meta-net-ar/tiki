@@ -521,16 +521,16 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         $params['rel'] = 'box[' . $this->getInsertId() . ']';
                     }
                     include_once('lib/wiki-plugins/wikiplugin_img.php');
-                    $ret = wikiplugin_img('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('img', '', $params);
                     $ret = WikiPlugin_Helper::resultString($ret);
                 } elseif ($this->getOption('displayMode') == 'vimeo') { // Vimeo videos stored as filegal REMOTEs
                     include_once('lib/wiki-plugins/wikiplugin_vimeo.php');
-                    $ret = wikiplugin_vimeo('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('vimeo', '', $params);
                 } elseif ($this->getOption('displayMode') == 'moodlescorm') {
                     include_once('lib/wiki-plugins/wikiplugin_playscorm.php');
                     foreach ($this->getConfiguration('files') as $fileId => $file) {
                         $params['fileId'] = $fileId;
-                        $ret .= wikiplugin_playscorm('', $params);
+                        $ret .= TikiLib::lib('parser')->invokePlugin('playscorm', '', $params);
                     }
                 } elseif ($this->getOption('displayMode') == 'googleviewer') {
                     if ($prefs['auth_token_access'] != 'y') {

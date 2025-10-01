@@ -110,13 +110,6 @@ function wikiplugin_annotation($data, $params)
     $smarty = TikiLib::lib('smarty');
     $ticketHtml = smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
 
-    $defaults = [];
-    $plugininfo = wikiplugin_annotation_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $annotations = [];
     foreach (explode("\n", $data) as $line) {
         $line = trim($line);

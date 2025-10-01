@@ -37,6 +37,7 @@ function wikiplugin_avatar_info()
                     ['text' => tra('Right'), 'value' => 'right'],
                     ['text' => tra('Left'), 'value' => 'left'],
                 ],
+                'default' => '',
             ],
             'fullsize' => [
                 'required' => false,
@@ -61,18 +62,18 @@ function wikiplugin_avatar($data, $params)
         $data = $user;
     }
 
-    if (isset($float)) {
+    if (! empty($float)) {
         $avatar = $tikilib->get_user_avatar($data, $float);
     } else {
         $avatar = $tikilib->get_user_avatar($data);
     }
 
 
-    if (isset($fullsize) && $fullsize == 'y' && $prefs["user_store_file_gallery_picture"] == 'y') {
-        $avatar = '<img src="tiki-show_user_avatar.php?fullsize=y&user=' . urlencode($data) . '"></img>';
+    if ($fullsize == 'y' && $prefs["user_store_file_gallery_picture"] == 'y') {
+        $avatar = '<img src="tiki-show_user_avatar.php?fullsize=y&user=' . urlencode($data) . '">';
     }
 
-    if (isset($page)) {
+    if (! empty($page)) {
         $avatar = "<a href='tiki-index.php?page=$page'>" . $avatar . '</a>';
     } elseif ($userlib->user_exists($data) && $tikilib->get_user_preference($data, 'user_information', 'public') == 'public') {
         $id = $userlib->get_user_id($data);

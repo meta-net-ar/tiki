@@ -213,13 +213,10 @@ function wikiplugin_mouseover_info()
 
 function wikiplugin_mouseover($data, $params)
 {
-    $default = ['parse' => 'y', 'parselabel' => 'y'];
-    $params = array_merge($default, $params);
-
-    $width = (int) ($params['width'] ?? 400);
-    $height = (int) ($params['height'] ?? 200);
-    $offsetx = (int) ($params['offsetx'] ?? 5);
-    $offsety = (int) ($params['offsety'] ?? 24);
+    $width = (int) ($params['width']);
+    $height = (int) ($params['height']);
+    $offsetx = (int) ($params['offsetx']);
+    $offsety = (int) ($params['offsety']);
     $parse = ! isset($params['parse']) || (strcasecmp($params['parse'], 'n') != 0);
     $sticky = isset($params['sticky']) && $params['sticky'] == 'y';
     $padding = isset($params['padding']) ? 'padding: ' . $params['padding'] . 'px;' : '';

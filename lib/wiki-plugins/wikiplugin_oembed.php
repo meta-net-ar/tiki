@@ -103,13 +103,6 @@ function wikiplugin_oembed($data, $params)
         $params = [];
     }
 
-    $plugininfo = wikiplugin_oembed_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if (empty($params['url'])) {
         Feedback::error(tra('Plugin oEmbed error: the URL parameter is empty.'));
         return '';

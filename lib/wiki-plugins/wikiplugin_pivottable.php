@@ -397,13 +397,12 @@ function wikiplugin_pivottable($data, $params)
     $headerlib->add_jsfile(SUBTOTAL_DIST_PATH . '/subtotal.min.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-pivottable.js', true);
 
-    // use default param value if not given
-    $defaults = [];
-    $info = wikiplugin_pivottable_info();
-    foreach ($info['params'] as $key => $value) {
-        $defaults[$key] = $value['default'] ?? null;
+    if (empty($params['height'])) {
+        $params['height'] = '1000px';
     }
-    $params = array_merge($defaults, $params);
+
+    // Minimal defaults array for template
+    $defaults = [];
 
     if ($params['lang'] == "site") {
         $lang = substr($prefs['site_language'], 0, 2);
@@ -429,29 +428,10 @@ function wikiplugin_pivottable($data, $params)
         return WikiParser_PluginOutput::internalError(tr('Error data parameter'));
     }
 
-    if (! empty($params['rendererName'])) {
-        $rendererName = $params['rendererName'];
-    } else {
-        $rendererName = "Table";
-    }
-
-    if (! empty($params['aggregatorName'])) {
-        $aggregatorName = $params['aggregatorName'];
-    } else {
-        $aggregatorName = "Count";
-    }
-
-    if (! empty($params['width'])) {
-        $width = $params['width'];
-    } else {
-        $width = "100%";
-    }
-
-    if (! empty($params['height'])) {
-        $height = $params['height'];
-    } else {
-        $height = "1000px";
-    }
+    $rendererName = $params['rendererName'];
+    $aggregatorName = $params['aggregatorName'];
+    $width = $params['width'];
+    $height = $params['height'];
     $derivedAttributes = [];
     $definitions = [];
     $splittedAttributes = [];
@@ -544,7 +524,7 @@ function wikiplugin_pivottable($data, $params)
 
             if ($validConfig) {
                 $heatmapParams = [
-                    'domain' => array_map(floatval, $params['heatmapDomain']),
+                    'domain' => array_map('floatval', $params['heatmapDomain']),
                     'colors' => $params['heatmapColors']
                 ];
             }

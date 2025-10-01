@@ -60,29 +60,14 @@ function wikiplugin_versions_info()
 function wikiplugin_versions($data, $params)
 {
     global $use_best_language, $prefs;
-    if (isset($params) and is_array($params)) {
-        extract($params, EXTR_SKIP);
-    }
+    extract($params, EXTR_SKIP);
     $data = $data;
     $navbar = '';
-    if (! isset($default)) {
-        $default = tra('Default');
-    }
-    if (! isset($title)) {
-        $title = 'y';
-    }
-    if (! isset($nav)) {
-        $nav = 'n';
-    }
 
     preg_match_all('/---\(([^\):]*)( : [^\)]*)?\)---*/', $data, $v);
 
     if (isset($type) and $type == 'host') {
-        if (isset($_SERVER['TIKI_VERSION'])) {
-            $vers = $_SERVER['TIKI_VERSION'];
-        } else {
-            $vers = $default;
-        }
+        $vers = $_SERVER['TIKI_VERSION'] ?? $default;
     } else {
         if (isset($_REQUEST['tikiversion'])) {
             $vers = $_REQUEST['tikiversion'];
@@ -135,46 +120,30 @@ function wikiplugin_versions($data, $params)
             } else {
                 $high = '';
             }
+            $uri = preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI']);
             if ($type == 'host') {
                 $vv = preg_replace('/[^a-z0-9]/', '', strtolower($version));
-                $navbar .= ' <li ' . $high . '"><a href="http://' . $vv
-                                    . '.' . preg_replace("/" . $v[1][$p] . "/", "", $_SERVER['SERVER_NAME'])
-                                    . preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI'])
-                                    . '" class="linkbut">' . $ver . '</a></li>'
-                                    ;
+                $host = preg_replace("/" . $v[1][$p] . "/", "", $_SERVER['SERVER_NAME']);
+                $url = "http://" . $vv . "." . $host . $uri;
             } else {
-                $navbar .= ' <li class="' . $high . '"><a href="';
-                if (str_contains($_SERVER['REQUEST_URI'], '?')) {
-                    $navb = preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI']);
-                } else {
-                    $navb = $_SERVER['REQUEST_URI'];
-                }
-                if (str_contains($navb, '?')) {
-                    $navbar .= "$navb&";
-                } else {
-                    $navbar .= "$navb?";
-                }
-                $navbar .= 'tikiversion=' . urlencode($version) . '" class="linkbut">' . $ver . '</a></li>';
+                $separator = str_contains($uri, '?') ? '&' : '?';
+                $cleanVersion = urlencode($version);
+                $url = $uri . $separator . "tikiversion=" . $cleanVersion;
             }
+            $navbar .= ' <li ' . $high . '"><a href="' . $url . '" class="linkbut">' . $ver . '</a></li>';
         }
 
-        if (! $highed) {
-            $high = " active";
-        } else {
-            $high = '';
-        }
+        $high = ! $highed ? ' active' : '';
+        $url = preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI']);
+
         if ($type == 'host') {
-            $navbar = '<li class="' . $high . '"><a href="http://'
-                                . preg_replace("/" . $v[1][$p] . "/", "", $_SERVER['SERVER_NAME'])
-                                . preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI'])
-                                . '" class="linkbut">' . $default . '</a></li>' . $navbar
-                                ;
-        } else {
-            $navbar = '<li class="' . $high . '"><a href="'
-                            . preg_replace("~(\?|&)tikiversion=[^&]*~", "", $_SERVER['REQUEST_URI'])
-                            . '" class="linkbut">' . $default . '</a></li>' . $navbar
-                            ;
+            $host = preg_replace("/" . $v[1][$p] . "/", "", $_SERVER['SERVER_NAME']);
+            $url = "http://{$host}{$url}";
         }
+
+        $navbar = '<li class="' . $high . '"><a href="' . $url . '" class="linkbut">' . $default . '</a>
+        </li>' . $navbar;
+
         $data = '<div class="clearfix tabs"><ul class="nav nav-tabs">' . $navbar
                     . '</ul></div><div class="versioncontent">' . $data . "</div>"
                     ;

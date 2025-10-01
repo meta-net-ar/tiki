@@ -13,8 +13,8 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'edit_language'               => 'string',          //post
             'action'                      => 'string',            //post
-            'only_db_translations'        => 'bool',            //post
-            'only_db_untranslated'        => 'bool',            //post
+            'only_db_translations'        => 'string',            //post
+            'only_db_untranslated'        => 'string',            //post
             'add_tran'                    => 'int',             //post
             'add_tran_source'             => 'text',            //post
             'add_tran_tran'               => 'text',            //post
@@ -23,6 +23,7 @@ $inputConfiguration = [
             'maxRecords'                  => 'int',             //post
             'translate_all'               => 'bool',            //post
             'find'                        => 'string',          //post
+            'tran_reset'                  => 'bool',            //post
         ],
     ],
 ];

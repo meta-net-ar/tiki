@@ -178,10 +178,6 @@ function wikiplugin_convene($data, $params): string
     /** @var UserLib $userlib */
     $userlib = TikiLib::lib('user');
 
-    if (! isset($params['voteoptions'])) {
-        $params['voteoptions'] = default_voteoptions();
-    }
-
     if (! is_array($params['voteoptions'])) {
         $params['voteoptions'] = explode(',', $params['voteoptions']);
     }
@@ -199,14 +195,6 @@ function wikiplugin_convene($data, $params): string
 
     static $convenePluginIndex = 0;
     ++$convenePluginIndex;
-
-    //set defaults
-    $plugininfo = wikiplugin_convene_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
 
     $params['index'] = $convenePluginIndex;
     $params['id'] = empty($params['id']) ? 'pluginConvene' . $convenePluginIndex : $params['id'];

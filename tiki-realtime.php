@@ -8,6 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+// Turn off any compression and buffering that would delay CLI output
+$force_no_compression = true;
+
 require_once('tiki-setup.php');
 
 $access = TikiLib::lib('access');
@@ -40,21 +44,51 @@ Start WS server with the same user that Tiki web requests run as (to avoid permi
 error_reporting(E_ALL);
 ini_set('session.use_cookies', 0);
 
-// Run the server application through the WebSocket protocol on specified port (default: 8080)
-$opts = getopt("p::");
-if (isset($opts['p'])) {
-    $port = $opts['p'];
-} elseif (! empty($prefs['realtime_port'])) {
-    $port = $prefs['realtime_port'];
+$websocket_full_base_url = $prefs['realtime_full_base_url'];
+
+if (! empty($websocket_full_base_url)) {
+    $parts = parse_url($websocket_full_base_url);
+    $port = $parts['port'] ?? 8080;
+    echo "Using data from realtime full base url preference: " . $websocket_full_base_url . " \n";
 } else {
-    $port = 8080;
+    // Run the server application through the WebSocket protocol on specified port (default: 8080)
+    $opts = getopt("p::");
+    if (isset($opts['p'])) {
+        $port = $opts['p'];
+    } elseif (! empty($prefs['realtime_port'])) {
+        $port = $prefs['realtime_port'];
+    } else {
+        $port = 8080;
+    }
 }
 $tikilib->set_preference('realtime_port', $port);
+echo "Starting Tiki Realtime WebSocket Server...\n";
+echo "Port: $port\n";
+echo "Host: localhost\n";
+
+// Validate port
+if (! is_numeric($port) || $port < 1 || $port > 65535) {
+    echo "Error: Invalid port number '$port'. Port must be between 1 and 65535.\n";
+    exit(1);
+}
+
 echo "Listening on port $port...\n";
 
-$app = new Ratchet\App('localhost', $port);
-$app->route('/console', new Console(), ['*']);
-$app->route('/chat', new Chat(), ['*']);
-$app->route('ping', new Ping(), ['*']);
-$app->route('/iot-dashboard-notifier', new IotDashboardNotifier(), ['*']);
-$app->run();
+try {
+    $app = new Ratchet\App('localhost', $port);
+    $app->route('/console', new Console(), ['*']);
+    $app->route('/chat', new Chat(), ['*']);
+    $app->route('ping', new Ping(), ['*']);
+    $app->route('/iot-dashboard-notifier', new IotDashboardNotifier(), ['*']);
+    echo "WebSocket routes configured:\n";
+    echo "  - /console\n";
+    echo "  - /chat\n";
+    echo "  - /ping\n";
+    echo "  - /iot-dashboard-notifier\n";
+    echo "Server is running. Press Ctrl+C to stop.\n";
+    $app->run();
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+    echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
+    exit(1);
+}

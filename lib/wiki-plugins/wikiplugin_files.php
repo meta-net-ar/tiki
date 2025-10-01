@@ -502,13 +502,6 @@ function wikiplugin_files($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
-    // set defaults for all params
-    $plugininfo = wikiplugin_files_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
     $filter = '';
     extract($params, EXTR_SKIP);
 

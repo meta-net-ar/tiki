@@ -12,50 +12,72 @@
 <table class="table table-condensed table-hover">
     <tr>
         <td>
-            {icon name='bold'} <strong>{tr}Bold text{/tr}</strong> &nbsp;&nbsp;&nbsp; __{tr}text{/tr}__
+            {icon name='bold'} 
+            <strong>{tr}Bold text{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>**{tr}text{/tr}**</code> {tr}or{/tr} <code>__{tr}text{/tr}__</code>
+        </td>
+        </tr>
+        <tr>
+        <td>
+            {icon name='italic'} 
+            <strong>{tr}Italic text{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>*{tr}text{/tr}*</code> {tr}or{/tr} <code>_{tr}text{/tr}_</code>
+        </td>
+        </tr>
+        <tr>
+        <td>
+            {icon name='strikethrough'} 
+            <strong>{tr}Deleted text{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>~~{tr}text{/tr}~~</code>
         </td>
     </tr>
     <tr>
         <td>
-            {icon name='italic'} <strong>{tr}Italic text{/tr}</strong> &nbsp;&nbsp;&nbsp; _{tr}text{/tr}_
+            {icon name='h1'} 
+            <strong>{tr}Headings{/tr}</strong> <br/>
+            <code># Heading 1</code>, <code>## Heading 2</code>, <code>### Heading 3</code>
+        </td>
+        </tr>
+        <tr>
+        <td>
+            {icon name='horizontal-rule'} 
+            <strong>{tr}Horizontal rule{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>---</code> {tr}or{/tr} <code>***</code>
+        </td>
+        </tr>
+        <tr>
+        <td>
+            {icon name='link-external'} 
+            <strong>{tr}External links{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>[text](url)</code>
         </td>
     </tr>
     <tr>
         <td>
-            {icon name='strikethrough'} <strong>{tr}Deleted text{/tr}</strong> &nbsp;&nbsp;&nbsp; {tr}2 dashes{/tr} "-". &nbsp;&nbsp;&nbsp; --{tr}text{/tr}--
+            {icon name='list'} {icon name='list-numbered'} 
+            <strong>{tr}Lists{/tr}</strong>
+            <br>
+            <code>*</code> {tr}or{/tr} <code>-</code>  {tr}for bullet lists,{/tr}<br>
+            <code>1.</code>, <code>2.</code>, <code>3.</code> etc.  {tr}for numbered lists,{/tr}
         </td>
     </tr>
     <tr>
         <td>
-            {icon name='h1'} <strong>{tr}Headings{/tr}</strong> <br/> #heading1, ##heading2, ###heading3
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {icon name='horizontal-rule'} <strong>{tr}Horizontal rule{/tr}</strong> &nbsp;&nbsp;&nbsp; -<em></em>-<em></em>-<em></em>-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {icon name='link-external'} <strong>{tr}External links{/tr}</strong> &nbsp;&nbsp;&nbsp;  [text](url)
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {icon name='list'} {icon name='list-numbered'} <strong>{tr}Lists{/tr}</strong> <br> * {tr}for bullet lists,{/tr} 1., 2., 3. etc {tr}for numbered lists,{/tr}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {icon name='table'} <strong>{tr}Tables{/tr}</strong> <br/>
-            | {tr}row{/tr}1-{tr}col{/tr}1 | {tr}row{/tr}1-{tr}col{/tr}2 | {tr}row{/tr}1-{tr}col{/tr}3<br>
-            | ----- | ----- | ----- |<br>
+            {icon name='table'} 
+            <strong>{tr}Tables{/tr}</strong>
+            <br/>
+            <code>
+            | {tr}row{/tr}1-{tr}col{/tr}1 | {tr}row{/tr}1-{tr}col{/tr}2 | {tr}row{/tr}1-{tr}col{/tr}3 |<br>
+            | --------- | --------- | --------- |<br>
             | {tr}row{/tr}2-{tr}col{/tr}1 | {tr}row{/tr}2-{tr}col{/tr}2 | {tr}row{/tr}2-{tr}col{/tr}3 |
+            </code>
         </td>
     </tr>
     <tr>
         <td>
-            <strong>{tr}Monospace font{/tr}</strong> &nbsp;&nbsp;&nbsp; `{tr}Code sample{/tr}`
+            {icon name='code'} 
+            <strong>{tr}Monospace font{/tr}</strong> &nbsp;&nbsp;&nbsp; 
+            <code>`{tr}Code sample{/tr}`</code>
         </td>
     </tr>
 </table>

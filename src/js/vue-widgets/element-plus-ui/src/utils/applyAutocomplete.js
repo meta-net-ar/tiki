@@ -29,6 +29,11 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
         elementPlusInput.remove();
     }
 
+    const uiRef = element.getAttribute("element-plus-ref");
+    if (uiRef && document.querySelector(`el-autocomplete#${uiRef}`)) {
+        return document.querySelector(`el-autocomplete#${uiRef}`);
+    }
+
     const elementUniqueId = Math.random().toString(36).substring(7);
     const elementPlusUi = document.createElement("el-autocomplete");
     elementPlusUi.setAttribute("id", elementUniqueId);

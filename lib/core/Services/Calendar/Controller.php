@@ -131,10 +131,11 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
         $viewend = new DateTime($viewend);
         $viewend = $viewend->getTimestamp();
-
-        if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+        $calendarIdFromModuleOrPlugin = $input->calIds->string();
+        if ($calendarIdFromModuleOrPlugin) {
+            $splitCalendarIdFromModuleOrPlugin = explode(',', $calendarIdFromModuleOrPlugin);
             $listevents = $this->calendarLib->list_raw_items(
-                array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
+                array_intersect($splitCalendarIdFromModuleOrPlugin, array_keys($calendars)),
                 $user,
                 $viewstart,
                 $viewend,
@@ -142,7 +143,18 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 -1
             );
         } else {
-            $listevents = [];
+            if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+                $listevents = $this->calendarLib->list_raw_items(
+                    array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
+                    $user,
+                    $viewstart,
+                    $viewend,
+                    0,
+                    -1
+                );
+            } else {
+                $listevents = [];
+            }
         }
 
         $listevents = Perms::filter(
@@ -241,9 +253,11 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $access = TikiLib::lib('access');
         $parserLib = TikiLib::lib('parser');
         $displayTimezone = TikiLib::lib('tiki')->get_display_timezone();
+        $trklib = TikiLib::lib('trk');
         $timezones = TikiDate::getTimeZoneList();
         $timezones = array_keys($timezones);
         $return_url = $input->return_url->url();
+        $trackerItems = [];
 
         $rawcals = $this->calendarLib->list_calendars();
 
@@ -351,6 +365,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             $calitem['start'] = $start->getTime();
             $calitem['end']   = $end->getTime();
             $calitem['duration'] = 0;
+
+            $trackerItems = $this->calendarLib->getAttachedTrackerItems($calitemId);
         } else {
             // new event
             $title = tr('Calendar event : %0', tr('New'));
@@ -564,6 +580,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'displayTimezone'            => $displayTimezone,
             'timezones'                  => $timezones,
             'prefilled'                  => $input->prefill_start->int() ? true : false,
+            // related tracker items
+            'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
         ];
     }
 
@@ -585,9 +603,11 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
     public function action_view_item(JitFilter $input): array
     {
         global $prefs;
+        $trklib = TikiLib::lib('trk');
 
         $calitemId = $input->calitemId->int();
         $recurrence = [];
+        $trackerItems = [];
         $preview = false;
         $calendar = null;
         $calitem = null;
@@ -677,6 +697,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calitem['participants'] = [];
                 $calitem['hiddenParticipants'] = true;
             }
+            $trackerItems = $this->calendarLib->getAttachedTrackerItems($calitemId);
         }
 
         return [
@@ -688,6 +709,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'daynames'             => $this->daynamesPlural,
             'monthnames'           => $this->monthnames,
             'preview'              => $preview,
+            // related tracker items
+            'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
         ];
     }
 

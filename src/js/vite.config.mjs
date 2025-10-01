@@ -409,7 +409,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/converse.js/dist/locales",
                     },
                     {
-                        src: "node_modules/converse.js/dist/emojis.js",
+                        src: "node_modules/converse.js/dist/emoji.json",
                         dest: "vendor_dist/converse.js/dist",
                     },
                     {

@@ -4,12 +4,17 @@
 import { createCalendar, DayGrid, TimeGrid, Interaction, List } from "@event-calendar/core";
 import moment from "moment";
 
-$.fn.setupEventCalendar = function (eventCalendarParams) {
+$.fn.setupEventCalendar = function (
+    eventCalendarParams,
+    calendarContainer,
+    targetId = "calendar",
+    urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items"
+) {
     this.each(function () {
-        const calendarEl = document.getElementById("calendar");
+        const calendarEl = document.getElementById(targetId);
         $(calendarEl).tikiModal(tr("Loading..."));
 
-        window.calendar = createCalendar(document.getElementById("calendar"), [DayGrid, TimeGrid, Interaction, List], {
+        calendarContainer[0] = createCalendar(document.getElementById(targetId), [DayGrid, TimeGrid, Interaction, List], {
             eventTimeFormat: {
                 hour: "numeric",
                 minute: "2-digit",
@@ -25,7 +30,7 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
             },
             editable: true,
             selectable: true,
-            eventSources: [{ url: "tiki-ajax_services.php?controller=calendar&action=list_items" }],
+            eventSources: [{ url: urlEventSource }],
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,
             nowIndicator: true,
@@ -45,7 +50,7 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
             viewDidMount: function (data) {
                 $(calendarEl).tikiModal();
                 if (data.type == "dayGridMonth" || data.type == "listMonth") {
-                    calendar.setOption("duration", { months: 1 });
+                    calendarContainer[0].setOption("duration", { months: 1 });
                     if (!document.getElementById("quarter")) {
                         const ecStart = document.querySelector(".ec-start");
                         const buttonMonthView = document.createElement("div");
@@ -62,8 +67,8 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                         oneMonth.classList.add("ec-active");
                         quarter.classList.remove("ec-active");
                         semester.classList.remove("ec-active");
-                        calendar.setOption("duration", { months: 1 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { months: 1 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     });
@@ -71,8 +76,8 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                         oneMonth.classList.remove("ec-active");
                         quarter.classList.add("ec-active");
                         semester.classList.remove("ec-active");
-                        calendar.setOption("duration", { months: 3 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { months: 3 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("M/D");
                         });
                     });
@@ -80,8 +85,8 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                         oneMonth.classList.remove("ec-active");
                         quarter.classList.remove("ec-active");
                         semester.classList.add("ec-active");
-                        calendar.setOption("duration", { months: 6 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { months: 6 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("M/D");
                         });
                     });
@@ -92,21 +97,21 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                         document.getElementById("semester").remove();
                     }
                     if (data.type == "timeGridWeek" || data.type == "listWeek") {
-                        calendar.setOption("duration", { days: 7 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { days: 7 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
                     if (data.type == "timeGridDay" || data.type == "listDay") {
-                        calendar.setOption("duration", { days: 1 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { days: 1 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
 
                     if (data.type == "listYear") {
-                        calendar.setOption("duration", { months: 12 });
-                        calendar.setOption("dayCellFormat", function (dayCell) {
+                        calendarContainer[0].setOption("duration", { months: 12 });
+                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
@@ -208,7 +213,7 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                 // If a date number is clicked, switch to Day View for the selected date.
                 // If any other part of the date cell is clicked, open a form to create a new event.
                 if (info.jsEvent.target.classList.contains("ec-day-head")) {
-                    window.calendar.changeView("timeGridDay", info.dateStr);
+                    calendarContainer[0].changeView("timeGridDay", info.dateStr);
                 } else {
                     let $this = $(info.dayEl).tikiModal(" ");
                     const countCals = $("#filtercal ul li").length;
@@ -255,7 +260,7 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
 // open modal for edit form
 $(document).on("click", ".edit-calendar-item-btn", function (e) {
     const $this = $(this);
-    const $modal = $this.parents().hasClass("modal-body")[0];
+    const $modal = $this.parents().hasClass("modal-body");
     if ($modal) {
         e.preventDefault();
         $.closeModal({

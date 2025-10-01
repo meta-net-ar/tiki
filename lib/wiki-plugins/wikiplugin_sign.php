@@ -56,7 +56,7 @@ function wikiplugin_sign($data, $params, $offset)
         return false;
     }
 
-    $user = $params['user'] ?? '';
+    $user = $params['user'];
 
     $time = strtotime($params['datetime']);
 

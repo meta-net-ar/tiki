@@ -178,13 +178,6 @@ function wikiplugin_matomo($data, $params)
         return;
     }
 
-    $plugininfo = wikiplugin_matomo_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
-
     if (empty($params['matomoserverurl'])) {
         $params['matomoserverurl'] = $prefs['site_matomo_analytics_server_url'];
     }

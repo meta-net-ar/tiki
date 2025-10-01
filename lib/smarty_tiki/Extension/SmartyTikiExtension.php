@@ -421,6 +421,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'queued_tasks_banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\QueuedTasksBanner();
+                break;
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;

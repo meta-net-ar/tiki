@@ -134,7 +134,7 @@ if (! empty($multiprint_pages)) {
     // for the information as the number of
     // days to get in the log 1,3,4,etc
     // it will default to 1 recovering information for today
-    if (isset($_REQUEST['maxRecords'])) {
+    if (! empty($_REQUEST['maxRecords'])) {
         $maxRecords = $_REQUEST['maxRecords'];
         $smarty->assign('maxRecords', $maxRecords);
     }

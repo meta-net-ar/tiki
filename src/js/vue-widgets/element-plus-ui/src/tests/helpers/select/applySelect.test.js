@@ -8,13 +8,16 @@ describe("applySelect helper functions", () => {
     });
 
     test.each([
-        ["is-invalid", ["class", "is-invalid", "true"]],
-        ["is-invalid", ["class", "", null]],
-        ["max", ["data-max", "2", "2"]],
-        ["max", ["data-max", "", ""]],
+        ["is-invalid", ["is-invalid", "class", "is-invalid", "true"]],
+        ["is-invalid", ["is-invalid", "class", "", null]],
+        ["max", ["max", "data-max", "2", "2"]],
+        ["max", ["max", "data-max", "", ""]],
+        ["style", ["style", "style", "color: red;", "color: red;"]],
+        ["style ('display: none' ignored)", ["style", "style", "display: none;", ""]],
+        ["style ('display: none' ignored but other styles considered)", ["style", "style", "display: none; color: red;", "color: red;"]],
     ])(
         "observeSelectElementMutations is able to update the element-plus-ui %s attribute when relative changes occurs in the select element",
-        async (attribute, [selectAttribute, attributeValue, expectedValue]) => {
+        async (_, [elementPlusAttribute, selectAttribute, attributeValue, expectedValue]) => {
             const givenSelect = document.createElement("select");
             const givenElementPlusUi = document.createElement("element-plus-ui");
             document.body.append(givenSelect, givenElementPlusUi);
@@ -23,12 +26,12 @@ describe("applySelect helper functions", () => {
 
             await window.happyDOM.waitUntilComplete();
 
-            expect(givenElementPlusUi.getAttribute(attribute)).toBeNull();
+            expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBeNull();
 
             givenSelect.setAttribute(selectAttribute, attributeValue);
             await window.happyDOM.waitUntilComplete();
 
-            expect(givenElementPlusUi.getAttribute(attribute)).toBe(expectedValue);
+            expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBe(expectedValue);
         }
     );
 

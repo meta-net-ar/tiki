@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\BruteForce\BruteForce;
+
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
@@ -16,6 +18,7 @@ $inputConfiguration = [
             'pass' => 'none',
             'passAgain' => 'none',
             'oldpass' => 'none',
+            'actpass' => 'none',
             'change' => 'text',
             'token' => 'text',
         ],
@@ -24,6 +27,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 
 $access->check_feature('change_password');
+$bruteForce = new BruteForce();
 
 if (empty($_REQUEST['user']) || ! $userlib->user_exists($_REQUEST['user'])) {
     Feedback::errorAndDie(tra('Invalid username'), \Laminas\Http\Response::STATUS_CODE_400);
@@ -46,6 +50,20 @@ $smarty->assign('secure_token', $secure_token);
 
 if (isset($_REQUEST["change"])) {
     $access->checkCsrf();
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
+            $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
+            $waitTime = $nextAllowedTime - time();
+            if ($waitTime > 60) {
+                $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+            } else {
+                $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d seconds.'), $waitTime);
+            }
+            $smarty->assign('msg', $waitMessage);
+            $smarty->display('error.tpl');
+            die;
+        }
+    }
 
     // If this is a new user validation, we do not check the token
     if (! isset($_REQUEST["new_user_validation"]) && $_REQUEST["new_user_validation"] !== 'y') {

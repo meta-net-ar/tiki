@@ -52,7 +52,7 @@ class Email
 
         if ($prefs['forum_notifications_use_new_threads'] === 'n') {
             $headers['In-Reply-To'] = ! empty($parentInfo['Message-Id']) ? $parentInfo['Message-Id'] : null;
-            $headers['References'] = ! empty($parentInfo['References']) ? $parentInfo['References'] . ' ' . $headers['In-Reply-To'] : $hash;
+            $headers['References'] = ! empty($parentInfo['References']) ? $parentInfo['References'] . ',' . $headers['In-Reply-To'] : $hash;
         } else {
             $headers['In-Reply-To'] = $comment['in_reply_to'];
         }

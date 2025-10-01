@@ -86,8 +86,6 @@ function wikiplugin_grouplist($data, $params)
     $smarty = TikiLib::lib('smarty');
     $access = TikiLib::lib('access');
 
-    $default = ['recur' => 'n', 'linkhome' => 'n'];
-    $params = array_merge($default, $params);
     if ($params['linkhome'] == 'y') {
         $access->check_feature('useGroupHome');
     }

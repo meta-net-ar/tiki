@@ -56,8 +56,10 @@
                                     <option value="">{tr}All{/tr}</option>
                                     <option value="Anonymous">{tr}Anonymous{/tr}</option>
                                     {foreach key=ix item=auser from=$users}
-                                        <option value="{$auser|escape}"
-                                                {if $selectedUsers[$ix] eq 'y'}selected="selected"{/if}>{$auser|username}</option>
+                                        <option value="{$auser}"
+                                                {if isset($selectedUsers[$ix]) && $selectedUsers[$ix] eq 'y'}selected="selected"{/if}>
+                                            {$auser|username}
+                                        </option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -76,8 +78,9 @@
                                         name="selectedGroups[]" id="selectedGroups" class="form-control">
                                     <option value="">{tr}All{/tr}</option>
                                     {foreach from=$groups key=ix item=group}
-                                        <option value="{$group|escape}"
-                                                {if $selectedGroups[$group] eq 'y'}selected="selected"{/if}>{$group|escape}</option>
+                                        <option value="{$group|escape}" {if isset($selectedGroups[$ix]) && $selectedGroups[$group] eq 'y'}selected="selected"{/if}>
+                                            {$group|escape}
+                                        </option>
                                     {/foreach}
                                 </select>
                             </div>

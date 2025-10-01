@@ -203,13 +203,6 @@ function wikiplugin_tour($data, $params)
 
     $_SESSION['id'] = ($_SESSION['id'] ?? 0) + 1;
 
-    $defaults = [];
-    $plugininfo = wikiplugin_tour_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $cookie_id = 'tour' . md5($params['tour_id']);
     $cookie_expiry = time() + 31536000;
     if (getCookie($cookie_id, 'tours') == 'y') {

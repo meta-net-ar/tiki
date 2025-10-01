@@ -16,7 +16,8 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
      */
     public function testWikiPluginCode($data, $expectedOutput, $params = []): void
     {
-        $this->assertEquals($expectedOutput, wikiplugin_youtube($data, $params));
+        $result = TikiLib::lib('parser')->invokePlugin('youtube', $data, $params);
+        $this->assertEquals($expectedOutput, $result);
     }
 
     public static function provider(): array

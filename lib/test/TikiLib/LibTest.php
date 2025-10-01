@@ -16,8 +16,17 @@ class TikiLib_LibTest extends TikiTestCase
         $this->assertInstanceOf(CalendarLib::class, TikiLib::lib('calendar'));
     }
 
-    public function testLibShouldReturnNullForInvalidClass(): void
+    /**
+     * @test
+     * #[WithoutErrorHandler]
+     * @throws ErrorException
+     */
+    public function testLibShouldTriggerErrorForInvalidClass(): void
     {
-        $this->assertThrowableMessage(tr("%0 library not found. This may be due to a typo or caused by a recent update.", 'invalidClass'), TikiLib::class . '::lib', 'invalidClass');
+        $this->assertTriggeredError(
+            tr("%0 library not found. This may be due to a typo or caused by a recent update.", 'invalidClass'),
+            'TikiLib::lib',
+            'invalidClass'
+        );
     }
 }

@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_catorphans_info()
 {
+    global $prefs;
     return [
         'name' => tra('Category Orphans'),
         'documentation' => 'PluginCatOrphans',
@@ -37,7 +38,7 @@ function wikiplugin_catorphans_info()
                 'description' => tr('Maximum number of items. Use %0 for unlimited. Default is the site admin setting
                     for maximum records.', '<code>-1</code>'),
                 'since' => '1',
-                'default' => '$prefs[\'maxRecords\']',
+                'default' => $prefs['maxRecords'],
                 'filter' => 'int',
             ],
             'offset' => [
@@ -61,8 +62,6 @@ function wikiplugin_catorphans($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $categlib = TikiLib::lib('categ');
 
-    $default = ['offset' => 0, 'max' => $prefs['maxRecords'], 'objects' => 'wiki'];
-    $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
     // check required objects parameter
     if ($params['objects'] !== 'wiki' && $params['objects'] !== 'file gallery' && $params['objects'] !== 'article' && $params['objects'] !== 'tracker' && $params['objects'] !== 'blog' && $params['objects'] !== 'calendar' && $params['objects'] !== 'forum') {

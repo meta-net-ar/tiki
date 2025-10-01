@@ -213,14 +213,6 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         return WikiParser_PluginOutput::userError(tr('API access is disabled but Kanban plugin needs it.  You can enable it here: %0', "<a href='$adminurl'>$adminurl</a>"));
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_kanban_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
-
     // Filter out unknown parameters
     $params = array_intersect_key($params, $plugininfo['params']);
 

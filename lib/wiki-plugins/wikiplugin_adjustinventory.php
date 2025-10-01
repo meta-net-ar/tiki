@@ -57,12 +57,6 @@ function wikiplugin_adjustinventory_info()
 
 function wikiplugin_adjustinventory($data, $params)
 {
-    if (! isset($params['add'])) {
-        $params['add'] = 'y';
-    }
-    if (! isset($params['subtract'])) {
-        $params['subtract'] = 'y';
-    }
     $smarty = TikiLib::lib('smarty');
     $smarty->assign('code', $params['code']);
     $smarty->assign('add', $params['add']);

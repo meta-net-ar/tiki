@@ -11,13 +11,17 @@ $inputConfiguration = [
             'siteId'                      => 'int',           //post
             'remove'                      => 'int',           //get
             'name'                        => 'string',        //post
+            'description'                 => 'string',        //post
             'url'                         => 'url',           //post
-            'siteCats'                    => 'string',        //post
             'isValid'                     => 'bool',          //post
             'country'                     => 'string',        //post
             'sort_mode'                   => 'string',        //get
             'offset'                      => 'int',           //get
             'find'                        => 'string',        //get
+            'save'                        => 'bool',          //post
+        ],
+        'staticKeyFiltersForArrays'      => [
+            'siteCats'                    => 'int',           //post
         ],
     ],
 ];

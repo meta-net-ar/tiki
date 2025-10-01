@@ -19,7 +19,7 @@ $opcode_stats = TikiLib::lib('admin')->getOpcodeCacheStatus();
 # admin/include_performance.php
 $txtUsed = tr('Used');
 $txtAvailable = tr('Available');
-if ($opcode_cache == 'WinCache') {
+if (isset($opcode_cache) && $opcode_cache == 'WinCache') {
     // Somehow WinCache seems to flip the representations
     $txtAvailable = tr('Used');
     $txtUsed = tr('Available');
@@ -67,15 +67,15 @@ if (! empty($probes)) {
 // Always check the monitoring_error_code parameter or header, regardless of probes
 $monitoringErrorCode = (int) getRequestParam('monitoring_error_code', 'X-Tiki-Monitoring-Error-Code');
 
-if ($probes['result'] === 'FAIL' && $monitoringErrorCode >= 200 && $monitoringErrorCode < 600) {
+if (isset($probes['result']) && $probes['result'] === 'FAIL' && $monitoringErrorCode >= 200 && $monitoringErrorCode < 600) {
     http_response_code($monitoringErrorCode);
     if ($_SERVER['REQUEST_METHOD'] === 'HEAD') {
         exit();
     }
 }
 
-$display = json_encode($result);
-echo $display;
+header('Content-Type: application/json');
+echo json_encode($result);
 
 /**
  * Check monitor is restricted by IP

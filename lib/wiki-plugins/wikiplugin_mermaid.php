@@ -43,13 +43,9 @@ function wikiplugin_mermaid($data, $params)
     global $headerlib;
 
     require_once("export-tracker_schema.php");
-    $plugininfo = wikiplugin_mermaid_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
 
-    $width = $params['width'] ?? $default['width'];
-    $height = $params['height'] ?? $default['height'];
+    $width = $params['width'];
+    $height = $params['height'];
     $mermaidOutput = handleMermaid($data, $width, $height);
 
     $output = <<<EOT

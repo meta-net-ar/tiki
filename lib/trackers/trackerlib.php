@@ -4541,9 +4541,11 @@ class TrackerLib extends TikiLib
                 }
             }
             for ($i = count($watchers_local) - 1; $i >= 0; --$i) {
-                if ($watchers_local[$i]['user'] == $user) {
-                    unset($watchers_local[$i]);
-                    break;
+                if ((isset($watchers_local[$i]['options_map_notify']) && $watchers_local[$i]['options_map_notify'] != 1) || ! isset($watchers_local[$i]['options_map_notify'])) {
+                    if ($watchers_local[$i]['user'] == $user) {
+                        unset($watchers_local[$i]);
+                        break;
+                    }
                 }
             }
             for ($i = count($watchers_item) - 1; $i >= 0; --$i) {
@@ -4690,7 +4692,7 @@ class TrackerLib extends TikiLib
                         if (! empty($fieldUser) && ! empty($email)) {
                             $tikilib->get_user_preferences($fieldUser, ['email', 'user', 'language', 'mailCharset']);
                             $emails[] = ['email' => $email, 'user' => $fieldUser, 'language' => $user_preferences[$fieldUser]['language'] ?? null,
-                                         'mailCharset' => $user_preferences[$fieldUser]['mailCharset'] ?? $prefs['users_prefs_mailCharset'], 'template' => $f['options_map']['notify_template'], 'templateFormat' => $f['options_map']['notify_template_format']];
+                                         'mailCharset' => $user_preferences[$fieldUser]['mailCharset'] ?? $prefs['users_prefs_mailCharset'], 'template' => $f['options_map']['notify_template'], 'templateFormat' => $f['options_map']['notify_template_format'], 'options_map_notify' => $f['options_map']['notify']];
                         }
                     }
                 }

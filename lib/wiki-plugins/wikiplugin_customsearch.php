@@ -216,13 +216,6 @@ function wikiplugin_customsearch($data, $params)
         $recalllastsearch = 0;
     }
 
-    $defaults = [];
-    $plugininfo = wikiplugin_customsearch_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
-
     if (! isset($_REQUEST["offset"])) {
         $offset = 0;
     } else {

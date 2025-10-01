@@ -78,9 +78,6 @@ function wikiplugin_poll($data, $params)
     $smarty = TikiLib::lib('smarty');
     $trklib = TikiLib::lib('trk');
 
-    $default = ['showtitle' => 'y', 'showresult' => 'link', 'showtotal' => 'y'];
-    $params = array_merge($default, $params);
-
     extract($params, EXTR_SKIP);
 
     if (! isset($pollId)) {

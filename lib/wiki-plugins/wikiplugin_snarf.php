@@ -218,7 +218,7 @@ function wikiplugin_snarf($data, $params)
     }
 
     include_once('lib/wiki-plugins/wikiplugin_code.php');
-    $ret = wikiplugin_code($snarf, $code_defaults);
+    $ret = TikiLib::lib('parser')->invokePlugin('code', $snarf, $code_defaults);
 
     if (! $isFresh && empty($params['link'])) {
         include_once('lib/smarty_tiki/block.self_link.php');

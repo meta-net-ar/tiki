@@ -81,7 +81,7 @@ function wikiplugin_font($data, $params)
     }
 
     $family = strtolower($params['family'] ?? '');
-    $size = $params['size'] ?? '';
+    $size = $params['size'];
 
     if ((string)(int)$size == $size and $size > 0) {
         $size .= "px";

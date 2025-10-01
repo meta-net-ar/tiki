@@ -157,16 +157,8 @@ function wikiplugin_vimeo_info()
 
 function vimeo_iframe($data, $params)
 {
-    if (! empty($params['height'])) {
-        $height = $params['height'];
-    } else {
-        $height = '350';
-    }
-    if (! empty($params['width'])) {
-        $width = $params['width'];
-    } else {
-        $width = '425';
-    }
+    $height = $params['height'];
+    $width = $params['width'];
 
     $urlparts = explode('/', $params['vimeo']);
     foreach ($urlparts as $urlpart) {

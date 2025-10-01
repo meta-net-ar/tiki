@@ -70,11 +70,8 @@ function wikiplugin_addreference($data, $params)
         }
         $params['biblio_code'] = $cleanBiblioCode;
 
-        extract($params, EXTR_SKIP);
-
         $matchedReferences = Reference::extractBibliographicCodesFromText($page_info['data']);
 
-        $temp = [];
         $curr_matches = [];
         $temp = array_unique($matchedReferences);
         $i = 0;

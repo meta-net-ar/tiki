@@ -31,6 +31,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 $artlib = TikiLib::lib('art');
+$categlib = TikiLib::lib('categ');
 
 if ($prefs['article_use_new_list_articles'] == 'y') {
     include "lists/articles.php";
@@ -97,23 +98,35 @@ $max_rating = $_REQUEST['max_rating'] ?? '';
 $find = $_REQUEST["find"] ?? '';
 
 $smarty->assign_by_ref('find', $find);
-if (isset($_REQUEST["type"])) {
+if (! empty($_REQUEST["type"])) {
     $type = $_REQUEST["type"];
+    if (empty($artlib->get_type($type))) {
+        Feedback::errorAndDie(tra("Invalid article type or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $type = '';
 }
-if (isset($_REQUEST["topic"])) {
+if (! empty($_REQUEST["topic"])) {
     $topic = $_REQUEST["topic"];
+    if (empty($artlib->get_topic($topic))) {
+         Feedback::errorAndDie(tra("Invalid article topic or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $topic = '';
 }
-if (isset($_REQUEST['topicName'])) {
+if (! empty($_REQUEST['topicName'])) {
     $topicName = $_REQUEST['topicName'];
+    if (empty($artlib->get_topic($topicName))) {
+        Feedback::errorAndDie(tra("Invalid article topic name or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $topicName = '';
 }
-if (isset($_REQUEST["categId"])) {
+if (! empty($_REQUEST["categId"])) {
     $categId = $_REQUEST["categId"];
+    if (empty($categlib->get_category($_REQUEST["categId"]))) {
+        Feedback::errorAndDie(tra("Invalid category or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $categId = '';
 }

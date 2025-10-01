@@ -109,9 +109,6 @@ function wikiplugin_trade($data, $params, $offset)
     require_once 'lib/payment/cclitelib.php';
     static $iPluginTrade = 0;
 
-    $default = [ 'inputtitle' => '', 'wanted' => 'n', 'action' => tra('Continue'), 'registry' => '', 'currency' => '' ];
-    $params = array_merge($default, $params);
-
     if (empty($params['registry'])) {
         $params['registry'] = $cclitelib->get_registry();
     }

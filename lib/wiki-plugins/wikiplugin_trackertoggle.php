@@ -65,8 +65,6 @@ function wikiplugin_trackertoggle_info()
 
 function wikiplugin_trackertoggle($data, $params)
 {
-    $default = ['visible' => 'n'];
-    $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
 
     if (empty($fieldId) || ! isset($value) || empty($id)) {

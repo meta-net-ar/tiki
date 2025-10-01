@@ -251,7 +251,7 @@ function wikiplugin_trackertimeline($data, $params)
         return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
     }
 
-    $default = ['scale' => 'month', 'height' => null, 'step' => '2'];
+    $default = ['height' => null, 'step' => '2'];
     $params = array_merge($default, $params);
     $formats = ['hour' => 'H:i', 'day' => 'jS', 'week' => 'jS', 'month' => 'm', 'year' => 'y'];
     $max = 0;

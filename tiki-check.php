@@ -4757,6 +4757,11 @@ if ($standalone && ! $nagios) {
         'MCrypt' => $criptLib->getUserCryptDataStats('mcrypt'),
     ));
     $ws_port = $prefs['realtime_port'] ? $prefs['realtime_port'] : '8080';
+    $websocket_full_base_url = $prefs['realtime_full_base_url'];
+    if (! empty($websocket_full_base_url)) {
+        $parts = parse_url($websocket_full_base_url);
+        $ws_port = $parts['port'] ?? null;
+    }
     $ws_conn = @fsockopen('localhost', $ws_port);
     if (is_resource($ws_conn)) {
         $ws_listening = true;
@@ -4791,7 +4796,11 @@ if ($standalone && ! $nagios) {
         )
     );
     $smarty->assign('realtime', $realtime);
-    $smarty->assign('realtime_url', preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    if (! empty($websocket_full_base_url)) {
+        $smarty->assign('realtime_url', $websocket_full_base_url);
+    } else {
+        $smarty->assign('realtime_url', preg_replace('#http://#', 'ws://', preg_replace('#https://#', 'wss://', $base_url)) . 'ws/');
+    }
 
     $output = array();
     $locales = null;

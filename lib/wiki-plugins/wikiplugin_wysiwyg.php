@@ -58,14 +58,6 @@ function wikiplugin_wysiwyg_info()
 
 function wikiplugin_wysiwyg($data, $params)
 {
-    // TODO refactor: defaults for plugins?
-    $defaults = [];
-    $plugininfo = wikiplugin_wysiwyg_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     global $tiki_p_edit, $page, $prefs, $user;
     static $execution = 0;
 

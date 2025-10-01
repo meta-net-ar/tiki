@@ -30,7 +30,7 @@ function wikiplugin_catpath_info()
                 'description' => tra('Show the top category as part of the path name (not shown by default)'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => 'no',
+                'default' => 'n',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -44,9 +44,6 @@ function wikiplugin_catpath_info()
 function wikiplugin_catpath($data, $params)
 {
     global $prefs;
-
-    $smarty = TikiLib::lib('smarty');
-    $tikilib = TikiLib::lib('tiki');
     $categlib = TikiLib::lib('categ');
 
     if ($prefs['feature_categories'] != 'y') {
@@ -54,18 +51,6 @@ function wikiplugin_catpath($data, $params)
     }
 
     extract($params, EXTR_SKIP);
-
-    // default divider is '>'
-    if (! (isset($divider))) {
-        $divider = '>';
-    }
-
-    // default setting for top is 'no'
-    if (! (isset($top))) {
-        $top = 'no';
-    } elseif ($top != 'y' and $top != 'yes' and $top != 'n' and $top != 'no') {
-        $top = 'no';
-    }
 
     $objId = urldecode($_REQUEST['page'] ?? '');
 
@@ -81,10 +66,8 @@ function wikiplugin_catpath($data, $params)
             $catpath .= '<a class="categpath" href="tiki-browse_categories.php?parentId=0">TOP</a> ' . $divider . ' ';
         }
 
-        $path = '';
         $info = $categlib->get_category($categId);
-        $path
-            = '<a class="categpath" href="tiki-browse_categories.php?parentId=' . $info["categId"] . '">' . htmlspecialchars($info["name"]) . '</a>';
+        $path = '<a class="categpath" href="tiki-browse_categories.php?parentId=' . $info["categId"] . '">' . htmlspecialchars($info["name"]) . '</a>';
 
         while ($info["parentId"] != 0) {
             $info = $categlib->get_category($info["parentId"]);

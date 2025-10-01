@@ -31,7 +31,7 @@ function wikiplugin_coil($data, $params)
     $paywall = $prefs['webmonetization_default_paywall_text'] ?? '';
     $alwaysDefaultPointer = $prefs['webmonetization_always_default'];
 
-    $user = $params['user'] ?? '';
+    $user = $params['user'];
 
     if ($alwaysDefaultPointer !== 'y' && $user && TikiLib::lib('user')->get_user_id($user) > 0) {
         $tikilib = TikiLib::lib('tiki');

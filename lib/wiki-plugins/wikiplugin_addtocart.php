@@ -211,13 +211,6 @@ function wikiplugin_addtocart($data, $params)
         return WikiParser_PluginOutput::argumentError(array_diff([ 'code', 'description', 'price'], array_keys($params)));
     }
 
-    $plugininfo = wikiplugin_addtocart_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
-
     // once forceanon is set it will have to affect the whole shopping cart otherwise it will be inconsistent
     if ($params['forceanon'] == 'y') {
         $_SESSION['forceanon'] = 'y';

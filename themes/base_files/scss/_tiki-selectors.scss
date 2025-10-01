@@ -554,6 +554,11 @@ li.toolbar:active {
 #intertrans-indicator {
     background-color: $tiki-intertrans_background;
     color: $success;
+    position: fixed !important;
+    bottom: 10px !important;         
+    width: 100% !important;       
+    z-index: 99999 !important;    /* on top of modals */
+    
 }
 
 #intertrans-form {
@@ -700,6 +705,7 @@ ul.all_languages > li {
     .icon {
         font-size: small;
         margin-left: 0.4rem;
+        display: inline;
     }
 }
 

@@ -235,6 +235,10 @@ if (
     Feedback::errorPage(['mes' => tr('You do not have permission to view this gallery'), 'errortype' => 401]);
 }
 
+if ($prefs['fgal_show_modtimedate']) {
+    $gal_info['show_modtimedate'] = $prefs['fgal_show_modtimedate'];
+}
+
 // Init smarty variables to blank values
 $smarty->assign('fname', '');
 $smarty->assign('fdescription', '');
@@ -471,7 +475,6 @@ if (isset($_REQUEST['fgal_actions'])) {
         $smarty->assign_by_ref('groups', $groups['data']);
     }
 }
-
 
 if (isset($_REQUEST['permsel']) && isset($_REQUEST['subgal']) && $access->checkCsrf()) {
     $access->check_permission('assign_perm_file_gallery');

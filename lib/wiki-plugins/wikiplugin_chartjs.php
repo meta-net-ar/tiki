@@ -111,14 +111,6 @@ function wikiplugin_chartjs($data, $params)
         $params['id'] = "tikiChart$instance";
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_chartjs_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if (empty($params['data_highlights'])) {
         $params['data_highlights'] = $params['data_colors'];
     }

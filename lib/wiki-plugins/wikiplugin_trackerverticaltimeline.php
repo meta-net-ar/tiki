@@ -155,7 +155,7 @@ function wikiplugin_trackerverticaltimeline($data, $params)
         return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'date') . '{BOX}';
     }
 
-    $default = ['distribution' => 'left-right', 'orientation' => 'vertical', 'aggregateBy' => 'minute', 'height' => '1000px', 'urlTarget' => '_blank'];
+    $default = ['aggregateBy' => 'minute'];
     $params = array_merge($default, $params);
 
     $urlTarget = "";

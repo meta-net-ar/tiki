@@ -50,10 +50,8 @@ function wikiplugin_translated($data, $params)
             $avflags[] = substr($file, 0, strlen($file) - 4);
         }
     }
-    if (isset($flag)) {
-        if (in_array($flag, $avflags)) {
-            $img = "<img src='img/flags/$flag.png' width='18' height='13' vspace='0' hspace='3' alt='$lang' align='baseline' /> ";
-        }
+    if (in_array($flag, $avflags)) {
+        $img = "<img src='img/flags/{$escapedFlag}.png' alt='{$escapedLang}' style='width:18px; height:13px; margin:0 3px 0 0; vertical-align:baseline;' />";
     }
 
     if (! $img) {

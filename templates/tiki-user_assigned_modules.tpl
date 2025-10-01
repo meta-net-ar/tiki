@@ -36,12 +36,14 @@
         {if $prefs.feature_left_column ne 'n' || count($modules_l) > 0}
             <td style="vertical-align: top">
                 <table class="table table-striped table-hover">
-                    <tr>
-                        <th>{tr}#{/tr}</th>
-                        <th>{tr}Name{/tr}</th>
-                        <th></th>
-                    </tr>
-
+                    <thead>
+                        <tr>
+                            <th>{tr}#{/tr}</th>
+                            <th>{tr}Name{/tr}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {section name=ix loop=$modules_l}
                         <tr>
                             <td>{$modules_l[ix].ord}</td>
@@ -51,45 +53,45 @@
                                     {ticket}
                                     <input type="hidden" name="redirect" value="1">
                                     <button
-                                        type="submit"
-                                        name="up"
-                                        value="{$modules_l[ix].moduleId}"
-                                        class="tips btn btn-link p-0"
-                                        title=":{tr}Move module up{/tr}"
-                                        aria-label="{tr}Move module up{/tr}"
+                                            type="submit"
+                                            name="up"
+                                            value="{$modules_l[ix].moduleId}"
+                                            class="tips btn btn-link p-0"
+                                            title=":{tr}Move module up{/tr}"
+                                            aria-label="{tr}Move module up{/tr}"
                                     >
                                         {icon name="up"}
                                     </button>
                                     <button
-                                        type="submit"
-                                        name="down"
-                                        value="{$modules_l[ix].moduleId}"
-                                        class="tips btn btn-link p-0"
-                                        title=":{tr}Move module down{/tr}"
-                                        aria-label="{tr}Move module down{/tr}"
+                                            type="submit"
+                                            name="down"
+                                            value="{$modules_l[ix].moduleId}"
+                                            class="tips btn btn-link p-0"
+                                            title=":{tr}Move module down{/tr}"
+                                            aria-label="{tr}Move module down{/tr}"
                                     >
                                         {icon name="down"}
                                     </button>
                                     {if $prefs.feature_right_column ne 'n'}
                                         <button
-                                            type="submit"
-                                            name="right"
-                                            value="{$modules_l[ix].moduleId}"
-                                            class="tips btn btn-link p-0"
-                                            title=":{tr}Move to right side{/tr}"
-                                            aria-label="{tr}Move to right side{/tr}"
+                                                type="submit"
+                                                name="right"
+                                                value="{$modules_l[ix].moduleId}"
+                                                class="tips btn btn-link p-0"
+                                                title=":{tr}Move to right side{/tr}"
+                                                aria-label="{tr}Move to right side{/tr}"
                                         >
                                             {icon name="next"}
                                         </button>
                                     {/if}
-                                    {if $modules_r[ix].name ne 'application_menu' and $modules_r[ix].name ne 'login_box' and $modules_r[ix].type ne 'P'}
+                                    {if $modules_l[ix].name ne 'application_menu' and $modules_l[ix].name ne 'login_box' and $modules_l[ix].type ne 'P'}
                                         <button
-                                            type="submit"
-                                            name="unassign"
-                                            value="{$modules_l[ix].moduleId}"
-                                            class="tips btn btn-link p-0"
-                                            title=":{tr}Unassign{/tr}"
-                                            aria-label="{tr}Unassign{/tr}"
+                                                type="submit"
+                                                name="unassign"
+                                                value="{$modules_l[ix].moduleId}"
+                                                class="tips btn btn-link p-0"
+                                                title=":{tr}Unassign{/tr}"
+                                                aria-label="{tr}Unassign{/tr}"
                                         >
                                             {icon name="remove"}
                                         </button>
@@ -98,6 +100,7 @@
                             </td>
                         </tr>
                     {/section}
+                    </tbody>
                 </table>
             </td>
         {/if}
@@ -105,11 +108,14 @@
         {if $prefs.feature_right_column ne 'n' || count($modules_r) > 0}
             <td style="vertical-align: top">
                 <table class="table table-striped table-hover">
-                    <tr>
-                        <th>{tr}#{/tr}</th>
-                        <th>{tr}Name{/tr}</th>
-                        <th></th>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>{tr}#{/tr}</th>
+                            <th>{tr}Name{/tr}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
                     {section name=ix loop=$modules_r}
                         <tr>
@@ -120,45 +126,45 @@
                                     {ticket}
                                     <input type="hidden" name="redirect" value="1">
                                     <button
-                                        type="submit"
-                                        name="up"
-                                        value="{$modules_r[ix].moduleId}"
-                                        class="tips btn btn-link p-0"
-                                        title=":{tr}Move module up{/tr}"
-                                        aria-label="{tr}Move module up{/tr}"
+                                            type="submit"
+                                            name="up"
+                                            value="{$modules_r[ix].moduleId}"
+                                            class="tips btn btn-link p-0"
+                                            title=":{tr}Move module up{/tr}"
+                                            aria-label="{tr}Move module up{/tr}"
                                     >
                                         {icon name="up"}
                                     </button>
                                     <button
-                                        type="submit"
-                                        name="down"
-                                        value="{$modules_r[ix].moduleId}"
-                                        class="tips btn btn-link p-0"
-                                        title=":{tr}Move module down{/tr}"
-                                        aria-label="{tr}Move module down{/tr}"
+                                            type="submit"
+                                            name="down"
+                                            value="{$modules_r[ix].moduleId}"
+                                            class="tips btn btn-link p-0"
+                                            title=":{tr}Move module down{/tr}"
+                                            aria-label="{tr}Move module down{/tr}"
                                     >
                                         {icon name="down"}
                                     </button>
                                     {if $prefs.feature_left_column ne 'n'}
                                         <button
-                                            type="submit"
-                                            name="left"
-                                            value="{$modules_r[ix].moduleId}"
-                                            class="tips btn btn-link p-0"
-                                            title=":{tr}Move to left side{/tr}"
-                                            aria-label="{tr}Move to left side{/tr}"
+                                                type="submit"
+                                                name="left"
+                                                value="{$modules_r[ix].moduleId}"
+                                                class="tips btn btn-link p-0"
+                                                title=":{tr}Move to left side{/tr}"
+                                                aria-label="{tr}Move to left side{/tr}"
                                         >
                                             {icon name="previous"}
                                         </button>
                                     {/if}
                                     {if $modules_r[ix].name ne 'application_menu' and $modules_r[ix].name ne 'login_box' and $modules_r[ix].type ne 'P'}
                                         <button
-                                            type="submit"
-                                            name="unassign"
-                                            value="{$modules_r[ix].moduleId}"
-                                            class="tips btn btn-link p-0"
-                                            title=":{tr}Unassign{/tr}"
-                                            aria-label="{tr}Unassign{/tr}"
+                                                type="submit"
+                                                name="unassign"
+                                                value="{$modules_r[ix].moduleId}"
+                                                class="tips btn btn-link p-0"
+                                                title=":{tr}Unassign{/tr}"
+                                                aria-label="{tr}Unassign{/tr}"
                                         >
                                             {icon name="remove"}
                                         </button>
@@ -167,6 +173,7 @@
                             </td>
                         </tr>
                     {/section}
+                    </tbody>
                 </table>
             </td>
         {/if}

@@ -23,7 +23,7 @@ const multiple = computed(() => normalize(props.multiple, false))
 const clearable = computed(() => normalize(props.clearable, false));
 const collapseTags = computed(() => normalize(props.collapseTags, false));
 const filterable = computed(() =>
-  Boolean(props.remoteSourceUrl) || normalize(props.filterable, false)
+    Boolean(props.remoteSourceUrl) || normalize(props.filterable, false)
 );
 const allowCreate = computed(() => normalize(props.allowCreate, false));
 const grouped = computed(() => normalize(props.group, false));
@@ -58,14 +58,23 @@ const options = ref([]);
 const wrapperRef = ref(null);
 
 const handleValueChange = (value) => {
-    props.emitValueChange({
-        value,
-    });
+    // check if the checkbox with id "intertrans-active" is checked
+    const checkbox = document.getElementById("intertrans-active");
+    if (!checkbox || !checkbox.checked) {
+        props.emitValueChange({
+            value,
+        });
+    }
+
+    if (typeof window.vueselectIntertransHandler === "function") {
+        const option = options.value.find(opt => opt.value === value);
+        window.vueselectIntertransHandler(option); // on envoie le label
+    }
 };
 
 const remoteMethod = async (query) => {
     if (!query) return;
-    
+
     try {
         const url = new URL(props.remoteSourceUrl);
         url.searchParams.append("q", query);
@@ -74,13 +83,13 @@ const remoteMethod = async (query) => {
                 Accept: "application/json",
             },
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        const loadedOptions = data.map(item => (typeof item === "string" ? { value: item, label: item }: item));
+        const loadedOptions = data.map(item => (typeof item === "string" ? { value: item, label: item } : item));
         const newOptions = [
             ...options.value.filter(item => modelValue.value?.includes(item.value)),
             ...loadedOptions,
@@ -125,56 +134,23 @@ export const DATA_TEST_ID = {
 
 <template>
     <ConfigWrapper :language="language">
-        <div 
-            :class="{ 'invalid': isInvalid }"
-            :data-testid="DATA_TEST_ID.SELECT_WRAPPER"
-            ref="wrapperRef"
-        >
-            <el-select
-                v-model="modelValue"
-                :multiple="multiple"
-                :filterable="filterable"
-                :allow-create="allowCreate"
-                default-first-option
-                :reserve-keyword="false"
-                :placeholder="placeholder"
-                :teleported="false"
-                @change="handleValueChange"
-                :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable" :collapse-tags="collapseTags"
-                :max-collapse-tags="parseInt(maxCollapseTags ?? 0, 10)"
-                :size="size"
-                :data-testid="DATA_TEST_ID.SELECT_ELEMENT"
-                :remote-method="remoteMethod"
-                :remote="Boolean(remoteSourceUrl)"
-                v-bind="$attrs"
-                :empty-values="[null, undefined]"
-            >
+        <div :class="{ 'invalid': isInvalid }" :data-testid="DATA_TEST_ID.SELECT_WRAPPER" ref="wrapperRef">
+            <el-select v-model="modelValue" :multiple="multiple" :filterable="filterable" :allow-create="allowCreate"
+                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false"
+                @change="handleValueChange" :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable"
+                :collapse-tags="collapseTags" :max-collapse-tags="parseInt(maxCollapseTags ?? 0, 10)" :size="size"
+                :data-testid="DATA_TEST_ID.SELECT_ELEMENT" :remote-method="remoteMethod"
+                :remote="Boolean(remoteSourceUrl)" v-bind="$attrs" :empty-values="[null, undefined]">
                 <template v-if="grouped">
-                    <el-option-group 
-                        v-for="group in options"
-                        :key="group.label"
-                        :label="group.label"
-                        :data-testid="DATA_TEST_ID.SELECT_OPTION_GROUP"
-                    >
-                        <el-option 
-                            v-for="item in group.options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                            :disabled="item.disabled"
-                            :data-testid="DATA_TEST_ID.SELECT_OPTION"
-                        />
+                    <el-option-group v-for="group in options" :key="group.label" :label="group.label"
+                        :data-testid="DATA_TEST_ID.SELECT_OPTION_GROUP">
+                        <el-option v-for="item in group.options" :key="item.value" :label="item.label"
+                            :value="item.value" :disabled="item.disabled" :data-testid="DATA_TEST_ID.SELECT_OPTION" />
                     </el-option-group>
                 </template>
                 <template v-else>
-                    <el-option 
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                        :disabled="item.disabled"
-                        :data-testid="DATA_TEST_ID.SELECT_OPTION"
-                    />
+                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"
+                        :disabled="item.disabled" :data-testid="DATA_TEST_ID.SELECT_OPTION" />
                 </template>
             </el-select>
         </div>

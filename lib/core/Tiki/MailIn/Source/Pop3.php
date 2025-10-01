@@ -12,7 +12,6 @@ use ZBateson\MailMimeParser\MailMimeParser;
  * @deprecated This class is deprecated and will be removed after Tiki30LTS.
  * POP3 access is no longer supported in Tiki.
  */
-#[\Deprecated]
 class Pop3 implements SourceInterface
 {
     protected $host;

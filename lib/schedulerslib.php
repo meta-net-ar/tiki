@@ -150,6 +150,26 @@ class SchedulersLib extends TikiLib
     }
 
     /**
+     * Get failed runs
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getFailedRuns($timeBack)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+
+        return $schedulersRunTable->fetchAll(
+            ['start_time', 'end_time', 'output', 'scheduler_id'],
+            [
+                'start_time' => $schedulersRunTable->greaterThan($timeBack),
+                'status' => 'failed'
+            ]
+        );
+    }
+
+    /**
      * Mark scheduler run as active (running)
      *
      * @param string    $scheduler_id   The scheduler id

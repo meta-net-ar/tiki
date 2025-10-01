@@ -50,6 +50,14 @@ function prefs_http_list()
                 'http_header_frame_options',
             ],
         ],
+        'http_header_access_control_allow_credentials' => [
+            'name' => tra('HTTP header allow credentials'),
+            'description' => tra('The Access-Control-Allow-Credentials response header tells browsers whether the server allows cross-origin HTTP requests to include credentials.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced']
+        ],
         'http_header_xss_protection' => [
             'name' => tra('HTTP header x-xss-protection'),
             'description' => tra('The x-xss-protection header is designed to enable the cross-site scripting (XSS) filter built into modern web browsers'),
@@ -72,6 +80,72 @@ function prefs_http_list()
             'dependencies' => [
                 'http_header_xss_protection',
             ],
+        ],
+        'http_header_cross_origin_embedder_policy' => [
+            'name' => tra('HTTP header cross-origin-embedder-policy'),
+            'description' => tra('Controls the loading of cross-origin resources in a document. Setting this header helps enhance security by ensuring that loaded resources explicitly grant permission to be loaded.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_cross_origin_embedder_policy_value' => [
+            'name' => tra('Header value'),
+            'description' => tra('Specifies the policy for loading cross-origin resources. "Require-CORP" requires cross-origin resources to have CORP headers. "Credentialless" allows loading cross-origin resources without credentials. "Unsafe-none" applies no restrictions.'),
+            'type' => 'list',
+            'options' => [
+                'unsafe-none' => tra('None'),
+                'require-corp' => tra('Require-CORP'),
+                'credentialless' => tra('Credentialless'),
+            ],
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_cross_origin_resource_policy' => [
+            'name' => tra('HTTP header Cross-Origin-Resource-Policy'),
+            'description' => tra('Defines which cross-origin requests are allowed to access resources on your site. This header can help prevent other sites from reading or loading your site\'s resources without permission.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_cross_origin_resource_policy_value' => [
+            'name' => tra('Header value'),
+            'description' => tra('Determines which origins are allowed to access resources. "Same-Origin" only allows your own site to access resources. "Same-Site" extends this to your entire site, including subdomains. "Cross-Origin" allows any site to access the resources.'),
+            'type' => 'list',
+            'options' => [
+                'same-origin' => tra('Same-Origin: Only same-origin requests are allowed.'),
+                'same-site' => tra('Same-Site: Only requests from the same site are allowed.'),
+                'cross-origin' => tra('Cross-Origin: Allows requests from any origin.'),
+            ],
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+            'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy',
+        ],
+        'http_header_cross_origin_opener_policy' => [
+            'name' => tra('HTTP header Cross-Origin-Opener-Policy'),
+            'description' => tra('Enables or disables the sending of the Cross-Origin-Opener-Policy header in HTTP responses from your site. This header controls how the document may interact with other browsing contexts.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_cross_origin_opener_policy_value' => [
+            'name' => tra('Header value'),
+            'description' => tra('Specifies the policy for cross-origin opener policy header.'),
+            'type' => 'list',
+            'options' => [
+                'same-origin' => tra('Same-Origin: Allows the document to be opened only by pages from the same origin.'),
+                'same-origin-allow-popups' => tra('Same-Origin-Allow-Popups: Allows the document to be opened by pages from the same origin, and allows those pages to open popups.'),
+                'same-origin-plus-coep' => tra('Same-Origin-Plus-COEP: Allows the document to be opened only by pages from the same origin, and sets the Cross-Origin-Embedder-Policy header to `require-corp`.'),
+                'unsafe-none' => tra('None: No specific policy is set.'),
+            ],
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+            'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy',
         ],
         'http_header_content_type_options' => [
             'name' => tra('HTTP header x-content-type-options'),
@@ -103,6 +177,52 @@ function prefs_http_list()
                 '<code>frame-ancestors https://example.com/</code>'
             ),
             'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy',
+        ],
+        'http_header_access_control_allow_methods' => [
+            'name' => tra('HTTP header access-control-allow-methods'),
+            'description' => tra('Enables or disables the sending of the Access-Control-Allow-Methods header in HTTP responses from your Tiki site. This header is crucial for Cross-Origin Resource Sharing (CORS) and specifies the HTTP methods that are allowed when accessing resources in response to a preflight request.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_access_control_allow_methods_value' => [
+            'name' => tra('Header value'),
+            'type' => 'text',
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+            'dependencies' => [
+                'http_header_access_control_allow_methods',
+            ],
+            'description' => tr(
+                'Specifies the HTTP methods that are allowed for cross-origin requests. This setting takes effect only if the HTTP header access-control-allow-methods is enabled. Separate multiple methods with commas. For example, to allow GET, POST, and PUT methods, set this value to %0',
+                '<code>GET, POST, PUT</code>'
+            ),
+            'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods',
+        ],
+        'http_header_access_control_allow_headers' => [
+            'name' => tra('HTTP header access-control-allow-headers'),
+            'description' => tra('Enables or disables the sending of the Access-Control-Allow-Headers header in HTTP responses from your Tiki site. This header is crucial for Cross-Origin Resource Sharing (CORS) and specifies the headers that are allowed when making actual requests (after the preflight has been accepted).'),
+            'type' => 'flag',
+            'default' => 'n',
+            'perspective' => false,
+            'tags' => ['advanced'],
+        ],
+        'http_header_access_control_allow_headers_value' => [
+            'name' => tra('Header value'),
+            'type' => 'text',
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+            'dependencies' => [
+                'http_header_access_control_allow_headers',
+            ],
+            'description' => tr(
+                'Specifies the HTTP headers that can be used when making the actual request. This setting takes effect only if the HTTP header access-control-allow-headers is enabled. Separate multiple header names with commas. For example, to allow headers such as Content-Type, Accept, and X-Requested-With, set this value to %0',
+                '<code>Content-Type, Accept, X-Requested-With</code>'
+            ),
+            'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
         ],
         'http_header_strict_transport_security' => [
             'name' => tra('HTTP header strict-transport-security'),

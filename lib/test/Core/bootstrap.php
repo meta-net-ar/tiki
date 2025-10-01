@@ -12,23 +12,40 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . "." . PATH_SEPARATOR . "../../core" . PATH_SEPARATOR . "../../..");
 
-function tra($string)
-{
-    return $string;
+if (getenv('TIKI_TEST_SKIP_DB') === '1' && ! function_exists('tra')) {
+    function tra($string)
+    {
+        return $string;
+    }
 }
 
 require __DIR__ . '/../../../vendor_bundled/vendor/autoload.php';
 
 $tikidomain = '';
-require 'db/local.php';
-
-if (extension_loaded("pdo")) {
-    require_once('db/tiki-db-pdo.php');
+$testLocal = __DIR__ . '/../local.php';
+if (file_exists($testLocal)) {
+    require $testLocal;
+} else {
+    require 'db/local.php';
 }
 
-$db = TikiDb::get();
+if (getenv('TIKI_TEST_SKIP_DB') !== '1') {
+    if (extension_loaded("pdo") && file_exists('db/tiki-db-pdo.php')) {
+        require_once 'db/tiki-db-pdo.php';
+    } else {
+        require_once 'db/tiki-db.php';
+    }
 
-$pwd = getcwd();
-chdir(__DIR__ . '/../../../');
-$cachelib = TikiLib::lib('cache');
-chdir($pwd);
+    $db = TikiDb::get();
+}
+
+if (getenv('TIKI_TEST_INIT_CACHE') === '1' && defined('TIKI_PATH') && class_exists('TikiLib')) {
+    $pwd = getcwd();
+    chdir(__DIR__ . '/../../../');
+    try {
+        $cachelib = TikiLib::lib('cache');
+    } catch (\Throwable $e) {
+        // ignore
+    }
+    chdir($pwd);
+}

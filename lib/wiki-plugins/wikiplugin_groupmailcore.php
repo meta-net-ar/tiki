@@ -118,7 +118,7 @@ function wikiplugin_groupmailcore($data, $params)
     $trackerparams['showcreated'] = 'n';
     $trackerparams['showlastmodif'] = 'n';
 
-    $data = wikiplugin_trackerlist('', $trackerparams);
+    $data = TikiLib::lib('parser')->invokePlugin('trackerlist', '', $trackerparams);
 
     return $data;
 }

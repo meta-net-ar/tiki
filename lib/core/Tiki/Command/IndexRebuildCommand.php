@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Tiki\Profiling\Timer;
+use Tiki\Search\SearchIndexRebuilder;
 
 #[AsCommand(
     name: 'index:rebuild',
@@ -101,11 +102,8 @@ class IndexRebuildCommand extends Command
 
         $num_queries_before = $num_queries;
 
-        // Apply 'Search index rebuild memory limit' setting if available
-        if (! empty($prefs['allocate_memory_unified_rebuild'])) {
-            $memory_limiter = new \Tiki_MemoryLimit($prefs['allocate_memory_unified_rebuild']);
-        }
-
+        // Set up progress bar if requested
+        $progress = null;
         if ($input->getOption('progress') && ! $cron) {
             $lastStats = \TikiLib::lib('tiki')->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
             if (isset($lastStats['default']['counts'])) {
@@ -131,28 +129,11 @@ class IndexRebuildCommand extends Command
             $progress->setFormat('custom');
             $progress->setMessage(tr('Rebuilding...'));
             $progress->start();
-        } else {
-            $progress = null;
         }
 
-        $result = $unifiedsearchlib->rebuild($log, false, $progress);
-
-        if ($progress) {
-            $progress->setMessage(tr('Rebuilding preferences index'));
-            $progress->advance();
-        }
-
-        // Also rebuild admin index
-        \TikiLib::lib('prefs')->rebuildIndex();
-
-        if ($progress) {
-            $progress->finish();
-        }
-
-        // Back up original memory limit if possible
-        if (isset($memory_limiter)) {
-            unset($memory_limiter);
-        }
+        // Use shared service to rebuild index directly (console commands always execute directly)
+        $searchIndexRebuilder = new SearchIndexRebuilder();
+        $result = $searchIndexRebuilder->rebuildIndex($log, false, $progress);
 
         \Feedback::printToConsole($output, $cron);
 

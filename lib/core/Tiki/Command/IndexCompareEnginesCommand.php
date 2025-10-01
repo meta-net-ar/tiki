@@ -308,7 +308,7 @@ class IndexCompareEnginesCommand extends Command
 
             foreach ($differentOutputs as $output) {
                 $pageName = $output['page'];
-                $pluginCode = wikiplugin_code($output['plugin'], ['colors' => 'tiki'], null, []);
+                $pluginCode = TikiLib::lib('parser')->invokePlugin('code', $output['plugin'], ['colors' => 'tiki']);
                 $diff = DiffUtils::diff2($output['output'][$engines[0]], $output['output'][$engines[1]]);
                 $htmlOutput .= <<<HTML
 <table class='table table-striped' style='margin-top: 40px'>

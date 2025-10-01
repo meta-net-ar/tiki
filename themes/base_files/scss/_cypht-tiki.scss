@@ -10,7 +10,7 @@
     .hide { display: none; }
     // override colors when not using cypht default theme
     img { opacity: 1 !important; max-width: 100%; }
-    i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
+    a i.bi, .menu-toggle i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
     .ui-widget-content { background-color: $tiki-ui-default-bg !important; }
     .ui-menu-item-wrapper { color: var(--bs-body-color) !important; }
     .ui-state-active { color: $tiki-ui-default-link-active-color !important; }
@@ -106,9 +106,7 @@
         text-decoration: $link-hover-decoration !important;
     }
     .content_title {
-        overflow: visible; min-height: 50px; max-height: 400px;
-        padding: 25px;
-        padding-bottom: 5px;
+        overflow: visible; min-height: 50px; max-height: 400px; padding: 15px;
     }
 
     .folders a, .subject a, .selected_menu a,
@@ -224,6 +222,28 @@
         border-radius: var(--bs-border-radius);
     }
 
+    .content_title {
+        .msg_controls {
+            flex-flow: wrap; margin-bottom: 10px;
+            a { text-decoration: none; }
+        }
+        .search_terms { width: 90% !important; margin: 0; padding: 4px 12px; }
+        .search_form {
+            padding-left: 0;
+            el-select { width: 45%; }
+        }
+        #imap_filter_form {
+            .imap_keyword, el-select { margin-right: 5px; }
+        }
+    }
+    .search_content {
+        .content_title {
+            flex-flow: wrap;
+            .msg_controls { margin-bottom: 0; }
+        }
+        .list_controls { position: absolute; top: 15px; right: 15px; }
+    }
+
     /* Bootstrap-based message headers */
     .msg_text * {
         white-space: normal !important;
@@ -308,6 +328,13 @@
     .collapsed ul {
         display: inherit;
     }
+    nav.collapsed .menu-toggle {
+        right: 36%;
+    }
+    .folder_cell.collapsed .folder_list {
+        padding-right: 20px;
+    }
+
     main .container {
         width: 100%;
     }
@@ -332,6 +359,8 @@
     .search_terms, .search_form select {
         width: auto !important;
     }
+
+    .nux_welcome { margin-bottom: 15px; }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
@@ -354,6 +383,11 @@
         border-bottom: 1px solid $input-border-color;
         white-space: normal;
     }
+
+    #middle_outer {
+        margin-top: 15px !important;
+        .middle-wrapper { padding-top: 0; }
+    }
 }
 
 //
@@ -375,12 +409,12 @@
             z-index: 1000;
             text-align: left;
             top: 0;
-            padding: 15px 0 15px 20px;
+            padding: 10px 0 10px 20px;
             background: #fff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        nav .menu-toggle {
+        nav .menu-toggle:not(.close-toggle) {
             right: 20px;
             left: unset;
             text-align: left;
@@ -402,32 +436,6 @@
             background-color: var(--bs-body-bg);
         }
 
-        .nav-header a {
-            margin: auto 45% auto auto;
-        }
-
-        .mobile .nav-header .app-logo {
-        display: block;
-        height: 2rem;
-        width: auto;
-        padding: 0;
-        margin: 0;
-        }
-
-        .mobile .nav-header .close-toggle {
-        position: static;
-        background: none;
-        box-shadow: none;
-        backdrop-filter: none;
-        width: fit-content;
-        margin-left: 0;
-        padding: 15px 20px;
-        }
-
-        .mobile .app-logo{
-        display: none;
-        }
-
         .content_cell {
             border: none;
             display: block !important;
@@ -439,13 +447,14 @@
 
         .content_title {
             background-color: $body-bg !important;
+            .ctr_divider + div.dropdown { margin-top: 4px; }
         }
 
         .list_controls i.bi-filter-circle {
             position: absolute;
             right: 15px;
-            top: 20px;
-            font-size: 150%;
+            top: 10px;
+            font-size: 125%;
             z-index: 100;
         }
         .imap_filter_form { margin-left: 10px; margin-right: 10px; }
@@ -460,12 +469,13 @@
         .msg_headers th { width: 20%; }
 
         .sys_messages {
-            top: 0; right: 0; width: 100%; min-height: 5px;
+            top: 45px; right: 0; width: 100%; min-height: 5px;
             padding-bottom: 15px; white-space: normal;
         }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
+        .nux_welcome, .nux_help { margin: 0 0 20px; width: 100%; max-width: 100%; }
         .nux_dev_news table td { display: block; }
         .nux_dev_news table tr {
             &:not(:last-child) td:last-child {
@@ -489,14 +499,11 @@
 
         // mobile folders
         .folder_dialog { margin-left: 30px; width: 85%; }
+        .folder_list { border: inherit; border-radius: 0; }
         #imap_server_folder { width: 100%; }
 
         // mobile search
         .search_content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
             .content_title { max-height: 500px; flex: 0 0 auto; margin-top: 0.5rem !important;}
             .mobile .search_content .p-3 {
                 flex: 1 1 auto;
@@ -506,9 +513,12 @@
                 display: block; padding: 0; margin: 0 !important;
                 select { width: calc(50% - 0.5rem); margin: 5px; }
                 input[type=submit], input[type=button] { font-size: 80%; }
+                > form { gap: 0.5rem !important; }
             }
-            #search_terms { margin: 10px 3px 3px; width: 270px; max-width: 100%; }
+            #search_terms { margin: 10px 3px 3px; width: 100% !important; }
             .message_table { margin-top: 0.1rem; }
+            el-select { width: calc(50% - 0.5rem); }
+            .combined_sort + el-select { width: 150px; }
         }
 
         .time_section input[type=date] { display: block; margin-bottom: 10px; }
@@ -550,8 +560,9 @@
         .msg_parts { table-layout: auto; }
         .msg_controls { position: fixed; right: 1rem !important; top: 0.3rem; z-index: 1000; height: auto; padding-top: 0; }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { justify-content: center; align-items: center; margin-top: 1rem; }
+        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }
+        .checkbox_cell { padding-top: 8px !important; }
 
         // groupmail
         .groupmail.message_table {
@@ -600,6 +611,15 @@
     }
 }
 
+html body.tiki.tiki-webmail #middle.container.container-std.middle {
+    width: 95% !important;
+    max-width: 95% !important;
+    min-width: 95% !important;
+}
+
+//
+// tablet and phone specific
+//
 @media screen and (min-width: 1200px) {
     .tiki-webmail {
         .container {
@@ -608,8 +628,20 @@
     }
 }
 
-html body.tiki.tiki-webmail #middle.container.container-std.middle {
-    width: 95% !important;
-    max-width: 95% !important;
-    min-width: 95% !important;
+@media (max-width: 768px) {
+    html body.tiki.tiki-webmail #middle.container.container-std.middle {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .mobile .inline-cypht {
+        .targets_section, .other_section,
+        .time_section, .source_section, .terms_section {
+            padding-left: 0px;
+        }
+        .submit_section { padding-left: 15px; }
+    }
 }

@@ -122,6 +122,7 @@ if (! $tikilib->getOne("SELECT COUNT(*) FROM `information_schema`.`character_set
 $tikilib->get_preferences($needed_prefs, true, true);
 global $systemConfiguration;
 $prefs = $systemConfiguration->preference->toArray() + $prefs;
+$systemConfiguration->setReadOnly();
 
 // Initialize ErrorTracking instance (Sentry/GlitchTip) as early as possible
 TikiLib::lib('errortracking')->init();

@@ -166,7 +166,11 @@
         <table class="table">
             {section name=ix loop=$trackers}
                 <tr>
-                    <td><a href="tiki-list_trackers.php?trackerId={$trackers[ix].trackerId}">{$trackers[ix].value|escape}</a></td>
+                    <td>
+                        <a href="{service controller=tracker action=replace trackerId=$trackers[ix].trackerId accordion_pos=6 modal=true}" 
+                        data-bs-toggle="modal" data-backdrop="static" data-bs-target="#bootstrap-modal" 
+                        onclick="$('[data-bs-toggle=popover]').popover('hide');">{$trackers[ix].value|escape}</a>
+                    </td>
                 </tr>
             {/section}
         </table>

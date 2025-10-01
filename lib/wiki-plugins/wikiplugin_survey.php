@@ -64,7 +64,8 @@ function wikiplugin_survey($data, $params)
     if ($tiki_p_admin !== 'y' || $survey_info['restriction'] === 'y') {
         if ($tikilib->user_has_voted($user, 'survey' . $params['id'])) {
             include_once('lib/wiki-plugins/wikiplugin_remarksbox.php');
-            return wikiplugin_remarksbox(
+            return TikiLib::lib('parser')->invokePlugin(
+                'remarksbox',
                 'You cannot take this survey twice',
                 ['type' => 'comment']
             );

@@ -20,7 +20,6 @@ class SecurityFileGenerateCommand extends Command
 {
     private const CONTACTS = [
         'https://security.tiki.org/tiki-contact.php',
-        'mailto:security@tiki.org',
     ];
     private const ACKNOWLEDGEMENTS = [
         'https://tiki.org/article514',
@@ -76,9 +75,12 @@ class SecurityFileGenerateCommand extends Command
 
         $contacts = [];
         foreach ($input->getOption('admin-contact') as $contact) {
-            if (! preg_match('/^(tel|mailto):/', $contact)) {
-                $output->writeln("<error>Admin contact $contact must either start with tel: or mailto:</error>");
+            if (! preg_match('/^(tel:|mailto:|https?:\/\/)/', $contact)) {
+                $output->writeln("<error>Admin contact $contact must either start with tel:, mailto:, or http(s)://</error>");
                 return false;
+            }
+            if (preg_match('/^mailto:/', $contact)) {
+                $output->writeln("<error>WARNING: Using email as contact may lead to spam.</error>");
             }
             $contacts[] = $contact;
         }

@@ -10,7 +10,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
-use Laminas\Config\Config;
+use Tiki\Config\Config;
+use Tiki\Config\Ini;
 use Tiki\Command\ConsoleSetupException;
 use Tiki\Installer\Installer;
 use Tiki\TikiInit;
@@ -72,60 +73,30 @@ if ($parts = TikiInit::getEnvironmentCredentials()) {
 unset($host_map, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $shadow_user, $shadow_pass, $shadow_host, $shadow_dbs);
 
 global $systemConfiguration;
-$systemConfiguration = new Config(
-    [
-        'preference' => [],
-        'rules' => [],
-    ],
-    ['readOnly' => false]
-);
-if (isset($_SERVER['TIKI_INI_FILE'])) {
-    if (! is_readable($_SERVER['TIKI_INI_FILE'])) {
-        $error = $_SERVER['TIKI_INI_FILE'] . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
-        }
-        echo $error;
-        exit(1);
-    }
+$systemConfiguration = new Config(['preference' => [], 'rules' => []], true);
 
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection($_SERVER['TIKI_INI_IDENTIFIER'] ?? null);
-    $configData = $configReader->fromFile($_SERVER['TIKI_INI_FILE']);
-    $systemConfiguration = $systemConfiguration->merge(new Laminas\Config\Config($configData));
+if (! empty($_SERVER['TIKI_INI_FILE']) && is_readable($_SERVER['TIKI_INI_FILE'])) {
+    try {
+        $envIni = new Ini();
+        $envData = $envIni->fromFile($_SERVER['TIKI_INI_FILE'], $_SERVER['TIKI_INI_IDENTIFIER'] ?? null);
+        $systemConfiguration->mergeAddOnly($envData);
+    } catch (\Throwable $e) {
+        $fail('Failed to load ' . $_SERVER['TIKI_INI_FILE'] . ': ' . $e->getMessage());
+    }
+} elseif (! empty($_SERVER['TIKI_INI_FILE']) && ! is_readable($_SERVER['TIKI_INI_FILE'])) {
+    $fail($_SERVER['TIKI_INI_FILE'] . ' could not be read');
 }
-if (isset($system_configuration_file)) {
-    if (! is_readable($system_configuration_file)) {
-        $error = $system_configuration_file . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
-        }
-        echo $error;
-        exit(1);
+
+if (! empty($system_configuration_file)) {
+    try {
+        $ini = new Ini();
+        $baseData = $ini->fromFile($system_configuration_file, $system_configuration_identifier ?? null);
+        $systemConfiguration->merge($baseData);
+    } catch (\Throwable $e) {
+        $fail('Failed to load ' . $system_configuration_file . ': ' . $e->getMessage());
     }
-    if (! isset($system_configuration_identifier)) {
-        $system_configuration_identifier = null;
-    }
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection($system_configuration_identifier);
-
-    if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-        $retrieveIniContent = function ($system_configuration_file) {
-            ob_start();
-            include($system_configuration_file);
-            $system_configuration_file_content = ob_get_contents();
-            ob_end_clean();
-
-            return $system_configuration_file_content;
-        };
-
-        $system_configuration_content = $retrieveIniContent($system_configuration_file);
-        $configData = $configReader->fromString($system_configuration_content);
-    } else {
-        $configData = $configReader->fromFile($system_configuration_file);
-    }
-
-    $systemConfiguration = $systemConfiguration->merge(new Config($configData));
+} elseif (! empty($system_configuration_file) && ! is_readable($system_configuration_file)) {
+    $fail($system_configuration_file . ' could not be read');
 }
 
 if ($re === false) {
@@ -302,3 +273,17 @@ function mydumpstack($stack)
     }
     return $o;
 }
+
+$fail = static function (string $msg, int $code = 1001): void {
+    if (defined('TIKI_CONSOLE')) {
+        throw new ConsoleSetupException($msg, $code);
+    }
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $msg . PHP_EOL);
+        exit(1);
+    }
+    header('HTTP/1.0 503 Service Unavailable', true, 503);
+    header('Retry-After: 300');
+    echo $msg;
+    exit(1);
+};

@@ -99,15 +99,6 @@ function wikiplugin_viewtextfile($data, $params)
         return ("<p>" . tr("Error: Missing file ID. Please provide a valid fileId.") . "</p>");
     }
 
-    $plugininfo = wikiplugin_viewtextfile_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $default["$key"] = $param['default'];
-        }
-    }
-    $params = array_merge($default, $params);
-
     $fileinfo = $filegallib->get_file_info($fileId);
 
     if (empty($fileinfo)) {

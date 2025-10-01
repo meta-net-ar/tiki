@@ -164,8 +164,9 @@
                 {include file='tiki-calendar_listmode.tpl'}
             {else}
                 {jq}
-                    $("#calendar").setupEventCalendar({{$eventCalendarParams|json_encode}});
-                    {{if $prefs.print_pdf_from_url neq 'none'}$("#calendar").addEventCalendarPrint('#calendar-pdf-btn', calendar);{/if}}
+                    const mainCalendarContainer = [window.calendar];
+                    $("#calendar").setupEventCalendar({{$eventCalendarParams|json_encode}}, mainCalendarContainer);
+                    {{if $prefs.print_pdf_from_url neq 'none'}$("#calendar").addEventCalendarPrint('#calendar-pdf-btn', mainCalendarContainer[0]);{/if}}
                 {/jq}
             {/if}
             {if $pdf_export eq 'y' and $pdf_warning eq 'n'}

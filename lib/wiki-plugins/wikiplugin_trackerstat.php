@@ -131,7 +131,7 @@ function wikiplugin_trackerstat($data, $params)
     $smarty = TikiLib::lib('smarty');
     extract($params, EXTR_SKIP);
 
-    if ($prefs['feature_trackers'] != 'y' || ! isset($trackerId) || ! ($tracker_info = $trklib->get_tracker($trackerId))) {
+    if ($prefs['feature_trackers'] != 'y' || empty($trackerId) || ! ($tracker_info = $trklib->get_tracker($trackerId))) {
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
     $perms = Perms::get(['type' => 'tracker', 'object' => $trackerId]);
@@ -155,28 +155,14 @@ function wikiplugin_trackerstat($data, $params)
         return tra('invalid status');
     }
 
-    if (isset($show_count) && $show_count == 'n') {
-        $smarty->assign('show_count', 'n');
-    } else {
-        $smarty->assign('show_count', 'y');
-    }
-    if (isset($show_percent) && $show_percent == 'y') {
+    $smarty->assign('show_count', $show_count);
+    $smarty->assign('show_percent', $show_percent);
+    $smarty->assign('show_bar', $show_bar);
+    $smarty->assign('show_link', $show_link);
+    if ($show_percent == 'y' || $show_bar == 'y') {
         $average = 'y';
-        $smarty->assign('show_percent', 'y');
-    } else {
-        $smarty->assign('show_percent', 'n');
     }
-    if (isset($show_bar) && $show_bar == 'y') {
-        $average = 'y';
-        $smarty->assign('show_bar', 'y');
-    } else {
-        $smarty->assign('show_bar', 'n');
-    }
-    if (isset($show_link) && $show_link == 'y') {
-        $smarty->assign('show_link', 'y');
-    } else {
-        $smarty->assign('show_link', 'n');
-    }
+
 
     $allFields = $trklib->list_tracker_fields($trackerId, 0, -1, 'position_asc', '');
     for ($iUser = count($allFields['data']) - 1; $iUser >= 0; $iUser--) {
@@ -202,8 +188,6 @@ function wikiplugin_trackerstat($data, $params)
     if ($t = $trklib->get_tracker_options($trackerId)) {
         $tracker_info = array_merge($tracker_info, $t);
     }
-
-    $status_types = $trklib->status_types();
 
     foreach ($listFields as $fieldId) {
         $v = [];

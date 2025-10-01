@@ -7,10 +7,30 @@ const props = defineProps(['value', 'remoteSourceUrl', 'sourceList', 'emitCustom
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
+const shouldRefocusOnBlur = ref(false);
 
 const modelValue = ref(props.value);
+const autocompleteRef = ref(null);
 
-const handleFetchSuggestions = (query, callback) => fetchSuggestions(query, callback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []));
+const handleFetchSuggestions = (query, callback) => {
+    const wrappedCallback = (results) => {
+        callback(results);
+
+        if (!results || results.length === 0) {
+             // If there are no results, set a flag indicating that the next blur event is likely programmatic and should be counteracted by a refocus.
+            shouldRefocusOnBlur.value = true;
+        }
+    };
+    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []));
+}
+
+const handleBlur = () => {
+    // Refocuses the input if the blur was triggered programmatically by a "no results" event.
+    if (shouldRefocusOnBlur.value) {
+        autocompleteRef.value?.inputRef?.focus();
+        shouldRefocusOnBlur.value = false;
+    }
+};
 
 const handleSelect = (value) => {
     props.emitCustomEvent('select', value);
@@ -46,6 +66,7 @@ export const DATA_TEST_ID = {
 <template>
     <ConfigWrapper :language="language">
         <el-autocomplete
+            ref="autocompleteRef"
             v-model="modelValue"
             :debounce="500"
             :trigger-on-focus="false"
@@ -57,6 +78,7 @@ export const DATA_TEST_ID = {
             @select="handleSelect"
             @input="handleInput"
             @keyup.enter="handlePressEnter"
+            @blur="handleBlur"
             clearable
             :teleported="false"
         >

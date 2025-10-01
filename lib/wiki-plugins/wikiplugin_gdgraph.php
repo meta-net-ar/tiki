@@ -147,14 +147,6 @@ function wikiplugin_gdgraph($data, $params)
         return ("<span class='error'>missing or wrong graph type parameter - only barvert and barhoriz available at present</span>");
     }
 
-    // set default params
-    $plugininfo = wikiplugin_gdgraph_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'] ?? '';
-    }
-    $params = array_merge($default, $params);
-
     // check axestext values
     if (($params['axestext'] !== 'Normal-Text' && $params['axestext'] !== 'Large-Text')) {
         return ("<span class='error'>wrong axestext parameter - only Normal-Text or Large-Text are allowed</span>");

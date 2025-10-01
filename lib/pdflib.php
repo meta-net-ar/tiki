@@ -495,6 +495,9 @@ class PdfGenerator
             }
         }
 
+        // Insert <a name="id"></a> immediately before each element with an id
+        $html = $this->addNamedAnchorsBeforeIdTags($html);
+
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
         //adding css styles with first page content
         $allCss = '<style>' .
@@ -731,6 +734,29 @@ class PdfGenerator
         $tempFile = fopen("temp/public/pdffile_" . session_id() . ".txt", "w");
         fwrite($tempFile, ($pagesTotal * 30));
         return $mpdf->Output('', 'S');                  // Return as a string
+    }
+
+    public function addNamedAnchorsBeforeIdTags(string $html): string
+    {
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//*[@id]'); // all elements with an id
+
+        foreach ($nodes as $node) {
+            $id = $node->getAttribute('id');
+
+            // Create <a name="id"></a>
+            $a = $dom->createElement("a");
+            $a->setAttribute("name", $id);
+
+            // Insert it just before the node with the id
+            $node->parentNode->insertBefore($a, $node);
+        }
+
+        return $dom->saveHTML();
     }
 
     public function getHtmlLayout($pageContent)
@@ -1170,6 +1196,8 @@ class PdfGenerator
 
     private function checkLargeTables(&$doc)
     {
+        $xpath = new DOMXPath($doc);
+
         //new code to split table large cells
         foreach ($doc->getElementsByTagName('table') as $table) {
             // iterate over each row in the table
@@ -1177,18 +1205,16 @@ class PdfGenerator
             $cloneArr = [];
             foreach ($trs as $tr) {
                 $cloned = 0;
-                foreach ($tr->getElementsByTagName('td') as $td) { // get the columns in this row
-                    if (strlen($td->textContent) > 2000) {
-                        $longValue = $td->nodeValue;
-                        $breaktill = strpos($td->nodeValue, '.', 1000);
+                $directTds = $xpath->query('./td', $tr);
+                foreach ($directTds as $td) { // get the columns in this row
+                    $clones = $this->checkLongTd($td);
+                    if (count($clones)) {
                         if ($cloned == 0) {
-                            $cloneNode = $tr->cloneNode(true);
                             $cloned = 1;
-                            $cloneArr[] = ["node" => $cloneNode,'row' => $tr,'breaktill' => $breaktill];
+                            foreach ($clones as $clone) {
+                                $cloneArr[] = $clone;
+                            }
                         }
-                        $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
-                        $td->setAttribute("style:", "white-space: nowrap");
-                        $td->setAttribute("width", "20%");
                     }
                 }
             }
@@ -1199,6 +1225,33 @@ class PdfGenerator
             }
         }
         $html = @$doc->saveHTML();
+    }
+
+    private function checkLongTd(&$td)
+    {
+        $cloneArr = [];
+        $xpath = new DOMXPath($td->ownerDocument);
+        $directTds = $xpath->query('./td', $td);
+        if (count($directTds)) {
+            array_walk(iterator_to_array($directTds), function ($childTd) use (&$cloneArr) {
+                $cloneArr = array_merge($cloneArr, $this->checkLongTd($childTd));
+            });
+        }
+
+        if ($td->nodeType === XML_TEXT_NODE) {
+            if (strlen($td->textContent) > 2000) {
+                $longValue = $td->nodeValue;
+                $breaktill = strpos($td->nodeValue, '.', 1000);
+                $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
+                $td->setAttribute("style:", "white-space: nowrap");
+                $td->setAttribute("width", "20%");
+                $parentTr = $td->parentNode;
+                $cloneNode = $parentTr->cloneNode(true);
+                $cloneArr[] = ['breaktill' => $breaktill, 'node' => $cloneNode, 'row' => $parentTr];
+            }
+        }
+
+        return $cloneArr;
     }
 
     private function insertNewNodes(&$cloneData, &$table, $start = 1000)

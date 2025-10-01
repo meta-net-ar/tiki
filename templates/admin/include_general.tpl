@@ -114,7 +114,7 @@
                 {preference name=log_mail}
                 {preference name=log_sql}
                 {preference name=log_failed_logins}
-                {preference name=log_file}
+                {preference name=log_file_path}
                 <div class="adminoptionboxchild" id="log_sql_childcontainer">
                     {preference name=log_sql_perf_min}
                 </div>
@@ -168,6 +168,10 @@
                     {preference name=headlessbrowser_chrome_path}
                 </div>
             </fieldset>
+            <fieldset id="QueuedTasks">
+                <legend>{tr}Queued Tasks{/tr}</legend>
+                {preference name=feature_queued_tasks}
+            </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>
                 {preference name=maintenanceMessageReindex}
@@ -213,6 +217,7 @@
                 {preference name=feature_realtime}
                 <div class="adminoptionboxchild" id="feature_realtime_childcontainer">
                     {preference name=realtime_port}
+                    {preference name=realtime_full_base_url}
                 </div>
                 {preference name=php_cli_path}
             </fieldset>

@@ -48,6 +48,7 @@ use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Auth\LdapLib;
 use Tiki\Lib\Auth\PhpBBLib;
 use Tiki\Lib\TikiDate;
+use Tiki\Lib\Auth\PhpCAS;
 
 class UsersLib extends TikiLib
 {
@@ -349,13 +350,18 @@ class UsersLib extends TikiLib
             $url .= '?' . SID;
         }
 
-        if ($prefs['auth_method'] === 'cas' && $user !== 'admin' && $user !== '' && $prefs['cas_force_logout'] === 'y') {
-            phpCAS::logoutWithRedirectService($url);
+        unset($_SESSION['cas_validation_time'], $_SESSION[$user_cookie_site], $_SESSION['phpCAS']);
+        if (session_status() !== PHP_SESSION_NONE) {
+            if (ini_get('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+            }
+            session_unset();
+            session_destroy();
         }
-        unset($_SESSION['cas_validation_time']);
-        unset($_SESSION[$user_cookie_site]);
-        session_unset();
-        session_destroy();
+        if ($prefs['auth_method'] === 'cas' && $user !== 'admin' && $user !== '' && $prefs['cas_force_logout'] === 'y') {
+            PhpCAS::logoutWithRedirectService($url);
+        }
 
         if ($remote_logout) {
             return;
@@ -600,8 +606,9 @@ class UsersLib extends TikiLib
                 return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result];
             }
         } elseif ($auth_cas) {
-        // next see if we need to check CAS
-            $result = $this->validate_user_cas($user);
+        // next see if we need to check CAS (via wrapper)
+            $hasTicket = isset($_GET['ticket']) || isset($_REQUEST['ticket']);
+            $result = $this->validate_user_cas($user, $hasTicket);
 
             switch ($result) {
                 case USER_VALID:
@@ -654,9 +661,6 @@ class UsersLib extends TikiLib
                     // just say no!
                     return [false, $user, $result];
                 }
-            } elseif ($userCAS && $userTikiPresent) {
-                // if the user was authenticated by CAS and found in Tiki (no password in Tiki user table necessary)
-                return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result];
             }
         } elseif ($auth_shib) {
             // next see if we need to check Shibboleth
@@ -1101,11 +1105,28 @@ class UsersLib extends TikiLib
             $_SESSION[$user_cookie_site] = strtolower($_SESSION['phpCAS']['user']);
         }
 
-        if (isset($_REQUEST['ticket']) && empty($_SESSION[$user_cookie_site])) {
+        if (isset($_REQUEST['ticket']) && empty($_SESSION[$user_cookie_site]) && isset($_GET['cas'])) {
             $cas_user = '';
             $_SESSION['cas_is_validating'] = false;
-            $this->validate_user_cas($cas_user, true);
-            die();
+            $res = $this->validate_user_cas($cas_user, true);
+            if ($res === USER_VALID && is_string($cas_user) && $cas_user !== '') {
+                $_SESSION['phpCAS']['user'] = strtolower($cas_user);
+                $_SESSION['cas_validation_time'] = $tikilib->now;
+            }
+            // Redirect to the same URL without the CAS parameters to avoid re-processing
+            $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $uri    = $_SERVER['REQUEST_URI'] ?? '/';
+            $parts  = parse_url($uri);
+            $path   = $parts['path'] ?? '/';
+            $qsArr  = [];
+            if (! empty($parts['query'])) {
+                parse_str($parts['query'], $qsArr);
+                unset($qsArr['ticket'], $qsArr['cas'], $qsArr['gateway'], $qsArr['renew']);
+            }
+            $newQs = http_build_query($qsArr, '', '&', PHP_QUERY_RFC3986);
+            header('Location: ' . $scheme . '://' . $host . $path . ($newQs ? ('?' . $newQs) : ''), true, 303);
+            exit;
         }
 
         // Check for CAS (re-)validation
@@ -1123,7 +1144,7 @@ class UsersLib extends TikiLib
             && basename($_SERVER['SCRIPT_NAME']) != 'tiki-logout.php'
             && (! isset($_SESSION[$user_cookie_site]) || $_SESSION[$user_cookie_site] != 'admin' )
             && empty($_POST)
-            && ( ( $prefs['cas_authentication_timeout'] && $tikilib->now - $_SESSION['cas_validation_time'] > $prefs['cas_authentication_timeout'] )
+            && ( ( $prefs['cas_authentication_timeout'] && isset($_SESSION['cas_validation_time']) && $tikilib->now - $_SESSION['cas_validation_time'] > $prefs['cas_authentication_timeout'] )
                 || ( isset($_SESSION['cas_is_validating']) && $_SESSION['cas_is_validating'] === true && $tikilib->now - $_SESSION['cas_validation_time'] > 5 ) )
         ) {
             unset($_SESSION["$user_cookie_site"]);
@@ -1133,10 +1154,10 @@ class UsersLib extends TikiLib
             $_SESSION['cas_is_validating'] = true;
             $cas_user = '';
 
-            // phpCAS will always redirect to CAS validate URL
+            // PhpCAS will always redirect to CAS validate URL
             $this->validate_user_cas($cas_user, true);
 
-            die();
+            return true;
         }
     }
 
@@ -1149,8 +1170,14 @@ class UsersLib extends TikiLib
             return false;
         }
         if (self::$cas_initialized === false) {
-            // initialize phpCAS
-            phpCAS::client($prefs['cas_version'], '' . $prefs['cas_hostname'], (int) $prefs['cas_port'], '' . $prefs['cas_path'], $base_url);
+            // initialize PhpCAS
+            PhpCAS::client(
+                (string) $prefs['cas_version'],
+                (string) $prefs['cas_hostname'],
+                (int)    $prefs['cas_port'],
+                (string) $prefs['cas_path'],
+                false
+            );
             self::$cas_initialized = true;
         }
 
@@ -1168,24 +1195,27 @@ class UsersLib extends TikiLib
             return false;
         }
 
-        // Redirect to this URL after authentication
-        if (! empty($prefs['cas_extra_param']) && basename($_SERVER['SCRIPT_NAME']) == 'tiki-login.php') {
-            phpCAS::setFixedServiceURL($base_url . 'tiki-login.php?cas=y&' . $prefs['cas_extra_param']);
+        if ($checkOnly && ! empty($_SESSION['phpCAS']['user'])) {
+            $user = strtolower($_SESSION['phpCAS']['user']);
+            return USER_VALID;
+        }
+        // If no ticket and no user in session, and we are only checking, return now
+        if ($checkOnly && empty($_GET['ticket']) && empty($_SESSION['phpCAS']['user'])) {
+            $user = null;
+            return PASSWORD_INCORRECT;
         }
 
-        // check CAS authentication
-        phpCAS::setNoCasServerValidation();
         if ($checkOnly) {
-            unset($_SESSION['phpCAS']['auth_checked']);
-            $auth = phpCAS::checkAuthentication();
+            $auth = PhpCAS::checkAuthentication();
         } else {
-            $auth = phpCAS::forceAuthentication();
+            PhpCAS::forceAuthentication();
+            $auth = PhpCAS::checkAuthentication();
         }
         $_SESSION['cas_validation_time'] = $tikilib->now;
 
         // at this step, the user has been authenticated by the CAS server
-        // and the user's login name can be read with phpCAS::getUser().
-        if ($auth && ($user = strtolower(phpCAS::getUser()))) {
+        // and the user's login name can be read with PhpCAS::getUser().
+        if ($auth && ($user = strtolower(PhpCAS::getUser()))) {
             return USER_VALID;
         } else {
             $user = null;
@@ -4998,7 +5028,7 @@ class UsersLib extends TikiLib
                 'level' => 'registered',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5007,7 +5037,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5016,7 +5046,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5025,7 +5055,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5034,7 +5064,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5043,7 +5073,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\TaskQueue\Tasks\PdfGenerationTask;
+use Tiki\TaskQueue\QueueManager;
 
 /**
  * TIKI_PRINTING is always true when tiki-print.php is used.
@@ -197,24 +200,53 @@ if (TIKI_PRINTING_PDF) {
                 /** @var \Tiki\Cache\CacheLib $cachelib */
                 $cachelib = TikiLib::lib('cache');
                 $cachelib->cacheItem($pdfToken, $page, 'pdfprint_');
+                if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {
+                    $taskParams = [];
+                    $taskParams['params']['page'] = $page;
+                    $taskParams['params']['pdf_type'] = 'cms';
+                    $taskParams['params']['pdata'] = $pdata;
+                    $taskParams['params']['get_pdf'] = [
+                        'file' => 'tiki-print.php',
+                        'array_params' => [
+                            'page' => $page,
+                            'pdf_token' => $pdfToken
+                        ]
+                    ];
+                    $queueManager = new QueueManager();
+                    $task = new PdfGenerationTask($taskParams);
+                    $queuedTask = $queueManager->queueTask($task);
+                    $taskId = $queuedTask->getId();
+                    if (! empty($taskId)) {
+                        QueuedTaskBanner::note([
+                            'id' => $taskId,
+                            'page' => 'pdf_generation',
+                            'status' => 'Pending',
+                            'mes' => tr("Your pdf generation task (#{$taskId}) has been queued successfully and will be executed shortly. You can view the status and output on the <a target='_blank' href='tiki-admin_queued_tasks.php'>Queued Tasks</a> page.")
+                        ]);
+                    } else {
+                        Feedback::error(tr("Failed to add pdf generation into queue"));
+                    }
+                    $smarty->assign('print_page', 'n');
+                    $access->redirect($page);
+                } else {
+                    $pdf = $generator->getPdf('tiki-print.php', ['page' => $page, 'pdf_token' => $pdfToken], $pdata);
 
-                $pdf = $generator->getPdf('tiki-print.php', ['page' => $page, 'pdf_token' => $pdfToken], $pdata);
+                    // cleanup subrequest token for pdf export
+                    $cachelib->invalidate($pdfToken, 'pdfprint_');
 
-                // cleanup subrequest token for pdf export
-                $cachelib->invalidate($pdfToken, 'pdfprint_');
-
-                $length = strlen($pdf);
-                header('Cache-Control: private, must-revalidate');
-                header('Pragma: private');
-                header("Content-Description: File Transfer");
-                $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
-                $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
-                header('Content-disposition: attachment; filename="' . $page . '.pdf"');
-                header("Content-Type: application/pdf");
-                header("Content-Transfer-Encoding: binary");
-                header('Content-Length: ' . $length);
-                TikiLib::lib('header')->setXRobotsTag($robots);
-                echo $pdf;
+                    $length = strlen($pdf);
+                    header('Cache-Control: private, must-revalidate');
+                    header('Pragma: private');
+                    header("Content-Description: File Transfer");
+                    $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
+                    $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
+                    header('Content-disposition: attachment; filename="' . $page . '.pdf"');
+                    header("Content-Type: application/pdf");
+                    header("Content-Transfer-Encoding: binary");
+                    header('Content-Length: ' . $length);
+                    TikiLib::lib('header')->setXRobotsTag($robots);
+                    echo $pdf;
+                }
             } catch (\Exception $e) {
                 $smarty->assign('print_page', 'n');
                 $smarty->assign('msg', tra($e->getMessage()));

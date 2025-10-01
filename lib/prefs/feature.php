@@ -695,13 +695,14 @@ function prefs_feature_list($partial = false)
             'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://summernote.org">Summernote</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'feature_ajax',
                 'ajax_autosave',
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
+            'tags' => ['experimental'],
         ],
 
         'feature_kaltura' => [
@@ -2875,6 +2876,15 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'view' => 'tiki-admin_schedulers.php',
             'default' => 'y',
+            'tags' => ['advanced'],
+        ],
+        'feature_queued_tasks' => [
+            'name' => tra('Queued Tasks'),
+            'description' => tra('Enables the execution of tasks in the background.'),
+            'help' => 'Queued Tasks',
+            'type' => 'flag',
+            'view' => 'tiki-admin_queued_tasks.php',
+            'default' => 'n',
             'tags' => ['advanced'],
         ],
         'feature_absolute_to_relative_links' => [

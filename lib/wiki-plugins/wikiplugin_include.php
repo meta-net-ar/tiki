@@ -180,10 +180,7 @@ function wikiplugin_include($dataIn, $params)
 
     $killtoc = true;
     $params = array_merge([
-        'nopage_text' => '',
-        'pagedenied_text' => '',
         'page_edit_icon' => $prefs['wiki_edit_plugin'],
-        'parse_included_page' => 'n',
         'page_replace_icon' => $prefs['wiki_edit_plugin'],
         'pagenotapproved_text' => tr('There are no approved versions of this page.'),
     ], $params);

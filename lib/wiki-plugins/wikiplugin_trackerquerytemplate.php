@@ -147,20 +147,6 @@ function wikiplugin_trackerquerytemplate_info()
 
 function wikiplugin_trackerquerytemplate($data, $params)
 {
-
-    $params = array_merge(
-        [
-            'tracker' => '',
-            'debug' => '',
-            'byname' => 'y',
-            'render' => 'y',
-            'likefilters' => '',
-            'andfilters' => '',
-            'getlast' => ''
-        ],
-        $params
-    );
-
     if (! empty($params['itemids'])) {
         $itemIds = $params['itemids'];
         unset($params['itemids']);

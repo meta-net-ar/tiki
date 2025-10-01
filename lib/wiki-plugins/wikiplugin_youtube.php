@@ -132,12 +132,6 @@ function wikiplugin_youtube($data, $params)
 {
     global $tikilib;
 
-     $plugininfo = wikiplugin_youtube_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
-
     if (empty($params['movie'])) {
         return '{BOX(class="text-bg-light")}' . tra('Plugin YouTube error: the movie parameter is empty.') . '{BOX}';
     }
