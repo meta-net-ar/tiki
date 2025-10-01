@@ -10,6 +10,9 @@ if (! defined('DEBUG_MODE')) {
     die();
 }
 
+// Include IMAP modules to ensure Hm_IMAP_List is available for email sending
+require_once APP_PATH . 'modules/imap/modules.php';
+
 /**
  * Retrive a Tiki-stored mail message and convert to a parsed mime message
  * @subpackage tiki/functions
@@ -319,12 +322,8 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
             return false;
         }
 
-        // profile details - simplified for tracker emails
-        $imap_server = null;
-        $from_name = $smtp_details['name'] ?? 'User';
-        $reply_to = '';
-        $from = $smtp_details['user'];
-
+        // profile details
+        list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail(['compose_smtp_id' => $compose_smtp_id], $profiles, $smtp_details, $hmod);
         // xoauth2 check
         smtp_refresh_oauth2_token_on_send($smtp_details, $hmod, $smtp_id);
 
