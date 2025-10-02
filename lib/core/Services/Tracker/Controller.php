@@ -1092,13 +1092,20 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $itemId = $this->utilities->insertItem(
                 $definition,
                 [
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
                 ]
             );
 
@@ -1360,6 +1367,12 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $result = $this->utilities->updateItem(
                 $definition,
                 [
@@ -1367,7 +1380,8 @@ class Services_Tracker_Controller
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
                 ]
             );
 
