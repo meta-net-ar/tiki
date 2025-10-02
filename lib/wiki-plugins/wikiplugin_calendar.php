@@ -100,7 +100,7 @@ function wikiplugin_calendar($data, $params)
         $params['viewnavbar'] = 'n';
     }
 
-    $slotDuration = '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT);
+    $pluginCalendarIds = implode(',', $params['calIds']);
 
     $rawcals = $calendarlib->list_calendars();
     TikiLib::lib('header')
@@ -108,8 +108,8 @@ function wikiplugin_calendar($data, $params)
         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js')
         ->add_cssfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.css')
         ->add_jsfile('vendor_bundled/vendor/moment/moment/min/moment.min.js', true)
-        ->add_cssfile('vendor_bundled/vendor/twbs/bootstrap-icons/font/bootstrap-icons.css')
         ->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }')
+        ->add_cssfile('vendor_bundled/vendor/twbs/bootstrap-icons/font/bootstrap-icons.css')
         ->add_jsfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.js', true)
         ->add_jsfile('lib/jquery_tiki/tiki-calendar.js');
     $rawcals['data'] = Perms::filter(
@@ -141,56 +141,24 @@ function wikiplugin_calendar($data, $params)
     }
     $viewstart = $_REQUEST['todate'] ?? $tikilib->now;
     $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
-    $listevents = $calendarlib->list_raw_items(
-        $params['calIds'],
-        $user,
-        $viewstart,
-        $viewend,
-        0,
-        -1
-    );
 
-    $listevents = Perms::filter(
-        ['type' => 'calendaritem'],
-        'object',
-        $listevents,
-        ['object' => 'calitemId'],
-        ['view_events']
-    );
     $defaultCalendarId = $params['calIds'][0];
     $calendars = [];
-    $canEditAnything = false;
 
-    foreach ($rawcals['data'] as $calendar) {
-        $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-        $calendars[$calendar['calendarId']] = $calendar;
-        // for week and day views
-        $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-        $startOfDayHour = $startOfDayUnix / 3600;
-        $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-        $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-        $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-        $endOfDayHour = $endOfDayUnix / 3600;
-        $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-        $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
-
-        $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-    }
-
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+    $calendarInitialParams['initialView'] = $initialView;
     $smarty->assign(
         'fullCalendarParams',
-        [
-            'firstDayofWeek'   => 0,//$firstDayofWeek,
-            'display_timezone' => $prefs['display_timezone'],
-            'language'         => $prefs['language'],
-            'minHourOfDay'     => $minHourOfDay,
-            'maxHourOfDay'     => $maxHourOfDay,
-            'slotDuration'     => $slotDuration,
-            'initialView'      => $initialView,
-            'initialDate'      => date("Y-m-d"),
-        ]
+        $calendarInitialParams
     );
 
+    if ($calendarInitialParams['canEditAnything']) {
+        TikiLib::lib('header')
+            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
+            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    }
+
+    $smarty->assign('pluginCalendarIds', $pluginCalendarIds);
     $smarty->assign('displayedcals', $params['calIds']);
     $thiscal = [];
     $checkedCalIds = [];

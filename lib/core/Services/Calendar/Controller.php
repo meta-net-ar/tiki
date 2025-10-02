@@ -166,10 +166,11 @@ class Services_Calendar_Controller
 
         $viewend = new DateTime($viewend);
         $viewend = $viewend->getTimestamp();
-
-        if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+        $calendarIdFromModuleOrPlugin = $input->calIds->string();
+        if ($calendarIdFromModuleOrPlugin) {
+            $splitCalendarIdFromModuleOrPlugin = explode(',', $calendarIdFromModuleOrPlugin);
             $listevents = $this->calendarLib->list_raw_items(
-                array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
+                array_intersect($splitCalendarIdFromModuleOrPlugin, array_keys($calendars)),
                 $user,
                 $viewstart,
                 $viewend,
@@ -177,7 +178,18 @@ class Services_Calendar_Controller
                 -1
             );
         } else {
-            $listevents = [];
+            if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
+                $listevents = $this->calendarLib->list_raw_items(
+                    array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
+                    $user,
+                    $viewstart,
+                    $viewend,
+                    0,
+                    -1
+                );
+            } else {
+                $listevents = [];
+            }
         }
 
         $parserLib = TikiLib::lib('parser');

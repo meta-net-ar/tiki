@@ -57,18 +57,6 @@ function module_calendar_new_info()
                 'filter' => 'word',
                 'default' => 'y',
             ],
-            'viewmodelink' => [
-                'name' => tra('Viewmode when clicking on a day'),
-                'description' => 'week|day',
-                'filter' => 'word',
-                'default' => 'week',
-            ],
-            'linkall' => [
-                'name' => tra('Put a link on all the days , not only those with event'),
-                'description' => 'y|n',
-                'filter' => 'word',
-                'default' => 'n',
-            ],
             'viewnavbar' => [
                 'name' => tra('View navigation bar'),
                 'description' => 'y|n|partial',
@@ -91,9 +79,8 @@ function module_calendar_new($mod_reference, $module_params)
     $calendarlib = TikiLib::lib('calendar');
     $userlib = TikiLib::lib('user');
     global $calendarViewMode, $focusdate;
-    $default = ['viewnavbar' => 'y', 'viewmodelink' => 'week', 'showaction' => 'y', 'linkall' => 'n'];
+    $default = ['viewnavbar' => 'y', 'viewmode' => 'month', 'showaction' => 'y'];
     $module_params = array_merge($default, $module_params);
-    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 
     if (isset($_REQUEST['viewmode'])) {
         $save_viewmode = $_REQUEST['viewmode'];
@@ -116,6 +103,20 @@ function module_calendar_new($mod_reference, $module_params)
         $_REQUEST['todate'] = $tikilib->make_time(0, 0, 0, $focus_month + $module_params['month_delta'], 1, $focus_year);
     }
 
+    switch ($calendarViewMode['casedefault']) {
+        case 'week':
+            $initialView = 'timeGridWeek';
+            break;
+        case 'day':
+            $initialView = 'timeGridDay';
+            break;
+        case 'month':
+            $initialView = 'dayGridMonth';
+            break;
+        default:
+            $initialView = 'dayGridMonth';
+    }
+
     if (! empty($module_params['calIds'])) {
         $calIds = $module_params['calIds'];
         if (! is_array($module_params['calIds'])) {
@@ -131,13 +132,34 @@ function module_calendar_new($mod_reference, $module_params)
     } else {
         $calIds = [];
     }
-
+    $moduleCalendarIds = implode(',', $calIds);
 
     $_REQUEST['gbi'] = 'y';
     if (! empty($module_params['viewlist'])) {
         $_REQUEST['viewlistmodule'] = $module_params['viewlist'];
     } else {
         $_REQUEST['viewlistmodule'] = 'table';
+    }
+
+    $rawcals = $calendarlib->list_calendars();
+    if (empty($rawcals['data'])) {
+        Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
+    }
+
+    $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $calIds));
+    $calendars = [];
+
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+    $calendarInitialParams['initialView'] = $initialView;
+    $smarty->assign(
+        'eventCalendarParams',
+        $calendarInitialParams
+    );
+    $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
+    if ($calendarInitialParams['canEditAnything']) {
+        TikiLib::lib('header')
+            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
+            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 
     foreach ($calIds as $i => $cal_id) {
@@ -161,14 +183,7 @@ function module_calendar_new($mod_reference, $module_params)
 
         $smarty->assign('name', 'calendar_new');
 
-        $smarty->assign('daformat2', $tikilib->get_long_date_format());
-        $smarty->assign('var', '');
-        $smarty->assign('myurl', 'tiki-calendar.php');
         $smarty->assign('show_calendar_module', 'y');
-        $smarty->assign_by_ref('viewmodelink', $module_params['viewmodelink']);
-        $smarty->assign_by_ref('linkall', $module_params['linkall']);
-        $smarty->assign('calendarViewMode', $calendarViewMode['casedefault']);
-
         if (isset($save_todate)) {
             $_REQUEST['todate'] = $save_todate;
         } else {
