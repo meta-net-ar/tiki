@@ -301,7 +301,6 @@ class Services_Category_Controller
                         $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
                         $trklib->log((int) $version, (int) $object['id'], (int) $fieldId, $itemValue);
                     }
-
                 }
             }
         }
