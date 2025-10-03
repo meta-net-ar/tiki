@@ -5248,12 +5248,12 @@ class TrackerLib extends TikiLib
         }
     }
     /**
-     * Saves the log on the trackeritem.
+     * The method saves the log to the trackeritem.
      *
-     * @param int $version the log version to add.
-     * @param int $itemId id of the item to add to the log.
-     * @param int $fieldId id of the field to add to the log.
-     * @param string $value value to add to the log.
+     * @param $version the log version to add.
+     * @param $itemId id of the item to add to the log.
+     * @param $fieldId id of the field to add to the log.
+     * @param $value value to add to the log.
      * @return void
      */
     public function log($version, $itemId, $fieldId, $value = '')
