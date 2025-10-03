@@ -355,4 +355,10 @@ $(function () {
         $(".slot-container.date" + $(this).val()).show();
         return false;
     });
+
+    $(document).on("click", ".btn-close-preview", function (e) {
+        e.preventDefault();
+        $previewElement = $(this).closest(".preview").toggleClass("d-none");
+        return false;
+    });
 });

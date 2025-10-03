@@ -295,15 +295,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                         $saved = $this->saveEvent($calitem, $calendar, $input);
 
                         if ($saved) { // then redirect?
-                            if ($input->offsetExists('exact_start_end')) {
-                                Feedback::success(tr('Event saved successfully.'));
-                            }
                             if ($input->offsetExists('redirect')) {
+                                Feedback::success(tr('Event saved successfully.'));
                                 return ['url' => $input->redirect->url()];
                             } else {
                                 if ($return_url && ! $access->is_xml_http_request()) {
                                     return $access->redirect($return_url, tr('The event was saved successfully'));
                                 }
+                                Feedback::success(tr('Event saved successfully.'));
                                 // reload the page?
                                 return [];
                             }
