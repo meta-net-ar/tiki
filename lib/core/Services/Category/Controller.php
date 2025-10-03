@@ -291,14 +291,18 @@ class Services_Category_Controller
     private function logCategorizedUncategorizedTrackeritem(array $categorizedObjects)
     {
         $trklib = TikiLib::lib('trk');
+        // browse categorized objects
         foreach ($categorizedObjects as $object) {
             if ($object['type'] == 'trackeritem') {
+                // retrieve the tracker ID to which the item belongs
                 $trackerId = $trklib->get_tracker_for_item($object['id']);
                 $definition = Tracker_Definition::get($trackerId);
+                // retrieve the tracker fields that are of type category
                 if ($fieldIds = $definition->getCategorizedFields()) {
                     $version = $trklib->last_log_version($object['id']) + 1;
                     foreach ($fieldIds as $fieldId) {
                         $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
+                        // log the categorization/uncategorization trackeritem action
                         $trklib->log((int) $version, (int) $object['id'], (int) $fieldId, $itemValue);
                     }
                 }
