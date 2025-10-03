@@ -197,9 +197,8 @@ class Services_Category_Controller
             }
             //now add objects to the category
             if (count($filteredObjects)) {
-                $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $this->logActionCategorizeUncategorizeTrackeritem($return['objects'], $caterizedItemsInfos);
+                $this->logCategorizedUncategorizedTrackeritem($return['objects']);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
@@ -257,9 +256,8 @@ class Services_Category_Controller
             }
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
-                $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $this->logActionCategorizeUncategorizeTrackeritem($return['objects'], $caterizedItemsInfos);
+                $this->logCategorizedUncategorizedTrackeritem($return['objects']);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
@@ -285,46 +283,25 @@ class Services_Category_Controller
         }
     }
     /**
-     * Takes a list of Items objects as a parameter and returns a list containing information about the trackeritem items that are categorized (fieldId, itemId, itemValue)
-     *
-     * @param array $filteredObjects Items objects.
-     * @return void
-     */
-    private function getCaterizedTrackeritemsInfos(array $filteredObjects)
-    {
-        $trklib = TikiLib::lib('trk');
-        $caterizedItemsInfos = [];
-        foreach ($filteredObjects as $object) {
-            if ($object['type'] == 'trackeritem') {
-                $trackerId = $trklib->get_tracker_for_item($object['id']);
-                $definition = Tracker_Definition::get($trackerId);
-                if ($fieldIds = $definition->getCategorizedFields()) {
-                    foreach ($fieldIds as $fieldId) {
-                        $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
-                        $caterizedItemsInfos[] = ["fieldId" => $fieldId, "itemId" => $object['id'],"itemValue" => $itemValue];
-                    }
-                }
-            }
-        }
-        return $caterizedItemsInfos;
-    }
-    /**
      * Saves the log when categorizing or uncategorizing a Trackeritem.
      *
-     * @param array $categorizedObjects a list containing the trackeritem objects that have been either categorized or uncategorized for which the log must be added.
-     * @param array $caterizedItemsInfos a list containing information about the trackeritem items that are categorized (fieldId, itemId, itemValue).
+     * @param array $categorizedObjects a list containing the objects that have been either categorized or uncategorized for which the log must be added.
      * @return void
      */
-    private function logActionCategorizeUncategorizeTrackeritem(array $categorizedObjects, array $caterizedItemsInfos)
+    private function logCategorizedUncategorizedTrackeritem(array $categorizedObjects)
     {
         $trklib = TikiLib::lib('trk');
         foreach ($categorizedObjects as $object) {
             if ($object['type'] == 'trackeritem') {
-                foreach ($caterizedItemsInfos as $caterizedItemInfos) {
-                    if ($caterizedItemInfos['itemId'] == $object['id']) {
-                        $version = $trklib->last_log_version($caterizedItemInfos['itemId']) + 1;
-                        $trklib->log((int) $version, (int) $caterizedItemInfos['itemId'], (int) $caterizedItemInfos['fieldId'], $caterizedItemInfos['itemValue']);
+                $trackerId = $trklib->get_tracker_for_item($object['id']);
+                $definition = Tracker_Definition::get($trackerId);
+                if ($fieldIds = $definition->getCategorizedFields()) {
+                    $version = $trklib->last_log_version($object['id']) + 1;
+                    foreach ($fieldIds as $fieldId) {
+                        $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
+                        $trklib->log((int) $version, (int) $object['id'], (int) $fieldId, $itemValue);
                     }
+
                 }
             }
         }
