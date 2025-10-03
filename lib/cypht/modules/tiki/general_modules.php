@@ -394,7 +394,7 @@ class Hm_Output_filter_message_headers_mpdf extends Hm_Output_Module
     {
         $headers = $this->get('msg_headers');
         if (is_string($headers) && TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
-            $pdf_link = ' <a class="hlink" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
+            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary ms-1" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
             $headers = append_to_msg_headers($headers, $pdf_link);
             $this->out('msg_headers', $headers, false);
         }
