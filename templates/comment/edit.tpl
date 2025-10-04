@@ -12,6 +12,8 @@
             </div>
             <fieldset>
                 <legend class="visually-hidden">{tr}Edit Comment{/tr}</legend>
+                <input type="hidden" name="type" value="{$comment.objectType|escape}"/>
+                <input type="hidden" name="objectId" value="{$comment.object|escape}"/>
                 <input type="hidden" name="edit" value="1"/>
                 <div class="card-body">
                 {if $prefs.comments_notitle neq 'y'}
@@ -28,7 +30,7 @@
                         <div class="mb-3 comment-post">
                             <input type="submit" class="clearfix comment-editclass btn btn-primary" value="{tr}Save{/tr}"/>
                             <div class="btn btn-link">
-                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
+                                <a href="#" class="comment-cancel" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>
                         </div>
                     {else}

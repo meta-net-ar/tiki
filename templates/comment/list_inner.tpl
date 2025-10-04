@@ -34,10 +34,10 @@
                     <div class="buttons comment-form comment-footer mt-2">
                         {block name="buttons"}
                             {if $allow_post && $comment.locked neq 'y'}
-                                <a class='btn btn-primary btn-sm' href="{service controller=comment action=post type=$type objectId=$objectId parentId=$comment.threadId}">{tr}Reply{/tr}</a>
+                                <a class='btn btn-primary btn-sm' data-action='reply' data-type="{$type}" data-object="{$objectId}" href="{service controller=comment action=post type=$type objectId=$objectId parentId=$comment.threadId}">{tr}Reply{/tr}</a>
                             {/if}
                             {if !empty($comment.can_edit)}
-                                <a class='btn btn-secondary btn-sm' href="{service controller=comment action=edit threadId=$comment.threadId}">{tr}Edit{/tr}</a>
+                                <a class='btn btn-secondary btn-sm' data-action='edit' data-type="{$type}" data-object="{$objectId}" href="{service controller=comment action=edit threadId=$comment.threadId}">{tr}Edit{/tr}</a>
                             {/if}
                             {if $allow_remove}
                                 <a class="btn btn-danger btn-sm" href="{service controller=comment action=remove threadId=$comment.threadId}">{tr}Delete{/tr}</a>

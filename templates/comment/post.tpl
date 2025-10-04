@@ -26,9 +26,9 @@
                     <input type="hidden"  name="return_url" value="{$return_url|escape}">
                     {if empty($version)}
                         <div class="mb-3 comment-post">
-                            <input type="submit" {if $prefs.feature_antibot eq 'y' && $user eq '' && $prefs.recaptcha_enabled eq 'y' && $prefs.recaptcha_version eq '3'}onclick="genToken();"{/if} class="comment-post btn btn-primary" value="{tr}Post{/tr}"/>
+                            <input type="submit" {if $prefs.feature_antibot eq 'y' && $user eq '' && $prefs.recaptcha_enabled eq 'y' && $prefs.recaptcha_version eq '3'}onclick="genToken();"{/if} class="comment-post btn btn-primary" value="{tr}Add a comment{/tr}"/>
                             <div class="btn btn-link">
-                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
+                                <a href="#" class="comment-cancel" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>
                         </div>
                     {else}
@@ -48,7 +48,7 @@
                         {/if}
                         <div class="submit">
                             <input type="hidden" name="version" value="{$version|escape}"/>
-                            <input type="submit" class="comment-post btn btn-primary" value="{tr}Post{/tr}"/>
+                            <input type="submit" class="comment-post btn btn-primary" value="{tr}Add a comment{/tr}"/>
                         </div>
                     {/if}
                 </div>
