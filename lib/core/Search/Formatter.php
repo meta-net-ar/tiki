@@ -230,12 +230,16 @@ class Search_Formatter
 
         $url = parse_url($_SERVER["REQUEST_URI"] ?? '', PHP_URL_PATH);
         $filters = [];
-        foreach ($_GET as $key => $val) {
+        $filters_fields_values = [];
+        foreach ($_REQUEST as $key => $val) {
             if (! str_starts_with($key, 'tf_')) {
                 $filters[$key] = $val;
+            } else {
+                $filters_fields_values[$key] = $val;
             }
         }
         $url .= '?' . http_build_query($filters);
+        $url .= '&' . http_build_query($filters_fields_values);
 
         if ($fields) {
             $smarty = TikiLib::lib('smarty');

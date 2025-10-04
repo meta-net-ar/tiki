@@ -37,4 +37,47 @@
 $('#list_filter{{$filterCounter}} input[name=reset_filter]').off('click').on('click', function() {
     window.location.href = $(this).closest('form').attr('action').replace('#list_filter{{$filterCounter}}', '');
 });
+
+$(window).on('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterCounter = '{{$filterCounter}}';
+    const filterForm = $('#list_filter' + filterCounter + ' form');
+
+    if (!filterForm.length) return;
+
+    // Prevent multiple submits per page load
+    let formSubmitted = false;
+
+    if (urlParams.get('filter') === 'Filter') {
+        urlParams.forEach((value, key) => {
+            if (key === 'filter') return;
+            if (!key.startsWith('tf_')) return;
+
+            const input = filterForm.find('[name="' + key + '"]')[0];
+            if (input) {
+                input.setAttribute('value', value);
+            }
+        });
+
+        if (!formSubmitted) {
+            formSubmitted = true;
+            filterForm.submit();
+        }
+    }
+
+    filterForm.find('[name^="tf_"]').on('input', function() {
+
+        const newParams = new URLSearchParams(window.location.search);
+
+        filterForm.find('[name^="tf_"]').each(function() {
+            newParams.set(this.name, this.value);
+        });
+
+        newParams.set('filter', 'Filter');
+        const hash = '#list_filter' + filterCounter;
+
+        // Handle param values change in the URL
+        history.replaceState(null, '', '?' + newParams.toString() + hash);
+    });
+});
 {/jq}
