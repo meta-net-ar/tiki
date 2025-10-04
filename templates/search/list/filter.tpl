@@ -45,39 +45,32 @@ $(window).on('load', function() {
 
     if (!filterForm.length) return;
 
-    // Prevent multiple submits per page load
-    let formSubmitted = false;
+    const remember_submitted = 'filter_just_submitted_' + filterCounter;
+    const justSubmitted = sessionStorage.getItem(remember_submitted);
 
-    if (urlParams.get('filter') === 'Filter') {
+    if (urlParams.get('filter') === 'Filter' && !justSubmitted) {
+        let hasValues = false;
+
         urlParams.forEach((value, key) => {
             if (key === 'filter') return;
             if (!key.startsWith('tf_')) return;
 
             const input = filterForm.find('[name="' + key + '"]')[0];
             if (input) {
-                input.setAttribute('value', value);
+                input.value = value;
+                hasValues = true;
             }
         });
 
-        if (!formSubmitted) {
-            formSubmitted = true;
+        if (hasValues) {
+            sessionStorage.setItem(remember_submitted, 'true');
             filterForm.submit();
+            return;
         }
     }
 
-    filterForm.find('[name^="tf_"]').on('input', function() {
-
-        const newParams = new URLSearchParams(window.location.search);
-
-        filterForm.find('[name^="tf_"]').each(function() {
-            newParams.set(this.name, this.value);
-        });
-
-        newParams.set('filter', 'Filter');
-        const hash = '#list_filter' + filterCounter;
-
-        // Handle param values change in the URL
-        history.replaceState(null, '', '?' + newParams.toString() + hash);
-    });
+    if (justSubmitted) {
+        sessionStorage.removeItem(remember_submitted);
+    }
 });
 {/jq}
