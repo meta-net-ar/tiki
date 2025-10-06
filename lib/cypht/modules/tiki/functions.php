@@ -10,8 +10,6 @@ if (! defined('DEBUG_MODE')) {
     die();
 }
 
-// Include IMAP modules to ensure Hm_IMAP_List is available for email sending
-require_once APP_PATH . 'modules/imap/modules.php';
 
 /**
  * Retrive a Tiki-stored mail message and convert to a parsed mime message
@@ -293,6 +291,12 @@ if (! hm_exists('tiki_flag_message')) {
 if (! hm_exists('tiki_send_email_through_cypht')) {
     function tiki_send_email_through_cypht($to, $cc, $subject, $body, $in_reply_to, $file, $profiles, $hmod, $recipient = null)
     {
+        // Ensure IMAP dependency is available
+        if (!class_exists('Hm_IMAP_List')) {
+            Hm_Msgs::add('IMAP module is required for email sending but is not enabled. Please enable the IMAP module in your configuration.', 'danger');
+            return false;
+        }
+
         // retrieve smtp server connected with an existing imap message via profiles
         $smtp_id = 0;
         $compose_smtp_id = null;

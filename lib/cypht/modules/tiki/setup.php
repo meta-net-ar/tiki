@@ -78,7 +78,9 @@ add_output('ajax_tiki_message_content', 'add_rsvp_actions', true, 'tiki', 'filte
 
 /* message page rsvp actions to an event */
 setup_base_ajax_page('ajax_rsvp_action', 'core');
+add_handler('ajax_rsvp_action', 'check_imap_dependency', true, 'tiki', 'load_user_data', 'after');
 add_handler('ajax_rsvp_action', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_rsvp_action', 'check_calendar_invitations_tiki', true, 'tiki', 'check_calendar_invitations_imap', 'after');
 add_handler('ajax_rsvp_action', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_rsvp_action', 'load_smtp_servers_from_config', true, 'smtp', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_rsvp_action', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
@@ -88,28 +90,39 @@ add_handler('ajax_rsvp_action', 'event_rsvp_action', true, 'tiki', 'imap_message
 
 /* message page add to calendar function */
 setup_base_ajax_page('ajax_add_to_calendar', 'core');
+add_handler('ajax_add_to_calendar', 'check_imap_dependency', true, 'tiki', 'load_user_data', 'after');
 add_handler('ajax_add_to_calendar', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_add_to_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'check_calendar_invitations_imap', 'after');
 add_handler('ajax_add_to_calendar', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_add_to_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_add_to_calendar', 'add_to_calendar', true, 'tiki', 'imap_message_content', 'after');
 
 /* message page update in calendar function */
 setup_base_ajax_page('ajax_update_in_calendar', 'core');
+add_handler('ajax_update_in_calendar', 'check_imap_dependency', true, 'tiki', 'load_user_data', 'after');
 add_handler('ajax_update_in_calendar', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_update_in_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'check_calendar_invitations_imap', 'after');
+add_handler('ajax_update_in_calendar', 'tiki_message_content', true, 'tiki', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_update_in_calendar', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_update_in_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_update_in_calendar', 'update_in_calendar', true, 'tiki', 'imap_message_content', 'after');
 
 /* message page update participant status function */
 setup_base_ajax_page('ajax_update_participant_status', 'core');
+add_handler('ajax_update_participant_status', 'check_imap_dependency', true, 'tiki', 'load_user_data', 'after');
 add_handler('ajax_update_participant_status', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_update_participant_status', 'check_calendar_invitations_tiki', true, 'tiki', 'check_calendar_invitations_imap', 'after');
+add_handler('ajax_update_participant_status', 'tiki_message_content', true, 'tiki', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_update_participant_status', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_update_participant_status', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_update_participant_status', 'update_participant_status', true, 'tiki', 'imap_message_content', 'after');
 
 /* message page remove event from calendar function */
 setup_base_ajax_page('ajax_remove_from_calendar', 'core');
+add_handler('ajax_remove_from_calendar', 'check_imap_dependency', true, 'tiki', 'load_user_data', 'after');
 add_handler('ajax_remove_from_calendar', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_remove_from_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'check_calendar_invitations_imap', 'after');
+add_handler('ajax_remove_from_calendar', 'tiki_message_content', true, 'tiki', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_remove_from_calendar', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_remove_from_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_remove_from_calendar', 'remove_from_calendar', true, 'tiki', 'imap_message_content', 'after');

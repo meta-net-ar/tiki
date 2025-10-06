@@ -17,6 +17,21 @@ if (! defined('DEBUG_MODE')) {
 require_once APP_PATH . 'modules/smtp/hm-mime-message.php';
 
 /**
+ * Check if IMAP module is available for calendar functionality
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_check_imap_dependency extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if (!class_exists('Hm_IMAP_List')) {
+            Hm_Msgs::add('IMAP module is required for calendar functionality but is not enabled. Please enable the IMAP module in your configuration.', 'danger');
+            $this->out('imap_dependency_error', true);
+        }
+    }
+}
+
+/**
  * Parse message and check for a calendar invitation
  * @subpackage tiki/handler
  */
@@ -24,6 +39,11 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
 {
     public function process()
     {
+        // Only process IMAP messages; tracker messages are handled elsewhere
+        $list_path = $this->get('list_path', '');
+        if (strpos($list_path, 'tracker_folder_') === 0) {
+            return;
+        }
         if ($this->get('msg_struct')) {
             get_calendar_part_imap($this->get('msg_struct'), $this);
         }
@@ -576,6 +596,14 @@ class Hm_Handler_check_calendar_invitations_tiki extends Hm_Handler_Module
 {
     public function process()
     {
+        // Respect dependency error and only run for tracker messages
+        if ($this->get('imap_dependency_error')) {
+            return;
+        }
+        $list_path = $this->get('list_path', '');
+        if (strpos($list_path, 'tracker_folder_') !== 0) {
+            return;
+        }
         if ($this->get('msg_struct')) {
             get_calendar_part_tiki($this->get('msg_struct'), $this);
         }
