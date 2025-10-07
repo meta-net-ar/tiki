@@ -76,8 +76,33 @@ function wikiplugin_zotero($data, $params)
         $cachelib->cacheItem($cacheKey, serialize($info), 'zotero');
     }
 
-    $content = $info['content'];
-    $content = str_replace('<div', '<span', $content);
-    $content = str_replace('</div>', '</span>', $content);
-    return "{FOOTNOTE()}~np~{$content} {$note}~/np~{FOOTNOTE}";
+    // Get the title from Zotero data
+    // Some Zotero entries don't have a direct 'title' field (e.g., notes or attachments)
+    // In these cases, extract the title from the content field to display something meaningful
+    $title = isset($info['title']) ? $info['title'] : '';
+
+    if (empty($title)) {
+        // Extract title from HTML content
+        // Replace block-level HTML tags with newlines to preserve structure
+        $content = $info['content'];
+        $content = preg_replace('/<\/(p|div|h[1-6]|li|tr|br)>/i', "\n", $content);
+
+        // Strip remaining HTML tags and decode entities
+        $textContent = strip_tags($content);
+        $textContent = html_entity_decode($textContent, ENT_QUOTES, 'UTF-8');
+        $textContent = trim($textContent);
+
+        // Use first non-empty line as title
+        $lines = array_filter(array_map('trim', explode("\n", $textContent)));
+        $title = ! empty($lines) ? reset($lines) : '';
+    }
+
+    // Combine title with note if provided
+    $footnoteContent = $title;
+    if (! empty($note)) {
+        $footnoteContent .= ' - ' . $note;
+    }
+
+    // Return the footnote with the title
+    return "{FOOTNOTE()}{$footnoteContent}{FOOTNOTE}";
 }
