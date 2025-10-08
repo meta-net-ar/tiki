@@ -198,7 +198,14 @@ class Services_Category_Controller
             //now add objects to the category
             if (count($filteredObjects)) {
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $this->logCategorizedUncategorizedTrackeritem($return['objects']);
+                // browse categorized objects
+                if (isset($return['objects'])) {
+                    foreach ($return['objects'] as $object) {
+                        if ($object['type'] == 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object['id']);
+                        }
+                    }
+                }
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
@@ -257,7 +264,14 @@ class Services_Category_Controller
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $this->logCategorizedUncategorizedTrackeritem($return['objects']);
+                // browse uncategorized objects
+                if (isset($return['objects'])) {
+                    foreach ($return['objects'] as $object) {
+                        if ($object['type'] == 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object['id']);
+                        }
+                    }
+                }
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
@@ -285,27 +299,29 @@ class Services_Category_Controller
     /**
      * Saves the log when categorizing or uncategorizing a Trackeritem.
      *
-     * @param array $categorizedObjects a list containing the objects that have been either categorized or uncategorized for which the log must be added.
+     * @param int $trackeritemId the identifier of the trackeritem whose log is to be saved
      * @return void
      */
-    private function logCategorizedUncategorizedTrackeritem(array $categorizedObjects)
+    private function logCategorizedUncategorizedTrackeritem(int $trackeritemId)
     {
         $trklib = TikiLib::lib('trk');
-        // browse categorized objects
-        foreach ($categorizedObjects as $object) {
-            if ($object['type'] == 'trackeritem') {
-                // retrieve the tracker ID to which the item belongs
-                $trackerId = $trklib->get_tracker_for_item($object['id']);
-                $definition = Tracker_Definition::get($trackerId);
-                // retrieve the tracker fields that are of type category
-                if ($fieldIds = $definition->getCategorizedFields()) {
-                    $version = $trklib->last_log_version($object['id']) + 1;
-                    foreach ($fieldIds as $fieldId) {
-                        $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
-                        // log the categorization/uncategorization trackeritem action
-                        $trklib->log((int) $version, (int) $object['id'], (int) $fieldId, $itemValue);
-                    }
-                }
+        // retrieve the tracker ID to which the item belongs
+        $trackerId = $trklib->get_tracker_for_item($trackeritemId);
+        $definition = Tracker_Definition::get($trackerId);
+        // retrieve the tracker fields that are of type category
+        if ($fieldIds = $definition->getCategorizedFields()) {
+            // determination of the next version of the log
+            $version = $trklib->last_log_version($trackeritemId) + 1;
+            foreach ($fieldIds as $fieldId) {
+                $itemValue = $trklib->get_item_value($trackerId, $trackeritemId, $fieldId) ?? '';
+                /* The log method of the TrackerLib class is a public method used to save logs when tracker item values ​​change.
+                 * It takes four parameters:
+                 * The version of the log to save, which must be the version of the last log + 1;
+                 * The tracker item ID;
+                 * The field ID;
+                 * The current value of the field.
+                 */
+                $trklib->log((int) $version, (int) $trackeritemId, (int) $fieldId, $itemValue);
             }
         }
     }
