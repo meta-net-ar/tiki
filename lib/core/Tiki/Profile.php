@@ -11,11 +11,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class Tiki_Profile
 {
-    const SHORTER_PATTERN = '/^\$((([\w\.\/-]+):)?(\w+))$/';
-    const SHORT_PATTERN = '/^\$((([\w\.\/-]+):)?((\w+):))?(\w+)$/';
-    const LONG_PATTERN = '/\$profileobject:((([\w\.\/-]+):)?((\w+):))?(\w+)\$/';
-    const INFO_REQUEST = '/\$profilerequest:([^\$\|]+)(\|(\w+))?\$([^\$]*)\$/';
-    const PREFERENCE_PATTERN = '/\$preference:(\w+)\$/';
+    private const SHORTER_PATTERN = '/^\$((([\w\.\/-]+):)?([\w-]+))$/';
+    public const SHORT_PATTERN = '/^\$((([\w\.\/-]+):)?(([\w-]+):))?([\w-]+)$/';
+    public const LONG_PATTERN = '/\$profileobject:((([\w\.\/-]+):)?(([\w-]+):))?([\w-]+)\$/';
+    private const INFO_REQUEST = '/\$profilerequest:([^\$\|]+)(\|([\w-]+))?\$([^\$]*)\$/';
+    private const PREFERENCE_PATTERN = '/\$preference:([\w-]+)\$/';
 
     private $transport;
     private $pageUrl;
