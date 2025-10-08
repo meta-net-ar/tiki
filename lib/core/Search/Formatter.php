@@ -61,7 +61,7 @@ class Search_Formatter
             . $this->render($this->plugin, $list, Search_Formatter_Plugin_Interface::FORMAT_WIKI);
     }
 
-    public function getPopulatedList($list, $preload = true)
+    public function getPopulatedList($list, $preload = true, $onlyPreloaded = false)
     {
         global $prefs;
 
@@ -121,6 +121,10 @@ class Search_Formatter
             }
 
             foreach ($pre as $k => $rawValue) {
+                if ($preload && $onlyPreloaded && ! in_array($k, $fields)) {
+                    continue;
+                }
+
                 $finalValue = null;
 
                 // process multilingual fields
