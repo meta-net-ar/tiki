@@ -16,20 +16,6 @@ if (! defined('DEBUG_MODE')) {
 
 require_once APP_PATH . 'modules/smtp/hm-mime-message.php';
 
-/**
- * Check if IMAP module is available for calendar functionality
- * @subpackage tiki/handler
- */
-class Hm_Handler_check_imap_dependency extends Hm_Handler_Module
-{
-    public function process()
-    {
-        if (!class_exists('Hm_IMAP_List')) {
-            Hm_Msgs::add('IMAP module is required for calendar functionality but is not enabled. Please enable the IMAP module in your configuration.', 'danger');
-            $this->out('imap_dependency_error', true);
-        }
-    }
-}
 
 /**
  * Parse message and check for a calendar invitation
@@ -39,14 +25,41 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
 {
     public function process()
     {
-        // Only process IMAP messages; tracker messages are handled elsewhere
-        $list_path = $this->get('list_path', '');
-        if (strpos($list_path, 'tracker_folder_') === 0) {
-            return;
+        $list_path = $this->get('list_path', '') ?: ($this->request->post['list_path'] ?? '');
+        $is_tracker = strpos($list_path, 'tracker_folder_') === 0;
+        
+        if ($is_tracker && !$this->get('msg_struct') && !$this->get('msg_headers')) {
+            list($success, $form) = $this->process_form(['imap_msg_uid']);
+            if ($success) {
+                $email = tiki_parse_message($list_path, $form['imap_msg_uid']);
+                if ($email && !empty($email['message_raw'])) {
+                    $message = $email['message_raw'];
+                    
+                    $msg_headers = [];
+                    foreach ($message->getAllHeaders() as $header) {
+                        if (function_exists('mb_decode_mimeheader')) {
+                            $msg_headers[$header->getName()] = mb_decode_mimeheader($header->getRawValue());
+                        } else {
+                            $msg_headers[$header->getName()] = $header->getRawValue();
+                        }
+                    }
+                    $this->out('msg_headers', $msg_headers);
+                    
+                    $msg_struct = tiki_mime_part_to_bodystructure($message);
+                    $this->out('msg_struct', $msg_struct);
+                }
+            }
         }
+        
+        // Extract calendar data - use appropriate parser based on message type
         if ($this->get('msg_struct')) {
-            get_calendar_part_imap($this->get('msg_struct'), $this);
+            if ($is_tracker) {
+                get_calendar_part_tiki($this->get('msg_struct'), $this);
+            } else {
+                get_calendar_part_imap($this->get('msg_struct'), $this);
+            }
         }
+        
         if ($this->get('calendar_event_raw')) {
             $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
             if ($this->get('formatted_calendar_event_description')) {
@@ -56,7 +69,8 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
         } else {
             $event = null;
         }
-        // get recipient from TO header
+        
+        // Determine recipient (same logic for both types)
         $recipient = null;
         $headers = $this->get('msg_headers', []);
         foreach ($headers as $name => $value) {
@@ -64,6 +78,7 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
                 $recipient = (string)$value;
             }
         }
+        
         if (! empty($event['participants'])) {
             // try to find the recipient in the participants' list
             $found = false;
@@ -588,45 +603,6 @@ if (! hm_exists('get_calendar_part_imap')) {
     }
 }
 
-/**
- * Parse tracker-stored message and check for a calendar invitation
- * @subpackage tiki/handler
- */
-class Hm_Handler_check_calendar_invitations_tiki extends Hm_Handler_Module
-{
-    public function process()
-    {
-        // Respect dependency error and only run for tracker messages
-        if ($this->get('imap_dependency_error')) {
-            return;
-        }
-        $list_path = $this->get('list_path', '');
-        if (strpos($list_path, 'tracker_folder_') !== 0) {
-            return;
-        }
-        if ($this->get('msg_struct')) {
-            get_calendar_part_tiki($this->get('msg_struct'), $this);
-        }
-
-        // If we have raw ICS data, denormalize to the event array Cypht/Tiki expect
-        if ($this->get('calendar_event_raw')) {
-            $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
-            $this->out('calendar_event', $event);
-        } else {
-            $event = null;
-        }
-
-        // Determine the recipient (like the IMAP handler does)
-        $recipient = null;
-        $headers = $this->get('msg_headers', []);
-        foreach ($headers as $name => $value) {
-            if (strtolower($name) == 'to') {
-                $recipient = (string) $value;
-            }
-        }
-        $this->out('recipient', $recipient);
-    }
-}
 
 /**
  * Search tracker message structure for text/calendar parts and load the ICS content
