@@ -420,6 +420,13 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'type' => 'flag',
             'default' => 'y',
         ],
+        'fgal_show_modtimedate' => [
+            'name' => tra('Show modification date and time'),
+            'shorthint' => tra('Displays both date and time for file modifications'),
+            'description' => tra('If checked, the modification date will be shown as date and time instead of just the date.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
         'fgal_show_path' => [
             'name' => tra('Show path'),
             'type' => 'flag',
