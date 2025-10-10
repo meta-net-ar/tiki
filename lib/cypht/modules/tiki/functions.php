@@ -371,7 +371,6 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             return '';
         }
         $field_list = [];
-        $fields_without_folders = [];
         foreach ($fields as $field) {
             $tracker = $trk->get_tracker($field['trackerId']);
             $handler = $trk->get_field_handler($field);
@@ -385,7 +384,6 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             } else {
                 $field_list[] = "<a href='#' class='object_selector_trigger dropdown-item' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='inbox'>{$tracker['name']} - {$field['name']}</a>";
             }
-            $fields_without_folders[] = ['tracker_id' => $field['trackerId'], 'field_id' => $field['fieldId'], 'title' => "{$tracker['name']} - {$field['name']}"];
         }
         $res = "<div class=\"" . ($class != 'move_to_trackers' ? 'dropdown ' : '') . "d-inline-block\">";
         if ($class != 'move_to_trackers') {
@@ -393,7 +391,6 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div>";
         } else {
             $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
-            $res .= '<script type="text/javascript">var tiki_tracker_fields = ' . json_encode($fields_without_folders) . '</script>';
         }
         $res .= "</div>";
 
