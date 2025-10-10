@@ -499,6 +499,17 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         $this->session->set('msg_uid', '');
         $this->session->set('imap_server_id', '');
 
+        $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+        $fields = array_map(function ($field) {
+            $tracker = TikiLib::lib('trk')->get_tracker($field['trackerId']);
+            return [
+                'tracker_id' => $field['trackerId'],
+                'field_id' => $field['fieldId'],
+                'title' => "{$tracker['name']} - {$field['name']}",
+            ];
+        }, $fields);
+        $this->out('tracker_fields', $fields);
+
         if (isset($this->request->post['lookup'])) {
             $searchArgs = [];
             if (isset($this->request->post['sort_mode'])) {
