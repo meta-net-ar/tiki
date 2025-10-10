@@ -114,35 +114,40 @@ if ($prefs['javascript_enabled'] == 'y') {  // we have JavaScript
 
     /** Use custom.js in themes and options dir if there **/
     $themelib = TikiLib::lib('theme');
+    $custom_js_files = [];
+    $custom_js_modules = [];
 
     // custom.js in the root of /themes/js
-    $custom_js = $themelib->get_theme_path('', '', 'custom.js');
-    if (! empty($custom_js)) {
-        $headerlib->add_jsfile($custom_js);
-    }
+    $custom_js_files[] = $themelib->get_theme_path('', '', 'custom.js');
+    $custom_js_modules[] = $themelib->get_theme_path('', '', 'custom.module.js');
 
-    // custom.js in the current theme?
+    // custom.js in the current theme and option
     if (! empty($prefs['theme_admin']) && ($section === 'admin' || empty($section))) {      // use admin theme if set
-        $custom_js = $themelib->get_theme_path($prefs['theme_admin'], '', 'custom.js');
+        $custom_js_files[] = $themelib->get_theme_path($prefs['theme_admin'], '', 'custom.js');
+        $custom_js_files[] = $themelib->get_theme_path($prefs['theme_admin'], $prefs['theme_option_admin'], 'custom.js');
+        $custom_js_modules[] = $themelib->get_theme_path($prefs['theme_admin'], '', 'custom.module.js');
+        $custom_js_modules[] = $themelib->get_theme_path($prefs['theme_admin'], $prefs['theme_option_admin'], 'custom.module.js');
     } else {
-        $custom_js = $themelib->get_theme_path($prefs['theme'], '', 'custom.js');
-    }
-    if (! empty($custom_js)) {
-        $headerlib->add_jsfile($custom_js);
-    }
-
-    // custom.js in the theme's current option?
-    if (! empty($prefs['theme_admin']) && ($section === 'admin' || empty($section))) {      // use admin theme if set
-        $custom_js = $themelib->get_theme_path($prefs['theme_admin'], $prefs['theme_option_admin'], 'custom.js');
-    } else {
-        $custom_js = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'custom.js');
-    }
-    if (! empty($custom_js)) {
-        $headerlib->add_jsfile($custom_js);
+        $custom_js_files[] = $themelib->get_theme_path($prefs['theme'], '', 'custom.js');
+        $custom_js_files[] = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'custom.js');
+        $custom_js_modules[] = $themelib->get_theme_path($prefs['theme'], '', 'custom.module.js');
+        $custom_js_modules[] = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'custom.module.js');
     }
 
-
-
+    foreach ($custom_js_files as $custom_js_file) {
+        if (! empty($custom_js_file)) {
+            $headerlib->add_jsfile($custom_js_file);
+        }
+    }
+    foreach ($custom_js_modules as $custom_js_module) {
+        if (! empty($custom_js_module)) {
+            $headerlib->add_js_module(
+                "
+import \"./$custom_js_module\";
+"
+            );
+        }
+    }
 
     // setup timezone array
     $tz = TikiDate::getTimezoneAbbreviations();
@@ -334,7 +339,7 @@ $(document).on("tiki.modal.redraw", function (event) {
         $modalContent.resizable( "destroy" );
     }
     $modalContent
-        .css({width: "", height: ""})    
+        .css({width: "", height: ""})
         .resizable({
             minHeight: 100,
             minWidth: 200
