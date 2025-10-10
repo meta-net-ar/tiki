@@ -69,28 +69,37 @@ if ($custom_js) {
 
 // Before Tiki 27, we used to also look in /themes/js for a custom.js file
 
+$custom_js_files = [];
+$custom_js_modules = [];
+
 // Is there a js/custom.js in the current base theme (no options)?
-$custom_js = ThemeLib::getThemePath(null, '', 'js/custom.js');
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = ThemeLib::getThemePath(null, '', 'js/custom.js');
+$custom_js_modules[] = ThemeLib::getThemePath(null, '', 'js/custom.module.js');
 
 // Is there a js/custom.js in the current theme options?
-$custom_js = ThemeLib::getThemePath(null, null, 'js/custom.js');
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = ThemeLib::getThemePath(null, null, 'js/custom.js');
+$custom_js_modules[] = ThemeLib::getThemePath(null, null, 'js/custom.module.js');
 
 //Is there a _custom/shared/js/custom.js
-$custom_js = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
 
 //Is there a _custom/sites/my.domain/js/custom.js
-$custom_js = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
+$custom_js_files[] = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
+
+foreach ($custom_js_files as $custom_js_file) {
+    if (! empty($custom_js_file)) {
+        $headerlib->add_jsfile($custom_js_file);
+    }
+}
+
+foreach ($custom_js_modules as $custom_js_module) {
+    if (! empty($custom_js_module)) {
+        $headerlib->add_js_module(
+            "
+import \"./$custom_js_module\";
+"
+        );
+    }
 }
 
 // setup timezone array
