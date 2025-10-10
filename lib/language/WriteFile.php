@@ -122,11 +122,7 @@ class Language_WriteFile
 
             $isCustomDir = $this->isCustomDir($targetDir);
 
-            if ($isCustomDir) {
-                $this->writeCustomLanguageFile($handle, $entries, $outputFiles, $language);
-            } else {
-                $this->writeStandardLanguageFile($handle, $entries, $outputFiles, $language);
-            }
+            $this->writeLanguageFile($handle, $entries, $outputFiles, $language, $isCustomDir);
 
             fclose($handle);
         }
@@ -206,56 +202,41 @@ TXT;
     }
 
     /**
-     * Write language strings for standard (non-custom) directories
+     * Write language strings to file, handling both standard and custom directories
      *
      * @param resource $handle File handle to write to
      * @param array $entries Language entries to write
      * @param bool $outputFiles Whether to include file paths in output
      * @param string $language Current language code
+     * @param bool $isCustomDir Whether this is a custom directory
      */
-    protected function writeStandardLanguageFile($handle, array $entries, bool $outputFiles, string $language): void
+    protected function writeLanguageFile($handle, array $entries, bool $outputFiles, string $language, bool $isCustomDir): void
     {
-        fwrite($handle, $this->fileHeader());
-
-        // Determine which array variable to use and whether to include English base
-        if ($language != "en") {
-            fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
-            fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
+        if ($isCustomDir) {
+            $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang_custom');
+            fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
         } else {
-            fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
-        }
+            fwrite($handle, $this->fileHeader());
 
-        foreach ($entries as $entry) {
-            fwrite($handle, $this->formatString($entry, $outputFiles, $language));
-        }
-
-        fwrite($handle, ");\n");
-
-        if ($language != "en") {
-            fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
+            if ($language != "en") {
+                fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
+                $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang_current');
+                fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
+            } else {
+                $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang');
+            }
         }
     }
 
-    /**
-     * Write language strings for custom directories
-     *
-     * @param resource $handle File handle to write to
-     * @param array $entries Language entries to write
-     * @param bool $outputFiles Whether to include file paths in output
-     * @param string $language Current language code
-     */
-    protected function writeCustomLanguageFile($handle, array $entries, bool $outputFiles, string $language): void
+    private function writeLanguageArray($handle, array $entries, bool $outputFiles, string $language, string $variableName): void
     {
-        // For custom directories (any language): use $lang_custom
-        fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
+        fwrite($handle, "{$variableName} = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
 
         foreach ($entries as $entry) {
             fwrite($handle, $this->formatString($entry, $outputFiles, $language));
         }
 
         fwrite($handle, ");\n");
-
-        fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
     }
 
     /**
