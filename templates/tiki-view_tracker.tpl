@@ -182,166 +182,170 @@
                     {ticket}
                     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
                         <table class="table table-striped table-hover" id="trItemTable">
-                            <tr>
-                                {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
-                                    <td class="auto" style="width:20px;"></td> {* th changed to td to prevent ARIA empty header error *}
-                                {/if}
-
-                                {if $tiki_p_admin_trackers eq 'y'}
-                                    <td style="width:20px;">  {* th changed to td to prevent ARIA empty header error *}
-                                        {select_all checkbox_names='action[]'}
-                                    </td>
-                                {/if}
-
-                                {foreach from=$listfields key=ix item=field_value}
-                                    {if $field_value.isTblVisible eq 'y' and ( $field_value.type ne 'x' and $field_value.type ne 'h') and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
-                                        <th class="auto" data-sort-field="f_{$field_value.fieldId}">
-                                            {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId _onclick="return handleSortClick(event, 'f_{$field_value.fieldId}');"}
-                                                {$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}
-                                            {/self_link}
-                                        </th>
-                                    {/if}
-                                {/foreach}
-
-                                {if $tracker_info.showCreated eq 'y'}
-                                    <th class="auto" data-sort-field="created">
-                                        {self_link _sort_arg='sort_mode' _sort_field='created' _onclick="return handleSortClick(event, 'created');"}{tr}Created{/tr}{/self_link}
-                                        <span class="sort-indicator"></span>
-                                    </th>
-                                {/if}
-                                {if $tracker_info.showLastModif eq 'y'}
-                                    <th class="auto" data-sort-field="lastModif">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModif' _onclick="return handleSortClick(event, 'lastModif');"}{tr}Last modified{/tr}{/self_link}
-                                    </th>
-                                {/if}
-                                {if $tracker_info.showLastModifBy eq 'y'}
-                                    <th class="auto" data-sort-field="lastModifby">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModifby' _onclick="return handleSortClick(event, 'lastModifby');"}{tr}Last modifier{/tr}{/self_link}
-                                    </th>
-                                {/if}
-                                {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' || $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
-                                    <th{if $tracker_info.showLastComment ne 'y'} style="width:5%"{/if}>{tr}Comments{/tr}</th>
-                                {/if}
-                                {if ($tiki_p_tracker_view_attachments eq 'y' or $tiki_p_admin_trackers eq 'y') and $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}
-                                    <th style="width:5%">{tr}atts{/tr}</th>
-                                    {if $tiki_p_admin_trackers eq 'y'}<th style="width:5%">{tr}dls{/tr}</th>{/if}
-                                {/if}
-                                {if $tiki_p_admin_trackers eq 'y' or $tiki_p_remove_tracker_items eq 'y' or $tiki_p_remove_tracker_items_pending eq 'y' or $tiki_p_remove_tracker_items_closed eq 'y'}
-                                    <td style="width:20px"></td> {* th changed to td to prevent ARIA empty header error *}
-                                {/if}
-                            </tr>
-
-                            {* ------- Items loop --- *}
-                            {$itemoff=0}
-
-                            {section name=user loop=$items}
+                            <thead>
                                 <tr>
                                     {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
-                                        <td class="icon">
-                                            {$ustatus=$items[user].status|default:"c"}
-                                            {icon name=$status_types.$ustatus.iconname iclass='tips' ititle=":{$status_types.$ustatus.label}"}
-                                        </td>
+                                        <td class="auto" style="width:20px;"></td> {* th changed to td to prevent ARIA empty header error *}
                                     {/if}
+
                                     {if $tiki_p_admin_trackers eq 'y'}
-                                        <td class="checkbox-cell">
-                                            <input type="checkbox" class="form-check-input" name="action[]" aria-label="{tr}Select{/tr}" value='{$items[user].itemId}'>
+                                        <td style="width:20px;">  {* th changed to td to prevent ARIA empty header error *}
+                                            {select_all checkbox_names='action[]'}
                                         </td>
                                     {/if}
 
-                                    {* ------- list values --- *}
-                                    {$ajaxedit = (empty($tracker_info.allowInlineEditing) and $prefs.ajax_inline_edit_trackerlist eq 'y') or
-                                            ($tracker_info.allowInlineEditing eq 'y') and
-                                            ($tiki_p_modify_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or
-                                            ($tiki_p_modify_tracker_items_pending eq 'y' and $items[user].status eq 'p') or
-                                            ($tiki_p_modify_tracker_items_closed eq 'y' and $items[user].status eq 'c')
-                                    }
-                                    {foreach from=$items[user].field_values key=ix item=field_value}
-                                        {if $field_value.isTblVisible eq 'y' and $field_value.type ne 'x' and $field_value.type ne 'h' and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
-                                            <td class={if $field_value.type eq 'n' or $field_value.type eq 'q' or $field_value.type eq 'b'}"numeric"{else}"auto"{/if} data-col-name="{$field_value.name}">
-                                                {if $field_value.type eq 'wiki'}
-                                                    <a href="tiki-index.php?page={$field_value.value|escape:"url"}">{$field_value.value}</a>
-                                                {else}
-                                                    {trackeroutput field=$field_value showlinks=y showpopup="y" item=$items[user] list_mode=y inTable=formcolor reloff=$itemoff editable=($ajaxedit and $listfields[$field_value.fieldId].editable) ? 'block' : ''}
-                                                {/if}
-                                            </td>
+                                    {foreach from=$listfields key=ix item=field_value}
+                                        {if $field_value.isTblVisible eq 'y' and ( $field_value.type ne 'x' and $field_value.type ne 'h') and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
+                                            <th class="auto" data-sort-field="f_{$field_value.fieldId}">
+                                                {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId _onclick="return handleSortClick(event, 'f_{$field_value.fieldId}');"}
+                                                    {$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}
+                                                {/self_link}
+                                            </th>
                                         {/if}
                                     {/foreach}
 
                                     {if $tracker_info.showCreated eq 'y'}
-                                        <td class="date">{if !empty($tracker_info.showCreatedFormat)}{$items[user].created|tiki_date_format:$tracker_info.showCreatedFormat}{else}{$items[user].created|tiki_short_datetime}{/if}</td>
+                                        <th class="auto" data-sort-field="created">
+                                            {self_link _sort_arg='sort_mode' _sort_field='created' _onclick="return handleSortClick(event, 'created');"}{tr}Created{/tr}{/self_link}
+                                            <span class="sort-indicator"></span>
+                                        </th>
                                     {/if}
                                     {if $tracker_info.showLastModif eq 'y'}
-                                        <td class="date">{if !empty($tracker_info.showLastModifFormat)}{$items[user].lastModif|tiki_date_format:$tracker_info.showLastModifFormat}{else}{$items[user].lastModif|tiki_short_datetime}{/if}</td>
+                                        <th class="auto" data-sort-field="lastModif">
+                                            {self_link _sort_arg='sort_mode' _sort_field='lastModif' _onclick="return handleSortClick(event, 'lastModif');"}{tr}Last modified{/tr}{/self_link}
+                                        </th>
                                     {/if}
                                     {if $tracker_info.showLastModifBy eq 'y'}
-                                        <td class="date">
-                                            {if empty($items[user].lastModifBy)}Unknown{else}{$items[user].lastModifBy|username}{/if}
-                                        </td>
+                                        <th class="auto" data-sort-field="lastModifby">
+                                            {self_link _sort_arg='sort_mode' _sort_field='lastModifby' _onclick="return handleSortClick(event, 'lastModifby');"}{tr}Last modifier{/tr}{/self_link}
+                                        </th>
                                     {/if}
-                                    {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' or $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
-                                        <td style="text-align:center;">{if $tracker_info.showComments eq 'y'}{$items[user].comments}{/if}{if $tracker_info.showComments eq 'y' and $tracker_info.showLastComment eq 'y'}<br>{/if}{if $tracker_info.showLastComment eq 'y' and !empty($items[user].lastComment)}{$items[user].lastComment.userName|escape}-{$items[user].lastComment.commentDate|tiki_short_date}{/if}</td>
+                                    {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' || $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
+                                        <th{if $tracker_info.showLastComment ne 'y'} style="width:5%"{/if}>{tr}Comments{/tr}</th>
                                     {/if}
                                     {if ($tiki_p_tracker_view_attachments eq 'y' or $tiki_p_admin_trackers eq 'y') and $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}
-                                        <td class="icon"><a href="tiki-view_tracker_item.php?itemId={$items[user].itemId}&amp;show=att{if $offset}&amp;offset={$offset}{/if}{foreach key=urlkey item=urlval from=$urlquery}{if $urlval}&amp;{$urlkey}={$urlval|escape:"url"}{/if}{/foreach}"
-                                        link="{tr}List Attachments{/tr}">{icon name="attach"}</a> {$items[user].attachments}</td>
-                                        {if $tiki_p_admin_trackers eq 'y'}<td style="text-align:center;">{$items[user].hits}</td>{/if}
+                                        <th style="width:5%">{tr}atts{/tr}</th>
+                                        {if $tiki_p_admin_trackers eq 'y'}<th style="width:5%">{tr}dls{/tr}</th>{/if}
                                     {/if}
-                                    {if $tiki_p_admin_trackers eq 'y' or ($tiki_p_remove_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or ($tiki_p_remove_tracker_items_pending eq 'y' and $items[user].status eq 'p') or ($tiki_p_remove_tracker_items_closed eq 'y' and $items[user].status eq 'c')}
-                                        <td class="action">
-                                            {actions}
-                                                {strip}
-                                                    {if $prefs.tracker_legacy_insert neq 'y'}
-                                                        <action>
-                                                            <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$items[user].itemId size='modal-lg'}"
-                                                                onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                                            >
-                                                                {icon name="edit" _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
-                                                            </a>
-                                                        </action>
-                                                    {else}
-                                                        <action>
-                                                            <a href="tiki-view_tracker_item.php?itemId={$items[user].itemId}&amp;show=mod"
-                                                                onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                                            >
-                                                                {icon name="post" _menu_text='y' _menu_icon='y' alt="{tr}View/Edit{/tr}"}
-                                                            </a>
-                                                        </action>
-                                                    {/if}
-                                                    {if $tiki_p_create_tracker_items eq 'y' and $prefs.tracker_clone_item eq 'y'}
-                                                        <action>
-                                                            <a href="{bootstrap_modal controller=tracker action=clone_item trackerId=$trackerId itemId=$items[user].itemId size='modal-lg'}"
-                                                                onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                                            >
-                                                                {icon name="copy" _menu_text='y' _menu_icon='y' alt="{tr}Duplicate{/tr}"}
-                                                            </a>
-                                                        </action>
-                                                    {/if}
-                                                    <action>
-                                                        <a href="{bootstrap_modal controller=tracker action=remove_item trackerId=$trackerId itemId=$items[user].itemId}"
-                                                            onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                                        >
-                                                            {icon name="delete" _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
-                                                        </a>
-                                                    </action>
-                                                    {if $tiki_p_admin_trackers eq 'y'}
-                                                        <action>
-                                                            {permission_link mode=text type=trackeritem id=$items[user].itemId permType=trackers parentId=$trackerId}
-                                                        </action>
-                                                        <action>
-                                                            <a href="tiki-tracker_view_history.php?itemId={$items[user].itemId}"
-                                                                onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                                            >
-                                                                {icon name="history" _menu_text='y' _menu_icon='y' alt="{tr}History{/tr}"}
-                                                            </a>
-                                                        </action>
-                                                    {/if}
-                                                {/strip}
-                                            {/actions}
-                                        </td>
+                                    {if $tiki_p_admin_trackers eq 'y' or $tiki_p_remove_tracker_items eq 'y' or $tiki_p_remove_tracker_items_pending eq 'y' or $tiki_p_remove_tracker_items_closed eq 'y'}
+                                        <td style="width:20px"></td> {* th changed to td to prevent ARIA empty header error *}
                                     {/if}
                                 </tr>
-                                {$itemoff=$itemoff+1}
-                            {/section}
+                            </thead>
+
+                            {* ------- Items loop --- *}
+                            {$itemoff=0}
+                            
+                            <tbody id="tracker-items-body">
+                                {section name=user loop=$items}
+                                    <tr>
+                                        {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
+                                            <td class="icon">
+                                                {$ustatus=$items[user].status|default:"c"}
+                                                {icon name=$status_types.$ustatus.iconname iclass='tips' ititle=":{$status_types.$ustatus.label}"}
+                                            </td>
+                                        {/if}
+                                        {if $tiki_p_admin_trackers eq 'y'}
+                                            <td class="checkbox-cell">
+                                                <input type="checkbox" class="form-check-input" name="action[]" aria-label="{tr}Select{/tr}" value='{$items[user].itemId}'>
+                                            </td>
+                                        {/if}
+
+                                        {* ------- list values --- *}
+                                        {$ajaxedit = (empty($tracker_info.allowInlineEditing) and $prefs.ajax_inline_edit_trackerlist eq 'y') or
+                                                ($tracker_info.allowInlineEditing eq 'y') and
+                                                ($tiki_p_modify_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or
+                                                ($tiki_p_modify_tracker_items_pending eq 'y' and $items[user].status eq 'p') or
+                                                ($tiki_p_modify_tracker_items_closed eq 'y' and $items[user].status eq 'c')
+                                        }
+                                        {foreach from=$items[user].field_values key=ix item=field_value}
+                                            {if $field_value.isTblVisible eq 'y' and $field_value.type ne 'x' and $field_value.type ne 'h' and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
+                                                <td class={if $field_value.type eq 'n' or $field_value.type eq 'q' or $field_value.type eq 'b'}"numeric"{else}"auto"{/if} data-col-name="{$field_value.name}">
+                                                    {if $field_value.type eq 'wiki'}
+                                                        <a href="tiki-index.php?page={$field_value.value|escape:"url"}">{$field_value.value}</a>
+                                                    {else}
+                                                        {trackeroutput field=$field_value showlinks=y showpopup="y" item=$items[user] list_mode=y inTable=formcolor reloff=$itemoff editable=($ajaxedit and $listfields[$field_value.fieldId].editable) ? 'block' : ''}
+                                                    {/if}
+                                                </td>
+                                            {/if}
+                                        {/foreach}
+
+                                        {if $tracker_info.showCreated eq 'y'}
+                                            <td class="date">{if !empty($tracker_info.showCreatedFormat)}{$items[user].created|tiki_date_format:$tracker_info.showCreatedFormat}{else}{$items[user].created|tiki_short_datetime}{/if}</td>
+                                        {/if}
+                                        {if $tracker_info.showLastModif eq 'y'}
+                                            <td class="date">{if !empty($tracker_info.showLastModifFormat)}{$items[user].lastModif|tiki_date_format:$tracker_info.showLastModifFormat}{else}{$items[user].lastModif|tiki_short_datetime}{/if}</td>
+                                        {/if}
+                                        {if $tracker_info.showLastModifBy eq 'y'}
+                                            <td class="date">
+                                                {if empty($items[user].lastModifBy)}Unknown{else}{$items[user].lastModifBy|username}{/if}
+                                            </td>
+                                        {/if}
+                                        {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' or $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
+                                            <td style="text-align:center;">{if $tracker_info.showComments eq 'y'}{$items[user].comments}{/if}{if $tracker_info.showComments eq 'y' and $tracker_info.showLastComment eq 'y'}<br>{/if}{if $tracker_info.showLastComment eq 'y' and !empty($items[user].lastComment)}{$items[user].lastComment.userName|escape}-{$items[user].lastComment.commentDate|tiki_short_date}{/if}</td>
+                                        {/if}
+                                        {if ($tiki_p_tracker_view_attachments eq 'y' or $tiki_p_admin_trackers eq 'y') and $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}
+                                            <td class="icon"><a href="tiki-view_tracker_item.php?itemId={$items[user].itemId}&amp;show=att{if $offset}&amp;offset={$offset}{/if}{foreach key=urlkey item=urlval from=$urlquery}{if $urlval}&amp;{$urlkey}={$urlval|escape:"url"}{/if}{/foreach}"
+                                            link="{tr}List Attachments{/tr}">{icon name="attach"}</a> {$items[user].attachments}</td>
+                                            {if $tiki_p_admin_trackers eq 'y'}<td style="text-align:center;">{$items[user].hits}</td>{/if}
+                                        {/if}
+                                        {if $tiki_p_admin_trackers eq 'y' or ($tiki_p_remove_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or ($tiki_p_remove_tracker_items_pending eq 'y' and $items[user].status eq 'p') or ($tiki_p_remove_tracker_items_closed eq 'y' and $items[user].status eq 'c')}
+                                            <td class="action">
+                                                {actions}
+                                                    {strip}
+                                                        {if $prefs.tracker_legacy_insert neq 'y'}
+                                                            <action>
+                                                                <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$items[user].itemId size='modal-lg'}"
+                                                                    onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                                                >
+                                                                    {icon name="edit" _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
+                                                                </a>
+                                                            </action>
+                                                        {else}
+                                                            <action>
+                                                                <a href="tiki-view_tracker_item.php?itemId={$items[user].itemId}&amp;show=mod"
+                                                                    onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                                                >
+                                                                    {icon name="post" _menu_text='y' _menu_icon='y' alt="{tr}View/Edit{/tr}"}
+                                                                </a>
+                                                            </action>
+                                                        {/if}
+                                                        {if $tiki_p_create_tracker_items eq 'y' and $prefs.tracker_clone_item eq 'y'}
+                                                            <action>
+                                                                <a href="{bootstrap_modal controller=tracker action=clone_item trackerId=$trackerId itemId=$items[user].itemId size='modal-lg'}"
+                                                                    onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                                                >
+                                                                    {icon name="copy" _menu_text='y' _menu_icon='y' alt="{tr}Duplicate{/tr}"}
+                                                                </a>
+                                                            </action>
+                                                        {/if}
+                                                        <action>
+                                                            <a href="{bootstrap_modal controller=tracker action=remove_item trackerId=$trackerId itemId=$items[user].itemId}"
+                                                                onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                                            >
+                                                                {icon name="delete" _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
+                                                            </a>
+                                                        </action>
+                                                        {if $tiki_p_admin_trackers eq 'y'}
+                                                            <action>
+                                                                {permission_link mode=text type=trackeritem id=$items[user].itemId permType=trackers parentId=$trackerId}
+                                                            </action>
+                                                            <action>
+                                                                <a href="tiki-tracker_view_history.php?itemId={$items[user].itemId}"
+                                                                    onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                                                >
+                                                                    {icon name="history" _menu_text='y' _menu_icon='y' alt="{tr}History{/tr}"}
+                                                                </a>
+                                                            </action>
+                                                        {/if}
+                                                    {/strip}
+                                                {/actions}
+                                            </td>
+                                        {/if}
+                                    </tr>
+                                    {$itemoff=$itemoff+1}
+                                {/section}
+                            </tbody>
                         </table>
                         </div>
                     </form>
@@ -376,7 +380,8 @@
                         </div>
                     {/if}
                 </form>
-                {pagination_links count=$item_count step=$maxRecords offset=$offset}{/pagination_links}
+                {* {pagination_links count=$item_count step=$maxRecords offset=$offset}{/pagination_links} *}
+                <el-infinite-scroll container-id="trItemTable" target-container-id="tracker-items-body" offset="{$offset}" step="{$maxRecords}" total-count="{$item_count}"></el-infinite-scroll>
                 {jq}
                     loadColumnPrefs();
 

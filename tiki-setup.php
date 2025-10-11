@@ -1080,6 +1080,7 @@ if ($prefs['feature_elementplus'] == 'y') {
     if ($prefs['elementplus_autocomplete'] == 'y') {
         $headerlib->add_js_module("import { autocomplete } from '@tiki/ui-utils'; window.autocomplete = autocomplete;");
     }
+    $headerlib->add_js_module("import '@vue-widgets/el-infinite-scroll';");
 } else {
     $headerlib->add_jq_onready("window.showMessage = function (message) { alert(message); };");
 }

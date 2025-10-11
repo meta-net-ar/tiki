@@ -112,6 +112,7 @@ export default defineConfig(({ command, mode }) => {
         "element-plus-ui/datepicker": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
         "element-plus-ui/fileGalUploader": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
         "element-plus-ui/fileInput": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileInput.js"),
+        "element-plus-ui/infiniteScroll": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/infiniteScroll.js"),
         "element-plus-ui/input": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/input.js"),
         "element-plus-ui/message": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/message.js"),
         "element-plus-ui/select": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),

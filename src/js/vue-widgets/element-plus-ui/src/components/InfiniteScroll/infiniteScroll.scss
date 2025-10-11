@@ -1,0 +1,11 @@
+@use 'element-plus/theme-chalk/el-icon.css';
+
+.infinite-list-wrapper {
+    height: 300px;
+    overflow: auto;
+}
+
+.infinite-list-loader {
+    margin: auto;
+    display: block;
+}
