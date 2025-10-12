@@ -2763,6 +2763,7 @@ class ParserLib extends TikiDb_Bridge
                     $hdrlevel = $tikilib->how_many_at_start($line, '!');
 
                     if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6 /* HTML has h1 to h6, but no h7 or above */) { // If the line starts with 1 to 6 exclamation marks ("!")
+                        ++$nb_hdrs;
                         if (preg_match('/^!+[\+\-]?#\)/', $line)) {
                             $counters = [];
                             $line = preg_replace('/(^!+[\+\-]?)(#)\)/', '$1$2', $line);
@@ -2772,6 +2773,13 @@ class ParserLib extends TikiDb_Bridge
                         $current_title_real_num = '';
                         $current_title_num = '';
 
+                        /*
+                         * Handle headings autonumbering syntax (i.e. !#Text, !!#Text, ...)
+                         * Note:
+                         *     this needs to be done even if the current header has no '#'
+                         *     in order to generate the right numbers when they are not specified for every headers.
+                         *     This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1.
+                         */
                         $support_numbering = preg_match('/^!+[\+\-]?#/', $line);
                         if ($support_numbering) {
                             // Normalize level (so the lowest becomes level 1)
@@ -2855,7 +2863,8 @@ class ParserLib extends TikiDb_Bridge
                         $title = preg_replace('#\<(.*?)\>#', '', $title_text);
                         $thisid = $this->getCleanAnchor($title, $all_anchors);
 
-                        // Collect TOC entry if any {maketoc} is present on the page
+                        // Collect TOC entry if any {maketoc} is present on the page.
+                        // Generates the skeleton of the TOC (e.g. 1, 2, 2.1, 2.1.1, ...).
                         //if ( $need_maketoc !== false ) {
                         $anch[] = [
                                         'id' => $thisid,

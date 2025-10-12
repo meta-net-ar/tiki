@@ -65,14 +65,14 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             //heading 1 with collapsible text open
             [
                 "!+foo\nheading text section",
-                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage0\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage0');return false;\">[-]</a><div id=\"idHomePage0\" class=\"showhide_heading\" style=\"display:block;\">\nheading text section<br /></div>",
+                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[-]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:block;\">\nheading text section<br /></div>",
                 ['page' => 'HomePage'],
             ],
 
             //heading 1 with collapsible text closed
             [
                 "!-foo\nheading text section",
-                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage0\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage0');return false;\">[+]</a><div id=\"idHomePage0\" class=\"showhide_heading\" style=\"display:none;\">\nheading text section<br /></div>",
+                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[+]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:none;\">\nheading text section<br /></div>",
                 ['page' => 'HomePage'],
             ],
 
