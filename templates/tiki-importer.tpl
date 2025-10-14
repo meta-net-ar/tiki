@@ -28,6 +28,8 @@
     </form>
     <br>
     <a href="tiki-import_xml_zip.php">Import wiki pages in an XML Zip file from another Tiki</a>
+    <br />
+    <a href="tiki-markdown_import.php">Import markdown files and convert to wiki pages</a>
 
 {elseif isset($softwareSpecificOptions)}
     <h2>Options:</h2>

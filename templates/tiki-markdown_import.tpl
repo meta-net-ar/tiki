@@ -6,7 +6,7 @@
 {tabset name='md_tabs'}
 
     {* ================== TAB 1: Import now ================== *}
-    {tab name="{tr}Importer maintenant{/tr}"}
+    {tab name="{tr}Import now{/tr}"}
 
         <form method="post" class="form-horizontal my-3" id="form_source">
             {ticket}
@@ -253,7 +253,7 @@
     {/tab}
 
     {* ================== TAB 2: Automatic import / Scheduler ================== *}
-    {tab name="{tr}Importation automatique / Planificateur{/tr}"}
+    {tab name="{tr}Automatic import / Scheduler{/tr}"}
 
         <div class="alert alert-info d-flex align-items-start gap-3">
             {icon name="information"}
