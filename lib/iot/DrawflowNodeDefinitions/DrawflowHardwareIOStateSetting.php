@@ -61,6 +61,13 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
                 <option value='ON'>" . tra('ON') . "</option>
                 <option value='OFF'>" . tra('OFF') . "</option>
             </select>
+            <div class='mb-3'>
+                <label>" . tra('Default State') . "</label>
+                <select df-{$this->node_df_identifier}-io-defaultstate needs-element-plus='false'> <!-- must be two words only,that the default drawflow behaviour follows -->
+                    <option value='ON'>" . tra('ON') . "</option>
+                    <option value='OFF'>" . tra('OFF') . "</option>
+                </select>
+            </div>
         </div>
         <div class='draggable-node clone bg-light px-2 py-1 border text-center w-100' data-inputs='{$this->n_input}' data-outputs='{$this->n_output}' data-for='{$this->node_identifier}'>
             <div class='node-mask' title='" . htmlentities($this->description, ENT_QUOTES) . "'>
@@ -72,8 +79,14 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
     public function execute(mixed $input, mixed $user_input): bool | array
     {
         // Placeholder implementation for setting the state of the hardware I/O based on the selected ID and state
-        if (! $input["success"] || empty($user_input['io'])) {
+        if (! $input["success"] || empty($user_input)) {
             $input['message'] = tra("IO status update skipped");
+            // check if current io state in database is null, if it is, we need to set the default state
+            $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], 'exception');
+            $current_state_array = json_decode($current_state, true);
+            if (empty($current_state_array[$user_input['io']['id']])) {
+                $current_state_array[$user_input['io']['id']]['state'] = $user_input['io']['defaultstate'];
+            }
             return $input;
         }
         $io_id = $user_input['io']['id'];

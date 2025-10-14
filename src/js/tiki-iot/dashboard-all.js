@@ -302,7 +302,7 @@ export function DrawflowInteractiveZone(editor_instance, draw_area_id) {
             var offsetElement1 = el.offset();
             var offsetElement2 = $("#" + draw_area_id).offset();
             const allinputs = el.find("input,select,textarea");
-            const data = $(this).data("flow-io") ? JSON.parse($(this).data("flow-io")) : {};
+            const data = $(this).attr("data-flow-io") ? JSON.parse($(this).attr("data-flow-io")) : {};
             allinputs.each(function () {
                 const attrs = $(this).get(0).attributes;
                 for (let attr of attrs) {
