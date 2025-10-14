@@ -52,14 +52,6 @@ $inputConfiguration = [[
         'journal_lang'   => 'word', // en|fr
         'journal_ns'     => 'string',
         'markdown_source' => 'word', // logseq|gfm|commonmark
-
-        // Cron tab
-        'cron_name'        => 'string',
-        'cron_desc'        => 'string',
-        'cron_expr'        => 'string', // ex: */10 * * * *
-        'cron_active'      => 'bool',
-        'cron_run_if_miss' => 'bool',
-        'cron_once'        => 'bool',
     ],
 ]];
 
@@ -103,14 +95,6 @@ if (! isset($_SESSION['md_import'])) {
             'journal_lang'   => 'en',
             'journal_ns'     => 'Journal',
             'markdown_source' => 'commonmark', // logseq|gfm|commonmark
-        ],
-        'cron' => [
-            'name'         => 'Markdown import',
-            'desc'         => '',
-            'expr'         => '*/30 * * * *',
-            'active'       => true,
-            'run_if_miss'  => true,
-            'once'         => false,
         ],
         // Last preview (dry-run)
         'last_preview' => null,
@@ -300,19 +284,6 @@ if ($action === 'import_now' && $access->checkCsrf()) {
     }
 }
 
-// 6) Save cron settings (no real job creation here, simple persist)
-// TODO: migrate to prefs/DB later + use TikiScheduler to create a real job
-if ($action === 'save_cron' && $access->checkCsrf()) {
-    $_SESSION['md_import']['cron'] = [
-        'name'        => trim($_POST['cron_name'] ?? 'Markdown import'),
-        'desc'        => trim($_POST['cron_desc'] ?? ''),
-        'expr'        => trim($_POST['cron_expr'] ?? '*/30 * * * *'),
-        'active'      => isset($_POST['cron_active']),
-        'run_if_miss' => isset($_POST['cron_run_if_miss']),
-        'once'        => isset($_POST['cron_once']),
-    ];
-    Feedback::success(tra('Scheduler options saved (not yet creating a real job).'));
-}
 
 // --------------------- CLI command builder (minimal) ---------------------
 // TODO: Should we save this Scheduler job here directly instead of just displaying a command ?
@@ -467,7 +438,6 @@ $smarty->assign('md_cli_sourcetype', $srcType);
 $cfg = $_SESSION['md_import'];
 $smarty->assign('md_source', $cfg['source']);
 $smarty->assign('md_wiki', $cfg['wiki']);
-$smarty->assign('md_cron', $cfg['cron']);
 $smarty->assign('md_preview', $cfg['last_preview']);
 
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

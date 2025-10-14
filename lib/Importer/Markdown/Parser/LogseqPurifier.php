@@ -87,6 +87,8 @@ class LogseqPurifier implements MarkdownPurifierInterface
             $notes[] = 'Kept [[wikilinks]] for runtime extension';
         }
 
+        // TODO: Handle other Logseq-specific syntax?
+
         return ['markdown' => $out, 'notes' => $notes];
     }
 
