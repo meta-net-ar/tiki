@@ -142,6 +142,7 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
         echo $pdf;
+        exit;
     }
 }
 
