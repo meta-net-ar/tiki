@@ -463,7 +463,7 @@ function find_relevant_tracker_items($keywords, $multivalueField = '', $searchAr
     $lib->initQuery($query);
     $query->filterType('trackeritem');
 
-    $query->setOrder($searchArgs['sort_mode'] ?? 'title_asc');
+    $query->setOrder($searchArgs['sort_mode'] ?? 'score_desc');
     $query->setRange(0, $searchArgs['maxRecords'] ?? $prefs['maxRecords']);
 
     if (! empty($searchArgs['tracker_id'])) {
