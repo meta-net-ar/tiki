@@ -255,63 +255,55 @@
     {* ================== TAB 2: Automatic import / Scheduler ================== *}
     {tab name="{tr}Importation automatique / Planificateur{/tr}"}
 
-        <form method="post" class="form-horizontal my-3" id="form_cron">
-            {ticket}
-            <input type="hidden" name="action" value="save_cron">
-
-            <h5 class="mb-3">{tr}Scheduler settings{/tr}</h5>
-
-            <div class="row mb-2">
-                <label class="col-sm-3 col-form-label">{tr}Name{/tr}</label>
-                <div class="col-sm-9"><input class="form-control" name="cron_name" value="{$md_cron.name|escape}"></div>
+        <div class="alert alert-info d-flex align-items-start gap-3">
+            {icon name="information"}
+            <div>
+                <strong>{tr}Automate imports{/tr}</strong><br>
+                {tr}Use the command below in a Tiki Scheduler task. Configure at:{/tr}
+                <a href="tiki-admin_schedulers.php?add=1">Tiki Scheduler</a>
             </div>
+        </div>
 
-            <div class="row mb-2">
-                <label class="col-sm-3 col-form-label">{tr}Description{/tr}</label>
-                <div class="col-sm-9"><input class="form-control" name="cron_desc" value="{$md_cron.desc|escape}"></div>
+        <h5 class="mb-2 text-primary">{tr}Command (copy & paste){/tr}</h5>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">{tr}Preview command{/tr}</label>
+            <div class="position-relative">
+                <textarea id="cmd_preview" class="form-control pe-5" rows="3" readonly>{$md_cli_preview}</textarea>
+                <button class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-2" type="button" data-copy="#cmd_preview">
+                    {icon name="clipboard"}
+                    {tr}Copy{/tr}
+                </button>
             </div>
-
-            <div class="row mb-2">
-                <label class="col-sm-3 col-form-label">{tr}CRON expression{/tr}</label>
-                <div class="col-sm-9">
-                    <input class="form-control" name="cron_expr" value="{$md_cron.expr|escape}" placeholder="*/30 * * * *">
-                    <div class="form-text">{tr}Minute Hour DayOfMonth Month DayOfWeek (server time){/tr}</div>
-                </div>
+            <div class="form-text">
+                {tr}Runs a dry-run and prints JSON output without writing pages.{/tr}
             </div>
+        </div>
 
-            <div class="row mb-3">
-                <div class="col-sm-3"></div>
-                <div class="col-sm-9">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="cron_active" name="cron_active" {if $md_cron.active}checked{/if}>
-                        <label class="form-check-label" for="cron_active">{tr}Enabled{/tr}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="cron_run_if_miss" name="cron_run_if_miss" {if $md_cron.run_if_miss}checked{/if}>
-                        <label class="form-check-label" for="cron_run_if_miss">{tr}Run if missed{/tr}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="cron_once" name="cron_once" {if $md_cron.once}checked{/if}>
-                        <label class="form-check-label" for="cron_once">{tr}Run once{/tr}</label>
-                    </div>
-                </div>
+        <div class="mb-4">
+            <label class="form-label fw-semibold">{tr}Import command{/tr}</label>
+            <div class="position-relative">
+                <textarea id="cmd_import" class="form-control pe-5" rows="3" readonly>{$md_cli_import}</textarea>
+                <button class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-2" type="button" data-copy="#cmd_import">
+                    {icon name="clipboard"}    
+                    {tr}Copy{/tr}
+                </button>
             </div>
-
-            <div class="text-end">
-                <button class="btn btn-primary" type="submit">{tr}Save scheduler{/tr}</button>
+            <div class="form-text">
+                {tr}Writes or updates wiki pages. For local source, replace{/tr} <code>path_to_your_zip_or_md</code> {tr}with an absolute path.{/tr}
+                {if $md_cli_sourcetype == 'ftp' || $md_cli_sourcetype == 'repo'}
+                    <br /><br /><span class="text-warning">{icon name='warning'} {tr}Credentials are included in the command.{/tr}</span>
+                {/if}
             </div>
-        </form>
+        </div>
 
-        <hr>
-
-        <p class="text-muted">{tr}You can test the configured source and run a preview using the same buttons as on the first tab.{/tr}</p>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary" form="form_source" name="action" value="test_source">
-                {tr}Test source{/tr}
-            </button>
-            <button class="btn btn-outline-info" form="form_run" name="action" value="dry_run">
-                {tr}Preview (dry-run){/tr}
-            </button>
+            <a class="btn btn-success" href="tiki-admin_schedulers.php?add=1" target="_blank">
+                {tr}Open Scheduler{/tr}
+            </a>
+            <a class="btn btn-outline-info" href="https://doc.tiki.org/Scheduler" target="_blank">
+                {tr}Scheduler docs{/tr}
+            </a>
         </div>
 
     {/tab}
@@ -365,6 +357,20 @@
     $btnPreview.removeClass('d-none');
     $btnImport.removeClass('d-none');
   }
+
+  $(document).on('click', '[data-copy]', function () {
+    var sel = $(this).attr('data-copy');
+    var $el = $(sel);
+    if (!$el.length) return;
+    $el[0].select();
+    $el[0].setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      $(this).text('{tr}Copied!{/tr}');
+      var btn = this;
+      setTimeout(function(){ $(btn).text('{tr}Copy{/tr}'); }, 1500);
+    } catch(e) {}
+  });
 
   updateUI();
   $sourceSelect.on('change', updateUI);

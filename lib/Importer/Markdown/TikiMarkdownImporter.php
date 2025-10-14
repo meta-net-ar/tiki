@@ -168,7 +168,7 @@ class TikiMarkdownImporter
             return [
                 'ok'      => true,
                 'counts'  => $scan['counts'] ?? ['pages' => 0, 'journals' => 0, 'total' => 0],
-                'dialect' => $wikiOpts['markdown_source'] ?? 'logseq',
+                'dialect' => $wikiOpts['markdown_source'] ?? 'commonmark',
                 'items'   => [],
             ];
         }
@@ -179,9 +179,9 @@ class TikiMarkdownImporter
             ->registerPurifier(new GfmPurifier())
             ->registerPurifier(new LogseqPurifier());
 
-        $dialect = $wikiOpts['markdown_source'] ?? 'logseq';
+        $dialect = $wikiOpts['markdown_source'] ?? 'commonmark';
 
-        // Context passed to purifiers (keep defaults friendly for Logseq)
+        // Context passed to purifiers (keep defaults friendly for commonmark)
         $ctx = array_merge([
             'journal_ns' => $wikiOpts['journal_ns'] ?? 'Journal',
             'strip_front_matter' => true,

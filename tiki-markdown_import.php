@@ -102,7 +102,7 @@ if (! isset($_SESSION['md_import'])) {
             'detect_journal' => true,
             'journal_lang'   => 'en',
             'journal_ns'     => 'Journal',
-            'markdown_source' => 'logseq', // logseq|gfm|commonmark
+            'markdown_source' => 'commonmark', // logseq|gfm|commonmark
         ],
         'cron' => [
             'name'         => 'Markdown import',
@@ -194,11 +194,11 @@ if ($action === 'dry_run' && $access->checkCsrf()) {
     $sourceCfg = $_SESSION['md_import']['source'] ?? [];
     $wikiOpts = $_SESSION['md_import']['wiki'] ?? [];
 
-    // Permettre override ponctuel depuis le petit formulaire de preview/import
+    // Markdown flavor selection comes from UI (or default)
     if (! empty($_POST['markdown_source'])) {
         $wikiOpts['markdown_source'] = $_POST['markdown_source'];
     } elseif (empty($wikiOpts['markdown_source'])) {
-        $wikiOpts['markdown_source'] = 'logseq';
+        $wikiOpts['markdown_source'] = 'commonmark';
     }
 
     // Upload local ad hoc ?
@@ -224,7 +224,7 @@ if ($action === 'dry_run' && $access->checkCsrf()) {
     }
 }
 
-// 5) Import now — placeholder
+// 5) Import now
 if ($action === 'import_now' && $access->checkCsrf()) {
     $sourceCfg = $_SESSION['md_import']['source'] ?? [];
     $wikiOpts = $_SESSION['md_import']['wiki'] ?? [];
@@ -259,7 +259,7 @@ if ($action === 'import_now' && $access->checkCsrf()) {
     ];
 
     // Markdown flavor selection comes from UI (or default)
-    $flavor = $_POST['markdown_source'] ?? ($wikiOpts['markdown_source'] ?? 'gfm');
+    $flavor = $_POST['markdown_source'] ?? ($wikiOpts['markdown_source'] ?? 'commonmark');
 
     $pipelineCfg = [
         'flavor'              => $flavor,
@@ -313,6 +313,156 @@ if ($action === 'save_cron' && $access->checkCsrf()) {
     ];
     Feedback::success(tra('Scheduler options saved (not yet creating a real job).'));
 }
+
+// --------------------- CLI command builder (minimal) ---------------------
+// TODO: Should we save this Scheduler job here directly instead of just displaying a command ?
+
+if (! function_exists('mdimp_val_plain')) {
+    function mdimp_val_plain($v): ?string
+    {
+        if ($v === null) {
+            return null;
+        }
+        if (is_bool($v)) {
+            return $v ? '1' : '0';
+        }
+        $s = (string) $v;
+        if ($s === '') {
+            return null;
+        }
+        // escape spaces to avoid quoting
+        $s = preg_replace('/\s+/u', ' ', $s);
+        return str_replace(' ', '\ ', $s);
+    }
+}
+
+if (! function_exists('mdimp_same')) {
+    function mdimp_same($v, $def): bool
+    {
+        // normalize types for fair compare
+        if (is_bool($def)) {
+            return (bool)$v === (bool)$def;
+        }
+        if (is_int($def)) {
+            return (int)$v === (int)$def;
+        }
+        // strings: trim normalize spaces
+        $vn = preg_replace('/\s+/u', ' ', (string)$v);
+        $dn = preg_replace('/\s+/u', ' ', (string)$def);
+        return $vn === $dn;
+    }
+}
+
+if (! function_exists('mdimp_opt_if_changed')) {
+    function mdimp_opt_if_changed(string $key, $value, $default): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (mdimp_same($value, $default)) {
+            return null; // omit if same as default
+        }
+        $v = mdimp_val_plain($value);
+        return $v === null ? null : "--{$key}={$v}";
+    }
+}
+
+// Defaults for CLI (should match those in Command class MarkdownImporterCommand)
+$cliDefaults = [
+    'mode'             => 'preview',
+    'source-type'      => 'local',
+    'markdown-source'  => 'commonmark',
+    // options wiki
+    'roots'            => '.',
+    'recursive'        => true,
+    'max-depth'        => 0,
+    'exclude-globs'    => null,
+    'title-strategy'   => 'fm_h1_filename',
+    'naming-mode'      => 'basename',
+    'dir-levels'       => 2,
+    'separator'        => ' ',
+    'namespace'        => null,
+    'detect-journal'   => true,
+    'journal-lang'     => 'en',
+    'journal-ns'       => 'Journal',
+    // source local
+    'local-path'       => null,
+    // source ftp
+    'ftp-host'         => null,
+    'ftp-port'         => 21,
+    'ftp-user'         => null,
+    'ftp-pass'         => null,
+    'ftp-path'         => '/',
+    'ftp-ssl'          => false,
+    'ftp-passive'      => true,
+    // source repo
+    'repo-provider'    => 'github',
+    'repo-owner'       => null,
+    'repo-name'        => null,
+    'repo-ref'         => 'main',
+    'repo-token'       => null,
+];
+
+$source = $_SESSION['md_import']['source'] ?? [];
+$wiki = $_SESSION['md_import']['wiki'] ?? [];
+
+$srcType = $source['type'] ?? $cliDefaults['source-type'];
+
+/**
+ * Prepare  CLI commands (preview + import)
+ * - only include options that differ from defaults
+ */
+$srcOpts = [];
+if ($srcType === 'local') {
+    $localPath = $source['local_path'] ?? null;
+    $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
+    $srcOpts[] = mdimp_opt_if_changed('local-path', $localPath ?: 'path_to_your_zip_or_md', $cliDefaults['local-path']);
+} elseif ($srcType === 'ftp') {
+    $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-host', $source['ftp_host'] ?? null, $cliDefaults['ftp-host']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-port', (int)($source['ftp_port'] ?? 21), $cliDefaults['ftp-port']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-user', $source['ftp_user'] ?? null, $cliDefaults['ftp-user']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-pass', $source['ftp_pass'] ?? null, $cliDefaults['ftp-pass']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-path', $source['ftp_path'] ?? '/', $cliDefaults['ftp-path']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-ssl', (bool)($source['ftp_ssl'] ?? false), $cliDefaults['ftp-ssl']);
+    $srcOpts[] = mdimp_opt_if_changed('ftp-passive', (bool)($source['ftp_passive'] ?? true ), $cliDefaults['ftp-passive']);
+} elseif ($srcType === 'repo') {
+    $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-provider', $source['repo_provider'] ?? 'github', $cliDefaults['repo-provider']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-owner', $source['repo_owner'] ?? null, $cliDefaults['repo-owner']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-name', $source['repo_name'] ?? null, $cliDefaults['repo-name']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-ref', $source['repo_ref'] ?? 'main', $cliDefaults['repo-ref']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-token', $source['repo_token'] ?? null, $cliDefaults['repo-token']);
+}
+
+// Options wiki (common)
+$common = [];
+$common[] = mdimp_opt_if_changed('markdown-source', $wiki['markdown_source'] ?? 'commonmark', $cliDefaults['markdown-source']);
+$common[] = mdimp_opt_if_changed('roots', $wiki['roots'] ?? '.', $cliDefaults['roots']);
+$common[] = mdimp_opt_if_changed('recursive', (bool)($wiki['recursive'] ?? true), $cliDefaults['recursive']);
+$common[] = mdimp_opt_if_changed('max-depth', (int)($wiki['max_depth'] ?? 0), $cliDefaults['max-depth']);
+$common[] = mdimp_opt_if_changed('exclude-globs', $wiki['exclude_globs'] ?? null, $cliDefaults['exclude-globs']);
+$common[] = mdimp_opt_if_changed('title-strategy', $wiki['title_strategy'] ?? 'fm_h1_filename', $cliDefaults['title-strategy']);
+$common[] = mdimp_opt_if_changed('naming-mode', $wiki['naming_mode'] ?? 'basename', $cliDefaults['naming-mode']);
+$common[] = mdimp_opt_if_changed('dir-levels', (int)($wiki['dir_levels'] ?? 2), $cliDefaults['dir-levels']);
+$common[] = mdimp_opt_if_changed('separator', $wiki['separator'] ?? ' ', $cliDefaults['separator']);
+$common[] = mdimp_opt_if_changed('namespace', $wiki['namespace'] ?? null, $cliDefaults['namespace']);
+$common[] = mdimp_opt_if_changed('detect-journal', (bool)($wiki['detect_journal'] ?? true), $cliDefaults['detect-journal']);
+$common[] = mdimp_opt_if_changed('journal-lang', $wiki['journal_lang'] ?? 'en', $cliDefaults['journal-lang']);
+$common[] = mdimp_opt_if_changed('journal-ns', $wiki['journal_ns'] ?? 'Journal', $cliDefaults['journal-ns']);
+
+// cleanup
+$srcOpts = array_values(array_filter($srcOpts));
+$common  = array_values(array_filter($common));
+
+//Build commands
+$base = 'markdown:importer';
+$cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' --json');
+$cmdImport  = trim($base . ' --mode=import  ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' --json');
+
+$smarty->assign('md_cli_preview', $cmdPreview);
+$smarty->assign('md_cli_import', $cmdImport);
+$smarty->assign('md_cli_sourcetype', $srcType);
 
 $cfg = $_SESSION['md_import'];
 $smarty->assign('md_source', $cfg['source']);
