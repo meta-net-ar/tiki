@@ -1324,7 +1324,8 @@ class Services_Tracker_Controller
         }
 
         if ($prefs['tracker_field_rules'] === 'y') {
-            $js = TikiLib::lib('vuejs')->generateTrackerRulesJS($definition->getFields());
+            $js = TikiLib::lib('vuejs')->generateTrackerRulesJS(fields: $definition->getFields(), isInEditContext: true);
+            //$js = TikiLib::lib('vuejs')->generateTrackerRulesJS($definition->getFields(), '', true);
             TikiLib::lib('header')->add_jq_onready($js);
         }
 

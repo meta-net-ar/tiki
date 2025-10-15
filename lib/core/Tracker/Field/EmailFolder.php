@@ -229,7 +229,11 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
     public function renderInput($context = [])
     {
-        return tr("Emails can be copied or moved here via the Webmail interface.");
+        $ins_id = $this->getInsertId();
+        //This input is useful for facilitating the execution of rules
+        $hiddenInput = "<input type='hidden' name='$ins_id'>";
+        $translatedText = tr("Emails can be copied or moved here via the Webmail interface.");
+        return $hiddenInput . $translatedText;
     }
 
     public function renderOutput($context = [])

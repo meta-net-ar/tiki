@@ -39,7 +39,7 @@ class Rules
      *
      * @return string
      */
-    public function getJavaScript(string $parentSelector, array $field): string
+    public function getJavaScript(string $parentSelector, array $field, $isInEditContext = false): string
     {
         global $prefs;
 
@@ -70,8 +70,14 @@ class Rules
             $operator = ' || ';
         }
 
+        if ($isInEditContext) {
+            $selectorAttribute = 'name';
+        } else {
+            $selectorAttribute = 'name^';
+        }
+
         foreach ($this->conditions->predicates as $predicate) {
-            $selector = '[name=\'' . $predicate->target_id . '\']' . $conditionQualifier;
+            $selector = "[$selectorAttribute='{$predicate->target_id}']$conditionQualifier";
             $selectors[] = $selector;
             if (
                 in_array($field['type'], ['R', 'M']) ||
@@ -92,7 +98,8 @@ class Rules
 
         foreach ($this->actions->predicates as $predicate) {
             if ($predicate->operator_id !== 'NoOp') {
-                $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
+                $targetSelector = "\$(\"[{$selectorAttribute}='{$predicate->target_id}']\", \$(this).closest(\"form\")).last()";
+
                 $actions[]
                     = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                 if (strpos($predicate->operator_id, 'Required') === false) {
@@ -113,7 +120,7 @@ class Rules
         if ($this->else->predicates) {
             foreach ($this->else->predicates as $predicate) {
                 if ($predicate->operator_id !== 'NoOp') {
-                    $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
+                    $targetSelector = "\$(\"[{$selectorAttribute}='{$predicate->target_id}']\", \$(this).closest(\"form\")).last()";
                     $else[]
                         = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                     if (strpos($predicate->operator_id, 'Required') === false) {
