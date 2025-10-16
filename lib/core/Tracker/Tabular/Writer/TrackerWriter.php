@@ -38,7 +38,7 @@ class TrackerWriter
                     'itemId' => false,
                     'fields' => [],
                     'skip_sync' => $source instanceof \Tracker\Tabular\Source\ODBCSource,
-                    'validate' => $source instanceof \Tracker\Tabular\Source\ODBCSource ? false : true, // ODBC sync needs saving no matter of validation errors
+                    'validate' => ($source instanceof \Tracker\Tabular\Source\ODBCSource || $schema->isSkipValidation()) ? false : true, // ODBC sync needs saving no matter of validation errors
                 ];
 
                 foreach ($columns as $column) {
@@ -113,6 +113,9 @@ class TrackerWriter
                     }
                 }
                 $ids[] = $info['itemId'];
+                if ($schema->isSkipValidation()) {
+                    return [];
+                }
                 return array_map(
                     function ($error) use ($line) {
                         return tr('Line %0:', $line + 1) . ' ' . $error;

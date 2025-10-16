@@ -93,6 +93,7 @@ class Schema
             'import_transaction' => 0,
             'bulk_import' => 0,
             'skip_unmodified' => 0,
+            'skip_validation' => 0,
             'encoding' => '',
             'format' => '',
         ], $config);
@@ -128,6 +129,11 @@ class Schema
     public function isSkipUnmodified()
     {
         return $this->config['skip_unmodified'];
+    }
+
+    public function isSkipValidation()
+    {
+        return $this->config['skip_validation'];
     }
 
     public function getEncoding()
