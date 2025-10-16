@@ -45,6 +45,14 @@ class TrackerSourceEntry implements SourceEntryInterface
 
     public function backfillPK($pk, $value)
     {
+        global $prefs;
+
         \TikiLib::lib('trk')->modify_field($this->data['itemId'], $pk, $value);
+
+        if ($prefs['feature_search'] === 'y' && $prefs['unified_incremental_update'] === 'y') {
+            $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+            $unifiedsearchlib->invalidateObject('trackeritem', $this->data['itemId']);
+            $unifiedsearchlib->processUpdateQueue();
+        }
     }
 }
