@@ -8,7 +8,7 @@
 
     {if $viewlist neq 'list'}
         {jq}
-            let content = {{$eventCalendarParams|json_encode}};
+            let content = {{$fullCalendarParams|json_encode}};
             const elt = document.getElementById('date-plugin-calendar');
             content['initialDate'] = $('#date-plugin-calendar').val();
             const wikipluginCalendar = [window.pluginCalendar]

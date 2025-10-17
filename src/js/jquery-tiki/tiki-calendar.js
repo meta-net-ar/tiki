@@ -106,6 +106,7 @@ $.fn.setupFullCalendar = function (
                 return event;
             },
             eventDidMount: function (arg) {
+                $(calendarEl).tikiModal();
                 const event = arg.event;
                 const element = $(arg.el);
                 const dayGrid = $(".fc-daygrid-event").length;

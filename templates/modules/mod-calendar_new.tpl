@@ -21,12 +21,12 @@
 
                 {if $viewlist neq 'list'}
                     {jq}
-                        let paramOfModuleCalendar = {{$eventCalendarParams|json_encode}};
+                        let paramOfModuleCalendar = {{$fullCalendarParams|json_encode}};
                         const moduleCalendarFocusDate = document.getElementById('date-module-calendar');
                         paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
 
                         const calendarContainer = [window.moduleCalendar];
-                        $("#module-calendar").setupFullCalendar({{$eventCalendarParams|json_encode}}, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                        $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
                         moduleCalendarFocusDate.addEventListener('change', () => {
                             document.getElementById('module-calendar').innerHTML = "";
                             paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
