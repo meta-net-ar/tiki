@@ -75,7 +75,7 @@ fi
 
 echo "Cleanup packaging folder and rebuild"
 rm -rf "${PACKDIR:?}/${BRANCH:?}"
-cp -r ${BASE}/data/"${BRANCH}" ${PACKDIR}
+cp -a ${BASE}/data/"${BRANCH}" ${PACKDIR}
 
 # cleanup
 if [ -d "${PACKDIR}/${BRANCH}" ]; then
