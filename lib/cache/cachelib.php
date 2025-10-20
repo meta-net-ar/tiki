@@ -503,7 +503,7 @@ class Cachelib
     public function invalidate_by_cache_purge_rules($args)
     {
         // First get all candidates which match type (source_itemId does not matter for now - see below)
-        $cache_purge_rules = $this->get_cache_purge_rules($args['type']);
+        $cache_purge_rules = $this->get_cache_purge_rules($args['type']) ?? [];
 
         foreach ($cache_purge_rules as $c) {
             if ($c['source_itemId'] == $args['object'] || $c['source_itemId'] == 0) {
