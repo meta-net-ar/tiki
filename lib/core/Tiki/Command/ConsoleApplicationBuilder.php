@@ -545,11 +545,14 @@ class ConsoleApplicationBuilder
         /**
          * Define our constants, based on what error (if any) was thrown
          * @see $statusCode For explanations on what these constants these do.
+         *  Note: when running the test suite, they may already be pre-defined by
+         * `lib/test/bootstrap.php` to force a specific application state.
+         *  In that case, the existing values are preserved and not overridden.
          */
-        define('DB_RUNNING', $statusCode > 1001);
-        define('DB_STATUS', $statusCode > 1002);
-        define('DB_TIKI_SETUP', $statusCode > 1003);
-        define('DB_SYNCHRONAL', $statusCode > 1004);
+        defined('DB_RUNNING')    || define('DB_RUNNING', $statusCode > 1001);
+        defined('DB_STATUS')     || define('DB_STATUS', $statusCode > 1002);
+        defined('DB_TIKI_SETUP') || define('DB_TIKI_SETUP', $statusCode > 1003);
+        defined('DB_SYNCHRONAL') || define('DB_SYNCHRONAL', $statusCode > 1004);
 
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();

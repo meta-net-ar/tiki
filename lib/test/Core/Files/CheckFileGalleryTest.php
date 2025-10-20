@@ -36,6 +36,8 @@ class CheckFileGalleryTest extends TestCase
         }
 
         global $prefs, $user;
+        $mock = $this->createMock(get_class(TikiLib::lib('unifiedsearch')));
+        $mock->method('processUpdateQueue')->willReturn(null);
 
         // impersonate admin
         $user = 'admin';
