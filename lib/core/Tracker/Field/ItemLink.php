@@ -318,7 +318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                             0 => tr('No'),
                             1 => tr('Yes'),
                         ],
-                        'default' => '1',
+                        'default' => '0',
                         'depends' => [
                             'pref' => 'tracker_clone_item',
                         ],
