@@ -216,7 +216,7 @@ class Executor
         foreach ($this->formatterPlugins as $name => $plugin) {
             $sf->addSubFormatter($name, $plugin);
         }
-        $formatted = $sf->getPopulatedList($result, true, true);
+        $formatted = $sf->getPopulatedList($result, true, $this->record->limitPreloaded());
 
         foreach ($formatted as $entry) {
             foreach ($this->reverseMapping as $i => $mappings) {
