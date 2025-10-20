@@ -15,6 +15,7 @@ class Record
     private $key;
     private $multiple;
     private $required;
+    private $limitPreloaded;
     private $body;
     /** Array of Record */
     private array $sublists = [];
@@ -27,6 +28,7 @@ class Record
         $this->key = $key;
         $this->multiple = false;
         $this->required = false;
+        $this->limitPreloaded = false;
         $this->parser = $parser;
         $this->parent = null;
     }
@@ -85,6 +87,16 @@ class Record
     public function setRequired($required)
     {
         $this->required = $required;
+    }
+
+    public function limitPreloaded()
+    {
+        return $this->limitPreloaded;
+    }
+
+    public function setLimitPreloaded($limitPreloaded)
+    {
+        $this->limitPreloaded = $limitPreloaded;
     }
 
     /**

@@ -31,6 +31,7 @@ class Parser
         $record = new Record($args['name'], $this);
         $record->setMultiple(! empty($args['multiple']));
         $record->setRequired(! empty($args['required']));
+        $record->setLimitPreloaded(! empty($args['limitfields']) && $args['limitfields'] === 'y');
 
         // handle nested sublists first
         $sublists = [];
