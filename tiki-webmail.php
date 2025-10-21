@@ -91,8 +91,8 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         if (isset($_POST['uid'])) {
             $uid = $_POST['uid'];
         }
-        if (isset($_POST['list_path'])) {
-            $list_path = $_POST['list_path'];
+        if (isset($_REQUEST['list_path'])) {
+            $list_path = $_REQUEST['list_path'];
         }
         if (isset($_POST['header_subject'])) {
             $header_subject = $_POST['header_subject'];
@@ -119,6 +119,8 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         }
         if (isset($_POST['header_cc'])) {
             $header_cc = $_POST['header_cc'];
+        } else {
+            $header_cc = '';
         }
 
         $contentpage = createWebPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc);
@@ -181,9 +183,9 @@ function createWebPage($header_subject, $header_date, $header_from, $header_to, 
     body, td {font-size:13px}
     body{background: #fff !important;}
     a:link, a:active {color:#1155CC; text-decoration:none}
-    a:hover {text-decoration:underline; cursor: pointer} 
-    a:visited{color:##6611CC} img{border:0px} 
-    pre { white-space: pre; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; white-space: pre-wrap; word-wrap: break-word; max-width: 800px; overflow: auto;} 
+    a:hover {text-decoration:underline; cursor: pointer}
+    a:visited{color:##6611CC} img{border:0px}
+    pre { white-space: pre; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; white-space: pre-wrap; word-wrap: break-word; max-width: 800px; overflow: auto;}
     .logo { left: -7px; position: relative; }
   </style>
 </head>
