@@ -129,6 +129,7 @@ class CalendarLib extends TikiLib
     {
         global $prefs;
         $canEditAnything = false;
+        $calendars = [];
         foreach ($rawcalsData as $calendar) {
             $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
             $calendars[$calendar['calendarId']] = $calendar;
@@ -152,6 +153,7 @@ class CalendarLib extends TikiLib
             'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
             'initialDate'      => date("Y-m-d"),
             'canEditAnything' => $canEditAnything,
+            'calendars' => $calendars,
         ];
     }
 

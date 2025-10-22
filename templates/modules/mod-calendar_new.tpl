@@ -21,15 +21,48 @@
 
                 {if $viewlist neq 'list'}
                     {jq}
+                        let paramOfModuleCalendar = {{$fullCalendarParams|json_encode}};
+                        const moduleCalendarFocusDate = document.getElementById('date-module-calendar');
+                        paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
+
                         const calendarContainer = [window.moduleCalendar];
                         $("#module-calendar").setupFullCalendar({{$fullCalendarParams|json_encode}}, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
-                        {{if $prefs.print_pdf_from_url neq 'none'}$("#module-calendar").addFullCalendarPrint('#module-calendar-pdf-btn', calendarContainer[0]);{/if}}
+                        moduleCalendarFocusDate.addEventListener('change', () => {
+                            document.getElementById('module-calendar').innerHTML = "";
+                            paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
+                            $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                        })
+                        {{if $prefs.print_pdf_from_url neq 'none'}$("#module-calendar").addEventCalendarPrint('#module-calendar-pdf-btn', calendarContainer[0]);{/if}}
                     {/jq}
                 {/if}
                 {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
                     <a id="module-calendar-pdf-btn" href="#" class="text-end d-none" role="button">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
                 {/if}
                 <div id="test"></div>
+                <div id="configlinks" class="mb-3 text-end">
+                    <div id="configlinks" class="mb-3 text-end">
+                        {if count($checkedCalIds)}
+                            {$maxCalsForButton = 20}
+                            {if count($checkedCalIds) > $maxCalsForButton}<select size="5">{/if}
+                            {foreach $checkedCalIds as $checkedCalId}
+                                {if $calendars}
+                                    {$thiscustombgcolor = $calendars[$checkedCalId].custombgcolor}
+                                    {$thiscustomfgcolor = $calendars[$checkedCalId].customfgcolor}
+                                    {$thiscalendarsname = $calendars[$checkedCalId].displayName|escape}
+                                    {if count($checkedCalIds) > $maxCalsForButton}
+                                        <option style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};" onclick="toggle('filtercal')">
+                                            {$thiscalendarsname}
+                                        </option>
+                                    {else}
+                                        {button href="{$checkedCalId|sefurl:'calendar'}" _style="background:#$thiscustombgcolor;color:#$thiscustomfgcolor;border:1px solid #$thiscustomfgcolor; " _text="{$thiscalendarsname}" _class='btn btn-sm me-2 mt-2' _icon_name='calendar'}
+                                    {/if}
+                                {/if}
+                            {/foreach}
+                            {if count($checkedCalIds) > $maxCalsForButton}</select>{/if}
+                        {/if}
+                    </div>    
+                </div>
+                <input type="date" value="{$moduleCalendarFocusdate}" id="date-module-calendar">
                 <div id='module-calendar'></div>
                 {if $viewlist eq 'list'}
                     {$out}

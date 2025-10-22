@@ -145,16 +145,17 @@ function module_calendar_new($mod_reference, $module_params)
     if (empty($rawcals['data'])) {
         Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
     }
-
+    $moduleCalendarFocusdate = date("Y-m-d");
     $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $calIds));
-    $calendars = [];
 
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
+    $calendars = $calendarInitialParams['calendars'];
     $smarty->assign(
         'eventCalendarParams',
         $calendarInitialParams
     );
+    $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
     $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
@@ -182,6 +183,9 @@ function module_calendar_new($mod_reference, $module_params)
         }
 
         $smarty->assign('name', 'calendar_new');
+        $smarty->assign('calendars', $calendars);
+        $smarty->assign_by_ref('checkedCalIds', $calIds);
+
 
         $smarty->assign('show_calendar_module', 'y');
         if (isset($save_todate)) {

@@ -80,7 +80,7 @@ function wikiplugin_calendar_info()
 
 function wikiplugin_calendar($data, $params)
 {
-    global $prefs, $tiki_p_admin, $tiki_p_view_calendar;
+    global $prefs, $tiki_p_admin, $tiki_p_view_calendar, $tikiroot;
     global $dc, $user;
 
     $smarty = TikiLib::lib('smarty');
@@ -126,6 +126,7 @@ function wikiplugin_calendar($data, $params)
 
     $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $params['calIds']));
 
+    $focusdate = date("Y-m-d");
     switch ($params['viewmode']) {
         case 'week':
             $initialView = 'timeGridWeek';
@@ -143,10 +144,10 @@ function wikiplugin_calendar($data, $params)
     $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
 
     $defaultCalendarId = $params['calIds'][0];
-    $calendars = [];
 
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
+    $calendars = $calendarInitialParams['calendars'];
     $smarty->assign(
         'fullCalendarParams',
         $calendarInitialParams
@@ -161,14 +162,15 @@ function wikiplugin_calendar($data, $params)
     $smarty->assign('pluginCalendarIds', $pluginCalendarIds);
     $smarty->assign('displayedcals', $params['calIds']);
     $thiscal = [];
-    $checkedCalIds = [];
+    $checkedCalIds = $params['calIds'];
 
     if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
         $defaultCalendarId = $_REQUEST["calIds"][0];
     }
 
-    $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
+    $smarty->assign_by_ref('checkedCalIds', $params['calIds']);
     $smarty->assign('calendars', $calendars);
+    $smarty->assign('focusdate', $focusdate);
     $smarty->assign('viewlist', $params['viewlist']);
 
     $out = '';
