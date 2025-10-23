@@ -460,7 +460,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         }
                     }
                 }
-                $res .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></div><div class="col-md-10 col-12"></div></div>';
+                $res .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><button class="btn btn-sm btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></div><div class="col-md-10 col-12"></div></div>';
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'REPLY') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);

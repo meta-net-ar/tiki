@@ -102,7 +102,7 @@
         background-color: transparent;
     }
     a:not(.btn):hover {
-        text-decoration: $link-hover-decoration !important;
+        text-decoration: var(--bs-link-decoration);
     }
     .content_title {
         overflow: visible; min-height: 50px; max-height: 400px; padding: 15px;
@@ -114,9 +114,12 @@
             color: var(--bs-body-color) !important;
             &:hover {
                 color: var(--bs-link-hover-color) !important;
-                text-decoration: $link-hover-decoration;
+                text-decoration: var(--bs-link-decoration);
             }
         }
+    }
+    .folders .selected_menu a {
+        &, &:hover, i.bi { color: var(--bs-primary-text-emphasis) !important; }
     }
 
     .folder_list, .content_cell, .compose_page, .message_list, .msg_text, .selected_part,
@@ -134,7 +137,14 @@
         margin-bottom: 10px;
     }
     .mailbox_list_title { display: inline-block; }
-    .move_to_location 
+    .move_to_location {
+        background-color: var(--bs-dropdown-bg);
+        a i.bi { color: var(--bs-dropdown-color) !important; }
+    }
+    .move_to_title {
+        background-color: var(--bs-dropdown-bg);
+        border-color: var(--bs-dropdown-border-color);
+    }
 
     .msg_text_inner {
         width: 100%;
@@ -161,6 +171,10 @@
     .msg_text table { width: 100% !important; }
     .msg_text .content table { table-layout: fixed; }
     .msg_text #contact_info { white-space: unset; }
+    .msg_text {
+        .js-header_subject { color: var(--bs-body-color); font-size: 1.4rem; }
+        .header_event_addtocal el-select { width: auto; }
+    }
 
     .src_name, .content_title, .list_controls {
         background-color: inherit !important;
@@ -235,7 +249,7 @@
     .select2-container { margin-bottom: 0; width: auto !important; }
     .message_list .combined_sort, .message_list .combined_sort + el-select { display: inline-block; margin-left: 10px; width: 150px; }
 
-    .folders li, .inner_list li {
+    .inner_list li {
         word-break: break-all;
         white-space: unset;
         padding: 0;
@@ -345,16 +359,6 @@
         .long_header .col-md-2 {
         font-weight: bold;
         }
-    
-        .msg_actions a {
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        background-color: #f8f9fa;
-        text-decoration: none;
-        color: #495057;
-        font-size: 0.6rem;
-        margin-right: 0;
-        }
     }
     
     .collapsed ul {
@@ -388,18 +392,20 @@
         flex-wrap: wrap;
         gap: 0.1rem !important;
     }
-    .search_terms, .search_form select {
+    .search_form select {
         width: auto !important;
     }
 
     .nux_welcome { margin-bottom: 15px; }
+    .block_sender_link.btn-outline-danger {
+        color: var(--bs-btn-color);
+        &:hover, &:active { color: var(--bs-btn-hover-color); text-decoration: none; }
+    }
+    #show_message_source { margin-right: 0.5rem; }
+    .msg_actions .d-inline-block > .hlink { margin-bottom: 0.5rem; }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
-    .msg_controls {
-        background: inherit !important;
-    }
-
     .folder_list {
         background-color: $popover-bg;
         color: $popover-body-color;
@@ -434,18 +440,7 @@
             position: fixed;
             z-index: 9999;
         }
-        .menu-toggle {
-            right: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            text-align: left;
-            top: 0;
-            padding: 10px 0 10px 20px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
+        .menu-toggle { background-color: var(--bs-body-bg); }
         nav .menu-toggle:not(.close-toggle) {
             right: 20px;
             left: unset;
@@ -486,11 +481,8 @@
         }
 
         .list_controls i.bi-filter-circle {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            font-size: 125%;
-            z-index: 100;
+            position: absolute; top: 11px; right: 15px; z-index: 100;
+            color: var(--bs-body-color);
         }
         .imap_filter_form { margin-left: 10px; margin-right: 10px; }
         .imap_sort, .imap_sort + el-select, .imap_filter + el-select {
@@ -594,7 +586,10 @@
         .msg_text_inner { width: 100%; padding: 15px !important; }
         .msg_parts { table-layout: auto; }
         .select2-container { min-width: 100px; }
-        .msg_controls { position: fixed; right: 1rem !important; top: 0.3rem; z-index: 1000; height: auto; padding-top: 0; }
+        .msg_controls {
+            top: 0.3rem; height: auto; padding-left: 0; z-index: 1200;
+            background-color: var(--bs-body-bg);
+        }
         #list_controls_menu { background-color: var(--bs-body-bg); }
         #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }
@@ -636,7 +631,7 @@
     #topbar_modules { display: none !important; }
     #row-middle { margin-left: -15px; margin-right: -15px; border: none; }
     #col1 { padding: 0; border: none; }
-    #col2, #col3 { margin-left: 15px; margin-right: 15px; }
+    #col2, #col3 { margin-left: 0; margin-right: 0; }
 }
 
 .tiki-webmail {
@@ -653,10 +648,10 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
     min-width: 95% !important;
 }
 
-//
-// tablet and phone specific
-//
-@media screen and (min-width: 1200px) {
+
+// responsive specific stuff
+// desktop (1199.98px)
+@include media-breakpoint-down(xl) {
     .tiki-webmail {
         .container {
             max-width: 1420px;
@@ -664,15 +659,19 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
     }
 }
 
-@media (max-width: 768px) {
+// landscape phones (767.98px)
+@include media-breakpoint-down(md) {
     html body.tiki.tiki-webmail #middle.container.container-std.middle {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 100% !important;
     }
+    .mobile .inline-cypht .list_controls i.bi-filter-circle { top: 2px; right: 0; }
+    .mobile #list_controls_menu.show { top: 25px; right: 0; }
 }
 
-@media (max-width: 575px) {
+// portrait phones (575.98px)
+@include media-breakpoint-down(sm) {
     .mobile .inline-cypht {
         .targets_section, .other_section,
         .time_section, .source_section, .terms_section {

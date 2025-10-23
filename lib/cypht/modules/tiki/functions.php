@@ -387,10 +387,10 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
         }
         $res = "<div class=\"" . ($class != 'move_to_trackers' ? 'dropdown ' : '') . "d-inline-block\">";
         if ($class != 'move_to_trackers') {
-            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2 dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle " . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
             $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div>";
         } else {
-            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary " . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
         }
         $res .= "</div>";
 
