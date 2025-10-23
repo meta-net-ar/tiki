@@ -12,6 +12,12 @@
     }
 }
 
+// Align the various width icons and the menu option text labels nicely
+.navbar-nav .nav-item > .nav-link .icon {
+    min-width: var(--bs-gutter-x);
+    text-align: center;
+}
+
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
     transform: rotate(-90deg);
     /* position: absolute;
