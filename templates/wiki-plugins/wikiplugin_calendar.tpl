@@ -18,7 +18,7 @@
                 content['initialDate'] = $('#date-plugin-calendar').val();
                 $("#plugin-calendar").setupFullCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}');
             })
-            {{if $prefs.print_pdf_from_url neq 'none'}$("#plugin-calendar").addEventCalendarPrint('#calendar-pdf-btn', wikipluginCalendar[0]);{/if}}
+            {{if $prefs.print_pdf_from_url neq 'none'}$("#plugin-calendar").addFullCalendarPrint('#calendar-pdf-btn', wikipluginCalendar[0]);{/if}}
         {/jq}
     {/if}
     {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
