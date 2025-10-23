@@ -103,15 +103,7 @@ function wikiplugin_calendar($data, $params)
     $pluginCalendarIds = implode(',', $params['calIds']);
 
     $rawcals = $calendarlib->list_calendars();
-    TikiLib::lib('header')
-        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-        ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js')
-        ->add_cssfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.css')
-        ->add_jsfile('vendor_bundled/vendor/moment/moment/min/moment.min.js', true)
-        ->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }')
-        ->add_cssfile('vendor_bundled/vendor/twbs/bootstrap-icons/font/bootstrap-icons.css')
-        ->add_jsfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.js', true)
-        ->add_jsfile('lib/jquery_tiki/tiki-calendar.js');
+
     $rawcals['data'] = Perms::filter(
         ['type' => 'calendar'],
         'object',

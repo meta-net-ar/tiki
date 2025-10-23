@@ -874,6 +874,13 @@ $("#top").on("annotationCreated", function (e, annotation) {
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
+$headerlib->add_cssfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.css');
+$headerlib->add_cssfile('vendor_bundled/vendor/twbs/bootstrap-icons/font/bootstrap-icons.css');
+// Disable fullcalendar's force events to be one-line tall
+$headerlib->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }');
+$headerlib->add_jsfile('vendor_bundled/vendor/moment/moment/min/moment.min.js', true);
+$headerlib->add_jsfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.js', true);
+$headerlib->add_jsfile('lib/jquery_tiki/tiki-calendar.js');
 
 if ($prefs['feature_machine_learning'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-machine_learning.js');
