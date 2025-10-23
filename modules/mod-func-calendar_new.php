@@ -152,16 +152,13 @@ function module_calendar_new($mod_reference, $module_params)
     $calendarInitialParams['initialView'] = $initialView;
     $calendars = $calendarInitialParams['calendars'];
     $smarty->assign(
-        'eventCalendarParams',
+        'fullCalendarParams',
         $calendarInitialParams
     );
     $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
     $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
-    if ($calendarInitialParams['canEditAnything']) {
-        TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
-    }
+    $canEditAnything = $calendarInitialParams['canEditAnything'] ? 'y' : 'n';
+    $smarty->assign('canEditAnything', $canEditAnything);
 
     foreach ($calIds as $i => $cal_id) {
         if ($tiki_p_admin_calendars != 'y' && ! $userlib->user_has_perm_on_object($user, $cal_id, 'calendar', 'tiki_p_view_calendar')) {
