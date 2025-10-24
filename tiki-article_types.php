@@ -50,8 +50,11 @@ $access->check_feature('feature_articles');
 $access->check_permission(['tiki_p_articles_admin_types']);
 
 if (isset($_REQUEST["add_type"])) {
-    if (! empty($_REQUEST["new_type"])) {
+    if (empty($_REQUEST["new_type"])) {
+        Feedback::error(tra('The article type field can not be empty'));
+    } else {
         $artlib->add_type($_REQUEST["new_type"]);
+        Feedback::success(tra('Article type saved successfully'));
     }
 } elseif (isset($_REQUEST["remove_type"])) {
     $access->checkCsrf();
