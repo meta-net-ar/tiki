@@ -523,7 +523,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         }
 
         if (! $keywords || ! $msgUid || ! $imapServerId) {
-            $this->out('error', 'No sent message found');
+            $this->out('no_message', true);
             return;
         }
 

@@ -277,6 +277,7 @@ return [
     'item_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'field_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'tracker_fields' => [FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY],
+    'no_message' => [FILTER_VALIDATE_BOOLEAN, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
