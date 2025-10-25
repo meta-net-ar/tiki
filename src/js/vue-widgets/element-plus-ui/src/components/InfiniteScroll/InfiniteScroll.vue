@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { Loading } from "@element-plus/icons-vue";
 
-const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount"]);
+const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_bootstrapThemeFile"]);
 
 const wrapper = ref(null);
 const loading = ref(false);
@@ -55,6 +55,7 @@ const load = async () => {
 </script>
 
 <template>
+    <link rel="stylesheet" :href="_bootstrapThemeFile" />
     <div ref="wrapper" v-loading="loading" class="infinite-list-wrapper" v-infinite-scroll="load" :infinite-scroll-disabled="disabled"></div>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />

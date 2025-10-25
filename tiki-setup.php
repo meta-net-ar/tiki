@@ -16,6 +16,7 @@ use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
 
@@ -1080,7 +1081,9 @@ if ($prefs['feature_elementplus'] == 'y') {
     if ($prefs['elementplus_autocomplete'] == 'y') {
         $headerlib->add_js_module("import { autocomplete } from '@tiki/ui-utils'; window.autocomplete = autocomplete;");
     }
-    $headerlib->add_js_module("import '@vue-widgets/el-infinite-scroll';");
+    list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
+    $theme_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
+    $headerlib->add_js_module("import registerInfiniteScroll from '@vue-widgets/el-infinite-scroll'; registerInfiniteScroll('$theme_css');");
 } else {
     $headerlib->add_jq_onready("window.showMessage = function (message) { alert(message); };");
 }
