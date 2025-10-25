@@ -194,7 +194,10 @@
     .server_section { color: inherit !important; }
 
     .total_unread_count, .unread_count { color: #000; }
-    .btn-outline-secondary:hover { color: #fff !important; text-decoration: none;}
+    .btn-outline-secondary:hover { color: #fff; text-decoration: none;}
+    .msg_controls {
+        .btn-outline-secondary:hover { color: var(--bs-btn-hover-color); }
+    }
 
     .profile_details th, .msg_date,
     .news_cell .source, .news_cell .from { color: $popover-body-color; }
@@ -399,7 +402,11 @@
     .nux_welcome { margin-bottom: 15px; }
     .block_sender_link.btn-outline-danger {
         color: var(--bs-btn-color);
-        &:hover, &:active { color: var(--bs-btn-hover-color); text-decoration: none; }
+        i.bi { color: var(--bs-btn-color) !important; }
+        &:hover, &:active {
+            color: var(--bs-btn-hover-color); text-decoration: none;
+            i.bi { color: var(--bs-btn-hover-color) !important; }
+        }
     }
     #show_message_source { margin-right: 0.5rem; }
     .msg_actions .d-inline-block > .hlink { margin-bottom: 0.5rem; }
@@ -499,6 +506,7 @@
             top: 45px; right: 0; width: 100%; min-height: 5px;
             padding-bottom: 15px; white-space: normal;
         }
+        .offline { height: 55px; }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
@@ -632,14 +640,6 @@
     #row-middle { margin-left: -15px; margin-right: -15px; border: none; }
     #col1 { padding: 0; border: none; }
     #col2, #col3 { margin-left: 0; margin-right: 0; }
-}
-
-.tiki-webmail {
-    #middle_outer {
-        .middle-wrapper {
-            padding-top: 65px;
-        }
-    }
 }
 
 html body.tiki.tiki-webmail #middle.container.container-std.middle {
