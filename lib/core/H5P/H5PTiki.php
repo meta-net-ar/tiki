@@ -25,6 +25,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
     public $isSaving = false;
 
     public static $h5p_path;
+    public static $h5p_abs; // absolute (for the FS)
 
     public function __construct()
     {
@@ -43,18 +44,19 @@ class H5P_H5PTiki implements H5PFrameworkInterface
 
         global $tikidomainslash;
 
-        self::$h5p_path = DEPRECATED_STORAGE_PATH . "/{$tikidomainslash}" . DEPRECATED_H5P_STORAGE_SUFFIX;
+        self::$h5p_path = self::resolveRelH5PPath();
+        self::$h5p_abs  = self::resolveAbsH5PPath();
 
-        if (! is_writable(self::$h5p_path)) {
-            \Feedback::error(tr("H5P directory is not writable: %0", self::$h5p_path));
+        if (! is_writable(self::$h5p_abs)) {
+            \Feedback::error(tr("H5P directory is not writable: %0", self::$h5p_abs));
 
             return;
         }
 
         foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
-            $path = self::$h5p_path . "/" . $dir;
+            $path = self::$h5p_abs . "/" . $dir;
             if (! is_dir($path)) {
-                mkdir($path);
+                @mkdir($path, 0775, true);
             } elseif (! is_writable($path)) {
                 \Feedback::error(tr("H5P directory is not writable: %0", $path));
             }
@@ -80,6 +82,49 @@ class H5P_H5PTiki implements H5PFrameworkInterface
     }
 
     /**
+     * Ensure that the H5P storage directory exists and is writable.
+     * Returns [ok(bool), path(string), msg(string|null)]
+     */
+    public static function ensureStorageReady(bool $createSubdirs = true): array
+    {
+        global $tikipath;
+        $abs = rtrim($tikipath, '/') . '/' . STORAGE_PUBLIC_H5P_PATH;
+
+        if (!is_dir($abs)) {
+            @mkdir($abs, 0775, true);
+        }
+        if ($createSubdirs) {
+            foreach (['cachedassets','content','exports','libraries','temp'] as $d) {
+                $sub = $abs . '/' . $d;
+                if (!is_dir($sub)) {
+                    @mkdir($sub, 0775, true);
+                }
+            }
+        }
+        $ok  = is_dir($abs) && is_writable($abs);
+        $msg = $ok ? null : 'not_writable';
+        return [$ok, $abs, $msg];
+    }
+
+    /**
+     * Guard that the H5P storage directory is ready, with feedback on failure.
+     * Returns true if OK, false sinon.
+     */
+    public static function guardWithFeedback(): bool
+    {
+        list($ok, $path, $why) = self::ensureStorageReady(true);
+        if ($ok) {
+            return true;
+        }
+
+        $hint = 'Run: <code>sh setup.sh </code> or <code>chown -R www-data:www-data storage && find storage -type d -exec chmod 775 {} \;</code>.';
+        $msg = tr('H5P directory is not writable: %0. %1', $path, $hint);
+
+        TikiLib::lib('tiki')->add_feedback('error', $msg);
+        return false;
+    }
+
+    /**
      * Get the different instances of the core components.
      *
      * @param string $component
@@ -101,8 +146,8 @@ class H5P_H5PTiki implements H5PFrameworkInterface
 
             $core = new \H5PCore(
                 $interface,
-                $tikipath . self::$h5p_path,   // Where the extracted content files will be stored
-                $tikiroot . self::$h5p_path,     // URL of the previous option
+                rtrim($tikipath, '/') . '/' . self::$h5p_path,   // Where the extracted content files will be stored
+                rtrim($tikiroot,  '/') . '/' . self::$h5p_path,     // URL of the previous option
                 $prefs['language'],                  // TODO: Map proper language code from Tiki to H5P langs
                 true                          // each time an h5p is saved it exports the reult into the file gallery to keep it up to date
             );
@@ -188,11 +233,11 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         }
 
         $response = curl_exec($handle);
-
         if (! $response) {
             $error = curl_error($handle);
-            // Print error?
+            error_log("H5P: Error fetching URL $url: $error");
         }
+        curl_close($handle);
 
         if ($blocking) {
             return $response;
@@ -527,8 +572,11 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         if (! isset($libraryData['fullscreen'])) {
             $libraryData['fullscreen'] = 0;
         }
-        if (! isset($library['hasIcon'])) {
-            $library['hasIcon'] = 0;
+        if (! isset($libraryData['hasIcon'])) {
+            $libraryData['hasIcon'] = 0;
+        }
+        if (! isset($libraryData['metadataSettings'])) {
+            $libraryData['metadataSettings'] = 0;
         }
 
         if ($new) {
@@ -1046,7 +1094,7 @@ WHERE hll.`library_id` = ?',
 
     private function getSemanticsFromFile($name, $majorVersion, $minorVersion)
     {
-        $semanticsPath = self::$h5p_path . '/libraries/' . $name . '-' . $majorVersion . '.' . $minorVersion . '/semantics.json';
+        $semanticsPath = self::$h5p_abs . '/libraries/' . $name . '-' . $majorVersion . '.' . $minorVersion . '/semantics.json';
 
         if (file_exists($semanticsPath)) {
             $semantics = file_get_contents($semanticsPath);
@@ -1152,7 +1200,7 @@ WHERE hll.`library_id` = ?',
 
         // Delete files
         H5PCore::deleteFileTree(
-            self::$h5p_path . '/libraries/' . $library->machine_name . '-' . $library->major_version . '.' . $library->minor_version
+            self::$h5p_abs . '/libraries/' . $library->machine_name . '-' . $library->major_version . '.' . $library->minor_version
         );
 
         // Delete data in database (won't delete content)
@@ -1531,7 +1579,7 @@ GROUP BY l.`name`, l.`major_version`, l.`minor_version`');
     {
         global $prefs, $user;
 
-        $exportedFile = H5P_H5PTiki::$h5p_path . '/exports/' . $filename;
+        $exportedFile = H5P_H5PTiki::$h5p_abs . '/exports/' . $filename;
         if (! file_exists($exportedFile)) {
             Feedback::error(tr('Exporting H5P content %0 failed', $content['id']));
         }
@@ -1600,7 +1648,8 @@ GROUP BY l.`name`, l.`major_version`, l.`minor_version`');
      */
     public function getLibraryFileUrl($libraryFolderName, $fileName)
     {
-        return H5P_H5PTiki::$h5p_path . '/libraries/' . $libraryFolderName . '/' . $fileName;
+        global $tikiroot;
+        return rtrim($tikiroot, '/') . '/' . self::$h5p_path . '/libraries/' . $libraryFolderName . '/' . $fileName;
     }
 
     /**
@@ -1728,6 +1777,18 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
                 ]
             )
         );
+    }
+
+    // Helper functions to resolve H5P paths
+    private static function resolveRelH5PPath(): string
+    {
+        return STORAGE_PUBLIC_H5P_PATH;
+    }
+
+    private static function resolveAbsH5PPath(): string
+    {
+        global $tikipath;
+        return rtrim($tikipath, '/') . '/' . self::resolveRelH5PPath();
     }
 
     public function replaceContentHubMetadataCache($metadata, $lang)

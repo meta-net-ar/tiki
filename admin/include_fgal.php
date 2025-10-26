@@ -138,4 +138,8 @@ foreach ($usedTypes as $type) {
 
 $smarty->assign_by_ref('missingHandlers', $missingHandlers);
 $smarty->assign('vnd_ms_files_exist', $vnd_ms_files_exist);
+// H5P storage status
+list($okH5P, $h5pAbs) = H5P_H5PTiki::ensureStorageReady(false);
+$smarty->assign('h5p_storage_ok', $okH5P);
+$smarty->assign('h5p_storage_abs', $h5pAbs);
 include_once('fgal_listing_conf.php');
