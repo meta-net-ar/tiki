@@ -47,18 +47,23 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         self::$h5p_path = self::resolveRelH5PPath();
         self::$h5p_abs  = self::resolveAbsH5PPath();
 
+        // Ensure H5P storage is ready
+        list($ok, $abs,) = self::ensureStorageReady(true);
+        self::$h5p_abs  = $abs;
+
         if (! is_writable(self::$h5p_abs)) {
             \Feedback::error(tr("H5P directory is not writable: %0", self::$h5p_abs));
 
             return;
         }
 
-        foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
-            $path = self::$h5p_abs . "/" . $dir;
-            if (! is_dir($path)) {
+        // double check that  subdirectories exist and are writable
+         foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
+            $path = $abs . '/' . $dir;
+            if (!is_dir($path)) {
                 @mkdir($path, 0775, true);
-            } elseif (! is_writable($path)) {
-                \Feedback::error(tr("H5P directory is not writable: %0", $path));
+            } elseif (!is_writable($path)) {
+                \Feedback::error(tr('H5P directory is not writable: %0', $path));
             }
         }
 
@@ -108,7 +113,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
 
     /**
      * Guard that the H5P storage directory is ready, with feedback on failure.
-     * Returns true if OK, false sinon.
+     * Returns true if OK, false
      */
     public static function guardWithFeedback(): bool
     {
@@ -117,7 +122,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             return true;
         }
 
-        $hint = 'Run: <code>sh setup.sh </code> or <code>chown -R www-data:www-data storage && find storage -type d -exec chmod 775 {} \;</code>.';
+        $hint = 'Run: <code>sh setup.sh -n fix </code> or <code>chown -R www-data:www-data storage && find storage -type d -exec chmod 775 {} \;</code>.';
         $msg = tr('H5P directory is not writable: %0. %1', $path, $hint);
 
         TikiLib::lib('tiki')->add_feedback('error', $msg);
@@ -1782,7 +1787,19 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
     // Helper functions to resolve H5P paths
     private static function resolveRelH5PPath(): string
     {
-        return STORAGE_PUBLIC_H5P_PATH;
+        if (defined('STORAGE_PUBLIC_H5P_PATH')) {
+            return rtrim(STORAGE_PUBLIC_H5P_PATH, '/');
+        }
+
+        $base = defined('STORAGE_PUBLIC_PATH') ? rtrim(STORAGE_PUBLIC_PATH, '/') : 'storage/public';
+
+        global $tikidomainslash;
+        if (!empty($tikidomainslash)) {
+            $site = trim($tikidomainslash, '/');
+            $base = "storage/{$site}/public";
+        }
+
+        return $base . '/h5p';
     }
 
     private static function resolveAbsH5PPath(): string
