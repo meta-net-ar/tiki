@@ -5250,13 +5250,18 @@ class TrackerLib extends TikiLib
     /**
      * The method saves the log to the trackeritem.
      *
-     * @param $version the log version to add.
      * @param $itemId id of the item to add to the log.
      * @param $fieldId id of the field to add to the log.
      * @param $value value to add to the log.
      * @return void
      */
-    public function log($version, $itemId, $fieldId, $value = '')
+    public function tracker_item_log($itemId, $fieldId, $value = '')
+    {
+        // determination of the next version of the log
+        $version = $this->last_log_version($itemId) + 1;
+        $this->log((int) $version, (int) $itemId, (int) $fieldId, $value);
+    }
+    private function log($version, $itemId, $fieldId, $value = '')
     {
         if ($value === null) {
             $value = ''; // we want to log it after all, so change is in history

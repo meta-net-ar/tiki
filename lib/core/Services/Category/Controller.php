@@ -310,18 +310,9 @@ class Services_Category_Controller
         $definition = Tracker_Definition::get($trackerId);
         // retrieve the tracker fields that are of type category
         if ($fieldIds = $definition->getCategorizedFields()) {
-            // determination of the next version of the log
-            $version = $trklib->last_log_version($trackeritemId) + 1;
             foreach ($fieldIds as $fieldId) {
                 $itemValue = $trklib->get_item_value($trackerId, $trackeritemId, $fieldId) ?? '';
-                /* The log method of the TrackerLib class is a public method used to save logs when tracker item values ​​change.
-                 * It takes four parameters:
-                 * The version of the log to save, which must be the version of the last log + 1;
-                 * The tracker item ID;
-                 * The field ID;
-                 * The current value of the field.
-                 */
-                $trklib->log((int) $version, (int) $trackeritemId, (int) $fieldId, $itemValue);
+                $trklib->tracker_item_log($trackeritemId, $fieldId, $itemValue);
             }
         }
     }
