@@ -312,7 +312,7 @@ class Services_Category_Controller
         if ($fieldIds = $definition->getCategorizedFields()) {
             foreach ($fieldIds as $fieldId) {
                 $itemValue = $trklib->get_item_value($trackerId, $trackeritemId, $fieldId) ?? '';
-                $trklib->tracker_item_log($trackeritemId, $fieldId, $itemValue);
+                $trklib->trackerItemLog($trackeritemId, $fieldId, $itemValue);
             }
         }
     }

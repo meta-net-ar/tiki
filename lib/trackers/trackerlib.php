@@ -5255,7 +5255,7 @@ class TrackerLib extends TikiLib
      * @param $value value to add to the log.
      * @return void
      */
-    public function tracker_item_log($itemId, $fieldId, $value = '')
+    public function trackerItemLog($itemId, $fieldId, $value = '')
     {
         // determination of the next version of the log
         $version = $this->last_log_version($itemId) + 1;
