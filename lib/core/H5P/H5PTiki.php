@@ -58,11 +58,11 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         }
 
         // double check that  subdirectories exist and are writable
-         foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
+        foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
             $path = $abs . '/' . $dir;
-            if (!is_dir($path)) {
+            if (! is_dir($path)) {
                 @mkdir($path, 0775, true);
-            } elseif (!is_writable($path)) {
+            } elseif (! is_writable($path)) {
                 \Feedback::error(tr('H5P directory is not writable: %0', $path));
             }
         }
@@ -95,13 +95,13 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         global $tikipath;
         $abs = rtrim($tikipath, '/') . '/' . STORAGE_PUBLIC_H5P_PATH;
 
-        if (!is_dir($abs)) {
+        if (! is_dir($abs)) {
             @mkdir($abs, 0775, true);
         }
         if ($createSubdirs) {
             foreach (['cachedassets','content','exports','libraries','temp'] as $d) {
                 $sub = $abs . '/' . $d;
-                if (!is_dir($sub)) {
+                if (! is_dir($sub)) {
                     @mkdir($sub, 0775, true);
                 }
             }
@@ -152,7 +152,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             $core = new \H5PCore(
                 $interface,
                 rtrim($tikipath, '/') . '/' . self::$h5p_path,   // Where the extracted content files will be stored
-                rtrim($tikiroot,  '/') . '/' . self::$h5p_path,     // URL of the previous option
+                rtrim($tikiroot, '/') . '/' . self::$h5p_path,     // URL of the previous option
                 $prefs['language'],                  // TODO: Map proper language code from Tiki to H5P langs
                 true                          // each time an h5p is saved it exports the reult into the file gallery to keep it up to date
             );
@@ -1794,7 +1794,7 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
         $base = defined('STORAGE_PUBLIC_PATH') ? rtrim(STORAGE_PUBLIC_PATH, '/') : 'storage/public';
 
         global $tikidomainslash;
-        if (!empty($tikidomainslash)) {
+        if (! empty($tikidomainslash)) {
             $site = trim($tikidomainslash, '/');
             $base = "storage/{$site}/public";
         }
