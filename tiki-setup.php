@@ -1083,12 +1083,10 @@ if ($prefs['feature_elementplus'] == 'y') {
     }
 
     if ($prefs['elementplus_infinite_scroll'] == 'y') {
-        $infinite_scroll_height = $prefs['elementplus_infinite_scroll_height'];
-
         list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
         $theme_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
 
-        $headerlib->add_js_module("import registerInfiniteScroll from '@vue-widgets/el-infinite-scroll'; registerInfiniteScroll('$theme_css', '$infinite_scroll_height');");
+        $headerlib->add_js_module("import registerInfiniteScroll from '@vue-widgets/el-infinite-scroll'; registerInfiniteScroll('$theme_css');");
     }
 } else {
     $headerlib->add_jq_onready("window.showMessage = function (message) { alert(message); };");

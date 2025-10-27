@@ -99,15 +99,6 @@ function prefs_elementplus_list()
             'dependencies' => [
                 'feature_elementplus'
             ]
-        ],
-        'elementplus_infinite_scroll_height' => [
-            'name' => tra('Infinite Scroll Height'),
-            'description' => tra('Height of the infinite scroll container in pixels.'),
-            'type' => 'text',
-            'default' => '400',
-            'dependencies' => [
-                'elementplus_infinite_scroll'
-            ]
-        ],
+        ]
     ];
 }
