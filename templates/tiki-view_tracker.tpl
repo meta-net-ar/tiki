@@ -380,7 +380,7 @@
                         </div>
                     {/if}
                 </form>
-                {if $prefs.elementplus_infinite_scroll eq 'y'}
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
                     <el-infinite-scroll container-id="trItemTable" target-container-id="tracker-items-body" offset="{$offset}" step="{$maxRecords}" total-count="{$item_count}"></el-infinite-scroll>
                 {else}
                     {pagination_links count=$item_count step=$maxRecords offset=$offset}{/pagination_links}

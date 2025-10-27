@@ -187,7 +187,6 @@
                     {preference name=elementplus_select_sortable}
                     {preference name=elementplus_upload}
                     {preference name=elementplus_infinite_scroll}
-                    {preference name=elementplus_infinite_scroll_height}
                 </div>
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
