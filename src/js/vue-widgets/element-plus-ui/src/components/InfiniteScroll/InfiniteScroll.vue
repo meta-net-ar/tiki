@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { Loading } from "@element-plus/icons-vue";
 
-const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_bootstrapThemeFile"]);
+const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_bootstrapThemeFile", "_height"]);
 
 const wrapper = ref(null);
 const loading = ref(false);
@@ -41,7 +41,7 @@ const load = async () => {
         tempDiv.innerHTML = html;
         const originalTargetContainer = tempDiv.querySelector(`#${props.targetContainerId}`);
         if (originalTargetContainer) {
-            container.value.insertAdjacentHTML("beforeend", originalTargetContainer.innerHTML);
+            container.value.querySelector(`#${props.targetContainerId}`).insertAdjacentHTML("beforeend", originalTargetContainer.innerHTML);
         }
     } catch (error) {
         offset.value -= Number(props.step);
@@ -56,7 +56,7 @@ const load = async () => {
 
 <template>
     <link rel="stylesheet" :href="_bootstrapThemeFile" />
-    <div ref="wrapper" v-loading="loading" class="infinite-list-wrapper" v-infinite-scroll="load" :infinite-scroll-disabled="disabled"></div>
+    <div ref="wrapper" v-loading="loading" class="infinite-list-wrapper" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :style="`height: ${_height}px`"></div>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />
     </el-icon>

@@ -90,6 +90,24 @@ function prefs_elementplus_list()
                 'feature_elementplus',
                 'feature_file_galleries'
             ]
-        ]
+        ],
+        'elementplus_infinite_scroll' => [
+            'name' => tra('Element Plus Infinite Scroll'),
+            'description' => tra('Provides infinite scrolling functionality for lists and tables instead of traditional pagination.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => [
+                'feature_elementplus'
+            ]
+        ],
+        'elementplus_infinite_scroll_height' => [
+            'name' => tra('Infinite Scroll Height'),
+            'description' => tra('Height of the infinite scroll container in pixels.'),
+            'type' => 'text',
+            'default' => '400',
+            'dependencies' => [
+                'elementplus_infinite_scroll'
+            ]
+        ],
     ];
 }
