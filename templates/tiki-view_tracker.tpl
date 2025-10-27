@@ -347,16 +347,11 @@
                                 {/section}
                             </tbody>
                         </table>
-                        </div>
-                    </form>
-                    
-                    {* JavaScript to handle the sorting functionality *}
-                    {jq}
-                    if (typeof $.trackerInitMultiSort === 'function') {
-                        $.trackerInitMultiSort();
-                    }
-                    {/jq}
-                    
+                    </div>
+
+                    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                        <el-infinite-scroll class="mb-2" container-id="trItemTable" target-container-id="tracker-items-body" offset="{$offset}" step="{$maxRecords}" total-count="{$item_count}"></el-infinite-scroll>
+                    {/if}
                     {if $tiki_p_admin_trackers eq 'y'}
                         <div class="mb-3 row">
                             <div class="input-group min-width-customized">
@@ -380,11 +375,15 @@
                         </div>
                     {/if}
                 </form>
-                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
-                    <el-infinite-scroll container-id="trItemTable" target-container-id="tracker-items-body" offset="{$offset}" step="{$maxRecords}" total-count="{$item_count}"></el-infinite-scroll>
-                {else}
+                {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
                     {pagination_links count=$item_count step=$maxRecords offset=$offset}{/pagination_links}
                 {/if}
+                {* JavaScript to handle the sorting functionality *}
+                {jq}
+                    if (typeof $.trackerInitMultiSort === 'function') {
+                        $.trackerInitMultiSort();
+                    }
+                {/jq}
                 {jq}
                     loadColumnPrefs();
 

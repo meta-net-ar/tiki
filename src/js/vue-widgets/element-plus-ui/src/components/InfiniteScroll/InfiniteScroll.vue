@@ -21,6 +21,24 @@ watch(() => {
         console.error(`Container with id ${props.containerId} not found`);
         return;
     }
+
+    // Mirror out all inputs inside the container, so form state is preserved
+    const inputs = originalContainer.querySelectorAll("input, select, textarea");
+    inputs.forEach(input => {
+        const mirror = input.cloneNode(true);
+        mirror.style.display = "none";
+        input.form?.appendChild(mirror);
+
+        input.addEventListener("change", () => {
+            if (mirror.type === "checkbox" || mirror.type === "radio") {
+                mirror.checked = input.checked;
+            } else {
+                mirror.value = input.value;
+            }
+            mirror.dispatchEvent(new Event("change"));
+        });
+    });
+
     wrapper.value.appendChild(originalContainer);
 });
 
