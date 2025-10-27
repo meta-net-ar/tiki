@@ -37,6 +37,15 @@ watch(() => {
             }
             mirror.dispatchEvent(new Event("change"));
         });
+
+        // sync back independent mirror changes (usually triggered programmatically) to the original input
+        $(mirror).on("change", () => {
+            if (input.type === "checkbox" || input.type === "radio") {
+                input.checked = mirror.checked;
+            } else {
+                input.value = mirror.value;
+            }
+        });
     });
 
     wrapper.value.appendChild(originalContainer);

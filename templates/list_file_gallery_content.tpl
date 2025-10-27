@@ -559,7 +559,7 @@
             {/section}
         </tbody>
         {if !empty($files) and $gal_info.show_checked ne 'n' and $tiki_p_admin_file_galleries eq 'y'
-            and $view neq 'page' and ($prefs.feature_elementplus neq 'y' && $prefs.elementplus_infinite_scroll neq 'y')}
+            and $view neq 'page' and ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
             <tr>
                 <td colspan="{$nbCols}">
                     {select_all checkbox_names='file[],subgal[]' label="{tr}Select All{/tr}"}
@@ -570,6 +570,6 @@
     </table>
     {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
         <el-infinite-scroll container-id="fgal_listing_table" target-container-id="fgal_listing_body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
-        <div class="mt-2">{select_all checkbox_names='file[],subgal[]' label="{tr}Select All{/tr}"}</div>
+        <div class="mt-2">{select_all checkbox_names='file[],subgal[]' label="{tr}Select All{/tr}" hidden_too='y'}</div>
     {/if}
 </div>
