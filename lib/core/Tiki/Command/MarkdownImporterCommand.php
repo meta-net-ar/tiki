@@ -1,15 +1,9 @@
 <?php
 
-// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-//
-// All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
 namespace Tiki\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,64 +12,53 @@ use Tiki\Lib\Importer\Markdown\TikiMarkdownImporter;
 
 #[AsCommand(
     name: 'markdown:importer',
-    description: 'Import Markdown files into Tiki wiki pages from local zip/FTP/Git repo'
+    description: 'Import Markdown files into Tiki wiki pages from local zip or Git repository'
 )]
 class MarkdownImporterCommand extends Command
 {
     protected function configure(): void
     {
         $this
-            ->setHelp('
-                Use this command to import Markdown files into Tiki wiki pages from a local zip file, an FTP server, or a Git repository.
-            ')
-            // High-level
+            ->setHelp('Import Markdown files from a local .zip/.md or from a Git repository (HTTPS + token).')
+
+            // Mode
             ->addOption('mode', null, InputOption::VALUE_REQUIRED, 'preview|import', 'preview')
 
-            // Source (choose one type)
-            ->addOption('source-type', null, InputOption::VALUE_REQUIRED, 'local|ftp|repo', 'local')
+            // Source (local|git). We also accept "repo" as alias.
+            ->addOption('source-type', null, InputOption::VALUE_REQUIRED, 'local|git', 'local')
 
-            // Local zip (used when source-type=local)
+            // Local
             ->addOption('local-path', null, InputOption::VALUE_REQUIRED, 'Path to local .zip OR single .md file')
 
-            // FTP options (used when source-type=ftp)
-            ->addOption('ftp-host', null, InputOption::VALUE_REQUIRED, 'FTP hostname', '')
-            ->addOption('ftp-port', null, InputOption::VALUE_REQUIRED, 'FTP port', '21')
-            ->addOption('ftp-user', null, InputOption::VALUE_REQUIRED, 'FTP username', '')
-            ->addOption('ftp-pass', null, InputOption::VALUE_REQUIRED, 'FTP password', '')
-            ->addOption('ftp-path', null, InputOption::VALUE_REQUIRED, 'FTP base path (eg. /)', '/')
-            ->addOption('ftp-ssl', null, InputOption::VALUE_REQUIRED, 'Use FTPS (1|0)', '0')
-            ->addOption('ftp-passive', null, InputOption::VALUE_REQUIRED, 'Passive mode (1|0)', '1')
+            // Git (HTTPS + token)
+            ->addOption('repo-url', null, InputOption::VALUE_REQUIRED, 'Git repository URL (HTTPS), e.g. https://github.com/owner/repo.git')
+            ->addOption('repo-branch', null, InputOption::VALUE_REQUIRED, 'Branch name', 'main')
+            ->addOption('repo-token', null, InputOption::VALUE_REQUIRED, 'Personal Access Token (PAT) if repository is private', '')
+            ->addOption('git-pull', null, InputOption::VALUE_REQUIRED, 'Pull before import (1|0)', '1')
+            ->addOption('git-timeout', null, InputOption::VALUE_REQUIRED, 'Git ops timeout (seconds)', '30')
 
-            // Repo options (used when source-type=repo)
-            ->addOption('repo-provider', null, InputOption::VALUE_REQUIRED, 'github|gitlab', 'github')
-            ->addOption('repo-owner', null, InputOption::VALUE_REQUIRED, 'Repository owner/namespace', '')
-            ->addOption('repo-name', null, InputOption::VALUE_REQUIRED, 'Repository name', '')
-            ->addOption('repo-ref', null, InputOption::VALUE_REQUIRED, 'Branch or tag', 'main')
-            ->addOption('repo-token', null, InputOption::VALUE_REQUIRED, 'Access token (if needed)', '')
-
-            // Scanner / mapping options
-            ->addOption('roots', null, InputOption::VALUE_REQUIRED, 'Root(s) in the zip (comma-separated)', '.')
+            // Scanner / mapping
+            ->addOption('roots', null, InputOption::VALUE_REQUIRED, 'Root(s) in the archive; semicolon/comma-separated', '.')
             ->addOption('recursive', null, InputOption::VALUE_REQUIRED, 'Recurse into subdirs (1|0)', '1')
             ->addOption('max-depth', null, InputOption::VALUE_REQUIRED, 'Max recursion depth (0 = unlimited)', '0')
             ->addOption('exclude-globs', null, InputOption::VALUE_REQUIRED, 'Glob patterns to exclude', '')
-            ->addOption('title-strategy', null, InputOption::VALUE_REQUIRED, 'fm_h1_filename|filename_only|h1_only', 'fm_h1_filename')
-            ->addOption('naming-mode', null, InputOption::VALUE_REQUIRED, 'basename|path|path_levels', 'basename')
-            ->addOption('dir-levels', null, InputOption::VALUE_REQUIRED, 'Used by naming-mode=path_levels', '2')
+            ->addOption('title-strategy', null, InputOption::VALUE_REQUIRED, 'fm_h1_filename|filename_only|h1_fm_filename', 'fm_h1_filename')
+            ->addOption('naming-mode', null, InputOption::VALUE_REQUIRED, 'basename|prefix|suffix', 'basename')
+            ->addOption('dir-levels', null, InputOption::VALUE_REQUIRED, 'Used by prefix/suffix modes', '2')
             ->addOption('separator', null, InputOption::VALUE_REQUIRED, 'Separator for path → name', ' ')
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Namespace prefix for created pages', '')
-            ->addOption('detect-journal', null, InputOption::VALUE_REQUIRED, 'Detect Logseq journals (1|0)', '1')
+            ->addOption('detect-journal', null, InputOption::VALUE_REQUIRED, 'Detect journal pages (1|0)', '1')
             ->addOption('journal-lang', null, InputOption::VALUE_REQUIRED, 'en|fr', 'en')
-            ->addOption('journal-ns', null, InputOption::VALUE_REQUIRED, 'Journal page prefix (e.g. "Journal")', 'Journal')
+            ->addOption('journal-ns', null, InputOption::VALUE_REQUIRED, 'Journal page prefix', 'Journal')
 
-            // Markdown flavor / pipeline options
-            ->addOption('markdown-source', null, InputOption::VALUE_REQUIRED, 'logseq|gfm|commonmark', 'logseq')
+            // Markdown flavor / pipeline
+            ->addOption('markdown-source', null, InputOption::VALUE_REQUIRED, 'logseq|gfm|commonmark', 'commonmark')
             ->addOption('strip-front-matter', null, InputOption::VALUE_REQUIRED, 'Remove YAML front matter (1|0)', '1')
             ->addOption('runtime-logseq', null, InputOption::VALUE_REQUIRED, 'Keep [[..]]/((..)) for runtime ext (1|0)', '0')
             ->addOption('blockref-mode', null, InputOption::VALUE_REQUIRED, 'inline|code|keep', 'inline')
 
-            // Verbosity/output
-            ->addOption('json', null, InputOption::VALUE_NONE, 'Print JSON result instead of human text')
-        ;
+            // Output
+            ->addOption('json', null, InputOption::VALUE_NONE, 'Print JSON result instead of human text');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -83,60 +66,53 @@ class MarkdownImporterCommand extends Command
         global $prefs;
         $io = new SymfonyStyle($input, $output);
 
-        if ($prefs['markdown_enabled'] !== 'y') {
+        if (($prefs['markdown_enabled'] ?? 'n') !== 'y') {
             $io->error(tr('Markdown is not enabled in Editing settings.'));
             return Command::FAILURE;
         }
 
-        $mode = strtolower((string)$input->getOption('mode')); // preview|import
-        if (! in_array($mode, ['preview', 'import'], true)) {
+        $mode = strtolower((string)$input->getOption('mode'));
+        if (!in_array($mode, ['preview', 'import'], true)) {
             $io->error('Invalid --mode. Use preview or import.');
             return Command::FAILURE;
         }
 
-        // ---------- Build source config (same shape as UI) ----------
-        $srcType = strtolower((string)$input->getOption('source-type') ?: 'local');
-        if (! in_array($srcType, ['local', 'ftp', 'repo'], true)) {
+        // -------- Source config (même shape que l’UI/Importer) --------
+        $srcTypeRaw = strtolower((string)$input->getOption('source-type') ?: 'local');
+        $srcType = ($srcTypeRaw === 'repo') ? 'git' : $srcTypeRaw; // alias
+        if (!in_array($srcType, ['local', 'git'], true)) {
             $srcType = 'local';
         }
 
         $sourceCfg = ['type' => $srcType];
-
         $localPath = (string)$input->getOption('local-path');
 
-        if ($srcType === 'ftp') {
+        if ($srcType === 'git') {
+            $repoUrl = (string)$input->getOption('repo-url');
+            if ($repoUrl === '') {
+                $io->error('For --source-type=git you must provide --repo-url (HTTPS).');
+                return Command::FAILURE;
+            }
+
             $sourceCfg += [
-                'ftp_host'    => (string)$input->getOption('ftp-host'),
-                'ftp_port'    => (int)$input->getOption('ftp-port'),
-                'ftp_user'    => (string)$input->getOption('ftp-user'),
-                'ftp_pass'    => (string)$input->getOption('ftp-pass'),
-                'ftp_path'    => (string)$input->getOption('ftp-path'),
-                'ftp_ssl'     => $this->toBool($input->getOption('ftp-ssl')),
-                'ftp_passive' => $this->toBool($input->getOption('ftp-passive')),
+                'repo_url'    => $repoUrl,
+                'repo_branch' => (string)$input->getOption('repo-branch') ?: 'main',
+                'git_pull'    => $this->toBool($input->getOption('git-pull'), true),
+                'repo_token'  => (string)$input->getOption('repo-token') ?: '',
+                'git_timeout' => (int)$input->getOption('git-timeout') ?: 30,
             ];
-        } elseif ($srcType === 'repo') {
-            $sourceCfg += [
-                'repo_provider' => (string)$input->getOption('repo-provider') ?: 'github',
-                'repo_owner'    => (string)$input->getOption('repo-owner'),
-                'repo_name'     => (string)$input->getOption('repo-name'),
-                'repo_ref'      => (string)$input->getOption('repo-ref') ?: 'main',
-                'repo_token'    => (string)$input->getOption('repo-token'),
-            ];
-        } elseif ($srcType === 'local') {
-            if (! $localPath) {
+        } else { // local
+            if (!$localPath) {
                 $io->error('For --source-type=local you must provide --local-path pointing to a .zip or a .md file.');
                 return Command::FAILURE;
             }
-            if (! is_readable($localPath)) {
+            if (!is_readable($localPath)) {
                 $io->error('local-path not readable: ' . $localPath);
                 return Command::FAILURE;
             }
-        } else {
-            $io->error('Invalid --source-type. Use local, ftp or repo.');
-            return Command::FAILURE;
         }
 
-        // ---------- Scanner options ----------
+        // -------- Scanner options --------
         $scanOpts = [
             'roots'          => (string)$input->getOption('roots') ?: '.',
             'recursive'      => $this->toBool($input->getOption('recursive'), true),
@@ -152,12 +128,11 @@ class MarkdownImporterCommand extends Command
             'journal_ns'     => (string)$input->getOption('journal-ns') ?: 'Journal',
         ];
 
-        // ---------- Markdown pipeline options ----------
-        $flavor = (string)$input->getOption('markdown-source') ?: 'logseq';
-        if (! in_array($flavor, ['logseq', 'gfm', 'commonmark'], true)) {
-            $flavor = 'logseq';
+        // -------- Markdown pipeline --------
+        $flavor = (string)$input->getOption('markdown-source') ?: 'commonmark';
+        if (!in_array($flavor, ['logseq', 'gfm', 'commonmark'], true)) {
+            $flavor = 'commonmark';
         }
-
         $pipelineCfg = [
             'flavor'             => $flavor,
             'strip_front_matter' => $this->toBool($input->getOption('strip-front-matter'), true),
@@ -167,9 +142,8 @@ class MarkdownImporterCommand extends Command
 
         $jsonOut = (bool)$input->getOption('json');
 
-        // ---------- Run through importer (single entry-point) ----------
+        // -------- Importer --------
         $importer = new TikiMarkdownImporter();
-
         [$uploadTmp, $uploadName, $tmpZipToDelete] = $this->resolveLocalPayload($srcType, $localPath);
 
         try {
@@ -182,31 +156,9 @@ class MarkdownImporterCommand extends Command
                 );
 
                 if ($jsonOut) {
-                    $io->writeln(json_encode($res, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                    $this->printJson($io, $res);
                 } else {
-                    if (! empty($res['ok'])) {
-                        $io->success('Preview OK');
-                        if (! empty($res['counts'])) {
-                            $io->writeln(sprintf(
-                                "Counts: pages=%d journals=%d total=%d",
-                                (int)($res['counts']['pages'] ?? 0),
-                                (int)($res['counts']['journals'] ?? 0),
-                                (int)($res['counts']['total'] ?? 0)
-                            ));
-                        }
-                        if (! empty($res['sample'])) {
-                            $io->section('Sample items');
-                            foreach (array_slice($res['sample'], 0, 5) as $s) {
-                                $io->writeln('- ' . ($s['relative'] ?? '(unknown)') . ' → ' . ($s['page_name'] ?? '?'));
-                                if (! empty($s['purified_preview'])) {
-                                    $io->writeln("  preview:\n" . $s['purified_preview']);
-                                }
-                            }
-                        }
-                    } else {
-                        $io->error($importer->getError() ?: ($res['error'] ?? 'Preview failed.'));
-                        return Command::FAILURE;
-                    }
+                    $this->printPreviewHuman($io, $importer, $res);
                 }
             } else {
                 $result = $importer->importFromSource(
@@ -218,30 +170,9 @@ class MarkdownImporterCommand extends Command
                 );
 
                 if ($jsonOut) {
-                    $io->writeln(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                    $this->printJson($io, $result);
                 } else {
-                    $written = (int)($result['written'] ?? 0);
-                    $io->success(sprintf('%d page(s) imported or updated.', $written));
-
-                    if (! empty($result['errors'])) {
-                        $io->warning('Errors:');
-                        foreach ($result['errors'] as $e) {
-                            if ($e) {
-                                $io->writeln(' - ' . $e);
-                            }
-                        }
-                    }
-
-                    if (! empty($result['notes'])) {
-                        $io->section('Purifier notes (by page)');
-                        // result['notes'] is typically keyed per page
-                        foreach ($result['notes'] as $page => $notes) {
-                            $io->writeln('• ' . $page);
-                            foreach ((array)$notes as $n) {
-                                $io->writeln('   - ' . $n);
-                            }
-                        }
-                    }
+                    $this->printImportHuman($io, $result);
                 }
             }
         } catch (\Throwable $e) {
@@ -252,7 +183,6 @@ class MarkdownImporterCommand extends Command
             }
             return Command::FAILURE;
         } finally {
-            // Clean temporary zip if we created one for a single .md
             if ($tmpZipToDelete && file_exists($tmpZipToDelete)) {
                 @unlink($tmpZipToDelete);
             }
@@ -261,36 +191,82 @@ class MarkdownImporterCommand extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * Accepts "1"/"0", "true"/"false", true/false. Default if null.
-     */
+    private function printJson(SymfonyStyle $io, array $payload): void
+    {
+        $io->writeln(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    private function printPreviewHuman(SymfonyStyle $io, TikiMarkdownImporter $importer, array $res): void
+    {
+        if (!empty($res['ok'])) {
+            $io->success('Preview OK');
+            if (!empty($res['counts'])) {
+                $io->writeln(sprintf(
+                    "Counts: pages=%d journals=%d total=%d",
+                    (int)($res['counts']['pages'] ?? 0),
+                    (int)($res['counts']['journals'] ?? 0),
+                    (int)($res['counts']['total'] ?? 0)
+                ));
+            }
+            if (!empty($res['sample'])) {
+                $io->section('Sample items');
+                foreach (array_slice($res['sample'], 0, 5) as $s) {
+                    $io->writeln('- ' . ($s['relative'] ?? '(unknown)') . ' → ' . ($s['page_name'] ?? '?'));
+                    if (!empty($s['purified_preview'])) {
+                        $io->writeln("  preview:\n" . $s['purified_preview']);
+                    }
+                }
+            }
+        } else {
+            $io->error($importer->getError() ?: ($res['error'] ?? 'Preview failed.'));
+        }
+    }
+
+    private function printImportHuman(SymfonyStyle $io, array $result): void
+    {
+        $written = (int)($result['written'] ?? 0);
+        $io->success(sprintf('%d page(s) imported or updated.', $written));
+
+        if (!empty($result['errors'])) {
+            $io->warning('Errors:');
+            foreach ($result['errors'] as $e) {
+                if ($e) {
+                    $io->writeln(' - ' . $e);
+                }
+            }
+        }
+
+        if (!empty($result['notes'])) {
+            $io->section('Purifier notes (by page)');
+            foreach ($result['notes'] as $page => $notes) {
+                $io->writeln('• ' . $page);
+                foreach ((array)$notes as $n) {
+                    $io->writeln('   - ' . $n);
+                }
+            }
+        }
+    }
+
+    /** Accepts "1"/"0", "true"/"false", true/false. Default if null. */
     private function toBool($val, bool $default = false): bool
     {
-        if ($val === null) {
-            return $default;
-        }
-        if (is_bool($val)) {
-            return $val;
-        }
+        if ($val === null) return $default;
+        if (is_bool($val)) return $val;
         $v = strtolower((string)$val);
-        if (in_array($v, ['1', 'true', 'yes', 'y'], true)) {
-            return true;
-        }
-        if (in_array($v, ['0', 'false', 'no', 'n'], true)) {
-            return false;
-        }
+        if (in_array($v, ['1', 'true', 'yes', 'y'], true)) return true;
+        if (in_array($v, ['0', 'false', 'no', 'n'], true)) return false;
         return $default;
     }
 
     /**
      * For source-type=local:
-     * - If $path ends with .zip, return it directly.
-     * - If $path ends with .md, wrap it into a temporary zip so the importer can scan it.
-     * Returns: [uploadTmp, uploadName, tmpZipCreated]
+     * - If .zip → pass-through
+     * - If .md  → wrap into temp zip (scanner-friendly)
+     * Returns [uploadTmp, uploadName, tmpZipCreated]
      */
     private function resolveLocalPayload(string $srcType, ?string $path): array
     {
-        if ($srcType !== 'local' || ! $path) {
+        if ($srcType !== 'local' || !$path) {
             return [null, null, null];
         }
 
@@ -300,15 +276,12 @@ class MarkdownImporterCommand extends Command
         }
 
         if (str_ends_with($lower, '.md')) {
-            // Create a temp zip and add the md under "pages/<basename>.md"
             $tmpZip = tempnam(sys_get_temp_dir(), 'md_import_') . '.zip';
             $zip = new \ZipArchive();
             if ($zip->open($tmpZip, \ZipArchive::CREATE) !== true) {
                 throw new \RuntimeException('Cannot create temporary zip for single .md');
             }
-            $mdName = basename($path);
-            // place it inside a conventional root; scanner can target "pages" by default
-            $zip->addFile($path, 'pages/' . $mdName);
+            $zip->addFile($path, 'pages/' . basename($path));
             $zip->close();
             return [$tmpZip, basename($tmpZip), $tmpZip];
         }

@@ -16,7 +16,7 @@ $inputConfiguration = [[
         'action' => 'word',
 
         // Source (common)
-        'source_type' => 'word', // local|repo
+        'source_type' => 'word', // local|git
 
         // Local
         // -> file via $_FILES['local_file']
