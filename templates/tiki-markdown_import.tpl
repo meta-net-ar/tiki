@@ -1,6 +1,6 @@
 {title help="Markdown import"}{tr}Markdown import{/tr}{/title}
 <p class="text-muted">
-    {tr}Import markdown files from various sources (local file/zip, FTP directory, or GitHub/GitLab repository) and convert them into Tiki wiki pages.{/tr}
+    {tr}Import markdown files from various sources (local file/zip, or Git repository) and convert them into Tiki wiki pages.{/tr}
 </p>
 
 {tabset name='md_tabs'}
@@ -18,73 +18,43 @@
                 <div class="col-sm-9">
                     <select name="source_type" class="form-select" id="source_type">
                         <option value="local" {if $md_source.type=='local'}selected{/if}>{tr}Local (upload){/tr}</option>
-                        <option value="ftp"   {if $md_source.type=='ftp'}selected{/if}>{tr}FTP{/tr}</option>
-                        <option value="repo"  {if $md_source.type=='repo'}selected{/if}>{tr}Repository (GitHub/GitLab){/tr}</option>
+                        <option value="git"  {if $md_source.type=='git'}selected{/if}>{tr}Git Repository{/tr}</option>
                     </select>
                     <div class="form-text">{tr}Choose where your markdown files will come from.{/tr}</div>
                 </div>
             </div>
 
-            <div class="border rounded p-3 mb-3" id="ftp_block">
-                <h6 class="mb-2">{tr}FTP settings (used if Source = FTP){/tr}</h6>
-                <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">Host</label>
-                    <div class="col-sm-9"><input class="form-control" name="ftp_host" value="{$md_source.ftp_host|escape}"></div>
-                </div>
-                <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">Port</label>
-                    <div class="col-sm-3"><input class="form-control" type="number" name="ftp_port" value="{$md_source.ftp_port|default:21|escape}"></div>
-                    <label class="col-sm-3 col-form-label">Path</label>
-                    <div class="col-sm-3"><input class="form-control" name="ftp_path" value="{$md_source.ftp_path|default:'/'|escape}"></div>
-                </div>
-                <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">User</label>
-                    <div class="col-sm-3"><input class="form-control" name="ftp_user" value="{$md_source.ftp_user|escape}"></div>
-                    <label class="col-sm-3 col-form-label">Password</label>
-                    <div class="col-sm-3"><input class="form-control" type="password" name="ftp_pass" value="{$md_source.ftp_pass|escape}"></div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3"></div>
-                    <div class="col-sm-9">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="ftp_ssl" {if $md_source.ftp_ssl}checked{/if} id="ftp_ssl">
-                            <label for="ftp_ssl" class="form-check-label">SSL/TLS</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="ftp_passive" {if $md_source.ftp_passive|default:true}checked{/if} id="ftp_passive">
-                            <label for="ftp_passive" class="form-check-label">{tr}Passive mode{/tr}</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="border rounded p-3 mb-3" id="repo_block">
-                <h6 class="mb-2">{tr}Repository settings (used if Source = Repository){/tr}</h6>
-                <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">{tr}Provider{/tr}</label>
-                    <div class="col-sm-9">
-                        <select name="repo_provider" class="form-select">
-                            <option value="github" {if $md_source.repo_provider=='github'}selected{/if}>GitHub</option>
-                            <option value="gitlab" {if $md_source.repo_provider=='gitlab'}selected{/if}>GitLab</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">{tr}Owner/Namespace{/tr}</label>
-                    <div class="col-sm-9"><input class="form-control" name="repo_owner" value="{$md_source.repo_owner|escape}" placeholder="myorg"></div>
-                </div>
+                <h6 class="mb-2">{tr}Repository settings (used if Source = Git Repository){/tr}</h6>
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">{tr}Repository{/tr}</label>
-                    <div class="col-sm-9"><input class="form-control" name="repo_name" value="{$md_source.repo_name|escape}" placeholder="myrepo"></div>
+                    <div class="col-sm-9"><input class="form-control" name="repo_url" value="{$md_source.repo_url|escape}" placeholder="myrepo"></div>
                 </div>
                 <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">{tr}Branch/Ref{/tr}</label>
-                    <div class="col-sm-9"><input class="form-control" name="repo_ref" value="{$md_source.repo_ref|default:'main'|escape}"></div>
+                    <label class="col-sm-3 col-form-label">{tr}Branch{/tr}</label>
+                    <div class="col-sm-9"><input class="form-control" name="repo_branch" value="{$md_source.repo_branch|default:'main'|escape}" placeholder="main"></div>
                 </div>
                 <div class="row mb-2">
-                    <label class="col-sm-3 col-form-label">{tr}Token (read-only){/tr}</label>
+                    <label class="col-sm-3 col-form-label">{tr}Access Token (HTTPS) (Required for private repos){/tr}</label>
                     <div class="col-sm-9">
-                        <input class="form-control" name="repo_token" value="{$md_source.repo_token|escape}" placeholder="{tr}Personal Access Token (if required){/tr}">
+                        <input class="form-control" type="password" name="repo_token" value="{$md_source.repo_token|escape}">
+                        <div class="form-text">{tr}GitHub: Fine-grained token with “Contents: Read-only” on this repo. GitLab: Access Token with read_repository.{/tr}</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label">{tr}Git timeout (seconds){/tr}</label>
+                    <div class="col-sm-3">
+                        <input class="form-control" type="number" min="5" step="1" name="git_timeout" value="{$md_source.git_timeout|default:30|escape}">
+                        <div class="form-text">{tr}Maximum time to wait for Git operations to complete.{/tr}</div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">{tr}Git pull before import{/tr}</label>
+                    <div class="col-sm-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="git_pull" name="git_pull" {if $md_source.git_pull|default:true}checked{/if}>
+                            <label class="form-check-label" for="git_pull">{tr}Update the repository by pulling the latest changes before each import.{/tr}</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,9 +261,6 @@
             </div>
             <div class="form-text">
                 {tr}Writes or updates wiki pages. For local source, replace{/tr} <code>path_to_your_zip_or_md</code> {tr}with an absolute path.{/tr}
-                {if $md_cli_sourcetype == 'ftp' || $md_cli_sourcetype == 'repo'}
-                    <br /><br /><span class="text-warning">{icon name='warning'} {tr}Credentials are included in the command.{/tr}</span>
-                {/if}
             </div>
         </div>
 
@@ -314,7 +281,6 @@
 (function () {
   var $sourceSelect = $('#source_type');
 
-  var $ftpBlock    = $('#ftp_block');
   var $repoBlock   = $('#repo_block');
   var $localRow    = $('#local_file_row');
   var $localInput  = $('#local_file_input');
@@ -329,11 +295,10 @@
     var t = ($sourceSelect.val() || 'local');
 
     // Hide all blocks
-    $ftpBlock.addClass('d-none');
     $repoBlock.addClass('d-none');
     $localRow.addClass('d-none');
 
-    // By default, hide repo/ftp-only buttons
+    // By default, hide repo buttons
     $btnSaveSrc.addClass('d-none');
     $btnTestSrc.addClass('d-none');
 
@@ -342,12 +307,7 @@
       $localRow.removeClass('d-none');
       $localInput.prop('required', false); // laisser facultatif pour dry-run rapide
       $localInput.val(''); // évite de garder un ancien fichier quand on change d’onglet
-    } else if (t === 'ftp') {
-      // FTP
-      $ftpBlock.removeClass('d-none');
-      $btnSaveSrc.removeClass('d-none');
-      $btnTestSrc.removeClass('d-none');
-    } else if (t === 'repo') {
+    } else if (t === 'git') {
       // REPO
       $repoBlock.removeClass('d-none');
       $btnSaveSrc.removeClass('d-none');

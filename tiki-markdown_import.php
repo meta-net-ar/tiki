@@ -9,7 +9,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\Lib\Importer\Markdown\Source\SourceManager;
 use Tiki\Lib\Importer\Markdown\TikiMarkdownImporter;
 
 $inputConfiguration = [[
@@ -17,26 +16,17 @@ $inputConfiguration = [[
         'action' => 'word',
 
         // Source (common)
-        'source_type' => 'word', // local|ftp|repo
+        'source_type' => 'word', // local|repo
 
         // Local
         // -> file via $_FILES['local_file']
 
-        // FTP
-        'ftp_host'    => 'string',
-        'ftp_port'    => 'digits',
-        'ftp_user'    => 'string',
-        'ftp_pass'    => 'string',
-        'ftp_path'    => 'string',
-        'ftp_ssl'     => 'bool',
-        'ftp_passive' => 'bool',
-
-        // Repo (GitHub/GitLab)
-        'repo_provider' => 'word', // github|gitlab
-        'repo_owner'    => 'string',
-        'repo_name'     => 'string',
-        'repo_ref'      => 'string',
-        'repo_token'    => 'string',
+        // Repo options
+        'repo_url'     => 'string',
+        'repo_branch'  => 'word',
+        'git_pull'      => 'bool',
+        'repo_token'  => 'string',
+        'git_timeout'  => 'digits',
 
         // Options Wiki / mapping
         'roots'          => 'string',
@@ -65,21 +55,13 @@ $access->check_permission('tiki_p_admin_importer');
 if (! isset($_SESSION['md_import'])) {
     $_SESSION['md_import'] = [
         'source' => [
-            'type'        => 'local', // local|ftp|repo
-            // ftp
-            'ftp_host'    => '',
-            'ftp_port'    => 21,
-            'ftp_user'    => '',
-            'ftp_pass'    => '',
-            'ftp_path'    => '/',
-            'ftp_ssl'     => false,
-            'ftp_passive' => true,
-            // repo
-            'repo_provider' => 'github',
-            'repo_owner'    => '',
-            'repo_name'     => '',
-            'repo_ref'      => 'main',
-            'repo_token'    => '',
+            'type'        => 'local', // local|git
+            // repo options
+            'repo_url'   => '',
+            'repo_branch' => 'main',
+            'git_pull'    => true,
+            'repo_token' => '',
+            'git_timeout' => 30,
         ],
         'wiki' => [
             'roots'          => '.',
@@ -109,25 +91,17 @@ $action = $_POST['action'] ?? null;
 //TODO: 1.validate fields more strictly 2. Save in prefs/DB
 if ($action === 'save_source' && $access->checkCsrf()) {
     $type = $_POST['source_type'] ?? 'local';
-    $type = in_array($type, ['local', 'ftp', 'repo'], true) ? $type : 'local';
+    $type = in_array($type, ['local', 'git'], true) ? $type : 'local';
 
     $src = $_SESSION['md_import']['source'];
     $src['type'] = $type;
 
-    if ($type === 'ftp') {
-        $src['ftp_host']    = trim($_POST['ftp_host'] ?? '');
-        $src['ftp_port']    = (int)($_POST['ftp_port'] ?? 21);
-        $src['ftp_user']    = trim($_POST['ftp_user'] ?? '');
-        $src['ftp_pass']    = (string)($_POST['ftp_pass'] ?? '');
-        $src['ftp_path']    = trim($_POST['ftp_path'] ?? '/');
-        $src['ftp_ssl']     = isset($_POST['ftp_ssl']);
-        $src['ftp_passive'] = isset($_POST['ftp_passive']);
-    } elseif ($type === 'repo') {
-        $src['repo_provider'] = in_array(($_POST['repo_provider'] ?? 'github'), ['github', 'gitlab'], true) ? $_POST['repo_provider'] : 'github';
-        $src['repo_owner']    = trim($_POST['repo_owner'] ?? '');
-        $src['repo_name']     = trim($_POST['repo_name'] ?? '');
-        $src['repo_ref']      = trim($_POST['repo_ref'] ?? 'main');
-        $src['repo_token']    = (string)($_POST['repo_token'] ?? '');
+    if ($type === 'git') {
+        $src['repo_url']    = trim($_POST['repo_url'] ?? '');
+        $src['repo_branch'] = trim($_POST['repo_branch'] ?? '');
+        $src['git_pull']    = isset($_POST['git_pull']);
+        $src['repo_token']  = trim($_POST['repo_token'] ?? '');
+        $src['git_timeout']  = max(5, (int)($_POST['git_timeout'] ?? 30));
     }
     $_SESSION['md_import']['source'] = $src;
     Feedback::success(tra('Source settings saved.'));
@@ -152,25 +126,6 @@ if ($action === 'save_wiki' && $access->checkCsrf()) {
         'journal_ns' => trim($_POST['journal_ns'] ?? 'Journal'),
     ];
     Feedback::success(tra('Import options saved.'));
-}
-
-// 3) Test source (placeholder)
-if ($action === 'test_source' && $access->checkCsrf()) {
-    $mgr = new SourceManager();
-    $cfg = $_SESSION['md_import']['source'] ?? [];
-
-    $zip = $mgr->fetchToTempZip($cfg);
-    if ($zip) {
-        $z = new ZipArchive();
-        $entries = ($z->open($zip) === true) ? $z->numFiles : 0;
-        if ($entries && $z->status === 0) {
-            $z->close();
-        }
-        Feedback::success(tra(sprintf('Source OK. Downloaded ZIP (~%s bytes, %s entries).', @filesize($zip) ?: 0, (string)$entries)));
-        @unlink($zip);
-    } else {
-        Feedback::error($mgr->getError());
-    }
 }
 
 // 4) Dry-run (preview) — placeholder
@@ -362,20 +317,12 @@ $cliDefaults = [
     'journal-ns'       => 'Journal',
     // source local
     'local-path'       => null,
-    // source ftp
-    'ftp-host'         => null,
-    'ftp-port'         => 21,
-    'ftp-user'         => null,
-    'ftp-pass'         => null,
-    'ftp-path'         => '/',
-    'ftp-ssl'          => false,
-    'ftp-passive'      => true,
     // source repo
-    'repo-provider'    => 'github',
-    'repo-owner'       => null,
-    'repo-name'        => null,
-    'repo-ref'         => 'main',
-    'repo-token'       => null,
+    'repo-url'        => null,
+    'repo-branch'     => 'main',
+    'git-pull'         => true,
+    'repo-token'    => null,
+    'git-timeout'    => 30,
 ];
 
 $source = $_SESSION['md_import']['source'] ?? [];
@@ -392,22 +339,13 @@ if ($srcType === 'local') {
     $localPath = $source['local_path'] ?? null;
     $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
     $srcOpts[] = mdimp_opt_if_changed('local-path', $localPath ?: 'path_to_your_zip_or_md', $cliDefaults['local-path']);
-} elseif ($srcType === 'ftp') {
+} elseif ($srcType === 'git') {
     $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-host', $source['ftp_host'] ?? null, $cliDefaults['ftp-host']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-port', (int)($source['ftp_port'] ?? 21), $cliDefaults['ftp-port']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-user', $source['ftp_user'] ?? null, $cliDefaults['ftp-user']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-pass', $source['ftp_pass'] ?? null, $cliDefaults['ftp-pass']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-path', $source['ftp_path'] ?? '/', $cliDefaults['ftp-path']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-ssl', (bool)($source['ftp_ssl'] ?? false), $cliDefaults['ftp-ssl']);
-    $srcOpts[] = mdimp_opt_if_changed('ftp-passive', (bool)($source['ftp_passive'] ?? true ), $cliDefaults['ftp-passive']);
-} elseif ($srcType === 'repo') {
-    $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-provider', $source['repo_provider'] ?? 'github', $cliDefaults['repo-provider']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-owner', $source['repo_owner'] ?? null, $cliDefaults['repo-owner']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-name', $source['repo_name'] ?? null, $cliDefaults['repo-name']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-ref', $source['repo_ref'] ?? 'main', $cliDefaults['repo-ref']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-url', $source['repo_url'] ?? null, $cliDefaults['repo-path']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-branch', $source['repo_branch'] ?? null, $cliDefaults['repo-branch']);
+    $srcOpts[] = mdimp_opt_if_changed('git-pull', $source['git_pull'] ?? null, $cliDefaults['git-pull']);
     $srcOpts[] = mdimp_opt_if_changed('repo-token', $source['repo_token'] ?? null, $cliDefaults['repo-token']);
+    $srcOpts[] = mdimp_opt_if_changed('git-timeout', $source['git_timeout'] ?? null, $cliDefaults['git-timeout']);
 }
 
 // Options wiki (common)

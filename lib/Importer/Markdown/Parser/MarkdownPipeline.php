@@ -26,19 +26,6 @@ class MarkdownPipeline
     }
 
     /**
-     * Backward-compat aliases (in case other code uses different names).
-     */
-    public function register(MarkdownPurifierInterface $purifier): self
-    {
-        return $this->registerPurifier($purifier);
-    }
-
-    public function addPurifier(MarkdownPurifierInterface $purifier): self
-    {
-        return $this->registerPurifier($purifier);
-    }
-
-    /**
      * Purify a raw markdown string according to $source ('commonmark','gfm','logseq', …)
      *
      * @return array{markdown:string, notes:array<int,string>}
@@ -68,14 +55,5 @@ class MarkdownPipeline
     {
         $id = strtolower($id);
         return $this->purifiers[$id] ?? null;
-    }
-
-    /** Convenience factory with sane defaults */
-    public static function withDefaults(): self
-    {
-        $pipeline = new self();
-        // Only register CommonMark by default here; callers can add others.
-        $pipeline->registerPurifier(new CommonMarkPurifier());
-        return $pipeline;
     }
 }
