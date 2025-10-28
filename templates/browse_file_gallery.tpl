@@ -11,7 +11,7 @@
         Math.max.apply(null, $('.thumbnailcontener').map(function(index, el) { return $(el).height(); }).get())
     );
 {/jq}
-<div id="thumbnails"{* style="float:left"*}>
+<div id="thumbnails" class="d-flex flex-wrap">
 
     {foreach $files as $file}
 
@@ -61,7 +61,7 @@
             {/if}
         {/capture}
         <div id="{$checkname}_{$file.id}" class="clearfix thumbnailcontener{if $is_checked eq 'y'} thumbnailcontenerchecked{/if}{if $file.isgal eq 1} subgallery{/if}" style="{if $view eq 'browse'}float:left;{/if}width:{$thumbnailcontener_size}px">
-            <div class="thumbnail" style="float:left; width:{$thumbnailcontener_size}px">
+            <div class="thumbnail" style="width:{$thumbnailcontener_size}px">
                 {include file='fgal_thumbnailframe.tpl'}
                 {if $show_infos eq 'y'}
                     <div class="thumbinfos">
@@ -144,6 +144,10 @@
         </div>
     {/foreach}
 </div>
+
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="thumbnails" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+{/if}
 
 <br clear="all" />
 {if (!empty($files) and $prefs.fgal_checked neq 'n' and $tiki_p_admin_file_galleries eq 'y'

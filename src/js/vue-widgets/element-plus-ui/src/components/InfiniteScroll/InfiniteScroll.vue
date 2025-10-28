@@ -2,7 +2,9 @@
 import { ref, computed, watch } from "vue";
 import { Loading } from "@element-plus/icons-vue";
 
-const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_bootstrapThemeFile"]);
+const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_cssFiles"]);
+
+const cssFiles = computed(() => props._cssFiles.split(","));
 
 const wrapper = ref(null);
 const loading = ref(false);
@@ -45,14 +47,18 @@ const load = async () => {
         const html = await response.text();
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
-        const originalTargetContainer = tempDiv.querySelector(`#${props.targetContainerId}`);
+        const originalTargetContainer = tempDiv.querySelector(`#${props.targetContainerId || props.containerId}`);
         if (originalTargetContainer) {
             const content = document.createDocumentFragment();
             content.append(...originalTargetContainer.childNodes);
 
             mirrorInputs(content);
 
-            container.value.querySelector(`#${props.targetContainerId}`).appendChild(content);
+            if (props.targetContainerId) {
+                container.value.querySelector(`#${props.targetContainerId}`).appendChild(content);
+            } else {
+                container.value.appendChild(content);
+            }
         }
 
     } catch (error) {
@@ -97,7 +103,9 @@ const mirrorInputs = (sourceContainer) => {
 </script>
 
 <template>
-    <link rel="stylesheet" :href="_bootstrapThemeFile" />
+    <template v-for="cssFile in cssFiles" :key="cssFile">
+        <link rel="stylesheet" :href="cssFile" />
+    </template>
     <div ref="wrapper" v-loading="loading" class="infinite-list-wrapper" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :style="`height: calc(${height}px - 35vh);`"></div>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />
