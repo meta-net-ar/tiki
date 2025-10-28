@@ -296,7 +296,83 @@
         "umakantp/smartylint": "0.1.4-p1"
     },
     "extra": {
-        "patches-file": "../installer/composer-patches/composer-patches.json"
+        "patches-file": "../installer/composer-patches/composer-patches.json",
+        "stability-ignore": {
+            "_comment": [
+                "Packages with non-standard version constraints that require explanation.",
+                "This includes both unstable versions (dev-master, etc.) and stable versions that aren't the latest available.",
+                "",
+                "TOOL USAGE:",
+                "This list is used by the Composer Stability Checker script (doc/devtools/check_composer_stability.php).",
+                "The script analyzes package stability across Tiki versions and flags non-standard constraints.",
+                "When packages are listed here, they are marked as [MITIGATED] in the script output.",
+                "",
+                "BRANCH PRESENCE:",
+                "The stability checker script may only be present in newer versions (master/29.x+) because:",
+                "1. The script is part of the release process and development tooling",
+                "2. Since the script compares across all available Tiki versions, being only on master can be sufficient",
+                "3. The ignore list itself provides documentation for dependency decisions across all versions",
+                "4. Older branches don't need the script since they're analyzed from the master version",
+                "",
+                "SPLIT DOCUMENTATION:",
+                "Package documentation is now split between two locations in this composer.json file:",
+                "1. This stability-ignore list (under 'extra'): Documents why specific version constraints are acceptable",
+                "2. The main _comment section above: Explains package purpose, usage, and general dependency notes",
+                "This separation allows for:",
+                "  - Clear distinction between 'what' (package docs in _comment) and 'why' (stability justification here)",
+                "  - Focused stability analysis without cluttering general documentation",
+                "  - Easier maintenance of stability justifications vs. feature documentation",
+                "  - Better organization: stability concerns are isolated from general package information",
+                "",
+                "NOTE:",
+                "This stability-ignore list will be included in all supported Tiki versions because:",
+                "1. It provides valuable context for dependency decisions across all supported versions",
+                "2. Helps maintain consistency in dependency management practices",
+                "3. Enables the stability checker tool to work properly when analyzing from master",
+                "4. Documents decisions that may affect future dependency updates",
+                "5. Ensures all versions have the same understanding of acceptable version constraints",
+                "",
+                "Each entry should include:",
+                "  - reason: Why this specific version constraint is necessary/acceptable",
+                "  - mitigation: How risk is reduced or managed",
+                "  - reviewed: Date when decision was reviewed",
+                "  - reviewer: Name of person who reviewed this decision",
+                "  - alternatives: What alternatives were considered (if any)",
+                "  - impact: What functionality would be lost without this package"
+            ],
+            "candy-chat/xmpp-prebind-php": {
+                "reason": "Essential XMPP prebinding for chat system authentication and session management.",
+                "mitigation": "PHP 8 compatibility via patches. Extended with custom TIKITOKEN auth.",
+                "reviewed": "2025-08-27",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for prebinding. Custom implementation would be complex.",
+                "impact": "XMPP chat completely non-functional. Users cannot authenticate or connect."
+            },
+            "garethp/php-ews": {
+                "reason": "Required by Cypht. Currently using dev-master due to needed features not yet available in stable.",
+                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
+                "reviewed": "2025-08-27",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "Recommendation: Consider migrating to stable v0.11.0 unless dev-master features are needed",
+                "impact": "Exchange integration may be affected if removed."
+            },
+            "rubix/extras": {
+                "reason": "Machine learning extras package providing additional algorithms and transformers. Using beta version 2.0.0-beta for required ML functionality. Package is ABANDONED - no stable release will be available.",
+                "mitigation": "Beta version provides stable API for core ML features. Used extensively in MachineLearningLib for classifiers, regressors, transformers, and neural networks. Package is abandoned but beta version remains functional for current needs.",
+                "reviewed": "2025-08-27",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "Migrate to alternative ML library or consider maintaining a fork. No stable release expected due to abandonment.",
+                "impact": "Machine learning features completely non-functional. Users lose access to ML models, predictions, and data analysis capabilities."
+            },
+            "symfony/polyfill-ctype": {
+                "reason": "Provides ctype_* functions when ext-ctype extension is not available.",
+                "mitigation": "Version ~1.8 required by Symfony 6.4 components. Provides fallback functionality.",
+                "reviewed": "2025-08-27",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for ctype function polyfills.",
+                "impact": "Symfony components fail. System likely unusable due to cascading failures."
+            }
+        }
     },
     "replace": {
         "npm-asset/tslib": "*"
