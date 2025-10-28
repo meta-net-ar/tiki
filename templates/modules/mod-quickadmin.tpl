@@ -58,8 +58,8 @@
                         <a class="dropdown-item"  href="tiki-admingroups.php">
                             {icon name="group"} {tr}Groups{/tr}
                         </a>
-                        <div class="dropdown-item">
-                            {permission_link mode=text}
+                        <div class="dropdown-item p-0">
+                        {permission_link mode=button_link addclass="d-block text-start"}
                         </div>
                         <a class="dropdown-item" href="tiki-admin_menus.php">
                             {icon name="menu"} {tr}Menus{/tr}
