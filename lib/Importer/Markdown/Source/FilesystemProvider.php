@@ -10,170 +10,133 @@ use ZipArchive;
 
 /**
  * FilesystemProvider
- *
- * Handles:
- *  - 'local' : uploaded file (.zip or .md/.markdown) and pack into ZIP if needed.
- *  - 'ftp'   : connect to FTP and collect *.md/*.markdown files recursively into a ZIP.
- *
- * Constructor takes a $mode ('local'|'ftp'), a $cfg array, and a $ctx array.
- * $ctx is provided by SourceManager, carrying uploadedPath / uploadedName for 'local'.
+ * - mode 'upload' : upload via HTTP (single .md/.zip file)
+ * - mode 'path'   : local filesystem path (file or dir)
  */
 class FilesystemProvider implements SourceProviderInterface
 {
     public function __construct(
-        private string $mode,
-        private array $cfg,
-        private array $ctx
-    ) {
-    }
+        private string $mode, // 'upload' | 'path'
+        private array $cfg,   // ['local_path' => '/srv/notes' (optionnel for mode=path)]
+        private array $ctx    // ['uploadedPath','uploadedName'] for mode=upload
+    ) {}
 
     public function fetchToTempZip(): string
     {
-        if ($this->mode === 'local') {
-            return $this->fromLocal();
-        }
-        if ($this->mode === 'ftp') {
-            return $this->fromFtp();
-        }
-        throw new \RuntimeException("Unsupported filesystem mode: {$this->mode}");
+        return $this->mode === 'upload' ? $this->fromUpload() : $this->fromPath();
     }
 
-    /**
-     * Local upload: if ZIP, copy to temp; if .md/.markdown, create a ZIP with one entry.
-     */
-    private function fromLocal(): string
+    private function fromUpload(): string
     {
         $uploadedPath = $this->ctx['uploadedPath'] ?? null;
         $uploadedName = $this->ctx['uploadedName'] ?? null;
 
-        if (! $uploadedPath || ! is_readable($uploadedPath)) {
+        if (!$uploadedPath || !is_readable($uploadedPath)) {
             throw new \RuntimeException('Uploaded file is missing or not readable.');
         }
 
-        $orig = (string)($uploadedName ?? basename($uploadedPath));
-        $ext  = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($uploadedName ?: $uploadedPath, PATHINFO_EXTENSION));
 
         if ($ext === 'zip') {
-            $tmp = $this->tmpZip();
-            if (! copy($uploadedPath, $tmp)) {
+            $dst = $this->tmpZip();
+            if (!copy($uploadedPath, $dst)) {
                 throw new \RuntimeException('Cannot copy uploaded ZIP to temp.');
             }
-            return $tmp;
+            return $dst;
         }
 
-        if (! class_exists(ZipArchive::class)) {
+        if (!class_exists(ZipArchive::class)) {
             throw new \RuntimeException('ZipArchive extension is required.');
         }
-
-        $tmpZip = $this->tmpZip();
+        $zipPath = $this->tmpZip();
         $zip = new ZipArchive();
-        if ($zip->open($tmpZip, ZipArchive::CREATE) !== true) {
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
             throw new \RuntimeException('Cannot create temporary ZIP.');
         }
-
+        $name = $uploadedName ?: 'note.md';
+        if (!preg_match('~\.(md|markdown)$~i', $name)) {
+            $name .= '.md';
+        }
         $data = file_get_contents($uploadedPath);
         if ($data === false) {
             $zip->close();
-            @unlink($tmpZip);
+            @unlink($zipPath);
             throw new \RuntimeException('Cannot read uploaded file.');
         }
-
-        $inner = $orig ?: 'note.md';
-        if (! preg_match('~\.(md|markdown)$~i', $inner)) {
-            $inner .= '.md';
-        }
-
-        $zip->addFromString($inner, $data);
+        $zip->addFromString($name, $data);
         $zip->close();
-
-        return $tmpZip;
+        return $zipPath;
     }
 
-    /**
-     * FTP: connect, traverse, collect *.md/*.markdown into a ZIP.
-     */
-    private function fromFtp(): string
+    private function fromPath(): string
     {
-        if (! class_exists(ZipArchive::class)) {
+        $path = (string)($this->cfg['local_path'] ?? '');
+        if ($path === '') {
+            throw new \RuntimeException('Missing local_path.');
+        }
+        if (!file_exists($path)) {
+            throw new \RuntimeException('Path does not exist: ' . $path);
+        }
+
+        // If it's already a ZIP file, just copy it to temp
+        if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
+            $dst = $this->tmpZip();
+            if (!copy($path, $dst)) {
+                throw new \RuntimeException('Cannot copy ZIP to temp.');
+            }
+            return $dst;
+        }
+
+        if (!class_exists(ZipArchive::class)) {
             throw new \RuntimeException('ZipArchive extension is required.');
         }
 
-        $host = (string)($this->cfg['ftp_host'] ?? '');
-        $port = (int)($this->cfg['ftp_port'] ?? 21);
-        $user = (string)($this->cfg['ftp_user'] ?? '');
-        $pass = (string)($this->cfg['ftp_pass'] ?? '');
-        $path = (string)($this->cfg['ftp_path'] ?? '/');
-        $ssl  = ! empty($this->cfg['ftp_ssl']);
-        $passive = ! empty($this->cfg['ftp_passive']);
-
-        $conn = $ssl ? ftp_ssl_connect($host, $port, 90) : ftp_connect($host, $port, 15);
-        if (! $conn) {
-            throw new \RuntimeException("Cannot connect to FTP server {$host}:{$port}. ");
-        }
-        if (! @ftp_login($conn, $user, $pass)) {
-            @ftp_close($conn);
-            throw new \RuntimeException('FTP authentication failed for user: ' . $user);
-        }
-        @ftp_pasv($conn, $passive);
-
-        $root = $path ?: '/';
-        if (! @ftp_chdir($conn, $root)) {
-            @ftp_close($conn);
-            throw new \RuntimeException('Cannot change directory on FTP.');
-        }
-
-        $tmpZip = $this->tmpZip();
+        $zipPath = $this->tmpZip();
         $zip = new ZipArchive();
-        if ($zip->open($tmpZip, ZipArchive::CREATE) !== true) {
-            @ftp_close($conn);
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
             throw new \RuntimeException('Cannot create temporary ZIP.');
         }
 
-        $this->ftpAddRecursive($conn, '.', $zip);
+        if (is_file($path)) {
+            $this->addOneFile($zip, $path, basename($path));
+        } else {
+            $this->addDir($zip, rtrim($path, '/'));
+        }
 
         $zip->close();
-        @ftp_close($conn);
-
-        return $tmpZip;
+        return $zipPath;
     }
 
-    private function ftpAddRecursive($conn, string $dir, ZipArchive $zip, int $depth = 0, int $max = 20): void
+    private function addOneFile(ZipArchive $zip, string $full, string $rel): void
     {
-        if ($depth > $max) {
+        $lower = strtolower($full);
+        if (!str_ends_with($lower, '.md') && !str_ends_with($lower, '.markdown')) {
             return;
         }
-        $list = @ftp_nlist($conn, $dir);
-        if (! $list) {
+        $data = @file_get_contents($full);
+        if ($data !== false) {
+            $zip->addFromString($rel, $data);
+        }
+    }
+
+    private function addDir(ZipArchive $zip, string $root, string $rel = ''): void
+    {
+        $dir = $rel ? ($root . '/' . $rel) : $root;
+        $it = @scandir($dir);
+        if ($it === false) {
+            // Permission denied → ignore
             return;
         }
-        foreach ($list as $item) {
-            $name = basename($item);
-            if ($name === '.' || $name === '..') {
-                continue;
+        foreach ($it as $n) {
+            if ($n === '.' || $n === '..') continue;
+            $full = $dir . '/' . $n;
+            $relPath = ltrim($rel . '/' . $n, '/');
+            if (is_dir($full)) {
+                if ($n === '.git') continue;
+                $this->addDir($zip, $root, $relPath);
+            } else {
+                $this->addOneFile($zip, $full, $relPath);
             }
-            $remote = ($dir === '.') ? $name : ($dir . '/' . $name);
-            $size = @ftp_size($conn, $remote);
-            if ($size === -1) {
-                // directory
-                $this->ftpAddRecursive($conn, $remote, $zip, $depth + 1, $max);
-                continue;
-            }
-            // file
-            if (! preg_match('~\.(md|markdown)$~i', $remote)) {
-                continue;
-            }
-            $stream = fopen('php://temp', 'w+b');
-            if (! $stream) {
-                continue;
-            }
-            if (@ftp_fget($conn, $stream, $remote, FTP_BINARY)) {
-                rewind($stream);
-                $data = stream_get_contents($stream);
-                if ($data !== false) {
-                    $zip->addFromString(ltrim($remote, './'), $data);
-                }
-            }
-            fclose($stream);
         }
     }
 
