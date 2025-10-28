@@ -201,8 +201,8 @@ class Services_Category_Controller
                 // browse categorized objects
                 if (isset($return['objects'])) {
                     foreach ($return['objects'] as $object) {
-                        if ($object['type'] == 'trackeritem') {
-                            $this->logCategorizedUncategorizedTrackeritem($object['id']);
+                        if ($object['type'] === 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object);
                         }
                     }
                 }
@@ -267,8 +267,8 @@ class Services_Category_Controller
                 // browse uncategorized objects
                 if (isset($return['objects'])) {
                     foreach ($return['objects'] as $object) {
-                        if ($object['type'] == 'trackeritem') {
-                            $this->logCategorizedUncategorizedTrackeritem($object['id']);
+                        if ($object['type'] === 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object);
                         }
                     }
                 }
@@ -299,20 +299,22 @@ class Services_Category_Controller
     /**
      * Saves the log when categorizing or uncategorizing a Trackeritem.
      *
-     * @param int $trackeritemId the identifier of the trackeritem whose log is to be saved
+     * @param int $objectCategorised a key-value list containing the object id and type of the object whose log is to be saved
      * @return void
      */
-    private function logCategorizedUncategorizedTrackeritem(int $trackeritemId)
+    private function logCategorizedUncategorizedTrackeritem(array $objectCategorised)
     {
-        $trklib = TikiLib::lib('trk');
-        // retrieve the tracker ID to which the item belongs
-        $trackerId = $trklib->get_tracker_for_item($trackeritemId);
-        $definition = Tracker_Definition::get($trackerId);
-        // retrieve the tracker fields that are of type category
-        if ($fieldIds = $definition->getCategorizedFields()) {
-            foreach ($fieldIds as $fieldId) {
-                $itemValue = $trklib->get_item_value($trackerId, $trackeritemId, $fieldId) ?? '';
-                $trklib->trackerItemLog($trackeritemId, $fieldId, $itemValue);
+        if (isset($objectCategorised['id'], $objectCategorised['type']) and $objectCategorised['type'] === 'trackeritem') {
+            $trklib = TikiLib::lib('trk');
+            // retrieve the tracker ID to which the item belongs
+            $trackerId = $trklib->get_tracker_for_item($objectCategorised['id']);
+            $definition = Tracker_Definition::get($trackerId);
+            // retrieve the tracker fields that are of type category
+            if ($fieldIds = $definition->getCategorizedFields()) {
+                foreach ($fieldIds as $fieldId) {
+                    $itemValue = $trklib->get_item_value($trackerId, $objectCategorised['id'], $fieldId) ?? '';
+                    $trklib->trackerItemLogFieldValueChange($objectCategorised['id'], $fieldId, $itemValue);
+                }
             }
         }
     }
