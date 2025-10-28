@@ -3946,7 +3946,7 @@ class Comments extends TikiLib
             $params['comment_topictype'] = 'n';
         }
 
-        if ($tiki_p_admin_forum != 'y') {// non admin can only post normal
+        if ($tiki_p_forum_post_topic != 'y') {// all users with post topic permission can set topic type
             $params['comment_topictype'] = 'n';
             if ($forum_info['topic_summary'] != 'y') {
                 $params['comment_topicsummary'] = '';

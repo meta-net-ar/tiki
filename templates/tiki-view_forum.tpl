@@ -202,7 +202,7 @@
                             </div>
                         </div>
                     {/if}
-                    {if $tiki_p_admin_forum eq 'y'}
+                    {if $tiki_p_forum_post_topic eq 'y'}
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label" for="comment_topictype">{tr}Type{/tr}</label>
                             <div class="col-sm-10">
