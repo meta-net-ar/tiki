@@ -74,6 +74,7 @@ class TikiMarkdownImporter
         $files   = $preview['files'] ?? [];
         $counts  = $preview['counts'] ?? ['total' => count($files)];
         $written = 0;
+        $skipped = 0;
 
         $flavor   = strtolower($pipelineCfg['flavor'] ?? 'gfm');
 
@@ -106,11 +107,15 @@ class TikiMarkdownImporter
 
             if ($this->writeMarkdownPage($page, $md, 'Markdown import')) {
                 $written++;
+            } else {
+                $skipped++;
+                $this->notesByPage[$page][] = 'Skipped (no changes)';
             }
         }
 
         return [
             'written' => $written,
+            'skipped' => $skipped,
             'counts'  => $counts,
             'errors'  => $this->errors,
             'notes'   => $this->notesByPage,
@@ -233,11 +238,20 @@ class TikiMarkdownImporter
         $ip   = method_exists($tikilib, 'get_ip_address') ? $tikilib->get_ip_address() : ($_SERVER['REMOTE_ADDR'] ?? '');
 
         // Tiki Markdown wrapper
-        $content = '{syntax type="markdown" editor="plain"}' . $markdown;
+        $content = $this->wrapMarkdown($markdown);
 
         if ($tikilib->page_exists($name)) {
+
+            $info = $tikilib->get_page_info($name);
+            $oldPageContent = $this->extractMarkdownBody($info['data']);
+
+            // skip if content is identical
+            if ($this->canon($oldPageContent ?? '') === $this->canon($markdown)) {
+                return false;
+            }
+
+            // update with history
             if (($prefs['feature_history'] ?? 'y') === 'y') {
-                $info = $tikilib->get_page_info($name);
                 $newVersion = (int) $info['version'] + 1;
 
                 // push current into tiki_history
@@ -315,5 +329,35 @@ class TikiMarkdownImporter
         }
 
         return true;
+    }
+
+    /**
+     * Wrap raw markdown in Tiki syntax tags.
+     */
+    private function wrapMarkdown(string $body): string
+    {
+        return '{syntax type="markdown" editor="plain"}' . $body;
+    }
+
+    /**
+     * Extract markdown body from Tiki syntax wrapper.
+     */
+    private function extractMarkdownBody(string $data): ?string
+    {
+        if (preg_match('~^\{syntax\s+type="markdown"[^}]*\}(.*)\z~s', $data, $m)) {
+            return $m[1];
+        }
+        return null;
+    }
+
+    private function canon(string $s): string
+    {
+        // normalize line endings to \n
+        $s = str_replace(["\r\n", "\r"], "\n", $s);
+        // trim trailing spaces/tabs on each line
+        $s = preg_replace('/[ \t]+$/m', '', $s);
+        // trim trailing newlines at end of file
+        $s = rtrim($s, "\n");
+        return $s;
     }
 }

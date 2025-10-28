@@ -262,6 +262,10 @@ if ($action === 'import_now' && $access->checkCsrf()) {
         );
         Feedback::success(tr('%0 pages imported or updated.', (int)$result['written']));
     } else {
+        $_SESSION['md_import']['last_preview'] = json_encode(
+            $result,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
         Feedback::warning(tr('No pages were imported.'));
     }
 
