@@ -207,7 +207,7 @@
         "melbahja/seo": "^2.0",
         "meyfa/php-svg": "^0.16",
         "michelf/php-smartypants": "^1.8.1",
-        "montefuscolo/xmpp": "dev-php8.1",
+        "montefuscolo/xmpp": "~0.8",
         "mottie/tablesorter": "^2.28",
         "mrrio/jspdf": "1.5.3",
         "nicolaskruchten/pivottable": "^2.20.0",
