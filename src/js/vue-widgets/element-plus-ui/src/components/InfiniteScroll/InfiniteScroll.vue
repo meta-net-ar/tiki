@@ -1,36 +1,34 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watchEffect } from "vue";
 import { Loading } from "@element-plus/icons-vue";
 
 const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_cssFiles"]);
 
 const cssFiles = computed(() => props._cssFiles.split(","));
 
-const wrapper = ref(null);
+const scrollbar = ref(null);
 const loading = ref(false);
 const offset = ref(Number(props.offset) || 0);
 
-const container = computed(() => wrapper.value?.querySelector(`#${props.containerId}`));
+const container = computed(() => scrollbar.value.wrapRef?.querySelector(`#${props.containerId}`));
 const disabled = computed(() => loading.value || (offset.value + Number(props.step)) >= Number(props.totalCount));
 const loadUrl = computed(() => props.loadUrl || window.location.href);
-const height = computed(() => container.value ? container.value.clientHeight: 0);
+const height = ref(0);
 
-watch(() => {
-    if (!wrapper.value) return;
-
+watchEffect(() => {
+    if (!scrollbar.value) return;
+    const wrapper = scrollbar.value.wrapRef.querySelector(".el-scrollbar__view");
     const originalContainer = document.getElementById(props.containerId);
     if (!originalContainer) {
         console.error(`Container with id ${props.containerId} not found`);
         return;
     }
-
-    wrapper.value.appendChild(originalContainer);
-
-    mirrorInputs(originalContainer);
+    height.value = originalContainer.clientHeight;
+    wrapper.appendChild(originalContainer);
 });
 
-const load = async () => {
-    if (disabled.value) return;
+const load = async (direction) => {
+    if (disabled.value || direction !== "bottom") return;
 
     loading.value = true;
 
@@ -73,7 +71,7 @@ const load = async () => {
 // Mirror out all inputs inside the container, so form state is preserved
 const mirrorInputs = (sourceContainer) => {
     const inputs = sourceContainer.querySelectorAll("input, select, textarea");
-    const targetContainer = wrapper.value.getRootNode().host.parentElement;
+    const targetContainer = scrollbar.value.wrapRef.getRootNode().host.parentElement;
 
     inputs.forEach(input => {
         const mirror = input.cloneNode(true);
@@ -106,7 +104,7 @@ const mirrorInputs = (sourceContainer) => {
     <template v-for="cssFile in cssFiles" :key="cssFile">
         <link rel="stylesheet" :href="cssFile" />
     </template>
-    <div ref="wrapper" v-loading="loading" class="infinite-list-wrapper" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :style="`height: calc(${height}px - 35vh);`"></div>
+    <el-scrollbar :height="`calc(${height}px - 35vh)`" @end-reached="load" ref="scrollbar"></el-scrollbar>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />
     </el-icon>

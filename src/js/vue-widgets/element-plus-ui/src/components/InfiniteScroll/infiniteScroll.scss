@@ -1,8 +1,5 @@
 @use 'element-plus/theme-chalk/el-icon.css';
-
-.infinite-list-wrapper {
-    overflow: auto;
-}
+@use 'element-plus/theme-chalk/el-scrollbar.css';
 
 .infinite-list-loader {
     margin: auto;
