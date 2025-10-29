@@ -79,6 +79,10 @@ class Tracker_Field_PageSelector extends \Tracker\Field\AbstractItemField
 
     public function renderInput($context = [])
     {
+        $itemId = $this->getItemId();
+        $itemIdPart = null !== $itemId ? '_' . $itemId : '';
+        $context['uniqId'] = 'field' . $this->getFieldId() . '_item' . $itemIdPart . '_' . uniqid();
+
         return $this->renderTemplate('trackerinput/pageselector.tpl', $context);
     }
 
