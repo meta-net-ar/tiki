@@ -2,7 +2,7 @@
 import { ref, computed, watchEffect } from "vue";
 import { Loading } from "@element-plus/icons-vue";
 
-const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "_cssFiles"]);
+const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "offsetArg", "_cssFiles"]);
 
 const cssFiles = computed(() => props._cssFiles.split(","));
 
@@ -35,7 +35,7 @@ const load = async (direction) => {
     try {
         offset.value += Number(props.step);
         const url = new URL(loadUrl.value);
-        url.searchParams.set("offset", offset.value);
+        url.searchParams.set(props.offsetArg || "offset", offset.value);
         const response = await fetch(url);
 
         if (!response.ok) {
