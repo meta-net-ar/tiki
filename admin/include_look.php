@@ -1074,19 +1074,22 @@ function edit_custom_mode(el,id,name,icon){
     var setupThemeSelects = function (themeDropDown, optionDropDown, showPreview) {
         // pick up theme drop-down change
         themeDropDown.on("change", function() {
-            var ops = theme_options[themeDropDown.val()];
+            var t = themeDropDown.find("option:selected").val();
+            var o = optionDropDown.find("option:selected").val();
+            
+            var ops = theme_options[t];
             var none = true;
-            var current = optionDropDown.val();
+            var current = o;
             optionDropDown.empty().attr('disabled',false)
                     .append(\$('<option/>').attr('value','').text($none));
-            if (themeDropDown.val()) {
+            if (t) {
                 \$.each(ops[1], function(i, val) {
                     optionDropDown.append(\$('<option/>').attr('value',i).text(i));
                     none = false;
                 });
             }
             optionDropDown.val(current);
-            if (!optionDropDown.val()){
+            if (!o){
                 optionDropDown.val('');
             }
 
@@ -1100,8 +1103,8 @@ function edit_custom_mode(el,id,name,icon){
         }).trigger("change");
         optionDropDown.on("change", function() {
             if (showPreview !== undefined) {
-                var t = themeDropDown.val();
-                var o = optionDropDown.val();
+                var t = themeDropDown.find("option:selected").val();
+                var o = optionDropDown.find("option:selected").val();
                 var f = theme_options[t][1][o];
 
                 if ( ! f ) {
