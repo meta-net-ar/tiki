@@ -104,7 +104,7 @@ const mirrorInputs = (sourceContainer) => {
     <template v-for="cssFile in cssFiles" :key="cssFile">
         <link rel="stylesheet" :href="cssFile" />
     </template>
-    <el-scrollbar :height="`calc(${height}px - 35vh)`" @end-reached="load" ref="scrollbar"></el-scrollbar>
+    <el-scrollbar :height="`calc(${height}px - 35vh)`" max-height="80vh" @end-reached="load" ref="scrollbar"></el-scrollbar>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />
     </el-icon>

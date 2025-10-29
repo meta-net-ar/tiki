@@ -32,10 +32,10 @@
     {/jq}
 {/if}
 <div>
-<ul class="searchresults">
-    {if $results->didYouMean}
-        <i>{tr}Found results for:{/tr} <b>{$results->didYouMean}</b></i>
-    {/if}
+{if $results->didYouMean}
+    <i>{tr}Found results for:{/tr} <b>{$results->didYouMean}</b></i>
+{/if}
+<ul class="searchresults" id="searchresults">
     {foreach item=result from=$results}
     <li>
         <strong>
@@ -76,5 +76,10 @@
             <li>{tr}No pages matched the search criteria{/tr} </li>
     {/foreach}
 </ul>
-{pagination_links resultset=$results}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="searchresults" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+{/if}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links resultset=$results}{/pagination_links}
+{/if}
 </div>

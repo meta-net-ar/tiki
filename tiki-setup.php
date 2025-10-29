@@ -1086,10 +1086,10 @@ if ($prefs['feature_elementplus'] == 'y') {
         list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
         $theme_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
 
-        $css = "$theme_css," . FONTAWESOME_CSS_PATH . '/all.css';
+        $css = "$theme_css," . FONTAWESOME_CSS_PATH . '/all.css' . ',themes/base_files/css/tiki_base.css';
 
         if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
-            $css .= ','. BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css';
+            $css .= ',' . BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css';
         }
 
         $headerlib->add_js_module("import registerInfiniteScroll from '@vue-widgets/el-infinite-scroll'; registerInfiniteScroll('$css');");
