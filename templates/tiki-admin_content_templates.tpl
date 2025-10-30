@@ -7,7 +7,8 @@
         {if $channels or ($find ne '')}
             {include file='find.tpl'}
         {/if}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="content-templates-table">
+            <thead>
             <tr>
                 <th>{tr}Id{/tr}</th>
                 <th>
@@ -23,7 +24,9 @@
                 {/if}
                 <th></th>
             </tr>
+            </thead>
             {cycle values="odd,even" print=false advance=false}
+            <tbody id="content-templates-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="text">{$channels[user].templateId}</td>
@@ -87,8 +90,13 @@
             {sectionelse}
                 {norecords _colspan=6}
             {/section}
+            </tbody>
         </table>
-        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="content-templates-table" target-container-id="content-templates-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {else}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
 
     {/tab}
     {if $canEdit}

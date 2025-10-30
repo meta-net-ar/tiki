@@ -26,7 +26,8 @@
 
         {include autocomplete="calendarname" file='find.tpl' find_in="<ul><li>{tr}Calendar name{/tr}</li></ul>"|strip_tags}
         <div {if $js}class="table-responsive"{/if}>
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="calendars-table">
+            <thead>
             <tr>
                 <th>
                     <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'calendarId_desc'}calendarId_asc{else}calendarId_desc{/if}">
@@ -87,7 +88,9 @@
                 {/if}
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="calendars-body">
             {foreach key=id item=cal from=$calendars}
                 <tr>
                     <td class="id">{$id}</td>
@@ -150,12 +153,18 @@
                         {/actions}
                     </td>
                 </tr>
-            {foreachelse}
-                {norecords _colspan=12}
-            {/foreach}
+                {foreachelse}
+                    {norecords _colspan=12}
+                {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="calendars-table" target-container-id="calendars-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
         </div>
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
 
         <h2>{tr}Calendar Subscriptions{/tr}</h2>
 

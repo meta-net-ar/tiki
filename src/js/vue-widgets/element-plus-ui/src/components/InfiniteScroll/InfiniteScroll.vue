@@ -15,6 +15,8 @@ const disabled = computed(() => loading.value || (offset.value + Number(props.st
 const loadUrl = computed(() => props.loadUrl || window.location.href);
 const height = ref(0);
 
+const DEFAULT_HEIGHT = 800;
+
 watchEffect(() => {
     if (!scrollbar.value) return;
     const wrapper = scrollbar.value.wrapRef.querySelector(".el-scrollbar__view");
@@ -23,7 +25,7 @@ watchEffect(() => {
         console.error(`Container with id ${props.containerId} not found`);
         return;
     }
-    height.value = originalContainer.clientHeight;
+    height.value = originalContainer.clientHeight || DEFAULT_HEIGHT;
     wrapper.appendChild(originalContainer);
 });
 

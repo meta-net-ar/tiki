@@ -208,7 +208,8 @@
     <input type="hidden" name="find" value="{$find|escape}">
     <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="banning_rules_table">
+            <thead>
             <tr>
                 <th>
                     {if $items|count > 0}
@@ -226,7 +227,9 @@
                 <th>{tr}Sections{/tr}</th>
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="banning_rules_body">
             {section name=user loop=$items}
                 <tr>
                     <td>
@@ -267,8 +270,14 @@
             {sectionelse}
                 {norecords _colspan=5 _text="{tr}No rules found{/tr}"}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="banning_rules_table" target-container-id="banning_rules_body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
