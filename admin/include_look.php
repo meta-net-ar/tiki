@@ -1125,9 +1125,10 @@ function edit_custom_mode(el,id,name,icon){
 
     var setupThemeLayouts = function (themeDropDown, optionDropDown, layoutDropDown) {
         themeDropDown,optionDropDown.on("change", function() {
-            var theme_name = themeDropDown.val();
-            if (optionDropDown.val()){
-                theme_name += ":" + optionDropDown.val();
+            var theme_option = optionDropDown.find("option:selected").val();
+            var theme_name = themeDropDown.find("option:selected").val();
+            if (theme_option){
+                theme_name += ":" + theme_option;
             }
             var layouts = theme_layouts[theme_name];
             var current = layoutDropDown.val();
