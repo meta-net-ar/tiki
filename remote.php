@@ -80,11 +80,11 @@ function check_key($key)
 
     $ip = $tikilib->get_ip_address();
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-        if(isset($prefs['known_hosts'][$key]['ip6']) and $prefs['known_hosts'][$key]['ip6'] == $ip) {
+        if (isset($prefs['known_hosts'][$key]['ip6']) and $prefs['known_hosts'][$key]['ip6'] == $ip) {
             return true;
         }
     } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        if(isset($prefs['known_hosts'][$key]['ip']) and $prefs['known_hosts'][$key]['ip'] == $ip) {
+        if (isset($prefs['known_hosts'][$key]['ip']) and $prefs['known_hosts'][$key]['ip'] == $ip) {
             return true;
         }
     } else {
