@@ -56,7 +56,7 @@
                     <th id="actions"></th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="{$ts.tableid}-body">
                 {section name=user loop=$users}
                     {if $groupname == $users[user].groupName}
                         {$href = '#'}
@@ -138,6 +138,9 @@
                 {/section}
                 </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+                <el-infinite-scroll container-id="{$ts.tableid}" target-container-id="{$ts.tableid}-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         {if !$ts.ajax}
                 </div>
                     <div class="input-group col-sm-8">
@@ -156,7 +159,7 @@
                             >
                     </div>
             </form>
-            {if !$ts.enabled}
+            {if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
                 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
             {/if}
         {/if}
@@ -601,7 +604,7 @@
                         <th id="actions"></th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="groupsMembers-body">
                     {foreach from=$memberslist item=member}
                         <tr>
                             {if $tiki_p_admin eq 'y'}
@@ -636,6 +639,9 @@
                     {/foreach}
                     </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+                    <el-infinite-scroll container-id="groupsMembers" target-container-id="groupsMembers-body" offset="{$membersOffset}" step="{$prefs.maxRecords}" total-count="{$membersCount}" offset-arg="membersOffset"></el-infinite-scroll>
+                {/if}
                 {if !$ts.ajax}
                     </div>
 
@@ -659,7 +665,7 @@
                     {/if}
                     </form>
                     </div>
-                    {if !$ts.enabled}
+                    {if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
                         {pagination_links count=$membersCount step=$prefs.maxRecords offset=$membersOffset offset_arg='membersOffset'}{/pagination_links}
                     {/if}
                 {/if}

@@ -80,7 +80,8 @@
     {include file='find.tpl'}
 {/if}
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="ad-html-p-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-admin_html_pages.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">{tr}Name{/tr}</a>
@@ -93,8 +94,10 @@
             </th>
             <th style="width:100px;"></th>
         </tr>
+        </thead>
 
 
+        <tbody id="ad-html-p-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="text">{$channels[user].pageName}</td>
@@ -130,7 +133,13 @@
         {sectionelse}
             {norecords _colspan=4}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="ad-html-p-table" target-container-id="ad-html-p-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

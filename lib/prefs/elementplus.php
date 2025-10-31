@@ -98,6 +98,9 @@ function prefs_elementplus_list()
             'default' => 'n',
             'dependencies' => [
                 'feature_elementplus'
+            ],
+            'conflicts' => [
+                'feature_jquery_tablesorter'
             ]
         ]
     ];

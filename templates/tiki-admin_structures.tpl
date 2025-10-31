@@ -77,13 +77,16 @@
         <form class="form">
             {ticket}
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="ad-struct-table">
+                    <thead>
                     <tr>
                         {if $tiki_p_admin eq 'y'}<th width="15">{select_all checkbox_names='action[]'}</th>{/if}
                         <th>{tr}Structure{/tr}</th>
                         <th></th>
                     </tr>
+                    </thead>
 
+                    <tbody id="ad-struct-body">
                     {section loop=$channels name=ix}
                         <tr>
                             {if $tiki_p_admin eq 'y'}
@@ -180,7 +183,11 @@
                     {sectionelse}
                         {if $tiki_p_admin eq 'y'}{norecords _colspan=3}{else}{norecords _colspan=2}{/if}
                     {/section}
+                    </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="ad-struct-table" target-container-id="ad-struct-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+                {/if}
             </div>
 
             {if $tiki_p_admin eq 'y'}
@@ -198,7 +205,9 @@
             </form>
         {/if}
 
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_edit_structures == 'y'}

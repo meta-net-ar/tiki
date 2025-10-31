@@ -10,7 +10,8 @@
 {/if}
 {include file='find.tpl'}
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-hover">
+    <table class="table table-hover" id="ad-menus-table">
+        <thead>
         <tr>
             <th>{self_link _sort_arg='sort_mode' _sort_field='menuId'}{tr}ID{/tr}{/self_link}</th>
             <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}</th>
@@ -18,7 +19,9 @@
             <th>{tr}Options{/tr}</th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="ad-menus-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="id">{$channels[user].menuId}</td>
@@ -86,6 +89,13 @@
         {sectionelse}
             {norecords _colspan=5}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="ad-menus-table" target-container-id="ad-menus-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

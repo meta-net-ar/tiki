@@ -131,7 +131,7 @@
                                     </tr>
                                 </thead>
                             {/if}
-                            <tbody>
+                            <tbody id="{$ts.tableid}-body">
                             {section name=user loop=$users}
                                 {if $users[user].editable}
                                     {capture assign=username}{$users[user].user|escape}{/capture}
@@ -331,6 +331,9 @@
                                 {/section}
                             </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+                            <el-infinite-scroll container-id="{$ts.tableid}" target-container-id="{$ts.tableid}-body" offset="{$offset}" step="{$numrows}" total-count="{$count}"></el-infinite-scroll>
+                        {/if}
                         {jq}
                             $document.on("show.bs.popover", function ( e ) {
                                 var itemId = $(e.target).data("itemid");
@@ -403,7 +406,7 @@
             </form>
 
 
-        {if !$ts.enabled}
+        {if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
             {pagination_links count=$count step=$numrows offset=$offset}{/pagination_links}
         {/if}
     {/if}

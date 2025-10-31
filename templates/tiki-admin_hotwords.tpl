@@ -29,7 +29,8 @@
     {include file='find.tpl'}
 {/if}
 <div class="table-responsive">
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover" id="admin-hotwords-table">
+    <thead>
     <tr>
         <th>
             <a href="tiki-admin_hotwords.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'word_desc'}word_asc{else}word_desc{/if}">{tr}Word{/tr}</a>
@@ -39,7 +40,9 @@
         </th>
         <th>{tr}Action{/tr}</th>
     </tr>
+    </thead>
 
+    <tbody id="admin-hotwords-body">
     {section name=user loop=$words}
         <tr>
             <td class="text">{$words[user].word}</td>
@@ -53,7 +56,13 @@
     {sectionelse}
         {norecords _colspan=3}
     {/section}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="admin-hotwords-table" target-container-id="admin-hotwords-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

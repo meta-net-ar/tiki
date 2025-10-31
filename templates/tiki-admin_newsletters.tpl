@@ -18,7 +18,8 @@
         {/if}
 
         <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="ad-newsletter-table">
+                <thead>
                 <tr>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='nlId'}{tr}ID{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Newsletter{/tr}{/self_link}</th>
@@ -29,7 +30,9 @@
                     <th>{self_link _sort_arg='sort_mode' _sort_field='lastSent'}{tr}Last Sent{/tr}{/self_link}</th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="ad-newsletter-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="id">{self_link cookietab='2' _anchor='anchor2' nlId=$channels[user].nlId _title="{tr}Edit{/tr}"}{$channels[user].nlId}{/self_link}</td>
@@ -86,10 +89,16 @@
                 {sectionelse}
                     {norecords _colspan=8}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-newsletter-table" target-container-id="ad-newsletter-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count_pages}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {tab name="{tr}Create/Edit Newsletters{/tr}"}

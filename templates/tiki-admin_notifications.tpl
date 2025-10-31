@@ -83,7 +83,8 @@
 <form method="get" action="tiki-admin_notifications.php">
     {ticket}
     <div class="table-responsive notifications-table">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="ad-notifications-table">
+            <thead>
             <tr>
                 <th>
                     {if $channels}
@@ -96,7 +97,9 @@
                 <th>{self_link _sort_arg="sort_mode" _sort_field="user"}{tr}User / Group{/tr}{/self_link}</th>
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="ad-notifications-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
@@ -134,7 +137,11 @@
             {sectionelse}
                 {norecords _colspan=6}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="ad-notifications-table" target-container-id="ad-notifications-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $channels}
         <br>
@@ -158,7 +165,9 @@
     {/if}
 </form>
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 {if !empty($trackers)}
     <h2>{tr}Trackers Outbound Emails{/tr}</h2>
