@@ -190,7 +190,11 @@
                         </li>
                     {/foreach}
                 </ul>
-                {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="page_list_container" offset="{$offset}" step="{$maxRecords}" total-count="{$listpages.count}"></el-infinite-scroll>
+                {else}
+                    {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {/if}
             </div>
         </div>
     </form>

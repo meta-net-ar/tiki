@@ -114,6 +114,7 @@
                         </form>
                     </div>
                 </div>
+            <div id="dirsites-content">
             {section name=ix loop=$items}
                 <div class="dirsite">
                     {if $prefs.directory_country_flag eq 'y'} <img alt="flag" src="img/flags/{$items[ix].country}.png"> {/if}
@@ -139,8 +140,14 @@
                     <span class="dirsitetrail text-info"> {tr}Added:{/tr} {$items[ix].created|tiki_short_date} {tr}Last updated:{/tr} {$items[ix].lastModif|tiki_short_date} {tr}Hits:{/tr} {$items[ix].hits} </span>
                 </div>
             {/section}
+            </div>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="dirsites-content" offset="{$offset}" step="{$prefs.directory_links_per_page}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
-        {pagination_links count=$pages_count step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
+        {/if}
     {elseif !empty($parent)}
         {tr}No records.{/tr}
     {/if}

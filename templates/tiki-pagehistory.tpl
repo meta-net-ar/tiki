@@ -149,8 +149,8 @@
         {/if}
     </form>
 
-        <div class="row mb-4">
-            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+        <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="row mb-4">
+            <div class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -160,8 +160,8 @@
                         <input type="text" name="history_pagesize" role="search" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
                         <label for="history_pagesize">{tr}rows per page{/tr}</label>
                     {/if}
-            </form>
-            <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+            </div>
+            <div class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -217,7 +217,7 @@
                     </div>
                     <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
                     {/if}
-        </div>
+            </div>
         <div>
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                 <table class="table table-condensed table-hover table-striped" id="pagehistory-table">
@@ -474,10 +474,10 @@
                         {/foreach}
                     </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && $paginate}
+                    <el-infinite-scroll container-id="pagehistory-table" target-container-id="pagehistory-body" offset="{$smarty.request.history_offset}" step="{$history_pagesize}" total-count="{$history_count}" offset-arg="history_offset" ></el-infinite-scroll>
+                {/if}
             </div>
-            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && $paginate}
-                <el-infinite-scroll container-id="pagehistory-table" target-container-id="pagehistory-body" offset="{$smarty.request.history_offset}" step="{$history_pagesize}" total-count="{$history_count}" offset-arg="history_offset" ></el-infinite-scroll>
-            {/if}
             <div class="input-group col-sm-8 mb-4">
                 <select class="form-select" name="action">
                     <option value="no_action" selected disabled>

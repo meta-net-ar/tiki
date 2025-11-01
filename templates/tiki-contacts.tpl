@@ -110,7 +110,8 @@
 
 {initials_filter_links}
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover" id="contacts-table">
+    <thead>
     <tr>
         {$numbercol=4}
         <th>
@@ -142,8 +143,10 @@
         {$numbercol=$numbercol+1}
         <th></th>
     </tr>
+    </thead>
 
 
+    <tbody id="contacts-body">
     {foreach key=k item=channels from=$all}
         {if count($channels)}
             {if $view neq 'list'}
@@ -239,10 +242,16 @@
             {norecords _colspan=$numbercol}
         {/if}
     {/foreach}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="contacts-table" target-container-id="contacts-body" offset="{$offset}" step="{$maxRecords}" total-count="{$total_contact}"></el-infinite-scroll>
+{/if}
 </div>
 
-{pagination_links count=$total_contact step=$maxRecords offset=$offset clean='y'}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$total_contact step=$maxRecords offset=$offset clean='y'}{/pagination_links}
+{/if}
 
 {literal}
 <script type="text/javascript">

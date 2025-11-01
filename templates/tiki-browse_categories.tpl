@@ -148,7 +148,8 @@
         {tab name="{tr}Objects{/tr}"}
             <div class="catobj">
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="browser-categ-table">
+                        <thead>
                         <tr>
                             <th>
                                 {tr}Name{/tr}
@@ -162,7 +163,9 @@
                                 </th>
                             {/if}
                         </tr>
+                        </thead>
 
+                        <tbody id="browser-categ-body">
                         {section name=ix loop=$objects}
                             <tr>
                                 <td class="text">
@@ -187,11 +190,17 @@
                                 {norecords _colspan=2}
                             {/if}
                         {/section}
+                        </tbody>
                     </table>
+                    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                        <el-infinite-scroll container-id="browser-categ-table" target-container-id="browser-categ-body" offset="{$offset}" step="{$maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+                    {/if}
                 </div>
             </div>
 
-            {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+            {/if}
         {/tab}
     {/tabset}
 {else}

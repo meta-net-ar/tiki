@@ -5,13 +5,16 @@
         <h2>{tr}List{/tr}</h2>
         <a href="tiki-switch_perspective.php">{tr}Return to the default perspective{/tr}</a>
         <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="edit-perspective-table">
+                <thead>
                 <tr>
                     <th>{tr}Perspective{/tr}</th>
                     <th>{tr}Preferences{/tr}</th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="edit-perspective-body">
                 {foreach from=$perspectives item=persp}
                     <tr>
                         <td class="text">
@@ -71,9 +74,15 @@
                         </td>
                     </tr>
                 {/foreach}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="edit-perspective-table" target-container-id="edit-perspective-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count}"></el-infinite-scroll>
+            {/if}
         </div>
-        {pagination_links offset=$offset step=$prefs.maxRecords count=$count}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links offset=$offset step=$prefs.maxRecords count=$count}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_perspective_create eq 'y'}

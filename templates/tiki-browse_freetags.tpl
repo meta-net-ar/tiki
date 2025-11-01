@@ -213,8 +213,8 @@
         <h4>{tr}Results{/tr} <span class="badge bg-secondary">{$objects_count}</span></h4>
     {/if}
     {if $objects_count > 0}
-        <table class="table table-hover">
-            <tbody>
+        <table class="table table-hover" id="browser-freetags-table">
+            <tbody id="browser-freetags-body">
                 {section name=ix loop=$objects}
                     <tr class="{cycle} freetagitemlist">
                         <td>
@@ -244,6 +244,10 @@
                 {/section}
             </tbody>
         </table>
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="browser-freetags-table" target-container-id="browser-freetags-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {else}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/if}
 </div>

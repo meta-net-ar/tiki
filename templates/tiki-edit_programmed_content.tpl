@@ -75,13 +75,17 @@
 {/if}
 
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table">
+    <table class="table" id="edit-pr-content-table">
+        <thead>
         <tr>
             <th>{self_link _sort_arg='sort_mode' _sort_field='pId'}{tr}Id{/tr}{/self_link}</th>
             <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate'}{tr}Publishing Date{/tr}{/self_link}</th>
             <th>{self_link _sort_arg='sort_mode' _sort_field='data'}{tr}Data{/tr}{/self_link}</th>
             <th></th>
         </tr>
+        </thead>
+
+        <tbody id="edit-pr-content-body">
         {section name=changes loop=$listpages}
             {if $actual eq $listpages[changes].publishDate}
                 {$class=third}
@@ -123,7 +127,13 @@
         {sectionelse}
             {norecords _colspan=4}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="edit-pr-content-table" target-container-id="edit-pr-content-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

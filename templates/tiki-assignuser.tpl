@@ -78,14 +78,17 @@
 <form method="post" action="tiki-assignuser.php{if $assign_user}?assign_user={$assign_user|escape:'url'}{/if}">
     {ticket}
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="assignuser-table">
+            <thead>
             <tr>
                 <th><a href="tiki-assignuser.php?{if $assign_user}assign_user={$assign_user|escape:url}&amp;{/if}offset={$offset}&amp;maxRecords={$prefs.maxRecords}&amp;sort_mode={if $sort_mode eq 'groupName_desc'}groupName_asc{else}groupName_desc{/if}">{tr}Name{/tr}</a></th>
                 <th><a href="tiki-assignuser.php?{if $assign_user}assign_user={$assign_user|escape:url}&amp;{/if}offset={$offset}&amp;maxRecords={$prefs.maxRecords}&amp;sort_mode={if $sort_mode eq 'groupDesc_desc'}groupDesc_asc{else}groupDesc_desc{/if}">{tr}Description{/tr}</a></th>
                 <th>{tr}Expiration{/tr}</th>
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="assignuser-body">
             {section name=user loop=$users}
                 {if $users[user].groupName != 'Anonymous'}
                     <tr>
@@ -120,8 +123,14 @@
                     </tr>
                 {/if}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="assignuser-table" target-container-id="assignuser-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}" />
 </form>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

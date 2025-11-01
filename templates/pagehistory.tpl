@@ -48,6 +48,7 @@
                     </td>
                 {else}
                     <td colspan="2">
+                        Show versions: {$show_all_versions}
                         {if isset($show_all_versions) and $show_all_versions eq "n"}
                             {pagination_links count=$ver_count offset=$smarty.request.oldver_idx offset_arg="oldver_idx" itemname="{tr}Old Session{/tr}" show_numbers="n"}{/pagination_links}
                         {else}

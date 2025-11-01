@@ -13,7 +13,8 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
     {ticket}
     <br>
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="dir-validate-sites-table">
+            <thead>
             <tr>
                 <th>
                     {if $items}
@@ -27,7 +28,9 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
                 <th><a href="tiki-directory_validate_sites.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'hits_desc'}hits_asc{else}hits_desc{/if}">{tr}Hits{/tr}</a></th>
                 <th>{tr}Action{/tr}</th>
             </tr>
+            </thead>
 
+            <tbody id="dir-validate-sites-body">
             {section name=user loop=$items}
                 <tr class="{cycle advance=false}">
                     <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="sites[{$items[user].siteId}]" required></td>
@@ -72,7 +75,11 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
             {sectionelse}
                 {norecords _colspan=6}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="dir-validate-sites-table" target-container-id="dir-validate-sites-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 
     {if $items}
@@ -104,4 +111,7 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
         }
     });
 {/jq}
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

@@ -26,6 +26,9 @@ watchEffect(() => {
         return;
     }
     height.value = originalContainer.clientHeight || DEFAULT_HEIGHT;
+
+    mirrorInputs(originalContainer);
+
     wrapper.appendChild(originalContainer);
 });
 
@@ -88,6 +91,12 @@ const mirrorInputs = (sourceContainer) => {
             }
             mirror.dispatchEvent(new Event("change"));
         });
+
+        if (input.type === "submit" || input.type === "button") {
+            input.addEventListener("click", () => {
+                mirror.click();
+            });
+        }
 
         // sync back independent mirror changes (usually triggered programmatically) to the original input
         $(mirror).on("change", () => {

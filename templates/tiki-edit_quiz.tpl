@@ -14,7 +14,8 @@
         <h2>{tr}Quizzes{/tr}</h2>
         {include file='find.tpl'}
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="edit-quiz-table">
+                <thead>
                 <tr>
                     <th>
                         {self_link _sort_arg='sort_mode' _sort_field='quizId'}{tr}ID{/tr}{/self_link}
@@ -32,6 +33,9 @@
                     <th>{tr}Results{/tr}</th>
                     <th></th>
                 </tr>
+                </thead>
+
+                <tbody id="edit-quiz-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="id">{$channels[user].quizId}</td>
@@ -84,9 +88,15 @@
                     {sectionelse}
                     {norecords _colspan=7}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="edit-quiz-table" target-container-id="edit-quiz-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
-    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
     {tab name="{tr}Create/edit quizzes{/tr}"}
         <h2>{tr}Create/edit quizzes{/tr}</h2>
