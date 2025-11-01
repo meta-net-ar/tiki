@@ -29,7 +29,8 @@ class RestoreVendors
         // get back previously "cleaned" widget-output.js for tablesorter export
         $package = $repoManager->findPackages('mottie/tablesorter');
 
-        if (! file_exists($vendors . 'mottie/tablesorter/js/widgets/widget-output.js') && ! empty($package[0])) {
+        if (! file_exists($vendors . 'mottie/tablesorter/dist/js/jquery.tablesorter.combined.js') && ! empty($package[0])) {
+            // tablesorter moved from js to dist/js around v2.32 and tiki v27.4
             $repoManager->removePackage($package[0]);
         }
     }

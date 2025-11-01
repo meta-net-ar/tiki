@@ -633,16 +633,16 @@ if ($prefs['feature_jquery_reflection'] == 'y') {
     $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/reflection-jquery/js/reflection.js');
 }
 if ($prefs['feature_jquery_tablesorter'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/jquery.tablesorter.combined.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/parsers/parser-input-select.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-columnSelector.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-filter-formatter-jui.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-grouping.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-math.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-pager.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-output.js'); // APTITUDE NEEDS THIS
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/jquery.tablesorter.combined.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/parsers/parser-input-select.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-columnSelector.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-grouping.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-math.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-pager.min.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-output.min.js'); // APTITUDE NEEDS THIS
     //currently only working when ajax is not used
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-sort2Hash.js');
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/dist/js/widgets/widget-sort2Hash.min.js');
     $headerlib->add_jsfile('lib/jquery_tiki/tablesorter.js');
 }
 
