@@ -604,11 +604,13 @@ function createRegressionInfo($package, $prev, $current, $prevVersion, $currentV
 
 /**
  * Check if version downgrade is mitigated
+ * Only the downgrade target (toVersion) needs to be mitigated, not the source version
  */
 function isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap)
 {
-    return isPackageIgnored($package, $fromVersion, $ignoreMap) &&
-           isPackageIgnored($package, $toVersion, $ignoreMap);
+    // Only check if the downgrade target (toVersion) is mitigated
+    // The fromVersion is the good/higher version and doesn't need mitigation
+    return isPackageIgnored($package, $toVersion, $ignoreMap);
 }
 
 /**
@@ -1233,7 +1235,10 @@ function generateStableRegressionsReport($stableRegressions, $versionsToCheck, $
         if ($hasWarnings || $hasUnmitigatedDowngrade) {
             $icon = '⚠️';
             $status = ' [WARNING]';
-        } elseif ($allVersionsMitigated) {
+        } elseif ($allVersionsMitigated || (! $hasUnmitigatedDowngrade && isset($data['regression_info']))) {
+            // Show [MITIGATED] if:
+            // 1. All unstable versions are mitigated, OR
+            // 2. There's a downgrade but it IS mitigated
             $status = ' [MITIGATED]';
         }
 
@@ -1271,11 +1276,12 @@ function printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade
         // Check if this specific version has the package mitigated
         $versionMitigated = isPackageIgnored($package, $tikiVersion, $ignoreMap);
 
-        // Check if this version is part of an unmitigated downgrade
+        // Check if this version is the TARGET of an unmitigated downgrade (not the source)
         $isPartOfUnmitigatedDowngrade = false;
         if (isset($data['regression_info']) && $hasUnmitigatedDowngrade) {
             $regressionInfo = $data['regression_info'];
-            if ($tikiVersion === $regressionInfo['from_tiki'] || $tikiVersion === $regressionInfo['to_tiki']) {
+            // Only mark the "to" version (downgrade target) as WARNING, not the "from" version (which is the better version)
+            if ($tikiVersion === $regressionInfo['to_tiki']) {
                 $isPartOfUnmitigatedDowngrade = true;
             }
         }
@@ -1525,6 +1531,19 @@ function analyzePackageCurrentBranch($package, $history, $metadata, $currentBran
             // Issue exists in baseline AND baseline is unstable - check if current branch makes it worse
             $baselineStability = $baselineAnalysis['stability'] ?? 'unknown';
             $baselineVersion = $baselineAnalysis['version'] ?? 'unknown';
+            $baselineWasMitigated = $baselineAnalysis['is_ignored'] ?? false;
+            $currentIsMitigated = isPackageIgnored($package, $currentBranch, $ignoreMap);
+
+            // Check if current branch loses the mitigation
+            if ($baselineWasMitigated && ! $currentIsMitigated) {
+                return [
+                    'package' => $package,
+                    'type' => 'new_issue',
+                    'stability' => $currentStability,
+                    'version' => $currentConstraint,
+                    'reason' => 'Mitigation lost - package was mitigated in baseline but not in current branch'
+                ];
+            }
 
             if (getStabilityNumeric($currentStability) < getStabilityNumeric($baselineStability)) {
                 return [
@@ -1536,15 +1555,21 @@ function analyzePackageCurrentBranch($package, $history, $metadata, $currentBran
                     'current_version' => $currentConstraint
                 ];
             }
-            // Note: existing issues are already counted above when scanning baseline
+            // Note: existing issues are already counted above when scanning baseline (if still mitigated or same)
         } else {
             // New issue introduced by current branch (either no baseline analysis or baseline was stable)
-            return [
-                'package' => $package,
-                'type' => 'new_issue',
-                'stability' => $currentStability,
-                'version' => $currentConstraint
-            ];
+            // Check if the new unstable package is mitigated
+            $currentIsMitigated = isPackageIgnored($package, $currentBranch, $ignoreMap);
+
+            if (! $currentIsMitigated) {
+                return [
+                    'package' => $package,
+                    'type' => 'new_issue',
+                    'stability' => $currentStability,
+                    'version' => $currentConstraint
+                ];
+            }
+            // If mitigated, don't flag it (it's a documented decision)
         }
     }
 
@@ -1740,7 +1765,8 @@ if ($isCiMode) {
                     case 'new_issue':
                         $stability = $issue['stability'] ?? 'unknown';
                         $version = $issue['version'] ?? 'unknown';
-                        echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability})\n";
+                        $reason = isset($issue['reason']) ? " - {$issue['reason']}" : "";
+                        echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability}){$reason}\n";
                         break;
                     case 'worsened_existing':
                         $baselineStability = $issue['baseline_stability'] ?? 'unknown';
