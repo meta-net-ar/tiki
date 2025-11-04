@@ -15,7 +15,8 @@
     {query _type='form_input'}
 {/if}
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table">
+    <table class="table" id="posts-table">
+        <thead>
         <tr>
             {if $posts and $tiki_p_blog_admin eq 'y'}
                 <td>  {* Changed from th to prevent ARIA empty header error *}
@@ -39,8 +40,9 @@
             </th>
             <td></td>  {* Changed from th to prevent ARIA empty header error *}
         </tr>
+        </thead>
 
-
+        <tbody id="posts-body">
         {section name=changes loop=$posts}{$id=$posts[changes].postId}
             <tr>
                 <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$id}"></td>
@@ -87,7 +89,11 @@
         {sectionelse}
             {norecords _colspan=7}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="posts-table" target-container-id="posts-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
 
 {if $posts and $tiki_p_blog_admin eq 'y'}
@@ -103,4 +109,6 @@
     </form>
 {/if}
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

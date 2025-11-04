@@ -4,7 +4,8 @@
 
 {include file='find.tpl' autocomplete="username"}
 
-<table bgcolor="#ffffff" class="table normal">
+<table bgcolor="#ffffff" class="table normal" id="users-table">
+    <thead>
     <tr>
         <th><a href="tiki-list_users.php?offset={$offset}&amp;find={$find}&amp;sort_mode={if $sort_mode eq 'login_desc'}login_asc{else}login_desc{/if}" class="userlistheading" style="color: White;">{tr}User{/tr}</a>&nbsp;</th>
         {if $prefs.feature_community_list_name eq 'y' and $prefs.user_show_realnames neq 'y'}
@@ -18,7 +19,9 @@
         {/if}
         {if $prefs.feature_community_list_distance eq 'y'}<th>{tr}Distance (km){/tr}&nbsp;</th>{/if}
     </tr>
+    </thead>
 
+    <tbody id="users-body">
     {section name=changes loop=$listusers}
         <tr>
             <td class="username">&nbsp;{$listusers[changes].login|userlink}&nbsp;</td>
@@ -44,6 +47,11 @@
     {sectionelse}
         {norecords _colspan=5}
     {/section}
+    </tbody>
 </table>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="users-table" target-container-id="users-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{else}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

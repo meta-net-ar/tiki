@@ -178,7 +178,7 @@
             </thead>
         {/if}
 
-        <tbody>
+        <tbody id="{$ts.tableid}-body">
 
             {section name=changes loop=$listpages}
 
@@ -422,6 +422,9 @@
             {/section}
         </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+        <el-infinite-scroll container-id="{$ts.tableid}" target-container-id="{$ts.tableid}-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}" offset-arg="{$offset_arg}"></el-infinite-scroll>
+    {/if}
 </div>
 {if isset($ts.enabled) }
     <script>
@@ -495,7 +498,7 @@
     {if $checkboxes_on eq 'y'}
         </form>
     {/if}
-    {if !isset($ts.enabled) or !$ts.enabled}
+    {if !isset($ts.enabled) or !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
         {if $pluginlistpages eq 'y'}
             {if $pagination eq 'y'}
                 {pagination_links count=$count step=$maxRecords offset=$offset offset_arg=$offset_arg clean=$clean}{/pagination_links}

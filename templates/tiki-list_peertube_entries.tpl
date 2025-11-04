@@ -35,7 +35,7 @@
     {/if}
 
     <div class="{if $js}table-responsive{/if}"> 
-        <table class="table table-striped">
+        <table class="table table-striped" id="peertube-entries-table">
             <thead>
                 <tr>
                     <th></th>
@@ -53,7 +53,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="peertube-entries-body">
                 {section name=ix loop=$klist}
                     {capture assign=pt_content}
                         <div class="text-start" style="max-width:380px">
@@ -163,6 +163,9 @@
                 {/section}
             </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="peertube-entries-table" target-container-id="peertube-entries-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
 
     {if $paginationBar}
@@ -172,7 +175,9 @@
     <p>{tr}No videos found.{/tr}</p>
 {/if}
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 {jq}
     $('.pt-popover').each(function () {

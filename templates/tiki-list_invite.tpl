@@ -52,7 +52,8 @@
 {tr}Number of invitations:{/tr} {$count}
 {if $count > 0}
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="invite-table">
+            <thead>
             <tr>
                 {if $tiki_p_admin eq 'y'}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='inviter'}{tr}Inviter{/tr}{/self_link}</th>
@@ -61,7 +62,9 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='email'}{tr}Email{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='status'}{tr}Status{/tr}{/self_link}</th>
             </tr>
+            </thead>
 
+            <tbody id="invite-body">
             {foreach item=invited from=$inviteds}
                 <tr>
                     {if $tiki_p_admin eq 'y'}
@@ -72,8 +75,14 @@
                     <td class="text">{$invited.used|escape}</td>
                 </tr>
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="invite-table" target-container-id="invite-body" offset="{$offset}" step="{$max}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
 {/if}
 
-{pagination_links count=$count step=$max offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$max offset=$offset}{/pagination_links}
+{/if}

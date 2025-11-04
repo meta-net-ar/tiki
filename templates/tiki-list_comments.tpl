@@ -13,7 +13,8 @@
 {$numbercol=2}
 
         <div class="{if $js}table-responsive{/if} comment-table"> {*the table-responsive class cuts off dropdown menus *}
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover" id="comments-table">
+    <thead>
     <tr>
         {if $comments}
             <td>
@@ -38,7 +39,9 @@
         {/if}
         <td></td>
     </tr>
+    </thead>
 
+    <tbody id="comments-body">
     {section name=ix loop=$comments}{$id=$comments[ix].threadId}
         <tr class="{cycle}{if $prefs.feature_comments_moderation eq 'y'} post-approved-{$comments[ix].approved}{/if}">
             <td class="checkbox-cell"><div class="form-check"><input type="checkbox" class="form-check-input" name="checked[]" value="{$id}" {if isset($rejected[$id]) }checked="checked"{/if}></div></td>
@@ -163,7 +166,11 @@
     {sectionelse}
         {norecords _colspan=$numbercol}
     {/section}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="comments-table" target-container-id="comments-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+{/if}
 </div>
 
 {if $comments}
@@ -211,4 +218,6 @@
     </form>
 {/if}
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

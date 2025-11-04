@@ -64,7 +64,8 @@
     {/if}
 
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table table-condensed table-hover table-striped">
+        <table class="table table-condensed table-hover table-striped" id="trackers-table">
+            <thead>
             <tr>
                 <th class="id text-center">{self_link _sort_arg='sort_mode' _sort_field='trackerId'}{tr}Id{/tr}{/self_link}
                 </th>
@@ -83,7 +84,9 @@
                 {/if}
                 <td></td> {* Changed from th to td to prevent ARIA empty header error *}
             </tr>
+            </thead>
 
+            <tbody id="trackers-body">
             {foreach from=$trackers item=tracker}
                 <tr>
                     <td class="id text-center">
@@ -280,9 +283,15 @@
                     {norecords _colspan=6}
                 {/if}
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="trackers-table" target-container-id="trackers-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {/if}
 
     {jq}
     $(document).on('click', '.remove.confirm-prompt', $.clickModal({

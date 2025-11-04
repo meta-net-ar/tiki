@@ -18,8 +18,9 @@
 {ticket}
     <input type="hidden" name="maxRecords" value="{$maxRecords|escape}">
     <div class="table-responsive"> {*the table-responsive class cuts off dropdown menus when chosen is selected*}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="submissions-table">
             {$numbercol=0}
+            <thead>
             <tr>
                 {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'}
                     <th class="auto">
@@ -71,7 +72,9 @@
                 {$numbercol=$numbercol+1}
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="submissions-body">
             {section name=changes loop=$listpages}
                 <tr>
                     {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'}
@@ -141,7 +144,9 @@
                 {$numbercol=$numbercol+1}
                 {norecords _colspan=$numbercol}
             {/section}
+            </tbody>
             {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'} 
+                <tbody>
                 <tr>
                     <td colspan="{$numbercol+1}">
                         {if $listpages}
@@ -151,8 +156,12 @@
                         {/if}
                     </td>
                 </tr>
+                </tbody>
             {/if}
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="submissions-table" target-container-id="submissions-body" offset="{$offset}" step="{$maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'}
         <div>
@@ -167,7 +176,9 @@
         </div>
     {/if}
 
-    {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+    {/if}
 </form>
 {jq}
     var checkboxes = $('.checkboxes');

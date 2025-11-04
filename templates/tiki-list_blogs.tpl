@@ -14,8 +14,9 @@
 {/if}
 
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-    <table class="table table-striped normal">
+    <table class="table table-striped normal" id="blogs-table">
         {$numbercol=0}
+        <thead>
         <tr>
             {if $prefs.blog_list_title eq 'y' or $prefs.blog_list_description eq 'y'}
                 {$numbercol=$numbercol+1}
@@ -48,6 +49,9 @@
             {$numbercol=$numbercol+1}
             <td></td> {* empty th changed to td to avoid ARIA error *}
         </tr>
+        </thead>
+
+        <tbody id="blogs-body">
         {section name=changes loop=$listpages}
             <tr>
                 {if $prefs.blog_list_title eq 'y' or $prefs.blog_list_description eq 'y'}
@@ -157,6 +161,12 @@
         {sectionelse}
             {norecords _colspan=$numbercol}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="blogs-table" target-container-id="blogs-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

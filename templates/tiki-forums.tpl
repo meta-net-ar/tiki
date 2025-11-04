@@ -103,7 +103,7 @@
             </tr>
         </thead>
         {/block}
-        <tbody>
+        <tbody id="{$ts.tableid}-body">
             {$section_old=""}
             {section name=user loop=$channels}
                 {$section=$channels[user].section}
@@ -192,7 +192,10 @@
             {/section}
         </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+        <el-infinite-scroll container-id="{$ts.tableid}" target-container-id="{$ts.tableid}-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
-{if !$ts.enabled}
+{if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
     {pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 {/if}

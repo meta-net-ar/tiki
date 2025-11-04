@@ -28,7 +28,8 @@
     <input type="hidden" name="offset" value="{$offset|escape}">
     <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
     <input type="hidden" name="find" value="{$find|escape}">
-    <table class="table table-hover">
+    <table class="table table-hover" id="forums-reported-table">
+        <thead>
         <tr>
             {if $items}
                 <th></th>
@@ -36,7 +37,9 @@
             <th>{tr}Message{/tr}</th>
             <th>{tr}Reported by{/tr}</th>
         </tr>
+        </thead>
 
+        <tbody id="forums-reported-body">
         {section name=ix loop=$items}
             <tr>
                 <td class="checkbox-cell">
@@ -52,7 +55,11 @@
         {sectionelse}
             {norecords _colspan=2}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="forums-reported-table" target-container-id="forums-reported-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
     {if $items}
         {tr}Perfom action with checked:{/tr} <input type="submit" class="btn btn-warning btn-sm" name="del" value=" {tr}Un-report{/tr} ">
     {/if}
@@ -60,4 +67,6 @@
 </form>
 {* END OF LISTING *}
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
