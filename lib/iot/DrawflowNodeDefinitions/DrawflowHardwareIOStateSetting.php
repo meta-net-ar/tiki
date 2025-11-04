@@ -37,7 +37,7 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
 
     public function getType(): DrawflowNodeType
     {
-        return DrawflowNodeType::User_input;
+        return DrawflowNodeType::User_hardware_io_setting;
     }
 
     public function getTemplate(array $config): string
@@ -45,25 +45,14 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
         return "
         <div class='{$this->node_identifier} draggable-node'>
             <div class='text-center'><span><span data-icon-name='microchip'></span>&nbsp;" . tra("Hardware I/O State Setting") . "</span></div>
-            <input type='text' 
-                   name='io[id]' 
-                   df-{$this->node_df_identifier}-io-id
-                   needs-element-plus='false'  
-                   class='form-control' 
-                   placeholder='" . tra("Enter I/O ID") . "'
-                   required>
-            <select name='io[state]' 
-                    df-{$this->node_df_identifier}-io-state 
-                    needs-element-plus='false' 
-                    class='noselect2'
-                    required>
-                <option value=''>" . tra('Select State') . "</option>
+            <input type='text' df-{$this->node_df_identifier}-io-id class='form-control' placeholder='" . tra("Enter I/O ID (based on your hardware lib configuration)") . "'>
+            <select df-{$this->node_df_identifier}-io-state>
                 <option value='ON'>" . tra('ON') . "</option>
                 <option value='OFF'>" . tra('OFF') . "</option>
             </select>
             <div class='mb-3'>
                 <label>" . tra('Default State') . "</label>
-                <select df-{$this->node_df_identifier}-io-defaultstate needs-element-plus='false'> <!-- must be two words only,that the default drawflow behaviour follows -->
+                <select df-{$this->node_df_identifier}-io-defaultstate> <!-- must be two words only,that the default drawflow behaviour follows -->
                     <option value='ON'>" . tra('ON') . "</option>
                     <option value='OFF'>" . tra('OFF') . "</option>
                 </select>
@@ -78,19 +67,38 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
 
     public function execute(mixed $input, mixed $user_input): bool | array
     {
-        // Placeholder implementation for setting the state of the hardware I/O based on the selected ID and state
-        if (! $input["success"] || empty($user_input)) {
-            $input['message'] = tra("IO status update skipped");
-            // check if current io state in database is null, if it is, we need to set the default state
-            $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], 'exception');
-            $current_state_array = json_decode($current_state, true);
-            if (empty($current_state_array[$user_input['io']['id']])) {
-                $current_state_array[$user_input['io']['id']]['state'] = $user_input['io']['defaultstate'];
+
+        $io_id = null;
+        $io_state = null;
+        $io_defaultstate = null;
+
+        foreach (json_decode($user_input, true) as $key => $value) {
+            if (is_array($value) && isset($value['io']['id']) && isset($value['io']['state']) && isset($value['io']['defaultstate'])) {
+                $io_id = $value['io']['id'];
+                $io_state = $value['io']['state'];
+                $io_defaultstate = $value['io']['defaultstate'];
+            }
+        }
+
+        if (! $input["success"] || empty($io_id) || empty($io_state) || empty($io_defaultstate)) {
+            try {
+                $input['message'] = tra("IO status set to default");
+                $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], 'exception');
+                $current_state_array = json_decode($current_state, true);
+
+                if (empty($current_state_array[$io_id]) || $current_state_array[$io_id] == 'null') {
+                    $current_state_array[$io_id]['state'] = $io_defaultstate;
+                }
+                $current_state_array[$io_id]['hardware_sync_done'] = false;
+                \TikiDb::get()->query("UPDATE `tiki_iot_apps` SET `state_object`=? WHERE `app_uuid`=?", [json_encode($current_state_array),$this->app_uuid]);
+                $input['message'] = tra('IO status scheduled to be changed: ') . $io_id . ' => ' . $io_state;
+                $input['success'] = $input['success'];
+        } catch (\Exception $e) {
+                $input['message'] = tra("Couldn't update IO status: ") . $e->getMessage();
+                $input['success'] = false;
             }
             return $input;
         }
-        $io_id = $user_input['io']['id'];
-        $io_state = $user_input['io']['state'];
         try {
             $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], 'exception');
             $current_state_array = json_decode($current_state, true);

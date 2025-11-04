@@ -174,7 +174,11 @@ class DrawflowProcessor
                 $inter_node_value = $node->execute($inter_node_value, $html);
             }
             if ($node_type == DrawflowNodeType::User_input) {
-                $user_flow_data = array_values($data)[0];
+                $user_flow_data = array_values($data)[0] ?? ""; //if no data, we pass empty string, the execute method support empty string as 2nd parameter
+                $inter_node_value = $node->execute($inter_node_value, $user_flow_data);
+            }
+            if ($node_type == DrawflowNodeType::User_hardware_io_setting) {
+                $user_flow_data = json_encode($data); //we need the full array not only first value
                 $inter_node_value = $node->execute($inter_node_value, $user_flow_data);
             }
             $this->outputs_track[$node_id] = $inter_node_value; //we save the output
