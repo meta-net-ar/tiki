@@ -56,7 +56,7 @@ class Sefurl
                 break;
 
             case 'calendaritem':
-                $href = "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=$source";
+                $href = $sefurl ? "tiki-calendar-view_item?calitemId=$source" : "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=$source";
                 break;
 
             case 'calendar event':
