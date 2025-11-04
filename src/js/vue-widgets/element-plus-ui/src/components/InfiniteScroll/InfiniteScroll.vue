@@ -9,11 +9,12 @@ const cssFiles = computed(() => props._cssFiles.split(","));
 const scrollbar = ref(null);
 const loading = ref(false);
 const offset = ref(Number(props.offset) || 0);
+const height = ref(0);
+const itemsCount = ref(0);
 
 const container = computed(() => scrollbar.value.wrapRef?.querySelector(`#${props.containerId}`));
 const disabled = computed(() => loading.value || (offset.value + Number(props.step)) >= Number(props.totalCount));
 const loadUrl = computed(() => props.loadUrl || window.location.href);
-const height = ref(0);
 
 const DEFAULT_HEIGHT = 800;
 
@@ -28,6 +29,8 @@ watchEffect(() => {
     height.value = originalContainer.clientHeight || DEFAULT_HEIGHT;
 
     mirrorInputs(originalContainer);
+
+    itemsCount.value = originalContainer.querySelector(`#${props.targetContainerId}`)?.childElementCount || originalContainer.childElementCount;
 
     wrapper.appendChild(originalContainer);
 });
@@ -115,7 +118,7 @@ const mirrorInputs = (sourceContainer) => {
     <template v-for="cssFile in cssFiles" :key="cssFile">
         <link rel="stylesheet" :href="cssFile" />
     </template>
-    <el-scrollbar :height="`calc(${height}px - 35vh)`" max-height="80vh" @end-reached="load" ref="scrollbar"></el-scrollbar>
+    <el-scrollbar :height="itemsCount >= Number(step) && itemsCount < Number(totalCount) && `calc(${height}px - 35vh)`" max-height="80vh" @end-reached="load" ref="scrollbar"></el-scrollbar>
     <el-icon class="is-loading infinite-list-loader" v-if="loading">
         <Loading />
     </el-icon>
