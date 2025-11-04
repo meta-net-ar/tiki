@@ -324,11 +324,11 @@ if (isset($_REQUEST['page'])) {
             $admin_icon = array_merge([ 'disabled' => false, 'description' => ''], $admin_icon);
         }
         if (isset($admin_icons[$adminPage])) {
-            $admin_icon = $admin_icons[$adminPage];
+            $current_admin_icon = $admin_icons[$adminPage];
 
-            $admintitle = $admin_icon['title'];
-            $description = isset($admin_icon['description']) ? $admin_icon['description'] : '';
-            $helpUrl = isset($admin_icon['help']) ? $admin_icon['help'] : '';
+            $admintitle = $current_admin_icon['title'];
+            $description = isset($current_admin_icon['description']) ? $current_admin_icon['description'] : '';
+            $helpUrl = isset($current_admin_icon['help']) ? $current_admin_icon['help'] : '';
         }
     }
     $helpDescription = tr("Help on %0 Config", $admintitle);
