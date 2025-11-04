@@ -86,7 +86,7 @@ const mirrorInputs = (sourceContainer) => {
         mirror.style.display = "none";
         targetContainer.appendChild(mirror);
 
-        input.addEventListener("change", () => {
+        $(input).on("change", () => {
             if (mirror.type === "checkbox" || mirror.type === "radio") {
                 mirror.checked = input.checked;
             } else {
