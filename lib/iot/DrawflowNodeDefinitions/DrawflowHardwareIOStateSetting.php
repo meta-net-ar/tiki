@@ -93,7 +93,7 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
                 \TikiDb::get()->query("UPDATE `tiki_iot_apps` SET `state_object`=? WHERE `app_uuid`=?", [json_encode($current_state_array),$this->app_uuid]);
                 $input['message'] = tra('IO status scheduled to be changed: ') . $io_id . ' => ' . $io_state;
                 $input['success'] = $input['success'];
-        } catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $input['message'] = tra("Couldn't update IO status: ") . $e->getMessage();
                 $input['success'] = false;
             }
