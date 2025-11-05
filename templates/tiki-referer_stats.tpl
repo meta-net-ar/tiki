@@ -13,7 +13,8 @@
 {include file='find.tpl'}
 
 <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="referer-stats-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-referer_stats.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'referer_desc'}referer_asc{else}referer_desc{/if}">{tr}Domain{/tr}</a>
@@ -25,7 +26,9 @@
                 <a href="tiki-referer_stats.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'last_desc'}last_asc{else}last_desc{/if}">{tr}Last{/tr}</a>
             </th>
         </tr>
+        </thead>
 
+        <tbody id="referer-stats-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="text"><a href="{$channels[user].lasturl}" target="_blank">{$channels[user].referer}</a></td>
@@ -35,7 +38,13 @@
         {sectionelse}
             {norecords _colspan=3}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="referer-stats-table" target-container-id="referer-stats-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

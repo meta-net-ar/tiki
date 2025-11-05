@@ -16,6 +16,7 @@
         {listfilter selectors='#plugins_list tr.odd,#plugins_list tr.even'}
         <div {if $js}class="table-responsive"{/if}>
             <table class="table table-hover table-striped" id="plugins_list">
+                <thead>
                 <tr>
                     <th>{select_all checkbox_names='clear[]'}</th>
                     <th>{tr}Plugin{/tr} </th>
@@ -25,6 +26,9 @@
                     <th>{tr}Plugin body{/tr} </th>
                     <th></th>
                 </tr>
+                </thead>
+
+                <tbody id="plugins_list-body">
                 {foreach name=foo from=$plugin_list item=plugin}
                     <tr>
                         <td class="checkbox-cell"><input type="checkbox" class="form-check-input" name="clear[]" value="{$plugin.fingerprint|escape}" id="{$plugin.fingerprint|escape}"></td>
@@ -66,9 +70,15 @@
                         </td>
                     </tr>
                 {/foreach}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="plugins_list" target-container-id="plugins_list-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count_pages}"></el-infinite-scroll>
+            {/if}
         </div>
-        {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
 
         <p>
             <label for="submit_mult">{tr}Perform action with checked:{/tr}</label>

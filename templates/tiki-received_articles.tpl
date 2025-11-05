@@ -171,7 +171,8 @@
         {include file='find.tpl'}
     {/if}
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="received-articles-table">
+            <thead>
             <tr>
                 <th>
                     <a href="tiki-received_articles.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'receivedArticleId_desc'}receivedArticleId_asc{else}receivedArticleId_desc{/if}">{tr}ID{/tr}</a>
@@ -190,7 +191,9 @@
                 </th>
                 <th></th>
             </tr>
+            </thead>
 
+            <tbody id="received-articles-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="id">{$channels[user].receivedArticleId}</td>
@@ -219,7 +222,13 @@
             {sectionelse}
                 {norecords _colspan=6}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="received-articles-table" target-container-id="received-articles-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {/if}
 </div>

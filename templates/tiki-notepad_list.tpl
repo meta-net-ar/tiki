@@ -18,7 +18,8 @@
     <form action="tiki-notepad_list.php" method="post">
     {ticket}
         <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="notepad-table">
+                <thead>
                 <tr>
                     <th style="text-align:center;">
                         <input type="submit" class="btn btn-danger btn-sm" name="delete" onclick="confirmPopup('{tr}Delete selected{/tr} ?')" title="{tr}Delete{/tr}" value="{tr}x{/tr} ">
@@ -40,7 +41,9 @@
                     </th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="notepad-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="id">
@@ -92,17 +95,25 @@
                         <td colspan="7">{tr}No notes yet{/tr}</td>
                     </tr>
                 {/section}
-                <tr>
-                    <td colspan="7"><div class="d-flex flex-row flex-wrap align-items-center">
-                        <input type="submit" class="btn btn-primary btn-sm me-2" name="merge" value="{tr}Merge selected notes into{/tr}">
-                            <input type="text" class="form-control" name="merge_name" size="20"></div>
-                    </td>
-                </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td colspan="7"><div class="d-flex flex-row flex-wrap align-items-center">
+                            <input type="submit" class="btn btn-primary btn-sm me-2" name="merge" value="{tr}Merge selected notes into{/tr}">
+                                <input type="text" class="form-control" name="merge_name" size="20"></div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="notepad-table" target-container-id="notepad-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
     </form>
 
-    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {/if}
 {/if}
 
 <h2>{tr}Upload file{/tr}</h2>

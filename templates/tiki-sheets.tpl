@@ -8,7 +8,8 @@
         {/if}
 
         <div class="table-responsive sheet-table">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="sheets-table">
+                <thead>
                 <tr>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='title'}{tr}Title{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='description'}{tr}Description{/tr}{/self_link}</th>
@@ -17,7 +18,9 @@
                     <th>{self_link _sort_arg='sort_mode' _sort_field='user'}{tr}User{/tr}{/self_link}</th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="sheets-body">
                 {foreach item=sheet from=$sheets}
                     {include name='base' file='tiki-sheets_listing.tpl' sheet=$sheet}
                     {foreach item=childSheet from=$sheet.children}
@@ -26,10 +29,16 @@
                 {foreachelse}
                     {norecords _colspan=6}
                 {/foreach}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="sheets-table" target-container-id="sheets-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_edit_sheet eq 'y'}

@@ -13,7 +13,7 @@
             <th id="actions"></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="{$table_id}-body">
         {foreach from=$payments.data item=payment}
             <tr>
                 <td class="id">{$payment.paymentRequestId}</td>
@@ -81,7 +81,10 @@
         {/foreach}
     </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+    <el-infinite-scroll container-id="{$table_id}" target-container-id="{$table_id}-body" offset="{$payments.offset}" step="{$payments.max}" total-count="{$payments.count}" offset-arg="{$payments.offset_arg}"></el-infinite-scroll>
+{/if}
 </div>
-{if !$ts.enabled}
+{if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
     {pagination_links count=$payments.count step=$payments.max offset=$payments.offset offset_arg=$payments.offset_arg}{/pagination_links}
 {/if}
