@@ -339,7 +339,7 @@ class StringBuffer extends APICObject {
         if ($length<=0) {
             return FALSE;
         }
-        mt_srand((double)microtime()*1000000);
+        mt_srand((float)microtime()*1000000);
         $key = "";
         while(strlen($key)!=$length){
             $c = mt_rand(0,2);

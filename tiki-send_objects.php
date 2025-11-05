@@ -7,20 +7,21 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-            'username'             => 'digits',            //post
-            'path'                 => 'bool',              //post
-            'site'                 => 'digits',            //post
+            'username'             => 'username',          //post
+            'path'                 => 'text',              //post
+            'site'                 => 'url',               //post
             'password'             => 'password',          //post
             'dbg'                  => 'bool',              //post
-            'find'                 => 'string',            //post
+            'find'                 => 'text',              //post
             'addpage'              => 'bool',              //post
             'pageName'             => 'pagename',          //post
             'clearpages'           => 'bool',              //post
             'addstructure'         => 'bool',              //post
-            'structure'            => 'string',            //post
+            'structure'            => 'int',               //post
             'clearstructures'      => 'bool',              //post
             'addarticle'           => 'bool',              //post
             'articleId'            => 'int',               //post
+            'cleararticles'        => 'alpha',             //post
             'send'                 => 'bool',              //post
         ],
         'staticKeyFiltersForArrays' => [

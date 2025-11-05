@@ -80,7 +80,7 @@
                 {if $smarty.foreach.line.last and $rowCount gt 1}
                     {$total=$smarty.foreach.line.total+1}
                     </ul>
-                    <label for="row-{$total|escape}">{tr}Row{/tr}&nbsp;{$total}</label>
+                    <label for="row-{$total|escape}" class="fs-5 fw-semibold">{tr}Row{/tr}&nbsp;{$total}</label>
                     <ul id="row-{$total|escape}" class="navbar card d-flex flex-row justify-content-start p-1 mb-3">
                 {/if}
                 </ul>
@@ -90,18 +90,18 @@
 
     <div class="row mx-0 pb-4">
         <div class="lists col-sm-4">
-            <label for="full-list-w">{tr}Formatting Tools{/tr}</label>
-            <ul id="full-list-w" class="full">
+            <label for="full-list-w" class="fs-5 fw-semibold mb-1">{tr}Formatting Tools{/tr}</label>
+            <ul id="full-list-w" class="full border border-1 float-start h-auto overflow-auto d-inline m-0 ps-0 w-100">
             {foreach from=$display_w item=tool}
-                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class}">{$qtelement[$tool].html}</li>
+                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class} text-nowrap py-1 px-2 overflow-hidden border border-bottom border-light-subtle d-flex flex-row align-items-center">{$qtelement[$tool].html}</li>
             {/foreach}
             </ul>
         </div>
         <div class="lists col-sm-4">
-            <label for="full-list-p">{tr}Plugin Tools{/tr}</label>
-            <ul id="full-list-p" class="full">
+            <label for="full-list-p" class="fs-5 fw-semibold mb-1">{tr}Plugin Tools{/tr}</label>
+            <ul id="full-list-p" class="full border border-1 float-start h-auto overflow-auto d-inline m-0 ps-0 w-100">
             {foreach from=$display_p item=tool}
-                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class}">{$qtelement[$tool].html}</li>
+                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class} text-nowrap py-1 px-2 overflow-hidden border border-bottom border-light-subtle d-flex flex-row align-items-center">{$qtelement[$tool].html}</li>
             {/foreach}
             </ul>
         </div>
@@ -112,22 +112,22 @@
                 </div>
                 <form name="toolbar_edit_form" method="post" action="tiki-admin_toolbars.php" class="p-2">
                     <div class="modal-body">
-                        <fieldset>
+                        <fieldset class="p-0 border-0 mt-4">
                             <div class="mb-3">
                                 <label for="tool_name">{tr}Name:{/tr}</label>
-                                <input type="text" name="tool_name" id="tool_name" class="form-control" minlength="2" maxlength="16">
+                                <input type="text" name="tool_name" id="tool_name" class="form-control p-2 mb-3" minlength="2" maxlength="16">
                             </div>
                             <div class="mb-3">
                                 <label for="tool_label">{tr}Label:{/tr}</label>
-                                <input type="text" name="tool_label" id="tool_label" class="form-control" minlength="1" maxlength="80">
+                                <input type="text" name="tool_label" id="tool_label" class="form-control p-2 mb-3" minlength="1" maxlength="80">
                             </div>
                             <div class="mb-3">
                                 <label for="tool_icon">{tr}Icon:{/tr}</label>
-                                <input type="text" name="tool_icon" id="tool_icon" class="form-control" placeholder="{tr}Search...{/tr}">
+                                <input type="text" name="tool_icon" id="tool_icon" class="form-control p-2 mb-3" placeholder="{tr}Search...{/tr}">
                             </div>
                             <div class="mb-3">
-                                <label for="tool_type">{tr}Type:{/tr}</label>
-                                <select name="tool_type" id="tool_type" class="form-control">
+                                <label for="tool_type" class="d-block">{tr}Type:{/tr}</label>
+                                <select name="tool_type" id="tool_type" class="form-control d-block">
                                     <option value="Inline">Inline</option>
                                     <option value="Block">Block</option>
                                     <option value="LineBased">LineBased</option>
@@ -144,12 +144,12 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="tool_syntax">{tr}Syntax:{/tr}</label>
-                                <input type="text" name="tool_syntax" id="tool_syntax" class="form-control">
+                                <label for="tool_syntax" class="d-block">{tr}Syntax:{/tr}</label>
+                                <input type="text" name="tool_syntax" id="tool_syntax" class="form-control d-block p-2 mb-3">
                             </div>
                             <div class="mb-3">
                                 <label for="tool_plugin">{tr}Plugin name:{/tr}</label>
-                                <select name="tool_plugin" id="tool_plugin" class="form-control mb-2">
+                                <select name="tool_plugin" id="tool_plugin" class="form-control mb-2 d-block">
                                     <option value="">{tr}None{/tr}</option>
                                     {foreach from=$plugins key=plugin item=info}
                                         <option value="{$plugin|escape}">{$info.name|escape}</option>
@@ -158,8 +158,8 @@
                             </div>
                             {if $prefs.feature_wysiwyg eq 'y'}
                                 <div class="mb-3">
-                                    <label for="tool_token">{tr}Wysiwyg Token:{/tr}</label>
-                                    <input type="text" name="tool_token" id="tool_token" class="form-control" placeholder="{tr}Search...{/tr}">
+                                    <label for="tool_token" class="d-block">{tr}Wysiwyg Token:{/tr}</label>
+                                    <input type="text" name="tool_token" id="tool_token" class="form-control p-2 mb-3" placeholder="{tr}Search...{/tr}">
                                 </div>
                             {/if}
                             <input type="hidden" value="" name="save_tool" id="save_tool">
@@ -175,11 +175,11 @@
                     </div>
                 </form>
             </div>
-            <label for="full-list-c">{tr}Custom Tools{/tr}</label>
+            <label for="full-list-c" class="fs-5 fw-semibold mb-1">{tr}Custom Tools{/tr}</label>
             <a href="#" id="toolbar_add_custom" role="button">{icon name="add" ititle=":{tr}Add a new custom tool{/tr}" iclass="tips"}</a>
-            <ul id="full-list-c" class="full">
+            <ul id="full-list-c" class="full border border-1 float-start h-auto overflow-auto d-inline m-0 ps-0 w-100">
             {foreach from=$display_c item=tool}
-                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class}">{$qtelement[$tool].html}</li>
+                <li title=":{$qtelement[$tool].label|escape}" class="tips {$qtelement[$tool].class} text-nowrap py-1 px-2 overflow-hidden border border-bottom border-light-subtle d-flex flex-row align-items-center">{$qtelement[$tool].html}</li>
             {/foreach}
             </ul>
         </div>

@@ -198,6 +198,9 @@ body.fullscreen.tiki.navbar-padding {
     white-space: nowrap;
 }
 
+.admin-icon{
+    color: var(--tiki-top-color)
+}
 
 //.layout_social,                   Selectors no longer match the HTML - g_c-l.
 //.layout_social_modules {
@@ -475,4 +478,12 @@ body.fullscreen.tiki.navbar-padding {
 // !important is needed here (after setting enable-important-utilities variable to false). g_c-l
 .flex-column {
     flex-direction: column !important;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.m-0 {
+    margin: 0 !important;
 }

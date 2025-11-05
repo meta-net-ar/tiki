@@ -35,8 +35,8 @@ $inputConfiguration = [
         'listonly'                              => 'bool',               //post
         'exclude_page'                          => 'string',             //post
         'find'                                  => 'string',             //post
-        'offset'                                => 'digits',             //get
-        'sort_mode'                            => 'word',                //get
+        'offset'                                => 'int',                //get
+        'sort_mode'                             => 'alnumdash',          //get
         ],
     ],
 ];

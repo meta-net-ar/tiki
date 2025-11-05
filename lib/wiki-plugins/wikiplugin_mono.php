@@ -37,11 +37,7 @@ function wikiplugin_mono($data, $params)
     $code = /* htmlentities( htmlspecialchars(*/ trim($data) /* ) )*/;
     $code = preg_replace("/\n/", "<br />", $code);
 
-    if (! isset($font)) {
-        $font = "monospace";
-    } else {
-        $font .= ", monospace";
-    }
+    $font .= ", monospace";
 
     $style = "style=\"font-family: " . $font . ";\"";
     $data = "<span " . $style . ">" . $code . "</span>";

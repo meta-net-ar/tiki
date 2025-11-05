@@ -11,9 +11,13 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'    => [
-            'menuId'          => 'int',        //get
-            'preview_css'     => 'bool',       //post
-            'preview_type'    => 'striptags',  //post
+            'menuId'             => 'int',        //get
+            'deletemenu'         => 'int',        //post
+            'preview_type'       => 'striptags',  //post
+            'preview_bootstrap'  => 'alpha',      //post
+            'find'               => 'striptags',  //get
+            'sort_mode'          => 'alnumdash', //get
+            'offset'             => 'int',        //get
         ],
     ],
 ];

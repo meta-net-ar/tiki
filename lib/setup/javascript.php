@@ -73,28 +73,37 @@ if ($custom_js) {
 
 // Before Tiki 27, we used to also look in /themes/js for a custom.js file
 
+$custom_js_files = [];
+$custom_js_modules = [];
+
 // Is there a js/custom.js in the current base theme (no options)?
-$custom_js = ThemeLib::getThemePath(null, '', 'js/custom.js');
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = ThemeLib::getThemePath(null, '', 'js/custom.js');
+$custom_js_modules[] = ThemeLib::getThemePath(null, '', 'js/custom.module.js');
 
 // Is there a js/custom.js in the current theme options?
-$custom_js = ThemeLib::getThemePath(null, null, 'js/custom.js');
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = ThemeLib::getThemePath(null, null, 'js/custom.js');
+$custom_js_modules[] = ThemeLib::getThemePath(null, null, 'js/custom.module.js');
 
 //Is there a _custom/shared/js/custom.js
-$custom_js = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
-}
+$custom_js_files[] = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
 
 //Is there a _custom/sites/my.domain/js/custom.js
-$custom_js = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
-if ($custom_js) {
-    $headerlib->add_jsfile($custom_js);
+$custom_js_files[] = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
+
+foreach ($custom_js_files as $custom_js_file) {
+    if (! empty($custom_js_file)) {
+        $headerlib->add_jsfile($custom_js_file);
+    }
+}
+
+foreach ($custom_js_modules as $custom_js_module) {
+    if (! empty($custom_js_module)) {
+        $headerlib->add_js_module(
+            "
+import \"./$custom_js_module\";
+"
+        );
+    }
 }
 
 // setup timezone array
@@ -313,9 +322,11 @@ if (in_array('y', [$prefs['feature_draggable_modals'], ! empty($prefs['feature_r
 if ($prefs['feature_draggable_modals'] === 'y') {
     $js .= <<< 'EOT'
 $(document).on("shown.bs.modal", function(event) {
-    const draggableId = 'modal' + Math.random().toString(36).substring(7);
-    $(event.target).find(".modal-dialog").attr("id", draggableId);
-    const position = { x: 0, y: 0 };
+    const dialog = $(event.target).find(".modal-dialog");
+    if (!dialog.attr('id')) { // To avoid overwriting IDs
+        dialog.attr("id", 'modal-dialog-' + Math.random().toString(36).substring(7));
+    }
+    const draggableId = dialog.attr('id');
     interact(`#${draggableId}`).draggable({
         inertia: true,
         autoScroll: true,
@@ -323,9 +334,12 @@ $(document).on("shown.bs.modal", function(event) {
         listeners: {
             move: (e) => {
                 const target = e.target;
-                position.x += e.dx;
-                position.y += e.dy;
-                target.style.transform = `translate(${position.x}px, ${position.y}px)`;
+                // Store position in data-attributes
+                let x = (parseFloat(target.getAttribute('data-x')) || 0) + e.dx;
+                let y = (parseFloat(target.getAttribute('data-y')) || 0) + e.dy;
+                target.style.transform = `translate(${x}px, ${y}px)`;
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
             }
         }
     });
@@ -341,27 +355,47 @@ $(document).on("tiki.modal.redraw", function(event) {
     if (!$modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
+    
+    // Guard (prevents duplicate listeners)
+    const el = $modalContent[0];
+    if (el.dataset.resizeInit === '1') return;
+    el.dataset.resizeInit = '1';
 
     const modalBody = $modalContent.find(".modal-body")[0];
+    if (!modalBody) return;
 
-    const initialWidth = parseFloat(getComputedStyle($modalContent[0]).width.slice(0, -2));
-    const initialHeight = parseFloat(getComputedStyle($modalContent[0]).height.slice(0, -2));
+    let initialWidth, initialHeight;
     const initialOverflow = getComputedStyle(modalBody).overflow;
 
     const modalId = 'modal' + Math.random().toString(36).substring(7);
     $modalContent.attr("id", modalId);
+    const dialogEl = $modalContent[0];
+    dialogEl.dataset.x = dialogEl.dataset.x || 0;
+    dialogEl.dataset.y = dialogEl.dataset.y || 0;
     interact(`#${modalId}`).resizable({
         edges: { left: true, right: true, bottom: true, top: true },
         inertia: true,
         listeners: {
+            // The start listener captures the modal's dimensions at the moment resizing begins, which is crucial for the overflow logic to work correctly on the first try.
+            start(event) {
+                initialWidth = event.rect.width;
+                initialHeight = event.rect.height;
+            },
             move: (e) => {
                 const target = e.target;
-                let width = parseFloat(getComputedStyle(target).width.slice(0, -2));
-                let height = parseFloat(getComputedStyle(target).height.slice(0, -2));
-                width += e.deltaRect.left + e.deltaRect.right;
-                height += e.deltaRect.top + e.deltaRect.bottom;
+                // width/height from interact
+                const width = Math.max(e.rect.width, 0);
+                const height = Math.max(e.rect.height, 0);
+
+                // translate when resizing from left/top
+                const x = (parseFloat(target.dataset.x) || 0) + (e.deltaRect.left || 0);
+                const y = (parseFloat(target.dataset.y) || 0) + (e.deltaRect.top || 0);
+
                 target.style.width = `${width}px`;
                 target.style.height = `${height}px`;
+                target.style.transform = `translate(${x}px, ${y}px)`;
+                target.dataset.x = x;
+                target.dataset.y = y;
 
                 if (width < initialWidth || height < initialHeight) {
                     modalBody.style.overflow = "auto";

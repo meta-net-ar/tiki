@@ -11,21 +11,20 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'offset'       => 'digits',             //get
+            'offset'       => 'int',                //get
             'login'        => 'username',           //post
-            'add'          => 'bool',               //post
-            'maxRecords'   => 'digits',             //post
+            'add'          => 'alpha',              //post
+            'maxRecords'   => 'int',                //get
             'removeevent'  => 'digits',             //get
             'removetype'   => 'word',               //get
-            'sort_mode'    => 'word',               //get
-            'find'         => 'striptags',          //get
-            'email'        => 'email',              //get
-            'event'        => 'text',               //get
-            'delsel_x'     => 'alpha',              //get
-            'action'       => 'alpha',              //get
+            'sort_mode'    => 'alnumdash',          //get
+            'find'         => 'text',               //get
+            'email'        => 'email',              //post
+            'event'        => 'text',               //post
+            'action'       => 'alpha',              //post
         ] ,
         'staticKeyFiltersForArrays' => [
-            'checked'               => 'alnum',     //get
+            'checked'      => 'text',               //post
         ] ,
     ]
 ];

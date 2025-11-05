@@ -68,6 +68,7 @@ function wikiplugin_diagram_info()
                 'name' => tr('template'),
                 'description' => tr('Diagram\'s file id to use as a template to new the diagram. This parameter will be skipped if the fileId parameter is present.'),
                 'since' => '23.0',
+                'default' => 0,
                 'filter' => 'int',
             ],
             'galleryId' => [
@@ -100,8 +101,8 @@ function wikiplugin_diagram_info()
 function wikiplugin_diagram($data, $params)
 {
     global $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_edit, $tiki_p_view;
-    $template = $params['template'] ?? 0;
-    $galleryId = $params['galleryId'] ?? (isset($params['fileName']) ? 1 : '');
+    $template = $params['template'];
+    $galleryId = $params['galleryId'] ?? (! is_null($params['fileName']) ? 1 : '');
     $fileName = $params['fileName'] ?? 'Diagram %page% %date%.drawio' ;
     $escapedPage = htmlentities($page, ENT_COMPAT);
     $fileName = preg_replace('/\%page\%/', $page, $fileName);
@@ -116,7 +117,7 @@ function wikiplugin_diagram($data, $params)
 
     if (
         empty($params['fileId'])
-        && isset($params['compressXml'])
+        && ! is_null($params['compressXml'])
         && in_array($params['compressXml'], ['false', '0'])
     ) {
             $compressXml = false;
@@ -257,14 +258,14 @@ function wikiplugin_diagram($data, $params)
 
             $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
             $galHtml = "";
-            if (! isset($params['fileName']) && ! isset($params['galleryId'])) {
+            if (is_null($params['fileName']) && is_null($params['galleryId'])) {
                 $galHtml = "<option value='0'>" . tr('Page (inline)') . "</option>";
             }
             usort($gals['data'], function ($a, $b) {
                 return strcmp(strtolower($a['name']), strtolower($b['name']));
             });
 
-            if (! isset($params['galleryId'])) {
+            if (is_null($params['galleryId'])) {
                 foreach ($gals['data'] as $gal) {
                     if ($gal['name'] != "Wiki Attachments" && $gal['name'] != "Users File Galleries") {
                         if ($gal['parentId'] == -1) {
@@ -329,7 +330,7 @@ EOF;
 
     $base_64_diagram = base64_encode($diagramXmlString);
 
-    if (isset($params['wikiparse']) && $params['wikiparse'] == 1) {
+    if ($params['wikiparse'] == 1) {
         $parsedDiagrams = [];
         $XMLDiagrams = simplexml_load_string($diagramXmlString);
 

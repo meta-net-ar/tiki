@@ -24,7 +24,6 @@ function wikiplugin_vimeo_info()
                     . ($prefs['vimeo_upload'] === 'y' ? ' ' . tra('or leave blank to upload one.') : ''),
                 'since' => '6.1',
                 'filter' => 'url',
-                'default' => '',
             ],
             'width' => [
                 'required' => false,
@@ -80,7 +79,6 @@ function wikiplugin_vimeo_info()
                 ),
                 'since' => '12.0',
                 'filter' => 'text',
-                'default' => '',
                 'advanced' => true
             ],
             'fromFieldId' => [
@@ -89,7 +87,6 @@ function wikiplugin_vimeo_info()
                 'description' => tra('Numeric ID of a Tracker Files field, using Vimeo displayMode.'),
                 'since' => '12.0',
                 'filter' => 'int',
-                'default' => 0,
                 'advanced' => true
             ],
             'fromItemId' => [
@@ -98,7 +95,6 @@ function wikiplugin_vimeo_info()
                 'description' => tra('Numeric ID of a Tracker item, using Vimeo displayMode.'),
                 'since' => '12.0',
                 'filter' => 'int',
-                'default' => 0,
                 'advanced' => true
             ],
             'galleryId' => [
@@ -195,14 +191,14 @@ function wikiplugin_vimeo($data, $params)
     static $instance = 0;
     $instance++;
 
-    if (isset($params['url'])) {
+    if (! is_null($params['url'])) {
         $params['vimeo'] = $params['url'];
         $params['player_id'] = "pid_" . uniqid();
         $params['vimeo_fileId'] = 0;
         unset($params['url']);
 
         return vimeo_iframe($data, $params);
-    } elseif (isset($params['fileId'])) {
+    } elseif (! is_null($params['fileId'])) {
         $fileIds = preg_split('/\D+/', $params['fileId'], -1, PREG_SPLIT_NO_EMPTY);
         unset($params['fileId']);
 
@@ -236,16 +232,16 @@ function wikiplugin_vimeo($data, $params)
 
         // old perms access to get "special" gallery perms to handle user gals etc
         $perms = TikiLib::lib('tiki')->get_perm_object(
-            ! empty($params['galleryId']) ? $params['galleryId'] : $prefs['vimeo_default_gallery'],
+            ! is_null($params['galleryId']) ? $params['galleryId'] : $prefs['vimeo_default_gallery'],
             'file gallery',
             TikiLib::lib('filegal')->get_file_gallery_info($prefs['vimeo_default_gallery']),
             false
         );
         if ($perms['tiki_p_upload_files'] !== 'y') {
             return '';      //$permMessage = tra('You do not have permsission to add files here.');
-        } elseif (! empty($params['fromFieldId'])) {
+        } elseif (! is_null($params['fromFieldId'])) {
             $fieldInfo = TikiLib::lib('trk')->get_tracker_field($params['fromFieldId']);
-            if (empty($params['fromItemId'])) {
+            if (is_null($params['fromItemId'])) {
                 $item = Tracker_Item::newItem($fieldInfo['trackerId']);
             } else {
                 $item = Tracker_Item::fromId($params['fromItemId']);
@@ -277,7 +273,7 @@ function wikiplugin_vimeo($data, $params)
             $smarty->getEmptyInternalTemplate()
         );
 
-        if (! empty($page) && empty($params['fromFieldId'])) {
+        if (! empty($page) && is_null($params['fromFieldId'])) {
             // Wikiplugin used within Wiki page
             $access = TikiLib::lib('access');
             $access->checkAuthenticity();
@@ -322,9 +318,9 @@ function wikiplugin_vimeo($data, $params)
                         "upload",
                         {
                             title: tr("Upload Video")' .
-                (! empty($params['galleryId']) ? ',galleryId:' . $params['galleryId'] : '') .
-                (! empty($params['fromFieldId']) ? ',fieldId:' . $params['fromFieldId'] : '') .
-                (! empty($params['fromItemId']) ? ',itemId:' . $params['fromItemId'] : '') . '
+                (! is_null($params['galleryId']) ? ',galleryId:' . $params['galleryId'] : '') .
+                (! is_null($params['fromFieldId']) ? ',fieldId:' . $params['fromFieldId'] : '') .
+                (! is_null($params['fromItemId']) ? ',itemId:' . $params['fromItemId'] : '') . '
                         }
                     )
                 });

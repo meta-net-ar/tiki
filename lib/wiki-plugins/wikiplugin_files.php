@@ -26,7 +26,6 @@ function wikiplugin_files_info()
                     for user files (hint: enter %0 for current logged-in user).', '<code>{{user}}</code>')
                     : ''),
                 'since' => '3.0',
-                'default' => null,
                 'separator' => ':',
                 'profile_reference' => 'file_gallery',
             ],
@@ -36,7 +35,6 @@ function wikiplugin_files_info()
                 'description' => tra('To restrict files listed to those belonging to one or more categories. Enter a
                     single category or ID or list of them separated by colon'),
                 'since' => '3.0',
-                'default' => null,
                 'filter' => 'text',
                 'accepted' => tra('Valid category IDs separated by colons'),
                 'advanced' => true,
@@ -51,7 +49,6 @@ function wikiplugin_files_info()
                 'type' => 'fileId',
                 'area' => 'fgal_picker_id',
                 'accepted' => tra('Valid file IDs separated by colons'),
-                'default' => null,
                 'filter' => 'text',
                 'separator' => ':',
                 'profile_reference' => 'file',
@@ -523,7 +520,7 @@ function wikiplugin_files($data, $params)
         $sort = $_REQUEST["wp_files_sort_mode$iplugin"];
     }
     if (empty($showgallery)) {
-        $show_parentName = empty($galleryId) ? 'y' : 'n';
+        $show_parentName = is_null($galleryId) ? 'y' : 'n';
     } else {
         $show_parentName = $showgallery;
     }
@@ -531,10 +528,8 @@ function wikiplugin_files($data, $params)
     $smarty->assign('show_thumb', $showthumb);
 
     $filter = empty($creator) ? '' : ['creator' => $creator];
-    if (! isset($sort)) {
-        $sort = 'name_asc';
-    }
-    if (isset($galleryId)) {
+
+    if (! is_null($galleryId)) {
         $galId = $galleryId[0];
         if ($prefs['feature_use_fgal_for_user_files'] === 'y' && ! is_numeric($galId)) {    // if not number could be a userfiles gallery
             $galId = $filegallib->get_user_file_gallery($galId);
@@ -555,16 +550,16 @@ function wikiplugin_files($data, $params)
                 $params['showupload'] = 'y';
             }
         }
-        if (! empty($slideshow) && $slideshow == 'y') {
+        if ($slideshow == 'y') {
             if (empty($data)) {
                 $data = tra('Slideshow');
             }
             // set caption field indicator for images in slide show
-            if (isset($showdescription) && $showdescription == 'y') {
+            if ($showdescription == 'y') {
                 $caption = 'd';
-            } elseif (isset($showname) && $showname == 'y') {
+            } elseif ($showname == 'y') {
                 $caption = 'n';
-            } elseif (isset($showfilename) && $showfilename == 'y') {
+            } elseif ($showfilename == 'y') {
                 $caption = 'f';
             } else {
                 $caption = false;
@@ -588,7 +583,7 @@ function wikiplugin_files($data, $params)
             $look_recursively = false;
         }
         $fs = $filegallib->get_files(0, $max, $sort, $find, $galleryId, false, $withsubgals == 'y', false, true, false, $show_parentName == 'y', true, $look_recursively, '', false, false, false, $filter);
-        if (isset($categId)) {
+        if (! is_null($categId)) {
             $objects = $categlib->list_category_objects($categId, 0, -1, 'itemId_asc', 'file');
             $objects_in_categs = [];
             foreach ($objects['data'] as $o) {
@@ -596,7 +591,7 @@ function wikiplugin_files($data, $params)
             }
         }
         for ($i = 0, $count_fs_data = count($fs['data']); $i < $count_fs_data; ++$i) {
-            if (isset($categId)) { // filter the files
+            if (! is_null($categId)) { // filter the files
                 if (! in_array($fs['data'][$i]['fileId'], $objects_in_categs)) {
                     continue;
                 }
@@ -609,7 +604,7 @@ function wikiplugin_files($data, $params)
             $fs['data'][$i]['lockable'] = $gal_info['lockable'];
             $files[] = $fs['data'][$i];
         }
-    } elseif (isset($categId)) {
+    } elseif (! is_null($categId)) {
         // galls of this category
         $objects = $categlib->list_category_objects($categId, 0, -1, 'itemId_asc', 'file gallery');
         // get the files of the gallery
@@ -638,7 +633,7 @@ function wikiplugin_files($data, $params)
             }
         }
         $gal_info = $filegallib->default_file_gallery();
-    } elseif (isset($fileId)) {
+    } elseif (! is_null($fileId)) {
         foreach ($fileId as $id) {
             if ($info = wikiplugin_files_check_perm_file($id)) {
                 $files[] = $info;
@@ -667,42 +662,18 @@ function wikiplugin_files($data, $params)
     }
     include_once('fgal_listing_conf.php');
     $gal_info['show_checked' ] = 'n'; // the multiple action will not work
-    if (! empty($showid)) {
-        $gal_info['show_id'] = $showid;
-    }
-    if (! empty($showicon)) {
-        $gal_info['show_icon'] = $showicon;
-    }
-    if (! empty($showsize)) {
-        $gal_info['show_size'] = $showsize;
-    }
-    if (! empty($showdescription)) {
-        $gal_info['show_description'] = $showdescription;
-    }
-    if (! empty($showcreated)) {
-        $gal_info['show_created'] = $showcreated;
-    }
-    if (! empty($showcreator)) {
-        $gal_info['show_creator'] = $showcreator;
-    }
-    if (! empty($showauthor)) {
-        $gal_info['show_author'] = $showauthor;
-    }
-    if (! empty($showmodified)) {
-        $gal_info['show_lastmodif'] = $gal_info['show_modified'] = $showmodified;
-    }
-    if (! empty($showmodtimedate)) {
-        $gal_info['show_modtimedate'] = $showmodtimedate;
-    }
-    if (! empty($showlockedby)) {
-        $gal_info['show_lockedby'] = $showlockedby;
-    }
-    if (! empty($showhits)) {
-        $gal_info['show_hits'] = $showhits;
-    }
-    if (! empty($showfiles)) {
-        $gal_info['show_files'] = $showfiles;
-    }
+    $gal_info['show_id'] = $showid;
+    $gal_info['show_icon'] = $showicon;
+    $gal_info['show_size'] = $showsize;
+    $gal_info['show_description'] = $showdescription;
+    $gal_info['show_created'] = $showcreated;
+    $gal_info['show_creator'] = $showcreator;
+    $gal_info['show_author'] = $showauthor;
+    $gal_info['show_lastmodif'] = $gal_info['show_modified'] = $showmodified;
+    $gal_info['show_modtimedate'] = $showmodtimedate;
+    $gal_info['show_lockedby'] = $showlockedby;
+    $gal_info['show_hits'] = $showhits;
+    $gal_info['show_files'] = $showfiles;
     if (! empty($showdeleteafter)) {
         $gal_info['show_deleteAfter'] = $showdeleteafter;
     }
@@ -712,34 +683,26 @@ function wikiplugin_files($data, $params)
     if (! empty($showshare)) {
         $gal_info['show_share'] = $showshare;
     }
-    if (! empty($showaction)) {
-        $gal_info['show_action'] = $showaction;
-    }
-    if (! empty($showcomment)) {
-        $gal_info['show_comment'] = $showcomment;
-    }
-    if (! empty($showlasteditor)) {
-        $gal_info['show_last_user'] = $showlasteditor;
-    }
-    if (! empty($showsource)) {
-        $gal_info['show_source'] = $showsource;
-    }
-    if (! empty($showname) && $showname == 'y' && ! empty($showfilename) && $showfilename == 'y') {
+    $gal_info['show_action'] = $showaction;
+    $gal_info['show_comment'] = $showcomment;
+    $gal_info['show_last_user'] = $showlasteditor;
+    $gal_info['show_source'] = $showsource;
+    if ($showname == 'y' && $showfilename == 'y') {
         $gal_info['show_name'] = 'a';
     }
-    if (! empty($showname) && $showname == 'y' && ! empty($showfilename) && $showfilename == 'n') {
+    if ($showname == 'y' && $showfilename == 'n') {
         $gal_info['show_name'] = 'n';
     }
-    if (! empty($showname) && $showname == 'n' && ! empty($showfilename) && $showfilename == 'y') {
+    if ($showname == 'n' && $showfilename == 'y') {
         $gal_info['show_name'] = 'f';
     }
-    if (! empty($showname) && $showname == 'n' && ! empty($showfilename) && $showfilename == 'n') {
+    if ($showname == 'n' && $showfilename == 'n') {
         $gal_info['show_name'] = '';
     }
     $gal_info['show_parentName'] = $show_parentName;
     $smarty->assign_by_ref('gal_info', $gal_info);
 
-    if (isset($categId)) {
+    if (! is_null($categId)) {
         if (is_array($categId)) {
             foreach ($categId as $cat) {
                 $category[] = $categlib->get_category_name($cat);

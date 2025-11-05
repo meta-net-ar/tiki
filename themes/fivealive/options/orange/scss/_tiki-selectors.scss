@@ -3,26 +3,21 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 
-//.header_outer,
-//.layout_basic #top_modules,
+
 .postbody-title,
-//.tiki > .navbar.fixed-top.bg-dark,
-    //.topbar, .navbar-dark, .topbar .navbar-dark .navbar-nav > li, .topbar .nav > li,
 .bg-dark {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c44a23+0,c64b23+10,dc5823+34,e96023+58,f06423+87,f06423+100 */
-    background: #c44a23 !important; /* Old browsers */
-    background: linear-gradient(to right,  #c44a23 0%,#c64b23 10%,#dc5823 34%,#e96023 58%,#f06423 87%,#f06423 100%) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c44a23+0,c64b23+10,dc5823+34,e96023+58,f06423+87,f06423+100
+    background: linear-gradient(to right,  #c44a23 0%,#c64b23 10%,#dc5823 34%,#e96023 58%,#f06423 87%,#f06423 100%) !important;
 }
 
 // CSS is used because Bootstrap partials aren't available for theme variables, etc.
 // (Everything below was copied from Grape and may need color adjusting.
 .text-danger {
-    color: $danger !important; // #B85B19 !important; // $danger !important;
+    color: $danger !important;
 }
 .text-dark {
     color: #6D5509 !important;
 }
-
 
 .breadcrumb-item.active {
     color: $text-muted !important;

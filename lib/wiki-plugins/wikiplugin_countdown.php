@@ -22,7 +22,6 @@ function wikiplugin_countdown_info()
                 'description' => tra('Target date and time. Multiple formats accepted.'),
                 'since' => '1',
                 'filter' => 'datetime',
-                'default' => '',
             ],
             'show' => [
                 'required' => false,
@@ -146,10 +145,7 @@ function wikiplugin_countdown_info()
 function wikiplugin_countdown($data, $params)
 {
     extract($params, EXTR_SKIP);
-    //must have an enddate
-    if (! isset($enddate)) {
-        return '<strong>' . tra('Countdown: Missing "enddate" parameter for plugin') . '</strong><br />';
-    }
+
     //set now date and time
     global $tikilib;
     $tz = $tikilib->get_display_timezone();
@@ -228,7 +224,7 @@ function wikiplugin_countdown($data, $params)
         }
         if (
             (($timediff < 0 && $diff['invert'] == 1) || ($timediff > 0 && $diff['invert'] == 0))
-            && isset($caldays) && $caldays == 'y' && $show_hours === false
+            && $caldays == 'y' && $show_hours === false
         ) {
             $int = is_int($days);
             $diff['caldays'] = $days + 1;
@@ -240,7 +236,7 @@ function wikiplugin_countdown($data, $params)
     //create the countdown string
     $ret = '';
     $word = '';
-    if ($diff['invert'] == 1 || (isset($since) && $since == 'y')) {
+    if ($diff['invert'] == 1 || $since == 'y') {
     //either before the event or if countdown also shown after the event
         //calculate total time in hours, minutes or seconds
         $diff['months'] = abs(($diff['y'] * 12) + $diff['o']);

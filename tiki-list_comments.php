@@ -92,6 +92,7 @@ foreach ($sections_enabled as $k => $info) {
 // No need to show types choices if there is only one choice that is already choosed
 if (count($show_types) == 1 && count($selected_types) == 1) {
     $show_types = [];
+    $selected_types = [];
 }
 
 $headers = ['title' => 'Title', 'objectType' => 'Type', 'object' => 'Object', 'userName' => 'Author', 'commentDate' => 'Date', 'data' => 'Comment',];
@@ -101,6 +102,8 @@ if (count($selected_types) == 1) {
     unset($headers['objectType']);
     $headers['object'] = tra(ucwords($selected_types[0]));
 }
+
+$show_types = array_intersect_key($show_types, array_flip($selected_types));
 
 $smarty->assign_by_ref('show_types', $show_types);
 $smarty->assign_by_ref('selected_types', $selected_types);

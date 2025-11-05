@@ -1,4 +1,4 @@
-//Custom styles for the FiveAlive Grape option theme.
+// Custom styles for the FiveAlive Grape option theme.
 
 @import "../../../scss/_variables.scss";
 
@@ -79,9 +79,9 @@ $table-hover-bg: #f5f5f5;
 
 
 // Forms
-$input-color: var(--#{$prefix}body-color);  // default // #555555;
-$input-bg: var(--#{$prefix}body-bg);  // default // #f4dded;
-$input-border-color: var(--#{$prefix}border-color);  // default // #e4afd3;
+$input-color: var(--#{$prefix}body-color);  // default
+$input-bg: var(--#{$prefix}body-bg);  // default
+$input-border-color: var(--#{$prefix}border-color);  // default
 $input-border-top-color: #e4afd3;
 $input-border-right-color: #fff;
 $input-border-bottom-color: #fff;
@@ -91,7 +91,7 @@ $input-focus-border-color: lighten($component-active-bg, 25%);
 // Form validation
 
 // Dropdowns
-$dropdown-bg: #8e286a; //#c82b8b;
+$dropdown-bg: #8e286a;
 $dropdown-border-color: rgba(0, 0, 0, 0.15);
 $dropdown-link-color: #ffffff;
 $dropdown-link-hover-color: #f2f2f2;
@@ -126,7 +126,7 @@ $card-border-color: #bc2f84;
 
 // Code
 
-$code-color:                        $body-color; // $pink !default;
+$code-color:                        $body-color; // !default;
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
@@ -136,6 +136,12 @@ $tiki-footer-btn-secondary-color: #f4f4f4;
 $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 $tiki-postbody-title-card-title-color: #fff;
 
+$tiki-dark-footer-card-header-bg: linear-gradient(to right, #642759 0%, #732860 19%, #92286b 43%, #a32872 67%, #a52873 100%);
+$tiki-dark-footer-card-header-title-color: #fff !important;
+$tiki-dark-footer-card-border-color: rgba(#fff, .45);
+$tiki-dark-footer-link-color: #d968ac;
+$tiki-dark-footer-link-hover-color: #e480bc !important;
+
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
@@ -143,6 +149,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     --tiki-top-border-color: #152304;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
@@ -167,6 +175,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     --tiki-top-border-color: #152304;
 }

@@ -36,7 +36,7 @@ function wikiplugin_qr($data, $params)
 {
 
     // default size
-    $params['size'] ??= 350;
+    $params['size'] = (int) ($params['size'] ?: 350);
 
     if (extension_loaded('imagick')) {
         $imageBackEnd = new ImagickImageBackEnd();

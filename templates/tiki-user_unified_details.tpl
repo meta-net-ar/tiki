@@ -265,7 +265,7 @@
                 {if $user eq $userinfo.object_id}
                 <div class="card">
                 <div class="card-header">
-                    <h3 class="tiki-card-header-title">{tr}Friendship Network{/tr}</h3>
+                    <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Friendship Network{/tr}</h3>
                 </div>
                 <div class="card-body">
                     {module module=friend_list nobox=y}

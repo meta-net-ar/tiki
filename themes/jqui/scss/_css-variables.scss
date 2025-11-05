@@ -2,6 +2,7 @@
 // These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
 
 // This file contains CSS variables / custom properties for:
+// * In the case of this theme, some specific page elements and widgets as shown in the jQuery UI ThemeRoller gallery
 // * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
 // * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
 // * For the above, dark and light L&F navbar preference styling, and color mode properties
@@ -14,9 +15,84 @@
 
 @import "variables";
 
+:root {
+    --tiki-jui-border-radius: 4px;
+    --tiki-jui-widget-content-parent-padding: .2rem;
+    --tiki-jui-widget-font-weight: bold;
+}
+
+:root {
+    /* Component container headers, including card-header, etc. */
+    --tiki-jui-widget-header-color: #222222;
+    --tiki-jui-widget-header-bg-color: #cccccc;
+    --tiki-jui-widget-header-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_highlight-soft_75_cccccc_1x100.png');
+    --tiki-jui-widget-header-bg-position: 50% 50%;
+    --tiki-jui-widget-header-border-color: #aaaaaa;
+    --tiki-jui-widget-header-link-color: #222222;
+
+    /* Component containers including card-body, etc. */
+    --tiki-jui-widget-content-color: #222222;
+    --tiki-jui-widget-content-bg-color: #ffffff;
+    --tiki-jui-widget-content-bg-path: ;
+    --tiki-jui-widget-content-bg-position: ;
+    --tiki-jui-widget-content-border-color: #aaaaaa;
+    --tiki-jui-widget-content-link-color: #222222;
+    --tiki-jui-widget-content-link-hover-color: #222222;
+
+    /* Interactive elements including buttons, etc. */
+    --tiki-jui-state-default-color: #555555; /* btn-primary, etc.*/
+    --tiki-jui-state-default-bg: #e6e6e6;
+    --tiki-jui-state-default-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png');
+    --tiki-jui-state-default-bg-path-adminui: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png');
+    --tiki-jui-state-default-bg-position: 50% 50%;
+    --tiki-jui-state-default-border-color: #d3d3d3;
+
+    --tiki-jui-state-hover-color: #212121;
+    --tiki-jui-state-hover-bg: #dadada;
+    --tiki-jui-state-hover-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png');
+    --tiki-jui-state-hover-bg-path-adminui: url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png');
+    --tiki-jui-state-hover-bg-position: 50% 50%;
+    --tiki-jui-state-hover-border-color: #d3d3d3;
+
+    --tiki-jui-state-active-color: #212121;
+    --tiki-jui-state-active-bg: #ffffff;
+    --tiki-jui-state-active-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png');
+    --tiki-jui-state-active-bg-path-adminui: url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png');
+    --tiki-jui-state-active-bg-position: 50% 50%;
+    --tiki-jui-state-active-border-color: #aaaaaa;
+
+    --tiki-jui-highlight-color: #363636;
+    --tiki-jui-highlight-link-color: #363636;
+    --tiki-jui-highlight-bg-color: #fbf9ee;
+    --tiki-jui-highlight-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png');
+    --tiki-jui-highlight-bg-position: 50% 50%;
+    --tiki-jui-highlight-bg-repeat: repeat;
+    --tiki-jui-highlight-border-color: #fcefa1;
+
+    --tiki-jui-error-color: #cd0a0a;
+    --tiki-jui-error-link-color: #cd0a0a;
+    --tiki-jui-error-bg-color: #fef1ec;
+    --tiki-jui-error-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_95_fef1ec_1x400.png');
+    --tiki-jui-error-bg-position: 50% 50%;
+    --tiki-jui-error-bg-repeat: repeat;
+    --tiki-jui-error-border-color: #cd0a0a;
+}
+
+[data-bs-theme=dark] {
+    --tiki-jui-state-active-color: #ffffff;
+    --tiki-jui-widget-header-border-color: #555555;
+    --tiki-jui-state-default-border-color: #555555;
+    --tiki-jui-widget-content-color: var(--bs-body-color);
+    --tiki-jui-widget-content-bg-color: var(--bs-secondary-bg);
+    --tiki-jui-widget-content-bg-path: ;
+    --tiki-jui-widget-content-link-color: var(--bs-link-color);
+    --tiki-jui-widget-content-link-hover-color: var(--bs-link-hover-color);
+    --tiki-jui-widget-header-color:  var(--bs-body-color);
+}
+
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
-    --tiki-top-bg: linear-gradient(180deg, rgba(69,69,69,1) 0%, rgba(0,0,0,1) 100%);
+    --tiki-top-bg: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(99, 98, 98, 1) 30%, rgba(82, 81, 81, 1) 50%, rgba(89, 88, 88, 1) 70%, rgba(82, 82, 82, 1) 100%);
     --tiki-top-color: #e0e0e0;
     --tiki-top-hover-color: #fff;
     --tiki-top-text-color: #fff;
@@ -27,7 +103,7 @@
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: linear-gradient(180deg, rgba(69,69,69,1) 0%, rgba(0,0,0,1) 100%);
+    --tiki-topbar-bg: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(99, 98, 98, 1) 30%, rgba(82, 81, 81, 1) 50%, rgba(89, 88, 88, 1) 70%, rgba(82, 82, 82, 1) 100%);
     --tiki-topbar-color: #e0e0e0;
     --tiki-topbar-hover-color: #fff;
     --tiki-topbar-text-color: #fff;
@@ -36,7 +112,7 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    --tiki-top-bg: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
     --tiki-top-text-color: #{$navbar-light-hover-color};
@@ -45,7 +121,7 @@
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    --tiki-topbar-bg: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
@@ -77,20 +153,12 @@
     }
 }
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    --tiki-admin-top-nav-bg: var(--tiki-jui-state-default-bg) url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png') var(--tiki-jui-state-default-bg-position) repeat-x;
     --tiki-admin-top-nav-color:  #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;
@@ -101,28 +169,40 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.accordion-button {
-        color: var(--tiki-admin-aside-nav-color) !important;
-        background: var(--tiki-admin-aside-nav-bg) !important;
+    button.accordion-button:not(.collapsed) {
+        color: var(--tiki-admin-aside-nav-color);
+        background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path-adminui) 50% 50% repeat-x;
+    }
+    button.accordion-button.collapsed {
+        color: var(--tiki-admin-aside-nav-color);
+        background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path-adminui) 50% 50% repeat-x;
+    }
+    button.accordion-button:hover {
+        color: var(--tiki-admin-aside-nav-color);
+        background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) 50% 50% repeat-x;
     }
 }
 
 // Dark navbar
 @mixin admin-nav-dark {
     --tiki-admin-top-nav-bg: var(--tiki-top-bg); //linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
-    --tiki-admin-top-nav-color: black; // #{$navbar-dark-color};
+    --tiki-admin-top-nav-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    --tiki-admin-aside-nav-bg: #{$dropdown-dark-bg};
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
-    --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
+    --tiki-admin-dropdown-bg: #{$dropdown-dark-bg} !important;
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    button.accordion-button {
-        color: var(--tiki-admin-aside-nav-color) !important;
-        background: var(--tiki-admin-aside-nav-bg) !important;
+    --bs-dropdown-link-active-color: #fff; // #{$dropdown-dark-link-active-color};
+    button.accordion-button.collapsed {
+        color: var(--tiki-admin-aside-nav-color);
+        background: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(99, 98, 98, 1) 30%, rgba(82, 81, 81, 1) 50%, rgba(89, 88, 88, 1) 70%, rgba(82, 82, 82, 1) 100%);
+    }
+    .tiki-admin-aside-nav-dark .dropdown-item.active, .dropdown-item:active {
+          --bs-dropdown-link-active-color: #fff;
     }
 }
 
@@ -171,7 +251,6 @@
     --tiki-vert-nav-link-hover-color: rgba(var(--bs-link-hover-color-rgb));
     .bg-light,
     .navbar.bg-light {
-//        background: var(--bs-tertiary-bg) !important;
         .nav-link {
             color: $link-color-dark;
         }

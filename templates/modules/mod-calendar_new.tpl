@@ -3,7 +3,7 @@
         {if $tiki_p_add_events eq 'y' && (empty($module_params.showaction) || $module_params.showaction ne 'n')}
             <br>
             <p>
-                <a class="btn btn-link" href="{bootstrap_modal controller='calendar' action=$prefs.calendar_event_click_action size='modal-lg'}" role="button">
+                <a class="btn btn-link" href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId}" role="button">
                     {icon name="add"}
                     {tr}Add Event{/tr}
                 </a>
@@ -21,8 +21,17 @@
 
                 {if $viewlist neq 'list'}
                     {jq}
+                        let paramOfModuleCalendar = {{$eventCalendarParams|json_encode}};
+                        const moduleCalendarFocusDate = document.getElementById('date-module-calendar');
+                        paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
+
                         const calendarContainer = [window.moduleCalendar];
                         $("#module-calendar").setupEventCalendar({{$eventCalendarParams|json_encode}}, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                        moduleCalendarFocusDate.addEventListener('change', () => {
+                            document.getElementById('module-calendar').innerHTML = "";
+                            paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
+                            $("#module-calendar").setupEventCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                        })
                         {{if $prefs.print_pdf_from_url neq 'none'}$("#module-calendar").addEventCalendarPrint('#module-calendar-pdf-btn', calendarContainer[0]);{/if}}
                     {/jq}
                 {/if}
@@ -30,6 +39,30 @@
                     <a id="module-calendar-pdf-btn" href="#" class="text-end d-none" role="button">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
                 {/if}
                 <div id="test"></div>
+                <div id="configlinks" class="mb-3 text-end">
+                    <div id="configlinks" class="mb-3 text-end">
+                        {if count($checkedCalIds)}
+                            {$maxCalsForButton = 20}
+                            {if count($checkedCalIds) > $maxCalsForButton}<select size="5">{/if}
+                            {foreach $checkedCalIds as $checkedCalId}
+                                {if $calendars}
+                                    {$thiscustombgcolor = $calendars[$checkedCalId].custombgcolor}
+                                    {$thiscustomfgcolor = $calendars[$checkedCalId].customfgcolor}
+                                    {$thiscalendarsname = $calendars[$checkedCalId].displayName|escape}
+                                    {if count($checkedCalIds) > $maxCalsForButton}
+                                        <option style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};" onclick="toggle('filtercal')">
+                                            {$thiscalendarsname}
+                                        </option>
+                                    {else}
+                                        {button href="{$checkedCalId|sefurl:'calendar'}" _style="background:#$thiscustombgcolor;color:#$thiscustomfgcolor;border:1px solid #$thiscustomfgcolor; " _text="{$thiscalendarsname}" _class='btn btn-sm me-2 mt-2' _icon_name='calendar'}
+                                    {/if}
+                                {/if}
+                            {/foreach}
+                            {if count($checkedCalIds) > $maxCalsForButton}</select>{/if}
+                        {/if}
+                    </div>    
+                </div>
+                <input type="date" value="{$moduleCalendarFocusdate}" id="date-module-calendar">
                 <div id='module-calendar'></div>
                 {if $viewlist eq 'list'}
                     {$out}

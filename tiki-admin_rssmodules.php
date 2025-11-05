@@ -12,18 +12,22 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
             'rssId'            => 'int',      //post
-            'name'             => 'string',      //post
+            'name'             => 'text',        //post
             'url'              => 'url',         //post
             'description'      => 'xss',         //post
-            'refreshMinutes'   => 'digits',      //post
+            'refreshMinutes'   => 'int',         //post
             'showTitle'        => 'bool',        //post
             'showPubDate'      => 'bool',        //post
-            'save'             => 'bool',        //post
+            'save'             => 'alpha',       //post
+            'refresh_all'      => 'alpha',       //post
+            'refresh'          => 'int',         //post
+            'clear'            => 'int',         //post
             'remove'           => 'int',         //get
-            'offset'           => 'bool',        //get
-            'sort_mode'        => 'word',        //get
-            'article'          => 'digits',      //get
-            'view'             => 'digits',      //get
+            'offset'           => 'int',         //get
+            'sort_mode'        => 'alnumdash',   //get
+            'find'             => 'text',        //get
+            'article'          => 'int',         //get
+            'view'             => 'int',         //get
         ],
     ],
 ];

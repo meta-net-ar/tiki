@@ -140,7 +140,7 @@ function wikiplugin_wikidiff($data, $params)
                 $text = $params['pagenotapproved_text'];
                 return($text);
             }
-            if (isset($params['newver']) && ! empty($params['newver'])) {
+            if (! empty($params['newver'])) {
                 // If specific version is specified, check if it has been approved
                 if (! $flaggedrevisionlib->version_is_flagged($params['object_id'], $params['newver'], 'moderation', 'OK')) {
                     return($params['pagenotapproved_text']);

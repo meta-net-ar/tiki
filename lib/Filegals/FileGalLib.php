@@ -1025,7 +1025,7 @@ class FileGalLib extends TikiLib
                     $exec = reset($optArray);
 
                     if (! isset($executables[$exec])) {
-                        $executables[$exec] = (bool) `which $exec`;
+                        $executables[$exec] = (bool) shell_exec("which $exec");
                     }
 
                     if ($executables[$exec]) {

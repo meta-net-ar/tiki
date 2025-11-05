@@ -171,5 +171,5 @@
             $('#comment-toggle').comment_toggle();
         {/jq}
     </div>
-    <div id="comment-container"></div>
+    <div id="comment-container" class="my-3 mx-0"></div>
 {/if}

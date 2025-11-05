@@ -95,10 +95,6 @@ function wikiplugin_viewtextfile($data, $params)
     $fileId = $params['fileId'];
     $filedetails = [];
 
-    if (! isset($fileId)) {
-        return ("<p>" . tr("Error: Missing file ID. Please provide a valid fileId.") . "</p>");
-    }
-
     $fileinfo = $filegallib->get_file_info($fileId);
 
     if (empty($fileinfo)) {
@@ -124,7 +120,7 @@ function wikiplugin_viewtextfile($data, $params)
     $out = [];
 
     foreach ($filecontent_data as $line_num => $line) {
-        if ($line_num >= $params['startline'] && (empty($params['stopline']) || $line_num <= $params['stopline'])) {
+        if ($line_num >= $params['startline'] && (is_null($params['stopline']) || $line_num <= $params['stopline'])) {
             $out[$line_num] = $line;
         }
     }

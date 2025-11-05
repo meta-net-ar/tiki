@@ -53,7 +53,7 @@
             {$big_image = ($prefs.art_header_text_pos == 'below' && $list_image_x > 0)}
             {* Show either a topic name, image OR a custom image (if there is a custom image or a topic). If a topic is set, link to it even if we show a custom image. *}
             {if $topicId}
-                <a href="tiki-view_articles.php?topic={$topicId}" class="{if $useImage eq 'y' and $hasImage neq 'y'}{else}thumbnail{/if}{if $big_image} cboxElement{/if}" title="{if $show_image_caption and $image_caption}{$image_caption|escape}{else}{tr}List all articles of the same topic{/tr}{if $topicName ne ''} ({tr}{$topicName|escape}{/tr}){/if}{/if}"
+                <a href="tiki-view_articles.php?topic={$topicId}" class="{if $useImage eq 'y' and $hasImage neq 'y'}{else}thumbnail d-block me-3{/if}{if $big_image} cboxElement{/if}" title="{if $show_image_caption and $image_caption}{$image_caption|escape}{else}{tr}List all articles of the same topic{/tr}{if $topicName ne ''} ({tr}{$topicName|escape}{/tr}){/if}{/if}"
             >{/if}
             {if $useImage eq 'y'}
                 {if $hasImage eq 'y'}
@@ -148,8 +148,8 @@
     {/if}
 
     {if isset($related_articles)}
-        <div class="related_articles">
-            <h4>{tr}Related content:{/tr}</h4>
+        <div class="related_articles mt-5">
+            <h4 class="m-0">{tr}Related content:{/tr}</h4>
             <ul>
                 {foreach from=$related_articles item=related}
                     <li>{self_link articleId=$related.articleId}{$related.name}{/self_link}</li>

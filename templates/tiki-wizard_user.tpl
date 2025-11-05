@@ -10,8 +10,7 @@
     <div class="col-sm-12">
         {include file="wizard/wizard_bar_user.tpl"}
     </div>
-    <hr>
-<div id="wizardBody">
+<div id="wizardBody" class="mt-5">
     <div class="row">
         {if !empty($wizard_toc)}
             <div class="col-sm-4">

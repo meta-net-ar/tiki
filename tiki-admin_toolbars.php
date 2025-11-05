@@ -14,14 +14,13 @@ $inputConfiguration = [
                 [
         'staticKeyFilters'                    => [
                 'save'                        => 'alpha',          //post
-                'load'                        => 'alpha',          //post
                 'pref'                        => 'striptags',      //post
                 'section'                     => 'striptags',      //post
                 'comments'                    => 'bool',           //post
                 'view_mode'                   => 'striptags',      //post
                 'reset_all_custom_tools'      => 'bool',           //post
-                'reset'                       => 'bool',           //post
-                'reset_global'                => 'bool',           //post
+                'reset'                       => 'alpha',           //post
+                'reset_global'                => 'alpha',           //post
                 'save_tool'                   => 'bool',           //post
                 'tool_name'                   => 'striptags',      //post
                 'tool_label'                  => 'striptags',      //post

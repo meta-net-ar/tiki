@@ -22,7 +22,6 @@ function wikiplugin_relations_info()
                 'description' => tra('Comma-separated list of relation qualifiers.'),
                 'separator' => ',',
                 'filter' => 'attribute_type',
-                'default' => [],
                 'since' => '8.0',
             ],
             'object' => [
@@ -30,7 +29,6 @@ function wikiplugin_relations_info()
                 'name' => tra('Object'),
                 'description' => tr('Object identifier as %0type:itemId%1', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => null,
                 'since' => '8.0',
                 'profile_reference' => 'type_colon_object',
             ],
@@ -63,23 +61,16 @@ function wikiplugin_relations($data, $params)
 {
     $object = current_object();
 
-    if (isset($params['object']) && false !== strpos($params['object'], ':')) {
+    if (! is_null($params['object']) && false !== strpos($params['object'], ':')) {
         list($object['type'], $object['object']) = explode(':', $params['object'], 2);
     }
 
-    if (! isset($params['qualifiers'])) {
-        return WikiParser_PluginOutput::argumentError(['qualifiers']);
-    }
-
     $singlelist = false;
-    if (isset($params['singlelist']) && $params['singlelist']) {
+    if ($params['singlelist']) {
         $singlelist = true;
     }
 
-    $emptymsg = "No relations found.";
-    if (isset($params['emptymsg']) && $params['emptymsg']) {
-        $emptymsg = $params['emptymsg'];
-    }
+    $emptymsg = $params['emptymsg'];
 
     $data = [];
 

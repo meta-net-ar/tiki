@@ -16,9 +16,9 @@ $inputConfiguration = [
         'quizId'                   => 'int',             //get
         'remove'                   => 'int',             //get
         'clear'                    => 'bool',            //post
-        'sort_mode'                => 'word',            //get
+        'sort_mode'                => 'alnumdash',       //get
         'offset'                   => 'int',             //get
-        'find'                     => 'word',            //post
+        'find'                     => 'text',            //get
         ],
     ],
 ];

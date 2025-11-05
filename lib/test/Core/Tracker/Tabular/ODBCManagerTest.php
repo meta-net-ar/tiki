@@ -38,9 +38,7 @@ class ODBCManagerTest extends TestCase
 }}'), true));
         $reflection = new ReflectionClass($this->mock);
         $this->fillFieldsFromConfig = $reflection->getMethod('fillFieldsFromConfig');
-        $this->fillFieldsFromConfig->setAccessible(true);
         $this->reverseMapFieldsFromConfig = $reflection->getMethod('reverseMapFieldsFromConfig');
-        $this->reverseMapFieldsFromConfig->setAccessible(true);
     }
 
     public function testPermanentValues()

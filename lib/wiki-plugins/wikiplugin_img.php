@@ -62,7 +62,6 @@ function wikiplugin_img_info()
                 'filter' => 'text',
                 'advanced' => $prefs['feature_file_galleries'] == 'y',
                 'accepted' => tra('Valid image IDs separated by commas or |'),
-                'default' => '',
                 'parentparam' => ['name' => 'type', 'value' => 'id'],
             ],
             'src' => [
@@ -139,7 +138,6 @@ function wikiplugin_img_info()
                 'since' => '3.0',
                 'doctype' => 'link',
                 'filter' => 'url',
-                'default' => '',
             ],
             'height' => [
                 'required' => false,
@@ -614,7 +612,9 @@ function wikiplugin_img($data, $params)
     $imgdata['noDrawIcon']  = 'y';
 
     $params = array_map(function ($param) {
-        return str_replace('"', '&quot;', $param);
+        return is_null($param)
+            ? null
+            : str_replace('"', '&quot;', $param);
     }, $params);
 
     $imgdata = array_merge($imgdata, $params);
@@ -635,7 +635,7 @@ function wikiplugin_img($data, $params)
         }
     }
 
-    if (isset($imgdata['id'])) {
+    if (! is_null($imgdata['id'])) {
         if ($prefs['file_galleries_redirect_from_image_gallery'] !== 'y') {
             return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('The "id" parameter is not allowed unless "file_galleries_redirect_from_image_gallery" preference is enabled.'));
         }

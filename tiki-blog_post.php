@@ -22,8 +22,8 @@ $inputConfiguration = [
         'publish_Month'            => 'digits',            //post
         'publish_Day'              => 'digits',            //post
         'publish_Year'             => 'digits',            //post
-        'cancel'                   => 'bool',              //post
-        'referer'                  => 'word',              //post
+        'cancel'                   => 'alpha',             //post
+        'referer'                  => 'url',               //post
         'lang'                     => 'lang',              //post
         'data'                     => 'none',              //post
         'mode_normal'              => 'bool',              //post
@@ -32,10 +32,10 @@ $inputConfiguration = [
         'preview'                  => 'bool',              //post
         'excerpt'                  => 'text',              //post
         'freetag_string'           => 'text',              //post
-        'save'                     => 'bool',              //post
+        'save'                     => 'alpha',             //post
         'contributions'            => 'text',              //post
         'title'                    => 'string',            //post
-        'geolocation'              => 'word',              //post
+        'geolocation'              => 'text',              //post
         ],
     ],
 ];

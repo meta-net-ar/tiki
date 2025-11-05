@@ -9,7 +9,7 @@
         {icon name="admin_fgal" size=3 iclass="float-sm-end"}
         <h4 class="mt-0 mb-4">{tr}Set up the file gallery and attachments{/tr}. {tr}Choose to store them either in the database or in files on disk, among other options{/tr}.</h4>
             <fieldset class="mb-4">
-                {icon name="admin_fgal" size=2 iclass="adminWizardIconright"}
+                {icon name="admin_fgal" size=2 iclass="adminWizardIconright float-end ms-2"}
                 <legend>{tr}File Gallery{/tr}</legend>
 
                 {preference name='fgal_elfinder_feature'}
@@ -23,7 +23,7 @@
             </fieldset>
 
             <fieldset>
-                {icon name="admin_wiki" size=2 iclass="adminWizardIconright"}
+                {icon name="admin_wiki" size=2 iclass="adminWizardIconright float-end ms-2"}
                 <legend>{tr}Wiki Attachments{/tr}</legend>
                 {preference name=feature_wiki_attachments}
                 {preference name=feature_use_fgal_for_wiki_attachments}

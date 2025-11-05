@@ -141,7 +141,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of usernames to pre-fill as participants'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
             'defaultgroups' => [
@@ -150,7 +149,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of group names to pre-fill as participants'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
             'defaultdates' => [
@@ -159,7 +157,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of strtotime-compatible date strings to pre-fill (e.g., "next Friday", "+2 weeks 10:00")'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
         ]
@@ -200,13 +197,13 @@ function wikiplugin_convene($data, $params): string
     $params['id'] = empty($params['id']) ? 'pluginConvene' . $convenePluginIndex : $params['id'];
 
     // Handle new parameters
-    $default_users = ! empty($params['defaultusers'])
+    $default_users = ! is_null($params['defaultusers'])
         ? (is_array($params['defaultusers']) ? $params['defaultusers'] : explode(',', $params['defaultusers']))
         : [];
-    $default_groups = ! empty($params['defaultgroups'])
+    $default_groups = ! is_null($params['defaultgroups'])
         ? (is_array($params['defaultgroups']) ? $params['defaultgroups'] : explode(',', $params['defaultgroups']))
         : [];
-    $default_dates = ! empty($params['defaultdates'])
+    $default_dates = ! is_null($params['defaultdates'])
         ? (is_array($params['defaultdates']) ? $params['defaultdates'] : explode(',', $params['defaultdates']))
         : [];
 

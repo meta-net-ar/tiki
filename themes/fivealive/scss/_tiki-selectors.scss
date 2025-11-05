@@ -17,11 +17,14 @@
 // Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
 @use "sass:color";
+
 $imagePath: "../images/";
 
 // Color system
 // Body
-html {
+.layout_basic,
+.layout_basic.fullscreen,
+.navbar-collapse.collapse.in {
     background-color: #414141;
 }
 
@@ -29,10 +32,14 @@ html {
     color: #000000;
 }
 
+.layout_basic .container.container-std {
+    background: var(--bs-body-bg);
+}
+
 .header_outer,
 .layout_basic .top_modules {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#136d9f+0,28a7de+100 */
-    background: linear-gradient(to right, #136d9f 0%, #28a7de 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#136d9f+0,28a7de+100
+    background: linear-gradient(to right, #136d9f 0%, #28a7de 100%);
     color: #000000;
 }
 
@@ -61,6 +68,7 @@ html {
         margin-top: 0.5rem;
     }
 }
+
 .layout_classic #topbar_modules .module .navbar.bg-dark, .layout_classic #topbar_modules .module .navbar.bg-light {
     margin-top: 5px;
 }
@@ -108,14 +116,12 @@ html {
         padding: 12px 10px 6px 10px;
     }
 }
-    // Page footer
+
+// Page footer
 .main-footer {
     min-height: 60px;
-    margin-top: 50px;
     background: black;
     padding: 1px 0 2px 0;
-    width: 100%;
-    color: #dee2e6; // Color theme switched by JS isn't styling text
 }
 
 // Links
@@ -189,6 +195,7 @@ label a:hover {
 // Pagination
 // Cards
 .card.module {
+    border: none;
     --bs-card-border-color: transparent !important;
 }
 
@@ -208,10 +215,46 @@ label a:hover {
 // Breadcrumbs
 // Code
 // Tiki-specific
-// Dark mode
+
+//.bottom_modules {
+//    .card-body { color: #dee2e6; background: #262626; }
+//}
+
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    color: #dee2e6;
+
+    .tiki-card-header-title {
+        color: #333 !important;
+    }
+
+    //    .card-header { background: ; }
+    //    .card, .card-header { border-color: transparent; }
+    .card-body {
+        color: #dee2e6;
+        background: #262626;
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link {
+        color: #1ea6be;
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover {
+        color: #8BB9FE;
+    }
+}
 
 
-
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    .card {
+        color: #dee2e6;
+        background: #000;
+    }
+}
 
 // External libraries
-

@@ -198,7 +198,6 @@ function wikiplugin_addtocart_info()
 function wikiplugin_addtocart($data, $params)
 {
     global $cartuserlist, $globalperms;
-
     $smarty = TikiLib::lib('smarty');
     $userlib = TikiLib::lib('user');
     $headerlib = TikiLib::lib('header');
@@ -207,8 +206,27 @@ function wikiplugin_addtocart($data, $params)
     if (! session_id()) {
         session_start();
     }
-    if (! isset($params['code'], $params['description'], $params['price'])) {
-        return WikiParser_PluginOutput::argumentError(array_diff([ 'code', 'description', 'price'], array_keys($params)));
+
+    $invalidDataType = [];
+    $invalidDataType[] = is_numeric($params['code']) ? null : 'code';
+    $invalidDataType[] = is_numeric($params['price']) ? null : 'price';
+    $invalidDataType = array_filter($invalidDataType);
+    if (! empty($invalidDataType)) {
+        return WikiParser_PluginOutput::userError(tra(
+            'Invalid data type for parameter(s): %0. Expected numeric value.',
+            '',
+            false,
+            [implode(', ', $invalidDataType)]
+        ));
+    }
+
+    $missing = [];
+    $missing[] = empty($params['code']) ? 'code' : null;
+    $missing[] = empty($params['description']) ? 'description' : null;
+    $missing = array_filter($missing);
+
+    if (! empty($missing)) {
+        return WikiParser_PluginOutput::argumentError($missing);
     }
 
     // once forceanon is set it will have to affect the whole shopping cart otherwise it will be inconsistent

@@ -1,5 +1,5 @@
 {capture assign=modzonetop}
-    {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
+    {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
 {/capture}
 {capture assign=modzonetopbar}
     {modulelist zone=topbar class="topbar_modules topbar navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Navigation and related functionality and content{/tr}'}
@@ -39,7 +39,7 @@
     {include file='tiki-maintenance_banner.tpl'}
 {/if}
 <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
-<div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
+<div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std d-flex min-vh-100 flex-column my-0">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         <div class="row">
             <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
@@ -103,12 +103,10 @@
                 {/if}
             </div>
             <div class="col col3 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if}" id="col3">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
-                    {/if}
-                    {$modzoneright}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                {/if}
+                {$modzoneright}
             </div>
         </div>
         {elseif zone_is_empty('right') or $prefs.feature_right_column eq 'n'}
@@ -142,12 +140,10 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if} order-sm-2 order-md-2 order-lg-1" id="col2">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
-                    {/if}
-                    {$modzoneleft}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                {/if}
+                {$modzoneleft}
             </div>
         {else}
             <div class="col col1 col-sm-12 col-lg-8 order-xs-1 order-lg-2 pb-4" id="col1">
@@ -188,26 +184,22 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-2 order-md-2 order-lg-1" id="col2">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
-                    {/if}
-                    {$modzoneleft}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                {/if}
+                {$modzoneleft}
             </div>
             <div class="col col3 col-12 col-md-6 col-lg-2 order-md-3" id="col3">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
-                    {/if}
-                    {$modzoneright}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                {/if}
+                {$modzoneright}
             </div>
         {/if}
     </div>
 
 {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
-    <footer class="row footer main-footer" id="footer">
+    <footer class="row footer main-footer mt-auto" id="footer">
         <div class="footer_liner w-100">
             {$modzonebottom}
         </div>

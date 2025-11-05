@@ -68,7 +68,6 @@ function wikiplugin_ajaxload_info()
                 'name' => tra('Id'),
                 'description' => tra('HTML id for the div or iframe.'),
                 'filter' => 'text',
-                'default' => '',
                 'since' => '14.1',
             ],
             'class' => [
@@ -146,15 +145,7 @@ function wikiplugin_ajaxload($data, $params)
     static $instance = 0;
     $instance++;
 
-    if (empty($params['url'])) {
-        return WikiParser_PluginOutput::userError(tr('Parameter "URL" is missing'));
-    }
-
-    if ($params['id']) {
-        $id = $params['id'];
-    } else {
-        $id = 'wp_ajaxload_' . $instance;
-    }
+    $id = ! is_null($params['id']) ? $params['id'] : 'wp_ajaxload_' . $instance;
     $attributes = empty($params['class']) ? '' : ' class="' . $params['class'] . '"';
     $attributes .= ' width="' . $params['width'] . '" height="' . $params['height'] . '"';
 

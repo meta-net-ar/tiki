@@ -16,21 +16,18 @@ function wikiplugin_oembed_info()
           'name' => tra('URL'),
           'description' => tra('Complete URL to the oEmbed video or media'),
           'filter' => 'url',
-          'default' => '',
         ],
         'width' => [
           'required' => false,
           'name' => tra('Width'),
           'description' => tra('Width in pixels (e.g., 560). Leave empty to use provider dimensions.'),
           'filter' => 'digits',
-          'default' => '',
         ],
         'height' => [
           'required' => false,
           'name' => tra('Height'),
           'description' => tra('Height in pixels (e.g., 315). Leave empty to use provider dimensions.'),
           'filter' => 'digits',
-          'default' => '',
         ],
         'privacyEnhanced' => [
           'required' => false,
@@ -50,7 +47,6 @@ function wikiplugin_oembed_info()
           'description' => tra('Object background color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
           'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
           'filter' => 'text',
-          'default' => '',
           'advanced' => true
         ],
         'border' => [
@@ -59,7 +55,6 @@ function wikiplugin_oembed_info()
           'description' => tra('Object border color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
           'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
           'filter' => 'text',
-          'default' => '',
           'advanced' => true
         ],
         'borderRadius' => [
@@ -103,11 +98,6 @@ function wikiplugin_oembed($data, $params)
         $params = [];
     }
 
-    if (empty($params['url'])) {
-        Feedback::error(tra('Plugin oEmbed error: the URL parameter is empty.'));
-        return '';
-    }
-
     $oEmbedData = getOEmbedData($params['url']);
     if (! $oEmbedData) {
         Feedback::error(tra('Invalid URL or no oEmbed data found.'));
@@ -135,7 +125,7 @@ function wikiplugin_oembed($data, $params)
     $newIframe->setAttribute('sandbox', 'allow-scripts allow-same-origin');
     $newIframe->setAttribute('title', tra('Embedded media content'));
 
-    if (isset($params['start']) && is_numeric($params['start']) && $params['start'] > 0) {
+    if (is_numeric($params['start']) && $params['start'] > 0) {
         $src = $newIframe->getAttribute('src');
         $newIframe->setAttribute('src', $src . (strpos($src, '?') === false ? '?' : '&') . 'start=' . $params['start']);
     }
@@ -163,7 +153,7 @@ function wikiplugin_oembed($data, $params)
         $aspectRatio = $oEmbedData['width'] / $oEmbedData['height'];
     }
 
-    if (! empty($params['width']) && is_numeric($params['width']) && $params['width'] > 0) {
+    if (! is_null($params['width']) && is_numeric($params['width']) && $params['width'] > 0) {
         $containerStyles['width'] = $params['width'] . 'px';
         $containerStyles['margin'] = '0 auto';
         $useResponsive = false;
@@ -172,7 +162,7 @@ function wikiplugin_oembed($data, $params)
         } elseif ($aspectRatio) {
             $containerStyles['aspect-ratio'] = $aspectRatio;
         }
-    } elseif (! empty($params['height']) && is_numeric($params['height']) && $params['height'] > 0) {
+    } elseif (! is_null($params['height']) && is_numeric($params['height']) && $params['height'] > 0) {
         $containerStyles['height'] = $params['height'] . 'px';
         $useResponsive = false;
         if ($aspectRatio) {
@@ -194,11 +184,11 @@ function wikiplugin_oembed($data, $params)
         $containerStyles['border-radius'] = '8px';
     }
 
-    if (! empty($params['bg'])) {
+    if (! is_null($params['bg'])) {
         $containerStyles['background-color'] = $params['bg'];
     }
 
-    if (! empty($params['border'])) {
+    if (! is_null($params['border'])) {
         $containerStyles['border'] = '1px solid ' . $params['border'];
     }
 

@@ -20,7 +20,7 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Features{/tr}</legend>
             <div class="adminoption mb-3 row">
-                <ul><li>{tr}Federation:{/tr} <a class="adminoption" href="tiki-admin_sync.php">{tr}Synchronize Dev{/tr}</a>
+                <ul><li>{tr}Federation:{/tr} <a class="adminoption text-center" href="tiki-admin_sync.php">{tr}Synchronize Dev{/tr}</a>
                     <a href="https://doc.tiki.org/Sync%20Dev-Prod%20Servers" target="tikihelp" class="tikihelp text-info" title="{tr}Tiki19:{/tr}
                         {tr}Use this tool if you have at least two different Tiki instances serving as development, staging or production instances. You can compare differences between Tiki configuration, wiki pages and their contents as well as tracker and field configurations. Especially useful when changes from a development server needs to be applied to production one. This tool will only show differences between instances, you will still have to manually apply the changes to the production one.{/tr}
                         <br/><br/>

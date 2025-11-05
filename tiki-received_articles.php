@@ -36,9 +36,9 @@ $inputConfiguration = [
         'created'                  => 'bool',              //post
         'remove'                   => 'int',               //get
         'save'                     => 'bool',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //get
-        'find'                     => 'word',              //post
+        'find'                     => 'text',              //get
         ],
     ],
 ];

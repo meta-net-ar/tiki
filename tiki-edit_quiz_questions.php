@@ -18,15 +18,15 @@ $inputConfiguration = [
             'question'                    => 'text',           //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'questionType'                => 'string',         //post
-            'position'                    => 'string',         //post
+            'questionType'                => 'word',         //post
+            'position'                    => 'int',         //post
             'import'                      => 'bool',           //post
             'input_data'                  => 'text',           //post
             'useQuestion'                 => 'bool',           //post
             'usequestionid'               => 'int',            //post
-            'sort_mode'                   => 'text',          //get
+            'sort_mode'                   => 'alnumdash',          //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];

@@ -38,7 +38,6 @@ $color-contrast-dark:             $gray-900;
 $color-contrast-light:            $white;
 
 // Options
-
 // Prefix
 $prefix: bs-;
 
@@ -46,7 +45,7 @@ $prefix: bs-;
 $body-bg:                   $white;  // default
 $body-color: #212529;
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color: #52702E; // #638637;
@@ -61,12 +60,11 @@ $component-active-bg: $secondary;
 
 // Navs
 $nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #f8f9d4;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #638637;
+$tiki-nav-tabs-link-bg: #f8f9d4;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #638637;
 
 // Navbars
-
 // Navbar
 $navbar-dark-color:                 rgba($white, .85); // !default;
 $navbar-dark-hover-color:           rgba($white, .75) !default;
@@ -97,7 +95,6 @@ $input-border-bottom-color: #fff;
 $input-border-left-color: #f5fb86;
 
 // Form validation
-
 // Dropdowns
 $dropdown-bg: #baba25;
 $dropdown-border-color: rgba(0, 0, 0, 0.15);
@@ -136,10 +133,14 @@ $code-color:                       $body-color; //  $pink; default
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
 // Needed for footer and modules in _selectors-for-options.scss
-$side-column-heading-color: #7E7615; // #cdbe23;
-$footer_liner-card-inner-border: #ebdc14;
-$footer-accent-color: #ebdc14;
-$tiki-footer-border-color: $footer-accent-color;
+$tiki-side-column-card-header-color: #7E7615; // #cdbe23;
+$tiki-footer_liner-card-inner-border: #ebdc14;
+$tiki-footer-accent-color: #ebdc14;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
+
+$tiki-dark-footer-card-header-border-color: #e4af00;
+$tiki-dark-footer-link-color: #71983e;
+$tiki-dark-footer-link-hover-color: #82a653;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -148,6 +149,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #212121;
     --tiki-top-hover-color: #3d3d3d;
     --tiki-top-text-color: #3d3d3d;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 
@@ -163,6 +166,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #2b3210; // #{$navbar-dark-link-color};
     --tiki-top-hover-color: #3f4624;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

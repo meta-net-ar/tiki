@@ -1,4 +1,4 @@
-<div class="wikitopline clearfix" style="clear: both;">
+<div class="wikitopline clearfix">
     <div class="content">
         {if !isset($hide_page_header) or !$hide_page_header}
             <div class="wikiinfo float-start">

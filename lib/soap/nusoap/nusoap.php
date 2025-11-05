@@ -3122,7 +3122,6 @@ class soap_transport_http extends nusoap_base {
             }
             $this->debug($err);
             $this->setError($err);
-            curl_close($this->ch);
             return false;
         } else {
             //echo '<pre>';
@@ -3131,7 +3130,6 @@ class soap_transport_http extends nusoap_base {
         }
         // close curl
         $this->debug('No cURL error, closing cURL');
-        curl_close($this->ch);
 
         // try removing skippable headers
         $savedata = $data;
@@ -7022,13 +7020,13 @@ class nusoap_parser extends nusoap_base {
             return (int) $value;
         }
         if ($type == 'float' || $type == 'double' || $type == 'decimal') {
-            return (double) $value;
+            return (float) $value;
         }
         if ($type == 'boolean') {
             if (strtolower($value) == 'false' || strtolower($value) == 'f') {
                 return false;
             }
-            return (boolean) $value;
+            return (bool) $value;
         }
         if ($type == 'base64' || $type == 'base64Binary') {
             $this->debug('Decode base64 value');

@@ -471,6 +471,9 @@
         "lib\/core\/Tracker\/Field\/Duration.php": {
             "class:Tracker_Field_Duration": true
         },
+        "lib\/core\/Tracker\/Field\/BigBlueButton.php": {
+            "class:Tracker_Field_BigBlueButton": true
+        },
         "lib\/core\/Tracker\/Options.php": {
             "class:Tracker_Options": true
         },
@@ -4022,6 +4025,9 @@
         },
         "lib\/core\/Tracker\/Query.php": {
             "Tracker_Query": true
+        },
+        "lib\/core\/Tracker\/Field\/BigBlueButton.php": {
+            "Tracker_Field_BigBlueButton": true
         },
         "lib\/core\/Math\/Formula\/Element.php": {
             "Math_Formula_Element": true

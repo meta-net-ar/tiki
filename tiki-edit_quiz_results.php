@@ -15,12 +15,12 @@ $inputConfiguration = [
             'resultId'                    => 'int',            //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'fromPoints'                  => 'digits',         //post
-            'toPoints'                    => 'digits',         //post
+            'fromPoints'                  => 'float',         //post
+            'toPoints'                    => 'float',         //post
             'answer'                      => 'xss',            //post
-            'sort_mode'                   => 'string',         //get
+            'sort_mode'                   => 'alnumdash',         //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];

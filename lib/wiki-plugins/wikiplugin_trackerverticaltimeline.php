@@ -22,7 +22,6 @@ function wikiplugin_trackerverticaltimeline_info()
                 'description' => tra('Numeric value representing the tracker ID'),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker',
             ],
             'title' => [
@@ -77,7 +76,6 @@ function wikiplugin_trackerverticaltimeline_info()
                     datetime/jscalendar field.'),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -111,7 +109,7 @@ function wikiplugin_trackerverticaltimeline_info()
                 ),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => 'left-right'
+                'default' => 'minute'
             ],
             'orientation' => [
                 'required' => false,
@@ -147,43 +145,32 @@ function wikiplugin_trackerverticaltimeline($data, $params)
     static $instance = 0;
     $instance++;
 
-    if (! isset($params['tracker'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
-    }
-
-    if (! isset($params['date'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'date') . '{BOX}';
-    }
-
-    $default = ['aggregateBy' => 'minute'];
-    $params = array_merge($default, $params);
-
     $urlTarget = "";
-    if (isset($params['urlTarget'])) {
+    if ($params['urlTarget']) {
         $fieldIds[ $params['urlTarget'] ] = 'urlTarget';
 
         $urlTarget = ".urlTarget('" . $params['urlTarget'] . "')";
     }
 
     $distribution = "";
-    if (isset($params['distribution'])) {
+    if ($params['distribution']) {
         $fieldIds[ $params['distribution'] ] = 'distribution';
         $distribution = ".distribution('" . $params['distribution'] . "')";
     }
 
     $orientation = "";
-    if (isset($params['orientation'])) {
+    if ($params['orientation']) {
         $fieldIds[ $params['orientation'] ] = 'orientation';
         $orientation = ".orientation('" . $params['orientation'] . "')";
     }
 
     $height = 'auto';
-    if (isset($params['height'])) {
+    if ($params['height']) {
         $fieldIds[ $params['height'] ] = 'height';
         $height = $params['height'];
     }
     $aggregateBy = "";
-    if (isset($params['aggregateBy'])) {
+    if ($params['aggregateBy']) {
         $fieldIds[ $params['aggregateBy'] ] = 'aggregateBy';
         $aggregateBy = ".aggregateBy('" . $params['aggregateBy'] . "')";
     }

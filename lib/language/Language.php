@@ -129,6 +129,7 @@ class Language extends TikiDb_Bridge
             case 'he':
             case 'ku':
             case 'ug':
+            case 'ur':
                 return true;
         }
         return false;

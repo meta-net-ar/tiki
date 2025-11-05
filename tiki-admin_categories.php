@@ -11,12 +11,49 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save'         => 'bool',                //post
+            'save'              => 'alpha',          //post
+            'import'            => 'alpha',          //post
             'parentId'     => 'int',                 //get
+            'categId'           => 'int',            //get/post
             'cookietab'    => 'int',                 //get
-            'sort_mode'    => 'striptags',           //get
+            'sort_mode'         => 'alnumdash',      //get
             'name'         => 'striptags',           //post
             'description'  => 'xss',                 //post
+            'pollId'            => 'int',            //post
+            'faqId'             => 'int',            //post
+            'trackerId'         => 'int',            //post
+            'quizId'            => 'int',            //post
+            'forumId'           => 'int',            //post
+            'galleryId'         => 'int',            //post
+            'file_galleryId'    => 'int',            //post
+            'articleId'         => 'int',            //post
+            'blogId'            => 'int',            //post
+            'directoryId'       => 'int',            //post
+            'removeObject'      => 'int',            //get
+            'removeCat'         => 'int',            //get
+            'tplGroupContainer' => 'int',            //post
+            'tplGroupPattern'   => 'text',           //post
+            'parentPerms'       => 'alpha',          //post
+            'applyRoles'        => 'alpha',          //post
+            'find'              => 'text',           //get
+            'find_objects'      => 'text',           //get
+            'offset'            => 'int',            //get
+            'addpage'           => 'alpha',          //post
+            'addpoll'           => 'alpha',          //post
+            'addfaq'            => 'alpha',          //post
+            'addtracker'        => 'alpha',          //post
+            'addquiz'           => 'alpha',          //post
+            'addforum'          => 'alpha',          //post
+            'addgallery'        => 'alpha',          //post
+            'addfilegallery'    => 'alpha',          //post
+            'addarticle'        => 'alpha',          //post
+            'addblog'           => 'alpha',          //post
+            'adddirectory'      => 'alpha',          //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'pageName'          => 'text',           //post
+            'categoryRole'      => 'int',            //post
+            'rolesToApply'      => 'int',            //post
         ],
     ],
 ];

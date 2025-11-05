@@ -514,7 +514,13 @@ if ( \$('#$id') ) {
         }
 
         if (! $validationPerformed) {
+            $originalData = $data;
             $this->plugin_apply_filters($name, $data, $args);
+
+            // If validation failed and plugin_apply_filters set $data to WikiParser_PluginOutput::userError message, return it immediately
+            if ($data !== $originalData && strpos($data, tra('Plugin argument(s) missing or invalid:')) !== false) {
+                return $data;
+            }
         }
 
         $result = '';

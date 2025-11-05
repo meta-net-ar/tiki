@@ -20,21 +20,19 @@ function wikiplugin_playscorm_info()
         'introduced' => 12,
         'params' => [
             'fileId' => [
-                                'required' => true,
-                                'name' => tra('File ID'),
-                                'area' => 'fgal_picker_id',
-                                'description' => tra('Numeric ID of a SCORM zip file in a File Gallery'),
+                'required' => true,
+                'name' => tra('File ID'),
+                'area' => 'fgal_picker_id',
+                'description' => tra('Numeric ID of a SCORM zip file in a File Gallery'),
                 'since' => '12.0',
                 'filter' => 'digits',
-                                'default' => '',
-                        ],
+            ],
             'moodle_url' => [
                 'required' => true,
                 'name' => tra('Moodle URL'),
                 'description' => tra('Web address of the Moodle instance'),
                 'since' => '12.0',
                 'filter' => 'url',
-                'default' => '',
             ],
             'moodle_course_id' => [
                 'required' => true,
@@ -42,7 +40,6 @@ function wikiplugin_playscorm_info()
                 'description' => tra('Course ID in Moodle to upload SCORM objects to'),
                 'since' => '12.0',
                 'filter' => 'digits',
-                'default' => '',
             ],
             'width' => [
                 'safe' => true,
@@ -216,26 +213,14 @@ function wikiplugin_playscorm($data, $params)
     $src = "$moodle_url/mod/scorm/view.php?id=$moodle_cm_id"; // this is the simple play "student" version requiring hacks since the teacher does not get it
     //$src = "$moodle_url/mod/scorm/player.php?mode=review&cm=$moodle_cm_id&display=popup"; // alternative player version?
 
-    if (isset($width)) {
-        $smarty->assign('iframewidth', $width);
-    } else {
-        $smarty->assign('iframewidth', 1160);
-    }
-    if (isset($height)) {
-        $smarty->assign('iframeheight', $height);
-    } else {
-         $smarty->assign('iframeheight', 740);
-    }
-    if (isset($scrolling) && $scrolling == 'n') {
+    $smarty->assign('iframewidth', $width);
+    $smarty->assign('iframeheight', $height);
+    if ($scrolling == 'n') {
         $smarty->assign('iframescrolling', 'false');
     } else {
         $smarty->assign('iframescrolling', 'true');
     }
-    if (isset($id)) {
-        $smarty->assign('id', $id);
-    } else {
-        $smarty->assign('id', '');
-    }
+    $smarty->assign('id', $id);
     $smarty->assign('iframeurl', $src);
     return $smarty->fetch('wiki-plugins/wikiplugin_playscorm.tpl');
 }

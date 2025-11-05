@@ -21,7 +21,6 @@ function wikiplugin_fancytable_info()
                  'required' => false,
                  'name' => tra('Heading Row'),
                  'description' => tr('Header rows of the table. Use %0 to separate multiple rows.', '<code>>></code>'),
-                 'default' => '',
                  'since' => '1'
              ],
              'headclass' => [
@@ -198,7 +197,7 @@ function wikiplugin_fancytable($data, $params)
         $desc = '<caption>' . $desc . '</caption>';
     }
     // Prepare table attributes
-    $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y';
+    $sticky = $allowStickyHeaders == 'y';
     $style = $sort ? ' style="visibility:hidden"' : '';
     $wret = '<div id="wpfancytable' . $iFancytable . '-div"' . $style
         . ' class="table-responsive ts-wrapperdiv ' . ($sticky ? 'table-sticky' : '') . '">' . "\r\t";
@@ -210,7 +209,7 @@ function wikiplugin_fancytable($data, $params)
     $wret .= '<table class="' . $tableClass . '" id="wpfancytable' . $iFancytable . '">' . "\r\t";
 
     // Process header
-    if (isset($head)) {
+    if (! is_null($head)) {
         $tdhdr = ! empty($headclass) ? "\r\t\t\t" . '<th class="' . $headclass . '"' : "\r\t\t\t<th";
         //replace tiki tags, plugins and other enclosing characters with hash strings before creating table so that any
         //pipes (| or ~|~) inside aren't mistaken for cell dividers
@@ -228,9 +227,9 @@ function wikiplugin_fancytable($data, $params)
             '>>',
             $tdhdr,
             '</th>',
-            $colwidths ?? '',
-            $headaligns ?? '',
-            $headvaligns ?? ''
+            $colwidths,
+            $headaligns,
+            $headvaligns
         );
 
         //restore original tags and plugin syntax
@@ -253,9 +252,9 @@ function wikiplugin_fancytable($data, $params)
         "\n",
         "\r\t\t\t" . '<td',
         '</td>',
-        $colwidths ?? '',
-        $colaligns ?? '',
-        $colvaligns ?? ''
+        $colwidths,
+        $colaligns,
+        $colvaligns
     );
     //restore original tags and plugin syntax
     $bodyhtml = $bodyrows['html'];

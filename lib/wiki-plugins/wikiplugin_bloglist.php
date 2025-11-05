@@ -19,7 +19,6 @@ function wikiplugin_bloglist_info()
                 'name' => tra('Blog ID'),
                 'description' => tra('Select one or more blogs to list posts from. Limitation: if more than one blog is selected, private posts (drafts) will not be shown.'),
                 'filter' => 'striptags',
-                'default' => '',
                 'profile_reference' => 'blog',
                 'separator' => ':',
                 'since' => '1'
@@ -28,8 +27,8 @@ function wikiplugin_bloglist_info()
                 'required' => false,
                 'name' => tra('Maximum Items'),
                 'description' => tra('Maximum number of entries to list (no maximum set by default)'),
-                'filter' => 'digits',
-                'default' => '',
+                'filter' => 'int',
+                'default' => '-1',
                 'since' => '3.0'
             ],
             'author' => [
@@ -133,7 +132,6 @@ function wikiplugin_bloglist_info()
                 'name' => tra('Start Date'),
                 'description' => tra('Earliest date to select posts from.') . ' (<code>YYYY-MM-DD</code>)',
                 'filter' => 'date',
-                'default' => '',
                 'since' => '3.5',
             ],
             'dateEnd' => [
@@ -141,7 +139,6 @@ function wikiplugin_bloglist_info()
                 'name' => tra('End Date'),
                 'description' => tra('Latest date to select posts from.') . ' (<code>YYYY-MM-DD</code>)',
                 'filter' => 'date',
-                'default' => '',
                 'since' => '3.5',
             ],
             'containerClass' => [
@@ -167,16 +164,9 @@ function wikiplugin_bloglist($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $params['Id'] = implode(':', $params['Id']);
-    if (! isset($params['Id'])) {
-        Feedback::error(tra('Missing blog ID for Bloglist plugin'));
-        return '';
-    }
     // Sanitize $params['Id'])
     $params['Id'] = preg_filter('/[^0-9:]*/', '', $params['Id']);
 
-    if (! isset($params['Items'])) {
-        $params['Items'] = -1;
-    }
     if (! isset($params['offset'])) {
         $params['offset'] = 0;
     }
@@ -187,10 +177,10 @@ function wikiplugin_bloglist($data, $params)
         $params['isHtml'] = 'n';
     }
 
-    if (isset($params['dateStart'])) {
+    if (! is_null($params['dateStart'])) {
         $dateStartTS = strtotime($params['dateStart']);
     }
-    if (isset($params['dateEnd'])) {
+    if (! is_null($params['dateEnd'])) {
         $dateEndTS = strtotime($params['dateEnd']);
     }
     $dateStartTS = ! empty($dateStartTS) ? $dateStartTS : 0;
@@ -198,27 +188,17 @@ function wikiplugin_bloglist($data, $params)
 
     $smarty->assign('container_class', $params['containerClass']);
 
-    if (! isset($params['wordBoundary'])) {
-        $params['wordBoundary'] = '';
-    }
-    if (! isset($params['ellipsis'])) {
-        $params['ellipsis'] = '';
-    }
-    if (! isset($params['more'])) {
-        $params['more'] = '';
-    }
-
     if ($params['simpleList'] == 'y') {
         $bloglib = TikiLib::lib('blog');
-        $blogItems = $bloglib->list_posts($params['offset'], $params['Items'], $params['sort_mode'], $params['find'], $params['Id'], $params['author'], '', $dateStartTS, $dateEndTS);
+        $blogItems = $bloglib->list_posts($params['offset'], $params['Items'], $params['sort_mode'], $params['find'] ?? '', $params['Id'], $params['author'], '', $dateStartTS, $dateEndTS);
         $smarty->assign_by_ref('blogItems', $blogItems['data']);
         $template = 'wiki-plugins/wikiplugin_bloglist.tpl';
     } else {
         $bloglib = TikiLib::lib('blog');
 
-        $blogItems = $bloglib->list_blog_posts($params['Id'], false, $params['offset'], $params['Items'], $params['sort_mode'], $params['find'], $dateStartTS, $dateEndTS);
+        $blogItems = $bloglib->list_blog_posts($params['Id'], false, $params['offset'], $params['Items'], $params['sort_mode'], $params['find'] ?? '', $dateStartTS, $dateEndTS);
 
-        if (isset($params['charCount']) && $params['charCount'] > 0) {
+        if ($params['charCount'] > 0) {
             $blogItems = $bloglib->mod_blog_posts($blogItems, $params['charCount'], $params['wordBoundary'], $params['ellipsis'], $params['more']);
         }
 
@@ -227,7 +207,7 @@ function wikiplugin_bloglist($data, $params)
 
         $smarty->assign('ownsblog', $user && ! empty($blog_data["user"]) && $user == $blog_data["user"] ? 'y' : 'n');
 
-        if (isset($params['showIcons']) && $params['showIcons'] == 'n') {
+        if ($params['showIcons'] == 'n') {
             $smarty->assign('excerpt', 'y');
         }
 

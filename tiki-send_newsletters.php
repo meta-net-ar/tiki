@@ -15,7 +15,7 @@ $inputConfiguration = [
             'nlId'                 => 'digits',            //post
             'cancel'               => 'bool',              //post
             'editionId'            => 'digits',            //post
-            'sendingUniqId'        => 'bool',              //post
+            'sendingUniqId'        => 'text',              //post
             'cookietab'            => 'digits',            //post
             'resend'               => 'bool',              //post
             'remove'               => 'int',               //get
@@ -33,7 +33,7 @@ $inputConfiguration = [
             'datatxt'              => 'text',              //post
             'replyto'              => 'email',             //post
             'sendfrom'             => 'email',             //post
-            'usedTpl'              => 'bool',              //post
+            'usedTpl'              => 'text',              //post
             'save'                 => 'bool',              //post
             'resendEditionId'      => 'bool',              //post
             'begin'                => 'bool',              //post
@@ -41,12 +41,16 @@ $inputConfiguration = [
             'ticket'               => 'string',               //post
             'clipArticles'         => 'bool',              //post
             'articleClip'          => 'text',              //post
-            'ed_sort_mode'         => 'word',              //get
-            'dr_sort_mode'         => 'word',              //get
+            'dataparsed'           => 'none',              //post
+            'ed_sort_mode'         => 'alnumdash',         //get
+            'dr_sort_mode'         => 'alnumdash',         //get
             'ed_offset'            => 'int',               //get
             'dr_offset'            => 'int',               //get
             'ed_find'              => 'word',              //post
             'dr_find'              => 'word',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'newsletterfile'       => 'text',              //post
         ],
     ],
 ];

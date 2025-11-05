@@ -16,6 +16,7 @@ $inputConfiguration = [
         'offline'              => 'bool',               //post
         'removeuser'           => 'username',           //post
         'find_users'           => 'string',             //post
+        'show_html'            => 'alpha',              //get
         ],
     ],
 ];

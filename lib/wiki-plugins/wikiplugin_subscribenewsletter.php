@@ -22,7 +22,6 @@ function wikiplugin_subscribenewsletter_info()
                 'description' => tra('Identification number of the Newsletter that you want to allow the users to subscribe to'),
                 'since' => '5.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'newsletter',
             ],
             'thanks' => [
@@ -94,9 +93,6 @@ function wikiplugin_subscribenewsletter($data, $params)
     if ($prefs['feature_newsletters'] != 'y') {
         return tra('Feature disabled');
     }
-    if (empty($nlId)) {
-            return tra('Incorrect param');
-    }
     $info = $nllib->get_newsletter($nlId);
     if (empty($info) || $info['allowUserSub'] != 'y') {
         return tra('Incorrect param');
@@ -164,7 +160,7 @@ function wikiplugin_subscribenewsletter($data, $params)
     $smarty->assign_by_ref('subscribeInfo', $info);
     $smarty->assign('useCaptcha', $useCaptcha);
     $res = $smarty->fetch('wiki-plugins/wikiplugin_subscribenewsletter.tpl');
-    if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
+    if ($params["wikisyntax"] == 1) {
         return $res;
     } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
         return '~np~' . $res . '~/np~';

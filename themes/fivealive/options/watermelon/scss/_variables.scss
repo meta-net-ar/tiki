@@ -1,4 +1,5 @@
-//Custom styles for the FiveAlive Watermelon theme option.
+// Custom variables for the Watermelon theme option of the FiveAlive theme
+
 $tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
@@ -8,6 +9,9 @@ $tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 
 
 $red-300: tint-color($red, 40%);  // default
 $green-300: tint-color($green, 40%);  // default
+
+$white:    #fff;
+$black:    #000;
 
 $primary:       #E61437; //#eb1e41;
 $secondary:     #8c1932;
@@ -107,7 +111,7 @@ $pagination-disabled-border-color: #dddddd;
 
 // Cards
 $card-border-color: #49006c;
-$card-cap-color: $light;
+$card-cap-color: $white;
 
 // Code
 
@@ -122,6 +126,13 @@ $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
 $tiki-postbody-title-card-title-color: #fff;
 
+// Footer colors in light and dark mode
+$tiki-dark-footer-card-header-bg: $tiki-top-bg;
+$tiki-dark-footer-card-header-title-color: #fff !important;
+$tiki-dark-footer-card-border-color: rgba(#fff, .45);
+$tiki-dark-footer-link-color: #f05670;
+$tiki-dark-footer-link-hover-color: #f6768c;
+
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
@@ -130,6 +141,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #f9f9f9; // #{$navbar-light-color};
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: var(--tiki-top-text-color);
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #152304;
     --tiki-top-border-color: #152304;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
@@ -139,10 +152,10 @@ $tiki-postbody-title-card-title-color: #fff;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #233b07;
-    --tiki-topbar-color: var(--tiki-top-color);
-    --tiki-topbar-hover-color: var(-tiki-top-hover-color);
-    --tiki-topbar-text-color: var(-tiki-top-hover-color);
+    --tiki-topbar-bg: #3c4822;
+    --tiki-topbar-color: #f9f9f9;
+    --tiki-topbar-hover-color: #f2f2f2;
+    --tiki-topbar-text-color: #f2f2f2;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
         --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
@@ -154,6 +167,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: var(--tiki-top-color);
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: var(-tiki-top-hover-color);
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #152304;
     --tiki-top-border-color: #152304;
 }
@@ -296,7 +311,3 @@ header.navbar.fixed-top {
     --bs-accordion-btn-bg: var(--tiki-topbar-bg);
     --bs-accordion-btn-color: #fff;
 }
-
-//:root {
-//    --bs-font-size-base: 1rem;
-//}

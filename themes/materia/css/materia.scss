@@ -52,12 +52,6 @@ input[type="radio"],
     margin-top: 0;
 }
 
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
 .navbar-dark-parent .form-control::placeholder, .navbar-dark-parent .form-control:focus, .navbar-dark-parent .form-control, .navbar-dark .form-control::placeholder, .navbar-dark .form-control:focus, .navbar-dark .form-control {
     color: rgba(255, 255, 255, 0.75);
 }

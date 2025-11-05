@@ -100,9 +100,14 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             ? $requestData[$ins_id]
             : $this->getValue();
 
-        if (! empty($value) && ! is_int((int) $value)) {    // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
-            $value = '';
-            Feedback::error(tr('Date Picker Field: "%0" is not a valid internal date value', $value));
+        if (! empty($value)) {
+            try {
+                // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
+                $this->validateTimestamp($value);
+            } catch (Services_Exception $e) {
+                $value = '';
+                Feedback::error(tr('Date Picker Field: %0', $e->getMessage()));
+            }
         }
 
         return [

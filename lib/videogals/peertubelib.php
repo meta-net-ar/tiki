@@ -125,12 +125,10 @@ class PeerTubeLib
                 fclose($verbose);
                 error_log("cURL verbose log: $verboseLog");
             }
-            curl_close($ch);
             throw new \Exception("cURL error: $error");
         }
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         if (isset($verbose)) {
             rewind($verbose);
@@ -272,7 +270,6 @@ class PeerTubeLib
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
 
             if ($httpCode === 204) {
                 return ['success' => true];

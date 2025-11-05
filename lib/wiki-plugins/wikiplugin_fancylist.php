@@ -50,25 +50,25 @@ function wikiplugin_fancylist($data, $params)
         extract($params, EXTR_SKIP);
     }
     $class ??= "";
-    if (isset($div)) {
+    if ($div) {
         $result = '<div class="fancylist' . " $class" . '">';
         $count = 1;
     } else {
-            $result = '<ol class="fancylist' . " $class" . '">';
+        $result = '<ol class="fancylist' . " $class" . '">';
     }
     // split data by lines (trimed whitespace from start and end)
     $lines = preg_split("/\n/", trim($data));
     foreach ($lines as $line) {
         // replace all before and including the ")"
         $part = preg_replace("/^[\w]+\)(.*)/", "$1", $line);
-        if (isset($div)) {
+        if ($div) {
             $result .= '<div><span class="count">' . $count . '</span><p>' . $part . '</p></div>';
             $count++;
         } else {
             $result .= '<li><p>' . $part . '</p></li>';
         }
     }
-    if (isset($div)) {
+    if ($div) {
         $result .= '</div>';
     } else {
         $result .= '</ol>';

@@ -84,7 +84,6 @@ function wikiplugin_trackerquerytemplate_info()
                 'name' => tra('Tracker Item Ids'),
                 'description' => tra('Item id of tracker items, separated with comma'),
                 'since' => '11.0',
-                'default' => '',
                 'filter' => 'digits',
                 'separator' => ',',
                 'profile_reference' => 'tracker_item',
@@ -147,7 +146,7 @@ function wikiplugin_trackerquerytemplate_info()
 
 function wikiplugin_trackerquerytemplate($data, $params)
 {
-    if (! empty($params['itemids'])) {
+    if (! is_null($params['itemids'])) {
         $itemIds = $params['itemids'];
         unset($params['itemids']);
         $newData = '';

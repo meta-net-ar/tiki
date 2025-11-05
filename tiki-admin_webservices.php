@@ -11,11 +11,11 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'name'                  => 'word',            //post
+            'name'                  => 'text',            //post
             'delete'                => 'bool',            //get
             'url'                   => 'url',             //post
-            'wstype'                => 'word',            //post
-            'operation'             => 'word',            //post
+            'wstype'                => 'alpha',           //post
+            'operation'             => 'text',            //post
             'postbody'              => 'xss',             //post
             'edit'                  => 'bool',            //post
             'parse'                 => 'bool',            //post
@@ -23,7 +23,6 @@ $inputConfiguration = [
             'test'                  => 'bool',            //post
             'deletetemplate'        => 'word',            //post
             'loadtemplate'          => 'word',            //post
-            'add'                   => 'bool',            //post
             'register'              => 'bool',            //post
             'new_name'              => 'word',            //post
             'old_name'              => 'word',            //post
@@ -32,9 +31,11 @@ $inputConfiguration = [
             'nt_engine'             => 'word',            //post
             'nt_output'             => 'word',            //post
             'nt_content'            => 'xss',             //post
+            'create_template'       => 'alpha',           //post
          ],
         'staticKeyFiltersForArrays' => [
-            'params'                => 'word',            //post
+            'params'                => 'text',            //post
+            'add'                   => 'int',             //post
         ],
     ],
 ];

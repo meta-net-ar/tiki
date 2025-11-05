@@ -19,9 +19,10 @@ $inputConfiguration = [
         'checked'                  => 'bool',              //post
         'prefix'                   => 'word',              //post
         'postfix'                  => 'word',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //get
-        'find'                     => 'alpha',             //post
+        'find'                     => 'text',              //get
+        'sort_modes'               => 'alnumdash',         //get
         ],
     ],
 ];

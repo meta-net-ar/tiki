@@ -359,7 +359,11 @@ class SieveFiltersCommand extends Command
                 'data' => [$field]
             ]);
 
-            if ($action == 'move') {
+            // Check system preference for email-to-tracker mode
+            global $prefs;
+            $email_mode = $prefs['email_to_tracker_mode'] ?? 'move';
+
+            if ($action == 'move' && $email_mode == 'move') {
                 $output->writeln(tr("Moved msg uid %0 to tracker %1, field %2, item %3", $msg['uid'], $item['trackerId'], $field['fieldId'], $item['itemId']));
                 $this->action_discard($imap, $msg, $output);
             } else {

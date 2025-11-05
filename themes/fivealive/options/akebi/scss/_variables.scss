@@ -5,6 +5,9 @@
 $tiki-top-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
 
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
+
+@import "../../../scss/variables";
+
 // Color system
 
 $red-300: tint-color($red, 40%);  // default
@@ -91,24 +94,7 @@ $nav-tabs-link-active-bg: #087084;
 $nav-pills-link-active-bg: #087084;
 
 // Navbars
-
 // Dropdowns
-//$dropdown-bg: #fff;
-//$dropdown-border-color: rgba(0, 0, 0, 0.15);
-//$dropdown-link-color: $link-color;
-//$dropdown-link-hover-color: $link-hover-color;
-//$dropdown-link-hover-bg: #087084;
-//$dropdown-link-active-color: red;
-//$dropdown-link-active-bg: #087084;
-//$dropdown-link-disabled-color: #f2f2f2;
-//$dropdown-header-color: #ffffff;
-//$dropdown-divider-bg: $dropdown-bg;
-
-//$dropdown-dark-color: #fff;
-//$dropdown-dark-link-color:          $dropdown-dark-color;  // default
-//$dropdown-dark-link-hover-color:    $white;  // default
-//$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-//$dropdown-dark-bg: #087f93;
 
 // Pagination
 $pagination-color: #0b8a98;
@@ -125,8 +111,7 @@ $pagination-disabled-border-color: #dddddd;
 
 // Cards
 $card-cap-bg: $tiki-top-bg;
-$card-cap-color: #fff; // -- Not implemented yet.
-//$card-title-color: #fff; // -- Incorrectly applied previously.
+$card-cap-color: #fff;
 
 // Code
 $code-color:                        $body-color; // $pink !default;
@@ -139,13 +124,21 @@ $tiki-footer-btn-secondary-color: #f4f4f4;
 
 $tiki-postbody-title-card-title-color: #fff;
 
+$tiki-dark-footer-card-header-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
+$tiki-dark-footer-card-header-title-color: #fff !important;
+$tiki-dark-footer-card-border-color: rgba(#fff, .45);
+$tiki-dark-footer-link-color: #1ea6be;
+$tiki-dark-footer-link-hover-color: #8BB9FE;
+
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
-    --tiki-top-bg: #{$tiki-top-bg}; //linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
-    --tiki-top-color: #f9f9f9; //{$navbar-light-color};
+    --tiki-top-bg: #{$tiki-top-bg};
+    --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -165,10 +158,12 @@ $tiki-postbody-title-card-title-color: #fff;
 }
 
 @mixin top-nav-dark {
-    --tiki-top-bg: #{$tiki-top-bg}; //linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
+    --tiki-top-bg: #{$tiki-top-bg};
     --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

@@ -127,8 +127,22 @@
             {/foreach}
         </div>
         {if isset($filter_button) && $filter_button eq 'y'}
-            <div>
-                <input id="filterbutton" type="submit" class="btn btn-primary" name="filter" value="{tr}Filter{/tr}" style="display:{if $filterfield}inline{else}none{/if}">
+            <div id="filterbutton" class="btn-group" role="group" style="display:{if $filterfield}inline-flex{else}none{/if}">
+                <button id="filterbutton_primary" type="submit" class="btn btn-primary" name="filter">
+                    {tr}Filter{/tr}
+                </button>
+                
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">{tr}Toggle dropdown{/tr}</span>
+                </button>
+
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" type="submit" name="filter_exact">
+                            {tr}Exact filter{/tr}
+                        </button>
+                    </li>
+                </ul>
             </div>
         {/if}
     </div>

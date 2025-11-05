@@ -31,7 +31,6 @@ function wikiplugin_titlesearch_info()
                 'name' => tra('Information'),
                 'description' => tra('Also show page hits or user'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'alpha',
                 'separator' => '|',
                 'options' => [
@@ -47,7 +46,6 @@ function wikiplugin_titlesearch_info()
                 'name' => tra('Exclude'),
                 'description' => tra('Pipe-separated list of page names to exclude from results.'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'text',
                 'separator' => '|',
                 'profile_reference' => 'wiki_page',
@@ -145,7 +143,7 @@ class WikiPluginTitleSearch extends PluginsLib
         // Start of Output
         /////////////////////////////////
         //
-        if (isset($noheader) && ! $noheader) {
+        if (! $noheader) {
             // Create header
             $count = $aPages["count"];
             if (! $count) {

@@ -118,6 +118,13 @@ $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
 $tiki-postbody-title-card-title-color: #fff;
 
+// Footer colors in light and dark mode
+$tiki-dark-footer-card-header-bg: $tiki-top-bg;
+$tiki-dark-footer-card-header-title-color: #000 !important;
+$tiki-dark-footer-card-border-color: rgba(#fff, .45);
+$tiki-dark-footer-link-color: #DE6B45;
+$tiki-dark-footer-link-hover-color: #eb8664;
+
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
@@ -126,6 +133,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #3C3106;
     --tiki-top-hover-color: #3C3106FF;
     --tiki-top-text-color: #3C3106FF;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 
@@ -141,6 +150,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: $black;
     --tiki-top-hover-color: #212121FF;
     --tiki-top-text-color: var(--tiki-top-hover-color);
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

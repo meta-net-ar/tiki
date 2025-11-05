@@ -58,10 +58,6 @@ function wikiplugin_xmlupdate($data, $params)
     if ($prefs['feature_file_galleries'] != 'y') {
         return ("<span class='error'>Error: sorry you need to have File Galleries enabled to use the XMLUPDATE plugin</span>");
     }
-    // check a fileId has been set
-    if (! isset($params['fileId'])) {
-        return ("<span class='error'>Error: fileId# for the XML file is not set</span>");
-    }
 
     // get the full path address for the fileId from the File Gallery info and the pref for the File Gallery directory folder
     $fileId = $params['fileId'];
@@ -91,7 +87,7 @@ function wikiplugin_xmlupdate($data, $params)
 
     $smarty->assign('attused', 'no');
     // check if an attribute label has been used in the XML file
-    if (isset($params['attribute'])) {
+    if (! empty($params['attribute'])) {
         $attlabel = $params['attribute'];
 
         // convert the xmldata array to get to the attributes only - not sure why this works!

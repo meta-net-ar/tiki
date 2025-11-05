@@ -13,25 +13,26 @@ $inputConfiguration = [
         'staticKeyFilters'            => [
              'nlId'                   => 'int',            //post
              'remove'                 => 'int',            //get
-             'save'                   => 'bool',           //post
-             'allowUserSub'           => 'bool',           //get
+             'save'                   => 'alpha',          //post
+             'allowUserSub'           => 'bool',           //post
              'allowAnySub'            => 'bool',           //post
              'unsubMsg'               => 'bool',           //post
              'validateAddr'           => 'bool',           //post
              'allowTxt'               => 'bool',           //post
-             'allowArticle'           => 'bool',           //post
              'autoArticleClip'        => 'bool',           //post
              'emptyClipBlocksSend'    => 'bool',           //post
              'articleClipRangeDays'   => 'int',            //post
-             'articleClipTypes'       => 'string',         //post
              'frequency'              => 'int',            //post
-             'author'                 => 'string',         //post
+             'author'                 => 'username',       //post
              'allowArticleClip'       => 'bool',           //post
-             'sort_mode_g'            => 'string',         //get
-             'offset'                 => 'string',         //get
-             'find'                   => 'string',         //get
-             'name'                   => 'string',         //post
+             'sort_mode'              => 'alnumdash',      //get
+             'offset'                 => 'int',            //get
+             'find'                   => 'text',           //get
+             'name'                   => 'text',           //post
              'description'            => 'xss',            //post
+        ],
+        'staticKeyFiltersForArrays'  => [
+             'articleClipTypes'       => 'text',           //post
         ],
     ],
 ];

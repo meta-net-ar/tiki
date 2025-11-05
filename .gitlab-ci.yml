@@ -213,10 +213,7 @@ phplint:
       - phplint.cache
   parallel:
     matrix:
-      - PHP_VERSION: "8.1"
-      - PHP_VERSION: "8.2"
-      - PHP_VERSION: "8.3"
-      - PHP_VERSION: "8.4"
+      - PHP_VERSION: ['8.1', '8.2', '8.3', '8.4', '8.5']
 
 smarty-lint:
   stage: lint
@@ -261,6 +258,13 @@ unix-ending-line:
 #
 # Check Tikiwiki development specific check (related also with release)
 #
+
+check-platform-binaries:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - sh doc/devtools/check_platform_binaries.sh
 
 sql-engine:
   stage: tiki-check
@@ -536,6 +540,8 @@ unit-tests:
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
       - PHP_VERSION: "8.4"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.5"
+        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
 
 unit-tests-node:
   stage: unit-tests
@@ -724,6 +730,21 @@ composer-operator-check:
   - apt-get update && apt-get install -y jq
   - chmod +x doc/devtools/check_caret_operator.sh
   - ./doc/devtools/check_caret_operator.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+  allow_failure: false
+
+check-alphabetical-list:
+  stage: unit-tests
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  needs:
+    - composer
+  script:
+    - chmod +x doc/devtools/check_alphabetical_list.php
+    - php doc/devtools/check_alphabetical_list.php
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: always

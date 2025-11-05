@@ -21,7 +21,6 @@ function wikiplugin_draw_info()
                 'description' => tra('Internal ID of the file ID'),
                 'filter' => 'digits',
                 'accepted' => ' ID number',
-                'default' => '',
                 'since' => '7.1',
                 'profile_reference' => 'file',
             ],
@@ -35,7 +34,6 @@ function wikiplugin_draw_info()
                 ),
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by % (e.g. "200px" or "100%").',
-                'default' => 'Image width',
                 'since' => '7.1'
             ],
             'height' => [
@@ -44,7 +42,6 @@ function wikiplugin_draw_info()
                 'description' => tra('Height in pixels or percentage. Default value is complete drawing height.'),
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by % (e.g. "200px" or "100%").',
-                'default' => 'Image height',
                 'since' => '7.1'
             ],
             'archive' => [
@@ -79,7 +76,7 @@ function wikiplugin_draw($data, $params)
     static $drawIndex = 0;
     ++$drawIndex;
 
-    if (! isset($id)) {
+    if (is_null($id)) {
         //check permissions
         if ($tiki_p_upload_files != 'y') {
             return;
@@ -123,7 +120,7 @@ EOF;
     $fileInfo = $filegallib->get_file_info($id);
 
     //this sets the image to latest in a group of archives
-    if (! isset($archive) || $archive != 'y') {
+    if ($archive != 'y') {
         if (! empty($fileInfo['archiveId']) && $fileInfo['archiveId'] > 0) {
             $id = $fileInfo['archiveId'];
             $fileInfo = $filegallib->get_file_info($id);
@@ -141,14 +138,14 @@ EOF;
 
         $label = tra('Edit SVG Image');
         $ret = '<div type="image/svg+xml" class="svgImage pluginImg table-responsive' . $fileInfo['fileId'] . '" style="' .
-            (isset($height) ? "height: $height;" : "" ) .
-            (isset($width) ? "width: $width;" : "" )
+            (! is_null($height) ? "height: $height;" : "" ) .
+            (! is_null($width) ? "width: $width;" : "" )
         . '">' . $fileInfo['data'] . '</div>';
 
         if ($globalperms->upload_files == 'y') {
             $editicon = smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate());
             $ret .= "<a title='$label' href='tiki-ajax_services.php?controller=draw&action=edit&modal=1&fileId=$id&page=$page&index=$drawIndex" .
-                (isset($width) ? "&width=$width" : "") . (isset($height) ? "&height=$height" : "") .
+                (! is_null($width) ? "&width=$width" : "") . (! is_null($height) ? "&height=$height" : "") .
                 "' data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first\" data-size='modal-fullscreen'  title='Edit: " . $fileInfo['filename'] . "'>" .
                 $editicon . "</a>";
         }

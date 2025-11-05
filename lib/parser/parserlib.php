@@ -134,20 +134,41 @@ class ParserLib extends TikiDb_Bridge
     }
 
     /**
-     * Apply default values for plugin parameters that are not set
+     * Process plugin parameters: apply defaults and validate required parameters
      *
      * @param array $params Reference to the parameters array to update
      * @param array $info Plugin info array (must contain 'params')
+     * @return WikiParser_PluginOutput|null Returns WikiParser_PluginOutput error if validation fails, null if validation passes
      */
-    private function applyPluginDefaults(&$params, $info)
+    private function processPluginParams(&$params, $info)
     {
+        $missingRequired = [];
         if (isset($info['params'])) {
             foreach ($info['params'] as $key => $param) {
-                if ((! isset($params[$key])) && isset($param['default'])) {
-                    $params[$key] = $param['default'];
+                // Validate required parameters
+                if (isset($param['required']) && $param['required'] === true) {
+                    // Parameter is required and has no default - check if user provided it
+                    if (! isset($param['default']) && ! isset($params[$key])) {
+                        $missingRequired[] = $key;
+                    }
+                }
+
+                // Apply default if parameter not set
+                if (! isset($params[$key])) {
+                    if (isset($param['default'])) {
+                        $params[$key] = $param['default'];
+                    } else {
+                        $params[$key] = null;
+                    }
                 }
             }
         }
+
+        if (! empty($missingRequired)) {
+            return WikiParser_PluginOutput::argumentError($missingRequired);
+        }
+
+        return null;
     }
 
     /**
@@ -160,9 +181,15 @@ class ParserLib extends TikiDb_Bridge
      */
     public function invokePlugin($name, $data, $params = [])
     {
-        // Get plugin info and apply defaults
+        // Get plugin info, apply defaults, and validate required parameters
         $info = $this->plugin_info($name);
-        $this->applyPluginDefaults($params, $info);
+        $validationResult = $this->processPluginParams($params, $info);
+
+        // If validation failed, return the error
+        if ($validationResult !== null) {
+            return $validationResult;
+        }
+
         // Call the plugin function
         $func = "wikiplugin_{$name}";
         if (function_exists($func)) {
@@ -1151,8 +1178,12 @@ class ParserLib extends TikiDb_Bridge
             $data = str_replace($noparsed['key'], $noparsed['data'], $data);
         }
 
-        // Apply default values for parameters that are not set
-        $this->applyPluginDefaults($args, $info);
+        // Apply default values and validate required parameters
+        $validationResult = $this->processPluginParams($args, $info);
+        // If validation failed, set $data to error HTML and return early
+        if ($validationResult !== null) {
+            $data = $this->convert_plugin_output($validationResult, '', 'wiki');
+        }
 
         // Make sure all arguments are declared
         if (isset($info['params'])) {
@@ -1171,16 +1202,23 @@ class ParserLib extends TikiDb_Bridge
                 }
                 $paramInfo = $params[$argKey];
                 $filter = isset($paramInfo['filter']) ? TikiFilter::get($paramInfo['filter']) : $default;
-                $argValue = TikiLib::htmldecode($argValue);
+
+                // Preserve null values (parameters not provided by user)
+                if ($argValue !== null) {
+                    $argValue = TikiLib::htmldecode($argValue);
+                }
 
                 if (isset($paramInfo['separator'])) {
-                    $vals = [];
-
-                    $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
-
-                    $argValue = array_values($vals);
+                    if ($argValue !== null) {
+                        $vals = [];
+                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
+                        $argValue = array_values($vals);
+                    }
+                    // If $argValue is null, leave it as null (don't process separator)
                 } else {
-                    $argValue = $filter->filter($argValue);
+                    if ($argValue !== null) {
+                        $argValue = $filter->filter($argValue);
+                    }
                 }
             }
         }
@@ -1922,7 +1960,7 @@ class ParserLib extends TikiDb_Bridge
     //*
     public function parse_wiki_argvariable(&$data)
     {
-        global $prefs, $user;
+        global $prefs, $user, $jitGet;
         $tikilib = TikiLib::lib('tiki');
         $smarty = TikiLib::lib('smarty');
 
@@ -2316,6 +2354,8 @@ class ParserLib extends TikiDb_Bridge
                         default:
                             if (isset($_GET[$name])) {
                                 $value = $_GET[$name];
+                            } elseif ($jitGet->offsetExists($name)) {
+                                $value = $jitGet->offsetGet($name);
                             } else {
                                 $value = '';
                                 include_once('lib/wiki-plugins/wikiplugin_showpref.php');

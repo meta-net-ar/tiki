@@ -12,13 +12,14 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
              'repID'               => 'int',          //post
-             'name'                => 'alpha',        //post
-             'start'               => 'alpha',        //post
-             'cssfile'             => 'alpha',        //post
+             'name'                => 'text',         //post
+             'path'                => 'text',         //post
+             'start'               => 'text',         //post
+             'cssfile'             => 'text',         //post
              'expiration'          => 'int',          //post
              'description'         => 'xss',          //post
-             'vis'                 => 'bool',         //post
-             'cacheable'           => 'bool',         //post
+             'vis'                 => 'alpha',        //post
+             'cacheable'           => 'alpha',        //post
              'action'              => 'striptags',    //post
              'save'                => 'striptags',    //post
         ],

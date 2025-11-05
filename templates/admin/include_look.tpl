@@ -133,8 +133,10 @@
             {preference name=theme_header_and_address_bar_color}
             {preference name=theme_default_color_mode}
 
-            <legend class="h3">{tr}Admin pages layout{/tr}</legend>
-            {preference name=site_layout_admin}
+            {if $prefs.theme_unified_admin_backend neq 'y'}
+                <legend class="h3">{tr}Admin pages layout{/tr}</legend>
+                {preference name=site_layout_admin}
+            {/if}
 
             <hr>
 

@@ -24,7 +24,6 @@ function wikiplugin_scroll_info()
                 'since' => '5.0',
                 'accepted' => tra('Number of pixels followed by "px".'),
                 'filter' => 'text',
-                'default' => '',
             ],
             'height' => [
                 'required' => true,
@@ -33,7 +32,6 @@ function wikiplugin_scroll_info()
                 'since' => '5.0',
                 'accepted' => tra('Number of pixels followed by "px".'),
                 'filter' => 'text',
-                'default' => '',
             ],
             'speed' => [
                 'required' => false,
@@ -50,20 +48,6 @@ function wikiplugin_scroll_info()
 function wikiplugin_scroll($data, $params)
 {
     extract($params, EXTR_SKIP);
-//minimum parameters
-    if (! isset($width)) {
-        return ('<b>missing width parameter for plugin</b><br/>');
-    }
-
-    if (! isset($height)) {
-        return ('<b>missing height parameter for plugin</b><br/>');
-    }
-
-//optional parameters
-    if (! isset($speed)) {
-        $speed = 8;
-    }
-
 
 // margin requierd for ilayer scrolling on mozilla
     $margin = 40;

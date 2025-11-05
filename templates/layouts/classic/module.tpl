@@ -15,7 +15,7 @@
             {if $module_decorations ne 'n'}
             <div class="card-header" {if !empty($module_params.bgcolor)} style="background-color:{$module_params.bgcolor};"{/if}>
                 {if ($module_notitle ne 'y' && !empty($module_title)) || ($module_flip eq 'y') || $prefs.menus_items_icons eq 'y'}
-                <h3 class="tiki-card-header-title clearfix">
+                <h3 class="tiki-card-header-title fs-5 pt-0 m-0 clearfix">
                     {if $module_notitle ne 'y' && !empty($module_title)}
                         <span class="moduletitle">{$module_title}</span>
                     {/if}
@@ -100,7 +100,7 @@
                                         type="submit"
                                         name="mc_up"
                                         value="{$moduleId}"
-                                        class="tips btn btn-link"
+                                        class="tips btn btn-link p-0"
                                         title=":{tr}Move up{/tr}"
                                         aria-label="{tr}Move up{/tr}"
                                     >
@@ -110,7 +110,7 @@
                                         type="submit"
                                         name="mc_down"
                                         value="{$moduleId}"
-                                        class="tips btn btn-link"
+                                        class="tips btn btn-link p-0"
                                         title=":{tr}Move down{/tr}"
                                         aria-label="{tr}Move down{/tr}"
                                     >
@@ -120,7 +120,7 @@
                                         type="submit"
                                         name="mc_move"
                                         value="{$moduleId}"
-                                        class="tips btn btn-link"
+                                        class="tips btn btn-link p-0"
                                         title=":{tr}Move to opposite side{/tr}"
                                         aria-label="{tr}Move to opposite side{/tr}"
                                     >
@@ -130,7 +130,7 @@
                                         type="submit"
                                         name="mc_unassign"
                                         value="{$moduleId}"
-                                        class="tips btn btn-link"
+                                        class="tips btn btn-link p-0"
                                         title=":{tr}Unassign{/tr}"
                                         aria-label="{tr}Unassign{/tr}"
                                     >
@@ -152,7 +152,7 @@
                                     type="submit"
                                     name="mc_up"
                                     value="{$moduleId}"
-                                    class="tips btn btn-link"
+                                    class="tips btn btn-link p-0"
                                     title=":{tr}Move up{/tr}"
                                     aria-label="{tr}Move up{/tr}"
                                 >
@@ -162,7 +162,7 @@
                                     type="submit"
                                     name="mc_down"
                                     value="{$moduleId}"
-                                    class="tips btn btn-link"
+                                    class="tips btn btn-link p-0"
                                     title=":{tr}Move down{/tr}"
                                     aria-label="{tr}Move down{/tr}"
                                 >
@@ -172,7 +172,7 @@
                                     type="submit"
                                     name="mc_move"
                                     value="{$moduleId}"
-                                    class="tips btn btn-link"
+                                    class="tips btn btn-link p-0"
                                     title=":{tr}Move to opposite side{/tr}"
                                     aria-label="{tr}Move to opposite side{/tr}"
                                 >
@@ -182,7 +182,7 @@
                                     type="submit"
                                     name="mc_unassign"
                                     value="{$moduleId}"
-                                    class="tips btn btn-link"
+                                    class="tips btn btn-link p-0"
                                     title=":{tr}Unassign{/tr}"
                                     aria-label="{tr}Unassign{/tr}"
                                 >

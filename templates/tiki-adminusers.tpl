@@ -410,7 +410,7 @@
                 {remarksbox type="warning" title="{tr}Warning: User Encryption is Active{/tr}"}
                 {tr}The feature User Encryption stores encrypted user information, such as password used to connect to external systems.
                     If the password is changed, it will destroy the user's decryption key, and make the data unreadable.
-                    The user will be forced to re-enter the passwords and other data that may be encrypted.{/tr}</a>.
+                    The user will be forced to re-enter the passwords and other data that may be encrypted.{/tr}
                 {/remarksbox}
             {/if}
             {if isset($userinfo.userId) && $userinfo.userId}
@@ -429,7 +429,7 @@
             {/if}
             {if $prefs.feature_intertiki eq 'y' and not empty($prefs.feature_intertiki_mymaster)}
                 {remarksbox type="info" title="{tr}Intertiki Enabled{/tr}"}
-                {tr _0=$prefs.feature_intertiki_mymaster|escape}This Tiki is an Intertiki Client so user information must be edited on the Intertiki Master "%0"{/tr}</a>.
+                {tr _0=$prefs.feature_intertiki_mymaster|escape}This Tiki is an Intertiki Client so user information must be edited on the Intertiki Master "%0"{/tr}
                 {/remarksbox}
             {elseif $userinfo.editable}
                 <form action="tiki-adminusers.php" method="post" enctype="multipart/form-data" name="RegForm" autocomplete="off">
@@ -498,10 +498,10 @@
                                 <input type="password" class="form-control" name="passAgain" id="pass2" placeholder="{tr}Password{/tr}" autocomplete="new-password">
                                 <div id="mypassword2_text">
                                     <div id="match" style="display:none">
-                                        {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
+                                        {icon name='ok' style='color:#0ca908'} {tr}Passwords match{/tr}
                                     </div>
                                     <div id="nomatch" style="display:none">
-                                        {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
+                                        {icon name='error' style='color:#ff0000'} {tr}Passwords do not match{/tr}
                                     </div>
                                 </div>
                             </div>
@@ -522,7 +522,7 @@
                                     <div class="form-check">
                                         <label class="form-check-label">
                                             <input class="form-check-input" type="checkbox" name="pass_first_login"
-                                                {if isset($userinfo.pass_confirm) && $userinfo.pass_confirm eq '0' or not empty($smarty.request.pass_first_login) or $prefs.user_must_change_password_set_default_on eq 'y'}
+                                                {if (isset($userinfo.pass_confirm) && $userinfo.pass_confirm eq '0') or (not empty($smarty.request.pass_first_login)) or ($prefs.user_must_change_password_set_default_on eq 'y')}
                                                     checked="checked"
                                                 {/if}>
                                             {tr}User must change password at next login{/tr}
@@ -566,7 +566,7 @@
                                 <div class="form-check">
                                     <label class="form-check-label">
                                         <input class="form-check-input" type="checkbox" name="insert_user_tracker_item"
-                                               {if not empty($smarty.request.insert_user_tracker_item or $prefs.user_add_tracker_item_set_default_on eq 'y')}checked="checked"{/if}>
+                                               {if (not empty($smarty.request.insert_user_tracker_item)) or $prefs.user_add_tracker_item_set_default_on eq 'y'}checked="checked"{/if}>
                                         {tr}Add a user tracker item for this user{/tr}
                                     </label>
                                 </div>
@@ -596,6 +596,36 @@
                                 {/if}
                             </div>
                         </div>
+                    {/if}
+
+                    {if $prefs.twoFactorAuth eq 'y'}
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-md-2 col-form-label" for="force2FA">{tr}2FA{/tr}</label>
+                            <div class="form-check form-switch col-sm-7 col-md-6">
+                                <input class="form-check-input" type="checkbox" role="switch" id="force2FA" data-user="{$userinfo.login}" {if $force2FA}checked{/if}>
+                                <small class="form-text text-muted">{tr}Enable/Disable Two Factor Authentication for this user.{/tr}</small>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-sm-3 col-md-2"></div>
+                            <div class="col-sm-7 col-md-6">
+                                <button type="button" class="btn btn-secondary w-100" id="reset2FA" {if not $userinfo.twoFactorSecret}disabled{/if} data-user="{$userinfo.login}">{tr}Reset 2FA{/tr}</button>
+                                <small class="form-text text-muted">{tr}This will require the user to reset up 2FA the next time they log in.{/tr}</small>
+                            </div>
+                        </div>
+
+                        {if $force2FA}
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-md-2">{tr}2FA Grace Period{/tr}</label>
+                                <div class="col-md-6">
+                                    <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$userinfo.twoFactorAuthGracePeriod|escape}">
+                                    <div class="form-text">
+                                        {tr}Number of days to allow this user to access the site without 2FA before forcing them to set it up.{/tr}
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+
                     {/if}
 
                     <div class="mb-3 row">

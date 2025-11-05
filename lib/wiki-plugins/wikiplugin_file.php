@@ -22,24 +22,22 @@ function wikiplugin_file_info()
         'tags' => [ 'basic' ],
         'params' => [
             'type' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Type'),
                 'description' => tra('Indicate whether the file is in a file gallery or is a wiki page attachment'),
                 'since' => '6.1',
                 'filter' => 'alpha',
-                'default' => 'gallery',
                 'options' => [
                     ['text' => '', 'value' => ''],
                 ], //rest filled in below
             ],
             'name' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Name'),
                 'description' => tra('Identify an attachment by entering its file name, which will show as a link to the
                     file. If the page parameter is empty, it must be a file name of an attachment to the page where the
                     plugin is used.'),
                 'since' => '3.0',
-                'default' => '',
                 'parentparam' => ['name' => 'type', 'value' => 'attachment'],
             ],
             'desc' => [
@@ -91,7 +89,7 @@ function wikiplugin_file_info()
                 ],
             ],
             'fileId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('File ID'),
                 'description' => tra('File ID of a file in a file gallery or an archive.') . ' ' . tra('Example value:')
                     . ' <code>42</code>',
@@ -99,7 +97,6 @@ function wikiplugin_file_info()
                 'type' => 'fileId',
                 'area' => 'fgal_picker_id',
                 'filter' => 'digits',
-                'default' => '',
                 'parentparam' => ['name' => 'type', 'value' => 'gallery'],
                 'profile_reference' => 'file',
             ],
@@ -110,7 +107,6 @@ function wikiplugin_file_info()
                     Special values : %0 and %1.', '<code>PAGE_LAST_MOD</code>', '<code>PAGE_VIEW_DATE</code>'),
                 'since' => '5.0',
                 'parentparam' => ['name' => 'type', 'value' => 'gallery'],
-                'default' => '',
                 'advanced' => true,
             ],
             'showicon' => [
@@ -177,22 +173,22 @@ function wikiplugin_file($data, $params)
     } elseif ($params['type'] != "gallery" && $params['type'] != "attachment") {
         return WikiParser_PluginOutput::error(tr('Error'), tra('Incorrect parameter') . ' type');
     } elseif ($params['type'] == "gallery") {
-        if (empty($params['fileId'])) {
+        if (is_null($params['fileId'])) {
             return WikiParser_PluginOutput::error(tr('Error'), tr('The %0 parameter is missing', 'fileId'));
         }
     } elseif ($params['type'] == "attachment") {
-        if (empty($params['name'])) {
+        if (is_null($params['name'])) {
             return WikiParser_PluginOutput::error(tr('Error'), tr('The %0 parameter is missing', 'name'));
         }
     }
 
-    if (isset($params['fileId'])) {
+    if (! is_null($params['fileId'])) {
         $filegallib = TikiLib::lib('filegal');
         if ($prefs['feature_file_galleries'] != 'y') {
             return;
         }
         $fileId = $params['fileId'];
-        if (isset($params['date'])) {
+        if (! is_null($params['date'])) {
             static $wikipluginFileDate = 0;
             if (empty($params['date'])) {
                 if (empty($wikipluginFileDate)) {
@@ -226,18 +222,18 @@ function wikiplugin_file($data, $params)
             $data = empty($file_info['name']) ? $file_info['filename'] : $file_info['name'];
         }
 
-        if (isset($params['translatetitle']) && $params['translatetitle'] == 'y') {
+        if ($params['translatetitle'] == 'y') {
             $data = tra($data);
         }
 
-        if (isset($params['browserdisplay']) && $params['browserdisplay'] == 'y') {
-            if (isset($params['showicon']) && $params['showicon'] == "y") {
+        if ($params['browserdisplay'] == 'y') {
+            if ($params['showicon'] == "y") {
                 return "{img src=tiki-download_file.php?fileId=$fileId&amp;thumbnail=y link=tiki-download_file.php?fileId=$fileId&display=y styleimage=max-width:32px;max-height:36px thumb=y responsive='n'} " . "<a class='wiki' href='tiki-download_file.php?fileId=$fileId&display=y' target='_blank' >" . $data . "</a>";
             } else {
                 return "<a class='wiki' href='tiki-download_file.php?fileId=$fileId&display=y' target='_blank' >" . $data . "</a>";
             }
         } else {
-            if (isset($params['showicon']) && $params['showicon'] == "y") {
+            if ($params['showicon'] == "y") {
                 return "{img src=tiki-download_file.php?fileId=$fileId&amp;thumbnail=y link=tiki-download_file.php?fileId=$fileId styleimage=max-width:32px responsive='n'} [tiki-download_file.php?fileId=$fileId|$data]";
             } else {
                 return "[tiki-download_file.php?fileId=$fileId|$data]";

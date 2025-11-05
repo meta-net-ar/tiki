@@ -81,6 +81,18 @@ a.ec-event:hover {
     --fc-page-bg-color: var(--bs-body-bg);
 }
 
+.ec-button:not(:disabled):hover, .ec-button.ec-active,
+.ec-active, .ec-prev, .ec-next {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
+button.ec-today,
+.ec-today .ec-day-head {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
 // tiki-categories.less - tiki-jquery.js - Doesn't show up in a search Apr 21 2024
 // /* Fancy filter */
 //.filter {
@@ -527,10 +539,14 @@ a.toolbar,
 li.toolbar,
 .textarea-toolbar a.toolbar {
     /* each tool button */
-    border: none;
     background: transparent;
     color: var(--bs-body-color);
-    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+//    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+}
+
+a.toolbar,
+.textarea-toolbar a.toolbar {
+    border: none;
 }
 
 a.toolbar:hover,

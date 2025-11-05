@@ -27,7 +27,7 @@ function wikiplugin_figlet_info(): array
                 'name' => tra('Output width'),
                 'description' => tra('Defines the maximum width of the output string in characters.'),
                 'filter' => 'int',
-                'default' => 100,
+                'default' => 500,
             ]
         ]
     ];
@@ -45,12 +45,9 @@ function wikiplugin_figlet(string $data, array $params): string | WikiParser_Plu
     if (empty($data)) {
         return '';
     }
-    $fontPath = $params['font'] ?? null;
-    $width = $params['width'] ?? 500;
+    $fontPath = $params['font'];
+    $width = $params['width'];
 
-    if (empty($fontPath)) {
-        return WikiParser_PluginOutput::error(tr('Error'), tr('The %0 parameter is missing', 'font'));
-    }
     if (! is_file($fontPath)) {
         return WikiParser_PluginOutput::error(tr('Error'), tr('%0 is not a file', $fontPath));
     }

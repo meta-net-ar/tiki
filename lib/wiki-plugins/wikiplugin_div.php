@@ -59,14 +59,12 @@ function wikiplugin_div_info()
                 'filter' => 'text',
                 'accepted' => tra('Valid CSS color name or hex code'),
                 'safe' => true,
-                'default' => '',
             ],
             'width' => [
                 'required' => false,
                 'name' => tra('Box width'),
                 'description' => tra('In pixels or percentage. Default is original size'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'text',
                 'safe' => true,
             ],
@@ -125,7 +123,6 @@ function wikiplugin_div_info()
                 'since' => '1',
                 'filter' => 'text',
                 'safe' => true,
-                'default' => '',
             ],
             'id' => [
                 'required' => false,
@@ -134,7 +131,6 @@ function wikiplugin_div_info()
                 'since' => '1',
                 'filter' => 'text',
                 'safe' => true,
-                'default' => '',
             ],
             'title' => [
                 'required' => false,
@@ -152,7 +148,6 @@ function wikiplugin_div_info()
                 'filter' => 'text',
                 'advanced' => true,
                 'since' => '14.0',
-                'default' => '',
             ],
             'style' => [
                 // Note that this is ignored unless preference wiki_plugindiv_approvable is set in
@@ -192,7 +187,6 @@ function wikiplugin_div_info()
                 'since' => '19.0',
                 'filter' => 'text',
                 'safe' => true,
-                'default' => '',
             ],
         ],
     ];
@@ -206,15 +200,15 @@ function wikiplugin_div($content, $params)
     extract($params, EXTR_SKIP);
 
     $possibletypes = ['div','span','section','aside','header','footer','pre','strong','em','tt','p','blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-    $t    = (isset($type) and in_array($type, $possibletypes)) ? "$type" : "div";
-    $c    = (isset($class)) ? " class='$class'" : "";
-    $id   = (isset($id)) ? " id='$id'" : "";
-    $oc   = (isset($onclick)) ? " onclick='$onclick'" : "";
-    $w    = (isset($width)) ? " width: $width;" : "";
-    $bg   = (isset($bg)) ? " background-color: $bg;" : "";
-    $al   = (isset($align) && ($align == 'right' || $align == "center" || $align == "justify" || $align == 'left')) ? " text-align: $align;" : '';
-    $fl   = (isset($float) && ($float == 'left' || $float == 'right' || $float == 'none')) ? " float: $float;" : '';
-    $cl   = (isset($clear) && ($clear == 'left' || $clear == 'right' || $clear == 'both' || $clear == 'none')) ? " clear: $clear;" : '';
+    $t    = (in_array($type, $possibletypes)) ? "$type" : "div";
+    $c    = (! is_null($class)) ? " class='$class'" : "";
+    $id   = (! is_null($id)) ? " id='$id'" : "";
+    $oc   = (! is_null($onclick)) ? " onclick='$onclick'" : "";
+    $w    = (! is_null($width)) ? " width: $width;" : "";
+    $bg   = (! is_null($bg)) ? " background-color: $bg;" : "";
+    $al   = (($align) && ($align == 'right' || $align == "center" || $align == "justify" || $align == 'left')) ? " text-align: $align;" : '';
+    $fl   = (($float) && ($float == 'left' || $float == 'right' || $float == 'none')) ? " float: $float;" : '';
+    $cl   = (($clear) && ($clear == 'left' || $clear == 'right' || $clear == 'both' || $clear == 'none')) ? " clear: $clear;" : '';
 
     if (! empty($params['data'])) {
         parse_str($params['data'], $attrs);
@@ -234,7 +228,7 @@ function wikiplugin_div($content, $params)
     } else {
         $ar = '';
     }
-    $ro = isset($params['role']) ? "role=\"{$params['role']}\"" : '';
+    $ro = ! is_null($params['role']) ? "role=\"{$params['role']}\"" : '';
 
     if (! empty($title)) {
         $title = " title=\"$title\"";

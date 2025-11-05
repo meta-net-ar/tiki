@@ -13,7 +13,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'trackerId'                => 'int',                //get
-        'sort_mode'                => 'word',               //post
+        'sort_mode'                => 'alnumdash',          //post
         'offset'                   => 'int',                //get
         'find'                     => 'string',             //post
         ],

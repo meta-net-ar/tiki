@@ -18,16 +18,16 @@ $inputConfiguration = [
             'begin'                       => 'bool',           //post
             'rremove'                     => 'int',            //get
             'page'                        => 'pagename',       //post
-            'page_ref_id'                 => 'digits',         //post
+            'page_ref_id'                 => 'int',         //post
             'sremove'                     => 'int',            //get
-            'watch_action'                => 'string',         //post
-            'watch_object'                => 'digits',         //post
+            'watch_action'                => 'alpha',         //post
+            'watch_object'                => 'int',         //post
             'create'                      => 'bool',           //post
-            'pageAlias'                   => 'string',         //post
+            'pageAlias'                   => 'text',         //post
             'after_ref_id'                => 'int',            //post
-            'name'                        => 'string',         //post
-            'move_node'                   => 'string',         //post
-            'find_objects'                => 'string',         //post
+            'name'                        => 'pagename',         //post
+            'move_node'                   => 'int',         //post
+            'find_objects'                => 'striptags',         //post
             'recategorize'                => 'bool',           //post
             'cat_categorize'              => 'bool',           //post
             'cat_override'                => 'bool',           //post
@@ -35,8 +35,8 @@ $inputConfiguration = [
             'offset'                      => 'int',            //get
         ],
         'staticKeyFiltersForArrays' => [
-            'name2'                 => 'string',        //post
-            'cat_categories'        => 'string',        //post
+            'name2'                 => 'pagename',        //post
+            'cat_categories'        => 'int',        //post
         ],
     ],
 ];

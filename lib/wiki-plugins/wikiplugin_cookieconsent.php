@@ -64,7 +64,7 @@ function wikiplugin_cookieconsent($body, $params)
     }
 
     $tag1 = $tag2 = '';
-    if ($params['element'] && $params['element'] !== 'none') {
+    if ($params['element'] !== 'none') {
         if ($class) {
             $class = " class=\"{$class}\"";
         }

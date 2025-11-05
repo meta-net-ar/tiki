@@ -24,7 +24,6 @@ function wikiplugin_group_info()
                 'description' => tra('Select one or more groups allowed to view the block.'),
                 'since' => '1',
                 'filter' => 'groupname',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'group',
             ],
@@ -34,7 +33,6 @@ function wikiplugin_group_info()
                 'description' => tra('Select one or more users allowed to view the block.'),
                 'since' => '27',
                 'filter' => 'username',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'user'
             ],
@@ -44,7 +42,6 @@ function wikiplugin_group_info()
                 'description' => tra('Select one or more groups not allowed to view the block.'),
                 'since' => '1',
                 'filter' => 'groupname',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'group',
             ],
@@ -54,7 +51,6 @@ function wikiplugin_group_info()
                 'description' => tr('Select one or more users. Friends of these selected users will be allowed to view the block.'),
                 'since' => '4.0',
                 'filter' => 'username',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'user'
             ],
@@ -65,7 +61,6 @@ function wikiplugin_group_info()
                     their membership payment to join the groups is outstanding.'),
                 'since' => '13.0',
                 'filter' => 'groupname',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'group',
             ],
@@ -76,7 +71,6 @@ function wikiplugin_group_info()
                     membership in all of the selected groups is not pending.'),
                 'since' => '13.0',
                 'filter' => 'groupname',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'group',
             ],
@@ -99,35 +93,29 @@ function wikiplugin_group($data, $params)
         return $data . $dataelse;
     }
 
-    if (! empty($params['groups'])) {
-        $groups = $params['groups'];
-    }
-    if (! empty($params['notgroups'])) {
-        $notgroups = $params['notgroups'];
-    }
-    if (! empty($params['users'])) {
-        $allowedUsers = $params['users'];
-    }
+    $groups = $params['groups'];
+    $notgroups = $params['notgroups'];
+    $allowedUsers = $params['users'];
     $userPending = [];
-    if (! empty($params['pending']) || ! empty($params['notpending'])) {
+    if (! is_null($params['pending']) || ! is_null($params['notpending'])) {
         $attributelib = TikiLib::lib('attribute');
         $attributes = $attributelib->get_attributes('user', $user);
         $userlib = TikiLib::lib('user');
-        if (! empty($params['pending'])) {
+        if (! is_null($params['pending'])) {
             $pending = $params['pending'];
             foreach ($pending as $pgrp) {
                 $grpinfo = $userlib->get_group_info($pgrp);
-                $attname = 'tiki.memberextend.' . $grpinfo['id'];
+                $attname = 'tiki.memberextend.' . ($grpinfo['id'] ?? '');
                 if (isset($attributes[$attname])) {
                     $userPending[] = $pgrp;
                 }
             }
         }
-        if (! empty($params['notpending'])) {
+        if (! is_null($params['notpending'])) {
             $notpending = $params['notpending'];
             foreach ($notpending as $npgrp) {
                 $grpinfo = $userlib->get_group_info($npgrp);
-                $attname = 'tiki.memberextend.' . $grpinfo['id'];
+                $attname = 'tiki.memberextend.' . ($grpinfo['id'] ?? '');
                 if (! isset($attributes[$attname])) {
                     $userNotPending[] = $npgrp;
                 }
@@ -135,7 +123,7 @@ function wikiplugin_group($data, $params)
         }
     }
 
-    if (empty($groups) && empty($notgroups) && empty($pending) && empty($notpending) && empty($allowedUsers)) {
+    if (is_null($groups) && is_null($notgroups) && empty($pending) && empty($notpending) && is_null($allowedUsers)) {
         return '';
     }
 
@@ -149,9 +137,9 @@ function wikiplugin_group($data, $params)
             }
         }
     }
-    if (! empty($groups) || ! empty($pending)) {
+    if (! is_null($groups) || ! empty($pending)) {
         $ok = false;
-        if (! empty($groups)) {
+        if (! is_null($groups)) {
             if (! is_array($groups)) {
                 $groups = explode('|', $groups);
             }
@@ -172,9 +160,9 @@ function wikiplugin_group($data, $params)
         }
     }
 
-    if (! empty($notgroups) || ! empty($notpending)) {
+    if (! is_null($notgroups) || ! empty($notpending)) {
         $ok = true;
-        if (! empty($notgroups)) {
+        if (! is_null($notgroups)) {
             foreach ($userGroups as $grp) {
                 if (in_array($grp, $notgroups)) {
                     $ok = false;
@@ -191,7 +179,7 @@ function wikiplugin_group($data, $params)
             return $dataelse;
         }
     }
-    if (! empty($allowedUsers)) {
+    if (! is_null($allowedUsers)) {
         $ok = false;
         if (! empty($user)) {
             if (in_array($user, $allowedUsers)) {

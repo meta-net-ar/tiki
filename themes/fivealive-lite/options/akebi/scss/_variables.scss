@@ -1,4 +1,4 @@
-// Custom variables for the Akebi theme option of the FiveAlive and FiveAlive-lite themes
+// Custom variables for the Akebi theme option of the FiveAlive-lite theme
 // These FiveAlive-lite Akebi theme option variables are applied to fivealive-lite/scss/fivealive-lite_option_selectors.scss.
 
 @import "../../../scss/_variables.scss";
@@ -40,7 +40,7 @@ $theme-colors: (
 $body-bg: #fff;
 $body-color: $black; // $gray-800;  // default From FiveAlive
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color: #11606E; //#138296;  From FiveAlive
@@ -80,15 +80,13 @@ $form-range-thumb-bg:                      $component-active-bg; // !default; NE
 // Form validation
 // Navs
 $nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #ddf8f9;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #087084;
+$tiki-nav-tabs-link-bg: #ddf8f9;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #087084;
 $nav-pills-link-active-bg: #087084;
 
 // Navbars
 // Dropdowns
-//$dropdown-link-active-bg:           $component-active-bg; //  !default;
-
 // Pagination
 
 // Cards
@@ -106,9 +104,12 @@ $tiki-top-link-color: #fff;
 $tiki-top-link-hover-color: #f9f9f9;
 
 // Needed for footer and modules in _selectors-for-options.scss
-$footer_liner-card-inner-border: #19a5be;
-$side-column-heading-color: #138296; // #169FB6; WCAG-AA
+$tiki-footer_liner-card-inner-border: #19a5be;
+$tiki-side-column-card-header-color: #138296; // #169FB6; WCAG-AA
 
+$tiki-dark-footer-card-header-border-color: #169FB6;
+$tiki-dark-footer-link-color: #1ea6be;
+$tiki-dark-footer-link-hover-color: #8BB9FE;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -129,6 +130,8 @@ $side-column-heading-color: #138296; // #169FB6; WCAG-AA
     --tiki-topbar-color: #f9f9f9; // #{$navbar-dark-link-color}; // #{$topbar-link-color};
     --tiki-topbar-hover-color: #f2f2f2; //#{$navbar-light-link-hover-color};
     --tiki-topbar-text-color: #f2f2f2; // #{$navbar-light-link-hover-color};
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
         --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
@@ -140,6 +143,8 @@ $side-column-heading-color: #138296; // #169FB6; WCAG-AA
     --tiki-top-color: #f9f9f9;; // #{$navbar-dark-link-color};
     --tiki-top-hover-color: #f2f2f2; // #{$navbar-dark-link-hover-color};
     --tiki-top-text-color: #f2f2f2; // #{$navbar-dark-link-hover-color};
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

@@ -1,6 +1,6 @@
 <div class="d-flex">
     <div class="flex-grow-1 ms-3">
-        <p class="wizardCongrat text-success">
+        <p class="wizardCongrat text-success mb-5 fs-4">
             {icon name="check" size=1}{tr}Congratulations{/tr}. {tr}You are done with the Changes Wizard{/tr}.
         </P>
         <fieldset>

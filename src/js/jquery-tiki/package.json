@@ -16,9 +16,9 @@
     "@svgedit/svgcanvas": "https://github.com/SVG-Edit/svgedit/blob/master/packages/svgcanvas/CHANGES.md"
   },
   "devDependencies": {
+    "@event-calendar/core": "^4.5.1",
     "@svgedit/svgcanvas": "^7.2.1",
     "async-es": "^3.2.6",
-    "summernote": "^0.9.1",
-    "@event-calendar/core": "^4.5.1"
+    "summernote": "^0.9.1"
   }
 }

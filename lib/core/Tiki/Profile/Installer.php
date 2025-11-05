@@ -634,7 +634,8 @@ class Tiki_Profile_Installer
                             $info['emailPattern'],
                             $info['anniversary'],
                             $info['prorateInterval'],
-                            $info['groupColor']
+                            $info['groupColor'],
+                            twaFAGracePeriod: $info['twoFactorAuthGracePeriod']
                         );
                         $this->setFeedback(tra('Group modified') . ': ' . $info['groupName']);
                     }
@@ -808,7 +809,8 @@ class Tiki_Profile_Installer
                     $info['email_pattern'],
                     $info['anniversary'],
                     $info['prorate_interval'],
-                    $info['color']
+                    $info['color'],
+                    twaFAGracePeriod: $info['twoFactorAuthGracePeriod']
                 );
             }
         }

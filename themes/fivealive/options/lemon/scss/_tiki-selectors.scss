@@ -1,8 +1,11 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
+h3.tiki-card-header-title {
+    color: #000;
+}
 
 .postbody-title,
 .bg-dark {
@@ -71,4 +74,7 @@
     .valid-feedback { color: #329F4F; }
     .invalid-feedback { color: #FF4800; }
     .blockquote-footer { color: #848C94; }
+    h3.tiki-card-header-title {
+        color: #000;
+    }
 }

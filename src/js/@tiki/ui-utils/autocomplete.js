@@ -1,6 +1,48 @@
 import { applyAutocomplete } from "@vue-widgets/el-autocomplete";
 
 export default function autocomplete(element, resourceType, options = {}) {
+    const { url, sourceList, valueKey } = getAutocompleteResources(resourceType, options);
+    const autoCompleteArgs = [element, url, sourceList, valueKey];
+
+    if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
+        const selectCb = (event) => {
+            const page = event.detail[0];
+            let slug = page.label;
+            const scheme = jqueryTiki.wiki_url_scheme;
+
+            if (scheme === "dash") {
+                slug = page.label.replace(/ /g, "-");
+            } else if (scheme === "underscore") {
+                slug = page.label.replace(/ /g, "_");
+            } else if (scheme === "urlencode") {
+                slug = page.label.replace(/ /g, "+");
+            }
+
+            if (jqueryTiki.sefurl) {
+                window.location.href = slug;
+            } else {
+                window.location.href = "tiki-index.php?page=" + slug;
+            }
+        };
+        autoCompleteArgs.push(selectCb);
+    } else if (options.select) {
+        autoCompleteArgs.push(options.select);
+    }
+
+    const component = applyAutocomplete(...autoCompleteArgs);
+
+    if (options.onEnter) {
+        handlePressEnter(component, options.onEnter);
+    }
+}
+
+const handlePressEnter = (component, callback) => {
+    $(component).on("pressEnter", (event) => {
+        callback(event.detail[0]);
+    });
+};
+
+export function getAutocompleteResources(type, options = {}) {
     let remoteSourceUrl = "";
     let sourceList = [];
     let valueKey = null;
@@ -8,7 +50,7 @@ export default function autocomplete(element, resourceType, options = {}) {
     const urlParams = new URLSearchParams(window.location.search);
     const excludepage = urlParams.get("page");
 
-    switch (resourceType) {
+    switch (type) {
         case "pagename":
             valueKey = "label";
             remoteSourceUrl =
@@ -61,42 +103,6 @@ export default function autocomplete(element, resourceType, options = {}) {
     }
 
     const url = remoteSourceUrl ? window.location.origin + (window.tikiroot || "/") + remoteSourceUrl : null;
-    const autoCompleteArgs = [element, url, sourceList, valueKey];
 
-    if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
-        const selectCb = (event) => {
-            const page = event.detail[0];
-            let slug = page.label;
-            const scheme = jqueryTiki.wiki_url_scheme;
-
-            if (scheme === "dash") {
-                slug = page.label.replace(/ /g, "-");
-            } else if (scheme === "underscore") {
-                slug = page.label.replace(/ /g, "_");
-            } else if (scheme === "urlencode") {
-                slug = page.label.replace(/ /g, "+");
-            }
-
-            if (jqueryTiki.sefurl) {
-                window.location.href = slug;
-            } else {
-                window.location.href = "tiki-index.php?page=" + slug;
-            }
-        };
-        autoCompleteArgs.push(selectCb);
-    } else if (options.select) {
-        autoCompleteArgs.push(options.select);
-    }
-
-    const component = applyAutocomplete(...autoCompleteArgs);
-
-    if (options.onEnter) {
-        handlePressEnter(component, options.onEnter);
-    }
+    return { url, sourceList, valueKey };
 }
-
-const handlePressEnter = (component, callback) => {
-    $(component).on("pressEnter", (event) => {
-        callback(event.detail[0]);
-    });
-};

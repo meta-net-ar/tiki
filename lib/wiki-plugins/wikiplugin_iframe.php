@@ -26,7 +26,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Name'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
             ],
             'title' => [
                 'safe' => true,
@@ -35,14 +34,12 @@ function wikiplugin_iframe_info()
                 'description' => tra('Frame title'),
                 'since' => '3.2',
                 'filter' => 'text',
-                'default' => '',
             ],
             'id' => [
                 'required' => false,
                 'name' => tra('Id'),
                 'description' => tra('HTML id for the iframe.'),
                 'filter' => 'text',
-                'default' => '',
                 'since' => '26.1',
             ],
             'class' => [
@@ -50,7 +47,6 @@ function wikiplugin_iframe_info()
                 'name' => tra('Class'),
                 'description' => tra('Class for the iframe.'),
                 'filter' => 'text',
-                'default' => '',
                 'since' => '26.1',
             ],
             'width' => [
@@ -60,7 +56,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Width in pixels or %'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
             ],
             'height' => [
                 'safe' => true,
@@ -69,7 +64,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Pixels or %'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
             ],
             'align' => [
                 'safe' => true,
@@ -78,7 +72,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Align the iframe on the page'),
                 'since' => '3.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Top'), 'value' => 'top'],
@@ -95,7 +88,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Choose whether to show a border around the iframe'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 1],
@@ -109,7 +101,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Margin height in pixels'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
             ],
             'marginwidth' => [
                 'safe' => true,
@@ -118,7 +109,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Margin width in pixels'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
             ],
             'scrolling' => [
                 'safe' => true,
@@ -127,7 +117,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('Choose whether to add a scroll bar'),
                 'since' => '3.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'yes'],
@@ -141,7 +130,6 @@ function wikiplugin_iframe_info()
                 'description' => tra('URL'),
                 'filter' => 'url',
                 'since' => '3.0',
-                'default' => '',
             ],
             'responsive' => [
                 'safe' => true,
@@ -164,7 +152,7 @@ function wikiplugin_iframe_info()
 
 function wikiplugin_iframe($data, $params)
 {
-    if (! isset($params['src']) && ! empty($data)) {
+    if (is_null($params['src']) && ! empty($data)) {
         $params['src'] = $data;
     }
 
@@ -175,59 +163,59 @@ function wikiplugin_iframe($data, $params)
 function renderIframe($params)
 {
     extract($params, EXTR_SKIP);
-    if (isset($responsive) and $responsive != 'no' and $responsive != 'n') {
+    if ($responsive != 'no' and $responsive != 'n') {
         if ($responsive == '4by3') {
             $ret = '<div class="embed-responsive embed-responsive-4by3"><iframe class="embed-responsive-item ';
         } else {
             $ret = '<div class="embed-responsive embed-responsive-16by9"><iframe class="embed-responsive-item ';
         }
 
-        if (isset($class)) {
+        if (! is_null($class)) {
             $ret .= $class . '"';
         } else {
             $ret .= '"';
         }
     } else {
         $ret = '<iframe ';
-        if (isset($class)) {
+        if (! is_null($class)) {
             $ret .= " class=\"$class\"";
         }
     }
 
-    if (isset($id)) {
+    if (! is_null($id)) {
         $ret .= " id=\"$id\"";
     }
-    if (isset($name)) {
+    if (! is_null($name)) {
         $ret .= " name=\"$name\"";
     }
-    if (isset($title)) {
+    if (! is_null($title)) {
         $ret .= " title=\"$title\"";
     }
-    if (isset($width)) {
+    if (! is_null($width)) {
         $ret .= " width=\"$width\"";
     }
-    if (isset($height)) {
+    if (! is_null($height)) {
         $ret .= " height=\"$height\"";
     }
-    if (isset($align)) {
+    if (! is_null($align)) {
         $ret .= " align=\"$align\"";
     }
-    if (isset($frameborder)) {
+    if (! is_null($frameborder)) {
         $ret .= " frameborder=\"$frameborder\"";
     }
-    if (isset($marginheight)) {
+    if (! is_null($marginheight)) {
         $ret .= " marginheight=\"$marginheight\"";
     }
-    if (isset($marginwidth)) {
+    if (! is_null($marginwidth)) {
         $ret .= " marginwidth=\"$marginwidth\"";
     }
-    if (isset($scrolling)) {
+    if (! is_null($scrolling)) {
         $ret .= " scrolling=\"$scrolling\"";
     }
-    if (isset($src)) {
+    if (! is_null($src)) {
         $ret .= " src=\"$src\"";
     }
-    if (isset($responsive) and $responsive != 'no' and $responsive != 'n') {
+    if ($responsive != 'no' and $responsive != 'n') {
         $ret .= "></iframe></div>";
     } else {
         $ret .= "></iframe>";

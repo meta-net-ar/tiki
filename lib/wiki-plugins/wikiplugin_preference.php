@@ -21,11 +21,14 @@ function wikiplugin_preference_info()
                 'description' => tra('Preferences to be edited(separated by ,).'),
                 'filter' => 'striptags',
                 'type' => 'list',
+                'default' => '',
             ],
             'currentpage' => [
                 'required' => true,
                 'name' => tra('Current Page'),
                 'description' => tra('Page\'s name where this plugin will be shown.'),
+                'filter' => 'striptags',
+                'default' => '',
             ],
         ],
     ];
@@ -44,8 +47,8 @@ function wikiplugin_preference($data, $params)
     $logslib = TikiLib::lib('logs');
     $prefslib = TikiLib::lib('prefs');
 
-    $name = $params['name'];
-    $currentpage = $params['currentpage'];
+    $name = $params['name'] ?? '';
+    $currentpage = $params['currentpage'] ?? '';
     $pageSlug = $wikilib->get_slug_by_page($currentpage);
 
     if (! isset($_GET['page']) || ! $name) {

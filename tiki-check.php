@@ -1758,7 +1758,6 @@ if ($s && function_exists('gd_info')) {
             'setting' => $gd_info['GD Version'],
             'message' => tra('The GD extension is needed for manipulation of images and for CAPTCHA images.')
         );
-        imagedestroy($im);
     } elseif ($im) {
         $php_properties['gd'] = array(
                 'fitness' => tra('unsure'),
@@ -1766,7 +1765,6 @@ if ($s && function_exists('gd_info')) {
                 'setting' => $gd_info['GD Version'],
                 'message' => tra('The GD extension is loaded, and Tiki can create images, but the FreeType extension is needed for CAPTCHA text generation.')
             );
-            imagedestroy($im);
     } else {
         $php_properties['gd'] = array(
             'fitness' => tra('unsure'),
@@ -2658,7 +2656,6 @@ if (function_exists('apache_get_version')) {
         } else {
             $apache_server_info = false;
         }
-        curl_close($curl);
     } else {
         $apache_server_info = 'nocurl';
     }
@@ -3288,7 +3285,7 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
             foreach ($options as $opt) {
                 $optArray = explode(' ', $opt, 2);
                 $exec = reset($optArray);
-                $which_exec = `which $exec`;
+                $which_exec = shell_exec("which $exec");
                 if ($which_exec) {
                     if ($file_handler['fitness_status'] == FITNESS_STATUS_INFO) {
                         $file_handler['message'] .= tra(", otherwise handled by ") . $which_exec;
@@ -5525,7 +5522,6 @@ function get_content_from_url($url)
         if ($http_code != 200) {
             $content = "fail-http-" . $http_code;
         }
-        curl_close($curl);
     } else {
         $content = "fail-no-request-done";
     }

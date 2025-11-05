@@ -191,7 +191,7 @@ function tiki_get_admin_mail($fromName = null)
         try {
             $mail->from(new Address($prefs['sender_email'], $fromName ?: $prefs['sender_name']));
         } catch (Throwable $e) {
-            // was already set
+            error_log("Mailer General Error: " . $e->getMessage());
         }
     }
 
@@ -233,6 +233,10 @@ function tiki_send_email($email)
     } catch (TransportExceptionInterface $e) {
         error_log("Mailer Transport Error: " . $e->getMessage());
     } catch (Throwable $e) {
-        error_log("Mailer General Error: " . $e->getMessage());
+        if (str_contains($e->getMessage(), 'An email must have a "From" or a "Sender" header')) {
+            Feedback::error(tr('Unable to send email: sender email not configured.'));
+        } else {
+            error_log("Mailer General Error: " . $e->getMessage());
+        }
     }
 }

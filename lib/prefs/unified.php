@@ -390,7 +390,7 @@ function prefs_unified_list()
             'type' => 'text',
             'default' => ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "not", "of", "on", "or", "s", "such", "t", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with"],
             'separator' => ',',
-            'hint' => tr('MySQL full-text search has its own list of stop words configured in the server.'),
+            'hint' => tr('This list is applied to the selected search engine. Note for MySQL: It completely replaces the native InnoDB stopword list. If left empty, will disable stopword filtering.'),
         ],
         'unified_trim_sorted_search' => [
             'name' => tra('Automatically trim Elasticsearch results on date-sorted query'),

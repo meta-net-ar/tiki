@@ -26,5 +26,25 @@ $(function () {
             }
         }
     });
+
+    $(".sm-nav-item").on("click", function () {
+        const $menu = $(this).find(".dropdown-menu, ul").first();
+        if ($menu.length === 0) return;
+
+        const rect = this.getBoundingClientRect();
+
+        // Determine vertical and horizontal position
+        const vertical = rect.top < window.innerHeight / 2 ? "top" : "bottom";
+        const horizontal = rect.left < window.innerWidth / 2 ? "end" : "start";
+
+        // Remove existing position classes
+        $menu.removeClass("dropdown-menu-top dropdown-menu-bottom dropdown-menu-end dropdown-menu-start");
+
+        if (vertical && horizontal) {
+            // Add new position classes
+            $menu.addClass(`dropdown-menu-${vertical} dropdown-menu-${horizontal}`);
+        }
+    });
 });
+
 // end of src/js/tiki-menu.js

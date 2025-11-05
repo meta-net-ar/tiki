@@ -33,7 +33,6 @@ function wikiplugin_mediaplayer_info()
                 'since' => '6.0',
                 'accepted' => ALL_ACCEPTED_FORMATS,
                 'filter' => 'url',
-                'default' => '',
             ],
 
             'mp3' => [
@@ -43,7 +42,6 @@ function wikiplugin_mediaplayer_info()
                 'since' => '27.0',
                 'accepted' => AUDIO_ACCEPTED_FORMATS,
                 'filter' => 'url',
-                'default' => '',
             ],
 
             // The type parameter is verified for Quicktime, Windows Media Player, Real Player, iframe (PDF)
@@ -63,14 +61,12 @@ function wikiplugin_mediaplayer_info()
                 'name' => tra('Width'),
                 'description' => tra('Player width in px or %'),
                 'since' => '10.0',
-                'default' => '',
                 ],
             'height' => [
                 'required' => false,
                 'name' => tra('Height'),
                     'description' => tra('Player height in px or %'),
                 'since' => '10.0',
-                'default' => '',
                 ],
             'mediatype' => [
                 'required' => false,
@@ -99,12 +95,12 @@ function wikiplugin_mediaplayer($data, $params)
     $access = TikiLib::lib('access');
     static $iMEDIAPLAYER = 0;
     $id = 'mediaplayer' . ++$iMEDIAPLAYER;
-    $params['type'] = strtolower($params['type'] ?? '');
+    $params['type'] = strtolower($params['type']);
     $extension = '';
-    if ((empty($params['src']) && empty($params['mp3']))) {
+    if ((is_null($params['src']) && is_null($params['mp3']))) {
         Feedback::error(['mes' => tr("PluginMediaPlayer : src and mp3 cannot both be empty")]);
         return '';
-    } elseif (! empty($params['src'])) {
+    } elseif (! is_null($params['src'])) {
         // This regex is used to extract the file ID from various URL formats:
         // - tiki-display.php?fileId=74
         // - display74
@@ -171,7 +167,7 @@ function wikiplugin_mediaplayer($data, $params)
             Feedback::error(tr("PluginMediaPlayer: Media format not supported. Here are the supported formats: ") . implode(", ", ALL_ACCEPTED_FORMATS));
             return '';
         }
-    } elseif (empty($params['src']) && ! empty($params['mp3'])) {
+    } elseif (is_null($params['src']) && ! is_null($params['mp3'])) {
         $extension = pathinfo($params['mp3'], PATHINFO_EXTENSION);
         if (! in_array($extension, AUDIO_ACCEPTED_FORMATS)) {
             Feedback::error(tr("PluginMediaPlayer: Media format not supported. Here are the audio supported formats: ") . implode(", ", AUDIO_ACCEPTED_FORMATS));
@@ -180,7 +176,7 @@ function wikiplugin_mediaplayer($data, $params)
         $params['src'] = $params['mp3'];
     }
 
-    if (empty($params['mediatype'])) {
+    if (is_null($params['mediatype'])) {
         if (in_array($extension, AUDIO_ACCEPTED_FORMATS)) {
             $params['mediatype'] = 'audio';
         } elseif (in_array($extension, VIDEO_ACCEPTED_FORMATS)) {
@@ -323,8 +319,8 @@ function wikiplugin_mediaplayer($data, $params)
                     return;
                 }
 
-                $smarty->assign('width', $params['width'] ?? '');
-                $smarty->assign('height', $params['height'] ?? '');
+                $smarty->assign('width', $params['width']);
+                $smarty->assign('height', $params['height']);
                 $smarty->assign('content', $filecontent);
 
                 return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_mediaplayer_text.tpl') . '~/np~';
@@ -365,12 +361,12 @@ if (found) {
         return "<a href=\"" . $params['src'] . "\" id=\"$id\"></a>";
     }
 
-    if ((! empty($params['mediatype']) && ($params['mediatype'] == 'audio' || $params['mediatype'] == 'video'))) {
+    if ((! is_null($params['mediatype']) && ($params['mediatype'] == 'audio' || $params['mediatype'] == 'video'))) {
         $code = '<' . $params['mediatype'];
-        if (! empty($params['height'])) {
+        if (! is_null($params['height'])) {
             $code .= ' height="' . $params['height'] . '"';
         }
-        if (! empty($params['width'])) {
+        if (! is_null($params['width'])) {
             $code .= ' width="' . $params['width'] . '"';
         }
         $code .= ' style="max-width: 100%" controls>';

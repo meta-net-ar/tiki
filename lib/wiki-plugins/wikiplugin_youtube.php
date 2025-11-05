@@ -22,7 +22,6 @@ function wikiplugin_youtube_info()
                     before the first question mark)', '<code>', '</code>'),
                 'since' => '2.0',
                 'filter' => 'url',
-                'default' => '',
             ],
             'privacyEnhanced' => [
                 'required' => false,
@@ -132,10 +131,6 @@ function wikiplugin_youtube($data, $params)
 {
     global $tikilib;
 
-    if (empty($params['movie'])) {
-        return '{BOX(class="text-bg-light")}' . tra('Plugin YouTube error: the movie parameter is empty.') . '{BOX}';
-    }
-
     $scheme = $tikilib->httpScheme();
 
     $sYoutubeId  = getYoutubeId($params['movie']);
@@ -168,7 +163,7 @@ function wikiplugin_youtube($data, $params)
     if (! empty($params['start'])) {
         $params['movie'] .= '&start=' . $params['start'];
     }
-    if (isset($params['related']) && $params['related'] == 'n') {
+    if ($params['related'] == 'n') {
         $params['movie'] .= '&rel=0';
     }
     if (! empty($params['border'])) {

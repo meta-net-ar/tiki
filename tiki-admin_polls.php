@@ -12,33 +12,33 @@ $inputConfiguration = [
     [
         'staticKeyFilters'               => [
              'pollId'                    => 'int',            //post
-             'closeall'                  => 'bool',           //get
-             'activeall'                 => 'bool',           //get
-             'active'                    => 'string',           //get
-             'save'                      => 'bool',           //post
-             'add'                       => 'bool',           //post
-             'addPoll'                   => 'bool',           //post
+             'setlast'                   => 'alpha',          //post
+             'closeall'                  => 'alpha',          //post
+             'activeall'                 => 'alpha',          //post
+             'active'                    => 'alpha',          //post
+             'save'                      => 'alpha',          //post
+             'add'                       => 'alpha',          //post
+             'addPoll'                   => 'alpha',          //post
              'remove'                    => 'int',            //get
-             'locked'                    => 'bool',           //get
-             'position'                  => 'word',           //get
-             'poll_template'             => 'word',           //get
+             'locked'                    => 'alpha',          //post
+             'poll_template'             => 'int',            //post
              'pollPublishDate'           => 'int',            //post
              'voteConsiderationSpan'     => 'digits',         //post
-             'title'                     => 'string',         //post
-             'sort_mode'                 => 'word',           //get
-             'find'                      => 'string',         //post
-             'offset'                    => 'digits',         //get
-             'Time_Meridian'             => 'digits',         //get
+             'title'                     => 'text',           //post
+             'sort_mode'                 => 'alnumdash',      //get
+             'find'                      => 'text',           //get
+             'offset'                    => 'int',            //get
+             'Time_Meridian'             => 'alpha',          //post
              'Time_Hour'                 => 'digits',         //get
              'Time_Minute'               => 'digits',         //get
              'Date_Month'                => 'digits',         //get
              'Date_Day'                  => 'digits',         //get
              'Date_Year'                 => 'digits',         //get
-             'optionsId'                 => 'int',            //get
         ],
              'staticKeyFiltersForArrays' => [
-                'options'                => 'string',         //post
-                'pages'                  => 'pagename',       //get
+                'options'                => 'text',           //post
+                'optionsId'              => 'int',            //post
+                'pages'                  => 'pagename',       //post
         ],
     ],
 ];

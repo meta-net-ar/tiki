@@ -32,7 +32,6 @@ $theme-colors: (
 );
 
 // Options
-
 // Prefix
 $prefix: bs-;
 
@@ -40,7 +39,7 @@ $prefix: bs-;
 $body-bg:                   $white;  // default
 $body-color: #212529;
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color: #a02871;
@@ -61,9 +60,9 @@ $table-hover-bg: #f5f5f5;
 
 // Navs
 $nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #f4dded;;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #742157; // same as $dropdown-link-hover-bg;
+$tiki-nav-tabs-link-bg: #f4dded;;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #742157; // same as $dropdown-link-hover-bg;
 
 // Navbars
 
@@ -116,10 +115,14 @@ $code-color:                        $body-color; // $pink; default
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
 // Needed for footer and modules in _selectors-for-options.scss
-$side-column-heading-color: #bc2f84;
-$footer_liner-card-inner-border: #a52873;
-$footer-accent-color: $input-border-color;
-$tiki-footer-border-color: $footer-accent-color;
+$tiki-side-column-card-header-color: #bc2f84 !important;
+$tiki-footer_liner-card-inner-border: #a52873;
+$tiki-footer-accent-color: $input-border-color;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
+
+$tiki-dark-footer-card-header-border-color: #bc2f84;
+$tiki-dark-footer-link-color: #d968ac;
+$tiki-dark-footer-link-hover-color: #e480bc;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.

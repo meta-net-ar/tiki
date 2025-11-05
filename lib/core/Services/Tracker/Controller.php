@@ -1101,13 +1101,20 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $itemId = $this->utilities->insertItem(
                 $definition,
                 [
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
                 ]
             );
 
@@ -1371,6 +1378,12 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $result = $this->utilities->updateItem(
                 $definition,
                 [
@@ -1378,7 +1391,8 @@ class Services_Tracker_Controller
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
                 ]
             );
 
@@ -3178,6 +3192,13 @@ class Services_Tracker_Controller
         $listFields = $input->listFields->text();
         $limit = $input->limit->int();
 
+        $displaySort = null;
+        try {
+            $displaySort = $input->displayFieldsListSort->text();
+        } catch (\Throwable $e) {
+            $displaySort = null;
+        }
+
         if (! $listFields) {
             $listFields = $field;
         }
@@ -3199,6 +3220,14 @@ class Services_Tracker_Controller
             $item['value'] = (string) $item['itemId'];
             unset($item['field_values']);
             $data[] = $item;
+        }
+
+        if ($displaySort === 'formatted' && ! empty($data)) {
+            usort($data, function ($a, $b) {
+                $ta = $a['label'] ?? '';
+                $tb = $b['label'] ?? '';
+                return strnatcasecmp($ta, $tb);
+            });
         }
 
         return $data;

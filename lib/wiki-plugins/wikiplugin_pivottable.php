@@ -20,7 +20,6 @@ function wikiplugin_pivottable_info()
                 'name' => tr('Data source'),
                 'description' => tr("For example 'tracker:1' or 'activitystream'"),
                 'required' => true,
-                'default' => 0,
                 'filter' => 'text',
                 'profile_reference' => 'tracker',
                 'separator' => ':',
@@ -61,7 +60,6 @@ function wikiplugin_pivottable_info()
                 'description' => tr('Which field or fields to use as table rows. Leaving blank will remove grouping by table rows. ') . ' ' . tr('Use permanentNames in case of tracker fields.') . ' ' . tr('Separated by colon (:) if more than one.'),
                 'since' => '',
                 'filter' => 'text',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'use_permname' => 'y',
                 'separator' => ':',
@@ -72,7 +70,6 @@ function wikiplugin_pivottable_info()
                 'description' => tr('Which field or fields to use as table columns. Leaving blank will use the first available field.') . ' ' . tr('Use permanentNames in case of tracker fields.') . ' ' . tr('Separated by colon (:) if more than one.'),
                 'since' => '',
                 'filter' => 'text',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'use_permname' => 'y',
                 'separator' => ':',
@@ -99,7 +96,6 @@ function wikiplugin_pivottable_info()
                 'description' => tr(''),
                 'since' => '17',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'heatmapColors' => [
@@ -108,7 +104,6 @@ function wikiplugin_pivottable_info()
                 'description' => tr(''),
                 'since' => '17',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'rendererName' => [
@@ -265,7 +260,6 @@ function wikiplugin_pivottable_info()
                 'since' => '24.7',
                 'required' => false,
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'highlightGroupColors' => [
@@ -274,7 +268,6 @@ function wikiplugin_pivottable_info()
                 'description' => tr(''),
                 'since' => '18.1',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'highlightChartType' => [

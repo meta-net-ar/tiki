@@ -35,7 +35,6 @@ function wikiplugin_listpages_info()
                 'name' => tra('Initial'),
                 'description' => tra('Initial page to show'),
                 'since' => '2.0',
-                'default' => '',
             ],
             'showNameOnly' => [
                 'required' => false,
@@ -277,7 +276,6 @@ function wikiplugin_listpages_info()
                 'description' => tr('Wiki page names to be excluded from list'),
                 'since' => '19.0',
                 'filter' => 'pagename',
-                'default' => '',
                 'separator' => '|',
                 'profile_reference' => 'wiki_page',
             ],
@@ -324,7 +322,7 @@ function wikiplugin_listpages($data, $params)
     $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
     $filter = [];
-    if (! isset($initial)) {
+    if (is_null($initial)) {
         if (isset($_REQUEST['initial'])) {
             $initial = $_REQUEST['initial'];
         } else {
@@ -358,10 +356,10 @@ function wikiplugin_listpages($data, $params)
             $filter['categId'] = $categId;
         }
     }
-    if (! empty($structHead) && $structHead == 'y') {
+    if ($structHead == 'y') {
         $filter['structHead'] = $structHead;
     }
-    if (! empty($translations) && $prefs['feature_multilingual'] == 'y') {
+    if (! is_null($translations) && $prefs['feature_multilingual'] == 'y') {
         $multilinguallib = TikiLib::lib('multilingual');
         if ($translations == 'user') {
             $translations = $multilinguallib->preferredLangs();
@@ -369,13 +367,13 @@ function wikiplugin_listpages($data, $params)
             $translations = explode('|', $translations);
         }
     }
-    if (! empty($translationOrphan)) {
+    if (! is_null($translationOrphan)) {
         $filter['translationOrphan'] = explode('|', $translationOrphan);
     }
-    if (! empty($langOrphan)) {
+    if (! is_null($langOrphan)) {
         $filter['langOrphan'] = $langOrphan;
     }
-    if (! empty($lang)) {
+    if (! is_null($lang)) {
         $filter['lang'] = $lang;
     } elseif (is_array($translations)) {
         $lang = $filter['lang'] = reset($translations);
@@ -386,7 +384,7 @@ function wikiplugin_listpages($data, $params)
         $lang = $filter['lang'] = reset($translations);
     }
     if ($pagination == 'y') {
-        if (! empty($offset_arg) && ! empty($_REQUEST[$offset_arg])) {
+        if (! is_null($offset_arg) && ! empty($_REQUEST[$offset_arg])) {
             $offset_pagination = $_REQUEST[$offset_arg];
         } else {
             $offset_pagination = 0;
@@ -396,14 +394,14 @@ function wikiplugin_listpages($data, $params)
         $sort = $_REQUEST['sort_mode'];
     }
 
-    $exact_match = ( isset($exact_match) && $exact_match == 'y' );
-    $only_name = ( isset($showNameOnly) && $showNameOnly == 'y' );
-    $only_orphan_pages = ( isset($only_orphan_pages) && $only_orphan_pages == 'y' );
-    $for_list_pages = ( isset($for_list_pages) && $for_list_pages == 'y' );
+    $exact_match = ( $exact_match == 'y' );
+    $only_name = ( $showNameOnly == 'y' );
+    $only_orphan_pages = ( $only_orphan_pages == 'y' );
+    $for_list_pages = ( $for_list_pages == 'y' );
     $only_count = false;
 
-    $listpages = $tikilib->list_pages($offset, $max, $sort, $find, $initial, $exact_match, $only_name, $for_list_pages, $only_orphan_pages, $filter, $only_count, '', $exclude_pages);
-    if (! empty($includetag) || ! empty($excludetag)) {
+    $listpages = $tikilib->list_pages($offset, $max, $sort, $find, $initial, $exact_match, $only_name, $for_list_pages, $only_orphan_pages, $filter, $only_count, '', $exclude_pages ?? '');
+    if (! is_null($includetag) || ! is_null($excludetag)) {
         if (str_contains($includetag, ';')) {
             $aIncludetag = explode(';', $includetag);
         } else {
@@ -465,7 +463,7 @@ function wikiplugin_listpages($data, $params)
 
     $smarty->assign_by_ref('checkboxes_on', $showCheckbox);
     $smarty->assign_by_ref('showNumberOfPages', $showNumberOfPages);
-    if (! empty($showPageAlias) && $showPageAlias == 'y') {
+    if ($showPageAlias == 'y') {
         $smarty->assign_by_ref('showPageAlias', $showPageAlias);
     }
 
@@ -497,13 +495,13 @@ function wikiplugin_listpages($data, $params)
     }
 
     // Display an error message if the $showNameAndDescriptionOnly and $showNameOnly options are all entered at the same time
-    if (isset($showNameAndDescriptionOnly) && $showNameAndDescriptionOnly == 'y' && isset($showNameOnly) && $showNameOnly == 'y') {
+    if ($showNameAndDescriptionOnly == 'y' && $showNameOnly == 'y') {
         Feedback::errorAndDie(tra("You cannot specify the showNameOnly and showNameAndDescriptionOnly options simultaneously, You must choose one of them."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
-    if (isset($showNameOnly) && $showNameOnly == 'y') {
+    if ($showNameOnly == 'y') {
         $ret = $smarty->fetch('wiki-plugins/wikiplugin_listpagenames.tpl');
-    } elseif (isset($showNameAndDescriptionOnly) && $showNameAndDescriptionOnly == 'y') {
+    } elseif ($showNameAndDescriptionOnly == 'y') {
         $ret = $smarty->fetch('wiki-plugins/wikiplugin_listpage_namesanddescription.tpl');
     } else {
         $ret = $smarty->fetch('tiki-listpages_content.tpl');

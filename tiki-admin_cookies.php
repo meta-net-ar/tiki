@@ -18,7 +18,6 @@ $inputConfiguration = [
             'sort_mode'               => 'striptags',    //post
             'offset'                  => 'digits',       //post
             'find'                    => 'striptags',    //post
-            'add'                     => 'bool',         //post
             'save'                    => 'bool',         //post
             'upload'                  => 'bool',         //post
         ],

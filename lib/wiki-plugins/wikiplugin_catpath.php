@@ -72,7 +72,7 @@ function wikiplugin_catpath($data, $params)
         while ($info["parentId"] != 0) {
             $info = $categlib->get_category($info["parentId"]);
 
-            $path = '<a class="categpath" href="tiki-browse_categories.php?parentId=' . $info["categId"] . '">' . htmlspecialchars($info["name"]) . '</a> ' . htmlspecialchars($divider) . ' ' . $path;
+            $path = '<a class="categpath" href="tiki-browse_categories.php?parentId=' . $info["categId"] . '">' . htmlspecialchars($info["name"]) . '</a> ' . $divider . ' ' . $path;
         }
 
         $catpath .= $path . '</span><br />';

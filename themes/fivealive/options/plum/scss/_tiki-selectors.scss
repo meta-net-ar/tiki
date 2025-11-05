@@ -3,15 +3,14 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 
-//.header_outer,
-//.layout_basic #top_modules,
+h3.tiki-card-header-title {
+    color: #fff;
+}
+
 .postbody-title,
-//.tiki > .navbar.fixed-top.bg-dark,
-    //.topbar, .navbar-dark, .topbar .navbar-dark .navbar-nav > li, .topbar .nav > li,
 .bg-dark {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5e028e+0,8f06c4+100 */
-//    background: #5e028e !important; /* Old browsers */
-    background: linear-gradient(to right,  #300149 0%,#15001F 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5e028e+0,8f06c4+100
+    background: linear-gradient(to right,  #300149 0%,#15001F 100%);
 }
 
 // Progress bars
@@ -25,7 +24,6 @@
 }
 
 // Dark color mode
-
 [data-bs-theme=dark] {
     .blockquote-footer { color: #848D94; }
     .btn.btn-outline-primary { color: #C659FC; border-color: #C659FC; }

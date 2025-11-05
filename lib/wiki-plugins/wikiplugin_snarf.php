@@ -108,7 +108,6 @@ function wikiplugin_snarf_info()
                 'description' => tr('Set to Yes (%0) to display the content as is instead of escaping HTML special
                     characters (not set by default).', '<code>1</code>'),
                 'since' => '3.0',
-                'default' => null,
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 1],
@@ -132,7 +131,6 @@ function wikiplugin_snarf_info()
                 'name' => tra('Label'),
                 'description' => tra('Text to click on to fetch the URL via Ajax'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'text'
             ],
         ],
@@ -152,7 +150,7 @@ function wikiplugin_snarf($data, $params)
     }
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
-    if (! empty($params['ajax'])) {
+    if (! is_null($params['ajax'])) {
         $params['iSnarf'] = $iSnarf;
         $params['href'] = '';
         $params['link'] = '-';
@@ -172,7 +170,7 @@ function wikiplugin_snarf($data, $params)
         if (isset($_REQUEST['snarf_refresh']) && $_REQUEST['snarf_refresh'] == $params['url']) {
             $cachetime = 0;
             unset($_REQUEST['snarf_refresh']);
-        } elseif (isset($params['cache']) && $params['cache'] >= 0) {
+        } elseif ($params['cache'] >= 0) {
             $cachetime = $params['cache'] * 60;
         } else {
             $cachetime = $prefs['wikiplugin_snarf_cache'];
@@ -187,14 +185,14 @@ function wikiplugin_snarf($data, $params)
     }
 
     // If content is HTML, keep only the content of the body
-    if (isset($params['ishtml']) && $params['ishtml'] == 1) {
+    if (! is_null($params['ishtml']) && $params['ishtml'] == 1) {
         // Not using preg_replace due to its limitations to 100.000 characters
         $snarf = preg_replace('/^.*<\s*body[^>]*>/i', '', $snarf);
         $snarf = preg_replace('/<\s*\/body[^>]*>.*$/i', '', $snarf);
     }
 
     // If the user specified a more specialized regex
-    if (isset($params['regex']) && isset($params['regexres'])) {
+    if (! empty($params['regex']) && ! empty($params['regexres'])) {
         // fixes http://dev.tiki.org/item4059
         $params['regex'] = str_replace("\0", "", $params['regex']);
 

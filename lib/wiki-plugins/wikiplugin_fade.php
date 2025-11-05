@@ -150,7 +150,7 @@ function wikiplugin_fade($body, $params)
 
         $headerlib->add_jq_onready($jq);
 
-        return "<div id='" . $unique_outer . "' class='card " . ($params['class'] ?? '' ) . "'>"
+        return "<div id='" . $unique_outer . "' class='card " . ($params['class']) . "'>"
                 . "<div class='card-header'>"
                   . "<a data-bs-toggle='collapse' class='d-block' href='#" . $unique_inner . "'>" . htmlspecialchars($params['label']) . "<span class='icon icon-menu-extra fas fa-chevron-down fa-fw' style='float:right'></span>" . "</a>"
                 . "</div>"
@@ -176,7 +176,7 @@ function wikiplugin_fade($body, $params)
                 });';
         $headerlib->add_jq_onready($jq);
     //wrapping in an extra div makes animation smoother
-        return ( isset($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
+        return (($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
             . "\r\t" . '<span class="' . $span_class . '">' . "\r\t\t"
         . '<a id="' . $unique_link . '" class=' . $a_class_hidden . '>' . "\r\t\t\t" . htmlspecialchars($params['label']) . "\r\t\t"
         . '</a>' . "\r\t" . '</span>' . "\r\t" . '<div id="' . $unique . '" class="' . $div_class . '">' . "\r\t\t\t"

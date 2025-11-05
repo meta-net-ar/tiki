@@ -7,7 +7,7 @@
     <fieldset>
         <legend>{tr}User Wizard{/tr}</legend>
         <p class="wizard_page_title">
-            {tr}Click at the "Start" button above to launch it{/tr}
+            {tr}Click at the "Start" button above to begin the wizard{/tr}
         </p>
         <p>
             <b>Tiki version {$tiki_version}</b>. {tr}To learn more about this Tiki release, go to <a href="https://doc.tiki.org/Tiki{$tikiMajorVersion}">Tiki {$tikiMajorVersion}</a>{/tr}.<br/><br/>

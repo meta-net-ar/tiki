@@ -117,21 +117,8 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                 ? $requestData[$ins_id]
                 : $this->getValue();
 
-            if (! empty($value) && ! is_numeric($value)) {
-                throw new Services_Exception(tr('Invalid UNIX timestamp "%0"', $value), 400);
-            }
-
-            // Validate that the given raw timestamp value is a numeric representation and logically corresponds to a valid timestamp.
-            if ($value && is_numeric($value)) {
-                try {
-                    $datetime = DateTime::createFromFormat('U', $value);
-                    if ($datetime == false || $datetime->format('U') != $value) {
-                        throw new Services_Exception(tr('Invalid UNIX timestamp "%0"', $value), 400);
-                    }
-                } catch (Exception $e) {
-                    throw new Services_Exception($e->getMessage(), 400);
-                }
-            }
+            // Validate timestamp format - exception will bubble up to stop form submission
+            $this->validateTimestamp($value);
 
             $data['value'] = $value;
         }
@@ -238,13 +225,15 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
         $value = $this->getValue();
-        // possibly milliseconds from js picker
-        $value = ($value && strlen($value) > 10 && substr($value, -3) === '000') ? ($value / 1000) : $value;
-        $timestamp = $typeFactory->timestamp($value, $this->getOption('datetime') == 'd');
 
-        if ($value && strlen($value) > 10) {
-            trigger_error("Possibly incorrect timestamp value found when trying to send to search index. Tracker item " . $this->getItemId() . ", field " . $this->getConfiguration('permName') . ", value " . $value, E_USER_WARNING);
+        // Backward compatibility: Convert millisecond timestamps for existing data
+        // This handles cases where the migration hasn't been run yet
+        if ($value && strlen($value) > 10 && substr($value, -3) === '000') {
+            trigger_error("Possibly incorrect timestamp value found when trying to send to search index. Tracker item " . $this->getItemId() . ", field " . $this->getConfiguration('permName') . ", value " . $value . ". Converting milliseconds to seconds.", E_USER_WARNING);
+            $value = intval(intval($value) / 1000);
         }
+
+        $timestamp = $typeFactory->timestamp($value, $this->getOption('datetime') == 'd');
 
         $data = [
             $this->getBaseKey() => $timestamp,
@@ -355,5 +344,33 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                     return TikiLib::lib('tiki')->get_short_date($date);
                 })
         ];
+    }
+
+    /**
+     * Validate timestamp format and throw exception if invalid
+     *
+     * @param mixed $value The timestamp value to validate
+     * @throws Services_Exception if timestamp is invalid
+     */
+    protected function validateTimestamp($value)
+    {
+        if (empty($value)) {
+            return;
+        }
+
+        if (! is_numeric($value)) {
+            throw new Services_Exception(tr('Invalid UNIX timestamp "%0"', $value), 400);
+        }
+
+        // Check for millisecond timestamps (length > 10 digits AND ends with '000')
+        if (strlen($value) > 10 && substr($value, -3) === '000') {
+            throw new Services_Exception(tr('Invalid timestamp format: "%0" appears to be in milliseconds. Expected seconds since Unix epoch.', $value), 400);
+        }
+
+        $datetime = DateTime::createFromFormat('U', $value);
+
+        if ($datetime == false || $datetime->format('U') != $value) {
+            throw new Services_Exception(tr('Invalid UNIX timestamp "%0"', $value), 400);
+        }
     }
 }

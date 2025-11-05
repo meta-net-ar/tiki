@@ -21,7 +21,6 @@ function wikiplugin_transclude_info()
                 'name' => tra('Page Name'),
                 'description' => tra('Name of the wiki page to use as a template for the values.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'pagename',
                 'profile_reference' => 'wiki_page',
             ],
@@ -48,10 +47,6 @@ class WikiPlugin_Transclude_Replacer
 
 function wikiplugin_transclude($data, $params)
 {
-    if (! isset($params['page'])) {
-        return WikiParser_PluginOutput::argumentError([ 'page' ]);
-    }
-
     $page = $params['page'];
     unset($params['page']);
 

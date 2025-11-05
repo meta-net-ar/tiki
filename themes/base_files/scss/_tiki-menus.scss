@@ -12,6 +12,12 @@
     }
 }
 
+// Align the various width icons and the menu option text labels nicely
+.navbar-nav .nav-item > .nav-link .icon {
+    min-width: var(--bs-gutter-x);
+    text-align: center;
+}
+
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
     transform: rotate(-90deg);
     /* position: absolute;
@@ -146,4 +152,26 @@
     font-variant: normal;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
+}
+
+/* --- Force all dropdowns to open upwards ---*/
+.dropdown-menu-bottom {
+    top: auto !important;
+    bottom: 100% !important;
+    margin-bottom: .5rem;
+    margin-top: 0 !important;
+    max-height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dropdown-menu-top,
+.dropdown-menu-end,
+.dropdown-menu-start {
+  top: 100%;
+  bottom: auto;
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 3000;
 }

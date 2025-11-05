@@ -17,10 +17,11 @@ $inputConfiguration = [
         'nlId'                 => 'int',         //post
         'subscribe'            => 'bool',        //post
         'email'                => 'email',       //post
-        'sort_mode'            => 'string',      //get
+        'sort_mode'            => 'alnumdash',   //get
         'offset'               => 'int',         //get
         'noshowlist'           => 'bool',        //post
         'find'                 => 'string',      //post
+        'info'                 => 'int',         //get
         ],
     ],
 ];

@@ -116,6 +116,10 @@
                         </th>
                         <th>
                             {*Reserved for stalled notices*}
+                            Stalled
+                        </th>
+                        <th>
+                            {tr}Last Run Status{/tr}
                         </th>
                         <th id="actions"></th>
                     </tr>
@@ -152,8 +156,23 @@
                                 <input type="checkbox" {if $schedulers[scheduler].re_run}checked{/if} disabled>
                             </td>
                             <td class="scheduler_stalled">
-                                {if $schedulers[scheduler].stalled}
-                                    <span class="label label-danger">{tr}Stalled{/tr}</span>
+                                {if $schedulers[scheduler].last_run_stalled}
+                                    <span class="badge bg-danger">{tr}Yes{/tr}</span>
+                                {else}
+                                    <span class="badge bg-secondary">{tr}No{/tr}</span>
+                                {/if}
+                            </td>
+                            <td class="scheduler_last_run_status">
+                                {if $schedulers[scheduler].last_run_status eq 'running'}
+                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
+                                {elseif $schedulers[scheduler].last_run_status eq 'failed'}
+                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                                {elseif $schedulers[scheduler].last_run_status eq 'done'}
+                                    <span class="badge bg-success">{tr}Done{/tr}</span>
+                                {elseif $schedulers[scheduler].stalled}
+                                    <span class="badge bg-danger">{tr}Stalled{/tr}</span>
+                                {else}
+                                    <span class="text-muted">-</span>
                                 {/if}
                             </td>
                             <td class="action">
@@ -507,6 +526,80 @@
             </div>
         </div>
     {/tab}
+{/if}
+
+{* ---------------------- Consolidated Logs Tab -------------------- *}
+<a id="tab5"></a>
+{if !isset($schedulerinfo.id)}
+{tab name="{tr}Logs{/tr}"}
+    <h2>{tr}Scheduler Run Logs{/tr}</h2>
+    <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+    <div id="admin_schedulers_logs-div">
+        <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+            <table class="table normal table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{tr}Name{/tr}</th>
+                        <th>{tr}Start Time{/tr}</th>
+                        <th>{tr}End Time{/tr}</th>
+                        <th>{tr}Status{/tr}</th>
+                        <th>{tr}Output{/tr}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {section name=run loop=$consolidatedLogs}
+                        <tr>
+                            <td>{$consolidatedLogs[run].id}</td>
+                            <td>
+                                {if $consolidatedLogs[run].scheduler_name}
+                                    {$consolidatedLogs[run].scheduler_name|escape}
+                                {else}
+                                    <span class="text-muted fst-italic">{tr}Scheduler Deleted{/tr}</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {$consolidatedLogs[run].start_time|tiki_short_datetime} ({$display_timezone})
+                                {if $display_timezone ne 'UTC'}
+                                    <br>{$consolidatedLogs[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                {/if}
+                            </td>
+                            <td>
+                                {if $consolidatedLogs[run].end_time ne null}
+                                    {$consolidatedLogs[run].end_time|tiki_short_datetime} ({$display_timezone})
+                                    {if $display_timezone ne 'UTC'}
+                                        <br>{$consolidatedLogs[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    {/if}
+                                {/if}
+                            </td>
+                            <td>
+                                {if $consolidatedLogs[run].status eq 'running'}
+                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
+                                {/if}
+                                {if $consolidatedLogs[run].status eq 'failed'}
+                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                                {/if}
+                                {if $consolidatedLogs[run].status eq 'done'}
+                                    <span class="badge bg-success">{tr}Done{/tr}</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {$consolidatedLogs[run].scheduler_output|nl2br}
+                            </td>
+                        </tr>
+                    {sectionelse}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                {tr}No scheduler logs found{/tr}
+                            </td>
+                        </tr>
+                    {/section}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {pagination_links count=$consolidatedLogsCount step=$numrows offset=$offset}tiki-admin_schedulers.php?consolidated_logs=1{/pagination_links}
+{/tab}
 {/if}
 {/tabset}
 

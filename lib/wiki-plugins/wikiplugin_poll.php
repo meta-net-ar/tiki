@@ -21,7 +21,6 @@ function wikiplugin_poll_info()
                 'name' => tra('Poll'),
                 'description' => tra('Select the poll to display'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'digits',
                 'profile_reference' => 'poll',
             ],
@@ -80,9 +79,6 @@ function wikiplugin_poll($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    if (! isset($pollId)) {
-        return WikiParser_PluginOutput::argumentError(['pollId']);
-    }
     $polllib = TikiLib::lib('poll');
 
 

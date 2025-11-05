@@ -26,7 +26,7 @@ function wikiplugin_shopperinfo_info()
                 'separator' => ':'
             ],
             'labels' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Labels for the values to be collected'),
                 'description' => tra('Labels of the values to be collected separated by a colon'),
                 'since' => '7.0',
@@ -54,7 +54,7 @@ function wikiplugin_shopperinfo($data, $params)
 {
     global $user;
     $smarty = TikiLib::lib('smarty');
-    if ($user && (isset($params['showifloggedin']) && $params['showifloggedin'] != 'y') || empty($params['values'])) {
+    if ($user && ($params['showifloggedin'] != 'y') || empty($params['values'])) {
         return '';
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['shopperinfo'])) {

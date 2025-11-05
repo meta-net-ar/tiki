@@ -26,9 +26,9 @@
                 {/if}
                 <div class="card-header text-center">
                     {if $new_user_validation neq 'y'}
-                        <h3 class="tiki-card-header-title">{tr}Change password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Change password{/tr}</h3>
                     {else}
-                        <h3 class="tiki-card-header-title">{tr}Set password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Set password{/tr}</h3>
                     {/if}
                 </div>
                 <div class="card-body">

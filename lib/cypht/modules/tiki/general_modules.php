@@ -377,7 +377,7 @@ class Hm_Output_filter_message_headers_mpdf extends Hm_Output_Module
     {
         $headers = $this->get('msg_headers');
         if (is_string($headers) && TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
-            $pdf_link = ' <a class="hlink" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
+            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary me-2" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
             $headers = append_to_msg_headers($headers, $pdf_link);
             $this->out('msg_headers', $headers, false);
         }
@@ -480,6 +480,17 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         $this->session->set('msg_uid', '');
         $this->session->set('imap_server_id', '');
 
+        $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+        $fields = array_map(function ($field) {
+            $tracker = TikiLib::lib('trk')->get_tracker($field['trackerId']);
+            return [
+                'tracker_id' => $field['trackerId'],
+                'field_id' => $field['fieldId'],
+                'title' => "{$tracker['name']} - {$field['name']}",
+            ];
+        }, $fields);
+        $this->out('tracker_fields', $fields);
+
         if (isset($this->request->post['lookup'])) {
             $searchArgs = [];
             if (isset($this->request->post['sort_mode'])) {
@@ -499,7 +510,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         }
 
         if (! $keywords || ! $msgUid || ! $imapServerId) {
-            $this->out('error', 'No sent message found');
+            $this->out('no_message', true);
             return;
         }
 

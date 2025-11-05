@@ -227,13 +227,13 @@ class WikiParser_PluginMatcher implements Iterator, Countable
 
     public function valid(): bool
     {
-        return isset($this->starts[$this->scanPosition]);
+        return $this->scanPosition !== null && isset($this->starts[$this->scanPosition]);
     }
 
     public function rewind(): void
     {
         reset($this->starts);
-        $this->scanPosition = key($this->starts);
+        $this->scanPosition = key($this->starts) ?? -1;
     }
 
     public function getChunkFrom($pos, $size)

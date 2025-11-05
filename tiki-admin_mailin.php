@@ -12,7 +12,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'            => [
             'mailin_autocheckFreq'    => 'int',  //post
-            'mailin_autocheck'        => 'bool', //post
+            'mailin_autocheck'        => 'alpha', //post
+            'set_auto'                => 'alpha', //post
         ],
     ],
 ];

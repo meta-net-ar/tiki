@@ -24,7 +24,6 @@ function wikiplugin_events_info()
                 'description' => tr('ID numbers for the site calendars whose events are to be displayed, separated by
                     vertical bars (%0)', '<code>|</code>'),
                 'since' => '2.0',
-                'default' => '',
                 'filter' => 'text',
                 'profile_reference' => 'calendar',
             ],
@@ -133,37 +132,6 @@ function wikiplugin_events($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    if (empty($params['calendarid'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'calendarid'));
-        return;
-    }
-
-    if (! isset($maxdays)) {
-        $maxdays = 365;
-    }
-    if (! isset($max)) {
-        $max = 10;
-    }
-    if (! isset($datetime)) {
-        $datetime = 1;
-    }
-    if (! isset($desc)) {
-        $desc = 1;
-    }
-    if (! isset($usePagination)) {
-        $usePagination = 'n';
-    }
-
-    // attendees
-    if (! isset($attendees)) {
-        $attendees = 'n';
-    }
-
-    // Pagination
-    if (! isset($timespan)) {
-        $timespan = "future";
-    }
-
     if ($usePagination == 'y') {
         if (! isset($_REQUEST["offset"])) {
             $start = 0;
@@ -245,7 +213,7 @@ function wikiplugin_events($data, $params)
     }
 
 
-    if (isset($calendarid)) {
+    if (! is_null($calendarid)) {
         $calParamIds = explode('|', $calendarid);
         if (array_diff($calParamIds, $calIds)) {
             $invalideid = true;

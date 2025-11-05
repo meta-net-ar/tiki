@@ -38,12 +38,6 @@
 
 // ----------------------------- Overrides and adjustments ----------------------------- //
 
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
 .blockquote-footer { color: #757575; }
 
 .accordion-button.collapsed { color: #CE4540; background: var(--bs-body-bg); }

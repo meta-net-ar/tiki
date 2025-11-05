@@ -35,6 +35,7 @@ function wikiplugin_tikimanagerclone_info()
                 'description' => tra('Source instance(instance to clone) ID or name.'),
                 'since' => '25.0',
                 'filter' => 'string',
+                'default' => '',
                 'advanced' => false
             ],
             'target' => [
@@ -43,6 +44,7 @@ function wikiplugin_tikimanagerclone_info()
                 'description' => tra('Destination instance(s) ID or name, comma separated in case of multiple instances.'),
                 'since' => '25.0',
                 'filter' => 'string',
+                'default' => '',
                 'advanced' => false
             ],
             'branch' => [

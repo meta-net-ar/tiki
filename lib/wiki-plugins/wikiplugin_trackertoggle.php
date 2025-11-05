@@ -67,9 +67,6 @@ function wikiplugin_trackertoggle($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    if (empty($fieldId) || ! isset($value) || empty($id)) {
-        return WikiParser_PluginOutput::error(tr('Error'), tr('trackertoggle: Params fieldId, id and value are required'));
-    }
     $field = TikiLib::lib('trk')->get_tracker_field($fieldId);
     if (empty($field)) {
         return WikiParser_PluginOutput::error(tr('Error'), tr('trackertoggle: Param fieldId field %0 does not exist', $fieldId));

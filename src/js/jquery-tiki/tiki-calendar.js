@@ -217,21 +217,14 @@ $.fn.setupEventCalendar = function (
                 } else {
                     let $this = $(info.dayEl).tikiModal(" ");
                     const countCals = $("#filtercal ul li").length;
-                    if (countCals >= 1) {
+                    if (countCals >= 1 || targetId != "calendar") {
                         $.openModal({
                             title: tr("New event"),
                             size: "modal-lg",
                             remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1 }),
                             open: function () {
                                 $this.tikiModal();
-                                $("form:not(.no-ajax)", this)
-                                    .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                    .on(
-                                        "submit",
-                                        ajaxSubmitEventHandler(function (data) {
-                                            calendarEditSubmit(data, this);
-                                        })
-                                    );
+                                $("form:not(.no-ajax)", this).addClass("no-ajax"); // Remove default ajax handling, we replace it
                             },
                         });
                     } else {

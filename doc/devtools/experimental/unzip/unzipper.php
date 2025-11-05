@@ -190,7 +190,6 @@ if ($download) {
         curl_exec($ch);
         //  $info = curl_getinfo($ch);
         //  echo $info."\n";
-        curl_close($ch);
         fclose($fp);
     } else {
         echo 'PHP curl_exec not installed';

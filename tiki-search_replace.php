@@ -13,16 +13,16 @@ $inputConfiguration = [
     [ 'staticKeyFilters'          => [
                 'searchtext'      => 'xss',             //post
                 'replacetext'     => 'xss',             //post
-                'maxRecords'      => 'digits',          //post
-                'offset'          => 'digits',          //post
-                'paddingLength'   => 'digits',          //post
-                'categId'         => 'digits',          //post
+                'maxRecords'      => 'int',             //post
+                'offset'          => 'int',             //post
+                'paddingLength'   => 'int',               //post
+                'categId'         => 'int',             //post
                 'casesensitive'   => 'bool',            //post
                 'replace'         => 'bool',            //post
                 'search'          => 'bool',            //post
     ],
     'staticKeyFiltersForArrays'   => [
-        'checked'                 => 'digits',          //post
+        'checked'                 => 'int',             //post
     ],
     ]
 ];

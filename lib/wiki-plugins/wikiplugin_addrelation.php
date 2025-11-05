@@ -22,7 +22,6 @@ function wikiplugin_addrelation_info()
                 'name' => tra('Qualifier'),
                 'description' => tra('Relation qualifier. Usually a three-part string separated by two periods.'),
                 'filter' => 'attribute_type',
-                'default' => [],
                 'since' => '8.0',
             ],
             'source_object' => [
@@ -31,7 +30,6 @@ function wikiplugin_addrelation_info()
                 'description' => tr('Object identifier as %0type:itemId%1 to start the relation from, will use the current
                     object if left blank.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => null,
                 'since' => '8.0',
                 'profile_reference' => 'type_colon_object',
             ],
@@ -41,7 +39,6 @@ function wikiplugin_addrelation_info()
                 'description' => tr('Object identifier as %0type:itemId%1 to end the relation to, will use the current
                     object if left blank.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => null,
                 'since' => '8.0',
                 'profile_reference' => 'type_colon_object',
             ],
@@ -92,12 +89,12 @@ function wikiplugin_addrelation_info()
 function wikiplugin_addrelation($data, $params)
 {
     global $user;
-    if (isset($params['source_object']) && str_contains($params['source_object'], ':')) {
+    if (! is_null($params['source_object']) && str_contains($params['source_object'], ':')) {
         list($source_object['type'], $source_object['object']) = explode(':', $params['source_object'], 2);
     } else {
         $source_object = current_object();
     }
-    if (isset($params['target_object']) && str_contains($params['target_object'], ':')) {
+    if (! is_null($params['target_object']) && str_contains($params['target_object'], ':')) {
         list($target_object['type'], $target_object['object']) = explode(':', $params['target_object'], 2);
     } else {
         $target_object = current_object();
@@ -111,36 +108,14 @@ function wikiplugin_addrelation($data, $params)
     if ($source_object == $target_object) {
         return tra('Source and target object cannot be the same');
     }
-    if (! isset($params['qualifier'])) {
-        return WikiParser_PluginOutput::argumentError(['qualifier']);
-    } else {
-        $qualifier = $params['qualifier'];
-    }
-    if (! empty($params['label_add'])) {
-        $labeladd = $params['label_add'];
-    } else {
-        $labeladd = tra('Add Relation');
-    }
-    if (! empty($params['label_remove'])) {
-        $labelremove = $params['label_remove'];
-    } else {
-        $labelremove = tra('Remove Relation');
-    }
-    if (! empty($params['label_added'])) {
-        $labeladded = $params['label_added'];
-    } else {
-        $labeladded = tra('Relation Added');
-    }
-    if (! empty($params['button_id'])) {
-        $id = 'wp_addrelation_' . $params['button_id'];
-    } else {
-        $id = 'wp_addrelation_0';
-    }
-    if (! empty($params['button_class'])) {
-        $button_class = $params['button_class'];
-    } else {
-        $button_class = "btn btn-primary";
-    }
+
+    $qualifier = $params['qualifier'];
+    $labeladd = $params['label_add'];
+    $labelremove = $params['label_remove'];
+    $labeladded = $params['label_added'];
+    $id  = ! empty($params['button_id']) ? 'wp_addrelation_' . $params['button_id'] : 'wp_addrelation_0';
+    $button_class = $params['button_class'];
+
     $relationlib = TikiLib::lib('relation');
 
     if (isset($_POST[$id])) {

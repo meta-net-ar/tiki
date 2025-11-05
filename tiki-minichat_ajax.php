@@ -49,8 +49,8 @@ function initchannelssession($chans)
         $_SESSION['minichat_channels'][] = $channel;
     }
 }
-if (isset($_REQUEST['msg'])) {
-    $msg = $_REQUEST['msg'];
+if (isset($_REQUEST['msg_chat'])) {
+    $msg = $_REQUEST['msg_chat'];
     $msg = strtr($msg, "\n\r\t", "   ");
     $msgon = $_REQUEST['msgon'] ?? null;
     if (empty($msg)) {
@@ -124,14 +124,17 @@ foreach ($chans as $chan) {
     }
     if ($lastid == 0) {
         $result = $tikilib->query("SELECT * FROM tiki_minichat WHERE channel=? ORDER by id desc LIMIT 100", [$channel]);
-        $msgtotal = "";
+        // collect rows, reverse to chronological order (oldest first)
+        $rows = [];
         while ($row = $result->fetchRow()) {
-            if (! $lastid) {
-                $lastid = $row['id'];
-                echo "minichat_updatelastid('$channel', $lastid);\n";
-            }
-            # if timestamp corresponds to previous days than current, show date with display_order according to the global preference
-            # daytmes = day from the time stamp of the message; daytnow = current day;
+            $rows[] = $row;
+        }
+        $rows = array_reverse($rows);
+
+        $msgtotal = "";
+        $prev_user = null;
+        foreach ($rows as $row) {
+            // compute time display (same logic as before)
             $daytmes = date("d/m/y", $row['ts']);
             $daytnow = date("d/m/y");
             if ($daytmes == $daytnow) {
@@ -153,12 +156,39 @@ foreach ($chans as $chan) {
                     $t = date("H:i", $row['ts']);
                 }
             }
-    //TODO: improve matching and replace with better smileys + use global lib
-            $msgtotal = "<span class='minichat_ts'>[$t]</span>&nbsp;<span class='minichat_nick'>&lt;" . ($row['nick'] == '' ? "<em>" . tra('Anonymous') . "</em>" : str_replace('"', '\"', smarty_modifier_userlink($row['user']))) . "&gt;</span> <span class='minichat_msg'>" . htmlentities($row['msg'], ENT_QUOTES, 'UTF-8') . "</span><br>" . $msgtotal;
+
+            $nick_html = ($row['nick'] == '' ? "<em>" . tra('Anonymous') . "</em>" : smarty_modifier_userlink($row['user']));
+            $msg_html = htmlentities($row['msg'], ENT_QUOTES, 'UTF-8');
+            $side_class = ($row['user'] == $user) ? 'mine' : 'other';
+
+            $show_header = ($prev_user !== $row['user']);
+
+            $align_class = ($side_class === 'mine') ? 'justify-content-end' : 'justify-content-start';
+            $card_classes = ($side_class === 'mine') ? 'card text-white bg-info' : 'card bg-light';
+
+            $bubble = "<div class='d-flex mb-2 {$align_class}'>";
+            $bubble .= "<div class='{$card_classes}' style='max-width:70%'>";
+            $bubble .= "<div class='card-body p-2'>";
+            if ($show_header) {
+                $bubble .= "<div class='fw-bold small'>" . $nick_html . "</div>";
+            }
+            $bubble .= "<div class='card-text'>{$msg_html}</div>";
+            $bubble .= "<div class='text-end'><small class='text-muted'>{$t}</small></div>";
+            $bubble .= "</div></div></div>";
+
+            $msgtotal .= $bubble; // append to keep chronological order top->bottom
+            $prev_user = $row['user'];
+        }
+
+        // update lastid with the newest message id (last element in $rows)
+        if (! empty($rows)) {
+            $newlast = $rows[count($rows) - 1]['id'];
+            $lastid = (int)$newlast;
+            echo "minichat_updatelastid(" . json_encode($channel) . ", $lastid);\n";
         }
         $editlib = TikiLib::lib('edit');
         $msgtotal = $editlib->convertSmileysToUnicode($msgtotal);
-        echo "document.getElementById('minichatdiv_'+minichat_getchanid('$channel')).innerHTML=\"$msgtotal\";\n";
+        echo "document.getElementById('minichatdiv_'+minichat_getchanid(" . json_encode($channel) . ")).innerHTML=" . json_encode($msgtotal) . ";\n";
         echo "document.getElementById('minichat').scrollTop=99999;\n";
     }
 }

@@ -27,18 +27,16 @@ function wikiplugin_trackeritemcopy_info()
                 ),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
                 'profile_reference' => 'tracker',
             ],
             'linkFieldIds' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Link Field IDs'),
                 'description' => tr('Fields links that are related to this tracker that you would like to join on,
                     separated by %0:%1', '<code>', '</code>'),
                 'since' => '8.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
             ],
@@ -49,7 +47,6 @@ function wikiplugin_trackeritemcopy_info()
                     %0|%1', '<code>', '</code>'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ['|', ':'],
                 'profile_reference' => 'tracker_field',
             ],
@@ -60,7 +57,6 @@ function wikiplugin_trackeritemcopy_info()
                     separated by %0|%1', '<code>', '</code>'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ['|', ':'],
                 'profile_reference' => 'tracker_field',
             ],
@@ -82,7 +78,6 @@ function wikiplugin_trackeritemcopy_info()
                 'description' => tra('ID of item to make copy of, otherwise input is asked for'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'profile_reference' => 'tracker_item',
             ],
             'copies_on_load' => [
@@ -91,7 +86,6 @@ function wikiplugin_trackeritemcopy_info()
                 'description' => tra('Set the number of copies to make on load of plugin automatically'),
                 'since' => '7.0',
                 'filter' => 'int',
-                'default' => ''
             ],
             'return_array' => [
                 'required' => false,
@@ -111,21 +105,18 @@ function wikiplugin_trackeritemcopy($data, $params)
 {
     $trklib = TikiLib::lib("trk");
     $smarty = TikiLib::lib('smarty');
+    $params["linkFieldIds"] = $params["linkFieldIds"] ?? [];
 
-    if (! isset($params["trackerId"]) || ! isset($params["copyFieldIds"])) {
-        return tra('Missing mandatory parameters');
-    } else {
-        $trackerId = $params["trackerId"];
-        if (is_array($trackerId) == false) {
-            $trackerId = [$trackerId];
-        }
-        $copyFieldIds = $params["copyFieldIds"];
+    $trackerId = $params["trackerId"];
+    if (is_array($trackerId) == false) {
+        $trackerId = [$trackerId];
     }
+    $copyFieldIds = $params["copyFieldIds"];
 
     $smarty->assign('itemIdSet', 'n');
     $itemId = 0;
 
-    if (isset($params["itemId"])) {
+    if (! is_null($params["itemId"])) {
         $itemId = $params["itemId"];
         $smarty->assign('itemIdSet', 'y');
     } elseif (isset($_POST["itemIdToCopy"])) {
@@ -212,7 +203,7 @@ function wikiplugin_trackeritemcopy($data, $params)
 
         foreach ($trackerId as $key => $trackerIdLeft) {
             //ensure that the fields are set and usable
-            if (isset($params["updateFieldIds"]) || isset($params["updateFieldValues"])) {
+            if (! is_null($params["updateFieldIds"]) || ! is_null($params["updateFieldValues"])) {
                 $updateFieldIds = $params["updateFieldIds"];
                 $updateFieldValues = $params["updateFieldValues"];
 
@@ -227,7 +218,7 @@ function wikiplugin_trackeritemcopy($data, $params)
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && $itemId && isset($_POST['copytrackeritem']) && isset($_POST['numberofcopies'])) {
                 $copies = (int) $_POST['numberofcopies'];
-            } elseif (isset($params['copies_on_load'])) {
+            } elseif (! is_null($params['copies_on_load'])) {
                 $copies = (int) $params['copies_on_load'];
             } else {
                 $copies = 0;

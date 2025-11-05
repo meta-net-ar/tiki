@@ -43,7 +43,6 @@ function wikiplugin_autotoc_info()
                 'description' => tr('Specify which levels you want to see in the TOC. Levels are integers (1 to 6) separated with colon. Example : <code>levels="1:2:3"</code> to show only level 1, 2 and 3 headers.'),
                 'since' => '23.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'offset' => [
@@ -92,7 +91,6 @@ function wikiplugin_autotoc_info()
                 'since' => '25.0',
                 'filter' => 'text',
                 'separator' => ',',
-                'default' => '',
             ],
             'tabset_panes' => [
                 'required' => false,
@@ -101,7 +99,6 @@ function wikiplugin_autotoc_info()
                 'since' => '25.0',
                 'filter' => 'text',
                 'separator' => ',',
-                'default' => '',
             ],
         ]
     ];
@@ -119,7 +116,7 @@ function wikiplugin_autotoc($data, $params)
         (! str_contains($_SERVER["SCRIPT_NAME"], 'tiki-pagehistory.php'))
     ) {
         if ($params['tabs'] == 'yes') {
-            if (empty($params['tabset_names']) || empty($params['tabset_panes'])) {
+            if (is_null($params['tabset_names']) || is_null($params['tabset_panes'])) {
                 Feedback::error(tra('Missing Tabs names (tabset_names) parameter: it must be filled in when the Tabs (tabs) parameter is set to yes'));
                 return;
             }
@@ -130,12 +127,12 @@ function wikiplugin_autotoc($data, $params)
             $jqueryAutoToc['plugin_autoToc_mode'] = $params['mode'] === 'inline' ?: 'off';
             $autotocPos = $params['align'];
             $jqueryAutoToc['plugin_autoToc_pos'] = $autotocPos;
-            $jqueryAutoToc['plugin_autoToc_offset'] = $params['offset'] ?: 15;
+            $jqueryAutoToc['plugin_autoToc_offset'] = $params['offset'];
             $jqueryAutoToc['plugin_autoToc_title'] = $params['title'];
             $jqueryAutoToc['plugin_autoToc_tabs'] = $params['tabs'];
-            $jqueryAutoToc['plugin_autoToc_tabset_names'] = $params['tabset_names'];
-            $jqueryAutoToc['plugin_autoToc_tabset_panes'] = $params['tabset_panes'];
-            $jqueryAutoToc['plugin_autoToc_levels'] = $params['levels'] ?: null;
+            $jqueryAutoToc['plugin_autoToc_tabset_names'] = $params['tabset_names'] ?? '';
+            $jqueryAutoToc['plugin_autoToc_tabset_panes'] = $params['tabset_panes'] ?? '';
+            $jqueryAutoToc['plugin_autoToc_levels'] = $params['levels'] ?? '';
             $jq_autotoc = json_encode($jqueryAutoToc, JSON_UNESCAPED_SLASHES);
             $headerlib->add_js('var jqueryAutoToc = ' . $jq_autotoc . '"\n";');
             if ($prefs['wiki_auto_toc'] !== 'y' || $prefs['wiki_toc_default'] !== 'on') {

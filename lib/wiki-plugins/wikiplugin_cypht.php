@@ -256,12 +256,6 @@ function wikiplugin_cypht($data, $params)
         return tr("Cypht already started.");
     }
 
-    if (TikiLib::lib('wiki')->get_page_by_slug($_GET['page']) == $page && $prefs['feature_sefurl'] !== 'y') {
-        TikiLib::lib('access')->redirect('tiki-index.php?page_id=' . $tikilib->get_page_id_from_name($page));
-    } elseif ($prefs['feature_sefurl'] === 'y' && ! empty($_GET['page_id'])) {
-        TikiLib::lib('access')->redirect(TikiLib::lib('wiki')->sefurl($page));
-    }
-
     static $called = false;
     if ($called) {
         return tr("Only one cypht plugin per page can be used.");
@@ -278,22 +272,6 @@ function wikiplugin_cypht($data, $params)
 
     if (empty($params['smtp_port'])) {
         $params['smtp_port'] = 587;
-    }
-
-    if (empty($params['smtp_tls'])) {
-        $params['smtp_tls'] = 'y';
-    }
-
-    if (empty($params['smtp_no_auth'])) {
-        $params['smtp_no_auth'] = 'n';
-    }
-
-    if (empty($params['use_global_settings'])) {
-        $params['use_global_settings'] = 'n';
-    }
-
-    if (empty($params['groupmail'])) {
-        $params['groupmail'] = 'n';
     }
 
     if ($params['groupmail'] == 'y') {

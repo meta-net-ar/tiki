@@ -24,8 +24,12 @@ class ShowShort extends Base
         }
 
         if (isset($params['sort']) and isset($params['var']) and isset($p)) {
-            $p = preg_split('/\s*,\s*/', $p);
-            foreach ($p as $value) {
+            if (is_array($p)) {
+                $p_list = $p;
+            } else {
+                $p_list = preg_split('/\s*,\s*/', $p);
+            }
+            foreach ($p_list as $value) {
                 $prop = substr($value, 0, strrpos($value, '_'));
                 $order = substr($value, strrpos($value, '_') + 1);
 

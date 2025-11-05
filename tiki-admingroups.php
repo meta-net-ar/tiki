@@ -34,6 +34,14 @@ $inputConfiguration = [
             'initial'                   => 'alpha',
             'find'                      => 'groupname',
             'group'                     => 'groupname',
+            'clean'                     => 'alpha',         //post
+            'add'                       => 'alpha',         //get
+            'export'                    => 'alpha',         //post
+            'username'                  => 'alpha',         //post
+            'email'                     => 'alpha',         //post
+            'lastLogin'                 => 'alpha',         //post
+            'encoding'                  => 'alpha',         //post
+            'import'                    => 'alpha',         //post
         ],
     ]
 ];
@@ -232,6 +240,10 @@ if (! empty($_REQUEST["group"])) {
                 $smarty->assign('groupitemid', $groupitemid);
             }
         }
+    }
+
+    if ($prefs['twoFactorAuth'] == 'y') {
+        $smarty->assign('twoFactorAuthGracePeriod', $re['twoFactorAuthGracePeriod']);
     }
     $groupperms = $re["perms"];
     //$allgroups = $userlib->list_all_groups();

@@ -3,11 +3,15 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
+h3.tiki-card-header-title {
+    color: #fff;
+}
+
+
 .postbody-title,
 .bg-dark {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#642759+0,732860+19,92286b+43,a32872+67,a52873+100 */
-    background: #642759 !important; /* Old browsers */
-    background: linear-gradient(to right,  #642759 0%,#732860 19%,#92286b 43%,#a32872 67%,#a52873 100%) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#642759+0,732860+19,92286b+43,a32872+67,a52873+100
+    background: linear-gradient(to right,  #642759 0%,#732860 19%,#92286b 43%,#a32872 67%,#a52873 100%) !important;
 }
 
 // Progress bars
@@ -16,7 +20,6 @@
 }
 
 // Dark color mode
-
 [data-bs-theme=dark] {
     .blockquote-footer { color: #848C94; }
     .valid-feedback { color: #329F4F !important; }

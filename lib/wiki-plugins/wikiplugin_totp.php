@@ -29,7 +29,6 @@ function wikiplugin_totp_info()
                 'description' => tra(
                     'Secret key required to generate time-based one-time passwords. If not provided, a new secret key will be generated automatically.'
                 ),
-                'default'     => '',
             ],
             'interval' => [
                 'required'    => false,
@@ -92,7 +91,7 @@ function wikiplugin_totp($data, $params)
     $params = array_merge($defaults, $params);
     // Automatically generate a secret key if none is provided
     $google2fa = new Google2FA();
-    if (! isset($params['secret']) || $params['secret'] === '') {
+    if (is_null($params['secret']) || $params['secret'] === '') {
         $params['secret'] = $google2fa->generateSecretKey();
     }
 
@@ -118,7 +117,7 @@ function wikiplugin_totp($data, $params)
         die;
     }
 
-    if (! isset($params['secret'])) {
+    if (is_null($params['secret'])) {
         if (! $editPerm) {
             return;
         }

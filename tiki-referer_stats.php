@@ -12,7 +12,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'clear'                    => 'bool',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //post
         'find'                     => 'string',            //post
         ],

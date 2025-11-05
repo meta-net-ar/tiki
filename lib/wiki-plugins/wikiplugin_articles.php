@@ -61,7 +61,6 @@ function wikiplugin_articles_info()
                 'description' => tra('Filter articles by topic. You can select multiple topics from the dropdown. Use negation (e.g., !topic1+topic2) to exclude articles from specific topics.'),
                 'filter' => 'striptags',
                 'accepted' => tra('Valid topic IDs'),
-                'default' => '',
                 'profile_reference' => 'article_topic',
                 'since' => '2.0',
                 'options' => $topicOptions,
@@ -75,7 +74,6 @@ function wikiplugin_articles_info()
                 'filter' => 'striptags',
                 'since' => '1',
                 'accepted' => tra('Valid article types'),
-                'default' => '',
                 'profile_reference' => 'article_type',
                 'options' => $typeOptions,
                 'separator' => '+',
@@ -86,7 +84,6 @@ function wikiplugin_articles_info()
                 'name' => tra('Category Filter'),
                 'description' => tra('Filter articles by category. You can select multiple categories from the dropdown. Only articles in all selected categories will be listed.'),
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'category',
                 'since' => '1',
                 'separator' => '|',
@@ -129,7 +126,6 @@ function wikiplugin_articles_info()
                 'description' => tra('List of ArticleId that must appear in this order if present'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'since' => '9.0',
             ],
             'articleId' => [
@@ -138,7 +134,6 @@ function wikiplugin_articles_info()
                 'description' => tr('List of article IDs to display, separated by "%0"', '<code>|</code>'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'article',
                 'since' => '9.0',
             ],
@@ -148,7 +143,6 @@ function wikiplugin_articles_info()
                 'description' => tra('List of article IDs to not display, separated by "%0"', '<code>|</code>'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'article',
                 'since' => '5.0',
             ],
@@ -225,7 +219,6 @@ function wikiplugin_articles_info()
                     "Start Date" and "End Date" are ignored.'),
                 'filter' => 'digits',
                 'since' => '1',
-                'default' => '',
             ],
             'periodUnit' => [
                 'required' => false,
@@ -309,7 +302,6 @@ function wikiplugin_articles_info()
                 'filter' => 'alpha',
                 'separator' => '|',
                 'since' => '1',
-                'default' => '',
             ],
             'useLinktoURL' => [
                 'required' => false,
@@ -378,7 +370,7 @@ function wikiplugin_articles($data, $params)
     $dateEndTS = 0;
 
     // if a period of time is set, date start and end are ignored
-    if (isset($periodQuantity)) {
+    if (! is_null($periodQuantity)) {
         $periodQuantity = match ($periodQuantity) {
             'hour' => 3600,
             'day' => 86400,
@@ -395,25 +387,20 @@ function wikiplugin_articles($data, $params)
         $dateEndTS = strtotime($dateEnd);
     }
 
-    if ($fullbody == 'y') {
-        $smarty->assign('fullbody', 'y');
-    } else {
-        $smarty->assign('fullbody', 'n');
-        $fullbody = 'n';
-    }
+    $smarty->assign('fullbody', $fullbody);
     $smarty->assign('largefirstimage', $largefirstimage);
 
-    if (! empty($translationOrphan)) {
+    if (! is_null($translationOrphan)) {
         $filter['translationOrphan'] = $translationOrphan;
     }
-    if (! empty($articleId)) {
+    if (! is_null($articleId)) {
         $filter['articleId'] = $articleId;
     }
-    if (! empty($notArticleId)) {
+    if (! is_null($notArticleId)) {
         $filter['notArticleId'] = $notArticleId;
     }
 
-    if (! empty($topicId)) {
+    if (! is_null($topicId)) {
         if (is_array($topicId)) {
             $separator = $pluginInfo['params']['topicId']['separator'] ?? '+';
             $topicId = implode($separator, $topicId);
@@ -421,7 +408,7 @@ function wikiplugin_articles($data, $params)
         $filter['topicId'] = $topicId;
     }
 
-    if (! empty($type)) {
+    if (! is_null($type)) {
         if (is_array($type)) {
             $separator = $pluginInfo['params']['type']['separator'] ?? '+';
             $type = implode($separator, $type);
@@ -441,7 +428,7 @@ function wikiplugin_articles($data, $params)
     }
 
     $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, 'admin', $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', ($overrideDates == 'y'), 'y', $filter);
-    if ($prefs['feature_multilingual'] == 'y' && empty($translationOrphan)) {
+    if ($prefs['feature_multilingual'] == 'y' && is_null($translationOrphan)) {
         $multilinguallib = TikiLib::lib('multilingual');
         $listpages['data'] = $multilinguallib->selectLangList('article', $listpages['data'], $pageLang);
         foreach ($listpages['data'] as &$article) {
@@ -507,7 +494,7 @@ function wikiplugin_articles($data, $params)
         $smarty->assign_by_ref('offset', $start);
         $smarty->assign_by_ref('count', $listpages['count']);
     }
-    if (! empty($order)) {
+    if (! is_null($order)) {
         foreach ($listpages['data'] as $i => $article) {
             $memo[$article['articleId']] = $i;
         }

@@ -14,10 +14,10 @@ $inputConfiguration = [
             'contentId'                   => 'int',            //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'content_type'                => 'string',         //post
-            'page_name'                   => 'pagemame',       //post
+            'content_type'                => 'word',         //post
+            'page_name'                   => 'pagename',       //post
             'data'                        => 'none',           //post
-            'Time_Meridian'               => 'int',            //post
+            'Time_Meridian'               => 'alpha',            //post
             'Time_Hour'                   => 'int',            //post
             'Time_Minute'                 => 'int',            //post
             'Date_Month'                  => 'int',            //post
@@ -25,9 +25,9 @@ $inputConfiguration = [
             'Date_Year'                   => 'int',            //post
             'pId'                         => 'int',            //post
             'edit'                        => 'int',            //post
-            'sort_mode'                   => 'alpha',          //get
+            'sort_mode'                   => 'alnumdash',          //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];

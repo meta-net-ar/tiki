@@ -104,6 +104,7 @@ class SchedulersLib extends TikiLib
         if (! empty($runs) && $runs[0]['status'] == 'running') {
             $runs[0]['output'] = SchedulerRunOutput::getTempLog($runs[0]['id']);
         }
+
         return $runs;
     }
 
@@ -130,10 +131,48 @@ class SchedulersLib extends TikiLib
      *
      * @return int
      */
-    public function countRuns($schedulerId)
+    public function countRuns($schedulerId = null)
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
+        if ($schedulerId === null) {
+            return $schedulersRunTable->fetchCount([]);
+        }
         return $schedulersRunTable->fetchCount(['scheduler_id' => $schedulerId]);
+    }
+
+    /**
+     * Get consolidated logs from all schedulers with scheduler names
+     *
+     * @param int $limit  The number of runs to return
+     * @param int $offset The offset for pagination
+     *
+     * @return array An array with the consolidated scheduler runs found
+     */
+    public function getConsolidatedLogs($limit = 100, $offset = 0)
+    {
+        if (! is_numeric($limit)) {
+            $limit = 100;
+        }
+        if (! is_numeric($offset)) {
+            $offset = 0;
+        }
+
+        $query = "SELECT sr.*, sr.output as scheduler_output, s.name as scheduler_name
+            FROM `tiki_scheduler_run` sr
+            LEFT JOIN `tiki_scheduler` s ON sr.scheduler_id = s.id
+            ORDER BY sr.id DESC
+            LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $runs = $this->fetchAll($query);
+
+        // Handle running tasks with temp log output
+        foreach ($runs as $key => $run) {
+            if ($run['status'] !== 'running') {
+                $runs[$key]['output'] = SchedulerRunOutput::getTempLog($run['id']);
+            }
+        }
+
+        return $runs;
     }
 
     /**
@@ -147,6 +186,19 @@ class SchedulersLib extends TikiLib
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
         return $schedulersRunTable->fetchOne('status', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
+    }
+
+    /**
+     * Get scheduler last run stalled status from database
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getStalled($scheduler_id)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+        return $schedulersRunTable->fetchOne('stalled', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
     }
 
     /**

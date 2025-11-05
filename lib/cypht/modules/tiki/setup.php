@@ -23,7 +23,7 @@ add_handler('ajax_hm_folders', 'check_groupmail_setting', true, 'tiki', 'load_us
 add_output('ajax_hm_folders', 'groupmail_page_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* ajax groupmail callback data */
-setup_base_ajax_page('ajax_tiki_groupmail', 'imap');
+setup_base_ajax_page('ajax_tiki_groupmail', 'core');
 add_handler('ajax_tiki_groupmail', 'prepare_groupmail_settings', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_tiki_groupmail', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_tiki_groupmail', 'imap_oauth2_token_check', true, 'imap');
@@ -222,10 +222,10 @@ add_handler('ajax_imap_unread', 'tiki_process_imap_unread', true, 'tiki', 'imap_
 add_handler('settings', 'process_tiki_run_sieve_filters_on_imap_unread', true, 'tiki', 'save_user_settings', 'before');
 add_output('settings', 'tiki_run_sieve_filters_on_imap_unread_setting', true, 'tiki', 'enable_gmail_contacts_module_setting', 'after');
 
-setup_base_ajax_page('ajax_tiki_msg_tracker_items', 'tiki');
+setup_base_ajax_page('ajax_tiki_msg_tracker_items', 'core');
 add_handler('ajax_tiki_msg_tracker_items', 'get_msg_tracker_items', true, 'tiki');
 
-setup_base_page('ajax_tiki_auto_move_reply_to_tracker', 'tiki');
+setup_base_page('ajax_tiki_auto_move_reply_to_tracker', 'core');
 add_handler('ajax_tiki_auto_move_reply_to_tracker', 'auto_move_reply_to_tracker', true, 'tiki');
 
 return [
@@ -280,6 +280,8 @@ return [
     'auto_move' => [FILTER_VALIDATE_BOOLEAN, false],
     'item_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'field_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
+    'tracker_fields' => [FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY],
+    'no_message' => [FILTER_VALIDATE_BOOLEAN, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

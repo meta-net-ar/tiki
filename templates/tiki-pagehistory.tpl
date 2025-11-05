@@ -161,7 +161,7 @@
                         <label for="history_pagesize">{tr}rows per page{/tr}</label>
                     {/if}
             </form>
-            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+            <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -482,7 +482,7 @@
                 </select>
                 <button
                     type="submit"
-                    form="pagehistory"
+                    form="pagehistory-rmv-history"
                     formaction="{bootstrap_modal controller=wiki}"
                     class="btn btn-primary"
                     onclick="confirmPopup()"

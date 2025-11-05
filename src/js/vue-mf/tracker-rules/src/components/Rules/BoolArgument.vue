@@ -1,6 +1,15 @@
 <template>
     <div>
-        <select class="form-select" @change="handleChange" :value="value">
+        <el-select
+            v-if="isElementPlusActive"
+            v-model="modelValue"
+            placeholder="Select"
+            @change="() => emit('change', modelValue)"
+        >
+            <el-option label="true" value="1" />
+            <el-option label="false" value="0" />
+        </el-select>
+        <select class="form-select" @change="handleChange" :value="value" v-else>
             <option value="1">true</option>
             <option value="0">false</option>
         </select>
@@ -8,14 +17,20 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
+
 defineOptions({ name: "BoolArgument" });
 
-defineProps({
+const props = defineProps({
     value: {
         type: null,
         required: true,
     },
 });
+
+const modelValue = ref(props.value);
+
+const isElementPlusActive = ref(!!window.elementPlus);
 
 const emit = defineEmits(["change"]);
 

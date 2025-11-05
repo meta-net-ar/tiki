@@ -8,7 +8,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'page'                     => 'pagename',           //get
-        'version'                  => 'digits',             //post
+        'version'                  => 'int',                //post
         'rollback'                 => 'bool',               //post
         'comment'                  => 'text',               //post
         ],

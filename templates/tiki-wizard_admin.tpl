@@ -9,15 +9,11 @@
     <div class="col-sm-12">
         {include file="wizard/wizard_bar_admin.tpl"}
     </div>
-    <hr>
-    <div id="wizardBody">
+    <div id="wizardBody" class="mt-5">
         <div class="row">
-            <div class="w-100">
             {$wizardBody}
-            </div>
         </div>
     </div>
-    <hr>
     {include file="wizard/wizard_bar_admin.tpl"}
 </form>
 {/block}

@@ -1,13 +1,135 @@
 #!/bin/sh
-# commit message file path
 msg_file="$1"
-msg=$(cat "$msg_file")
 
-# regex Tiki tags
-regex='^(Revert:? \"?)?((\[(BP|DB|DOC|ENH|FIX|KIL|MOD|MRG|NEW|REF|REL|REM|SEC|TRA|UI|UPD|UX)\]){1,5} +[^\[\]: ]+( +[^\[\]: ]+)*(:( +[^\[\]: ]+)+)?|[^\[\]: ]+( +[^\[\]: ]+)*(:( +[^\[\]: ]+)+)?)\"?$'
+# Remove Windows CRLF endings
+msg=$(tr -d '\r' < "$msg_file")
 
-if ! echo "$msg" | grep -qP "$regex"; then
-  echo "❌ Error: your commit message is not properly formatted. It should start with at least one of the Tiki commit tags (e.g., [ENH], [FIX], [NEW], [UI][UX], …) and use spaces where appropriate."
-  echo "For details see: https://dev.tiki.org/Commit-Tags"
-  exit 1
+# ------------------------------
+# Revert commit validation (must have non-empty quoted message)
+# ------------------------------
+if echo "$msg" | grep -Eq "^Revert:?"; then
+    if ! echo "$msg" | grep -Eq '^Revert:?[[:space:]]*".+"$'; then
+        echo "❌ Error: Revert commits must use quotes and include a message."
+        echo "For details see: https://dev.tiki.org/Commit-Tags"
+        exit 1
+    fi
+
+    inner_msg=$(echo "$msg" | sed -E 's/^Revert:?[[:space:]]*"(.+)"$/\1/')
+    trimmed_inner=$(echo "$inner_msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+    if [ -z "$trimmed_inner" ]; then
+        echo "❌ Error: Revert commit message inside quotes cannot be empty." 
+        echo "For details see: https://dev.tiki.org/Commit-Tags"
+        exit 1
+    fi
+
+    exit 0
 fi
+
+# Valid Tiki tags
+valid_tags="BP DB DOC ENH FIX KIL MOD MRG NEW REF REL REM SEC TRA UI UPD UX"
+
+check_tags() {
+    tags_part="$1"
+    invalid_found=0
+
+    for tag in $(echo "$tags_part" | grep -Eo '\[[A-Z]+\]' | tr -d '[]'); do
+        echo "$valid_tags" | grep -qw "$tag" || {
+            echo "❌ Error: Invalid tag '[${tag}]'. Allowed tags: $valid_tags"
+            invalid_found=1
+        }
+    done
+    return $invalid_found
+}
+
+# Check if commit starts with a tag
+if echo "$msg" | grep -Eq "^(\[[A-Z]+\]){1,5}"; then
+    # Tagged commit — normal validation later
+    :
+else
+    # Not a tagged commit — reject if starts with space or special char
+    if echo "$msg" | grep -Eq "^[^a-zA-Z0-9]"; then
+        echo "❌ Error: Commit must start with alphanumeric character if not tagged." 
+        echo "For details see: https://dev.tiki.org/Commit-Tags"
+        exit 1
+    fi
+fi
+
+# Reject tag-only commits
+if echo "$msg" | grep -Eq "^(\[[A-Z]+\]){1,5}[[:space:]]*$"; then
+    echo "❌ Error: Commit must have a message after tag(s)."
+    echo "For details see: https://dev.tiki.org/Commit-Tags"
+    exit 1
+fi
+
+# Allow plain text commits (no tags or revert)
+if echo "$msg" | grep -q "^\["; then
+    :
+elif echo "$msg" | grep -Eq "^Revert:? "; then
+    :
+else
+    exit 0
+fi
+
+# ------------------------------
+# tagged commit validation
+# ------------------------------
+if echo "$msg" | grep -Eq "^(\[[A-Z]+\]){1,5}[[:space:]]+.+$"; then
+    tags_part=$(echo "$msg" | grep -Eo "^(\[[A-Z]+\]){1,5}" || echo "")
+    body_part=$(echo "$msg" | sed -E "s/^(\[[A-Z]+\]){1,5}[[:space:]]+//")
+
+    if [ -z "$body_part" ] || echo "$body_part" | grep -Eq "^[[:space:]]*$"; then
+        echo "❌ Error: Commit body is empty after tags."
+        echo "For details see: https://dev.tiki.org/Commit-Tags"
+        exit 1
+    fi
+
+    if echo "$body_part" | grep -q ":"; then
+        # Space before colon → ❌
+        if echo "$body_part" | grep -Eq "[[:space:]]+:"
+        then
+            echo "❌ Error: No space allowed before a colon in commit body."
+            echo "For details see: https://dev.tiki.org/Commit-Tags"
+            exit 1
+        fi
+
+        # Colon at start → ❌
+        if echo "$body_part" | grep -Eq "^:"
+        then
+            echo "❌ Error: Commit body cannot start with a colon."
+            echo "For details see: https://dev.tiki.org/Commit-Tags"
+            exit 1
+        fi
+
+        # Colon at end → ❌
+        if echo "$body_part" | grep -Eq ":[[:space:]]*$"
+        then
+            echo "❌ Error: Colon must be followed by a non-empty description."
+            echo "For details see: https://dev.tiki.org/Commit-Tags"
+            exit 1
+        fi
+
+        # Double colons → ❌
+        if echo "$body_part" | grep -Eq ":[[:space:]]*:"
+        then
+            echo "❌ Error: No double colons allowed in commit body."
+            echo "For details see: https://dev.tiki.org/Commit-Tags"
+            exit 1
+        fi
+
+        # Colon not followed by a space → ❌
+        if ! echo "$body_part" | grep -Eq ":[[:space:]]"
+        then
+            echo "❌ Error: Colon must always be followed by a space."
+            echo "For details see: https://dev.tiki.org/Commit-Tags"
+            exit 1
+        fi
+    fi
+
+    check_tags "$tags_part" && exit 0 || exit 1
+fi
+
+# No match — invalid commit
+echo "❌ Error: your commit message is not properly formatted. "
+echo "For details see: https://dev.tiki.org/Commit-Tags"
+exit 1

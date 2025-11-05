@@ -119,6 +119,10 @@ export default defineConfig(({ command, mode }) => {
         "element-plus-ui/slider": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/slider.js"),
         "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
         "element-plus-ui/backtop": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/backtop.js"),
+        "element-plus-ui/datepicker-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/DatePicker/datePicker.scss"),
+        "element-plus-ui/autocomplete-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Autocomplete/autocomplete.scss"),
+        "element-plus-ui/input-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Input/input.scss"),
+        "element-plus-ui/select-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Select/select.scss"),
         "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         comments: resolve(__dirname, "vue-mf/comments/src/comments.js"),
@@ -217,33 +221,6 @@ export default defineConfig(({ command, mode }) => {
         css: {
             postcss: {
                 plugins: [postcssRootToHost()],
-            },
-            /**
-             * This workaround suppresses warnings from Sass about mixed declarations
-             * after nested rules. The issue originates from Bootstrap (twbs) and is
-             * tracked here: https://github.com/twbs/bootstrap/issues/40621.
-             *
-             * The fix involves configuring the `scss` preprocessor to silence the specific
-             * deprecation warnings (`mixed-decls`). This is implemented using the `silenceDeprecations`
-             * option with the value `['mixed-decls']`.
-             *
-             * IMPORTANT: This workaround can be removed once Bootstrap is updated to
-             * version 5.3.4 (or later), which includes the resolution to this issue
-             * (see: https://github.com/twbs/bootstrap/pull/40623).
-             *
-             * Original suppressed warning:
-             * DEPRECATION WARNING: Sass's behavior for declarations that appear after nested rules
-             * will change in future versions.
-             *
-             * Future developers should verify whether the workaround is still required
-             * by consulting the linked issue and confirming that the fix is included in the
-             * version of Bootstrap used by the project.
-             */
-            preprocessorOptions: {
-                scss: {
-                    api: "modern-compiler", // or "modern", "legacy"
-                    silenceDeprecations: ["mixed-decls"],
-                },
             },
         },
         plugins: [

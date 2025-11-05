@@ -29,6 +29,8 @@ $inputConfiguration = [
         'url'                  => 'url',            //post
         'rme'                  => 'bool',           //post
         'ticket'               => 'string',         //post
+        'login_mode'           => 'alpha',          //post
+        'keep_login_box_visible' => 'alpha',        //post
         ],
     ],
 ];

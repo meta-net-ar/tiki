@@ -17,7 +17,7 @@ function prefs_site_list()
     }
     unset($groups['Anonymous']);
 
-    return  [
+    $preferences = [
         'site_closed' => [
             'name' => tra('Close site'),
             'description' => tra("Use this setting to \"close\" the Tiki site (such as for maintenance). Users attempting to access the site will see only a log-in form. Only users with specific permission will be allowed to log in. Use the Message to display to specify the message that visitors will see when attempting to access your site."),
@@ -239,19 +239,6 @@ function prefs_site_list()
             'tags' => ['advanced'],
             'options' => $available_layouts,
         ],
-        'site_layout_admin' => [
-            'name' => tr('Admin layout'),
-            'description' => tr('Specify which layout template to use for admin pages.'),
-            'type' => 'list',
-            'default' => SMARTY_DEFAULT_LAYOUT,
-            'help' => 'Site-Layout',
-            'hint' => tra('Note: this does not affect the Unified Admin Backend. Only the legacy admin pages when UAB is disabled. An admin theme must be selected first.'),
-            'tags' => ['advanced'],
-            'options' => $available_admin_layouts,
-            'mandatory_dependencies' => [
-                'theme_admin',
-            ],
-        ],
         'site_layout_per_object' => [
             'name' => tr('Enable layout per page, etc.'),
             'description' => tr('Specify an alternate layout for a particular wiki page, etc.'),
@@ -346,4 +333,23 @@ function prefs_site_list()
             ],
         ],
     ];
+
+    // Only include the admin layout preference if UAB is disabled
+    if (isset($prefs['theme_unified_admin_backend']) && $prefs['theme_unified_admin_backend'] !== 'y') {
+        $preferences['site_layout_admin'] = [
+            'name' => tr('Admin layout'),
+            'description' => tr('Specify which layout template to use for admin pages.'),
+            'type' => 'list',
+            'default' => SMARTY_DEFAULT_LAYOUT,
+            'help' => 'Site-Layout',
+            'hint' => tra('Note: this does not affect the Unified Admin Backend. Only the legacy admin pages when UAB is disabled. An admin theme must be selected first.'),
+            'tags' => ['advanced'],
+            'options' => $available_admin_layouts,
+            'mandatory_dependencies' => [
+                'theme_admin',
+            ],
+        ];
+    }
+
+    return $preferences;
 }

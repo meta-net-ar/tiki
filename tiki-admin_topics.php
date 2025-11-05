@@ -11,9 +11,9 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'addtopic'              => 'bool',      //post
+            'addtopic'              => 'alpha',      //post
             'name'                  => 'string',    //post
-            'remove'                => 'int',       //get
+            'remove'                => 'int',       //post
             'removeall'             => 'int',       //post
             'activate'              => 'int',       //post
             'deactivate'            => 'int',       //post

@@ -28,7 +28,7 @@ function wikiplugin_registermemberpayment_info()
                         Example:') . " <code>name:value;name:value;value;value;</code>",
                     'since' => '9.1',
                     'filter' => 'text',
-                    'default' => 'Number of periods:',
+                    'default' => tr('Number of periods:'),
                 ],
             ]
         )
@@ -54,7 +54,7 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
         $_REQUEST['price'] = $_POST['price'] = $_GET['price'] = $params['price'];
     }
 
-    $periodslabel = isset($params['periodslabel']) ? tr($params['periodslabel']) : tr('Number of periods:');
+    $periodslabel = $params['periodslabel'];
     $fixedperiodsDDL = '';
 
     $fixedperiods = explode(';', $params['fixedperiods'] ?? '');

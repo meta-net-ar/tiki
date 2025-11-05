@@ -128,14 +128,32 @@ $twoFactorSecret = $userlib->get_2_factor_secret($user);
 $force2FA = $userlib->forceTwoFactorAuth($user);
 //Check if 2FA is required for a user and if it not yet enabled
 if ($prefs['twoFactorAuth'] == 'y' && empty($twoFactorSecret) && $force2FA && ! empty($user)) {
-    $accesslib = TikiLib::lib('access');
-    //URL to send user who has not yet enabled 2FA
-    $accessibleUrl = $base_url . 'tiki-user_preferences.php';
-    $pageUrl = $url_scheme . "://" . $host . $requestUri;
-    //Do not redirect the user if it is a logout action
-    if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
-        header('location: tiki-user_preferences.php');
-        exit();
+    $gracePeriod = $userlib->get2FAGracePeriod($user);
+    $userGracePeriodStart = $userlib->get2FAGracePeriodStart($user);
+
+    if (! $userGracePeriodStart) {
+        if ($gracePeriod > 0) {
+            $userGracePeriodStart = $userlib->reset2FAGracePeriodStart($user);
+        } else {
+            $userGracePeriodStart = 0;
+        }
+    }
+
+    $userGracePeriodShouldEnd = $userGracePeriodStart + ($gracePeriod * 24 * 3600);
+
+    if ($userGracePeriodShouldEnd < time()) {
+        $accesslib = TikiLib::lib('access');
+        //URL to send user who has not yet enabled 2FA
+        $accessibleUrl = $base_url . 'tiki-user_preferences.php';
+        $pageUrl = $url_scheme . "://" . $host . $requestUri;
+        //Do not redirect the user if it is a logout action
+        if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
+            header('location: tiki-user_preferences.php');
+            exit();
+        }
+    } else {
+        $daysLeft = ceil(($userGracePeriodShouldEnd - time()) / (24 * 3600));
+        Feedback::warning(tra(strtr('You must enable Two-Factor Authentication within the next %days% day(s) to continue using your account. Please update your <a href="%url%">user preferences</a>.', ['%days%' => $daysLeft, '%url%' => 'tiki-user_preferences.php'])));
     }
 }
 

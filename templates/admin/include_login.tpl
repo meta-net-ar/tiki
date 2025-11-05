@@ -227,6 +227,7 @@
                     {preference name=twoFactorAuthEmailTokenChars}
                     {preference name=twoFactorAuthEmailTokenTTL}
                     {preference name=twoFactorAuthAllUsers}
+                    {preference name=twoFactorAuthGracePeriod}
                     {preference name=twoFactorAuthIncludedGroup}
                     {preference name=twoFactorAuthIncludedUsers}
                     {preference name=twoFactorAuthExcludedGroup}

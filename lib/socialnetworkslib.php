@@ -460,7 +460,6 @@ class SocialNetworksLib extends LogsLib
         $linkedin_info = json_decode($result);
 
         if (isset($linkedin_info->serviceErrorCode)) {
-            curl_close($curl);
             Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
@@ -480,12 +479,9 @@ class SocialNetworksLib extends LogsLib
             $linkedin_email = json_decode($result);
 
             if (isset($linkedin_email->serviceErrorCode)) {
-                curl_close($curl);
                 Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
-
-        curl_close($curl);
 
         $linkedin_locale = $linkedin_info->firstName->preferredLocale->language;
         if (! empty($linkedin_info->firstName->preferredLocale->country)) {

@@ -195,25 +195,28 @@
 
                                 {foreach from=$listfields key=ix item=field_value}
                                     {if $field_value.isTblVisible eq 'y' and ( $field_value.type ne 'x' and $field_value.type ne 'h') and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
-                                        <th class="auto" data-col-name="{$field_value.name}">
-                                            {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId}{$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}{/self_link}
+                                        <th class="auto" data-sort-field="f_{$field_value.fieldId}">
+                                            {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId _onclick="return handleSortClick(event, 'f_{$field_value.fieldId}');"}
+                                                {$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}
+                                            {/self_link}
                                         </th>
                                     {/if}
                                 {/foreach}
 
                                 {if $tracker_info.showCreated eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="created">
+                                        {self_link _sort_arg='sort_mode' _sort_field='created' _onclick="return handleSortClick(event, 'created');"}{tr}Created{/tr}{/self_link}
+                                        <span class="sort-indicator"></span>
                                     </th>
                                 {/if}
                                 {if $tracker_info.showLastModif eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="lastModif">
+                                        {self_link _sort_arg='sort_mode' _sort_field='lastModif' _onclick="return handleSortClick(event, 'lastModif');"}{tr}Last modified{/tr}{/self_link}
                                     </th>
                                 {/if}
                                 {if $tracker_info.showLastModifBy eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModifby'}{tr}Last modifier{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="lastModifby">
+                                        {self_link _sort_arg='sort_mode' _sort_field='lastModifby' _onclick="return handleSortClick(event, 'lastModifby');"}{tr}Last modifier{/tr}{/self_link}
                                     </th>
                                 {/if}
                                 {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' || $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
@@ -340,8 +343,16 @@
                                 {$itemoff=$itemoff+1}
                             {/section}
                         </table>
-                    </div>
-
+                        </div>
+                    </form>
+                    
+                    {* JavaScript to handle the sorting functionality *}
+                    {jq}
+                    if (typeof $.trackerInitMultiSort === 'function') {
+                        $.trackerInitMultiSort();
+                    }
+                    {/jq}
+                    
                     {if $tiki_p_admin_trackers eq 'y'}
                         <div class="mb-3 row">
                             <div class="input-group min-width-customized">

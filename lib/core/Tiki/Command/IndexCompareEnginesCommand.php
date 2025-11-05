@@ -295,7 +295,7 @@ class IndexCompareEnginesCommand extends Command
                     $filenames[] = $fname;
                 }
 
-                $io->writeln(`diff3 $filenames[0] $filenames[1] $filenames[2]`);
+                $io->writeln(shell_exec("diff3 $filenames[0] $filenames[1] $filenames[2]"));
 
                 foreach ($filenames as $fname) {
                     unlink($fname);

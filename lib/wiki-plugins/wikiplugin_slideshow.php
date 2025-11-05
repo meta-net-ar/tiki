@@ -47,7 +47,6 @@ function wikiplugin_slideshow_info()
                 ),
                 'filter' => 'url',
                 'accepted' => tra('Valid URL'),
-                'default' => '',
                 'since' => '19.0',
             ],
             'parallaxBackgroundSize' => [
@@ -282,7 +281,7 @@ function wikiplugin_slideshow($data, $params)
 
     if (! empty($_REQUEST['pdf'])) {
         global $pdfStyles;
-        if (isset($params['parallaxBackgroundImage'])) {
+        if (! is_null($params['parallaxBackgroundImage'])) {
             $pdfStyles = '<style>@page,body,div.reveal{background-image-resize:0 !important;
             background-image:url("' . $params['parallaxBackgroundImage'] . '") !important;}</style>';
         }

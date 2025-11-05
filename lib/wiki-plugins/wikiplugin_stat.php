@@ -152,46 +152,64 @@ function wikiplugin_stat($data, $params)
         if ($when == 'type' || $when == 'parentId') {
             continue;
         }
+        // Skip parameters with empty values (default values)
+        if (empty($whats)) {
+            continue;
+        }
         if (! in_array($when, ['day', 'lastday', 'week', 'lastweek', 'month', 'lastmonth', 'year', 'lastyear'])) {
             return getInvalidActivityStatusMessage($when);
         }
-        $whats = explode(':', $whats);
+
+        $activity_status = ActivityStatuses::tryFrom($whats);
+        if ($activity_status === null) {
+            return getInvalidActivityStatusMessage($whats);
+        }
+
         $types = explode(':', $params['type']);
         foreach ($types as $type) {
-            foreach ($whats as $what) {
-                $activity_status = ActivityStatuses::tryFrom($what);
-                switch ($type) {
-                    case 'trackeritem':
-                        if ($activity_status != ActivityStatuses::Viewed && $activity_status != ActivityStatuses::Added) {
-                            return getInvalidActivityStatusMessage($what);
-                        }
-                        if (empty($params['parentId'])) {
-                            $params['parentId'] = 0;
-                        }
-                        //for tracker items, only added items can be shown, so either a or v will result in added items being displayed
-                        $stat[$when][$type]['Added tracker items'] = $statslib->count_this_period('tiki_tracker_items', 'created', $when, 'trackerId', $params['parentId']);
-                        break;
-                    case 'wiki':
-                        if ($activity_status == ActivityStatuses::Viewed) {
-                            $stat[$when][$type]['Viewed wiki pages'] = $statslib->hit_this_period('wiki', $when);
-                        } elseif ($activity_status == ActivityStatuses::AddedViewed) {
-                            $stat[$when][$type]['Added wiki pages'] = $statslib->count_this_period('tiki_pages', 'created', $when);
-                        } else {
-                            return getInvalidActivityStatusMessage($what);
-                        }
-                        break;
-                    case 'article':
-                        if ($activity_status == ActivityStatuses::Viewed) {
-                            $stat[$when][$type]['Viewed articles'] = $statslib->hit_this_period('article', $when);
-                        } elseif ($activity_status == ActivityStatuses::Added) {
-                            $stat[$when][$type]['Added articles'] = $statslib->count_this_period('tiki_articles', 'created', $when);
-                        } else {
-                            return getInvalidActivityStatusMessage($what);
-                        }
-                        break;
-                    default:
-                        return getInvalidActivityStatusMessage($type);
-                }
+            switch ($type) {
+                case 'trackeritem':
+                    if ($activity_status != ActivityStatuses::Viewed && $activity_status != ActivityStatuses::Added) {
+                        return getInvalidActivityStatusMessage($whats);
+                    }
+                    if (is_null($params['parentId'])) {
+                        $params['parentId'] = 0;
+                    }
+                    //for tracker items, only added items can be shown, so either a or v will result in added items being displayed
+                    $stat[$when][$type]['Added tracker items'] = $statslib->count_this_period('tiki_tracker_items', 'created', $when, 'trackerId', $params['parentId']);
+                    break;
+                case 'wiki':
+                    if ($activity_status == ActivityStatuses::Viewed) {
+                        $stat[$when][$type]['Viewed wiki pages'] = $statslib->hit_this_period('wiki', $when);
+                    } elseif ($activity_status == ActivityStatuses::Added) {
+                        $stat[$when][$type]['Added wiki pages'] = $statslib->count_this_period('tiki_pages', 'created', $when);
+                    } elseif ($activity_status == ActivityStatuses::AddedViewed) {
+                        $stat[$when][$type]['Added wiki pages'] = $statslib->count_this_period('tiki_pages', 'created', $when);
+                        $stat[$when][$type]['Viewed wiki pages'] = $statslib->hit_this_period('wiki', $when);
+                    } elseif ($activity_status == ActivityStatuses::ViewedAdded) {
+                        $stat[$when][$type]['Viewed wiki pages'] = $statslib->hit_this_period('wiki', $when);
+                        $stat[$when][$type]['Added wiki pages'] = $statslib->count_this_period('tiki_pages', 'created', $when);
+                    } else {
+                        return getInvalidActivityStatusMessage($whats);
+                    }
+                    break;
+                case 'article':
+                    if ($activity_status == ActivityStatuses::Viewed) {
+                        $stat[$when][$type]['Viewed articles'] = $statslib->hit_this_period('article', $when);
+                    } elseif ($activity_status == ActivityStatuses::Added) {
+                        $stat[$when][$type]['Added articles'] = $statslib->count_this_period('tiki_articles', 'created', $when);
+                    } elseif ($activity_status == ActivityStatuses::AddedViewed) {
+                        $stat[$when][$type]['Added articles'] = $statslib->count_this_period('tiki_articles', 'created', $when);
+                        $stat[$when][$type]['Viewed articles'] = $statslib->hit_this_period('article', $when);
+                    } elseif ($activity_status == ActivityStatuses::ViewedAdded) {
+                        $stat[$when][$type]['Viewed articles'] = $statslib->hit_this_period('article', $when);
+                        $stat[$when][$type]['Added articles'] = $statslib->count_this_period('tiki_articles', 'created', $when);
+                    } else {
+                        return getInvalidActivityStatusMessage($whats);
+                    }
+                    break;
+                default:
+                    return getInvalidActivityStatusMessage($type);
             }
         }
     }

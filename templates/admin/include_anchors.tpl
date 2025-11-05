@@ -288,7 +288,7 @@
                                             {/if}
                                             {if $prefs.feature_shoutbox eq "y" and $tiki_p_admin_shoutbox eq "y"}
                                                 <a class="dropdown-item" href="tiki-shoutbox.php">
-                                                    {icon name="bullhorn"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
+                                                    {icon name="message"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.payment_feature eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_credits.php">

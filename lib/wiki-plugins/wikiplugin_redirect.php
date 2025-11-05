@@ -22,7 +22,6 @@ function wikiplugin_redirect_info()
                 'description' => tra('Wiki page name to redirect to.'),
                 'since' => '3.0',
                 'filter' => 'pagename',
-                'default' => '',
                 'profile_reference' => 'wiki_page',
             ],
             'url' => [
@@ -31,7 +30,6 @@ function wikiplugin_redirect_info()
                 'description' => tra('Complete URL, internal or external.'),
                 'since' => '3.0',
                 'filter' => 'url',
-                'default' => '',
             ],
             'perspective' => [
                 'required' => false,
@@ -39,7 +37,6 @@ function wikiplugin_redirect_info()
                 'description' => tra('The ID of a perspective to switch to (requires feature_perspective).'),
                 'since' => '7.1',
                 'filter' => 'int',
-                'default' => '',
                 'profile_reference' => 'perspective',
             ],
             'autologin_remotetiki' => [
@@ -60,15 +57,15 @@ function wikiplugin_redirect($data, $params)
     extract($params, EXTR_SKIP);
     $areturn = '';
 
-    if (! isset($page) && ! isset($url)) {
+    if (is_null($page) && is_null($url)) {
         $areturn = "REDIRECT plugin: No page or url specified!<br />";
     }
 
-    if (isset($page)) {
+    if (! is_null($page)) {
         $location = $page;
-    } elseif (isset($url)) {
+    } elseif (! is_null($url)) {
         $location = $url;
-    } elseif (isset($perspective)) {
+    } elseif (! is_null($perspective)) {
         $location = tra('perspective ') . $perspective;
     } else {
         $location = tra('nowhere');
@@ -96,7 +93,7 @@ function wikiplugin_redirect($data, $params)
             return TikiLib::lib('parser')->parse_data($info['data'], $parserOptions);
         }
     } else {
-        if (isset($perspective)) {
+        if (! is_null($perspective)) {
             global $base_host;
             $access = TikiLib::lib('access');
             $perspectivelib = TikiLib::lib('perspective');
@@ -138,7 +135,7 @@ function wikiplugin_redirect($data, $params)
                 }
             }
 
-            if (isset($page)) {
+            if (! is_null($page)) {
                 $safePage = urlencode($page);
                 // Ensure temporary, non-cached redirect to avoid URL caching issues and SEO impact
                 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -156,7 +153,7 @@ function wikiplugin_redirect($data, $params)
                     TikiLib::lib('access')->redirect("tiki-index.php?page={$safePage}", '', 301);
                 }
             }
-            if (isset($url)) {
+            if (! is_null($url)) {
                 global $base_url, $url_path;        // try to detect redirect loop to server root
                 if (
                     $url == $base_url ||            // whole site url

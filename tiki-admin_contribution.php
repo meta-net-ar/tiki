@@ -18,11 +18,12 @@ $inputConfiguration = [
             'feature_contribution_mandatory_forum'           => 'bool',         //post
             'feature_contribution_mandatory_comment'         => 'bool',         //post
             'feature_contribution_mandatory_blog'            => 'bool',         //post
+            'feature_contribution_display_in_comment'        => 'bool',         //post
             'feature_contributor_wiki'                       => 'bool',         //post
-            'new_contribution_name'                          => 'alpha',        //post
-            'description'                                    => 'alpha',        //post
+            'new_contribution_name'                          => 'text',         //post
+            'description'                                    => 'text',         //post
             'replace'                                        => 'bool',         //post
-            'name'                                           => 'alpha',        //post
+            'name'                                           => 'text',         //post
             'remove'                                         => 'int',          //post
             'save'                                           => 'bool',         //post
         ],

@@ -15,16 +15,48 @@ class Search_MySql_FieldQueryBuilder
     private $invert = false;
     private $boolean_or = ' ';
     private $escapeCallback;
+    private $stopwords = [];
+    private $minTokenSize = 3;
+
+    /**
+    * Sets the list of stopwords to be ignored during query building.
+    *
+    * @param array $stopwords The list of stopword strings.
+    */
+    public function setStopwords(array $stopwords)
+    {
+        $this->stopwords = array_map('strtolower', $stopwords);
+    }
+
+    /**
+    * Sets the minimum word length for a token to be included in the query.
+    * This should match the @@innodb_ft_min_token_size setting of the MySQL server.
+    *
+    * @param int $size The minimum number of characters a word must have.
+    */
+    public function setMinTokenSize(int $size)
+    {
+        $this->minTokenSize = $size;
+    }
 
     public function build(Search_Expr_Interface $expr, Search_Type_Factory_Interface $factory)
     {
         $invert = false;
         $string = $expr->walk(
             function ($node, $childNodes) use ($factory, &$invert) {
+                $childNodes = array_filter($childNodes);
                 if ($node instanceof Token) {
                     $string = $node->getValue($factory)->getValue();
                     if (is_array($string)) {
                         $string = implode(' ', $string);
+                    }
+                    // If it's too short, treat it as empty.
+                    if (mb_strlen($string) < $this->minTokenSize) {
+                        return '';
+                    }
+                    // If it's a stopword, treat it as an empty token.
+                    if (in_array(strtolower($string), $this->stopwords, true)) {
+                        return '';
                     }
                     if ($this->escapeCallback) {
                         $string = call_user_func($this->escapeCallback, $string);

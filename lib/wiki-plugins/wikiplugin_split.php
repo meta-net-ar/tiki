@@ -52,7 +52,6 @@ function wikiplugin_split_info()
                 'since' => '1',
                 'seprator' => '|',
                 'filter' => 'text',
-                'default' => '',
             ],
             'first' => [
                 'required' => false,
@@ -134,8 +133,8 @@ function wikiplugin_split($data, $params, $pos)
     }
 
     extract($params, EXTR_SKIP);
-    $fixedsize = ! isset($fixedsize) || $fixedsize == 'y' || $fixedsize == 1;
-    $joincols  = ! isset($joincols)  || $joincols == 'y' || $joincols == 1;
+    $fixedsize = $fixedsize == 'y' || $fixedsize == 1;
+    $joincols  = $joincols == 'y' || $joincols == 1;
     // Split data by rows and cells
 
     $smarty = TikiLib::lib('smarty');
@@ -158,8 +157,8 @@ function wikiplugin_split($data, $params, $pos)
     }
 
     $percent = false;
-    if (isset($colsize)) {
-        $tdsize = explode("|", $colsize);
+    if (! is_null($colsize)) {
+        $tdsize = is_array($colsize) ? $colsize : explode('|', $colsize);
         $tdtotal = 0;
         for ($i = 0; $i < $maxcols; $i++) {
             if (! isset($tdsize[$i])) {
@@ -183,15 +182,12 @@ function wikiplugin_split($data, $params, $pos)
         $class = 'class="table split"';
         $percent = true;
     }
-    if (! isset($edit)) {
-        $edit = 'n';
-    }
     $result = "<div class='table-responsive'><div><table class='table" . ($percent ? " normalnoborder" : "") . ( ! empty($customclass) ? " $customclass" : "") . "'>";
 
     // Attention: Dont forget to remove leading empty line in section ...
     //            it should remain from previous '---' line...
     // Attention: original text must be placed between \n's!!!
-    if (! isset($first) || $first != 'col') {
+    if ($first != 'col') {
         foreach ($rows as $r) {
             $result .= "<tr>";
             $idx = 1;
@@ -204,7 +200,7 @@ function wikiplugin_split($data, $params, $pos)
                 $colspan = ((count($r) == $idx) && (($maxcols - $idx) > 0) ? ' colspan="' . ($maxcols - $idx + 1) . '"' : '');
                 $idx++;
                 // Add cell to table
-                if (isset($colsize)) {
+                if (! is_null($colsize)) {
                     $width = ' width="' . $tdsize[$idx - 2] . '"';
                 } elseif ($fixedsize) {
                     $width = ' width="' . $columnSize . '%" ';

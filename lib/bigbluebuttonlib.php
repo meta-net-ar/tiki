@@ -89,7 +89,6 @@ class BigBlueButtonLib
         if ($response->getReturnCode() !== 'FAILED') {
             $reflection = new \ReflectionClass($response);
             $property = $reflection->getProperty('rawXml');
-            $property->setAccessible(true);
             $rawXml = $property->getValue($response);
 
             $attendees = [];
@@ -276,7 +275,6 @@ class BigBlueButtonLib
         } else {
             $reflection = new \ReflectionClass($response);
             $property = $reflection->getProperty('rawXml');
-            $property->setAccessible(true);
             $rawXml = $property->getValue($response);
 
             return [

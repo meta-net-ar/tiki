@@ -30,7 +30,6 @@ function wikiplugin_trackerstat_info()
                 'description' => tra('Colon-separated list of field IDs to be displayed. Example:')
                     . ' <code>2:4:5</code>' . tra('. ') . tra('Leave it empty to display all fields from this tracker.'),
                 'since' => '2.0',
-                'default' => '',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
             ],
@@ -149,9 +148,7 @@ function wikiplugin_trackerstat($data, $params)
         return smarty_modifier_tiki_date_format($date, tra($show_lastmodif));
     }
 
-    if (! isset($status)) {
-        $status = 'o';
-    } elseif (! $trklib->valid_status($status)) {
+    if (! $trklib->valid_status($status)) {
         return tra('invalid status');
     }
 
@@ -177,7 +174,7 @@ function wikiplugin_trackerstat($data, $params)
             }
         }
     }
-    if (! empty($fields)) {
+    if (! is_null($fields)) {
         $listFields = $fields;
     } else {
         foreach ($allFields['data'] as $f) {

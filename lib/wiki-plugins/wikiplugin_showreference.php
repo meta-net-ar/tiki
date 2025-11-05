@@ -26,7 +26,7 @@ function wikiplugin_showreference_info()
                     '</code>'
                 ),
                 'since' => '10.0',
-                'default' => 'Bibliography',
+                'default' => tr('Bibliography'),
                 'filter' => 'text',
             ],
             'showtitle' => [
@@ -93,15 +93,15 @@ function wikiplugin_showreference($data, $params)
 
     $referenceStyle = (! empty($prefs['feature_references_style']) && $prefs['feature_references_style'] === 'mla') ? 'mla' : 'ama';
 
-    $params['title'] = empty($params['title']) ? '' : trim($params['title']);
-    $params['hlevel'] = empty($params['hlevel']) ? '' : trim($params['hlevel']);
-    $params['removelines'] = empty($params['removelines']) ? '' : trim($params['removelines']);
-    $params['pageid'] = empty($params['pageid']) ? '' : trim($params['pageid']);
+    $params['title'] = trim($params['title']);
+    $params['hlevel'] = trim($params['hlevel']);
+    $params['removelines'] = trim($params['removelines']);
+    $params['pageid'] = trim($params['pageid']);
 
     $title = empty($params['title']) ? tr('Bibliography') : $params['title'];
     $showtitle = empty($params['showtitle']) || trim($params['showtitle']) !== 'no';
 
-    if (isset($params['hlevel']) && $params['hlevel'] != '') {
+    if ($params['hlevel'] != '') {
         if ($params['hlevel'] != '0') {
             $hlevel_start = '<h' . $params['hlevel'] . '>';
             $hlevel_end = '</h' . $params['hlevel'] . '>';

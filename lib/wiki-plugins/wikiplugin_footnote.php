@@ -23,7 +23,6 @@ function wikiplugin_footnote_info()
                 'name' => tra('Tag'),
                 'description' => tra('Tag footnote with unique identifier'),
                 'since' => '15.0',
-                'default' => '',
                 'filter' => 'alnum',
                 'accepted' => tra('One word made of alphanumeric characters'),
             ],
@@ -32,7 +31,6 @@ function wikiplugin_footnote_info()
                 'name' => tra('Same as Tag'),
                 'description' => tra('Tag to existing footnote by its Tag'),
                 'since' => '15.0',
-                'default' => '',
                 'filter' => 'alnum',
                 'accepted' => tra('One word made of alphanumeric characters'),
             ],
@@ -41,7 +39,6 @@ function wikiplugin_footnote_info()
                 'name' => tra('Same as'),
                 'description' => tra('Tag to existing footnote number'),
                 'since' => '5.0',
-                'default' => '',
                 'filter' => 'alnum',
                 'accepted' => tra('tag name (since 17) or footnote number'),
             ],
@@ -50,7 +47,6 @@ function wikiplugin_footnote_info()
                 'name' => tra('Class'),
                 'description' => tra('Add class to footnotearea'),
                 'since' => '14.0',
-                'default' => '',
                 'filter' => 'alnumspace',
                 'accepted' => tra('Valid CSS class'),
             ],
@@ -59,7 +55,6 @@ function wikiplugin_footnote_info()
                 'name' => tra('Scheme'),
                 'description' => tra('Segregate footnotes by class in footnotearea. Apply different numbering style (optional)'),
                 'since' => '17.0',
-                'default' => '',
                 'filter' => 'text',
                 'accepted' => tra('Scheme strings (ClassName:((Number Style|numStyle))). Multiples may be separated by | (roman-upper:className|decimal)'),
             ],
@@ -100,7 +95,7 @@ function wikiplugin_footnote($data, $params, $offset, $context)
         $footnotes['lists']['.def.']['listType'] = 'decimal';    // set the default display type for lists
     }
 
-    if (isset($params['scheme'])) {
+    if (! is_null($params['scheme'])) {
         setScheme($params['scheme']);
     }
 
@@ -109,7 +104,7 @@ function wikiplugin_footnote($data, $params, $offset, $context)
         $footnotes['count']++;                      // keep a record of how many times footones is called to generate unique id's
 
         // Create an array of classes to be applied
-        $classes = (isset($params['class'])) ? explode(' ', trim($params["class"])) : [];
+        $classes = (! is_null($params['class'])) ? explode(' ', trim($params["class"])) : [];
         if ($footnotes['nest'] > 0) {   // if we are in a nested footnote, add a nested class
             $classes[] = 'footnest' . $footnotes['nest'];
         }
@@ -129,7 +124,7 @@ function wikiplugin_footnote($data, $params, $offset, $context)
         // set the current number of list entries
         $listNum = (is_array($footnote) ? count($footnote) : 0) + 1;
 
-        if (isset($params["tag"]) && ! isset($footnotes['tag'][$params["tag"]])) {  // do nothing if duplicate tag
+        if (! is_null($params["tag"]) && ! isset($footnotes['tag'][$params["tag"]])) {  // do nothing if duplicate tag
             // Keep track of where data can be found for this Tag
             $footnotes['tag'][$params["tag"]]['class'] = $list;
             $footnotes['tag'][$params["tag"]]['num'] = $listNum;
@@ -153,9 +148,9 @@ function wikiplugin_footnote($data, $params, $offset, $context)
         $smarty->assign('data', $data);
         return $smarty->fetch('templates/wiki-plugins/wikiplugin_footnote.tpl');
     } else {                             // if there is no data
-        if (isset($params['sameastag'])) {
+        if (! is_null($params['sameastag'])) {
             $sameas = $params['sameastag'];
-        } elseif (isset($params['sameas'])) {
+        } elseif (! is_null($params['sameas'])) {
             $sameas = $params['sameas'];
         }
         if (isset($sameas)) {

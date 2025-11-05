@@ -1,3 +1,12 @@
+{capture assign=modzonetop}
+    {modulelist zone=top class='top_modules d-flex justify-content-between'}
+{/capture}
+{capture assign=modzonetopbar}
+    {modulelist zone=topbar}
+{/capture}
+{capture assign=modzonebottom}
+    {modulelist zone=bottom}
+{/capture}
 <!DOCTYPE html>
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="page_{$page_id}"{/if}{if Language::isRTL()} dir="rtl"{/if}>
     <head>
@@ -17,13 +26,13 @@
 {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
             <div class="row">
                 <header class="page-header w-100" id="page-header">
-                    {modulelist zone=top class='top_modules d-flex justify-content-between'}
+                    {$modzonetop}
                 </header>
             </div>
 {/if}
             <div class="row">
                 <div class="col-md-12">
-                    {modulelist zone=topbar}
+                    {$modzonetopbar}
                 </div>
             </div>
 
@@ -38,7 +47,7 @@
 
             <div class="row">
                 <div class="col-md-12 well">
-                    {modulelist zone=bottom}
+                    {$modzonebottom}
                 </div>
             </div>
         </div>

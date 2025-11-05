@@ -7,11 +7,6 @@ $imagePath: "../images/";
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// Restates default for benefit of first-child (logo module) exception
-.navbar {
-    --bs-navbar-padding-y: 0.5rem;
-}
-
 .layout_classic .header_container {
     box-shadow: inset 0 44px 0 0 $classic-header-container-shadow;
 }

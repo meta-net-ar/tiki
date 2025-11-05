@@ -8,8 +8,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'clear'                    => 'bool',              //post
-        'sort_mode'                => 'word',             //post
-        'offset'                   => 'digits',            //post
+        'sort_mode'                => 'alnumdash',         //get
+        'offset'                   => 'int',               //get
         'find'                     => 'string',            //post
         ],
     ],

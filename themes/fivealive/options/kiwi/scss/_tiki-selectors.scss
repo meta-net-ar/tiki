@@ -3,13 +3,8 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 
-.header_outer,
-.layout_basic #top_modules,
-.postbody-title//  ,
-    //.tiki > .navbar.fixed-top.bg-dark,
-    //.topbar, .navbar-dark, .topbar .navbar-dark .navbar-nav > li, .topbar .nav > li,
-//.bg-dark
-{
+
+.postbody-title {
     background: #bebc24;
     background: linear-gradient(to right,  #bebc24 0%,#ded319 53%,#e7d915 100%);
 }
@@ -22,10 +17,6 @@
 .text-dark {
     color: $dark !important;
 }
-
-//.bg-dark {
-//    background-color: $dark !important;
-//}
 
 .btn-dark {
     color: #fff;
@@ -69,7 +60,6 @@
 }
 
 .badge.bg-primary,
-    //.badge.bg-danger,
 .badge.bg-warning,
 .badge.bg-success,
 .badge.bg-info {

@@ -51,9 +51,8 @@ function wikiplugin_fluidgrid_info()
                 'name' => tra('Column Sizes'),
                 'description' => tra('Specify all column widths in units which add up to 12 or percent, separating each width by a pipe (|)'),
                 'since' => '17',
-                'seprator' => '|',
+                'separator' => '|',
                 'filter' => 'text',
-                'default' => '',
             ],
             'first' => [
                 'required' => false,
@@ -143,11 +142,11 @@ function wikiplugin_fluidgrid($data, $params, $pos)
         $data2 = $data;
     }
 
-        extract($params, EXTR_SKIP);
-    $joincols  = (! isset($joincols)  || $joincols == 'y' || $joincols == 1 ? true : false);
+    extract($params, EXTR_SKIP);
+    $joincols  = ($joincols == 'y' || $joincols == 1 ? true : false);
 
         // Check the device size parameter which must be one of 'sm', 'md', 'lg' or 'xl'
-    if (! isset($devicesize) || ! ( ( $devicesize == 'sm' ) || ( $devicesize == 'md' ) || ( $devicesize == 'lg' ) || ( $devicesize == 'xl' ) )) {
+    if (! ( ( $devicesize == 'sm' ) || ( $devicesize == 'md' ) || ( $devicesize == 'lg' ) || ( $devicesize == 'xl' ) )) {
         $devicesize = 'sm' ;
     }
 
@@ -183,7 +182,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
     // flipping the matrices before generating the table. This is probably
     // not very efficient, but keeps the code fairly readable.
     //
-    if (isset($first) && $first == 'col') {
+    if ($first == 'col') {
         $cols    = [] ;
         $maxrows = count($rows) ;
 
@@ -266,12 +265,18 @@ function wikiplugin_fluidgrid($data, $params, $pos)
     $w_array = [] ;
 
     // colsize is specified
-    if (isset($colsize)) {
+    if (! is_null($colsize)) {
         // Check for a percent symbol on any column
-        $percent = ( strpos($colsize, '%') !== false );
+        $percent = false;
+        foreach ($colsize as $val) {
+            if (strpos($val, '%') !== false) {
+                $percent = true;
+                break;
+            }
+        }
 
         // Count the total size and the number of unsized columns
-        $tdsize   = explode("|", $colsize);
+        $tdsize   = $colsize;
         $tdtotal  = 0 ;
         $tdtotalPercent  = 0 ;
         $tdnosize = 0 ;

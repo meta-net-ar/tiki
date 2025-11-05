@@ -1415,6 +1415,14 @@ class UnifiedSearchLib
             unset($filter['not_prefix']);
         }
 
+        if (isset($filter['exact']) && is_array($filter['exact'])) {
+            foreach ($filter['exact'] as $field => $value) {
+                $query->filterIdentifier($value, $field);
+            }
+
+            unset($filter['exact']);
+        }
+
         if (
             isset($filter['distance']) && is_array($filter['distance']) &&
                     isset($filter['distance']['distance'], $filter['distance']['lat'], $filter['distance']['lon'])

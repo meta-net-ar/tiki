@@ -1589,12 +1589,15 @@ class TikiLib extends TikiDb_Bridge
         switch ($type) {
             case 'l':
                 if (str_starts_with($libname, 'dicebear')) {
+                    $seed = $res['avatarName'];
+                    if ($seed === 'admin') {
+                        return '<i class="fa fa-user-tie fa-2xl admin-icon" title="' . tra("Administrator") . '"></i>';
+                    }
                     TikiLib::lib('header')->add_js_module(<<<JS
                         import { renderAvatars } from 'avatar-generator';
                         renderAvatars();
                     JS);
 
-                    $seed = $res['avatarName'];
                     $style = explode('/', $libname)[1];
                     return <<<HTML
                         <div class="dicebear-avatar" data-seed="{$seed}" data-style="{$style}" data-size="{$avatarRenderSize}"></div>

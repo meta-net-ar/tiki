@@ -1,4 +1,4 @@
-//Custom styles for the FiveAlive Lemon option theme.
+// Custom styles for the FiveAlive Lemon option theme.
 
 @import "../../../scss/_variables.scss";
 
@@ -132,6 +132,12 @@ $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
 $tiki-postbody-title-card-title-color: #fff;
 
+$tiki-dark-footer-card-header-bg: $tiki-top-bg;
+$tiki-dark-footer-card-header-title-color: #000 !important;
+$tiki-dark-footer-card-border-color: #e4af00;
+$tiki-dark-footer-link-color: #f0d800;
+$tiki-dark-footer-link-hover-color: #cfbc11;
+
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
@@ -139,6 +145,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #151414;
     --tiki-top-hover-color: #333131;
     --tiki-top-text-color: #333131;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 
@@ -154,6 +162,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #151414;
     --tiki-top-hover-color: #333131;
     --tiki-top-text-color: #333131;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

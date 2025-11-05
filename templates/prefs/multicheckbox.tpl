@@ -1,8 +1,8 @@
 <div class="adminoptionbox preference d-flex multicheckbox mb-3 row text-start {$p.tagstring|escape}{if isset($smarty.request.highlight) and $smarty.request.highlight eq $p.preference} highlight{/if}">
-    <label for="{$p.id|escape}" class="col-form-label col-sm-3">{$p.name|escape}
+    <label for="{$p.id|escape}" class="col-form-label col-sm-3 float-left">{$p.name|escape}
         {include file="prefs/shared-help-icon.tpl"}
     </label>
-    <div class="col">
+    <div class="col float-start">
         {foreach from=$p.options key=value item=label}
             <div class="form-check form-check-inline">
                 <label class="col-form-label me-3">

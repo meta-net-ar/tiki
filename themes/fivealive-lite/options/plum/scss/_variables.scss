@@ -29,7 +29,6 @@ $theme-colors: (
 );
 
 // Options
-
 // Prefix
 $prefix: bs-;
 
@@ -37,7 +36,7 @@ $prefix: bs-;
 $body-bg:                   $white;  // default
 $body-color: #212529;
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color: #7a04b5;
@@ -55,16 +54,8 @@ $table-accent-bg: #f9f9f9;
 $table-hover-bg: #f5f5f5;
 
 // Navs
-$nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #f4e1ff; // Same as $input-bg;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #15001f; // Same as $dropdown-link-hover-bg;
-
-// Navbar
-$navbar-dark-color:                 rgba($white, .85); // !default;
-$navbar-dark-hover-color:           rgba($white, .75) !default;
-$navbar-dark-active-color:          $white !default;
-$navbar-dark-disabled-color:        rgba($white, .25) !default;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
 
 // Forms
 $input-color: var(--#{$prefix}body-color);  // default // #555555;
@@ -111,15 +102,19 @@ $pagination-disabled-border-color: #dddddd;
 $card-border-color: #49006c;
 
 // Code
-$code-color:                       $body-color; // $pink;  // default
+$code-color:                       $body-color; // default
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
 // Needed for footer and modules in _selectors-for-options.scss
-$side-column-heading-color: #49006c;
-$footer_liner-card-inner-border: #7a04b5;
-$footer-accent-color: #7a04b5;
-$tiki-footer-border-color: $footer-accent-color;
+$tiki-side-column-card-header-color: #49006c;
+$tiki-footer_liner-card-inner-border: #7a04b5;
+$tiki-footer-accent-color: #7a04b5;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
+
+$tiki-dark-footer-card-header-border-color: #bc2f84;
+$tiki-dark-footer-link-color: #d968ac;
+$tiki-dark-footer-link-hover-color: #e480bc;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -128,6 +123,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #f9f9f9;
     --tiki-top-text-color: #f9f9f9;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -151,6 +148,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

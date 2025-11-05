@@ -171,11 +171,7 @@ function wikiplugin_googlechart($data, $params)
     $headerlib = TikiLib::lib('header');
 
     if ($id === 1 && (empty($params['credentials']) || ! is_readable($params['credentials']))) {
-        return tra('googlechart: No credentials file.');
-    }
-
-    if (empty($params['query_ids'])) {
-        return tra('googlechart: No query_ids supplied.');
+        return WikiParser_PluginOutput::error(tr('Error'), tra('googlechart: No credentials file.'));
     }
 
     if (empty($params['chart_container'])) {

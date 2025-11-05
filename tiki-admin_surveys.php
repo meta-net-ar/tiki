@@ -12,14 +12,13 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
             'surveyId'              => 'int',                //get
-            'questionId'            => 'int',                //post
-            'restriction'           => 'bool',               //post
+            'restriction'           => 'alpha',              //post
             'name'                  => 'string',             //post
-            'sort_mode'             => 'word',               //get
+            'sort_mode'             => 'alnumdash',          //get
             'offset'                => 'int',                //get
             'description'           => 'xss',                //post
-            'save'                  => 'bool',               //post
-            'status'                => 'striptags',          //post
+            'save'                  => 'alpha',              //post
+            'status'                => 'alpha',              //post
             'remove'                => 'int',                //post
             'find'                  => 'string',             //post
         ],

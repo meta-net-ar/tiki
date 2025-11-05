@@ -280,7 +280,6 @@ class CCLiteLib extends TikiDb_Bridge
 
         curl_setopt($ch, CURLOPT_URL, $REST_url);
         $result = curl_exec($ch);
-        curl_close($ch);
         return strip_tags($result);
     }
 
@@ -323,7 +322,6 @@ class CCLiteLib extends TikiDb_Bridge
 //          curl_setopt($ch, CURLOPT_VERBOSE, true);
 
             $logon = curl_exec($ch);
-            curl_close($ch);
 
             $results = [];  // for response & cookies on success
             $err_msg = '';      // error message on failure

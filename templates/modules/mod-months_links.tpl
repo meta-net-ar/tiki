@@ -27,25 +27,25 @@
         {/if}
         {if $year_number == $year_expanded }
             {$i=$i+1}
-            <li class='archivedate expanded' id='ml-li-{$module_id}-{$i}' >
+            <li class='archivedate expanded ps-0' id='ml-li-{$module_id}-{$i}' >
                 <a class="toggle" href="javascript:void();" >
                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >○</span>
                 </a>
                 <a class="linkmodule" href="javascript:void();">{$year_number}</a>
                 <span class="post-count badge bg-secondary" dir="ltr">{$year_data.count}</span>
-                <ul id='ml-sub-{$module_id}-{$i}' >
+                <ul class="list-unstyled ps-0" id='ml-sub-{$module_id}-{$i}' >
                     {foreach from=$year_data.monthlist key=month_name item=month_data}
                         {if $month_name == $month_expanded }
                             {$i=$i+1}
-                            <li class='archivedate expanded' id='ml-{$module_id}-{$i}' >
+                            <li class='archivedate expanded ps-1' id='ml-{$module_id}-{$i}' >
                                 <a class="toggle" href="javascript:mlchange('{$module_id}-{$i}')" >
                                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >▼</span>
                                 </a>
                                 <a class="linkmodule" href="{$month_data.link}">{$month_name}</a>
                                 <span class="post-count badge bg-secondary" dir="ltr">{$month_data.count}</span>
-                                <ul id='ml-sub-{$module_id}-{$i}' >
+                                <ul class="list-unstyled ps-0" id='ml-sub-{$module_id}-{$i}' >
                                     {foreach from=$month_data.postlist key=articleId item=title}
-                                        <li class='archivedate collapsed' >
+                                        <li class='archivedate collapsed ps-2' >
                                             <a class="linkmodule" href="{$itemlink}{$articleId}">{$title}</a>
                                         </li>
                                     {/foreach}
@@ -53,15 +53,15 @@
                             </li>
                         {else}
                             {$i=$i+1}
-                            <li class='archivedate collapsed' id='ml-{$module_id}-{$i}' >
+                            <li class='archivedate collapsed ps-1' id='ml-{$module_id}-{$i}' >
                                 <a class="toggle" href="javascript:mlchange('{$module_id}-{$i}')" >
                                     <span class="zippy " id='ml-icon-{$module_id}-{$i}'>►</span>
                                 </a>
                                 <a class="linkmodule" href="{$month_data.link}">{$month_name}</a>
                                 <span class="post-count badge bg-secondary" dir="ltr">{$month_data.count}</span>
-                                <ul id='ml-sub-{$module_id}-{$i}' >
+                                <ul class="list-unstyled ps-0" id='ml-sub-{$module_id}-{$i}' >
                                     {foreach from=$month_data.postlist key=articleId item=title}
-                                        <li class='archivedate collapsed' >
+                                        <li class='archivedate collapsed ps-2' >
                                             <a class="linkmodule" href="{$itemlink}{$articleId}">{$title}</a>
                                         </li>
                                     {/foreach}
@@ -73,7 +73,7 @@
             </li>
         {else}
             {$i=$i+1}
-            <li class='archivedate collapsed' id='ml-li-{$module_id}-{$i}' >
+            <li class='archivedate collapsed ps-1' id='ml-li-{$module_id}-{$i}' >
                 <a class="toggle" href="{$year_data.link}" >
                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >●</span>
                 </a>

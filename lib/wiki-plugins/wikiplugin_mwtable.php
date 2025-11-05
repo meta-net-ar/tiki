@@ -57,12 +57,12 @@ function wikiplugin_mwtable($data, $params)
 
     // Parse the parameters
     extract($params, EXTR_SKIP);
-    if (isset($fancy) and $fancy == "true") {
+    if ($fancy == "true") {
         $fancy = true;
     } else {
         $fancy = false;
     }
-    if (isset($wiki_classes) and $wiki_classes == "false") {
+    if ($wiki_classes == "false") {
         $wiki_classes = false;
     } else {
         $wiki_classes = true;

@@ -106,11 +106,6 @@ function wikiplugin_kaltura($data, $params)
 
     $instance++;
 
-    if (empty($params['id'])) {
-        $html = '<span class="alert-warning">' . tra('Media ID is required to display the video') . '</span>';
-        return $html;
-    }
-
     if (empty($params['player_id'])) {
         $params['player_id'] = $prefs['kaltura_kdpUIConf'];
     }

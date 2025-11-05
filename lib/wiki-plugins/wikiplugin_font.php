@@ -80,7 +80,7 @@ function wikiplugin_font($data, $params)
         $f = strtolower($f);
     }
 
-    $family = strtolower($params['family'] ?? '');
+    $family = strtolower($params['family']);
     $size = $params['size'];
 
     if ((string)(int)$size == $size and $size > 0) {
@@ -89,7 +89,7 @@ function wikiplugin_font($data, $params)
 
     $style  = '';
     $style .= ($family and in_array($family, $all_fonts)) ? "font-family: $family; " : '';
-    $style .= (isset($params['size']) ? "font-size: $size;" : '');
+    $style .= (($params['size']) ? "font-size: $size;" : '');
 
     if ($style) {
         return "<$tag style=\"$style\">$data</$tag>";

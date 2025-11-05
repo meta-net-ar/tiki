@@ -38,12 +38,6 @@
 
 // ----------------------------- Overrides and adjustments ----------------------------- //
 
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
 /* Search preferences > button */
 .tiki-admin aside.admin-nav li form .my-1 .input-group {
     overflow: hidden;

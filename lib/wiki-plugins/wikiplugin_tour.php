@@ -231,7 +231,7 @@ function wikiplugin_tour($data, $params)
         $_SESSION[$TOUR_STEPS] = [];
     }
 
-    $step = array_filter($params);
+    $step = $params;
     $content = TikiLib::lib('parser')->parse_data($data);
     $step['content'] = $content;
     $_SESSION[$TOUR_STEPS] = array_merge($_SESSION[$TOUR_STEPS] ?? [], [$step]);

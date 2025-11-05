@@ -720,7 +720,6 @@ if ($install_step == '2') {
         $im = @imagecreate(110, 20);
         if ($im) {
                 $smarty->assign('sample_image', 'y');
-                imagedestroy($im);
         } else {
                 $smarty->assign('sample_image', 'n');
         }

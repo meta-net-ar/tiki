@@ -5,7 +5,7 @@
     <div id="weburls" style="display:none;position:absolute;right:-10px;top:-50px;z-index:1;"
             class="card">
         <div class="card-header">
-            <h3 class="tiki-card-header-title" id="urltop">{tr}Some useful URLs{/tr}</h3>
+            <h3 class="tiki-card-header-title fs-5 pt-0 m-0" id="urltop">{tr}Some useful URLs{/tr}</h3>
             <div class="text-end">
                 <a href="#" class="hide_weburls" style="font-size: 85%" onclick="flip('weburls');return false;" role="button">{tr}Hide Quick URLs{/tr}</a>
             </div>

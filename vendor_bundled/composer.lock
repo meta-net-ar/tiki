@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27e29f0ca322ceace3f65122724a55eb",
+    "content-hash": "38351e87463d7fc688fb1ff3128a12a9",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3009,12 +3009,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "49d6f048b2dc5758853cb4d548edc5b39645d4ea"
+                "reference": "9d9085484964cd51a52eb871af01fe02100eb3c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/49d6f048b2dc5758853cb4d548edc5b39645d4ea",
-                "reference": "49d6f048b2dc5758853cb4d548edc5b39645d4ea",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/9d9085484964cd51a52eb871af01fe02100eb3c7",
+                "reference": "9d9085484964cd51a52eb871af01fe02100eb3c7",
                 "shasum": ""
             },
             "require": {
@@ -3090,7 +3090,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2025-09-24T14:08:35+00:00"
+            "time": "2025-10-14T14:10:55+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -8548,17 +8548,13 @@
                 "php": "^7.1|^8.0"
             },
             "require-dev": {
-                "symfony/phpunit-bridge": "^5.4@dev"
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^7.5.15|^8.5|^9.0"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.4.x-dev"
-                }
-            },
             "autoload": {
-                "psr-0": {
-                    "Pimple": "src/"
+                "psr-4": {
+                    "PragmaRX\\Google2FA\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -8567,15 +8563,17 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Antonio Carlos Ribeiro",
+                    "email": "acr@antoniocarlosribeiro.com",
+                    "role": "Creator & Designer"
                 }
             ],
-            "description": "Pimple, a simple Dependency Injection Container",
-            "homepage": "https://pimple.symfony.com",
+            "description": "A One Time Password Authentication package, compatible with Google Authenticator.",
             "keywords": [
-                "container",
-                "dependency injection"
+                "2fa",
+                "Authentication",
+                "Two Factor Authentication",
+                "google2fa"
             ],
             "support": {
                 "issues": "https://github.com/antonioribeiro/google2fa/issues",

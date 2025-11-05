@@ -217,16 +217,28 @@ class WikiRenderer
             $links = [];
 
             $wikilib = TikiLib::lib('wiki');
-            $selfHref = $wikilib->sefurl($this->page);
+            global $base_url;
+            $base = rtrim((string) $base_url, '/');
 
-            $links[] = '<link rel="alternate" href="' . $selfHref . '" hreflang="' . $this->info['lang'] . '">';
+            $selfHref = $wikilib->sefurl($this->page);
+            if (! preg_match('~^https?://~i', $selfHref)) {
+                $selfHref = $base . '/' . ltrim($selfHref, '/');
+            }
+
+            $links[] = '<link rel="alternate" hreflang="' . htmlspecialchars(strtolower($this->info['lang']), ENT_QUOTES, 'UTF-8') . '" href="' . htmlspecialchars($selfHref, ENT_QUOTES, 'UTF-8') . '">';
 
             foreach ($this->trads as $trad) {
                 if ($trad['lang'] != $this->info['lang']) {
-                    $links[] = '<link rel="alternate" href="tiki-index.php?page=' . $trad['objName'] . '" hreflang="' . $trad['lang'] . '">';
+                    $tradHref = $wikilib->sefurl($trad['objName']);
+                    if (! preg_match('~^https?://~i', $tradHref)) {
+                        $tradHref = $base . '/' . ltrim($tradHref, '/');
+                    }
+                    $links[] = '<link rel="alternate" hreflang="' . htmlspecialchars(strtolower($trad['lang']), ENT_QUOTES, 'UTF-8') . '" href="' . htmlspecialchars($tradHref, ENT_QUOTES, 'UTF-8') . '">';
                 }
             }
-            $headerlib->add_rawhtml(implode("\n", $links) . "\n");
+            if (! empty($links)) {
+                $headerlib->add_rawhtml(implode("\n", $links) . "\n");
+            }
         }
 
         if ($prefs['feature_machine_translation'] == 'y' && $prefs['lang_machine_translate_wiki'] == 'y' && ! empty($this->info['lang'])) {

@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3 class="tiki-card-header-title">{$params.title}</h3>
+        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{$params.title}</h3>
     </div>
     <div class="card-body">
         <form id='{$params.id}'>
@@ -83,14 +83,14 @@
                                     {$icon = 'help'}
                                 {/if}
 
-                                {if $comments[$stamp][$voter] eq ""}
+                                {if empty($comments[$stamp][$voter])}
                                     {$voteComment = "{tr}No Comment{/tr}"}
                                 {else}
                                     {$voteComment = $comments[$stamp][$voter]}
                                 {/if}
                                 <td class='align-middle flex-align-center {$class}'>
                                     {icon name=$icon size=2 iclass="tips $iconClass" ititle="{tr}Vote value{/tr} $vote:$voteComment "  }
-                                    <input type='hidden' name='dates_{$stamp}_{$voter}' value='{$vote}' class='conveneUserVote' data-voter="{$voter}" data-date="{$stamp}" data-comment="{$comments[$stamp][$voter]}">
+                                    <input type='hidden' name='dates_{$stamp}_{$voter}' value='{$vote}' class='conveneUserVote' data-voter="{$voter}" data-date="{$stamp}" data-comment="{$voteComment}">
                                 </td>
                             {/foreach}
                         </tr>

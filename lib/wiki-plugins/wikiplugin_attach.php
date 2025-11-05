@@ -183,8 +183,12 @@ function wikiplugin_attach($data, $params)
         if ($section == 'trackers') {
             $trklib = TikiLib::lib('trk');
             $atts_item_name = $_REQUEST["itemId"];
-            $tracker_info = $trklib->get_tracker($atts_item_name);
-            $tracker_options = $trklib->get_tracker_options($atts_item_name);
+
+            // First get the tracker ID for this item
+            $trackerId = $trklib->get_tracker_for_item($atts_item_name);
+            $tracker_info = $trklib->get_tracker($trackerId);
+            $tracker_options = $trklib->get_tracker_options($trackerId);
+
             if (! is_array($tracker_info) || ! is_array($tracker_options)) {
                 throw new Exception(tr('No tracker found matching id %0', $atts_item_name));
             }

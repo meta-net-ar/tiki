@@ -13628,7 +13628,7 @@ $lang_current = array(
 "Please see the <a class='alert-link' target='tikihelp' href='http://doc.tiki.org/Features'>evaluation of each feature</a> on Tiki's developer site" => "Veuillez consulter l'<a class='alert-link' target='tikihelp' href='http://doc.tiki.org/Features'>évaluation de chaque fonctionnalité</a> sur le site des développeurs de Tiki",
 "Global features" => "Fonctionnalités globales",
 "Main features" => "Fonctionnalités principales",
-"Secondary features" => "Fonctionnalités sécondaires",
+"Secondary features" => "Fonctionnalités secondaires",
 "Administrative features" => "Fonctionnalités Administratives",
 "Watches" => "Surveillances",
 "Object Maintainers and Freshness" => "Responsables d'objets et fraîcheur",
@@ -22295,6 +22295,13 @@ $lang_current = array(
 "Content Features" => "Fonctionnalités de contenu",
 "Search articles, blogs, wiki pages, trackers, and other user data input related content" => "Rechercher des articles, blogs, pages wiki, trackers et autres contenus liés aux saisies de données utilisateur",
 "Search Pages" => "Rechercher des pages",
+"The detected timezone is %0, but your configured timezone is set to %1." => "Le fuseau horaire détecté est %0, mais votre fuseau horaire configuré est défini sur %1.",
+"The detected timezone is %0, and you have not configured a preferred timezone yet." => "Le fuseau horaire détecté est %0, et vous n'avez pas encore configuré de fuseau horaire préféré.",
+"Only change timezone to %0 until (your next login?)" => "Changer uniquement le fuseau horaire en %0 jusqu'à (votre prochaine connexion?)",
+"Logged in as:" => "Connecté en tant que:",
+"Navigation and related functionality and content" => "Navigation et fonctionnalités et contenu associés",
+"More content and functionality (left side)" => "Plus de contenu et de fonctionnalités (côté gauche)",
+"Keep login box visible" => "Garder la zone de connexion visible",
 );
 $lang = array_replace($lang, $lang_current);
 

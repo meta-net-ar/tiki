@@ -4,14 +4,14 @@
   "description": "Sass (scss) build system for themes.  Note that for themes in _custom to actually work, you also need the main vite js build to run to copy the assets (images, fonts, etc.)",
   "type": "module",
   "scriptsComments": {
-    "build/watch": "The flags --silence-deprecation=color-functions,global-builtin,mixed-decls,import are there because as of 2025-06-09, bootstrap 5.3.6 hasn't fixed everything.  See https://github.com/orgs/twbs/discussions/41370.  In addition, our own code requires ignoring @import deprecation, because we can't run px sass-migrator module --migrate-deps --load-path=../../templates --load-path=../../themes ../../themes/**/**/*.scss on our own codebase until bootstrap is fixed.  benoitg - 2025-06-09"
+    "build/watch": "The flags --silence-deprecation=color-functions,global-builtin,import are there because as of 2025-06-09, bootstrap 5.3.6 hasn't fixed everything.  See https://github.com/orgs/twbs/discussions/41370.  In addition, our own code requires ignoring @import deprecation, because we can't run px sass-migrator module --migrate-deps --load-path=../../templates --load-path=../../themes ../../themes/**/**/*.scss on our own codebase until bootstrap is fixed.  benoitg - 2025-06-09 EDIT Jomagene 2025-10-20: The 'mixed-decls' flag was removed as it became obsolete in newer Sass compiler versions (post v1.92.0) and was causing a new build warning."
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "node scripts/check_custom.js",
     "prewatch": "node scripts/check_custom.js",
-    "build": "sass --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,mixed-decls,import",
-    "watch": "sass --watch --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,mixed-decls,import",
+    "build": "sass --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,import",
+    "watch": "sass --watch --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,import",
     "clean": "git clean -f -x \"../../themes/**/*.css\" \"../../themes/**/*.css.map\" \"../../public/generated/_custom/**/*.css\" \"../../public/generated/_custom/**/*.css.map\""
   },
   "author": "",

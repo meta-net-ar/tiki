@@ -19,6 +19,8 @@ $inputConfiguration = [
         'twoFactorForm'        => 'string',         //post
         'clearmenucache'       => 'bool',           //post
         'user'                 => 'username',       //post
+        'create2FaCodeNormalLogin' => 'alpha',      //get
+        'tiki_username'        => 'username',       //get
         ],
     ],
 ];

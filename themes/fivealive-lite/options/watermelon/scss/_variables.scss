@@ -34,7 +34,7 @@ $prefix: bs-;
 $body-bg:                   $white;  // default
 $body-color: #212529;
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color: #E11436;
@@ -56,9 +56,9 @@ $table-hover-bg: #f5f5f5;
 
 // Navs
 $nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #ffdace; // Same as $input-bg;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
+$tiki-nav-tabs-link-bg: #ffdace; // Same as $input-bg;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
 
 // Navbar
 $navbar-dark-color:                 rgba($white, .85); // !default;
@@ -103,10 +103,15 @@ $code-color:                       $body-color; //  $pink;  // default
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
-$side-column-heading-color: #6c0c02;
-$footer_liner-card-inner-border: #b51360;
-$footer-accent-color: #b51360;
-$tiki-footer-border-color: $footer-accent-color;
+$tiki-side-column-card-header-color: #6c0c02;
+$tiki-footer_liner-card-inner-border: #b51360;
+$tiki-footer-accent-color: #b51360;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
+
+$tiki-dark-footer-card-header-border-color: #f05670;
+$tiki-dark-footer-link-color: #f05670;
+$tiki-dark-footer-link-hover-color: #f6768c;
+
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -115,6 +120,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #f9f9f9;
     --tiki-top-text-color: #f9f9f9;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -124,9 +131,11 @@ $tiki-footer-border-color: $footer-accent-color;
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: #3c4822;
-    --tiki-topbar-color: #212121;
+    --tiki-topbar-color: #f9f9f9;
     --tiki-topbar-hover-color: #f2f2f2;
     --tiki-topbar-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
         --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;

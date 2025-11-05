@@ -23,7 +23,6 @@ function wikiplugin_memberpayment_info()
                 'description' => tra('Name of the group for which the subscription should be added or extended.'),
                 'since' => '5.0',
                 'filter' => 'groupname',
-                'default' => '',
             ],
             'price' => [
                 'required' => true,
@@ -185,13 +184,9 @@ function wikiplugin_memberpayment($data, $params, $offset)
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
-    if (empty($params['price']) || empty($params['group'])) {
-        return WikiParser_PluginOutput::error(tr('Plugin Memberpayment error'), tr('Params group and price are required'));
-    }
-
     $iPluginMemberpayment++;
     $smarty->assign('iPluginMemberpayment', $iPluginMemberpayment);
-    $smarty->assign('returnurl', ! empty($params['returnurl']) ? $params['returnurl'] : '');
+    $smarty->assign('returnurl', $params['returnurl']);
     $params['price'] = (float)$params['price'];
     $default = [ 'inputtitle' => '', 'howtitle' => '', 'paytitle' => ''];
     $params = array_merge($default, $params);
@@ -219,7 +214,7 @@ function wikiplugin_memberpayment($data, $params, $offset)
         if ($post) {
             $periods = (int) $_POST['wp_member_periods'];
             $freeperiods = 0;
-            if ($periods && ! empty($params['freeperiods'])) {
+            if ($periods && $params['freeperiods']) {
                 // give free periods (purchase of at least 1 full real period required)
                 $freeperiods = (int) $params['freeperiods'];
                 $periods += $freeperiods;
@@ -319,13 +314,13 @@ function wikiplugin_memberpayment($data, $params, $offset)
         $smarty->assign('wp_member_title', $params['inputtitle']);
         $smarty->assign('wp_member_titleonly', $params['inputtitleonly']);
         $smarty->assign('wp_member_paymentid', 0);
-        if (isset($params['currentuser']) && $params['currentuser'] == 'y' && ! empty($params['preventdoublerequest']) && $params['preventdoublerequest'] == 'y') {
+        if ($params['currentuser'] == 'y' && $params['preventdoublerequest'] == 'y') {
             $attname = 'tiki.memberextend.' . $info['id'];
             $attributes = $attributelib->get_attributes('user', $user);
             if (isset($attributes[$attname])) {
                 $smarty->assign('wp_member_requestpending', 'y');
                 $smarty->assign('wp_member_paymentid', $attributes[$attname]);
-                if (! empty($params['paytitle'])) {
+                if ($params['paytitle']) {
                     $smarty->assign('wp_member_title', $params['paytitle']);
                     $smarty->assign('wp_member_titleonly', $params['paytitleonly']);
                 }
@@ -339,7 +334,7 @@ function wikiplugin_memberpayment($data, $params, $offset)
             $users = array_filter($users);
             $smarty->assign('wp_member_users', count($users));
 
-            if (! empty($params['preventdoublerequest']) && $params['preventdoublerequest'] == 'y') {
+            if ($params['preventdoublerequest'] == 'y') {
                 foreach ($users as $u) {
                     $attname = 'tiki.memberextend.' . $info['id'];
                     $attributes = $attributelib->get_attributes('user', $u);

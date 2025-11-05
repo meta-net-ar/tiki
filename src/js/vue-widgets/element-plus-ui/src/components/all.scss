@@ -1,6 +1,6 @@
 @use 'element-plus/theme-chalk/el-scrollbar.css';
 
-:host {
+:host, :root {
     --el-border-color: var(--bs-border-color); // added by g_c-l
     --el-color-primary: var(--bs-primary);
 //    --el-border-width: var(--bs-border-width); Not working

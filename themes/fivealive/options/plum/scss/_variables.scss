@@ -1,10 +1,11 @@
-// Custom styles for the FiveAlive Plum option theme.
+// Custom variables for the Plum theme option of the FiveAlive and FiveAlive-lite themes
 
 @import "../../../scss/_variables.scss";
 
 $tiki-top-bg: linear-gradient(to right, #300149 0%, #15001F 100%);
 
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
+
 // Color system
 
 $red-300: tint-color($red, 40%);  // default
@@ -49,11 +50,6 @@ $link-hover-color: #7a04b5;
 $link-shade-percentage:                   20%;  // default
 
 // Navs
-$nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #f4e1ff; // Same as $input-bg;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #15001f; // Same as $dropdown-link-hover-bg;
-
 // Navbars
 
 // Typography
@@ -108,22 +104,28 @@ $pagination-disabled-border-color: #dddddd;
 
 // Cards
 $card-border-color: #49006c;
-// $card-title-color: $body-color;
 $card-cap-color: $white;
 $card-cap-bg: $tiki-top-bg; // Property is background-color so this won't work.
 
 // Code
-
-$code-color:                        $body-color; // $pink; default
+$code-color:                       $body-color; // default
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
+// Needed for footer and modules in _selectors-for-options.scss
 $tiki-footer_liner-card-inner-border: #7a04b5;
 $tiki-footer-accent-color: #7a04b5;
 $tiki-footer-btn-secondary-color: #f4f4f4;
 $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
 $tiki-postbody-title-card-title-color: #fff;
+
+// Footer colors in light and dark mode
+$tiki-dark-footer-card-header-bg: $tiki-top-bg;
+$tiki-dark-footer-card-header-title-color: #fff !important;
+$tiki-dark-footer-card-border-color: rgba(#fff, .45);
+$tiki-dark-footer-link-color: #C85FFC;
+$tiki-dark-footer-link-hover-color: #cf7bf8;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -132,6 +134,8 @@ $tiki-postbody-title-card-title-color: #fff;
     --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -151,10 +155,12 @@ $tiki-postbody-title-card-title-color: #fff;
 }
 
 @mixin top-nav-dark {
-    --tiki-top-bg: #{$tiki-top-bg}; // linear-gradient(to right, #300149 0%, #15001F 100%);
+    --tiki-top-bg: #{$tiki-top-bg};
     --tiki-top-color: #f9f9f9;
     --tiki-top-hover-color: #f2f2f2;
     --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
 }
 

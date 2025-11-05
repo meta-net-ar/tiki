@@ -23,7 +23,6 @@ function wikiplugin_mail_info()
                 'description' => tra('Limit the list of groups to the groups including each group'),
                 'filter' => 'groupname',
                 'since' => '5.0',
-                'default' => '',
                 'separator' => ':',
             ],
             'showgroupdd' => [

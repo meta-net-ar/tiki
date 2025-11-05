@@ -22,7 +22,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Numeric value representing the tracker ID'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker',
             ],
             'title' => [
@@ -42,7 +41,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Tracker Field ID containing the item color(that field must contains valid css color like : red, yellow,#FAEBD7,BlanchedAlmond , ... .'),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -53,7 +51,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra("Tracker Field ID containing the type of item. The type of the item can be 'box' (default), 'point', 'range', or 'background'. Types 'box' and 'point' need a start date, the types 'range' and 'background' needs both a start and end date."),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -89,7 +86,6 @@ function wikiplugin_trackertimeline_info()
                     datetime/jscalendar field.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -101,7 +97,6 @@ function wikiplugin_trackertimeline_info()
                     displayed on the same row.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -114,7 +109,6 @@ function wikiplugin_trackertimeline_info()
                     Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'upper' => [
@@ -125,7 +119,6 @@ function wikiplugin_trackertimeline_info()
                     Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'max' => [
@@ -136,7 +129,6 @@ function wikiplugin_trackertimeline_info()
                     in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '29.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'min' => [
@@ -147,7 +139,6 @@ function wikiplugin_trackertimeline_info()
                     in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '29.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'scale' => [
@@ -157,7 +148,6 @@ function wikiplugin_trackertimeline_info()
                     'second', 'minute', 'hour', 'weekday', 'week', 'day', 'month', 'year'"),
                 'since' => '29.0',
                 'filter' => 'alpha',
-                'default' => 'month',
             ],
             'step' => [
                 'required' => false,
@@ -165,7 +155,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra("Set a fixed step size for the time axis. Only applicable when used together with scale parameter. Choose for example 1, 2, 5, or 10"),
                 'since' => '29.0',
                 'filter' => 'number',
-                'default' => '1',
             ],
             'height' => [
                 'required' => false,
@@ -176,7 +165,6 @@ function wikiplugin_trackertimeline_info()
                 ),
                 'since' => '9.0',
                 'filter' => 'text',
-                'default' => ''
             ],
             'orientation' => [
                 'required' => false,
@@ -187,7 +175,6 @@ function wikiplugin_trackertimeline_info()
                 ),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => 'bottom'
             ],
             'band2_height' => [
                 'required' => false,
@@ -219,7 +206,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Tracker Field ID containing the page name for item details.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -230,7 +216,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Tracker Field ID containing the image file.'),
                 'since' => '7.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -247,18 +232,12 @@ function wikiplugin_trackertimeline($data, $params)
     static $instance = 0;
     $instance++;
 
-    if (! isset($params['tracker'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
-    }
-
-    $default = ['height' => null, 'step' => '2'];
-    $params = array_merge($default, $params);
     $formats = ['hour' => 'H:i', 'day' => 'jS', 'week' => 'jS', 'month' => 'm', 'year' => 'y'];
     $max = 0;
     $min = 0;
     $step = ! empty($params['step']) ? ($params['step']) : '1';
-    $start = isset($params['lower']) ? strtotime($params['lower']) : null;
-    $end = isset($params['upper']) ? strtotime($params['upper']) : null;
+    $start = ! is_null($params['lower']) ? strtotime($params['lower']) : null;
+    $end = ! is_null($params['upper']) ? strtotime($params['upper']) : null;
 
     if ($start && $end) {
         $size = $end - $start;
@@ -267,29 +246,29 @@ function wikiplugin_trackertimeline($data, $params)
         }
     }
 
-    if (isset($params['max'])) {
+    if (! is_null($params['max'])) {
         $fieldIds[ $params['max'] ] = 'max';
         $max = strtotime($params['max']);
     }
 
-    if (isset($params['min'])) {
+    if (! is_null($params['min'])) {
         $fieldIds[ $params['min'] ] = 'min';
         $min = strtotime($params['min']);
     }
 
-    if (isset($params['orientation'])) {
+    if (! is_null($params['orientation'])) {
         $fieldIds[ $params['orientation'] ] = 'orientation';
     }
 
-    if (isset($params['scale'])) {
+    if (! is_null($params['scale'])) {
         $fieldIds[ $params['scale'] ] = 'scale';
     }
 
-    if (isset($params['step'])) {
+    if (! is_null($params['step'])) {
         $fieldIds[ $params['step'] ] = 'step';
     }
 
-    if (isset($params['type'])) {
+    if (! is_null($params['type'])) {
         $fieldIds[ $params['type'] ] = 'type';
     }
 
@@ -299,23 +278,23 @@ function wikiplugin_trackertimeline($data, $params)
         $params['start'] => 'start',
     ];
 
-    if (isset($params['end'])) {
+    if (! is_null($params['end'])) {
         $fieldIds[ $params['end'] ] = 'end';
     }
 
-    if (isset($params['link_page'])) {
+    if (! is_null($params['link_page'])) {
         $fieldIds[ $params['link_page'] ] = 'link_page';
     }
 
-    if (! empty($params['image_field'])) {
+    if (! is_null($params['image_field'])) {
         $fieldIds[ $params['image_field'] ] = 'image';
     }
 
-    if (isset($params['color'])) {
+    if (! is_null($params['color'])) {
         $fieldIds[ $params['color'] ] = 'color';
     }
 
-    if (isset($params['group'])) {
+    if (! is_null($params['group'])) {
         $fieldIds[ $params['group'] ] = 'group';
     }
 
@@ -416,13 +395,13 @@ function wikiplugin_trackertimeline($data, $params)
         ];
     }
     $js .= 'var data = ' . json_encode($events) . "; const options = {}; console.log(data);";
-    $js .= ! empty($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
-    $js .= ! empty($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
-    $js .= ! empty($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
+    $js .= ! is_null($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
+    $js .= ! is_null($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
+    $js .= ! is_null($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
     $js .= ! empty($max) ? "let max = new Date(" . $max * 1000 . "); options.max = max;" : "";
     $js .= ! empty($min) ? "let min = new Date(" . $min * 1000 . "); options.min = min;" : "";
-    $js .= ! empty($params['scale']) ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
-    $js .= ! empty($params['orientation']) ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
+    $js .= ! is_null($params['scale']) ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
+    $js .= ! is_null($params['orientation']) ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
     $codeHandleGroupParameter = "const removeDuplicationInGroup = new Set(groups);
         let arrayOfGroupWithoutDuplication = [ ...removeDuplicationInGroup ];
         let groupsOption = [];\n
@@ -430,10 +409,10 @@ function wikiplugin_trackertimeline($data, $params)
             groupsOption.push({id: arrayOfGroupWithoutDuplication[i], content: arrayOfGroupWithoutDuplication[i]})
         };\n;
     ";
-    $js .= ! empty($params['group']) ? "var groups = " . json_encode($groups) . ";console.log('franck'); console.log('$groups');\n" . $codeHandleGroupParameter : "";
+    $js .= ! is_null($params['group']) ? "var groups = " . json_encode($groups) . ";console.log('franck'); console.log('$groups');\n" . $codeHandleGroupParameter : "";
     $js .= "const container = document.getElementById('container-timeline');\n";
     $js .= "const items = new DataSet(data);";
-    $js .= ! empty($params['group']) ? "const timeline = new Timeline(container, items, groupsOption, options);" : "const timeline = new Timeline(container, items, options);";
+    $js .= ! is_null($params['group']) ? "const timeline = new Timeline(container, items, groupsOption, options);" : "const timeline = new Timeline(container, items, options);";
     $headerlib->add_js_module('import { Timeline, DataSet } from "timeline";' . $js);
     $smarty->assign('css', $css);
     return $smarty->fetch('wiki-plugins/wikiplugin_trackertimeline.tpl');

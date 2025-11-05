@@ -84,7 +84,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
             $sOutput = $this->generateFieldsExport($selectedFields);
         } elseif (
             // One of the variables below, not two or more, plus $info set
-            $this->exactlyOneSet([[$module, $plugin, $preference, $trackerfield]]) && isset($info)
+            $this->exactlyOneSet([[$module, $plugin, $preference, $trackerfield]]) && $info
         ) {
             $aPrincipalField = ['field' => 'plugin', 'name' => 'Plugin'];
             $helppath = $helpurl . $aPrincipalField['name'];
@@ -309,10 +309,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
                             } else {
                                 $rows .= '<code>' . $paramname . '</code>' ;
                             }
-                            if (
-                                isset($params['showparamtype']) && $params['showparamtype'] === 'y'
-                                && ! empty($paraminfo['doctype'])
-                            ) {
+                            if ($params['showparamtype'] === 'y' && ! empty($paraminfo['doctype'])) {
                                 $rows .= '<br /><small>(' . $paraminfo['doctype'] . ')</small>';
                             }
                             $rows .= '</td>';
@@ -758,7 +755,7 @@ function wikiplugin_tikidocfromcode_info()
                     Ignored when %0singletitle%1 is set to %0top%1 or %0none%1.', '<code>', '</code>'),
                    'filter' => 'text',
                 'accepted' => tra('One or more of: description | parameters | paraminfo'),
-                'default' => 'description | parameters | paraminfo ',
+                'default' => 'description|parameters|paraminfo',
                 'since' => '27',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -811,7 +808,7 @@ function wikiplugin_tikidocfromcode_info()
                 'name' => tra('Preferences export'),
                 'description' => tr('Default preferences export with columns name, description, location or list more separated by %0|%1.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => 'name | description | locations',
+                'default' => '',
                 'since' => '27',
             ],
             'type' => [

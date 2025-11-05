@@ -14,7 +14,7 @@
     {/remarksbox}
 {/if}
 
-<div class="wiki-help-masonry">
+<div class="wiki-help-grid">
     {if (!isset($wysiwyg) or $wysiwyg ne 'y') or (isset($wysiwyg) and $wysiwyg eq 'y' and $prefs.wysiwyg_wiki_parsed eq 'y')}
         <div class="help-item">{icon name='bold'} <strong>{tr}Bold text{/tr}</strong> &nbsp;&nbsp;&nbsp; __{tr}text{/tr}__</div>
         <div class="help-item">{icon name='italic'} <strong>{tr}Italic text{/tr}</strong> &nbsp;&nbsp;&nbsp; 2 {tr}single quotes{/tr} ('). &nbsp;&nbsp;&nbsp; '"{tr}text{/tr}"'</div>

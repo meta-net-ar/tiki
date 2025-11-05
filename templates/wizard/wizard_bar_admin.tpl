@@ -30,7 +30,7 @@
     </div>
 </div>
 {/if}
-<div class="row">
+<div class="row mb-3">
     <div class="col-sm-3 offset-sm-9 text-end">
         <input type="hidden" name="url" value="{$homepageUrl}">
         <input type="hidden" name="wizard_step" value="{$wizard_step}">
@@ -51,15 +51,15 @@
         {if !isset($firstWizardPage)}
             <input type="submit" class="btn btn-outline-dark" name="back" value="{tr}Back{/tr}" />
         {/if}
-            <input type="submit" class="btn btn-dark" style="{if $useDefaultPrefs}display:none{/if}" name="{if isset($firstWizardPage)}use-default-prefs{else}continue{/if}" value="{if isset($lastWizardPage)}{tr}Finish{/tr}{elseif isset($firstWizardPage)}{tr}Start the Wizardry{/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}"/>
+            <input type="submit" class="btn btn-primary" style="{if $useDefaultPrefs}display:none{/if}" name="{if isset($firstWizardPage)}use-default-prefs{else}continue{/if}" value="{if isset($lastWizardPage)}{tr}Finish_C(imperative){/tr}{elseif isset($firstWizardPage)}{tr}Start the Wizardry{/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}"/>
+            <input type="submit" class="btn btn-outline-danger" name="close" value="{tr}Close{/tr}"/>
         </div>
-            <input type="submit" class="btn btn-outline-danger btn-sm" name="close" value="{tr}Close{/tr}"/>
     </div>
 </div>
 <div class="row">
     <div class="col-sm-12 text-center">
         {if !isset($showWizardPageTitle) or $showWizardPageTitle neq 'y'}
-            <h1 class="adminWizardPageTitle">{$pageTitle}</h1>
+            <h1 class="adminWizardPageTitle text-center">{$pageTitle}</h1>
             {$showWizardPageTitle="y" scope="root"}
         {/if}
     </div>

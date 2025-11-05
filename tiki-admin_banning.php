@@ -11,16 +11,39 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save' => 'bool',           //post
-            'import' => 'bool',         //post
+            'save' => 'alpha',          //post
+            'import' => 'alpha',        //post
+            'del' => 'alpha',           //post
+            'banId' => 'int',           //post
             'title' => 'text',          //post
+            'mode' => 'alpha',          //post
             'userreg' => 'text',        //post
             'ip1' => 'int',             //post
             'ip2' => 'int',             //post
             'ip3' => 'int',             //post
             'ip4' => 'int',             //post
-            'use_dates' => 'bool',      //post
+            'use_dates' => 'alpha',     //post
+            'date_fromMonth' => 'digits',   //post
+            'date_fromDay' => 'digits',     //post
+            'date_fromYear' => 'digits',    //post
+            'date_toMonth' => 'digits',     //post
+            'date_toDay' => 'digits',       //post
+            'date_toYear' => 'digits',      //post
             'message' => 'xss',         //post
+            'import_as_new' => 'alpha', //post
+            'export' => 'alpha',        //post
+            'max' => 'digits',          //post
+            'sort_mode' => 'alnumdash', //post
+            'offset' => 'digits',       //post
+            'find' => 'striptags',      //post
+            'mass_ban_ip' => 'striptags',           //get
+            'mass_ban_ip_actionlog' => 'striptags', //get
+            'mass_ban_ip_users' => 'striptags',     //get
+        ],
+        'staticKeyFiltersForArrays' => [
+            'delsec' => 'int',
+            'section' => 'alpha',
+            'multi_banned_ip' => 'alpha',
         ],
     ],
 ];

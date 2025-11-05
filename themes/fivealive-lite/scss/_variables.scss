@@ -35,7 +35,6 @@ $theme-colors: (
 $body-color: $gray-800; // !default
 $body-bg: #fff; // !default
 
-
 $body-secondary-color:      rgba($body-color, .75); // !default;
 $body-secondary-bg:         $gray-200; // !default;
 
@@ -106,7 +105,7 @@ $tiki-header-color: #ffffff !default;
 $tiki-topbar_container-bg: #28aae1 !default;
 $tiki-topbar-bg: #28a7de !default;
 $tiki-footer-color: #696969 !default;
-$tiki-footer-border-color: #28aae1 !default;
+$tiki-footer_liner-border-color: #28aae1 !default;
 // $tiki-footer-link-color: #a9a9a9 !default;
 $tiki-navbar-dark-navbar-nav-li-a-bg: #28aae1 !default;
 $tiki-postbody-title-bg: $tiki-header_outer-bg !default;

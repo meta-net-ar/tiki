@@ -11,16 +11,19 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-             'menuId'               => 'int',            //post
-             'name'                 => 'alpha',          //post
-             'find'                 => 'alpha',          //post
+             'menuId'               => 'int',            //get
+             'name'                 => 'text',           //post
+             'find'                 => 'striptags',      //post
              'offset'               => 'int',            //get
-             'sort_mode'            => 'alpha',          //get
+             'sort_mode'            => 'alnumdash',      //get
              'remove'               => 'int',            //post
-             'use_items_icons'      => 'bool',           //post
-             'parse'                => 'bool',           //get
-             'description'          => 'xss',            //get
-             'type'                 => 'string',         //get
+             'save'                 => 'alpha',          //post
+             'icon'                 => 'text',           //post
+             'use_items_icons'      => 'alpha',          //post
+             'parse'                => 'alpha',          //post
+             'description'          => 'xss',            //post
+             'type'                 => 'string',         //post
+             'reset'                => 'alpha',          //get
         ],
     ],
 ];

@@ -6,7 +6,7 @@
         </span>
     </div>
     <div class="flex-grow-1 ms-3">
-        {icon name="admin_textarea" size=3 iclass="adminWizardIconright"}
+        {icon name="admin_textarea" size=3 iclass="adminWizardIconright float-end ms-2"}
         <h4 class="mt-0 mb-4">{tr}Set up the text area environment (Editing and Plugins){/tr}</h4>
         <fieldset>
             <legend>{tr}General settings{/tr}</legend>

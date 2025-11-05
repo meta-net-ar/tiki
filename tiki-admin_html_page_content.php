@@ -17,10 +17,10 @@ $inputConfiguration = [
              'sort_mode'   => 'text',         //get
              'editmany'    => 'bool',         //post
              'save'        => 'bool',         //post
-             'content'     => 'text',         //get
+             'content'     => 'xss',          //post
              'zone'        => 'int',          //get
         ],
-        ],
+    ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/htmlpages/htmlpageslib.php');

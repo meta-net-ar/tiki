@@ -417,6 +417,17 @@
                         </div>
                     </div>
                 {/if}
+                {if $prefs.twoFactorAuth eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-md-3">{tr}2FA Grace Period{/tr}</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$twoFactorAuthGracePeriod|escape}">
+                            <div class="form-text">
+                                {tr}Number of days to allow users in this group to access the site without 2FA before forcing them to set it up.{/tr}
+                            </div>
+                        </div>
+                    </div>
+                {/if}
                 {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins'}
                     <div class="mb-3 row">
                         <label class="col-form-label col-md-3">{tr}User Choice{/tr}</label>

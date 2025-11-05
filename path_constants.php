@@ -163,6 +163,10 @@ const PRIMARY_AUTOLOAD_FILE_PATH = 'vendor_bundled/vendor/autoload.php';
 const PRIMARY_COMPOSERJSON_FILE_PATH = 'vendor_bundled/composer.json';
 const COMPOSERLOCK_FILE_PATH = 'vendor_bundled/composer.lock';
 
+const PRIMARY_PACKAGEJSON_FILE_PATH = 'package.json';
+const PRIMARY_PACKAGERLOCK_FILE_PATH = 'package-lock.json';
+const PRIMARY_JQUERYTIKI_PACKAGEJSON_FILE_PATH = 'src/js/jquery-tiki/package.json';
+const PRIMARY_EXTERNAL_PACKAGEJSON_FILE_PATH = 'src/js/common-externals/package.json';
 
 /* BEGIN - HTTP PATHS */
 const HTTP_PUBLIC_PATH = 'public';

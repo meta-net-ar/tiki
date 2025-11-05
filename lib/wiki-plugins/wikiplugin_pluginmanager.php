@@ -480,7 +480,7 @@ function wikiplugin_pluginmanager_info()
                 'name' => tra('Preferences export'),
                 'description' => tr('Default preferences export with columns name, description, location or list more separated by %0|%1.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => 'name | description | locations',
+                'default' => '',
                 'since' => '27',
             ],
             'type' => [

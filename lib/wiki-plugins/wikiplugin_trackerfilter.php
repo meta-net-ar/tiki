@@ -11,7 +11,7 @@ function wikiplugin_trackerfilter_info()
     $params = array_merge(
         [
             'filters' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Filters'),
                 'description' => tr(
                     'The list of fields that can be used as filters along with their formats.
@@ -33,7 +33,6 @@ function wikiplugin_trackerfilter_info()
                     . tr('Example:') . ' <code>2/d:4/r:5:(6:7)/sqlsearch</code>',
                 'since' => '1',
                 'doctype' => 'filter',
-                'default' => '',
                 'profile_reference' => 'tracker_field_string',
             ],
             'action' => [
@@ -159,7 +158,6 @@ function wikiplugin_trackerfilter_info()
                 'since' => '6.0' . tr(' - was %0 until 12.0', '<code>googlemapButtons</code>'),
                 'filter' => 'alpha',
                 'doctype' => 'show',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -286,7 +284,7 @@ function wikiplugin_trackerfilter($data, $params)
         unset($GLOBALS['_REQUEST']["tr_offset$iTrackerFilter"]);
     }
 
-    if (! isset($filters)) {
+    if (is_null($filters)) {
         if (empty($export_action)) {
             return tra('missing parameters') . ' filters';
         } else {
@@ -442,7 +440,7 @@ function wikiplugin_trackerfilter($data, $params)
     $smarty->assign_by_ref('noflipflop', $noflipflop);
     $smarty->assign_by_ref('dataRes', $dataRes);
 
-    if (isset($mapButtons)) {
+    if (! is_null($mapButtons)) {
         $smarty->assign('mapButtons', $mapButtons);
     }
 

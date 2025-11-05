@@ -51,7 +51,6 @@ function wikiplugin_trackeritemfield_info()
                 'name' => tra('Fields'),
                 'description' => tra('Colon-separated list of field IDs. Default is all fields'),
                 'since' => '2.0',
-                'default' => '',
                 'filter' => 'text',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
@@ -235,7 +234,7 @@ function wikiplugin_trackeritemfield($data, $params)
         return $dataelse;
     } elseif (empty($itemId)) {
         return tra('Incorrect param') . ': itemId';
-    } elseif (isset($fields)) {
+    } elseif (! is_null($fields)) {
         $all_fields = $trklib->list_tracker_fields($trackerId, 0, -1);
         $all_fields = $all_fields['data'];
         if (! empty($fields)) {
@@ -297,7 +296,7 @@ function wikiplugin_trackeritemfield($data, $params)
                 $handler = $trklib->get_field_handler($field, $info);
                 $field = array_merge($field, $handler->getFieldData());     // some fields (such as DropDown and Category need this)
                 $handler = $trklib->get_field_handler($field, $info);
-                if (isset($params['list_mode']) && ! empty($params['list_mode'])) {
+                if (! empty($params['list_mode'])) {
                     $list_mode = $params['list_mode'];
                     $out = $handler->renderOutput(['list_mode' => $list_mode]);
                 } else {

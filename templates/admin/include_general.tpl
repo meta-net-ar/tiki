@@ -82,8 +82,9 @@
                         <input type="text" name="testMail" id="testMail" class="form-control">
                     </div>
                 </div>
-                {preference name=email_footer}
-                {preference name=mail_template_custom_text}
+                    {preference name=email_footer}
+                    {preference name=mail_template_custom_text}
+                    {preference name=email_to_tracker_mode}
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Newsletter{/tr}</legend>

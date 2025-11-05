@@ -16,6 +16,7 @@ $inputConfiguration = [
             'remove_type'                 => 'word',                //get
             'update_type'                 => 'bool',                //post
             'att_remove'                  => 'int',                 //post
+            'att_type'                    => 'text',                //get
         ],
         'staticKeyFiltersForArrays'                => [
             'type_array'                  => 'string',              //post

@@ -10,9 +10,9 @@
 <div id="module_{$moduleId}"
     class="card box-{$module_name} {if $module_decorations eq 'n'}no-decorations{/if} module" {if !empty($tpl_module_style) or $module_decorations eq 'n'}style="{$tpl_module_style}  {if $module_decorations eq 'n'}border-color: transparent !important; background: transparent;{/if} "{/if}>
    {* {if $module_decorations ne 'n'} *} {* Code updated so module title isn't affected by $module_decorations (actually it already wasn't).  *}
-        <div class="card-header" {if !empty($module_params.bgcolor)} style="background-color:{$module_params.bgcolor};"{/if} {if $module_decorations eq 'n'}style="border-color: transparent !important; background: transparent !important; padding-bottom: 0 !important;"{/if}>
+   <div class="card-header" {if !empty($module_params.bgcolor) || $module_decorations eq 'n'}style="{if !empty($module_params.bgcolor)}background-color:{$module_params.bgcolor};{/if}{if $module_decorations eq 'n'}border-color: transparent !important; background: transparent !important; padding-bottom: 0 !important;{/if}"{/if}>
             {if ($module_notitle ne 'y' && !empty($module_title)) || ($module_flip eq 'y') || $prefs.menus_items_icons eq 'y'}
-                <h3 class="{if $module_decorations eq 'n'}card-title{else}tiki-card-header-title{/if} h5 mb-0">
+                <h3 class="{if $module_decorations eq 'n'}card-title mb-0{else}tiki-card-header-title fs-5 pt-0 m-0{/if}">
                     {if $module_notitle ne 'y' && !empty($module_title)}
                         <span class="moduletitle">{$module_title}</span>
                     {/if}
@@ -27,7 +27,7 @@
                                         {icon name="remove"}
                                     </button>
                                 </form>
-                                <a href="#" title="{tr}Edit module{/tr}" class="btn-close" style="font-size: 16px" onclick="$(this).parents('.module').first().trigger('dblclick');" role="button">
+                                <a href="#" title="{tr}Edit module{/tr}" class="btn-close" onclick="$(this).parents('.module').first().trigger('dblclick');" role="button">
                                     {icon name="edit"}
                                 </a>
                             {/if}
@@ -76,7 +76,7 @@
              class="card-body{if !empty($module_params.class)} {$module_params.class}{/if}">
             {else}{* $module_nobox eq 'y' *}
             <div id="module_{$moduleId}" style="{$module_params.style}{$tpl_module_style}"
-                 class="module{if !empty($module_params.class)} {$module_params.class}{/if} box-{$module_name}">
+                 class="module{if !empty($module_params.class)} {$module_params.class}{/if} box-{$module_name} p-2">
                 <div id="mod-{$smarty.capture.name}">
                     {/if}{* close $module_nobox *}
                     {$module_content}
@@ -97,7 +97,7 @@
                                 type="submit"
                                 name="mc_up"
                                 value="{$moduleId}"
-                                class="tips btn btn-link"
+                                class="tips btn btn-link p-0"
                                 title=":{tr}Move up{/tr}"
                                 aria-label="{tr}Move up{/tr}"
                             >
@@ -107,7 +107,7 @@
                                 type="submit"
                                 name="mc_down"
                                 value="{$moduleId}"
-                                class="tips btn btn-link"
+                                class="tips btn btn-link p-0"
                                 title=":{tr}Move down{/tr}"
                                 aria-label="{tr}Move down{/tr}"
                             >
@@ -117,7 +117,7 @@
                                 type="submit"
                                 name="mc_move"
                                 value="{$moduleId}"
-                                class="tips btn btn-link"
+                                class="tips btn btn-link p-0"
                                 title=":{tr}Move to opposite side{/tr}"
                                 aria-label="{tr}Move to opposite side{/tr}"
                             >
@@ -148,7 +148,7 @@
                             type="submit"
                             name="mc_up"
                             value="{$moduleId}"
-                            class="tips btn btn-link"
+                            class="tips btn btn-link p-0"
                             title=":{tr}Move up{/tr}"
                             aria-label="{tr}Move up{/tr}"
                         >
@@ -158,7 +158,7 @@
                             type="submit"
                             name="mc_down"
                             value="{$moduleId}"
-                            class="tips btn btn-link"
+                            class="tips btn btn-link p-0"
                             title=":{tr}Move down{/tr}"
                             aria-label="{tr}Move down{/tr}"
                         >
@@ -168,7 +168,7 @@
                             type="submit"
                             name="mc_move"
                             value="{$moduleId}"
-                            class="tips btn btn-link"
+                            class="tips btn btn-link p-0"
                             title=":{tr}Move to opposite side{/tr}"
                             aria-label="{tr}Move to opposite side{/tr}"
                         >
@@ -178,7 +178,7 @@
                             type="submit"
                             name="mc_unassign"
                             value="{$moduleId}"
-                            class="tips btn btn-link"
+                            class="tips btn btn-link p-0"
                             title=":{tr}Unassign{/tr}"
                             aria-label="{tr}Unassign{/tr}"
                         >

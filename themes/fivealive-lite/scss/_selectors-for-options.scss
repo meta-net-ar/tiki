@@ -5,7 +5,6 @@ $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
-
 // This is reduced from the amount in tiki_base.css - maybe that needs to be changed, too.
 body.layout_social.tiki.navbar-padding {
     padding-top: 2.72rem;
@@ -58,21 +57,20 @@ hr {
 }
 
 .nav-tabs .nav-link {
-    color: $nav-tabs-link-color; //#ffffff;
-    background-color: $nav-tabs-link-bg; // #0c8a99;
+    // color: $nav-tabs-link-color; //#ffffff;
+    // background-color: $tiki-nav-tabs-link-bg; // #0c8a99;
     border-color: #dee2e6 #dee2e6 #ffffff;
 }
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-    color: $nav-tabs-link-active-color; // #000;
-    background-color: $nav-tabs-link-active-bg; //#a8e2ec;
+    color: $tiki-tabs-link-active-color; // #000;
+    background-color: $tiki-nav-tabs-link-active-bg; //#a8e2ec;
 }
 
 .blog-postbody-title h2.card-title {
     font-size: 20px;
 }
-
 
 // /* Auto TOC */
 #autotoc .nav-link.active,
@@ -105,12 +103,12 @@ hr {
     }
 }
 
-#col2 .card-title,
-#col3 .card-title,
+#col2 .tiki-card-header-title,
+#col3 .tiki-card-header-title,
 a.flipmoduletitle,
 #col2 .card-secondary > .card-header a,
 #col3 .card-secondary > .card-header a {
-    color: $side-column-heading-color; //#169FB6;
+    color: $tiki-side-column-card-header-color; //#169FB6;
 }
 
 .page-item.disabled,
@@ -124,11 +122,9 @@ a.flipmoduletitle,
 }
 
 .footer_liner {
-    border-top: 1px solid $tiki-footer-border-color;
-    border-bottom: 1px solid $tiki-footer-border-color;
+    border-top: 1px solid $tiki-footer_liner-border-color;
+    border-bottom: 1px solid $tiki-footer_liner-border-color;
 }
-
-
 
 .footer_liner {
     .card,
@@ -143,8 +139,8 @@ a.flipmoduletitle,
     }
     .card-header {
         color: #fff;
-        border-bottom: 1px dotted $tiki-footer-border-color;
-        border-bottom: 1px dotted $footer_liner-card-inner-border;
+        border-bottom: 1px dotted $tiki-footer_liner-border-color;
+        border-bottom: 1px dotted $tiki-footer_liner-card-inner-border;
     }
     .module-title,
     .module-title a {
@@ -152,6 +148,15 @@ a.flipmoduletitle,
     }
 }
 
-[data-bs-theme=dark].bottom_modules {
-    color: $body-color-dark;
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    //    color: #dee2e6;
+    // .tiki-card-header-title { color: $tiki-dark-footer-card-header-title-color; }
+    .card-header { border-bottom: solid 1px $tiki-dark-footer-card-header-border-color; }
+    //.card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
+    .card { color: #dee2e6; background: #262626; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: $tiki-dark-footer-link-color; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: $tiki-dark-footer-link-hover-color; }
 }

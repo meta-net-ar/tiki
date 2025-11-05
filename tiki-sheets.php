@@ -13,11 +13,16 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
             'sheetId'              => 'int',                 //post
-            'edit_mode'            => 'bool',                //post
+            'edit_mode'            => 'alpha',               //post
             'title'                => 'striptags',           //post
             'find'                 => 'striptags',           //post
             'edit'                 => 'bool',                //post
             'description'          => 'xss',                 //post
+            'parseValues'          => 'alpha',               //post
+            'creator'              => 'username',            //post
+            'parentSheetId'        => 'int',                 //post
+            'sort_mode'            => 'alnumdash',           //get
+            'offset'               => 'int',                 //get
         ],
     ],
 ];

@@ -27,29 +27,32 @@ function wikiplugin_ganttchart_info()
             'order' => [
                 'name' => tr('Order Field'),
                 'description' => tr('Permanent name of the field to use for row number order'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'level' => [
                 'name' => tr('Level Field'),
                 'description' => tr('Permanent name of the field to use for row level'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'status' => [
                 'name' => tr('Status Field'),
                 'description' => tr('Permanent name of the field to use for row status'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
                 'since' => 19,
             ],
             'depends' => [
                 'name' => tr('Dependency Field'),
                 'description' => tr('Permanent name of the field to use for row dependency'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'progress' => [
@@ -57,12 +60,13 @@ function wikiplugin_ganttchart_info()
                 'description' => tr('Permanent name of the field to use for row progress, values between 0-100'),
                 'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'name' => [
                 'name' => tr('Name Field'),
                 'description' => tr('Permanent name of the field to use for row name'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
                 'since' => 19,
             ],
@@ -83,12 +87,12 @@ function wikiplugin_ganttchart_info()
             'begin' => [
                 'name' => tr('Begin Date Field'),
                 'description' => tr('Permanent name of the field to use for event beginning'),
-                'required' => true,
+                'required' => false,
             ],
             'end' => [
                 'name' => tr('End Date Field'),
                 'description' => tr('Permanent name of the field to use for event ending'),
-                'required' => true,
+                'required' => false,
                 'since' => 19,
             ],
             'resourceId' => [
@@ -191,11 +195,11 @@ function wikiplugin_ganttchart($data, $params)
     $access = TikiLib::lib('access');
     $access->setTicket();
     $trackerId = $params['trackerId'];
-    $order = ! empty($params['order']) ? $params['order'] : '';
-    $levelParam = ! empty($params['level']) ? $params['level'] : '';
+    $order = $params['order'];
+    $levelParam = $params['level'];
     $status = $params['status'];
-    $depends = ! empty($params['depends']) ? $params['depends'] : '';
-    $progress = ! empty($params['progress']) ? $params['progress'] : '';
+    $depends = $params['depends'];
+    $progress = $params['progress'];
     $name = $params['name'];
     $description = $params['description'];
     $code = $params['code'];

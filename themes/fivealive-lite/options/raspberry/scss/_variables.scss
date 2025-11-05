@@ -34,7 +34,7 @@ $prefix: bs-;
 $body-bg:                   $white;  // default
 $body-color: #212529;
 
-$tiki-footer-border-color: $primary;
+$tiki-footer_liner-border-color: $primary;
 
 // Links
 $link-color:                   #b51360;
@@ -56,9 +56,9 @@ $table-hover-bg: #f5f5f5;
 
 // Navs
 $nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #ffdace;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
+$tiki-nav-tabs-link-bg: #ffdace;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
 
 // Navbar
 $navbar-dark-color:                 rgba($white, .85); // !default;
@@ -103,10 +103,14 @@ $code-color:                       $body-color; //  $pink;  // default
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
-$side-column-heading-color: #93071a; //#e60b7f;
-$footer_liner-card-inner-border: #93071a; //#eb0a82;
-$footer-accent-color: #93071a; //#eb0a82;
-$tiki-footer-border-color: $footer-accent-color;
+$tiki-side-column-card-header-color: #93071a; //#e60b7f;
+$tiki-footer_liner-card-inner-border: #93071a; //#eb0a82;
+$tiki-footer-accent-color: #93071a; //#eb0a82;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
+
+$tiki-dark-footer-card-header-border-color: #bc2f84;
+$tiki-dark-footer-link-color: #d968ac;
+$tiki-dark-footer-link-hover-color: #e480bc;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -115,6 +119,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #f9f9f9;
     --tiki-top-text-color: #f9f9f9;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -127,6 +133,8 @@ $tiki-footer-border-color: $footer-accent-color;
     --tiki-topbar-color: #fff;
     --tiki-topbar-hover-color: #f2f2f2;
     --tiki-topbar-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
         --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
@@ -270,13 +278,3 @@ $tiki-footer-border-color: $footer-accent-color;
     --bs-accordion-btn-color: #fff;
 }
 
-//:root {
-//    .page-link.active, .active > .page-link {
-//        --bs-pagination-active-bg: #b51360;
-//        --bs-pagination-active-border-color: #b51360;
-//    }
-//    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-////        --bs-nav-pills-link-active-color: ;
-//        --bs-nav-pills-link-active-bg: #93071a;
-//    }
-//}

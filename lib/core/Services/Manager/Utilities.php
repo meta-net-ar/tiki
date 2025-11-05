@@ -34,7 +34,7 @@ class Services_Manager_Utilities
         $available = [];
         $vcs = null;
 
-        $output = `git --version`;
+        $output = shell_exec("git --version");
         if (str_contains($output, 'version') && ($instance instanceof Instance)) {
             $vcs = new Git($instance);
         }

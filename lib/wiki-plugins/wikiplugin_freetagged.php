@@ -230,7 +230,7 @@ function wikiplugin_freetagged($data, $params)
     }
     $smarty->assign_by_ref('moreurl', $moreurl);
 
-    if (isset($moretext)) {
+    if ($moretext != 'more') {
         $smarty->assign_by_ref('moretext', $moretext);
     } else {
         $smarty->assign('moretext', 'more');

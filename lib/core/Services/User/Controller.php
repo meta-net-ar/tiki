@@ -1340,4 +1340,45 @@ class Services_User_Controller
         TikiLib::lib('tiki')->set_user_preference($user, 'trk_items_column_pref', $columns);
         return tr('Your column preference for tracker "%0" is saved.', $tracker_name);
     }
+
+    public function actionReset2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        TikiLib::lib('user')->update_2_factor_secret($user, '');
+        return ['success' => true, 'message' => tra('2FA secret reset successfully')];
+    }
+
+    public function actionToggle2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        $tikilib = TikiLib::lib('tiki');
+
+        $usersDisabled2FA = $tikilib->get_preference('twoFactorAuthExcludedUsers', expectArray: true);
+        $usersEnabled2FA = $tikilib->get_preference('twoFactorAuthIncludedUsers', expectArray: true);
+
+        if ($input->enable->bool()) {
+            $usersEnabled2FA = array_unique(array_merge($usersEnabled2FA, [$user]));
+            $usersDisabled2FA = array_diff($usersDisabled2FA, [$user]);
+        } else {
+            $usersDisabled2FA = array_unique(array_merge($usersDisabled2FA, [$user]));
+            $usersEnabled2FA = array_diff($usersEnabled2FA, [$user]);
+        }
+
+        $tikilib->set_preference('twoFactorAuthExcludedUsers', $usersDisabled2FA);
+        $tikilib->set_preference('twoFactorAuthIncludedUsers', $usersEnabled2FA);
+
+        return ['success' => true];
+    }
 }

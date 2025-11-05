@@ -17,10 +17,10 @@ $inputConfiguration = [
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
             'optionText'                  => 'xss',            //post
-            'points'                      => 'string',         //post
-            'sort_mode'                   => 'alpha',          //get
+            'points'                      => 'float',         //post
+            'sort_mode'                   => 'alnumdash',          //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];

@@ -11,14 +11,17 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'from'              => 'int',           //post
-            'to'                  => 'int',         //post
-            'label'                => 'string',      //post
-            'preserve'             => 'bool',        //post
-            'transition_mode'            => 'string'  //post
+            'from'                  => 'int',           //post
+            'to'                    => 'int',           //post
+            'label'                 => 'string',        //post
+            'preserve'              => 'alpha',         //post
+            'transition_mode'       => 'string',        //post
+            'transitionId'          => 'int',           //post
+            'type'                  => 'alpha',         //post
+            'count'                 => 'int',           //post
           ],
         'staticKeyFiltersForArrays' => [
-            'cat_categories'        => 'word',       //post
+            'cat_categories'        => 'int',        //post
         ],
     ],
 ];

@@ -473,3 +473,26 @@ header.fixed-top {
     --tiki-fixed-top-border-top-width: 0px;
     --tiki-fixed-top-border-bottom-width: 5px;
 }
+
+// mod-collapse styles
+.btn-toggle:not(.collapsed) .show-text {
+    display: none;
+}
+.btn-toggle:not(.collapsed) .hide-text {
+    display: inline;
+}
+.btn-toggle.collapsed .show-text {
+    display: inline;
+}
+.btn-toggle.collapsed .hide-text {
+    display: none;
+}
+
+// Quickadmin module Permissions link
+#quickadmin div.dropdown-item {
+    padding: 0 var(--bs-dropdown-item-padding-x);
+    & .btn-link {
+        color: var(--bs-dropdown-link-color);
+        padding: 0;
+    }
+}

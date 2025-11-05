@@ -1,6 +1,8 @@
 // jQui theme for Tiki Bootstrap 5.3
 
-// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// This theme uses some design elements from the Smoothness theme from the jQuery UI ThemeRoller Gallery (https://jqueryui.com/themeroller/)
+
+// This file may contain iki selectors to implement styles not covered by standard Bootstrap rules, including
 // * SCSS code
 // * CSS selectors and values
 // * Overrides and extensions of vendor (Bootswatch, etc.) styles
@@ -19,157 +21,42 @@
 @use "sass:color";
 
 // Color system
-// Body
-
-.topbar {
-    border-radius: $border-radius;
-    border: 1px solid #aaaaaa;
-}
-
-.topbar {
-    .nav > li > a {
-        border-right: 1px solid #aaaaaa;
-        font-weight: bold;
-    }
-
-    .nav > li:first-of-type > a {
-        border-left: none;
-    }
-}
-
-.card-header,
-.tiki .bg-dark:not(.navbar-dark) {
-    background-image: var(--tiki-card-header-bg); //linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
-}
-
-.top_modules,
-.topbar_modules {
-    .nav-link,
-    button.dropdown-toggle, {
-        //  border-right: 1px solid #aaaaaa;
-        font-weight: bold;
-    }
-}
-
-.topbar .nav-link:first-of-type {
-    border-left: none;
-}
-
-// Make links visible in dark mode
-#col2 .navbar {
-    background: transparent;
-
-    .nav-link {
-        color: var(--tiki-vert-nav-link-color);
-
-        &:hover {
-            color: var(--tiki-vert-nav-link-hover-color);
-        }
-    }
-}
-
+// Body (large elements)
 // Links
 // Components
 // Typography
 // Tables
 // Buttons
-.btn-primary,
-.btn-secondary,
-.btn-success,
-.btn-info,
-.btn-warning,
-.btn-danger {
-    background: #f2f2f2;
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f2f2f2), color-stop(46%, #f2f2f2), color-stop(50%, #e6e6e6), color-stop(50%, #eeeeee), color-stop(100%, #eeeeee));
-    background: -webkit-linear-gradient(top, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
-    background: -o-linear-gradient(top, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
-    background: linear-gradient(to bottom, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f2f2f2', endColorstr='#eeeeee', GradientType=0);
-    color: #333;
-}
-
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-success:hover,
-.btn-info:hover,
-.btn-warning:hover,
-.btn-danger:hover {
-    background: #eeeeee;
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(50%, #eeeeee), color-stop(50%, #e6e6e6), color-stop(54%, #f2f2f2), color-stop(100%, #f2f2f2));
-    background: -webkit-linear-gradient(top, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
-    background: -o-linear-gradient(top, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
-    background: linear-gradient(to bottom, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#f2f2f2', GradientType=0);
-    color: #333;
-}
-
-.btn-primary:disabled,
-.btn-secondary:disabled,
-.btn-success:disabled,
-.btn-info:disabled,
-.btn-warning:disabled,
-.btn-danger:disabled,
-.btn-primary.disabled,
-.btn-secondary.disabled,
-.btn-success.disabled,
-.btn-info.disabled,
-.btn-warning.disabled,
-.btn-danger.disabled {
-    color: color.adjust(#333, $lightness: 10%, $space: hsl);
-}
-
-.show > .btn-primary.dropdown-toggle {
-    color: #333333;
-}
-
-.btn-outline-primary,
-.btn-outline-secondary,
-.btn-outline-success,
-.btn-outline-info,
-.btn-outline-warning,
-.btn-outline-danger {
-    background: transparent;
+    // Declaring styles to override Bootstrap defaults
+.btn:not(.btn-link) {
+    color: var(--tiki-jui-state-default-color);
+    background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
+    // border-color: var(--tiki-jui-state-default-border-color); Retain default Bootstrap theme color for border
+    &:hover {
+        color: var(--tiki-jui-state-hover-color);
+        background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
+        border-color: var(--tiki-jui-state-hover-border-color);
+    }
+    &.active {
+        color: var(--tiki-jui-state-actuve-color);
+        background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) repeat-x;
+        border-color: var(--tiki-jui-state-active-border-color);
+    }
 }
 
 // Forms
+// Form validation
 // Navs
 // Navbar
+.sm-navbar.sm-navbar--vertical {
+    background: transparent !important;
+}
+
 // Dropdowns
 // Pagination
 // Cards
-.card.postbody,
-.card.postbody .card-header {
-    border: 1px solid #999;
-}
-
-.card-header {
-    margin: 3px;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-
-.card-title {
-    font-weight: bold;
-    font-size: 1rem;
-}
-
-.card-body h4 {
-    font-size: 1rem;
-}
-
-.card.postbody .card-footer {
-    background-color: rgba(0, 0, 0, .03);
-    border-top: 1px solid #999;
-}
-
 // Accordion
 // Popovers
-    // So form submit buttons with icons and text used in popover actions can look just like links
-.popover button.btn-link.link-list,
-.popover button.btn-link.link-list .icon {
-    font-size: $popover-font-size;
-}
-
 // Badges
 // Alerts
 // Progress bars

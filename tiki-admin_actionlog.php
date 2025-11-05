@@ -14,21 +14,23 @@ use Tiki\Lib\GraphEngine\GDGRenderer;
 $inputConfiguration = [
     [
         'staticKeyFilters'                   => [
-            'save'                           => 'bool',        //post
-            'saveAction'                     => 'bool',        //post
+            'save'                           => 'alpha',       //post
+            'saveAction'                     => 'alpha',       //post
+            'unset'                          => 'alpha',       //post
             'action_log_type'                => 'striptags',   //post
             'action_log_ip'                  => 'striptags',   //post
             'action_log_action'              => 'striptags',   //post
             'find'                           => 'striptags',   //post
             'offset'                         => 'digits',      //post
-            'export'                         => 'bool',        //post
+            'export'                         => 'alpha',       //post
             'max'                            => 'digits',      //post
             'actionId'                       => 'digits',      //post
             'contributions'                  => 'striptags',   //post
             'startDate'                      => 'digits',      //post
+            'startDate_Year'                 => 'digits',      //post
             'endDate'                        => 'digits',      //post
-            'list'                           => 'bool',        //post
-            'graph'                          => 'bool',        //post
+            'list'                           => 'alpha',       //post
+            'graph'                          => 'alpha',       //post
             'categId'                        => 'int',         //post
             'startDate_Month'                => 'digits',      //post
             'Time_Hour'                      => 'digits',      //post
@@ -41,22 +43,23 @@ $inputConfiguration = [
             'end_Second'                     => 'digits',      //post
             'endDate_Day'                    => 'digits',      //post
             'endDate_Year'                   => 'digits',      //post
-            'export_bbb'                     => 'bool',        //post
-            'unit'                           => 'striptags',   //post
-            'sort_mode'                      => 'striptags',   //get
-            'contribTime'                    => 'striptags',   //post
-            'barPlot'                        => 'striptags',   //post
-            'bgcolor'                        => 'striptags',   //post
-            'legendBgcolor'                  => 'striptags',   //post
+            'export_bbb'                     => 'alpha',       //post
+            'unit'                           => 'alpha',       //post
+            'sort_mode'                      => 'alnumdash',   //get
+            'contribTime'                    => 'alpha',       //post
+            'barPlot'                        => 'alpha',       //post
+            'bgcolor'                        => 'alpha',       //post
+            'legendBgcolor'                  => 'alpha',       //post
             'galleryId'                      => 'int',         //post
             'time'                           => 'digits',      //post
             'action'                         => 'striptags'    //post
         ],
         'staticKeyFiltersForArrays' => [
-            'cat_categories'        => 'striptags',           //post
+            'cat_categories'        => 'digits',              //post
             'selectedUsers'         => 'username',            //post
             'selectedGroups'        => 'groupname',           //post
             'contributors'          => 'striptags',          //post
+            'checked'               => 'digits',              //post
         ],
     ],
 ];

@@ -10,10 +10,10 @@ use Tiki\Lib\TikiDate;
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'loadprevious'                    => 'word',              //post
+        'loadprevious'                    => 'int',              //post
         'emailslist'                      => 'xss',              //post
         'emailslist_format'               => 'word',              //post
-        'emailsubject'                    => 'word',              //post
+        'emailsubject'                    => 'text',              //post
         'emailcontent'                    => 'xss',               //post
         'wikicontent'                     => 'xss',               //post
         'wikipageafter'                   => 'pagename',          //post

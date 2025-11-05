@@ -160,6 +160,16 @@ footer.footer {
     color: $body-color;
 }
 
+// Light mode dark page footer
+[data-bs-theme="light"] .bottom_modules {
+    color: #e0d6cc;
+    .tiki-card-header-title { color: #e0d6cc !important; }
+    .card, .card-header { border-color: rgba(#fff, .45); }
+    .card-body { color: #f6a8a8; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: #f6a8a8; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: #fababa; }
+}
+
 // Dark mode
 [data-bs-theme="dark"] {
     body:not(.tiki-admin) .row-middle {
