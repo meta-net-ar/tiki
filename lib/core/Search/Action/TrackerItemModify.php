@@ -188,11 +188,13 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         }
 
         if (empty($add) && empty($remove)) {
-            if (is_string($value)) {
-                $value = ['ins_' . $fieldInfo['fieldId'] => $value];
+            if ($method !== 'copy') {
+                if (is_string($value)) {
+                    $value = ['ins_' . $fieldInfo['fieldId'] => $value];
+                }
+                $data = $handler->getFieldData($value);
+                $value = $data['value'];
             }
-            $data = $handler->getFieldData($value);
-            $value = $data['value'];
 
             switch ($method) {
                 case 'add':
@@ -213,6 +215,26 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
                     }
                     $values = explode(',', $value);
                     $value = implode(',', array_unique(array_filter($values)));
+                    break;
+                case 'copy':
+                    $value = $value['list_input'];
+                    $info = $trklib->get_tracker_item($value);
+                    if ($info) {
+                        $fieldInfo = $trklib->get_field_by_perm_name($field);
+                        if (array_key_exists($fieldInfo['fieldId'], $info)) {
+                            $value = $info[$fieldInfo['fieldId']];
+                        } else {
+                            throw new Search_Action_Exception(
+                                tr(
+                                    'Copy method: field %0 not found for itemId %1',
+                                    $fieldInfo['fieldId'],
+                                    $value
+                                )
+                            );
+                        }
+                    } else {
+                        throw new Search_Action_Exception(tr('Copy method: source itemId %0 not found', $value));
+                    }
                     break;
             }
         }
