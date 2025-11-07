@@ -571,6 +571,9 @@
         {/section}
         </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="subforums-table" target-container-id="subforums-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 {/if}
 <form id="view_forum" method="post">
@@ -910,16 +913,20 @@
     </div>
 </form>
 {if !$ts.ajax}
-    {if !$ts.enabled}
+    {if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
         {pagination_links count=$comments_count step=$comments_per_page offset=$comments_offset offset_arg='comments_offset'}{/pagination_links}
     {/if}
     {if $forum_info.forum_last_n > 0 && count($last_comments)}
         {* Last n titles *}
         <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="forum-table">
+            <thead>
             <tr>
                 <th>{tr}Last{/tr} {$forum_info.forum_last_n} {tr}posts in this forum{/tr}</th>
             </tr>
+            </thead>
+
+            <tbody id="forum-body">
             {section name=ix loop=$last_comments}
                 <tr>
                     <td>
@@ -932,7 +939,11 @@
                     </td>
                 </tr>
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+            <el-infinite-scroll container-id="forum-table" target-container-id="forum-body" offset="{$comments_offset}" step="{$comments_per_page}" total-count="{$comments_count}" offset-arg="comments_offset"></el-infinite-scroll>
+        {/if}
         </div>
         <br>
     {/if}

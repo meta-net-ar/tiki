@@ -3,7 +3,8 @@
 {* start ************ Task list ***************}
 <form action="tiki-user_tasks.php" method="post">
     {ticket}
-    <table class="formcolor">
+    <table class="formcolor" id="tasks-list-table">
+        <thead>
         <tr>
             <td colspan="6">
                 <div align="right">
@@ -37,7 +38,9 @@
                 </a>
             </th>
         </tr>
+        </thead>
 
+        <tbody id="tasks-list-body">
         {section name=task_i loop=$tasklist}
             <tr>
                 <td class="prio{$tasklist[task_i].priority}">
@@ -126,6 +129,8 @@
                 <td class="odd" colspan="6">{tr}No tasks entered{/tr}</td>
             </tr>
         {/section}
+        </tbody>
+        <tbody>
         <tr>
             <td colspan="3" style="text-align:left; vertical-align:bottom;">
                 <div class="input-group">
@@ -168,8 +173,14 @@
                 <input type="submit" class="btn btn-info btn-sm" name="reload" value="{tr}Reload{/tr}">
             </td>
         </tr>
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="tasks-list-table" target-container-id="tasks-list-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </form>
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 {* end ************ Task list ***************}

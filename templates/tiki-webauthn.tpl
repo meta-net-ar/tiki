@@ -6,7 +6,9 @@
         </div>
     </div>
 {/if}
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 <div id="webauthn-div">
     <div class="table-responsive webauthn">
         <table id="webauthn_table" class="table normal table-striped table-hover" data-count="{$devices|count}">
@@ -19,7 +21,7 @@
                 <th>{tr}Last SignIn{/tr}</th>
                 <th>{tr}Action{/tr}</th>
             </thead>
-            <tbody>
+            <tbody id="webauthn_table-body">
                 {section name=device loop=$devices}
                     <tr>
                         <td> {$devices[device].user} </td>
@@ -41,9 +43,14 @@
                 {/section}
             </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="webauthn_table" target-container-id="webauthn_table-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
 </div>
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 {jq}
     $('#registerWebAuthDevice').on('click', async function(event) {
         const registeredUser = "{{$user}}";

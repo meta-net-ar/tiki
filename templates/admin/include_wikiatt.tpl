@@ -13,7 +13,8 @@
 
 
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="wikiatt-table">
+            <thead>
             <tr>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='user'}{tr}User{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='page'}{tr}Page{/tr}{/self_link}</th>
@@ -25,7 +26,9 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='hits'}{tr}Hits{/tr}{/self_link}</th>
                 <th>&nbsp;</th>
             </tr>
+            </thead>
 
+            <tbody id="wikiatt-body">
             {section name=x loop=$attachments}
                 {if $attachments[x].path}
                     {$current = 'file'}{$move = 'move2db'}{$confirm = "{tr}Move attachment to database?{/tr}"}
@@ -57,10 +60,16 @@
             {sectionelse}
                 {norecords _colspan=9}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="wikiatt-table" target-container-id="wikiatt-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 
-    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {/if}
 
     <table>
         <tr>

@@ -2,15 +2,20 @@
 
 {include file='tiki-tests_menubar.tpl'}
 
-{pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{/if}
 
 <div class="table-responsive">
-<table class="table">
+<table class="table" id="tests-list-table">
+<thead>
 <tr>
     <th>{tr}File Name{/tr}</th>
     <th>{tr}Actions{/tr}</th>
 </tr>
+</thead>
 
+<tbody id="tests-list-body">
 {foreach from=$files item=file}
 <tr>
     <td class="text">{$file}</td>
@@ -21,7 +26,13 @@
     </td>
 </tr>
 {/foreach}
+</tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="tests-list-table" target-container-id="tests-list-body" offset="{$offset}" step="{$files_per_page}" total-count="{$files_number}"></el-infinite-scroll>
+{/if}
 </div>
 
-{pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{/if}

@@ -5,7 +5,7 @@
 {/block}
 
 {block name="content"}
-    <div class="row">
+    <div class="row" id="thumbnail-gallery">
         {foreach $results as $key => $row}
             {if $key % 3 == 0 && $key > 0}
                 </div>
@@ -32,5 +32,9 @@
             </div>
         {/foreach}
     </div>
-    {pagination_links resultset=$results}{service controller=file action=thumbnail_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}{/pagination_links}
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="thumbnail-gallery" offset="{$results.offset}" step="{$results.maxRecords}" total-count="{$results.count}" load-url="{service controller=file action=thumbnail_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}"></el-infinite-scroll>
+    {else}
+        {pagination_links resultset=$results}{service controller=file action=thumbnail_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}{/pagination_links}
+    {/if}
 {/block}

@@ -200,7 +200,8 @@
 {if isset($view_atts) and $view_atts eq 'y'}
     <h2 id="attachments">{tr}Attachments{/tr}</h2>
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="threads-table">
+            <thead>
             <tr>
                 <th>{tr}Type{/tr}</th>
                 <th>{tr}Filename{/tr}</th>
@@ -208,7 +209,9 @@
                 <th>{tr}Created{/tr}</th>
                 <th>{tr}Action{/tr}</th>
             </tr>
+            </thead>
 
+            <tbody id="threads-body">
             {foreach from=$atts.data item=att}
                 <tr>
                     <td class="icon">
@@ -232,7 +235,13 @@
                     </td>
                 </tr>
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="threads-table" target-container-id="threads-body" offset="{$atts.offset}" step="{$atts.maxRecords}" total-count="{$atts.count}" offset-arg="fa_offset"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$atts.count offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$atts.count offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
+    {/if}
 {/if}

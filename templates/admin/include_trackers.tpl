@@ -203,7 +203,8 @@
         {/if}
 
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="include-trackers-table">
+                <thead>
                 <tr>
                     <th>
                         <a href="tiki-admin.php?page=trackers&amp;sort_mode=user_{if $sort_mode eq 'attId'}asc{else}desc{/if}">{tr}ID{/tr}</a>
@@ -234,7 +235,9 @@
                     </th>
                     <th>{tr}Switch storage{/tr}</th>
                 </tr>
+                </thead>
 
+                <tbody id="include-trackers-body">
                 {section name=x loop=$attachments}
                     <tr class={cycle}>
                         <td class="id"><a href="tiki-download_item_attachment.php?attId={$attachments[x].attId}" title="{tr}Download{/tr}">{$attachments[x].attId}</a></td>
@@ -255,10 +258,16 @@
                 {sectionelse}
                     {norecords _colspan=10}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="include-trackers-table" target-container-id="include-trackers-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     </div>
     {if $attachments}
         <table>

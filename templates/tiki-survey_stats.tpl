@@ -11,7 +11,8 @@
 {include file='find.tpl'}
 
 <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="survey-stats-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-survey_stats.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">
@@ -34,7 +35,9 @@
                 </a>
             </th>
         </tr>
+        </thead>
 
+        <tbody id="survey-stats-body">
         {section name=user loop=$channels}
             {if ($tiki_p_admin eq 'y') or ($channels[user].individual eq 'n' and $tiki_p_view_survey_stats eq 'y') or ($channels[user].individual_tiki_p_view_survey_stats eq 'y')}
                 <tr>
@@ -57,7 +60,13 @@
         {sectionelse}
             {norecords _colspan=4}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="survey-stats-table" target-container-id="survey-stats-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

@@ -17,7 +17,8 @@
 <form action="tiki-userfiles.php" method="post">
 {ticket}
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="userfiles-table">
+            <thead>
             <tr>
                 <th class="text-center">&nbsp;</th>
                 <th><a href="tiki-userfiles.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'filename_desc'}filename_asc{else}filename_desc{/if}">{tr}Name{/tr}</a></th>
@@ -28,7 +29,9 @@
                     </a>
                 </th>
             </tr>
+            </thead>
 
+            <tbody id="userfiles-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
@@ -45,14 +48,20 @@
             {sectionelse}
                 {norecords _colspan=4}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="userfiles-table" target-container-id="userfiles-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $channels|@count ge '1'}
         {tr}Perform action with checked:{/tr} <input type="submit" class="btn btn-primary btn-sm" name="delete" value="{tr}Delete{/tr}">
     {/if}
 </form>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 <h2>{tr}Upload file{/tr}</h2>
 <form enctype="multipart/form-data" action="tiki-userfiles.php" method="post">
