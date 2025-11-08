@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watchEffect } from "vue";
 import { Loading } from "@element-plus/icons-vue";
+import mirrorInputs from "../../helpers/infiniteScroll/mirrorInputs";
 
 const props = defineProps(["containerId", "targetContainerId", "offset", "step", "loadUrl", "totalCount", "offsetArg", "_cssFiles"]);
 
@@ -12,11 +13,9 @@ const offset = ref(Number(props.offset) || 0);
 const height = ref(0);
 const itemsCount = ref(0);
 
-const container = computed(() => scrollbar.value.wrapRef?.querySelector(`#${props.containerId}`));
+const container = ref(null);
 const disabled = computed(() => loading.value || (offset.value + Number(props.step)) >= Number(props.totalCount));
 const loadUrl = computed(() => props.loadUrl || window.location.href);
-
-const DEFAULT_HEIGHT = 800;
 
 watchEffect(() => {
     if (!scrollbar.value) return;
@@ -28,10 +27,11 @@ watchEffect(() => {
     }
     height.value = originalContainer.clientHeight || DEFAULT_HEIGHT;
 
-    mirrorInputs(originalContainer);
+    mirrorInputs(originalContainer, scrollbar);
 
     itemsCount.value = originalContainer.querySelector(`#${props.targetContainerId}`)?.childElementCount || originalContainer.childElementCount;
 
+    container.value = originalContainer;
     wrapper.appendChild(originalContainer);
 });
 
@@ -58,12 +58,12 @@ const load = async (direction) => {
             const content = document.createDocumentFragment();
             content.append(...originalTargetContainer.childNodes);
 
-            mirrorInputs(content);
+            mirrorInputs(content, scrollbar);
 
             if (props.targetContainerId) {
                 container.value.querySelector(`#${props.targetContainerId}`).appendChild(content);
             } else {
-                container.value.appendChild(content);
+                container.value.appendChild(content)
             }
         }
 
@@ -76,42 +76,10 @@ const load = async (direction) => {
     }
 }
 
-// Mirror out all inputs inside the container, so form state is preserved
-const mirrorInputs = (sourceContainer) => {
-    const inputs = sourceContainer.querySelectorAll("input, select, textarea");
-    const targetContainer = scrollbar.value.wrapRef.getRootNode().host.parentElement;
+</script>
 
-    inputs.forEach(input => {
-        const mirror = input.cloneNode(true);
-        mirror.style.display = "none";
-        targetContainer.appendChild(mirror);
-
-        $(input).on("change", () => {
-            if (mirror.type === "checkbox" || mirror.type === "radio") {
-                mirror.checked = input.checked;
-            } else {
-                mirror.value = input.value;
-            }
-            mirror.dispatchEvent(new Event("change"));
-        });
-
-        if (input.type === "submit" || input.type === "button") {
-            input.addEventListener("click", () => {
-                mirror.click();
-            });
-        }
-
-        // sync back independent mirror changes (usually triggered programmatically) to the original input
-        $(mirror).on("change", () => {
-            if (input.type === "checkbox" || input.type === "radio") {
-                input.checked = mirror.checked;
-            } else {
-                input.value = mirror.value;
-            }
-        });
-    });
-};
-
+<script>
+export const DEFAULT_HEIGHT = 800;
 </script>
 
 <template>
