@@ -11,6 +11,7 @@ const maxFiles = JSON.parse(props.maxFiles);
 
 const uploadRef = ref(null);
 const insertIntoEditor = ref(false);
+const uploadedFiles = ref([]);
 
 onMounted(() => {
     const searcParams = new URLSearchParams(location.search);
@@ -37,6 +38,14 @@ const handleUploadError = (error) => {
 
 const handleUploadSuccess = (response, file) => {
     ElMessage.success(`${file.name} uploaded successfully`)
+
+    // Store uploaded file info
+    uploadedFiles.value.push({
+        name: file.name,
+        fileId: response.fileId,
+        syntax: `{img fileId="${response.fileId}" thumb="box"}`
+    });
+
     const searcParams = new URLSearchParams(location.search);
     if (insertIntoEditor.value) {
         window.opener.insertAt(searcParams.get('filegals_manager'), response.syntax, false, false, true);
@@ -45,6 +54,14 @@ const handleUploadSuccess = (response, file) => {
     if (props.vimeoUrl) {
         completeVimeoUpload(file.name);
     }
+}
+
+const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+        ElMessage.success('Copied to clipboard!');
+    }).catch(() => {
+        ElMessage.error('Failed to copy');
+    });
 }
 </script>
 
@@ -82,6 +99,24 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             Drop file here or <em>click to upload</em>
             </div>
         </el-upload>
+
+        <div v-if="uploadedFiles.length > 0" class="uploaded-files-list">
+            <h4>Uploaded Files:</h4>
+            <div v-for="file in uploadedFiles" :key="file.fileId" class="uploaded-file-item">
+                <div class="file-name">{{ file.name }} (fileId: {{ file.fileId }})</div>
+                <div class="file-syntax-row">
+                    <code>{{ file.syntax }}</code>
+                    <button
+                        @click="copyToClipboard(file.syntax)"
+                        class="copy-button"
+                        title="Copy to clipboard"
+                    >
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <el-button type="primary" @click="submitUpload" :data-testid="DATA_TEST_ID.SUBMIT_BUTTON">
         <span v-if="!insertIntoEditor">Upload</span>
         <span v-else>Insert</span>
