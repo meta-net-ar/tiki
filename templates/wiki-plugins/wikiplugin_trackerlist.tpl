@@ -245,6 +245,10 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                         </tfoot>
                     {/if}
                 </table>
+                {assign var="offset" value=${$offset_arg}}
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="wptrackerlist{$listTrackerId}-{$iTRACKERLIST}" target-container-id="wptrackerlist{$listTrackerId}-{$iTRACKERLIST}-body" offset="{$offset}" step="{$max}" total-count="{$count_item}" offset-arg="{$offset_arg}"></el-infinite-scroll>
+                {/if}
             </div>
         </div> {* end: div id="trackerlist_{$iTRACKERLIST}" *}
         {if isset($displaysheet) && $displaysheet eq 'true'}
@@ -269,15 +273,17 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
         {/if}
     {/if}
 
-    {if $more eq 'y'}
-        <div class="more">
-            {capture assign=moreUrl}
-                {if $moreurl}{$moreurl}{else}tiki-view_tracker.php{/if}?trackerId={$listTrackerId}{if isset($tr_sort_mode)}&amp;sort_mode={$tr_sort_mode}{/if}
-            {/capture}
-            {button class='more' href="$moreUrl" _text="{tr}More...{/tr}"}
-        </div>
-    {elseif $showpagination ne 'n'}
-        {pagination_links count=$count_item step=$max offset=${$offset_arg} offset_arg=$offset_arg _keepall=y} {/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {if $more eq 'y'}
+            <div class="more">
+                {capture assign=moreUrl}
+                    {if $moreurl}{$moreurl}{else}tiki-view_tracker.php{/if}?trackerId={$listTrackerId}{if isset($tr_sort_mode)}&amp;sort_mode={$tr_sort_mode}{/if}
+                {/capture}
+                {button class='more' href="$moreUrl" _text="{tr}More...{/tr}"}
+            </div>
+        {elseif $showpagination ne 'n'}
+            {pagination_links count=$count_item step=$max offset=${$offset_arg} offset_arg=$offset_arg _keepall=y} {/pagination_links}
+        {/if}
     {/if}
     {if $export eq 'y' && ($perms.tiki_p_admin_trackers eq 'y' || $perms.tiki_p_export_tracker eq 'y')}
         {button href=$exportUrl _text="{tr}Export{/tr}" _class='exportButton'}
@@ -288,7 +294,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
 
     {$itemoff=0}
     {if empty($tpl)}
-        <tbody>
+        <tbody id="wptrackerlist{$listTrackerId}-{$iTRACKERLIST}-body">
     {/if}
     {section name=user loop=$items}
 
