@@ -63,6 +63,19 @@ trait Services_Manager_Trait
             mkdir($storage_path, 0777, true);
         }
 
+        $home = getenv('HOME') ?: ($_ENV['HOME'] ?? ($_SERVER['HOME'] ?? null));
+        if (empty($home)) {
+            $home = $storage_path . '/home';
+            if (! is_dir($home)) {
+                if (! @mkdir($home, 0700, true) && ! is_dir($home)) {
+                    throw new TikiManager\Config\Exception\ConfigurationErrorException(tr('Unable to create fallback HOME directory %0 for Tiki Manager processes. Check permissions for %1.', $home, dirname($home)));
+                }
+            }
+        }
+        $_ENV['HOME'] = $home;
+        $_SERVER['HOME'] = $home;
+        putenv('HOME=' . $home);
+
         if (isset($_SERVER['SYMFONY_DOTENV_VARS']) || isset($_ENV['SYMFONY_DOTENV_VARS'])) {
             // in case loadEnv is called multiple times, we need to reset server/env .env variables
             // (e.g. when calling manager commands from within console command of another manager command)
@@ -130,10 +143,10 @@ trait Services_Manager_Trait
             ]);
         }
         $input->setInteractive(false);
-        $app = new Application();
-        $app->add($cmd);
-        $app->setAutoExit(false);
+
+        $app = $this->createManagerApplication($cmd);
         $app->run($input, $this->manager_output);
+
         // some TM commands might change current working dir
         chdir($cwd);
         $output = $this->manager_output->fetch();
@@ -143,6 +156,76 @@ trait Services_Manager_Trait
         } else {
             $this->manager_output->write($output);
         }
+    }
+
+    /**
+     * Create a Symfony application instance with all Tiki Manager commands registered.
+     */
+    protected function createManagerApplication(\Symfony\Component\Console\Command\Command $primaryCommand): Application
+    {
+        $app = new Application();
+        $app->setAutoExit(false);
+
+        $primaryClass = get_class($primaryCommand);
+        $primaryAdded = false;
+
+        foreach ($this->getManagerCommandClasses() as $commandClass) {
+            if ($commandClass === $primaryClass) {
+                $app->add($primaryCommand);
+                $primaryAdded = true;
+                continue;
+            }
+
+            $app->add(new $commandClass());
+        }
+
+        if (! $primaryAdded) {
+            $app->add($primaryCommand);
+        }
+
+        return $app;
+    }
+
+    /**
+     * Get the list of available Tiki Manager command classes.
+     */
+    protected function getManagerCommandClasses(): array
+    {
+        global $tikipath;
+
+        static $commandClasses = null;
+
+        if ($commandClasses !== null) {
+            return $commandClasses;
+        }
+
+        $commandClasses = [];
+        $commandDir = $tikipath . '/vendor/tikiwiki/tiki-manager/src/Command';
+
+        if (! is_dir($commandDir)) {
+            return $commandClasses;
+        }
+
+        foreach (glob($commandDir . '/*Command.php') as $commandPath) {
+            $class = 'TikiManager\\Command\\' . basename($commandPath, '.php');
+            if (! class_exists($class)) {
+                continue;
+            }
+
+            try {
+                $ref = new \ReflectionClass($class);
+            } catch (\ReflectionException $e) {
+                continue;
+            }
+
+            if ($ref->isAbstract()) {
+                continue;
+            }
+
+            $commandClasses[] = $class;
+        }
+
+        return $commandClasses;
     }
 
     protected function getCommandHelpTexts($cmd)
