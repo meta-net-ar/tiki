@@ -18,7 +18,7 @@ abstract class ApiTestCase extends TikiTestCase
     private static $adminApiToken = null;
 
     /**
-     * Path to the tiki-api.php file
+     * Path to the tiki-api-wrapper.php file
      */
     private $tikiapiPath;
 
@@ -45,7 +45,7 @@ abstract class ApiTestCase extends TikiTestCase
     }
 
     /**
-     * Execute a request against the API by calling tiki-api.php in a subprocess
+     * Execute a request against the API by calling tiki-api-wrapper.php in a subprocess
      *
      * @param string $method The HTTP method (GET, POST, PUT, DELETE)
      * @param string $endpoint The API endpoint path (e.g., '/version', '/categories')
@@ -54,12 +54,12 @@ abstract class ApiTestCase extends TikiTestCase
      * @param string $contentType The content type (default: 'application/json')
      * @return array Response data including status code, headers, and body
      */
-    protected function makeApiRequest($method, $endpoint, $permission = 'Admins', $data = [], $contentType = 'application/json')
+    protected function makeApiRequest($method, $endpoint, $permission = null, $data = [], $contentType = 'application/json')
     {
         $env = $this->prepareRequestEnvironment($method, $endpoint, $permission, $data, $contentType);
-        
+
         $response = $this->executeApiSubprocess($env);
-        
+
         return $this->parseResponse($response);
     }
 
@@ -77,7 +77,7 @@ abstract class ApiTestCase extends TikiTestCase
     {
         // Extract the route from the endpoint (remove leading slash)
         $route = ltrim($endpoint, '/');
-        
+
         // Base environment variables with all required $_SERVER keys
         $env = [
             'REQUEST_METHOD' => $method,
@@ -124,7 +124,7 @@ abstract class ApiTestCase extends TikiTestCase
     }
 
     /**
-     * Execute tiki-api.php in a subprocess with the prepared environment
+     * Execute tiki-api-wrapper.php in a subprocess with the prepared environment
      *
      * @param array $env Environment variables
      * @return string Raw response output
@@ -140,7 +140,14 @@ abstract class ApiTestCase extends TikiTestCase
             2 => ['pipe', 'w'],  // stderr
         ];
 
-        $processEnv = array_merge($_ENV, $env);
+        // Force Tiki to use lib/test/local.php instead of db/local.php (these env vars only trigger that switch)
+        $testDbEnv = [
+            'TIKI_TEST_HOST'   => '127.0.0.1',
+            'TIKI_TEST_HOST_A' => 'tiki_test_user',
+            'TIKI_TEST_HOST_B' => 'tiki_test_db',
+        ];
+
+        $processEnv = array_merge($_ENV, $env, $testDbEnv);
 
         // Start the process
         $fullCommand = $command . ' ' . escapeshellarg($this->tikiapiPath);
@@ -187,10 +194,10 @@ abstract class ApiTestCase extends TikiTestCase
     {
         // Clean up the response - remove any HTTP headers if present
         $body = $this->extractJsonFromResponse($rawResponse);
-        
+
         // Try to parse as JSON
         $jsonDecoded = json_decode($body, true);
-        
+
         if (json_last_error() === JSON_ERROR_NONE && is_array($jsonDecoded)) {
             // Scenario 1 & 2: Valid JSON response
             return $this->handleValidJsonResponse($jsonDecoded, $body);
@@ -206,7 +213,7 @@ abstract class ApiTestCase extends TikiTestCase
     private function extractJsonFromResponse($rawResponse)
     {
         $body = trim($rawResponse);
-        
+
         // If response contains HTTP headers, extract just the body
         if (strpos($body, "\r\n\r\n") !== false) {
             $parts = explode("\r\n\r\n", $body, 2);
@@ -215,7 +222,7 @@ abstract class ApiTestCase extends TikiTestCase
             $parts = explode("\n\n", $body, 2);
             $body = $parts[1] ?? $body;
         }
-        
+
         return trim($body);
     }
 

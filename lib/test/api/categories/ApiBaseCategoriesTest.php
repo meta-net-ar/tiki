@@ -88,6 +88,28 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
     }
 
     /**
+     * Clean up specific test categories by IDs
+     */
+    protected static function cleanupTestCategoriesById($categIds)
+    {
+        $categlib = TikiLib::lib('categ');
+        foreach ($categIds as $categId) {
+            try {
+                if ($category = $categlib->get_category($categId)) {
+                    $categlib->remove_category($categId);
+                }
+            } catch (Exception $e) {
+                // Ignore cleanup errors
+            }
+            // Also remove from tracked test categories
+            $index = array_search($categId, static::$testCategories);
+            if ($index !== false) {
+                unset(static::$testCategories[$index]);
+            }
+        }
+    }
+
+    /**
      * Create a test category for use in tests
      * Returns the category ID if successful, or skips test if no permission
      */
@@ -168,7 +190,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
     protected function assertValidCategoryListResponse($body, $message = 'Category list response should be valid')
     {
         $this->assertIsArray($body, $message);
-        
+
         foreach ($body as $category) {
             $this->assertValidCategoryResponse($category, 'Each category in list should be valid');
         }
@@ -209,13 +231,37 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
     protected function assertValidCategorizeResponse($body, $expectedCategId, $message = 'Categorize response should be valid')
     {
         $this->assertIsArray($body, $message);
-    
+
         // Required fields
         $this->assertArrayHasKey('categId', $body, 'Response should have categId');
         $this->assertArrayHasKey('objects', $body, 'Response should have objects array');
-    
+        $this->assertArrayHasKey('count', $body, 'Response should have count');
+
         // Data validation
         $this->assertEquals($expectedCategId, $body['categId'], 'categId should match expected');
         $this->assertIsArray($body['objects'], 'objects should be array');
+
+        // Validate each object in the response
+        foreach ($body['objects'] as $object) {
+            if ($body['count'] === 'unchanged') {
+                $this->assertIsString($object, 'Each object should be a string when count is "unchanged"');
+                $this->assertStringContainsString(':', $object, 'Object string should be in "type:id" format');
+
+                list($type, $id) = array_map('trim', explode(':', $object, 2)); // Split into type and id
+                $this->assertNotEmpty($type, 'Object type should not be empty');
+                $this->assertNotEmpty($id, 'Object id should not be empty');
+            } else {
+                $this->assertArrayHasKey('type', $object, 'Each object should have type');
+                $this->assertIsString($object['type'], 'Object type should be string');
+                $this->assertArrayHasKey('id', $object, 'Each object should have id');
+                $this->assertArrayHasKey('catObjectId', $object, 'Each object should have catObjectId');
+            }
+        }
+
+        // Count can be integer (number of objects) or string 'unchanged'
+        $this->assertTrue(
+            is_int($body['count']) || $body['count'] === 'unchanged',
+            'Count should be integer or "unchanged"'
+        );
     }
 }

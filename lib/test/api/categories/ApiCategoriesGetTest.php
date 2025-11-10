@@ -11,6 +11,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCategoriesTest.php');
  * Integration tests for Categories API GET endpoints
  *
  * @group api-integration-test
+ * @group api-categories
  */
 class ApiCategoriesGetTest extends ApiBaseCategoriesTest
 {
@@ -52,11 +53,11 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         }
 
         // Should include the default root categories
-        $rootCategoryIds = array_column($body, 'categId');
-        $this->assertContains($this->getDefaultCategory('root'), $rootCategoryIds, 'Default root category should be in roots list');
-        $this->assertContains($this->getDefaultCategory('another_root'), $rootCategoryIds, 'Another root category should be in roots list');
+        $rootCategoryIds = array_map('intval', array_column($body, 'categId'));
+        $this->assertContains((int) $this->getDefaultCategory('root'), $rootCategoryIds, 'Default root category should be in roots list');
+        $this->assertContains((int) $this->getDefaultCategory('another_root'), $rootCategoryIds, 'Another root category should be in roots list');
 
-        $this->assertNotContains($this->getDefaultCategory('child'), $rootCategoryIds, 'Child category should not be in roots list');
+        $this->assertNotContains((int) $this->getDefaultCategory('child'), $rootCategoryIds, 'Child category should not be in roots list');
     }
 
     public function testListCategoriesByParentId()
@@ -77,8 +78,8 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         }
 
         // Should contain the default child category
-        $childCategoryIds = array_column($body, 'categId');
-        $this->assertContains($this->getDefaultCategory('child'), $childCategoryIds, 'Default child category should be in children list');
+        $childCategoryIds = array_map('intval', array_column($body, 'categId'));
+        $this->assertContains((int) $this->getDefaultCategory('child'), $childCategoryIds, 'Default child category should be in children list');
 
         // Verify child category details
         foreach ($body as $category) {
