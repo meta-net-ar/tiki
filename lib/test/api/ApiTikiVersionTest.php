@@ -22,7 +22,7 @@ class ApiTikiVersionTest extends ApiTestCase
 
     public function testApiGetTikiVersion()
     {
-        $response = $this->makeApiRequest('GET', '/version', null);
+        $response = $this->makeApiRequest('GET', '/version');
         $responseData = $this->getResponseBody($response);
         $expectedVersion = $this->lib->getVersion();
 
@@ -34,7 +34,7 @@ class ApiTikiVersionTest extends ApiTestCase
 
     public function testApiGetTikiVersionResponseFormat()
     {
-        $response = $this->makeApiRequest('GET', '/version', null);
+        $response = $this->makeApiRequest('GET', '/version');
         $responseData = $this->getResponseBody($response);
 
         $this->assertResponseStatus(200, $response);
@@ -49,7 +49,7 @@ class ApiTikiVersionTest extends ApiTestCase
 
     public function testApiGetTikiVersionHttpHeaders()
     {
-        $response = $this->makeApiRequest('GET', '/version', null);
+        $response = $this->makeApiRequest('GET', '/version');
 
         $this->assertResponseStatus(200, $response);
 

@@ -7,6 +7,10 @@
 
 // API wrapper for testing - handles $_GET setup from QUERY_STRING
 
+// Suppress warnings and notices during API tests to prevent them from breaking JSON output
+// Only errors and above will be reported
+error_reporting(E_ERROR | E_PARSE);
+
 // Parse QUERY_STRING into $_GET if set
 if (! empty($_SERVER['QUERY_STRING'])) {
     parse_str($_SERVER['QUERY_STRING'], $_GET);

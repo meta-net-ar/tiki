@@ -14,7 +14,7 @@ class ApiOauthPublicKeyTest extends ApiTestCase
 {
     public function testApiGetPublicKey()
     {        
-        $response = $this->makeApiRequest('GET', '/oauth/public-key', null);
+        $response = $this->makeApiRequest('GET', '/oauth/public-key');
 
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
