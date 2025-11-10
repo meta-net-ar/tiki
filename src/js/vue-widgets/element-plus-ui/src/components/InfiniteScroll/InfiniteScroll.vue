@@ -80,14 +80,18 @@ const load = async (direction) => {
 
 <script>
 export const DEFAULT_HEIGHT = 800;
+export const DATA_TESTID = {
+    LOADER: "infinite-scroll-loader",
+    CSS_STYLE: "infinite-scroll-css-style",
+}
 </script>
 
 <template>
     <template v-for="cssFile in cssFiles" :key="cssFile">
-        <link rel="stylesheet" :href="cssFile" />
+        <link rel="stylesheet" :href="cssFile" :data-testid="DATA_TESTID.CSS_STYLE" />
     </template>
     <el-scrollbar :height="itemsCount >= Number(step) && itemsCount < Number(totalCount) && `calc(${height}px - 35vh)`" max-height="80vh" @end-reached="load" ref="scrollbar"></el-scrollbar>
-    <el-icon class="is-loading infinite-list-loader" v-if="loading">
+    <el-icon class="is-loading infinite-list-loader" v-if="loading" :data-testid="DATA_TESTID.LOADER">
         <Loading />
     </el-icon>
 </template>
