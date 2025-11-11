@@ -15,7 +15,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCategoriesTest.php');
  */
 class ApiCategoriesGetTest extends ApiBaseCategoriesTest
 {
-    public function testListCategoriesWithoutAuth()
+    public function testApiListCategoriesWithoutPermission()
     {
         $response = $this->makeApiRequest('GET', '/categories');
 
@@ -26,7 +26,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
     }
 
-    public function testListAllCategories()
+    public function testApiListAllCategories()
     {
         $queryParams = ['type' => 'all'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
@@ -38,7 +38,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertValidCategoryListResponse($body, 'Should return array of all categories');
     }
 
-    public function testListRootCategories()
+    public function testApiListRootCategories()
     {
         $queryParams = ['type' => 'roots'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
@@ -60,7 +60,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertNotContains((int) $this->getDefaultCategory('child'), $rootCategoryIds, 'Child category should not be in roots list');
     }
 
-    public function testListCategoriesByParentId()
+    public function testApiListCategoriesByParentId()
     {
         $parentCategId = $this->getDefaultCategory('root');
 
@@ -90,7 +90,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         }
     }
 
-    public function testListCategoriesByNonExistentParentId()
+    public function testApiListCategoriesByNonExistentParentId()
     {
         $nonExistentParentId = 999999999;
         
@@ -105,7 +105,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertEmpty($body, 'Should return empty array for non-existent parent');
     }
 
-    public function testListCategoriesMissingParentIdForChildren()
+    public function testApiListCategoriesMissingParentIdForChildren()
     {
         $queryParams = ['type' => 'children']; // Missing parentId
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
@@ -117,7 +117,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 409, '<!--field[parentId]-->Field Required');
     }
 
-    public function testListCategoriesWithInvalidParentId()
+    public function testApiListCategoriesWithInvalidParentId()
     {
         $queryParams = ['parentId' => 'not_a_number', 'type' => 'children'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
@@ -129,7 +129,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 409, '<!--field[parentId]-->Field Required');
     }
 
-    public function testListCategoriesWhenFeatureDisabled()
+    public function testApiListCategoriesWhenFeatureDisabled()
     {
         $tikilib = TikiLib::lib('tiki');
         $originalValue = $tikilib->get_preference('feature_categories');

@@ -16,7 +16,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCategoriesTest.php');
  */
 class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 {
-    public function testCreateCategoryWithoutParent()
+    public function testApiCreateCategoryWithoutParent()
     {
         $data = [
             'name' => 'POST Test Root Category',
@@ -50,7 +50,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertEmpty($body['descendants'], 'New category should have no descendants');
     }
 
-    public function testCreateChildCategory()
+    public function testApiCreateChildCategory()
     {
         $parentId = $this->getDefaultCategory('root'); // Use default root category as parent
         $childData = [
@@ -86,7 +86,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertStringContainsString('Test Root Category', $body['categpath'], 'categpath should include parent name');
     }
 
-    public function testCreateCategoryWithoutName()
+    public function testApiCreateCategoryWithoutName()
     {
         $data = [
             'description' => 'Category without name',
@@ -107,7 +107,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 409, '<!--field[name]-->Field Required');
     }
 
-    public function testCreateCategoryWithoutPermission()
+    public function testApiCreateCategoryWithoutPermission()
     {
         $data = [
             'name' => 'Unauthorized Category',
@@ -129,7 +129,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
     }
 
-    public function testUpdateCategory()
+    public function testApiUpdateCategory()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
         $updateData = [
@@ -156,7 +156,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertEquals('Updated description', $body['description']);
     }
 
-    public function testUpdateCategoryParent()
+    public function testApiUpdateCategoryParent()
     {
         $parent2Id = $this->getDefaultCategory('another_root');
         $childId = $this->getDefaultCategory('child');
@@ -184,7 +184,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertStringContainsString('Another Test Root', $body['categpath'], 'categpath should reflect new parent');
     }
 
-    public function testUpdateNonExistentCategory()
+    public function testApiUpdateNonExistentCategory()
     {
         $updateData = [
             'name' => 'Should fail',
@@ -205,7 +205,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
-    public function testCategorizeWikiPage()
+    public function testApiCategorizeWikiPage()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
         $wikiData = [
@@ -249,7 +249,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         TikiLib::lib('tiki')->remove_all_versions('TestWikiPage');
     }
 
-    public function testCategorizeMultipleObjects()
+    public function testApiCategorizeMultipleObjects()
     {
         $categId = $this->getDefaultCategory('child');
 
@@ -298,7 +298,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         }
     }
 
-    public function testCategorizeAlreadyCategorizedObject()
+    public function testApiCategorizeAlreadyCategorizedObject()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
         $this->makeApiRequest(
@@ -346,7 +346,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         TikiLib::lib('tiki')->remove_all_versions('DuplicatePage');
     }
 
-    public function testCategorizeWithoutPermission()
+    public function testApiCategorizeWithoutPermission()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
         $categorizeData = [
@@ -369,7 +369,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
     }
 
-    public function testCategorizeWithInvalidObjectFormat()
+    public function testApiCategorizeWithInvalidObjectFormat()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
 
@@ -399,7 +399,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertCount(1, $body['objects'], 'Should have exactly 1 object returned');
     }
 
-    public function testUncategorizeWikiPage()
+    public function testApiUncategorizeWikiPage()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
         $this->makeApiRequest(
@@ -450,7 +450,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         TikiLib::lib('tiki')->remove_all_versions('UncategorizePage');
     }
 
-    public function testUncategorizeMultipleObjects()
+    public function testApiUncategorizeMultipleObjects()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
 
@@ -511,7 +511,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         }
     }
 
-    public function testUncategorizeNotCategorizedObject()
+    public function testApiUncategorizeNotCategorizedObject()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
 
@@ -550,7 +550,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         TikiLib::lib('tiki')->remove_all_versions('NotCategorizedPage');
     }
 
-    public function testUncategorizeWithoutPermission()
+    public function testApiUncategorizeWithoutPermission()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
 
