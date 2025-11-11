@@ -16,7 +16,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCategoriesTest.php');
  */
 class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
 {
-    public function testDeleteCategoryWithoutChildren()
+    public function testApiDeleteCategoryWithoutChildren()
     {
         $categId = $this->createTestCategory('New Category');
         $response = $this->makeApiRequest(
@@ -53,7 +53,7 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         $this->cleanupTestCategoriesById([$categId]);
     }
 
-    public function testDeleteCategoryWithChildren()
+    public function testApiDeleteCategoryWithChildren()
     {
         $parentId = $this->createTestCategory('Parent1 Category');
         $childId = $this->createTestCategory('Child1 Category', $parentId);
@@ -108,7 +108,7 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         $this->cleanupTestCategoriesById([$parentId, $childId, $grandchildId]);
     }
 
-    public function testDeleteNonExistentCategory()
+    public function testApiDeleteNonExistentCategory()
     {
         $response = $this->makeApiRequest(
             'DELETE',
@@ -123,7 +123,7 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
-    public function testDeleteCategoryWithoutPermission()
+    public function testApiDeleteCategoryWithoutPermission()
     {
         $categId = $this->createTestCategory('Permission Test');
         $response = $this->makeApiRequest(
