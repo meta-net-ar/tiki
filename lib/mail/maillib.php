@@ -27,6 +27,7 @@ use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
@@ -110,8 +111,10 @@ function tiki_mail_setup()
         if (! empty($queryParameters)) {
             $dns .= "?" . implode("&", $queryParameters);
         }
-    } elseif (! empty($prefs['mailer_handler']) && $prefs['mailer_handler'] === 'sendmail' && ! empty($prefs['sender_email'])) {
-        $dns = "sendmail://default?command=" . urlencode('-f' . $prefs['sender_email']);
+    } elseif (! empty($prefs['mailer_handler']) && $prefs['mailer_handler'] === 'sendmail') {
+        $dns = "sendmail://default";
+    } elseif (! empty($prefs['mailer_handler']) && $prefs['mailer_handler'] === 'phpini') {
+        $dns = "native://default";
     } elseif (! empty($prefs['mailer_handler']) && $prefs['mailer_handler'] === 'file') {
         $mail_debug_path = TIKI_PATH . '/' . TEMP_MAIL_DEBUG ;
         if (! file_exists($mail_debug_path)) {
@@ -225,11 +228,23 @@ function tiki_send_email($email)
         $email->bcc([]);
     }
 
+    $envelope = null;
+    if (! empty($prefs['sender_email'])) {
+        try {
+            $envelope = Envelope::create($email);
+            $senderName = $prefs['sender_name'] ?? null;
+            $envelope->setSender(new Address($prefs['sender_email'], $senderName));
+        } catch (Throwable $e) {
+            error_log("Mailer Envelope Error: " . $e->getMessage());
+            $envelope = null;
+        }
+    }
+
     /* @var $tiki_maillib__mailer_default_transport  */
     global $tiki_maillib__mailer_default_transport;
 
     try {
-        $tiki_maillib__mailer_default_transport->send($email);
+        $tiki_maillib__mailer_default_transport->send($email, $envelope);
     } catch (TransportExceptionInterface $e) {
         error_log("Mailer Transport Error: " . $e->getMessage());
     } catch (Throwable $e) {

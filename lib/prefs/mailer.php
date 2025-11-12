@@ -9,7 +9,8 @@ use Tiki\Package\VendorHelper;
 function prefs_mailer_list()
 {
     $emailOptions = [
-        'sendmail' => tra('Sendmail'),
+        'sendmail' => tra('Sendmail (sendmail binary)'),
+        'phpini' => tra('Php.ini mail settings'),
         'smtp' => tra('SMTP'),
         'file' => tra('File (debug)'),
     ];
@@ -151,7 +152,7 @@ function prefs_mailer_list()
         ],
         'mailer_handler' => [
             'name' => tra('Mail sender'),
-            'description' => tra('Specify if Tiki should use Sendmail(the PHP mail() function), SMTP or File (Debug) (to debug email sending by means of storing emails as files on disk at ./temp/Mail_yyyymmddhhmmss_randomstring.tmp ) to send mail notifications.'),
+            'description' => tra('Specify if Tiki should use the system Sendmail binary, the PHP mail() settings from php.ini, SMTP, or File (Debug) (to debug email sending by means of storing emails as files on disk at ./temp/Mail_yyyymmddhhmmss_randomstring.tmp ) to send mail notifications.'),
             'type' => 'list',
             'options' => $emailOptions,
             'default' => 'sendmail',
