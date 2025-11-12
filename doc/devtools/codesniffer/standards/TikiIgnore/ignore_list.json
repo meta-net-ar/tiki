@@ -5397,6 +5397,7 @@
             "Services_Payment_Controller::action_capture": true
         },
         "lib\/core\/Services\/PDF\/Controller.php": {
+            "Services_PDF_Controller::action_get_pdf": true,
             "Services_PDF_Controller::action_storeTable": true,
             "Services_PDF_Controller::action_checkPDFFile": true
         },
