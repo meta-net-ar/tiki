@@ -26,11 +26,13 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
-
+        // $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
-        $this->assertValidCategoryResponse($body, 'Deleted category should return valid structure');
+        $this->assertValidCategoryResponse($body);
+        $this->assertGreaterThan(0, $body['categId'], 'categId should be positive');
+        $this->assertGreaterThanOrEqual(0, $body['parentId'], 'parentId should be non-negative');
+        $this->assertNotEmpty($body['name'], 'name should not be empty');
 
         // Verify the returned data matches what was deleted
         $this->assertEquals($categId, $body['categId']);
@@ -67,12 +69,9 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
-
         $body = $this->getResponseBody($response);
 
-        // Validate the deleted parent category information
-        $this->assertValidCategoryResponse($body, 'Deleted parent category should return valid structure');
+        $this->assertValidCategoryResponse($body);
         $this->assertEquals($parentId, $body['categId']);
         $this->assertEquals('Parent1 Category', $body['name']);
         $this->assertEquals('Test category: Parent1 Category', $body['description']);

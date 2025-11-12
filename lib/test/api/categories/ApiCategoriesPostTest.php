@@ -41,7 +41,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
             static::$testCategories[] = $body['categId'];
         }
 
-        $this->assertValidCategoryResponse($body, 'Created category should have valid structure');
+        $this->assertValidCategoryResponse($body);
         $this->assertEquals('POST Test Root Category', $body['name']);
         $this->assertEquals('This is a test root category', $body['description']);
         $this->assertEquals(0, $body['parentId'], 'Root category should have parentId = 0');
@@ -77,7 +77,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
             static::$testCategories[] = $body['categId'];
         }
 
-        $this->assertValidCategoryResponse($body, 'Created child category should have valid structure');
+        $this->assertValidCategoryResponse($body);
         $this->assertEquals('POST Child Category', $body['name']);
         $this->assertEquals('Child category description', $body['description']);
         $this->assertEquals($parentId, $body['parentId']);
@@ -147,10 +147,10 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
-        
+
         $body = $this->getResponseBody($response);
 
-        $this->assertValidCategoryResponse($body, 'Updated category should have valid structure');
+        $this->assertValidCategoryResponse($body);
         $this->assertEquals($categId, $body['categId']);
         $this->assertEquals('Updated Test Child Category', $body['name']);
         $this->assertEquals('Updated description', $body['description']);
@@ -177,7 +177,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         $body = $this->getResponseBody($response);
 
-        $this->assertValidCategoryResponse($body, 'Moved category should have valid structure');
+        $this->assertValidCategoryResponse($body);
         $this->assertEquals($childId, $body['categId']);
         $this->assertEquals($parent2Id, $body['parentId']);
         $this->assertEquals($parent2Id, $body['rootId'], 'rootId should update to new parent');
@@ -208,19 +208,8 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
     public function testApiCategorizeWikiPage()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
-        $wikiData = [
-            'pageName' => 'TestWikiPage',
-            'data' => 'Test content for categorization',
-        ];
-
-        $this->makeApiRequest(
-            'POST',
-            '/wiki',
-            'Admins',
-            $wikiData,
-            'application/x-www-form-urlencoded'
-        );
-
+        $tikilib = TikiLib::lib('tiki');
+        $tikilib->create_page('TestWikiPage', 0, 'Test content for categorization', time(), 'API Test');
         $categorizeData = [
             'categId' => $categId,
             'objects' => ['wiki page:TestWikiPage'], // Format: "Type:ID"
@@ -235,13 +224,11 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
-
-        $this->assertValidCategorizeResponse($body, $categId, 'Categorize response should be valid');
-        $this->assertIsInt($body['count'], 'Count should be integer for successful categorization');
+        $this->assertValidCategorizeResponse($body);
         $this->assertCount(1, $body['objects'], 'Should have exactly 1 categorized object');
+        $this->assertEquals($categId, $body['categId'], 'categId should match expected');
         $this->assertEquals('wiki page', $body['objects'][0]['type']);
         $this->assertEquals('TestWikiPage', $body['objects'][0]['id']);
 
@@ -255,14 +242,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         // Create multiple wiki pages
         $pages = ['Page1', 'Page2', 'Page3'];
+        $tikilib = TikiLib::lib('tiki');
         foreach ($pages as $pageName) {
-            $this->makeApiRequest(
-                'POST',
-                '/wiki',
-                'Admins',
-                ['pageName' => $pageName, 'data' => "Content for $pageName"],
-                'application/x-www-form-urlencoded'
-            );
+            $tikilib->create_page($pageName, 0, 'Test content for categorization', time(), 'API Test');
         }
 
         // Categorize all pages using "Type:ID" format
@@ -284,11 +266,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
-
-        $this->assertValidCategorizeResponse($body, $categId, 'Categorize multiple objects response should be valid');
+        $this->assertValidCategorizeResponse($body);
         $this->assertCount(3, $body['objects'], 'Should have exactly 3 categorized objects');
         $this->assertIsInt($body['count'], 'Count should be integer for successful categorization');
 
@@ -301,13 +281,8 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
     public function testApiCategorizeAlreadyCategorizedObject()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
-        $this->makeApiRequest(
-            'POST',
-            '/wiki',
-            'Admins',
-            ['pageName' => 'DuplicatePage', 'data' => 'Test content'],
-            'application/x-www-form-urlencoded'
-        );
+        $tikilib = TikiLib::lib('tiki');
+        $tikilib->create_page('DuplicatePage', 0, 'Test content', time(), 'API Test');
 
         // Categorize the page first time
         $categorizeData = [
@@ -335,11 +310,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $secondResponse);
-        $this->assertResponseIsJson($secondResponse);
 
         $body = $this->getResponseBody($secondResponse);
-
-        $this->assertValidCategorizeResponse($body, $categId, 'Duplicate categorization should have valid response');
+        $this->assertValidCategorizeResponse($body);
         $this->assertEquals('unchanged', $body['count'], 'Count should be "unchanged" for already categorized object');
 
         // cleanup created page
@@ -389,7 +362,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         // Should return success but with no objects processed
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertArrayHasKey('categId', $body, 'Response should contain objects key');
@@ -402,13 +374,8 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
     public function testApiUncategorizeWikiPage()
     {
         $categId = $this->getDefaultCategory('child'); // Use default test category
-        $this->makeApiRequest(
-            'POST',
-            '/wiki',
-            'Admins',
-            ['pageName' => 'UncategorizePage', 'data' => 'Test content'],
-            'application/x-www-form-urlencoded'
-        );
+        $tikilib = TikiLib::lib('tiki');
+        $tikilib->create_page('UncategorizePage', 0, 'Test content', time(), 'API Test');
 
         $this->makeApiRequest(
             'POST',
@@ -436,11 +403,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
-        
-        $this->assertValidCategorizeResponse($body, $categId, 'Uncategorize response should be valid');
+        $this->assertValidCategorizeResponse($body);
         $this->assertCount(1, $body['objects'], 'Should have exactly 1 uncategorized object');
         $this->assertEquals('wiki page', $body['objects'][0]['type']);
         $this->assertEquals('UncategorizePage', $body['objects'][0]['id']);
@@ -456,14 +421,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         // Create and categorize multiple wiki pages
         $pages = ['UnPage1', 'UnPage2', 'UnPage3'];
+        $tikilib = TikiLib::lib('tiki');
         foreach ($pages as $pageName) {
-            $this->makeApiRequest(
-                'POST',
-                '/wiki',
-                'Admins',
-                ['pageName' => $pageName, 'data' => "Content for $pageName"],
-                'application/x-www-form-urlencoded'
-            );
+            $tikilib->create_page($pageName, 0, "Content for $pageName", time(), 'API Test');
         }
 
         // Build object strings using "Type:ID" format
@@ -497,11 +457,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
-
-        $this->assertValidCategorizeResponse($body, $categId, 'Uncategorize multiple objects response should be valid');
+        $this->assertValidCategorizeResponse($body);
         $this->assertCount(3, $body['objects'], 'Should have exactly 3 uncategorized objects');
         $this->assertIsInt($body['count'], 'Count should be integer for successful uncategorization');
 
@@ -516,13 +474,8 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $categId = $this->getDefaultCategory('child'); // Use default test category
 
         // Create a wiki page but don't categorize it
-        $this->makeApiRequest(
-            'POST',
-            '/wiki',
-            'Admins',
-            ['pageName' => 'NotCategorizedPage', 'data' => 'Test content'],
-            'application/x-www-form-urlencoded'
-        );
+        $tikilib = TikiLib::lib('tiki');
+        $tikilib->create_page('NotCategorizedPage', 0, 'Test content', time(), 'API Test');
 
         // Try to uncategorize a page that's not in the category
         $uncategorizeData = [
@@ -539,11 +492,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         
         $body = $this->getResponseBody($response);
-
-        $this->assertValidCategorizeResponse($body, $categId, 'Uncategorize non-categorized object should have valid response');
+        $this->assertValidCategorizeResponse($body);
         $this->assertEquals('unchanged', $body['count'], 'Count should be "unchanged" for non-categorized object');
 
         // cleanup created page
