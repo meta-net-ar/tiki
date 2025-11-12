@@ -34,8 +34,8 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
-        
-        $this->assertValidCategoryListResponse($body, 'Should return array of all categories');
+
+        $this->assertValidCategoryListResponse($body);
     }
 
     public function testApiListRootCategories()
@@ -47,7 +47,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
-        $this->assertValidCategoryListResponse($body, 'Should return array of root categories');
+        $this->assertValidCategoryListResponse($body);
         foreach ($body as $category) {
             $this->assertEquals(0, $category['parentId'], 'Root categories should have parentId = 0');
         }
@@ -70,7 +70,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
-        $this->assertValidCategoryListResponse($body, 'Should return array of child categories');
+        $this->assertValidCategoryListResponse($body);
 
         // All returned categories should have the specified parentId
         foreach ($body as $category) {
