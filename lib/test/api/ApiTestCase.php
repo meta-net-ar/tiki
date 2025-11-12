@@ -270,6 +270,77 @@ abstract class ApiTestCase extends TikiTestCase
     }
 
     /**
+     * Recursively asserts that all expected keys exist in the data array and match expected types
+     *
+     * @param array $data The actual API response (part or full)
+     * @param array $schema An associative array where keys match expected keys and values are types (e.g., "string", "int|null")
+     * @param string $context Optional prefix for failure messages
+     */
+    protected function assertMatchesSchema(array $data, array $schema, string $context = ''): void
+    {
+        foreach ($schema as $key => $typeOrNested) {
+            $msg = $context ? "$context - $key" : $key;
+
+            $this->assertArrayHasKey($key, $data, "$msg is missing");
+
+            $value = $data[$key];
+
+            if (is_array($typeOrNested)) {
+                // Nested schema: must be an array
+                $this->assertIsArray($value, "$msg should be an array");
+
+                // Check if it's a list of items or an associative array
+                if ($this->isSequentialArray($value)) {
+                    foreach ($value as $i => $item) {
+                        $this->assertMatchesSchema($item, $typeOrNested, "$msg[$i]");
+                    }
+                } else {
+                    $this->assertMatchesSchema($value, $typeOrNested, $msg);
+                }
+
+                continue;
+            }
+
+            $valid = false;
+            foreach (explode('|', $typeOrNested) as $type) {
+                $type = trim($type);
+                if ($this->valueMatchesType($value, $type)) {
+                    $valid = true;
+                    break;
+                }
+            }
+
+            $this->assertTrue($valid, "$msg should be of type $typeOrNested, got " . gettype($value));
+        }
+    }
+
+    /**
+     * Check if array is a sequential list (non-associative with integer keys starting from 0)
+     */
+    private function isSequentialArray(array $array): bool
+    {
+        return array_values($array) === $array;
+    }
+
+    /**
+     * Helper: Check if a value matches the expected PHP type
+     */
+    private function valueMatchesType($value, string $type): bool
+    {
+        return match ($type) {
+            'string' => is_string($value),
+            'int', 'integer' => is_int($value),
+            'float' => is_float($value),
+            'numeric' => is_numeric($value),
+            'bool', 'boolean' => is_bool($value),
+            'array' => is_array($value),
+            'null' => is_null($value),
+            'scalar' => is_scalar($value),
+            default => false,
+        };
+    }
+
+    /**
      * Get authentication token for API requests
      * 
      * @param string $permission Permission level
