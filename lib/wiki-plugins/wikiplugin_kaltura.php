@@ -100,7 +100,7 @@ function wikiplugin_kaltura_info()
 
 function wikiplugin_kaltura($data, $params)
 {
-    global $prefs, $user, $page;
+    global $prefs;
 
     static $instance = 0;
 
@@ -131,7 +131,7 @@ function wikiplugin_kaltura($data, $params)
 
     try {
         $playlistObject = $kalturalib->getPlaylist($params['id']);
-    } catch (Exception $e) {
+    } catch (Exception) {
         $playlistObject = null;
     }
 

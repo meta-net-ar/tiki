@@ -110,7 +110,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
             $folder = hex2bin($matches[2]);
             $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
             if (! $mailbox->authed()) {
-                Hm_Msgs::add('Could not authenticate with mail server', 'danger');
+                Hm_Msgs::add(tr('Could not authenticate with mail server'), 'danger');
                 return;
             }
 
@@ -122,7 +122,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         } elseif (preg_match("/^tracker_folder_/", $form['list_path'], $matches)) {
             $email = tiki_parse_message($form['list_path'], $msg_ids[0]);
             if (! $email) {
-                Hm_Msgs::add('Message could not be loaded', 'danger');
+                Hm_Msgs::add(tr('Message could not be loaded'), 'danger');
                 return;
             }
             if (isset($form['folder']) && $form['folder'] != 'archive') {
@@ -190,7 +190,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                 bind_tracker_item_update_event($mailbox, $folder, $form, $ids);
             }
         } else {
-            Hm_Msgs::add('Message from this source could not be moved', 'danger');
+            Hm_Msgs::add(tr('Message from this source could not be moved'), 'danger');
             return;
         }
 
@@ -198,13 +198,13 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         $item = $trk->get_item_info($form['tracker_item_id']);
 
         if (! $item) {
-            Hm_Msgs::add('Tracker item not found', 'danger');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
 
         $field = $trk->get_field_info($form['tracker_field_id']);
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
@@ -239,12 +239,12 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
 
         $total_msg_ids = count($msg_ids);
         if ($errors > 0 && $errors < $total_msg_ids) {
-            Hm_Msgs::add('Some messages moved');
+            Hm_Msgs::add(tr('Some messages moved'));
         } elseif ($total_msg_ids == $errors) {
-            Hm_Msgs::add('Unable to move/copy selected messages', 'danger');
+            Hm_Msgs::add(tr('Unable to move/copy selected messages'), 'danger');
             return;
         } else {
-            Hm_Msgs::add('Messages moved');
+            Hm_Msgs::add(tr('Messages moved'));
         }
     }
 }
@@ -351,12 +351,12 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('Tracker item not found', 'danger');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
         $field['value'] = [
@@ -403,12 +403,12 @@ class Hm_Handler_tiki_delete_draft extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('Could not delete the saved draft. (Tracker item was not found)', 'danger');
+            Hm_Msgs::add(tr('Could not delete the saved draft. (Tracker item was not found)'), 'danger');
             return;
         }
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('Could not delete the saved draft. (Tracker field not found)', 'danger');
+            Hm_Msgs::add(tr('Could not delete the saved draft. (Tracker field not found)'), 'danger');
             return;
         }
         $field['value'] = [
@@ -442,20 +442,20 @@ class Hm_Handler_tiki_presave_draft extends Hm_Handler_Module
 
             $item = $trk->get_item_info($itemId);
             if (! $item) {
-                Hm_Msgs::add('Could not save draft to tracker item because the item was not found. id: ' . $itemId, 'warning');
+                Hm_Msgs::add(tr('Could not save draft to tracker item because the item was not found. id: ') . $itemId, 'warning');
                 return;
             }
 
             $field = $trk->get_field_info($fieldId);
             if (! $field) {
-                Hm_Msgs::add('Could not save draft to tracker item because the field was not found.', 'warning');
+                Hm_Msgs::add(tr('Could not save draft to tracker item because the field was not found.'), 'warning');
                 return;
             }
 
             $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
 
             if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
-                Hm_Msgs::add('Could not save draft to tracker item because folders are not configured for the current field.', 'warning');
+                Hm_Msgs::add(tr('Could not save draft to tracker item because folders are not configured for the current field.'), 'warning');
                 return;
             }
             $this->out('save_draft_to_imap', false);
@@ -486,18 +486,18 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('Tracker item not found', 'danger');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
         $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
         if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
-            Hm_Msgs::add('Configure folders for this tracker field to save drafts', 'danger');
+            Hm_Msgs::add(tr('Configure folders for this tracker field to save drafts'), 'danger');
             return;
         }
 
@@ -536,7 +536,7 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
         ]);
 
         if ($this->request->post['draft_notice']) {
-            Hm_Msgs::add('Draft saved');
+            Hm_Msgs::add(tr('Draft saved'));
         }
     }
 }
@@ -558,7 +558,7 @@ class Hm_Handler_tiki_compose_from_draft extends Hm_Handler_Module
         $field = $trk->get_field_info($fieldId);
 
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
@@ -606,13 +606,13 @@ class Hm_Handler_tiki_archive_replied extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('Tracker item not found', 'danger');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
 
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
@@ -646,13 +646,13 @@ class Hm_Handler_tiki_delete_message extends Hm_Handler_Module
             $trk = TikiLib::lib('trk');
             $item = $trk->get_item_info($itemId);
             if (! $item) {
-                Hm_Msgs::add('Tracker item not found', 'danger');
+                Hm_Msgs::add(tr('Tracker item not found'), 'danger');
                 $this->out('delete_error', true);
                 return;
             }
             $field = $trk->get_field_info($fieldId);
             if (! $field) {
-                Hm_Msgs::add('Tracker field not found', 'danger');
+                Hm_Msgs::add(tr('Tracker field not found'), 'danger');
                 $this->out('delete_error', true);
                 return;
             }
@@ -662,7 +662,7 @@ class Hm_Handler_tiki_delete_message extends Hm_Handler_Module
             $trk->replace_item($item['trackerId'], $item['itemId'], [
                 'data' => [$field]
             ]);
-            Hm_Msgs::add('Message deleted');
+            Hm_Msgs::add(tr('Message deleted'));
             $this->out('delete_error', false);
         }
     }
@@ -689,13 +689,13 @@ class Hm_Handler_tiki_archive_message extends Hm_Handler_Module
             $trk = TikiLib::lib('trk');
             $item = $trk->get_item_info($itemId);
             if (! $item) {
-                Hm_Msgs::add('Tracker item not found', 'danger');
+                Hm_Msgs::add(tr('Tracker item not found'), 'danger');
                 $this->out('archive_error', true);
                 return;
             }
             $field = $trk->get_field_info($fieldId);
             if (! $field) {
-                Hm_Msgs::add('Tracker field not found', 'danger');
+                Hm_Msgs::add(tr('Tracker field not found'), 'danger');
                 $this->out('archive_error', true);
                 return;
             }
@@ -705,7 +705,7 @@ class Hm_Handler_tiki_archive_message extends Hm_Handler_Module
             $trk->replace_item($item['trackerId'], $item['itemId'], [
                 'data' => [$field]
             ]);
-            Hm_Msgs::add('Message archived');
+            Hm_Msgs::add(tr('Message archived'));
             $this->out('archive_error', false);
         }
     }
@@ -920,7 +920,7 @@ class Hm_Handler_tiki_download_message extends Hm_Handler_Module
                 echo $part->getContent();
                 Hm_Functions::cease();
             }
-            Hm_Msgs::add('An Error occurred trying to download the message', 'danger');
+            Hm_Msgs::add(tr('An Error occurred trying to download the message'), 'danger');
         }
     }
 }
@@ -951,11 +951,11 @@ class Hm_Handler_tiki_process_move extends Hm_Handler_Module
                 }
             }
             if ($moved == 0) {
-                Hm_Msgs::add('Unable to move/copy selected messages', 'danger');
+                Hm_Msgs::add(tr('Unable to move/copy selected messages'), 'danger');
             } elseif ($form['imap_move_action'] == 'move') {
-                Hm_Msgs::add($moved == 1 ? 'Message moved' : $moved . ' messages moved');
+                Hm_Msgs::add($moved == 1 ? tr('Message moved') : $moved . ' ' . tr('messages moved'));
             } else {
-                Hm_Msgs::add($moved == 1 ? 'Message copied' : $moved . ' messages copied');
+                Hm_Msgs::add($moved == 1 ? tr('Message copied') : $moved . ' ' . tr('messages copied'));
             }
             $this->out('move_count', $moved);
         }

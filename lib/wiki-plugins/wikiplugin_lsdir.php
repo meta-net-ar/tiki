@@ -68,7 +68,6 @@ function wikiplugin_lsdir_info()
 
 function wikiplugin_lsdir($data, $params)
 {
-    global $tikilib;
     $dir = $params['dir'];
     $urlprefix = $params['urlprefix'];
     $sort = $params['sort'];

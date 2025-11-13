@@ -53,8 +53,6 @@ function wikiplugin_mwtable_info()
 
 function wikiplugin_mwtable($data, $params)
 {
-    global $tikilib;
-
     // Parse the parameters
     extract($params, EXTR_SKIP);
     if ($fancy == "true") {
@@ -70,12 +68,11 @@ function wikiplugin_mwtable($data, $params)
 
     // set class constants
     $default_class_table = "normal";
-    $default_class_heading = "";
-    $default_class_td_odd = "";
+    $default_class_headings = "";
     $default_class_td_odd = "";
     if ($fancy) {
         $default_class_table = "normal";
-        $default_class_heading = "heading";
+        $default_class_headings = "heading";
         $default_class_td_odd = "odd";
         $default_class_td_even = "even";
     } elseif ($wiki_classes) {

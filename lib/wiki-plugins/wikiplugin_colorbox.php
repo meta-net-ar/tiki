@@ -119,10 +119,9 @@ function wikiplugin_colorbox_info()
 }
 function wikiplugin_colorbox($data, $params)
 {
-    global $user, $prefs, $base_url;
+    global $prefs, $base_url;
     static $iColorbox = 0;
     $smarty = TikiLib::lib('smarty');
-    $tikilib = TikiLib::lib('tiki');
 
     if (! is_null($params['fgalId'])) {
         if ($prefs['feature_file_galleries'] != 'y') {

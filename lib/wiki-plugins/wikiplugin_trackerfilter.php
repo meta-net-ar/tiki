@@ -562,7 +562,6 @@ function wikiplugin_trackerFilter_reset_filters($iTrackerFilter = 0)
 
 function wikiplugin_trackerFilter_get_session_filters_key($iTrackerFilter = 0)
 {
-    $trackerId = $_REQUEST['trackerId'] ?? 0;
     if (! empty($_REQUEST['page'])) {
         return 'f_' . $_REQUEST['page'] . '_' . $iTrackerFilter;
     }
@@ -625,7 +624,7 @@ function wikiplugin_trackerFilter_get_filters($trackerId = 0, array $listfields 
 
     if ($listfields) {
         $newListFields = [];
-        foreach ($listfields as $id => $field) {
+        foreach ($listfields as $field) {
             /** @var TrackerLib $trklib */
             $info = $trklib->get_field_info($field);
             if (! is_numeric($field) || ($info && $info['trackerId'] == $trackerId)) {
@@ -647,7 +646,6 @@ function wikiplugin_trackerFilter_get_filters($trackerId = 0, array $listfields 
         }
     }
 
-    $iField = 0;
     foreach ($listfields as $fieldId) {
         if ($fieldId == 'status' || $fieldId == 'Status') {
             $filter = ['name' => $fieldId, 'fieldId' => 'status', 'format' => 'd', 'opts' => [['id' => 'o', 'name' => 'open', 'selected' => (! empty($_REQUEST['f_status']) && $_REQUEST['f_status'] == 'o') ? 'y' : 'n'], ['id' => 'p', 'name' => 'pending', 'selected' => (! empty($_REQUEST['f_status']) && $_REQUEST['f_status'] == 'p') ? 'y' : 'n'], ['id' => 'c', 'name' => 'closed', 'selected' => (! empty($_REQUEST['f_status']) && $_REQUEST['f_status'] == 'c') ? 'y' : 'n']]];
@@ -662,7 +660,7 @@ function wikiplugin_trackerFilter_get_filters($trackerId = 0, array $listfields 
             $filters[] = $filter;
             continue;
         }
-        foreach ($fields['data'] as $iField => $field) {
+        foreach ($fields['data'] as $field) {
             if ($field['fieldId'] == $fieldId) {
                 break;
             }
@@ -906,7 +904,6 @@ function wikiplugin_trackerFilter_get_filters($trackerId = 0, array $listfields 
                     $field['ins_id'] = 'f_' . $field['fieldId'];
                     break;
                 case 'F': // freetags
-                    $freetaglib = TikiLib::lib('freetag');
                     $opts = [];
                     $tags = [];
                     $items = $trklib->list_items($field['trackerId'], 0, -1, '', [$field]);

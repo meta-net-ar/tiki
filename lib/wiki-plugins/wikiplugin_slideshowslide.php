@@ -102,6 +102,7 @@ function wikiplugin_slideshowslide_info()
                 'description' => tra('Select entry transition effect for slide'),
                 'filter' => 'word',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
@@ -117,6 +118,7 @@ function wikiplugin_slideshowslide_info()
                 'description' => tra('Select exit transition effect for slide'),
                 'filter' => 'word',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],

@@ -381,7 +381,7 @@ function wikiplugin_include($dataIn, $params)
             $tip = tr('Include Plugin') . ' | ' . tr('Edit the included page:') . ' &quot;' . $page . '&quot;';
             if (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF) {
                 $text .= '<a class="editplugin" ' . // ironically smarty_block_self_link doesn't work for this! ;)
-                smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), $tmp = false) . '>' .
+                smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), false) . '>' .
                 smarty_function_icon(['name' => 'edit', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
             }
         }

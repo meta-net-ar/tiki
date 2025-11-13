@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_div_info()
 {
-    global $prefs;
 
     $info = [
         'searchable_by_default' => true,

@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_mail_info()
 {
-    global $prefs;
 
     return [
         'name' => tra('Mail'),

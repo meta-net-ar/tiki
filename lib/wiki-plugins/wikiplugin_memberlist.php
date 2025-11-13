@@ -154,7 +154,7 @@ function wikiplugin_memberlist_info()
 
 function wikiplugin_memberlist($data, $params)
 {
-    global $prefs, $user, $page;
+    global $prefs, $user;
     $mail = false;
     $tikilib = TikiLib::lib('tiki');
     $userlib = TikiLib::lib('user');
@@ -273,12 +273,10 @@ function wikiplugin_memberlist($data, $params)
             $group['info'] = $userlib->get_group_info($name);
         }
     }
+    $showgroupname = false;
 
-    $showgroupname = "";
     if ($params['showgroupname'] === "y") {
         $showgroupname = true;
-    } else {
-        $showgroupname = false;
     }
 
     $smarty = TikiLib::lib('smarty');

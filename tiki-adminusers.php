@@ -539,7 +539,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
                         $cookietab = '1';
                         $logslib->add_log('adminusers', 'Password reset required at next login has been enabled for ' . $_POST['login'], $user);
                     }
-                } else if (! $pass_first_login && $userinfo['pass_confirm'] === 0) {
+                } elseif (! $pass_first_login && $userinfo['pass_confirm'] === 0) {
                     if ($userlib->change_user_password($userinfo['login'], '', $pass_first_login)) {
                         Feedback::success(sprintf(tra('Password reset requirement has been disabled for %s'), $_POST['login']));
                         $cookietab = '1';

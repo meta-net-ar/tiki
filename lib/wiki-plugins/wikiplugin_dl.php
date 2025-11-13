@@ -37,9 +37,6 @@ function wikiplugin_dl_info()
 
 function wikiplugin_dl($data, $params)
 {
-    global $tikilib;
-
-    global $replacement;
     if (isset($param)) {
         extract($params, EXTR_SKIP);
     }

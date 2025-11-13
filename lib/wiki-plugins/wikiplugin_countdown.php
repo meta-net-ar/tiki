@@ -226,7 +226,6 @@ function wikiplugin_countdown($data, $params)
             (($timediff < 0 && $diff['invert'] == 1) || ($timediff > 0 && $diff['invert'] == 0))
             && $caldays == 'y' && $show_hours === false
         ) {
-            $int = is_int($days);
             $diff['caldays'] = $days + 1;
         } else {
             $diff['caldays'] = $days;

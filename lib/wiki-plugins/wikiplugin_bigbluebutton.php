@@ -103,7 +103,7 @@ function wikiplugin_bigbluebutton_info()
 function wikiplugin_bigbluebutton($data, $params)
 {
     try {
-        global $prefs, $user;
+        global $prefs;
 
         if (empty($prefs['bigbluebutton_server_location'])) {
             return WikiParser_PluginOutput::error(tr('Warning'), tr('BigBlueButton server location is not defined'));
@@ -161,7 +161,7 @@ function wikiplugin_bigbluebutton($data, $params)
         return $smarty->fetch('wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl');
     } catch (ServerSaltKeyException $e) {
         return WikiParser_PluginOutput::internalError($e->getMessage());
-    } catch (Exception $e) {
+    } catch (Exception) {
         return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
     }
 }

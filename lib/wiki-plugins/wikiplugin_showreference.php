@@ -143,7 +143,6 @@ function wikiplugin_showreference($data, $params)
         $is_global = 1;
         if (isset($GLOBALS['referencesData']) && is_array($GLOBALS['referencesData'])) {
             $referencesData = $GLOBALS['referencesData'];
-            $is_global = 1;
         } else {
             foreach ($references['data'] as $data) {
                 array_push($referencesData, $data['biblio_code']);

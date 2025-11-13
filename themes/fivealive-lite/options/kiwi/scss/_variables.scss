@@ -48,12 +48,11 @@ $body-color: #212529;
 $tiki-footer_liner-border-color: $primary;
 
 // Links
-$link-color: #52702E; // #638637;
-$link-hover-color: #a59705;
-$link-hover-color:               darken($link-color, 15%);
-$link-hover-decoration:       none;
-$link-shade-percentage:                   20%;  // default
-$btn-link-disabled-color:     $gray-600;  // default
+$link-color:                #52702E; // #638637;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Components
 $component-active-bg: $secondary;

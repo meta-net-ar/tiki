@@ -29,7 +29,6 @@ function wikiplugin_showpref_info()
 
 function wikiplugin_showpref($data, $params)
 {
-    global $prefs;
     $tikilib = TikiLib::lib('tiki');
     global $tikipath;
 

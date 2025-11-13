@@ -65,7 +65,7 @@ class LanguageTranslator
         list($content, $out, $wasTranslated) = $this->traImpl($content, $this->lang, $args);
         $out = typography($out, $this->lang, true);
 
-        $this->populateCollectedTranslations($content, $out, $wasTranslated);
+        $this->populateCollectedTranslations($content, $out, $wasTranslated, $args);
         return $out;
     }
 
@@ -235,10 +235,10 @@ class LanguageTranslator
      * @param $printed
      * @param $isTranslated
      */
-    private function populateCollectedTranslations($original, $printed, $isTranslated)
+    private function populateCollectedTranslations($original, $printed, $isTranslated, $args = [])
     {
         if (self::inInteractiveMode()) {
-            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated];
+            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated, $args];
         }
     }
 

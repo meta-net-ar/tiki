@@ -21,105 +21,147 @@ class NlLib extends TikiLib
     private const TABLE_NEWSLETTERS = 'tiki_newsletters';
     private const TABLE_SENT_NEWSLETTERS_FILES = 'tiki_sent_newsletters_files';
     private const TABLE_SENT_NEWSLETTERS = 'tiki_sent_newsletters';
-    public function replace_newsletter(
-        $nlId,
-        $name,
-        $description,
-        $allowUserSub,
-        $allowAnySub,
-        $unsubMsg,
-        $validateAddr,
-        $allowTxt,
-        $frequency,
-        $author,
-        $allowArticleClip = 'y',
-        $autoArticleClip = 'n',
-        $articleClipRange = null,
-        $articleClipTypes = '',
-        $emptyClipBlocksSend = 'n'
-    ) {
 
-        if ($nlId) {
-            $query = "update `" . self::TABLE_NEWSLETTERS . "` set `name`=?,
-                                `description`=?,
-                                `allowUserSub`=?,
-                                `allowTxt`=?,
-                                `allowAnySub`=?,
-                                `unsubMsg`=?,
-                                `validateAddr`=?,
-                                `frequency`=?,
-                                `allowArticleClip`=?,
-                                `autoArticleClip`=?,
-                                `articleClipRange`=?,
-                                `articleClipTypes`=?,
-                                `emptyClipBlocksSend`=?
-                                where `nlId`=?";
-            $result = $this->query(
-                $query,
-                [
-                        $name,
-                        $description,
-                        $allowUserSub,
-                        $allowTxt,
-                        $allowAnySub,
-                        $unsubMsg,
-                        $validateAddr,
-                        $frequency,
-                        $allowArticleClip,
-                        $autoArticleClip,
-                        $articleClipRange,
-                        $articleClipTypes,
-                        $emptyClipBlocksSend,
-                        (int) $nlId,
-                ]
-            );
-        } else {
-            $query = "insert into `" . self::TABLE_NEWSLETTERS . "`(
-                                `name`,
-                                `description`,
-                                `created`,
-                                `lastSent`,
-                                `editions`,
-                                `users`,
-                                `allowUserSub`,
-                                `allowTxt`,
-                                `allowAnySub`,
-                                `unsubMsg`,
-                                `validateAddr`,
-                                `frequency`,
-                                `author`,
-                                `allowArticleClip`,
-                                `autoArticleClip`,
-                                `articleClipRange`,
-                                `articleClipTypes`
-                                ) ";
-            $query .= " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $result = $this->query(
-                $query,
-                [
-                    $name,
-                    $description,
-                    $this->now,
-                    0,
-                    0,
-                    0,
-                    $allowUserSub,
-                    $allowTxt,
-                    $allowAnySub,
-                    $unsubMsg,
-                    $validateAddr,
-                    null,
-                    $author,
-                    $allowArticleClip,
-                    $autoArticleClip,
-                    $articleClipRange,
-                    $articleClipTypes,
-                ]
-            );
-            $queryid = "select max(`nlId`) from `" . self::TABLE_NEWSLETTERS . "` where `created`=?";
-            $nlId = $this->getOne($queryid, [(int) $this->now]);
+    private function insertNewsletter(
+        string $name,
+        string $description,
+        string $allowUserSub = 'y',
+        string $allowAnySub = 'n',
+        string $unsubMsg = '',
+        string $validateAddr = 'n',
+        string $allowTxt = 'n',
+        string $frequency = '',
+        string $author = '',
+        string $allowArticleClip = 'y',
+        string $autoArticleClip = 'n',
+        ?string $articleClipRange = null,
+        string $articleClipTypes = '',
+        string $emptyClipBlocksSend = 'n'
+    ): int|false {
+        $query = 'insert into `' . self::TABLE_NEWSLETTERS . '` (
+                    `name`, `description`, `created`, `lastSent`, `editions`, `users`,
+                    `allowUserSub`, `allowTxt`, `allowAnySub`, `unsubMsg`, `validateAddr`,
+                    `frequency`, `author`, `allowArticleClip`, `autoArticleClip`,
+                    `articleClipRange`, `articleClipTypes`, `emptyClipBlocksSend`
+                ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+        $result = $this->query($query, [
+            $name,
+            $description,
+            (int) $this->now,
+            0,
+            0,
+            0,
+            $allowUserSub,
+            $allowTxt,
+            $allowAnySub,
+            $unsubMsg,
+            $validateAddr,
+            $frequency,
+            $author,
+            $allowArticleClip,
+            $autoArticleClip,
+            $articleClipRange,
+            $articleClipTypes,
+            $emptyClipBlocksSend,
+        ]);
+
+        if ($result) {
+            return $this->getOne('select max(`nlId`) from `' . self::TABLE_NEWSLETTERS . '` where `created`=?', [(int) $this->now]);
         }
+
+        return false;
+    }
+
+    private function updateNewsletter(
+        int $nlId,
+        string $name,
+        string $description,
+        string $allowUserSub,
+        string $allowAnySub,
+        string $unsubMsg,
+        string $validateAddr,
+        string $allowTxt,
+        string $frequency,
+        string $allowArticleClip,
+        string $autoArticleClip,
+        ?string $articleClipRange,
+        string $articleClipTypes,
+        string $emptyClipBlocksSend
+    ): int|false {
+        $query = 'update `' . self::TABLE_NEWSLETTERS . '` set  
+                `name`=?,
+                `description`=?,
+                `allowUserSub`=?,
+                `allowTxt`=?,
+                `allowAnySub`=?,
+                `unsubMsg`=?,
+                `validateAddr`=?,
+                `frequency`=?,
+                `allowArticleClip`=?,
+                `autoArticleClip`=?,
+                `articleClipRange`=?,
+                `articleClipTypes`=?,
+                `emptyClipBlocksSend`=? 
+                where `nlId`=?';
+        $result = $this->query($query, [
+            $name,
+            $description,
+            $allowUserSub,
+            $allowTxt,
+            $allowAnySub,
+            $unsubMsg,
+            $validateAddr,
+            $frequency,
+            $allowArticleClip,
+            $autoArticleClip,
+            $articleClipRange,
+            $articleClipTypes,
+            $emptyClipBlocksSend,
+            (int) $nlId,
+        ]);
+
+        if (! $result && ! $result->numRows()) {
+            return false;
+        }
+
         return $nlId;
+    }
+
+    public function replace_newsletter(
+        ?int $nlId,
+        string $name,
+        string $description,
+        string $allowUserSub,
+        string $allowAnySub,
+        string $unsubMsg,
+        string $validateAddr,
+        string $allowTxt,
+        string $frequency,
+        string $author,
+        string $allowArticleClip = 'y',
+        string $autoArticleClip = 'n',
+        ?string $articleClipRange = null,
+        string $articleClipTypes = '',
+        string $emptyClipBlocksSend = 'n'
+    ): int|false {
+        if ($nlId) {
+            return $this->updateNewsletter($nlId, $name, $description, $allowUserSub, $allowAnySub, $unsubMsg, $validateAddr, $allowTxt, $frequency, $allowArticleClip, $autoArticleClip, $articleClipRange, $articleClipTypes, $emptyClipBlocksSend);
+        } else {
+            if (! $this->isNewsletterUnique($name, $author)) {
+                return -1;
+            } else {
+                return $this->insertNewsletter($name, $description, $allowUserSub, $allowAnySub, $unsubMsg, $validateAddr, $allowTxt, $frequency, $author, $allowArticleClip, $autoArticleClip, $articleClipRange, $articleClipTypes, $emptyClipBlocksSend);
+            }
+        }
+    }
+
+    private function isNewsletterUnique(string $name, string $author): bool
+    {
+        $query = 'select `nlId` from `' . self::TABLE_NEWSLETTERS . '` where `name` = ? and `author` = ?';
+        $item = $this->getOne($query, [$name, $author]);
+
+        return ! $item;
     }
 
     public function replace_edition($nlId, $subject, $data, $users, $editionId = 0, $draft = false, $datatxt = '', $files = [], $wysiwyg = null, $is_html = null)

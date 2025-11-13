@@ -166,7 +166,7 @@ function wikiplugin_file_info()
 
 function wikiplugin_file($data, $params)
 {
-    global $tikilib, $prefs, $info, $page_view_date;
+    global $prefs, $info, $page_view_date;
 
     if (empty($params['type'])) {
         $params['type'] = "gallery";

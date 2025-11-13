@@ -101,7 +101,6 @@ function wikiplugin_groupmailcore_info()
 
 function wikiplugin_groupmailcore($data, $params)
 {
-    global $tikilib;
     require_once('lib/wiki-plugins/wikiplugin_trackerlist.php');
 
     $trackerparams = [];

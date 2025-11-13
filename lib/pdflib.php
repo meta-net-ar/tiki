@@ -324,6 +324,9 @@ class PdfGenerator
         $mpdf = new \Mpdf\Mpdf($mpdfConfig);
         $mpdf->curlAllowUnsafeSslRequests = ($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] ?? 'y') === 'y';
 
+        $basePath = $params['base_path'] ?? TIKI_PATH ;
+        $mpdf->SetBasePath($basePath);
+
         //custom fonts add, currently fontawesome support is added, more fonts can be added in future
         $custom_fontdata = [
          'fontawesome' => [
@@ -364,7 +367,6 @@ class PdfGenerator
         } else {
             $extcss = '';
         }
-
         // checking if print friendly preference is enabled if so then attach print css
         // otherwise theme styles will be retained by theme css
         $themecss = '';

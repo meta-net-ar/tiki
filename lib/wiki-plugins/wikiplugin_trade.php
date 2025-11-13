@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_trade_info()
 {
-    global $prefs;
-
     return [
         'name' => tra('Trade'),
         'documentation' => 'PluginTrade',

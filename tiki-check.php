@@ -3128,11 +3128,11 @@ $fcts = array(
             'risky' => tra('System is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled.'),
             'safe' => tra('System is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled.')
          ),
-         array(
+        array(
             'function' => 'proc_open',
-            'risky' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.'),
-            'safe' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.')
-         ),
+            'risky' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.') . ' ' . tra('The Sendmail mailer option also requires it.'),
+            'safe' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.') . ' ' . tra('The Sendmail mailer option also requires it.')
+        ),
          array(
             'function' => 'popen',
             'risky' => tra('popen is similar to exec.') . ' ' . tra('Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.'),
@@ -3659,6 +3659,7 @@ function processKeyFields(&$alterTableFile, $tableName, $keyFields, $isUnique = 
 // Function used to check db mismatches
 function check_db_mismatches()
 {
+    $diffDbColumns = array();
     $tikiSql = file_get_contents('db/tiki.sql');
     preg_match_all('/CREATE TABLE (?:.(?!;[^\S]))+./s', $tikiSql, $tables);
     preg_match_all("/ALTER TABLE (?:.(?!;[^\S]))+./s", $tikiSql, $alterTables);
@@ -3858,15 +3859,15 @@ function getDbKeyDefinitions($tableName)
     SELECT 
         INDEX_NAME, 
         TABLE_NAME,
-        GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS INDEX_COLUMNS, 
+        GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS INDEX_COLUMNS,
     CASE 
-        WHEN NON_UNIQUE = 0 AND INDEX_NAME = 'PRIMARY' 
+        WHEN NON_UNIQUE = 0 AND INDEX_NAME = 'PRIMARY'
             THEN 'PRIMARY' 
         WHEN NON_UNIQUE = 0
             THEN 'UNIQUE'
         ELSE 'INDEX' 
     END AS INDEX_TYPE 
-    FROM information_schema.statistics 
+    FROM information_schema.statistics
     WHERE TABLE_SCHEMA = database() AND TABLE_NAME = "$tableName"
     GROUP BY INDEX_NAME, NON_UNIQUE;
     SQL;
@@ -4754,7 +4755,7 @@ if ($standalone && ! $nagios) {
         'MCrypt' => $criptLib->getUserCryptDataStats('mcrypt'),
     ));
     $ws_port = $prefs['realtime_port'] ? $prefs['realtime_port'] : '8080';
-    $websocket_full_base_url = $prefs['realtime_full_base_url'];
+    $websocket_full_base_url = $prefs['realtime_full_base_url'] ?? '';
     if (! empty($websocket_full_base_url)) {
         $parts = parse_url($websocket_full_base_url);
         $ws_port = $parts['port'] ?? null;

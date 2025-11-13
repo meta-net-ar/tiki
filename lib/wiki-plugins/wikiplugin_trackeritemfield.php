@@ -119,7 +119,7 @@ function wikiplugin_trackeritemfield_info()
 
 function wikiplugin_trackeritemfield($data, $params)
 {
-    global $userTracker, $group, $user, $tiki_p_admin_trackers, $prefs;
+    global $userTracker, $group, $user, $prefs;
 
     static $memoItemId = 0;
     static $memoTrackerId = 0;

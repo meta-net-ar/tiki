@@ -135,7 +135,7 @@ function wikiplugin_sheet_info()
 
 function wikiplugin_sheet($data, $params)
 {
-    global $tiki_p_edit_sheet, $tiki_p_edit, $tiki_p_admin_sheet, $tiki_p_admin, $prefs, $user, $page;
+    global $tiki_p_edit_sheet, $tiki_p_edit, $tiki_p_admin, $user, $page;
     extract($params, EXTR_SKIP);
     $style = (! is_null($height)) ? "height: $height !important;" : '';
     $style .= (! is_null($width)) ? "width: $width;" : '';
@@ -169,7 +169,7 @@ function wikiplugin_sheet($data, $params)
                 <form id="$formId" method="post" action="tiki-wikiplugin_edit.php">
                 <div>
                     <input type="hidden" name="page" value="$page"/>
-                    <input type="hidden" name="content" value="$data"/>
+                    <input type="hidden" name="content" value="$content"/>
                     <input type="hidden" name="index" value="$index"/>
                     <input type="hidden" name="type" value="sheet"/>
                     <input type="hidden" name="params[id]" value="$sheetId"/>
@@ -233,7 +233,6 @@ EOF;
 
     // Grab sheet output
     if (! empty($url)) {
-        $file = file_get_contents($url);
         $pathInfo = pathinfo($url);
         if ($pathInfo['extension'] == 'csv') {
             $handler = new CSVHandler($url);

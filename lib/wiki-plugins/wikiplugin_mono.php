@@ -30,8 +30,6 @@ function wikiplugin_mono_info()
 
 function wikiplugin_mono($data, $params)
 {
-    global $tikilib;
-
     extract($params, EXTR_SKIP);
 
     $code = /* htmlentities( htmlspecialchars(*/ trim($data) /* ) )*/;

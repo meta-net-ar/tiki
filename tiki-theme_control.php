@@ -13,12 +13,14 @@ $inputConfiguration = [
         'staticKeyFilters'   => [
         'categId'            => 'int',               //post
         'categoryId'         => 'int',               //post
-        'theme'              => 'word',              //post
-        'delete'             => 'int',               //get
-        'categoryIds'        => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'theme'              => 'alnumdash',         //post
+        'delete'             => 'alpha',             //post
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'word',              //post
+        'find'               => 'text',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+        'categoryIds'        => 'int',               //post
         ],
     ],
 ];

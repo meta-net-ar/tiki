@@ -167,8 +167,6 @@ function wikiplugin_map_info()
 
 function wikiplugin_map($data, $params)
 {
-    $smarty = TikiLib::lib('smarty');
-
     $width = '100%';
     if (! is_null($params['width'])) {
         $width = (int)$params['width'] . 'px';
@@ -364,8 +362,6 @@ OUT;
 
 function wp_map_plugin_colorpicker($body, $args)
 {
-    $headerlib = TikiLib::lib('header');
-    static $counter = 0;
 
     $args->replaceFilter('colors', 'word');
     $colors = array_map('wp_map_color_filter', $args->asArray('colors', ','));

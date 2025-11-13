@@ -88,7 +88,7 @@ function wikiplugin_playscorm_info()
 function wikiplugin_playscorm($data, $params)
 {
 
-    global $base_url, $tikiroot, $tikipath, $user, $prefs;
+    global $base_url, $tikiroot, $user, $prefs;
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
@@ -103,7 +103,6 @@ function wikiplugin_playscorm($data, $params)
     }
 
     $localname = "scorm$fileId";
-    $sitepath = parse_url($base_url);
 
     if (str_ends_with($moodle_url, '/')) {
         $moodle_url = substr($moodle_url, 0, -1);

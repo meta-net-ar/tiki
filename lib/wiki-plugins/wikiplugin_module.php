@@ -362,7 +362,7 @@ function wikiplugin_module($data, $params)
         $handle = opendir('modules');
 
         while ($file = readdir($handle)) {
-            if ((substr($file, 0, 4) == "mod-") and (substr($file, -4, 4) == ".php")) {
+            if ((str_starts_with($file, "mod-")) and (str_ends_with($file, ".php"))) {
                 $mod = substr(substr(basename($file), 4), 0, -4);
 
                 $out .= "<option value=\"$mod\">$mod</option>";
@@ -394,7 +394,7 @@ function wikiplugin_module($data, $params)
         $out = $modlib->execute_module($module_reference);
     }
 
-    if (! is_null($out)) {
+    if (! empty($out)) {
         if ($float != 'nofloat') {
             $data = "<div style='float: $float;'>$out</div>";
         } else {
@@ -405,7 +405,7 @@ function wikiplugin_module($data, $params)
         $data = "<div class=\"alert alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-bs-dismiss=\"alert\" aria-label=\"" . tra("Close") . "\"><span aria-hidden=\"true\">&times;</span></button>" . tra("Sorry, no such module") . "<br><b>$module</b></div>" . $data;
     }
 
-    if (! is_null($module) && $module == 'register') {
+    if ($module == 'register') {
         // module register (maybe others too?) adds ~np~ to plugin output so remove them
         $data = preg_replace('/~[\/]?np~/ms', '', $data);
     }

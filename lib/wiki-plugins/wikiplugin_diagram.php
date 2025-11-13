@@ -100,7 +100,7 @@ function wikiplugin_diagram_info()
  */
 function wikiplugin_diagram($data, $params)
 {
-    global $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_edit, $tiki_p_view;
+    global $user, $page, $wikiplugin_included_page, $prefs;
     $template = $params['template'];
     $galleryId = $params['galleryId'] ?? (! is_null($params['fileName']) ? 1 : '');
     $fileName = $params['fileName'] ?? 'Diagram %page% %date%.drawio' ;
@@ -388,7 +388,6 @@ function loadImageAnnotate($annotate)
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($annotate);
 
-    $smarty = TikiLib::lib('smarty');
     $url = smarty_modifier_sefurl($annotate, 'display');
 
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {

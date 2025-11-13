@@ -105,7 +105,7 @@
                 {elseif zone_is_empty('left') or $prefs.feature_left_column eq 'n'}
                     <div class="col col1 col-md-12 col-lg-9 {if $prefs.feature_fixed_width neq 'y'}col-xl-10{/if} pb-4" id="col1">
                         <div id="col1top-outer-wrapper" class="col1top-outer-wrapper d-flex justify-content-between">
-                            <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                            <div class="col1top-inner-wrapper flex-grow-1 ">
                                 {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                                     {$modzonepagetop}
                                 {/if}
@@ -151,7 +151,7 @@
                                     </div>
                                 {/if}
                             </div>
-                            <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                            <div class="col1top-inner-wrapper flex-grow-1 ">
                                 {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                                     {$modzonepagetop}
                                 {/if}
@@ -188,7 +188,7 @@
                             </div>
                         {/if}
                     </div>
-                    <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                    <div class="col1top-inner-wrapper flex-grow-1 ">
                         {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                             {$modzonepagetop}
                         {/if}

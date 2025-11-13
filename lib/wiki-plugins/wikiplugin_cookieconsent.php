@@ -8,7 +8,6 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 function wikiplugin_cookieconsent_info()
 {
-    global $prefs;
     return [
         'name' => tra('Cookie Consent'),
         'documentation' => 'PluginCookieConsent',

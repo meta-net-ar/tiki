@@ -91,14 +91,20 @@ class MenuLib extends TikiLib
     public function reset_app_menu()
     {
         $tiki_sql = file_get_contents('db/tiki.sql');
-        preg_match_all('/^(?:INSERT|UPDATE) (?:INTO )?`?tiki_menu_options`? .*$/mi', $tiki_sql, $matches);
+
+        //handle multi-line INSERT statements
+        preg_match_all('/(?:INSERT\s+INTO\s+`?tiki_menu_options`?.*?;|UPDATE\s+tiki_menu_options\s+SET.*?;)/ims', $tiki_sql, $matches);
 
         if ($matches && count($matches[0])) {
             $menuoptions = $this->table('tiki_menu_options');
             $menuoptions->deleteMultiple([ 'menuId' => 42 ]);
 
             foreach ($matches[0] as $query) {
-                $this->query($query);
+                // remove extra whitespace and newlines
+                $query = preg_replace('/\s+/', ' ', trim($query));
+                if (! empty($query)) {
+                    $this->query($query);
+                }
             }
             $this->empty_menu_cache(42);
         }

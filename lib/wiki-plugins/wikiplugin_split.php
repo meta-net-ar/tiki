@@ -112,7 +112,6 @@ function wikiplugin_split_rollback($data, $hashes)
 function wikiplugin_split($data, $params, $pos)
 {
     global $tikilib, $tiki_p_admin_wiki, $tiki_p_admin, $section;
-    global $replacement;
     preg_match_all('/{(SPLIT|CODE|HTML|FADE|JQ|JS|MOUSEOVER|VERSIONS).+{\1}/ismU', $data, $matches);
     $hashes = [];
     foreach ($matches[0] as $match) {
@@ -134,7 +133,6 @@ function wikiplugin_split($data, $params, $pos)
 
     extract($params, EXTR_SKIP);
     $fixedsize = $fixedsize == 'y' || $fixedsize == 1;
-    $joincols  = $joincols == 'y' || $joincols == 1;
     // Split data by rows and cells
 
     $smarty = TikiLib::lib('smarty');
@@ -159,7 +157,6 @@ function wikiplugin_split($data, $params, $pos)
     $percent = false;
     if (! is_null($colsize)) {
         $tdsize = is_array($colsize) ? $colsize : explode('|', $colsize);
-        $tdtotal = 0;
         for ($i = 0; $i < $maxcols; $i++) {
             if (! isset($tdsize[$i])) {
                 $tdsize[$i] = 0;
@@ -169,22 +166,14 @@ function wikiplugin_split($data, $params, $pos)
                     $percent = true;
                 }
             }
-            $tdtotal += (float)$tdsize[$i];
-        }
-        $tdtotaltd = floor($tdtotal / 100 * 100);
-        if ($tdtotaltd == 100) { // avoir IE to do to far
-            $class = 'class="table split"';
-        } else {
-            $class = 'class="split" width="' . $tdtotaltd . '%"';
         }
     } elseif ($fixedsize) {
         $columnSize = floor(100 / $maxcols);
-        $class = 'class="table split"';
         $percent = true;
     }
     $result = "<div class='table-responsive'><div><table class='table" . ($percent ? " normalnoborder" : "") . ( ! empty($customclass) ? " $customclass" : "") . "'>";
 
-    // Attention: Dont forget to remove leading empty line in section ...
+    // Attention: Don't forget to remove leading empty line in section ...
     //            it should remain from previous '---' line...
     // Attention: original text must be placed between \n's!!!
     if ($first != 'col') {
@@ -276,8 +265,6 @@ function wikiplugin_split_cell($data, $pos, $cell)
 {
     $start = $pos;
     $end = $pos;
-    $no_parsed = '~np~|~pp~|\\<pre\\>|\\<PRE\\>';
-    $no_parsed_end = '';
     $match = '@@@+|----*|\{SPLIT\}|\{SPLIT\(|~np~|~pp~|\\<pre\\>|\\<PRE\\>';
     while (true) {
         if (! preg_match("#($match)#m", substr($data, $pos), $matches)) {

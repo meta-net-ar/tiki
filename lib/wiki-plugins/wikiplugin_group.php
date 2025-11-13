@@ -78,6 +78,20 @@ function wikiplugin_group_info()
     ];
 }
 
+function filterGroups(array $groupsList, bool $shouldExist, array $attributes): array
+{
+    $result = [];
+    $userlib = TikiLib::lib('user');
+    foreach ($groupsList as $grp) {
+        $grpinfo = $userlib->get_group_info($grp);
+        $attname = 'tiki.memberextend.' . $grpinfo['id'];
+        if ($shouldExist ? isset($attributes[$attname]) : ! isset($attributes[$attname])) {
+            $result[] = $grp;
+        }
+    }
+    return $result;
+}
+
 function wikiplugin_group($data, $params)
 {
     // TODO : Re-implement friend filter
@@ -97,30 +111,15 @@ function wikiplugin_group($data, $params)
     $notgroups = $params['notgroups'];
     $allowedUsers = $params['users'];
     $userPending = [];
+    $userNotPending = [];
     if (! is_null($params['pending']) || ! is_null($params['notpending'])) {
+        $pending = $params['pending'] ?? [];
+        $notpending = $params['notpending'] ?? [];
         $attributelib = TikiLib::lib('attribute');
         $attributes = $attributelib->get_attributes('user', $user);
-        $userlib = TikiLib::lib('user');
-        if (! is_null($params['pending'])) {
-            $pending = $params['pending'];
-            foreach ($pending as $pgrp) {
-                $grpinfo = $userlib->get_group_info($pgrp);
-                $attname = 'tiki.memberextend.' . ($grpinfo['id'] ?? '');
-                if (isset($attributes[$attname])) {
-                    $userPending[] = $pgrp;
-                }
-            }
-        }
-        if (! is_null($params['notpending'])) {
-            $notpending = $params['notpending'];
-            foreach ($notpending as $npgrp) {
-                $grpinfo = $userlib->get_group_info($npgrp);
-                $attname = 'tiki.memberextend.' . ($grpinfo['id'] ?? '');
-                if (! isset($attributes[$attname])) {
-                    $userNotPending[] = $npgrp;
-                }
-            }
-        }
+
+        $userPending = filterGroups($pending, true, $attributes);
+        $userNotPending = filterGroups($notpending, false, $attributes);
     }
 
     if (is_null($groups) && is_null($notgroups) && empty($pending) && empty($notpending) && is_null($allowedUsers)) {

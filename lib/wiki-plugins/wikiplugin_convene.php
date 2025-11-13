@@ -165,7 +165,6 @@ function wikiplugin_convene_info(): array
 
 function wikiplugin_convene($data, $params): string
 {
-    global $page;
     /** @var HeaderLib $headerlib */
     $headerlib = TikiLib::lib('header');
     /** @var TikiLib $tikilib */
@@ -221,7 +220,6 @@ function wikiplugin_convene($data, $params): string
 
     if (! is_array($dataArray)) {
         //start flat static text to prepared array
-        $dataString = $data . '';
         $dataArray = [];
 
         $lines = explode("\n", trim($data));
@@ -284,7 +282,7 @@ function wikiplugin_convene($data, $params): string
                     foreach ($users as $user) {
                         $data[$timestamp][$user] = 0;
                     }
-                } catch (Exception $e) {
+                } catch (Exception) {
                     Feedback::error(tr('Invalid date string: "%0". Please use a valid strtotime-compatible format.', $date_str));
                 }
             }
@@ -298,7 +296,7 @@ function wikiplugin_convene($data, $params): string
     $votes = [];
     $dateLabels = [];
     foreach ($data as $stamp => & $date) {
-        foreach ($date as $user => $vote) {
+        foreach ($date as $vote) {
             if (empty($votes[$stamp])) {
                 $votes[$stamp] = 0;
             }
@@ -457,7 +455,6 @@ function send_email_result_vote($vote_infos)
 
         $userlib = TikiLib::lib('user');
         $smarty = TikiLib::lib('smarty');
-        $tikilib = TikiLib::lib('tiki');
 
         $mail = new TikiMail();
 

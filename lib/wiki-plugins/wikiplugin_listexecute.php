@@ -140,7 +140,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
     $result->setId('wplistexecute-' . $iListExecute);
 
     $resultBuilder = new Search_ResultSet_WikiBuilder($result);
-    $resultBuilder->apply($matches, $params);
+    $resultBuilder->apply($matches);
 
     $dataSource = $unifiedsearchlib->getDataSource();
     $builder = new Search_Formatter_Builder();

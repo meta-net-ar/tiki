@@ -412,7 +412,7 @@ function wikiplugin_appframe_template($data, $params, $start)
 
         $smarty->assign('input', $data);
         return $smarty->fetch($file);
-    } catch (SmartyException $e) {
+    } catch (SmartyException) {
         return tr('Template file not found: %0', $file);
     }
 }
@@ -422,7 +422,6 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
     static $counter = 0;
     $function = null;
     $control = null;
-    $label = null;
     $mode = null;
 
     switch ($name = $params->type->word()) {

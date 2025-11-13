@@ -60,6 +60,11 @@
                     {preference name=mailer_spark_post_key}
                     {preference name=mailer_spark_post_region}
                 </div>
+                <div class="adminoptionboxchild mailer_handler_childcontainer phpini">
+                    {remarksbox type="warning" title="{tr}PHP mail() limitations{/tr}"}
+                        {tr _0='<a href="https://symfony.com/doc/current/mailer.html#using-built-in-transports" target="_blank" rel="noopener">' _1='</a>'}This uses PHP’s mail() settings from php.ini (sendmail_path or SMTP). Because it relies on the host configuration, delivery errors may be hidden and Bcc headers might be exposed. Prefer the Sendmail or SMTP options when possible. See %0Symfony’s mailer documentation%1 for details.{/tr}
+                    {/remarksbox}
+                </div>
                 <div class="adminoptionboxchild mailer_handler_childcontainer smtp">
                     {preference name=mailer_smtp_server}
                     {preference name=mailer_smtp_auth}

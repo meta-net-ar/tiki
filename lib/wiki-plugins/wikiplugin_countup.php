@@ -21,7 +21,6 @@ function getFontOptions()
 
 function wikiplugin_countup_info()
 {
-    $fontWeightOptions = [];
     $fontWeightOptions = [
         ['text' => '', 'value' => ''],
         ['text' => tra('normal'), 'value' => 'normal'],

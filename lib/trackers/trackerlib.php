@@ -1978,7 +1978,7 @@ class TrackerLib extends TikiLib
         $_GET = $get;
     }
 
-    public function replace_item($trackerId, $itemId, $ins_fields, $status = '', $ins_categs = 0, $bulk_import = false, $skip_sync = false, $deleted_files = [])
+    public function replace_item($trackerId, $itemId, $ins_fields, $status = '', $ins_categs = 0, $bulk_import = false, $skip_sync = false, $deleted_files = [], $notify_watchers = true)
     {
         global $user, $prefs, $tiki_p_admin_trackers, $tiki_p_admin_users;
         $final_event = 'tiki.trackeritem.update';
@@ -2349,6 +2349,7 @@ class TrackerLib extends TikiLib
             'bulk_import' => $bulk_import,
             'skip_sync' => $skip_sync,
             'aggregate' => sha1("trackeritem/$currentItemId"),
+            'notify_watchers' => $notify_watchers,
         ];
 
         // this needs to trigger no matter of the size as trackeritem categorization depends on this and other event types as well
@@ -5591,6 +5592,10 @@ class TrackerLib extends TikiLib
 
         // Don't send a notification if this operation is part of a bulk import
         if ($args['bulk_import']) {
+            return;
+        }
+
+        if (! $args['notify_watchers']) {
             return;
         }
 

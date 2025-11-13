@@ -138,7 +138,7 @@ function wikiplugin_miniquiz($data, $params)
                 shuf($answers);
                 $back .= '<div class="wikitext">';
                 $i = 1;
-                foreach ($answers as $aid => $answer) {
+                foreach ($answers as $answer) {
                     $back .= '<div class="q"><input type="radio" id="answer' . $id . '_' . ++$i . '" name="answer[' . $id . ']" value="' . htmlspecialchars($answer) . '"';
                     if (! empty($item['qresult']) && $item['qresult'] == $answer) {
                         $back .= ' checked="checked"';

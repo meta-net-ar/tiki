@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_xmlupdate_info()
 {
-    global $prefs;
     $info = [
         'name' => tra('XMLupdate'),
         'documentation' => 'PluginXMLupdate',
@@ -51,8 +50,7 @@ function wikiplugin_xmlupdate_info()
 
 function wikiplugin_xmlupdate($data, $params)
 {
-    global $tikilib, $prefs, $user, $info;
-    $filegallib = TikiLib::lib('filegal');
+    global $prefs;
     $smarty = TikiLib::lib('smarty');
     // check that File Galleries have been set for use
     if ($prefs['feature_file_galleries'] != 'y') {

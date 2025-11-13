@@ -57,7 +57,7 @@ function module_tracker_input_info()
                 'filter' => 'text',
             ],
             'insertmode' => [
-                'name' => tr('Mode change on complete'),
+                'name' => tra('Mode change on complete'),
                 'description' => tr('Target mode to enter after dialog closes'),
                 'filter' => 'text',
                 'default' => '',

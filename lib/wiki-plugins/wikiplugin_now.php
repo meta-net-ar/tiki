@@ -108,7 +108,7 @@ function wikiplugin_now($data, $params)
             //see if the user format setting results in a valid date, return default format if not
             try {
                 new DateTime($ret);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $ret = $default;
             }
         }

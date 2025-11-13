@@ -148,6 +148,51 @@ foreach ($transitions as & $trans) {
     $trans['to_label'] = transition_label_finder($trans['to']);
 }
 
+// Setup Mermaid diagram data
+if (count($available_states) > 0) {
+    $cleanStringData = function (string $s): string {
+        $s = preg_replace('/\s+/u', ' ', $s ?? '');
+        $s = str_replace(['"', "\r", "\n"], ['\"', '', ''], $s);
+        return trim($s);
+    };
+
+    $buildMermaidData = function (array $states, array $transitions) use ($cleanStringData): string {
+        $lines = ['stateDiagram-v2'];
+        $idMap = [];
+        $n = 1;
+
+        // Map DB ids to short Mermaid ids and declare states with labels safely
+        foreach ($states as $stateId => $label) {
+            $mid = 'S' . $n++;
+            $idMap[$stateId] = $mid;
+            $lines[] = "state \"{$cleanStringData((string)$label)}\" as {$mid}";
+        }
+
+        // Edges (label optional)
+        foreach ($transitions as $tr) {
+            $from = $idMap[$tr['from']] ?? null;
+            $to = $idMap[$tr['to']] ?? null;
+            if (! $from || ! $to) {
+                continue;
+            }
+
+            $edge = $cleanStringData((string)($tr['name'] ?? ''));
+            if (! empty($tr['preserve'])) {
+                $edge = trim($edge . ' (preserve)');
+            }
+
+            $lines[] = $edge ? "{$from} --> {$to} : {$edge}" : "{$from} --> {$to}";
+        }
+
+        return implode("\n", $lines);
+    };
+
+    $smarty->assign('mermaid_transition_data', $buildMermaidData($available_states, $transitions));
+
+    $headerlib->add_js_module("import handleMermaid from '@mermaidPack'; handleMermaid();");
+}
+
+
 // Setup Smarty & Session
 $_SESSION['transition'] = [
                 'mode' => $transition_mode,
@@ -174,24 +219,7 @@ $smarty->assign('available_states', $available_states);
 $smarty->assign('transitions', $transitions);
 $smarty->assign('guards', $guards);
 $smarty->assign('selected_transition', $selected_transition);
-
 $smarty->assign('cat_tree', $cat_tree);
-
-// Graph setup
-if (count($available_states) > 0) {
-    $edges = [];
-    foreach ($transitions as $tr) {
-        $edges[] = [
-                        'from' => $tr['from_label'],
-                        'to' => $tr['to_label'],
-                        'label' => $tr['name'],
-                        'preserve' => (bool) $tr['preserve']
-        ];
-    }
-
-    $smarty->assign('graph_nodes', json_encode(array_values($available_states)));
-    $smarty->assign('graph_edges', json_encode($edges));
-}
 
 $smarty->assign('mid', 'tiki-admin_transitions.tpl');
 $smarty->display('tiki.tpl');

@@ -133,7 +133,7 @@ if (isset($_POST['uploadIndex']) && $access->checkCsrf()) {
         $blackL->set_preference('pass_blacklist_file', $blackL->generateBlacklistName(false));
         $blackL->loadBlacklist($filename);
     } else {
-        Feedback::error(tr('Unable to Write Password File to Disk'));
+        Feedback::error(tra('Unable to Write Password File to Disk'));
     }
 } elseif (isset($_POST['deleteIndex']) && $access->checkCsrf(true)) {
     $blackL->deletePassIndex();

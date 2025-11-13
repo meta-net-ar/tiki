@@ -11,15 +11,17 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'objdata'            => 'word',              //post
-        'type'               => 'word',              //post
-        'assign'             => 'bool',              //post
-        'theme'              => 'word',              //post
+        'objdata'            => 'text',              //post
+        'type'               => 'text',              //post
+        'assign'             => 'alpha',             //post
+        'theme'              => 'alnumdash',         //post
         'delete'             => 'int',               //get
-        'obj'                => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+        'obj'                => 'int',               //post
         ],
     ],
 ];

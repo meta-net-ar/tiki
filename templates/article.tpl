@@ -46,7 +46,7 @@
         {rating_result id=$articleId type=article}
     {/if}
 
-    <div class="articleheading{if $isfloat neq 'y'}d-md-flex{/if} clearfix"> {* No flex in sm screen, to prevent skinny text column *}
+    <div class="articleheading{if $isfloat neq 'y'} d-md-flex{/if} clearfix"> {* No flex in sm screen, to prevent skinny text column *}
 
         <div class="{if $isfloat eq 'y'}float-start me-3{else}flex-shrink-0 me-2 ms-2{/if}">
             {capture name=imgTitle}{if $show_image_caption eq 'y' and $image_caption}{$image_caption|escape}{elseif isset($topicName)}{tr}{$topicName}{/tr}{/if}{/capture}

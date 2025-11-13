@@ -204,7 +204,6 @@ function wikiplugin_tour($data, $params)
     $_SESSION['id'] = ($_SESSION['id'] ?? 0) + 1;
 
     $cookie_id = 'tour' . md5($params['tour_id']);
-    $cookie_expiry = time() + 31536000;
     if (getCookie($cookie_id, 'tours') == 'y') {
         $dontStart = true;
     } else {
@@ -213,10 +212,6 @@ function wikiplugin_tour($data, $params)
         if ($params['show_once'] === 'y') {
             CookieConsentLib::tikiSetCookie($cookie_id, 'y', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, 'tours');
         }
-    }
-
-    if (! isset($wp_tour['start'])) {
-        $wp_tour['start'] = $params['start'];
     }
 
     // tour constants (change across multiple tours)

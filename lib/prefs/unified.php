@@ -274,6 +274,14 @@ function prefs_unified_list()
             'description' => tra('In case of Elasticsearch is active and unavailable, use MySQL Full-Text Search as fallback'),
             'default' => 'n',
         ],
+        'unified_elastic_index_max_result_window' => [
+            'name' => tra('Index max result window for ElasticSearch'),
+            'description' => tra('This allows a larger amount of data to be recorded.'),
+            'type' => 'text',
+            'size' => '3',
+            'units' => tra('records'),
+            'default' => '',
+        ],
         'unified_mysql_index_current' => [
             'name' => tra('MySQL full-text search current index'),
             'description' => tra('A new index is created upon rebuilding, and the old one is then destroyed. This setting enables seeing the currently active index.'),

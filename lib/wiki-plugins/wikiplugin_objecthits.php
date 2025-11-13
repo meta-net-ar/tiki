@@ -55,7 +55,6 @@ function wikiplugin_objecthits_info()
 
 function wikiplugin_objecthits($data, $params)
 {
-    $tikilib = TikiLib::lib('tiki');
     $statslib = TikiLib::lib('stats');
 
     extract($params, EXTR_SKIP);

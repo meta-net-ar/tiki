@@ -103,12 +103,11 @@ function wikiplugin_trackeritemcopy_info()
 
 function wikiplugin_trackeritemcopy($data, $params)
 {
-    $trklib = TikiLib::lib("trk");
     $smarty = TikiLib::lib('smarty');
     $params["linkFieldIds"] = $params["linkFieldIds"] ?? [];
 
     $trackerId = $params["trackerId"];
-    if (is_array($trackerId) == false) {
+    if (! is_array($trackerId)) {
         $trackerId = [$trackerId];
     }
     $copyFieldIds = $params["copyFieldIds"];

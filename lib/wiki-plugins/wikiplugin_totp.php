@@ -79,9 +79,6 @@ function wikiplugin_totp($data, $params)
         ZXING_DIST_PATH . '/umd/index.min.js'
     );
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-totp.js', true);
-
-    $tikilib = TikiLib::lib('tiki');
-    $info = $tikilib->get_page_info($page, true, true);
     $defaults = [
         'interval'   => 30,
         'issuer'     => 'Unknown Application',
@@ -189,8 +186,6 @@ function addTOTPPlugin($pageName, $user, $secret, $interval, $issuer)
         $interval,
         $issuer
     );
-
-    $re = '/{totp(\s+\}|\})/mi';
 
     $tikilib = TikiLib::lib('tiki');
     $info = $tikilib->get_page_info($pageName, true, true);

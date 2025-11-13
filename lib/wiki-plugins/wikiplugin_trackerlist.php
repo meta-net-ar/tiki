@@ -1021,15 +1021,12 @@ function wikiplugin_trackerlist_info()
 
 function wikiplugin_trackerlist($data, $params)
 {
-    global $tiki_p_admin_trackers, $prefs, $tiki_p_view_trackers, $user,
-           $page, $tiki_p_tracker_vote_ratings, $tiki_p_tracker_view_ratings,
-           $tiki_p_export_tracker, $tiki_p_watch_trackers, $tiki_p_edit;
+    global $tiki_p_admin_trackers, $prefs, $user, $tiki_p_tracker_vote_ratings, $tiki_p_watch_trackers, $tiki_p_edit;
 
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
-    $notificationlib = TikiLib::lib('notification');
 
     static $iTRACKERLIST = 0;
     ++$iTRACKERLIST;
@@ -1053,7 +1050,7 @@ function wikiplugin_trackerlist($data, $params)
         $smarty->assign('force_separate_compile', 'y');
     }
 
-    if ($prefs['feature_trackers'] != 'y' || is_null($trackerId) || ! ($tracker_info = $trklib->get_tracker($trackerId))) {
+    if ($prefs['feature_trackers'] != 'y' || is_null($trackerId) || ! ($trklib->get_tracker($trackerId))) {
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     } else {
         global $auto_query_args;

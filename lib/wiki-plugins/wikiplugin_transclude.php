@@ -59,7 +59,7 @@ function wikiplugin_transclude($data, $params)
     if ($info = $tikilib->get_page_info($page)) {
         $parts = preg_split('/%%%text%%%/', $info['data']);
         $pass = $parts[0] . $data . $parts[1];
-        $data = TikiLib::lib('parser')->parse_data($data, ['objectType' => 'wiki page',
+        TikiLib::lib('parser')->parse_data($data, ['objectType' => 'wiki page',
         'objectId' => $page, 'fieldName' => 'data']);
         return preg_replace_callback(
             '/%%%([A-z0-9]+)%%%/',

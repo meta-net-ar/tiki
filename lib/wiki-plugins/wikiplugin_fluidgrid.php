@@ -102,8 +102,6 @@ function wikiplugin_fluidgrid_rollback($data, $hashes)
  */
 function wikiplugin_fluidgrid($data, $params, $pos)
 {
-    global $tikilib;
-
     //
     // The following function uses a regular expression in the form
     // "/pattern/ismU"

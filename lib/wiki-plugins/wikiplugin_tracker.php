@@ -1492,7 +1492,7 @@ function wikiplugin_tracker($data, $params)
 
                     $sentMails = [];
 
-                    foreach ($emailOptions[1] as $ieo => $ueos) {
+                    foreach ($emailOptions[1] as $ueos) {
                         $mailDir = ! str_starts_with($tplSubject[$subjectCounter], 'wiki:') ? 'mail/' : '';
                         @$mail_data = $smarty->fetch($mailDir . $tplSubject[$subjectCounter]);
                         if (empty($mail_data)) {
@@ -1520,7 +1520,7 @@ function wikiplugin_tracker($data, $params)
                                     $mail->send($ueo);
                                     $sentMails[] = $ueo . $tplKey;
                                     $title = 'mail';
-                                } catch (TransportExceptionInterface | \Throwable $e) {
+                                } catch (TransportExceptionInterface | \Throwable) {
                                     $title = 'mail error';
                                 }
                                 if ($title == 'mail error') {
@@ -1589,7 +1589,6 @@ function wikiplugin_tracker($data, $params)
                     }
 
                     if (! is_null($urlparams)) {
-                        $i = 0;
                         foreach ($_REQUEST as $kk => $vv) {
                             $ins = preg_replace('/^(ins_)/', '', $kk); // replace the ins_ from the input field names to match with e.g. urlparams="1:2:3"
                             $vv = urlencode($vv);
@@ -1597,7 +1596,6 @@ function wikiplugin_tracker($data, $params)
                                 $ss = str_contains($url[$key], '?') ? '&' : '?'; // if there is "?" already in the URL, use "&" to separate the params
                                 $url[$key] .= "$ss$kk=$vv";
                             }
-                            $i++;
                         }
                     }
 
@@ -2038,7 +2036,6 @@ function wikiplugin_tracker($data, $params)
                 $smarty->assign_by_ref('f_status_input', $status_input);
             }
         }
-        $backLength0 = strlen($back);
 
         $datepicker = false;
 
@@ -2482,7 +2479,7 @@ function wikiplugin_tracker_save_item($trackerSavedState)
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
 
-    $numVarOk = extract($trackerSavedState, EXTR_SKIP);
+    extract($trackerSavedState, EXTR_SKIP);
     if (! isset($ins_fields)) {
         $ins_fields = null;
     }
@@ -2529,7 +2526,7 @@ function wikiplugin_tracker_save_item($trackerSavedState)
                 } else {
                     $fill_item = $fill_flds_defaults[$i];
                 }
-                $fill_rid = $trklib->modify_field($rid, $fill_flds['data'][$i]['fieldId'], $fill_item);
+                $trklib->modify_field($rid, $fill_flds['data'][$i]['fieldId'], $fill_item);
             }
             if (is_array($ins_categs)) {
                 if ($registration === BooleanEnglishLetter::Yes && empty($item_info)) {

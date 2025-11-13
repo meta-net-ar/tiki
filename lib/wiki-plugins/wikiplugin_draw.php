@@ -64,12 +64,9 @@ function wikiplugin_draw_info()
 
 function wikiplugin_draw($data, $params)
 {
-    global $tiki_p_edit, $tiki_p_admin, $tiki_p_upload_files, $prefs, $user, $page;
-    $headerlib = TikiLib::lib('header');
-    $tikilib = TikiLib::lib('tiki');
+    global $tiki_p_upload_files, $user, $page;
     $smarty = TikiLib::lib('smarty');
     $filegallib = TikiLib::lib('filegal');
-    $globalperms = Perms::get();
 
     extract(array_merge($params, []), EXTR_SKIP);
 

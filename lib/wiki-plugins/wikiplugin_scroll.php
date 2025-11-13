@@ -50,7 +50,6 @@ function wikiplugin_scroll($data, $params)
     extract($params, EXTR_SKIP);
 
 // margin requierd for ilayer scrolling on mozilla
-    $margin = 40;
     if (str_ends_with($width, "x")) {
         $width_w = substr($width, 0, -2);
         $height_h = substr($height, 0, -2);

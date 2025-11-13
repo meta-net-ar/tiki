@@ -78,7 +78,7 @@ function wikiplugin_preview_info()
  */
 function wikiplugin_preview($data, $params)
 {
-    global $user, $prefs, $tikipath, $tikidomain;
+    global $user, $tikipath, $tikidomain;
 
     if (! AlchemyLib::isLibraryAvailable()) {
         return;
@@ -92,7 +92,6 @@ function wikiplugin_preview($data, $params)
 
     $smartyLib = TikiLib::lib('smarty');
 
-    $fileGalleryLib = TikiLib::lib('filegal');
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($fileId);
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {

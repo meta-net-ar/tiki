@@ -32,36 +32,36 @@ class IndexCompareEnginesCommand extends Command
     {
         $this
             ->setHelp(
-                'Check unified search plugin results inside wiki pages by comparing different search index results. Only plugins that use the unified search results are verified.'
+                tra('Check unified search plugin results inside wiki pages by comparing different search index results. Only plugins that use the unified search results are verified.')
             )
             ->addOption(
                 'page',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The page name to check',
+                tra('The page name to check'),
             )->addOption(
                 'engine',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Search engines to compare: specify exactly two engines, should be one of: elastic, mysql or manticore'
+                tra('Search engines to compare: specify exactly two engines, should be one of: elastic, mysql or manticore')
             )
             ->addOption(
                 'html',
                 null,
                 InputOption::VALUE_NONE,
-                'Export the differences found in a well formatted HTML file'
+                tra('Export the differences found in a well formatted HTML file')
             )
             ->addOption(
                 'reindex',
                 null,
                 InputOption::VALUE_NONE,
-                'Reindex search engines before running this script'
+                tra('Reindex search engines before running this script')
             )
             ->addOption(
                 'log',
                 null,
                 InputOption::VALUE_NONE,
-                'Generate a log of the indexed documents, useful to track down failures or memory issues'
+                tra('Generate a log of the indexed documents, useful to track down failures or memory issues')
             )
             ;
     }
@@ -79,14 +79,14 @@ class IndexCompareEnginesCommand extends Command
         $engines = $input->getOption('engine');
         if (count($engines) < 2) {
             $io->error(
-                'To execute this script you need to specify at least two engines to compare.'
+                tra('To execute this script you need to specify at least two engines to compare.')
             );
             return Command::FAILURE;
         }
 
         if (count($engines) == 3 && $input->getOption('html')) {
             $io->error(
-                'Comparing all three engines works in text-mode only, you cannot specify the --html option.'
+                tra('Comparing all three engines works in text-mode only, you cannot specify the --html option.')
             );
             return Command::FAILURE;
         }
@@ -109,7 +109,7 @@ class IndexCompareEnginesCommand extends Command
         }
 
         if (! $pages) {
-            $io->writeln('There are no wiki pages to check.');
+            $io->writeln(tra('There are no wiki pages to check.'));
             return Command::SUCCESS;
         }
 
@@ -121,11 +121,11 @@ class IndexCompareEnginesCommand extends Command
                     $prefs['unified_engine'] = 'elastic';
                     $elasticStatus = $unifiedSearchLib->checkElasticsearch();
                     if ($elasticStatus['error']) {
-                        $io->error('Elasticsearch Error' . PHP_EOL . $elasticStatus['feedback']);
+                        $io->error(tra('Elasticsearch Error') . PHP_EOL . $elasticStatus['feedback']);
                         exit(1);
                     }
                     if (! $reindex && ! $unifiedSearchLib->getIndex()->exists()) {
-                        $io->error('Elasticsearch index not found. Use --reindex to rebuild the index.');
+                        $io->error(tra('Elasticsearch index not found. Use --reindex to rebuild the index.'));
                         exit(1);
                     }
                     break;
@@ -145,7 +145,7 @@ class IndexCompareEnginesCommand extends Command
                         exit(1);
                     }
                     if (! $reindex && ! $unifiedSearchLib->getIndex()->exists()) {
-                        $io->error('Manticore index not found. Use --reindex to rebuild the index.');
+                        $io->error(tra('Manticore index not found. Use --reindex to rebuild the index.'));
                         exit(1);
                     }
                     break;
@@ -157,7 +157,7 @@ class IndexCompareEnginesCommand extends Command
         $indices = [];
 
         if ($input->getOption('reindex')) {
-            $io->writeln('Rebuilding index, please wait...');
+            $io->writeln(tra('Rebuilding index, please wait...'));
             foreach ($engines as $engine) {
                 $io->writeln('Rebuilding ' . $engine);
                 // change prefs
@@ -176,7 +176,7 @@ class IndexCompareEnginesCommand extends Command
                 unset($indexer);
                 unset($index);
             }
-            $io->writeln('Index rebuild finished.');
+            $io->writeln(tra('Index rebuild finished.'));
             $io->newLine(2);
         } else {
             foreach ($engines as $engine) {
@@ -274,7 +274,7 @@ class IndexCompareEnginesCommand extends Command
         $prefs = $orig_prefs;
 
         if (empty($differentOutputs)) {
-            $io->writeln('Plugin outputs using selected engines are identical.');
+            $io->writeln(tra('Plugin outputs using selected engines are identical.'));
             return Command::SUCCESS;
         }
 
@@ -284,7 +284,7 @@ class IndexCompareEnginesCommand extends Command
             }
             foreach ($differentOutputs as $output) {
                 $io->section('Tiki Page - ' . $output['page']);
-                $io->writeln('Plugin Declaration:');
+                $io->writeln(tra('Plugin Declaration:'));
                 $io->writeln($output['plugin']);
                 $io->newLine(2);
 
@@ -364,7 +364,7 @@ HTML;
 
             foreach ($differentOutputs as $output) {
                 $io->section('Tiki Page - ' . $output['page']);
-                $io->writeln('Plugin Declaration:');
+                $io->writeln(tra('Plugin Declaration:'));
                 $io->writeln($output['plugin']);
                 $io->newLine(2);
 

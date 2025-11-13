@@ -74,7 +74,6 @@ function wp_fixture_tracker_math($data, $params)
         return '__' . tr('Tracker not found.') . '__';
     }
 
-    $smarty = TikiLib::lib('smarty');
     $url = smarty_modifier_sefurl($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Math for [%0|%1]', $url, $tracker->getConfiguration('name')));
 
@@ -129,7 +128,6 @@ function wp_fixture_tracker_data($data, $params, $mock)
         return '__' . tr('Tracker not found.') . '__';
     }
 
-    $smarty = TikiLib::lib('smarty');
     $url = smarty_modifier_sefurl($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Data for [%0|%1]', $url, $tracker->getConfiguration('name')));
 
@@ -138,7 +136,7 @@ function wp_fixture_tracker_data($data, $params, $mock)
     }
 
     foreach ($headings as $permName) {
-        if ($permName != 'itemId' && ! $field = $tracker->getFieldFromPermName($permName)) {
+        if ($permName != 'itemId' && ! $tracker->getFieldFromPermName($permName)) {
             return '__' . tr('Tracker Field not found: %0', $permName) . '__';
         }
     }

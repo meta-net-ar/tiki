@@ -89,11 +89,11 @@ if (isset($_REQUEST['comments']) && $_REQUEST['comments'] == 'on') {
 } else {
     $show_comments = false;
 }
-
+$comments_suffix = $show_comments ? '_comments' : '';
 foreach ($sections as $skey => $sval) {
     if (
-        isset($prefs['toolbar_' . $skey . ($show_comments ? '_comments' : '') . 'modified'])
-        && $prefs['toolbar_' . $skey . ($show_comments ? '_comments' : '') . 'modified'] == 'y'
+        isset($prefs['toolbar_' . $skey . $comments_suffix . 'modified'])
+        && $prefs['toolbar_' . $skey . $comments_suffix . 'modified'] == 'y'
     ) {
         $sections[$skey] = $sval . ' *';
     }
@@ -112,13 +112,13 @@ if (! empty($_REQUEST['reset_all_custom_tools']) && $access->checkCsrf()) {
 }
 
 if (isset($_REQUEST['save'], $_REQUEST['pref'])) {
-    $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+    $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->set_preference($prefName, $_REQUEST['pref']);
     $tikilib->set_preference($prefName . 'modified', 'y');
 }
 
 if ((isset($_REQUEST['reset']) && $section != 'global') || (isset($_REQUEST['reset_global']) && $section == 'global')) {
-    $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+    $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->delete_preference($prefName);
     $tikilib->set_preference($prefName . 'modified', 'n');
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
@@ -138,9 +138,9 @@ if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // i
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 
-$current = $tikilib->get_preference('toolbar_' . $section . ($show_comments ? '_comments' : ''));
+$current = $tikilib->get_preference('toolbar_' . $section . $comments_suffix);
 if (empty($current)) {
-    $current = $tikilib->get_preference('toolbar_global' . ($show_comments ? '_comments' : ''));
+    $current = $tikilib->get_preference('toolbar_global' . $comments_suffix);
     $smarty->assign('not_global', false);
 } else {
     $smarty->assign('not_global', true);
@@ -149,7 +149,7 @@ $smarty->assign('not_default', false);
 if ($section == 'global') {
     $cachelib = TikiLib::lib('cache');
     if ($defprefs = $cachelib->getSerialized("tiki_default_preferences_cache")) {
-        if ($defprefs['toolbar_global' . ($show_comments ? '_comments' : '')] != $current) {
+        if ($defprefs['toolbar_global' . $comments_suffix] != $current) {
             $smarty->assign('not_default', true);
         }
     }
@@ -160,7 +160,7 @@ if (! empty($_REQUEST['delete_tool']) && ! empty($_REQUEST['tool_name'])) { // i
     if (str_contains($_REQUEST['tool_name'], $current)) {
         $current = str_replace($_REQUEST['tool_name'], '', $current);
         $current = str_replace(',,', ',', $current);
-        $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+        $prefName = 'toolbar_' . $section . $comments_suffix;
         $tikilib->set_preference($prefName, $current);
     }
 }
@@ -298,6 +298,7 @@ foreach ($parserlib->plugin_get_list() as $name) {
 $smarty->assign('plugins', $plugins);
 
 $smarty->assign('show_comments', $show_comments);
+$smarty->assign('comments', $show_comments ? 'on' : 'no');
 $smarty->assign('loaded', $section);
 $smarty->assign('rows', range(0, $rowCount - 1));
 $smarty->assign('rowCount', $rowCount);

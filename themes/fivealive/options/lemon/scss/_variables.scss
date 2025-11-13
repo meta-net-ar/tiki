@@ -49,9 +49,11 @@ $headings-color: $body-color;
 $body-color: $gray-800;  // default
 
 // Links
-$link-color: #BB5525; //#c75a28;
-$link-hover-color:               darken($link-color, 15%);
-$link-shade-percentage:                   20%;  // default
+$link-color:                #BB5525; //#c75a28;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Components
 $component-active-color: #2D7709; // $dark;

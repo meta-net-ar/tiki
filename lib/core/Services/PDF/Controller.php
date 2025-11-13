@@ -11,6 +11,35 @@ class Services_PDF_Controller
         Services_Exception_Disabled::check('feature_wiki_print');
     }
 
+    public function action_get_pdf($input)
+    {
+        // edit permission is needed to convert arbitrary text to PDF
+        if (! Perms::get()->edit) {
+            throw new Services_Exception_Denied();
+        }
+
+        $contents = $input->contents->html();
+        $filename = $input->filename->text();
+
+        if (empty($filename)) {
+            $filename = 'contents.pdf';
+        }
+
+        require_once 'lib/pdflib.php';
+        $generator = new PdfGenerator();
+        if (! empty($generator->error)) {
+            Feedback::error($generator->error);
+            return "";
+        } else {
+            $pdf = $generator->getPdf('tiki-print.php', [], $contents);
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($pdf));
+            echo $pdf;
+            exit;
+        }
+    }
+
     //function added to hold current state of fancy table / sorted table for pdf and print version. So when user generates pdf he gets his sorted data not default data in table.
     public function action_storeTable($input)
     {

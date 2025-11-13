@@ -9,10 +9,11 @@ $inputConfiguration = [
     [
         'staticKeyFilters'   => [
         'surveyId'           => 'int',               //get
-        'clear'              => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'clear'              => 'int',               //post
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        'print'              => 'alpha',             //get
         ],
     ],
 ];

@@ -104,9 +104,8 @@ function wikiplugin_viewtextfile($data, $params)
     $filedescription = $fileinfo['description'];
     $filename = $fileinfo['filename'];
     $filetype = $fileinfo['filetype'];
-    $filesize = $fileinfo['filesize'];
 
-    // convert the file size to a human readable format
+    // convert the file size to a human-readable format
     $filesize = $filegallib->convertFileSize($fileinfo['filesize']);
 
     if ($filetype != 'text/plain') {

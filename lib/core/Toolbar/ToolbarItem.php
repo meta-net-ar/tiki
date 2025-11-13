@@ -391,6 +391,7 @@ abstract class ToolbarItem
         return $tag;
     }
 
+
     public function getWikiHtml(): string
     {
         $onClick = $this->getOnClick();

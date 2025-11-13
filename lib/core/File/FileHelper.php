@@ -71,7 +71,7 @@ class FileHelper
                 $errorMessageToAppend = 'Previous npm-asset/pdfjs-dist package has been deprecated.<br/>';
             }
 
-            $vendorPath = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js', false);
+            $vendorPath = VendorHelper::getAvailableVendorPath('pdfjsviewer', 'npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js', false);
             if (! file_exists($vendorPath)) {
                 $accesslib->display_error('tiki-display.php', tr($errorMessageToAppend . 'To view PDF files Tiki needs the npm-asset/pdfjs-dist-viewer-min. If you do not have permission to install this package, ask the site administrator.'));
             }
@@ -101,7 +101,7 @@ class FileHelper
             if (empty($sourceLink)) {
                 $accesslib->display_error('', tr('Invalid request'));
             } else {
-                $htmlViewFile = $vendorPath . '/npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=';
+                $htmlViewFile = $vendorPath . 'npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html?file=';
                 // smarty_modifier_sefurl return &amp; that is already encoded, revert so when url is encoded, it works.
                 $sourceLink = preg_replace('/amp;/', '', $sourceLink);
                 $sourceLink = $htmlViewFile . urlencode(TikiLib::lib('access')->absoluteUrl($sourceLink));

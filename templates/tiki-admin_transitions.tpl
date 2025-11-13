@@ -90,20 +90,26 @@
 
     {if $available_states|@count > 0}
         {tab name="{tr}Transitions{/tr}"}
-            <h2>{tr}Transitions{/tr}</h2>
-            {* former add_dracula() *}
-            {$headerlib->add_jsfile('lib/dracula/raphael-min.js', true)}
-            {$headerlib->add_jsfile('lib/dracula/graffle.js')}
-            {$headerlib->add_jsfile('lib/dracula/graph.js')}
-            <div id="graph-canvas" class="graph-canvas" data-graph-nodes="{$graph_nodes|escape}" data-graph-edges="{$graph_edges|escape}"></div>
-            <a href="#" id="graph-draw" class="button" role="button">{tr}Draw Transition Diagram{/tr}</a>
+            <div class="d-flex justify-content-between align-items-center mb-3">    
+                <h2>{tr}Transitions{/tr}</h2>
+                <button type="button" id="toggle-diagram" class="btn btn-light">
+                    {tr}Hide Transition Diagram{/tr}
+                </button>
+            </div>
+
+            <div id="transitions-diagram" class="mermaid-container p-3 mb-3 card card-body">
+                <textarea class="code d-none">{$mermaid_transition_data|escape}</textarea>
+                <div class="mermaid"></div>
+            </div>
+
             {jq}
-            $('#graph-draw').on("click", function( e ) {
-                $(this).hide();
-                $('#graph-canvas').drawGraph();
-                return false;
-            } );
+            $('#toggle-diagram').on('click', function() {
+                $('#transitions-diagram').toggle();
+                const isVisible = $('#transitions-diagram').is(':visible');
+                $(this).text(isVisible ? '{tr}Hide Transition Diagram{/tr}' : '{tr}Show Transition Diagram{/tr}');
+            });
             {/jq}
+
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                 <table class="table table-striped table-hover">
                     <thead>

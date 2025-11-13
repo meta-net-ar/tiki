@@ -1910,6 +1910,7 @@ CREATE TABLE `tiki_newsletters` (
   `emptyClipBlocksSend` char(1) default 'n',
   PRIMARY KEY (`nlId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
+ALTER TABLE `tiki_newsletters` ADD CONSTRAINT `uniq_author_name` UNIQUE (author(100), name(100));
 
 DROP TABLE IF EXISTS `tiki_page_footnotes`;
 CREATE TABLE `tiki_page_footnotes` (

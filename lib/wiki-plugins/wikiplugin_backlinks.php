@@ -37,7 +37,6 @@ class WikiPluginBackLinks extends PluginsLib
 
     public function get_backlink_from_tracker_item($trackerObjectId)
     {
-        $backlink = "";
         $ids = explode(":", $trackerObjectId);
         $itemId = (int)$ids[0];
         $trackerId = (int)$ids[1];

@@ -62,7 +62,7 @@ class TaskLib extends TikiLib
             } else {
                 $res['disabled'] = true;
             }
-            if ($res['percentage'] == null) {
+            if ($res['percentage'] === null) {
                 $res['percentage_null'] = true;
             } else {
                 $res['percentage_null'] = false;
@@ -422,7 +422,7 @@ class TaskLib extends TikiLib
             } else {
                 $res['disabled'] = true;
             }
-            if ($res['percentage'] == null) {
+            if ($res['percentage'] === null) {
                 $res['percentage_null'] = true;
             } else {
                 $res['percentage_null'] = false;

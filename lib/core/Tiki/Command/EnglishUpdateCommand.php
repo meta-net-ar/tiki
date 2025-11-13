@@ -397,7 +397,7 @@ class EnglishUpdateCommand extends Command
         $progress->advance();
 
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            $output->writeln("\n\n<info>Strings Being Updated</info>\n");
+            $output->writeln("\n\n<info>" . tra('Strings Being Updated') . "</info>\n");
             foreach ($diffs as $diff) {
                 $output->writeln('* ' . $diff['-']);
                 $output->writeln('* ' . $diff['+'] . "\n");
@@ -467,24 +467,24 @@ class EnglishUpdateCommand extends Command
                         }
                     }
                     if (isset($lang[$langNow])) {
-                        $progress->setMessage($langNow . "\tStrings to update");
+                        $progress->setMessage($langNow . "\ttra(Strings to update)");
                         $progress->advance();
                         if (! $input->getOption('audit')) {
                             file_put_contents($directory . '/language.php', $file);
                         }
                     } else {
-                        $progress->setMessage($langNow . "\tNo changes to make");
+                        $progress->setMessage($langNow . "\t" . tra("No changes to make"));
                         $progress->advance();
                     }
                 } else {
-                    $progress->setMessage($langNow . "\tSkipping <info>language.php not writable</info>");
+                    $progress->setMessage(tra("%0\t%1 %2", $langNow, tra("Skipping"), "<info>" . tra("language.php not writable") . "</info>"));
                     $progress->advance();
                 }
             }
         }
         $skippedMessage = '';
         if ($this->duplicates) {
-            $skippedMessage = ' Skipped ' . $this->duplicates . ' duplicate strings.';
+            $skippedMessage = tra('Skipped %0 duplicate strings.', $this->duplicates);
         }
 
         if ($input->getOption('audit')) {
@@ -498,7 +498,7 @@ class EnglishUpdateCommand extends Command
         if ($input->getOption('audit')) {
             if (count($string)) {
                 $syncMessage = "\n";
-                $output->writeln("\n\n<info>Updated Strings not found in Language Files</info>");
+                $output->writeln("\n\n<info>" . tra('Updated Strings not found in Language Files') . "</info>");
                 foreach ($diffs as $key => $entry) {
                     if (isset($string[$key])) {
                         $syncMessage .= '* ' . $entry['-'] . "\n";
@@ -506,23 +506,23 @@ class EnglishUpdateCommand extends Command
                 }
                 $output->writeln($syncMessage);
                 if ($input->getOption('email')) {
-                    mail($input->getOption('email'), 'Updated Strings not found in Language Files', wordwrap(TIKI_PATH . "\n" . $syncMessage, 70, "\r\n"));
+                    mail($input->getOption('email'), tra('Updated Strings not found in Language Files'), wordwrap(TIKI_PATH . "\n" . $syncMessage, 70, "\r\n"));
                 }
                 exit(1);
             }
-            $output->writeln("\n\n<info>English and Translations are in Sync</info>\n");
+            $output->writeln("\n\n<info>" . tra('English and Translations are in Sync') . "</info>\n");
             // if were not in audit mode
         } else {
             if (count($string) < $this->stringCount) {
-                $output->writeln("\n\n<info>Strings Not Translated</info>");
+                $output->writeln("\n\n<info>" . tra('Strings Not Translated') . "</info>");
                 foreach ($diffs as $key => $entry) {
                     if (! isset($string[$key]) && ! isset($skipped[$key])) {
                         $output->writeln('* ' . $entry['-']);
                     }
                 }
             }
-            $output->writeln("\n\nOptionally run php get_strings.php to remove any unused translation strings.");
-            $output->writeln("Verify before committing.\n");
+            $output->writeln("\n\n" . tra("Optionally run %0 to remove any unused translation strings.\n", 'php get_strings.php'));
+            $output->writeln(tra("Verify before committing.\n"));
         }
         return Command::SUCCESS;
     }

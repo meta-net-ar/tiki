@@ -141,7 +141,6 @@ function wikiplugin_trackerverticaltimeline($data, $params)
 {
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
-    $js = '';
     static $instance = 0;
     $instance++;
 
@@ -203,8 +202,6 @@ function wikiplugin_trackerverticaltimeline($data, $params)
             $detail[ $fieldIds[$field['fieldId']] ] = $field['value'];
         }
 
-        $detailStart = $detail['date'] ?? 0;
-        $detailSummary = $detail['title'] ?? null;
         $detailGroup = $detail['url'] ?? null;
         $detail['encoded'] = json_encode($detail);
 
@@ -219,12 +216,11 @@ function wikiplugin_trackerverticaltimeline($data, $params)
     // prepare the data - to be included in the page for now (ajax feed to come)
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/d3-milestones/build/d3-milestones.css');
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/d3-milestones/build/d3-milestones.min.js');
-    foreach ($data as $group => $list) {
+    foreach ($data as $list) {
         $counter = 0;  // ignoring group for now
         foreach ($list as $item) {
             $counter++;
             $itemDate = $item['date'] ?? null;
-            $itemSummary = $item['url'] ?? null;
             $itemImage = $item['image'] ?? null;
 
             $event = [
@@ -268,7 +264,7 @@ function wikiplugin_trackerverticaltimeline($data, $params)
         })
         .parseTime('%Y-%m-%dT%H:%M:%S.%LZ')
         $orientation
-        $distributation
+        $distribution
         $aggregateBy
         .optimize(true)
         $urlTarget

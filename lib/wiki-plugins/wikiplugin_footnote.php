@@ -74,8 +74,6 @@ function wikiplugin_footnote_info()
  */
 function wikiplugin_footnote($data, $params, $offset, $context)
 {
-    /** @var int $globalId Globally unique number of the next footnote, used for intra-document (anchor) links */
-    static $globalId = 1;
     global $prefs;
 
     $footnotes = &$context->footnotes;

@@ -439,7 +439,7 @@ class AdminLib extends TikiLib
         $tar->toTar($dumpPath, false);
         unset($tar);
         $logslib = TikiLib::lib('logs');
-        $logslib->add_log('dump', 'wiki file dump created in ' . $dumpPath);
+        $logslib->add_log('dump', tra('wiki file dump created in ') . $dumpPath);
     }
 
     /**

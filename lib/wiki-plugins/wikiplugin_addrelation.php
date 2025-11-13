@@ -88,7 +88,6 @@ function wikiplugin_addrelation_info()
 
 function wikiplugin_addrelation($data, $params)
 {
-    global $user;
     if (! is_null($params['source_object']) && str_contains($params['source_object'], ':')) {
         list($source_object['type'], $source_object['object']) = explode(':', $params['source_object'], 2);
     } else {

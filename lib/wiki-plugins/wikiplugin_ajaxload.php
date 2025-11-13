@@ -141,7 +141,6 @@ function wikiplugin_ajaxload_info()
 
 function wikiplugin_ajaxload($data, $params)
 {
-    global $prefs;
     static $instance = 0;
     $instance++;
 

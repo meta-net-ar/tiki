@@ -261,7 +261,7 @@ function wikiplugin_ganttchart($data, $params)
     $users = $userlib->list_all_users();
 
     //fetch user to show in select
-    foreach ($users as $key => $value) {
+    foreach ($users as $value) {
         $allResources[] = [
             'id' => $value,
             'name' => $value,
@@ -885,7 +885,7 @@ function updateTasks($info, $params, $allResources, $allRoles)
         $transaction->commit();
 
         $order = 1;
-        foreach ($info['tasks'] as $key => $task) {
+        foreach ($info['tasks'] as $task) {
             // mapping gantt task to tracker items
             $task['trackerId'] = $info['trackerId'];
             $task['trackerItemId'] = $task['id'];

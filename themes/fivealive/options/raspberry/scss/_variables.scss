@@ -42,9 +42,11 @@ $prefix: bs-;
 $body-color: $gray-800;  // default
 
 // Links
-$link-color:                   #b51360;
-$link-hover-color:               darken($link-color, 15%);
-$link-hover-decoration:       none;
+$link-color:                #b51360;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Navs
 $nav-tabs-link-color: #000;

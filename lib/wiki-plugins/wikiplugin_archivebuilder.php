@@ -154,10 +154,9 @@ function wikiplugin_archivebuilder_trackerfiles($basepath, $trackerItem)
 
     $attachments = [];
 
-    /** @var Tiki\Lib\Filegals\FileGalLib $fileGal */
-    $fileGal = TikiLib::lib('filegal');
+
     /** @var Tracker_Definition $definition */
-    $definition = $fields = $item->getDefinition();
+    $definition = $item->getDefinition();
     $fields = $definition->getFields();
     foreach ($fields as $field) {
         if ($field['type'] == 'FG') {

@@ -12,9 +12,9 @@ $section = 'surveys';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'sort_mode'          => 'word',              //get
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
         ],
     ],
 ];

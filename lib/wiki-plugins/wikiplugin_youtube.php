@@ -131,8 +131,6 @@ function wikiplugin_youtube($data, $params)
 {
     global $tikilib;
 
-    $scheme = $tikilib->httpScheme();
-
     $sYoutubeId  = getYoutubeId($params['movie']);
     if (empty($sYoutubeId)) {
         Feedback::error(tra('Invalid YouTube URL provided'));

@@ -503,7 +503,7 @@ function wikiplugin_articles($data, $params)
                 $list[] = $listpages['data'][$memo[$articleId]];
             }
         }
-        foreach ($listpages['data'] as $i => $article) {
+        foreach ($listpages['data'] as $article) {
             if (! in_array($article['articleId'], $order)) {
                 $list[] = $article;
             }

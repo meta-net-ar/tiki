@@ -342,7 +342,7 @@ class ConsoleApplicationBuilder
         if (! file_exists('.git')) {
             //.git may be a directory (normal case) or a file (in the case of a git workspace)
             throw new UnavailableException(
-                'You must be running Tiki as a VCS see: https://dev.tiki.org/Get-code',
+                tra('You must be running Tiki as a VCS see:') . ' https://dev.tiki.org/Get-code',
                 UnavailableException::CHECK_VCS
             );
         }
@@ -360,7 +360,7 @@ class ConsoleApplicationBuilder
         // check to see if something from the dev-mode packages has been auto-loaded
         if (! class_exists(\PHPUnit\Framework\TestCase::class)) {
             throw new UnavailableException(
-                'You need to be running in dev mode. To Fix run: php console.php dev:configure',
+                tra('You need to be running in dev mode. To Fix run: php console.php dev:configure'),
                 UnavailableException::CHECK_DEV
             );
         }
@@ -375,7 +375,7 @@ class ConsoleApplicationBuilder
     {
         if (! defined('DB_RUNNING') || ! DB_RUNNING) {
             throw new UnavailableException(
-                'Your database must be running and have valid credentials in the local.php file. See http://doc.tiki.org/Installation for more information.',
+                tra('Your database must be running and have valid credentials in the local.php file. See http://doc.tiki.org/Installation for more information.'),
                 UnavailableException::CHECK_RUNNING
             );
         }
@@ -393,7 +393,7 @@ class ConsoleApplicationBuilder
         $this->checkIsDbRunning();
         if (! defined('DB_STATUS') || ! DB_STATUS) {
             throw new UnavailableException(
-                'Cannot initiate Database. Probably because the database needs updating.',
+                tra('Cannot initiate Database. Probably because the database needs updating.'),
                 UnavailableException::CHECK_INSTALLED
             );
         }
@@ -411,7 +411,7 @@ class ConsoleApplicationBuilder
         $this->checkIsDatabaseInstalled();
         if (! defined('DB_TIKI_SETUP') || ! DB_TIKI_SETUP) {
             throw new UnavailableException(
-                'Database errors prevented tiki-setup from completing. Try running php console.php database:update',
+                tra('Database errors prevented tiki-setup from completing. Try running php console.php database:update'),
                 UnavailableException::CHECK_TIKI_SETUP
             );
         }
@@ -431,7 +431,7 @@ class ConsoleApplicationBuilder
 
         if (! defined('DB_SYNCHRONAL') || ! DB_SYNCHRONAL) {
             throw new UnavailableException(
-                'The database needs to be updated. Solved by: php console.php database:update',
+                tra('The database needs to be updated. Solved by: php console.php database:update'),
                 UnavailableException::CHECK_UPDATED
             );
         }
@@ -445,7 +445,7 @@ class ConsoleApplicationBuilder
     protected function checkProfileInfoExists(): void
     {
         if (! file_exists(TIKI_PATH . '/profiles/info.ini')) {
-            throw new UnavailableException('The /profiles/info.ini file does not exist', 311);
+            throw new UnavailableException(tra('The /profiles/info.ini file does not exist'), 311);
         }
         $this->checkIsDatabaseInstalled();
     }
@@ -476,7 +476,7 @@ class ConsoleApplicationBuilder
         global $prefs;
 
         if (! empty($prefs['ocr_enable']) && $prefs['ocr_enable'] !== 'y') {
-            throw new UnavailableException('You need to enable your Tiki OCR preference before continuing.', 313);
+            throw new UnavailableException(tra('You need to enable your Tiki OCR preference before continuing.'), 313);
         }
         $this->checkDatabaseUpToDate();
     }
@@ -503,7 +503,7 @@ class ConsoleApplicationBuilder
         global $prefs;
 
         if (! empty($prefs['tiki_monitor_performance']) && $prefs['tiki_monitor_performance'] !== 'y') {
-            throw new UnavailableException('You need to enable your Monitor Tiki Performance preference before continuing.', 313);
+            throw new UnavailableException(tra('You need to enable your Monitor Tiki Performance preference before continuing.'), 313);
         }
 
         $this->checkDatabaseUpToDate();
@@ -551,7 +551,7 @@ class ConsoleApplicationBuilder
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();
         $console->setAutoExit(false);
-        $console->setName('Tiki Console Tool');
+        $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
 
         $commandCalled = $_SERVER['argv'][1] ?? false;

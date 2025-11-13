@@ -109,7 +109,7 @@ class TrackerImportCommand extends Command
 
         \Feedback::printToConsole($output);
 
-        $output->writeln('Import done');
+        $output->writeln(tra('Import done'));
         $logslib->add_action('tracker import', 'system', 'system', 'tracker #' . $info['trackerId'] . ' imported.');
 
         return Command::SUCCESS;

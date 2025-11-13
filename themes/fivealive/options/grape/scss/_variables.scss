@@ -51,9 +51,11 @@ $prefix: bs-;
 $body-color: $black;
 
 // Links
-$link-color: #a02871;
-$link-hover-color: #a02871;
-$link-shade-percentage:                   20%;  // default
+$link-color:                #a02871;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Components
 $component-active-bg: #BC2F84FF;

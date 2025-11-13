@@ -232,7 +232,6 @@ function wikiplugin_trackertimeline($data, $params)
     static $instance = 0;
     $instance++;
 
-    $formats = ['hour' => 'H:i', 'day' => 'jS', 'week' => 'jS', 'month' => 'm', 'year' => 'y'];
     $max = 0;
     $min = 0;
     $step = ! empty($params['step']) ? ($params['step']) : '1';
@@ -313,9 +312,6 @@ function wikiplugin_trackertimeline($data, $params)
             $detail[ $fieldIds[$field['fieldId']] ] = $field['value'];
         }
 
-        $detailStart = $detail['start'] ?? 0;
-        $detailEnd = $detail['end'] ?? 0;
-        $detailSummary = $detail['summary'] ?? null;
         $detailGroup = $detail['group'] ?? null;
         $detail['encoded'] = json_encode($detail);
         // Add to data list
@@ -328,11 +324,10 @@ function wikiplugin_trackertimeline($data, $params)
     $headerlib = TikiLib::lib('header');
     // prepare the data - to be included in the page for now (ajax feed to come)
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/vis-timeline/dist/vis-timeline-graph2d.min.css');
-    $ttl_data = [];
     $events = [];
     $css = '';
     $groups = [];
-    foreach ($data as $group => $list) {    // ignoring group for now
+    foreach ($data as $list) {
         foreach ($list as $item) {
             $itemStart = $item['start'] ?? null;
             $itemSummary = $item['summary'] ?? null;
@@ -387,12 +382,6 @@ function wikiplugin_trackertimeline($data, $params)
             }
             $events[] = $event;
         }
-        $ttl_data = [
-            'dateTimeFormat' => '', // iso8601
-//           'wikiURL' => '',
-//           'wikiSection' => '',
-            'events' => $events,
-        ];
     }
     $js .= 'var data = ' . json_encode($events) . "; const options = {}; console.log(data);";
     $js .= ! is_null($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";

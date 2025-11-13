@@ -197,6 +197,11 @@
     }
 }
 
+.form-switch .form-check-input.tracker-notify-switch {
+  margin-left: 0;
+  margin-right: 0.5em;
+}
+
 // vue.js field conditions defs
 
 .tracker-rules .actions .ui-predicate__row:first-child,

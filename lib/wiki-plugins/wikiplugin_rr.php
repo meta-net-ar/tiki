@@ -364,7 +364,7 @@ function wikiplugin_rr_info()
 
 function wikiplugin_rr($data, $params)
 {
-    global $smarty, $trklib, $tikilib, $prefs, $tikidomainslash, $user, $tiki_p_edit;
+    global $trklib, $tikilib, $prefs, $tikidomainslash, $user, $tiki_p_edit;
 
     include_once(TIKI_CONFIG_PATH . '/tiki-db.php'); // to set up multitiki etc if there ($tikidomain)
 
@@ -586,26 +586,19 @@ function wikiplugin_rr($data, $params)
             include_once('lib/mime/mimelib.php');
             $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
         }
-
-        $type = $info["filetype"];
-        $file = $info["filename"];
     } else {
     }
 
     $type = $params["type"];
 
-
     if (! is_null($params["attId"]) && ($type == "text/csv" || $type == "text/comma-separated-values")) {
-        $path = $_SERVER["SCRIPT_NAME"];
         // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
         $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.csv(\"$filepath\")\n$data";
     } elseif (! is_null($params["attId"]) && $type == "text/plain") {
-        $path = $_SERVER["SCRIPT_NAME"];
         // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
         // read.delim & read.delim2 expect tabs as field separators (read.delim2 uses comma "," as decimal point; whereas read.delim uses point ".")
         $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.delim2(\"$filepath\")\n$data";
     } elseif (! is_null($params["attId"]) && $type == "text/xml") {
-        $path = $_SERVER["SCRIPT_NAME"];
         // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
         $data = "library(XML)\nfile_type <- \"$type\"\ndata_file <- xml(\"$filepath\")\ndata <- xmlTreeParse(data_file,  getDTD = F )\n$data";
     } elseif (! is_null($params["attId"]) && $type != "text/csv" && $type != "text/comma-separated-values" && $type != "text/xml" && $type != "text/plain") {
@@ -618,14 +611,13 @@ function wikiplugin_rr($data, $params)
 
     // Find age of previous cache
     $cache_last_modif = @filemtime($r_html);
-    if ($cache_last_modif == false) {
+    if (! $cache_last_modif) {
         $cache_last_modif_readable = 'No cache';
         $cache_age = 0;
     } else {
         $cache_last_modif_readable = $tikilib->get_long_datetime($cache_last_modif);
         $cache_age = time() - $cache_last_modif;
     }
-    $now = time();
 
     // Check if new run is needed or cached results (from the same plugin r calls) can be shown
     if (file_exists($r_html)) {
@@ -765,7 +757,6 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
     // Generate a graphics
     $prg = ''; # This variable is not being used. ToDo: Remove or reuse for something.
     $err = "\n";
-    $rws = $r_dir . DIRECTORY_SEPARATOR;
     $rst  = $r_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 . '.html';
     // Since pluginR 0.7, graphic file type is not hardcoded here into png;
     //  file extensions will be set later for png and svg and/or pdf
@@ -787,17 +778,9 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
     }
 
     $units = $params["units"];
-
+    $onefile = true;
     if ($params["onefile"]) {
-        $onefile = $params["onefile"];
-        if ($onefile = "1") {
-            $onefile = true;
-        }
-        if ($onefile = "0") {
-            $onefile = false;
-        }
-    } else {
-        $onefile = true;
+        $onefile = $params["onefile"] !== "0";
     }
 
     if (! is_null($params["pointsize"])) {

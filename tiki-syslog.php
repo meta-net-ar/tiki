@@ -11,12 +11,14 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'clean'              => 'bool',              //post
-        'months'             => 'int',               //post
-        'sort_mode'          => 'word',              //get
+        'clean'              => 'bool',              //get
+        'months'             => 'int',               //get
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
         'max'                => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        'actionId'           => 'int',               //post
+        'page'               => 'alnumdash',         //post
         ],
     ],
 ];

@@ -2572,6 +2572,9 @@
         "lib\/test\/Core\/Request\/RequestTest.php": {
             "class:RequestTest": true
         },
+        "lib\/test\/Core\/Search\/Query\/WikiBuilderTest.php": {
+            "class:Search_Query_WikiBuilderTest": true
+        },
         "lib\/test\/Core\/TikiDb\/TableTest.php": {
             "class:TikiDb_TableTest": true
         },
@@ -6981,6 +6984,7 @@
             "Services_OAuthServer_Controller::action_public_key": true
         },
         "lib\/core\/Services\/PDF\/Controller.php": {
+            "Services_PDF_Controller::action_get_pdf": true,
             "Services_PDF_Controller::action_storeTable": true,
             "Services_PDF_Controller::action_checkPDFFile": true
         },

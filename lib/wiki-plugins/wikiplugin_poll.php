@@ -70,12 +70,9 @@ function wikiplugin_poll_info()
 
 function wikiplugin_poll($data, $params)
 {
-    global $tiki_p_admin, $prefs, $user;
-    $userlib = TikiLib::lib('user');
+    global $prefs, $user;
     $tikilib = TikiLib::lib('tiki');
-    $polllib = TikiLib::lib('poll');
     $smarty = TikiLib::lib('smarty');
-    $trklib = TikiLib::lib('trk');
 
     extract($params, EXTR_SKIP);
 
@@ -101,7 +98,7 @@ function wikiplugin_poll($data, $params)
         $ret = $smarty->fetch('tiki-plugin_poll.tpl');
     }
     if (($showresult == 'voted' && $hasVoted) || $showresult == 'always') {
-        $total = $polllib->options_percent($poll_info, $options);
+        $polllib->options_percent($poll_info, $options);
         $poll_info['options'] = $options;
         $smarty->assign_by_ref('poll_info', $poll_info);
         $smarty->assign_by_ref('user_vote', $userVote);

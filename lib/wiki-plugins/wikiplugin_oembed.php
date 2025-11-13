@@ -141,7 +141,6 @@ function wikiplugin_oembed($data, $params)
         'max-height' => '75vh',
     ];
 
-    $iframeStyles = [];
     $useResponsive = true;
     $aspectRatio = null;
 

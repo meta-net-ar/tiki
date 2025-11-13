@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_mouseover_info()
 {
-    global $prefs;
     include_once('lib/prefs/jquery.php');
     $jqprefs = prefs_jquery_list();
     $jqfx = [];

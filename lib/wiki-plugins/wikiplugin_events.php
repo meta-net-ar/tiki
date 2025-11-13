@@ -125,7 +125,6 @@ function wikiplugin_events($data, $params)
 {
     global $tiki_p_admin, $tiki_p_view_calendar, $user;
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
     $invalideid = false;
@@ -177,9 +176,9 @@ function wikiplugin_events($data, $params)
 
     // Pagination
     if ($timespan == 'future') {
-        $events = $calendarlib->upcoming_events(
+        $calendarlib->upcoming_events(
             $max,
-            array_intersect($calIds, $viewable) ? array_intersect($calIds, $viewable) : [],
+            array_intersect($calIds, $viewable) ?: [],
             $maxdays,
             'start_asc',
             1,
@@ -189,7 +188,7 @@ function wikiplugin_events($data, $params)
     }
 
     if ($timespan == 'all') {
-        $events = $calendarlib->all_events(
+        $calendarlib->all_events(
             $max,
             array_intersect($calIds, $viewable),
             $maxdays,
@@ -201,7 +200,7 @@ function wikiplugin_events($data, $params)
     }
 
     if ($timespan == 'past') {
-        $events = $calendarlib->past_events(
+        $calendarlib->past_events(
             $max,
             array_intersect($calIds, $viewable),
             $maxdays,
@@ -220,7 +219,7 @@ function wikiplugin_events($data, $params)
             $calParamIds = [];
         }
     }
-    $events = $calendarlib->upcoming_events($max, array_intersect($calParamIds, $viewable) ? array_intersect($calParamIds, $viewable) : [], $maxdays);
+    $events = $calendarlib->upcoming_events($max, array_intersect($calParamIds, $viewable) ?: [], $maxdays);
 
     $smarty->assign_by_ref('datetime', $datetime);
     $smarty->assign_by_ref('desc', $desc);

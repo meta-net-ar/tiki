@@ -61,7 +61,6 @@ function wikiplugin_dbreport_parse_error(&$token, $msg)
 
 function wikiplugin_dbreport_next_token(&$code, $len, $pos)
 {
-    global $wikiplugin_dbreport_errors, $wikiplugin_dbreport_fields_allowed;
     $whitespace = " \n\r\t\v\f";
     $tokenstop = " :<>[$\"\n\r\t\v\f";
     // create a token object to return
@@ -422,7 +421,7 @@ function wikiplugin_dbreport_next_token(&$code, $len, $pos)
 
 function wikiplugin_dbreport_parse(&$code)
 {
-    global $debug, $wikiplugin_dbreport_fields_allowed;
+    global $wikiplugin_dbreport_fields_allowed;
     // code properties
     $len = strlen($code);
     $pos = 0;
@@ -1017,8 +1016,7 @@ function wikiplugin_dbreport_info()
 function wikiplugin_dbreport($data, $params)
 {
     // TikiWiki globals
-    global $tikilib, $user, $group, $page, $prefs;
-    global $wikiplugin_dbreport_errors, $wikiplugin_dbreport_fields;
+    global $tikilib, $user, $group, $prefs;
     // wikiplugin_dbreport globals
     global $wikiplugin_dbreport_errors;
     global $wikiplugin_dbreport_fields;

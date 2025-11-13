@@ -275,7 +275,6 @@ function wikiplugin_accordion($body, $params)
 {
     static $id = 0;
     $unique = 'accordion-' . ++$id;
-    $headers = [];
     $icons = [];
     if (! empty($params['headers'])) {
         $headers = explode('|', $params['headers']);

@@ -190,14 +190,6 @@ function wikiplugin_mediaplayer($data, $params)
     if (in_array($params['type'], ['pdf']) && defined('TIKI_DISPLAY_CONTAINS_PDF') && TIKI_DISPLAY_CONTAINS_PDF) {
         return "<pdfpage>.<pdfinclude src='" . $access->absoluteUrl($params['src']) . "' /></pdfpage>";
     }
-    $defaults_html5 = [
-        'width' => '',
-        'height' => '',
-    ];
-    $defaults = [
-        'width' => 320,
-        'height' => 240,
-    ];
 
     if (in_array($params['type'], DOCUMENT_ACCEPTED_FORMATS)) {
         $headerlib = TikiLib::lib('header');
@@ -210,11 +202,11 @@ function wikiplugin_mediaplayer($data, $params)
             $url = $access->absoluteUrl($params['src']);
             $smarty->assign('url', $url);
             $smarty->assign('mediaplayerId', $iMEDIAPLAYER);
-            $oldPdfJsFile = VendorHelper::getAvailableVendorPath('pdfjs', '/npm-asset/pdfjs-dist/build/pdf.js');
+            $oldPdfJsFile = VendorHelper::getAvailableVendorPath('pdfjs', 'npm-asset/pdfjs-dist/build/pdf.js');
             $oldPdfJsFileAvailable = file_exists($oldPdfJsFile);
             $smarty->assign('oldPdfJsFileAvailable', $oldPdfJsFileAvailable);
 
-            $pdfJsfile = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js');
+            $pdfJsfile = VendorHelper::getAvailableVendorPath('pdfjsviewer', 'npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js');
             $pdfJsAvailable = file_exists($pdfJsfile);
             $smarty->assign('pdfJsAvailable', $pdfJsAvailable);
 
@@ -287,7 +279,7 @@ function wikiplugin_mediaplayer($data, $params)
             }
 
             if (! empty($sourceLink)) {
-                $htmlViewFile = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html') . '?file=';
+                $htmlViewFile = VendorHelper::getAvailableVendorPath('pdfjsviewer', 'npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html') . '?file=';
                 $sourceLink = $htmlViewFile . urlencode($access->absoluteUrl($sourceLink));
             }
 

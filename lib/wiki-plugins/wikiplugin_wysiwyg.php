@@ -58,7 +58,7 @@ function wikiplugin_wysiwyg_info()
 
 function wikiplugin_wysiwyg($data, $params)
 {
-    global $tiki_p_edit, $page, $prefs, $user;
+    global $page, $prefs, $user;
     static $execution = 0;
 
     global $wikiplugin_included_page;

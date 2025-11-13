@@ -129,7 +129,7 @@ class PrefsDoc extends TWVersion
         $this->docTable = '{TABS(name="' . $tabName . '" tabs="Tiki Version ' . implode('|', $this->state->files->{$tabName}) . "\" toggle=\"n\")}";
         $imageArray = [];
         $images = explode('|', $images ?? "");
-        foreach ($images as $key => $image) {
+        foreach ($images as $image) {
             $image = explode(':', $image);
             $imageArray[$image[0]][0] = @$image[1];
             $imageArray[$image[0]][1] = $image[0];

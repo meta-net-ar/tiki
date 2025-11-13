@@ -398,24 +398,13 @@ function process_section($data, $type, $line_sep, $cellbeg, $cellend, $widths, $
     $rnum1 = 0;
     $rnum2 = 0;
     $wret = '';
-    $row_is_odd = true;
     $parts = [];
 
     //Each row
     foreach ($lines as $line) {
         $line = trim($line);
         if (strlen($line) > 0) {
-            if ($type == 'b') {
-            //  if ($row_is_odd) {
-            //      $cellbeg = "\r\t\t\t" . '<td class="odd"';
-            //      $row_is_odd = false;
-            //  } else {
-            //      $cellbeg = "\r\t\t\t" . '<td class="even"';
-            //      $row_is_odd = true;
-            //  }
-                //don't set odd/even class if tablesorter is on because jquery will add it
-                //and the classes won't alternate correctly if added here too
-            } elseif ($type == 'bs') {
+            if ($type == 'bs') {
                 $cellbeg = "\r\t\t\t" . '<td';
             }
             $c = 0;

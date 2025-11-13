@@ -79,9 +79,6 @@ function wikiplugin_calendar_info()
 
 function wikiplugin_calendar($data, $params)
 {
-    global $prefs, $tiki_p_admin, $tiki_p_view_calendar, $tikiroot;
-    global $dc, $user;
-
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
     $calendarlib = TikiLib::lib('calendar');
@@ -115,10 +112,6 @@ function wikiplugin_calendar($data, $params)
         default:
             $initialView = 'dayGridMonth';
     }
-    $viewstart = $_REQUEST['todate'] ?? $tikilib->now;
-    $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
-
-    $defaultCalendarId = $params['calIds'][0];
 
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
@@ -136,12 +129,6 @@ function wikiplugin_calendar($data, $params)
 
     $smarty->assign('pluginCalendarIds', $pluginCalendarIds);
     $smarty->assign('displayedcals', $params['calIds']);
-    $thiscal = [];
-    $checkedCalIds = $params['calIds'];
-
-    if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
-        $defaultCalendarId = $_REQUEST["calIds"][0];
-    }
 
     $smarty->assign_by_ref('checkedCalIds', $params['calIds']);
     $smarty->assign('calendars', $calendars);

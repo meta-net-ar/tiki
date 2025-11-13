@@ -192,11 +192,11 @@ class FilesBatchuploadCommand extends Command
                 'files batch upload',
                 'system',
                 'system',
-                'Files batch uploaded from ' . $prefs['fgal_batch_dir'] . ' to gallery #' . $galleryId
+                tra('Files batch uploaded from ') . $prefs['fgal_batch_dir'] . ' to gallery #' . $galleryId
             );
         } else {
             if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $output->writeln("<comment>Files to upload from {$prefs['fgal_batch_dir']} to gallery #$galleryId</comment>");
+                $output->writeln("<comment>" . tra('Files to upload from %0 to gallery #%1', $prefs['fgal_batch_dir'], $galleryId) . "</comment>");
             }
 
             foreach ($files as $file) {

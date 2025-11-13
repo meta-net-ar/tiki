@@ -40,8 +40,6 @@ function wikiplugin_mermaid_info()
 
 function wikiplugin_mermaid($data, $params)
 {
-    global $headerlib;
-
     require_once("export-tracker_schema.php");
 
     $width = $params['width'];

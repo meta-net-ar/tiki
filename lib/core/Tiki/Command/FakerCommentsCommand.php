@@ -49,49 +49,49 @@ class FakerCommentsCommand extends Command
                 'items',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Number of comments (items) to generate',
+                tra('Number of comments (items) to generate'),
                 100
             )
             ->addOption(
                 'replies',
                 'r',
                 InputOption::VALUE_OPTIONAL,
-                'Percentage of comments as replies',
+                tra('Percentage of comments as replies'),
                 40
             )
             ->addOption(
                 'anonymous',
                 'a',
                 InputOption::VALUE_OPTIONAL,
-                'Percentage of anonymous posts if permitted',
+                tra('Percentage of anonymous posts if permitted'),
                 20
             )
             ->addOption(
                 'minstart',
                 's',
                 InputOption::VALUE_OPTIONAL,
-                'Earliest start date for first comment',
+                tra('Earliest start date for first comment'),
                 '-1 year'
             )
             ->addOption(
                 'maxstart',
                 'e',
                 InputOption::VALUE_OPTIONAL,
-                'Latest start date for first comment',
+                tra('Latest start date for first comment'),
                 '-11 months'
             )
             ->addOption(
                 'mingap',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Shortest gap between comments',
+                tra('Shortest gap between comments'),
                 '10 minutes'
             )
             ->addOption(
                 'maxgap',
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Longest gap between comments',
+                tra('Longest gap between comments'),
                 '5 days'
             );
     }

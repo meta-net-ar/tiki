@@ -43,10 +43,11 @@ $body-color: $black; // $gray-800;  // default From FiveAlive
 $tiki-footer_liner-border-color: $primary;
 
 // Links
-$link-color: #11606E; //#138296;  From FiveAlive
-$link-hover-color:            darken($link-color, 15%);
-$link-hover-decoration:       none;
-$link-shade-percentage:                   20%;  // default
+$link-color:                #11606E; //#138296;  From FiveAlive
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Components
 //$component-active-color:       #ddb9af; // $white;  // default

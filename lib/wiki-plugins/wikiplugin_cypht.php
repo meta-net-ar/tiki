@@ -248,7 +248,7 @@ function wikiplugin_cypht_info()
 
 function wikiplugin_cypht($data, $params)
 {
-    global $tikipath, $tikiroot, $user, $page, $logslib, $prefs;
+    global $tikipath, $user, $page, $logslib;
     $headerlib = TikiLib::lib('header');
     $tikilib = TikiLib::lib('tiki');
 

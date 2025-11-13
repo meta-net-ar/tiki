@@ -103,7 +103,9 @@ class TextArea extends Base
 
         if (empty($params['section'])) {
             global $section;
-            $params['section'] = $section ? $section : 'wiki page';
+            $params['section'] = $section ?: 'wiki page';
+        } elseif ($params['section'] === 'trackeritem') {
+            $params['section'] = 'trackers';
         }
         $html = '';
         $html .= '<input type="hidden" name="mode_wysiwyg" value="" /><input type="hidden" name="mode_normal" value="" />';

@@ -34,7 +34,7 @@ class TaskQueueProcessCommand extends Command
                 'loop',
                 null,
                 InputOption::VALUE_NONE,
-                'Enable continuous processing of tasks. Without this option, all queued tasks are processed once and the command exits.'
+                tra('Enable continuous processing of tasks. Without this option, all queued tasks are processed once and the command exits.')
             );
     }
 
@@ -45,26 +45,26 @@ class TaskQueueProcessCommand extends Command
             $loop = $input->getOption('loop');
 
             do {
-                $output->writeln("Fetching Pending Queued Tasks...");
+                $output->writeln(tra("Fetching Pending Queued Tasks..."));
                 $queuedTasks = $this->queueManager->getQueuedTasks([], ['status' => QueuedTaskSettings::PENDING]);
                 if (empty($queuedTasks)) {
-                    $output->writeln("No pending tasks found.");
+                    $output->writeln(tra("No pending tasks found."));
                 } else {
-                    $output->writeln(sprintf("Found %d pending task(s).", count($queuedTasks)));
+                    $output->writeln(sprintf(tra("Found %d pending task(s)."), count($queuedTasks)));
                     foreach ($queuedTasks as $queuedTask) {
-                        $output->writeln(sprintf("Processing task ID %d of type %s...", $queuedTask->getId(), $queuedTask->getType()));
+                        $output->writeln(sprintf(tra("Processing task ID %d of type %s..."), $queuedTask->getId(), $queuedTask->getType()));
                         $this->queueManager->processTask($queuedTask);
                     }
                 }
                 if ($loop) {
-                    $output->writeln("Sleeping for 0.2 seconds.");
+                    $output->writeln(tra("Sleeping for 0.2 seconds."));
                     usleep(200000);
                 }
             } while ($loop);
 
             return Command::SUCCESS;
         } catch (QueueManagerException $e) {
-            $output->writeln(sprintf("An error occurred: %s", $e->getMessage()));
+            $output->writeln(sprintf(tra("An error occurred: %s"), $e->getMessage()));
             return Command::FAILURE;
         }
     }

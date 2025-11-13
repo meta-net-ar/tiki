@@ -45,9 +45,11 @@ $prefix: bs-;
 $body-color: $gray-800;  // default
 
 // Links
-$link-color: #7a04b5;
-$link-hover-color: #7a04b5;
-$link-shade-percentage:                   20%;  // default
+$link-color:                #7a04b5;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
 // Navs
 // Navbars

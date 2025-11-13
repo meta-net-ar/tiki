@@ -219,7 +219,6 @@ HTML;
         if (! $cacheLib->isCached($scriptHash, $cacheKey)) {
             $headlessBrowser = HeadlessBrowserFactory::getHeadlessBrowser();
             $htmlFile = writeTempFile($html_content, '', true, 'wikiplugin_chart_', '.html');
-            $htmlFileUrl = rtrim($base_url, '/') . '/temp/' . basename($htmlFile);
             $hash = str_replace('wikiplugin_chart_', '', str_replace('.html', '', basename($htmlFile)));
             $outputPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'wikiplugin_chart_' . $hash . '.png';
             $htmlFile = realpath($htmlFile);

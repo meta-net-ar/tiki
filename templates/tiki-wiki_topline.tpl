@@ -1,13 +1,13 @@
-<div class="wikitopline clearfix">
-    <div class="content">
+<div class="wikitopline d-flex justify-content-between w-100">
+    <div class="content mb-2">
         {if !isset($hide_page_header) or !$hide_page_header}
-            <div class="wikiinfo float-start">
+            <div class="wikiinfo">
                 {if $prefs.wiki_page_name_above eq 'y' and $print_page ne 'y'}
                     <a href="tiki-index.php?page={$page|escape:"url"}" class="titletop" title="{tr}refresh{/tr}">{$page|escape}</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{* The hard-coded spaces help selecting the page name for inclusion in a wiki link *}
                 {/if}
 
                 {if $prefs.feature_wiki_pageid eq 'y' and $print_page ne 'y'}
-                    <small><a class="link" href="tiki-index.php?page_id={$page_id}">{tr}page id:{/tr} {$page_id}</a></small>
+                    <small><a class="link" href="tiki-index.php?page_id={$page_id}">{tr}Page id:{/tr} {$page_id}</a></small>
                 {/if}
 
                 <div class="description page-description">{breadcrumbs type="desc" loc="page" crumbs=$crumbs}</div>
@@ -18,20 +18,20 @@
                 {/if}
             </div>
         {/if} {*hide_page_header*}
-        {if $pdf_export eq 'y'}
-            <div class="wikiinfo float-start" id="pdfinfo" style="display:none">
-                <div class="alert alert-info" style="width:500px"><h4><span class="icon icon-information fas fa-info-circle fa-fw "></span>&nbsp;<span class="rboxtitle">{tr}Please wait{/tr}</span></h4><div class="rboxcontent" style="display: inline"><span class="fas fa-circle-notch fa-spin" style="font-size:24px"></span>{tr} The PDF is being prepared, please wait...{/tr}</div></div>
-            </div>
-        {/if}
     </div> {* div.content *}
-</div> {* div.wikitopline *}
+     {*   {if $pdf_export eq 'y'} *}
+            <div class="wikiinfo" id="pdfinfo" style="display:none">
+                <div class="alert alert-info mx-2" style="min-width: 380px;"><h4><span class="icon icon-information fas fa-info-circle fa-fw "></span>&nbsp;<span class="rboxtitle alert-heading">{tr}Please wait{/tr}</span></h4><div class="rboxcontent" style="display: inline"><span class="fas fa-circle-notch fa-spin me-2" style="font-size:24px"></span>{tr}The PDF is being prepared....{/tr}</div></div>
+            </div>
+    {*    {/if} *}
+
 
 {if !isset($versioned) and $print_page ne 'y'}
-    <div class="wikiactions_wrapper clearfix">
+  {*  <div class="wikiactions_wrapper clearfix"> *}
     {strip}
     {if $show_wiki_actions}
-        <div class="wikiactions d-flex justify-content-end mb-2">
-            <div class="btn-group ms-2">
+        <div class="wikiactions d-flex justify-content-end mb-2 align-self-end">
+            <div class="btn-group ms-2" style="min-width: 6rem;">
                 {* Show language dropdown only if there is more than 1 language or user has right to edit *}
                 {if ($tiki_p_admin eq 'y' or $tiki_p_admin_wiki eq 'y' or $tiki_p_edit eq 'y' or $tiki_p_edit_inline eq 'y') or (isset($translationsCount) and $translationsCount gt 1)}
                     {if $prefs.feature_multilingual eq 'y' && $prefs.show_available_translations eq 'y' && $machine_translate_to_lang eq '' }
@@ -80,9 +80,9 @@
                                 {*<li role="presentation">*}
                                     <span class="dropdown-item" role="menuitem" tabindex="-1">
                                         {if $backlinks[back].type eq 'wiki page'}
-                                            {icon name="notepad"}
+                                            <span class="me-1">{icon name="notepad"}</span>
                                         {elseif $backlinks[back].type eq 'trackeritemfield'}
-                                            {icon name="database"}
+                                            <span class="me-1">{icon name="database"}</span>
                                         {/if}
                                         {if $prefs.wiki_backlinks_name_len ge '1'}
                                             {object_link id=$backlinks[back].objectId type=$backlinks[back].type title=$smarty.capture.backlink_title|truncate:$prefs.wiki_backlinks_name_len:"...":true}
@@ -329,3 +329,4 @@
     {/strip}
     </div>
 {/if}
+{*</div> div.wikitopline *}

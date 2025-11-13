@@ -55,8 +55,7 @@ $smarty->assign('nlId', $_REQUEST["nlId"]);
 $perms = Perms::get(['type' => 'newsletter', 'object' => $_REQUEST['nlId']]);
 
 if ($perms->admin_newsletters != 'y') {
-    Feedback::errorPage(['mes' => tr('You do not have the permission that is needed to use this feature'),
-                         'errortype' => 401]);
+    Feedback::errorPage(['mes' => tr('You do not have the permission that is needed to use this feature'), 'errortype' => 401]);
 }
 $defaultArticleClipRange = 3600 * 24; // one day
 if ($_REQUEST["nlId"]) {
@@ -152,7 +151,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         if (! isset($_REQUEST['frequency'])) {
             $_REQUEST['frequency'] = 0;
         }
-        $sid = $nllib->replace_newsletter(
+        $result = $nllib->replace_newsletter(
             $_REQUEST["nlId"],
             $_REQUEST["name"],
             $_REQUEST["description"],
@@ -169,11 +168,18 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $articleClipTypes,
             $_REQUEST["emptyClipBlocksSend"]
         );
-
-        if ($sid) {
-            Feedback::success(tr('Newsletter created or modified'));
-        } else {
-            Feedback::error(tr('Newsletter not created or modified'));
+        // Handle the result of the operation
+        // -1 indicates that the newsletter already exists
+        // If the result is an integer > 0, it indicates the ID of the updated newsletter
+        // If the result is an array, it indicates a new newsletter was created
+        if ($result === false) {
+            Feedback::error(tr('A newsletter error occurred during the information-writing process.'));
+        } elseif ($result === -1) {
+            Feedback::error(tr('Newsletter already exists. with the same name'));
+        } elseif (is_int($result) && $result > 0) {
+            Feedback::success(tr('Newsletter updated successfully'));
+        } elseif (is_array($result)) {
+            Feedback::success(tr('Newsletter created successfully'));
         }
     }
 

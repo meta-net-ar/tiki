@@ -193,17 +193,6 @@ function wikiplugin_attach($data, $params)
                 throw new Exception(tr('No tracker found matching id %0', $atts_item_name));
             }
 
-            // Merge the two arrays
-            $tracker_info = array_merge($tracker_info, $tracker_options);
-
-            $attextra = 'n';
-
-            if (str_contains($tracker_info["orderAttachments"], '|')) {
-                $attextra = 'y';
-            }
-
-            $attfields = explode(',', strtok($tracker_info["orderAttachments"], '|'));
-
             $atts = $trklib->list_item_attachments($atts_item_name, 0, -1, 'comment_asc', '');
         }
 

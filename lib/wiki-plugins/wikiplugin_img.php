@@ -749,7 +749,7 @@ function wikiplugin_img($data, $params)
             $id = 'fileId';
         }
         $params[$id] = '';
-        foreach ($id_list as $i => $value) {
+        foreach ($id_list as $value) {
             $params[$id] = trim($value);
             $params['fgalId'] = '';
             $params['type'] = $id;
@@ -1712,7 +1712,7 @@ function getMetaField($metarray, $labelarray)
     foreach ($labelmap as $type => $fieldname) {
         foreach ($metarray as $subtype => $group) {
             if ($type == $subtype) {
-                foreach ($group as $groupname => $fields) {
+                foreach ($group as $fields) {
                     if (array_key_exists($fieldname, $fields)) {
                         $ret = $fields[$fieldname]['newval'];
                         return $ret;

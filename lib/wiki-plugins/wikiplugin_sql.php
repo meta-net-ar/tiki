@@ -121,7 +121,6 @@ function wikiplugin_sql($data, $params)
     }
 
     $ret = '';
-    $sql_oke = true;
     $dbmsg = '';
 
     if ($db = $tikilib->get_db_by_name($db)) {
@@ -155,7 +154,7 @@ function wikiplugin_sql($data, $params)
         }
 
         $first_field = true;
-        foreach ($res as $name => $val) {
+        foreach ($res as $val) {
             if (! is_null($delim) && ! $first_field) {
                 $ret .= $delim;
             }

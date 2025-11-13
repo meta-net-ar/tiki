@@ -78,7 +78,7 @@ function wikiplugin_ftp($data, $params)
             ftp_close($conn_id);
             return tra('Connection failed');
         }
-        if (! ($login_result = ftp_login($conn_id, $user, $password))) {
+        if (! (ftp_login($conn_id, $user, $password))) {
             ftp_close($conn_id);
             return tra('Incorrect param');
         }

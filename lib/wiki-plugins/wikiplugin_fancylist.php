@@ -44,8 +44,6 @@ function wikiplugin_fancylist_info()
 
 function wikiplugin_fancylist($data, $params)
 {
-    global $tikilib;
-    global $replacement;
     if (isset($params)) {
         extract($params, EXTR_SKIP);
     }

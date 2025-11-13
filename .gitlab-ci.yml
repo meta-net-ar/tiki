@@ -634,7 +634,6 @@ check-directories:
     # It wasn't automated before, and I don't know how we were supposed to get some of these packages locally.  php console.php package:list can generate the list, but I can find no command to install them all - benoitg - 2023-05-04
     - composer require jerome-breton/casperjs-installer:dev-master --no-progress
     - composer require enygma/expose:^3.0 --no-progress
-    - composer require fullcalendar/fullcalendar-scheduler ^1.9 --no-progress
     - composer require fakerphp/faker dev-master --no-progress
     - composer require google/apiclient ^2.2.2 --no-progress
     - composer require mpdf/mpdf ^8.0.0 --no-progress

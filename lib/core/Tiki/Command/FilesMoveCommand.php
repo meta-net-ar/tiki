@@ -24,18 +24,18 @@ class FilesMoveCommand extends Command
             ->addArgument(
                 'galleryId',
                 InputArgument::REQUIRED,
-                'Gallery to move files from'
+                tra('Gallery to move files from')
             )
             ->addArgument(
                 'destinationPath',
                 InputArgument::REQUIRED,
-                'Path to move files to'
+                tra('Path to move files to')
             )
             ->addOption(
                 'confirm',
                 null,
                 InputOption::VALUE_NONE,
-                'Confirm the move operation (required)'
+                tra('Confirm the move operation (required)')
             )
         ;
     }
@@ -117,10 +117,10 @@ class FilesMoveCommand extends Command
         }
 
         $logslib->add_action(
-            'files move',
+            tra('files move'),
             'system',
             'system',
-            'Moving files from gallery #' . $galleryId . ' to folder' . $destinationPath . ' completed.' . count($files) . ' Files moved.'
+            tra('Moving files from gallery #%0 to folder %1 completed. %2 files moved.', $galleryId, $destinationPath, count($files))
         );
         return Command::SUCCESS;
     }

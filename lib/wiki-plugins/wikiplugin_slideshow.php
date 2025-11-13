@@ -48,6 +48,7 @@ function wikiplugin_slideshow_info()
                 'filter' => 'url',
                 'accepted' => tra('Valid URL'),
                 'since' => '19.0',
+                'default' => '',
             ],
             'parallaxBackgroundSize' => [
                 'required' => false,
@@ -292,7 +293,7 @@ function wikiplugin_slideshow($data, $params)
 
     $headerlib = TikiLib::lib('header');
     if (! isset($_REQUEST['theme'])) {
-        $headerlib->add_cssfile(REVEALJS_DIST_PATH . "./theme/" . $params['theme'] . '.css', 1);
+        $headerlib->add_cssfile(REVEALJS_DIST_PATH . "/theme/" . $params['theme'] . '.css', 1);
         $headerlib->add_js(
             '$( "#showtheme" ).val( "' . $params['theme'] . '" );'
         );

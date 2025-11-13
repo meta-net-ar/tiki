@@ -1143,7 +1143,7 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
             if (empty($_gap)) {
                 $_gap = 365 * 24 * 3600;
             }
-            $params['date'] = $params['enddate'] - $gap;
+            $params['date'] = $params['enddate'] - $_gap;
         }
     } elseif (empty($params['enddate'])) {
         $params['enddate'] = $startEmpty ? '' : TikiLib::lib('tiki')->now + 365 * 24 * 3600;
