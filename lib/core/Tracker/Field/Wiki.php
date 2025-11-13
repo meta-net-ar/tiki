@@ -554,7 +554,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         $trklib = TikiLib::lib('trk');
         $relationlib = TikiLib::lib('relation');
         $logslib = TikiLib::lib('logs');
-//        $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+        // $unifiedsearchlib = TikiLib::lib('unifiedsearch');
         $tikilib = TikiLib::lib('tiki');
 
         $fieldId = $this->getConfiguration('fieldId');
@@ -625,8 +625,8 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 $related = $relationlib->get_relations_to('trackeritem', $itemId, 'tiki.wiki.linkeditem');
                 foreach ($related as $rel) {
                     $pageName = $rel['itemId'];
-                    if (strlen($page_name) > 160) {
-                        $page_name = substr($page_name, 0, 160);
+                    if (strlen($pageName) > 160) {
+                        $pageName = substr($pageName, 0, 160);
                     }
                     $pageData = $pageTable->fetchColumn('data', [
                         'pageName' => $pageName,
@@ -674,7 +674,7 @@ Page too big, so included below:
                     );
                 }
             } else {
-                $finalValue = "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"}";
+                $finalValue = "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"";
                 $trklib->table('tiki_tracker_item_fields')->update(
                     ['value' => $finalValue],
                     ['itemId' => $itemId, 'fieldId' => $fieldId]
@@ -697,17 +697,15 @@ Page too big, so included below:
         }
         $tx->commit();
         return [
-            'samerow' => $options['samerow'],
-            'toolbars' => $options['toolbars'],
-            'width' => $options['width'],
-            'height' => $options['height'],
-            'max' => $options['max'],
-            'wordmax' => $options['wordmax'],
-            'wysiwyg' => $options['wysiwyg'],
+            'samerow' => $this->getOption('samerow'),
+            'toolbars' => $this->getOption('toolbars'),
+            'width' => $this->getOption('width'),
+            'height' => $this->getOption('height'),
+            'max' => $this->getOption('max'),
+            'wordmax' => $this->getOption('wordmax'),
+            'wysiwyg' => $this->getOption('wysiwyg'),
         ];
     }
-
-
 
     protected function attemptParse($text)
     {
