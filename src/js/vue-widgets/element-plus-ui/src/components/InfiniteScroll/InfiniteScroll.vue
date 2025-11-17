@@ -27,7 +27,7 @@ watchEffect(() => {
     }
     height.value = originalContainer.clientHeight || DEFAULT_HEIGHT;
 
-    mirrorInputs(originalContainer, scrollbar);
+    mirrorInputs(originalContainer, scrollbar, props.containerId);
 
     itemsCount.value = originalContainer.querySelector(`#${props.targetContainerId}`)?.childElementCount || originalContainer.childElementCount;
 
@@ -58,7 +58,7 @@ const load = async (direction) => {
             const content = document.createDocumentFragment();
             content.append(...originalTargetContainer.childNodes);
 
-            mirrorInputs(content, scrollbar);
+            mirrorInputs(content, scrollbar, props.containerId);
 
             if (props.targetContainerId) {
                 container.value.querySelector(`#${props.targetContainerId}`).appendChild(content);
