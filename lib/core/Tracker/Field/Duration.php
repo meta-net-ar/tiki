@@ -163,32 +163,42 @@ class Tracker_Field_Duration extends \Tracker\Field\AbstractItemField implements
             $applicationId = 'new';
         }
 
-        // language=JavaScript
-        $headerlib->add_jq_onready('
-        console.log("registerApplication");
-window.registerApplication({
-    name: "@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ',
-    app: () => importShim("@vue-mf/duration-picker"),
-    activeWhen: (location) => {
-        let condition = true;
-        return condition;
-    },
-    customProps: {
-        durationData: {
-            inputId: ' . json_encode($composedFieldId) . ',
-            inputName: ' . json_encode($this->getInsertId()) . ',
-            draft: ' . json_encode($_SESSION['duration_drafts'][$composedFieldId]) . ',
-            value: ' . $value . ',
-            units: ' . json_encode($this->enabledUnits()) . ',
-            chronometer: ' . $this->getOption("chronometer") . '
-        },
-    },
-});
-onDOMElementRemoved("single-spa-application:@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ', function () {
-    window.unregisterApplication("@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ');
-});
-');
-        $appHtml = '<div id="single-spa-application:@vue-mf/duration-picker-' . $applicationId . '" class="wp-duration-picker"></div>';
+        $elementId = 'duration-picker-' . $applicationId;
+        $composedFieldIdJson = json_encode($composedFieldId);
+        $enabledUnitsJson = json_encode($this->enabledUnits());
+        $draftJson = json_encode($_SESSION['duration_drafts'][$composedFieldId]);
+        $chronometerJson = json_encode($this->getOption("chronometer"));
+
+        $headerlib->add_jq_onready("
+            (async function() {
+
+                const container = document.getElementById(" . json_encode($elementId) . ");
+                if (!container) return;
+
+                import('@vue-mf/duration-picker').then(mod => {
+                    mod.mount[1](container, {
+                        durationData: {
+                            inputId: " . $composedFieldIdJson . ",
+                            inputName: " . json_encode($this->getInsertId()) . ",
+                            draft: " . $draftJson . ",
+                            value: " . $value . ",
+                            units: " . $enabledUnitsJson . ",
+                            chronometer: " . $chronometerJson . "
+                        }
+                    });
+                });
+
+                const observer = new MutationObserver(() => {
+                    if (!document.body.contains(container)) {
+                        mod.unmount[1](app);
+                    }
+                });
+                observer.observe(document.body, { childList: true, subtree: true });                
+                
+            })();
+        ");
+
+        $appHtml = '<div id="' . $elementId . '" class="wp-duration-picker"></div>';
 
         return $appHtml;
     }
