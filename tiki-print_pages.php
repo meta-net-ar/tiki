@@ -22,6 +22,7 @@ $inputConfiguration = [
         'clearpages'               => 'bool',                //post
         'clearstructures'          => 'bool',                //post
         'addstructurepages'        => 'bool',                //post
+        'addstructure'             => 'bool',                //post
         ],
         'staticKeyFiltersForArrays' => [
             'structureId'           => 'digits',       //post
