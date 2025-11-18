@@ -13,8 +13,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
         'page'                 => 'pagename',        //get
-        'process'              => 'bool',          //post
-        'lastversion'          => 'digits',          //post
+        'process'              => 'int',            //post
+        'lastversion'          => 'int',            //post
         'show'                 => 'bool',            //post
         'showstatistics'       => 'bool',             //post
         'showpage'             => 'bool',             //post
