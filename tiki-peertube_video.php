@@ -12,7 +12,7 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'videoId' => 'word',
+            'videoId' => 'alnumdash',
             'action' => 'word',
             'name' => 'text',
             'description' => 'xss',
