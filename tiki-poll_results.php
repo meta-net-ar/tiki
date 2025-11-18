@@ -26,14 +26,14 @@ $inputConfiguration = [
         'deletevote'               => 'bool',              //get
         'optionId'                 => 'digits',            //get
         'pollId'                   => 'digits',            //get
-        'user'                     => 'usename',           //get
+        'user'                     => 'username',          //get
         'ip'                       => 'text',              //post
         'scoresort_asc'            => 'text',              //get
         'scoresort_desc'           => 'text',              //get
         'list'                     => 'text',              //get
         'scoresort'                => 'text',              //get
-        'sort_mode'                => 'text',              //get
-        'offset'                   => 'digit',             //get
+        'sort_mode'                => 'alnumdash',        //get - used in SQL ORDER BY
+        'offset'                   => 'digits',           //get
         ],
     ],
 ];
