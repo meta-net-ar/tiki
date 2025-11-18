@@ -13,6 +13,7 @@ $inputConfiguration = [
         'average_stat_order'       => 'text',              //get
         'maximum_stat_offset'      => 'digits',            //get
         'maximum_stat_order'       => 'text',              //get
+        'no_of_requests'           => 'alpha',             //get
         ],
     ],
 ];
