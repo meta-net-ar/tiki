@@ -10,10 +10,10 @@ $inputConfiguration = [
         'staticKeyFilters'     => [
         'merge'                => 'bool',        //get
         'delete'               => 'bool',        //post
-        'merge_name'           => 'string',      //post
-        'sort_mode'            => 'string',      //post
+        'merge_name'           => 'text',        //post
+        'sort_mode'            => 'alnumdash',   //post
         'offset'               => 'int',         //post
-        'find'                 => 'string',      //post
+        'find'                 => 'text',        //post
         ],
         'staticKeyFiltersForArrays' => [
             'note' => 'int',
