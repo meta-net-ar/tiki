@@ -270,18 +270,53 @@ if (! hm_exists('tiki_flag_message')) {
             $flags = '';
         }
         if ($action == 'remove') {
-            $flags = preg_replace('/\\\?'.ucfirst($flag).'/', '', $flags);
-            $state = 'un'.$flag;
+            $flags = preg_replace('/\\\?' . ucfirst($flag) . '/', '', $flags);
+            $state = 'un' . $flag;
         } elseif (! stristr($flags, $flag)) {
-            $flags .= ' \\'.ucfirst($flag);
+            $flags .= ' \\' . ucfirst($flag);
             $state = $flag;
         }
         $flags = preg_replace("/\s{2,}/", ' ', trim($flags));
         $raw = preg_replace("/Flags:.*?\r\n/", "Flags: $flags\r\n", $file->getContents(), -1, $cnt);
         if ($cnt == 0) {
-            $raw = "Flags: $flags\r\n".$raw;
+            $raw = "Flags: $flags\r\n" . $raw;
         }
         $file->replaceQuick($raw);
         return $state;
+    }
+}
+
+/**
+ * @subpackage tiki/functions
+ * @param object $mod the module calling this function
+ * @return string trackers with email folder fields dropdown
+ */
+if (! hm_exists('tiki_move_to_tracker_dropdown')) {
+    function tiki_move_to_tracker_dropdown($mod)
+    {
+        $trk = TikiLib::lib('trk');
+        $fields = $trk->get_fields_by_type('EF');
+        if (! $fields) {
+            return;
+        }
+        $field_list = [];
+        foreach ($fields as $field) {
+            $tracker = $trk->get_tracker($field['trackerId']);
+            $handler = $trk->get_field_handler($field);
+            if ($handler->getOption('useFolders')) {
+                $folder_list = [];
+                foreach ($handler->getFolders() as $folder => $folderName) {
+                    $folder_list[] = "<div><a href='#' class='object_selector_trigger' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='" . htmlspecialchars($folder) . "'>{$folderName}</a></div>";
+                }
+                $field_list[] = "<a href='#' class='tiki_folder_trigger'>{$tracker['name']} - {$field['name']}</a>"
+                    . "<div class='tiki_folder_container' style='display: none'>" . implode("\n", $folder_list) . "</div>";
+            } else {
+                $field_list[] = "<a href='#' class='object_selector_trigger' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='inbox'>{$tracker['name']} - {$field['name']}</a>";
+            }
+        }
+        $res = "<a class=\"hlink\" id=\"move_to_trackers\" href=\"#\">" . tra('Trackers') . "</a>";
+        $res .= "<div class='move_to_trackers'><div class='move_to_title'>" . tra('Move to trackers...') . "<span><a class='close_move_to_trackers' href='#'>X</a></span></div>" . implode("<br>\n", $field_list) . "</div>";
+
+        return $res;
     }
 }

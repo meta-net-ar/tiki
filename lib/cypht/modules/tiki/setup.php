@@ -128,6 +128,7 @@ add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 
 add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
+add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 setup_base_ajax_page('ajax_move_to_tracker', 'core');
 add_handler('ajax_move_to_tracker', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_move_to_tracker', 'imap_oauth2_token_check', true, 'imap');
@@ -223,6 +224,7 @@ return array(
   'allowed_post' => array(
     'imap_server_id' => FILTER_VALIDATE_INT,
     'imap_msg_uid' => FILTER_SANITIZE_STRING,
+    'imap_msg_ids' => FILTER_SANITIZE_STRING,
     'imap_msg_part' => FILTER_SANITIZE_STRING,
     'folder' => FILTER_SANITIZE_STRING,
     'msgid' => FILTER_SANITIZE_STRING,
