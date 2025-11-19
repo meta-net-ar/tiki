@@ -88,11 +88,7 @@ if (isset($_REQUEST['delete_all']) && $tiki_p_admin) {
 }
 
 //Selection for untranslated Strings and edit translations
-if (isset($_REQUEST["action"])) {
-    $action = $_REQUEST["action"];
-} else {
-    $action = "";
-}
+$action = $_REQUEST["action"] ?? "";
 
 if ($action == "edit_rec_sw" || $action == "edit_tran_sw") {
     $access->checkCsrf();

@@ -539,11 +539,7 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
 
-if (isset($_REQUEST['geo_zoomlevel_to_found_location'])) {
-    $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'];
-} else {
-    $zoomToFoundLocation = $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-}
+$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
 $headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
 
 if ($prefs['geo_enabled'] === 'y') {

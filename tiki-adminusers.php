@@ -430,25 +430,13 @@ if (empty($_REQUEST['offset'])) {
 }
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST['initial'])) {
-    $initial = $_REQUEST['initial'];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST['initial'] ?? '';
 $smarty->assign('initial', $initial);
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 $smarty->assign('find', $find);
 
-if (isset($_REQUEST['filterGroup'])) {
-    $filterGroup = $_REQUEST['filterGroup'];
-} else {
-    $filterGroup = '';
-}
+$filterGroup = $_REQUEST['filterGroup'] ?? '';
 $smarty->assign('filterGroup', $filterGroup);
 
 list($username, $usermail, $usersTrackerId, $chlogin) = ['', '', '',    false];

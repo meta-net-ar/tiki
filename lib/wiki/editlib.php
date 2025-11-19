@@ -165,20 +165,10 @@ class EditLib
     private function setTranslationSourceAndTargetVersions()
     {
         global $_REQUEST, $tikilib;
-
-        if (isset($_REQUEST['oldver'])) {
-            $this->oldSourceVersion = $_REQUEST['oldver'];
-        } else {
-            // Note: -1 means a "virtual" empty version.
-            $this->oldsourceVersion = -1;
-        }
-
-        if (isset($_REQUEST['newver'])) {
-            $this->newSourceVersion = $_REQUEST['newver'];
-        } else {
-            // Note: version number of 0 means the most recent version.
-            $this->newSourceVersion = 0;
-        }
+        // Note: -1 means a "virtual" empty version.
+        $this->oldSourceVersion = $_REQUEST['oldver'] ?? -1;
+        // Note: version number of 0 means the most recent version.
+        $this->newSourceVersion = $_REQUEST['newver'] ?? 0;
     }
 
     public function aTranslationWasSavedAs($complete_or_partial)

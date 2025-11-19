@@ -467,29 +467,17 @@ if (isset($_REQUEST["save"])) {
         }
     }
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST["maxRecords"])) {
     $maxRecords = $_REQUEST['maxRecords'];
 }
-if (isset($_REQUEST["initial"])) {
-    $initial = $_REQUEST["initial"];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
 $writerfield = $trackerDefinition->getWriterField();
 $writergroupfield = $trackerDefinition->getWriterGroupField();
 
-if (isset($_REQUEST["filterfield"])) {
-    $filterfield = $_REQUEST["filterfield"];
-} else {
-    $filterfield = '';
-}
+$filterfield = $_REQUEST["filterfield"] ?? '';
 $smarty->assign('filterfield', $filterfield);
 if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and isset($_REQUEST["filtervalue"]["$filterfield"])) {
     $filtervalue = $_REQUEST["filtervalue"]["$filterfield"];

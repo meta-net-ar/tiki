@@ -448,11 +448,7 @@ if ((isset($_REQUEST['save'])) || (isset($_REQUEST['preview']))) {
             $msg_changes .= tra('Rights by creator') . ': ' . $info['rights_by_creator'] . ' --> ' . $save_head['rights_by_creator'] . "\n";
         }
     }
-    if (isset($_REQUEST['public_for_group'])) {
-        $public_for_group = $_REQUEST['public_for_group'];
-    } else {
-        $public_for_group = null;
-    }
+    $public_for_group = $_REQUEST['public_for_group'] ?? null;
     if (isset($_REQUEST['title']) and $info['title'] != $_REQUEST['title']) {
         $save['title'] = $_REQUEST['title'];
         $msg_changes .= tra('Title') . ': ' . $info['title'] . ' --> ' . $save['title'] . "\n";
@@ -729,11 +725,7 @@ if (! isset($_REQUEST['offset'])) {
     $offset = $_REQUEST['offset'];
 }
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = null;
-}
+$find = $_REQUEST['find'] ?? null;
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (! $show_form) {

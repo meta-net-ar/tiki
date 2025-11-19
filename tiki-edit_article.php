@@ -106,11 +106,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('articleId', $articleId);
 $smarty->assign('previewId', $previewId);
@@ -284,20 +280,12 @@ $topics = $artlib->list_topics();
  */
 $topics = array_values($topics);
 $smarty->assign_by_ref('topics', $topics);
+$smarty->assign('preview', isset($_REQUEST['preview']) ? 1 : 0);
 
-if (isset($_REQUEST['preview'])) {
-    $smarty->assign('preview', 1);
-} else {
-    $smarty->assign('preview', 0);
-}
 
 // If we are in preview mode then preview it!
 if (isset($_REQUEST['preview']) or ! empty($errors)) {
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     $smarty->assign('reads', '0');
     $smarty->assign('edit_data', 'y');
@@ -482,11 +470,7 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
 if (isset($_REQUEST['save']) && empty($errors)) {
     $access->checkCsrf();
 
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     if (isset($_REQUEST['allowhtml']) && $_REQUEST['allowhtml'] == 'on' || $_SESSION['wysiwyg'] == 'y') {
         $body = $_REQUEST['body'];

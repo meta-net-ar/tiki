@@ -31,8 +31,6 @@ if ($mess_archiveAfter > 0) {
 
 //set defaults
 $sort_mode = 'date_desc';
-$offset = 0;
-$find = '';
 $orig_or_reply = "r";
 
 // Mark messages if the mark button was pressed
@@ -127,12 +125,9 @@ if (isset($_REQUEST['filter'])) {
 if (isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
+$find = $_REQUEST["find"] ?? '';
+
 if (isset($_REQUEST["origto"])) {
     $_REQUEST["replyto"] = $_REQUEST["origto"];
     $orig_or_reply = "o";

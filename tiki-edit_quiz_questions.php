@@ -147,11 +147,7 @@ if (! isset($_REQUEST['offset'])) {
 
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $smarty->assign('find', $find);
 

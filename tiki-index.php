@@ -238,11 +238,7 @@ if (
 $wikilib->processPageDisplayOptions(TikiLib::lib('header'));
 
 #Propagate the fullscreen parameter to templates
-if (isset($_REQUEST['fullscreen'])) {
-    $fullscreen = $_REQUEST['fullscreen'];
-} else {
-    $fullscreen = 'n';
-}
+$fullscreen = $_REQUEST['fullscreen'] ?? 'n';
 $smarty->assign('fullscreen', $fullscreen);
 
 if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {

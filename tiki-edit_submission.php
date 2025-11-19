@@ -72,11 +72,7 @@ if ($tiki_p_admin != 'y') {
     }
 }
 
-if (isset($_REQUEST['subId'])) {
-    $subId = $_REQUEST['subId'];
-} else {
-    $subId = 0;
-}
+$subId = $_REQUEST['subId'] ?? 0;
 
 if (! empty($_REQUEST['topicId'])) {
     $topicId = $_REQUEST['topicId'];
@@ -91,11 +87,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('subId', $subId);
 $smarty->assign('articleId', $subId);

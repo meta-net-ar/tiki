@@ -610,11 +610,7 @@ if (! isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $channels = $menulib->list_menus($offset, $maxRecords, $sort_mode, $find);
 foreach ($channels['data'] as $i => $channel) {

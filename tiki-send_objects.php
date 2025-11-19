@@ -91,11 +91,7 @@ if (isset($_REQUEST['dbg'])) {
     $smarty->assign('dbg', $_REQUEST['dbg']);
 }
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $smarty->assign('find', $find);
 

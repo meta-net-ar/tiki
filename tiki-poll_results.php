@@ -128,11 +128,7 @@ foreach ($pollIds as $pK => $pId) { // iterate each poll
  */
 function scoresort($a, $b)
 {
-    if (isset($_REQUEST['scoresort_asc'])) {
-        $i = $_REQUEST['scoresort_asc'];
-    } else {
-        $i = $_REQUEST['scoresort_desc'];
-    }
+    $i = $_REQUEST['scoresort_asc'] ?? $_REQUEST['scoresort_desc'];
     // must first sort based on missing, otherwise missing index will occur when trying to read more info.
     if (count($a['options']) <= $i && count($b['options']) <= $i) {
         return 0;

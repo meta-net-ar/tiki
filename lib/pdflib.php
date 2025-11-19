@@ -411,6 +411,26 @@ class PdfGenerator
                 $themecss .= file_get_contents($themePath);
             }
 
+            // and a theme pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                '',
+                'css/pdf.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            // and an option pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'css/pdf.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
             $themecss .= "\nb,strong{font-weight:bold !important;}";
             // preserving theme styles by removing media print styles to print what is shown on screen
             $themecss = str_replace(["media print", "color : fff"], ["media p","color : #fff"], $themecss);

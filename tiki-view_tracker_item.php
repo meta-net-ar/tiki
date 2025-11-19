@@ -295,17 +295,9 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // ************* previous/next **************
 foreach (
@@ -852,11 +844,7 @@ if (isset($_REQUEST['show'])) {
         }
     }
 }
-if (isset($_REQUEST['from'])) {
-    $from = $_REQUEST['from'];
-} else {
-    $from = false;
-}
+$from = $_REQUEST['from'] ?? false;
 $smarty->assign('from', $from);
 if (isset($_REQUEST['status'])) {
     $smarty->assign_by_ref('status', $_REQUEST['status']);

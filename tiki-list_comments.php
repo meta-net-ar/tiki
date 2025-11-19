@@ -246,17 +246,10 @@ if (isset($_REQUEST["sort_mode"])) {
     $sort_mode = 'commentDate_desc';
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-} else {
-    $offset = 0;
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = strip_tags($_REQUEST["find"]);
-} else {
-    $find = '';
-}
+$find = strip_tags($_REQUEST["find"] ?? '');
+
 $smarty->assign_by_ref('find', $find);
 if (! isset($_REQUEST['findfilter_approved'])) {
     $_REQUEST['findfilter_approved'] = '';

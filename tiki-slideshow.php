@@ -65,11 +65,7 @@ if (! ($info = $tikilib->page_exists($page))) {
     die;
 }
 
-if (isset($_REQUEST['theme'])) {
-    $theme = $_REQUEST['theme'];
-} else {
-    $theme = "black";
-}
+$theme = $_REQUEST['theme'] ?? "black";
 
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);

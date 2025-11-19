@@ -198,11 +198,7 @@ if ($editable === 'y') {
             $structlib->demote_node($_REQUEST["page_ref_id"]);
         }
     }
-    if (isset($_REQUEST["find_objects"])) {
-        $find_objects = $_REQUEST["find_objects"];
-    } else {
-        $find_objects = '';
-    }
+    $find_objects = $_REQUEST["find_objects"] ?? '';
     $smarty->assign('find_objects', $find_objects);
 
     $filter = [];
@@ -213,11 +209,7 @@ if ($editable === 'y') {
         $smarty->assign('find_categId', '');
     }
 
-    if (! isset($_REQUEST["offset"])) {
-        $offset = 0;
-    } else {
-        $offset = $_REQUEST["offset"];
-    }
+    $offset = $_REQUEST["offset"] ?? 0;
     $smarty->assign_by_ref('offset', $offset);
 
     // Get all wiki pages for the dropdown menu

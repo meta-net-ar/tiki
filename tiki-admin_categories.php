@@ -603,24 +603,11 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-$smarty->assign('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-if (isset($_REQUEST["find_objects"])) {
-    $find_objects = $_REQUEST["find_objects"];
-} else {
-    $find_objects = '';
-}
+$find_objects = $_REQUEST["find_objects"] ?? '';
 
 // ---------------------------------------------------
 if ($prefs['feature_search'] !== 'y' || $prefs['unified_add_to_categ_search'] !== 'y') {    // no unified search

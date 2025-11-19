@@ -32,12 +32,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign('sort_mode', $sort_mode);
 
-//Offset and Step param for pagination
-$offset = 0;
+//Step param for pagination
 $step = 5;
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
 if ($prefs['feature_wiki'] == 'y') {
     $mytiki_pages = $tikilib->get_user_preference($user, 'mytiki_pages', 'y');

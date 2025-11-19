@@ -248,11 +248,7 @@ if (! empty($multiprint_pages)) {
         $smarty->assign_by_ref('filter_values', $filter_values);
     }
 
-    if (isset($_REQUEST['initial'])) {
-        $initial = $_REQUEST['initial'];
-    } else {
-        $initial = '';
-    }
+    $initial = $_REQUEST['initial'] ?? '';
 
     $smarty->assign('initial', $initial);
     // What a checked checkbox returns is browser dependant. Don't test on the value, just presence

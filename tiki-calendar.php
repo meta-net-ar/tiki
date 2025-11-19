@@ -188,12 +188,7 @@ if (is_array($_SESSION['CalendarViewGroups'])) {
     }
 }
 $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 if (! empty($_REQUEST['mon'])) {

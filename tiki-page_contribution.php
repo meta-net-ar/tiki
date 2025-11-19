@@ -39,18 +39,10 @@ if (! isset($_REQUEST["page"])) {
 $tikilib->get_perm_object($page, 'wiki page');
 $access->check_permission('tiki_p_page_contribution_view');
 
-if (isset($_REQUEST['process'])) {
-    $process = $_REQUEST['process'];
-} else {
-    $process = 1;
-}
+$process = $_REQUEST['process'] ?? 1;
 $smarty->assign('process', $process);
 
-if (isset($_REQUEST['lastversion'])) {
-    $lastversion = $_REQUEST['lastversion'];
-} else {
-    $lastversion = 0;
-}
+$lastversion = $_REQUEST['lastversion'] ?? 0;
 $smarty->assign('lastversion', $lastversion);
 
 if (! isset($_REQUEST['show'])) { //defaults
@@ -59,22 +51,10 @@ if (! isset($_REQUEST['show'])) { //defaults
     $showpopups = 0;
     $escape = 0;
 } else {
-    if (isset($_REQUEST['showstatistics'])) {
-        $showstatistics = $_REQUEST['showstatistics'];
-    } else {
-        $showstatistics = 0;
-    }
-    if (isset($_REQUEST['showpage'])) {
-        $showpage = $_REQUEST['showpage'];
-    } else {
-        $showpage = 0;
-    }
+    $showstatistics = $_REQUEST['showstatistics'] ?? 0;
+    $showpage = $_REQUEST['showpage'] ?? 0;
 
-    if (isset($_REQUEST['showpopups'])) {
-        $showpopups = $_REQUEST['showpopups'];
-    } else {
-        $showpopups = 0;
-    }
+    $showpopups = $_REQUEST['showpopups'] ?? 0;
     $escape = 0;
     if (
         isset($prefs['feature_source']) and $prefs['feature_source'] == 'y' and
