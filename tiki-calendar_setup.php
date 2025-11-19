@@ -438,9 +438,9 @@ $smarty->assign(
     [
         'firstDayofWeek'   => $firstDayofWeek,
         'display_timezone' => $prefs['display_timezone'],
-        'language'         => $prefs['language'],
-        'minHourOfDay'     => $minHourOfDay ? $minHourOfDay : "00:00:00",
-        'maxHourOfDay'     => $maxHourOfDay ? $maxHourOfDay : "23:00:00",
+        'language'         => Language::getCurrentLanguage(),
+        'minHourOfDay'     => $minHourOfDay ?: "00:00:00",
+        'maxHourOfDay'     => $maxHourOfDay ?: "23:00:00",
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
         'initialDate'      => "$focus_year-$focus_month-$focus_day",

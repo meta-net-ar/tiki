@@ -34,7 +34,7 @@ if (file_exists('lang/' . $prefs['language'] . '/language.js')) {
 
 
 /** Use custom.js in lang dir if there **/
-$language = $prefs['language'];
+$language = Language::getCurrentLanguage();
 if (is_file("lang/$language/custom.js")) {
     TikiLib::lib('header')->add_jsfile_late("lang/$language/custom.js");    // before styles custom.js
 }
@@ -211,7 +211,7 @@ $jqueryTiki['googleStreetViewOverlay'] = $prefs['geo_google_streetview_overlay']
 $jqueryTiki['googleMapsAPIKey'] = $prefs['gmap_key'];
 $jqueryTiki['structurePageRepeat'] = $prefs['page_n_times_in_a_structure'] === 'y';
 $jqueryTiki['no_cookie'] = false;
-$jqueryTiki['language'] = $prefs['language'];
+$jqueryTiki['language'] = Language::getCurrentLanguage();
 $jqueryTiki['useInlineComment'] = $prefs['feature_inline_comments'] === 'y';
 $jqueryTiki['useInlineAnnotations'] = $prefs['comments_inline_annotator'] === 'y';
 $jqueryTiki['helpurl'] = $prefs['feature_help'] === 'y' ? $prefs['helpurl'] : '';

@@ -80,7 +80,9 @@
                                 </a>
                             </action>
                             <action>
-                                <a href="{service controller=manager action=delete instanceId=$instance->id}">
+                                <a href="{service controller=manager action=delete instanceId=$instance->id}"
+                                    aria-label="{tr}Delete{/tr}"
+                                    onclick="confirmPopup('{tr}Are you sure you want to delete this instance?{/tr}', '{ticket mode=get}');">
                                     {icon name=times _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                 </a>
                             </action>

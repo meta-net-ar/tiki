@@ -10,6 +10,7 @@ use Error;
 use Exception;
 use Feedback;
 use HTMLPurifier;
+use Language;
 use Perms;
 use Smarty\Extension\CoreExtension;
 use Smarty\Extension\DefaultExtension;
@@ -220,14 +221,14 @@ class SmartyTiki extends Smarty
 
         $_smarty_tpl_file = $this->get_filename($_smarty_tpl_file);
 
-        $lgSave = $prefs['language'];
+        $lgSave = Language::getCurrentLanguage();
         $prefs['language'] = $lg;
         $this->refreshLanguage();
         $res = parent::fetch($_smarty_tpl_file, $_smarty_cache_id, $_smarty_compile_id);
         $prefs['language'] = $lgSave; // Restore the language of the user triggering the notification
         $this->refreshLanguage();
 
-        return preg_replace("/^[ \t]*/", '', $res);
+        return ltrim($res, " \t");
     }
 
     /**
@@ -613,7 +614,7 @@ class SmartyTiki extends Smarty
     {
         global $tikidomain, $prefs;
 
-        $lang = $prefs['language'];
+        $lang = Language::getCurrentLanguage();
         if (empty($lang)) {
             $lang = 'default';
         }

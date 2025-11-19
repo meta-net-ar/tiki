@@ -59,7 +59,7 @@ class TikiMail
             $this->mail = tiki_get_basic_mail();
             try {
                 $this->mail->from(new Address($from, $fromName));
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // was already set, then do nothing
             }
         } else {

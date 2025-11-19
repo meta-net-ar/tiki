@@ -60,9 +60,7 @@ class Tracker implements ActionInterface
 
     public function execute(Account $account, Message $message)
     {
-        global $prefs;
         $tikilib = TikiLib::lib('tiki');
-        $filegallib = TikiLib::lib('filegal');
         $trackerUtilities = new Services_Tracker_Utilities();
 
         $fieldSubject = [
@@ -220,7 +218,7 @@ class Tracker implements ActionInterface
             for ($i = 0; $i < sizeof($permNames); $i++) {
                 $toItem[$permNames[$i]] = $datasItem[$i];
             }
-            $itemId = $trackerUtilities->insertItem(
+            $trackerUtilities->insertItem(
                 $definition,
                 [
                     'status' => null,
@@ -247,7 +245,7 @@ class Tracker implements ActionInterface
                     }
                 }
             }
-            $itemId = $trackerUtilities->insertItem(
+            $trackerUtilities->insertItem(
                 $definition,
                 [
                     'status' => null,

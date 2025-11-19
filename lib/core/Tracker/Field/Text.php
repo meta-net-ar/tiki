@@ -178,7 +178,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
     protected function processMultilingual($requestData, $id_string)
     {
         global $prefs;
-        $language = $prefs['language'];
+        $language = Language::getCurrentLanguage();
         $multilingual = $this->getConfiguration('isMultilingual') == 'y';
 
         if (! isset($requestData[$id_string])) {
@@ -475,7 +475,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                 })
                 ;
         } else {
-            $lang = $prefs['language'];
+            $lang = Language::getCurrentLanguage();
             $schema->addNew($permName, 'current')
                 ->setLabel(tr('%0 (%1)', $name, $lang))
                 ->setReadOnly(true)
@@ -581,7 +581,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                     ;
             }
         } else {
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
             $filters->addNew($permName, "fulltext-current")
                 ->setLabel($name)
                 ->setHelp(tr('Full-text search in the current language.'))

@@ -34,9 +34,6 @@ class TrackerHandler extends DataHandler
      */
     public function __construct($trackerId)
     {
-        $tikilib = TikiLib::lib('tiki');
-        $trklib = TikiLib::lib("trk");
-
         $this->id = $trackerId;
         $this->def = Tracker_Definition::get($trackerId);
         $this->info = $this->def->getInformation();
@@ -47,8 +44,6 @@ class TrackerHandler extends DataHandler
     // _load
     public function load(&$sheet)
     {
-        $tikilib = TikiLib::lib('tiki');
-
         $i = 0;
         $trackerName = $this->info['name'];
         $tracker = Tracker_Query::tracker($trackerName)

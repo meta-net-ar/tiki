@@ -16,8 +16,6 @@ class ToolbarDialog extends ToolbarItem
 
     public static function fromName(string $tagName, bool $is_wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = ''): ?ToolbarItem
     {
-        global $prefs;
-
         $tool_prefs = [];
         $markdown_wysiwyg = '';
         $markdown = '';
@@ -44,13 +42,10 @@ class ToolbarDialog extends ToolbarItem
                 $icon = tra('img/icons/page_link.png');
                 $wysiwyg = '';
 
-                $smarty = TikiLib::lib('smarty');
-
                 break;
             case 'link':
                 $wysiwyg = 'link';
                 $label = tra('External Link');
-                $iconname = 'link-external';
                 $iconname = 'external-link-alt';    // for isDialogSupported but will work if not too
                 $icon = tra('img/icons/world_link.png');
                 $markdown = 'link';

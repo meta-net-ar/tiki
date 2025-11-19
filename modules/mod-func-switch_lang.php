@@ -29,17 +29,12 @@ function module_switch_lang_info()
  */
 function module_switch_lang($mod_reference, $module_params)
 {
-    global $prefs, $user, $flagmapping;
+    global $flagmapping;
 
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
 
-    $frontendLang = $prefs['language'];
-    if (! empty($user)) {
-        $userlib = TikiLib::lib('user');
-        $userLang = $userlib->get_user_preference($user, 'language');
-        $frontendLang = ! empty($userLang) ? $userLang : $prefs['site_language'];
-    }
+    $frontendLang = Language::getCurrentLanguage();
 
     // tiki-setup has already set the $language variable
     //Create a list of languages
@@ -51,7 +46,6 @@ function module_switch_lang($mod_reference, $module_params)
     if ($mode == 'flags' || $mode == 'words' || $mode == 'abrv') {
         include('lang/flagmapping.php');
         global $pageRenderer;
-        //$trads = $multilinguallib->getTranslations('wiki page', $page_id, $page, $prefs['language']);
 
         for ($i = 0, $icount_languages = count($languages); $i < $icount_languages; $i++) {
             if (isset($flagmapping[$languages[$i]['value']])) {

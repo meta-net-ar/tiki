@@ -88,7 +88,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
         try {
             // Assertion 1: Check if the select element exists
             $this->webDriver->findElement(WebDriverBy::id($selectElementID));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->fail("$message\nMarkup element '$selectElementID' did not exist");
         }
 
@@ -113,7 +113,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
         try {
             // Check if the select element exists
             $this->webDriver->findElement(WebDriverBy::id($selectElementID));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->fail("$message\nMarkup element '$selectElementID' did not exist");
         }
 
@@ -131,7 +131,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
         $this->assertEquals($gotItemsText, $expItemsText, "$message\nItems in the Select element '$selectElementID' were wrong.");
 
         // Assert that each expected item is present in the select element
-        foreach ($expItems as $anItem => $anItemValue) {
+        foreach ($expItems as $anItemValue) {
             $thisItemElementID = "$selectElementID/option[@value='$anItemValue']";
             $this->webDriver->findElement(WebDriverBy::xpath($thisItemElementID));
         }
@@ -140,14 +140,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
     public function assertSelectElementDoesNotContainItems($selectElementID, $expItems, $message)
     {
         $this->assertTrue($this->webDriver->findElement(WebDriverBy::id($selectElementID))->isDisplayed(), "$message\nMarkup element '$selectElementID' did not exist");
-        $selectElement = new WebDriverSelect($this->webDriver->findElement(WebDriverBy::id($selectElementID)));
-        $options = $selectElement->getOptions();
-        $gotItemsText = [];
-        foreach ($options as $option) {
-            $gotItemsText[] = $option->getText();
-        }
-        $expItemsText = array_keys($expItems);
-        foreach ($expItems as $anItem => $anItemValue) {
+        foreach ($expItems as $anItemValue) {
             $thisItemElementID = "$selectElementID/option[@value='$anItemValue']";
             $this->assertFalse($this->webDriver->findElement(WebDriverBy::xpath($thisItemElementID))->isDisplayed(), "$message\nElement '$thisItemElementID' should not be present.");
         }
@@ -170,7 +163,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
                 $this->webDriver->wait()->until(WebDriverExpectedCondition::visibilityOfAnyElementLocated(WebDriverBy::cssSelector('body')));
                 // If any visible element appears, assume login success
                 return true;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // If no visible element appears within the timeout, assume login failure
                 return false;
             }
@@ -205,7 +198,7 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
         try {
             $element = $this->webDriver->findElement(WebDriverBy::xpath($locator));
             return $element !== null;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }
@@ -234,8 +227,8 @@ class TikiSeleniumTestCase extends PHPUnit\Framework\TestCase
             // Find the body element
             $bodyElement = $this->webDriver->findElement(WebDriverBy::tagName('body'));
             // Check if the text exists in the body element
-            return strpos($bodyElement->getText(), $text) !== false;
-        } catch (Exception $e) {
+            return str_contains($bodyElement->getText(), $text);
+        } catch (Exception) {
             return false;
         }
     }

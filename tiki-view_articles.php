@@ -15,17 +15,19 @@ $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'remove'            => 'int',           //post
-            'sort_mode'         => 'word',          //get
-            'offset'            => 'digits',        //get
+            'sort_mode'         => 'alnumdash',     //get
+            'offset'            => 'int',           //get
             'date_min'          => 'digits',        //post
             'date_max'          => 'digits',        //post
-            'min_rating'        => 'string',        //post
-            'max_rating'        => 'string',        //post
-            'type'              => 'string',        //post
-            'topic'             => 'string',        //post
-            'topicName'         => 'string',        //post
+            'min_rating'        => 'digits',        //post
+            'max_rating'        => 'digits',        //post
+            'type'              => 'striptags',        //post
+            'topic'             => 'int',        //post
+            'topicName'         => 'striptags',        //post
             'categId'           => 'int',           //post
             'lang'              => 'lang',          //post
+            'find'              => 'striptags',     //get
+            'watch_action'      => 'alpha',     //get
         ]
     ],
 ];

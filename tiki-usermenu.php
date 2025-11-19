@@ -14,15 +14,15 @@ $inputConfiguration = [
             'addbk'             => 'bool',          //post
             'url'               => 'url',           //post
             'save'              => 'bool',          //post
-            'name'              => 'string',        //post
+            'name'              => 'striptags',     //post
             'position'          => 'int',           //post
-            'mode'              => 'string',        //post
-            'sort_mode'         => 'string',        //post
+            'mode'              => 'alpha',         //post
+            'sort_mode'         => 'alnumdash',     //post
             'offset'            => 'int',           //post
-            'find'              => 'string',        //post
+            'find'              => 'striptags',     //post
         ],
         'staticKeyFiltersForArrays' => [
-            'menu'          => 'string',    //post
+            'menu'          => 'int',    //post
         ],
     ],
 ];

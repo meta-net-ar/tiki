@@ -12,7 +12,7 @@
 function module_git_detail_info()
 {
     return [
-        'name' => tra('Git detail'),
+        'name' => tra('Git information'),
         'description' => tra('Git commit and last update information.'),
         'params' => [],
     ];

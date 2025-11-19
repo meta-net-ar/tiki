@@ -2806,8 +2806,6 @@ installer/composer-patches/jcbrand-conversejs_remove-native-javascript-for-boots
 installer/composer-patches/jquery-sheet_fix-visibility-issues.patch -text
 installer/composer-patches/pear_xml_rpc-php7-patch-RELEASE_1_5_5.patch -text
 installer/composer-patches/text_wiki__recursive_call_to_constructor.json -text
-installer/composer-patches/text_wiki_mediawiki__func_collision.patch -text
-installer/composer-patches/text_wiki_mediawiki__php7fixes.patch -text
 installer/index.php -text
 installer/installlib.php -text
 installer/schema/00000000_schema_change_tiki.sql -text

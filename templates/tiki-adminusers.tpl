@@ -150,6 +150,9 @@
                                                     title="{$username}:{tr}Edit account settings{/tr}" {if $users[user].itemId}data-itemid="{$users[user].itemId}"{/if}>
                                                         {$users[user].user|escape}
                                                 </a>
+                                                {if $users[user].waiting eq 'l'}
+                                                    {icon name='lock' title="|{tr}Locked account{/tr}" class='tips text-warning'}
+                                                {/if}
                                                 {if $prefs.user_show_realnames eq 'y' and $smarty.capture.username ne $users[user].user}
                                                     <div class="subcomment">
                                                         {$smarty.capture.username|escape}
@@ -181,6 +184,10 @@
                                                 {if $users[user].waiting eq 'a'}
                                                     <br>
                                                     {tr}Need to validate user{/tr}
+                                                {/if}
+                                                {if $users[user].waiting eq 'l'}
+                                                    <br>
+                                                    <span class="text-warning">{icon name="lock"} {tr}Account locked{/tr}</span>
                                                 {/if}
                                             </td>
                                             <td class="text">
@@ -359,6 +366,12 @@
                                 </option>
                                 <option value="default_groups">
                                     {tr}Set default groups{/tr}
+                                </option>
+                                <option value="lock_users">
+                                    {tr}Lock accounts{/tr}
+                                </option>
+                                <option value="unlock_users">
+                                    {tr}Unlock accounts{/tr}
                                 </option>
                                 {if $prefs.feature_wiki == 'y'}
                                     <option value="email_wikipage">

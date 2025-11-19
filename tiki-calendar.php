@@ -171,6 +171,9 @@ if (! empty($_REQUEST["calitemId"])) {
 } else {
     $calitemId = '';
 }
+global $base_uri;
+$current_url = $base_uri;
+$smarty->assign('returnURL', $current_url);
 $smarty->assign('currentcalitemId', $calitemId);
 
 $smarty->assign('displayedcals', $_SESSION['CalendarViewGroups']);

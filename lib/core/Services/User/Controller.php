@@ -1305,15 +1305,45 @@ class Services_User_Controller
         }
     }
 
+    /**
+     * Admin user "perform with checked" action to lock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionLockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'lock';
+        return $this->action_set_user_lock_status($input);
+    }
+
+    /**
+     * Admin user "perform with checked" action to unlock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionUnlockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'unlock';
+        return $this->action_set_user_lock_status($input);
+    }
+
     private function updateUserLockStatus($users, $newLockStatus)
     {
         global $user;
         foreach ($users as $user_to_lock) {
             if ($user_to_lock != 'admin') {
                 $res = $this->lib->update_user_lock_status($user_to_lock, $newLockStatus);
-                if ($res === true) {
-                    Feedback::success(tr('User %0 lock status successfully updated', $user_to_lock));
-                } else {
+                if ($res !== true) {
                     Feedback::error(tr('An error occurred. User %0 lock status could not be updated', $user_to_lock));
                     Services_Utilities::closeModal();
                     return false;

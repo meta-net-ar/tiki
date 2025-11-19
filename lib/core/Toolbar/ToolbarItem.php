@@ -583,10 +583,9 @@ abstract class ToolbarItem
 
     public function getSelfLink(string $click, string $title, string $class): string
     {
-        global $prefs;
         $smarty = TikiLib::lib('smarty');
         $params = [];
-        $params['_onclick'] = $click . (substr($click, strlen($click) - 1) != ';' ? ';' : '') . 'return false;';
+        $params['_onclick'] = $click . (! str_ends_with($click, ';') ? ';' : '') . 'return false;';
         $params['_class'] = 'toolbar btn btn-sm px-2 tips bottom' . (! empty($class) ? ' ' . $class : '');
         $params['_ajax'] = 'n';
         $content = $title;

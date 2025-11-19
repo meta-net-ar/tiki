@@ -707,7 +707,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
 }
 
 if ($prefs['jquery_timeago'] === 'y') {
-    $language = $prefs['language'];
+    $language = Language::getCurrentLanguage();
     $locale_file = '';
 
     $full_locale_path = NODE_PUBLIC_DIST_PATH . "/timeago/dist/locales/jquery.timeago.{$language}.js";

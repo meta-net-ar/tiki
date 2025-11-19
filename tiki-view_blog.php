@@ -12,15 +12,18 @@ $section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
-            'blogTitle'         => 'word',     //get
+            'blogTitle'         => 'striptags', //get
             'blogId'            => 'int',      //get
             'remove'            => 'int',      //get
             'offset'            => 'int',      //get
-            'sort_mode'         => 'word',     //get
-            'find'              => 'word',     //get
-            'date_min'          => 'word',     //get
-            'date_max'          => 'word',     //get
-            'savenotepad'       => 'none',     //get
+            'sort_mode'         => 'alnumdash',     //get
+            'find'              => 'striptags',     //get
+            'date_min'          => 'digits',        //get
+            'date_max'          => 'digits',        //get
+            'savenotepad'       => 'int',           //get
+            'watch_event'       => 'striptags',     //get
+            'watch_action'      => 'alpha',     //get
+            'watch_object'      => 'int',      //get
         ]
     ],
 ];

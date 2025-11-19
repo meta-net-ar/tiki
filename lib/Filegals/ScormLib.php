@@ -8,6 +8,7 @@ namespace Tiki\Lib\Filegals;
 
 use DOMDocument;
 use DOMElement;
+use Language;
 use Services_Tracker_Utilities;
 use Tiki\FileGallery\File;
 use TikiDb;
@@ -204,9 +205,8 @@ class ScormLib
 
     private function getForDefaultLanguage($values)
     {
-        global $prefs;
 
-        $defaultLanguage = $prefs['language'];
+        $defaultLanguage = Language::getCurrentLanguage();
         foreach ($values as $valueSet) {
             if (isset($valueSet[$defaultLanguage])) {
                 return $valueSet[$defaultLanguage];

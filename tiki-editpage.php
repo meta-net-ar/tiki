@@ -78,7 +78,7 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
                     $need_lang = false;
                 } else {
                     $smarty->assign('languages', $languages);
-                    $smarty->assign('default_lang', $prefs['language']);
+                    $smarty->assign('default_lang', Language::getCurrentLanguage());
                     $need_lang = true;
                     $smarty->assign('_REQUEST', $_REQUEST);
                 }

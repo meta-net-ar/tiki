@@ -202,8 +202,7 @@ class TrackerWriter
 
         $lookup = $this->getItemIdLookup($schema);
 
-        $result = [];
-        foreach ($source->getEntries() as $line => $entry) {
+        foreach ($source->getEntries() as $entry) {
             $info = [
                 'itemId' => false,
                 'fields' => [],

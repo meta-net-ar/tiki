@@ -39,7 +39,7 @@ function module_switch_lang_admin($mod_reference, $module_params)
         return false;
     }
 
-    $frontendLang = $prefs['language'];
+    $frontendLang = Language::getCurrentLanguage();
     $userlib = TikiLib::lib('user');
     $languageAdmin = ! empty($prefs['language_admin']) ? $prefs['language_admin'] : $frontendLang;
     $userLang = $userlib->get_user_preference($user, 'language');
@@ -47,12 +47,6 @@ function module_switch_lang_admin($mod_reference, $module_params)
 
     if (! empty($userAdminLang)) {
         $frontendLang = $userAdminLang;
-    } elseif (! empty($languageAdmin)) {
-        $frontendLang = $languageAdmin;
-    } elseif (! empty($userLang)) {
-        $frontendLang = $userLang;
-    } else {
-        $frontendLang = $prefs['site_language'];
     }
 
     $smarty = TikiLib::lib('smarty');

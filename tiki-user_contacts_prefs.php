@@ -13,9 +13,9 @@ $inputConfiguration = [
     [
         'staticKeyFilters'           => [
         'prefs'                      => 'bool',              //post
-        'user_contacts_default_view' => 'bool',              //post
+        'user_contacts_default_view' => 'alpha',              //post
         'ext_remove'                 => 'int',               //get
-        'ext_add'                    => 'string',            //post
+        'ext_add'                    => 'striptags',            //post
         'ext_show'                   => 'int',               //get
         'ext_hide'                   => 'int',               //get
         'ext_public'                 => 'int',               //get

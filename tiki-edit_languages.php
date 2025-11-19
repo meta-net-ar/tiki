@@ -44,8 +44,9 @@ if (isset($_REQUEST["edit_language"])) {
     $smarty->assign('edit_language', $_REQUEST["edit_language"]);
     $edit_language = $_REQUEST["edit_language"];
 } else {
-    $smarty->assign('edit_language', $prefs['language']);
-    $edit_language = $prefs['language'];
+    $lang = Language::getCurrentLanguage();
+    $smarty->assign('edit_language', $lang);
+    $edit_language = $lang;
 }
 
 $translations = new LanguageTranslations($edit_language);

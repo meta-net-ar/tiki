@@ -521,7 +521,7 @@ $pageCache = Tiki_PageCache::create()
     ->requiresPreference('memcache_wiki_output')
     ->addValue('role', 'wiki-page-output')
     ->addValue('page', $page)
-    ->addValue('locale', $prefs['language'])
+    ->addValue('locale', Language::getCurrentLanguage())
     ->addKeys($_GET, array_keys($_GET))
     ->checkMeta('wiki-page-output-meta-timestamp', ['page' => $page,])
     ->dieAndOutputOrStore();

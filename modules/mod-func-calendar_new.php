@@ -73,7 +73,7 @@ function module_calendar_new_info()
  */
 function module_calendar_new($mod_reference, $module_params)
 {
-    global $prefs, $user, $tiki_p_admin_calendars;
+    global $prefs, $user, $tiki_p_admin_calendars, $base_uri;
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
@@ -82,7 +82,6 @@ function module_calendar_new($mod_reference, $module_params)
     $default = ['viewnavbar' => 'y', 'viewmode' => 'month', 'showaction' => 'y'];
     $module_params = array_merge($default, $module_params);
     $defaultCalendarId = 0;
-
     if (isset($_REQUEST['viewmode'])) {
         $save_viewmode = $_REQUEST['viewmode'];
     }
@@ -157,9 +156,13 @@ function module_calendar_new($mod_reference, $module_params)
         'eventCalendarParams',
         $calendarInitialParams
     );
+
+    $current_url = $base_uri;
+    $smarty->assign('returnURL', $current_url);
     $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
     $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
     $smarty->assign('defaultCalendarId', $defaultCalendarId);
+
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
             ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)

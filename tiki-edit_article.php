@@ -121,7 +121,7 @@ $smarty->assign(
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
     $templateslib = TikiLib::lib('template');
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
     if ($templateslib->template_is_in_section($_REQUEST['templateId'], 'wiki_html')) {
@@ -142,7 +142,7 @@ $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
 $smarty->assign('image_alt', '');
-$smarty->assign('lang', $prefs['language']);
+$smarty->assign('lang', Language::getCurrentLanguage());
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
 $smarty->assign('topicId', $topicId);
