@@ -197,14 +197,14 @@ class Services_Category_Controller
             }
             //now add objects to the category
             if (count($filteredObjects)) {
-                $tracker_items_before_update = $this->get_tracker_items_objects($filteredObjects);
+                $tracker_items_before_update = $this->getTrackerItemsObjects($filteredObjects);
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $tracker_items_after_update = $this->get_tracker_items_objects($filteredObjects);
+                $tracker_items_after_update = $this->getTrackerItemsObjects($filteredObjects);
                 // browse categorized objects
                 if (isset($return['objects'])) {
                     foreach ($return['objects'] as $object) {
                         if ($object['type'] === 'trackeritem') {
-                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update );
+                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update);
                         }
                     }
                 }
@@ -265,14 +265,14 @@ class Services_Category_Controller
             }
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
-                $tracker_items_before_update = $this->get_tracker_items_objects($filteredObjects);
+                $tracker_items_before_update = $this->getTrackerItemsObjects($filteredObjects);
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $tracker_items_after_update = $this->get_tracker_items_objects($filteredObjects);
+                $tracker_items_after_update = $this->getTrackerItemsObjects($filteredObjects);
                 // browse uncategorized objects
                 if (isset($return['objects'])) {
                     foreach ($return['objects'] as $object) {
                         if ($object['type'] === 'trackeritem') {
-                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update );
+                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update);
                         }
                     }
                 }
@@ -330,16 +330,17 @@ class Services_Category_Controller
      * Return le tracker items des objets a categoriser ou a decategoriser.
      *
      * @param int $objects a list of objects to categorize or de-categorize,
-     * @return array 
+     * @return array
      */
-    private function get_tracker_items_objects(array $objects) {
+    private function getTrackerItemsObjects(array $objects)
+    {
         $trklib = TikiLib::lib('trk');
         $tracker_items = [];
         foreach ($objects as $object) {
             if ($object['type'] === 'trackeritem') {
                 $tracker_item = $trklib->get_tracker_item($object['id']);
                 if ($tracker_item) {
-                    $tracker_items[$tracker_item['itemId']] =  $tracker_item;
+                    $tracker_items[$tracker_item['itemId']] = $tracker_item;
                 }
             }
         }
