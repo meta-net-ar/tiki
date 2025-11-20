@@ -11,8 +11,7 @@ $.fn.setupFullCalendar = function (
     fullCalendarParams,
     calendarContainer,
     targetId = "calendar",
-    urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items",
-    returnUrl = "tiki-calendar.php"
+    urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items"
 ) {
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
@@ -228,7 +227,7 @@ $.fn.setupFullCalendar = function (
                         $.openModal({
                             title: tr("New event"),
                             size: "modal-lg",
-                            remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1, return_url: returnUrl }),
+                            remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1 }),
                             open: function () {
                                 $this.tikiModal();
                                 $("form:not(.no-ajax)", this).addClass("no-ajax"); // Remove default ajax handling, we replace it
