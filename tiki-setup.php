@@ -1086,6 +1086,8 @@ if ($prefs['feature_elementplus'] == 'y') {
 
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
 $headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
+// module allowing you to limit the number of characters allowed in the fields.
+$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 
 $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
 

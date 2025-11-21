@@ -140,6 +140,8 @@ class Search_Indexer
 
         $timer = new Timer();
 
+        Search_ContentSource_TrackerItemSource::cacheRelationFields();
+
         foreach ($this->contentSources as $objectType => $contentSource) {
             if ($progress) {
                 if (! empty($lastStats['default']['times'][$objectType]) && ! empty($lastStats['default']['counts'][$objectType])) {

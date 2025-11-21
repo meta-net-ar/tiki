@@ -18,6 +18,8 @@ class Comments extends TikiLib
 {
     public $time_control = 0;
     private $extras = true;
+    public const MAX_COMMENT_TITLE_LENGTH = 255;
+    public const MAX_COMMENT_DATA_LENGTH = 65535;
 
     /* Functions for the forums */
     public function report_post($forumId, $parentId, $threadId, $user, $reason = '')

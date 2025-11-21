@@ -159,7 +159,7 @@
         <exclude-pattern>lib/cypht/integration/*</exclude-pattern>
         <exclude-pattern>lib/cypht/modules/*</exclude-pattern>
     </rule>
-    <rule ref="Squiz.Classes.ValidClassName.NotCamelCaps">
+    <rule ref="Squiz.Classes.ValidClassName.NotPascalCase">
         <exclude-pattern>lib/cypht/integration/*</exclude-pattern>
         <exclude-pattern>lib/cypht/modules/*</exclude-pattern>
     </rule>

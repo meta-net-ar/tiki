@@ -19,16 +19,16 @@ $inputConfiguration = [
         'staticKeyFilters' => [
             'sheetId'      => 'int',     //get
             'file'         => 'word',    //get
-            'fileId'       => 'word',    //get
+            'fileId'       => 'int',     //get
             'page'         => 'page',    //get
             'height'       => 'int',     //get
-            'parse'        => 'word',    //get
+            'parse'        => 'alpha',    //get
             's'            => 'string',  //get
             'readdate'     => 'int',     //get
-            'relate'       => 'int',     //get
+            'relate'       => 'alpha',   //get
             'trackerId'    => 'int',     //get
             'childSheetId' => 'int',     //get
-            'sheetonly'    => 'bool',    //get
+            'sheetonly'    => 'alpha',   //get
         ]
     ],
 ];

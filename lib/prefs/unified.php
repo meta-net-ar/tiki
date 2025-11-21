@@ -132,6 +132,14 @@ function prefs_unified_list()
             'default' => 'n',
             'tags' => ['advanced'],
         ],
+        'unified_cache_relation' => [
+            'name' => tra('Cache relation field formatted values'),
+            'description' => tr('Relation field formats related objects by searching existing index on each record rebuild. This might be very slow if you have relation fields on many tracker items. Enable this option to pre-cache all possible relation formatted values at indexing time.'),
+            'warning' => tr('This could potentially use a lot of memory (if you have relations on big trackers) or be less efficient (if you have little density of populated relation fields).'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced'],
+        ],
         'unified_excluded_categories' => [
             'name' => tra('Excluded categories'),
             'description' => tra('List of category IDs to exclude from the search index'),

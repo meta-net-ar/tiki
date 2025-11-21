@@ -1,3 +1,4 @@
+
 {
     "name": "tiki/tiki",
     "description": "Tiki Wiki CMS Groupware",
@@ -80,9 +81,6 @@
         "    Used for our Glitchtip integration to catch PHP errors",
         "    Initialised by lib/setup/errortracking.php when ",
         "    error_tracking_enabled_php is set",
-        "",
-        " squizlabs/php_codesniffer:",
-        "    We use version ~3.0 instead of ~4.0 because new version is currently in the pre-release phase",
         "",
         "  steverhoades/oauth2-openid-connect-client:",
         "    Provides namespace OpenIDConnectClient",
@@ -303,7 +301,7 @@
         "phpunit/phpunit": "~10.5.26",
         "rector/rector": "~2.0",
         "sebastian/diff": "~5.1",
-        "squizlabs/php_codesniffer": "~3.1",
+        "squizlabs/php_codesniffer": "~4.0",
         "stevegrunwell/phpunit-markup-assertions": "~2.0",
         "symfony/browser-kit": "~6.4",
         "symfony/http-client": "~6.4",

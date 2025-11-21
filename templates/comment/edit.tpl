@@ -17,11 +17,11 @@
                 {if $prefs.comments_notitle neq 'y'}
                     <div class="mb-3 row">
                         <label for="comment-title" class="clearfix comment-title">{tr}Title{/tr}</label>
-                        <input type="text" id="comment-title" name="title" value="{$comment.title|escape}" class="form-control" placeholder="Comment title"/>
+                        <input type="text" id="comment-title" name="title" value="{$comment.title|escape}" class="form-control check_character_limit" placeholder="Comment title" maxlength="{$max_comment_title_length}"/>
                     </div>
                 {/if}
                 {capture name=rows}{if $type eq 'forum'}{$prefs.default_rows_textarea_forum}{else}{$prefs.default_rows_textarea_comment}{/if}{/capture}
-                {textarea codemirror='true' name=data comments="y" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows _preview=$prefs.ajax_edit_previews}{$comment.data}{/textarea}
+                {textarea codemirror='true' name=data comments="y" maxlength="{$max_comment_data_length}" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows _preview=$prefs.ajax_edit_previews}{$comment.data}{/textarea}
                 </div>
                 <div class="card-footer">
                     {if empty($comment.version)}

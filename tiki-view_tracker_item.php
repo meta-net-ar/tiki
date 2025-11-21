@@ -22,12 +22,12 @@ $inputConfiguration = [
             'grouptracker'     => 'bool',          //get
             'group'            => 'groupname',     //get
             'offset'           => 'int',           //get
-            'sort_mode'        => 'word',          //get
-            'find'             => 'word',          //post
+            'sort_mode'        => 'alnumdash',     //get
+            'find'             => 'text',          //post
             'filterfield'      => 'word',          //get
             'filtervalue'      => 'word',          //get
             'exactvalue'       => 'word',          //get
-            'reloff'           => 'word',          //get
+            'reloff'           => 'int',           //get
             'move'             => 'word',          //get
             'count'             => 'int',           //get
             'remove'           => 'int',           //post
@@ -54,6 +54,11 @@ $inputConfiguration = [
             'attach_longdesc'  => 'word',          //get
             'status'           => 'word',          //get
             'conflictoverride' => 'bool',          //get
+            'editattach'       => 'int',           //get
+            'vi_tpl'           => 'text',          //get
+            'ei_tpl'           => 'text',          //get
+            'maxRecords'       => 'int',           //get
+            'initial'          => 'text',          //get
         ]
     ],
 ];

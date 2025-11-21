@@ -169,9 +169,13 @@ class Services_Comment_Controller
             if ($prefs['comments_notitle'] != 'y' && empty($title)) {
                 $errors['title'] = tr('Title is empty');
             }
-
+            if (mb_strlen($title) > Comments::MAX_COMMENT_TITLE_LENGTH) {
+                $errors['title'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment title field"), Comments::MAX_COMMENT_TITLE_LENGTH);
+            }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
+            } elseif (mb_strlen($data) > Comments::MAX_COMMENT_DATA_LENGTH) {
+                $errors['data'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment data field"), Comments::MAX_COMMENT_DATA_LENGTH);
             }
 
             if (empty($user) && $prefs['feature_antibot'] == 'y') {
@@ -329,6 +333,8 @@ class Services_Comment_Controller
             'type' => $type,
             'objectId' => $objectId,
             'title' => $title,
+            'max_comment_title_length' => Comments::MAX_COMMENT_TITLE_LENGTH,
+            'max_comment_data_length' => Comments::MAX_COMMENT_DATA_LENGTH,
             'data' => $data,
             'contributions' => $contributions,
             'anonymous_name' => $anonymous_name,
@@ -362,9 +368,13 @@ class Services_Comment_Controller
 
             $tikilib = TikiLib::lib('tiki');
             $data = $tikilib->convertAbsoluteLinksToRelative($data);
-
+            if (mb_strlen($title) > Comments::MAX_COMMENT_TITLE_LENGTH) {
+                $errors['title'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment title field"), Comments::MAX_COMMENT_TITLE_LENGTH);
+            }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
+            } elseif (mb_strlen($data) > Comments::MAX_COMMENT_DATA_LENGTH) {
+                $errors['data'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment data field"), Comments::MAX_COMMENT_DATA_LENGTH);
             }
 
             if (count($errors) === 0) {
@@ -382,6 +392,8 @@ class Services_Comment_Controller
 
         return [
             'comment' => $comment,
+            'max_comment_title_length' => Comments::MAX_COMMENT_TITLE_LENGTH,
+            'max_comment_data_length' => Comments::MAX_COMMENT_DATA_LENGTH,
             'diffInfo' => $diffInfo,
             'errors' => $errors,
             'type' => $comment['objectType'],
