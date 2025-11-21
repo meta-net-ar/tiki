@@ -30,9 +30,8 @@
  * - Provides a summary of all detected issues
  *
  * Exit codes (CI mode with --ci flag):
- *   0 - No stability issues detected
+ *   0 - No stability issues detected OR all existing issues are [MITIGATED]
  *   1 - Current branch introduces new issues OR baseline has unmitigated issues [WARNING] (fail)
- *   2 - Only baseline issues present and all are [MITIGATED] (warning, doesn't block)
  */
 
 require_once __DIR__ . '/../../path_constants.php';
@@ -1727,6 +1726,48 @@ function aggregateExistingIssues($existingIssues)
     return array_values($aggregatedIssues);
 }
 
+/**
+ * Check if there are any unmitigated warnings in existing issues
+ * This includes both stability issues (unstable versions not mitigated) and
+ * unmitigated version downgrades.
+ *
+ * @param array $existingIssues Array of existing issues from baseline analysis
+ * @param array $packageHistory Complete package history across all versions
+ * @param array $ignoreMap Map of ignored packages per version
+ * @return bool True if there are any unmitigated warnings, false otherwise
+ */
+function hasUnmitigatedWarnings($existingIssues, $packageHistory, $ignoreMap)
+{
+    if (empty($existingIssues)) {
+        return false;
+    }
+
+    foreach ($existingIssues as $issue) {
+        $package = $issue['package'];
+        $history = $packageHistory[$package];
+
+        // Check for stability warnings (unstable versions not mitigated)
+        $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+        if ($packageStatus['hasWarnings']) {
+            return true;
+        }
+
+        // Check for unmitigated version downgrades
+        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+            if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
+                $fromVersion = $issue['from_tiki'];
+                $toVersion = $issue['to_tiki'];
+                $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+                if ($hasUnmitigatedDowngrade) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 // Main execution
 $currentVersion = getCurrentTikiVersion();
 if (! $currentVersion) {
@@ -1753,6 +1794,13 @@ $ignoreMap = buildStabilityIgnoreMap($packageHistory);
 // Determine exit code based on CI mode and baseline analysis
 if ($isCiMode) {
     $baselineAnalysis = analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, $ignoreMap);
+
+    // Calculate warning status once for consistency between display and exit code
+    $hasWarnings = false;
+    if (! empty($baselineAnalysis['existingIssues'])) {
+        // Check if there are unmitigated warnings (stability issues AND version downgrades)
+        $hasWarnings = hasUnmitigatedWarnings($baselineAnalysis['existingIssues'], $packageHistory, $ignoreMap);
+    }
 
     // Handle CI mode output here to avoid duplication
     if ($baselineAnalysis['shouldFail']) {
@@ -1795,35 +1843,7 @@ if ($isCiMode) {
         echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
         echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     } elseif (! empty($baselineAnalysis['existingIssues'])) {
-        // Check if there are unmitigated warnings FIRST to determine the heading
-        // This includes both stability issues AND version downgrades
-        $hasWarnings = false;
-        foreach ($baselineAnalysis['existingIssues'] as $issue) {
-            $package = $issue['package'];
-            $history = $packageHistory[$package];
-
-            // Check for stability warnings (unstable versions not mitigated)
-            $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
-            if ($packageStatus['hasWarnings']) {
-                $hasWarnings = true;
-                break;
-            }
-
-            // Check for unmitigated version downgrades
-            if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
-                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
-                    $fromVersion = $issue['from_tiki'];
-                    $toVersion = $issue['to_tiki'];
-                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
-                    if ($hasUnmitigatedDowngrade) {
-                        $hasWarnings = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Display appropriate heading based on warning status
+        // Display appropriate heading based on warning status (using pre-calculated $hasWarnings)
         if ($hasWarnings) {
             echo "\n## 🚨 Pipeline Failed: Unmitigated Stability Issues Detected\n\n";
             echo "**Reason**: Baseline contains packages with [WARNING] tags (not mitigated).\n\n";
@@ -1938,45 +1958,17 @@ if ($isCiMode) {
     file_put_contents('composer-stability-report.xml', $junitReport);
 
     // Exit codes:
+    // 0 = no issues OR all existing issues are mitigated - SUCCESS
     // 1 = current branch introduces issues OR existing issues have warnings (not mitigated) - FAIL
-    // 2 = only baseline issues present and ALL are mitigated - WARNING (doesn't block)
-    // 0 = no issues
     $exitCode = 0;
     if ($baselineAnalysis['shouldFail']) {
         $exitCode = 1;
-    } elseif (! empty($baselineAnalysis['existingIssues'])) {
-        // Check if there are any packages with warnings (stability issues OR version downgrades)
-        $hasWarnings = false;
-        foreach ($baselineAnalysis['existingIssues'] as $issue) {
-            $package = $issue['package'];
-            $history = $packageHistory[$package];
-
-            // Check for stability warnings (unstable versions not mitigated)
-            $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
-            if ($packageStatus['hasWarnings']) {
-                    $hasWarnings = true;
-                break;
-            }
-
-            // Check for unmitigated version downgrades
-            if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
-                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
-                    $fromVersion = $issue['from_tiki'];
-                    $toVersion = $issue['to_tiki'];
-                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
-                    if ($hasUnmitigatedDowngrade) {
-                        $hasWarnings = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if ($hasWarnings) {
-            $exitCode = 1; // FAIL if there are any packages with warnings (not mitigated)
-        } else {
-            $exitCode = 2; // WARNING if all existing issues are mitigated
-        }
+    } elseif ($hasWarnings) {
+        // FAIL if there are any packages with warnings (not mitigated)
+        $exitCode = 1;
+    } else {
+        // No issues or all existing issues are mitigated - exit with 0 (success)
+        $exitCode = 0;
     }
 
     exit($exitCode);
