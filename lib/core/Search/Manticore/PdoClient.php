@@ -404,7 +404,9 @@ class PdoClient
             'total' => 0,
         ];
         if ($selectFields) {
-            $sql = 'SELECT ' . implode(', ', $selectFields);
+            $sql = 'SELECT ' . implode(', ', array_filter($selectFields, function ($field) use ($indexFields) {
+                return in_array($field, $indexFields);
+            }));
         } else {
             $sql = 'SELECT object_type, object_id' . (in_array('tracker_id', $indexFields) ? ', tracker_id' : '');
         }

@@ -477,6 +477,12 @@ class RelationLib extends TikiDb_Bridge
         return $this->table->update(['metadata_itemId' => $metadata_item_id], ['relationId' => $id]);
     }
 
+    public function getAllRelatedTrackerItems()
+    {
+        $rows = $this->table->fetchAll(['source_itemId', 'target_itemId'], ['source_type' => 'trackeritem', 'target_type' => 'trackeritem']);
+        return array_unique(array_merge(array_column($rows, 'source_itemId'), array_column($rows, 'target_itemId')));
+    }
+
     /**
      * @param $relation
      * @param $cond
