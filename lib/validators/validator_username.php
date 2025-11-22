@@ -22,6 +22,9 @@ function validator_username($input, $parameter = '', $message = '')
         if (! empty($prefs['username_pattern']) && ! preg_match($prefs['username_pattern'], $input)) {
             return tra("Invalid character combination for username");
         }
+        if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $input)) {
+            return tra("Username cannot contain any spaces");
+        }
         if (strtolower($input) == 'anonymous' || strtolower($input) == 'registered') {
             return tra("Invalid username");
         }

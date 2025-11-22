@@ -13,7 +13,7 @@ function prefs_username_list()
             'type' => 'text',
             'size' => 25,
             'perspective' => false,
-            'default' => '/^[ \'\-_a-zA-Z0-9@\.]*$/',
+            'default' => '/^[\'\-_a-zA-Z0-9@\.]*$/',
         ],
     ];
 }
