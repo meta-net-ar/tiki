@@ -20,7 +20,7 @@
             </div>
             <input type="hidden" name="calitem[user]" value="{$calitem.user|escape}">
             <input type="hidden" name="tzoffset" value="">
-            <input type="hidden"  name="return_url" value="tiki-calendar.php">
+            <input type="hidden" id="return_url" name="return_url" value="{$calitem.returnURL}">
             {if $calitemId}
                 <input type="hidden" name="calitemId" value="{$calitemId|escape}">
             {/if}

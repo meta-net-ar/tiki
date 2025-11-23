@@ -3,7 +3,7 @@
         {if $tiki_p_add_events eq 'y' && (empty($module_params.showaction) && $canEditAnything eq 'y' || $module_params.showaction ne 'n')}
             <br>
             <p>
-                <a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId}" class="btn btn-primary">{icon name='create'} {tr}Add Event{/tr}</a>
+                <a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId return_url=$returnURL}" class="btn btn-primary">{icon name='create'} {tr}Add Event{/tr}</a>
             </p>
         {/if}
         {if $viewlist eq 'list'}
@@ -21,13 +21,15 @@
                         let paramOfModuleCalendar = {{$fullCalendarParams|json_encode}};
                         const moduleCalendarFocusDate = document.getElementById('date-module-calendar');
                         paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
+                        let returnUrl = ('{{$returnURL}}');
+                        returnUrl = returnUrl.toString();
 
                         const calendarContainer = [window.moduleCalendar];
-                        $("#module-calendar").setupFullCalendar({{$fullCalendarParams|json_encode}}, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                        $("#module-calendar").setupFullCalendar({{$fullCalendarParams|json_encode}}, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}', returnUrl);
                         moduleCalendarFocusDate.addEventListener('change', () => {
                             document.getElementById('module-calendar').innerHTML = "";
                             paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
-                            $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}');
+                            $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}', returnUrl);
                         })
                         {{if $prefs.print_pdf_from_url neq 'none'}$("#module-calendar").addFullCalendarPrint('#module-calendar-pdf-btn', calendarContainer[0]);{/if}}
                     {/jq}

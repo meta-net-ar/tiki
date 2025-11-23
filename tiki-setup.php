@@ -880,6 +880,8 @@ $headerlib->add_cssfile('vendor_bundled/vendor/twbs/bootstrap-icons/font/bootstr
 $headerlib->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }');
 $headerlib->add_jsfile('vendor_bundled/vendor/moment/moment/min/moment.min.js', true);
 $headerlib->add_jsfile('vendor_bundled/vendor/npm-asset/fullcalendar/main.js', true);
+$headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
+$headerlib->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-calendar.js');
 
 if ($prefs['feature_machine_learning'] == 'y') {

@@ -447,6 +447,7 @@ class Services_Calendar_Controller
                 'recurrenceId'          => 0,
                 'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
                 'organizers'            => [$user],
+                'returnURL'             => $return_url,
                 'participants'          => [[
                                                 'username' => $user,
                                                 'role'     => '',
