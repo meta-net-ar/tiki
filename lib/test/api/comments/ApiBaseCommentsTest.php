@@ -34,6 +34,25 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected static $defaultComments = [];
 
     /**
+     * Preferences to enable required features
+     * @var array
+     */
+    private static $preferences = [
+        'feature_wiki_comments' => 'y',
+        'wiki_comments_allow_per_page' => 'y',
+        'feature_file_galleries_comments' => 'y',
+        'feature_polls' => 'y',
+        'feature_poll_comments' => 'y',
+        'feature_faqs' => 'y',
+        'feature_faq_comments' => 'y',
+        'feature_blogs' => 'y',
+        'feature_blogposts_comments' => 'y',
+        'feature_articles' => 'y',
+        'feature_article_comments' => 'y',
+        'feature_forum' => 'y',
+    ];
+
+    /**
      * Setup before class - enable features and create default test objects
      */
     public static function setUpBeforeClass(): void
@@ -41,28 +60,10 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         parent::setUpBeforeClass();
 
         // Enable required features
-        global $prefs;
-        $prefs['feature_wiki'] = 'y';
-        $prefs['feature_wiki_comments'] = 'y';
-
-        $prefs['feature_file_galleries'] = 'y';
-        $prefs['feature_file_galleries_comments'] = 'y';
-
-        $prefs['feature_polls'] = 'y';
-        $prefs['feature_poll_comments'] = 'y';
-
-        $prefs['feature_faqs'] = 'y';
-        $prefs['feature_faq_comments'] = 'y';
-
-        $prefs['feature_blogs'] = 'y';
-        $prefs['feature_blogposts_comments'] = 'y';
-
-        $prefs['feature_trackers'] = 'y';
-
-        $prefs['feature_articles'] = 'y';
-        $prefs['feature_article_comments'] = 'y';
-
-        $prefs['feature_forum'] = 'y';
+        $tikilib = TikiLib::lib('tiki');
+        foreach (self::$preferences as $pref => $value) {
+            $tikilib->set_preference($pref, $value);
+        }
 
         // Create default test objects with comments
         static::createDefaultTestObjects();
@@ -153,7 +154,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected static function createWikiPage($pageName)
     {
         $tikilib = TikiLib::lib('tiki');
-        $tikilib->create_page($pageName, 0, 'Test content for API comments testing', time(), 'API Test');
+        $tikilib->create_page($pageName, 0, 'Test content for API comments testing', time(), 'API Test', 'admin', '0.0.0.0', '', '', false, ['lock_it' => 'n', 'comments_enabled' => 'y']);
         static::$testObjects['wiki_pages'][] = $pageName;
         return $pageName;
     }
@@ -282,7 +283,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         $itemId = $trklib->replace_item(
             $trackerId,
             0,
-            ['data' => [$fieldId => $name]]
+            ['data' => [$fieldId => ['value' => $name]]]
         );
         if ($itemId) {
             static::$testObjects['tracker_items'][] = $itemId;
@@ -334,6 +335,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected static function createComment($type, $objectId, $title, $data, $parentId = null)
     {
         $commentslib = TikiLib::lib('comments');
+        $message_id = '';
 
         $threadId = $commentslib->post_new_comment(
             "$type:$objectId",
@@ -341,7 +343,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'admin',
             $title,
             $data,
-            ''
+            $message_id
         );
 
         if ($threadId) {
@@ -357,6 +359,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected static function cleanupTestData()
     {
         $commentslib = TikiLib::lib('comments');
+        $tikilib = TikiLib::lib('tiki');
 
         // Remove all test comments
         foreach (static::$testComments as $threadId) {
@@ -369,7 +372,6 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
 
         // Cleanup test objects
         if (isset(static::$testObjects['wiki_pages'])) {
-            $tikilib = TikiLib::lib('tiki');
             foreach (static::$testObjects['wiki_pages'] as $pageName) {
                 try {
                     $tikilib->remove_all_versions($pageName);
@@ -466,6 +468,11 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
                 }
             }
         }
+
+        // disable preferences set for tests
+        foreach (self::$preferences as $pref => $value) {
+            $tikilib->delete_preference($pref);
+        }
     }
 
     private function getSimpleCommentResponseSchema()
@@ -516,7 +523,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'user_online' => 'string|null',
             'user_exists' => 'int|bool|null',
             'can_edit' => 'bool',
-            'replies_info' => [
+            'replies_info' => [ // FIXME: replies_info sometimes contains null value instead of array
                 'replies' => [[ /* same as $commentSchema */]],
                 'numReplies' => 'int',
                 'totalReplies' => 'int',
@@ -530,11 +537,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     {
         return [
             'title' => 'string',
-            'comments' => [
-                [ // array of comments
-                    $this->getCommentResponseSchema()
-                ]
-            ],
+            'comments' => [ $this->getCommentResponseSchema() ],
             'type' => 'string',
             'objectId' => 'string|int',
             'parentId' => 'int|null',
@@ -569,29 +572,5 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected function assertValidCommentListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getCommentListResponseSchema());
-    }
-
-    /**
-     * Extract threadId from API response and track for cleanup
-     * @param array $response
-     * @param string $context
-     * @return int The thread ID
-     */
-    protected function getThreadIdFromResponse($response, $context = '')
-    {
-        $this->assertResponseStatus(200, $response, $context);
-        $this->assertResponseIsJson($response, $context);
-        
-        $body = $this->getResponseBody($response);
-        $this->assertArrayHasKey('threadId', $body, $context . ' - Response should contain threadId');
-        
-        $threadId = $body['threadId'];
-        $this->assertIsInt($threadId, $context . ' - threadId should be an integer');
-        $this->assertGreaterThan(0, $threadId, $context . ' - threadId should be positive');
-        
-        // Track for cleanup
-        static::$testComments[] = $threadId;
-        
-        return $threadId;
     }
 }
