@@ -286,15 +286,14 @@ abstract class ApiTestCase extends TikiTestCase
             $value = $data[$key];
 
             if (is_array($typeOrNested)) {
-                // Nested schema: must be an array
                 $this->assertIsArray($value, "$msg should be an array");
 
-                // Check if it's a list of items or an associative array
-                if ($this->isSequentialArray($value)) {
+                // Handle schemas defined as [0 => [...]] (array of objects)
+                if (isset($typeOrNested[0]) && is_array($typeOrNested[0])) {
                     foreach ($value as $i => $item) {
-                        $this->assertMatchesSchema($item, $typeOrNested, "$msg[$i]");
+                        $this->assertMatchesSchema($item, $typeOrNested[0], "$msg");
                     }
-                } else {
+                } else { // Handle associative nested schemas
                     $this->assertMatchesSchema($value, $typeOrNested, $msg);
                 }
 
@@ -432,5 +431,34 @@ abstract class ApiTestCase extends TikiTestCase
     protected function getRawResponseBody($response)
     {
         return $response['body'];
+    }
+
+    /**
+     * Assert that response contains a valid error structure
+     */
+    protected function assertValidErrorResponse($body, $expectedCode = null, $expectedMessage = null)
+    {
+        $this->assertIsArray($body, 'Error response should have valid structure');
+
+        // Required error fields
+        $this->assertArrayHasKey('code', $body, 'Error response should have code');
+        $this->assertArrayHasKey('message', $body, 'Error response should have message');
+        if ($expectedMessage !== null) {
+            $this->assertStringContainsString($expectedMessage, $body['message'], 'Error message should be contains expected text');
+        }
+
+        // Data type validation
+        $this->assertIsInt($body['code'], 'Error code should be integer');
+        $this->assertIsString($body['message'], 'Error message should be string');
+        $this->assertNotEmpty($body['message'], 'Error message should not be empty');
+
+        // Optional specific code check
+        if ($expectedCode !== null) {
+            $this->assertEquals($expectedCode, $body['code'], "Error code should be {$expectedCode}");
+        }
+
+        if (isset($body['errortitle'])) {
+            $this->assertIsString($body['errortitle'], 'Error title should be string');
+        }
     }
 }
