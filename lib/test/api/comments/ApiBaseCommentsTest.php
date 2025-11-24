@@ -50,6 +50,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         'feature_articles' => 'y',
         'feature_article_comments' => 'y',
         'feature_forum' => 'y',
+        'comments_notitle' => 'n',
     ];
 
     /**
@@ -509,11 +510,10 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'smiley' => 'string|null',
             'message_id' => 'string|null',
             'in_reply_to' => 'string|null',
-            'comment_rating' => 'string|null',
+            'comment_rating' => 'int|null',
             'archived' => 'string|null',
             'approved' => 'string|null',
             'locked' => 'string|null',
-            'grandFather' => 'int|null',
             'parsed' => 'string|null',
             'user_posts' => 'int|null',
             'user_level' => 'int|null',
@@ -521,23 +521,30 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'attachments' => 'array',
             'is_reported' => 'int|bool|null',
             'user_online' => 'string|null',
-            'user_exists' => 'int|bool|null',
-            'can_edit' => 'bool',
-            'replies_info' => [ // FIXME: replies_info sometimes contains null value instead of array
-                'replies' => [[ /* same as $commentSchema */]],
-                'numReplies' => 'int',
-                'totalReplies' => 'int',
-            ],
-            'replies_flat' => [[ /* same as $commentSchema */]]
+            'user_exists' => 'int|bool|null'
         ];
         return $commentSchema;
     }
 
     private function getCommentListResponseSchema()
     {
+        $commentExtraKeys = array_merge(
+            $this->getCommentResponseSchema(),
+            [
+                'grandFather' => 'int|null',
+                'can_edit' => 'bool',
+                'replies_info' => [ // FIXME: replies_info sometimes contains null value instead of array
+                    'replies' => [[ /* same as getCommentResponseSchema() */]],
+                    'numReplies' => 'int',
+                    'totalReplies' => 'int',
+                ],
+                'replies_flat' => [[ /* same as getCommentResponseSchema() */]]
+            ]
+        );
+
         return [
             'title' => 'string',
-            'comments' => [ $this->getCommentResponseSchema() ],
+            'comments' => [ $commentExtraKeys ],
             'type' => 'string',
             'objectId' => 'string|int',
             'parentId' => 'int|null',
@@ -555,6 +562,25 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
+    private function getUpdateCommentResponseSchema()
+    {
+        return [
+            'threadId' => 'string|int|null',
+            'comment' => $this->getCommentResponseSchema(),
+        ];
+    }
+
+    private function getDeleteCommentResponseSchema()
+    {
+        return [
+            'threadId' => 'int',
+            'status' => 'string',
+            'objectType' => 'string',
+            'objectId' => 'string|int',
+            'parsed' => 'string',
+        ];
+    }
+
     /**
      * Assert that a comment response has valid structure
      * @param array $comment
@@ -562,6 +588,11 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected function assertValidCommentResponse($comment)
     {
         $this->assertMatchesSchema($comment, $this->getSimpleCommentResponseSchema());
+    }
+
+    protected function assertValidUpdateCommentResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getUpdateCommentResponseSchema());
     }
 
     /**
@@ -572,5 +603,10 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected function assertValidCommentListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getCommentListResponseSchema());
+    }
+
+    protected function assertValidDeleteCommentResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getDeleteCommentResponseSchema());
     }
 }

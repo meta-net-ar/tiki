@@ -267,7 +267,9 @@ class Services_Comment_Controller
                     }
                     if ($watch_event) {
                         Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
+                        if (! TIKI_API) {
                         Feedback::sendHeaders();
+                    }
                     }
 
                     // Set watch if requested
@@ -397,6 +399,9 @@ class Services_Comment_Controller
 
             if (count($errors) === 0) {
                 $commentslib->update_comment($threadId, $title, $comment['comment_rating'], $data);
+
+                // get updated comment info
+                $comment = $this->getCommentInfo($threadId);
 
                 return [
                     'threadId' => $threadId,

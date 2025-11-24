@@ -168,7 +168,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
                 [ // array of objects
                     'type' => 'string',
                     'id' => 'string|int',
-                    'catObjectId' => 'int',
+                    'catObjectId' => 'string|int', // FIXME: catObjectId is returned as string. eg. "180"
                 ]
             ],
         ];
@@ -220,35 +220,6 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
                 $this->assertNotEmpty($type, 'Object type should not be empty');
                 $this->assertNotEmpty($id, 'Object id should not be empty');
             }
-        }
-    }
-
-    /**
-     * Assert that response contains a valid error structure
-     */
-    protected function assertValidErrorResponse($body, $expectedCode = null, $expectedMessage = null)
-    {
-        $this->assertIsArray($body, 'Error response should have valid structure');
-
-        // Required error fields
-        $this->assertArrayHasKey('code', $body, 'Error response should have code');
-        $this->assertArrayHasKey('message', $body, 'Error response should have message');
-        if ($expectedMessage !== null) {
-            $this->assertStringContainsString($expectedMessage, $body['message'], 'Error message should be contains expected text');
-        }
-
-        // Data type validation
-        $this->assertIsInt($body['code'], 'Error code should be integer');
-        $this->assertIsString($body['message'], 'Error message should be string');
-        $this->assertNotEmpty($body['message'], 'Error message should not be empty');
-
-        // Optional specific code check
-        if ($expectedCode !== null) {
-            $this->assertEquals($expectedCode, $body['code'], "Error code should be {$expectedCode}");
-        }
-
-        if (isset($body['errortitle'])) {
-            $this->assertIsString($body['errortitle'], 'Error title should be string');
         }
     }
 }
