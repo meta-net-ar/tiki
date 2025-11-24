@@ -103,9 +103,11 @@ body.tiki-admin {
     background-color: var(--tiki-admin-dropdown-bg);
     .dropdown-item:not(.active) {
         color: var(--tiki-admin-dropdown-link-color);
+    }
+    & .dropdown-item {
         &:focus,
         &:hover,
-        & .active {
+        &.active {
             color: var(--tiki-admin-dropdown-link-hover-color);
             background: var(--tiki-admin-dropdown-link-hover-bg);
         }

@@ -144,8 +144,23 @@ function module_calendar_new($mod_reference, $module_params)
 
     $rawcals = $calendarlib->list_calendars();
     if (empty($rawcals['data'])) {
-        Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
+        Feedback::error(tra("No calendars found"));
+        return;
     }
+
+    $rawcals['data'] = Perms::filter(
+        ['type' => 'calendar'],
+        'object',
+        $rawcals['data'],
+        [ 'object' => 'calendarId' ],
+        'view_calendar'
+    );
+
+    if (empty($rawcals['data'])) {
+        Feedback::error(tra("You do not have permission to view the calendar"));
+        return;
+    }
+
     $moduleCalendarFocusdate = date("Y-m-d");
     $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $calIds));
 

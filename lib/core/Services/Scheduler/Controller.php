@@ -213,4 +213,142 @@ class Services_Scheduler_Controller
         $access = TikiLib::lib('access');
         $access->redirect('tiki-admin_schedulers.php#contenttabs_admin_schedulers-3');
     }
+
+    /**
+     * Remove schedulers
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Services_Exception_Denied
+     */
+    public function actionRemoveSchedulers($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $util = new Services_Utilities();
+
+        // First pass - show confirmation modal
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, [], 'checked');
+
+            if ($util->itemsCount > 0) {
+                // Get scheduler names for the confirmation dialog
+                $schedulerItems = [];
+                foreach ($util->items as $schedulerId) {
+                    $scheduler = $this->lib->get_scheduler((int)$schedulerId);
+                    if ($scheduler) {
+                        $schedulerItems[$schedulerId] = $scheduler['name'];
+                    }
+                }
+
+                return [
+                    'title' => $util->itemsCount === 1 ? tra('Remove Scheduler') : tra('Remove Schedulers'),
+                    'items' => $schedulerItems,
+                ];
+            } else {
+                Services_Utilities::modalException(tra('No schedulers were selected. Please select one or more schedulers.'));
+            }
+
+        // Second pass - perform the deletion
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, [], 'items');
+
+            $deletedCount = 0;
+            $deletedSchedulers = [];
+
+            foreach ($util->items as $schedulerId) {
+                $scheduler = $this->lib->get_scheduler((int)$schedulerId);
+                if ($scheduler) {
+                    $this->lib->remove_scheduler((int)$schedulerId);
+                    $deletedSchedulers[] = $scheduler['name'];
+                    $deletedCount++;
+                }
+            }
+
+            if ($deletedCount > 0) {
+                if ($deletedCount === 1) {
+                    $feedback = sprintf(tra('Scheduler %s was deleted.'), $deletedSchedulers[0]);
+                } else {
+                    $feedback = sprintf(tra('%d schedulers were deleted.'), $deletedCount);
+                }
+                Feedback::success($feedback);
+            }
+
+            return Services_Utilities::refresh();
+        }
+    }
+
+    /**
+     * Remove jobs
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Services_Exception_Denied
+     */
+    public function actionRemoveJobs($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $util = new Services_Utilities();
+
+        // First pass - show confirmation modal
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, [], 'checked_jobs');
+
+            if ($util->itemsCount > 0) {
+                // Get job names for the confirmation dialog
+                $jobItems = [];
+                foreach ($util->items as $jobId) {
+                    $job = $this->lib->get_scheduler((int)$jobId);
+                    if ($job) {
+                        $jobItems[$jobId] = $job['name'];
+                    }
+                }
+
+                return [
+                    'title' => $util->itemsCount === 1 ? tra('Remove Job') : tra('Remove Jobs'),
+                    'items' => $jobItems,
+                ];
+            } else {
+                Services_Utilities::modalException(tra('No jobs were selected. Please select one or more jobs.'));
+            }
+
+        // Second pass - perform the deletion
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, [], 'items');
+
+            $deletedCount = 0;
+            $deletedJobs = [];
+
+            foreach ($util->items as $jobId) {
+                $job = $this->lib->get_scheduler((int)$jobId);
+                if ($job) {
+                    $this->lib->remove_scheduler((int)$jobId);
+                    $deletedJobs[] = $job['name'];
+                    $deletedCount++;
+                }
+            }
+
+            if ($deletedCount > 0) {
+                if ($deletedCount === 1) {
+                    $feedback = sprintf(tra('Job %s was deleted.'), $deletedJobs[0]);
+                } else {
+                    $feedback = sprintf(tra('%d jobs were deleted.'), $deletedCount);
+                }
+                Feedback::success($feedback);
+            }
+
+            return Services_Utilities::refresh();
+        }
+    }
+
+    /**
+     * Handle no action selected for bulk operations
+     *
+     * @throws Services_Exception
+     */
+    public function actionNoAction()
+    {
+        Services_Utilities::modalException(tra('No action was selected. Please select an action before clicking OK.'));
+    }
 }

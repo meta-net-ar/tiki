@@ -1,14 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-
-.postbody-title,
-.bg-dark {
-    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c44a23+0,c64b23+10,dc5823+34,e96023+58,f06423+87,f06423+100
-    background: linear-gradient(to right,  #c44a23 0%,#c64b23 10%,#dc5823 34%,#e96023 58%,#f06423 87%,#f06423 100%) !important;
-}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 // CSS is used because Bootstrap partials aren't available for theme variables, etc.
 // (Everything below was copied from Grape and may need color adjusting.

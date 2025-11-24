@@ -265,7 +265,7 @@ if (
 
         if (! $username && $email && $oicLib->canCreateUserTiki()) {
             // Remove invalid characters, based on username_pattern pref
-            $username = preg_replace('/[^ \'\-_a-zA-Z0-9@\.]/', '_', $name);
+            $username = preg_replace('/[^\'\-_a-zA-Z0-9@\.]/', '_', $name);
             $user = $userlib->add_user($username, '', $email);
 
             if (! $user) {

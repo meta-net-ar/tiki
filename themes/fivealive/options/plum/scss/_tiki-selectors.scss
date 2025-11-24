@@ -1,22 +1,18 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-h3.tiki-card-header-title {
-    color: #fff;
-}
-
-.postbody-title,
-.bg-dark {
-    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#5e028e+0,8f06c4+100
-    background: linear-gradient(to right,  #300149 0%,#15001F 100%);
-}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 // Progress bars
 .progress-bar {
     --bs-progress-bar-bg: #{$info};
 }
+
+//h3.tiki-card-header-title {
+//    color: #fff;
+//}
 
 // Dropdown partial isn't available to these theme options.
 :root .tiki-admin .dropdown-item.active {

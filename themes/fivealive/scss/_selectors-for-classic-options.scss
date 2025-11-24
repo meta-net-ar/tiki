@@ -22,12 +22,10 @@ $imagePath: "../images/";
 // Make logo module background full height of navbar
 // Use CSS variable for padding-right so site admin can adjust per logo or layout
 .top_modules .module:not(.box-login_box):first-child { // This exception is for United Back End, which has the log-in as first module.
-    margin-top: calc(var(--bs-navbar-padding-y) * -1) !important;
-    margin-bottom: calc(var(--bs-navbar-padding-y) * -1) !important;
-    padding-top: var(--bs-navbar-padding-y);
-    padding-bottom: var(--bs-navbar-padding-y);
+    margin-top: -.5em;
+    margin-bottom: -.5em;
     padding-left: 15px;
-    padding-right: var(--tiki-fivealive-classic-logo-module-padding-right);
+    padding-right: var(--tiki-fivealive-classic-logo-module-padding-end);
 }
 
 .top_modules .module:not(.box-login_box):first-child {
@@ -42,9 +40,15 @@ $imagePath: "../images/";
 .layout_classic .sitetitle,
 .layout_classic .sitetitle a,
 .layout_classic .sitesubtitle {
-    color: #000 !important;
+    color: $navbar-light-color !important;
 }
 
 .layout_classic .page-header .nav-link {
     color: #fff;
+}
+
+.layout_social .tiki-top-nav-dark,
+.layout_social .tiki-top-nav-light {
+    --tiki-site-title-color: #000 !important;
+    --tiki-site-subtitle-color: #000 !important;
 }

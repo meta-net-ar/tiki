@@ -149,48 +149,48 @@ label a:hover {
 }
 
 // Dropdowns
-.dropdown-menu {
-    text-transform: none;
-    background-color: $dropdown-bg; //#005064;
-    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-}
+//.dropdown-menu {
+//    text-transform: none;
+//    background-color: $dropdown-bg; //#005064;
+//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
+//}
 
-.dropdown-item a,
-.dropdown-item .btn.btn-link {
-    color: $dropdown-link-color;
-
-    &:hover,
-    &:focus {
-        color: $dropdown-link-hover-color;
-    }
-
-    &:active,
-    &.active {
-        color: $dropdown-link-active-color;
-    }
-
-    &.disabled,
-    &:disabled {
-        color: $dropdown-link-disabled-color;
-    }
-
-    .dropdown-header {
-        color: $dropdown-header-color;
-    }
-
-    .dropdown-divider {
-        background: $dropdown-divider-bg;
-    }
-}
-
-.dropdown-item.btn-link.text-danger {
-    background: color.adjust($danger, $lightness: 40%, $space: hsl) !important; //lighten($danger, 70%);
-    border-radius: 0 !important;
-
-    &:hover {
-        background: color.adjust($danger, $lightness: 30%, $space: hsl) !important;
-    }
-}
+//.dropdown-item a,
+//.dropdown-item .btn.btn-link {
+//    color: $dropdown-link-color;
+//
+//    &:hover,
+//    &:focus {
+//        color: $dropdown-link-hover-color;
+//    }
+//
+//    &:active,
+//    &.active {
+//        color: $dropdown-link-active-color;
+//    }
+//
+//    &.disabled,
+//    &:disabled {
+//        color: $dropdown-link-disabled-color;
+//    }
+//
+//    .dropdown-header {
+//        color: $dropdown-header-color;
+//    }
+//
+//    .dropdown-divider {
+//        background: $dropdown-divider-bg;
+//    }
+//}
+//
+//.dropdown-item.btn-link.text-danger {
+//    background: color.adjust($danger, $lightness: 40%, $space: hsl) !important; //lighten($danger, 70%);
+//    border-radius: 0 !important;
+//
+//    &:hover {
+//        background: color.adjust($danger, $lightness: 30%, $space: hsl) !important;
+//    }
+//}
 
 // Pagination
 // Cards

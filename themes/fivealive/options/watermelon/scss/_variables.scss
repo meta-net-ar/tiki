@@ -1,6 +1,5 @@
-// Custom variables for the Watermelon theme option of the FiveAlive theme
+// Custom styles for the FiveAlive Watermelon option theme.
 
-$tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 @import "../../../scss/variables";
@@ -33,6 +32,15 @@ $theme-colors: (
     "dark":              $dark
 );
 
+// Background and foreground colors for areas using the child theme page header background
+:root {
+    --tiki-fivealive-theme-bg-darkest-color: rgba(169, 25, 29, 1);
+    --tiki-fivealive-theme-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
+    --tiki-fivealive-theme-color: #{$white};
+    --tiki-fivealive-theme-link-color: #{$gray-100};
+    --tiki-fivealive-theme-link-hover-color: #{$gray-300};
+}
+
 // Options
 $enable-gradients: true;
 $enable-shadows: true;
@@ -42,6 +50,17 @@ $prefix: bs-;
 
 // Body
 $body-color: $gray-800;  // default
+$body-bg:                   $white; // !default;
+
+$body-secondary-color:     rgba($body-color, .75); // !default;
+$body-secondary-bg:         $gray-200; // !default;
+
+$body-tertiary-color:       rgba($body-color, .5); // !default;
+$body-tertiary-bg:          $gray-100; // !default;
+
+$body-emphasis-color:       $black; // !default;
+
+//:root { --#{$prefix}secondary-color: purple !important; }
 
 // Links
 $link-color:                #E11436;
@@ -50,13 +69,41 @@ $link-hover-color:          shift-color($link-color, $link-shade-percentage); //
 $link-hover-decoration:     none;
 $btn-link-disabled-color:   $gray-600;  // default
 
+// Components
+$component-active-color:       #ddb9af; // $white;  // default
+$component-active-bg:         $primary;  // default
+
 // Navs
+$nav-link-color:                    var(--#{$prefix}link-color);
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color);
+$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+$nav-link-disabled-color:           var(--#{$prefix}secondary-color);
+$nav-link-font-size:                null;
+
 $nav-tabs-link-color: #000;
 $nav-tabs-link-bg: #ffdace; // Same as $input-bg;
 $nav-tabs-link-active-color: #fff;
 $nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
 
 // Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);
+$navbar-light-icon-color:           rgba($body-color, .75);
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-light-toggler-border-color: rgba($black, .1);//rgba(var(--#{$prefix}emphasis-color-rgb), .15); <-- why was this change made?
+$navbar-light-brand-color:          $navbar-light-active-color;
+$navbar-light-brand-hover-color:    $navbar-light-active-color;
+
+$navbar-dark-color:                 rgba($white, .75);
+$navbar-dark-hover-color:           rgba($white, .85);
+$navbar-dark-active-color:          $white;
+$navbar-dark-disabled-color:        rgba($white, .25);
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-dark-toggler-border-color:  rgba($white, .1);
+$navbar-dark-brand-color:           $navbar-dark-active-color;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color;
 
 // Typography
 $hr-color: #faada1;
@@ -77,22 +124,27 @@ $input-border-right-color: #fcf6f9;
 $input-border-bottom-color: #fcf6f9;
 $input-border-left-color: #faada1;
 
-// Form validation
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
-// Dropdowns
-$dropdown-bg: #AD3245; //#e71e40; // #771437
-$dropdown-border-color: rgba(0, 0, 0, 0.15);
-$dropdown-link-color: #ffffff;
-$dropdown-link-hover-color: #f9f9f9;
-$dropdown-link-hover-bg: #a61a32; // #61102d
-$dropdown-link-active-color: #ffffff;
-$dropdown-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg; // #61102d
-$dropdown-link-disabled-color: #f2f2f2;
-$dropdown-header-color: #ffffff;
-$dropdown-divider-bg: $dropdown-bg;
+// Form validation
+// Dropdowns (Bootstrap SCSS variables for dropdowns aren't supported in this child theme. )
+:root {
+    --bs-dropdown-bg: var(--#{$prefix}body-bg); // !default;
+    --bs-dropdown-border-color: rgba(0, 0, 0, 0.15);
+    --bs-dropdown-link-color: var(--#{$prefix}body-color); // !default;
+    --bs-dropdown-link-hover-color: #{$component-active-bg}; //var(--bs-dropdown-link-color); //  !default;
+    --bs-dropdown-link-hover-bg: #{$component-active-bg}; //var(--#{$prefix}tertiary-bg); //  !default;
+    --bs-dropdown-link-active-color: #{$component-active-color}; //  !default;
+    --bs-dropdown-link-active-bg: #{$component-active-bg}; //  !default;
+    --bs-dropdown-link-disabled-color: var(--#{$prefix}tertiary-color); //  !default;
+    --bs-dropdown-header-color: #ffffff;
+    --bs-dropdown-divider-bg: var(--bs-dropdown-bg);
+}
 
 $dropdown-dark-color: #fff;
-$dropdown-dark-bg: $dropdown-bg;
+$dropdown-dark-bg: var(--tiki-fivealive-theme-bg-darkest-color);
 
 // Pagination
 $nav-pills-link-active-bg: #b51360;
@@ -109,15 +161,17 @@ $pagination-disabled-bg: #ffffff;
 $pagination-disabled-border-color: #dddddd;
 
 // Cards
-$card-border-color: #49006c;
+$card-cap-bg: var(--tiki-fivealive-theme-bg);
 $card-cap-color: $white;
+$card-border-color: #49006c;
+
 
 // Code
-
 $code-color:                       $body-color; //  $pink; default
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
+// Needed for footer and modules in _selectors-for-options.scss
 $tiki-footer_liner-card-inner-border: #b51360;
 $tiki-footer-accent-color: #b51360;
 $tiki-footer-btn-secondary-color: #f4f4f4;
@@ -126,7 +180,7 @@ $tiki-footer_liner-border-color: $tiki-footer-accent-color;
 $tiki-postbody-title-card-title-color: #fff;
 
 // Footer colors in light and dark mode
-$tiki-dark-footer-card-header-bg: $tiki-top-bg;
+$tiki-dark-footer-card-header-bg:  var(--tiki-fivealive-theme-bg);;
 $tiki-dark-footer-card-header-title-color: #fff !important;
 $tiki-dark-footer-card-border-color: rgba(#fff, .45);
 $tiki-dark-footer-link-color: #f05670;
@@ -134,57 +188,60 @@ $tiki-dark-footer-link-hover-color: #f6768c;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
-@mixin top-nav-light {
-    // Use this one instead of the next to get color bands on the side like an actual watermelon slice    --tiki-top-light-bg: linear-gradient(90deg, rgba(71,71,71,1) 0%, rgba(167,41,42,1) 0%, rgba(35,59,7,1) 0%, rgba(112,123,59,1) 1%, rgba(190,188,129,1) 3%, rgba(164,133,93,1) 4%, rgba(170,29,17,1) 5%);
-    --tiki-top-bg: #{$tiki-top-bg}; // linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
-    --tiki-top-color: #f9f9f9; // #{$navbar-light-color};
-    --tiki-top-hover-color: #f2f2f2;
-    --tiki-top-text-color: var(--tiki-top-text-color);
-    --tiki-site-title-color: var(--tiki-top-color);
-    --tiki-site-subtitle-color: var(--tiki-top-color);
-    --tiki-top-border: solid #152304;
-    --tiki-top-border-color: #152304;
-    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
-    .navbar-light {
-        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-    }
-}
-
-@mixin topbar-nav-light {
-    --tiki-topbar-bg: #3c4822;
-    --tiki-topbar-color: #f9f9f9;
-    --tiki-topbar-hover-color: #f2f2f2;
-    --tiki-topbar-text-color: #f2f2f2;
-    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
-    .navbar-light {
-        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-    }
-}
 
 @mixin top-nav-dark {
-    --tiki-top-bg: #{$tiki-top-bg};
-    --tiki-top-color: var(--tiki-top-color);
-    --tiki-top-hover-color: #f2f2f2;
-    --tiki-top-text-color: var(-tiki-top-hover-color);
-    --tiki-site-title-color: var(--tiki-top-color);
-    --tiki-site-subtitle-color: var(--tiki-top-color);
+    --tiki-top-bg:  var(--tiki-fivealive-theme-bg);;
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color};
+    --tiki-site-subtitle-color:  #{$navbar-dark-brand-color};
     --tiki-top-border: solid #152304;
     --tiki-top-border-color: #152304;
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: var(--tiki-topbar-bg);
-    --tiki-topbar-color: var(--tiki-top-color);
-    --tiki-topbar-hover-color: var(-tiki-top-hover-color);
-    --tiki-topbar-text-color: var(-tiki-top-hover-color);
+    --tiki-topbar-bg: #{$dark};
+    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
+
+//@mixin top-nav-light {
+//    // Use this one instead of the next to get color bands on the side like an actual watermelon slice    --tiki-top-light-bg: linear-gradient(90deg, rgba(71,71,71,1) 0%, rgba(167,41,42,1) 0%, rgba(35,59,7,1) 0%, rgba(112,123,59,1) 1%, rgba(190,188,129,1) 3%, rgba(164,133,93,1) 4%, rgba(170,29,17,1) 5%);
+//    --tiki-top-bg:  var(--tiki-fivealive-theme-bg);; // linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
+//    --tiki-top-color: #f9f9f9; // #{$navbar-light-color};
+//    --tiki-top-hover-color: #f2f2f2;
+//    --tiki-top-text-color: var(--tiki-top-text-color);
+//    --tiki-site-title-color: var(--tiki-top-color);
+//    --tiki-site-subtitle-color: var(--tiki-top-color);
+//    --tiki-top-border: solid #152304;
+//    --tiki-top-border-color: #152304;
+//    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+//    .navbar-light {
+//        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+//    }
+//}
+//
+//@mixin topbar-nav-light {
+//    --tiki-topbar-bg: #3c4822;
+//    --tiki-topbar-color: #f9f9f9;
+//    --tiki-topbar-hover-color: #f2f2f2;
+//    --tiki-topbar-text-color: #f2f2f2;
+//    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+//    .navbar-light {
+//        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+//    }
+//}
+
+
 .tiki-top-nav-light {
-    @include top-nav-light;
+    @include top-nav-dark;
 }
 
 .tiki-topbar-nav-light {
-    @include topbar-nav-light;
+    @include topbar-nav-dark;
 }
 
 .tiki-top-nav-dark {
@@ -224,7 +281,7 @@ header.navbar.fixed-top {
         @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
+        @include topbar-nav-dark;
     }
 }
 
@@ -232,15 +289,15 @@ header.navbar.fixed-top {
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
+    --tiki-admin-top-nav-bg: var(--tiki-fivealive-theme-bg); //linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
     --tiki-admin-top-nav-color: #fff;
     --tiki-admin-top-nav-hover-color: #f9f9f9;
     --tiki-admin-top-nav-hover-bg: none ;
-    --tiki-admin-aside-nav-bg: #E72326;
+    --tiki-admin-aside-nav-bg: var(--tiki-fivealive-theme-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-bg: #{$dropdown-bg};
-    --tiki-admin-dropdown-link-color: #fff;
+    --tiki-admin-dropdown-bg: var(--bs-dropdown-bg);
+    --tiki-admin-dropdown-link-color:  var(--bs-dropdown-link-color);
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     .accordion-item.search-preferences,
@@ -255,16 +312,16 @@ header.navbar.fixed-top {
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
-    --tiki-admin-top-nav-color: #212121;
+    --tiki-admin-top-nav-bg:  var(--tiki-fivealive-theme-bg); // linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
+    --tiki-admin-top-nav-color: #fff;
     --tiki-admin-top-nav-hover-color: #f2f2f2;
     //    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: #E72326;
+    --tiki-admin-aside-nav-bg: var(--tiki-admin-top-nav-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-link-color: #212121;
-    --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
-    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
+    --tiki-admin-dropdown-link-color: #f2f2f2;
+    --tiki-admin-dropdown-bg: var(--tiki-fivealive-theme-bg-darkest-color);
+    --tiki-admin-dropdown-link-hover-color: #fff;
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     .accordion-button::after {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");

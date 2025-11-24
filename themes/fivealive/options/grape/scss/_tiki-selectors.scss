@@ -1,18 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
+@import "variables";
+
 // - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
-
-h3.tiki-card-header-title {
-    color: #fff;
-}
-
-
-.postbody-title,
-.bg-dark {
-    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#642759+0,732860+19,92286b+43,a32872+67,a52873+100
-    background: linear-gradient(to right,  #642759 0%,#732860 19%,#92286b 43%,#a32872 67%,#a52873 100%) !important;
-}
 
 // Progress bars
 .progress-bar {
@@ -21,10 +12,6 @@ h3.tiki-card-header-title {
 
 // Dark color mode
 [data-bs-theme=dark] {
-    .blockquote-footer { color: #848C94; }
-    .valid-feedback { color: #329F4F !important; }
-    .invalid-feedback { color: #F65151 !important; }
-
     .btn.btn-outline-primary { color: #D963AA; border-color: #D963AA; }
     .btn.btn-outline-secondary { color: #A47DB5; border-color: #A47DB5; }
     .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
@@ -33,10 +20,8 @@ h3.tiki-card-header-title {
     .btn.btn-outline-info { color: #CB6CA2; border-color: #CB6CA2; }
     .btn.btn-outline-dark { color: #D364AC; border-color: #D364AC; }
 
+    .blockquote-footer { color: #848C94; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #F65151 !important; }
     .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
-}
-
-// Dropdown partial isn't available to these theme options.
-:root .tiki-admin .dropdown-item.active {
-    background-color: #{$component-active-bg};
 }

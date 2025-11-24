@@ -5,12 +5,6 @@ $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
-// This is reduced from the amount in tiki_base.css - maybe that needs to be changed, too.
-body.layout_social.tiki.navbar-padding {
-    padding-top: 2.72rem;
-    padding-bottom: 0;
-}
-
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
 .tiki .wiki.external + .icon-link-external, // wikitext
 .tiki .wiki.external .icon-link-external,

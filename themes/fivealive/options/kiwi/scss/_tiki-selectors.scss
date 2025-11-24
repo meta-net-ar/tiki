@@ -1,15 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-
-.postbody-title {
-    background: #bebc24;
-    background: linear-gradient(to right,  #bebc24 0%,#ded319 53%,#e7d915 100%);
-}
-
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 .text-danger {
     color: #D63D00 !important;
@@ -82,12 +76,20 @@
 
 
 // Dropdown partial isn't available to these theme options.
-:root .tiki-admin .dropdown-item.active {
-    background-color: #{$component-active-bg};
+//:root .tiki-admin .dropdown-item.active {
+//    background-color: #{$component-active-bg};
+//}
+
+.tiki-admin-aside-nav-dark .dropdown-item.active {
+    background-color: $dropdown-dark-link-active-bg;
 }
 
-// Dark color mode
+//.dropdown-menu {
+//     background: var(--bs-dropdown-bg);
+//    background: lightyellow;
+// }
 
+// Dark color mode
 [data-bs-theme=dark] {
     .blockquote-footer { color: #848D94; }
     .valid-feedback { color: #329F4F !important; }

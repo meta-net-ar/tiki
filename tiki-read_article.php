@@ -12,8 +12,6 @@ use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
 
 $section = 'cms';
-$here = [];
-
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -21,10 +19,6 @@ $inputConfiguration = [
         'switchlang'               => 'bool',            //post
         'page'                     => 'int',             //post
         ],
-         'staticKeyFiltersForArrays' => [
-            $here['itemkey']       => 'digits',       //post
-            $here['key']           => 'digits',       //post
-         ],
     ],
 ];
 require_once('tiki-setup.php');

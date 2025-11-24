@@ -1,17 +1,20 @@
+// Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
+// and CSS selectors remaining.
+
+@import "variables";
+
 // - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 h3.tiki-card-header-title {
     color: #fff;
 }
 
-.header_outer,
-.layout_basic #top_modules,
+.page-header,
 .postbody-title,
-.tiki > .navbar.fixed-top.bg-dark,
-.bg-dark {
-    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#0a8794+0,169fb6+53,18a4bc+72,19a5bd+100
-    background: #0a8794 !important; /* Old browsers */
-    background: linear-gradient(to right,  #0a8794 0%,#169fb6 53%,#18a4bc 72%,#19a5bd 100%) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+.bg-dark,
+.card-header,
+.card-footer {
+    background: var(--tiki-fivealive-theme-bg);
 }
 
 // CSS is used because Bootstrap partials aren't available for theme variables, etc.
@@ -53,34 +56,10 @@ h3.tiki-card-header-title {
     color: #fff;
 }
 
-.card-header {
-    background: $tiki-top-bg;
-}
-
 // Progress bars
 .progress-bar {
     --bs-progress-bar-bg: #{$info};
 }
-
-// Dropdowns
-//.dropdown-item.active,
-//.dropdown-item:active {
-//    color: var(--bs-dropdown-link-active-color);
-//    text-decoration: none;
-//    background-color: #087084; // var(--bs-dropdown-link-active-bg);
-//}
-
-
-:root .tiki-admin .dropdown-item.active {
-    background-color: #{$component-active-bg};
-}
-
-.tiki-admin .dropdown-item.active,
-.tiki-admin .dropdown-item:active,
-.tiki-admin .dropdown-item:hover {
-    color: #fff !important;
-}
-
 
 // Dark color mode
 [data-bs-theme=dark] {

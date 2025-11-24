@@ -87,15 +87,19 @@
         </div>
 
         <div id="admin_schedulers-div">
-            <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
-                {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                <table id="admin_schedulers" class="table normal table-striped table-hover" data-count="{$schedulers|count}">
-                    <thead>
-                    <tr>
-
-                        <th>
-                            {tr}Name{/tr}
-                        </th>
+            <form name="schedulerform" id="schedulerform" method="post">
+                {ticket}
+                <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+                    {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
+                    <table id="admin_schedulers" class="table normal table-striped table-hover" data-count="{$schedulers|count}">
+                        <thead>
+                        <tr>
+                            <th>
+                                {select_all checkbox_names='checked[]'}
+                            </th>
+                            <th>
+                                {tr}Name{/tr}
+                            </th>
                         <th>
                             {tr}Description{/tr}
                         </th>
@@ -129,6 +133,9 @@
                     {section name=scheduler loop=$schedulers}
                         {$scheduler_name = $schedulers[scheduler].name|escape}
                         <tr>
+                            <td class="checkbox-cell">
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$schedulers[scheduler].id|escape}">
+                            </td>
                             <td class="scheduler_name">
                                 <a class="link tips"
                                     href="tiki-admin_schedulers.php?scheduler={$schedulers[scheduler].id}{if $prefs.feature_tabs ne 'y'}#2{/if}"
@@ -219,6 +226,29 @@
                     </tbody>
                 </table>
             </div>
+
+            {if $schedulers|count > 0}
+                <div class="input-group col-sm-8">
+                    <select class="form-select" name="action">
+                        <option value="no_action" selected disabled>
+                            {tr}Select action to perform with checked{/tr}...
+                        </option>
+                        <option value="remove_schedulers">
+                            {tr}Remove schedulers...{/tr}
+                        </option>
+                    </select>
+                    <button
+                        type="submit"
+                        form="schedulerform"
+                        formaction="{bootstrap_modal controller=scheduler action=remove_schedulers}"
+                        class="btn btn-primary"
+                        id="bulk-action-submit"
+                    >
+                        {tr}OK{/tr}
+                    </button>
+                </div>
+            {/if}
+        </form>
         </div>
     {/tab}
 {/if}
@@ -418,11 +448,16 @@
             {remarksbox type="note" title="{tr}Information{/tr}"}
             {tr}This page lists all scheduled background jobs along with their processing status. You can re-run a job or see a log of the job executions. Note that Tiki Scheduler must be executed periodically by a cron job in order to execute the background jobs. If you see a job in Active status below for too long interval, then your cron job is most probably not running. {/tr}
             {/remarksbox}
-            <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
-                {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                <table id="admin_jobs" class="table normal table-striped table-hover" data-count="{$jobs|count}">
-                    <thead>
-                    <tr>
+            <form name="jobsform" id="jobsform" method="post">
+                {ticket}
+                <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+                    {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
+                    <table id="admin_jobs" class="table normal table-striped table-hover" data-count="{$jobs|count}">
+                        <thead>
+                        <tr>
+                            <th>
+                                {select_all checkbox_names='checked_jobs[]'}
+                            </th>
 
                         <th>
                             {tr}Name{/tr}
@@ -459,6 +494,9 @@
                     {section name=job loop=$jobs}
                         {$job = $jobs[job]}
                         <tr>
+                            <td class="checkbox-cell">
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked_jobs[]" value="{$job.id|escape}">
+                            </td>
                             <td class="scheduler_name">
                                 <a class="link tips"
                                     href="tiki-admin_schedulers.php?scheduler={$job.id}{if $prefs.feature_tabs ne 'y'}#2{/if}"
@@ -524,6 +562,29 @@
                     </tbody>
                 </table>
             </div>
+
+            {if $jobs|count > 0}
+                <div class="input-group col-sm-8">
+                    <select class="form-select" name="job_action">
+                        <option value="no_action" selected disabled>
+                            {tr}Select action to perform with checked{/tr}...
+                        </option>
+                        <option value="remove_jobs">
+                            {tr}Remove jobs...{/tr}
+                        </option>
+                    </select>
+                    <button
+                        type="submit"
+                        form="jobsform"
+                        formaction="{bootstrap_modal controller=scheduler action=remove_jobs}"
+                        class="btn btn-primary"
+                        id="bulk-job-action-submit"
+                    >
+                        {tr}OK{/tr}
+                    </button>
+                </div>
+            {/if}
+        </form>
         </div>
     {/tab}
 {/if}
@@ -633,5 +694,45 @@
 
     $('#notificationUsersCollapse').on('hide.bs.collapse', function() {
         $(this).prev().find('.fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+
+    // Handle bulk action submission
+    $('#bulk-action-submit').on('click', function(e) {
+        var selectedAction = $('select[name="action"]').val();
+        var checkedBoxes = $('input[name="checked[]"]:checked');
+
+        if (!selectedAction || selectedAction === 'no_action') {
+            e.preventDefault();
+            alert('{tr}Please select an action first.{/tr}');
+            return false;
+        }
+
+        if (checkedBoxes.length === 0) {
+            e.preventDefault();
+            alert('{tr}Please select at least one scheduler.{/tr}');
+            return false;
+        }
+
+        // Validation passed - let form submit
+    });
+
+    // Handle bulk job action submission
+    $('#bulk-job-action-submit').on('click', function(e) {
+        var selectedAction = $('select[name="job_action"]').val();
+        var checkedBoxes = $('input[name="checked_jobs[]"]:checked');
+
+        if (!selectedAction || selectedAction === 'no_action') {
+            e.preventDefault();
+            alert('{tr}Please select an action first.{/tr}');
+            return false;
+        }
+
+        if (checkedBoxes.length === 0) {
+            e.preventDefault();
+            alert('{tr}Please select at least one job.{/tr}');
+            return false;
+        }
+
+        // Validation passed - let form submit
     });
 {/jq}

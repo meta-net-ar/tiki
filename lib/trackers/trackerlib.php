@@ -4046,7 +4046,8 @@ class TrackerLib extends TikiLib
                 if (isset($param['options'])) {
                     $text .= "<dd><ul>";
                     foreach ($param['options'] as $k => $label) {
-                        $text .= "<li><strong>{$k}</strong> = <em>$label</em></li>";
+                        $label = is_array($label) ? implode(', ', $label) : $label;
+                        $text .= "<li><strong>{$k}</strong> = <em>{$label}</em></li>";
                     }
                     $text .= "</ul></dd>";
                 }

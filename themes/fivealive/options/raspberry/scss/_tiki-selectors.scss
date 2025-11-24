@@ -1,23 +1,18 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-h3.tiki-card-header-title {
-    color: #fff;
-}
-
-.postbody-title,
-.bg-dark {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#b3135f+0,b61261+9,c21069+18,e70b80+69,ea0a81+100 */
-    background: #b3135f !important; /* Old browsers */
-    background: linear-gradient(to right,  #b3135f 0%,#b61261 9%,#c21069 18%,#e70b80 69%,#ea0a81 100%) !important; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 // Progress bars
 .progress-bar {
     --bs-progress-bar-bg: #{$info};
 }
+
+//h3.tiki-card-header-title {
+//    color: #fff;
+//}
 
 // Dropdown partial isn't available to these theme options.
 :root .tiki-admin .dropdown-item.active {
@@ -35,5 +30,4 @@ h3.tiki-card-header-title {
     .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
     .btn.btn-outline-info { color: #E35F91; border-color: #E35F91; }
     .btn.btn-outline-dark { color: #F641A2; border-color: #F641A2; }
-
 }

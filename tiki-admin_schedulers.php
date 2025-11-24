@@ -33,6 +33,8 @@ $inputConfiguration = [
             'run_time'                   => 'string',         //get
             'status'                     => 'string',         //get
             're_run'                     => 'string',         //get
+            'action'                     => 'alpha',          //post
+            'checked'                    => 'array',          //post
         ],
     ],
 ];
