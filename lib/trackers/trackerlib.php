@@ -928,12 +928,19 @@ class TrackerLib extends TikiLib
         }
     }
 
-    public function concat_item_from_fieldslist($trackerId, $itemId, $fieldsId, $status = 'o', $separator = ' ', $list_mode = '', $strip_tags = false, $format = '', $item = [])
+    public function concat_item_from_fieldslist($trackerId, $itemId, $fieldsId, $status = 'o', $separator = ' ', $list_mode = '', $strip_tags = false, $format = '', $item = [], $use_cache = false)
     {
         $res = '';
         $values = [];
         if (is_string($fieldsId)) {
             $fieldsId = preg_split('/\|/', $fieldsId, -1, PREG_SPLIT_NO_EMPTY);
+        }
+        if ($use_cache) {
+            static $cache = [];
+            $cacheKey = "concat_item_from_fieldslist_{$trackerId}_{$itemId}_{$fieldsId}_{$status}_{$separator}_{$list_mode}_{$strip_tags}_{$format}";
+            if (isset($cache[$cacheKey])) {
+                return $cache[$cacheKey];
+            }
         }
         $definition = Tracker_Definition::get($trackerId);
         if ($definition) {
@@ -979,6 +986,12 @@ class TrackerLib extends TikiLib
             }
         } else {
             Feedback::error(tr('Tracker %0 not found for Field %1', $trackerId, implode(',', $fieldsId)));
+        }
+        if ($use_cache) {
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                $cache = [];
+            }
+            $cache[$cacheKey] = $res;
         }
         return $res;
     }
@@ -4143,9 +4156,17 @@ class TrackerLib extends TikiLib
      * @param [type] $trackerId, optionnal (will be retrieved from itemId if missing)
      * @param [type] $itemId
      */
-    public function get_isMain_value($trackerId, $itemId): string
+    public function get_isMain_value($trackerId, $itemId, $use_cache = false): string
     {
         global $prefs;
+
+        if ($use_cache) {
+            static $cache = [];
+            $cacheKey = "isMain_value_{$trackerId}_{$itemId}";
+            if (isset($cache[$cacheKey])) {
+                return $cache[$cacheKey];
+            }
+        }
 
         $query = "select tif.`value` from `tiki_tracker_item_fields` tif, `tiki_tracker_items` i, `tiki_tracker_fields` tf where i.`itemId`=? and i.`itemId`=tif.`itemId` and tf.`fieldId`=tif.`fieldId` and tf.`isMain`=? ORDER BY tf.`position`";
         $queryResult = $this->getOne($query, [ (int) $itemId, "y"]);
@@ -4192,14 +4213,22 @@ class TrackerLib extends TikiLib
             $decoded = json_decode($result, true);
             if ($decoded !== null) {     // might start with a "{" but may not be a json_encoded value
                 if (isset($decoded[$prefs['language']])) {
-                    return $decoded[$prefs['language']];
+                    $result = $decoded[$prefs['language']];
                 } elseif (is_array($decoded)) {
-                    return reset($decoded);
+                    $result = reset($decoded);
                 }
             }
         }
 
-        return (string) $result;
+        $result = (string) $result;
+
+        if ($use_cache) {
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                $cache = [];
+            }
+            $cache[$cacheKey] = $result;
+        }
+        return $result;
     }
 
     /**

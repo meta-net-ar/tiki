@@ -335,12 +335,12 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         return parent::watchCompare($o, $n);    // then compare as text
     }
 
-    public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
+    public function getDocumentPart(Search_Type_Factory_Interface $typeFactory, $mode = '')
     {
         $baseKey = $this->getBaseKey();
         $items = $this->getItemIds(false);
 
-        $list = $this->getItemLabels($items);
+        $list = $this->getItemLabels($items, ['list_mode' => ''], $mode);
         $listtext = implode(' ', $list);
 
         return [
@@ -869,7 +869,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
      * @param array $context
      * @return array array of values by itemId
      */
-    private function getItemLabels($items, $context = ['list_mode' => ''])
+    private function getItemLabels($items, $context = ['list_mode' => ''], $mode = '')
     {
         $displayFields = $this->getOption('displayFieldIdThere');
         $trackerId = (int) $this->getOption('trackerId');
@@ -903,10 +903,11 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                     isset($context['list_mode']) ? $context['list_mode'] : '',
                     $this->getOption('linkToItems'),
                     $this->getOption('displayFieldIdThereFormat'),
-                    $trklib->get_tracker_item($itemId)
+                    $trklib->get_tracker_item($itemId),
+                    $mode === 'indexing'
                 );
             } else {
-                $list[$itemId] = $trklib->get_isMain_value($trackerId, $itemId);
+                $list[$itemId] = $trklib->get_isMain_value($trackerId, $itemId, $mode === 'indexing');
             }
         }
 
