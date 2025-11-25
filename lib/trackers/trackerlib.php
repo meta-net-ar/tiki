@@ -937,7 +937,7 @@ class TrackerLib extends TikiLib
         }
         if ($use_cache) {
             static $cache = [];
-            $cacheKey = "concat_item_from_fieldslist_{$trackerId}_{$itemId}_{$fieldsId}_{$status}_{$separator}_{$list_mode}_{$strip_tags}_{$format}";
+            $cacheKey = "concat_item_from_fieldslist_{$trackerId}_{$itemId}_" . implode('|', $fieldsId) . "_{$status}_{$separator}_{$list_mode}_{$strip_tags}_{$format}";
             if (isset($cache[$cacheKey])) {
                 return $cache[$cacheKey];
             }
