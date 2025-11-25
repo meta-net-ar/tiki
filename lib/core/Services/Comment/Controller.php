@@ -572,7 +572,11 @@ class Services_Comment_Controller
         $type = $comment['objectType'];
         $object = $comment['object'];
 
-        if ($comment['approved'] == 'y') {
+        if ($comment['approved'] == 'r' && $do == 'reject') {
+            throw new Services_Exception(tr('Comment already rejected.'), 403);
+        }
+
+        if ($comment['approved'] == 'y' && $do == 'approve') {
             throw new Services_Exception(tr('Comment already approved.'), 403);
         }
 
@@ -618,6 +622,14 @@ class Services_Comment_Controller
 
         $type = $comment['objectType'];
         $object = $comment['object'];
+
+        if ($comment['archived'] == 'y' && $do == 'archive') {
+            throw new Services_Exception(tr('Comment already archived.'), 403);
+        }
+
+        if ($comment['archived'] == 'n' && $do == 'unarchive') {
+            throw new Services_Exception(tr('Comment already unarchived.'), 403);
+        }
 
         if (! $this->canArchive($type, $object)) {
             throw new Services_Exception(tr('Permission denied.'), 403);
