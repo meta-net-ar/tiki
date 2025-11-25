@@ -51,6 +51,9 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         'feature_article_comments' => 'y',
         'feature_forum' => 'y',
         'comments_notitle' => 'n',
+        'feature_comments_locking' => 'y',
+        'feature_comments_moderation' => 'y',
+        'comments_archive' => 'y',
     ];
 
     /**
@@ -581,6 +584,28 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
+    private function getLockCommentResponseSchema()
+    {
+        return [
+            'title' => 'string',
+            'type' => 'string',
+            'objectId' => 'string|int',
+            'status' => 'string',
+        ];
+    }
+
+    // schema for approve, reject, archive, unarchive
+    private function getModerateCommentResponseSchema()
+    {
+        return [
+            'threadId' => 'int',
+            'type' => 'string',
+            'objectId' => 'string|int',
+            'status' => 'string',
+            'do' => 'string',
+        ];
+    }
+
     /**
      * Assert that a comment response has valid structure
      * @param array $comment
@@ -608,5 +633,15 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected function assertValidDeleteCommentResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getDeleteCommentResponseSchema());
+    }
+
+    protected function assertValidLockCommentResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getLockCommentResponseSchema());
+    }
+
+    protected function assertValidModerateCommentResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getModerateCommentResponseSchema());
     }
 }
