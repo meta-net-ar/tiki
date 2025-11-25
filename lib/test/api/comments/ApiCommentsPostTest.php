@@ -15,7 +15,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCommentsTest.php');
  */
 class ApiCommentsPostTest extends ApiBaseCommentsTest
 {
-    public function testUpdateCommentWithoutPermission()
+    public function testApiUpdateCommentWithoutPermission()
     {
         $pageName = 'POST_UpdatePermTestPage';
         static::createWikiPage($pageName);
@@ -56,7 +56,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
     }
 
-    public function testCreateCommentWithoutPermission()
+    public function testApiCreateCommentWithoutPermission()
     {
         $pageName = 'POST_TestPermPage';
         static::createWikiPage($pageName);
@@ -80,7 +80,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 403, 'Permission denied.');
     }
 
-    public function testCreateCommentOnWikiPage()
+    public function testApiCreateCommentOnWikiPage()
     {
         $pageName = static::$defaultComments['wiki page']['objectId'];
         $data = [
@@ -107,7 +107,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         static::$testComments[] = $body['threadId'];
     }
 
-    public function testCreateReplyComment()
+    public function testApiCreateReplyComment()
     {
         $pageName = static::$defaultComments['wiki page']['objectId'];
 
@@ -158,7 +158,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         static::$testComments[] = $body['threadId'];
     }
 
-    public function testCreateCommentOnDifferentObjectTypes()
+    public function testApiCreateCommentOnDifferentObjectTypes()
     {
         $objectTypes = [
             ['type' => 'wiki page', 'createMethod' => 'createWikiPage', 'objectName' => 'POST_MultiTypeWikiPage'],
@@ -204,7 +204,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         }
     }
 
-    public function testCreateCommentWithoutRequiredFields()
+    public function testApiCreateCommentWithoutRequiredFields()
     {
         // Missing type
         $data = [
@@ -225,7 +225,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 403, 'Comments not allowed on this page.');
     }
 
-    public function testUpdateComment()
+    public function testApiUpdateComment()
     {
         // Create a wiki page and comment
         $pageName = 'POST_UpdateTestPage';
@@ -274,7 +274,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
         static::$testComments[] = $threadId;
     }
 
-    public function testUpdateNonExistentComment()
+    public function testApiUpdateNonExistentComment()
     {
         $updateData = [
             'title' => 'Updated Title',
@@ -291,5 +291,516 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
+    }
+
+    public function testApiLockCommentWithoutPermission()
+    {
+        $threadId = static::$defaultComments['wiki page']['threadId'];
+        // Try to lock as anonymous
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            null, // Anonymous user
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permissions denied.');
+    }
+
+    public function testApiLockComment()
+    {
+        // createComment
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Lock Test Comment',
+            'This comment will be locked.'
+        );
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidLockCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after locking the comment');
+        $this->assertStringContainsString('Lock comments', $body['title'], 'Title should indicate lock action');
+    }
+
+    public function testApiLockAlreadyLockedComment()
+    {
+        // createComment
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Lock Test Comment 2',
+            'This comment will be locked twice.'
+        );
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        // First lock
+        $response1 = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $this->assertResponseStatus(200, $response1);
+
+        // Second lock attempt
+        $response2 = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+
+        $body = $this->getResponseBody($response2);
+        $this->assertValidErrorResponse($body, 403, 'Comments already locked.');
+    }
+
+    public function testApiLockCommentWithMissingParameters()
+    {
+        $threadId = static::$defaultComments['wiki page']['threadId'];
+        // Missing objectId
+        $data = [
+            'type' => 'wiki page',
+        ];
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 409, '<!--field[objectId]-->Field Required');
+    }
+
+    public function testApiUnlockCommentWithoutPermission()
+    {
+        $threadId = static::$defaultComments['wiki page']['threadId'];
+        // Try to unlock as anonymous
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unlock',
+            null, // Anonymous user
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permissions denied.');
+    }
+
+    public function testApiUnlockComment()
+    {
+        // createComment
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Unlock Test Comment',
+            'This comment will be locked and then unlocked.'
+        );
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        // First lock
+        $response1 = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/lock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $this->assertResponseStatus(200, $response1);
+        // Then unlock
+        $response2 = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unlock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $this->assertResponseStatus(200, $response2);
+        $body = $this->getResponseBody($response2);
+        $this->assertValidLockCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after unlocking the comment');
+        $this->assertStringContainsString('Unlock comments', $body['title'], 'Title should indicate unlock action');
+    }
+
+    public function testApiUnlockAlreadyUnlockedComment()
+    {
+        // createComment
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Unlock Test Comment 2',
+            'This comment will be unlocked twice.'
+        );
+        $data = [
+            'type' => 'wiki page',
+            'objectId' => static::$defaultComments['wiki page']['objectId'],
+        ];
+        // First unlock attempt
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unlock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Comments already unlocked.');
+    }
+
+    public function testApiUnlockCommentWithMissingParameters()
+    {
+        $threadId = static::$defaultComments['wiki page']['threadId'];
+        // Missing objectId
+        $data = [
+            'type' => 'wiki page',
+        ];
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unlock',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 409, '<!--field[objectId]-->Field Required');
+    }
+
+    public function testApiApproveCommentWithoutPermission()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Approve Test Comment',
+            'This comment will be approved.'
+        );
+        // The comment might already be approved (default state), so we start by rejecting it to ensure a clean state.
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->reject_comment($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/approve',
+            null, // Anonymous user
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied.');
+    }
+
+    public function testApiApproveComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Approve Test Comment 2',
+            'This comment will be approved.'
+        );
+        // The comment might already be approved (default state), so we start by rejecting it to ensure a clean state.
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->reject_comment($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/approve',
+            'Admins',
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidModerateCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after approving the comment');
+        $this->assertTrue($body['do'] == 'approve', 'Do should be APPROVE after approving the comment');
+        $this->assertEquals($threadId, $body['threadId'], 'threadId should match the approved comment');
+    }
+
+    public function testApiApproveNonExistentComment()
+    {
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/99999/approve',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Comment not found. (404)');
+    }
+
+    public function testApiApproveAlreadyApprovedComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Approve Test Comment 3',
+            'This comment will be approved twice.'
+        );
+        // Ensure the comment is approved
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->approve_comment($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/approve',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Comment already approved.');
+    }
+
+    public function testApiRejectCommentWithoutPermission()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Reject Test Comment',
+            'This comment will be rejected.'
+        );
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/reject',
+            null, // Anonymous user
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied.');
+    }
+
+    public function testApiRejectComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Reject Test Comment 2',
+            'This comment will be rejected.'
+        );
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/reject',
+            'Admins',
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidModerateCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after rejecting the comment');
+        $this->assertTrue($body['do'] == 'reject', 'Do should be REJECT after rejecting the comment');
+        $this->assertEquals($threadId, $body['threadId'], 'threadId should match the rejected comment');
+    }
+
+    public function testApiRejectNonExistentComment()
+    {
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/99999/reject',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Comment not found. (404)');
+    }
+
+    public function testApiRejectAlreadyRejectedComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Reject Test Comment 3',
+            'This comment will be rejected twice.'
+        );
+        // Ensure the comment is rejected
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->reject_comment($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/reject',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Comment already rejected.');
+    }
+
+    public function testApiArchiveCommentWithoutPermission()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Archive Test Comment',
+            'This comment will be archived.'
+        );
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/archive',
+            null, // Anonymous user
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied.');
+    }
+
+    public function testApiArchiveComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Archive Test Comment 2',
+            'This comment will be archived.'
+        );
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/archive',
+            'Admins',
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidModerateCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after archiving the comment');
+        $this->assertTrue($body['do'] == 'archive', 'Do should be ARCHIVE after archiving the comment');
+        $this->assertEquals($threadId, $body['threadId'], 'threadId should match the archived comment');
+    }
+
+    public function testApiArchiveNonExistentComment()
+    {
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/99999/archive',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Comment not found. (404)');
+    }
+
+    public function testApiArchiveAlreadyArchivedComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Archive Test Comment 3',
+            'This comment will be archived twice.'
+        );
+        // First archive the comment
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->archive_thread($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/archive',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Comment already archived.');
+    }
+
+    public function testApiUnarchiveCommentWithoutPermission()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Unarchive Test Comment',
+            'This comment will be unarchived.'
+        );
+        // First archive the comment
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->archive_thread($threadId);
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unarchive',
+            null, // Anonymous user
+        );
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied.');
+    }
+
+    public function testApiUnarchiveComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Unarchive Test Comment 2',
+            'This comment will be unarchived.'
+        );
+        // First archive the comment
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->archive_thread($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unarchive',
+            'Admins',
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidModerateCommentResponse($body);
+        $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after unarchiving the comment');
+        $this->assertTrue($body['do'] == 'unarchive', 'Do should be UNARCHIVE after unarchiving the comment');
+        $this->assertEquals($threadId, $body['threadId'], 'threadId should match the unarchived comment');
+    }
+
+    public function testApiUnarchiveNonExistentComment()
+    {
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/99999/unarchive',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Comment not found. (404)');
+    }
+
+    public function testApiUnarchiveAlreadyUnarchivedComment()
+    {
+        $threadId = static::createComment(
+            'wiki page',
+            static::$defaultComments['wiki page']['objectId'],
+            'Unarchive Test Comment 3',
+            'This comment will be unarchived twice.'
+        );
+        // Ensure the comment is unarchived
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->unarchive_thread($threadId);
+
+        $response = $this->makeApiRequest(
+            'POST',
+            '/comments/' . $threadId . '/unarchive',
+            'Admins',
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Comment already unarchived.');
     }
 }

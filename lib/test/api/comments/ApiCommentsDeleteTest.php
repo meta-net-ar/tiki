@@ -15,7 +15,7 @@ require_once(dirname(__FILE__) . '/ApiBaseCommentsTest.php');
  */
 class ApiCommentsDeleteTest extends ApiBaseCommentsTest
 {
-    public function testDeleteCommentWithoutReplies()
+    public function testApiDeleteCommentWithoutReplies()
     {
         $pageName = static::$defaultComments['wiki page']['objectId'];
         $commentData = [
@@ -65,7 +65,7 @@ class ApiCommentsDeleteTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
-    public function testDeleteCommentWithReplies()
+    public function testApiDeleteCommentWithReplies()
     {
         $pageName = static::$defaultComments['wiki page']['objectId'];
 
@@ -136,7 +136,7 @@ class ApiCommentsDeleteTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
-    public function testDeleteNonExistentComment()
+    public function testApiDeleteNonExistentComment()
     {
         $response = $this->makeApiRequest(
             'DELETE',
@@ -148,7 +148,7 @@ class ApiCommentsDeleteTest extends ApiBaseCommentsTest
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
-    public function testDeleteCommentWithoutPermission()
+    public function testApiDeleteCommentWithoutPermission()
     {
         $pageName = static::$defaultComments['wiki page']['objectId'];
 
@@ -202,7 +202,7 @@ class ApiCommentsDeleteTest extends ApiBaseCommentsTest
         static::$testComments[] = $threadId;
     }
 
-    public function testDeleteCommentsOnDifferentObjectTypes()
+    public function testApiDeleteCommentsOnDifferentObjectTypes()
     {
         $objectTypes = [
             ['type' => 'wiki page', 'createMethod' => 'createWikiPage', 'objectName' => 'DELETE_MultiTypeWikiPage'],
