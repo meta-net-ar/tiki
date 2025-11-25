@@ -21,7 +21,6 @@ $inputConfiguration = [
         ],
         'staticKeyFiltersForArrays' => [
             'checked'              => 'string',   //post
-        $g                         => 'string', //post
         ],
     ],
 ];

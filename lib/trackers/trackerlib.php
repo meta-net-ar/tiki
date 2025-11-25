@@ -835,10 +835,10 @@ class TrackerLib extends TikiLib
         }
 
         $query = "
-          SELECT tiki_trackers.*, 
+          SELECT tiki_trackers.*,
           COUNT(tiki_tracker_fields.fieldId) AS fieldsCount
           FROM tiki_trackers
-          LEFT JOIN tiki_tracker_fields 
+          LEFT JOIN tiki_tracker_fields
           ON tiki_trackers.trackerId = tiki_tracker_fields.trackerId
           $join
           WHERE 1=1 $where
@@ -949,12 +949,19 @@ class TrackerLib extends TikiLib
         }
     }
 
-    public function concat_item_from_fieldslist($trackerId, $itemId, $fieldsId, $status = 'o', $separator = ' ', $list_mode = '', $strip_tags = false, $format = '', $item = [])
+    public function concat_item_from_fieldslist($trackerId, $itemId, $fieldsId, $status = 'o', $separator = ' ', $list_mode = '', $strip_tags = false, $format = '', $item = [], $use_cache = false)
     {
         $res = '';
         $values = [];
         if (is_string($fieldsId)) {
             $fieldsId = preg_split('/\|/', $fieldsId, -1, PREG_SPLIT_NO_EMPTY);
+        }
+        if ($use_cache) {
+            static $cache = [];
+            $cacheKey = "concat_item_from_fieldslist_{$trackerId}_{$itemId}_" . implode('|', $fieldsId) . "_{$status}_{$separator}_{$list_mode}_{$strip_tags}_{$format}";
+            if (isset($cache[$cacheKey])) {
+                return $cache[$cacheKey];
+            }
         }
         $definition = Tracker_Definition::get($trackerId);
         if ($definition) {
@@ -1000,6 +1007,12 @@ class TrackerLib extends TikiLib
             }
         } else {
             Feedback::error(tr('Tracker %0 not found for Field %1', $trackerId, implode(',', $fieldsId)));
+        }
+        if ($use_cache) {
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                $cache = [];
+            }
+            $cache[$cacheKey] = $res;
         }
         return $res;
     }
@@ -4083,9 +4096,16 @@ class TrackerLib extends TikiLib
      * @param [type] $trackerId, optionnal (will be retrieved from itemId if missing)
      * @param [type] $itemId
      */
-    public function get_isMain_value($trackerId, $itemId): string
+    public function get_isMain_value($trackerId, $itemId, $use_cache = false): string
     {
-        $query = "SELECT tif.`value`, tf.`type` 
+        if ($use_cache) {
+            static $cache = [];
+            $cacheKey = "isMain_value_{$trackerId}_{$itemId}";
+            if (isset($cache[$cacheKey])) {
+                return $cache[$cacheKey];
+            }
+        }
+        $query = "SELECT tif.`value`, tf.`type`
                 FROM `tiki_tracker_item_fields` tif
                 JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
                 JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
@@ -4108,7 +4128,14 @@ class TrackerLib extends TikiLib
                 $titles[] = $value;
             }
         }
-        return implode(' ', $titles);
+        $result = implode(' ', $titles);
+        if ($use_cache) {
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                $cache = [];
+            }
+            $cache[$cacheKey] = $result;
+        }
+        return $result;
     }
     /**
      * @param int $itemId

@@ -1390,14 +1390,16 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => $s,
-            'message' => tra('The session.save_path must be writable.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 must be writable. %1 How to change this value %2", 'session.save_path', '<a href="#php_conf_info">', '</a>') .
+                        '<br><strong>' . tra('Alternative solution:') . '</strong> ' .
+                        tr("Consider using database session storage instead. Navigate to Admin → General Settings, switch to 'Advanced' mode, look for the 'Sessions' group, and set 'Session storage location' to 'Database'. This will store sessions in the database instead of the filesystem. %0 Go to General Settings %1", '<a href="tiki-admin.php?page=general#contentadmin_general-2">', '</a>')
         );
     } else {
         $php_properties['session.save_path'] = array(
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => $s,
-            'message' => tra('The session.save_path is writable.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 is writable. %1 More info about %0 %2", 'session.save_path', '<a href="#php_conf_info">', '</a>')
         );
     }
 } else {
@@ -1407,14 +1409,14 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
             'fitness' => tra('unknown'),
             'fitness_status' => FITNESS_STATUS_UNKNOWN,
             'setting' => $s,
-            'message' => tra('The session.save_path can\'t be checked because open_basedir is defined.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 can't be checked because %1 is defined. %2 More info about %0 %3", "session.save_path", "open_basedir", '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['session.save_path'] = array(
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => $s,
-            'message' => tra('The session.save_path is writable.') . tra('It doesn\'t matter though, since your session.save_handler is not set to \'files\'.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 is writable. It doesn't matter though, since your %1 is not set to 'files'. %2 More info about %0 %3", "session.save_path", "session.save_handler", '<a href="#php_conf_info">', '</a>')
         );
     }
 }

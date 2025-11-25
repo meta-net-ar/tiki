@@ -1057,6 +1057,7 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('errortitle', $detail['errortitle']);
             $smarty->assign('msg', $detail['message']);
             $smarty->assign('errortype', $detail['code']);
+            $smarty->assign('twoFactorForm', $prefs['twoFactorAuth']);
             if (isset($detail['page'])) {
                 $smarty->assign('page', $page);
             }

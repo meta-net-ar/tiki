@@ -2,20 +2,12 @@
 // and CSS selectors remaining.
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
-//body.layout_basic {
-//    background-image: linear-gradient(to bottom, #91abaf, #8aa9ae, #84a7ac, #7da5ab, #76a3aa, #78a6ad, #79aab1, #7badb4, #86b6bd, #91c0c7, #9dc9d0, #a8d3da);
-//}
 
 .text-danger {
     color: #D63D00 !important;
 }
 .text-dark {
     color: $dark !important;
-}
-
-.bg-dark {
-    background-color: $dark !important;
 }
 
 .btn-dark {

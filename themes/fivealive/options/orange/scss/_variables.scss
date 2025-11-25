@@ -72,6 +72,29 @@ $btn-link-disabled-color:   $gray-600;  // default
 $component-active-color:       #ddb9af; // $white;  // default
 $component-active-bg:         $primary;  // default
 
+// Typography
+$hr-color: #e77d4f;
+$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
+
+// Tables
+$table-border-color: #e77d4f;
+$table-accent-bg: #f9f9f9;
+$table-hover-bg: #f5f5f5;
+
+// Forms
+$input-color: var(--#{$prefix}body-color);  // default // #555555;
+$input-bg: var(--#{$prefix}body-bg);  // default // #f8e4dd;
+$input-border-color: var(--#{$prefix}border-color);  // default // #fac5b1;
+$input-border-top-color: #fac5b1;
+$input-border-right-color: #fbf1ed;
+$input-border-bottom-color: #fbf1ed;
+$input-border-left-color: #fac5b1;
+
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+// Form validation
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color);
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);
@@ -104,30 +127,6 @@ $navbar-dark-toggler-border-color:  rgba($white, .1);
 $navbar-dark-brand-color:           $navbar-dark-active-color;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color;
 
-// Typography
-$hr-color: #e77d4f;
-$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 - #6B737B;
-$headings-font-weight: 700;
-
-// Tables
-$table-border-color: #e77d4f;
-$table-accent-bg: #f9f9f9;
-$table-hover-bg: #f5f5f5;
-
-// Forms
-$input-color: var(--#{$prefix}body-color);  // default // #555555;
-$input-bg: var(--#{$prefix}body-bg);  // default // #f8e4dd;
-$input-border-color: var(--#{$prefix}border-color);  // default // #fac5b1;
-$input-border-top-color: #fac5b1;
-$input-border-right-color: #fbf1ed;
-$input-border-bottom-color: #fbf1ed;
-$input-border-left-color: #fac5b1;
-
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
-
-// Form validation
 // Dropdowns (Bootstrap SCSS variables for dropdowns aren't supported in this child theme. )
 :root {
     --bs-dropdown-bg: var(--#{$prefix}body-bg); // !default;
@@ -143,7 +142,7 @@ $form-range-thumb-bg:                      $component-active-bg; // !default; NE
 }
 
 $dropdown-dark-color: #fff;
-$dropdown-dark-bg: #be8514;
+$dropdown-dark-bg: #996B0F;
 $dropdown-dark-link-hover-bg: #C8A229;
 
 // Pagination
@@ -205,9 +204,9 @@ $tiki-dark-footer-link-hover-color: #eb8664;
 
 @mixin top-nav-dark {
     --tiki-top-bg:  var(--tiki-fivealive-theme-bg); //linear-gradient(90deg, rgba(190, 133, 20, 1) 2%, rgba(199, 159, 29, 1) 93%, rgba(202, 172, 78, 1) 100%);
-    --tiki-top-color: $black;
-    --tiki-top-hover-color: #212121FF;
-    --tiki-top-text-color: var(--tiki-top-hover-color);
+    --tiki-top-color:#{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-color};
+    --tiki-top-text-color: #{$navbar-dark-color};
     --tiki-site-title-color: var(--tiki-top-color);
     --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;

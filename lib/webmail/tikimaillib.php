@@ -133,15 +133,18 @@ class TikiMail
     public function setHeader($name, $value)
     {
         $headers = $this->mail->getHeaders();
+        if (is_string($value)) {
+            $value = explode(',', trim($value));
+        }
         switch ($name) {
             case 'Message-Id':
-                $headers->addIdHeader('Message-ID', trim($value));
+                $headers->addIdHeader('Message-ID', $value);
                 break;
             case 'In-Reply-To':
-                $headers->addIdHeader('In-Reply-To', trim($value));
+                $headers->addIdHeader('In-Reply-To', $value);
                 break;
             case 'References':
-                $headers->addIdHeader('References: ', trim($value));
+                $headers->addIdHeader('References', $value);
                 break;
             default:
                 $headers->addTextHeader($name, $value);

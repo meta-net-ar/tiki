@@ -19,7 +19,7 @@ $info:          #8c1946;
 $warning:       #A4660E; // #f0ad4e;
 $danger:        #EA0606; // #ef0606; // #85072e;
 $light:         $gray-100; // !default;
-$dark:          #063035; // #b50964; Changed to topbar bg color
+$dark:          #390821;
 
 $theme-colors: (
     "primary":           $primary,
@@ -72,6 +72,30 @@ $btn-link-disabled-color:   $gray-600;  // default
 $component-active-color:       #ddb9af; // $white;  // default
 $component-active-bg:         $primary;  // default
 
+// Typography
+$hr-color: #e10c7c;
+$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
+$headings-font-weight: 700;
+
+// Tables
+$table-border-color: #f459ab;
+$table-accent-bg: #f9f9f9;
+$table-hover-bg: #f5f5f5;
+
+// Forms
+$input-color: var(--#{$prefix}body-color);  // default
+$input-bg: var(--#{$prefix}body-bg);  // default
+$input-border-color: var(--#{$prefix}border-color);  // default
+$input-border-top-color: #fa9ccd;
+$input-border-right-color: #fcf6f9;
+$input-border-bottom-color: #fcf6f9;
+$input-border-left-color: #fa9ccd;
+
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+// Form validation
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color);
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);
@@ -104,30 +128,7 @@ $navbar-dark-toggler-border-color:  rgba($white, .1);
 $navbar-dark-brand-color:           $navbar-dark-active-color;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color;
 
-// Typography
-$hr-color: #e10c7c;
-$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
-$headings-font-weight: 700;
 
-// Tables
-$table-border-color: #f459ab;
-$table-accent-bg: #f9f9f9;
-$table-hover-bg: #f5f5f5;
-
-// Forms
-$input-color: var(--#{$prefix}body-color);  // default
-$input-bg: var(--#{$prefix}body-bg);  // default
-$input-border-color: var(--#{$prefix}border-color);  // default
-$input-border-top-color: #fa9ccd;
-$input-border-right-color: #fcf6f9;
-$input-border-bottom-color: #fcf6f9;
-$input-border-left-color: #fa9ccd;
-
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
-
-// Form validation
 // Dropdowns (Bootstrap SCSS variables for dropdowns aren't supported in this child theme. )
 :root {
     --bs-dropdown-bg: var(--#{$prefix}body-bg); // !default;
@@ -165,7 +166,7 @@ $card-cap-color: #fff;
 $card-border-color: #e60b7f;
 
 // Code
-$code-color:                        $body-color;
+$code-color:                       $body-color;
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
@@ -186,23 +187,6 @@ $tiki-dark-footer-link-hover-color: #f171af;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
-
-@mixin top-nav-dark {
-    --tiki-top-bg: var(--tiki-fivealive-theme-bg);
-    --tiki-top-color: #{$navbar-dark-color};
-    --tiki-top-hover-color: #{$navbar-dark-hover-color};
-    --tiki-top-text-color: #{$navbar-dark-hover-color};
-    --tiki-site-title-color: #{$navbar-dark-brand-color};
-    --tiki-site-subtitle-color:  #{$navbar-dark-brand-color};
-    --tiki-top-border: solid #000;
-}
-
-@mixin topbar-nav-dark {
-    --tiki-topbar-bg: #{$dark};
-    --tiki-topbar-color: #{$navbar-dark-color};
-    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
-    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
-}
 
 //@mixin top-nav-light {
 //    --tiki-top-bg: var(--tiki-fivealive-theme-bg);
@@ -229,6 +213,22 @@ $tiki-dark-footer-link-hover-color: #f171af;
 //    }
 //}
 
+@mixin top-nav-dark {
+    --tiki-top-bg: var(--tiki-fivealive-theme-bg);
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color};
+    --tiki-site-subtitle-color:  #{$navbar-dark-brand-color};
+    --tiki-top-border: solid #000;
+}
+
+@mixin topbar-nav-dark {
+    --tiki-topbar-bg: #{$dark};
+    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
+}
 
 // Same set of colors is used for light and dark top and topbar
 .tiki-top-nav-light {

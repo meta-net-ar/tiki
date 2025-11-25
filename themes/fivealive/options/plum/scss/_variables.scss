@@ -72,6 +72,31 @@ $btn-link-disabled-color:   $gray-600;  // default
 $component-active-color:      $white;  // default
 $component-active-bg:         $primary;  // default
 
+// Typography
+$hr-color: #7a04b5;
+$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
+$headings-font-weight: 700;
+
+// Tables
+$table-border-color: #c564f5;
+$table-accent-bg: #f9f9f9;
+$table-hover-bg: #f5f5f5;
+
+// Forms
+$input-color: var(--#{$prefix}body-color);  // default // #555555;
+$input-bg: var(--#{$prefix}body-bg);  // default // #f4e1ff;
+$input-border-color: var(--#{$prefix}border-color);  // default // #f9f0ff;
+$input-border-top-color: #db9fff;
+$input-border-right-color: #f9f0ff;
+$input-border-bottom-color: #f9f0ff;
+$input-border-left-color: #db9fff;
+
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+// Form validation
+
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color);
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);
@@ -104,31 +129,6 @@ $navbar-dark-toggler-border-color:  rgba($white, .1);
 $navbar-dark-brand-color:           $navbar-dark-active-color;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color;
 
-// Typography
-$hr-color: #7a04b5;
-$text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
-$headings-font-weight: 700;
-
-// Tables
-$table-border-color: #c564f5;
-$table-accent-bg: #f9f9f9;
-$table-hover-bg: #f5f5f5;
-
-// Forms
-$input-color: var(--#{$prefix}body-color);  // default // #555555;
-$input-bg: var(--#{$prefix}body-bg);  // default // #f4e1ff;
-$input-border-color: var(--#{$prefix}border-color);  // default // #f9f0ff;
-$input-border-top-color: #db9fff;
-$input-border-right-color: #f9f0ff;
-$input-border-bottom-color: #f9f0ff;
-$input-border-left-color: #db9fff;
-
-
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
-
-// Form validation
 // Dropdowns (Bootstrap SCSS variables for dropdowns aren't supported in this child theme. )
 :root {
     --bs-dropdown-bg: var(--#{$prefix}body-bg); // !default;
@@ -144,7 +144,8 @@ $form-range-thumb-bg:                      $component-active-bg; // !default; NE
 }
 
 $dropdown-dark-color: #fff;
-$dropdown-dark-bg: $dropdown-bg;
+$dropdown-dark-bg: #2e0044;
+$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
 
 // Pagination
 $nav-pills-link-active-bg: #7a04b5;
@@ -187,23 +188,6 @@ $tiki-dark-footer-link-hover-color: #cf7bf8;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
-@mixin top-nav-dark {
-    --tiki-top-bg: var(--tiki-fivealive-theme-bg);
-    --tiki-top-color: #f9f9f9;
-    --tiki-top-hover-color: #f2f2f2;
-    --tiki-top-text-color: #f2f2f2;
-    --tiki-site-title-color: var(--tiki-top-color);
-    --tiki-site-subtitle-color: var(--tiki-top-color);
-    --tiki-top-border: solid #000;
-}
-
-@mixin topbar-nav-dark {
-    --tiki-topbar-bg: #180124;
-    --tiki-topbar-color: #f9f9f9;
-    --tiki-topbar-hover-color: #f2f2f2;
-    --tiki-topbar-text-color: #f2f2f2;
-}
-
 //@mixin top-nav-light {
 //    --tiki-top-bg: #{$tiki-top-bg}; // linear-gradient(to right, #300149 0%, #15001F 100%);
 //    --tiki-top-color: #f9f9f9;
@@ -229,8 +213,24 @@ $tiki-dark-footer-link-hover-color: #cf7bf8;
 //    }
 //}
 
+@mixin top-nav-dark {
+    --tiki-top-bg: var(--tiki-fivealive-theme-bg);
+    --tiki-top-color: #f9f9f9;
+    --tiki-top-hover-color: #f2f2f2;
+    --tiki-top-text-color: #f2f2f2;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
+    --tiki-top-border: solid #000;
+}
 
+@mixin topbar-nav-dark {
+    --tiki-topbar-bg: #180124;
+    --tiki-topbar-color: #f9f9f9;
+    --tiki-topbar-hover-color: #f2f2f2;
+    --tiki-topbar-text-color: #f2f2f2;
+}
 
+// This theme uses the dark mixins for both light and dark Look and Feel navbar options
 .tiki-top-nav-light {
     @include top-nav-dark;
 }

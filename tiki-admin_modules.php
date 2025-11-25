@@ -635,7 +635,6 @@ if (! empty($_REQUEST['edit_module'])) {    // pick up ajax calls
     }
     $smarty->assign('padding_top_layout', true);
     $smarty->assign('layout_has_modules', true);
-    $smarty->assign('theme_navbar_fixed_topbar_offset', $prefs["theme_navbar_fixed_topbar_offset"] + 35);
     $smarty->assign('mid', 'tiki-admin_modules.tpl');
     $smarty->display('tiki.tpl');
 }

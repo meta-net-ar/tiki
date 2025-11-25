@@ -19,7 +19,7 @@ $info:          #a51e37;
 $warning:       #A4660E; // f0ad4e;
 $danger:        #D63D00; //#ff5c1a;
 $light:         #F9DECA;
-$dark:          #a51e37;
+$dark:          #3c4822;
 
 $theme-colors: (
     "primary":           $primary,
@@ -364,6 +364,6 @@ header.navbar.fixed-top {
 .accordion {
     --bs-accordion-active-bg: #A9191DFF;
     --bs-accordion-active-color: #fff;
-    --bs-accordion-btn-bg: var(--tiki-topbar-bg);
+    --bs-accordion-btn-bg: #{$dark};
     --bs-accordion-btn-color: #fff;
 }
