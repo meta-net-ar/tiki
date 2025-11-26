@@ -4,8 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-require_once(dirname(__FILE__) . '/ApiBaseCategoriesTest.php');
+namespace Tiki\Lib\Test\Api\Categories;
 
 /**
  * Integration tests for Category DELETE API endpoint
