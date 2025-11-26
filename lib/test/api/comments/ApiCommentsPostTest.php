@@ -349,22 +349,16 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
             'Lock Test Comment 2',
             'This comment will be locked twice.'
         );
+        // First lock the comment
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->lock_comment($threadId);
+
+        // Try to lock already locked comment
         $data = [
             'type' => 'wiki page',
             'objectId' => static::$defaultComments['wiki page']['objectId'],
         ];
-        // First lock
-        $response1 = $this->makeApiRequest(
-            'POST',
-            '/comments/' . $threadId . '/lock',
-            'Admins',
-            $data,
-            'application/x-www-form-urlencoded'
-        );
-        $this->assertResponseStatus(200, $response1);
-
-        // Second lock attempt
-        $response2 = $this->makeApiRequest(
+        $response = $this->makeApiRequest(
             'POST',
             '/comments/' . $threadId . '/lock',
             'Admins',
@@ -372,7 +366,7 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
             'application/x-www-form-urlencoded'
         );
 
-        $body = $this->getResponseBody($response2);
+        $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Comments already locked.');
     }
 
@@ -422,29 +416,24 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
             'Unlock Test Comment',
             'This comment will be locked and then unlocked.'
         );
+        // First lock the comment
+        $commentslib = TikiLib::lib('comments');
+        $commentslib->lock_comment($threadId);
+
+        // Then unlock
         $data = [
             'type' => 'wiki page',
             'objectId' => static::$defaultComments['wiki page']['objectId'],
         ];
-        // First lock
-        $response1 = $this->makeApiRequest(
-            'POST',
-            '/comments/' . $threadId . '/lock',
-            'Admins',
-            $data,
-            'application/x-www-form-urlencoded'
-        );
-        $this->assertResponseStatus(200, $response1);
-        // Then unlock
-        $response2 = $this->makeApiRequest(
+        $response = $this->makeApiRequest(
             'POST',
             '/comments/' . $threadId . '/unlock',
             'Admins',
             $data,
             'application/x-www-form-urlencoded'
         );
-        $this->assertResponseStatus(200, $response2);
-        $body = $this->getResponseBody($response2);
+        $this->assertResponseStatus(200, $response);
+        $body = $this->getResponseBody($response);
         $this->assertValidLockCommentResponse($body);
         $this->assertTrue($body['status'] == 'DONE', 'Status should be DONE after unlocking the comment');
         $this->assertStringContainsString('Unlock comments', $body['title'], 'Title should indicate unlock action');

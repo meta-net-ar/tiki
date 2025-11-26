@@ -452,7 +452,7 @@ class Services_Comment_Controller
                 $status = 'DONE';
             }
         } else {
-            $status = 'DONE'; // Already gone
+            throw new Services_Exception_NotFound();
         }
 
 
