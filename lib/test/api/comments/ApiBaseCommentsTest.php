@@ -4,8 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Tiki\Lib\Test\Api\Comments;
 
-require_once(__DIR__ . '/../ApiTestCase.php');
+use ApiTestCase;
+use TikiLib;
+use Exception;
 
 /**
  * Base class for Comments API integration tests
