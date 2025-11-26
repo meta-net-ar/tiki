@@ -1,0 +1,273 @@
+<?php
+
+// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+//
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Tiki\Test\Api\Galleries;
+
+/**
+ * Tests for File Galleries API GET endpoints
+ *
+ * @group api-integration-test
+ * @group api-galleries
+ */
+class ApiGalleriesGetTest extends ApiBaseGalleriesTest
+{
+    public function testApiGetGalleriesWithoutPermission()
+    {
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries'
+        );
+
+        $this->assertResponseStatus(403, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied');
+    }
+
+    public function testApiGetGalleries()
+    {
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries',
+            'Admins'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidGalleryListResponse($body);
+        $this->assertEquals('List Galleries', $body['title'], 'Offset should be 0');
+        $this->assertEquals(1, $body['parentId'], 'parentId should be 1');
+    }
+
+    public function testApiGetGalleriesWithPagination()
+    {
+        $data = [
+            'offset' => 0,
+            'maxRecords' => 2,
+        ];
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidGalleryListResponse($body);
+
+        $this->assertEquals('List Galleries', $body['title'], 'Offset should be 0');
+        $this->assertEquals(1, $body['parentId'], 'parentId should be 1');
+        $this->assertEquals(0, $body['offset'], 'Offset should be 0');
+        $this->assertEquals(2, count($body['result']), 'Should return at most 2 results');
+        $this->assertEquals(2, $body['maxRecords'], 'maxRecords should be 2');
+    }
+
+    public function testApiGetGalleriesWithSorting()
+    {
+        $data = ['sort_mode' => 'name_asc'];
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidGalleryListResponse($body);
+
+        // Verify galleries are sorted by name (if we have multiple)
+        if (count($body['result']) > 1) {
+            $names = array_column($body['result'], 'name');
+            $sortedNames = $names;
+            sort($sortedNames);
+            $this->assertEquals($sortedNames, $names, 'Galleries should be sorted by name ascending');
+        }
+    }
+
+    public function testApiGetGalleriesWithSearch()
+    {
+        $data = ['find' => 'API_Test_Gallery_Child'];
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries',
+            'Admins',
+            $data,
+            'application/x-www-form-urlencoded'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidGalleryListResponse($body);
+        // Should return only galleries matching the search term (API_Test_Gallery_Child)
+        $this->assertEquals(1, count($body['result']), 'Should return 1 matching gallery');
+        $this->assertStringContainsString('API_Test_Gallery_Child', $body['result'][0]['name'], 'Gallery name should contain search term');
+    }
+
+    public function testApiGetGalleryInfo()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}",
+            'Admins'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidGalleryResponse($body);
+
+        $this->assertEquals($galleryId, $body['galleryId'], 'Should return the requested gallery');
+        $this->assertEquals('API_Test_Gallery_Default', $body['name'], 'Gallery name should match');
+    }
+
+    public function testApiGetNonExistentGalleryInfo()
+    {
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries/999999',
+            'Admins'
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Not found (404)');
+    }
+
+    public function testApiGetGalleryFilesWithoutPermission()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files"
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied');
+    }
+
+    public function testApiGetGalleryFiles()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+
+        $this->assertEquals($galleryId, $body['galleryId'], 'Should return files for the requested gallery');
+
+        // Verify our default file is in the list
+        $foundDefault = false;
+        foreach ($body['result'] as $file) {
+            if ($file['filename'] === 'test_file.txt') {
+                $foundDefault = true;
+                break;
+            }
+        }
+        $this->assertTrue($foundDefault, 'Default test file should be in the list');
+    }
+
+    public function testApiGetGalleryFilesWithPagination()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        // Add more files to ensure we have enough for pagination test
+        for ($i = 0; $i < 5; $i++) {
+            static::createFile(
+                $galleryId,
+                "test_file_{$i}.txt",
+                "Test File {$i}",
+                "This is test file number {$i} for API testing",
+                'text/plain',
+                "Test content for file number {$i} in galleries API"
+            );
+        }
+
+        $data = [
+            'offset' => 0,
+            'maxRecords' => 2,
+        ];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins',
+            $data
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+
+        $this->assertEquals('List files', $body['title'], 'Offset should be 0');
+        $this->assertEquals(2, count($body['result']), 'Should return at most 2 results');
+        $this->assertEquals($galleryId, $body['galleryId'], 'galleryId should be 1');
+        $this->assertEquals(0, $body['offset'], 'Offset should be 0');
+        $this->assertEquals(2, $body['maxRecords'], 'maxRecords should be 2');
+    }
+
+    public function testApiGetGalleryFilesWithSorting()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+
+        $data = ['sort_mode' => 'filename_asc'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins',
+            $data
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+
+        // verify files are sorted by filename (if we have multiple)
+        if (count($body['result']) > 1) {
+            $filenames = array_column($body['result'], 'name');
+            $sortedFilenames = $filenames;
+            sort($sortedFilenames);
+            $this->assertEquals($sortedFilenames, $filenames, 'Files should be sorted by name ascending');
+        }
+    }
+
+    public function testApiGetGalleryFilesWithSearch()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+
+        $data = ['find' => 'Test File'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins',
+            $data
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+
+        // should return only files matching the search term
+        $this->assertGreaterThanOrEqual(1, count($body['result']), 'Should return at least 1 matching file');
+        foreach ($body['result'] as $file) {
+            $this->assertStringContainsString('Test File', $file['name'], 'File name should contain search term');
+        }
+    }
+}

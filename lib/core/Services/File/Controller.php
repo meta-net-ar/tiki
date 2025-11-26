@@ -648,7 +648,12 @@ class Services_File_Controller
 
         $fileGallery = TikiLib::lib('filegal');
 
-        return $fileGallery->get_file_gallery_info($galleryId);
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
+        return $galleryInfo;
     }
 
     public function action_list_files($input)
