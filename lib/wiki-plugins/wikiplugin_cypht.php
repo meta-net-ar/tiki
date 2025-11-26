@@ -362,9 +362,16 @@ function wikiplugin_cypht($data, $params)
             $_SESSION[$session_prefix]['user_data']['imap_servers'] = [];
         }
         $found = false;
-        foreach ($_SESSION[$session_prefix]['user_data']['imap_servers'] as $server) {
+        foreach ($_SESSION[$session_prefix]['user_data']['imap_servers'] as $id => $server) {
             if ($server['server'] == $attributes['server'] && $server['tls'] == $attributes['tls'] && $server['port'] == $attributes['port'] && $server['user'] == $attributes['user']) {
                 $found = true;
+
+                if (array_diff($server, $attributes)) {
+                    TikiLib::lib('cache')->invalidate('imap_folders_imap_' . $id . '_');
+                    $headerlib->add_js("sessionStorage.clear();");
+                    $_SESSION[$session_prefix]['user_data']['imap_servers'][$id] = array_merge($server, $attributes);
+                }
+
                 break;
             }
         }

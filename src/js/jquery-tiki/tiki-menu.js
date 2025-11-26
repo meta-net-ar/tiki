@@ -34,11 +34,11 @@ $(function () {
         const rect = this.getBoundingClientRect();
 
         // Determine vertical and horizontal position
-        const vertical = rect.top < window.innerHeight / 2 ? "top" : "bottom";
-        const horizontal = rect.left < window.innerWidth / 2 ? "end" : "start";
+        const vertical = rect.top < window.innerHeight / 2 ? "top-t" : "bottom-b";
+        const horizontal = rect.left < window.innerWidth / 2 ? "end-l" : "start-r";
 
         // Remove existing position classes
-        $menu.removeClass("dropdown-menu-top dropdown-menu-bottom dropdown-menu-end dropdown-menu-start");
+        $menu.removeClass("dropdown-menu-top-t dropdown-menu-bottom-b dropdown-menu-end-l dropdown-menu-start-r");
 
         if (vertical && horizontal) {
             // Add new position classes

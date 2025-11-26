@@ -134,6 +134,7 @@ add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_delete_draft'
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_handler('compose', 'tiki_compose_from_draft', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
+add_output('search', 'add_multiple_move_to_trackers', true, 'imap', 'search_move_copy_controls', 'after');
 add_output('message_list', 'add_multiple_item_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 add_handler('ajax_smtp_save_draft', 'tiki_presave_draft', true, 'smtp', 'smtp_save_draft', 'before');
 add_handler('ajax_smtp_save_draft', 'tiki_save_draft', true, 'smtp', 'smtp_save_draft', 'after');

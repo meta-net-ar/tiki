@@ -160,18 +160,22 @@
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
-    max-height: 65vh;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.dropdown-menu-top,
-.dropdown-menu-end,
-.dropdown-menu-start {
+.dropdown-menu-top-t,
+.dropdown-menu-end-l,
+.dropdown-menu-start-r {
   top: 100%;
   bottom: auto;
   max-height: 40vh;
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: 3000;
+  z-index: 2000 !important;
+}
+
+.dropdown-menu-bottom-b {
+    max-height: 65vh;
+    z-index: 3000;
 }
