@@ -189,6 +189,37 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                     ]);
                 }
             }, ['email' => $email]);
+        } elseif (in_array($form['list_path'], ['sent', 'unread', 'combined_inbox', 'flagged', 'search', 'drafts'])) {
+            $imaps = [];
+            $ids = [];
+            foreach ($msg_ids as $msg_id) {
+                $full_path = explode('_', $msg_id);
+                $imap_server_id = $full_path[1];
+                $folder = hex2bin($full_path[3]);
+
+                if (! in_array($imap_server_id, array_keys($imaps))) {
+                    $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+                    $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+                    if (! imap_authed($imap)) {
+                        Hm_Msgs::add('ERRCould not authenticate with mail server');
+                        return;
+                    }
+                    if (! $imap->select_mailbox($folder)) {
+                        Hm_Msgs::add('ERRMailbox not found');
+                        return;
+                    }
+
+                    $imaps[$imap_server_id] = $imap;
+                }
+
+                $mailbox = $imaps[$imap_server_id];
+
+                list($msgs[], $headers_array[]) = get_message_data($mailbox, $folder, $full_path[2]);
+                $ids[] = $full_path[2];
+            }
+            if (count($ids)) {
+                bind_tracker_item_update_event($mailbox, $folder, $form, $ids, $this);
+            }
         } else {
             Hm_Msgs::add('ERRMessage from this source could not be moved');
             return;

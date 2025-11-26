@@ -320,3 +320,68 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
         return $res;
     }
 }
+
+/**
+ * @subpackage tiki/functions
+ * @return string ensure file was saved before removing it from remote mailbox
+ */
+if (! hm_exists('bind_tracker_item_update_event')) {
+    function bind_tracker_item_update_event($mailbox, $folder, $form, $msg_ids, $mod)
+    {
+        TikiLib::events()->bind('tiki.trackeritem.update', function ($args) {
+            $mailbox = $args['mailbox'];
+            $folder = $args['folder'];
+            $form = $args['form'];
+            $old = $args['old_values'][$form['tracker_field_id']];
+            $new = $args['values'][$form['tracker_field_id']];
+            $mod = $args['mod'];
+            if ($old != $new) {
+                // Check system preference for email-to-tracker mode
+                global $prefs;
+                $email_mode = $prefs['email_to_tracker_mode'] ?? 'move';
+
+                $trash_folder = false;
+                $specials = get_special_folders($mod, $form['imap_server_id']);
+                if (array_key_exists('trash', $specials) && $specials['trash']) {
+                    $trash_folder = $specials['trash'];
+                }
+
+                if ($email_mode == 'move') {
+                    foreach ($args['msg_ids'] as $msg_id) {
+                        if ($trash_folder && $trash_folder != hex2bin($form['folder'])) {
+                            $mailbox->message_action('MOVE', array($msg_id), $trash_folder);
+                        } else {
+                            if ($mailbox->message_action('DELETE', array($msg_id))) {
+                                $mailbox->message_action('EXPUNGE', array($msg_id));
+                            }
+                        }
+                    }
+                }
+            }
+        }, ['mailbox' => $mailbox, 'folder' => $folder, 'form' => $form, 'msg_ids' => $msg_ids, 'mod' => $mod]);
+    }
+}
+
+/**
+ * @subpackage tiki/functions
+ * @return string array message and headers
+ */
+if (! hm_exists('get_message_data')) {
+    function get_message_data($mailbox, $folder, $msg_id)
+    {
+        if (! $mailbox->select_mailbox($folder)) {
+            return [null, null];
+        }
+        $msg = $mailbox->get_message_content($msg_id, 0);
+        $msg = str_replace("\r\n", "\n", $msg);
+        $msg = str_replace("\n", "\r\n", $msg);
+        $msg = rtrim($msg) . "\r\n";
+
+        $headers = $mailbox->get_message_headers($msg_id);
+        if (! empty($headers['Flags'])) {
+            $msg = "Flags: " . $headers['Flags'] . "\r\n" . $msg;
+        }
+
+        return [$msg, $headers];
+    }
+}

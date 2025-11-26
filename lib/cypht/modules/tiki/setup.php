@@ -129,6 +129,7 @@ add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', '
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
+add_output('search', 'add_multiple_move_to_trackers', true, 'imap', 'search_move_copy_controls', 'after');
 setup_base_ajax_page('ajax_move_to_tracker', 'core');
 add_handler('ajax_move_to_tracker', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_move_to_tracker', 'imap_oauth2_token_check', true, 'imap');
