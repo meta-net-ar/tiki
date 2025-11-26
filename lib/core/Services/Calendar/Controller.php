@@ -582,6 +582,16 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             );
         }
 
+        $attachmentsGalleryId = $this->calendarLib->getAttachmentsGalleryId();
+
+        $canUploadAttachments = Perms::get(['type' => 'file gallery', 'object' => $attachmentsGalleryId])->upload_files;
+
+        // Load elFinder JS/CSS if enabled for file browsing
+        if ($prefs['fgal_elfinder_feature'] == 'y' && $prefs['fgal_tracker_existing_search'] == 'y') {
+            include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
+            \tikiElFinder::loadJSCSS();
+        }
+
         return [
             // collections
             'daynames'                   => $this->daynames,
@@ -621,6 +631,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'hideCalendarSelector'       => $input->prefill_start->text() !== '' && $input->target_user->text() !== '',
             // related tracker items
             'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
+            // file attachments
+            'attachmentsGalleryId'       => $attachmentsGalleryId,
+            'canUploadAttachments'       => $canUploadAttachments,
         ];
     }
 
@@ -838,6 +851,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                     $calitemId = $calitem['calitemId'];
                 } else {
                     $calitemId = $this->calendarLib->getMaxItemId();
+                }
+
+                // Handle file attachments
+                if ($calitemId && isset($calitem['attachments'])) {
+                    $fileIds = is_array($calitem['attachments'])
+                        ? $calitem['attachments']
+                        : array_filter(explode(',', (string) $calitem['attachments']));
+                    $this->calendarLib->setEventAttachments((int) $calitemId, $fileIds);
                 }
 
                 // Save the ip at the log for the addition of new calendar items
