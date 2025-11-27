@@ -717,7 +717,7 @@ CREATE TABLE `tiki_comments` (
   `user_ip` varchar(39) default NULL,
   `summary` varchar(240) default NULL,
   `smiley` varchar(80) default NULL,
-  `message_id` TEXT,
+  `message_id` TEXT default NULL,
   `in_reply_to` varchar(255) default NULL,
   `comment_rating` tinyint(2) default NULL,
   `archived` char(1) default NULL,

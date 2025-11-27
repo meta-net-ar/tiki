@@ -1,1 +1,0 @@
-ALTER TABLE `tiki_comments` ALTER COLUMN `message_id` DROP DEFAULT;
