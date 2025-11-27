@@ -2778,16 +2778,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v1.4.6",
+            "version": "v1.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "54c208d834dc2b4d4be6d3f4b8758f69666e72e9"
+                "reference": "93a0924b94885959acb90d3e87eb8b38d67add8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/54c208d834dc2b4d4be6d3f4b8758f69666e72e9",
-                "reference": "54c208d834dc2b4d4be6d3f4b8758f69666e72e9",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/93a0924b94885959acb90d3e87eb8b38d67add8c",
+                "reference": "93a0924b94885959acb90d3e87eb8b38d67add8c",
                 "shasum": ""
             },
             "require": {
@@ -2855,7 +2855,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2025-04-17T07:06:08+00:00"
+            "time": "2025-09-30T12:22:00+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -16188,5 +16188,5 @@
         "ext-soap": "0",
         "php": "7.4"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
