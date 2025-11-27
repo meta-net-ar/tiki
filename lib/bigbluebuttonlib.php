@@ -14,7 +14,7 @@ use BigBlueButton\Parameters\EndMeetingParameters;
 use BigBlueButton\Responses\GetMeetingInfoResponse;
 use BigBlueButton\Parameters\MetaParameters;
 use BigBlueButton\Exception\BigBlueButtonException;
-use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+use Tiki\Exceptions\BigBlueButton\SharedSecretKeyException;
 use BigBlueButton\Responses\ApiVersionResponse;
 
 /**
@@ -321,7 +321,7 @@ class BigBlueButtonLib
         $response = $this->bbb->getRecordings($recordingParams);
 
         if (! $response || ! $response->getRawXml()) {
-            throw new ServerSaltKeyException(tr('Invalid shared secret key entered. Please contact the site administrator to insert a valid shared secret key in the RTC > BigBlueButton control panel.'));
+            throw new SharedSecretKeyException(tr('Invalid shared secret key entered. Please contact the site administrator to insert a valid shared secret key in the RTC > BigBlueButton control panel.'));
         }
 
         $data = [];

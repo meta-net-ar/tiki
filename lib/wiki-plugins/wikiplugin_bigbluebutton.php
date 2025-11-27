@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+use Tiki\Exceptions\BigBlueButton\SharedSecretKeyException;
 
 function wikiplugin_bigbluebutton_info()
 {
@@ -159,7 +159,7 @@ function wikiplugin_bigbluebutton($data, $params)
 
         // Won't display anything if recordings were not loaded
         return $smarty->fetch('wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl');
-    } catch (ServerSaltKeyException $e) {
+    } catch (SharedSecretKeyException $e) {
         return WikiParser_PluginOutput::internalError($e->getMessage());
     } catch (Exception) {
         return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
