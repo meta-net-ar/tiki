@@ -2138,6 +2138,10 @@ class ParserLib extends TikiDb_Bridge
                         default:
                             if (isset($_GET[$name])) {
                                 $value = $_GET[$name];
+                                // Escape Smarty template delimiters to prevent template code injection in wiki context
+                                if ($this->option['inside_pretty'] ?? false) {
+                                    $value = str_replace(['{', '}'], ['&#123;', '&#125;'], $value);
+                                }
                             } else {
                                 $value = '';
                                 include_once('lib/wiki-plugins/wikiplugin_showpref.php');
