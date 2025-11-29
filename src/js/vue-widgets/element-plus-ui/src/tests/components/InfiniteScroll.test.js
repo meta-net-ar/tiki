@@ -76,7 +76,8 @@ describe("InfiniteScroll", () => {
             await vi.waitFor(() => {
                 expect(mirrorInputs).toHaveBeenCalledWith(
                     container[0],
-                    expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) })
+                    expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) }),
+                    givenProps.containerId
                 );
             });
 
@@ -115,7 +116,8 @@ describe("InfiniteScroll", () => {
 
             expect(mirrorInputs).toHaveBeenCalledWith(
                 container[0],
-                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) })
+                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) }),
+                givenProps.containerId
             );
 
             expect(screen.getAllByTestId("scrollbar-view")[0].innerHTML).toBe(container[0].outerHTML);
@@ -150,7 +152,8 @@ describe("InfiniteScroll", () => {
 
             expect(mirrorInputs).toHaveBeenCalledWith(
                 container[0],
-                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) })
+                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) }),
+                givenProps.containerId
             );
 
             expect(screen.getAllByTestId("scrollbar-view")[0].innerHTML).toBe(container[0].outerHTML);
@@ -224,7 +227,8 @@ describe("InfiniteScroll", () => {
             expect(mirrorInputs).toHaveBeenNthCalledWith(
                 2,
                 expect.any(DocumentFragment),
-                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) })
+                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) }),
+                givenProps.containerId
             );
         });
 
@@ -278,7 +282,8 @@ describe("InfiniteScroll", () => {
             expect(mirrorInputs).toHaveBeenNthCalledWith(
                 2,
                 expect.any(DocumentFragment),
-                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) })
+                expect.objectContaining({ value: expect.objectContaining({ wrapRef: expect.any(HTMLElement) }) }),
+                givenProps.containerId
             );
         });
 

@@ -1,6 +1,11 @@
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import mirrorInputs from "../../../helpers/infiniteScroll/mirrorInputs";
 import $ from "jquery";
+import mirrorInlineEditElements from "../../../helpers/infiniteScroll/mirrorInlineEditElements";
+
+vi.mock("../../../helpers/infiniteScroll/mirrorInlineEditElements", () => ({
+    default: vi.fn(),
+}));
 
 describe("mirrorInputs", () => {
     beforeAll(() => {
@@ -9,6 +14,7 @@ describe("mirrorInputs", () => {
 
     test("copies all input elements from the source container to the host parent element of infinite scroll component", () => {
         const givenSourceContainer = document.createElement("div");
+        const givenInfiniteScrollContainerId = "infinite-scroll-container-1";
         givenSourceContainer.innerHTML = `
             <input type="text" id="input-text" value="Sample Text" />
             <input type="checkbox" id="input-checkbox" checked />
@@ -35,7 +41,7 @@ describe("mirrorInputs", () => {
             },
         };
 
-        mirrorInputs(givenSourceContainer, mockScrollbarRef);
+        mirrorInputs(givenSourceContainer, mockScrollbarRef, givenInfiniteScrollContainerId);
 
         const mirroredInputs = mockHostParentElement.querySelectorAll("input, select, textarea");
         expect(mirroredInputs.length).toBe(7);
@@ -48,6 +54,8 @@ describe("mirrorInputs", () => {
             }
             expect(mirroredInput.style.display).toBe("none");
         });
+
+        expect(mirrorInlineEditElements).toHaveBeenCalledWith(givenSourceContainer, mockHostParentElement, givenInfiniteScrollContainerId);
     });
 
     test("synchronizes changes from original inputs to mirrored inputs and vice versa", async () => {
