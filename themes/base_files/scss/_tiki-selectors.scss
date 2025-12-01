@@ -716,21 +716,24 @@ ul.all_languages > li {
 }
 
 .editable-inline {
+    padding: 2px;
     padding-right: 20px;
     display: inline-block;
+    border: solid 2px transparent;
+
     .icon {
         font-size: small;
         margin-left: 0.4rem;
         display: inline;
     }
+
+    .popover {
+        z-index: 9;
+    }
 }
 
 .editable-inline.loaded {
-    width: 100%;
     background: $popover-bg;
-    padding: 6px;
-    border: 1px solid #eee;
-    border-radius: 4px;
     z-index: 2;
 }
 
@@ -741,12 +744,11 @@ ul.all_languages > li {
 }
 
 .editable-inline.modified {
-    border: solid 2px $danger;
-    padding: 2px;
+    border-color: $danger;
 }
 
 .editable-inline.unsaved {
-    border: solid 2px $danger;
+    border-color: $danger;
 }
 
 // .admintoclevel .actions input {

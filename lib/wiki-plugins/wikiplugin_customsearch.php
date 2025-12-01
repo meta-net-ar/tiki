@@ -212,7 +212,7 @@ function wikiplugin_customsearch($data, $params)
     } else {
         $recalllastsearch = 0;
     }
-    $offset = (int) $_REQUEST["offset"] ?? 0;
+    $offset = (int) ($_REQUEST["offset"] ?? 0);
     if (isset($_REQUEST['maxRecords'])) {
         $maxRecords = (int) $_REQUEST['maxRecords'];
     } elseif ($recalllastsearch && ! empty($_SESSION["customsearch_$id"]['maxRecords'])) {

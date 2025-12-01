@@ -127,7 +127,11 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
         // Parse current value (could be URL or JSON with cached data)
         $currentData = $this->parseStoredValue($currentValue);
 
-        $smarty->assign('field', $this->getFieldDefinition());
+
+        $smarty->assign('allow_multiple', $this->getOption('allow_multiple', 'n'));
+        $smarty->assign('show_playback_formats', $this->getOption('show_playback_formats', 'y'));
+        $smarty->assign('show_metadata', $this->getOption('show_metadata', 'y'));
+        $smarty->assign('meeting_filter', $this->getOption('meeting_filter', ''));
         $smarty->assign('input_mode', $inputMode);
         $smarty->assign('recordings', $recordings);
         $smarty->assign('current_value', $currentValue);
@@ -149,7 +153,8 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
             $recordingData = $this->getRecordingData($value);
         }
 
-        $smarty->assign('field', $this->getFieldDefinition());
+        $smarty->assign('show_playback_formats', $this->getOption('show_playback_formats', 'y'));
+        $smarty->assign('show_metadata', $this->getOption('show_metadata', 'y'));
         $smarty->assign('recording_data', $recordingData);
         $smarty->assign('value', $value);
 

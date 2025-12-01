@@ -2,7 +2,7 @@
     {if $tiki_p_admin == "y"}
         <div id="quickadmin" class="nav justify-content-end flex-nowrap">
             {if $only_shortcuts neq 'y'}
-                <div class="nav-item prefs-history-dropdown">
+                <div class="nav-item dropdown prefs-history-dropdown">
                     {if ! $js}<ul><li>{/if}
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-display="dynamic" data-flip="true" href="#" role="button">
                         {icon name="history"}

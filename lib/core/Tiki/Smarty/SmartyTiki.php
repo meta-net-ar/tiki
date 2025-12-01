@@ -526,6 +526,11 @@ class SmartyTiki extends Smarty
 
         if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST')) {
             require_once 'tiki-modules.php';
+            // Re-assign module_pref_errors after modules are loaded to capture errors from lazy rendering
+            if (Perms::get()->admin) {
+                $modlib = TikiLib::lib('mod');
+                $this->assign('module_pref_errors', $modlib->pref_errors);
+            }
         }
         $this->assign('TIKI_IN_INSTALLER', defined('TIKI_IN_INSTALLER'));
     }

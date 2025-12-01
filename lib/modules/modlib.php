@@ -1123,8 +1123,11 @@ class ModLib extends TikiLib
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
 
+            $prefslib = TikiLib::lib('prefs');
+
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
+                    $this->add_pref_error($mod_reference['name'], $preference);
                     return smarty_block_remarksbox(
                         [
                             'type' => 'warning',

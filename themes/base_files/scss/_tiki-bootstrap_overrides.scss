@@ -135,6 +135,14 @@ body.fullscreen.tiki.navbar-padding {
 //    word-wrap: normal;
 //    word-break: normal;
 }
+@media (max-width: 768px) {
+    .tiki.tiki-list_file_gallery .popover,
+    .tiki.tiki_file_galleries .popover,
+    .tiki.tiki_trackers .popover,
+    .tiki .wikiplugin-trackerlist .popover {
+        max-width: 90vw;
+    }
+}
 
 .tiki.tiki_wiki_page .popover {
     max-width: 50vw;

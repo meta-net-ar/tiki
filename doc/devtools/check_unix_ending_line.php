@@ -13,6 +13,11 @@ require dirname(__FILE__) . '/vcscommons.php';
 
 $dir = realpath(__DIR__ . '/../../');
 
+// Load LineEnding\Converter class
+include_once $dir . '/lib/core/LineEnding/Converter.php';
+// Import the class from namespace
+use Tiki\LineEnding\Converter;
+
 $excludePattern = [
     // composer related folders
     $dir . '/' . TIKI_VENDOR_NONBUNDLED_PATH,
@@ -21,10 +26,8 @@ $excludePattern = [
     // temp folder (generated files)
     $dir . '/' . TEMP_PATH,
 
-    // folders where node modules can be installed
-    $dir . '/lib/vue-mf/duration-picker/node_modules',
-    $dir . '/lib/vue-mf/kanban/node_modules',
-    $dir . '/lib/vue-mf/styleguide/node_modules',
+    // bin directory (executables)
+    $dir . '/bin',
 
     // libraries included in tiki, so taking it as is
     $dir . '/lib/openlayers/theme/default/style.tidy.css',
@@ -32,6 +35,11 @@ $excludePattern = [
     $dir . '/lib/openlayers/theme/default/google.tidy.css',
     $dir . '/lib/openlayers/theme/default/style.mobile.tidy.css',
     $dir . '/lib/vue/lib/ui-predicate-vue.css',
+];
+
+// Wildcard patterns - these can appear at multiple levels
+$wildcardExcludes = [
+    '/node_modules/',
 ];
 
 $extensions = [
@@ -59,6 +67,9 @@ if (empty($iterator)) {
     $iterator = new RecursiveIteratorIterator($dirIterator);
 }
 
+$converter = new Converter();
+$filesToCheck = [];
+
 foreach ($iterator as $file) {
     $currentFile = $file;
 
@@ -69,25 +80,31 @@ foreach ($iterator as $file) {
     $fileInfo = pathinfo($currentFile);
     $excludeFile = (str_replace($excludePattern, '', $currentFile) != $currentFile);
 
+    // Check wildcard patterns (e.g., node_modules at any level)
+    if (! $excludeFile) {
+        foreach ($wildcardExcludes as $pattern) {
+            if (strpos($currentFile, $pattern) !== false) {
+                $excludeFile = true;
+                break;
+            }
+        }
+    }
+
     if ($excludeFile === false) {
         if (isset($fileInfo['extension']) && in_array($fileInfo['extension'], $extensions)) {
-            $data = file($currentFile);
-            if (! count($data)) {
-                // empty file
-                continue;
-            }
-            $lastLine = $data[count($data) - 1];
-            $lineEnding = substr($lastLine, -1);
-
-            if ($lineEnding !== "\n") {
-                $message .= str_replace($dir . DIRECTORY_SEPARATOR, '', $currentFile) . PHP_EOL;
-            }
+            $filesToCheck[] = $currentFile;
         }
     }
 }
 
-if (! empty($message)) {
-    echo color('Files that do not end with a unix style end of line:', 'yellow') . PHP_EOL;
+// Use streaming detection for efficiency (no memory issues with large files)
+$affectedFiles = $converter->fix($filesToCheck, true); // report-only mode
+
+if (! empty($affectedFiles)) {
+    echo color('Files that do not have unix style line endings:', 'yellow') . PHP_EOL;
+    foreach ($affectedFiles as $file) {
+        $message .= str_replace($dir . DIRECTORY_SEPARATOR, '', $file) . PHP_EOL;
+    }
     info($message);
     exit(1);
 } else {

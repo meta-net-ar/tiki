@@ -87,6 +87,7 @@ class PrefsGen
                 'description' => tra('socnet settings enabled by your website admins?'),
                 'keywords' => 'social login',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'default' => 'n',
             ],
             '_loginEnabled' => [
@@ -94,6 +95,7 @@ class PrefsGen
                 'description' => tra('socnet to login users into your website'),
                 'keywords' => 'social login',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'dependencies' => [
                     '_socnetEnabled',
                     '_app_id',
@@ -121,6 +123,7 @@ class PrefsGen
                 'description' => tra('Application ID generated when registering this Tiki site as an application with them.'),
                 'keywords' => 'social login',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 100,
                 'default' => '',
             ],
@@ -129,6 +132,7 @@ class PrefsGen
                 'description' => tra('Application secret generated when registering this Tiki site as an application with them'),
                 'keywords' => 'social login',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 100,
                 'default' => '',
             ],
@@ -137,6 +141,7 @@ class PrefsGen
                 'description' => tra('Social network API (or graph) version - Hybridauth default will be used until implemented.'),
                 'keywords' => 'social login',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 30,
                 'default' => '',
             ],
@@ -145,6 +150,7 @@ class PrefsGen
                 'description' => tra('The default website name that will be used by the social network for every web page. This parameter will be used instead of the browser title.'),
                 'keywords' => 'social login',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 60,
                 'default' => '',
             ],
@@ -153,6 +159,7 @@ class PrefsGen
                 'description' => tra('The default image (logo, picture, etc) that will be used by the social network for every web page. The image must be specified as a URL or/and uploaded to the social network site.'),
                 'keywords' => 'social login',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 60,
                 'default' => '',
             ],
@@ -161,6 +168,7 @@ class PrefsGen
                 'description' => tra('Automatically create a Tiki user by the username of fb_xxxxxxxx for eg users logging in using Facebook if they do not yet have a Tiki account. If not, they will be asked to link or register a Tiki account'),
                 'keywords' => 'social networks',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'dependencies' => [
                     '_socnetEnabled',
                 ],
@@ -172,6 +180,7 @@ class PrefsGen
                 'description' => tra('A Tiki user prefix is auto-created such as xx_nnnnnnn, etc. Click reset if no prefix should be created.'),
                 'keywords' => 'social networks',
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'size' => 20,
                 'dependencies' => [
                     '_socnetEnabled',
@@ -184,6 +193,7 @@ class PrefsGen
                 'description' => tra('Automatically create a Tiki user email from the social network account'),
                 'keywords' => 'social networks',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'dependencies' => [
                     '_socnetEnabled',
                     '_autocreateuser',
@@ -195,6 +205,7 @@ class PrefsGen
                 'description' => tra('Automatically set a Tiki user tracker item from the social network account'),
                 'keywords' => 'social networks',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'dependencies' => [
                     '_socnetEnabled',
                     '_autocreateuser',
@@ -206,6 +217,7 @@ class PrefsGen
                 'description' => tra('Automatically create a Tiki user name/name from the social network account'),
                 'keywords' => 'social networks',
                 'type' => 'flag',
+                'tags' => ['experimental'],
                 'dependencies' => [
                     '_socnetEnabled',
                     '_autocreateuser',
@@ -365,6 +377,7 @@ class PrefsGen
                 'name' => tra('Social networks selected for configuration:'),
                 'description' => tra('Enable site users to sign in to and interact with social networks via Hybridauth'),
                 'type' => 'multicheckbox',
+                'tags' => ['experimental'],
                 'options' => $allProviders,
                 'default' => $allProviders,
                 ],
@@ -373,6 +386,7 @@ class PrefsGen
                 'name' => tra('Social networks selected for configuration:'),
                 'description' => tra('Enable site users to sign in to and interact with social networks via Hybridauth'),
                 'type' => 'multicheckbox',
+                'tags' => ['experimental'],
                 'options' => $allProviders,
                 'default' => [],
                 ],
@@ -380,6 +394,7 @@ class PrefsGen
                 'name' => tra('Enabled social network names- Do not use in forms:'),
                 'description' => tra('Hybridauth-enabled social network names'),
                 'type' => 'array',
+                'tags' => ['experimental'],
                 'default' => self::getEnabledProvidersNames(),
                 'hidden' => 'y',
                 //TODO does this array and hidden work? It looks like it is not...
@@ -388,6 +403,7 @@ class PrefsGen
                 'name' => tra('Social networks login base URL:'),
                 'description' => tra('This is for programmers - just add a social network name for a new social network.'),
                 'type' => 'text',
+                'tags' => ['experimental'],
                 'default' => self::getSocLoginBaseUrl(),
                 ],
             /*

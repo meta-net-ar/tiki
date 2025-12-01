@@ -2,8 +2,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+//
+// This JavaScript file is a handler for tiki-admin_menu_options.php
+// It contains shared knowledge about the menu options management interface
+// and handles the client-side interactions for menu option editing and deletion.
 
 import Sortable from "sortablejs";
+
+var ADMIN_MENU_OPTIONS_SCRIPT = "tiki-admin_menu_options.php";
 
 $(function () {
     var dirty = false,
@@ -104,11 +110,43 @@ $(function () {
 
         $options.on("click", ".option-remove", function () {
             if (confirm(tr("Are you sure you want to remove this option?"))) {
-                var tab = $(this).siblings("a.option-edit").attr("href");
-                $("#deletemenu").val(tab.split("&")[3]);
-                $("form").submit();
-                $(this).parents("li").first().remove();
-                setDirty();
+                var $li = $(this).parents("li").first();
+                var optionId = $li.data("id");
+                if (optionId) {
+                    var $form = $("form");
+                    var menuId = $form.find("input[name=menuId]").val();
+                    var ticket = $form.find("input[name=ticket]").val();
+
+                    // Submit deletion via POST
+                    $.post(
+                        ADMIN_MENU_OPTIONS_SCRIPT,
+                        {
+                            deletemenu: optionId,
+                            menuId: menuId,
+                            ticket: ticket,
+                        },
+                        function () {
+                            dirty = false;
+                            location.reload();
+                        }
+                    ).fail(function (jqXHR, textStatus, errorThrown) {
+                        var errorMessage = tr("An error occurred while deleting the menu option.");
+                        if (textStatus) {
+                            errorMessage += " " + tr("Status:") + " " + textStatus;
+                        }
+                        if (errorThrown) {
+                            errorMessage += " (" + errorThrown + ")";
+                        }
+                        if (jqXHR && jqXHR.status) {
+                            errorMessage += " [" + jqXHR.status;
+                            if (jqXHR.statusText) {
+                                errorMessage += " " + jqXHR.statusText;
+                            }
+                            errorMessage += "]";
+                        }
+                        feedback(errorMessage, "error");
+                    });
+                }
             }
             return false;
         });

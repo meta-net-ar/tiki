@@ -1530,6 +1530,7 @@ class Comments extends TikiLib
             }
             //need to sort within sections if sections are used (also works if sections aren't used)
             $sections = array_unique(array_column($result, 'section'));
+            $sorted = [];
             foreach ($sections as $section) {
                 foreach ($sortarray as $key => $data) {
                     if ($result[$key]['section'] === $section) {
