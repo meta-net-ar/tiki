@@ -514,6 +514,7 @@ class CategLib extends ObjectLib
     public function categorize($catObjectId, $categId, $user = '')
     {
         global $prefs;
+        $trklib = TikiLib::lib('trk');
         if (empty($categId)) {
             return;
         }
@@ -530,7 +531,8 @@ class CategLib extends ObjectLib
         $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if ($prefs['feature_actionlog'] == 'y') {
             $logslib = TikiLib::lib('logs');
-            $logslib->add_action('Categorized', $info['itemId'], $info['type'], "categId=$categId", $user);
+            $version = $trklib->last_log_version($info['itemId']) + 1;
+            $logslib->add_action('Categorized', $info['itemId'], $info['type'], $version, $user);
         }
         TikiLib::events()->trigger('tiki.object.categorized', [
             'object' => $info['itemId'],
@@ -546,6 +548,7 @@ class CategLib extends ObjectLib
     public function uncategorize($catObjectId, $categId)
     {
         global $prefs;
+        $trklib = TikiLib::lib('trk');
         $query = "delete from `tiki_category_objects` where `catObjectId`=? and `categId`=?";
         $result = $this->query($query, [(int)$catObjectId, (int)$categId], -1, -1, false);
 
@@ -556,7 +559,8 @@ class CategLib extends ObjectLib
         $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if ($prefs['feature_actionlog'] == 'y') {
             $logslib = TikiLib::lib('logs');
-            $logslib->add_action('Uncategorized', $info['itemId'], $info['type'], "categId=$categId");
+            $version = $trklib->last_log_version($info['itemId']) + 1;
+            $logslib->add_action('Uncategorized', $info['itemId'], $info['type'], $version);
         }
         TikiLib::events()->trigger('tiki.object.categorized', [
             'object' => $info['itemId'],

@@ -5181,8 +5181,21 @@ class TrackerLib extends TikiLib
             }
         }
     }
-
-    public function log($version, $itemId, $fieldId, $value = '')
+    /**
+     * The method saves the change log of a field of the trackeritem.
+     *
+     * @param int $itemId id of the item to add to the log.
+     * @param int $fieldId id of the field to add to the log.
+     * @param string $value value to add to the log. The function will create duplicate entries and a new version even if the value is not changed!
+     * @return void
+     */
+    public function trackerItemLogFieldValueChange(int $itemId, int $fieldId, string $value = '')
+    {
+        // determination of the next version of the log
+        $version = $this->last_log_version($itemId) + 1;
+        $this->log((int) $version, (int) $itemId, (int) $fieldId, $value);
+    }
+    private function log($version, $itemId, $fieldId, $value = '')
     {
         if ($value === null) {
             $value = ''; // we want to log it after all, so change is in history

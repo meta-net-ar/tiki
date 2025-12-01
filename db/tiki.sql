@@ -3223,6 +3223,8 @@ INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES 
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Created', 'trackeritem', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Viewed', 'trackeritem', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Removed', 'trackeritem', 'y');
+INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Categorized', 'trackeritem', 'y');
+INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Uncategorized', 'trackeritem', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Created', 'wiki page attachment', 'n');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Removed', 'wiki page attachment', 'n');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Categorized', 'wiki page', 'n');

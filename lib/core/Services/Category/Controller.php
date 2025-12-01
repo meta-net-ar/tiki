@@ -197,7 +197,17 @@ class Services_Category_Controller
             }
             //now add objects to the category
             if (count($filteredObjects)) {
+                $tracker_items_before_update = $this->getTrackerItemsObjects($filteredObjects);
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
+                $tracker_items_after_update = $this->getTrackerItemsObjects($filteredObjects);
+                // browse categorized objects
+                if (isset($return['objects'])) {
+                    foreach ($return['objects'] as $object) {
+                        if ($object['type'] === 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update);
+                        }
+                    }
+                }
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
@@ -255,7 +265,17 @@ class Services_Category_Controller
             }
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
+                $tracker_items_before_update = $this->getTrackerItemsObjects($filteredObjects);
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
+                $tracker_items_after_update = $this->getTrackerItemsObjects($filteredObjects);
+                // browse uncategorized objects
+                if (isset($return['objects'])) {
+                    foreach ($return['objects'] as $object) {
+                        if ($object['type'] === 'trackeritem') {
+                            $this->logCategorizedUncategorizedTrackeritem($object, $tracker_items_before_update, $tracker_items_after_update);
+                        }
+                    }
+                }
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
@@ -279,6 +299,52 @@ class Services_Category_Controller
                 'objects' => $objects,
             ];
         }
+    }
+    /**
+     * Saves the log when categorizing or uncategorizing a Trackeritem.
+     *
+     * @param int $object a key-value list containing the object id and type of the object whose log is to be saved
+     * @param array $tracker_items_before_update list of tracker items before the value update
+     * @param array $tracker_items_after_update list of tracker items after the value update
+     * @return void
+     */
+    private function logCategorizedUncategorizedTrackeritem(array $object, array $tracker_items_before_update, array $tracker_items_after_update)
+    {
+        if (isset($object['id'], $object['type']) and $object['type'] === 'trackeritem') {
+            $trklib = TikiLib::lib('trk');
+            // retrieve the tracker ID to which the item belongs
+            $trackerId = $trklib->get_tracker_for_item($object['id']);
+            $definition = Tracker_Definition::get($trackerId);
+            // retrieve the tracker fields that are of type category
+            if ($fieldIds = $definition->getCategorizedFields()) {
+                foreach ($fieldIds as $fieldId) {
+                    if (isset($tracker_items_before_update[$object['id']][$fieldId], $tracker_items_after_update[$object['id']][$fieldId]) && $tracker_items_before_update[$object['id']][$fieldId] != $tracker_items_after_update[$object['id']][$fieldId]) {
+                        $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
+                        $trklib->trackerItemLogFieldValueChange($object['id'], $fieldId, $itemValue);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * Return le tracker items des objets a categoriser ou a decategoriser.
+     *
+     * @param int $objects a list of objects to categorize or de-categorize,
+     * @return array
+     */
+    private function getTrackerItemsObjects(array $objects)
+    {
+        $trklib = TikiLib::lib('trk');
+        $tracker_items = [];
+        foreach ($objects as $object) {
+            if ($object['type'] === 'trackeritem') {
+                $tracker_item = $trklib->get_tracker_item($object['id']);
+                if ($tracker_item) {
+                    $tracker_items[$tracker_item['itemId']] = $tracker_item;
+                }
+            }
+        }
+        return $tracker_items;
     }
 
     public function action_select($input)
