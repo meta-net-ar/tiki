@@ -13,6 +13,8 @@ class Services_PDF_Controller
 
     public function action_get_pdf($input)
     {
+        global $prefs;
+
         // edit permission is needed to convert arbitrary text to PDF
         if (! Perms::get()->edit) {
             throw new Services_Exception_Denied();
@@ -20,6 +22,23 @@ class Services_PDF_Controller
 
         $contents = $input->contents->html();
         $filename = $input->filename->text();
+
+        $pdfsettings = $input->pdfsettings->json();
+        if ($pdfsettings) {
+            $pdfsettings = json_decode($pdfsettings, true);
+        }
+        if ($pdfsettings) {
+            $allowed_keys = [];
+            foreach ($prefs as $key => $_) {
+                if (str_starts_with($key, 'print_pdf_mpdf_')) {
+                    $allowed_keys[] = str_replace('print_pdf_mpdf_', '', $key);
+                }
+            }
+            $pdfsettings = array_intersect_key($pdfsettings, array_flip($allowed_keys));
+            $contents = "<pdfsettings " . implode('', array_map(function ($key) use ($pdfsettings) {
+                return $key . '="' . htmlspecialchars($pdfsettings[$key]) . '" ';
+            }, array_keys($pdfsettings))) . "></pdfsettings>" . $contents;
+        }
 
         if (empty($filename)) {
             $filename = 'contents.pdf';
