@@ -796,8 +796,11 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
         $moved = $fileGallery->move_file_gallery($galleryId, $new_parent_id);
 
+        // $moved returns a Tiki\TikiDb\PdoResult, so we need to check numrows.
+        $moved = $moved && $moved->numrows ?? false;
+
         if (! $moved) {
-            $msg = tr('An error occured while moving the file gallery: %0', $galleryId);
+            throw new Services_Exception_NotFound();
         } else {
             $msg = tr('The file gallery %0 has been moved', $galleryId);
         }
