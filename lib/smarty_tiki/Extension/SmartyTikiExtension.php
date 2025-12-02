@@ -88,6 +88,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\FileCanConvertToPdf(), 'handle'];
             case 'file_diagram':
                 return [new \SmartyTiki\Modifier\FileDiagram(), 'handle'];
+            case 'forummaskemail':
+                return [new \SmartyTiki\Modifier\ForumMaskEmail(), 'handle'];
             case 'forumname':
                 return [new \SmartyTiki\Modifier\ForumName(), 'handle'];
             case 'forumtopiccount':

@@ -54,6 +54,7 @@
                 {preference name=forum_match_regex}
                 {preference name=forum_moderator_notification}
                 {preference name=forum_moderator_email_approve}
+                {preference name=forum_mask_emails}
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Threads{/tr}</legend>

@@ -195,5 +195,11 @@ function prefs_forum_list()
             'type' => 'flag',
             'default' => 'y',
         ],
+        'forum_mask_emails' => [
+            'name' => tr('Mask emails'),
+            'description' => tr('Email information will be masked as "<2 letters>…@<2 letters>…"'),
+            'type' => 'flag',
+            'default' => 'n'
+        ],
     ];
 }

@@ -5756,6 +5756,7 @@ lib/test/bigbluebutton/config.xml -text
 lib/test/bigbluebutton/index.php -text
 lib/test/bootstrap.php -text
 lib/test/comments/CommentsTest.php -text
+lib/test/comments/CommentsEmailMaskingTest.php -text
 lib/test/comments/index.php -text
 lib/test/Core/Category/ManipulatorTest.php -text
 lib/test/Core/Category/index.php -text
@@ -6100,6 +6101,7 @@ lib/test/rating/index.php -text
 lib/test/shipping/ShippingTest.php -text
 lib/test/shipping/index.php -text
 lib/test/smarty_tiki/ModifierDurationTest.php -text
+lib/test/smarty_tiki/ModifierForumMaskEmailTest.php -text
 lib/test/smarty_tiki/index.php -text
 lib/test/wiki-plugins/CodeTest.php -text
 lib/test/wiki-plugins/TranslationOfTest.php -text

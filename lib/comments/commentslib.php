@@ -1881,6 +1881,7 @@ class Comments extends TikiLib
             $res = $comments->fetchFullRow(['threadId' => $id]);
         }
         if ($res && is_array($res)) { //if there is a comment with that id
+            $res = $this->maskFields($res);
             $this->add_comments_extras($res, $forum_info);
             if (! empty($res['objectType']) && $res['objectType'] == 'forum') {
                 $res['deliberations'] = $this->get_forum_deliberations($res['threadId']);
@@ -1892,6 +1893,33 @@ class Comments extends TikiLib
             $res = null;
         }
         return $res;
+    }
+
+    /**
+     * Mask forum comment fields
+     *
+     * @param array $data
+     * @return array
+     */
+    public function maskFields($data)
+    {
+        if (empty($data) || ! is_array($data)) {
+            return $data;
+        }
+
+        $fieldsToMaks = [
+            'title',
+            'data',
+            'userName'
+        ];
+
+        foreach ($fieldsToMaks as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = smarty_modifier_forummaskemail($data[$field]);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -2636,6 +2664,7 @@ class Comments extends TikiLib
                     }
                 }
             }
+            $ret[$key] = $this->maskFields($ret[$key]);
         }
 
         if ($old_sort_mode == 'replies_asc') {
