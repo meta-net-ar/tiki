@@ -833,6 +833,11 @@ class Services_File_Controller
             }
         }
 
+        $fileInfo = $fileGallery->get_file_info($fileId);
+        if (! $fileInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newFileId = $fileGallery->duplicate_file($fileId, $galleryId, $newName, $description);
 
         return [
@@ -863,6 +868,11 @@ class Services_File_Controller
         }
 
         $fileGallery = TikiLib::lib('filegal');
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newGalleryId = $fileGallery->duplicate_file_gallery($galleryId, $name, $description);
 
         return [
