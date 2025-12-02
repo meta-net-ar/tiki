@@ -432,6 +432,38 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
+    private function getFileUploadResponseSchema()
+    {
+        $info = array_merge(
+            $this->getFileRespoonseSchema()['info'],
+            [
+                'data' => 'string|null',
+                'lockedby' => 'string|null',
+                'comment' => 'string|null',
+                'archiveId' => 'int|null',
+                'deleteAfter' => 'int|string|null',
+                'ocr_state' => 'int|string|null',
+                'ocr_lang' => 'string|null',
+                'ocr_data' => 'string|null',
+                'search_data' => 'string|null'
+            ]
+        );
+
+        return [
+            'size' => 'int',
+            'name' => 'string',
+            'title' => 'string',
+            'description' => 'string|null',
+            'type' => 'string|null',
+            'fileId' => 'int|string', // FIXME: sometimes comes as string?
+            'galleryId' => 'int',
+            'md5sum' => 'string|null',
+            'ticket' => 'string|null',
+            'syntax' => 'string|null',
+            'info' => $info
+        ];
+    }
+
     /**
      * Assert that a gallery response has valid structure
      * @param array $response
@@ -450,6 +482,16 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     protected function assertValidGalleryListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getGalleriesListResponseSchema());
+    }
+
+    protected function assertValidGalleryInfoResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getInfoGalleriesResponseSchema());
+    }
+
+    protected function assertValidFileUploadResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getFileUploadResponseSchema());
     }
     
     protected function assertValidFileListResponse($response)
