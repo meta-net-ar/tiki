@@ -117,6 +117,31 @@ abstract class ApiTestCase extends TikiTestCase
             } elseif ($contentType === 'application/x-www-form-urlencoded') {
                 $env['CONTENT_DATA'] = http_build_query($data);
                 $env['CONTENT_LENGTH'] = strlen($env['CONTENT_DATA']);
+            } elseif ($contentType === 'multipart/form-data') {
+                $env['CONTENT_TYPE'] = $contentType;
+                $boundary = '----TikiTestBoundary' . md5(mt_rand());
+                $env['CONTENT_TYPE'] .= "; boundary=$boundary";
+
+                $multipart = '';
+
+                foreach ($data as $key => $value) {
+                    $multipart .= "--$boundary\r\n";
+                    if (file_exists($value)) {
+                        $filename = basename($value);
+                        $fileContent = file_get_contents($value);
+                        $multipart .= "Content-Disposition: form-data; name=\"$key\"; filename=\"$filename\"\r\n";
+                        $multipart .= "Content-Type: application/octet-stream\r\n\r\n";
+                        $multipart .= $fileContent . "\r\n";
+                    } else {
+                        $multipart .= "Content-Disposition: form-data; name=\"$key\"\r\n\r\n";
+                        $multipart .= "$value\r\n";
+                    }
+                }
+
+                $multipart .= "--$boundary--\r\n";
+
+                $env['CONTENT_DATA'] = $multipart;
+                $env['CONTENT_LENGTH'] = strlen($multipart);
             }
         }
 

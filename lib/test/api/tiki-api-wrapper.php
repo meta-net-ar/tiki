@@ -29,6 +29,36 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH'])) {
         } elseif (strpos($contentType, 'application/x-www-form-urlencoded') !== false) {
             parse_str($input, $postData);
             $_POST = array_merge($_POST, $postData);
+        } elseif (strpos($contentType, 'multipart/form-data') !== false) {
+            if (preg_match('/boundary=(.*)$/', $contentType, $matches)) {
+                $boundary = trim($matches[1]);
+                $parts = explode('--' . $boundary, $input);
+
+                foreach ($parts as $part) {
+                    if (empty(trim($part)) || $part === '--') {
+                        continue;
+                    }
+
+                    if (preg_match('/Content-Disposition:.*?name=\"([^\"]+)\"(?:; filename=\"([^\"]+)\")?/', $part, $dispMatch)) {
+                        $name = $dispMatch[1];
+                        $filename = $dispMatch[2] ?? null;
+                        
+                        // Split on \r\n\r\n to separate headers from content
+                        $partPieces = preg_split('/\r\n\r\n/', $part, 2);
+                        $value = $partPieces[1] ?? '';
+
+                        if ($filename) {
+                            $_POST[$name] = base64_encode($value);
+                            $_POST['name'] = $filename;
+                            $_POST['size'] = strlen($value);
+                            $_POST['type'] = 'application/octet-stream';
+                        } else {
+                            // For regular form fields, trim the value
+                            $_POST[$name] = trim($value);
+                        }
+                    }
+                }
+            }
         }
     }
 }
