@@ -553,13 +553,13 @@ class RSSLib extends TikiDb_Bridge
      * @return array
      * @throws Exception
      */
-    private function update_feed($url, $rssId = null, $actions = null): array
+    private function update_feed($url, $rssId = null, $actions = null, $requestLastModifiedHeader = null): array
     {
         global $tikilib;
         $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => self::DEFAULT_FEED_TTL, 'lastUpdated' => $tikilib->now];
         $filter = $this->createFilter();
-        $feed = $this->fetchFeed($url);
-        if (! $feed) {
+        $feedResponse = $this->fetchFeed($url, $requestLastModifiedHeader);
+        if (! $feedResponse) {
             if ($rssId) {
                 $this->modules->update(
                     [
@@ -572,6 +572,13 @@ class RSSLib extends TikiDb_Bridge
             }
             return $success;
         }
+
+        $feed = $feedResponse['content'];
+
+        if (isset($feedResponse['headers']['Last-Modified'])) {
+            $success['lastModified'] = $feedResponse['headers']['Last-Modified'];
+        }
+
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
         $siteUrl = TikiFilter::get('url')->filter($feed->getLink());
         $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
@@ -1055,19 +1062,23 @@ class RSSLib extends TikiDb_Bridge
         return  $data;
     }
 
-    private function fetchFeed(string $url)
+    private function fetchFeed(string $url, $lastModified = null)
     {
         global $tikilib, $prefs;
         try {
-            if (isset($prefs['use_rss_proxy']) && $prefs['use_rss_proxy'] == 'y') {
-                $content = $tikilib->httprequest($url, useRssProxy: true);
-            } else {
-                $content = $tikilib->httprequest($url);
+
+            $headers = [];
+            if ($lastModified) {
+                $headers['If-Modified-Since'] = $lastModified;
             }
 
-            if ($content) {
-                return Laminas\Feed\Reader\Reader::importString($content);
+            $useProxy = $prefs['use_rss_proxy'] == 'y';
+            $res = $tikilib->advanced_httprequest($url, $headers, ['Last-Modified'], $useProxy);
+
+            if ($res) {
+                return ['headers' => $res['headers'], 'content' => Laminas\Feed\Reader\Reader::importString($res['body'])];
             }
+
             throw new Laminas\Feed\Exception\RuntimeException('Unreadable feed.');
         } catch (Laminas\Feed\Exception\ExceptionInterface) {
             return null;

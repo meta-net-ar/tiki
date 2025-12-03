@@ -585,6 +585,34 @@ class TikiLib extends TikiDb_Bridge
         }
     }
 
+    /**
+     * @param $url
+     * @param array $headers
+     * @param array $headers_out Headers to return in the output, specified as an array of header names.
+     * @param bool $useRssProxy Whether to use the RSS proxy settings for this request
+     * @return bool|array
+     */
+    public function advanced_httprequest($url, $headers = [], $headers_out = [], $useRssProxy = false)
+    {
+        try {
+            $client = $this->get_http_client($url, useRssProxy: $useRssProxy);
+            $client->setHeaders($headers);
+            $response = $this->http_perform_request($client);
+
+            if (! $response->isSuccess()) {
+                return false;
+            }
+
+            foreach ($headers_out as $header) {
+                $headers_out[$header] = $response->getHeaders()->get($header);
+            }
+
+            return ['headers' => $headers_out, 'body' => $response->getBody()];
+        } catch (Laminas\Http\Exception\ExceptionInterface $e) {
+            return false;
+        }
+    }
+
     /*shared*/
     /**
      * @param $name
