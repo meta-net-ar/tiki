@@ -558,7 +558,7 @@ class RSSLib extends TikiDb_Bridge
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
         $siteUrl = TikiFilter::get('url')->filter($feed->getLink());
         $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
-        
+
         $xml = $feed->saveXML();
         if (preg_match('/<ttl>(\d+)<\/ttl>/i', $xml, $matches)) {
             $success['ttl'] = (int)$matches[1];
