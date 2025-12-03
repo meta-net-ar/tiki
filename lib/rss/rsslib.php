@@ -19,6 +19,7 @@ class RSSLib extends TikiDb_Bridge
      * Limit of the name field of the tiki_rss_modules table
      */
     public const MAX_EXTERNAL_FEED_NAME_LENGTH = 200;
+    private static string $cache_ttl_key = 'rss_feed_ttl';
 
     public function __construct()
     {
@@ -538,7 +539,7 @@ class RSSLib extends TikiDb_Bridge
     private function update_feed($url, $rssId = null, $actions = null): array
     {
         global $tikilib;
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => []];
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => 0];
         $filter = $this->createFilter();
         $feed = $this->fetchFeed($url);
         if (! $feed) {
@@ -557,6 +558,12 @@ class RSSLib extends TikiDb_Bridge
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
         $siteUrl = TikiFilter::get('url')->filter($feed->getLink());
         $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
+        
+        $xml = $feed->saveXML();
+        if (preg_match('/<ttl>(\d+)<\/ttl>/i', $xml, $matches)) {
+            $success['ttl'] = (int)$matches[1];
+        }
+
         if ($rssId) {
             $this->modules->update(
                 [
@@ -1077,7 +1084,12 @@ class RSSLib extends TikiDb_Bridge
 
         $cache_feed_key = self::$cache_feed_key . md5($url);
         $cache_meta_key = self::$cache_meta_Key . md5($url);
-        $refresh_time = $tikilib->now - $params['refresh'] * 60;
+        $cache_ttl_key = self::$cache_ttl_key . md5($url);
+
+        $cached_ttl = self::$cachelib->getSerialized($cache_ttl_key);
+        $ttl = max($cached_ttl, $params['refresh']);
+        $refresh_time = $tikilib->now - $ttl * 60;
+
         $cache_feed_items = self::$cachelib->getSerialized($cache_feed_key, '', $refresh_time);
         $cache_meta = self::$cachelib->getSerialized($cache_meta_key, '', $refresh_time);
 
@@ -1090,6 +1102,7 @@ class RSSLib extends TikiDb_Bridge
             $title = $result['siteMeta'];
             self::$cachelib->cacheItem($cache_feed_key, serialize($items));
             self::$cachelib->cacheItem($cache_meta_key, serialize($title));
+            self::$cachelib->cacheItem($cache_ttl_key, serialize($result['ttl']));
         }
 
         $params = array_merge($params, [
