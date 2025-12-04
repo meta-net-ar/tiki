@@ -560,9 +560,7 @@ class RSSLib extends TikiDb_Bridge
         $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
 
         $xml = $feed->saveXML();
-        if (preg_match('/<ttl>(\d+)<\/ttl>/i', $xml, $matches)) {
-            $success['ttl'] = (int)$matches[1];
-        }
+        $success['ttl'] = $this->extractTtlFromFeed($xml);
 
         if ($rssId) {
             $this->modules->update(
@@ -1071,6 +1069,19 @@ class RSSLib extends TikiDb_Bridge
             }
         }
         return $data;
+    }
+
+    private static function extractTtlFromFeed($xml): int
+    {
+        $DOM = new DOMDocument();
+        @$DOM->loadXML($xml);
+        $xpath = new DOMXPath($DOM);
+
+        $ttlNodes = $xpath->query('//*[local-name()="channel"]/*[local-name()="ttl"]');
+        if ($ttlNodes->length > 0) {
+            return (int)$ttlNodes->item(0)->nodeValue;
+        }
+        return 0;
     }
 
     public function loadRss(array $params): array
