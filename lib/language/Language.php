@@ -682,7 +682,7 @@ class Language extends TikiDb_Bridge
         } elseif (! empty($prefs['language'])) {
             $language = $prefs['language'];
         } else {
-            $language = $prefs['site_language'] ?: $language;
+            $language = $prefs['site_language'] ?? $language;
         }
         return $language;
     }

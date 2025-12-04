@@ -724,14 +724,14 @@ CREATE TABLE `tiki_comments` (
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
-  UNIQUE KEY `no_repeats` (`parentId`, `userName`(40), `title`(43), `commentDate`, `message_id`(40), `in_reply_to`(40)),
+  UNIQUE KEY `no_repeats` (`parentId`, `userName`(20), `title`(30), `commentDate`, `message_id`(30), `in_reply_to`(30)),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
   KEY `hits` (hits),
   KEY `tc_pi` (`parentId`),
   KEY `objectType` (object(160), `objectType`),
   KEY `commentDate` (`commentDate`),
-  KEY `threaded` (message_id(89), in_reply_to(88), `parentId`),
+  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`),
   KEY `idx_slvn_commentDate` (`commentDate`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 

@@ -7,9 +7,9 @@
 namespace TikiDevTools;
 
 require_once(__DIR__ . '/../../path_constants.php');
-use DBDiff;
 use Exception;
 use PDO;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Tiki\Process\Process;
 use TikiDb;
@@ -647,41 +647,54 @@ class CheckSchemaUpgrade
     {
         $outputFile = tempnam(sys_get_temp_dir(), 'dbdiff_');
 
-        $argv = $GLOBALS['argv'];
-        $fakeArgv = [
-            $argv[0],
-                sprintf('--server1=%s:%s@%s', $this->oldDb['user'], $this->oldDb['pass'], $this->oldDb['host']),
-            sprintf('--server2=%s:%s@%s', $this->newDb['user'], $this->newDb['pass'], $this->newDb['host']),
-            '--type=all',
-            '--include=all',
-            sprintf('--template=%s', __DIR__ . '/dbdiff/tiki.tmpl'),
-            '--nocomments=true',
-            sprintf('server1.%s:server2.%s', $this->oldDb['dbs'], $this->newDb['dbs']),
-            sprintf('--output=%s', $outputFile),
+        // Build command
+        $cmd = [
+            'php',
+            'doc/devtools/dbdiff/vendor/bin/dbdiff',
+            "--server1={$this->oldDb['user']}:{$this->oldDb['pass']}@{$this->oldDb['host']}",
+            "--server2={$this->newDb['user']}:{$this->newDb['pass']}@{$this->newDb['host']}",
+            "--type=all",
+            "--include=all",
+            "--template=" . __DIR__ . "/dbdiff/tiki.tmpl",
+            "--nocomments=true",
+            "server1.{$this->oldDb['dbs']}:server2.{$this->newDb['dbs']}",
+            "--output=$outputFile",
         ];
-        $GLOBALS['argv'] = $fakeArgv;
 
-        $dbdiff = new DBDiff\DBDiff();
-
-        $errorLevel = error_reporting();
-        ob_start();
-        try {
-            error_reporting($errorLevel & ~E_NOTICE); // DBDiff returns some notices of undefined offsets
-            $dbdiff->run();
-            error_reporting($errorLevel);
-        } catch (\Exception $e) {
-            error_reporting($errorLevel);
-            ob_end_flush();
-            throw $e;
+        // Display the command if verbose
+        if ($this->verbose) {
+            $escapedCmd = implode(' ', array_map('escapeshellarg', $cmd));
+            $this->printMessage("Running: $escapedCmd");
         }
 
-        $output = ob_get_clean();
+        // Run process
+        $process = new Process($cmd);
+        $process->setTimeout(600); // 10 minutes
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $e) {
+            $this->printMessageError("==Process failed:==\n");
+            $this->printMessageError($e->getMessage());
+            $err = trim($process->getErrorOutput());
+            if ($err !== '') {
+                $this->printMessageError("==Errors ==\n$err");
+            }
+            throw $e; // stop execution
+        }
 
         if ($this->verbose) {
-            echo $output;
-        }
+            $out = trim($process->getOutput());
+            $err = trim($process->getErrorOutput());
 
-        $GLOBALS['argv'] = $argv;
+            if ($out !== '') {
+                $this->printMessage("==Output ==\n$out");
+            }
+
+            if ($err !== '') {
+                $this->printMessageError("==Errors ==\n$err");
+            }
+        }
 
         $originalResult = trim(file_get_contents($outputFile));
         unlink($outputFile);
@@ -704,6 +717,7 @@ class CheckSchemaUpgrade
 
         throw new Exception('DB compare error');
     }
+
 
     protected function filterPreferencesChanges($results)
     {

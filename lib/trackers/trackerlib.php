@@ -6819,7 +6819,7 @@ class TrackerLib extends TikiLib
         return array_filter(
             array_map(function ($user) {
                 return trim($user ?? '');
-            }, is_array($value) ? $value : str_getcsv($value ?? '', escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)),
+            }, is_array($value) ? $value : str_getcsv($value ?? '', ',', '"', TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)),
         );
     }
 

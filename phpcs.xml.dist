@@ -16,6 +16,7 @@
     <exclude-pattern>*/vendor_bundled/vendor/*</exclude-pattern>
     <exclude-pattern>*/vendor_custom/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/gitlab-ci-local/*</exclude-pattern>
 
     <!-- libraries bundled with tiki -->
     <exclude-pattern>*/lib/dracula/*</exclude-pattern>
@@ -88,26 +89,13 @@
     <!-- ## Exceptions for compatibility check -->
 
     <!-- Skip check compatibility for functions included as polyfill -->
-    <rule ref="PHPCompatibility">
-        <!-- polyfill-php82: https://github.com/symfony/polyfill-php82/tree/main/bootstrap.php and
-             https://github.com/symfony/polyfill-php82/tree/main/Resources/stubs -->
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_is_quotedFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_should_quoteFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_quoteFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ini_parse_quantityFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.random_brokenrandomengineerrorFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.random_randomerrorFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.random_randomexceptionFound"/>
+    <!-- polyfill-php82: https://github.com/symfony/polyfill-php82/tree/main/bootstrap.php and -->
 
-        <!-- polyfill-php83: https://github.com/symfony/polyfill-php83/tree/main/bootstrap.php and
-             https://github.com/symfony/polyfill-php83/tree/main/Resources/stubs -->
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.json_validateFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.mb_str_padFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ldap_exop_syncFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ldap_connect_walletFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.stream_context_set_optionsFound"/>
-    </rule>
-
+    <rule ref="PHPCompatibilitySymfonyPolyfillPHP82" />
+    <rule ref="PHPCompatibilitySymfonyPolyfillPHP83" />
+    <rule ref="PHPCompatibilitySymfonyPolyfillPHP84" />
+    <rule ref="PHPCompatibilitySymfonyPolyfillPHP85" />
+    
     <!--
         # PHP Coding Standards
     -->

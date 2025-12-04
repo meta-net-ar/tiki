@@ -166,6 +166,11 @@
         "  sebastian/diff: ",
         "    provides SebastianBergmann\\Diff\\Differ",
         "    Used by phpunit and console.php index:compare-engines",
+        "",
+        "  phpcompatibility/php-compatibility: ",
+        "    https://github.com/PHPCompatibility/PHPCompatibility",
+        "    A set of sniffs for PHP_CodeSniffer that checks for ",
+        "    PHP cross-version compatibility.",
         ""
 
     ],
@@ -295,6 +300,9 @@
         "overtrue/phplint": "~9.0",
         "php-webdriver/webdriver": "~1.15",
         "phpcompatibility/php-compatibility": "~10.x-dev",
+        "phpcompatibility/phpcompatibility-paragonie": "~2.0@dev",
+        "phpcompatibility/phpcompatibility-passwordcompat":"~2.0@dev",
+        "phpcompatibility/phpcompatibility-symfony": "~2.0@dev",
         "phpcsstandards/phpcsutils": "~1.0",
         "phpstan/phpstan": "~2.1",
         "phpstan/phpstan-deprecation-rules": "~2.0",

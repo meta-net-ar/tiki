@@ -369,9 +369,14 @@ if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $versionUtils = new Tiki_Version_Utils();
     $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
 
+    $gitlib = TikiLib::lib('git');
+    $gitDetails = $gitlib->isGitInstall() ? $gitlib->getGitDetails()['content'] : [];
+
     $smarty->assign('upgrade_messages', $upgrades);
+    $smarty->assign('git_details', $gitDetails);
 } else {
     $smarty->assign('upgrade_messages', []);
+    $smarty->assign('git_details', []);
 }
 
 // SSL setup

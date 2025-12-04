@@ -31,32 +31,15 @@ function module_git_detail($mod_reference, $module_params)
     $smarty = TikiLib::lib('smarty');
     /** @var GitLib $gitlib */
     $gitlib = TikiLib::lib('git');
-    $error = '';
-    $content = [];
-    include_once('lib/setup/twversion.class.php');
-    $TWV = new TWVersion();
-    $version = $TWV->getVersion();
 
-    try {
-        $content = $gitlib->get_info();
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-    } catch (Error $e) {
-        $error = $e->getMessage();
-    } catch (Throwable $e) {
-        $error = $e->getMessage();
+    if (! $gitlib->isGitInstall()) {
+        $smarty->assign('error', tra('Not a Git installation'));
+        $smarty->assign('content', []);
+        return;
     }
 
-    if (empty($content)) {
-        $content = [
-            'version' => $version,
-            'commit' => 'N/A',
-            'date' => 'N/A',
-            'branch' => 'N/A',
-            'remote' => 'N/A',
-        ];
-    }
+    $result = $gitlib->getGitDetails();
 
-    $smarty->assign('error', $error);
-    $smarty->assign('content', $content);
+    $smarty->assign('error', $result['error']);
+    $smarty->assign('content', $result['content']);
 }
