@@ -454,7 +454,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                     return hex2bin($value);
                 })
                 ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-                    $info['fields'][$permName] = bin2hex($value);
+                    $info['fields'][$permName] = is_null($value) ? null : bin2hex($value);
                 })
                 ;
         } else {
