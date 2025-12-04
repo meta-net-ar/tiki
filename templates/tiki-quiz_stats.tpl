@@ -11,7 +11,8 @@
 {/if}
 
 <div class="table-responsive">
-<table class="table">
+<table class="table" id="quiz-stats-table">
+    <thead>
     <tr>
         <th>
             <a href="tiki-quiz_stats.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'quizName_desc'}quizName_asc{else}quizName_desc{/if}">{tr}Quiz{/tr}</a>
@@ -26,7 +27,9 @@
             <a href="tiki-quiz_stats.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'avgtime_desc'}avgtime_asc{else}avgtime_desc{/if}">{tr}Av time{/tr}</a>
         </th>
     </tr>
+    </thead>
 
+    <tbody id="quiz-stats-body">
     {section name=user loop=$channels}
         {if ($tiki_p_admin eq 'y') or ($channels[user].individual eq 'n' and $tiki_p_view_quiz_stats eq 'y') or ($channels[user].individual_tiki_p_view_quiz_stats eq 'y')}
             <tr>
@@ -39,7 +42,13 @@
     {sectionelse}
         {norecords _colspan=4}
     {/section}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="quiz-stats-table" target-container-id="quiz-stats-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

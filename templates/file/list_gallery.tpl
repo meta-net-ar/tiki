@@ -5,7 +5,7 @@
 {/block}
 
 {block name="content"}
-    <ul class="media-list list-unstyled ps-0 mb-0">
+    <ul class="media-list list-unstyled ps-0 mb-0" id="list-gallery">
         {foreach from=$results item=row}
             <li class="d-flex align-items-start border-bottom py-2 px-2">
                 <div class="form-check mt-2 me-2">
@@ -38,5 +38,9 @@
             </li>
         {/foreach}
     </ul>
-    {pagination_links resultset=$results}{service controller=file action=list_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}{/pagination_links}
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="list-gallery" offset="{$results.offset}" step="{$results.maxRecords}" total-count="{$results.count}" load-url="{service controller=file action=list_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}"></el-infinite-scroll>
+    {else}
+        {pagination_links resultset=$results}{service controller=file action=list_gallery galleryId=$galleryId plain=1 search=$search type=$typeFilter}{/pagination_links}
+    {/if}
 {/block}

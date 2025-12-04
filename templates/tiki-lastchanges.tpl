@@ -30,7 +30,8 @@
     {tr}Found{/tr} "<b>{$findwhat|escape}</b>" {tr}in{/tr} {$records_count|escape} {tr}LastChanges{/tr}
 {/if}
 <div class="table-responsive">
-<table class="table">
+<table class="table" id="lastchanges-table">
+    <thead>
     <tr>
         <th>{self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Date{/tr}{/self_link}</th>
         <th>{self_link _sort_arg='sort_mode' _sort_field='object'}{tr}Page{/tr}{/self_link}</th>
@@ -42,7 +43,9 @@
         <th>{self_link _sort_arg='sort_mode' _sort_field='comment'}{tr}Comment{/tr}{/self_link}</th>
         <th>{tr}Action{/tr}</th>
     </tr>
+    </thead>
 
+    <tbody id="lastchanges-body">
     {section name=changes loop=$lastchanges}
         <tr>
             <td class="date">{$lastchanges[changes].lastModif|tiki_short_datetime}</td>
@@ -79,6 +82,13 @@
     {sectionelse}
         {norecords _colspan=7}
     {/section}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="lastchanges-table" target-container-id="lastchanges-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$records_count}"></el-infinite-scroll>
+{/if}
 </div>
-{pagination_links count=$records_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$records_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

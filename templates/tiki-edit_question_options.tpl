@@ -39,15 +39,17 @@
 {include file='find.tpl'}
 
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="edit-q-options-table">
+        <thead>
         <tr>
             <th><a href="tiki-edit_question_options.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'optionId_desc'}optionId_asc{else}optionId_desc{/if}">{tr}ID{/tr}</a></th>
             <th><a href="tiki-edit_question_options.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'optionText_desc'}optionText_asc{else}optionText_desc{/if}">{tr}text{/tr}</a></th>
             <th><a href="tiki-edit_question_options.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'points_desc'}points_asc{else}points_desc{/if}">{tr}points{/tr}</a></th>
             <th></th>
         </tr>
+        </thead>
 
-
+        <tbody id="edit-q-options-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="id">{$channels[user].optionId}</td>
@@ -80,7 +82,13 @@
         {sectionelse}
             {norecords _colspan=4}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="edit-q-options-table" target-container-id="edit-q-options-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

@@ -1,4 +1,4 @@
-<ul class="list-unstyled media-list">
+<ul class="list-unstyled media-list" id="media-container">
     {foreach from=$results item=row}
         <li class="media">
             {if $icon and $icon.field}
@@ -17,4 +17,8 @@
         </li>
     {/foreach}
 </ul>
-{pagination_links resultset=$results}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="media-container" offset="{$results.offset}" step="{$results.maxRecords}" total-count="{$results.count}"></el-infinite-scroll>
+{else}
+    {pagination_links resultset=$results}{/pagination_links}
+{/if}

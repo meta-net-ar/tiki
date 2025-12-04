@@ -221,7 +221,9 @@
             {else}
                 {self_link max=$prefs.maxRecords}{tr}Pagination{/tr}{/self_link}
             {/if}
-            {pagination_links count=$count step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links count=$count step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
+            {/if}
             {tr}Records:{/tr} {$count}
             {if !empty($actionlogs)}
                 <a href="#Statistics">{tr}See Statistics{/tr}</a><br/>
@@ -230,7 +232,7 @@
                 {ticket}
                 {query _type='form_input'}
                 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover" id="actionlogtable">
                         <thead>
                             <tr>
                                 {if $prefs.feature_banning eq 'y'}
@@ -277,7 +279,7 @@
                                 {/if}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="actionlogbody">
                         {foreach from=$actionlogs item=actionlog}
                             <tr>
                                 {if $prefs.feature_banning eq 'y'}
@@ -349,8 +351,13 @@
                         {/foreach}
                         </tbody>
                     </table>
+                    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                        <el-infinite-scroll container-id="actionlogtable" target-container-id="actionlogbody" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+                    {/if}
                 </div>
-                {pagination_links count=$count step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
+                {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                    {pagination_links count=$count step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
+                {/if}
                 {if $prefs.feature_banning eq 'y'}
                     <div class="input-group col-sm-8">
                         <select class="form-select" name="action">

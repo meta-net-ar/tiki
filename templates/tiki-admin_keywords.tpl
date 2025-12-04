@@ -33,14 +33,16 @@
 
 {if $existing_keywords}
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-        <table class="table table-striped table-hover">
-            <tbody>
+        <table class="table table-striped table-hover" id="ad-keywords-table">
+            <thead>
                 <tr>
                     <th>{tr}Page{/tr}</th>
                     <th>{tr}Keywords{/tr}</th>
                     <th></th>
                 </tr>
+            </thead>
 
+            <tbody id="ad-keywords-body">
                 {section name=i loop=$existing_keywords}
                     <tr>
                         <td class="text"><a href="{$existing_keywords[i].page|sefurl}">{$existing_keywords[i].page|escape}</a></td>
@@ -75,9 +77,14 @@
                 {/section}
             </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="ad-keywords-table" target-container-id="ad-keywords-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 {else}
     <h2>{tr}No pages found{/tr}</h2>
 {/if}
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

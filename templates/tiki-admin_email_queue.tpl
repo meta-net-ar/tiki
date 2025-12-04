@@ -17,7 +17,8 @@
 <form method="get" action="tiki-admin_email_queue.php">
     {ticket}
     <div class="table-responsive email-queue-table">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="admin-email-queue-table">
+            <thead>
             <tr>
                 <th>
                     {if $mailQueues}
@@ -30,6 +31,9 @@
                 <th>{tr}Message{/tr}</th>
                 <th></th>
             </tr>
+            </thead>
+
+            <tbody id="admin-email-queue-body">
             {section name=queue loop=$mailQueues}
                 <tr>
                     <td class="checkbox-cell">
@@ -61,7 +65,11 @@
             {sectionelse}
                 {norecords _colspan=6}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="admin-email-queue-table" target-container-id="admin-email-queue-body" offset="{$offset}" step="{$maxRecords}" total-count="{$cant}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $mailQueues}
         <div class="input-group col-sm-8">
@@ -83,4 +91,6 @@
     {/if}
 </form>
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

@@ -13,7 +13,8 @@
     {include file='find.tpl'}
 {/if}
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="quizzes-table">
+        <thead>
         <tr>
             {$numbercol=1}
             <th>
@@ -32,7 +33,9 @@
                 <th></th>
             {/if}
         </tr>
+        </thead>
 
+        <tbody id="quizzes-body">
         {section name=user loop=$channels}
             {if ($tiki_p_admin eq 'y') or ($channels[user].individual eq 'n' and $tiki_p_take_quiz eq 'y') or ($channels[user].individual_tiki_p_take_quiz eq 'y')}
                 <tr>
@@ -75,7 +78,13 @@
         {sectionelse}
             {norecords _colspan=$numbercol}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="quizzes-table" target-container-id="quizzes-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

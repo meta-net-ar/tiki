@@ -90,6 +90,18 @@ function prefs_elementplus_list()
                 'feature_elementplus',
                 'feature_file_galleries'
             ]
+        ],
+        'elementplus_infinite_scroll' => [
+            'name' => tra('Element Plus Infinite Scroll'),
+            'description' => tra('Provides infinite scrolling functionality for lists and tables instead of traditional pagination.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => [
+                'feature_elementplus'
+            ],
+            'conflicts' => [
+                'feature_jquery_tablesorter'
+            ]
         ]
     ];
 }

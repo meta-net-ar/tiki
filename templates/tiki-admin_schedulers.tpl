@@ -383,7 +383,7 @@
             <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
             <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
             <div class="table-responsive">
-                <table class="table normal table-striped table-hover">
+                <table class="table normal table-striped table-hover" id="ad-schedulers-table">
                     <thead>
                     <tr>
                         <th>ID</th>
@@ -393,7 +393,7 @@
                         <th>Output</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="ad-schedulers-body">
                     {section name=run loop=$schedulerruns}
                         <tr>
                             <td>{$schedulerruns[run].id}</td>
@@ -436,8 +436,13 @@
                     {/section}
                     </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="ad-schedulers-table" target-container-id="ad-schedulers-body" offset="{$offset}" step="{$numrows}" total-count="{$count}"></el-infinite-scroll>
+                {/if}
             </div>
-            {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
+            {/if}
         {/tab}
     {/if}
 

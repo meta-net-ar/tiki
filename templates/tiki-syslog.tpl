@@ -24,10 +24,13 @@
 
 {include file='find.tpl'}
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 <div class="table-responsive syslog-table">
-    <table class="table">
+    <table class="table" id="syslog-table">
+        <thead>
         <tr>
             <th>{self_link _sort_arg="sort_mode" _sort_field="actionid"}{tr}Id{/tr}{/self_link}</th>
             <th>{self_link _sort_arg="sort_mode" _sort_field="action"}{tr}Type{/tr}{/self_link}</th>
@@ -39,7 +42,9 @@
             <th>{self_link _sort_arg="sort_mode" _sort_field="client"}{tr}Client{/tr}{/self_link}</th>
             <th>Actions</th>
         </tr>
+        </thead>
 
+        <tbody id="syslog-body">
         {section name=ix loop=$list}
             <tr>
                 <td class="id">{$list[ix].actionId}</td>
@@ -76,7 +81,13 @@
                 </td>
             </tr>
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="syslog-table" target-container-id="syslog-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

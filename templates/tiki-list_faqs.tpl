@@ -9,7 +9,8 @@
         {/if}
 
         <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="faqs-table">
+                <thead>
                 <tr>
                     <th>
                         <a href="tiki-list_faqs.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'title_desc'}title_asc{else}title_desc{/if}">{tr}Title{/tr}</a>
@@ -24,7 +25,9 @@
                         <th></th>
                     {/if}
                 </tr>
+                </thead>
 
+                <tbody id="faqs-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="text">
@@ -72,10 +75,16 @@
                 {sectionelse}
                     {if $tiki_p_admin_faqs eq 'y'}{norecords _colspan=5}{else}{norecords _colspan=4}{/if}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="faqs-table" target-container-id="faqs-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_admin_faqs eq 'y'}

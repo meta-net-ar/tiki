@@ -38,6 +38,7 @@
         </form>
         <br>
     {/if}
+    <div id="dirsearch-content">
     {section name=ix loop=$items}
         <div class="dirsite">
             {if $prefs.directory_country_flag eq 'y'}<img alt="flag" src="img/flags/{$items[ix].country}.png">{/if}
@@ -58,5 +59,11 @@
     {sectionelse}
         {tr}No records found.{/tr}
     {/section}
+    </div>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="dirsearch-content" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

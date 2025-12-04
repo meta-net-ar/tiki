@@ -115,7 +115,8 @@
         </table>
     </div>
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="poll-results-table">
+            <thead>
             <tr>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='user'}{tr}User{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='ip'}{tr}IP{/tr}{/self_link}</th>
@@ -123,7 +124,9 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='time'}{tr}Date{/tr}{/self_link}</th>
                 {if $tiki_p_admin eq 'y'}<th></th>{/if}
             </tr>
+            </thead>
 
+            <tbody id="poll-results-body">
             {section name=ix loop=$list_votes}
                 <tr>
                     <td class="username">{$list_votes[ix].user|userlink}</td>
@@ -155,9 +158,15 @@
             {sectionelse}
                 {norecords _colspan=4}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="poll-results-table" target-container-id="poll-results-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {/if}
 {/if}
 
 {*---------------------- comments *}

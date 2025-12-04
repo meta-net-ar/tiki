@@ -49,12 +49,15 @@
     <div class="row">
         <div class="col-sm-9">
             <div class="table-responsive">
-                <table class="table">
+                <table class="table" id="tabular-table">
+                    <thead>
                     <tr>
                         {foreach $columns as $column}
                             <th class="text-{$column->getDisplayAlign()|escape}">{$column->getLabel()}</th>
                         {/foreach}
                     </tr>
+                    </thead>
+                    <tbody id="tabular-body">
                     {foreach $data as $row}
                         <tr>
                             {foreach $row as $i => $col}
@@ -62,9 +65,15 @@
                             {/foreach}
                         </tr>
                     {/foreach}
+                    </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="tabular-table" target-container-id="tabular-body" offset="{$resultset.offset}" step="{$resultset.maxRecords}" total-count="{$resultset.count}" load-url="{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}"></el-infinite-scroll>
+                {/if}
             </div>
-            {pagination_links resultset=$resultset}{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links resultset=$resultset}{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}{/pagination_links}
+            {/if}
         </div>
         <div class="col-sm-3">
             <form method="get" action="{service controller=tabular action=list}">
@@ -94,12 +103,15 @@
     </div>
 {else}
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="tabular-table-2">
+            <thead>
             <tr>
                 {foreach $columns as $column}
                     <th class="text-{$column->getDisplayAlign()|escape}">{$column->getLabel()}</th>
                 {/foreach}
             </tr>
+            </thead>
+            <tbody id="tabular-body-2">
             {foreach $data as $row}
                 <tr>
                     {foreach $row as $i => $col}
@@ -107,9 +119,15 @@
                     {/foreach}
                 </tr>
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="tabular-table-2" target-container-id="tabular-body-2" offset="{$resultset.offset}" step="{$resultset.maxRecords}" total-count="{$resultset.count}" load-url="{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links resultset=$resultset}{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links resultset=$resultset}{service controller=tabular action=list tabularId=$tabularId _params=$baseArguments}{/pagination_links}
+    {/if}
 {/if}
 </div>{* .table-responsive END *}
 {/block}

@@ -32,8 +32,10 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign('sort_mode', $sort_mode);
 
-//Step param for pagination
-$step = 5;
+//Offset and Step param for pagination
+global $prefs;
+
+$step = $prefs['maxRecords'];
 $offset = $_REQUEST["offset"] ?? 0;
 
 if ($prefs['feature_wiki'] == 'y') {

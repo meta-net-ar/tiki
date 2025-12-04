@@ -94,7 +94,8 @@
 <form action="tiki-directory_admin_sites.php" method="post">
     {ticket}
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="dir-ad-sites-table">
+            <thead>
             <tr>
                 <td></td> {* th changed to td to prevent AIRA empty header error *}
                 <th> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">{tr}Name{/tr}</a> </th>
@@ -106,7 +107,9 @@
                 <th class="text-center"> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'isValid_desc'}isValid_asc{else}isValid_desc{/if}">{tr}Valid{/tr}</a> </th>
                 <td></td>
             </tr>
+            </thead>
 
+            <tbody id="dir-ad-sites-body">
             {section name=user loop=$items}
             <tr class="{cycle advance=false}">
                 <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="remove[]" value="{$items[user].siteId}" required></td>
@@ -157,7 +160,11 @@
                     {norecords _colspan=6}
                 {/if}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="dir-ad-sites-table" target-container-id="dir-ad-sites-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $items}
         {tr}Perform action with selected:{/tr}
@@ -181,4 +188,6 @@
     });
 
 {/jq}
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

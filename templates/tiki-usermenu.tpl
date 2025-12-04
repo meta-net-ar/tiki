@@ -51,7 +51,8 @@
 <form action="tiki-usermenu.php" method="post">
 {ticket}
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="usermenu-table">
+            <thead>
             <tr>
                 <th><input type="submit" class="btn btn-warning btn-sm" name="delete" value="x " title="{tr}Delete Selected{/tr}"></th>
                 <th><a href="tiki-usermenu.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'position_desc'}position_asc{else}position_desc{/if}">{tr}Pos{/tr}</a></th>
@@ -59,7 +60,9 @@
                 <th><a href="tiki-usermenu.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'url_desc'}url_asc{else}url_desc{/if}">{tr}URL{/tr}</a></th>
                 <th><a href="tiki-usermenu.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'mode_desc'}mode_asc{else}mode_desc{/if}">{tr}Mode{/tr}</a></th>
             </tr>
+            </thead>
 
+            <tbody id="usermenu-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
@@ -77,8 +80,14 @@
             {sectionelse}
                 {norecords _colspan=5}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="usermenu-table" target-container-id="usermenu-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

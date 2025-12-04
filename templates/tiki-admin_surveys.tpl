@@ -15,7 +15,8 @@
         {/if}
 
         <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="ad-survey-table">
+                <thead>
                 <tr>
                     <th>
                         {self_link _sort_arg='sort_mode' _sort_field='surveyId'}{tr}ID{/tr}{/self_link}
@@ -29,7 +30,9 @@
                     <th>{tr}Questions{/tr}</th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="ad-survey-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="id">{$channels[user].surveyId}</td>
@@ -89,10 +92,16 @@
                 {sectionelse}
                     {norecords _colspan=5}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-survey-table" target-container-id="ad-survey-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {tab name="{tr}Create/Edit Surveys{/tr}"}

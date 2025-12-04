@@ -35,7 +35,8 @@
 <form action="tiki-theme_control.php" method="post" class="form">
     {ticket}
     <div class="table-responsive themecat-table">
-        <table class="table">
+        <table class="table" id="t-control-table">
+            <thead>
             <tr>
                 <td> {* th changed to td to prevent ARIA empty header error *}
                     <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" aria-label="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
@@ -53,6 +54,9 @@
                     </a>
                 </th>
             </tr>
+            </thead>
+
+            <tbody id="t-control-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
@@ -66,7 +70,14 @@
                     </td>
                 </tr>
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="t-control-table" target-container-id="t-control-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

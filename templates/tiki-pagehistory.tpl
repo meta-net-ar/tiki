@@ -149,8 +149,8 @@
         {/if}
     </form>
 
-        <div class="row mb-4">
-            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+        <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="row mb-4">
+            <div class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -160,8 +160,8 @@
                         <input type="text" name="history_pagesize" role="search" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
                         <label for="history_pagesize">{tr}rows per page{/tr}</label>
                     {/if}
-            </form>
-            <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+            </div>
+            <div class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -217,259 +217,266 @@
                     </div>
                     <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
                     {/if}
-        </div>
+            </div>
         <div>
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-                <table class="table table-condensed table-hover table-striped">
-                    <tr>
-                        {if $tiki_p_remove eq 'y'}
-                            <th>
-                                {select_all checkbox_names='checked[]'}
-                            </th>
-                        {/if}
-                        <th>
-                            {tr}Information{/tr}
-                        </th>
-                        {if $prefs.feature_contribution eq 'y'}
-                            <th>
-                                {tr}Contribution{/tr}
-                            </th>
-                        {/if}
-                        {if $prefs.feature_contribution eq 'y' and $prefs.feature_contributor_wiki eq 'y'}
-                            <th>
-                                {tr}Contributors{/tr}
-                            </th>
-                        {/if}
-                        <th>
-                            {tr}Version{/tr}
-                        </th>
-                        <th>
-                            {icon name='edit' iclass='tips' ititle='{tr}WYSIWYG or HTML allowed:{/tr}{tr}HTML syntax is allowed either by page setting or use of the WYSIWIG editor{/tr}'}
-                        </th>
-                        {if $prefs.markdown_enabled eq 'y'}
-                            <th>
-                                <a href="#"  class="tips" title="Syntax|Markdown" role="button">
-                                    <svg aria-hidden="true" height="16" width="16">
-                                        <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
-                                    </svg>
-                                </a>
-                            </th>
-                        {/if}
-                        <th></th>
-                        {if $prefs.default_wiki_diff_style != "old" and $history}
-                            <th colspan="3" class="text-center">
-                                <input type="submit" class="btn btn-info btn-sm" name="compare" value="{tr}Compare{/tr}">
-                            </th>
-                        {/if}
-                    </tr>
-                    <tr class="active">
-                        {if $history_offset eq 1}
-                            {if $tiki_p_remove eq 'y'}
-                                <td>&nbsp;</td>
-                            {/if}
-                            <td class="text-start">
-                                {$info.lastModif|tiki_short_datetime}
-                                {icon name="user"} {$info.user|userlink}
-                                {if $prefs.feature_wiki_history_ip ne 'n'}{tr _0=$info.ip}from %0{/tr}{/if}
-
-                                {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $tiki_p_wiki_view_latest eq 'y'
-                                    and $info.approved}<strong>({tr}approved{/tr})</strong>{/if}
-
-                                {if !empty($info.comment)}<div>{$info.comment|escape}</div>{/if}
-
-                                {if isset($translation_sources[$info.version]) and $translation_sources[$info.version]}
-                                    {foreach item=source from=$translation_sources[$info.version]}
-                                        <div>
-                                            {tr}Updated from:{/tr} {self_link _script="tiki-index.php" page=$source.page|escape}{$source.page}{/self_link} at version {$source.version}
-                                        </div>
-                                    {/foreach}
-                                {/if}
-                                {if isset($translation_targets[$info.version]) and $translation_targets[$info.version]}
-                                    {foreach item=target from=$translation_targets[$info.version]}
-                                    <div>
-                                        {tr}Used to update:{/tr} {self_link _script="tiki-index.php" page=$target.page|escape}{$target.page}{/self_link} to version {$target.version}
-                                    </div>
-                                    {/foreach}
-                                {/if}
-                            </td>
-                            {if $prefs.feature_contribution eq 'y'}
-                                <td>{section name=ix loop=$contributions}{if !$smarty.section.ix.first},{/if}{$contributions[ix].name|escape}{/section}</td>
-                            {/if}
-                            {if $prefs.feature_contribution eq 'y' and $prefs.feature_contributor_wiki eq 'y'}
-                                <td>
-                                    {section name=ix loop=$contributors}{if !$smarty.section.ix.first},{/if}{$contributors[ix].login|username}{/section}
-                                </td>
-                            {/if}
-                            <td class="button_container">
-                                {if $current eq $info.version}
-                                    <strong>{/if}{$info.version}<br>{tr}Current{/tr}{if $current eq $info.version}</strong>
-                                {/if}
-                            </td>
-                            <td class="button_container">
-                                {if $info.is_html || $info.wysiwyg eq "y"}
-                                    {icon name='html' iclass='tips' ititle=':{tr}HTML allowed or WYSIWYG t{/tr}'}
-                                {/if}
-                            </td>
-                            <td class="button_container">
-                                {if !empty($info.is_markdown)}
-                                    {icon name='check' iclass='tips' ititle=':{tr}Markdown{/tr}'}
-                                {/if}
-                            </td>
-                            <td class="button_container" style="white-space: nowrap">
-                                {actions}
-                                    {strip}
-                                        <action>
-                                            {self_link page=$page preview=$info.version _icon_name="view" _menu_text='y' _menu_icon='y'}
-                                                {tr}View{/tr}
-                                            {/self_link}
-                                        </action>
-                                        {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
-                                            <action>
-                                                {self_link page=$page source=$info.version _icon_name="code" _menu_text='y' _menu_icon='y'}
-                                                    {tr}Source{/tr}
-                                                {/self_link}
-                                            </action>
-                                        {/if}
-                                    {/strip}
-                                {/actions}
-                            </td>
-                            {if $prefs.default_wiki_diff_style ne "old" and $history}
-                                <td class="button_container">
-                                    <input type="radio" class="form-check-input" name="oldver" value="0" title="{tr}Compare{/tr}" {if isset($old.version)
-                                        and $old.version == $info.version}checked="checked"{/if}>
-                                </td>
-                                <td class="button_container">
-                                    <input type="radio" class="form-check-input" name="newver" value="0" title="{tr}Compare{/tr}" {if (isset($new.version)
-                                        and $new.version == $info.version) or (!isset($smarty.request.diff_style)
-                                        or !$smarty.request.diff_style)}checked="checked"{/if}>
-                                </td>
-                            {/if}
-                        {/if}
-                    </tr>
-
-                    {foreach name=hist item=element from=$history}
+                <table class="table table-condensed table-hover table-striped" id="pagehistory-table">
+                    <thead>
                         <tr>
                             {if $tiki_p_remove eq 'y'}
-                                <td>
-                                    <input type="checkbox" name="checked[]" value="{$element.version}">
-                                </td>
+                                <th>
+                                    {select_all checkbox_names='checked[]'}
+                                </th>
                             {/if}
-                            <td class="text-start">
-                                {$element.lastModif|tiki_short_datetime}
-                                {icon name="user"} {$element.user|userlink}
-                                {if $prefs.feature_wiki_history_ip ne 'n'}{tr _0=$element.ip}from %0{/tr}{/if}
-
-                                {if !empty($element.comment)}<span class="form-text">{$element.comment|escape}</span>{/if}
-
-                                {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $tiki_p_wiki_view_latest eq 'y' and $element.approved}<strong>({tr}approved{/tr})</strong>{/if}
-                                {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $element.rejected}<strong>({tr}rejected:{/tr}</strong> {$element.rejection_reason}<strong>)</strong>{/if}
-
-                                {if isset($translation_sources[$element.version]) and $translation_sources[$element.version]}
-                                    {foreach item=source from=$translation_sources[$element.version]}
-                                    <div>
-                                        {tr}Updated from:{/tr} {self_link _script="tiki-index.php" page=$source.page|escape}{$source.page}{/self_link} at version {$source.version}
-                                    </div>
-                                    {/foreach}
-                                {/if}
-                                {if isset($translation_targets[$element.version]) and $translation_targets[$element.version]}
-                                    {foreach item=target from=$translation_targets[$element.version]}
-                                    <div>
-                                        {tr}Used to update:{/tr} {self_link _script="tiki-index.php" page=$target.page|escape}{$target.page}{/self_link} to version {$target.version}
-                                    </div>
-                                    {/foreach}
-                                {/if}
-                            </td>
+                            <th>
+                                {tr}Information{/tr}
+                            </th>
                             {if $prefs.feature_contribution eq 'y'}
-                                <td>
-                                    {section name=ix loop=$element.contributions}{if !$smarty.section.ix.first}&nbsp;{/if}{$element.contributions[ix].name|escape}{/section}
-                                </td>
+                                <th>
+                                    {tr}Contribution{/tr}
+                                </th>
                             {/if}
                             {if $prefs.feature_contribution eq 'y' and $prefs.feature_contributor_wiki eq 'y'}
-                                <td>
-                                    {section name=ix loop=$element.contributors}{if !$smarty.section.ix.first},{/if}{$element.contributors[ix].login|username}{/section}
-                                </td>
+                                <th>
+                                    {tr}Contributors{/tr}
+                                </th>
                             {/if}
-                            <td class="button_container">
-                                {if $current eq $element.version}<strong>{/if}
-                                {if $show_all_versions eq "n" and not empty($element.session)}
-                                    <em>{$element.session} - {$element.version}</em>
-                                {else}
-                                    {$element.version}
+                            <th>
+                                {tr}Version{/tr}
+                            </th>
+                            <th>
+                                {icon name='edit' iclass='tips' ititle='{tr}WYSIWYG or HTML allowed:{/tr}{tr}HTML syntax is allowed either by page setting or use of the WYSIWIG editor{/tr}'}
+                            </th>
+                            {if $prefs.markdown_enabled eq 'y'}
+                                <th>
+                                    <a href="#"  class="tips" title="Syntax|Markdown" role="button">
+                                        <svg aria-hidden="true" height="16" width="16">
+                                            <path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path>
+                                        </svg>
+                                    </a>
+                                </th>
+                            {/if}
+                            <th></th>
+                            {if $prefs.default_wiki_diff_style != "old" and $history}
+                                <th colspan="3" class="text-center">
+                                    <input type="submit" class="btn btn-info btn-sm" name="compare" value="{tr}Compare{/tr}">
+                                </th>
+                            {/if}
+                        </tr>
+                        <tr class="active">
+                            {if $history_offset eq 1}
+                                {if $tiki_p_remove eq 'y'}
+                                    <td>&nbsp;</td>
                                 {/if}
-                                {if $current eq $element.version}</strong>{/if}
-                            </td>
-                            <td class="button_container">
-                                {if $element.is_html eq "1"}
-                                    {icon name='html' iclass='tips' ititle=':{tr}HTML allowed{/tr}'}
-                                {elseif $element.wysiwyg eq "y"}
-                                    {icon name='bold' iclass='tips' ititle=':{tr}WYSIWYG{/tr}'}
+                                <td class="text-start">
+                                    {$info.lastModif|tiki_short_datetime}
+                                    {icon name="user"} {$info.user|userlink}
+                                    {if $prefs.feature_wiki_history_ip ne 'n'}{tr _0=$info.ip}from %0{/tr}{/if}
+
+                                    {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $tiki_p_wiki_view_latest eq 'y'
+                                        and $info.approved}<strong>({tr}approved{/tr})</strong>{/if}
+
+                                    {if !empty($info.comment)}<div>{$info.comment|escape}</div>{/if}
+
+                                    {if isset($translation_sources[$info.version]) and $translation_sources[$info.version]}
+                                        {foreach item=source from=$translation_sources[$info.version]}
+                                            <div>
+                                                {tr}Updated from:{/tr} {self_link _script="tiki-index.php" page=$source.page|escape}{$source.page}{/self_link} at version {$source.version}
+                                            </div>
+                                        {/foreach}
+                                    {/if}
+                                    {if isset($translation_targets[$info.version]) and $translation_targets[$info.version]}
+                                        {foreach item=target from=$translation_targets[$info.version]}
+                                        <div>
+                                            {tr}Used to update:{/tr} {self_link _script="tiki-index.php" page=$target.page|escape}{$target.page}{/self_link} to version {$target.version}
+                                        </div>
+                                        {/foreach}
+                                    {/if}
+                                </td>
+                                {if $prefs.feature_contribution eq 'y'}
+                                    <td>{section name=ix loop=$contributions}{if !$smarty.section.ix.first},{/if}{$contributions[ix].name|escape}{/section}</td>
                                 {/if}
-                            </td>
-                            <td class="button_container">
-                                {if !empty($element.is_markdown)}
-                                    {icon name='check' iclass='tips' ititle=':{tr}Markdown{/tr}'}
+                                {if $prefs.feature_contribution eq 'y' and $prefs.feature_contributor_wiki eq 'y'}
+                                    <td>
+                                        {section name=ix loop=$contributors}{if !$smarty.section.ix.first},{/if}{$contributors[ix].login|username}{/section}
+                                    </td>
                                 {/if}
-                            </td>
-                            <td class="button_container" style="white-space: nowrap">
-                                {actions}
-                                    {strip}
-                                        <action>
-                                            {self_link page=$page preview=$element.version _icon_name="view" _menu_text='y' _menu_icon='y'}
-                                                {tr}View{/tr}
-                                            {/self_link}
-                                        </action>
-                                        {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
-                                            <action>
-                                                {self_link page=$page source=$element.version _icon_name="code" _menu_text='y' _menu_icon='y'}
-                                                    {tr}Source{/tr}
-                                                {/self_link}
-                                            </action>
-                                        {/if}
-                                        {if $prefs.default_wiki_diff_style eq "old"}
-                                            <action>
-                                                {self_link page=$page diff2=$element.version diff_style="sideview" _icon_name="copy" _menu_text='y' _menu_icon='y'}
-                                                    {tr}Compare{/tr}
-                                                {/self_link}
-                                            </action>
-                                            <action>
-                                                {self_link page=$page diff2=$element.version diff_style="unidiff" _icon_name="difference" _menu_text='y' _menu_icon='y'}
-                                                    {tr}Difference{/tr}
-                                                {/self_link}
-                                            </action>
-                                        {/if}
-                                        {if $tiki_p_rollback eq 'y' && $lock neq true && $current neq $element.version}
-                                            <action>
-                                                {self_link _script="tiki-rollback.php" page=$page version=$element.version _icon_name="undo" _menu_text='y' _menu_icon='y'}
-                                                    {tr _0=$element.version}Revert to version %0{/tr}
-                                                {/self_link}
-                                            </action>
-                                        {/if}
-                                    {/strip}
-                                {/actions}
-                            </td>
-                            {if $prefs.default_wiki_diff_style ne "old"}
                                 <td class="button_container">
-                                    {if $show_all_versions eq 'n' and not empty($element.session)}
-                                        <input type="radio" class="form-check-input" name="oldver" value="{$element.session}"
-                                            title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.session) and $old.version == $element.session)
-                                            or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
-                                            and $smarty.foreach.hist.first)}checked="checked"{/if}>
-                                    {else}
-                                        <input type="radio" class="form-check-input" name="oldver" value="{$element.version}"
-                                            title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.version) and $old.version == $element.version)
-                                            or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
-                                            and $smarty.foreach.hist.first)}checked="checked"{/if}>
+                                    {if $current eq $info.version}
+                                        <strong>{/if}{$info.version}<br>{tr}Current{/tr}{if $current eq $info.version}</strong>
                                     {/if}
                                 </td>
                                 <td class="button_container">
-                                    {* if $smarty.foreach.hist.last &nbsp; *}
-                                    <input type="radio" class="form-check-input" name="newver" value="{$element.version}" title="Select a newer version for comparison"
-                                        {if isset($new.version) and $new.version == $element.version}checked="checked"{/if} >
+                                    {if $info.is_html || $info.wysiwyg eq "y"}
+                                        {icon name='html' iclass='tips' ititle=':{tr}HTML allowed or WYSIWYG t{/tr}'}
+                                    {/if}
                                 </td>
+                                <td class="button_container">
+                                    {if !empty($info.is_markdown)}
+                                        {icon name='check' iclass='tips' ititle=':{tr}Markdown{/tr}'}
+                                    {/if}
+                                </td>
+                                <td class="button_container" style="white-space: nowrap">
+                                    {actions}
+                                        {strip}
+                                            <action>
+                                                {self_link page=$page preview=$info.version _icon_name="view" _menu_text='y' _menu_icon='y'}
+                                                    {tr}View{/tr}
+                                                {/self_link}
+                                            </action>
+                                            {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
+                                                <action>
+                                                    {self_link page=$page source=$info.version _icon_name="code" _menu_text='y' _menu_icon='y'}
+                                                        {tr}Source{/tr}
+                                                    {/self_link}
+                                                </action>
+                                            {/if}
+                                        {/strip}
+                                    {/actions}
+                                </td>
+                                {if $prefs.default_wiki_diff_style ne "old" and $history}
+                                    <td class="button_container">
+                                        <input type="radio" class="form-check-input" name="oldver" value="0" title="{tr}Compare{/tr}" {if isset($old.version)
+                                            and $old.version == $info.version}checked="checked"{/if}>
+                                    </td>
+                                    <td class="button_container">
+                                        <input type="radio" class="form-check-input" name="newver" value="0" title="{tr}Compare{/tr}" {if (isset($new.version)
+                                            and $new.version == $info.version) or (!isset($smarty.request.diff_style)
+                                            or !$smarty.request.diff_style)}checked="checked"{/if}>
+                                    </td>
+                                {/if}
                             {/if}
                         </tr>
-                    {/foreach}
+                    </thead>
+
+                    <tbody id="pagehistory-body">
+                        {foreach name=hist item=element from=$history}
+                            <tr>
+                                {if $tiki_p_remove eq 'y'}
+                                    <td>
+                                        <input type="checkbox" name="checked[]" value="{$element.version}">
+                                    </td>
+                                {/if}
+                                <td class="text-start">
+                                    {$element.lastModif|tiki_short_datetime}
+                                    {icon name="user"} {$element.user|userlink}
+                                    {if $prefs.feature_wiki_history_ip ne 'n'}{tr _0=$element.ip}from %0{/tr}{/if}
+
+                                    {if !empty($element.comment)}<span class="form-text">{$element.comment|escape}</span>{/if}
+
+                                    {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $tiki_p_wiki_view_latest eq 'y' and $element.approved}<strong>({tr}approved{/tr})</strong>{/if}
+                                    {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $element.rejected}<strong>({tr}rejected:{/tr}</strong> {$element.rejection_reason}<strong>)</strong>{/if}
+
+                                    {if isset($translation_sources[$element.version]) and $translation_sources[$element.version]}
+                                        {foreach item=source from=$translation_sources[$element.version]}
+                                        <div>
+                                            {tr}Updated from:{/tr} {self_link _script="tiki-index.php" page=$source.page|escape}{$source.page}{/self_link} at version {$source.version}
+                                        </div>
+                                        {/foreach}
+                                    {/if}
+                                    {if isset($translation_targets[$element.version]) and $translation_targets[$element.version]}
+                                        {foreach item=target from=$translation_targets[$element.version]}
+                                        <div>
+                                            {tr}Used to update:{/tr} {self_link _script="tiki-index.php" page=$target.page|escape}{$target.page}{/self_link} to version {$target.version}
+                                        </div>
+                                        {/foreach}
+                                    {/if}
+                                </td>
+                                {if $prefs.feature_contribution eq 'y'}
+                                    <td>
+                                        {section name=ix loop=$element.contributions}{if !$smarty.section.ix.first}&nbsp;{/if}{$element.contributions[ix].name|escape}{/section}
+                                    </td>
+                                {/if}
+                                {if $prefs.feature_contribution eq 'y' and $prefs.feature_contributor_wiki eq 'y'}
+                                    <td>
+                                        {section name=ix loop=$element.contributors}{if !$smarty.section.ix.first},{/if}{$element.contributors[ix].login|username}{/section}
+                                    </td>
+                                {/if}
+                                <td class="button_container">
+                                    {if $current eq $element.version}<strong>{/if}
+                                    {if $show_all_versions eq "n" and not empty($element.session)}
+                                        <em>{$element.session} - {$element.version}</em>
+                                    {else}
+                                        {$element.version}
+                                    {/if}
+                                    {if $current eq $element.version}</strong>{/if}
+                                </td>
+                                <td class="button_container">
+                                    {if $element.is_html eq "1"}
+                                        {icon name='html' iclass='tips' ititle=':{tr}HTML allowed{/tr}'}
+                                    {elseif $element.wysiwyg eq "y"}
+                                        {icon name='bold' iclass='tips' ititle=':{tr}WYSIWYG{/tr}'}
+                                    {/if}
+                                </td>
+                                <td class="button_container">
+                                    {if !empty($element.is_markdown)}
+                                        {icon name='check' iclass='tips' ititle=':{tr}Markdown{/tr}'}
+                                    {/if}
+                                </td>
+                                <td class="button_container" style="white-space: nowrap">
+                                    {actions}
+                                        {strip}
+                                            <action>
+                                                {self_link page=$page preview=$element.version _icon_name="view" _menu_text='y' _menu_icon='y'}
+                                                    {tr}View{/tr}
+                                                {/self_link}
+                                            </action>
+                                            {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
+                                                <action>
+                                                    {self_link page=$page source=$element.version _icon_name="code" _menu_text='y' _menu_icon='y'}
+                                                        {tr}Source{/tr}
+                                                    {/self_link}
+                                                </action>
+                                            {/if}
+                                            {if $prefs.default_wiki_diff_style eq "old"}
+                                                <action>
+                                                    {self_link page=$page diff2=$element.version diff_style="sideview" _icon_name="copy" _menu_text='y' _menu_icon='y'}
+                                                        {tr}Compare{/tr}
+                                                    {/self_link}
+                                                </action>
+                                                <action>
+                                                    {self_link page=$page diff2=$element.version diff_style="unidiff" _icon_name="difference" _menu_text='y' _menu_icon='y'}
+                                                        {tr}Difference{/tr}
+                                                    {/self_link}
+                                                </action>
+                                            {/if}
+                                            {if $tiki_p_rollback eq 'y' && $lock neq true && $current neq $element.version}
+                                                <action>
+                                                    {self_link _script="tiki-rollback.php" page=$page version=$element.version _icon_name="undo" _menu_text='y' _menu_icon='y'}
+                                                        {tr _0=$element.version}Revert to version %0{/tr}
+                                                    {/self_link}
+                                                </action>
+                                            {/if}
+                                        {/strip}
+                                    {/actions}
+                                </td>
+                                {if $prefs.default_wiki_diff_style ne "old"}
+                                    <td class="button_container">
+                                        {if $show_all_versions eq 'n' and not empty($element.session)}
+                                            <input type="radio" class="form-check-input" name="oldver" value="{$element.session}"
+                                                title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.session) and $old.version == $element.session)
+                                                or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
+                                                and $smarty.foreach.hist.first)}checked="checked"{/if}>
+                                        {else}
+                                            <input type="radio" class="form-check-input" name="oldver" value="{$element.version}"
+                                                title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.version) and $old.version == $element.version)
+                                                or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
+                                                and $smarty.foreach.hist.first)}checked="checked"{/if}>
+                                        {/if}
+                                    </td>
+                                    <td class="button_container">
+                                        {* if $smarty.foreach.hist.last &nbsp; *}
+                                        <input type="radio" class="form-check-input" name="newver" value="{$element.version}" title="Select a newer version for comparison"
+                                            {if isset($new.version) and $new.version == $element.version}checked="checked"{/if} >
+                                    </td>
+                                {/if}
+                            </tr>
+                        {/foreach}
+                    </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && $paginate}
+                    <el-infinite-scroll container-id="pagehistory-table" target-container-id="pagehistory-body" offset="{$smarty.request.history_offset}" step="{$history_pagesize}" total-count="{$history_count}" offset-arg="history_offset" ></el-infinite-scroll>
+                {/if}
             </div>
             <div class="input-group col-sm-8 mb-4">
                 <select class="form-select" name="action">
@@ -490,7 +497,7 @@
                     {tr}OK{/tr}
                 </button>
             </div>
-            {if $paginate}
+            {if $paginate && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
                 {if isset($smarty.request.history_offset)}
                     {pagination_links count=$history_count offset=$smarty.request.history_offset offset_arg="history_offset" step=$history_pagesize}
                     {/pagination_links}

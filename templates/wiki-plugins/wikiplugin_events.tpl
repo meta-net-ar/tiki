@@ -2,9 +2,12 @@
     <div class="card bg-body-tertiary"><div class="card-body">{tr}The calendarid parameter is invalid or contains an id that does not exist.{/tr}</div></div>
 {else}
     <div class="table-responsive">
-    <table class="table table-condensed table-bordered">
+    <table class="table table-condensed table-bordered" id="events-table">
+    <thead>
     <tr><th colspan="2">{tr}Upcoming Events{/tr}</th></tr>
+    </thead>
 
+    <tbody id="events-body">
     {foreach from=$events item=event}
         <tr class="{cycle advance=false}">
             <td>
@@ -35,10 +38,14 @@
             {/if}
         </tr>{* {cycle} *}
     {/foreach}
+    </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="events-table" target-container-id="events-body" offset="{$offset}" step="{$maxEvents}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
     </div>
     {*Pagination *}
-    {if !empty($events) && $usePagination ne 'n'}
+    {if !empty($events) && $usePagination ne 'n' && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
         {pagination_links count=$count step=$maxEvents offset=$offset}{/pagination_links}
     {/if}
 {/if}

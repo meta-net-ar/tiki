@@ -195,13 +195,16 @@
         {/if}
         <h2>{tr}Custom Modules{/tr}</h2>
         <div class="{if $js}table-responsive{/if}">
-            <table class="table">
+            <table class="table" id="ad-c-modules-table">
+                <thead>
                 <tr>
                     <th>{tr}Name{/tr}</th>
                     <th>{tr}Title{/tr}</th>
                     <td></td>
                 </tr>
+                </thead>
 
+                <tbody id="ad-c-modules-body">
                 {section name=user loop=$user_modules}
                     <tr>
                         <td class="text"><a class="tips" href="tiki-admin_modules.php?um_edit={$user_modules[user].name|escape:'url'}&amp;cookietab=2#editcreate" title="{tr}Edit{/tr}">{$user_modules[user].name|escape}</a></td>
@@ -240,10 +243,16 @@
                 {sectionelse}
                 {norecords _colspan=3}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-c-modules-table" target-container-id="ad-c-modules-body" offset="{$offset}" step="{$maxRecords}" total-count="{$maximum}"></el-infinite-scroll>
+            {/if}
         </div>
         <br>
-        {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
         {if $um_name eq ''}
             <h2>{tr}Create new custom module{/tr}</h2>
         {else}

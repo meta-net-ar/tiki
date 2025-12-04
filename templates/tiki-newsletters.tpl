@@ -66,12 +66,15 @@
     {/if}
 
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="newsletters-table">
+            <thead>
             <tr>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Newsletter{/tr}{/self_link}</th>
                 <th style="width:100px"></th>
             </tr>
+            </thead>
 
+            <tbody id="newsletters-body">
             {section name=user loop=$channels}
                 {if $channels[user].tiki_p_subscribe_newsletters eq 'y' or $channels[user].tiki_p_list_newsletters eq 'y'}
                     <tr>
@@ -118,7 +121,13 @@
             {sectionelse}
                 {norecords _colspan=2}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="newsletters-table" target-container-id="newsletters-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$count offset=$offset step=$maxRecords}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$count offset=$offset step=$maxRecords}{/pagination_links}
+    {/if}
 {/if}

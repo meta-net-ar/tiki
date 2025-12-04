@@ -49,7 +49,7 @@
                         <th id="actions"></th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="admin-references-body">
                     {section name=reference loop=$references}
                         {$reference_code = $references[reference].biblio_code|escape}
                         <tr>
@@ -92,6 +92,9 @@
                     {/section}
                     </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="admin_references" target-container-id="admin-references-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+                {/if}
             </div>
         </div>
     {pagination_links count=$count step=$maxRecords offset=$offset}

@@ -70,7 +70,7 @@
                     {$numbercol = $numbercol+1}
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="{$ts.tableid}-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td style="text-align:center">
@@ -148,6 +148,9 @@
                 {/section}
                 </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y' && !$ts.enabled}
+                <el-infinite-scroll container-id="{$ts.tableid}" target-container-id="{$ts.tableid}-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+            {/if}
         </div>
         {if !$ts.ajax}
             {if $channels}
@@ -171,7 +174,7 @@
             {/if}
         {/if}
     </form>
-{if !$ts.enabled}
+{if !$ts.enabled && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
     {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 {/if}
 {/tab}

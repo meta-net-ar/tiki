@@ -38,7 +38,8 @@
 
 <h2>{tr}External Wiki{/tr}</h2>
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="admin-external-wikis-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-admin_external_wikis.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">{tr}Name{/tr}</a>
@@ -54,7 +55,9 @@
             </th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="admin-external-wikis-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="text">{$channels[user].name}</td>
@@ -81,7 +84,13 @@
         {sectionelse}
             {norecords _colspan=5}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="admin-external-wikis-table" target-container-id="admin-external-wikis-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

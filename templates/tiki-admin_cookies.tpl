@@ -45,7 +45,8 @@
     {include file='find.tpl'}
 {/if}
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="admin-cookies-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-admin_cookies.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'cookieId_desc'}cookieId_asc{else}cookieId_desc{/if}">{tr}ID{/tr}</a>
@@ -55,6 +56,9 @@
             </th>
             <th width="15%"></th>
         </tr>
+        </thead>
+
+        <tbody id="admin-cookies-body">
         {cycle values="odd,even" print=false advance=false}
         {section name=user loop=$channels}
             <tr>
@@ -80,7 +84,12 @@
         {sectionelse}
             {norecords _colspan=3}
         {/section}
+        </tbody>
     </table>
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="admin-cookies-table" target-container-id="admin-cookies-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{else}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

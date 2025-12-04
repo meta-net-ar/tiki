@@ -31,6 +31,7 @@
                     <div class="col-md-8">
                         {if $resultset}
                             <h3>{tr}People{/tr}</h3>
+                            <div id="detail-container">
                             {foreach $resultset as $row}
                                 <div class="d-flex">
                                     <div class="flex-shrink-0">
@@ -44,7 +45,12 @@
                             {foreachelse}
                                 <p>{tr}Empty list.{/tr}</p>
                             {/foreach}
-                            {pagination_links resultset=$resultset}{/pagination_links}
+                            </div>
+                            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                                <el-infinite-scroll container-id="detail-container" offset="{$resultset.offset}" step="{$resultset.maxRecords}" total-count="{$resultset.count}"></el-infinite-scroll>
+                            {else}
+                                {pagination_links resultset=$resultset}{/pagination_links}
+                            {/if}
                         {/if}
                     </div>
                 </div>

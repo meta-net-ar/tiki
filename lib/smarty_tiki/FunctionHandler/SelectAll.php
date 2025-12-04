@@ -54,7 +54,7 @@ class SelectAll extends Base
             $onclick = '';
         } else {
             foreach ($checkbox_names as $cn) {
-                $onclick .= "switchCheckboxes(this.form,'" . htmlspecialchars(smarty_modifier_escape($cn, 'javascript')) . "',this.checked$hidden_too);";
+                $onclick .= "switchCheckboxes(this.form || this.getRootNode(),'" . htmlspecialchars(smarty_modifier_escape($cn, 'javascript')) . "',this.checked$hidden_too);";
             }
             $onclick = ' onclick="' . $onclick . '"';
         }

@@ -24,7 +24,8 @@
 
 {* begin table for stats data *}
 <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="quiz-stats-table">
+        <thead>
         <tr>
             <th>
                 {* sort user *}
@@ -51,7 +52,9 @@
             </th>
             <th>{tr}Pass/Fail{/tr}</th>
         </tr>
+        </thead>
 
+        <tbody id="quiz-stats-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="username">{$channels[user].user|userlink}</td>
@@ -80,10 +83,16 @@
                 <td>{if $channels[user].ispassing}{tr}Passed{/tr}{else}{tr}Failed{/tr}{/if}</td>
             </tr>
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="quiz-stats-table" target-container-id="quiz-stats-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 {* begin second table *}
 <h2>{tr}Stats for this quiz Questions {/tr}</h2>

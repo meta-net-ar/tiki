@@ -196,8 +196,10 @@ class TemplatesLib extends TikiLib
 
         $query = "select `name`,`created`,`templateId` from `tiki_content_templates` $mid order by " .
                             $this->convertSortMode($sort_mode);
+        $query_count = "select count(*) from `tiki_content_templates` $mid";
 
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
         $categlib = TikiLib::lib('categ');
 
@@ -234,8 +236,6 @@ class TemplatesLib extends TikiLib
                 $ret[] = $res;
             }
         }
-
-        $count = count($ret);
 
         $retval = [];
         $retval["data"] = $ret;

@@ -188,7 +188,8 @@
             {/if}
             <div class="table-responsive">
                 <form id="remove_object_form" method="post" action="{service controller='category' action='uncategorize'}">
-                    <table class="table">
+                    <table class="table" id="admin-categories-table">
+                        <thead>
                         <tr>
                             <th class="checkbox-cell">
                                 {select_all checkbox_names='objects[]'}
@@ -205,7 +206,9 @@
                                 </a>
                             </th>
                         </tr>
+                        </thead>
 
+                        <tbody id="admin-categories-body">
                         {section name=ix loop=$objects}
                             <tr>
                                 <td class="checkbox-cell">
@@ -228,6 +231,10 @@
                         {sectionelse}
                             {norecords _colspan=4}
                         {/section}
+                        </tbody>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="admin-categories-table" target-container-id="admin-categories-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$objects_count}"></el-infinite-scroll>
+                        {/if}
                     </table>
                     {if not empty($objects)}
                         <div class="submit text-center p-1">
@@ -255,7 +262,9 @@ $("#remove_object_form").off("submit").on("submit", function (e) {
                 {/jq}
             </div>
 
-            {pagination_links count=$objects_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links count=$objects_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+            {/if}
         {/tab}
 
         {tab name="{tr}Add objects{/tr}"}

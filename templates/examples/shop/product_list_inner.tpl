@@ -1,5 +1,6 @@
 {* this inner list tpl is separate as it is used both in product_list.tpl and product_ajax.tpl for the search page*}
-<ul class="product-list row list-unstyled mb-5">
+{assign var="containerId" value="container-{uniqid()}"}
+<ul class="product-list row list-unstyled mb-5" id="{$containerId}">
     {foreach $results as $row}
         {$link = "tiki-index.php?page=cart+product&itemId={$row.object_id}"}
         <li class="col-sm-3 text-center">
@@ -27,3 +28,6 @@
         </li>
     {/foreach}
 </ul>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="{$containerId}" offset="{$results.offset}" step="{$results.maxRecords}" total-count="{$results.count}"></el-infinite-scroll>
+{/if}

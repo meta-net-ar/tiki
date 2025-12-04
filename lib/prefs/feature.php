@@ -1948,6 +1948,9 @@ function prefs_feature_list($partial = false)
             'help' => 'JQuery#TableSorter',
             'default' => 'n',   // sortable tables ([will] override existing)
             'tags' => ['experimental'],
+            'conflicts' => [
+                'elementplus_infinite_scroll',
+            ]
         ],
         'feature_jquery_tagcanvas' => [
             'name' => tra('TagCanvas'),

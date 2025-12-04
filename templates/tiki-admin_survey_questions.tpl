@@ -20,7 +20,8 @@
             <input type="hidden" name="questionIds" value="">
         </form>
         <div class="table-responsive">
-            <table class="table surveyquestions table-striped table-hover">
+            <table class="table surveyquestions table-striped table-hover" id="ad-survey-q-table">
+                <thead>
                 <tr>
                     <th>
                         {self_link _sort_arg='sort_mode' _sort_field='questionId'}{tr}ID{/tr}{/self_link}
@@ -39,6 +40,9 @@
                     </th>
                     <th></th>
                 </tr>
+                </thead>
+
+                <tbody id="ad-survey-q-body">
                 {cycle print=false values="odd,even"}
                 {section name=user loop=$channels}
                     <tr>
@@ -71,10 +75,16 @@
                     {sectionelse}
                     {norecords _colspan=6}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-survey-q-table" target-container-id="ad-survey-q-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
 
-        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
 
         {button _text="{tr}Save{/tr}" _style="display:none;" _class="save_list" _ajax="n" _auto_args="save_list"}
     {/tab}

@@ -38,7 +38,8 @@
 </form>
 
 <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="transcripts-table">
+        <thead>
         <tr>
             <th><a href="tiki-live_support_transcripts.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'chat_started_desc'}chat_started_asc{else}chat_started_desc{/if}">{tr}started{/tr}</a></th>
             <th><a href="tiki-live_support_transcripts.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'tiki_user_desc'}tiki_user_asc{else}tiki_user_desc{/if}">{tr}Username{/tr}</a></th>
@@ -46,7 +47,9 @@
             <th><a href="tiki-live_support_transcripts.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'operator_desc'}operator_asc{else}operator_desc{/if}">{tr}operator{/tr}</a></th>
             <th>{tr}msgs{/tr}</th>
         </tr>
+        </thead>
 
+        <tbody id="transcripts-body">
         {section name=ix loop=$items}
             <tr>
                 <td>{$items[ix].chat_started|tiki_short_datetime}</td>{*date_format:"%d %b [%H:%M]"*}
@@ -58,10 +61,16 @@
         {sectionelse}
             {norecords _colspan=5}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="transcripts-table" target-container-id="transcripts-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
 
 {if !empty($smarty.request.view)}
     <h3>{tr}Transcript{/tr}</h3>

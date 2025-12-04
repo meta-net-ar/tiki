@@ -104,6 +104,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-file-gal-uploader" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/fileGalUploader.js",
                 "@vue-widgets/el-file-input" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/fileInput.js",
                 "@vue-widgets/el-input" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/input.js",
+                "@vue-widgets/el-infinite-scroll" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/infiniteScroll.js",
                 "@vue-widgets/el-message" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/message.js",
                 "@vue-widgets/el-select" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/select.js",
                 "@vue-widgets/el-slider" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/slider.js",

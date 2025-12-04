@@ -4,7 +4,7 @@
 
 {tab name="{tr}List{/tr}"}
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="discount-table">
             <thead>
                 <tr>
                     <th class="text-center">{tr}Code{/tr}</th>
@@ -16,6 +16,7 @@
                 </tr>
             </thead>
 
+            <tbody id="discount-body">
             {foreach from=$discounts.data item=discount}
                 <tr>
                     <td class="text text-center">{$discount.code|escape}</td>
@@ -43,9 +44,15 @@
             {foreachelse}
                 {norecords _colspan=6}
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="discount-table" target-container-id="discount-body" offset="{$discounts.offset}" step="{$discounts.max}" total-count="{$discounts.count}"></el-infinite-scroll>
+        {/if}
     </div>
-    {pagination_links count=$discounts.count step=$discounts.max offset=$discounts.offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$discounts.count step=$discounts.max offset=$discounts.offset}{/pagination_links}
+    {/if}
 {/tab}
 
 {capture name=tabtitle}{if empty($info.id)}{tr}Create{/tr}{else}{tr}Edit{/tr}{/if}{/capture}

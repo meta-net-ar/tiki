@@ -39,7 +39,8 @@
     <input type="hidden" name="maxRecords" value="{$maxRecords|escape}">
     {$numbercol=1}
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-        <table class="table">
+        <table class="table" id="articles-table">
+            <thead>
             <tr>
                 {if $listpages and $tiki_p_remove_article eq 'y'}
                     <td class="auto">  {* Changed from th to prevent ARIA empty header error *}
@@ -116,7 +117,9 @@
                     <td></td> {* Changed from th to prevent ARIA empty header error *}
                 {/if}
             </tr>
+            </thead>
 
+            <tbody id="articles-body">
             {section name=changes loop=$listpages}
 
                 {if isset($mapview) and $mapview}
@@ -126,7 +129,7 @@
                 <tr>
                     {if $listpages[changes].perms.tiki_p_remove_article eq 'y'}
                         <td class="checkbox-cell">
-                            <input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$listpages[changes].articleId|escape}" {if $listpages[changes].checked eq 'y'}checked="checked" {/if} required>
+                            <input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$listpages[changes].articleId|escape}" {if $listpages[changes].checked eq 'y'}checked="checked" {/if}>
                         </td>
                     {/if}
                     {if $prefs.art_list_title eq 'y'}
@@ -220,14 +223,20 @@
             {sectionelse}
                 {norecords _colspan=$numbercol}
             {/section}
+            </tbody>
             {if $listpages and $tiki_p_remove_article eq 'y'}
+                <tbody>
                 <tr>
                     <td colspan="{$numbercol+1}">
                         {button _text="{tr}Select Duplicates{/tr}" _onclick="checkDuplicateRows(this, [2, 7]); return false;"}
                     </td>
                 </tr>
+                </tbody>
             {/if}
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="articles-table" target-container-id="articles-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $listpages and $tiki_p_remove_article eq 'y'}
         <div>
@@ -241,7 +250,9 @@
         </div>
     {/if}
 
-    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+    {/if}
 </form>
 
 {jq}

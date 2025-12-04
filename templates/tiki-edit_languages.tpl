@@ -127,6 +127,7 @@
                         <h4 class="col-md-6">{tr}Translation{/tr}</h4>
                     </div>
                 </div>
+                <div id="translation_list">
                 {foreach from=$translations name=translations item=item}
                     <div class="row mb-3">
                         {* Source string *}
@@ -202,6 +203,10 @@
                 {foreachelse}
                     {norecords _colspan=3}
                 {/foreach}
+                </div>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="translation_list" offset="{$offset}" step="{$maxRecords}" total-count="{$total}"></el-infinite-scroll>
+                {/if}
 
                 {jq}
                     jQuery('select[name^="scope_"]').tooltip(
@@ -228,11 +233,13 @@
                 </div>
             </div>
 
-            <div class="card-footer text-center">
-                {pagination_links count=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
-                tiki-edit_languages.php?edit_language={$edit_language}&action={$action}&maxRecords={$maxRecords}&only_db_translations={$only_db_translations}&only_db_untranslated={$only_db_untranslated}{if isset($find)}&find={$find}{/if}
-                {/strip}{/pagination_links}
-            </div>
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                <div class="card-footer text-center">
+                    {pagination_links count=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
+                    tiki-edit_languages.php?edit_language={$edit_language}&action={$action}&maxRecords={$maxRecords}&only_db_translations={$only_db_translations}&only_db_untranslated={$only_db_untranslated}{if isset($find)}&find={$find}{/if}
+                    {/strip}{/pagination_links}
+                </div>
+            {/if}
         </div>
     {/if}
 </form>

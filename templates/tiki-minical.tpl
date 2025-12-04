@@ -152,7 +152,8 @@
         {ticket}
         <input type="hidden" name="view" value="{$view|escape}">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="channels-table">
+                <thead>
                 <tr>
                     <th><input type="submit" class="btn btn-primary btn-sm" name="delete" onclick="confirmPopup()" value="x "></th>
                     <th>
@@ -168,7 +169,9 @@
                         <a href="tiki-minical.php?view={$view}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'topicId_desc'}topicId_asc{else}topicId_desc{/if}">{tr}Topic{/tr}</a>
                     </th>
                 </tr>
+                </thead>
 
+                <tbody id="channels-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td style="text-align:center;">
@@ -192,11 +195,17 @@
                         </td>
                     </tr>
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="channels-table" target-container-id="channels-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+            {/if}
         </div>
     </form>
 
-    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {/if}
 {/if}
 
 <a id="add"></a>

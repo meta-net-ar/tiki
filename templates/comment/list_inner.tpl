@@ -1,4 +1,5 @@
-<ul class="list-unstyled">
+{assign var="containerId" value="container-{uniqid()}"}
+<ul class="list-unstyled" id="{$containerId}">
     {foreach from=$comments item=comment}
         <li class="d-flex comment mt-3 mb-4{if $comment.archived eq 'y'} archived{* well well-sm*}{/if} {if $allow_moderate}{if $comment.approved eq 'n'} pending bg-warning{elseif $comment.approved eq 'r'} rejected bg-danger{/if}{/if}{*{if ! $parentId && $prefs.feature_wiki_paragraph_formatting eq 'y'} inline{/if}*}" data-comment-thread-id="{$comment.threadId|escape}">
             <div class="align-self-start me-3">
@@ -119,4 +120,8 @@
         {/if}
     {/foreach}
 </ul>
-{pagination_links count=$count step=$maxRecords offset=$offset offset_jsvar='comment_offset' _onclick=$paginationOnClick}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="{$containerId}" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+{else}
+    {pagination_links count=$count step=$maxRecords offset=$offset offset_jsvar='comment_offset' _onclick=$paginationOnClick}{/pagination_links}
+{/if}

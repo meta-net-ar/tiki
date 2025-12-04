@@ -66,6 +66,7 @@
     {/if}
 {/if}
 
+<div id="articles-container">
 {section name=ix loop=$listpages}
     {capture name=href}{strip}
         {if empty($urlparam)}
@@ -303,6 +304,10 @@
         {/remarksbox}
     {/if}
 {/section}
+</div>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="articles-container" offset="{$offset}" step="{$maxArticles}" total-count="{$count}"></el-infinite-scroll>
+{/if}
 
 {if !isset($actions) or $actions eq "y"}
     {if $tiki_p_edit_article eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_cms eq 'y'}
@@ -317,6 +322,6 @@
     {/if}
 {/if}
 
-{if !empty($listpages) && (!isset($usePagination) or $usePagination ne 'n')}
+{if !empty($listpages) && (!isset($usePagination) or $usePagination ne 'n') && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
     {pagination_links count=$count step=$maxArticles offset=$offset}{if isset($urlnext)}{$urlnext}{/if}{/pagination_links}
 {/if}

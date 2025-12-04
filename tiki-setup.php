@@ -16,6 +16,7 @@ use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
 
@@ -1079,6 +1080,19 @@ if ($prefs['feature_elementplus'] == 'y') {
     }
     if ($prefs['elementplus_autocomplete'] == 'y') {
         $headerlib->add_js_module("import { autocomplete } from '@tiki/ui-utils'; window.autocomplete = autocomplete;");
+    }
+
+    if ($prefs['elementplus_infinite_scroll'] == 'y') {
+        list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
+        $theme_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
+
+        $css = "$theme_css," . FONTAWESOME_CSS_PATH . '/all.css' . ',themes/base_files/css/tiki_base.css';
+
+        if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
+            $css .= ',' . BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css';
+        }
+
+        $headerlib->add_js_module("import registerInfiniteScroll from '@vue-widgets/el-infinite-scroll'; registerInfiniteScroll('$css');");
     }
 } else {
     $headerlib->add_jq_onready("window.showMessage = function (message) { alert(message); };");

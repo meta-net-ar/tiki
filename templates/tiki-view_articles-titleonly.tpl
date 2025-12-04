@@ -1,4 +1,5 @@
 {if !empty($container_class)}<div class="{$container_class}">{/if}
+<div id="articles-container">
 {section name=ix loop=$listpages}
     {capture name=href}{strip}
         {if empty($urlparam)}
@@ -18,7 +19,11 @@
         <br>
     </div>
 {/section}
-{if !empty($listpages) && (isset($usePagination) and $usePagination ne 'n')}
+</div>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="articles-container" offset="{$offset}" step="{$maxArticles}" total-count="{$count}"></el-infinite-scroll>
+{/if}
+{if !empty($listpages) && (isset($usePagination) and $usePagination ne 'n') && ($prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y')}
     {pagination_links count=$count step=$maxArticles offset=$offset}{if isset($urlnext)}{$urlnext}{/if}{/pagination_links}
 {/if}
 {if !empty($container_class)}</div>{/if}

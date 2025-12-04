@@ -78,7 +78,8 @@
 {include file='find.tpl'}
 
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="edit-qui-options-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-edit_quiz_questions.php?quizId={$quizId}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'questionId_desc'}questionId_asc{else}questionId_desc{/if}">{tr}ID{/tr}</a>
@@ -94,7 +95,9 @@
             <th>{tr}Maximum score{/tr}</th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="edit-qui-options-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="id">{$channels[user].questionId}</td>
@@ -129,8 +132,14 @@
         {sectionelse}
             {norecords _colspan=6}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="edit-qui-options-table" target-container-id="edit-qui-options-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}
 {* tiki-edit_quiz_questions.tpl end *}

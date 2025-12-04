@@ -49,7 +49,8 @@
     {ticket}
     <input type="hidden" name="type" value="{$type|escape}">
     <div class="table-responsive themeobj-table">
-        <table class="table">
+        <table class="table" id="t-control-objects-table">
+            <thead>
             <tr>
                 <th><button type="submit" class="btn btn-warning btn-sm" name="delete" title="{tr}Delete selected{/tr}" aria-label="{tr}Delete selected{/tr}">{icon name="delete"}</button></th>
                 <th>
@@ -67,7 +68,9 @@
                         {tr}Theme{/tr}</a>
                 </th>
             </tr>
+            </thead>
 
+            <tbody id="t-control-objects-body">
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
@@ -78,8 +81,14 @@
                     <td class="text">{$channels[user].theme}</td>
                 </tr>
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="t-control-objects-table" target-container-id="t-control-objects-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

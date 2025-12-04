@@ -10,7 +10,8 @@
                 <div id="content1" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My pages{/tr}{else}{tr}User Pages{/tr}{/if} <span class="badge bg-secondary">{$user_pages_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="user-pages-table">
+                            <thead>
                             <tr>
                                 <th>
                                     <a href="tiki-my_tiki.php?sort_mode={if $sort_mode eq 'pageName_desc'}pageName_asc{else}pageName_desc{/if}">{tr}Page{/tr}</a>
@@ -22,7 +23,9 @@
                                 </th>
                                 <th></th>
                             </tr>
+                            </thead>
 
+                            <tbody id="user-pages-body">
                             {section name=ix loop=$user_pages}
                                 <tr>
                                     <td class="text">
@@ -44,9 +47,15 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="user-pages-table" target-container-id="user-pages-body" offset="{$pages_offset}" step="{$step}" total-count="{$user_pages_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
-                    {pagination_links count=$user_pages_count step=$step offset=$pages_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$user_pages_count step=$step offset=$pages_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -56,12 +65,15 @@
                 <div id="content3" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My Articles{/tr}{else}{tr}User Articles{/tr}{/if} <span class="badge bg-secondary">{$user_articles_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="user-articles-table">
+                            <thead>
                             <tr>
                                 <th>{tr}Article{/tr}</th>
                                 <th style="width:50px"></th>
                             </tr>
+                            </thead>
 
+                            <tbody id="user-articles-body">
                             {section name=ix loop=$user_articles}
                                 <tr>
                                     <td class="text">
@@ -76,9 +88,15 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="user-articles-table" target-container-id="user-articles-body" offset="{$articles_offset}" step="{$step}" total-count="{$user_articles_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
-                    {pagination_links count=$user_articles_count step=$step offset=$articles_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$user_articles_count step=$step offset=$articles_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -88,12 +106,15 @@
                 <div id="content4" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My User Items{/tr}{else}{tr}User Items{/tr}{/if} <span class="badge bg-secondary">{$user_items_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="user-items-table">
+                            <thead>
                             <tr>
                                 <th>{tr}Item{/tr}</th>
                                 <th>{tr}Tracker{/tr}</th>
                             </tr>
+                            </thead>
 
+                            <tbody id="user-items-body">
                             {section name=ix loop=$user_items}
                                 <tr>
                                     <td class="text">
@@ -108,13 +129,19 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="user-items-table" target-container-id="user-items-body" offset="{$user_items_offset}" step="{$step}" total-count="{$user_items_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
                     <ul class="nav nav-pills float-end">
                         <li><a href="#">{tr}Records{/tr} <span class="badge bg-secondary" role="button">{$user_items|@count}</span></a>&nbsp;</li>
                         <li><a href="#">{tr}Comments{/tr} <span class="badge bg-secondary" role="button">{$nb_item_comments}</span></a></li>
                     </ul>
-                    {pagination_links count=$user_items_count step=$step offset=$user_items_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$user_items_count step=$step offset=$user_items_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -124,13 +151,16 @@
                 <div id="content5" class="content clearfix mb-4">
                     <h4>{tr}Unread Messages{/tr} <span class="badge bg-secondary">{$msgs_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="msgs-table">
+                            <thead>
                             <tr>
                                 <th>{tr}Subject{/tr}</th>
                                 <th>{tr}From{/tr}</th>
                                 <th>{tr}Date{/tr}</th>
                             </tr>
+                            </thead>
 
+                            <tbody id="msgs-body">
                             {section name=ix loop=$msgs}
                                 <tr>
                                     <td class="text">
@@ -146,9 +176,15 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="msgs-table" target-container-id="msgs-body" offset="{$msgs_offset}" step="{$step}" total-count="{$msgs_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
-                    {pagination_links count=$msgs_count step=$step offset=$msgs_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$msgs_count step=$step offset=$msgs_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -158,11 +194,14 @@
                 <div id="content6" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My tasks{/tr}{else}{tr}My Tasks{/tr}{/if} <span class="badge bg-secondary">{$tasks_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="tasks-table">
+                        <thead>
                         <tr>
                             <th>{tr}Tasks{/tr}</th>
                         </tr>
+                        </thead>
 
+                        <tbody id="tasks-body">
                         {section name=ix loop=$tasks}
                             <tr>
                                 <td class="text">
@@ -172,9 +211,15 @@
                                 </td>
                             </tr>
                         {/section}
+                        </tbody>
                     </table>
+                    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                        <el-infinite-scroll container-id="tasks-table" target-container-id="tasks-body" offset="{$tasks_offset}" step="{$step}" total-count="{$tasks_count}"></el-infinite-scroll>
+                    {/if}
                     </div>
-                    {pagination_links count=$tasks_count step=$step offset=$tasks_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$tasks_count step=$step offset=$tasks_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -184,12 +229,15 @@
                 <div id="content7" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My forum topics{/tr}{else}{tr}User forum topics{/tr}{/if} <span class="badge bg-secondary">{$forum_topics_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="forum-topics-table">
+                            <thead>
                             <tr>
                                 <th>{tr}Forum topic{/tr}</th>
                                 <th>{tr}Date of post{/tr}</th>
                             </tr>
+                            </thead>
 
+                            <tbody id="forum-topics-body">
                             {section name=ix loop=$user_forum_topics}
                                 <tr>
                                     <td class="text">
@@ -202,9 +250,15 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="forum-topics-table" target-container-id="forum-topics-body" offset="{$forum_topics_offset}" step="{$step}" total-count="{$forum_topics_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
-                    {pagination_links count=$forum_topics_count step=$step offset=$forum_topics_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$forum_topics_count step=$step offset=$forum_topics_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -214,12 +268,15 @@
                 <div id="content8" class="content clearfix mb-4">
                     <h4>{if $userwatch eq $user}{tr}My forum replies{/tr}{else}{tr}User forum replies{/tr}{/if} <span class="badge bg-secondary">{$forum_replies_count}</span></h4>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="forum-replies-table">
+                            <thead>
                             <tr>
                                 <th>{tr}Forum reply{/tr}</th>
                                 <th>{tr}Date of post{/tr}</th>
                             </tr>
+                            </thead>
 
+                            <tbody id="forum-replies-body">
                             {section name=ix loop=$user_forum_replies}
                                 <tr>
                                     <td class="text">
@@ -232,9 +289,15 @@
                                     </td>
                                 </tr>
                             {/section}
+                            </tbody>
                         </table>
+                        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                            <el-infinite-scroll container-id="forum-replies-table" target-container-id="forum-replies-body" offset="{$forum_replies_offset}" step="{$step}" total-count="{$forum_replies_count}"></el-infinite-scroll>
+                        {/if}
                     </div>
-                    {pagination_links count=$forum_replies_count step=$step offset=$forum_replies_offset clean='y'}{/pagination_links}
+                    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                        {pagination_links count=$forum_replies_count step=$step offset=$forum_replies_offset clean='y'}{/pagination_links}
+                    {/if}
                 </div>
             {/tab}
         {/if}
@@ -269,12 +332,15 @@
                     <div class="clearfix">
                         <h4>{if $userwatch eq $user}{tr}My blog Posts{/tr}{else}{tr}User Blog Posts{/tr}{/if} <span class="badge bg-secondary">{$user_posts_count}</span></h4>
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-striped table-hover" id="user-posts-table">
+                                <thead>
                                 <tr>
                                     <th>{tr}Blog post{/tr}</th>
                                     <th style="width:50px"></th>
                                 </tr>
+                                </thead>
 
+                                <tbody id="user-posts-body">
                                 {section name=ix loop=$user_blog_posts}
                                     <tr>
                                         <td class="text">
@@ -287,9 +353,15 @@
                                         </td>
                                     </tr>
                                 {/section}
+                                </tbody>
                             </table>
+                            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                                <el-infinite-scroll container-id="user-posts-table" target-container-id="user-posts-body" offset="{$posts_offset}" step="{$step}" total-count="{$user_posts_count}"></el-infinite-scroll>
+                            {/if}
                         </div>
-                        {pagination_links count=$user_posts_count step=$step offset=$posts_offset clean='y'}{/pagination_links}
+                        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                            {pagination_links count=$user_posts_count step=$step offset=$posts_offset clean='y'}{/pagination_links}
+                        {/if}
                     </div>
                 </div>
             {/tab}

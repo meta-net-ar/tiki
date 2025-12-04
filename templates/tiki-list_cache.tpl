@@ -7,7 +7,8 @@
 {include file='find.tpl'}
 
 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-    <table class="table">
+    <table class="table" id="cache-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-list_cache.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'url_desc'}url_asc{else}url_desc{/if}">{tr}URL{/tr}</a>
@@ -17,6 +18,8 @@
             </th>
             <th></th>
         </tr>
+        </thead>
+        <tbody id="cache-body">
         {section name=changes loop=$listpages}
             <tr>
                 <td class="text">
@@ -61,7 +64,13 @@
         {sectionelse}
             {norecords _colspan=3}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="cache-table" target-container-id="cache-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

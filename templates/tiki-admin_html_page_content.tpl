@@ -48,7 +48,8 @@
     {ticket}
     <input type="hidden" name="pageName" value="{$pageName|escape}">
     <input type="hidden" name="zone" value="{$zone|escape}">
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="ad-html-pc-table">
+        <thead>
         <tr>
             <th>
                 <a href="tiki-admin_html_page_content.php?pageName={$pageName|escape:"url"}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'zone_desc'}zone_asc{else}zone_desc{/if}">{tr}zone{/tr}</a>
@@ -58,7 +59,9 @@
             </th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="ad-html-pc-body">
         {section name=user loop=$channels}
             <tr>
                 <td class="text">{$channels[user].zone}</td>
@@ -76,7 +79,12 @@
                 </td>
             </tr>
         {/section}
+        </tbody>
     </table>
+
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="ad-html-pc-table" target-container-id="ad-html-pc-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 
     <div class="mb-3 row">
         <div class="col-sm-3"></div>
@@ -86,4 +94,6 @@
     </div>
 </form>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

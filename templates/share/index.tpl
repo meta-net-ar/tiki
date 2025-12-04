@@ -11,7 +11,7 @@
 {block name="content"}
     <form name="checkform" id="checkform" method="post">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="tokens-table">
                 <thead>
                     <tr>
                         {if isset($checkboxes_on) and $checkboxes_on eq 'y'}
@@ -35,7 +35,7 @@
                         <th>{tr}Actions{/tr}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tokens-body">
                     {if $tokens|@count == 0}
                         <tr>
                             <td colspan="13" class="text-center">{tr}No shared URLs found.{/tr}</td>
@@ -82,6 +82,9 @@
                     {/if}
                 </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="tokens-table" target-container-id="tokens-body" offset="0" step="{$prefs.maxRecords}" total-count="{$count}"></el-infinite-scroll>
+            {/if}
         </div>
         {if $tokens|@count > 0 and $tiki_p_remove_share == 'y'}
             <div>
@@ -103,5 +106,7 @@
             </div>
         {/if}
     </form>
-    {pagination_links cant=$cant step=$prefs.maxRecords}{/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links cant=$cant step=$prefs.maxRecords}{/pagination_links}
+    {/if}
 {/block}

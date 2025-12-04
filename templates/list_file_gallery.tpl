@@ -42,7 +42,7 @@
         <div class="col-sm-12 fgallisting explorerDisplayed">
     {/if}
     <div>
-        {if $maxRecords > 20 and $count > $maxRecords}
+        {if $maxRecords > 20 and $count > $maxRecords && ($prefs.elementplus_infinite_scroll eq 'n' || $prefs.feature_elementplus eq 'n')}
             <div class="clearboth" style="margin-bottom: 3px;">
                 {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
             </div>
@@ -219,11 +219,13 @@
             {/if}
         </form>
         {reindex_file_pixel id=$reindex_file_id}<br>
-        {pagination_links count=$count step=$maxRecords offset=$offset}
-            {if $view eq 'page'}
-                tiki-list_file_gallery.php?galleryId={$galleryId}&maxWidth={$maxWidth}&maxRecords={$maxRecords}&view={$view}
-            {/if}
-        {/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count step=$maxRecords offset=$offset}
+                {if $view eq 'page'}
+                    tiki-list_file_gallery.php?galleryId={$galleryId}&maxWidth={$maxWidth}&maxRecords={$maxRecords}&view={$view}
+                {/if}
+            {/pagination_links}
+        {/if}
         </div>
     </div>
 </div>

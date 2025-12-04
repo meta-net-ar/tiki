@@ -141,7 +141,8 @@
             {ticket}
             <input type="hidden" name="nlId" value="{$nlId|escape}">
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="ad-newsletter-s-table">
+                <thead>
                 <tr>
                     <th>
                         {select_all checkbox_names='checked[]'}
@@ -157,7 +158,9 @@
                     </th>
                     <th></th>
                 </tr>
+                </thead>
 
+                <tbody id="ad-newsletter-s-body">
                 {section name=user loop=$channels}
                     <tr>
                         <td class="checkbox-cell">
@@ -201,7 +204,11 @@
                 {sectionelse}
                     {norecords _colspan=5}
                 {/section}
+                </tbody>
             </table>
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-newsletter-s-table" target-container-id="ad-newsletter-s-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count_pages}"></el-infinite-scroll>
+            {/if}
         </div>
 
         {if $channels}
@@ -230,7 +237,9 @@
 
         </form>
 
-        {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+            {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {tab name="{tr}Add subscribers{/tr}"}

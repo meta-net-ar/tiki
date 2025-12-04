@@ -23,15 +23,22 @@
 {/if}
 
 {if $listpages|@count > 0}
+    <div id="posts-container">
     {foreach from=$listpages item=post_info}
         <article class="card blogpost clearfix d-block mb-5 border-0{if !empty($container_class)} {$container_class}{/if}">
             {include file='blog_wrapper.tpl' blog_post_context=$request_context}
         </article>
     {/foreach}
+    </div>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="posts-container" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+    {/if}
 {else}
     {remarksbox type="warning" close="y" id="warningMessage"}
     {tr}The blog has no post yet{/tr}
     {/remarksbox}
 {/if}
 
-{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

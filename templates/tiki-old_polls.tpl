@@ -2,14 +2,17 @@
 
 {include file='find.tpl'}
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover" id="polls-table">
+<thead>
 <tr>
 <th>{self_link _sort_arg='sort_mode' _sort_field='title' title="{tr}Title{/tr}"}{tr}Title{/tr}{/self_link}</th>
 <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate' title="{tr}Published{/tr}"}{tr}Published{/tr}{/self_link}</th>
 <th>{self_link _sort_arg='sort_mode' _sort_field='votes' title="{tr}Votes{/tr}"}{tr}Votes{/tr}{/self_link}</th>
 <th></th>
 </tr>
+</thead>
 
+<tbody id="polls-body">
 {section name=changes loop=$listpages}
 <tr>
 <td class="text">{$listpages[changes].title|escape}</td>
@@ -37,6 +40,12 @@
 {sectionelse}
     {norecords _colspan=4}
 {/section}
+</tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="polls-table" target-container-id="polls-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{/if}
 </div>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

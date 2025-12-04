@@ -32,13 +32,16 @@
     <form action="tiki-search_replace.php" method="post">
         {if isset($results)}
             <div class="table-responsive">
-                <table class="table">
+                <table class="table" id="results-table">
+                    <thead>
                     <tr>
                         <td class="text-end">
                             {select_all checkbox_names='checked[]'}
                         </td>
                     </tr>
+                    </thead>
 
+                    <tbody id="results-body">
                     {section name=search loop=$results}
                         {if isset($results[search].searchreplace)}
                             <tr>
@@ -69,7 +72,11 @@
                             </tr>
                         {/if}
                     {/section}
+                    </tbody>
                 </table>
+                {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                    <el-infinite-scroll container-id="results-table" target-container-id="results-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+                {/if}
             </div>
             <input type="hidden" name="searchtext" value="{$searchtext}">
             <input type="hidden" name="replacetext" value="{$replacetext}">
@@ -77,7 +84,9 @@
             <input type="hidden" name="casesensitive" value="{$casesensitive}">
             <input type="hidden" name="paddingLength" value="{$paddingLength}">
             <input type="submit" class="btn btn-primary btn-sm" name="replace" value="{tr}Replace selected{/tr}">
-            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+            {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+                {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+            {/if}
         {/if}
     </form>
 </div>

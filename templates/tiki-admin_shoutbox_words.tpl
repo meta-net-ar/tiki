@@ -24,14 +24,17 @@
 {include file='find.tpl'}
 
 <div class="table-responsive">
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover" id="ad-shoutbox-table">
+    <thead>
     <tr>
         <th>
             <a href="tiki-admin_shoutbox_words.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'word_desc'}word_asc{else}word_desc{/if}">{tr}Word{/tr}</a>
         </th>
         <th></th>
     </tr>
+    </thead>
 
+    <tbody id="ad-shoutbox-body">
     {section name=user loop=$words}
         <tr>
             <td class="text">{$words[user].word|escape}</td>
@@ -50,7 +53,12 @@
     {sectionelse}
         {norecords _colspan=2}
     {/section}
+    </tbody>
 </table>
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="ad-shoutbox-table" target-container-id="ad-shoutbox-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{/if}
 </div>
-
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

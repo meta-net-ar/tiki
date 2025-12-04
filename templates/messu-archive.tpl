@@ -71,7 +71,8 @@
 var CHECKBOX_LIST = [{{section name=user loop=$items}'msg[{$items[user].msgId}]'{if not $smarty.section.user.last},{/if}{/section}}];
 {/jq}
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="messu-archive-table">
+            <thead>
             <tr>
                 <th><input type="checkbox" name="checkall" onclick="checkbox_list_check_all('form_messu_archive',CHECKBOX_LIST,this.checked);"></th>
                 <th style="width:18px">&nbsp;</th>
@@ -80,7 +81,9 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'msg[{$items[user].msgId}]'
                 <th><a href="messu-archive.php?flag={$flag|escape:"url"}&amp;priority={$priority|escape:"url"}&amp;flagval={$flagval|escape:"url"}&amp;find={$find|escape:"url"}&amp;offset={$offset|escape:"url"}&amp;sort_mode={if $sort_mode eq 'date_desc'}date_asc{else}date_desc{/if}">{tr}Date{/tr}</a></th>
                 <th style="text-align:right">{tr}Size{/tr}</th>
             </tr>
+            </thead>
 
+            <tbody id="messu-archive-body">
             {section name=user loop=$items}
                 <tr>
                     <td class="prio{$items[user].priority|escape:"attr"}"><input type="checkbox" name="msg[{$items[user].msgId|escape:"attr"}]"></td>
@@ -93,7 +96,14 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'msg[{$items[user].msgId}]'
             {sectionelse}
                 <tr><td colspan="6">{tr}No messages to display{/tr}<td></tr>
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="messu-archive-table" target-container-id="messu-archive-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

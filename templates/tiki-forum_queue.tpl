@@ -137,12 +137,15 @@
     <input type="hidden" name="find" value="{$find|escape}">
 
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="forum-queue-table">
+            <thead>
             <tr>
                 {if $items}<th>&nbsp;</th>{/if}
                 <th>{tr}Message{/tr}</th>
             </tr>
+            </thead>
 
+            <tbody id="forum-queue-body">
             {section name=ix loop=$items}
                 <tr>
                     <td class="checkbox-cell">
@@ -191,7 +194,11 @@
             {sectionelse}
                 {norecords _colspan=2 _text="{tr}No messages queued yet{/tr}"}
             {/section}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="forum-queue-table" target-container-id="forum-queue-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
     {if $items}
         <br>
@@ -202,4 +209,6 @@
 </form>
 {* END OF LISTING *}
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

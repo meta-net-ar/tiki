@@ -10,7 +10,8 @@
     {/if}
 </div>
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="surveys-table">
+        <thead>
         <tr>
             <th>
                 {self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}
@@ -18,7 +19,9 @@
             <th>{tr}Questions{/tr}</th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="surveys-body">
         {section name=user loop=$channels}
             {if ($tiki_p_admin eq 'y') or ($channels[user].individual eq 'n' and $tiki_p_take_survey eq 'y') or ($channels[user].individual_tiki_p_take_survey eq 'y')}
                 <tr>
@@ -73,7 +76,13 @@
             {sectionelse}
             {norecords _colspan=3}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="surveys-table" target-container-id="surveys-body" offset="{$offset}" step="{$maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
+{/if}

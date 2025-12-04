@@ -46,7 +46,8 @@
             {if $channels or ($find ne '')}
                 {include file='find.tpl'}
             {/if}
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="ad-rssmod-table">
+                <thead>
                 <tr>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='rssId'}{tr}ID{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}</th>
@@ -55,6 +56,9 @@
                     <th>{self_link _sort_arg='sort_mode' _sort_field='showPubDate'}{tr}Show Date{/tr}{/self_link}</th>
                     <th></th>
                 </tr>
+                </thead>
+
+                <tbody id="ad-rssmod-body">
                 {section name=chan loop=$channels}
                     <tr>
                         <td class="id">{$channels[chan].rssId|escape}</td>
@@ -136,9 +140,14 @@
                 {sectionelse}
                     {norecords _colspan=6}
                 {/section}
+                </tbody>
             </table>
 
-            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+            {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+                <el-infinite-scroll container-id="ad-rssmod-table" target-container-id="ad-rssmod-body" offset="{$offset}" step="{$maxRecords}" total-count="{$count}"></el-infinite-scroll>
+            {else}
+                {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+            {/if}
 
         </div>
     {/tab}

@@ -13,7 +13,8 @@
 {/if}
 
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="banners-table">
+        <thead>
         <tr>
             <th>{self_link _sort_arg='sort_mode' _sort_field='bannerId'}{tr}Id{/tr}{/self_link}</th>
             <th>{self_link _sort_arg='sort_mode' _sort_field='client'}{tr}Client{/tr}{/self_link}</th>
@@ -28,7 +29,9 @@
             <th>{self_link _sort_arg='sort_mode' _sort_field='clicks'}{tr}Clicks{/tr}{/self_link}</th>
             <th></th>
         </tr>
+        </thead>
 
+        <tbody id="banners-body">
         {section name=changes loop=$listpages}
         <tr>
             <td class="id">{if $tiki_p_admin_banners eq 'y'}<a class="link" href="tiki-edit_banner.php?bannerId={$listpages[changes].bannerId}">{/if}{$listpages[changes].bannerId}{if $tiki_p_admin_banners eq 'y'}</a>{/if}</td>
@@ -75,7 +78,13 @@
         {sectionelse}
             {norecords _colspan=12}
         {/section}
+        </tbody>
     </table>
+    {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+        <el-infinite-scroll container-id="banners-table" target-container-id="banners-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+    {/if}
 </div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

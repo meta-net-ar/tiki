@@ -68,28 +68,34 @@
 
 {include file='find.tpl'}
 
-{section name=user loop=$channels}
-    <div class="shoutboxmsg">
-        <b><a href="tiki-user_information.php?view_user={$channels[user].user}">{$channels[user].user}</a></b>, {$channels[user].timestamp|tiki_long_date}, {$channels[user].timestamp|tiki_long_time}
+<div id="shoutbox-content">
+    {section name=user loop=$channels}
+        <div class="shoutboxmsg">
+            <b><a href="tiki-user_information.php?view_user={$channels[user].user}">{$channels[user].user}</a></b>, {$channels[user].timestamp|tiki_long_date}, {$channels[user].timestamp|tiki_long_time}
 
-        {if $tiki_p_admin_shoutbox eq 'y' || $channels[user].user == $user}
-            <a href="tiki-shoutbox.php?find={$find}&amp;offset={$offset}&amp;sort_mode={$sort_mode}&amp;msgId={$channels[user].msgId}" class="tips text-primary" title=":{tr}Edit{/tr}">
-                {icon name='edit'}
-            </a>
-            <form style="display: inline" action="tiki-shoutbox.php" method="post">
-                {ticket}
-                <input type="hidden" name="find" value="{$find}">
-                <input type="hidden" name="offset" value="{$offset}">
-                <input type="hidden" name="sort_mode" value="{$sort_mode}">
-                <input type="hidden" name="remove" value="{$channels[user].msgId}">
-                <button type="submit" class="btn btn-link px-0 pt-0 tips text-danger" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" onclick="confirmPopup()">
-                    {icon name='remove'}
-                </button>
-            </form>
-        {/if}
-        <br>
-        {$channels[user].message}
-    </div>
-{/section}
+            {if $tiki_p_admin_shoutbox eq 'y' || $channels[user].user == $user}
+                <a href="tiki-shoutbox.php?find={$find}&amp;offset={$offset}&amp;sort_mode={$sort_mode}&amp;msgId={$channels[user].msgId}" class="tips text-primary" title=":{tr}Edit{/tr}">
+                    {icon name='edit'}
+                </a>
+                <form style="display: inline" action="tiki-shoutbox.php" method="post">
+                    {ticket}
+                    <input type="hidden" name="find" value="{$find}">
+                    <input type="hidden" name="offset" value="{$offset}">
+                    <input type="hidden" name="sort_mode" value="{$sort_mode}">
+                    <input type="hidden" name="remove" value="{$channels[user].msgId}">
+                    <button type="submit" class="btn btn-link px-0 pt-0 tips text-danger" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" onclick="confirmPopup()">
+                        {icon name='remove'}
+                    </button>
+                </form>
+            {/if}
+            <br>
+            {$channels[user].message}
+        </div>
+    {/section}
+</div>
 
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+    <el-infinite-scroll container-id="shoutbox-content" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+{else}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

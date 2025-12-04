@@ -63,7 +63,7 @@
     <input type="hidden" name="oldcategId" value="{$items[user].relatedTo|default:''|escape}">
 
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="dir-ad-rel-table">
             <thead>
                 <tr>
                     <th>{tr}Directory Category{/tr}</th>
@@ -71,7 +71,7 @@
                     <th class="text-center">{tr}Update{/tr}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="dir-ad-rel-body">
                 {section name=user loop=$items}
                 <tr>
                     <td>
@@ -89,6 +89,11 @@
                 {/section}
             </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="dir-ad-rel-table" target-container-id="dir-ad-rel-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$pages_count}"></el-infinite-scroll>
+        {/if}
     </div>
 </form>
-{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{/if}

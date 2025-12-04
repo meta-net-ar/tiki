@@ -57,7 +57,8 @@
     <br/>
 
     <div class="table-responsive">
-        <table class="table">
+        <table class="table" id="item-history-table">
+            <thead>
             <tr>
                 <th class="text-nowrap">{tr}Version{/tr}</th>
                 <th class="text-nowrap">{tr}Date{/tr}</th>
@@ -71,7 +72,9 @@
                     <th class="text-nowrap" colspan="2">{tr}Difference{/tr}</th>
                 {/if}
             </tr>
+            </thead>
 
+            <tbody id="item-history-body">
             {$last_version = 0}
             {foreach from=$history item=hist}
                 {if $hist.value neq $hist.new or $hist.version == 0}
@@ -106,9 +109,14 @@
                     {/if}
                 {/if}
             {/foreach}
+            </tbody>
         </table>
+        {if $prefs.feature_elementplus eq 'y' && $prefs.elementplus_infinite_scroll eq 'y'}
+            <el-infinite-scroll container-id="item-history-table" target-container-id="item-history-body" offset="{$offset}" step="{$prefs.maxRecords}" total-count="{$count}"></el-infinite-scroll>
+        {/if}
     </div>
 
-    {pagination_links count=$count offset=$offset step=$prefs.maxRecords}
-    {/pagination_links}
+    {if $prefs.feature_elementplus neq 'y' || $prefs.elementplus_infinite_scroll neq 'y'}
+        {pagination_links count=$count offset=$offset step=$prefs.maxRecords}{/pagination_links}
+    {/if}
 {/block}
