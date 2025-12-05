@@ -15,11 +15,11 @@ class RSSLib extends TikiDb_Bridge
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
     private static string $cache_meta_Key = 'rss_feed_meta';
+    private static string $cache_ttl_key = 'rss_feed_ttl';
     /**
      * Limit of the name field of the tiki_rss_modules table
      */
     public const MAX_EXTERNAL_FEED_NAME_LENGTH = 200;
-    private static string $cache_ttl_key = 'rss_feed_ttl';
 
     public function __construct()
     {
@@ -539,7 +539,7 @@ class RSSLib extends TikiDb_Bridge
     private function update_feed($url, $rssId = null, $actions = null): array
     {
         global $tikilib;
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => 0];
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => 0, 'lastUpdated' => $tikilib->now];
         $filter = $this->createFilter();
         $feed = $this->fetchFeed($url);
         if (! $feed) {
@@ -1074,7 +1074,7 @@ class RSSLib extends TikiDb_Bridge
     private static function extractTtlFromFeed($xml): int
     {
         $DOM = new DOMDocument();
-        @$DOM->loadXML($xml);
+        $DOM->loadXML($xml);
         $xpath = new DOMXPath($DOM);
 
         $ttlNodes = $xpath->query('//*[local-name()="channel"]/*[local-name()="ttl"]');
@@ -1094,26 +1094,27 @@ class RSSLib extends TikiDb_Bridge
         }
 
         $cache_feed_key = self::$cache_feed_key . md5($url);
-        $cache_meta_key = self::$cache_meta_Key . md5($url);
-        $cache_ttl_key = self::$cache_ttl_key . md5($url);
 
-        $cached_ttl = self::$cachelib->getSerialized($cache_ttl_key);
-        $ttl = max($cached_ttl, $params['refresh']);
-        $refresh_time = $tikilib->now - $ttl * 60;
+        $cache_feed_result = self::$cachelib->getSerialized($cache_feed_key);
 
-        $cache_feed_items = self::$cachelib->getSerialized($cache_feed_key, '', $refresh_time);
-        $cache_meta = self::$cachelib->getSerialized($cache_meta_key, '', $refresh_time);
+        if ($cache_feed_result) {
+            $ttl = max($cache_feed_result['ttl'], $params['refresh']);
+            $cache_time = $cache_feed_result['lastUpdated'];
+            $maxTime = $cache_time + $ttl * 60;
+            if ($maxTime <= $tikilib->now) {
+                self::$cachelib->invalidate($cache_feed_key);
+                $cache_feed_result = null;
+            }
+        }
 
-        if ($cache_feed_items || $cache_meta) {
-            $items = $cache_feed_items;
-            $title = $cache_meta;
+        if ($cache_feed_result) {
+            $items = $cache_feed_result['feedData'];
+            $title = $cache_feed_result['siteMeta'];
         } else {
             $result = $this->update_feed($url);
             $items = $result['feedData'];
             $title = $result['siteMeta'];
-            self::$cachelib->cacheItem($cache_feed_key, serialize($items));
-            self::$cachelib->cacheItem($cache_meta_key, serialize($title));
-            self::$cachelib->cacheItem($cache_ttl_key, serialize($result['ttl']));
+            self::$cachelib->cacheItem($cache_feed_key, serialize($result));
         }
 
         $params = array_merge($params, [
