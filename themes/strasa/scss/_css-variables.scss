@@ -15,34 +15,38 @@
 @import "variables";
 
 // Used for L&F nav color choice and color mode override
-@mixin top-nav-light {
-    --tiki-top-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
-    --tiki-top-color: #fff;
-    --tiki-top-hover-color: #{$navbar-dark-hover-color}; // darken(#fff, 10%);
-    --tiki-top-text-color: #{$navbar-dark-hover-color}; // darken(#fff, 10%);
-    --bs-navbar-brand-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+@mixin top-nav-dark {
+    --tiki-top-bg: var(--tiki-strasa-darkblue-bg);
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #393939;
 }
 
-@mixin topbar-nav-light {
-    --tiki-topbar-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
-    --tiki-topbar-color: #{$navbar-light-color};
+@mixin topbar-nav-dark {
+    --tiki-topbar-bg: var(--tiki-strasa-lightblue-bg);
+    --tiki-topbar-color: #000000a6;
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
-@mixin top-nav-dark {
-    --tiki-top-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+@mixin top-nav-light {
+    --tiki-top-bg: var(--tiki-strasa-darkblue-bg);
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
     --tiki-top-text-color: #{$navbar-dark-hover-color};
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #393939;
 }
 
-@mixin topbar-nav-dark {
-    --tiki-topbar-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
-    --tiki-topbar-color: #000000a6; //#{$navbar-light-color}; // #{$navbar-dark-color};
+@mixin topbar-nav-light {
+    --tiki-topbar-bg: var(--tiki-strasa-lightblue-bg);
+    --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
@@ -74,24 +78,24 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+    --tiki-admin-top-nav-bg: var(--tiki-strasa-darkblue-bg);
     --tiki-admin-top-nav-color: #fff;
     --tiki-admin-top-nav-hover-color: darken(#fff, 10%);
     --tiki-admin-top-nav-hover-bg: none ;
-    --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+    --tiki-admin-aside-nav-bg: var(--tiki-strasa-darkblue-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
@@ -102,11 +106,11 @@
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+    --tiki-admin-top-nav-bg: var(--tiki-strasa-darkblue-bg);
     --tiki-admin-top-nav-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+    --tiki-admin-aside-nav-bg: var(--tiki-strasa-darkblue-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-link-color: #{$navbar-dark-color};
@@ -124,17 +128,16 @@
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 // Color mode preference trumps L&F admin light navbar option
@@ -157,6 +160,7 @@
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 :root {
+    --tiki-page-content-top-margin: 0px !important;
     .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
     .ec-v-event {
         background: var(--bs-secondary-bg) !important;

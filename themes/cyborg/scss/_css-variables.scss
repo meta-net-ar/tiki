@@ -13,43 +13,48 @@
 // * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
 
 @use "sass:color";
+@import "../../../node_modules/bootswatch/dist/cyborg/_variables.scss";
 @import "variables";
 
 // Used for L&F nav color choice and color mode override
+@mixin top-nav-dark {
+    --tiki-top-bg: #060606;
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: solid #282828;
+    --tiki-top-border-width: 0px 0px 1px 0px;
+    --tiki-top-box-shadow: 0px 1px 10px  #060606;
+}
+
+@mixin topbar-nav-dark {
+    --tiki-topbar-bg: #060606;
+    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-border: solid #282828;
+    --tiki-topbar-border-width: 0px 0px 1px 0px;
+    --tiki-topbar-box-shadow: none;
+}
+
 @mixin top-nav-light {
     --tiki-top-bg: #3D3D3D; // #{$light};
     --tiki-top-color: #{$navbar-light-color};
-    --tiki-top-hover-color: #{color.adjust($blue, $lightness: 10%, $space: hsl)};
-    --tiki-top-text-color:  #{color.adjust($blue, $lightness: 10%, $space: hsl)};
-    --bs-navbar-brand-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
+    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #2e2e2e;
 }
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: #3D3D3D; // #{$light};
     --tiki-topbar-color: #{$navbar-light-color};
-    --tiki-topbar-hover-color: #{color.adjust($blue, $lightness: 10%, $space: hsl)};
-    --tiki-topbar-text-color: #{color.adjust($blue, $lightness: 10%, $space: hsl)};
-}
-
-@mixin top-nav-dark {
-    --tiki-top-bg: #060606;
-    --tiki-top-color: rgba(255, 255, 255, 0.55);
-    --tiki-top-hover-color: #{$white};
-    --tiki-top-text-color: #{$white};
-    --tiki-top-border: solid #282828;
-    --tiki-top-border-width: 0px 0px 1px 0px;
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
-}
-
-@mixin topbar-nav-dark {
-    --tiki-topbar-bg: #060606;
-    --tiki-topbar-color: rgba(255, 255, 255, 0.55);
-    --tiki-topbar-hover-color: #{$white};
-    --tiki-topbar-text-color: #{$white};
-    --tiki-topbar-border: solid #282828;
-    --tiki-topbar-border-width: 0px 0px 1px 0px;
+    --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-hover-color};
 }
 
 .tiki-top-nav-light {
@@ -96,6 +101,7 @@
     --tiki-admin-top-nav-color: #{$blue};
     --tiki-admin-top-nav-hover-color: #{color.adjust($blue, $lightness: 10%, $space: hsl)};
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #2e2e2e;
     --tiki-admin-aside-nav-bg: #{$light};
     --tiki-admin-aside-nav-color: #{$blue};
     --tiki-admin-aside-nav-hover-color: #{color.adjust($blue, $lightness: 10%, $space: hsl)};
@@ -116,30 +122,30 @@
     --tiki-admin-top-nav-hover-bg: none;
     --tiki-admin-top-border: solid #282828;
     --tiki-admin-top-border-width: 0px 0px 1px 0px;
+    --tiki-admin-top-box-shadow: 0px 1px 10px  #060606;
     --tiki-admin-aside-nav-bg: #060606;
     --tiki-admin-aside-nav-color: rgba(255, 255, 255, 0.85);
     --tiki-admin-aside-nav-hover-color: #{$white};
-    --tiki-admin-dropdown-link-color:  #{$dropdown-dark-color};
+    --tiki-admin-dropdown-link-color:  #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
-    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
-    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
+    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     .accordion-item {
         border-color: transparent !important;
     }
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 //// Color mode preference trumps L&F admin light navbar option ------ Dark mode isn't supported because the theme is already dark.

@@ -32,12 +32,6 @@ function module_git_detail($mod_reference, $module_params)
     /** @var GitLib $gitlib */
     $gitlib = TikiLib::lib('git');
 
-    if (! $gitlib->isGitInstall()) {
-        $smarty->assign('error', tra('Not a Git installation'));
-        $smarty->assign('content', []);
-        return;
-    }
-
     $result = $gitlib->getGitDetails();
 
     $smarty->assign('error', $result['error']);

@@ -45,7 +45,10 @@ $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default; /
 $form-feedback-valid-color:         #238560; // $success !default;
 
 // Navs
-// Navbars
+// Navbar
+$navbar-dark-color:                 rgba($white, .90); // !default;
+$navbar-dark-hover-color:           rgba($white, .80); // !default;
+
 // Dropdowns
 // Pagination
 // Cards

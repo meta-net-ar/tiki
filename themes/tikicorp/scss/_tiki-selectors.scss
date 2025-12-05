@@ -1,14 +1,24 @@
-@use "sass:color";
+// TikiCorp theme for Tiki Bootstrap 5.3
 
-// This file contains CSS rules for this theme that aren't covered by Bootstrap, such as additional Tiki theme properties.
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
-$imagePath: "../images/";
+// Image path example:
+//$imagePath: "../images/";
 // body {
-//	background-image: url('#{$imagePath}bg.jpg');
+//    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// The headings below that are commented are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
-// In the case of CSS selectors that are grouped to share common CSS properties, the category appropriate for most of the selectors is used.
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+@use "sass:color";
+
+$imagePath: "../images/";
 
 //  Color system
 // Spacing
@@ -29,11 +39,10 @@ $imagePath: "../images/";
     padding-bottom: 40px;
 }
 
-
 //  Body (large elements
 body {
     background-image: var(--tiki-page-bg-image);
-    background-position: 50% 0%;
+    background-position: 50% 0;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -217,9 +226,8 @@ h1.pagetitle a {
 
 .topbar-wrapper, // Classic Bootstrap and classic Tiki layouts
 .layout_basic .topbar_modules { // Single container layout
-    padding: 20px;
     border-radius: 20px;
-    margin: 0 40px;
+    margin: 32px 40px 0px;
 }
 
 //  Dropdowns
@@ -248,5 +256,33 @@ h1.pagetitle a {
 //  Etc
 
 //  Tiki-specific
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    color: #dee2e6;
+    .card {
+        color: #dee2e6;
+        background: var(--tiki-brand-bg-dark);
+    }
+    .tiki-card-header-title {
+        color: #dee2e6;
+    }
+
+    //    .card-header { background: ; }
+    //    .card, .card-header { border-color: transparent; }
+    .card-body {
+        color: #dee2e6;
+        background: var(--tiki-brand-bg-dark);
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link {
+        color: #dee2e6;
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover {
+        color: #dee2e6;
+    }
+}
 
 //  External libraries

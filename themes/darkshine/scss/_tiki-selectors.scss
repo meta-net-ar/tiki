@@ -22,7 +22,7 @@ body,
 body.fullscreen,
 .layout_social header.navbar.navbar-dark.bg-dark,
 .layout_social header.navbar.navbar-light.bg-light {
-    background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0 !important;
+    background: var(--tiki-darkshine-diagonals-bg);
 }
 
 .layout_classic #middle,
@@ -233,9 +233,8 @@ body.fullscreen,
 
 .tiki.layout_classic .topbar_modules,
 .tiki.layout_basic .topbar_modules,
-.tiki.layout_social .topbar_modules {
-    background: #000 url('#{$imagePath}stripes_small.gif') repeat-x /*0 -8px*/
-    !important;
+.tiki.layout_social:not(.uab.tiki_admin) .topbar_modules {
+    background: #000 url('#{$imagePath}stripes_small.gif') repeat-x !important;
     border: solid 15px #600000 !important;
     border-bottom: 1px solid #916047 !important;
 
@@ -342,7 +341,7 @@ body.fullscreen,
 .tiki .admin-content {
     .tiki-topbar-nav-dark,
     .adminanchors.card {
-        background: linear-gradient(to bottom, #040404 0%, #060606 2%, #121212 55%, #0f0f0f 57%, #030303 59%, #000000 61%, #000000 100%) !important;
+        background: var(--tiki-darkroom-navbar-bg);
     }
 }
 

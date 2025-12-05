@@ -1,7 +1,34 @@
 <b>List of returned objects</b>
 <ol>
     {foreach from=$results item=result}
-        <li><a href="{if not empty($result.url)}{$result.url}{else}#{/if}" >{$result.title}</a>
+        <li>
+            {* 1. Use explicit URL from PluginList if available *}
+            {if ! empty($result.url)}
+                <a href="{$result.url|escape}">
+                    {$result.title|escape}
+                </a>
+
+            {* 2. Generate URL based on object type + object id *}
+            {elseif ! empty($result.object_type) && ! empty($result.object_id)}
+                <a href="{sefurl type=$result.object_type objectId=$result.object_id}">
+                    {if ! empty($result.title)}
+                        {$result.title|escape}
+                    {else}
+                        Item #{$result.object_id}
+                    {/if}
+                </a>
+
+            {* 3. Fallback when no URL can be generated *}
+            {else}
+                {if ! empty($result.title)}
+                    {$result.title|escape}
+                {elseif ! empty($result.object_id)}
+                    Item #{$result.object_id}
+                {else}
+                    Unknown Item
+                {/if}
+            {/if}
+        </li>
     {/foreach}
 </ol>
 

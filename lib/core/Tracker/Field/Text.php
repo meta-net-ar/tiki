@@ -260,7 +260,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
     {
         $length = $this->getOption('max');
 
-        if ($length) {
+        if ($length && ! is_null($value)) {
             $f_len = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
             $f_substr = function_exists('mb_substr') ? 'mb_substr' : 'substr';
 
@@ -471,7 +471,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                     return hex2bin($value);
                 })
                 ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-                    $info['fields'][$permName] = bin2hex($value);
+                    $info['fields'][$permName] = is_null($value) ? null : bin2hex($value);
                 })
                 ;
         } else {

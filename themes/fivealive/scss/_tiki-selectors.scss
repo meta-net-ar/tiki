@@ -225,13 +225,13 @@ label a:hover {
 [data-bs-theme="light"] .bottom_modules,
 [data-bs-theme="dark"] .bottom_modules {
     color: #dee2e6;
-
+    .card {
+        color: #dee2e6;
+        background: #000;
+    }
     .tiki-card-header-title {
         color: #333 !important;
     }
-
-    //    .card-header { background: ; }
-    //    .card, .card-header { border-color: transparent; }
     .card-body {
         color: #dee2e6;
         background: #262626;
@@ -243,17 +243,6 @@ label a:hover {
 
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover {
         color: #8BB9FE;
-    }
-}
-
-
-// Dark page footer
-:root .bottom_modules,
-[data-bs-theme="light"] .bottom_modules,
-[data-bs-theme="dark"] .bottom_modules {
-    .card {
-        color: #dee2e6;
-        background: #000;
     }
 }
 

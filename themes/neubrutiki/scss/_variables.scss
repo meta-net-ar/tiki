@@ -132,12 +132,47 @@ $nav-tabs-border-color:             #000; // New
 $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);
 
 // Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65); // default
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // default
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // default
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // default
+$navbar-light-icon-color:           rgba($body-color, .75); // default
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15); // default
+$navbar-light-brand-color:          $navbar-light-active-color; // default
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // default
+// scss-docs-end navbar-variables
+
+// scss-docs-start navbar-dark-variables
+$navbar-dark-color:                 rgba($white, .55); // default
+$navbar-dark-hover-color:           rgba($white, .75); // default
+$navbar-dark-active-color:          $white; // default
+$navbar-dark-disabled-color:        rgba($white, .25); // default
+$navbar-dark-icon-color:            $navbar-dark-color; // default
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-dark-toggler-border-color:  rgba($white, .1); // default
+$navbar-dark-brand-color:           $navbar-dark-active-color; // default
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
+
 // Dropdowns
 $dropdown-color:                    var(--#{$prefix}body-color);
 $dropdown-bg:                       var(--#{$prefix}body-bg);
 $dropdown-box-shadow:               $box-shadow-lg; // $box-shadow;  // default - New
-$dropdown-link-color:               var(--#{$prefix}link-color);
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-color:               $dropdown-color; // var(--#{$prefix}link-color);
+$dropdown-link-active-bg:           $component-active-bg; // default
+
+$dropdown-dark-color:               $gray-300; // default
+$dropdown-dark-bg:                  $gray-800; // default
+$dropdown-dark-border-color:        $dropdown-border-color; // default
+$dropdown-dark-divider-bg:          $dropdown-divider-bg; // default
+$dropdown-dark-box-shadow:          null; // default
+$dropdown-dark-link-color:          $dropdown-dark-color; // default
+$dropdown-dark-link-hover-color:    $white; // default
+$dropdown-dark-link-hover-bg:       rgba($white, .15); // default
+$dropdown-dark-link-active-color:   $dropdown-link-active-color; // default
+$dropdown-dark-link-active-bg:      $dropdown-link-active-bg; // default
+$dropdown-dark-link-disabled-color: $gray-500; // default
+$dropdown-dark-header-color:        $gray-500; // default
 
 // Pagination
 // Cards
