@@ -103,8 +103,11 @@ class Rules
                 $actions[]
                     = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                 if (! str_contains($predicate->operator_id, 'Required')) {
-                    // show/hide etc needs the parent object
-                    $actions[] = "    $targetSelector.parents('$parentSelector')" .
+                    // show/hide etc needs the parent object - try multiple parent selectors for robustness
+                    $actions[] = "    var \$parentElement = $targetSelector.parents('$parentSelector');";
+                    $actions[] = "    if (\$parentElement.length === 0) { \$parentElement = $targetSelector.parents('.form-group, .field-group, .tracker-field'); }";
+                    $actions[] = "    if (\$parentElement.length === 0) { \$parentElement = $targetSelector.parent(); }";
+                    $actions[] = "    \$parentElement" .
                         $this->getPredicateSyntax($predicate, 'Action') . ';';
                 } else {
                     // validation doesn't need parent
@@ -124,7 +127,11 @@ class Rules
                     $else[]
                         = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                     if (! str_contains($predicate->operator_id, 'Required')) {
-                        $else[] = "    $targetSelector.parents('$parentSelector')" .
+                        // show/hide etc needs the parent object - try multiple parent selectors for robustness
+                        $else[] = "    var \$parentElement = $targetSelector.parents('$parentSelector');";
+                        $else[] = "    if (\$parentElement.length === 0) { \$parentElement = $targetSelector.parents('.form-group, .field-group, .tracker-field'); }";
+                        $else[] = "    if (\$parentElement.length === 0) { \$parentElement = $targetSelector.parent(); }";
+                        $else[] = "    \$parentElement" .
                             $this->getPredicateSyntax($predicate, 'Action') . ';';
                     } else {
                         $else[] = "    $targetSelector" .

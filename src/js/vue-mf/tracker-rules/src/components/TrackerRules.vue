@@ -91,6 +91,109 @@
 <script setup>
 import { ref, computed, reactive, useTemplateRef, nextTick, onBeforeMount } from 'vue';
 
+// Sentry integration - we'll try to access it via multiple methods
+// Note: Sentry is initialized by Tiki but may not be exposed globally
+
+/**
+ * Try to get Sentry instance from various possible locations
+ * @returns {Object|null} Sentry instance or null if not available
+ */
+const getSentry = () => {
+    // Try window.Sentry first (if manually exposed)
+    if (typeof window !== 'undefined' && window.Sentry) {
+        return window.Sentry;
+    }
+    
+    // Try global Sentry
+    if (typeof globalThis !== 'undefined' && globalThis.Sentry) {
+        return globalThis.Sentry;
+    }
+    
+    // Try accessing via __SENTRY__ global (common Sentry pattern)
+    if (typeof window !== 'undefined' && window.__SENTRY__) {
+        return window.__SENTRY__;
+    }
+    
+    return null;
+};
+
+/**
+ * Utility function to handle errors with proper GlitchTip/Sentry integration
+ * @param {Error} error - The error to handle
+ * @param {string} context - Context information about where the error occurred
+ * @param {Object} extra - Additional data to send with the error
+ */
+const handleTrackerRulesError = (error, context = 'TrackerRules', extra = {}) => {
+    // Always log to console for local debugging
+    console.error(`${context}:`, error);
+    
+    if (extra && Object.keys(extra).length > 0) {
+        console.error(`${context} additional data:`, extra);
+    }
+    
+    // Send to GlitchTip/Sentry if available
+    const Sentry = getSentry();
+    if (Sentry) {
+        try {
+            // Set context and extra data
+            Sentry.withScope((scope) => {
+                scope.setTag('component', 'TrackerRules');
+                scope.setTag('context', context);
+                scope.setLevel('error');
+                
+                // Add extra data
+                if (extra && Object.keys(extra).length > 0) {
+                    Object.keys(extra).forEach(key => {
+                        scope.setExtra(key, extra[key]);
+                    });
+                }
+                
+                // Capture the exception
+                Sentry.captureException(error);
+            });
+        } catch (sentryError) {
+            console.error('Failed to send error to Sentry/GlitchTip:', sentryError);
+        }
+    }
+};
+
+/**
+ * Utility function to log warnings with optional Sentry integration
+ * @param {string} message - The warning message
+ * @param {string} context - Context information
+ * @param {Object} extra - Additional data
+ */
+const handleTrackerRulesWarning = (message, context = 'TrackerRules', extra = {}) => {
+    // Always log to console
+    console.warn(`${context}: ${message}`);
+    
+    if (extra && Object.keys(extra).length > 0) {
+        console.warn(`${context} additional data:`, extra);
+    }
+    
+    // Optionally send to GlitchTip/Sentry as a message (not exception)
+    const Sentry = getSentry();
+    if (Sentry) {
+        try {
+            Sentry.withScope((scope) => {
+                scope.setTag('component', 'TrackerRules');
+                scope.setTag('context', context);
+                scope.setLevel('warning');
+                
+                if (extra && Object.keys(extra).length > 0) {
+                    Object.keys(extra).forEach(key => {
+                        scope.setExtra(key, extra[key]);
+                    });
+                }
+                
+                Sentry.captureMessage(message);
+            });
+        } catch (sentryError) {
+            console.error('Failed to send warning to Sentry/GlitchTip:', sentryError);
+        }
+    }
+};
+
 /** UI PREDICATE DEFAULT COMPONENT OVERRIDES */
 import PredicateAdd from "./Overrides/PredicateAdd.vue";
 import PredicateRemove from "./Overrides/PredicateRemove.vue";
@@ -331,9 +434,19 @@ const handleInvertActions = () => {
 
 /**
  * validate the targets in case options have changed or fields deleted
- * @param predicates 
+ * @param {Array} predicates - Array of predicate objects to filter/validate
+ * @returns {Array} - Filtered array of valid predicates
  */
 const getPredicates = function (predicates) {
+    if (!Array.isArray(predicates)) {
+        const error = new Error(`getPredicates: invalid predicates value — expected array but got: ${typeof predicates}`);
+        handleTrackerRulesError(error, 'getPredicates', { 
+            predicates: predicates,
+            predicatesType: typeof predicates 
+        });
+        // This is a fatal error - throw after logging to Sentry
+        throw error;
+    }
     return predicates.filter(predicate => {
         let found = actionsColumns.targets.find(target => {
             if (predicate.target_id === target.target_id) {
@@ -355,7 +468,14 @@ const getPredicates = function (predicates) {
                     predicate.target_id = predicate.target_id + "[]";
                 }
             } else {
-                console.error("Tracker Field Rules: field " + predicate.target_id + " not found in predicates");
+                handleTrackerRulesWarning(
+                    `Tracker Field Rules: field ${predicate.target_id} not found in predicates`,
+                    'getPredicates',
+                    { 
+                        predicate: predicate,
+                        availableTargets: actionsColumns.targets?.map(t => t.target_id) || []
+                    }
+                );
             }
         }
         return found;
@@ -363,7 +483,6 @@ const getPredicates = function (predicates) {
 };
 
 onBeforeMount(() => {
-
     const fields = targetFields.value;
     let field = {};
     const conditionsTargets = [];
@@ -379,9 +498,7 @@ onBeforeMount(() => {
     actionsColumns.types = definition.value.types;
 
     if (fields !== undefined) {
-
         fields.forEach(function (value) {
-
             conditionsTargets.push({
                 target_id: value.ins_id,
                 label: value.name,
@@ -407,22 +524,22 @@ onBeforeMount(() => {
     const defaultCondition = function () {
         let operatorId = "";
 
-        if (field.argumentType === "Text") {
+        if (field?.argumentType === "Text") {
             operatorId = "TextContains";
-        } else if (field.argumentType === "Number") {
+        } else if (field?.argumentType === "Number") {
             operatorId = "NumberEquals";
-        } else if (field.argumentType === "Boolean") {
+        } else if (field?.argumentType === "Boolean") {
             operatorId = "BooleanTrueFalse";
-        } else if (field.argumentType === "DateTime") {
+        } else if (field?.argumentType === "DateTime") {
             operatorId = "DateTimeOn";
-        } else if (field.argumentType === "Collection") {
+        } else if (field?.argumentType === "Collection") {
             operatorId = "CollectionContains";
         }
 
         return {
             logicalType_id: "any",
             predicates: [{
-                target_id: "ins_" + field.fieldId + (field.argumentType === "Collection" ? "[]" : ""),
+                target_id: "ins_" + field?.fieldId + (field?.argumentType === "Collection" ? "[]" : ""),
                 operator_id: operatorId,
                 argument: "",
             }]
@@ -443,12 +560,54 @@ onBeforeMount(() => {
     }
 
     if (rules.value.actions) {
-        actionsData.value = rules.value.actions;
-        actionsData.value.predicates = getPredicates(rules.value.actions.predicates);
+        let allPredicates;
+        
+        if (Array.isArray(rules.value.actions)) {
+            console.table(rules.value.actions);
+            actionsData.value = rules.value.actions;
+            allPredicates = rules.value.actions.flatMap(action => action.predicates || []);
+        } else if (rules.value.actions && Array.isArray(rules.value.actions.predicates)) {
+            console.table([rules.value.actions]);
+            actionsData.value = [rules.value.actions];
+            allPredicates = rules.value.actions.predicates;
+        } else {
+            const error = new Error("Unexpected structure for rules.value.actions");
+            handleTrackerRulesError(error, 'actions initialization', { 
+                rulesValueActions: rules.value.actions,
+                actionsType: typeof rules.value.actions,
+                isArray: Array.isArray(rules.value.actions),
+                hasPredicates: rules.value.actions && rules.value.actions.predicates !== undefined
+            });
+            // This is a fatal error - throw after logging to Sentry
+            throw error;
+        }
+
+        try {
+            actionsData.value.predicates = getPredicates(allPredicates);
+        } catch (error) {
+            handleTrackerRulesError(error, 'actions predicates processing', {
+                allPredicates: allPredicates,
+                actionsData: actionsData.value
+            });
+            actionsData.value = { predicates: [] };
+        }
+    } else {
+        actionsData.value = { predicates: [] };
     }
+    
     if (rules.value.else) {
         elseData.value = rules.value.else;
-        elseData.value.predicates = getPredicates(rules.value.else.predicates);
+        try {
+            elseData.value.predicates = getPredicates(rules.value.else.predicates);
+        } catch (error) {
+            handleTrackerRulesError(error, 'else predicates processing', {
+                elsePredicates: rules.value.else.predicates,
+                elseData: elseData.value
+            });
+            elseData.value = { predicates: [] };
+        }
+    } else {
+        elseData.value = { predicates: [] };
     }
 });
 

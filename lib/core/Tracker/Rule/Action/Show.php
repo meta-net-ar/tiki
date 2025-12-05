@@ -9,6 +9,6 @@ class Show extends Action
 {
     public function __construct()
     {
-        parent::__construct(tr('Show'), Nothing::class, '.show()', [Field::class]);
+        parent::__construct(tr('Show'), Nothing::class, '.show().css("display", "")', [Field::class]);
     }
 }
