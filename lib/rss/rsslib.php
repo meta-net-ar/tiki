@@ -29,6 +29,26 @@ class RSSLib extends TikiDb_Bridge
         $this->modules = $this->table('tiki_rss_modules');
     }
 
+    /**
+     * The life time of a cache, always computed in seconds when given in other units
+     * @param int $time
+     * @param string $unit
+     * @return int
+     */
+    private function cacheLifetime($time, $unit = 'seconds')
+    {
+        switch ($unit) {
+            case 'minutes':
+                return $time * 60;
+            case 'hours':
+                return $time * 3600;
+            case 'days':
+                return $time * 86400;
+            case 'seconds':
+            default:
+                return $time;
+        }
+    }
 
     // ------------------------------------
     // functions for rss feeds we syndicate
@@ -106,7 +126,7 @@ class RSSLib extends TikiDb_Bridge
             // entry found in db:
             $output["data"] = $res["cache"];
             // $refresh = $res["refresh"]; // global cache time currently
-            $refresh = $prefs['feed_cache_time']; // global cache time currently
+            $refresh = $this->cacheLifetime($prefs['feed_cache_time']); // global cache time currently
             $lastUpdated = $res["lastUpdated"];
             // up to date? if not, then set trigger to reload data:
             if ($tikilib->now - $lastUpdated >= $refresh) {
@@ -360,7 +380,7 @@ class RSSLib extends TikiDb_Bridge
         $ret = $this->modules->fetchAll($this->modules->all(), $conditions, $maxRecords, $offset, $this->modules->sortMode($sort_mode));
 
         foreach ($ret as &$res) {
-            $res["minutes"] = $res["refresh"] / 60;
+            $res["minutes"] = $this->cacheLifetime($res["refresh"]) / 60;
         }
 
         return [
@@ -370,10 +390,9 @@ class RSSLib extends TikiDb_Bridge
     }
 
     /* replace rss feed in db */
-    public function replace_rss_module($rssId, $name, $description, $url, $refresh, $showTitle, $showPubDate, $noUpdate = false)
+    public function replace_rss_module($rssId, $name, $description, $url, $refreshMinutes, $showTitle, $showPubDate, $noUpdate = false)
     {
-        //if ($this->rss_module_name_exists($name)) return false; // TODO: Check the name
-        $refresh = 60 * $refresh;
+        $refresh = $this->cacheLifetime($refreshMinutes, 'minutes');
 
         $data = [
             'name' => $name,
@@ -1098,9 +1117,9 @@ class RSSLib extends TikiDb_Bridge
         $cache_feed_result = self::$cachelib->getSerialized($cache_feed_key);
 
         if ($cache_feed_result) {
-            $ttl = max($cache_feed_result['ttl'], $params['refresh']);
+            $refresh_time = max($this->cacheLifetime($cache_feed_result['ttl'], 'minutes'), $this->cacheLifetime($params['refresh'], 'minutes'));
             $cache_time = $cache_feed_result['lastUpdated'];
-            $maxTime = $cache_time + $ttl * 60;
+            $maxTime = $cache_time + $refresh_time;
             if ($maxTime <= $tikilib->now) {
                 self::$cachelib->invalidate($cache_feed_key);
                 $cache_feed_result = null;
