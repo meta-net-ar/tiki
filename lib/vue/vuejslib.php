@@ -84,9 +84,11 @@ class VueJsLib
                  */
                 $importAlias = 'mountApp' . $name;
 
+                $mode = $minify ? 'production' : 'development';
+
                 $headerlib->add_js_module(<<<JS
                     import { mountApp as $importAlias } from '@tiki-vue-sfc-loader';
-                    $importAlias('$name', '$file', $data);
+                    $importAlias('$name', '$file', $data, '$mode');
                 JS
                 );
 

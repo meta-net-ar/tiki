@@ -122,6 +122,10 @@ if (isset($_SERVER['REQUEST_URI'])) {
     $requestUri = "";
 }
 
+if ($prefs['feature_js_dependencies_bundle_mode'] === 'auto' || ! $prefs['feature_js_dependencies_bundle_mode']) {
+    $tikilib->set_preference('feature_js_dependencies_bundle_mode', $https_mode ? 'production' : 'development');
+}
+
 //The value returned allows to check if the user has already enabled 2FA
 $twoFactorSecret = $userlib->get_2_factor_secret($user);
 //Check if user is forced to enable 2FA
