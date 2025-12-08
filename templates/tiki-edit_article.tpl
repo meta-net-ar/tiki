@@ -15,7 +15,7 @@
     <h2>{tr}Preview{/tr}</h2>
     {include file='article.tpl'}
 {/if}
-<form enctype="multipart/form-data" method="post" action="tiki-edit_article.php" id='editpageform'>
+<form enctype="multipart/form-data" method="post" action="tiki-edit_article.php" id='editpageform' novalidate>
     {ticket}
     <input type="hidden" name="articleId" value="{$articleId|escape}">
     <input type="hidden" name="previewId" value="{$previewId|escape}">
@@ -184,7 +184,7 @@
                 <input type="hidden" name="MAX_FILE_SIZE" value="{$prefs.article_image_file_size_max}">
                 <label for="userfile1" class="col-form-label col-md-4">{tr}Own Image{/tr}</label>
                 <div class="col-md-8">
-                    <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
+                    <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true;">
                     <span class="form-text">{tr}If not the topic image{/tr} - {tr}Max file size : {$prefs.article_image_file_size_max/1000} KB{/tr}</span>
                 </div>
             </div>
@@ -204,6 +204,9 @@
                 <label class="col-md-4 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
                 <div class="col-md-8">
                     <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
+                    <div class="invalid-feedback">
+                        {tr}Please enter an alternative text when using your own image.{/tr}
+                    </div>
                 </div>
             </div>
             <div class="mb-3 {if $types.$type.show_image_caption neq 'y'}hidden{/if}">
@@ -382,21 +385,21 @@
     </div>
     {if $smarty.session.wysiwyg neq 'y'}
         {jq}
-$("#editpageform").on("submit", function(evt) {
-    var isHtml = false;
-    if (this.saving && !$("input[name=allowhtml]:checked").length) {
-        $("textarea", this).each(function(){
-            if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
-                isHtml = true;
-            }
-        });
-        if (isHtml) {
-            this.saving = false;
-            return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
-        }
-    }
-    return true;
-}).attr('saving', false);
+            $("#editpageform").on("submit", function(evt) {
+                var isHtml = false;
+                if (this.saving && !$("input[name=allowhtml]:checked").length) {
+                    $("textarea", this).each(function(){
+                        if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
+                            isHtml = true;
+                        }
+                    });
+                    if (isHtml) {
+                        this.saving = false;
+                        return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
+                    }
+                }
+                return true;
+            }).attr('saving', false);
         {/jq}
     {/if}
 </form>

@@ -127,6 +127,9 @@ $systemConfiguration->setReadOnly();
 // Initialize ErrorTracking instance (Sentry/GlitchTip) as early as possible
 TikiLib::lib('errortracking')->init();
 
+// Start automatic HTTP transaction for performance tracing
+TikiLib::lib('errortracking')->startHttpTransaction();
+
 // Handle load balancers or reverse proxy (most reliable to do it early on as much code depends on these 2 server vars)
 
 if (

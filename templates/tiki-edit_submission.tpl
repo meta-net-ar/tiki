@@ -21,7 +21,7 @@
     {tr}Use {$wikiPageSeparator} to separate pages in a multi-page post{/tr}
 {/remarksbox}
 
-<form enctype="multipart/form-data" method="post" action=" " id="editpageform">
+<form enctype="multipart/form-data" method="post" action=" " id="editpageform" novalidate>
     {ticket}
     <input type="hidden" name="subId" value="{$subId|escape}">
     <input type="hidden" name="previewId" value="{$previewId|escape}">
@@ -124,13 +124,16 @@
         <label class="col-sm-3 col-form-label">{tr}Own Image{/tr}</label>
         <div class="col-sm-7">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input name="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
+            <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true;">
         </div>
     </div>
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
-        <div class="col-sm-7">
+    <div class="mb-3">
+        <label class="col-md-4 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
+        <div class="col-md-8">
             <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
+            <div class="invalid-feedback">
+                {tr}Please enter an alternative text when using your own image.{/tr}
+            </div>
         </div>
     </div>
     {if $hasImage eq 'y'}
@@ -289,25 +292,24 @@
             <input type="submit" class="wikiaction btn btn-primary" name="save" value="{tr}Auto-Approve Article{/tr}" onclick="needToConfirm=false;">
         {/if}
     </div>
-{if $smarty.session.wysiwyg neq 'y'}
-    {jq}
-$("#editpageform").on("submit", function(evt) {
-    var isHtml = false;
-    if (this.saving && !$("input[name=allowhtml]:checked").length) {
-        $("textarea", this).each(function(){
-            if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
-                isHtml = true;
-            }
-        });
-        if (isHtml) {
-            this.saving = false;
-            return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
-        }
-    }
-    return true;
-}).attr('saving', false);
-    {/jq}
-{/if}
+    {if $smarty.session.wysiwyg neq 'y'}
+        {jq}
+            $("#editpageform").on("submit", function(evt) {
+                var isHtml = false;
+                if (this.saving && !$("input[name=allowhtml]:checked").length) {
+                    $("textarea", this).each(function(){
+                        if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
+                            isHtml = true;
+                        }
+                    });
+                    if (isHtml) {
+                        this.saving = false;
+                        return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
+                    }
+                }
+                return true;
+            }).attr('saving', false);
+        {/jq}
+    {/if}
 </form>
-
 <br>

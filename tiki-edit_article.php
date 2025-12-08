@@ -797,6 +797,9 @@ $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 $smarty->assign('displayTimezone', TikiLib::lib('tiki')->get_display_timezone());
 
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
+
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_article.tpl');
 $smarty->display('tiki.tpl');

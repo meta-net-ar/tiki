@@ -23,11 +23,10 @@ require_once 'lib/tree/BrowseTreeMaker.php';
 
 $access->check_feature('feature_categories');
 
-// Generate the category tree {{{
 $ctall = $categlib->getCategories();
 
-$tree_nodes = [];
-foreach ($ctall as $c) {
+
+foreach ($ctall as &$c) {
     $url = htmlentities(
         'tiki-edit_categories.php?' . http_build_query(
             [
@@ -39,36 +38,12 @@ foreach ($ctall as $c) {
     );
     $name = htmlentities($c['name'], ENT_QUOTES, 'UTF-8');
     $perms = Perms::get('category', $c['categId']);
-
-    $add = $perms->add_object ? '<span class="control categ-add float-end" style="cursor: pointer" data-ticket="'
-        . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '"></span>' : '';
-    $remove = $perms->remove_object ? '<span class="control categ-remove float-end" style="cursor: pointer" data-ticket="'
-        . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '"></span>' : '';
-
-    $body = <<<BODY
-$add
-$remove
-<span class="object-count">{$c['objects']}</span>
-<a class="catname" href="{$url}" data-categ="{$c['categId']}">{$name}</a>
-BODY;
-
-    $tree_nodes[] = [
-        'id' => $c['categId'],
-        'parent' => $c['parentId'],
-        'data' => $body,
-    ];
+    $c['can_add'] = $perms->add_object ?: '';
+    $c['can_remove'] = $perms->remove_object ?: '';
+    $c['url'] = $url;
 }
 
-$tree_nodes[] = [
-    'id' => 'orphan',
-    'parent' => '0',
-    'data' => '<a class="catname" href="tiki-edit_categories.php?filter~categories=orphan"><em>' . tr('Orphans') . '</em></a>',
-];
-
-$tm = new BrowseTreeMaker('categ');
-$res = $tm->make_tree(0, $tree_nodes);
-$smarty->assign('tree', $res);
-// }}}
+$smarty->assign('categories', $ctall);
 
 $filter = $_REQUEST['filter'] ?? [];
 $smarty->assign('filter', $filter);

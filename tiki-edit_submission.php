@@ -653,6 +653,9 @@ include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
+
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_submission.tpl');
 $smarty->display('tiki.tpl');

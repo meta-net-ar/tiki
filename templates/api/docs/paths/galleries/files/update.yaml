@@ -11,10 +11,13 @@ post:
   requestBody:
     required: true
     content:
-      application/x-www-form-urlencoded:
+      multipart/form-data:
         schema:
           type: object
           properties:
+            data:
+              type: file
+              description: file path to upload. If omitted, the current file will remain unchanged.
             user:
               type: string
               description: The user who uploaded the file
@@ -27,23 +30,6 @@ post:
             description:
               type: string
               description: The description of the file
-      multipart/form-data:
-        schema:
-          type: object
-          required:
-            - data
-          properties:
-            data:
-              type: string
-              description: file path
-            user:
-              type: string
-            title:
-              type: string
-            name:
-              type: string
-            description:
-              type: string
   responses:
     '200':
       description: update file response
@@ -69,7 +55,77 @@ post:
               md5sum:
                 type: string
               ticket:
+                type: string
+              syntax:
+                type: string
+              info:
                 type: object
+                properties:
+                  fileId:
+                    type: integer
+                  galleryId:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  created:
+                    type: integer
+                  filename:
+                    type: string
+                  filesize:
+                    type: integer
+                  filetype:
+                    type: string
+                  user:
+                    type: string
+                  author:
+                    type: string
+                  hits:
+                    type: integer
+                  maxhits:
+                    type: integer
+                  lastDownload:
+                    type: integer
+                  votes:
+                    type: integer
+                  points:
+                    type: string
+                  path:
+                    type: string
+                    nullable: true
+                  reference_url:
+                    type: string
+                  is_reference:
+                    type: string
+                  hash:
+                    type: string
+                  search_data:
+                    type: string
+                  metadata:
+                    type: string
+                    description: JSON-encoded metadata string
+                  lastModif:
+                    type: integer
+                  lastModifUser:
+                    type: string
+                  lockedby:
+                    type: string
+                  comment:
+                    type: string
+                  archiveId:
+                    type: integer
+                  deleteAfter:
+                    type: integer
+                  ocr_state:
+                    type: string
+                    nullable: true
+                  ocr_lang:
+                    type: string
+                    nullable: true
+                  ocr_data:
+                    type: string
+                    nullable: true
     '403':
       description: forbidden
       content:

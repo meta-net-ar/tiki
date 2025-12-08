@@ -281,12 +281,13 @@ if (isset($_REQUEST['comments_remove']) && isset($_REQUEST['comments_threadId'])
     $smarty->assign('comments_threadId', 0);
 }
 
+if (isset($_comments_title_decoded)) {
+    // Encode back comment_title before display to avoid specials characters
+    $_comments_title_encoded = htmlspecialchars($_comments_title_decoded);
+}
+
 if ($_REQUEST['comments_threadId'] > 0) {
     $comment_info = $commentslib->get_comment($_REQUEST['comments_threadId']);
-    if (isset($_comments_title_decoded)) {
-        // Encode back comment_title before display to avoid specials characters
-        $_comments_title_encoded = htmlspecialchars($_comments_title_decoded);
-    }
     $smarty->assign('comment_title', $_comments_title_encoded ?? $comment_info['title']);
     $smarty->assign('comment_data', $_REQUEST['comments_data'] ?? $comment_info['data']);
     $smarty->assign(

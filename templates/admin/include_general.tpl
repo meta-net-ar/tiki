@@ -145,6 +145,14 @@
                         {preference name=error_tracking_enabled_js}
                     </div>
                 </div>
+                <div class="adminoptionbox">
+                    <legend class="h4">{tr}Performance Tracing{/tr}</legend>
+                    {preference name=error_tracking_traces_sample_rate}
+                    <div class="adminoptionboxchild">
+                        {preference name=error_tracking_tracing_enabled_php}
+                        {preference name=error_tracking_tracing_enabled_js}
+                    </div>
+                </div>
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Web Cron{/tr}</legend>
