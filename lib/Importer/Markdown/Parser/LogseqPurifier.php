@@ -123,7 +123,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
     /**
      * Try to interpret a Logseq journal title into ISO date (YYYY-MM-DD).
      * Handles: "Month Xth, Year", "X Month Year", "X Month Year", "Year_Month_X", etc.
-     * Do we need to handle other languages?
+     * Supports multiple languages via IntlDateFormatter.
      */
     private function parseJournalDate(string $title, ?string &$iso = null): bool
     {
@@ -138,40 +138,33 @@ class LogseqPurifier implements MarkdownPurifierInterface
         // Strip English ordinals: 6th to 6
         $t2 = preg_replace('~\b(\d{1,2})(st|nd|rd|th)\b~i', '$1', $t);
 
-        // FR to EN month normalization for strtotime()
-        $fr = [
-            'janv.' => 'jan',
-            'févr.' => 'feb',
-            'fevr.' => 'feb',
-            'mars'  => 'mar',
-            'avr.'  => 'apr',
-            'mai'   => 'may',
-            'juin'  => 'jun',
-            'juil.' => 'jul',
-            'août'  => 'aug',
-            'aout' => 'aug',
-            'sept.' => 'sep',
-            'oct.'  => 'oct',
-            'nov.'  => 'nov',
-            'déc.'  => 'dec',
-            'dec.'  => 'dec',
-            'janvier' => 'january',
-            'février' => 'february',
-            'fevrier' => 'february',
-            'avril'   => 'april',
-            'juillet' => 'july',
-            'septembre' => 'september',
-            'octobre' => 'october',
-            'novembre' => 'november',
-            'décembre' => 'december',
-            'decembre' => 'december',
+        // Try parsing with IntlDateFormatter for multiple locales and patterns
+        $locales = ['en_US', 'fr_FR'];
+        $patterns = [
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::SHORT,
         ];
-        $t2_low = $t2;
-        foreach ($fr as $k => $v) {
-            $t2_low = preg_replace('~' . preg_quote($k, '~') . '~iu', $v, $t2_low);
+
+        foreach ($locales as $locale) {
+            foreach ($patterns as $pattern) {
+                $formatter = new \IntlDateFormatter(
+                    $locale,
+                    $pattern,
+                    \IntlDateFormatter::NONE,
+                    'UTC'
+                );
+                
+                $ts = $formatter->parse($t2);
+                if ($ts !== false) {
+                    $iso = date('Y-m-d', $ts);
+                    return true;
+                }
+            }
         }
 
-        $ts = strtotime($t2_low);
+        // Fallback to strtotime for other formats
+        $ts = strtotime($t2);
         if ($ts !== false) {
             $iso = date('Y-m-d', $ts);
             return true;
