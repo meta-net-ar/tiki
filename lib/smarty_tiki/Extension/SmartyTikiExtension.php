@@ -49,7 +49,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         $allowed_builtin_php_functions = array_filter(TikiLib::lib('tiki')->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
         if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
-            return function(...$args) use ($modifierName) {
+            return function (...$args) use ($modifierName) {
                 return call_user_func_array($modifierName, $args);
             };
         }
