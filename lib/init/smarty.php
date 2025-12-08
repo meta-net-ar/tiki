@@ -125,6 +125,16 @@ class Tiki_Security_Policy extends \Smarty\Security
         $this->secure_dir = array_merge($this->secure_dir, $dirs);
     }
 
+    public function isTrustedModifier($modifier_name, $compiler)
+    {
+        $allowed_builtin_php_functions = array_filter(TikiLib::lib('tiki')->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+        if (in_array($modifier_name, $allowed_builtin_php_functions)) {
+            return true;
+        }
+
+        return parent::isTrustedModifier($modifier_name, $compiler);
+    }
+
     /**
      * Work around a bug in smarty where _updateResourceDir doesn't clear the values correctly when
      * smarty templateDir has been updated

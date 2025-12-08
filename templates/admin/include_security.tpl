@@ -59,6 +59,7 @@
                     {preference name=smarty_security_disabled_tags}
                     {preference name=smarty_security_allowed_modifiers}
                     {preference name=smarty_security_disabled_modifiers}
+                    {preference name=smarty_security_allowed_builtin_php_functions}
                     {preference name=smarty_security_dirs}
                 </div>
                 {preference name=feature_purifier}
