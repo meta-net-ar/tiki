@@ -308,9 +308,6 @@
     $repoBlock.addClass('d-none');
     $localRow.addClass('d-none');
 
-    // By default, hide repo buttons
-    $btnSaveSrc.addClass('d-none');
-
     if (t === 'local') {
       // LOCAL
       $localRow.removeClass('d-none');

@@ -81,8 +81,10 @@ class ImportRegistry
 
     /**
      * Insert or update an entry in the registry.
+     * @return bool True if the operation succeeded, false otherwise.
+     * @throws \Exception if the query fails critically.
      */
-    public function upsert(array $row): void
+    public function upsert(array $row): bool
     {
         $now = $this->tikilib->now;
 
@@ -100,18 +102,23 @@ class ImportRegistry
                 is_journal    = VALUES(is_journal),
                 orphaned_at   = NULL";
 
-        $this->tikilib->query($q, [
-            (string) $row['source_key'],
-            (string) $row['relpath'],
-            (string) $row['page_name'],
-            (string) $row['checksum'],
-            isset($row['size_bytes']) ? (int) $row['size_bytes'] : null,
-            isset($row['mtime_utc']) ? (int) $row['mtime_utc'] : null,
-            isset($row['last_imported']) ? (int) $row['last_imported'] : $now,
-            (string) ($row['last_status'] ?? 'ok'),
-            $row['error_note'] ?? null,
-            isset($row['is_journal']) ? (int) $row['is_journal'] : 0,
-        ]);
+        try {
+            $result = $this->tikilib->query($q, [
+                (string) $row['source_key'],
+                (string) $row['relpath'],
+                (string) $row['page_name'],
+                (string) $row['checksum'],
+                isset($row['size_bytes']) ? (int) $row['size_bytes'] : null,
+                isset($row['mtime_utc']) ? (int) $row['mtime_utc'] : null,
+                isset($row['last_imported']) ? (int) $row['last_imported'] : $now,
+                (string) ($row['last_status'] ?? 'ok'),
+                $row['error_note'] ?? null,
+                isset($row['is_journal']) ? (int) $row['is_journal'] : 0,
+            ]);
+            return $result !== false;
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to upsert registry entry for {$row['relpath']}: " . $e->getMessage(), 0, $e);
+        }
     }
 
     public function markOrphan(string $sourceKey, string $relpath, int $timestamp): void
