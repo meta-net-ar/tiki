@@ -277,81 +277,36 @@ class TikiMarkdownImporter
         $user = $GLOBALS['user'] ?? 'import';
         $ip   = method_exists($tikilib, 'get_ip_address') ? $tikilib->get_ip_address() : ($_SERVER['REMOTE_ADDR'] ?? '');
 
-        $content = $this->wrapMarkdown($markdown); // wrapper fermé
+        $content = $this->wrapMarkdown($markdown);
 
         if ($tikilib->page_exists($name)) {
             $info = $tikilib->get_page_info($name);
             $oldPageContent = $this->extractMarkdownBody($info['data']);
             if ($this->canon($oldPageContent ?? '') === $this->canon($markdown)) {
-                return false; // rien à écrire
+                return false; // no changes to write
             }
 
-            if (($prefs['feature_history'] ?? 'y') === 'y') {
-                $newVersion = (int)$info['version'] + 1;
-
-                // push current into tiki_history
-                $tikilib->query(
-                    'INSERT INTO `tiki_history`
-                       (`pageName`,`version`,`lastModif`,`user`,`ip`,`comment`,`data`,`description`)
-                     VALUES (?,?,?,?,?,?,?,?)',
-                    [
-                        $name,
-                        $newVersion,
-                        (int)$tikilib->now,
-                        $user,
-                        $ip,
-                        $comment,
-                        $info['data'],
-                        $info['description'] ?? '',
-                    ]
-                );
-
-                // update page
-                $tikilib->query(
-                    'UPDATE `tiki_pages`
-                       SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?, `version`=?
-                     WHERE `pageName`=?',
-                    [
-                        $content,
-                        (int)strlen($content),
-                        (int)$tikilib->now,
-                        $user,
-                        $ip,
-                        $comment,
-                        $newVersion,
-                        $name,
-                    ]
-                );
-            } else {
-                // update sans historique
-                $tikilib->query(
-                    'UPDATE `tiki_pages`
-                       SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?
-                     WHERE `pageName`=?',
-                    [
-                        $content,
-                        (int)strlen($content),
-                        (int)$tikilib->now,
-                        $user,
-                        $ip,
-                        $comment,
-                        $name,
-                    ]
-                );
-            }
+            // Use Tiki's native update_page() which handles history automatically
+            $tikilib->update_page(
+                $name,           // pageName
+                $content,        // edit_data
+                $comment,        // edit_comment
+                $user,           // edit_user
+                $ip              // edit_ip
+            );
         } else {
-            // create
+            // Use Tiki's native create_page()
             $tikilib->create_page(
-                $name,
-                0,
-                $content,
-                $tikilib->now,
-                $comment,
-                $user,
-                $ip,
-                '',
-                '',
-                0
+                $name,           // name
+                0,               // hits
+                $content,        // data
+                $tikilib->now,   // lastModif
+                $comment,        // comment
+                $user,           // user
+                $ip,             // ip
+                '',              // description
+                '',              // lang
+                0                // is_html
             );
         }
 
