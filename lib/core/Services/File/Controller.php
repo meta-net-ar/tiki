@@ -592,6 +592,11 @@ class Services_File_Controller
             throw new Services_Exception_Denied();
         }
 
+        $info = TikiLib::lib('filegal')->get_file_gallery_info($id);
+        if (! $info) {
+            throw new Services_Exception_NotFound();
+        }
+
         $fileGallery = TikiLib::lib('filegal');
         $removed = $fileGallery->remove_file_gallery($id, $galleryId, $recurse);
         if (! $removed) {

@@ -473,12 +473,20 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-   private function getUnlockFileResponseSchema()
+    private function getUnlockFileResponseSchema()
     {
         return [
             'title' => 'string',
             'count' => 'int',
             'unlocked' => 'array'
+        ];
+    }
+
+    private function getDeleteFileGalleryResponseSchema()
+    {
+        return [
+            'title' => 'string',
+            'message' => 'string'
         ];
     }
 
@@ -535,5 +543,10 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     public function assertValidUnlockFileResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getUnlockFileResponseSchema());
+    }
+
+    public function assertValidDeleteFileGalleryResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getDeleteFileGalleryResponseSchema());
     }
 }
