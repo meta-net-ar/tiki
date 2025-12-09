@@ -61,7 +61,9 @@ class FilesystemProvider implements SourceProviderInterface
         $data = file_get_contents($uploadedPath);
         if ($data === false) {
             $zip->close();
-            @unlink($zipPath);
+            if (file_exists($zipPath)) {
+                @unlink($zipPath);
+            }
             throw new \RuntimeException('Cannot read uploaded file.');
         }
         $zip->addFromString($name, $data);
