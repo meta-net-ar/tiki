@@ -30,31 +30,9 @@ class ImportRegistry
      */
     public static function buildSourceKey(array $sourceCfg): string
     {
-        $type = $sourceCfg['type'] ?? 'zip';
-
-        if ($type === 'git') {
-            $repoUrl = $sourceCfg['repo_url'];
-            $host  = parse_url($repoUrl, PHP_URL_HOST) ?: 'unknown';
-            //get owner/repo from url
-            if (preg_match('~[:/](?P<owner>[^/]+)/(?P<repo>[^/.]+)(\.git)?$~', $repoUrl, $matches)) {
-                $owner = $matches['owner'];
-                $repo  = $matches['repo'];
-            } else {
-                $owner = 'unknown';
-                $repo  = 'unknown';
-            }
-            $ref   = $sourceCfg['repo_branch'] ?? 'main';
-            return "git:$host/$owner/$repo@$ref";
-        }
-
-        if ($type === 'filesystem') {
-            $root = $sourceCfg['root'] ?? '';
-            return "fs:$root";
-        }
-
-        // fallback zip
-        $zip = $sourceCfg['zip_path'] ?? ($sourceCfg['tmp_zip'] ?? '');
-        return "zip:$zip";
+        // Delegate to SourceManager for proper source identification
+        $manager = new \Tiki\Lib\Importer\Markdown\Source\SourceManager();
+        return $manager->getSourceIdentifier($sourceCfg);
     }
 
     public function getAllBySourceKey(string $sourceKey): array

@@ -117,25 +117,9 @@ class TikiMarkdownImporter
             // Unchanged vs registre
             $row = $existingMap[$relpath] ?? null;
             if ($row && hash_equals($row['checksum'], $checksum)) {
-                // Upsert pour rafraîchir last_imported + dé-marquer orphan
-                try {
-                    $registry->upsert([
-                        'source_key'    => $sourceKey,
-                        'relpath'       => $relpath,
-                        'page_name'     => $row['page_name'],
-                        'checksum'      => $checksum,
-                        'size_bytes'    => $f['size_bytes'] ?? strlen($raw),
-                        'mtime_utc'     => $f['mtime_utc'] ?? null,
-                        'last_imported' => TikiLib::lib('tiki')->now,
-                        'last_status'   => 'skipped',
-                        'is_journal'    => ($f['type'] ?? '') === 'journal' ? 1 : 0,
-                        'orphaned_at'   => null, // IMPORTANT: on enlève l'état orphelin si présent
-                    ]);
-                } catch (\Exception $e) {
-                    $this->errors[] = "Registry update failed for {$page}: " . $e->getMessage();
-                }
                 $skipped++;
                 $this->notesByPage[$page][] = 'Skipped (no changes via registry).';
+                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'skipped');
                 continue;
             }
 
@@ -148,31 +132,15 @@ class TikiMarkdownImporter
                 $this->notesByPage[$page][] = 'Skipped (no changes in DB).';
             }
 
-            // Upsert registre (et clear orphan)
-            try {
-                $registry->upsert([
-                    'source_key'    => $sourceKey,
-                    'relpath'       => $relpath,
-                    'page_name'     => $page,
-                    'checksum'      => $checksum,
-                    'size_bytes'    => $f['size_bytes'] ?? strlen($raw),
-                    'mtime_utc'     => $f['mtime_utc'] ?? null,
-                    'last_imported' => TikiLib::lib('tiki')->now,
-                    'last_status'   => $ok ? 'ok' : 'skipped',
-                    'error_note'    => null,
-                    'is_journal'    => ($f['type'] ?? '') === 'journal' ? 1 : 0,
-                    'orphaned_at'   => null, // IMPORTANT
-                ]);
-            } catch (\Exception $e) {
-                $this->errors[] = "Registry update failed for {$page}: " . $e->getMessage();
-            }
+            // Upsert registry (clear orphan status)
+            $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, $ok ? 'ok' : 'skipped');
         }
 
         // 4) Garbage collect
         $gcCfg  = $pipelineCfg['gc'] ?? [];
         $gcMode = $gcCfg['mode'] ?? 'mark'; // off|mark|delete
         if ($isFirstRun && $gcMode === 'delete') {
-            $gcMode = 'mark'; // sécurité premier run
+            $gcMode = 'mark'; // security for first run
             $this->notesByPage['__gc__'][] = 'GC mode forced to "mark" on first run.';
         }
 
@@ -419,6 +387,38 @@ class TikiMarkdownImporter
         $s = preg_replace('/[ \t]+$/m', '', $s);
         $s = rtrim($s, "\n");
         return $s;
+    }
+
+    /**
+     * Update registry entry for a file
+     */
+    private function updateRegistry(
+        ImportRegistry $registry,
+        string $sourceKey,
+        string $relpath,
+        string $pageName,
+        string $checksum,
+        array $fileData,
+        string $rawContent,
+        string $status
+    ): void {
+        try {
+            $registry->upsert([
+                'source_key'    => $sourceKey,
+                'relpath'       => $relpath,
+                'page_name'     => $pageName,
+                'checksum'      => $checksum,
+                'size_bytes'    => $fileData['size_bytes'] ?? strlen($rawContent),
+                'mtime_utc'     => $fileData['mtime_utc'] ?? null,
+                'last_imported' => TikiLib::lib('tiki')->now,
+                'last_status'   => $status,
+                'error_note'    => null,
+                'is_journal'    => ($fileData['type'] ?? '') === 'journal' ? 1 : 0,
+                'orphaned_at'   => null, // Clear orphan status
+            ]);
+        } catch (\Exception $e) {
+            $this->errors[] = "Registry update failed for {$pageName}: " . $e->getMessage();
+        }
     }
 
     /**
