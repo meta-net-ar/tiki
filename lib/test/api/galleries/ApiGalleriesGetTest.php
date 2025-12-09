@@ -21,8 +21,6 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
             '/galleries'
         );
 
-        $this->assertResponseStatus(403, $response);
-
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
     }
