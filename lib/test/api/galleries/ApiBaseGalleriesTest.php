@@ -332,7 +332,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getFileRespoonseSchema()
+    private function getFileResponseSchema()
     {
         return [
             'title' => 'string',
@@ -435,7 +435,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     private function getFileUploadResponseSchema()
     {
         $info = array_merge(
-            $this->getFileRespoonseSchema()['info'],
+            $this->getFileResponseSchema()['info'],
             [
                 'data' => 'string|null',
                 'lockedby' => 'string|null',
@@ -461,6 +461,24 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
             'ticket' => 'string|null',
             'syntax' => 'string|null',
             'info' => $info
+        ];
+    }
+
+    private function getLockFileResponseSchema()
+    {
+        return [
+            'title' => 'string',
+            'count' => 'int',
+            'locked' => 'array'
+        ];
+    }
+
+   private function getUnlockFileResponseSchema()
+    {
+        return [
+            'title' => 'string',
+            'count' => 'int',
+            'unlocked' => 'array'
         ];
     }
 
@@ -506,19 +524,16 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
      */
     protected function assertValidFileResponse($response)
     {
-        $this->assertMatchesSchema($response, $this->getFileRespoonseSchema());
+        $this->assertMatchesSchema($response, $this->getFileResponseSchema());
     }
 
-    /**
-     * Create a temporary file for upload testing
-     * @param string $content File content
-     * @param string $filename Filename
-     * @return string Path to temporary file
-     */
-    protected function createTempFile($content, $filename = 'test_upload.txt')
+    public function assertValidLockFileResponse($response)
     {
-        $tmpFile = tempnam(sys_get_temp_dir(), 'tiki_test_');
-        file_put_contents($tmpFile, $content);
-        return $tmpFile;
+        $this->assertMatchesSchema($response, $this->getLockFileResponseSchema());
+    }
+
+    public function assertValidUnlockFileResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getUnlockFileResponseSchema());
     }
 }
