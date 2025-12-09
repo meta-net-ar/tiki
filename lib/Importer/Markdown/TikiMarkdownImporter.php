@@ -72,7 +72,9 @@ class TikiMarkdownImporter
             $existingMap = $registry->getAllBySourceKey($sourceKey); // relpath => row
             $isFirstRun  = empty($existingMap);
         } finally {
-            @unlink($zip);
+            if (file_exists($zip)) {
+                unlink($zip);
+            }
         }
 
         $files   = $preview['files'] ?? [];
@@ -206,7 +208,9 @@ class TikiMarkdownImporter
                 'journal_ns'     => $wikiOpts['journal_ns'] ?? 'Journal',
             ]);
         } finally {
-            @unlink($zip);
+            if (file_exists($zip)) {
+                unlink($zip);
+            }
         }
 
         if (empty($scan['files'])) {
