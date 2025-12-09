@@ -114,6 +114,18 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertStringContainsString('API_Test_Gallery_Child', $body['result'][0]['name'], 'Gallery name should contain search term');
     }
 
+    public function testApiGetGalleryInfoWithoutPermission()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}"
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied');
+    }
+
     public function testApiGetGalleryInfo()
     {
         $galleryId = static::$defaultGalleries['default']['galleryId'];
@@ -181,6 +193,18 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
             }
         }
         $this->assertTrue($foundDefault, 'Default test file should be in the list');
+    }
+
+    public function testApiGetNonExistentGalleryFiles()
+    {
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries/999999/list_files',
+            'Admins'
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 
     public function testApiGetGalleryFilesWithPagination()
@@ -269,5 +293,49 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         foreach ($body['result'] as $file) {
             $this->assertStringContainsString('Test File', $file['name'], 'File name should contain search term');
         }
+    }
+
+    public function testApiGetFileInfoWithoutPermission()
+    {
+        $fileId = static::$defaultFiles['default']['fileId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/files/{$fileId}"
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'Permission denied');
+    }
+
+    public function testApiGetFileInfo()
+    {
+        $fileId = static::$defaultFiles['default']['fileId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/files/{$fileId}",
+            'Admins'
+        );
+
+        $this->assertResponseStatus(200, $response);
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileResponse($body);
+
+        $this->assertEquals($fileId, $body['fileId'], 'Should return the requested file info');
+        $this->assertEquals('test_file.txt', $body['info']['filename'], 'File name should match');
+        $this->assertEquals('Test File', $body['info']['name'], 'File name should match');
+        $this->assertEquals('This is a test file for API testing', $body['info']['description'], 'File description should match');
+    }
+
+    public function testApiGetNonExistentFileInfo()
+    {
+        $response = $this->makeApiRequest(
+            'GET',
+            '/galleries/files/999999',
+            'Admins'
+        );
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 404, 'Not found (404)');
     }
 }

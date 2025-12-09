@@ -673,6 +673,9 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
 
         $result = $fileGallery->list_files($offset, $maxRecords, $sort_mode, $find, $galleryId);
+        if (! $result['data']) {
+            throw new Services_Exception_NotFound();
+        }
 
         return [
             'title' => tr('List files'),

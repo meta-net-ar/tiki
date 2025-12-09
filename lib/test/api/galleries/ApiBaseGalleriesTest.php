@@ -346,7 +346,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
                 'filename' => 'string',
                 'filesize' => 'int|null',
                 'filetype' => 'string|null',
-                'user' => 'string',
+                'user' => 'string|null',
                 'author' => 'string|null',
                 'hits' => 'int|null',
                 'maxhits' => 'int|null',
