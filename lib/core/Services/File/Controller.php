@@ -906,6 +906,10 @@ class Services_File_Controller
         global $user;
         $fileIDs = $input->asArray('items');
 
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
+
         $fileGallery = TikiLib::lib('filegal');
         $result = [];
 
@@ -930,6 +934,10 @@ class Services_File_Controller
     public function action_unlock_files($input)
     {
         $fileIDs = $input->asArray('items');
+
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
 
         $fileGallery = TikiLib::lib('filegal');
         $result = [];
