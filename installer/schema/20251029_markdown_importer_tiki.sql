@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS `tiki_markdown_imports` (
   `error_note` TEXT NULL,
   `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_src_rel (source_key, relpath),
-  KEY idx_page (page_name),
-  KEY idx_status (last_status),
-  KEY idx_orphaned (orphaned_at)
+  KEY `idx_page` (`page_name`),
+  KEY `idx_status` (`last_status`),
+  KEY `idx_orphaned` (`orphaned_at`)
 ) ENGINE=MyISAM;

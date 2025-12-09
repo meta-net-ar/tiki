@@ -24,24 +24,24 @@ class SourceManager
     public function getSourceIdentifier(array $cfg): string
     {
         // Prefer explicit source_id from configuration
-        if (!empty($cfg['source_id'])) {
+        if (! empty($cfg['source_id'])) {
             return $cfg['source_id'];
         }
 
         // Fallback: generate stable hash
         $type = $cfg['type'] ?? 'local';
-        
+
         if ($type === 'git') {
             $url = $cfg['repo_url'] ?? '';
             $branch = $cfg['repo_branch'] ?? 'main';
             // Use hash of normalized repo info
             return 'git_' . hash('sha256', $url . ':' . $branch);
         }
-        
-        if ($type === 'local' && !empty($cfg['local_path'])) {
+
+        if ($type === 'local' && ! empty($cfg['local_path'])) {
             return 'local_' . hash('sha256', realpath($cfg['local_path']) ?: $cfg['local_path']);
         }
-        
+
         // Last resort: generic identifier with timestamp
         return 'source_' . hash('sha256', serialize($cfg));
     }
