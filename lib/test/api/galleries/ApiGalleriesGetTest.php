@@ -334,6 +334,6 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         );
 
         $body = $this->getResponseBody($response);
-        $this->assertValidErrorResponse($body, 404, 'Not found (404)');
+        $this->assertValidErrorResponse($body, 404, 'Requested file does not exist (404)');
     }
 }
