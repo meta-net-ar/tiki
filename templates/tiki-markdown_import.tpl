@@ -24,6 +24,14 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <label class="col-sm-3 col-form-label">{tr}Source ID{/tr}</label>
+                <div class="col-sm-9">
+                    <input class="form-control" name="source_id" value="{$md_source.source_id|escape}" placeholder="{tr}my-docs-repo{/tr}">
+                    <div class="form-text">{tr}Unique, stable identifier for this source (e.g., "my-docs", "wiki-backup"). Used to track imported pages. If empty, an identifier will be auto-generated.{/tr}</div>
+                </div>
+            </div>
+
             <div class="border rounded p-3 mb-3" id="repo_block">
                 <h6 class="mb-2">{tr}Repository settings (used if Source = Git Repository){/tr}</h6>
                 <div class="row mb-2">

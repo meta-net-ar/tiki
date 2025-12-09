@@ -154,7 +154,6 @@ class LogseqPurifier implements MarkdownPurifierInterface
                     \IntlDateFormatter::NONE,
                     'UTC'
                 );
-                
                 $ts = $formatter->parse($t2);
                 if ($ts !== false) {
                     $iso = date('Y-m-d', $ts);

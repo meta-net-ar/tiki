@@ -60,6 +60,7 @@ if (! isset($_SESSION['md_import'])) {
     $_SESSION['md_import'] = [
         'source' => [
             'type'        => 'local', // local|git
+            'source_id'   => '',      // Stable identifier for this source
             // repo options
             'repo_url'   => '',
             'repo_branch' => 'main',
@@ -102,6 +103,7 @@ if ($action === 'save_import_options' && $access->checkCsrf()) {
 
     $src = $_SESSION['md_import']['source'];
     $src['type'] = $type;
+    $src['source_id'] = trim($_POST['source_id'] ?? '');
 
     if ($type === 'git') {
         $src['repo_url']    = trim($_POST['repo_url'] ?? '');
