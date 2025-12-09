@@ -150,8 +150,7 @@ class Services_Language_Controller
         if ($input->language->text()) {
             $language = $input->language->text();
         } else {
-            global $prefs;
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
         }
 
         //get list of languages
@@ -293,8 +292,7 @@ class Services_Language_Controller
         if ($input->language->text()) {
             $language = $input->language->text();
         } else {
-            global $prefs;
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
         }
 
         //define upload types for the uploaded file

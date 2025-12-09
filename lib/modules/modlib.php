@@ -854,7 +854,7 @@ class ModLib extends TikiLib
         global $prefs;
 
         $cachelib = TikiLib::lib('cache');
-        $cacheKey = 'module.' . $moduleName . $prefs['language'];
+        $cacheKey = 'module.' . $moduleName . Language::getCurrentLanguage();
         $info = $cachelib->getSerialized($cacheKey, 'module');
 
         if ($info) {

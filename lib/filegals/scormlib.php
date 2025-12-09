@@ -195,7 +195,7 @@ class ScormLib
     {
         global $prefs;
 
-        $defaultLanguage = $prefs['language'];
+        $defaultLanguage = Language::getCurrentLanguage();
         foreach ($values as $valueSet) {
             if (isset($valueSet[$defaultLanguage])) {
                 return $valueSet[$defaultLanguage];

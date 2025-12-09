@@ -657,7 +657,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
 
 if ($prefs['jquery_timeago'] === 'y') {
     $headerlib->add_jsfile('vendor_bundled/vendor/rmm5t/jquery-timeago/jquery.timeago.js');
-    $language_short = substr($prefs['language'], 0, 2);
+    $language_short = substr(Language::getCurrentLanguage(), 0, 2);
     $timeago_locale = "vendor_bundled/vendor/rmm5t/jquery-timeago/locales/jquery.timeago.{$language_short}.js";
     if (is_readable($timeago_locale)) {
         $headerlib->add_jsfile($timeago_locale);    // TODO handle zh-CN and zh-TW

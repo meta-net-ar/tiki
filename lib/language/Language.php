@@ -143,7 +143,7 @@ class Language extends TikiDb_Bridge
     public static function isRTL()
     {
         global $prefs;
-        return self::isLanguageRTL($prefs['language']);
+        return self::isLanguageRTL(Language::getCurrentLanguage());
     }
 
     /**
@@ -157,7 +157,7 @@ class Language extends TikiDb_Bridge
         global $prefs;
 
         $args = func_get_args();
-        $key = 'disk_languages' . implode(',', $args) . $prefs['language'];
+        $key = 'disk_languages' . implode(',', $args) . self::getCurrentLanguage();
         $cachelib = TikiLib::lib('cache');
 
         if (! $languages = $cachelib->getSerialized($key)) {
@@ -218,7 +218,7 @@ class Language extends TikiDb_Bridge
      * @param $language
      * @return bool
      */
-    public function is_valid_language($language)
+    public static function is_valid_language($language)
     {
         return preg_match("/^[a-zA-Z-_]*$/", $language)
             && file_exists('lang/' . $language . '/language.php');
@@ -670,5 +670,19 @@ class Language extends TikiDb_Bridge
         // now lets sort the list so it comes back all pretty :)
         asort($LangCodes);
         return $LangCodes;
+    }
+
+    public static function getCurrentLanguage(): string
+    {
+        global $user, $user_preferences, $prefs;
+        $language = 'en';
+        if (isset($user) && ! empty($user_preferences[$user]['language'])) {
+            $language = $user_preferences[$user]['language'];
+        } elseif (! empty($prefs['language'])) {
+            $language = $prefs['language'];
+        } else {
+            $language = $prefs['site_language'] ?: $language;
+        }
+        return $language;
     }
 }

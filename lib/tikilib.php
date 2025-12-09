@@ -6093,7 +6093,7 @@ class TikiLib extends TikiDb_Bridge
 
         foreach ($args as $arg) {
             if ($arg == 'language') {
-                $language = isset($prefs['language']) ? $prefs['language'] : 'en';
+                $language = Language::getCurrentLanguage();
                 $key .= "_{$language}";
             } elseif ($arg == 'external') {
                 $key .= (int) self::$isExternalContext;
@@ -6368,7 +6368,7 @@ class TikiLib extends TikiDb_Bridge
 
         $cachelib = TikiLib::lib('cache');
         $args = func_get_args();
-        $cacheKey = serialize($args) . $prefs['language'];
+        $cacheKey = serialize($args) . Language::getCurrentLanguage();
 
         if ($data = $cachelib->getSerialized($cacheKey, 'flags')) {
             return $data;

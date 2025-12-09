@@ -255,11 +255,10 @@ function wikiplugin_category($data, $params)
     }
     if (! empty($lang)) {
         $filter['language'] = $lang;
-    } elseif (isset($params['lang'])) {
-        $filter['language'] = $prefs['language'];
     } else {
-        $filter = null;
+        $filter['language'] = Language::getCurrentLanguage();
     }
+
     if (isset($and) and substr(strtolower($and), 0, 1) == 'y') {
         $and = true;
     } else {

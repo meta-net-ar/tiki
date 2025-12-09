@@ -32,21 +32,6 @@ class LanguageTranslator
         return self::$instances[$hash];
     }
 
-    public static function getLanguageFromPrefs()
-    {
-        global $user, $user_preferences;
-        if (isset($user) && isset($user_preferences[$user]['language'])) {
-            $retval = $user_preferences[$user]['language'];
-        } else {
-            global $prefs;
-            $retval = $prefs['language'];
-        }
-        if (! $retval) {
-            throw new Language_Exception("Unable to find a language in preferences.  This isn't supposed to happen");
-        }
-        return $retval;
-    }
-
     private function __construct(string $lang, array $options)
     {
         global $prefs;

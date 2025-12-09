@@ -87,7 +87,7 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
         // check translations of multilingual fields
         global $prefs;
         if ($field['isMultilingual'] === 'y' && isset($entry[$name . '_' . $prefs['language']])) {
-            $name = $name . '_' . $prefs['language'];
+            $name = $name . '_' . Language::getCurrentLanguage();
             $value = $entry[$name];
         }
         // TextArea fields need the raw wiki syntax here for it to get wiki parsed if necessary

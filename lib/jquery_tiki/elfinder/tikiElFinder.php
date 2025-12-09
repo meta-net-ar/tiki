@@ -18,7 +18,7 @@ class tikiElFinder extends elFinder
         $headerlib->add_jsfile('vendor_bundled/vendor/studio-42/elfinder/js/elfinder.' . $str . '.js', true)
             ->add_jsfile('lib/jquery_tiki/elfinder/tiki-elfinder.js');
 
-        $elFinderLang = str_replace(['cn', 'pt-br'], ['zh_CN', 'pt_BR'], $prefs['language']);
+        $elFinderLang = str_replace(['cn', 'pt-br'], ['zh_CN', 'pt_BR'], Language::getCurrentLanguage());
 
         if (file_exists('vendor_bundled/vendor/studio-42/elfinder/js/i18n/elfinder.' . $elFinderLang . '.js')) {
             $headerlib->add_jsfile('vendor_bundled/vendor/studio-42/elfinder/js/i18n/elfinder.' . $elFinderLang . '.js');
