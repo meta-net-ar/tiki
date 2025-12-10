@@ -51,26 +51,26 @@ class LogseqPurifier implements MarkdownPurifierInterface
         // 1) Properties "key:: value" to "**key:** value"
         $out = $this->convertProperties($out, $pcount);
         if ($pcount) {
-            $notes[] = "Converted $pcount Logseq properties";
+            $notes[] = tr('Converted %0 Logseq properties', $pcount);
         }
 
         // 2) Task markers to GFM checkboxes
         $out = GfmPurifier::normalizeTasks($out, $tcount);
         if ($tcount) {
-            $notes[] = 'Task markers normalized to GFM';
+            $notes[] = tra('Task markers normalized to GFM');
         }
 
         // 3) Logbook blocks and CLOCK lines
         $out = self::stripLogbookBlocks($out, $rmLogs);
         if ($rmLogs) {
-            $notes[] = 'Removed Logseq :LOGBOOK: entries';
+            $notes[] = tra('Removed Logseq :LOGBOOK: entries');
         }
 
         // 4) ((block-id)) handling
         if ($opts['blockref_mode'] !== 'keep') {
             $out = $this->convertBlockRefs($out, $opts['blockref_mode'], $brcount);
             if ($brcount) {
-                $notes[] = 'Block references converted';
+                $notes[] = tra('Block references converted');
             }
         }
 
@@ -78,13 +78,13 @@ class LogseqPurifier implements MarkdownPurifierInterface
         if (! $opts['runtime_logseq']) {
             $out = $this->convertWikilinksToMarkdown($out, $opts['journal_ns'], $wlcount, $journalLinks);
             if ($wlcount) {
-                $notes[] = "Converted $wlcount wikilinks";
+                $notes[] = tr('Converted %0 wikilinks', $wlcount);
             }
             if ($journalLinks) {
-                $notes[] = "$journalLinks journal links recognized";
+                $notes[] = tr('%0 journal links recognized', $journalLinks);
             }
         } else {
-            $notes[] = 'Kept [[wikilinks]] for runtime extension';
+            $notes[] = tra('Kept [[wikilinks]] for runtime extension');
         }
 
         // TODO: Handle other Logseq-specific syntax?

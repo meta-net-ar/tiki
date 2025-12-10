@@ -58,7 +58,7 @@ class SourceManager
             $type = (string)($cfg['type'] ?? 'local');
 
             if ($type === 'local') {
-                // Priorité à l’upload si fourni, sinon chemin local
+                // Prioritize upload if provided, otherwise use local path
                 if ($uploadTmp) {
                     $prov = new FilesystemProvider('upload', $cfg, [
                         'uploadedPath' => $uploadTmp,
@@ -75,14 +75,14 @@ class SourceManager
                     'repo_url'      => $cfg['repo_url'] ?? '',
                     'repo_branch'   => $cfg['repo_branch'] ?? 'main',
                     'git_pull'      => ! empty($cfg['git_pull']),
-                    'repo_token'  => $cfg['repo_token'] ?? null,   // optionnel
+                    'repo_token'  => $cfg['repo_token'] ?? null,   // optional
                 ], [
                     'timeout'       => (int)($cfg['git_timeout'] ?? 45),
                 ]);
                 return $prov->fetchToTempZip();
             }
 
-            throw new \RuntimeException('Unsupported source type: ' . $type);
+            throw new \RuntimeException(tra('Unsupported source type:') . ' ' . $type);
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
             return null;

@@ -30,7 +30,7 @@ class GfmPurifier implements MarkdownPurifierInterface
         $normalized = false;
         $out = self::normalizeTasks($out, $normalized);
         if ($normalized) {
-            $notes[] = 'Task markers normalized to GFM';
+            $notes[] = tra('Task markers normalized to GFM');
         }
 
         return ['markdown' => $out, 'notes' => $notes];

@@ -66,7 +66,7 @@ class TikiMarkdownImporter
             $scanner = new ZipScanner();
             $preview = $scanner->scan($zip, $wikiOpts); // ['files'=>[], 'counts'=>...]
 
-            // 2) Registre avant import
+            // 2) Load registry
             $registry  = new ImportRegistry();
             $sourceKey = ImportRegistry::buildSourceKey($sourceCfg);
             $existingMap = $registry->getAllBySourceKey($sourceKey); // relpath => row
@@ -97,13 +97,12 @@ class TikiMarkdownImporter
         ];
 
         foreach ($files as $f) {
-            // relpath robuste (aligne ZipScanner)
             $relpath = $f['relpath'] ?? $f['relative'] ?? ($f['path'] ?? $f['file'] ?? null);
             $page    = $f['page_name'] ?? null;
             $raw     = $f['raw'] ?? null;
 
             if (! $relpath || ! $page || ! is_string($raw)) {
-                $this->notesByPage['__scanner__'][] = 'Skipping item (missing relpath/page/raw).';
+                $this->notesByPage['__scanner__'][] = tra('Skipping item (missing relpath/page/raw).');
                 continue;
             }
 
@@ -113,25 +112,25 @@ class TikiMarkdownImporter
             $res = $pipeline->purify($flavor, $raw, $ctx);
             $md  = $res['markdown'] ?? $raw;
 
-            // checksum du markdown purifié
+            // checksum
             $checksum = hash('sha256', $this->canon($md));
 
             // Unchanged vs registre
             $row = $existingMap[$relpath] ?? null;
             if ($row && hash_equals($row['checksum'], $checksum)) {
                 $skipped++;
-                $this->notesByPage[$page][] = 'Skipped (no changes via registry).';
+                $this->notesByPage[$page][] = tra('Skipped (no changes via registry).');
                 $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'skipped');
                 continue;
             }
 
             // Write / Update page
-            $ok = $this->writeMarkdownPage($page, $md, 'Markdown import');
+            $ok = $this->writeMarkdownPage($page, $md, tra('Imported from Markdown source'));
             if ($ok) {
                 $written++;
             } else {
                 $skipped++;
-                $this->notesByPage[$page][] = 'Skipped (no changes in DB).';
+                $this->notesByPage[$page][] = tra('Skipped (no content changes).');
             }
 
             // Upsert registry (clear orphan status)
@@ -143,7 +142,7 @@ class TikiMarkdownImporter
         $gcMode = $gcCfg['mode'] ?? 'mark'; // off|mark|delete
         if ($isFirstRun && $gcMode === 'delete') {
             $gcMode = 'mark'; // security for first run
-            $this->notesByPage['__gc__'][] = 'GC mode forced to "mark" on first run.';
+            $this->notesByPage['__gc__'][] = tra('GC mode downgraded to "mark" on first run for safety.');
         }
 
         $gcReport = $this->runGarbageCollect(
@@ -187,7 +186,7 @@ class TikiMarkdownImporter
         $mgr = new SourceManager();
         $zip = $mgr->fetchToTempZip($sourceCfg, $uploadTmp, $uploadName);
         if (! $zip) {
-            $this->lastError = $mgr->getError() ?: 'Unable to fetch source ZIP.';
+            $this->lastError = $mgr->getError() ?: tra('Unknown error fetching source.');
             return ['ok' => false, 'error' => $this->lastError];
         }
 
@@ -376,7 +375,7 @@ class TikiMarkdownImporter
                 'orphaned_at'   => null, // Clear orphan status
             ]);
         } catch (\Exception $e) {
-            $this->errors[] = "Registry update failed for {$pageName}: " . $e->getMessage();
+            $this->errors[] = tra('Failed to update registry for %0: %1', $relpath, $e->getMessage());
         }
     }
 
@@ -399,7 +398,7 @@ class TikiMarkdownImporter
             return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => []];
         }
         if (empty($seenRelpaths)) {
-            return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => ['GC skipped: no files scanned']];
+            return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => [tra('No seen relpaths provided for garbage collection.')]];
         }
 
         $now      = $tikilib->now;

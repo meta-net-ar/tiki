@@ -195,7 +195,7 @@ class MarkdownImporterCommand extends Command
             return Command::FAILURE;
         } finally {
             if ($tmpZipToDelete && file_exists($tmpZipToDelete)) {
-                @unlink($tmpZipToDelete);
+                unlink($tmpZipToDelete);
             }
         }
 

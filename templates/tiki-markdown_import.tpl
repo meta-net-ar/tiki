@@ -319,8 +319,8 @@
     if (t === 'local') {
       // LOCAL
       $localRow.removeClass('d-none');
-      $localInput.prop('required', false); // laisser facultatif pour dry-run rapide
-      $localInput.val(''); // évite de garder un ancien fichier quand on change d’onglet
+      $localInput.prop('required', false); // optional for dry-run 
+      $localInput.val('');
     } else if (t === 'git') {
       // REPO
       $repoBlock.removeClass('d-none');
