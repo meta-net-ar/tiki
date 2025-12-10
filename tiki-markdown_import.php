@@ -257,55 +257,48 @@ if ($action === 'import_now' && $access->checkCsrf()) {
     }
 }
 
-
-if (! function_exists('mdimp_val_plain')) {
-    function mdimp_val_plain($v): ?string
-    {
-        if ($v === null) {
-            return null;
-        }
-        if (is_bool($v)) {
-            return $v ? '1' : '0';
-        }
-        $s = (string) $v;
-        if ($s === '') {
-            return null;
-        }
-        // escape spaces to avoid quoting
-        $s = preg_replace('/\s+/u', ' ', $s);
-        return str_replace(' ', '\ ', $s);
+function mdimp_val_plain($v): ?string
+{
+    if ($v === null) {
+        return null;
     }
+    if (is_bool($v)) {
+        return $v ? '1' : '0';
+    }
+    $s = (string) $v;
+    if ($s === '') {
+        return null;
+    }
+    // escape spaces to avoid quoting
+    $s = preg_replace('/\s+/u', ' ', $s);
+    return str_replace(' ', '\ ', $s);
 }
 
-if (! function_exists('mdimp_same')) {
-    function mdimp_same($v, $def): bool
-    {
-        // normalize types for fair compare
-        if (is_bool($def)) {
-            return (bool)$v === (bool)$def;
-        }
-        if (is_int($def)) {
-            return (int)$v === (int)$def;
-        }
-        // strings: trim normalize spaces
-        $vn = preg_replace('/\s+/u', ' ', (string)$v);
-        $dn = preg_replace('/\s+/u', ' ', (string)$def);
-        return $vn === $dn;
+function mdimp_same($v, $def): bool
+{
+    // normalize types for fair compare
+    if (is_bool($def)) {
+        return (bool)$v === (bool)$def;
     }
+    if (is_int($def)) {
+        return (int)$v === (int)$def;
+    }
+    // strings: trim normalize spaces
+    $vn = preg_replace('/\s+/u', ' ', (string)$v);
+    $dn = preg_replace('/\s+/u', ' ', (string)$def);
+    return $vn === $dn;
 }
 
-if (! function_exists('mdimp_opt_if_changed')) {
-    function mdimp_opt_if_changed(string $key, $value, $default): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-        if (mdimp_same($value, $default)) {
-            return null; // omit if same as default
-        }
-        $v = mdimp_val_plain($value);
-        return $v === null ? null : "--{$key}={$v}";
+function mdimp_opt_if_changed(string $key, $value, $default): ?string
+{
+    if ($value === null) {
+        return null;
     }
+    if (mdimp_same($value, $default)) {
+        return null; // omit if same as default
+    }
+    $v = mdimp_val_plain($value);
+    return $v === null ? null : "--{$key}={$v}";
 }
 
 // Defaults for CLI (should match those in Command class MarkdownImporterCommand)
