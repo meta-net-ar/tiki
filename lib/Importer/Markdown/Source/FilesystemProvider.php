@@ -17,7 +17,7 @@ class FilesystemProvider implements SourceProviderInterface
 {
     public function __construct(
         private string $mode, // 'upload' | 'path'
-        private array $cfg,   // ['local_path' => '/srv/notes' (optionnel for mode=path)]
+        private array $cfg,   // ['local_path' => '/srv/notes' (optional for mode=path)]
         private array $ctx    // ['uploadedPath','uploadedName'] for mode=upload
     ) {
     }
@@ -33,7 +33,7 @@ class FilesystemProvider implements SourceProviderInterface
         $uploadedName = $this->ctx['uploadedName'] ?? null;
 
         if (! $uploadedPath || ! is_readable($uploadedPath)) {
-            throw new \RuntimeException('Uploaded file is missing or not readable.');
+            throw new \RuntimeException(tra('Uploaded file is missing or not readable.'));
         }
 
         $ext = strtolower(pathinfo($uploadedName ?: $uploadedPath, PATHINFO_EXTENSION));
@@ -41,18 +41,18 @@ class FilesystemProvider implements SourceProviderInterface
         if ($ext === 'zip') {
             $dst = $this->tmpZip();
             if (! copy($uploadedPath, $dst)) {
-                throw new \RuntimeException('Cannot copy uploaded ZIP to temp.');
+                throw new \RuntimeException(tra('Cannot copy uploaded ZIP to temp.'));
             }
             return $dst;
         }
 
         if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException('ZipArchive extension is required.');
+            throw new \RuntimeException(tra('ZipArchive extension is required.'));
         }
         $zipPath = $this->tmpZip();
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException('Cannot create temporary ZIP.');
+            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
         }
         $name = $uploadedName ?: 'note.md';
         if (! preg_match('~\.(md|markdown)$~i', $name)) {
@@ -64,7 +64,7 @@ class FilesystemProvider implements SourceProviderInterface
             if (file_exists($zipPath)) {
                 @unlink($zipPath);
             }
-            throw new \RuntimeException('Cannot read uploaded file.');
+            throw new \RuntimeException(tra('Cannot read uploaded file.'));
         }
         $zip->addFromString($name, $data);
         $zip->close();
@@ -75,29 +75,29 @@ class FilesystemProvider implements SourceProviderInterface
     {
         $path = (string)($this->cfg['local_path'] ?? '');
         if ($path === '') {
-            throw new \RuntimeException('Missing local_path.');
+            throw new \RuntimeException(tra('Missing local_path.'));
         }
         if (! file_exists($path)) {
-            throw new \RuntimeException('Path does not exist: ' . $path);
+            throw new \RuntimeException(tra('Path does not exist:') . ' ' . $path);
         }
 
         // If it's already a ZIP file, just copy it to temp
         if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
             $dst = $this->tmpZip();
             if (! copy($path, $dst)) {
-                throw new \RuntimeException('Cannot copy ZIP to temp.');
+                throw new \RuntimeException(tra('Cannot copy ZIP to temp.'));
             }
             return $dst;
         }
 
         if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException('ZipArchive extension is required.');
+            throw new \RuntimeException(tra('ZipArchive extension is required.'));
         }
 
         $zipPath = $this->tmpZip();
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException('Cannot create temporary ZIP.');
+            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
         }
 
         if (is_file($path)) {

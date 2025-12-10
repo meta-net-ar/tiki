@@ -25,7 +25,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $timeout   = (int)($this->ctx['timeout'] ?? 45);
 
         if ($repoUrl === '') {
-            throw new \RuntimeException('Missing repo_url.');
+            throw new \RuntimeException(tra('Missing repo_url.'));
         }
 
         // Prepare dirs + .gitconfig
@@ -59,13 +59,13 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         }
 
         if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException('ZipArchive extension is required.');
+            throw new \RuntimeException(tra('ZipArchive extension is required.'));
         }
 
         $zipPath = $this->tmpZip();
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException('Cannot create temporary ZIP.');
+            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
         }
         $this->addDirMarkdown($zip, $wcPath, '');
         $zip->close();
@@ -106,7 +106,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         if (! empty($out[0]) && is_executable($out[0])) {
             return $out[0];
         }
-        throw new \RuntimeException('git not found. Install command line tools and ensure git is in PATH.');
+        throw new \RuntimeException(tra('git not found. Install command line tools and ensure git is in PATH.'));
     }
 
     private function baseEnv(): array
@@ -258,7 +258,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             umask($old);
             if (! $ok && ! is_dir($dir)) {
                 $e = error_get_last();
-                $msg = 'Cannot create dir: ' . $dir;
+                $msg = tra('Cannot create dir:') . ' ' . $dir;
                 if ($e && ! empty($e['message'])) {
                     $msg .= ' — ' . $e['message'];
                 }
@@ -267,7 +267,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             @chmod($dir, 0775);
         }
         if (! is_writable($dir)) {
-            throw new \RuntimeException('Dir not writable: ' . $dir);
+            throw new \RuntimeException(tra('Dir not writable:') . ' ' . $dir);
         }
     }
 
@@ -303,11 +303,11 @@ class GitWorkingCopyProvider implements SourceProviderInterface
                 $host = $m[1];
                 $path = $m[2];
             } else {
-                throw new \RuntimeException('Invalid repo_url: ' . $repoUrl);
+                throw new \RuntimeException(tra('Invalid repo_url:') . ' ' . $repoUrl);
             }
         }
 
-        // Nettoyage
+        // Cleanup
         $path = preg_replace('~^/+~', '', $path);
         $path = preg_replace('~\.git$~i', '', $path);
         $safe = preg_replace('~[^A-Za-z0-9/_\.-]+~', '-', $path);
@@ -357,14 +357,14 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $this->ensureDir($repoRoot);
         $this->ensureDir($homeDir);
 
-        // Test écriture
+        // Test write permissions
         $probe = $repoRoot . '/.write-test';
         if (@file_put_contents($probe, 'ok') === false) {
-            throw new \RuntimeException('Repo root not writable: ' . $repoRoot);
+            throw new \RuntimeException(tra('Repo root not writable:') . ' ' . $repoRoot);
         }
         @unlink($probe);
 
-        // .gitconfig minimal (conservé car tu veux le garder)
+        // Minimal .gitconfig
         $gitconfig = $homeDir . '/.gitconfig';
         if (! file_exists($gitconfig)) {
             $cfg = <<<INI

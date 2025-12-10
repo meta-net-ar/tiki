@@ -249,7 +249,6 @@ if ($action === 'import_now' && $access->checkCsrf()) {
     if (! empty($result['notes'])) {
         $cnt = count($result['notes']);
         Feedback::warning(tr('Purifier notes available for %0 page(s).', $cnt));
-        // facultatif: tu peux aussi stocker en session si tu veux les afficher en bas
         $_SESSION['md_import']['last_preview'] = json_encode(
             ['notes' => $result['notes'], 'counts' => $result['counts']],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
