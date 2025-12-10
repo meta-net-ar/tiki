@@ -44,7 +44,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
         if ($opts['strip_front_matter']) {
             [$out, $had] = CommonMarkPurifier::removeFrontMatter($out);
             if ($had) {
-                $notes[] = 'Front matter stripped';
+                $notes[] = tra('Front matter stripped');
             }
         }
 

@@ -304,8 +304,6 @@ class ZipScanner implements ScannerInterface
 
     /**
      * Try to parse a human date title into ISO YYYY-MM-DD (en/fr)
-     * ######### Specific to LogSeq style journals for now. We need to implement a more generic mapping later. #########
-     * ######### Do we want to support other languages than en/fr?  #########
      * @param string $title
      * @param string|null $iso output ISO date if detected
      * @param string $lang 'en'|'fr' (for month names)
@@ -329,53 +327,39 @@ class ZipScanner implements ScannerInterface
         // 2) Remove English ordinals (1st, 2nd, 3rd, 4th…)
         $t2 = preg_replace('~\b(\d{1,2})(st|nd|rd|th)\b~i', '$1', $t);
 
-        // 3) FR → EN month normalization (for strtotime)
-        $fr = [
-            'janv.' => 'jan',
-            'févr.' => 'feb',
-            'fevr.' => 'feb',
-            'mars' => 'mar',
-            'avr.' => 'apr',
-            'mai' => 'may',
-            'juin' => 'jun',
-            'juil.' => 'jul',
-            'août' => 'aug',
-            'aout' => 'aug',
-            'sept.' => 'sep',
-            'oct.' => 'oct',
-            'nov.' => 'nov',
-            'déc.' => 'dec',
-            'dec.' => 'dec',
-            'janvier' => 'january',
-            'février' => 'february',
-            'fevrier' => 'february',
-            'avril' => 'april',
-            'juillet' => 'july',
-            'septembre' => 'september',
-            'octobre' => 'october',
-            'novembre' => 'november',
-            'décembre' => 'december',
-            'decembre' => 'december',
+        // 3) Try parsing with IntlDateFormatter for multiple locales and patterns
+        $locales = ['en_US', 'fr_FR'];
+        $patterns = [
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::SHORT,
         ];
-        $t2low = $t2;
-        foreach ($fr as $k => $v) {
-            $t2low = preg_replace('~' . preg_quote($k, '~') . '~iu', $v, $t2low);
+
+        foreach ($locales as $locale) {
+            foreach ($patterns as $pattern) {
+                $formatter = new \IntlDateFormatter(
+                    $locale,
+                    $pattern,
+                    \IntlDateFormatter::NONE,
+                    'UTC'
+                );
+                $ts = $formatter->parse($t2);
+                if ($ts !== false) {
+                    $iso = date('Y-m-d', $ts);
+                    return true;
+                }
+            }
         }
 
-        // 4) Try strtotime directly
-        $ts = strtotime($t2low);
+        // 4) Fallback to strtotime for other formats
+        $ts = strtotime($t2);
         if ($ts !== false) {
             $iso = date('Y-m-d', $ts);
             return true;
         }
 
-        // 5) Normalize separators to '-' and try explicit patterns (d-m-Y)
-        $norm = preg_replace('~[ \t/_\.]+~', '-', $t2low);
-        if (preg_match('~^(\d{4})-(\d{1,2})-(\d{1,2})$~', $norm, $m)) {
-            $iso = sprintf('%04d-%02d-%02d', (int)$m[1], (int)$m[2], (int)$m[3]);
-            return true;
-        }
-        if (preg_match('~^(\d{1,2})-(\d{1,2})-(\d{4})$~', $norm, $m)) { // assume d-m-Y
+        // 5) Explicit D M Y like "06 10 2025" to European preference (d/m/Y)
+        if (preg_match('~^(\d{1,2})[ \t./-](\d{1,2})[ \t./-](\d{4})$~', $t2, $m)) {
             $iso = sprintf('%04d-%02d-%02d', (int)$m[3], (int)$m[2], (int)$m[1]);
             return true;
         }

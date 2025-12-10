@@ -23,7 +23,7 @@ class GfmPurifier implements MarkdownPurifierInterface
         if ($stripFM) {
             [$out, $had] = CommonMarkPurifier::removeFrontMatter($out);
             if ($had) {
-                $notes[] = 'Front matter stripped';
+                $notes[] = tra('Front matter stripped');
             }
         }
 
