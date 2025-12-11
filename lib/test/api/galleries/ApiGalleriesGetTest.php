@@ -87,14 +87,20 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         if (count($body['result']) > 1) {
             $names = array_column($body['result'], 'name');
             $sortedNames = $names;
-            sort($sortedNames);
+            sort($sortedNames, SORT_NATURAL | SORT_FLAG_CASE);
             $this->assertEquals($sortedNames, $names, 'Galleries should be sorted by name ascending');
         }
     }
 
     public function testApiGetGalleriesWithSearch()
     {
-        $data = ['find' => 'API_Test_Gallery_Child'];
+        // create a gallery to search for
+        static::createGallery(
+            'API_Test_Gallery_Search',
+            'Gallery created for API search testing',
+            1
+        );
+        $data = ['find' => 'API_Test_Gallery_Search'];
         $response = $this->makeApiRequest(
             'GET',
             '/galleries',
@@ -107,9 +113,9 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
 
         $body = $this->getResponseBody($response);
         $this->assertValidGalleryListResponse($body);
-        // Should return only galleries matching the search term (API_Test_Gallery_Child)
+        // Should return only galleries matching the search term (API_Test_Gallery_Search)
         $this->assertEquals(1, count($body['result']), 'Should return 1 matching gallery');
-        $this->assertStringContainsString('API_Test_Gallery_Child', $body['result'][0]['name'], 'Gallery name should contain search term');
+        $this->assertStringContainsString('API_Test_Gallery_Search', $body['result'][0]['name'], 'Gallery name should contain search term');
     }
 
     public function testApiGetGalleryInfoWithoutPermission()
@@ -247,6 +253,32 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
     {
         $galleryId = static::$defaultGalleries['default']['galleryId'];
 
+        // create more files with varying names to test sorting
+        static::createFile(
+            $galleryId,
+            "cherry.txt",
+            "Cherry File",
+            "This is a cherry file for sorting test",
+            'text/plain',
+            "Cherry content"
+        );
+        static::createFile(
+            $galleryId,
+            "apple.txt",
+            "Apple File",
+            "This is an apple file for sorting test",
+            'text/plain',
+            "Apple content"
+        );
+        static::createFile(
+            $galleryId,
+            "banana.txt",
+            "Banana File",
+            "This is a banana file for sorting test",
+            'text/plain',
+            "Banana content"
+        );
+
         $data = ['sort_mode' => 'filename_asc'];
         $response = $this->makeApiRequest(
             'GET',
@@ -261,12 +293,10 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertValidFileListResponse($body);
 
         // verify files are sorted by filename (if we have multiple)
-        if (count($body['result']) > 1) {
-            $filenames = array_column($body['result'], 'name');
-            $sortedFilenames = $filenames;
-            sort($sortedFilenames);
-            $this->assertEquals($sortedFilenames, $filenames, 'Files should be sorted by name ascending');
-        }
+        $filenames = array_column($body['result'], 'name');
+        $sortedFilenames = $filenames;
+        sort($sortedFilenames, SORT_NATURAL | SORT_FLAG_CASE);
+        $this->assertEquals($sortedFilenames, $filenames, 'Files should be sorted by name ascending');
     }
 
     public function testApiGetGalleryFilesWithSearch()
