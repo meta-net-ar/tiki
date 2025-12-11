@@ -13,8 +13,6 @@ if (! defined('DEBUG_MODE')) {
     die();
 }
 
-require_once APP_PATH . 'modules/imap/functions.php';
-
 /**
  * Prepare message page title
  * @subpackage tiki/handler

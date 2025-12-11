@@ -292,8 +292,8 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
     function tiki_send_email_through_cypht($to, $cc, $subject, $body, $in_reply_to, $file, $profiles, $hmod, $recipient = null)
     {
         // Ensure IMAP dependency is available
-        if (!class_exists('Hm_IMAP_List')) {
-            Hm_Msgs::add('IMAP module is required for email sending but is not enabled. Please enable the IMAP module in your configuration.', 'danger');
+        if (! class_exists('Hm_SMTP_List')) {
+            Hm_Msgs::add('The smtp module is required to send emails. Please enable it through the configuration file.', 'danger');
             return false;
         }
 

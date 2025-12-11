@@ -27,39 +27,11 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
     {
         $list_path = $this->get('list_path', '') ?: ($this->request->post['list_path'] ?? '');
         $is_tracker = strpos($list_path, 'tracker_folder_') === 0;
-        
-        if ($is_tracker && !$this->get('msg_struct') && !$this->get('msg_headers')) {
-            list($success, $form) = $this->process_form(['imap_msg_uid']);
-            if ($success) {
-                $email = tiki_parse_message($list_path, $form['imap_msg_uid']);
-                if ($email && !empty($email['message_raw'])) {
-                    $message = $email['message_raw'];
-                    
-                    $msg_headers = [];
-                    foreach ($message->getAllHeaders() as $header) {
-                        if (function_exists('mb_decode_mimeheader')) {
-                            $msg_headers[$header->getName()] = mb_decode_mimeheader($header->getRawValue());
-                        } else {
-                            $msg_headers[$header->getName()] = $header->getRawValue();
-                        }
-                    }
-                    $this->out('msg_headers', $msg_headers);
-                    
-                    $msg_struct = tiki_mime_part_to_bodystructure($message);
-                    $this->out('msg_struct', $msg_struct);
-                }
-            }
-        }
-        
-        // Extract calendar data - use appropriate parser based on message type
+
         if ($this->get('msg_struct')) {
-            if ($is_tracker) {
-                get_calendar_part_tiki($this->get('msg_struct'), $this);
-            } else {
-                get_calendar_part_imap($this->get('msg_struct'), $this);
-            }
+            get_calendar_part($this->get('msg_struct'), $this, ! $is_tracker);
         }
-        
+
         if ($this->get('calendar_event_raw')) {
             $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
             if ($this->get('formatted_calendar_event_description')) {
@@ -69,7 +41,7 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
         } else {
             $event = null;
         }
-        
+
         // Determine recipient (same logic for both types)
         $recipient = null;
         $headers = $this->get('msg_headers', []);
@@ -78,7 +50,7 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
                 $recipient = (string)$value;
             }
         }
-        
+
         if (! empty($event['participants'])) {
             // try to find the recipient in the participants' list
             $found = false;
@@ -556,10 +528,11 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
  * @subpackage tiki/functions
  * @param array $struct message structure
  * @param object $mod Hm_Handler_Module
+ * @param bool $is_imap indicates if the source is an IMAP message or a Tiki tracker message
  * @return string
  */
-if (! hm_exists('get_calendar_part_imap')) {
-    function get_calendar_part_imap($struct, $mod)
+if (! hm_exists('get_calendar_part')) {
+    function get_calendar_part($struct, $mod, $is_imap = true)
     {
         $event = $method = $html = null;
         $part = false;
@@ -574,91 +547,66 @@ if (! hm_exists('get_calendar_part_imap')) {
                     $htmlPart = $id;
                 }
                 if (isset($vals['subs'])) {
-                    return get_calendar_part_imap($vals['subs'], $mod);
+                    return get_calendar_part($vals['subs'], $mod, $is_imap);
                 }
             } else {
                 if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                    return get_calendar_part_imap($vals['subs'], $mod);
+                    return get_calendar_part($vals['subs'], $mod, $is_imap);
                 }
             }
         }
         if (! $part) {
             return;
         }
-        list($success, $form) = $mod->process_form(['imap_server_id', 'imap_msg_uid', 'folder']);
-        if ($success) {
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $mod->cache);
-            if ($mailbox->authed()) {
-                $event = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, true)[2];
-                if ($htmlPart) {
-                    $html = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $htmlPart, true)[2];
-                    $html = sanitize_email_html($html);
-                    $html = format_msg_html($html);
-                }
-            }
+
+        if ($is_imap) {
+            process_calendar_imap($html, $event, $mod, $part, $htmlPart);
+        } else {
+            process_calendar_tiki($html, $event, $method, $mod, $part, $htmlPart);
         }
+
         $mod->out('calendar_method', $method);
         $mod->out('calendar_event_raw', $event);
         $mod->out('formatted_calendar_event_description', $html);
     }
 }
 
-
-/**
- * Search tracker message structure for text/calendar parts and load the ICS content
- * @subpackage tiki/functions
- * @param array $struct message structure
- * @param object $mod Hm_Handler_Module
- * @return string
- */
-if (! hm_exists('get_calendar_part_tiki')) {
-    function get_calendar_part_tiki($struct, $mod)
-    {
-        $part = false;
-        $method = null;
-
-        foreach ($struct as $id => $vals) {
-            if (is_array($vals) && isset($vals['type'])) {
-                if ($vals['type'] . '/' . $vals['subtype'] == 'text/calendar') {
-                    $part = $id;
-                    $method = $vals['attributes']['method'] ?? null;
-                }
-                if (isset($vals['subs'])) {
-                    $found = get_calendar_part_tiki($vals['subs'], $mod);
-                    if ($found) {
-                        return $found;
-                    }
-                }
-            } elseif (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                $found = get_calendar_part_tiki($vals['subs'], $mod);
-                if ($found) {
-                    return $found;
-                }
+function process_calendar_imap(&$html, &$event, $mod, $part, $htmlPart)
+{
+    list($success, $form) = $mod->process_form(['imap_server_id', 'imap_msg_uid', 'folder']);
+    if ($success) {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $mod->cache);
+        if ($mailbox->authed()) {
+            $event = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, true)[2];
+            if ($htmlPart) {
+                $html = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $htmlPart, true)[2];
+                $html = sanitize_email_html($html);
+                $html = format_msg_html($html);
             }
         }
+    }
+}
 
-        // No calendar part
-        if (! $part) {
-            return;
-        }
-
-        list($success, $form) = $mod->process_form(['imap_msg_uid', 'list_path']);
-        if ($success) {
-            $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
-            if ($email && ! empty($email['message_raw'])) {
-                $message = $email['message_raw'];
-                $mimePart = tiki_get_mime_part($message, $part);
-                if ($mimePart) {
-                    $event = $mimePart->getContent();
-                    $header = $mimePart->getHeader('Content-Type');
-                    if (! $method && $header && $header->hasParameter('method')) {
-                        $method = $header->getValueFor('method');
-                    }
-                    $mod->out('calendar_method', $method);
-                    $mod->out('calendar_event_raw', $event);
+function process_calendar_tiki(&$html, &$event, &$method, $mod, $part, $htmlPart)
+{
+    list($success, $form) = $mod->process_form(['imap_msg_uid', 'list_path']);
+    if ($success) {
+        $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
+        if ($email && ! empty($email['message_raw'])) {
+            $message = $email['message_raw'];
+            $mimePart = tiki_get_mime_part($message, $part);
+            if ($mimePart) {
+                $event = $mimePart->getContent();
+                $header = $mimePart->getHeader('Content-Type');
+                if (! $method && $header && $header->hasParameter('method')) {
+                    $method = $header->getValueFor('method');
                 }
             }
+            $html = tiki_get_mime_part($message, $htmlPart);
+            if ($html) {
+                $html = sanitize_email_html($html->getContent());
+                $html = format_msg_html($html);
+            }
         }
-        return $part;
     }
 }
