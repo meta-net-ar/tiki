@@ -580,7 +580,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/tablesorter/dist/js/widgets",
                     },
                     {
-                        src: "node_modules/vue/dist/vue.esm-browser.js",
+                        src: ["node_modules/vue/dist/vue.esm-browser.js", "node_modules/vue/dist/vue.esm-browser.prod.js"],
                         dest: "vendor_dist/vue/dist",
                     },
                     {

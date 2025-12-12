@@ -2972,5 +2972,16 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
         ],
+        'feature_js_dependencies_bundle_mode' => [
+            'name' => tra('Bundle mode for JS dependencies'),
+            'description' => tra('Specify whether Tiki should load production-ready (minified) bundles of JS dependencies or load their development versions.'),
+            'type' => 'list',
+            'options' => [
+                'auto' => tra('Auto (Tiki decides wether the site is in production mode or not based on the ssl status)'),
+                'production' => tra('Production (load minified bundles)'),
+                'development' => tra('Development (load non-minified versions)'),
+            ],
+            'default' => 'auto',
+        ]
     ];
 }

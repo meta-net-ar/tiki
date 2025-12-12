@@ -39,6 +39,19 @@ function wikiplugin_vue_info()
                 'since' => '21.0',
                 'default' => '',
             ],
+            'mode' => [
+                'required' => false,
+                'name' => tra('Mode'),
+                'description' => tra('Specify the Vue bundle mode to use (development or production). "feature_js_dependencies_bundle_mode" preference will be used if not set.'),
+                'since' => '30.0',
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Development'), 'value' => 'development'],
+                    ['text' => tra('Production'), 'value' => 'production'],
+                ],
+                'default' => '',
+                'advanced' => true,
+            ]
         ]
     ];
 }

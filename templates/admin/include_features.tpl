@@ -228,6 +228,7 @@
         {tab name="{tr}Programmer{/tr}" key=programmer}
             <br>
             <div class="admin clearfix featurelist">
+                {preference name=feature_js_dependencies_bundle_mode}
                 {preference name=feature_internet_of_things}
                 {preference name=feature_integrator}
                 {preference name=feature_xmlrpc}

@@ -53,13 +53,16 @@ class Vue extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
+        global $prefs;
+
         if ($repeat || empty($content)) {
             return '';
         }
 
         $app = ! (empty($params['app']) || $params['app'] === 'n');
         $name = $params['name'] ?? '';
+        $mode = $params['mode'] ?: $prefs['feature_js_dependencies_bundle_mode'];
 
-        return \TikiLib::lib('vuejs')->processVue($content, $name, $app);
+        return \TikiLib::lib('vuejs')->processVue($content, $name, $app, minify: $mode === 'production');
     }
 }
