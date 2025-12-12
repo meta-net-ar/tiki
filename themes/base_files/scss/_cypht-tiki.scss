@@ -10,8 +10,9 @@
     .hide { display: none; }
     // override colors when not using cypht default theme
     img { opacity: 1 !important; max-width: 100%; }
+    a.text-decoration-none { text-decoration: none; }
     a i.bi, .menu-toggle i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
-    a i.bi.bi-person-plus { color: var(--bs-btn-color) !important; }
+    a i.bi.bi-person-plus { color: var(--bs-secondary) !important; }
     .ui-widget-content { background-color: $tiki-ui-default-bg !important; }
     .ui-menu-item-wrapper { color: var(--bs-body-color) !important; }
     .ui-state-active { color: $tiki-ui-default-link-active-color !important; }
@@ -196,6 +197,7 @@
     }
     .btn-outline-secondary:hover {
         color: var(--bs-btn-hover-color); text-decoration: none;
+        background-color: var(--bs-secondary) !important;
     }
     .msg_controls {
         .btn-outline-secondary:hover { color: var(--bs-btn-hover-color); }
@@ -250,6 +252,15 @@
         .msg_controls {
             flex-flow: wrap; margin-bottom: 10px;
             a { text-decoration: none; }
+//            .btn-light:not(.btn-outline-secondary) { color: var(--bs-body-color); }
+            .btn-light, .btn-secondary {
+                color: var(--bs-secondary); background: none !important;
+                border-color: var(--bs-secondary);
+                &:hover {
+                    color: var(--bs-secondary-bg);
+                    background-color: var(--bs-secondary) !important;
+                }
+            }
         }
         .search_terms { width: 90% !important; margin: 0; padding: 4px 12px; }
         .search_form {
@@ -374,12 +385,23 @@
         width: auto !important;
     }
 
-    .nux_welcome { margin-bottom: 15px; }
+    .nux_welcome {
+        margin-bottom: 15px;
+        .mb-3 a.btn-light {
+            background: none; color: var(--bs-secondary); border-color: var(--bs-secondary);
+            &:hover {
+                color: var(--bs-secondary-bg);
+                background-color: var(--bs-secondary);
+                .bi-person-plus { color: var(--bs-secondary-bg) !important; }
+            }
+        }
+    }
     .block_sender_link.btn-outline-danger {
-        color: var(--bs-btn-color);
+        color: var(--bs-btn-color); background: none !important;
         i.bi { color: var(--bs-btn-color) !important; }
         &:hover, &:active {
             color: var(--bs-btn-hover-color); text-decoration: none;
+            background-color: var(--bs-danger) !important;
             i.bi { color: var(--bs-btn-hover-color) !important; }
         }
     }

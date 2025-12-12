@@ -237,7 +237,6 @@ if (isset($_REQUEST['pdf'])) {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
         exit(0);
     }

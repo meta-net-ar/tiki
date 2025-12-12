@@ -171,11 +171,14 @@ function wikiplugin_youtube($data, $params)
         $oEmbedData['height'] = 16;
     }
 
-    $fqdn = $params['privacyEnhanced'] === 'y' ? 'www.youtube-nocookie.com' : 'www.youtube.com';
+    $privacyEnhanced = $params['privacyEnhanced'] ?? '';
+    $related = $params['related'] ?? 'y';
+
+    $fqdn = $privacyEnhanced === 'y' ? 'www.youtube-nocookie.com' : 'www.youtube.com';
     $src = $scheme . '://' . $fqdn . '/embed/' . $sYoutubeId;
 
     $queryParams = [];
-    if ($params['related'] === 'n') {
+    if ($related === 'n') {
         $queryParams[] = 'rel=0';
     }
     if (! empty($params['quality']) && in_array($params['quality'], ['high', 'medium', 'low'])) {

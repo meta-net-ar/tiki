@@ -35,7 +35,7 @@
 
 @mixin top-nav-light {
     --tiki-top-bg: #fff;
-    --tiki-top-color: var(--tiki-top-color);
+    --tiki-top-color: #000;
     --tiki-top-hover-color: #000;
     --tiki-top-active-color: #000;
 //    --tiki-top-hover-bg:;
@@ -43,8 +43,8 @@
     --tiki-top-text-color: #000;
     --tiki-top-order: solid #000;
     --tiki-top-box-shadow: 0px 1px 10px #e3e1e1;
-    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
-    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-title-color: var(--tiki-top-color); // #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: var(--tiki-top-color); // #{$navbar-light-brand-color, var(--tiki-top-color)};
 }
 
 @mixin topbar-nav-light {

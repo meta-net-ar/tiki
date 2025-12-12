@@ -20,7 +20,7 @@
                 {if ! $user or $prefs.feature_comments_post_as_anonymous eq 'y'}
                     <div class="card-header">
                         {if $user}
-                            {remarksbox type=warning title="Anonymous posting"}
+                            {remarksbox type=warning title="{tr}Anonymous posting{/tr}"}
                                 {tr}You are currently registered on this site. This section is optional. By filling it, you will not link this post to your account and preserve your anonymity.{/tr}
                             {/remarksbox}
                         {/if}

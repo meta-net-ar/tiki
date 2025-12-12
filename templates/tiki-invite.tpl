@@ -1,4 +1,5 @@
 {title url="tiki-invite.php"}{tr}Invitation{/tr}{/title}
+{assign var=invite_action value="{$base_url}tiki-invite.php"}
 
 <div class="t_navbar mb-4">
     {button href="tiki-list_invite.php" _type="link" _icon_name="list" _text="{tr}Invitations List{/tr}"}
@@ -11,6 +12,9 @@
             <li>{$mail.email|escape}</li>
         {/foreach}
     </ul>
+    <form method='POST' action="{$invite_action}">
+        <input type='submit' name='return' value="{tr}Ok{/tr}" class="btn btn-primary">
+    </form>
 {elseif $smarty.request.send && !$smarty.request.confirm && !$smarty.request.back}
     <div class="highlight mt-2">{tr}You are about to send an invitation to theses people, please confirm :{/tr}</div>
     <ul>
@@ -18,7 +22,7 @@
             <li>{$mail.email|escape}</li>
         {/foreach}
     </ul>
-    <form method='POST' action='tiki-invite.php'>
+    <form method='POST' action="{$invite_action}">
         <input type='hidden' name='emailslist' value='{$smarty.request.emailslist|escape}'>
         <input type='hidden' name='emailslist_format' value='{$smarty.request.emailslist_format|escape}'>
         <input type='hidden' name='emailsubject' value='{$smarty.request.emailsubject|escape}'>
@@ -36,7 +40,7 @@
 
 {else}
     <hr>
-    <form method='POST' action='tiki-invite.php'>
+    <form method='POST' action="{$invite_action}">
         <div class="mb-3 row">
             <label class="col-form-label col-sm-5" for="loadprevious">{tr}Load a previous invitation settings{/tr}</label>
             <div class="col-sm-7">
@@ -103,7 +107,6 @@ You are here because you have just clicked on the link from my invitation email.
 {/if}{/tr}</textarea>
             </div>
         </div>
-
         {if count($invitegroups) > 0 && count($usergroups) > 0}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-5" for="invitegroups">{tr}Choose one or more groups that you want these subscriptions to be in. Don't choose any if you don't want anything special{/tr}</label>
@@ -121,7 +124,7 @@ You are here because you have just clicked on the link from my invitation email.
         <div class="mb-3 row">
             <label class="col-form-label col-sm-5" for="wikipageafter">{tr}Redirect to this wiki page after invitation acceptance (leave it blank if unwanted){/tr}</label>
             <div class="col-sm-7">
-                <input type='text' name='wikipageafter' value='{$smarty.request.wikipageafter|escape}'>
+                <input type='text' class="form-control" name='wikipageafter' value='{$smarty.request.wikipageafter|escape}'>
             </div>
         </div>
 

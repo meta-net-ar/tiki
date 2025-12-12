@@ -1,6 +1,6 @@
 stages:
   - build
-  - lint
+  - code-quality
   - tiki-check
   - unit-tests
   - package-tiki
@@ -113,12 +113,14 @@ node_build:
 #
 
 .cache-vendor_bundled: &cache-vendor_bundled
+    #I'm actually not sure this speeds up anything - benoitg - 2025-12-11
     key:
       prefix: "vendor_bundled"
       files:
           - vendor_bundled/composer.lock
     paths:
-      - vendor_bundled/vendor
+      - vendor_bundled/vendor/
+      - bin/
     policy: pull
 
 .cache-composercache: &cache-composercache
@@ -151,6 +153,7 @@ composer:
   artifacts:
     paths:
       - vendor_bundled/vendor/
+      - bin/
     expire_in: 2 days
 
 composer-dbdiff:
@@ -180,11 +183,11 @@ composer-dbdiff:
 
 
 #
-# Lint
+# Code quality:  linting, coding standards, etc.
 #
 
 phpcs:
-  stage: lint
+  stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
@@ -201,7 +204,7 @@ phpcs:
       policy: pull-push
 
 phplint:
-  stage: lint
+  stage: code-quality
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
@@ -216,7 +219,7 @@ phplint:
       - PHP_VERSION: ['8.1', '8.2', '8.3', '8.4', '8.5']
 
 smarty-lint:
-  stage: lint
+  stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
@@ -224,7 +227,7 @@ smarty-lint:
     - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
 
 eslint:
-  stage: lint
+  stage: code-quality
   needs: 
     - node_modules
   image:
@@ -234,7 +237,7 @@ eslint:
     - npx eslint .
       
 shlint:
-  stage: lint
+  stage: code-quality
   needs: []
   image: koalaman/shellcheck-alpine:latest
   script:
@@ -242,19 +245,43 @@ shlint:
     - shellcheck ./doc/devtools/*.sh
 
 check-bom-encoding:
-  stage: lint
+  stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php doc/devtools/check_bom_encoding.php
 
 unix-ending-line:
-  stage: lint
+  stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php doc/devtools/check_unix_ending_line.php
 
+translation-standards:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php doc/devtools/check_template_translation_standards.php --all
+
+rector:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    # If rector would have changed any files, it will return a non-zero code
+    - php bin/rector process --dry-run
+  cache:
+    - key:
+        prefix: "rector"
+        files:
+          - rector.php
+      paths:
+        - temp/dev/rector_cache
+      policy: pull-push
 #
 # Check Tikiwiki development specific check (related also with release)
 #
@@ -295,14 +322,6 @@ translation:
   script:
     - git log --first-parent --pretty="format:%h" -1 --skip=1 | xargs -I gitHash php -d display_errors=On console.php translation:englishupdate --audit
   allow_failure: true
-
-translation-standards:
-  stage: tiki-check
-  needs:
-    - composer
-  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    - php doc/devtools/check_template_translation_standards.php --all
 
 #satis-validates:
 #  stage: tiki-check

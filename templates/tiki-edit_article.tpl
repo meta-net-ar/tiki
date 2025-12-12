@@ -164,7 +164,7 @@
                     <input type="text" name="authorName" id="authorName" value="{$authorName|escape}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row{if $tiki_p_edit_article_user neq 'y'}hidden{/if} clearfix">
+            <div class="mb-3 row {if $tiki_p_edit_article_user neq 'y'}hidden{/if} clearfix">
                 <label for="author" class="col-form-label col-md-4">{tr}User (article owner){/tr}</label>
                 <div class="col-md-4">
                     <input id="author" type="text" name="author" value="{$author|escape}" class="form-control">

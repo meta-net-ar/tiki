@@ -141,7 +141,7 @@ if (isset($_REQUEST['send'])) {
 
     $igroups = $_REQUEST['invitegroups'] ?? [];
 
-    if (! empty($_REQUEST['confirm']) && isset($_REQUEST['invitegroups'])) {
+    if (! empty($_REQUEST['confirm'])) {
         $tikilib->query(
             "INSERT INTO `tiki_invite` (inviter, `groups`, ts, emailsubject,emailcontent,wikicontent,wikipageafter) VALUES (?,?,?,?,?,?,?)",
             [
@@ -168,13 +168,11 @@ if (isset($_REQUEST['send'])) {
             );
         }
 
-        $_SERVER['SCRIPT_URI'] = empty($_SERVER['SCRIPT_URI']) ? 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_URI'];
         foreach ($emails as $m) {
             $mail = new TikiMail();
             $mail->setFrom($prefs['sender_email']);
             $mail->setSubject($_REQUEST["emailsubject"]);
-            $url = str_replace('tiki-invite.php', 'tiki-invited.php', $_SERVER['SCRIPT_URI'])
-                . '?invite=' . $id . '&email=' . urlencode($m['email']);
+            $url = TikiLib::tikiUrl('tiki-invited.php', ['invite' => $id, 'email' => $m['email']]);
             $text = $_text;
             $text = str_replace('{link}', $url, $text);
             $text = str_replace('{email}', $m['email'], $text);
@@ -185,11 +183,6 @@ if (isset($_REQUEST['send'])) {
         }
 
         $smarty->assign('sentresult', true);
-    } elseif (! isset($_REQUEST['invitegroups'])) {
-        Feedback::error(tr("You must select an invite group"));
-        $smarty->assign('mid', 'tiki-invite.tpl');
-        $smarty->display("tiki.tpl");
-         die();
     }
     $smarty->assign('emails', $emails);
 }

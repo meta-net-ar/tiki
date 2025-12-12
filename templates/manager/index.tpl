@@ -9,7 +9,7 @@
 {/block}
 
 {block name="content"}
-    <h2>Instances</h2>
+    <h2>{tr}Instances{/tr}</h2>
     <div class="table-responsive">
         <table class="table">
             <tr>

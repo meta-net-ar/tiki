@@ -125,6 +125,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-3d-model-viewer": resolve(__dirname, "tiki-model3dviewer/model3dviewer.js"),
         "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(__dirname, "tiki-sentry-browser/sentry-browser.js"),
         "tiki-figlet": resolve(__dirname, "tiki-figlet/figlet.js"),

@@ -488,10 +488,19 @@ body.fullscreen.tiki.navbar-padding {
     flex-direction: column !important;
 }
 
+// These classes are used in templates and should resist being overridden.
 .p-0 {
     padding: 0 !important;
 }
 
 .m-0 {
     margin: 0 !important;
+}
+
+.border-0 {
+    border: 0 !important;
+}
+
+.shadow-none {
+    box-shadow: none !important;
 }

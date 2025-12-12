@@ -67,11 +67,11 @@
     {if $carousel and not empty($carousel.controls) and $carousel.controls neq 'n'}
         <a class="carousel-control-prev" href="#{$containerId}" role="button" data-bs-slide="prev">
             {icon name='chevron-left'}
-            <span class="sr-only">Previous</span>
+            <span class="sr-only">{tr}Previous{/tr}</span>
         </a>
         <a class="carousel-control-next" href="#{$containerId}" role="button" data-bs-slide="next">
             {icon name='chevron-right'}
-            <span class="sr-only">Next</span>
+            <span class="sr-only">{tr}Next{/tr}</span>
         </a>
     {/if}
 

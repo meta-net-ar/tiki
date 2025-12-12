@@ -160,6 +160,15 @@ function prefs_theme_list($partial = false)
             'options' => $prefs['color_modes_names'] ?? [],
             'default' => 'auto',
             'tags' => ['basic']
-        ]
+        ],
+        'theme_model3dviewer_default_background' => [
+            'name' => tra('Default 3D model background'),
+            'description' => tra('Default background for 3D models. This can be overridden by the model3dviewer parameter in the plugin. ex: <code>#243d40</code> or <code>grey</code>'),
+            'type' => 'text',
+            'help' => 'Model3DViewer',
+            'default' => '#ffffff',
+            'keywords' => '3d model viewer glb gltf obj stl fbx 3ds ply background',
+            'tags' => ['basic'],
+        ],
     ];
 }

@@ -10,7 +10,7 @@
             <div class="offcanvas offcanvas-start tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style="top: var(--tiki-admin-top-modules-height); height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title nav-link" id="offcanvasNavbarLabel">{tr}Admin menu{/tr}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: lightgray;"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{tr}Close{/tr}" style="background-color: lightgray;"></button>
                 </div>
                 <div class="offcanvas-body p-0 w-100">
                     <div class="tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" style="height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">

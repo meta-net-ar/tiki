@@ -298,7 +298,7 @@ $items = $banlib->list_rules($offset, $maxRecords, $sort_mode, $find);
 if (isset($_REQUEST['export']) || isset($_REQUEST['csv'])) {
     // export banning rules //
     $csv = $banlib->export_rules($items['data']);
-    TikiLib::lib('header')->setXRobotsTag($robots);
+
     header("Content-type: text/comma-separated-values; charset:UTF-8");
     header('Content-Disposition: attachment; filename="tiki-admin_banning.csv"');
     if (function_exists('mb_strlen')) {

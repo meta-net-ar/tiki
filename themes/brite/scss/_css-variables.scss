@@ -23,8 +23,8 @@
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
     --tiki-top-text-color: #{$navbar-light-hover-color};
-    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
-    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-title-color: var(--tiki-top-color); // #{$navbar-light-brand-color, var(--tiki-top-color)}; This background color is too light for the brand color to have good contrast with it.
+    --tiki-site-subtitle-color: var(--tiki-top-color); // #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: solid #{$black};
     --tiki-top-border-width: 0px 0px 2px 0px;
     --tiki-top-box-shadow: 0px 1px 10px #34292c;

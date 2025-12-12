@@ -372,7 +372,6 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
     header("Expires: 0");
     header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
     header("Pragma: public");
-    TikiLib::lib('header')->setXRobotsTag($robots);
     echo $data;
     die;
 }

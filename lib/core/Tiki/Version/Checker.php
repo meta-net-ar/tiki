@@ -28,7 +28,7 @@ class Tiki_Version_Checker
         $versions = $this->getSupportedVersions($content);
 
         if ($supported = $this->findSupportedInBranch($versions)) {
-            if ($supported->isUpgradeTo($this->version)) {
+            if ($supported->isStableUpgradeTo($this->version)) {
                 $upgrades[] = new Tiki_Version_Upgrade($this->version, $supported, true);
                 $branchupdate = $supported;
             }
@@ -36,7 +36,7 @@ class Tiki_Version_Checker
 
         $max = $this->getLatestVersion($versions);
 
-        if ($max !== $branchupdate && $max->isUpgradeTo($this->version)) {
+        if ($max !== $branchupdate && (! $this->version->isStable() || $max->isStableUpgradeTo($this->version))) {
             $upgrades[] = new Tiki_Version_Upgrade($supported ?: $this->version, $max, $supported === false);
         }
 
@@ -64,7 +64,7 @@ class Tiki_Version_Checker
         $max = array_shift($versions);
 
         foreach ($versions as $candidate) {
-            if ($candidate->isUpgradeTo($max)) {
+            if ($candidate->isStableUpgradeTo($max)) {
                 $max = $candidate;
             }
         }

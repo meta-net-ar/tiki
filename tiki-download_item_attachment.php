@@ -52,7 +52,6 @@ $file = $info["filename"];
 $content = $info["data"];
 
 session_write_close();
-TikiLib::lib('header')->setXRobotsTag($robots);
 header("Content-type: $type");
 if (isset($_REQUEST["display"])) {
     header("Content-Disposition: inline; filename=\"" . urlencode($file) . "\"");

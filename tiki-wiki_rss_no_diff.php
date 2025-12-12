@@ -108,5 +108,4 @@ if ($output["data"] == "EMPTY") {
     $output = $rsslib->generate_feed($feed, $uniqueid, '', $changes, $readrepl, $param, $id, $title, $titleId, $desc, $descId, $dateId, $authorId);
 }
 header("Content-type: " . $output["content-type"]);
-TikiLib::lib('header')->setXRobotsTag($robots);
 print $output["data"];

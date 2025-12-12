@@ -13,16 +13,6 @@
             <fieldset>
                 <legend class="h3">{tr}Release check{/tr}</legend>
                 {include file='admin/version_check.tpl'}
-                {remarksbox type="info" title="{tr}Tiki version{/tr}"}
-                    <div class="adminoptionbox">
-                        <strong>{tr}Tiki version: {/tr}</strong> {$tiki_version}
-                    </div>
-                    {if ! empty($git_details)}
-                        <div class="adminoptionbox">
-                            <strong>{tr}Git Information:{/tr}</strong> {$git_details.branch}: <a target="_blank" class="wiki external" href="https://gitlab.com/tikiwiki/tiki/-/commit/{$git_details.commit.hash}"><cite>{$git_details.commit.hash|substring:0:8}</cite></a>{icon name='link-external'} {tr}from{/tr} {$git_details.committer.date|tiki_short_datetime}
-                        </div>
-                    {/if}
-                {/remarksbox}
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Site identity{/tr}</legend>

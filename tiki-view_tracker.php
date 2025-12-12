@@ -180,19 +180,46 @@ if (isset($_REQUEST['status'])) {
     $sts = preg_split('//', $tracker_info["defaultStatus"], -1, PREG_SPLIT_NO_EMPTY);
     $_REQUEST['status'] = $tracker_info["defaultStatus"];
 } else {
-    $sts = [
-        'o'
-    ];
+    $sts = ['o'];
     $_REQUEST['status'] = 'o';
 }
+
+/**
+ * Keep a consistent order for combined statuses, based on tracker’s declared statuses.
+ * Example typical order: ['o','p','c'].
+ */
+$statusOrder = array_keys($status_raw);
+
 foreach ($status_raw as $let => $sta) {
     if (isset($sta['perm']) || ($my || $ours)) {
-        if (in_array($let, $sts)) {
+        // Visual state
+        if (in_array($let, $sts, true)) {
             $sta['class'] = 'statuson';
         } else {
             $sta['class'] = 'statusoff';
         }
-        $sta['statuslink'] = $let;
+
+        // Build toggled set against current selection
+        $newSet = $sts;
+
+        if (in_array($let, $newSet, true)) {
+            // Remove this status from the set
+            $newSet = array_values(array_diff($newSet, [$let]));
+            // If that would leave empty, show all OTHER statuses instead
+            if (empty($newSet)) {
+                $newSet = array_values(array_diff($statusOrder, [$let]));
+            }
+        } else {
+            // Add clicked status
+            $newSet[] = $let;
+        }
+
+        // Normalize order to tracker's order, and ensure uniqueness
+        $newSet = array_values(array_intersect($statusOrder, $newSet));
+
+        // Link carries the combined status string (e.g. 'op', 'pc', 'opc', etc.)
+        $sta['statuslink'] = implode('', $newSet);
+
         $status_types[$let] = $sta;
     }
 }

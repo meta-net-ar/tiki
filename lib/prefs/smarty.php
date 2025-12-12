@@ -78,6 +78,19 @@ function prefs_smarty_list()
                 'smarty_security',
             ],
         ],
+        'smarty_security_allowed_builtin_php_functions' => [
+            'name' => tr('Allowed Smarty built-in PHP functions'),
+            'description' => tr("This is the list of allowed built-in PHP functions to be used as smarty modifiers. Smarty 5+ disabled the use of PHP functions as smarty modifiers. Use this preference to allow specific built-in functions not available in the currently exposed modifiers list that you need to use in your templates."),
+            'warning' => tr('There may be security implications. Make sure you know what you are doing. Try to keep this list as short as possible.'),
+            'hint' => tr('Use "," to separate values'),
+            'type' => 'text',
+            'separator' => ',',
+            'perspective' => false,
+            'default' => '',
+            'dependencies' => [
+                'smarty_security',
+            ],
+        ],
         'smarty_security_dirs' => [
             'name' => tr('Extra Smarty directories'),
             'description' => tr('Make additional directories available as Smarty directories. This may be needed for custom icons (clear temp/cache after changing).'),

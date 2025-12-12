@@ -588,8 +588,8 @@
 
                         <p>{tr}Blacklist Currently Using:{/tr} {$file_using}</p>
                         {if $num_indexed}
-                            <h3>Generate and Save a Password Blacklist{help desc="{tr}Saving places a text file with the generated passwords in your storage/pass_blacklists folder and enables it
-                            as an option for use. Fields default to the password standards set in tiki. You should not have to change these, unless you plan on changing your password
+                            <h3>{tr}Generate and Save a Password Blacklist{/tr}{help desc="{tr}Saving places a text file with the generated passwords in your storage/pass_blacklists folder and enables it
+                            as an option for use. Fields default to the password standards set in Tiki. You should not have to change these, unless you plan on changing your password
                             requirements in the future.{/tr}"}</h3>
                             {tr}Number of passwords (limit):{/tr} <input type="number" name="limit" value="{$limit}" />
                             {help desc="{tr}This sets the number of passwords that your blacklist will use. The words from the begining of of the file will be selected over the lower,

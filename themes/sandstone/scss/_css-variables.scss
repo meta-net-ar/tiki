@@ -74,11 +74,17 @@
 [data-bs-theme=dark] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
+        --tiki-site-title-color: #{$navbar-dark-color};
+        --tiki-site-subtitle-color: #{$navbar-dark-color};
     }
+
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
+
+
 
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode

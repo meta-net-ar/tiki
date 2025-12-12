@@ -212,10 +212,13 @@ if ($editable === 'y') {
     $offset = $_REQUEST["offset"] ?? 0;
     $smarty->assign_by_ref('offset', $offset);
 
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
+
     // Get all wiki pages for the dropdown menu
     $listpages = $tikilib->list_pages(
         $offset,
-        $prefs['maxRecords'],
+        $maxRecords,
         'pageName_asc',
         $find_objects,
         '',
@@ -226,19 +229,25 @@ if ($editable === 'y') {
         $filter
     );
 
-    if ($prefs['page_n_times_in_a_structure'] === 'n') {
-        // pages can appear only once in a structure so filter them out
-        $listpages['data'] = array_filter($listpages['data'], function ($item) use ($subtree) {
-            foreach ($subtree as $sub) {
-                if ($item['pageName'] === $sub['pageName']) {
-                    return false;
-                }
-            }
-            return true;
-        });
+    // Filter out pages already in the structure
+    $structure_page_names = [];
+    foreach ($subtree as $sub) {
+        if (isset($sub['pageName']) && ! empty($sub['pageName']) && ! ($sub['last'] == true && $sub['first'] == false)) {
+            $structure_page_names[$sub['pageName']] = true;
+        }
     }
+    $filtered_data = array_filter($listpages['data'], function ($item) use ($structure_page_names) {
+        return ! isset($structure_page_names[$item['pageName']]);
+    });
+    $listpages['data'] = array_values($filtered_data);
 
     $smarty->assign_by_ref('listpages', $listpages);
+} else {
+    $offset = $_REQUEST["offset"] ?? 0;
+    $smarty->assign_by_ref('offset', $offset);
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
+    $smarty->assign('listpages', ['data' => [], 'count' => 0]);
 } // end of security hardening
 
 $page_info = $structlib->s_get_page_info($_REQUEST["page_ref_id"]);

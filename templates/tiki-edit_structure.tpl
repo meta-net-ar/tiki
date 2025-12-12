@@ -128,9 +128,11 @@
                         {capture assign=title}{tr _0=$page_info.user}locked by %0{/tr}{/capture}
                         {icon name='lock' alt="{tr}Locked{/tr}" title=$title}
                     {else}
-                        {self_link _script='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}'}
-                            {icon name="edit"}
-                        {/self_link}
+                        {if !empty($structure_name)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {elseif !empty($pageName)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$pageName _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {/if}
                     {/if}
                     {if empty($page)}
                         {self_link _class="tips btn btn-link btn-sm add_new_child_page" _title=":{tr}Add new child page{/tr}"}
@@ -184,13 +186,19 @@
                     {/if}
                 </div>
                 <ul id="page_list_container" class="list-group">
-                    {foreach $listpages.data as $aPage}
-                        <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
-                            {$aPage.pageName|escape}
-                        </li>
-                    {/foreach}
+                    {if !empty($listpages.data)}
+                        {foreach $listpages.data as $aPage}
+                            <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
+                                {$aPage.pageName|escape}
+                            </li>
+                        {/foreach}
+                    {else}
+                        <li class="list-group-item">{tr}No pages found{/tr}</li>
+                    {/if}
                 </ul>
-                {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {if !empty($listpages.count) && $listpages.count > 0 && !empty($maxRecords) && $maxRecords > 0 && $listpages.count > $maxRecords}
+                    {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {/if}
             </div>
         </div>
     </form>

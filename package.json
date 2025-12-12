@@ -134,6 +134,7 @@
     "src/js/tiki-sentry-browser",
     "src/js/tiki-figlet",
     "src/js/tiki-iot",
+    "src/js/tiki-model3dviewer",
     "src/js/tiki-toast-ui",
     "src/js/tiki-vue-sfc-loader",
     "src/js/tiki-ui-utils",

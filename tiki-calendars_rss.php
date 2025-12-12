@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
 require_once('tiki-sefurl.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
 $rsslib = TikiLib::lib('rss');
 $calendarlib = TikiLib::lib('calendar');
 

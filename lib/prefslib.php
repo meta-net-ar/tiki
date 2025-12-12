@@ -15,6 +15,7 @@ class PreferencesLib
         'smarty_security_disabled_tags',
         'smarty_security_allowed_modifiers',
         'smarty_security_disabled_modifiers',
+        'smarty_security_allowed_builtin_php_functions',
         'tiki_allow_trust_input',
         'feature_create_webhelp',
         'scheduler_shell_command',

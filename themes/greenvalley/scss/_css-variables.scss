@@ -22,8 +22,8 @@ $imagePath: "../images/";
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
     --tiki-top-text-color: #{$navbar-dark-hover-color};
-    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
-    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-title-color: var(--tiki-top-color); // #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: var(--tiki-top-color); // #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
     --tiki-top-box-shadow: 0px 1px 10px #393939;
 }

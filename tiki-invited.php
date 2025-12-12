@@ -65,16 +65,16 @@ function tiki_invited()
         );
         $groups = explode(',', $groups);
         foreach ($groups as $group) {
-            $userlib->assign_user_to_group($user, trim($group));
+            if (! empty(trim($group))) {
+                $userlib->assign_user_to_group($user, trim($group));
+            }
         }
 
         $tikilib->query("UPDATE tiki_invited SET used=?, used_on_user=? WHERE id=?", ["logged", $user, $invited['id']]);
 
         if (! empty($inviterow['wikipageafter'])) {
-            $_SERVER['SCRIPT_URI'] = empty($_SERVER['SCRIPT_URI']) ? 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_URI'];
-            $redirect = str_replace('tiki-invited.php', 'tiki-index.php?page=', $_SERVER['SCRIPT_URI']) . urlencode($inviterow['wikipageafter']);
-            header('Location: ' . $redirect);
-            exit;
+            $redirect = TikiLib::tikiUrl('tiki-index.php', ['page' => $inviterow['wikipageafter']]);
+            TikiLib::lib('access')->redirect($redirect);
         }
 
         $error = tra("Congratulations! You are now part of this invitation group(s)");

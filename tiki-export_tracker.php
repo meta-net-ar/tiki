@@ -16,8 +16,6 @@ if (! isset($_REQUEST['trackerId'])) {
     Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $trklib = TikiLib::lib('trk');
 @ini_set('max_execution_time', 0);
 

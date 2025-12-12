@@ -71,7 +71,6 @@ if (isset($_REQUEST['encoding'])) {
     $handler = new $handler("php://stdout", 'UTF-8', $_REQUEST['encoding']);
     $grid->export($handler);
 
-    TikiLib::lib('header')->setXRobotsTag($robots);
     header("Content-type: text/comma-separated-values");
     header("Content-Disposition: attachment; filename=export.csv");
     header("Expires: 0");

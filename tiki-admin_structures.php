@@ -75,7 +75,6 @@ if ($tiki_p_edit_structures == 'y') {
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
             Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
         }
-        TikiLib::lib('header')->setXRobotsTag($robots);
         header("content-type: text/plain");
         $structlib->s_export_structure_tree($_REQUEST['export_tree']);
         die;
@@ -238,7 +237,10 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // default $maxRecords defined in tiki-setup.php
 if (isset($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
+} else {
+    $maxRecords = $prefs['maxRecords'];
 }
+$smarty->assign('maxRecords', $maxRecords);
 $filter = '';
 if (! empty($_REQUEST['lang'])) {
     $filter['lang'] = $_REQUEST['lang'];

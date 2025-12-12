@@ -52,6 +52,18 @@
                 {breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs}
             {/if}
             *}
+            {if ! empty($tiki_version)}
+                {remarksbox type="info" title="{tr}Tiki version{/tr}"}
+                    <div class="adminoptionbox">
+                        <strong>{tr}Tiki version: {/tr}</strong> {$tiki_version}{if !empty($db_engine_type)} ({$db_engine_type}){/if}
+                    </div>
+                    {if ! empty($git_details)}
+                        <div class="adminoptionbox">
+                            <strong>{tr}Git Information:{/tr}</strong> {$git_details.branch}: <a target="_blank" class="wiki external" href="https://gitlab.com/tikiwiki/tiki/-/commit/{$git_details.commit.hash}"><cite>{$git_details.commit.hash|substring:0:8}</cite></a>{icon name='link-external'} {tr}from{/tr} {$git_details.committer.date|tiki_short_datetime}
+                        </div>
+                    {/if}
+                {/remarksbox}
+            {/if}
             {if $mailer_queue_requires_update}
                 {remarksbox type="error" title="{tr}Email Queue Problem{/tr}"}
                     <p>{tr}There are messages in the email queue that exceeded the number of retries and will not be retried anymore.{/tr}</p>
@@ -197,7 +209,9 @@
         </div>
 
         {if $upgrade_messages|count}
-            {if $upgrade_messages|count eq 1}
+            {if not $is_stable}
+                {$title="{tr}Stable version available{/tr}"}
+            {elseif $upgrade_messages|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}

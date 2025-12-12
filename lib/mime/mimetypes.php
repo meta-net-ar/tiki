@@ -492,5 +492,14 @@ $mimetypes = [
     "xlam" => "application/vnd.ms-excel.addin.macroEnabled.12",
     "xlsb" => "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
 
+    // Additional MIME types for 3D model viewer
+    '3ds'  => 'image/x-3ds',
+    'dae'  => 'model/vnd.collada+xml',
+    'fbx'  => 'application/octet-stream',
+    'gltf' => 'model/gltf+json',
+    'glb'  => 'model/gltf-binary',
+    'stl'  => 'model/stl',
+    'obj'  => 'text/plain',
+
     'vimeo' => 'video/vimeo'
 ];
