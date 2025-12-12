@@ -370,7 +370,6 @@ class Tracker_Field_Files extends Tracker_Field_Abstract implements Tracker_Fiel
         global $prefs;
         global $mimetypes;
         global $tikipath;
-        
 
         include('lib/mime/mimetypes.php');
         $galleryId = (int)$this->getOption('galleryId');
@@ -541,40 +540,32 @@ class Tracker_Field_Files extends Tracker_Field_Abstract implements Tracker_Fiel
                     $viewicon = smarty_function_icon(['name' => 'view'], $smarty->getEmptyInternalTemplate());
 
                     if ($file['filetype'] == $mimetypes["pdf"] || (PDFHelper::canConvertToPDF($file['filetype']) && $prefs['fgal_convert_documents_pdf'] == 'y')) {
-
                         if ($pdfjsIsInstalled && $prefs['fgal_pdfjs_feature'] == 'y') {
                             $ret .= " <a href='tiki-display.php?fileId=" . $file['fileId']
                                 . "' target='_blank' class='tips' title='Preview: " . $file['filename'] . "'>
                                 $viewicon
                             </a>";
                         }
-                        
-                    } elseif ($file['filetype'] == $mimetypes['mp3'] || $file['filetype'] == $mimetypes['oga']) {
+                    } elseif ($this->isMimeType($mimetypes, $file['filetype'], ['mp3', 'oga', 'webm', 'mp4', 'wmv', 'ogv'])) {
                         global $base_url;
                         $src = smarty_modifier_sefurl($file['fileId'], 'display');
                         $fileurl = $base_url . $src;
 
-                        //Audio preview modal
-                        $audiomodal = '
-                            <div class="modal fade" id="audioModal' . $fileId . '" tabindex="-1" role="dialog"  aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                                <audio controls style="width : 100%">
-                                                    <source src="'.$fileurl.'" type="audio/mpeg">
-                                                </audio>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>';
-
-                        $ret .= $audiomodal . " <a type='button' href='' title='preview' data-toggle='modal' data-backdrop='false' data-target='#audioModal$fileId' >
-                            $viewicon
-                        </a>";
-
+                        $ret .= "<div style='display:none'>
+                            <div id='inline-file-$fileId'>";
+                        if ($this->isMimeType($mimetypes, $file['filetype'], ['mp3', 'oga'])) {
+                            $tag = 'audio';
+                            $style = "data-box-width='35%' data-box-height='20%'";
+                        } else {
+                            $tag = 'video';
+                            $style = '';
+                        }
+                        $ret .= "<{$tag} controls style='width : 100%'>
+                                    <source src='{$fileurl}' type='{$file['filetype']}'>
+                                </{$tag}>
+                            </div>
+                        </div>
+                        <a class='cboxInlineMedia' $style title='{$tag} preview' href='#inline-file-$fileId'>$viewicon</a>";
                     } else {
                         $dataAttributes = [];
 
@@ -594,6 +585,16 @@ class Tracker_Field_Files extends Tracker_Field_Abstract implements Tracker_Fiel
             }
         }
         return $ret;
+    }
+
+    private function isMimeType(array $mimes, string $fileType, array $extensions): bool
+    {
+        foreach ($extensions as $ext) {
+            if ($mimes[$ext] == $fileType) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function handleSave($value, $oldValue)
@@ -730,7 +731,7 @@ class Tracker_Field_Files extends Tracker_Field_Abstract implements Tracker_Fiel
             $url = smarty_modifier_sefurl($file['fileId'], 'file');
             $result .= smarty_modifier_iconify($url, $file['filetype'], $file['fileId'], 1);
             $result .= ' <a href="' . $url . '">' . smarty_modifier_escape($file['name']) . '</a>';
-            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-content="'.smarty_modifier_escape($file['name']).'" data-box="box-3" data-original-title="Preview">';
+            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-content="' . smarty_modifier_escape($file['name']) . '" data-box="box-3" data-original-title="Preview">';
             $result .= '<span class="icon icon-view fas fa-search-plus"></span></a><br/>';
         }
 

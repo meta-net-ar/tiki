@@ -268,9 +268,6 @@
         addFile(data.fileId, data.filetype, data.name);
             };
         });
-        $(function() {
-            $('.tracker-item-files .modal').appendTo('body');
-        });
     {/jq}
 
     {if $prefs.vimeo_upload eq 'y' and $field.options_map.displayMode eq 'vimeo' and $prefs.feature_jquery_validation eq 'y'}
