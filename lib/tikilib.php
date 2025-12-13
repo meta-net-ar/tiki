@@ -364,9 +364,10 @@ class TikiLib extends TikiDb_Bridge
      */
     private function prepare_http_auth_header($client, $arguments)
     {
-        $url = $arguments['url'];
-
-        $client->setUri($this->urlencode_accent($url)); // Laminas\Http\Client seems to fail with accents in urls
+        if (isset($arguments['url'])) {
+            $url = $arguments['url'];
+            $client->setUri($this->urlencode_accent($url)); // Laminas\Http\Client seems to fail with accents in urls
+        }
         $client->setMethod(Laminas\Http\Request::METHOD_GET);
 
         $headers = $client->getRequest()->getHeaders();
