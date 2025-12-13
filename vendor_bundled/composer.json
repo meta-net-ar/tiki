@@ -281,7 +281,7 @@
         "kornrunner/dbunit": "^7.0.0",
         "mikey179/vfsstream": "^1",
         "overtrue/phplint": "^9.0.4",
-        "phpcompatibility/php-compatibility": "^10.x-dev",
+        "phpcompatibility/php-compatibility": "^10.0.0-alpha2",
         "phpcsstandards/phpcsutils": "^1.1.0",
         "phpstan/phpstan": "^1.10.57",
         "phpstan/phpstan-deprecation-rules": "^1.1.3",
