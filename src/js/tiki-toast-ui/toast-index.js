@@ -306,6 +306,7 @@ export default function tikiToastEditor(options) {
                 load: function (editor) {
                     let md = editor.getMarkdown();
                     // maybe some more init here?
+                    $("#editwiki_editor").resizable();
                 },
                 keyup: function (editorType, ev) {
                     if (ev.key === "(") {

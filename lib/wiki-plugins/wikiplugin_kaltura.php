@@ -100,24 +100,11 @@ function wikiplugin_kaltura_info()
 
 function wikiplugin_kaltura($data, $params)
 {
-    global $prefs, $user, $page;
+    global $prefs;
 
     static $instance = 0;
 
     $instance++;
-
-    $defaults = [];
-    $plugininfo = wikiplugin_kaltura_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $defaults[$key] = $param['default'];
-        }
-    }
-
-    if (empty($params['id'])) {
-        $html = '<span class="alert-warning">' . tra('Media ID is required to display the video') . '</span>';
-        return $html;
-    }
 
     if (empty($params['player_id'])) {
         $params['player_id'] = $prefs['kaltura_kdpUIConf'];
@@ -139,13 +126,12 @@ function wikiplugin_kaltura($data, $params)
     }
 
     $kalturalib = TikiLib::lib('kalturauser');
-    $params = array_merge($defaults, $params);
     $params['session'] = $kalturalib->getSessionKey();
     $params['media_url'] = $kalturalib->getMediaUrl($params['id'], $params['player_id']);
 
     try {
         $playlistObject = $kalturalib->getPlaylist($params['id']);
-    } catch (Exception $e) {
+    } catch (Exception) {
         $playlistObject = null;
     }
 

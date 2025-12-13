@@ -18,16 +18,16 @@ $inputConfiguration = [
             'begin'                       => 'bool',           //post
             'rremove'                     => 'int',            //get
             'page'                        => 'pagename',       //post
-            'page_ref_id'                 => 'digits',         //post
+            'page_ref_id'                 => 'int',         //post
             'sremove'                     => 'int',            //get
-            'watch_action'                => 'string',         //post
-            'watch_object'                => 'digits',         //post
+            'watch_action'                => 'alpha',         //post
+            'watch_object'                => 'int',         //post
             'create'                      => 'bool',           //post
-            'pageAlias'                   => 'string',         //post
+            'pageAlias'                   => 'text',         //post
             'after_ref_id'                => 'int',            //post
-            'name'                        => 'string',         //post
-            'move_node'                   => 'string',         //post
-            'find_objects'                => 'string',         //post
+            'name'                        => 'pagename',         //post
+            'move_node'                   => 'int',         //post
+            'find_objects'                => 'striptags',         //post
             'recategorize'                => 'bool',           //post
             'cat_categorize'              => 'bool',           //post
             'cat_override'                => 'bool',           //post
@@ -35,8 +35,8 @@ $inputConfiguration = [
             'offset'                      => 'int',            //get
         ],
         'staticKeyFiltersForArrays' => [
-            'name2'                 => 'string',        //post
-            'cat_categories'        => 'string',        //post
+            'name2'                 => 'pagename',        //post
+            'cat_categories'        => 'int',        //post
         ],
     ],
 ];
@@ -198,11 +198,7 @@ if ($editable === 'y') {
             $structlib->demote_node($_REQUEST["page_ref_id"]);
         }
     }
-    if (isset($_REQUEST["find_objects"])) {
-        $find_objects = $_REQUEST["find_objects"];
-    } else {
-        $find_objects = '';
-    }
+    $find_objects = $_REQUEST["find_objects"] ?? '';
     $smarty->assign('find_objects', $find_objects);
 
     $filter = [];
@@ -213,17 +209,16 @@ if ($editable === 'y') {
         $smarty->assign('find_categId', '');
     }
 
-    if (! isset($_REQUEST["offset"])) {
-        $offset = 0;
-    } else {
-        $offset = $_REQUEST["offset"];
-    }
+    $offset = $_REQUEST["offset"] ?? 0;
     $smarty->assign_by_ref('offset', $offset);
+
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
 
     // Get all wiki pages for the dropdown menu
     $listpages = $tikilib->list_pages(
         $offset,
-        $prefs['maxRecords'],
+        $maxRecords,
         'pageName_asc',
         $find_objects,
         '',
@@ -234,19 +229,25 @@ if ($editable === 'y') {
         $filter
     );
 
-    if ($prefs['page_n_times_in_a_structure'] === 'n') {
-        // pages can appear only once in a structure so filter them out
-        $listpages['data'] = array_filter($listpages['data'], function ($item) use ($subtree) {
-            foreach ($subtree as $sub) {
-                if ($item['pageName'] === $sub['pageName']) {
-                    return false;
-                }
-            }
-            return true;
-        });
+    // Filter out pages already in the structure
+    $structure_page_names = [];
+    foreach ($subtree as $sub) {
+        if (isset($sub['pageName']) && ! empty($sub['pageName']) && ! ($sub['last'] == true && $sub['first'] == false)) {
+            $structure_page_names[$sub['pageName']] = true;
+        }
     }
+    $filtered_data = array_filter($listpages['data'], function ($item) use ($structure_page_names) {
+        return ! isset($structure_page_names[$item['pageName']]);
+    });
+    $listpages['data'] = array_values($filtered_data);
 
     $smarty->assign_by_ref('listpages', $listpages);
+} else {
+    $offset = $_REQUEST["offset"] ?? 0;
+    $smarty->assign_by_ref('offset', $offset);
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
+    $smarty->assign('listpages', ['data' => [], 'count' => 0]);
 } // end of security hardening
 
 $page_info = $structlib->s_get_page_info($_REQUEST["page_ref_id"]);

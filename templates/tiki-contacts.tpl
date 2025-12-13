@@ -13,7 +13,17 @@
             {if $prefs.feature_webmail eq 'y' and $tiki_p_use_webmail eq 'y' and $tiki_p_use_group_webmail eq 'y'}
                 {button href="tiki-webmail.php" _class="btn btn-primary" _text="{tr}Webmail{/tr}"}
             {/if}
-            {button href="tiki-carddav.php/addressbooks/{$user}/webmail" _class="btn btn-primary" _text="{tr}CardDAV{/tr}"}
+            {if $prefs.feature_webmail eq 'y'}
+                {button
+                    href="tiki-carddav.php/addressbooks/{$user}/webmail"
+                    _class="btn btn-primary"
+                    _text="{tr}CardDAV{/tr}"}
+            {else}
+                {button
+                    href="tiki-webmail.php?page=settings#Webmail%20settings"
+                    _class="btn btn-warning"
+                    _text="{tr}Enable Webmail{/tr}"}
+            {/if}
         {/if}
     </div>
 </div>

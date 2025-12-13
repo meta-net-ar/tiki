@@ -279,13 +279,6 @@ function wikiplugin_paypal($data, $params)
     $unique = 'wppaypal-' . ++$id;
     $smarty = TikiLib::lib('smarty');
 
-    // process default
-    $plugininfo = wikiplugin_paypal_info();
-    foreach ($plugininfo['params'] as $key => $p) {
-        $default[$key] = $p['default'];
-    }
-    $params = array_merge($default, $params);
-
     // check required params
     if (empty($params['business'])) {
         $access = TikiLib::lib('access');
@@ -361,8 +354,8 @@ function wikiplugin_paypal($data, $params)
         $returnUrl = $base_uri;
     }
     if (
-        strpos($returnUrl, 'tiki-ajax_services.php') !== false ||
-            (isset($_REQUEST['controller']) && $_REQUEST['controller'] === 'search_customsearch')
+        str_contains($returnUrl, 'tiki-ajax_services.php') ||
+        (isset($_REQUEST['controller']) && $_REQUEST['controller'] === 'search_customsearch')
     ) {
         $csearchEvent = 'pageSearchReady';
         if (! empty($_SERVER['HTTP_REFERER'])) {

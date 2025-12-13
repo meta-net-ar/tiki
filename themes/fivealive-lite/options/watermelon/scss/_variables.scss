@@ -1,167 +1,70 @@
-// Custom variables for the Watermelon theme option of the FiveAlive and FiveAlive-lite themes
+// Custom styles for the Watermelon theme option of the FiveAlive themes
+
+@import "../../../scss/_variables.scss";
 
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 // Color system
 
-// scss-docs-start gray-color-variables
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #6c757d;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-// scss-docs-end gray-color-variables
-
-// fusv-disable
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-);  // default
-// scss-docs-end gray-colors-map
-// fusv-enable
-
-// scss-docs-start color-variables
-$blue:    #0d6efd;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #d63384;  // default
-$red:     #dc3545;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #ffc107;  // default
-$green:   #198754;  // default
-$teal:    #20c997;  // default
-$cyan:    #0dcaf0;  // default
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-);  // default
-// scss-docs-end colors-map
-
-
-$theme-colors: (
-    "primary":            #E61437, // #eb1e41,
-    "secondary":         #8c1932,
-    "success":             #5cb85c,
-    "info":               #a51e37,
-    "warning":             #f0ad4e,
-    "danger":              #ff5c1a,
-    "light":            #ffffff,
-    "dark":                #a51e37
-);
+$red-300: tint-color($red, 40%);  // default
+$green-300: tint-color($green, 40%);  // default
 
 $primary:       #E61437; //#eb1e41;
 $secondary:     #8c1932;
 $success:       #5cb85c;
 $info:          #a51e37;
 $warning:       #f0ad4e;
-$danger:        #ff5c1a;
+$danger:        #D63D00; // #ff5c1a;
 $light:         #ffffff;
-$dark:          #a51e37;
+$dark:          #3c4822;
 
-$theme-colors: map-merge(
-        (
-            "primary":    $primary,
-            "secondary":  $secondary,
-            "success":    $success,
-            "info":       $info,
-            "warning":    $warning,
-            "danger":     $danger,
-            "light":      $light,
-            "dark":       $dark
-        ),
-        $theme-colors
+$theme-colors: (
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
 );
 
-// The following are default values from node_modules/bootstrap/scss/variables.scss - change as needed for theme child option (or to match values in parent theme).
-// Comment-out any that are already defined in the parent theme variables.scss file and shouldn't be redefined.
-
-$gray-600: #6c757d;
-$gray-900: #212529;
-
-$white:    #fff;
-$black:    #000;
-$light: #b51360;
-$bg-light: $light;
-$bg-dark: #a51e37;
-
-$red-300: tint-color($red, 40%);  // default
-$green-300: tint-color($green, 40%);  // default
+// Background and foreground colors for areas using the child theme page header background
+:root {
+    --tiki-fivealive-lite-theme-bg: #E72326;
+}
 
 // Options
-
 // Prefix
 $prefix: bs-;
 
-
-$body-bg:                   $white;  // default
+// Body
+$body-bg:                   #fffefe;
 $body-color: #212529;
 
+$body-secondary-color:     rgba($body-color, .75); // !default;
+$body-secondary-bg:         $gray-200; // !default;
+
+$body-tertiary-color:       rgba($body-color, .5); // !default;
+$body-tertiary-bg:          $gray-100; // !default;
+
+$body-emphasis-color:       $black; // !default;
+
+$tiki-footer_liner-border-color: $primary;
+
 // Links
-$link-color: #E11436;
-$link-hover-color:               darken($link-color, 15%);
-$link-hover-decoration:       none;
-$link-shade-percentage:                   20%;  // default
+$link-color:                #E11436;
+$link-shade-percentage:     20%; // default
+$link-hover-color:          shift-color($link-color, $link-shade-percentage); // default
+$link-hover-decoration:     none;
+$btn-link-disabled-color:   $gray-600;  // default
 
-$btn-link-disabled-color:     $gray-600;  // default
-
-// Navs
-$nav-tabs-link-color: #000;
-$nav-tabs-link-bg: #ffdace; // Same as $input-bg;
-$nav-tabs-link-active-color: #fff;
-$nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
-
-// Navbar
-$navbar-dark-color:                 rgba($white, .85); // !default;
-$navbar-dark-hover-color:           rgba($white, .75) !default;
-$navbar-dark-active-color:          $white !default;
-$navbar-dark-disabled-color:        rgba($white, .25) !default;
-
-$bg-dark-link-hover-color: #f2f2f2;
-$bg-dark-link-hover-bg: #003c4a;
-
-$tiki-top-bg: #C63A4F; // #a51e37;
-$tiki-top-color: #fff;
-$tiki-top-link-color: #fff;
-$tiki-top-link-hover-color: #f9f9f9;
-$topbar-bg: #7a3030; // #527A30; // #13850b;
-$topbar-link-color: #fff;
-$bg-dark-info: #f2f2f2;
-$page-header-link-color: #000;
+// Components
+$component-active-color:       #ddb9af;
+$component-active-bg:         $primary;  // default
 
 // Typography
 $hr-color: #faada1;
 $text-muted:  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B;
-
-// Cards
-$card-border-color: #49006c;
 
 // Tables
 $table-border-color: #faada1;
@@ -177,117 +80,88 @@ $input-border-right-color: #fcf6f9;
 $input-border-bottom-color: #fcf6f9;
 $input-border-left-color: #faada1;
 
-// Form validation
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                     $component-active-bg; // !default; NECESSARY
 
-// Dropdowns
-$dropdown-bg: #AD3245; //#e71e40; // #771437
-$dropdown-border-color: rgba(0, 0, 0, 0.15);
-$dropdown-link-color: #ffffff;
-$dropdown-link-hover-color: #f9f9f9;
-$dropdown-link-hover-bg: #a61a32; // #61102d
-$dropdown-link-active-color: #ffffff;
-$dropdown-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg; // #61102d
-$dropdown-link-disabled-color: #f2f2f2;
-$dropdown-header-color: #ffffff;
-$dropdown-divider-bg: $dropdown-bg;
+// Form validation
+// Navs
+$nav-link-color:                    var(--#{$prefix}link-color);
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color);
+$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+$nav-link-disabled-color:           var(--#{$prefix}secondary-color);
+$nav-link-font-size:                null;
+
+$nav-tabs-link-color: #000;
+$tiki-nav-tabs-link-bg: #ffdace; // Same as $input-bg;
+$tiki-tabs-link-active-color: #fff;
+$tiki-nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
+
+// Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);
+$navbar-light-icon-color:           rgba($body-color, .75);
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-light-toggler-border-color: rgba($black, .1);//rgba(var(--#{$prefix}emphasis-color-rgb), .15); <-- why was this change made?
+$navbar-light-brand-color:          $navbar-light-active-color;
+$navbar-light-brand-hover-color:    $navbar-light-active-color;
+
+$navbar-dark-color:                 rgba($white, .85); // !default;
+$navbar-dark-hover-color:           rgba($white, .75); // !default;
+$navbar-dark-active-color:          $white; // !default;
+$navbar-dark-disabled-color:        rgba($white, .25); // !default;
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-dark-toggler-border-color:  rgba($white, .1);
+$navbar-dark-brand-color:           $navbar-dark-active-color;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color;
+
+// Dropdowns (Bootstrap SCSS variables for dropdowns aren't supported in this child theme. )
+:root {
+    --bs-dropdown-bg: var(--#{$prefix}body-bg); // !default;
+    --bs-dropdown-border-color: rgba(0, 0, 0, 0.15);
+    --bs-dropdown-link-color: var(--#{$prefix}body-color); // !default;
+    --bs-dropdown-link-hover-color: var(--bs-dropdown-link-color); //  !default;
+    --bs-dropdown-link-hover-bg: #{$component-active-bg};
+    --bs-dropdown-link-active-color: #{$component-active-color}; //  !default;
+    --bs-dropdown-link-active-bg: #{$component-active-bg}; //  !default;
+    --bs-dropdown-link-disabled-color: var(--#{$prefix}tertiary-color); //  !default;
+    --bs-dropdown-header-color: #ffffff;
+    --bs-dropdown-divider-bg: var(--bs-dropdown-bg);
+}
 
 $dropdown-dark-color: #fff;
-$dropdown-dark-bg: $dropdown-bg;
+$dropdown-dark-bg: $secondary;
 
 // Pagination
-$nav-pills-link-active-bg: #b51360;
-$pagination-color: #b51360;
-$pagination-bg: #ffffff;
-$pagination-border-color: #dddddd;
-$pagination-hover-color: #b51360;
-$pagination-hover-bg: #eeeeee;
-$pagination-hover-border-color: #dddddd;
-$pagination-active-bg: #b51360;
-$pagination-active-border-color: #b51360;
-$pagination-disabled-color: #999999;
-$pagination-disabled-bg: #ffffff;
-$pagination-disabled-border-color: #dddddd;
+// Cards
+$card-border-color: #49006c;
 
 // Code
 $code-color:                       $body-color; //  $pink;  // default
 
-
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
-// Aug 18 2022 start
-$tiki-top-bg: #49006c; // Used for $post-card-header-bg and .postbody-title
-$tiki-top-color: #fff;
-$tiki-top-link-color: #fff;
-$tiki-top-link-hover-color: #f9f9f9;
-//$topbar-bg: #063035;
+// Needed for footer and modules in _selectors-for-options.scss
+$tiki-side-column-card-header-color: #6c0c02;
+$tiki-footer_liner-card-inner-border: #b51360;
+$tiki-footer-accent-color: #b51360;
+$tiki-footer_liner-border-color: $tiki-footer-accent-color;
 
-$tiki-top-dark-bg: #E72326; // #c63a45;
-$tiki-top-dark-color: #fff;
-$tiki-topbar-dark-bg: #3c4822; //#7a3030; // $tiki-topbar-light-bg;
-$tiki-topbar-dark-color: #fff;
-
-$tiki-top-light-bg: $tiki-top-dark-bg; // #a52874;
-$tiki-top-light-color: $tiki-top-dark-color; // #fff;
-$tiki-topbar-light-bg: $tiki-topbar-dark-bg;  // #551e3d;
-$tiki-topbar-light-color: $tiki-topbar-dark-color; //#fff;
-
-$tiki-navbar-light-link-color: $tiki-top-light-color;
-$navbar-light-link-hover-color: #f2f2f2;
-$navbar-light-link-hover-bg: #003c4a;
-
-$navbar-dark-link-color: $tiki-top-light-color;
-$navbar-dark-link-hover-color: #f2f2f2;
-$navbar-dark-link-hover-color: $navbar-light-link-hover-color;
-//$navbar-light-link-hover-bg: #003c4a;
-// Aug 18 2022 revamp end
-
-$navbar-light-color:               $tiki-navbar-light-link-color; // rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
-$navbar-dark-color:                 rgba($white, .85); // !default;
-
-// Dropdowns
-$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-
-$side-column-heading-color: #6c0c02;
-
-$middle_outer-inset-shadow-bg: #35061d;
-$footer_liner-card-inner-border: #b51360;
-
-$footer-accent-color: #b51360;
-$footer-btn-secondary-color: #f4f4f4;
-$footer-border-color: $footer-accent-color;
-$footer-link-color: #fff;
-
-//$autotoc-nav-bg: #771437;
-//$autotoc-color: #ffffff;
-//$autotoc-nav-link-hover-color: #f2f2f2;
-//$autotoc-nav-link-hover-bg: #61102d;
-
-//$autotoc-nav-bg: #ffffff;
-//$autotoc-nav-border: #e71e40;
-//$autotoc-color: #c21e3b;
-//$autotoc-nav-li-link-hover-color: #f2f2f2;
-//$autotoc-nav-li-link-hover-bg: #76142a;
-
-// These variables need to be defined for the files to compile. The specific variables for the child theme's button colors are defined
-// at the bottom of the file but by default they use the child theme's theme-colors. There appears to be redundancy in defining colors but each line is necessary.
-// There are unique names for the child theme button colors to avoid any conflict with the general theme colors.
-
-$box-shadow-sm:               0 .125rem .25rem rgba($black, .075);  // default
-$box-shadow:                  0 .5rem 1rem rgba($black, .15);  // default
-$box-shadow-lg:               0 1rem 3rem rgba($black, .175);  // default
-$btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075);  // default
-$enable-gradients:               false;
-$enable-shadows:              false;
-$input-btn-focus-width:       .2rem;  // default
-$btn-focus-width:             $input-btn-focus-width;  // default
+$tiki-dark-footer-card-header-border-color: #f05670;
+$tiki-dark-footer-link-color: #f05670;
+$tiki-dark-footer-link-hover-color: #f6768c;
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
-    --tiki-top-bg: #{$tiki-top-light-bg} !important;
-    --tiki-top-color: #{$tiki-top-link-color};
-    --tiki-top-hover-color: #{$tiki-top-link-hover-color};
-    --tiki-top-text-color: #{$tiki-top-link-hover-color};
+    --tiki-top-bg: var(--tiki-fivealive-lite-theme-bg);
+    --tiki-top-color: #fff;
+    --tiki-top-hover-color: #f9f9f9;
+    --tiki-top-text-color: #f9f9f9;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
     --tiki-top-border: solid #000;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
@@ -296,10 +170,10 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #{$tiki-topbar-light-bg};
-    --tiki-topbar-color: #{$tiki-top-light-color};
-    --tiki-topbar-hover-color: #{$navbar-light-link-hover-color};
-    --tiki-topbar-text-color: #{$navbar-light-link-hover-color};
+    --tiki-topbar-bg: #{$dark};
+    --tiki-topbar-color: #f9f9f9;
+    --tiki-topbar-hover-color: #f2f2f2;
+    --tiki-topbar-text-color: #f2f2f2;
     // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
     .navbar-light {
         --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
@@ -307,18 +181,20 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 }
 
 @mixin top-nav-dark {
-    --tiki-top-bg: #{$tiki-top-dark-bg} !important;
-    --tiki-top-color: #{$navbar-dark-link-color};
-    --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
-    --tiki-top-text-color: #{$navbar-dark-link-hover-color};
+    --tiki-top-bg: #df3437;
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color};
+    --tiki-site-subtitle-color:  #{$navbar-dark-brand-color};
     --tiki-top-border: solid #000;
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: #{$tiki-topbar-dark-bg};
-    --tiki-topbar-color: #{$navbar-dark-link-color};
-    --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
-    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-bg: #{$dark};
+    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
@@ -341,6 +217,10 @@ $btn-focus-width:             $input-btn-focus-width;  // default
     @include topbar-nav-dark;
 }
 
+.tiki-top-nav-light, .tiki-top-nav-dark {
+    --tiki-top-border-width: 0 0 5px 0;
+}
+
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
@@ -351,29 +231,29 @@ $btn-focus-width:             $input-btn-focus-width;  // default
     }
 }
 
-// Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-dark;                      // dark values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//// Color mode preference trumps L&F admin dark navbar option
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-dark;                      // dark values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: #{$tiki-top-light-bg};
-    --tiki-admin-top-nav-color: #{$tiki-top-link-color};
-    --tiki-admin-top-nav-hover-color: #{$tiki-top-link-hover-color};
+    --tiki-admin-top-nav-bg: var(--tiki-fivealive-lite-theme-bg);
+    --tiki-admin-top-nav-color: #fff;
+    --tiki-admin-top-nav-hover-color: #f9f9f9;
     --tiki-admin-top-nav-hover-bg: none ;
-    --tiki-admin-aside-nav-bg: #{$tiki-top-light-bg};
+    --tiki-admin-aside-nav-bg: var(--tiki-fivealive-lite-theme-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-bg: #{$dropdown-bg};
-    --tiki-admin-dropdown-link-color: #{$tiki-top-link-color};
+    --tiki-admin-dropdown-bg: var(--bs-dropdown-bg);
+    --tiki-admin-dropdown-link-color: var(--bs-dropdown-link-color);
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     .accordion-button::after {
@@ -383,16 +263,16 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: #{$tiki-top-dark-bg};
-   --tiki-admin-top-nav-color: #{$navbar-dark-link-color};
-    --tiki-admin-top-nav-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-admin-top-nav-bg: #df3437;
+    --tiki-admin-top-nav-color: #{$navbar-dark-color};
+    --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
 //    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: #{$tiki-top-dark-bg};
+    --tiki-admin-aside-nav-bg: #df3437;
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-link-color: #{$navbar-dark-link-color};
+    --tiki-admin-dropdown-link-color: #{$dropdown-dark-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
-    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     .accordion-button::after {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
@@ -400,17 +280,16 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 // Color mode preference trumps L&F admin light navbar option
@@ -433,8 +312,15 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 .accordion {
-    --bs-accordion-active-bg: #{$tiki-topbar-light-bg};
+    --bs-accordion-active-bg: #A9191DFF;
     --bs-accordion-active-color: #fff;
-    --bs-accordion-btn-bg: #{$tiki-top-light-bg};
+    --bs-accordion-btn-bg: #{$dark};
     --bs-accordion-btn-color: #fff;
+}
+
+:root {
+    .page-link.active, .active > .page-link {
+        --bs-pagination-active-bg: var(--tiki-fivealive-lite-theme-bg);
+        --bs-pagination-active-border-color: var(--tiki-fivealive-lite-theme-bg);
+    }
 }

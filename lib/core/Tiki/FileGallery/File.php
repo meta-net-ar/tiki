@@ -9,6 +9,7 @@ namespace Tiki\FileGallery;
 use TikiLib;
 use Feedback;
 use JitFilter;
+use Tiki\Lib\Diff\TextDiff;
 
 /**
  * A basic file representation in Tiki. Includes params needed to store back contents
@@ -258,9 +259,7 @@ class File
 
     public function diffLatestWithArchive($archive = 0)
     {
-        include_once(__DIR__ . "/../../../diff/Diff.php");
-
-        $textDiff = new \Text_Diff(
+        $textDiff = new TextDiff(
             self::id($this->getParam('fileId'))
             ->archive($archive)
             ->data(),

@@ -1,11 +1,17 @@
+// Variables for the Tikinewt theme
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
-@import "../../default/scss/variables";
+
 // Colors
 $light:                #c7d0d9;
 $dark: $gray-900;
-
-//$green-300: tint-color($green, 40%);  // default
-//$red-300: tint-color($red, 40%);  // default
 
 $primary: #005faa;
 $secondary: #003d99; // #52269c;
@@ -15,24 +21,18 @@ $warning: #f0ad4e;
 $danger: #df6e1e;
 
 $theme-colors: (
-    "primary":             #005faa, //#0099cc,
-    "secondary":           #003d99, // #52269c,
-    "success":             #48ca3b, //#5cb85c,
-    "info":                #1373c0,
-    "warning":             #f0ad4e,
-    "danger":              #df6e1e,
-    "light":               #ffffff,
-    "dark":                #212529
+    "primary":           $primary,
+    "secondary":         $secondary,
+    "success":           $success,
+    "info":              $info,
+    "warning":           $warning,
+    "danger":            $danger,
+    "light":             $light,
+    "dark":              $dark,
 );
 
 // Options
-// Prefix for :root CSS variables
-
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
-
 // Spacing
-
 // Body
 $body-bg: #f4f4f4;
 $body-color: #222;
@@ -69,6 +69,9 @@ $btn-primary-border: #999999;
 
 // Forms
 $input-border-color:                      var(--#{$prefix}border-color); // #8cacbb;
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Form validation
 $form-valid-color:                  #115F3B; // $form-feedback-valid-color !default;
@@ -76,27 +79,30 @@ $form-valid-border-color:           #115F3B; // $form-feedback-valid-color !defa
 $form-invalid-color:                #A01C2A; // $form-feedback-invalid-color !default;
 $form-invalid-border-color:         #A01C2A; // $form-feedback-invalid-color !default;
 
-// Dropdowns
 // Navs
 // Navbar
-$navbar-dark-color: $gray-200;
-$navbar-dark-bg: $dark;
-$navbar-dark-border: $border-color;
+$navbar-light-color:                rgba($black, .6); // rgba(var(--#{$prefix}emphasis-color-rgb), .65); // default
+$navbar-light-hover-color:          rgba($black, .7); // rgba(var(--#{$prefix}emphasis-color-rgb), .8); // default
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // default
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // default
+$navbar-light-icon-color:           rgba($body-color, .75); // default
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15); // default
+$navbar-light-brand-color:          $navbar-light-active-color; // default
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // default
 
-//// Navbarlinks ??
-$navbar-dark-color:                      lighten( $gray-300, 15%) ;
-$navbar-dark-hover-color:           #fff;
-//$navbar-dark-active-color:          $white;  // default
-//$navbar-dark-disabled-color:        rgba($white, .25);  // default
-//$navbar-dark-toggler-icon-bg:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-dark-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23");  // default
-//$navbar-dark-toggler-border-color:  rgba($white, .1);  // default
+$navbar-dark-color:                 $gray-200; // rgba($white, .55); // default
+$navbar-dark-hover-color:           #fff; // rgba($white, .75); // default
+$navbar-dark-active-color:          $white; // default
+$navbar-dark-disabled-color:        rgba($white, .25); // default
+$navbar-dark-icon-color:            $navbar-dark-color; // default
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-dark-toggler-border-color:  rgba($white, .1); // default
+$navbar-dark-brand-color:           $navbar-dark-active-color; // default
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
 
-$navbar-light-color:                rgba($black, .5);  // default
-$navbar-light-hover-color:          rgba($black, .7);  // default
-//$navbar-light-active-color:         rgba($black, .9);  // default
-//$navbar-light-disabled-color:       rgba($black, .3);  // default
-//$navbar-light-toggler-icon-bg:      str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23");  // default
-//$navbar-light-toggler-border-color: rgba($black, .1);  // default
+//$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
+
 
 // Dropdowns
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
@@ -144,36 +150,5 @@ $code-color:                        $body-color; // $pink;  // default // Bootst
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
-
-.btn {
-//    color: #6c839b;
-
-    &:focus {
-        color: $gray-700;
-    }
-
-    &:hover,
-    &:focus,
-    &:active,
-    &:active:focus {
-        color: $gray-700;
-    }
-
-    @each $color, $value in $theme-colors {
-        &-#{$color} {
-
-            &:active,
-            &:active:focus {
-                @if ($color == secondary or $color == light) {
-                    color: $gray-700;
-                    background-color: $gray-200;
-                } @else {
-                    color: $white;
-                    background-color: $value;
-                }
-            }
-        }
-    }
-}
 
 // - - - - - - - - - - - - - - - - - CSS variables, if any - - - - -

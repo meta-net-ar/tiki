@@ -1,11 +1,14 @@
-// Simplex 5.3.3 -- This file contains variables to override or add to those in node_modules/bootswatch/dist/simplex/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Simplex 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/simplex/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/simplex/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $red;  // default
 //$secondary:     $white;  // default
@@ -16,15 +19,17 @@ $warning:       #AA6618; // $orange;  // default
 //$light:         $white;  // default
 //$dark:          $gray-800;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
 // Options
-//Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
+
+// Components
+$border-color:                green; // $gray-300; // !default;
 
 // Form-validation
 $form-valid-color: #3F8406;
+$input-border-color: var(--bs-body-color);
+$input-bg: var(--bs-secondary-bg);
 
 // Body
 $body-color: $gray-800;  // default

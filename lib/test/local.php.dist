@@ -10,7 +10,7 @@ flush privileges;
 \q
 ln -s lib/test/local.php.dist lib/test/local.php
 
-Note that acceptance tests do not use this file, it's still hardcoded in TikiAcceptanceTestDBRestorer
+Note that acceptance tests do not use this file, it's still hardcoded in lib/test/AcceptanceTests/AbstractDBRestorer
 However, acceptance tests are currently skipped since they haven't been updated since 2010
 
 But they would require:

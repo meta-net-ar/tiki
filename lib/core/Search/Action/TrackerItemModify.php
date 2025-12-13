@@ -26,7 +26,6 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
     {
         $object_type = $data->object_type->text();
         $object_id = $data->object_id->int();
-        $tracker_id = $data->tracker_id->text();
         $field = $data->field->word();
         $value = $data->value->text();
         $calc = $data->calc->text();
@@ -59,7 +58,6 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
             if (! $info) {
                 throw new Search_Action_Exception(tr('Tracker item %0 not found.', $object_id));
             }
-            $definition = Tracker_Definition::get($info['trackerId']);
         }
 
         if (empty($value) && empty($calc) && empty($add) && empty($remove) && empty($method)) {

@@ -65,7 +65,7 @@ class Scheduler_Manager
                 $this->logger->info(tr("Scheduler %0 (id: %1) is stalled", $schedulerTask->name, $schedulerTask->id));
 
                 //Attempt to heal
-                $notify = $tikilib->get_preference('scheduler_notify_on_healing', 'y');
+                $notify = $tikilib->get_preference('scheduler_notify_on_stalled', 'y');
                 $schedulerTask->heal('Scheduler was healed by cron', $notify);
             }
         }
@@ -127,6 +127,11 @@ class Scheduler_Manager
 
             if ($result['status'] == 'failed') {
                 $this->logger->error(sprintf(tra("***** Scheduler %s - FAILED *****\n%s"), $schedulerTask->name, $result['message']));
+                if ($tikilib->get_preference('scheduler_notify_on_stalled', 'y')) {
+                    $users = Scheduler_Utils::getSchedulerNotificationUsers('scheduler_users_to_notify_on_healed');
+
+                    Tiki\Notifications\Email::sendSchedulerNotification('scheduler_failed_notification_subject.tpl', 'scheduler_failed_notification.tpl', $this, $users, $result['message']);
+                }
             } else {
                 $this->logger->notice(sprintf(tra("***** Scheduler %s - OK *****"), $schedulerTask->name));
             }
@@ -192,7 +197,7 @@ class Scheduler_Manager
         if ($lastRun = $scheduler->getLastRun()) {
             $lastRunDate = $lastRun['end_time'];
         } else {
-            $lastRunDate = isset($scheduler->creation_date) ? $scheduler->creation_date : time();
+            $lastRunDate = $scheduler->creation_date ?? time();
         }
 
         $lastRunDate = (int)($lastRunDate - ($lastRunDate % 60));

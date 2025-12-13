@@ -144,8 +144,6 @@ if (! $skip) {
     }
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 //if the file is remote, display, and don't cache
 $attributelib = TikiLib::lib('attribute');
 $attributes = $attributelib->get_attributes('file', $info['fileId']);
@@ -251,10 +249,6 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $last_modified == strtotime(cur
     unset($tmp);
 }
 
-header("Pragma: ");
-header('Expires: ');
-header('Cache-Control: ' . ( ! empty($user) ? 'private' : 'public' ) . ',must-revalidate,post-check=0,pre-check=0');
-
 if ($use_client_cache) {
     header('Status: 304 Not Modified', true, 304);
     exit;
@@ -262,6 +256,18 @@ if ($use_client_cache) {
     if (! empty($last_modified)) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
     }
+}
+
+$maxAge = (int)($prefs['tiki_cachecontrol_maxage'] ?? 86400);
+$downloadableByAnonymous = $userlib->user_has_perm_on_object(null, $info['fileId'], 'file', 'tiki_p_download_files');
+
+if ($downloadableByAnonymous) {
+    header('Cache-Control: public, max-age=' . $maxAge . ', must-revalidate');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $maxAge) . ' GMT');
+} else {
+    header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
+    header('Pragma: no-cache');
 }
 
 // Indicates if a 'office' document should be converted to pdf for download or display in browser.
@@ -422,7 +428,7 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                 }
             } while ($tryIconFallback);
         }
-        if (strpos($info['filetype'], 'image/svg') !== false) {
+        if (str_contains($info['filetype'], 'image/svg')) {
             $info['filetype'] = 'image/svg+xml';
             $content = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' . "\n" . $content;
         }
@@ -454,7 +460,11 @@ if (
             || $info['filetype'] == 'application/octet-stream' || $info['filetype'] == 'unknown'
 ) {
     $info['filetype'] = $mimelib->from_path($info['filename'], $filepath);
-} elseif (isset($_GET['thumbnail']) && (strpos($info['filetype'], 'image') === false || ($content_changed && strpos($info['filetype'], 'image/svg') === false))) {  // use thumb format
+} elseif (
+    isset($_GET['thumbnail'])
+    && (! str_contains($info['filetype'], 'image')
+        || ($content_changed && ! str_contains($info['filetype'], 'image/svg')))
+) {  // use thumb format
     $info['filetype'] = $mimelib->from_content($info['filename'], $content);
 }
 header('Content-type: ' . $info['filetype']);
@@ -474,7 +484,7 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
     $filesize = filesize($filepath);
     header("Accept-Ranges: bytes");
     if (empty($_SERVER['HTTP_RANGE'])) {
-        if (strpos($info['filetype'], 'text/') === false || $downloading) {
+        if (! str_contains($info['filetype'], 'text/') || $downloading) {
             header('Content-Length: ' . $filesize);
             readfile($filepath);
         } else {
@@ -515,7 +525,7 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
         }
     }
 } else {
-    if (strpos($info['filetype'], 'text/') !== false && ! $downloading) {
+    if (str_contains($info['filetype'], 'text/') && ! $downloading) {
         $content = htmlspecialchars($content);
     }
     if (function_exists('mb_strlen')) {

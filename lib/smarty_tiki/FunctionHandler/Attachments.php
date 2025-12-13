@@ -67,7 +67,7 @@ class Attachments extends Base
         $url_overrided_arguments = [ 'sort_mode', 'remove', 'galleryId', 'comment', 'upload', 'page' ];
         $smarty->set_request_overriders($url_override_prefix, $url_overrided_arguments);
 
-        $params['sort_mode'] = isset($_REQUEST[ $url_override_prefix . '-sort_mode' ]) ? $_REQUEST[ $url_override_prefix . '-sort_mode' ] : '';
+        $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? '';
 
         // Get listing display config
         include_once('fgal_listing_conf.php');

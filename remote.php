@@ -136,9 +136,8 @@ function validate($params)
     $userInfo = $userlib->get_user_info($login);
     $userlib->create_user_cookie($userInfo['userId'], $hashkey);
 
+    $logslib->add_log('intertiki', 'auth granted from ' . $prefs['known_hosts'][$key]['name'], $login);
     if ($slave) {
-        $logslib->add_log('intertiki', 'auth granted from ' . $prefs['known_hosts'][$key]['name'], $login);
-
         $user_details = $userlib->get_user_details($login);
         $user_info = $userlib->get_user_info($login);
         $ret['avatarData'] = new XML_RPC_Value($user_info['avatarData'], 'base64');
@@ -146,7 +145,6 @@ function validate($params)
 
         return new XML_RPC_Response(new XML_RPC_Value($ret, 'struct'));
     } else {
-        $logslib->add_log('intertiki', 'auth granted from ' . $prefs['known_hosts'][$key]['name'], $login);
         return new XML_RPC_Response(new XML_RPC_Value(1, 'boolean'));
     }
 }

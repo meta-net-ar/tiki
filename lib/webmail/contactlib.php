@@ -114,7 +114,7 @@ class ContactLib extends TikiLib
     public function parse_nicknames($dirs)
     {
         for ($i = 0, $icount_dirs = count($dirs); $i < $icount_dirs; $i++) {
-            if (! strstr($dirs[$i], '@') && ! empty($dirs[$i])) {
+            if (! str_contains($dirs[$i], '@') && ! empty($dirs[$i])) {
                 $query = "select `email` from `tiki_webmail_contacts` where `nickname`=?";
                 $result = $this->query($query, [$dirs[$i]]);
                 if ($result->numRows()) {

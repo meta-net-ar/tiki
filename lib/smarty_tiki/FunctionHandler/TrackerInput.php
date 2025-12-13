@@ -16,7 +16,20 @@ class TrackerInput extends Base
     {
         $trklib = \TikiLib::lib('trk');
 
-        $field = $params['field'];
+        if (isset($params['fieldId'])) {
+            $field = $trklib->get_tracker_field($params['fieldId']);
+            if (empty($field)) {
+                return tr('Field %0 not found', $params['fieldId']);
+            }
+            $field['ins_id'] = "ins_{$field['fieldId']}";
+            $handler = $trklib->get_field_handler($field, $item);
+            if ($handler) {
+                $field = array_merge($field, $handler->getFieldData());
+            }
+        } else {
+            $field = $params['field'];
+        }
+
         if (isset($params['item'])) {
             $item = $params['item'];
         } elseif (! empty($params['itemId'])) {
@@ -38,7 +51,7 @@ class TrackerInput extends Base
                     $key = new \Tiki\Encryption\Key($field['encryptionKeyId']);
                     $field['value'] = $key->decryptData($handler->getValue());
                     $info = tr('Field data is encrypted using key "%0".', $key->get('name'));
-                } catch (\Tiki\Encryption\NotFoundException $e) {
+                } catch (\Tiki\Encryption\NotFoundException) {
                     return tr('Field is encrypted with a key that no longer exists!');
                 } catch (\Tiki\Encryption\Exception $e) {
                     $field['value'] = '';

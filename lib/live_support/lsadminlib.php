@@ -122,7 +122,7 @@ class LsAdminlib extends TikiLib
             }
         }
 
-        $query = 'select * from `tiki_live_support_requests` $mid order by ' . $this->convertSortMode($sort_mode);
+        $query = "select * from `tiki_live_support_requests` $mid order by " . $this->convertSortMode($sort_mode);
         $query_count = "select count(*) from `tiki_live_support_requests` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
         $count = $this->getOne($query_count, $bindvars);

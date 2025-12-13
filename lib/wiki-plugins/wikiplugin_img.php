@@ -22,7 +22,7 @@ function wikiplugin_img_info()
             'type' => [
                 'required' => true,
                 'name' => tra('Image Source'),
-                'description' => tra('Choose where to get the image from'),
+                'description' => tra('Choose where to get the image from (Useful only in the Plugin Helper GUI)'),
                 'since' => '11.0',
                 'doctype' => 'id',
                 'default' => '',
@@ -37,7 +37,7 @@ function wikiplugin_img_info()
                 ],
             ],
             'fileId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('File ID'),
                 'type' => 'image',
                 'area' => 'fgal_picker_id',
@@ -62,11 +62,10 @@ function wikiplugin_img_info()
                 'filter' => 'text',
                 'advanced' => $prefs['feature_file_galleries'] == 'y',
                 'accepted' => tra('Valid image IDs separated by commas or |'),
-                'default' => '',
                 'parentparam' => ['name' => 'type', 'value' => 'id'],
             ],
             'src' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Image Source'),
                 'description' => tra('Full URL to the image to display.'),
                 'since' => '3.0',
@@ -76,7 +75,7 @@ function wikiplugin_img_info()
                 'parentparam' => ['name' => 'type', 'value' => 'src'],
             ],
             'randomGalleryId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Gallery ID'),
                 'description' => tra('Numeric ID of a file gallery. Displays a random image from that gallery.'),
                 'since' => '5.0',
@@ -88,7 +87,7 @@ function wikiplugin_img_info()
                 'profile_reference' => 'file_gallery',
             ],
             'fgalId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('File Gallery ID'),
                 'description' => tra('Numeric ID of a file gallery. Displays all images from that gallery.'),
                 'since' => '8.0',
@@ -100,7 +99,7 @@ function wikiplugin_img_info()
                 'profile_reference' => 'file_gallery',
             ],
             'attId' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Attachment ID'),
                 'description' => tr(
                     'Numeric ID of an image attached to a wiki page (or a comma- or %0-separated list).',
@@ -139,7 +138,6 @@ function wikiplugin_img_info()
                 'since' => '3.0',
                 'doctype' => 'link',
                 'filter' => 'url',
-                'default' => '',
             ],
             'height' => [
                 'required' => false,
@@ -605,50 +603,18 @@ function wikiplugin_img($data, $params)
     $smarty = TikiLib::lib('smarty');
 
     $imgdata = [];
-
-    $imgdata['src'] = '';
-    $imgdata['fileId'] = '';
-    $imgdata['randomGalleryId'] = '';
     $imgdata['galleryId'] = '';
-    $imgdata['fgalId'] = '';
-    $imgdata['sort_mode'] = 'created_desc';
-    $imgdata['attId'] = '';
-    $imgdata['thumb'] = '';
-    $imgdata['button'] = '';
-    $imgdata['link'] = '';
-    $imgdata['rel'] = '';
-    $imgdata['usemap'] = '';
-    $imgdata['height'] = '';
-    $imgdata['width'] = '';
-    $imgdata['max'] = '';
-    $imgdata['legacyalign'] = '';
-    $imgdata['hspace'] = '';
-    $imgdata['vspace'] = '';
-    $imgdata['imalign'] = '';
-    $imgdata['styleimage'] = '';
-    $imgdata['align'] = '';
-    $imgdata['stylebox'] = '';
-    $imgdata['styledesc'] = '';
-    $imgdata['block'] = '';
-    $imgdata['class'] = '';
-    $imgdata['desc'] = '';
-    $imgdata['title'] = '';
-    $imgdata['metadata'] = '';
     $imgdata['alt'] = '';
     $imgdata['responsive'] = $prefs['image_responsive_class'];
-    $imgdata['default'] = '';
-    $imgdata['mandatory'] = '';
     $imgdata['fromFieldId'] = 0;        // "private" params set by Tracker_Field_Files
     $imgdata['fromItemId']  = 0;        // ditto
     $imgdata['checkItemPerms']  = 'y';  // ditto
     $imgdata['noDrawIcon']  = 'y';
-    $imgdata['retina']  = 'n';
-    $imgdata['widths']  = '';
-    $imgdata['sizes']  = '';
-    $imgdata['featured']  = 'n';
 
     $params = array_map(function ($param) {
-        return str_replace('"', '&quot;', $param);
+        return is_null($param)
+            ? null
+            : str_replace('"', '&quot;', $param);
     }, $params);
 
     $imgdata = array_merge($imgdata, $params);
@@ -669,20 +635,7 @@ function wikiplugin_img($data, $params)
         }
     }
 
-    // Before it was possible to specify many image types at once and Tiki will guess which one to use.
-    // Now there is "type" field that clearly identifies image type.
-    // Code below leaves image param that is related to "type", removing all others,  this way code is not confused if
-    // several parameters are passed
-    if (! empty($imgdata['type'])) {
-        $info = wikiplugin_img_info();
-        foreach ($info['params']['type']['options'] as $type) {
-            if (! empty($type['value']) && $type['value'] != $imgdata['type'] && ! empty($imgdata[$type['value']])) {
-                $imgdata[$type['value']] = null;
-            }
-        }
-    }
-
-    if (isset($imgdata['id'])) {
+    if (! is_null($imgdata['id'])) {
         if ($prefs['file_galleries_redirect_from_image_gallery'] !== 'y') {
             return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('The "id" parameter is not allowed unless "file_galleries_redirect_from_image_gallery" preference is enabled.'));
         }
@@ -719,6 +672,7 @@ function wikiplugin_img($data, $params)
         unset($params['id']);
     }
 
+
     //////////////////////////////////////////////////// Error messages and clean javascript //////////////////////////////
     // Must set at least one image identifier
     $set = ! empty($imgdata['fileId']) + ! empty($imgdata['src']) + ! empty($imgdata['attId'])
@@ -726,19 +680,40 @@ function wikiplugin_img($data, $params)
     if ($set == 0) {
         return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('No image specified. One of the following parameters must be set: fileId, randomGalleryId, fgalId, attId or src.'));
     } elseif ($set > 1) {
-        return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('Use one and only one of the following parameters: fileId, randomGalleryId, fgalId, attId or src.'));
+        // Image source handling policy:
+        // If multiple image sources are provided (src, fileId, attId, fgalId, randomGalleryId),
+        // automatically select the first non-empty source in the defined priority order.
+        // After saving, display a warning message
+        // All other sources are ignored to avoid ambiguity.
+        $chosenSource = null;
+        $repeated = [];
+        foreach ($pluginInfo['params']['type']['options'] as $type) {
+            $key = $type['value'];
+            if (! empty($imgdata[$key])) {
+                $repeated[] = $key;
+                if (! empty($chosenSource)) {
+                    $imgdata[$key] = null;
+                } else {
+                    $chosenSource = $key;
+                }
+            }
+        }
+        $warningMessage = tr(
+            'Plugin Image: Multiple image sources detected (%0) . Only one is allowed. Using the first defined: %1',
+            implode(',', $repeated),
+            $chosenSource
+        );
+        Feedback::warning($warningMessage);
     }
     // Clean up src URLs to exclude javascript
-    $imgdata['src'] = $imgdata['src'] ?? '';
-    $imgdata['src'] = str_replace(' ', '', $imgdata['src']);
-    if (stristr($imgdata['src'], 'javascript:')) {
-        $imgdata['src'] = '';
-    }
-    if (strstr($imgdata['src'], 'javascript:')) {
-        $imgdata['src']  = '';
+    if (! empty($imgdata['src'])) {
+        $imgdata['src'] = str_replace(' ', '', $imgdata['src']);
+        if (stristr($imgdata['src'], 'javascript:')) {
+            $imgdata['src'] = '';
+        }
     }
 
-    if (! isset($data) or ! $data) {
+    if (empty($data)) {
         $data = '&nbsp;';
     }
 
@@ -747,7 +722,7 @@ function wikiplugin_img($data, $params)
     //Process "|" or "," separated images
     $notice = '<!--' . tra('PluginImg: User lacks permission to view image') . '-->';
     $srcmash = $imgdata['fileId'] . $imgdata['attId'] . $imgdata['src'];
-    if (( strpos($srcmash, '|') !== false ) || (strpos($srcmash, ',') !== false ) || ! empty($imgdata['fgalId'])) {
+    if ((str_contains($srcmash, '|')) || (str_contains($srcmash, ',')) || ! empty($imgdata['fgalId'])) {
         $separator = '';
         if (! empty($imgdata['fileId'])) {
             $id = 'fileId';
@@ -756,9 +731,9 @@ function wikiplugin_img($data, $params)
         } else {
             $id = 'src';
         }
-        if (strpos($imgdata[$id], '|') !== false) {
+        if (str_contains($imgdata[$id], '|')) {
             $separator = '|';
-        } elseif (strpos($imgdata[$id], ',') !== false) {
+        } elseif (str_contains($imgdata[$id], ',')) {
             $separator = ',';
         }
         $repl = '';
@@ -774,18 +749,17 @@ function wikiplugin_img($data, $params)
             $id = 'fileId';
         }
         $params[$id] = '';
-        foreach ($id_list as $i => $value) {
+        foreach ($id_list as $value) {
             $params[$id] = trim($value);
             $params['fgalId'] = '';
             $params['type'] = $id;
-            $pluginResult = wikiplugin_img($data, $params);
+            $pluginResult = TikiLib::lib('parser')->invokePlugin('img', $data, $params);
             $repl .= WikiPlugin_Helper::resultString($pluginResult);
         }
-        if (strpos($repl, $notice) !== false) {
+        if (str_contains($repl, $notice)) {
             return $repl;
         } else {
-            $repl = "\n\r" . '<br style="clear:both" />' . "\r" . $repl . "\n\r" . '<br style="clear:both" />' . "\r";
-            return $repl; // return the multiple images
+            return "\n\r" . '<br style="clear:both" />' . "\r" . $repl . "\n\r" . '<br style="clear:both" />' . "\r"; // return the multiple images
         }
     }
 
@@ -819,7 +793,16 @@ function wikiplugin_img($data, $params)
         $imgdata['file'] = \Tiki\FileGallery\File::id($imgdata['fileId']);
     }
 
-    if (empty($imgdata['src'])) {
+    if (! empty($imgdata['src'])) {
+        if ($absolute_links && ! preg_match('|^[a-zA-Z]+:\/\/|', $imgdata['src'])) {
+            global $base_host, $url_path;
+            $src = $base_host . ( $imgdata['src'][0] == '/' ? '' : $url_path ) . $imgdata['src'];
+        } elseif ($tikidomain && ! preg_match('|^https?:|', $imgdata['src'])) {
+            $src = preg_replace("~" . DEPRECATED_IMG_WIKI_UP_PATH . " /~", DEPRECATED_IMG_WIKI_UP_PATH . "/$tikidomain/", $imgdata['src']);
+        } else {
+            $src = $imgdata['src'];
+        }
+    } else {
         if (! empty($imgdata['fileId'])) {
             $src = smarty_modifier_sefurl($imgdata['fileId'], 'file');
 
@@ -831,13 +814,6 @@ function wikiplugin_img($data, $params)
         } else {                    //only attachments left
             $src = $attachpath . $imgdata['attId'];
         }
-    } elseif ($absolute_links && ! preg_match('|^[a-zA-Z]+:\/\/|', $imgdata['src'])) {
-        global $base_host, $url_path;
-        $src = $base_host . ( $imgdata['src'][0] == '/' ? '' : $url_path ) . $imgdata['src'];
-    } elseif ($tikidomain && ! preg_match('|^https?:|', $imgdata['src'])) {
-        $src = preg_replace("~" . DEPRECATED_IMG_WIKI_UP_PATH . " /~", DEPRECATED_IMG_WIKI_UP_PATH . "/$tikidomain/", $imgdata['src']);
-    } else {
-        $src = $imgdata['src'];
     }
 
     $browse_full_image = $src;
@@ -852,7 +828,7 @@ function wikiplugin_img($data, $params)
         //Get ID numbers for images in galleries and attachments included in src as url parameter
         //So we can get db info for these too
         $parsed = parse_url($imgdata['src']);
-        if (empty($parsed['host']) || strstr($base_url, $parsed['host'])) {
+        if (empty($parsed['host']) || str_contains($base_url, $parsed['host'])) {
             if (strlen(strstr($imgdata['src'], $imagegalpath)) > 0) {
                 $imgdata['id'] = substr(strstr($imgdata['src'], $imagegalpath), strlen($imagegalpath));
             } elseif (strlen(strstr($imgdata['src'], $filegalpath)) > 0) {
@@ -880,9 +856,6 @@ function wikiplugin_img($data, $params)
                 $wikilib = TikiLib::lib('wiki');
                 $dbinfo = $wikilib->get_item_attachment($imgdata['attId']);
             }
-            if (! empty($dbinfo['path'])) {
-                $basepath = $prefs['w_use_dir'];
-            }
             //Give error messages if a file doesn't exist, isn't an image. Display nothing if user lacks permission
             if (! empty($imgdata['fileId']) || ! empty($imgdata['attId'])) {
                 if (! $dbinfo) {
@@ -909,8 +882,11 @@ function wikiplugin_img($data, $params)
                     }
                 }
             }
-        } //finished getting info from db for images in image or file galleries or attachments
-
+        }
+        //finished getting info from db for images in image or file galleries or attachments
+        if (! empty($dbinfo['path'])) {
+            $basepath = $prefs['w_use_dir'];
+        }
         //get image to get height and width and iptc data
         if (! empty($dbinfo['data'])) {
             $imageObj = Image::create($dbinfo['data'], false);
@@ -956,27 +932,21 @@ function wikiplugin_img($data, $params)
                 $imageObjt = Image::create($dbinfo['data'], false);
             } elseif (! empty($dbinfo['path'])) {
                 $imageObjt = Image::create($basepath . $dbinfo['path'] . '.thumb', true);
+            } else {
+                $imageObjt = null;
             }
-
-            // Ensure $imageObjt is defined before using it
-            if (isset($imageObjt) && is_object($imageObjt)) {
+            if ($imageObjt) {
                 $fwidtht = $imageObjt->getWidth();
                 $fheightt = $imageObjt->getHeight();
-            } else {
-                // Handle the case where $imageObjt could not be created
-                if (empty($dbinfo['fileId'])) {
-                    Feedback::error(tr('Failed to create thumbnail image. The image file may be missing or corrupted.'));
-                    return;
-                }
             }
         }
     /////////////////////////////////////Add image dimensions to src string////////////////////////////////////////////
         //Use url resizing parameters for file gallery images to set $height and $width
         //since they can affect other elements; overrides plugin parameters
         if (! empty($imgdata['fileId']) && str_contains($src, '&')) {
-            $urlthumb = strpos($src, '&thumbnail');
-            $urlprev = strpos($src, '&preview');
-            $urldisp = strpos($src, '&display');
+            $urlthumb = str_contains($src, '&thumbnail');
+            $urlprev = str_contains($src, '&preview');
+            $urldisp = str_contains($src, '&display');
             preg_match('/(?<=\&max=)[0-9]+(?=.*)/', $src, $urlmax);
             preg_match('/(?<=\&x=)[0-9]+(?=.*)/', $src, $urlx);
             preg_match('/(?<=\&y=)[0-9]+(?=.*)/', $src, $urly);
@@ -996,10 +966,10 @@ function wikiplugin_img($data, $params)
                 $imgdata['width'] = '';
                 $imgdata['height'] = '';
             }
-            if ($urlthumb != false && empty($imgdata['height']) && empty($imgdata['width']) && empty($imgdata['max'])) {
+            if ($urlthumb && empty($imgdata['height']) && empty($imgdata['width']) && empty($imgdata['max'])) {
                 $imgdata['max'] = 120;
             }
-            if ($urlprev != false && empty($urlscale[0]) && empty($imgdata['height']) && empty($imgdata['width']) && empty($imgdata['max'])) {
+            if ($urlprev && empty($urlscale[0]) && empty($imgdata['height']) && empty($imgdata['width']) && empty($imgdata['max'])) {
                 $imgdata['max'] = 800;
             }
         }
@@ -1033,11 +1003,10 @@ function wikiplugin_img($data, $params)
                 if (($fwidth > $imgdata['max']) || ($fheight > $imgdata['max'])) {
                     //use image gal thumbs when possible
                     if (
-                        (! empty($imgdata['id']) && $imgalthumb == false)
+                        (! empty($imgdata['id']) && ! $imgalthumb)
                         && ($imgdata['max'] < $fwidtht || $imgdata['max'] < $fheightt)
                     ) {
                         $src .= '&thumb=1';
-                        $imgalthumb == true;
                     }
                     if ($fwidth > $fheight) {
                         $width = $imgdata['max'];
@@ -1055,11 +1024,10 @@ function wikiplugin_img($data, $params)
             } elseif (! empty($imgdata['height'])) {
                 //use image gal thumbs when possible
                 if (
-                    (! empty($imgdata['id']) && $imgalthumb == false)
+                    (! empty($imgdata['id']) && ! $imgalthumb)
                     && ($imgdata['height'] < $fheightt)
                 ) {
                     $src .= '&thumb=1';
-                    $imgalthumb == true;
                 }
                 $height = $imgdata['height'];
                 if (empty($imgdata['width']) && $fheight > 1 && is_numeric($height)) {
@@ -1070,14 +1038,13 @@ function wikiplugin_img($data, $params)
             } elseif (! empty($imgdata['width'])) {
                 //use image gal thumbs when possible
                 if (
-                    (! empty($imgdata['id']) && $imgalthumb == false)
+                    (! empty($imgdata['id']) && ! $imgalthumb)
                     && ($imgdata['width'] < $fwidth)
                 ) {
                     $src .= '&thumb=1';
-                    $imgalthumb == true;
                 }
                 $width = $imgdata['width'];
-                if (empty($imgdata['height']) && $fwidth > 1 && is_numeric($width)) {
+                if ($fwidth > 1 && is_numeric($width)) {
                     $height = floor($width * $fheight / $fwidth);
                 } else {
                     $height = $imgdata['height'];
@@ -1093,9 +1060,8 @@ function wikiplugin_img($data, $params)
                 if (! empty($imgdata['id']) && ! empty($fwidtht)  && ! empty($fheightt)) {
                     $width = $fwidtht;
                     $height = $fheightt;
-                    if ($imgalthumb == false) {
+                    if (! $imgalthumb) {
                         $src .= '&thumb=1';
-                        $imgalthumb == true;
                     }
                 } else {
                     if (($fwidth > $thumbdef) || ($fheight > $thumbdef)) {
@@ -1121,7 +1087,7 @@ function wikiplugin_img($data, $params)
             }
             if (
                 (! empty($imgdata['max']) && $imgdata['thumb'] != 'download')
-                    && (empty($urlthumb) && empty($urlmax[0]) && empty($urlprev))
+                && (empty($urlthumb) && empty($urlmax[0]) && empty($urlprev))
             ) {
                 $src .= '&max=' . $imgdata['max'];
                 $imgdata_dim .= ' width="' . $width . '"';
@@ -1140,7 +1106,6 @@ function wikiplugin_img($data, $params)
                     $imgdata_dim .= ' height="' . $height . '"';
                 }
             } else {
-                $imgdata_dim = '';
                 $height = $fheight;
                 $width = $fwidth;
                 if (! empty($width) && ! empty($height)) {
@@ -1155,7 +1120,6 @@ function wikiplugin_img($data, $params)
             if (! empty($height)) {
                 $imgdata_dim = ' height="' . $height . '"';
             } else {
-                $imgdata_dim = '';
                 $height = $fheight;
             }
             if (! empty($width)) {
@@ -1307,8 +1271,8 @@ function wikiplugin_img($data, $params)
         if (! empty($imgdata['styleimage'])) {
             if (! empty($imalign)) {
                 if (
-                    (strpos(trim($imgdata['styleimage'], ' '), 'float:') !== false)
-                    || (strpos(trim($imgdata['styleimage'], ' '), 'display:') !== false)
+                    (str_contains(trim($imgdata['styleimage'], ' '), 'float:'))
+                    || (str_contains(trim($imgdata['styleimage'], ' '), 'display:'))
                 ) {
                     $imalign = '';          //override imalign setting if style image contains alignment syntax
                 }
@@ -1316,8 +1280,8 @@ function wikiplugin_img($data, $params)
             if ($imgdata['styleimage'] == 'border') {
                 $border = $borderdef;
             } elseif (
-                strpos($imgdata['styleimage'], 'hidden') === false
-                && strpos($imgdata['styleimage'], 'position') === false
+                ! str_contains($imgdata['styleimage'], 'hidden')
+                && ! str_contains($imgdata['styleimage'], 'position')
             ) { // quick filter for dangerous styles
                 $style = $imgdata['styleimage'];
             }
@@ -1330,8 +1294,9 @@ function wikiplugin_img($data, $params)
         $replimg .= ' usemap="#' . $imgdata['usemap'] . '"';
     }
     //class
-    if (! empty($imgdata['class'])) {
-        $replimg .= ' class="' . $imgdata['class'] . '"';
+    [$imageClassList, $reflectClassList] = filterImgClassList($imgdata['class']);
+    if (! empty($imageClassList)) {
+        $replimg .= ' class="' . $imageClassList . '"';
     }
     //data-src
     if (! empty($imgdata['data-src'])) {
@@ -1339,7 +1304,7 @@ function wikiplugin_img($data, $params)
     }
 
     //src
-    if ((! empty($imgdata['src']) || ! empty($src)) && strpos($replimg, 'src="' . $src . '"') == false) {
+    if ((! empty($imgdata['src']) || ! empty($src)) && ! str_contains($replimg, 'src="' . $src . '"')) {
         $replimg .= ' src="' . $src . '"';
     }
 
@@ -1395,6 +1360,7 @@ function wikiplugin_img($data, $params)
         $replimg .= '>' . $repldata . '</' . $tagName . '>';
     }
 
+    $replimg = applyReflectIfExists($replimg, $src, $reflectClassList);
 
     ////////////////////////////////////////// Create the HTML link ///////////////////////////////////////////
     //Variable for identifying if javascript mouseover is set
@@ -1473,21 +1439,7 @@ function wikiplugin_img($data, $params)
             }
         }
         // rel or data-box
-        if (! empty($imgdata['rel'])) {
-            $box = ['box', 'type=', 'slideshow', 'zoom'];
-            foreach ($box as $btype) {
-                if (strpos($imgdata['rel'], $btype) !== false) {
-                    $attr = 'data-box';
-                    break;
-                }
-            }
-            if (! isset($attr)) {
-                $attr = 'rel';
-            }
-            $linkrel = ' ' . $attr . '="' . $imgdata['rel'] . '"';
-        } else {
-            $linkrel = '';
-        }
+        $linkrel = buildLinkRelAttribute($imgdata);
         // title
         ! empty($imgtitle) ? $linktitle = $imgtitle : $linktitle = '';
 
@@ -1562,7 +1514,7 @@ function wikiplugin_img($data, $params)
 
         //Enlarge button div and link string (innermost div)
         if (! empty($imgdata['button'])) {
-            if (empty($link) || (! empty($link) && ! empty($javaset))) {
+            if (empty($link) || ! empty($javaset)) {
                 if (! empty($imgdata['fileId']) && $imgdata['button'] != 'download') {
                     $link_button = $browse_full_image . '&display';
                 } elseif (! empty($imgdata['attId']) && $imgdata['thumb'] == 'download') {
@@ -1575,21 +1527,7 @@ function wikiplugin_img($data, $params)
                 $link_button = $link;
             }
             //Set button rel
-            if (! empty($imgdata['rel'])) {
-                $box = ['box', 'type=', 'slideshow', 'zoom'];
-                foreach ($box as $btype) {
-                    if (strpos($imgdata['rel'], $btype) !== false) {
-                        $attr = 'data-box';
-                        break;
-                    }
-                }
-                if (! isset($attr)) {
-                    $attr = 'rel';
-                }
-                $linkrel_button = ' ' . $attr . '="' . $imgdata['rel'] . '"';
-            } else {
-                $linkrel_button = '';
-            }
+            $linkrel_button = buildLinkRelAttribute($imgdata);
             //Set button target
             if (empty($imgtarget) && (empty($imgdata['thumb']) || ! empty($javaset))) {
                 if (($imgdata['button'] == 'popup') || ($imgdata['button'] == 'browsepopup')) {
@@ -1616,7 +1554,7 @@ function wikiplugin_img($data, $params)
                 . '</a></div>';
         }
         //Add description based on user setting (use $desconly from above) and close divs
-        isset($desconly) ? $repl .= $desconly : '';
+        $repl .= $desconly ?? '';
         $repl .= "\r\t\t</div>";
         $repl .= "\r\t</div>";
     }
@@ -1651,8 +1589,8 @@ function wikiplugin_img($data, $params)
                     $class = 'class="imgbox" ';
                     if (! empty($alignbox)) {
                         if (
-                            (strpos(trim($imgdata['stylebox'], ' '), 'float:') !== false)
-                            || (strpos(trim($imgdata['stylebox'], ' '), 'display:') !== false)
+                            (str_contains(trim($imgdata['stylebox'], ' '), 'float:'))
+                            || (str_contains(trim($imgdata['stylebox'], ' '), 'display:'))
                         ) {
                             $alignbox = '';         //override align setting if stylebox contains alignment syntax
                         }
@@ -1665,8 +1603,8 @@ function wikiplugin_img($data, $params)
                 $styleboxplus = $alignbox . ' max-width: 100%; width:' . $boxwidth . 'px; height:' . $boxheight . 'px';
             } elseif (! empty($styleboxinit)) {
                 if (
-                    (strpos(trim($imgdata['stylebox'], ' '), 'height:') === false)
-                    && (strpos(trim($imgdata['stylebox'], ' '), 'width:') === false)
+                    (! str_contains(trim($imgdata['stylebox'], ' '), 'height:'))
+                    && (! str_contains(trim($imgdata['stylebox'], ' '), 'width:'))
                 ) {
                     $styleboxplus = $styleboxinit . ' max-width: 100%; width:' . $boxwidth . 'px;';
                 } else {
@@ -1728,7 +1666,7 @@ function wikiplugin_img($data, $params)
 
         if (
             $perms['tiki_p_upload_files'] === 'y' &&
-            (empty($src) == true || $srcIsEditable == true) &&
+            (empty($src) || $srcIsEditable) &&
             ($tiki_p_edit == 'y' || $trackerItemPerms)
         ) {
             if ($prefs['wiki_edit_icons_toggle'] == 'y' && ! isset($_COOKIE['wiki_plugin_edit_view']) && ! $imgdata['fromItemId']) {
@@ -1774,7 +1712,7 @@ function getMetaField($metarray, $labelarray)
     foreach ($labelmap as $type => $fieldname) {
         foreach ($metarray as $subtype => $group) {
             if ($type == $subtype) {
-                foreach ($group as $groupname => $fields) {
+                foreach ($group as $fields) {
                     if (array_key_exists($fieldname, $fields)) {
                         $ret = $fields[$fieldname]['newval'];
                         return $ret;
@@ -1784,4 +1722,126 @@ function getMetaField($metarray, $labelarray)
             }
         }
     }
+}
+
+function buildLinkRelAttribute(array $imgdata): string
+{
+    if (! empty($imgdata['rel'])) {
+        $box = ['box', 'type=', 'slideshow', 'zoom'];
+        foreach ($box as $btype) {
+            if (str_contains($imgdata['rel'], $btype)) {
+                $attr = 'data-box';
+                break;
+            }
+        }
+        if (! isset($attr)) {
+            $attr = 'rel';
+        }
+        return ' ' . $attr . '="' . $imgdata['rel'] . '"';
+    }
+
+    return '';
+}
+
+function filterImgClassList($classList)
+{
+    $reflectClassList = '';
+    $imageClassList = '';
+    // get all the class that doesn't start with reflect
+    foreach (explode(' ', $classList) as $class) {
+        if (str_starts_with($class, 'reflect')) {
+            $reflectClassList .= $class . ' ';
+        } else {
+            $imageClassList .= $class . ' ';
+        }
+    }
+    return [$imageClassList, $reflectClassList];
+}
+
+function applyReflectIfExists($html, $src, $classList)
+{
+    global $base_url, $headerlib;
+    $classes = explode(' ', $classList);
+    // Check if "reflect" exists as a standalone word
+    if (in_array('reflect', $classes)) {
+        $headerlib->add_jq_onready(<<<JS
+            function setReflectHeight(\$img) {
+                const height = \$img.height();
+                \$img.closest('.reflect-container').css('--reflect-height', height + 'px');
+            }
+            // select all images inside reflect-container
+            $('.reflect-container > img').each(function() {
+                const \$img = $(this);
+                // if image already loaded (cached), apply immediately
+                if (this.complete) {
+                    setReflectHeight(\$img);
+                } else {
+                    // attach load handler
+                    //.off('load.reflect') → ensures we don’t attach multiple handlers accidentally.
+                    \$img.off('load.reflect').on('load.reflect', function() {
+                        setReflectHeight(\$img);
+                    });
+                }
+            });
+            
+            // recalc on window resize
+            $(window).on('resize', function() {
+                $('.reflect-container img').each(function() {
+                    setReflectHeight($(this));
+                });
+            });
+JS);
+        $headerlib->add_css(<<<CSS
+                .reflect-container {
+                    --reflect-height: 200px;
+                    --reflect-opacity: 0.5;
+                    --reflect-fade-point: 80%;
+                    --reflect-gap: 0px;
+                    position: relative;
+                    display: inline-block;
+                    margin-bottom: calc((var(--reflect-height) + var(--reflect-gap)));
+                }
+                
+                .reflect-container > img {
+                    display: block;
+                    margin-bottom: var(--reflect-gap);
+                }
+                
+                .reflect-container::after {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    height: var(--reflect-height);
+                    background-image: var(--reflect-src);
+                    background-repeat: no-repeat;
+                    background-size: 100% 100%;
+                    background-position: bottom;
+                    transform: scaleY(-1);
+                    mask-image: linear-gradient(to top, rgba(0, 0, 0, var(--reflect-opacity)) 0%, rgba(0, 0, 0, 0.0) var(--reflect-fade-point));
+                    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, var(--reflect-opacity)) 0%, rgba(0, 0, 0, 0.0) var(--reflect-fade-point));
+                }
+CSS);
+        if (! str_starts_with($src, 'http:') && ! str_starts_with($src, 'https:')) {
+            $src = $base_url . $src;
+        }
+        $styles = "--reflect-src: url('" . htmlspecialchars($src) . "');";
+        // Match all words starting with "reflect-"
+        foreach ($classes as $class) {
+            if (str_starts_with($class, 'reflect-')) {
+                if (str_starts_with($class, 'reflect-opacity-')) {
+                    $opacity = substr($class, strlen('reflect-opacity-')) / 100;
+                    $styles .= " --reflect-opacity: " . number_format($opacity, 2) . ";";
+                } elseif (str_starts_with($class, 'reflect-height-')) {
+                    $height = substr($class, strlen('reflect-height-')) . "px";
+                    $styles .= " --reflect-height: " . $height . ";";
+                } elseif (str_starts_with($class, 'reflect-gap-')) {
+                    $gap = substr($class, strlen('reflect-gap-')) . "px";
+                    $styles .= " --reflect-gap: " . $gap . ";";
+                }
+            }
+        }
+        $html = '<div class="reflect-container" style="' . $styles . '">' . $html . '</div>';
+    }
+
+    return $html;
 }

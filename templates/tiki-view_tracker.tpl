@@ -147,11 +147,41 @@
             {if (isset($pages_count) && $pages_count > 1) or $initial}{initials_filter_links}{/if}
 
             {if $items|@count ge '1'}
+                {* ------- list toggleable fields --- *}
+
+                {if $tracker_info.allowChooseFieldsToDisplay eq 'y'}
+                    {if $trk_items_col_pref neq ''}
+                        <textarea id="savedcolpref" class="d-none">{$trk_items_col_pref}</textarea>
+                    {/if}
+                    <form id="savecolprefsform" method="post" action="{service controller=user action=save_column_prefs}">
+                        {ticket}
+                        <div class="mb-3">
+                            <div class="toggle-col-warning d-none">
+                                {remarksbox type="danger" title="{tr}Warning{/tr}" close="y"}
+                                    {tr}{"At least one column must remain visible."}{/tr}
+                                {/remarksbox}
+                            </div>
+                            {foreach from=$listfields key=ix item=field_value}
+                                {if $field_value.isTblVisible eq 'y' and ( $field_value.type ne 'x' and $field_value.type ne 'h') and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input toggle-col" data-col-name="{$field_value.name}" checked>
+                                        <label class="form-check-label">{$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}</label>
+                                    </div>
+                                {/if}
+                            {/foreach}
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="prefs" id="prefs" class="d-none"></textarea>
+                            <input name="trackerId" type="hidden" id="col_pref_trackerid" value="{$trackerId}">
+                            <input name="trackerName" type="hidden" value="{tr}{$tracker_info.name}{/tr}">
+                        </div>
+                    </form>
+                {/if}
                 {* ------- list headings --- *}
                 <form name="checkform" method="post">
                     {ticket}
                     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover" id="trItemTable">
                             <tr>
                                 {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
                                     <td class="auto" style="width:20px;"></td> {* th changed to td to prevent ARIA empty header error *}
@@ -165,25 +195,28 @@
 
                                 {foreach from=$listfields key=ix item=field_value}
                                     {if $field_value.isTblVisible eq 'y' and ( $field_value.type ne 'x' and $field_value.type ne 'h') and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
-                                        <th class="auto">
-                                            {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId}{$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}{/self_link}
+                                        <th class="auto" data-sort-field="f_{$field_value.fieldId}">
+                                            {self_link _sort_arg='sort_mode' _sort_field='f_'|cat:$field_value.fieldId _onclick="return handleSortClick(event, 'f_{$field_value.fieldId}');"}
+                                                {$field_value.name|tra|truncate:255:"..."|escape|default:"&nbsp;"}
+                                            {/self_link}
                                         </th>
                                     {/if}
                                 {/foreach}
 
                                 {if $tracker_info.showCreated eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="created">
+                                        {self_link _sort_arg='sort_mode' _sort_field='created' _onclick="return handleSortClick(event, 'created');"}{tr}Created{/tr}{/self_link}
+                                        <span class="sort-indicator"></span>
                                     </th>
                                 {/if}
                                 {if $tracker_info.showLastModif eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="lastModif">
+                                        {self_link _sort_arg='sort_mode' _sort_field='lastModif' _onclick="return handleSortClick(event, 'lastModif');"}{tr}Last modified{/tr}{/self_link}
                                     </th>
                                 {/if}
                                 {if $tracker_info.showLastModifBy eq 'y'}
-                                    <th class="auto">
-                                        {self_link _sort_arg='sort_mode' _sort_field='lastModifby'}{tr}Last modifier{/tr}{/self_link}
+                                    <th class="auto" data-sort-field="lastModifby">
+                                        {self_link _sort_arg='sort_mode' _sort_field='lastModifby' _onclick="return handleSortClick(event, 'lastModifby');"}{tr}Last modifier{/tr}{/self_link}
                                     </th>
                                 {/if}
                                 {if $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' || $tracker_info.showLastComment eq 'y') and $tiki_p_tracker_view_comments ne 'n'}
@@ -224,7 +257,7 @@
                                     }
                                     {foreach from=$items[user].field_values key=ix item=field_value}
                                         {if $field_value.isTblVisible eq 'y' and $field_value.type ne 'x' and $field_value.type ne 'h' and ($field_value.type ne 'p' or $field_value.options_array[0] ne 'password') and $field_value.visibleInViewMode eq 'y'}
-                                            <td class={if $field_value.type eq 'n' or $field_value.type eq 'q' or $field_value.type eq 'b'}"numeric"{else}"auto"{/if}>
+                                            <td class={if $field_value.type eq 'n' or $field_value.type eq 'q' or $field_value.type eq 'b'}"numeric"{else}"auto"{/if} data-col-name="{$field_value.name}">
                                                 {if $field_value.type eq 'wiki'}
                                                     <a href="tiki-index.php?page={$field_value.value|escape:"url"}">{$field_value.value}</a>
                                                 {else}
@@ -310,8 +343,16 @@
                                 {$itemoff=$itemoff+1}
                             {/section}
                         </table>
-                    </div>
-
+                        </div>
+                    </form>
+                    
+                    {* JavaScript to handle the sorting functionality *}
+                    {jq}
+                    if (typeof $.trackerInitMultiSort === 'function') {
+                        $.trackerInitMultiSort();
+                    }
+                    {/jq}
+                    
                     {if $tiki_p_admin_trackers eq 'y'}
                         <div class="mb-3 row">
                             <div class="input-group min-width-customized">
@@ -330,12 +371,82 @@
                                 </select>
                                 {ticket}
                                 <input type="hidden" name="trackerId" value="{$trackerId}">
-                                <input type="submit" class="btn btn-primary" onclick="if($('select.trackerbatchaction').children('option:selected').val() == 'delete')confirmPopup('{tr}Are you sure you want to delete the selected items?{/tr}')" name="act" value="{tr}OK{/tr}">
+                                <input type="submit" class="btn btn-primary js-confirm-delete" name="act" value="{tr}OK{/tr}">
                             </div>
                         </div>
                     {/if}
                 </form>
                 {pagination_links count=$item_count step=$maxRecords offset=$offset}{/pagination_links}
+                {jq}
+                    loadColumnPrefs();
+
+                    $('.toggle-col').on('change', function () {
+                        const checkedboxes = $('.toggle-col:checked');
+                        let form = $('#savecolprefsform');
+
+                        if (checkedboxes.length === 0) {
+                            $(this).prop('checked', true);
+                            $('.toggle-col-warning').removeClass('d-none');
+                            return;
+                        }
+                        $('.toggle-col').each(function () {
+                            const columnName = $(this).data('col-name');
+                            const isVisible = $(this).is(':checked');
+                            $('#trItemTable [data-col-name="' + columnName + '"]').toggle(isVisible);
+                        });
+                        $('#prefs').val(getColumnPrefs());
+                        saveColsPref();
+                    });
+
+                    function getColumnPrefs() {
+                        const prefs = {};
+                        let currentSavedPrefs = JSON.parse($('#savedcolpref').val());
+                        const trackerId = $('#col_pref_trackerid').val();
+                        const colprefkey = 'tracker_' + trackerId;
+
+                        $('.toggle-col').each(function() {
+                            const columnName = $(this).data('col-name');
+                            const isChecked = $(this).is(':checked');
+                            prefs[columnName] = isChecked;
+                        });
+                        currentSavedPrefs[colprefkey] = prefs;
+                        return JSON.stringify(currentSavedPrefs);
+                    }
+
+                    function loadColumnPrefs() {
+                        let savedPrefs = $('#savedcolpref').val();
+                        const trackerId = $('#col_pref_trackerid').val();
+                        const colprefkey = 'tracker_' + trackerId;
+
+                        if (savedPrefs) {
+                            let prefs = JSON.parse(savedPrefs);
+                            const actual_tracker_prefs = prefs[colprefkey];
+                            if (! actual_tracker_prefs) {
+                                return;
+                            }
+                            Object.keys(actual_tracker_prefs).forEach(function (columnName) {
+                                const checkbox = $('.toggle-col[data-col-name="' + columnName +'"]');
+                                checkbox.prop('checked', actual_tracker_prefs[columnName]);
+                                $('#trItemTable [data-col-name="' + columnName + '"]').toggle(actual_tracker_prefs[columnName]);
+                            });
+                        }
+                    }
+
+                    const saveColsPref = delayedExecutor(2000, function () {
+                        let form = $('#savecolprefsform');
+                        $.ajax({
+                            url: form.attr('action'),
+                            type: 'POST',
+                            data: form.serialize(),
+                            success: function (message) {
+                                if (! message) {
+                                    feedback(tr('An error occured while attempting to save your column preference.'), 'error');
+                                }
+                                feedback(message, 'success');
+                            }
+                        });
+                    });
+                {/jq}
             {/if}
         {/tab}
     {/if}
@@ -459,3 +570,29 @@
         {/tab}
     {/if}
 {/tabset}
+
+{jq}
+    const confirmDeleteMsg = '{tr}Are you sure you want to delete the selected items?{/tr}';
+    const selectItemMsg = '{tr}Please select at least one item.{/tr}';
+    // Target the batch delete button to add validation.
+    $('.js-confirm-delete').on('click', function(event) {
+        const form = $(this).closest('form');
+        const batchAction = form.find('select.trackerbatchaction').val();
+
+        // For any other action, the form submits normally without interference.
+        if (batchAction === 'delete') {
+            // Stop the default form submission to perform our checks.
+            event.preventDefault();
+
+            const itemsSelected = form.find('input[name="action[]"]:checked').length;
+
+            if (itemsSelected > 0) {
+                // Validation passed: proceed with the confirmation popup.
+                confirmPopup.call({event: event}, confirmDeleteMsg);
+            } else {
+                // Validation failed: show an feedback and do nothing else.
+                feedback(selectItemMsg,'warning');
+            }
+        }
+    });
+{/jq}

@@ -20,5 +20,17 @@ function prefs_realtime_list()
                 'feature_realtime',
             ],
         ],
+        'realtime_full_base_url' => [
+            'name' => tra('Realtime base URL'),
+            'description' => tr('Full WebSocket base URL for the realtime server. When set, it overrides host/port derived from Tiki preferences. Example: ws://localhost:8080/'),
+            'type' => 'text',
+            'size' => 5,
+            'default' => '',
+            'shorthint' => tr('Leave blank to use the instance URL and realtime_port'),
+            'tags' => ['advanced'],
+            'dependencies' => [
+                'feature_realtime',
+            ],
+        ]
     ];
 }

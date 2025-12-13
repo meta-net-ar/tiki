@@ -42,7 +42,7 @@
             </form>
         {/if}
         <h2>{tr}External Feeds{/tr}</h2>
-        <div class="table-responsive" align="center">
+        <div class="table-responsive text-center">
             {if $channels or ($find ne '')}
                 {include file='find.tpl'}
             {/if}
@@ -160,27 +160,27 @@
             {ticket}
             <input type="hidden" name="rssId" value="{$rssId|escape}">
             <div class="mb-3 row">
-                <label for="name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
+                <label for="feed_name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="name" value="{$name|escape}" class="form-control">
+                    <input type="text" name="name" id="feed_name" value="{$name|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="url" class="col-form-label col-sm-3">{tr}URL{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="url" name="url" value="{$url|escape}" class="form-control">
+                    <input type="url" name="url" id="url" value="{$url|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea name="description" rows="4" class="form-control">{$description|escape}</textarea>
+                    <textarea name="description" id="description" rows="4" class="form-control">{$description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="refreshMinutes" class="col-form-label col-sm-3">{tr}Refresh rate{/tr}</label>
                 <div class="col-sm-9">
-                    <select class="form-select" name="refreshMinutes">
+                    <select class="form-select" name="refreshMinutes" id="refreshMinutes">
                         {foreach [1, 5, 10, 15, 20, 30, 45, 60, 90, 120, 360, 720, 1440] as $min}
                             <option value="{$min|escape}" {if $refreshSeconds eq ($min*60)}selected="selected"{/if}>{($min*60)|duration}</option>
                         {/foreach}

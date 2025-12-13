@@ -1,21 +1,13 @@
 {if $tikiShowSuggestionsPopup}
-    <div id="suggestionsPopup">
-        <div class="sug-header">
-            <div class="sug-button-close">
-                <button id="suggestionsClosePopup" type="button" class="btn-close" aria-label="{tr}Close{/tr}"></button>
-            </div>
-            <div class="sug-title">
-                <h3 >
-                    <span>{tr}Tiki Suggestions{/tr}</span>
-                </h3>
-            </div>
-            <div class="clearfix"></div>
-        </div>
-        <div class="clearfix sug-body">
-            <p>{tr}Do you need help with your Tiki?{/tr}<br/>
+    <div id="suggestionsPopup" class="alert alert-info alert-dismissible fade show" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <h4 class="alert-heading">
+            <span class="icon icon-information bi bi-info-circle "></span> <span>{tr}Tiki Suggestions{/tr}</span>
+        </h4>
+        <p>{tr}Do you need help with your Tiki?{/tr}<br/>
                 {tr}You can reach out to a specialist:{/tr}
-                <a target="_blank" title="{tr}Tiki Consultants{/tr}" alt="{tr}Tiki Consultants{/tr}" href="https://tiki.org/Consultants">https://tiki.org/Consultants</a></p>
-        </div>
+                <a target="_blank" title="{tr}Tiki Consultants{/tr}" href="https://tiki.org/Consultants">https://tiki.org/Consultants</a>
+        </p>
     </div>
 {/if}
 

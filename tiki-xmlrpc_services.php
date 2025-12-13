@@ -22,6 +22,8 @@ use PhpXmlRpc\Value as XML_RPC_Value;
 use PhpXmlRpc\Response as XML_RPC_Response;
 use PhpXmlRpc\Server as XML_RPC_Server;
 $bloglib = TikiLib::lib('blog');
+$access = TikiLib::lib('access');
+$access->check_feature('feature_xmlrpc');
 
 if ($prefs['feature_xmlrpc'] != 'y') {
     die;
@@ -213,7 +215,7 @@ function editPost($params)
         }
     }
 
-    $id = $bloglib->update_post($postid, $blogid, $content, $username, $title);
+    $bloglib->update_post($postid, $blogid, $content, $username, $title);
     return new XML_RPC_Response(new XML_RPC_Value(1, 'boolean'));
 }
 

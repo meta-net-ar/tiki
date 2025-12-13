@@ -5,7 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-require_once __DIR__ . '/../../shipping/shippinglib.php';
+use Tiki\Lib\Shipping\Provider\ShippingProviderInterface as ShippingProvider;
+use Tiki\Lib\Shipping\ShippingLib;
 
 class ShippingTest extends TikiTestCase implements ShippingProvider
 {

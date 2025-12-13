@@ -23,7 +23,7 @@ add_handler('ajax_hm_folders', 'check_groupmail_setting', true, 'tiki', 'load_us
 add_output('ajax_hm_folders', 'groupmail_page_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* ajax groupmail callback data */
-setup_base_ajax_page('ajax_tiki_groupmail', 'imap');
+setup_base_ajax_page('ajax_tiki_groupmail', 'core');
 add_handler('ajax_tiki_groupmail', 'prepare_groupmail_settings', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_tiki_groupmail', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_tiki_groupmail', 'imap_oauth2_token_check', true, 'imap');
@@ -61,6 +61,8 @@ add_output('ajax_hm_folders', 'tiki_contacts_page_link', true, 'tiki', 'main_men
 add_handler('compose', 'check_for_tiki_redirect', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'add_file_attachment', true, 'smtp', 'load_smtp_servers_from_config', 'before');
 add_handler('compose', 'tiki_load_smtp_is_imap_forward', true, 'smtp', 'load_smtp_is_imap_forward', 'after');
+add_handler('compose', 'post_imap_save_sent', true, 'tiki', 'imap_unflag_on_send', 'after');
+add_output('compose', 'post_imap_save_sent', true, 'tiki', 'compose_form_end', 'before');
 
 /* message page calendar invitation hooks */
 add_handler('ajax_imap_message_content', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
@@ -127,10 +129,12 @@ add_handler('message_list', 'check_path_redirect', true, 'core', 'load_user_data
 add_handler('compose', 'tiki_presave_sent', true, 'smtp', 'imap_save_sent', 'before');
 add_handler('compose', 'tiki_mark_as_answered', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 'after');
-add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
+add_handler('compose', 'tiki_delete_draft', true, 'tiki', 'tiki_save_sent', 'after');
+add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_delete_draft', 'after');
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_handler('compose', 'tiki_compose_from_draft', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
+add_output('search', 'add_multiple_move_to_trackers', true, 'imap', 'search_move_copy_controls', 'after');
 add_output('message_list', 'add_multiple_item_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 add_handler('ajax_smtp_save_draft', 'tiki_presave_draft', true, 'smtp', 'smtp_save_draft', 'before');
 add_handler('ajax_smtp_save_draft', 'tiki_save_draft', true, 'smtp', 'smtp_save_draft', 'after');
@@ -219,6 +223,12 @@ add_handler('ajax_imap_unread', 'tiki_process_imap_unread', true, 'tiki', 'imap_
 add_handler('settings', 'process_tiki_run_sieve_filters_on_imap_unread', true, 'tiki', 'save_user_settings', 'before');
 add_output('settings', 'tiki_run_sieve_filters_on_imap_unread_setting', true, 'tiki', 'enable_gmail_contacts_module_setting', 'after');
 
+setup_base_ajax_page('ajax_tiki_msg_tracker_items', 'core');
+add_handler('ajax_tiki_msg_tracker_items', 'get_msg_tracker_items', true, 'tiki');
+
+setup_base_page('ajax_tiki_auto_move_reply_to_tracker', 'core');
+add_handler('ajax_tiki_auto_move_reply_to_tracker', 'auto_move_reply_to_tracker', true, 'tiki');
+
 return [
   'allowed_pages' => [
     'groupmail',
@@ -241,6 +251,8 @@ return [
     'ajax_tiki_tracker_info',
     'ajax_tiki_sieve_get_mailboxes',
     'info',
+    'ajax_tiki_msg_tracker_items',
+    'ajax_tiki_auto_move_reply_to_tracker',
   ],
   'allowed_get' => [
     'tiki_download_message' => FILTER_VALIDATE_BOOLEAN,
@@ -262,6 +274,15 @@ return [
     'tracker_data' => [FILTER_DEFAULT, false],
     'mailboxes' => [FILTER_UNSAFE_RAW, false],
     'msg_headers' => [FILTER_UNSAFE_RAW, false],
+    'msg_uid' => [FILTER_UNSAFE_RAW, false],
+    'list_path' => [FILTER_UNSAFE_RAW, false],
+    'tracker_items' => [FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY],
+    'error' => [FILTER_UNSAFE_RAW, false],
+    'auto_move' => [FILTER_VALIDATE_BOOLEAN, false],
+    'item_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
+    'field_id' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
+    'tracker_fields' => [FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY],
+    'no_message' => [FILTER_VALIDATE_BOOLEAN, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -300,5 +321,12 @@ return [
     'imap_account' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'tiki_archive_replied' => FILTER_VALIDATE_INT,
     'tiki_run_sieve_filters_on_imap_unread' => FILTER_VALIDATE_INT,
+    'lookup' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'tracker_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'sort_mode' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'limit' => FILTER_VALIDATE_INT,
+    'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'auto_move' => FILTER_VALIDATE_BOOLEAN,
   ]
 ];

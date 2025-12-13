@@ -65,9 +65,9 @@ index.php
 /lib/cypht/modules/themes
 /lib/test/clover.xml
 /lib/test/junit.xml
-/lib/test/core/Search/Index/test_index
-/lib/test/core/Search/test_index
-/lib/test/core/Search/Lucene/test_index/*
+/lib/test/Core/Search/Index/test_index
+/lib/test/Core/Search/test_index
+/lib/test/Core/Search/Lucene/test_index/*
 /lib/test/local.php
 /lib/test/phpunit-log.current.json
 /lib/test/templates_c

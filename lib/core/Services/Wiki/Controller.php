@@ -995,6 +995,8 @@ class Services_Wiki_Controller
         }
 
         Feedback::sendHeaders();
+        $data .= TikiLib::lib('header')->output_js();
+
         return [
             'result' => $data,
         ];

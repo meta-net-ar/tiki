@@ -34,7 +34,7 @@ if (! isset($_REQUEST["cacheId"])) {
 $info = $tikilib->get_cache($_REQUEST["cacheId"]);
 $ggcacheurl = 'http://google.com/search?q=cache:' . urlencode(strstr($info['url'], 'http://'));
 // test if url ends with .txt : formatting for text
-if (substr($info["url"], -4, 4) == ".txt") {
+if (str_ends_with($info["url"], ".txt")) {
     $info["data"] = "<pre>" . $info["data"] . "</pre>";
 }
 // disallow robots to index page:

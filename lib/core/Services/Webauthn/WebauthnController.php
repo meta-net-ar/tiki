@@ -62,7 +62,7 @@ class WebauthnController
                 $url_host
             );
 
-            $uuid = Uuid::v4();
+            $uuid = \Tiki\Utilities\Identifiers::generateUUID();
             $userEntity = PublicKeyCredentialUserEntity::create(
                 $userName,
                 $uuid,

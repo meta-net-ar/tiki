@@ -77,7 +77,6 @@ class DevbuildwsconfsCommand extends Command
             $filePath = $o_path->getRealpath();
             $folders = explode(\DIRECTORY_SEPARATOR, $filePath);
             $folderName = end($folders);//This is a string...
-            //var_dump($folders);
             $folder = count($folders);
 
             $excludeDir = [
@@ -95,7 +94,6 @@ class DevbuildwsconfsCommand extends Command
 
 
             if ($o_path->isDir() && str_starts_with($folderName, '.')) {// UNIX directories that are hidden (Ex: .composer)
-                //var_dump($folderName);
                 return false;
             }
 

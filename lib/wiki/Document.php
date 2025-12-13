@@ -17,7 +17,10 @@
 
 namespace Tiki\Lib\Wiki;
 
-use Text_Diff;
+use Tiki\Lib\Diff\TextDiff;
+use Tiki\Lib\Diff\Op\Add;
+use Tiki\Lib\Diff\Op\Copy;
+use Tiki\Lib\Diff\Op\Delete;
 use TikiLib;
 
 class Document
@@ -472,7 +475,7 @@ class Document
                 }
                 foreach ($this->document as $word) {
                     $skip = false;
-                    $d = isset($word['deleted_by']) ? $word['deleted_by'] : '';
+                    $d = $word['deleted_by'] ?? '';
                     $w = $word['word'];
                     if ($author != $word['author'] or $deleted != $word['deleted'] or $deleted_by != $d) {
                         if ($text != '') {
@@ -495,10 +498,10 @@ class Document
                     }
                     if (! $options['escape']) {
                         if ($this->parsed and ! $this->nohtml) { // skipping popups for links
-                            if (substr($w, 0, 3) == '<a ') {
+                            if (str_starts_with($w, '<a ')) {
                                 $text .= '{AUTHOR}';
                             }
-                            if (substr($w, -4) == '</a>') {
+                            if (str_ends_with($w, '</a>')) {
                                 $text .= $w . "{AUTHOR(author=\"$author\"" .
                                        ($deleted ? ",deleted_by=\"$deleted_by\"" : '') .
                                        ',visible="1", ' .
@@ -641,16 +644,16 @@ class Document
         }
         preg_match_all($this->search, $page, $out, PREG_PATTERN_ORDER);
         $new = $out[0];
-        $z = new Text_Diff($this->getDiffArray(), $new);
+        $z = new TextDiff($this->getDiffArray(), $new);
         $pos = 0;
         foreach ($z->getDiff() as $element) {
-            if (is_a($element, 'Text_Diff_Op_copy')) {
+            if (is_a($element, Copy::class)) {
                 $this->moveWords($newdoc, $pos, $element->orig, $deleted, $deleted_by);
             } else {
-                if (is_a($element, 'Text_Diff_Op_add')) {
+                if (is_a($element, Add::class)) {
                     $newdoc = $this->addWords($newdoc, $element->final, $author, $deleted, $deleted_by);
                 } else {
-                    if (is_a($element, 'Text_Diff_Op_delete')) {
+                    if (is_a($element, Delete::class)) {
                         $this->moveWords($newdoc, $pos, $element->orig, $deleted, $author);
                     } else { //change
                         $newdoc = $this->addWords($newdoc, $element->final, $author, $deleted, $deleted_by);

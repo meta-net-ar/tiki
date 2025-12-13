@@ -18,8 +18,7 @@
                     <option value="{$data.selected_users[ix]}" selected>{if ($field.showRealname == 'y')}{$data.selected_users[ix]|username}{else}{$data.selected_users[ix]}{/if}</option>
                 {/section}
             </select>
-            <input type="hidden" name="{$field.html_name}" value="">
-            <p id="info" class="italic" style="font-style: italic; font-size: 0.8em; color: red"></p>
+            <input type="hidden" name="{$field.html_name}" id="hidden_{$field.fieldId}" value="{$data.selected_users|implode:','}">
         </div>
     {/if}
 </div>
@@ -54,6 +53,7 @@
                 $("#info").removeClass("d-none");
             }
 
+
             var to_remove = $.map(selected, function(user) {
                 return $.inArray(user, all_users) < 0 ? user : null;
             });
@@ -87,5 +87,10 @@
                 elementPlusTransfer.setAttribute("data", JSON.stringify(group_users));
             }
         }
+    }).trigger('change');
+
+    $("#user_selector_{{$field.fieldId}}").on("change", function() {
+        var selectedUsers = $(this).val() || [];
+        $("#hidden_{{$field.fieldId}}").val(selectedUsers.join(","));
     }).trigger('change');
 {/jq}

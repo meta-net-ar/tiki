@@ -13,6 +13,8 @@ use Tiki\Lib\GraphEngine\GDGRenderer;
 use Tiki\Lib\GraphEngine\GridBasedGraphic;
 use Tiki\Lib\GraphEngine\PDFLibGRenderer;
 use Tiki\Lib\GraphEngine\PSGRenderer;
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\DatabaseHandler;
 
 $inputConfiguration = [
     [
@@ -20,9 +22,9 @@ $inputConfiguration = [
         'sheetId'                         => 'int',               //get
         'graphic'                         => 'word',              //get
         'renderer'                        => 'word',              //get
-        'title'                           => 'word',              //get
-        'width'                           => 'word',              //get
-        'height'                          => 'word',              //get
+        'title'                           => 'text',              //get
+        'width'                           => 'int',              //get
+        'height'                          => 'int',              //get
         'format'                          => 'word',              //get
         'orientation'                     => 'word',              //get
         'independant'                     => 'bool',              //get
@@ -136,8 +138,8 @@ if (isset($_REQUEST['title'])) {
         exit;
     }
 
-    $handler = new TikiSheetDatabaseHandler($sheetId);
-    $grid = new TikiSheet();
+    $handler = new DatabaseHandler($sheetId);
+    $grid = new Sheet();
     $grid->import($handler);
 
     $graph = $_REQUEST['graphic'];
@@ -200,13 +202,13 @@ if (isset($_REQUEST['title'])) {
         $smarty->assign('graph', $graph);
         $smarty->assign('renderer', $_REQUEST['renderer']);
 
-        $handler = new TikiSheetDatabaseHandler($sheetId);
-        $grid = new TikiSheet($_REQUEST['sheetId']);
+        $handler = new DatabaseHandler($sheetId);
+        $grid = new Sheet($_REQUEST['sheetId']);
         $grid->import($handler);
 
         $dataGrid = $grid->getTableHtml(true);
 
-        require_once('lib/sheet/grid.php');
+        require_once('lib/Sheet/grid.php');
         $sheetlib->setup_jquery_sheet();
         $headerlib->add_jq_onready(
             '$("div.tiki_sheet").sheet($.extend($.sheet.tikiOptions, {editable: false}));'

@@ -38,7 +38,7 @@ class Search_Formatter_Plugin_ReportTemplate implements Search_Formatter_Plugin_
 
                 if (isset($arguments['name'])) {
                     if (! isset($fields[$arguments['name']])) {
-                        $fields[$arguments['name']] = isset($arguments['default']) ? $arguments['default'] : null;
+                        $fields[$arguments['name']] = $arguments['default'] ?? null;
                     } else {
                         Feedback::warning(tr('Duplicate field name used in display blocks, only the first one defined will be used: %0', $arguments['name']));
                     }

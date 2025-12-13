@@ -96,7 +96,7 @@
                         <b>{$offline_operators[ix].user|escape}</b>
                     </td>
                     <td>
-                        <table >
+                        <table>
                             <tr>
                                 <td>{tr}Accepted requests:{/tr}</td>
                                 <td>{$offline_operators[ix].accepted_requests}</td>

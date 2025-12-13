@@ -35,6 +35,12 @@ const cssLifecycle = singleSpaCss({
         {
             href: "public/generated/js/toolbar-dialogs.css",
         },
+        {
+            href: "public/generated/js/element-plus-ui/autocomplete-root-css.css",
+        },
+        {
+            href: "public/generated/js/element-plus-ui/input-root-css.css",
+        },
     ],
 });
 

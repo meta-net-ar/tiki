@@ -12,7 +12,7 @@
                 </a>
             {/if}
             {if $tiki_p_admin_wiki eq 'y' or $tiki_p_assign_perm_wiki_page eq 'y'}
-                {permission_link mode="button" type="wiki page" addclass="dropdown-item" id=$page permType=wiki title=$page}
+                {permission_link mode="dropdown_item" type="wiki page" id=$page permType=wiki title=$page}
             {/if}
             {if $prefs.feature_page_contribution eq 'y' and $tiki_p_page_contribution_view eq 'y'}
                 {button _keepall='y' href="tiki-page_contribution.php" page=$page _type="link" _class="dropdown-item" _text="{tr}Contributions by author{/tr}"}
@@ -140,7 +140,7 @@
                         <a class="btn btn-secondary mb-2" id="comment-toggle" href="{service controller=comment action=list type="wiki page" objectId=$page}#comment-container">
                             {tr}Comments{/tr}
                             {if $count_comments}
-                                &nbsp;<span class="count_comments badge bg-secondary">{$count_comments}</span>
+                                 <span class="count_comments badge text-bg-info">{$count_comments}</span>
                             {/if}
                         </a>
                         {jq}
@@ -151,30 +151,18 @@
 
             {if isset($show_page) and $show_page eq 'y'}
                 {* don't show attachments button if feature disabled or no corresponding rights or no attached files and r/o*}
-
                 {if $prefs.feature_wiki_attachments == 'y'
                     && (
-                        $tiki_p_wiki_view_attachments == 'y'
-                        && (isset($atts_count) && $atts_count gt 0)
+                        ($tiki_p_wiki_view_attachments == 'y' && $atts_count|default:0 > 0)
                         || $tiki_p_wiki_attach_files == 'y'
                         || $tiki_p_wiki_admin_attachments == 'y')}
-
                     {capture assign=thistext}
                         {strip}
-                            {if (!isset($atts_count) or $atts_count == 0) || $tiki_p_wiki_attach_files == 'y'
-                                && $tiki_p_wiki_view_attachments == 'n' && $tiki_p_wiki_admin_attachments == 'n'}
-                                {tr}Files{/tr}
-                            {else}
-                                {tr}Files{/tr}
-                                &nbsp;<span class="atts_count badge bg-info">{$atts_count}</span>
-                            {/if}
+                            {tr}Files{/tr} <span class="atts_count badge text-bg-info">{$atts_count|default:0}</span>
                         {/strip}
                     {/capture}
-
-                    {if (isset($atts_count) and $atts_count gt 0) || $editable}
-                        {button href="#attachments" _flip_id="attzone{if isset($pagemd5)}{$pagemd5}{/if}" _type="secondary mb-2" _text=$thistext _flip_default_open=$prefs.w_displayed_default _flip_hide_text="n"}
-                    {/if}
-                {/if}{* attachments *}
+                    {button href="#attachments" _flip_id="attzone{if isset($pagemd5)}{$pagemd5}{/if}" _type="secondary mb-2" _text=$thistext _flip_default_open=$prefs.w_displayed_default _flip_hide_text="n"}
+                {/if} {* attachments *}
 
             {/if}
             {if $more_section|trim neq ''}
@@ -213,7 +201,7 @@
         {/if}
 
         {if $prefs.feature_wiki_comments eq 'y' and $tiki_p_wiki_view_comments == 'y' and $edit_page ne 'y'}
-            <div id="comment-container"></div>
+            <div id="comment-container" class="my-3 mx-0"></div>
         {/if}
 
     {/strip}

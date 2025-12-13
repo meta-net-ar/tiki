@@ -589,7 +589,7 @@ class Services_User_Controller
                             'fields' => $extraFields
                         ],
                         'modal' => '1',
-                        'userGroups' => str_replace(['\'','&'], ['%39;','%26'], json_encode($userGroups)),
+                        'userGroups' => json_encode($userGroups),
                     ];
                 }
             } else {
@@ -602,7 +602,7 @@ class Services_User_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
@@ -1128,6 +1128,55 @@ class Services_User_Controller
         }
     }
 
+    public function actionLocalTimezoneSync($input)
+    {
+        global $user, $tikilib;
+        $access = TikiLib::lib('access');
+        $clientTz = $input->client_timezone->text();
+        $action = $input->timezone_action->text();
+
+        if ($action === 'never') {
+            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
+                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
+            }
+            $access->redirect($_SERVER['HTTP_REFERER']);
+            return [];
+        }
+
+        if (! empty($_SESSION["temp_timezone"])) {
+            $preferedTz = $_SESSION["temp_timezone"];
+        } else {
+            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        }
+
+        if ($action === 'switch') {
+            $tikilib->set_user_preference($user, 'display_timezone', $clientTz);
+            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        } elseif ($action === 'temporary') {
+            $_SESSION["temp_timezone"] = $clientTz;
+            $preferedTz = $clientTz;
+        }
+
+        $different = $clientTz && $clientTz !== $preferedTz;
+        $result = [
+            'different'      => $different ? true : false,
+            'preferedTimezone' => $preferedTz,
+            'clientTimezone'   => $clientTz,
+        ];
+
+        if ($action === 'switch' || $action === 'temporary') {
+            return $this->redirectAndReturn($result);
+        }
+
+        return $result;
+    }
+
+    private function redirectAndReturn($data = []): array
+    {
+        header("Location:" . $_SERVER['HTTP_REFERER']);
+        return $data;
+    }
+
     private function removeUsers(array $users, $page = false, $trackerIds = [], $files = false)
     {
         global $user;
@@ -1256,15 +1305,45 @@ class Services_User_Controller
         }
     }
 
+    /**
+     * Admin user "perform with checked" action to lock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionLockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'lock';
+        return $this->action_set_user_lock_status($input);
+    }
+
+    /**
+     * Admin user "perform with checked" action to unlock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionUnlockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'unlock';
+        return $this->action_set_user_lock_status($input);
+    }
+
     private function updateUserLockStatus($users, $newLockStatus)
     {
         global $user;
         foreach ($users as $user_to_lock) {
             if ($user_to_lock != 'admin') {
                 $res = $this->lib->update_user_lock_status($user_to_lock, $newLockStatus);
-                if ($res === true) {
-                    Feedback::success(tr('User %0 lock status successfully updated', $user_to_lock));
-                } else {
+                if ($res !== true) {
                     Feedback::error(tr('An error occurred. User %0 lock status could not be updated', $user_to_lock));
                     Services_Utilities::closeModal();
                     return false;
@@ -1272,5 +1351,64 @@ class Services_User_Controller
             }
         }
         return true;
+    }
+
+    public function actionValidateUser($input)
+    {
+        $username = $input->username->text();
+        $password = $input->password->text();
+        $userlib = TikiLib::lib('user');
+        $ret = $userlib->validate_user($username, $password);
+        return $ret[0];
+    }
+
+    public function action_save_column_prefs($input)
+    {
+        global $user;
+        $columns = $input->prefs->value();
+        $tracker_name = $input->trackerName->value();
+        TikiLib::lib('tiki')->set_user_preference($user, 'trk_items_column_pref', $columns);
+        return tr('Your column preference for tracker "%0" is saved.', $tracker_name);
+    }
+
+    public function actionReset2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        TikiLib::lib('user')->update_2_factor_secret($user, '');
+        return ['success' => true, 'message' => tra('2FA secret reset successfully')];
+    }
+
+    public function actionToggle2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        $tikilib = TikiLib::lib('tiki');
+
+        $usersDisabled2FA = $tikilib->get_preference('twoFactorAuthExcludedUsers', expectArray: true);
+        $usersEnabled2FA = $tikilib->get_preference('twoFactorAuthIncludedUsers', expectArray: true);
+
+        if ($input->enable->bool()) {
+            $usersEnabled2FA = array_unique(array_merge($usersEnabled2FA, [$user]));
+            $usersDisabled2FA = array_diff($usersDisabled2FA, [$user]);
+        } else {
+            $usersDisabled2FA = array_unique(array_merge($usersDisabled2FA, [$user]));
+            $usersEnabled2FA = array_diff($usersEnabled2FA, [$user]);
+        }
+
+        $tikilib->set_preference('twoFactorAuthExcludedUsers', $usersDisabled2FA);
+        $tikilib->set_preference('twoFactorAuthIncludedUsers', $usersEnabled2FA);
+
+        return ['success' => true];
     }
 }

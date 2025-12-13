@@ -4,13 +4,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'loadprevious'                    => 'word',              //post
-        'emailslist'                      => 'word',              //post
+        'loadprevious'                    => 'int',              //post
+        'emailslist'                      => 'xss',              //post
         'emailslist_format'               => 'word',              //post
-        'emailsubject'                    => 'word',              //post
+        'emailsubject'                    => 'text',              //post
         'emailcontent'                    => 'xss',               //post
         'wikicontent'                     => 'xss',               //post
         'wikipageafter'                   => 'pagename',          //post
@@ -45,7 +48,7 @@ function parsemails_csv($bloc)
         $r['lastname'] = trim($l[0]);
         $r['firstname'] = trim($l[1]);
         $r['email'] = trim($l[2]);
-        if (strpos($r['email'], '@') !== false) {
+        if (str_contains($r['email'], '@')) {
             $results[] = $r;
         }
     }
@@ -63,14 +66,13 @@ function parsemails_all($bloc)
     $bloc = str_replace("\n\r", "\n", $bloc);
     $bloc = str_replace("\r", "\n", $bloc);
     $mails = preg_split('/[^a-zA-Z0-9@._-]/', $bloc);
-
     $results = [];
     foreach ($mails as $m) {
         $m = trim($m);
-        if (strpos($m, '@') === false) {
+        if (! str_contains($m, '@')) {
             continue;
         }
-        if (strpos($m, '.') === false) {
+        if (! str_contains($m, '.')) {
             continue;
         }
         $r = [];
@@ -126,7 +128,6 @@ if (isset($_REQUEST['send'])) {
     $_text = str_replace("\r", "\n", $_text);
 
     $mails = $_REQUEST["emailslist"];
-
     switch ($_REQUEST['emailslist_format']) {
         case 'all':
             $emails = parsemails_all($mails);
@@ -140,7 +141,7 @@ if (isset($_REQUEST['send'])) {
 
     $igroups = $_REQUEST['invitegroups'] ?? [];
 
-    if (! empty($_REQUEST['confirm']) && isset($_REQUEST['invitegroups'])) {
+    if (! empty($_REQUEST['confirm'])) {
         $tikilib->query(
             "INSERT INTO `tiki_invite` (inviter, `groups`, ts, emailsubject,emailcontent,wikicontent,wikipageafter) VALUES (?,?,?,?,?,?,?)",
             [
@@ -167,13 +168,11 @@ if (isset($_REQUEST['send'])) {
             );
         }
 
-        $_SERVER['SCRIPT_URI'] = empty($_SERVER['SCRIPT_URI']) ? 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_URI'];
         foreach ($emails as $m) {
             $mail = new TikiMail();
             $mail->setFrom($prefs['sender_email']);
             $mail->setSubject($_REQUEST["emailsubject"]);
-            $url = str_replace('tiki-invite.php', 'tiki-invited.php', $_SERVER['SCRIPT_URI'])
-                . '?invite=' . $id . '&email=' . urlencode($m['email']);
+            $url = TikiLib::tikiUrl('tiki-invited.php', ['invite' => $id, 'email' => $m['email']]);
             $text = $_text;
             $text = str_replace('{link}', $url, $text);
             $text = str_replace('{email}', $m['email'], $text);
@@ -184,11 +183,6 @@ if (isset($_REQUEST['send'])) {
         }
 
         $smarty->assign('sentresult', true);
-    } elseif (! isset($_REQUEST['invitegroups'])) {
-        Feedback::error(tr("You must select an invite group"));
-        $smarty->assign('mid', 'tiki-invite.tpl');
-        $smarty->display("tiki.tpl");
-         die();
     }
     $smarty->assign('emails', $emails);
 }

@@ -1,8 +1,5 @@
 <?php
 
-include_once('lib/core/Tiki/TikiInit.php');
-use Tiki\TikiInit;
-
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -15,6 +12,11 @@ use Tiki\TikiInit;
 // You can also get a detailed help on this script with:
 //    php doc/devtools/release.php --help
 //
+
+use Tiki\Smarty\SmartyTiki;
+use Tiki\TikiInit;
+
+include_once('lib/core/Tiki/TikiInit.php');
 
 define('TOOLS', __DIR__);
 define('ROOT', realpath(TOOLS . '/../..'));
@@ -44,7 +46,7 @@ require_once ROOT . '/lib/setup/third_party.php';
 require_once ROOT . '/path_constants.php';
 require_once ROOT . '/' . DEPRECATED_DEVTOOLS_PATH . '/vcscommons.php';
 
-$phpCommand = isset($_SERVER['_']) ? $_SERVER['_'] : 'php';
+$phpCommand = $_SERVER['_'] ?? 'php';
 $phpCommandArguments = implode(' ', $_SERVER['argv']);
 
 if (! ($options = get_options()) || $options['help']) {
@@ -88,14 +90,14 @@ if ($options['only-secdb']) {
 }
 
 $script = $_SERVER['argv'][0];
-$version = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '';
-$subrelease = isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : '';
+$version = $_SERVER['argv'][1] ?? '';
+$subrelease = $_SERVER['argv'][2] ?? '';
 
 if (! preg_match("/^\d+\.\d+$/", $version)) {
     error("Version number should be in X.X format.\n");
 }
 
-$isPre = strpos($subrelease, 'pre') === 0;
+$isPre = str_starts_with($subrelease, 'pre');
 if ($isPre) {
     $subrelease = substr($subrelease, 3);
     $pre = 'pre';
@@ -378,7 +380,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
                 }
 
                 foreach ($virtuals as $virtual) {
-                    if (strpos($entry, "/$virtual/") !== false) {
+                    if (str_contains($entry, "/$virtual/")) {
                         continue 2;
                     }
                 }
@@ -626,10 +628,11 @@ function build_packages($releaseVersion)
     }
 
     if (
-        strpos($shellout, 'Fatal error:') !== false ||
-        strpos($shellout, 'Installation failed,') !== false ||
+        str_contains($shellout, 'Fatal error:')
+        || str_contains($shellout, 'Installation failed,')
+        ||
         // symfony/dependency-injection comes in quite late in the list and is required - sometimes no error is reported even though it didn't work
-        strpos($shellout, 'symfony/dependency-injection') === false
+        ! str_contains($shellout, 'symfony/dependency-injection')
     ) {
         echo 'Vendor bundled packages installation Failed. Exiting' . "\n";
         die();
@@ -719,7 +722,7 @@ function build_packages($releaseVersion)
 
     echo "Creating $fileName.7z\n";
     $shellout = shell_exec("cd $relDir; 7za a " . escapeshellarg($fileName . ".7z") . ' ' . escapeshellarg($fileName) . ' -xr!*.DS_Store -mx=9 2>&1');
-    if (strpos($shellout, 'command not found')) {
+    if (str_contains($shellout, 'command not found')) {
         error("7za not installed. Archive creation failed.\n");
     }
     if ($options['debug-packaging']) {
@@ -800,13 +803,11 @@ function check_smarty_syntax(&$error_msg)
     $prefs['feature_sefurl_filter'] = 'y';
     $prefs['site_layout'] = 'basic';
     require_once 'lib/init/initlib.php';
-    require_once 'lib/init/smarty.php';
-    // needed in Smarty_Tiki
     define('TIKI_PATH', getcwd());
     require_once 'lib/smarty_tiki/prefilter.tr.php';
     require_once 'lib/smarty_tiki/prefilter.jq.php';
     require_once 'lib/smarty_tiki/prefilter.log_tpl.php';
-    $smarty = new Smarty_Tiki();
+    $smarty = new SmartyTiki();
     set_error_handler('check_smarty_syntax_error_handler');
 
     $templates_dir = TIKI_PATH . '/' . SMARTY_TEMPLATES_PATH;
@@ -822,7 +823,7 @@ function check_smarty_syntax(&$error_msg)
     for ($i = 0; $i < $nbEntries; $i++) {
         display_progress_percentage($i, $nbEntries, '%d%% of files passed the Smarty syntax check');
 
-        if (strpos($entries[$i], 'tiki-mods.tpl') === false) {
+        if (! str_contains($entries[$i], 'tiki-mods.tpl')) {
             $template_file = substr($entries[$i], strlen($templates_dir) + 1);
 
             try {
@@ -854,7 +855,7 @@ function check_smarty_syntax(&$error_msg)
  */
 function check_smarty_syntax_error_handler($errno, $errstr, $errfile = '', $errline = 0, $errcontext = [])
 {
-    if (strpos($errstr, 'filemtime(): stat failed for') === false) {    // smarty seems to emit these for every file
+    if (! str_contains($errstr, 'filemtime(): stat failed for')) {    // smarty seems to emit these for every file
         echo "\n" . color($errstr, 'red') . "\n";
     }
     return true;
@@ -882,7 +883,7 @@ function check_php_syntax(&$dir, &$error_msg, $hide_php_warnings)
         exec("$checkPhpCommand -l {$entries[$i]} 2>&1", $output, $return_var);
         $fullOutput = implode("\n", $output);
 
-        if (strpos($fullOutput, 'Segmentation fault') !== false) {
+        if (str_contains($fullOutput, 'Segmentation fault')) {
             // If php -l command segfaults, wait and retry (it seems to happen quite often on some environments for this command)
             echo "\r[Retrying due to a Segfault...]";
             sleep(1);
@@ -964,7 +965,7 @@ function check_database_files_and_upgrade($mainversion, &$error_msg)
 
     foreach ($checkList as $checkPrefix => $checkName) {
         foreach ($jobs['tiki-check'] as $jobName => $job) {
-            if (strpos($jobName, $checkPrefix) === 0) {
+            if (str_starts_with($jobName, $checkPrefix)) {
                 echo color(
                     $checkName . ': ' . $job['status'] . ', job: ' . $jobName . ', url: ' . $gitlabUrl . $job['url'] . "\n",
                     $job['status'] == PIPELINE_STATUS_PASSED ? 'green' : 'red'
@@ -1110,7 +1111,7 @@ function get_options()
     }
 
     foreach ($_SERVER['argv'] as $arg) {
-        if (substr($arg, 0, 2) == '--') {
+        if (str_starts_with($arg, '--')) {
             if (($opt = substr($arg, 2)) != '' && isset($options[$opt])) {
                 $options[$opt] = true;
             } elseif (substr($arg, 2, 11) == 'http-proxy=') {
@@ -1130,7 +1131,7 @@ function get_options()
                 if (($uri = substr($arg, 17)) != '') {
                     $options[substr($arg, 2, 14)] = $uri;
                 }
-            } elseif (strpos($arg, '=') !== false) {
+            } elseif (str_contains($arg, '=')) {
                 $parts = explode('=', substr($arg, 2));
                 if (isset($options[$parts[0]])) {
                     $options[$parts[0]] = $parts[1];
@@ -1374,7 +1375,7 @@ function update_copyright_file($newVersion)
     $contributors = [];
 
     $repositoryUri = empty($options['mirror-uri']) ? TIKIVCS : $options['mirror-uri']; //
-    if (strpos($repositoryUri, '/') === 0) {
+    if (str_starts_with($repositoryUri, '/')) {
         $repositoryUri = 'file://' . $repositoryUri;
     }
     $repositoryInfo = get_revision($repositoryUri);
@@ -1472,7 +1473,7 @@ function parse_copyrights()
         if (empty($line)) {
             continue;
         }
-        if (substr($line, 0, 10) == 'Nickname: ') {
+        if (str_starts_with($line, 'Nickname: ')) {
             $curNickname = rtrim(substr($line, 10));
             $return[$curNickname] = [];
         } elseif ($curNickname != '' && ($pos = strpos($line, ':')) !== false) {

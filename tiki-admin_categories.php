@@ -11,12 +11,49 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save'         => 'bool',                //post
+            'save'              => 'alpha',          //post
+            'import'            => 'alpha',          //post
             'parentId'     => 'int',                 //get
+            'categId'           => 'int',            //get/post
             'cookietab'    => 'int',                 //get
-            'sort_mode'    => 'striptags',           //get
+            'sort_mode'         => 'alnumdash',      //get
             'name'         => 'striptags',           //post
             'description'  => 'xss',                 //post
+            'pollId'            => 'int',            //post
+            'faqId'             => 'int',            //post
+            'trackerId'         => 'int',            //post
+            'quizId'            => 'int',            //post
+            'forumId'           => 'int',            //post
+            'galleryId'         => 'int',            //post
+            'file_galleryId'    => 'int',            //post
+            'articleId'         => 'int',            //post
+            'blogId'            => 'int',            //post
+            'directoryId'       => 'int',            //post
+            'removeObject'      => 'int',            //get
+            'removeCat'         => 'int',            //get
+            'tplGroupContainer' => 'int',            //post
+            'tplGroupPattern'   => 'text',           //post
+            'parentPerms'       => 'alpha',          //post
+            'applyRoles'        => 'alpha',          //post
+            'find'              => 'text',           //get
+            'find_objects'      => 'text',           //get
+            'offset'            => 'int',            //get
+            'addpage'           => 'alpha',          //post
+            'addpoll'           => 'alpha',          //post
+            'addfaq'            => 'alpha',          //post
+            'addtracker'        => 'alpha',          //post
+            'addquiz'           => 'alpha',          //post
+            'addforum'          => 'alpha',          //post
+            'addgallery'        => 'alpha',          //post
+            'addfilegallery'    => 'alpha',          //post
+            'addarticle'        => 'alpha',          //post
+            'addblog'           => 'alpha',          //post
+            'adddirectory'      => 'alpha',          //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'pageName'          => 'text',           //post
+            'categoryRole'      => 'int',            //post
+            'rolesToApply'      => 'int',            //post
         ],
     ],
 ];
@@ -35,6 +72,26 @@ if (! empty($_REQUEST["categId"])) {
 
 @ini_set('max_execution_time', 0);    // as pagination is broken and almost every object gets fully loaded on this page
 @ini_set('memory_limit', -1);        // at least try and avoid WSoD on large sites (TODO better still - see r30064)
+
+function getImportStatus(array $res)
+{
+    if (empty($res)) {
+        return 'none';
+    }
+    if (in_array('exist', $res, true)) {
+        return 'some_exist';
+    }
+
+    $trueCount = count(array_filter($res, fn($v) => $v === true));
+    $totalCount = count($res);
+    if ($trueCount === $totalCount) {
+        return 'all';
+    } elseif ($trueCount > 0) {
+        return 'some';
+    } else {
+        return 'none';
+    }
+}
 
 $access->check_feature('feature_categories');
 // Check for parent category or set to 0 if not present
@@ -216,7 +273,7 @@ if (
 }
 if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["name"]) > 0 && $access->checkCsrf()) {
     // Save
-    if (! empty($_REQUEST["tplGroupContainer"]) && strpos($_REQUEST["tplGroupPattern"], '--groupname--') === false) {
+    if (! empty($_REQUEST["tplGroupContainer"]) && ! str_contains($_REQUEST["tplGroupPattern"], '--groupname--')) {
         Feedback::error(tra('A pattern that does not contain "--groupname--" is not allowed'));
     }
     if ($_REQUEST["categId"]) {
@@ -261,7 +318,7 @@ if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["na
         }
     }
 
-    $cRolesInput = isset($_REQUEST["categoryRole"]) ? $_REQUEST["categoryRole"] : [];
+    $cRolesInput = $_REQUEST["categoryRole"] ?? [];
     $rolesToSave = [];
     if (isset($cRolesInput) && ! empty($cRolesInput)) {
         $rolesRepo->deleteSelectedCategoryRoleNotUsed($_REQUEST["categId"]);
@@ -289,6 +346,7 @@ if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["na
 }
 if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $access->checkCsrf()) {
     $fhandle = fopen($_FILES['csvlist']['tmp_name'], 'r');
+    $success = [];
     if (! $fhandle) {
         Feedback::error(tr("The file has incorrect syntax or is not a CSV file"));
     } else {
@@ -301,7 +359,6 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
                 Feedback::error(tr('The file does not have the required header:') . ' category, description, parent');
             } else {
                 while (! feof($fhandle)) {
-                    $success = false;
                     $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
                     if (! empty($data)) {
                         $temp_max = count($fields);
@@ -309,7 +366,8 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
                         if ($temp_max > 1 && strtolower($data[2]) != 'top' && ! empty($data[2])) {
                             $parentId = $categlib->get_category_id($data[2]);
                             if (empty($parentId)) {
-                                Feedback::error(tr('Incorrect parameter %0', $data[2]));
+                                $success[] = false;
+                                Feedback::error(tr('The specified parent category "%0" does not exist.', $data[2]));
                                 $getCategory = false;
                             } else {
                                 $access->check_permission('tiki_p_admin_categories', '', 'category', $parentId);
@@ -322,19 +380,35 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
                             if (! $categlib->exist_child_category($parentId, $data[0])) {
                                 $newcategId = $categlib->add_category($parentId, $data[0], $data[1]);
                                 if (empty($newcategId)) {
-                                    Feedback::error(tr('Incorrect parameter %0', $data[0]));
+                                    $success[] = false;
                                 } else {
-                                    $success = true;
+                                    $success[] = true;
                                     if ($tiki_p_admin_categories != 'y') {
                                         $userlib->copy_object_permissions($parentId, $newcategId, 'category');
                                     }
                                 }
+                            } else {
+                                $success[] = 'exist';
                             }
                         }
                     }
                 }
-                if ($success) {
+                $status = getImportStatus($success);
+                if ($status === 'all') {
                     Feedback::success(tr('Categories imported'));
+                    $headerlib->add_jq_onready("
+                        var triggerEl = document.querySelector('a[href=\"#contentadmin_categories1-1\"]');
+                        if (triggerEl) {
+                            var tab = new bootstrap.Tab(triggerEl);
+                            tab.show();
+                        }
+                    ");
+                } elseif ($status === 'some_exist') {
+                    Feedback::warning(tr('Certain categories could not be imported because they already exist.'));
+                } elseif ($status === 'some') {
+                    Feedback::warning(tr('Certain categories could not be imported.'));
+                } else {
+                    Feedback::error(tr('No categories were imported due to invalid parameters.'));
                 }
             }
         }
@@ -529,24 +603,11 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-$smarty->assign('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-if (isset($_REQUEST["find_objects"])) {
-    $find_objects = $_REQUEST["find_objects"];
-} else {
-    $find_objects = '';
-}
+$find_objects = $_REQUEST["find_objects"] ?? '';
 
 // ---------------------------------------------------
 if ($prefs['feature_search'] !== 'y' || $prefs['unified_add_to_categ_search'] !== 'y') {    // no unified search

@@ -15,11 +15,12 @@ class CommentsTest extends TikiTestCase
     private $readsTable;
     private $originalPrefs;
 
+    private $forumId;
     protected function setUp(): void
     {
         parent::setUp();
         // Backup original prefs if they exist
-        $this->originalPrefs = isset($GLOBALS['prefs']) ? $GLOBALS['prefs'] : null;
+        $this->originalPrefs = $GLOBALS['prefs'] ?? null;
 
         $this->commentsLib = TikiLib::lib('comments');
         $this->reportedTable = $this->commentsLib->table('tiki_forums_reported');
@@ -45,11 +46,10 @@ class CommentsTest extends TikiTestCase
             'sender_email' => 'noreply@example.com',
             'feature_user_watches' => 'n',
             'feature_group_watches' => 'n',
-            'comments_akismet_filter' => 'n',  // Added missing preference
             'feature_comments_moderation' => 'n',  // Added missing preference
             'feature_file_galleries' => 'n',  // Added missing preference
         ];
-        $this->commentsLib->replace_forum(['forumId' => 0, 'name' => "forum 1", 'description' => "description"]);
+        $this->forumId = $this->commentsLib->replace_forum(['forumId' => 1, 'name' => "forum 1", 'description' => "description"]);
         $_SERVER['SERVER_NAME'] = 'localhost';
     }
 
@@ -111,7 +111,7 @@ class CommentsTest extends TikiTestCase
     {
         // Test case with reason provided
         $postInfo = [
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'parentId' => 2,
             'threadId' => 3,
             'user' => $GLOBALS['user'],
@@ -154,7 +154,7 @@ class CommentsTest extends TikiTestCase
 
     public function testListReported(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $offset = 0;
         $maxRecords = 25;
         $sort_mode = "timestamp_desc";
@@ -163,7 +163,7 @@ class CommentsTest extends TikiTestCase
         // insert the comment that will be report
         $message_id = '1';
         $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             "2",
             $GLOBALS['user'],
             "Re: forum 1",
@@ -171,7 +171,7 @@ class CommentsTest extends TikiTestCase
             $message_id
         );
         // report the comment we have just created above
-        $this->commentsLib->report_post(1, 2, 1, 'my name', 'Inappropriate content');
+        $this->commentsLib->report_post($this->forumId, 2, 1, 'my name', 'Inappropriate content');
 
         // Fetch the reported list
         $result = $this->commentsLib->list_reported($forumId, $offset, $maxRecords, $sort_mode, $find);
@@ -193,11 +193,11 @@ class CommentsTest extends TikiTestCase
     {
         $threadId = 3;
 
-        $this->commentsLib->report_post(1, 2, $threadId, 'my user', 'Inappropriate content');
+        $this->commentsLib->report_post($this->forumId, 2, $threadId, 'my user', 'Inappropriate content');
         $isReported = $this->commentsLib->is_reported($threadId);
         $this->assertEquals("yes", ($isReported === 1 ? 'yes' : 'no'));
         // another user report the same thread
-        $this->commentsLib->report_post(1, 2, $threadId, 'another user', 'Spam');
+        $this->commentsLib->report_post($this->forumId, 2, $threadId, 'another user', 'Spam');
         $this->assertEquals("no", ($isReported > 1 ? 'yes' : 'no'));
 
         $isReported = $this->commentsLib->is_reported(999);
@@ -207,7 +207,7 @@ class CommentsTest extends TikiTestCase
     public function testRemoveReported(): void
     {
         $threadId = 3;
-        $this->commentsLib->report_post(1, 2, $threadId, 'my user', 'Inappropriate content');
+        $this->commentsLib->report_post($this->forumId, 2, $threadId, 'my user', 'Inappropriate content');
 
         $isReported = $this->commentsLib->is_reported($threadId);
         $this->assertEquals("yes", ($isReported > 0 ? 'yes' : 'no'));
@@ -220,13 +220,13 @@ class CommentsTest extends TikiTestCase
 
     public function testGetNumReported(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $message_id = '1';
 
         // insert the comment that will be report
         $parentId = 2;
         $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Re: forum 1",
@@ -234,14 +234,14 @@ class CommentsTest extends TikiTestCase
             $message_id
         );
         // report the comment we have just created above
-        $this->commentsLib->report_post(1, 2, 1, 'my name', 'Inappropriate content');
+        $this->commentsLib->report_post($this->forumId, 2, 1, 'my name', 'Inappropriate content');
         $numReported = $this->commentsLib->get_num_reported($forumId);
         $this->assertEquals(1, $numReported);
 
         // Insert another comment
         $anotherParentId = 3;
         $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $anotherParentId,
             $GLOBALS['user'],
             "Re: forum 1",
@@ -250,7 +250,7 @@ class CommentsTest extends TikiTestCase
         );
 
         // Insert another reported post & Check the number of reported posts for the forum again
-        $this->commentsLib->report_post(1, 2, 2, 'my name', 'Inappropriate content');
+        $this->commentsLib->report_post($this->forumId, 2, 2, 'my name', 'Inappropriate content');
         $numReported = $this->commentsLib->get_num_reported($forumId);
         $this->assertEquals(2, $numReported);
 
@@ -261,7 +261,7 @@ class CommentsTest extends TikiTestCase
 
     public function testMarkComment(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $threadId = 3;
         $user = $GLOBALS['user'];
 
@@ -280,7 +280,7 @@ class CommentsTest extends TikiTestCase
 
     public function testUnMarkComment(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $threadId = 3;
         $user = $GLOBALS['user'];
 
@@ -300,7 +300,7 @@ class CommentsTest extends TikiTestCase
 
     public function testIsMarked(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $threadId = 3;
         $user = $GLOBALS['user'];
 
@@ -329,7 +329,7 @@ class CommentsTest extends TikiTestCase
         $data = 'Test file content';
         $fhash = '';  // Simulating direct data storage
         $dir = '/path/to/dir';
-        $forumId = 1;
+        $forumId = $this->forumId;
 
         $attachmentId = $this->commentsLib->forum_attach_file($threadId, $qId, $name, $type, $size, $data, $fhash, $dir, $forumId);
 
@@ -366,7 +366,7 @@ class CommentsTest extends TikiTestCase
             $data = 'Test content for ' . $filename;
             $fhash = '';
             $dir = '/path/to/dir';
-            $forumId = 1;
+            $forumId = $this->forumId;
 
             $attachmentId = $this->commentsLib->forum_attach_file(
                 $threadId,
@@ -430,7 +430,7 @@ class CommentsTest extends TikiTestCase
             'user' => trim($GLOBALS['user']),
             'title' => 'Test Title',
             'data' => 'Test Data',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'type' => 'n',
             'topic_title' => 'Test Topic Title',
             'topic_smiley' => ':)',
@@ -453,7 +453,7 @@ class CommentsTest extends TikiTestCase
             'path' => '',
             'created' => time(),
             'dir' => '',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ]);
 
         // Configure approve_queued mock behavior
@@ -565,7 +565,7 @@ class CommentsTest extends TikiTestCase
             'att_max_size' => 1024 * 1024, // 1MB
             'att_store' => 'db',
             'att_store_dir' => '/path/to/dir',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $errors = [];
@@ -622,7 +622,7 @@ class CommentsTest extends TikiTestCase
             'att_max_size' => 1024 * 1024, // 1MB
             'att_store' => 'db',
             'att_store_dir' => '/path/to/dir',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         // Test data 1
@@ -673,7 +673,7 @@ class CommentsTest extends TikiTestCase
             'att_max_size' => 1024 * 1024,
             'att_store' => 'db',
             'att_store_dir' => '/path/to/dir',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $threadId = 1;
@@ -705,7 +705,7 @@ class CommentsTest extends TikiTestCase
             'att_max_size' => 1024 * 1024,
             'att_store' => 'db',
             'att_store_dir' => '/path/to/dir',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $testData = [
@@ -747,7 +747,7 @@ class CommentsTest extends TikiTestCase
             'att_max_size' => 1024 * 1024,
             'att_store' => 'db',
             'att_store_dir' => '/path/to/dir',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $threadId = 1;
@@ -829,7 +829,7 @@ class CommentsTest extends TikiTestCase
      */
     public function testReplaceQueue(array $params): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $qId = 0;
 
         $result = $this->commentsLib->replace_queue(
@@ -881,7 +881,7 @@ class CommentsTest extends TikiTestCase
         $message_id = '1';
         $parentId = 0;
         $commentResult = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             trim($GLOBALS['user']), // Ensure username is trimmed
             "Test Comment",
@@ -937,7 +937,7 @@ class CommentsTest extends TikiTestCase
         $data = [
             'object' => $object,
             'parentId' => 0,
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'timestamp' => time(),
             'user' => $GLOBALS['user'],
             'title' => 'Test Title 1',
@@ -991,7 +991,7 @@ class CommentsTest extends TikiTestCase
             'user' => $GLOBALS['user'],
             'title' => 'Test Title 1',
             'data' => 'Test Data 1',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'type' => 'n',
             'topic_title' => 'Test Topic Title 1',
             'topic_smiley' => ':)',
@@ -1024,7 +1024,7 @@ class CommentsTest extends TikiTestCase
             'path' => '',
             'created' => time(),
             'dir' => '',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $this->attachmentsTable->insert($attachmentData);
@@ -1069,7 +1069,7 @@ class CommentsTest extends TikiTestCase
             'user' => $GLOBALS['user'],
             'title' => 'Test Title',
             'data' => 'Test Data',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'type' => 'n',
             'topic_title' => 'Test Topic Title',
             'topic_smiley' => ':)',
@@ -1093,7 +1093,7 @@ class CommentsTest extends TikiTestCase
             'path' => '',
             'created' => time(),
             'dir' => '',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $this->attachmentsTable->insert($attachment);
@@ -1129,7 +1129,7 @@ class CommentsTest extends TikiTestCase
             'user' => $GLOBALS['user'],
             'title' => 'Test Title',
             'data' => 'Test Data',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
             'type' => 'n',
             'topic_title' => 'Test Topic Title',
             'topic_smiley' => ':)',
@@ -1162,7 +1162,7 @@ class CommentsTest extends TikiTestCase
             'path' => '',
             'created' => time(),
             'dir' => '',
-            'forumId' => 1,
+            'forumId' => $this->forumId,
         ];
 
         $this->attachmentsTable->insert($attachment);
@@ -1196,7 +1196,7 @@ class CommentsTest extends TikiTestCase
         $messageId = uniqid();
         $parentId = 0;
         $normalThreadId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Test Comment",
@@ -1214,7 +1214,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 2: Comment with attachment
         $messageId2 = uniqid();
         $threadIdWithAttachment = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Comment with Attachment",
@@ -1243,7 +1243,7 @@ class CommentsTest extends TikiTestCase
         $messageId3 = uniqid();
         $specialContent = "Content with special chars: áéíóú ñ € ® © ™";
         $threadIdSpecial = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Special Chars Comment",
@@ -1257,7 +1257,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 4: Nested comment (reply)
         $messageId4 = uniqid();
         $replyThreadId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $normalThreadId, // Reply to the first comment
             $GLOBALS['user'],
             "Reply Comment",
@@ -1289,7 +1289,7 @@ class CommentsTest extends TikiTestCase
         $messageId = uniqid();
         $parentId = 0;
         $threadId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Original Title",
@@ -1323,7 +1323,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 2: Update with attachment
         $messageId2 = uniqid();
         $threadId2 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Comment with Attachment",
@@ -1383,7 +1383,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 3: Update with special characters
         $messageId3 = uniqid();
         $threadId3 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Original Special",
@@ -1421,7 +1421,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 4: Update reply
         $messageId4 = uniqid();
         $replyId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $threadId,  // Reply to first comment
             $GLOBALS['user'],
             "Original Reply",
@@ -1480,7 +1480,7 @@ class CommentsTest extends TikiTestCase
      */
     public function testConcurrentForumOperations(): void
     {
-        $forumId = 1;
+        $forumId = $this->forumId;
         $users = ['user1', 'user2'];
         $operations = [];
 
@@ -1612,7 +1612,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 1: Basic comment
         $messageId = uniqid();
         $threadId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,  // parentId
             $GLOBALS['user'],
             "Test Title",
@@ -1632,7 +1632,7 @@ class CommentsTest extends TikiTestCase
         $messageId2 = uniqid();
         $anonymousName = "Anonymous User";
         $threadId2 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             "",  // empty username
             "Anonymous Title",
@@ -1655,7 +1655,7 @@ class CommentsTest extends TikiTestCase
         $specialTitle = "Title with áéíóú ñ";
         $specialContent = "Content with €£¥ special chars ®©™";
         $threadId3 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             $GLOBALS['user'],
             $specialTitle,
@@ -1670,7 +1670,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 4: Nested comment (reply)
         $messageId4 = uniqid();
         $threadId4 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $threadId,  // Reply to first comment
             $GLOBALS['user'],
             "Reply Title",
@@ -1684,7 +1684,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 5: Comment with attachment
         $messageId5 = uniqid();
         $threadId5 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             $GLOBALS['user'],
             "Comment with Attachment",
@@ -1729,7 +1729,7 @@ class CommentsTest extends TikiTestCase
         // Invalid parent ID
         $messageId7 = uniqid();
         $threadId7 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             999999,  // Non-existent parent
             $GLOBALS['user'],
             "Invalid Parent",
@@ -1756,7 +1756,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 1: Basic comment removal
         $messageId = uniqid();
         $threadId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             $GLOBALS['user'],
             "Test Title",
@@ -1771,7 +1771,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 2: Remove comment with attachments
         $messageId2 = uniqid();
         $threadId2 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             $GLOBALS['user'],
             "Comment with Attachment",
@@ -1799,7 +1799,7 @@ class CommentsTest extends TikiTestCase
         // Test Case 3: Remove comment with replies
         $messageId3 = uniqid();
         $parentId = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             0,
             $GLOBALS['user'],
             "Parent Comment",
@@ -1810,7 +1810,7 @@ class CommentsTest extends TikiTestCase
         // Add replies
         $messageId4 = uniqid();
         $replyId1 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Reply 1",
@@ -1820,7 +1820,7 @@ class CommentsTest extends TikiTestCase
 
         $messageId5 = uniqid();
         $replyId2 = $this->commentsLib->post_new_comment(
-            "forum:1",
+            "forum:$this->forumId",
             $parentId,
             $GLOBALS['user'],
             "Reply 2",

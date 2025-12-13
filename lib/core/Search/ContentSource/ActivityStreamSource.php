@@ -46,7 +46,7 @@ class Search_ContentSource_ActivityStreamSource implements Search_ContentSource_
         ];
 
         foreach ($info['arguments'] as $key => $value) {
-            $type = isset($this->mapping[$key]) ? $this->mapping[$key] : '';
+            $type = $this->mapping[$key] ?? '';
 
             if ($type) {
                 $document[$key] = $typeFactory->$type($value);

@@ -10,7 +10,7 @@ namespace TikiLib\Socnets\Util;
 
 //require_once('lib/prefs/sochybrid.php');
 /*
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -64,7 +64,7 @@ class Util
 
         $ret = [];
         foreach (array_keys($prefs) as $prefName) {
-            if (substr($prefName, 0, strlen($nameStarts)) == $nameStarts) {
+            if (str_starts_with($prefName, $nameStarts)) {
                 $tikiLib->delete_preference($prefName);
                 $prefs[$prefName] = null;
                 $ret[] = $prefName;

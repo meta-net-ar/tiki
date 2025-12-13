@@ -20,6 +20,8 @@ $inputConfiguration = [[
 ];
 $section = 'trackers';
 require_once('tiki-setup.php');
-
+if (empty($_REQUEST["itemId"])) {
+    Feedback::errorAndDie(tra("No tracker item indicated"), \Laminas\Http\Response::STATUS_CODE_400);
+}
 $broker = TikiLib::lib('service')->getBroker();
 $broker->process('tracker', 'item_history', $jitRequest);

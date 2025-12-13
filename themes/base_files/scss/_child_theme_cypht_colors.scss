@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // this is to override some cypht colors when using a child theme
 // -- This file isn't imported by any child themes in the package currently  (g_c-l aug 2022)
 .tiki {
@@ -39,7 +41,7 @@
             &, .icon { color: $nav-tabs-link-active-color !important; }
         }
 
-        .btn-primary { border-color: darken($child-btn-primary, 7.5%) !important; }
-        .btn-info { border-color: darken($child-btn-info, 7.5%) !important; }
+        .btn-primary { border-color: color.adjust($child-btn-primary, $lightness: -7.5%, $space: hsl) !important; }
+        .btn-info { border-color: color.adjust($child-btn-info, $lightness: -7.5%, $space: hsl) !important; }
     }
 }

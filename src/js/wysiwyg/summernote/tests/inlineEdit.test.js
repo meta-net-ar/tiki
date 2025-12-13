@@ -118,7 +118,7 @@ describe("inlineEdit", () => {
 
             inlineEditors.each(function (index) {
                 $(this).children().first().trigger("click");
-                expect(initSummernote).toHaveBeenCalledWith(this.id, [], { lang: "en" });
+                expect(initSummernote).toHaveBeenCalledWith(this.id, [], { lang: "en", inline: true });
 
                 const editor = $(`#editor-${this.id}`);
                 expect(editor.length).toBe(1);
@@ -220,11 +220,11 @@ describe("inlineEdit", () => {
 
             // Open the editor
             inlineEditor.children().first().trigger("click");
-            expect(initSummernote).toHaveBeenCalledWith(inlineEditor[0].id, [], { lang: "en" });
+            expect(initSummernote).toHaveBeenCalledWith(inlineEditor[0].id, [], { lang: "en", inline: true });
             const scrollIntoViewSpy = vi.spyOn(inlineEditor.next(".note-editor")[0], "scrollIntoView");
 
             secondInlineEditor.children().first().trigger("click");
-            expect(initSummernote).not.toHaveBeenCalledWith(secondInlineEditor[0].id, [], { lang: "en" });
+            expect(initSummernote).not.toHaveBeenCalledWith(secondInlineEditor[0].id, expect.anything(), expect.anything());
             expect(initSummernote).toHaveBeenCalledTimes(1);
             expect(inlineEditor.next(".note-editor").hasClass("highlight")).toBe(true);
 

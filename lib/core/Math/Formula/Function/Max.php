@@ -8,20 +8,31 @@ class Math_Formula_Function_Max extends Math_Formula_Function
 {
     public function evaluate($element)
     {
-        $out = $this->evaluateChild($element[0]);
+        $list = [];
 
         foreach ($element as $child) {
-            $evaluated = $this->evaluateChild($child);
+            $child = $this->evaluateChild($child);
+
+            if (is_array($child)) {
+                $list = array_merge($list, $child);
+            } else {
+                $list[] = $child;
+            }
+        }
+
+        $out = $list[0] ?? '';
+
+        foreach ($list as $child) {
             if ($out instanceof Math_Formula_Applicator) {
-                if ($out->lessThan($evaluated)) {
-                    $out = $evaluated;
+                if ($out->lessThan($child)) {
+                    $out = $child;
                 }
-            } elseif ($evaluated instanceof Math_Formula_Applicator) {
-                if ($evaluated->moreThan($out)) {
-                    $out = $evaluated;
+            } elseif ($child instanceof Math_Formula_Applicator) {
+                if ($child->moreThan($out)) {
+                    $out = $child;
                 }
             } else {
-                $out = max($out, $evaluated);
+                $out = max($out, $child);
             }
         }
 

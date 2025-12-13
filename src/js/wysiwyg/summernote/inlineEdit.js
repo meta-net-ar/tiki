@@ -59,7 +59,7 @@ function handleEditorEntryClick(id, toolbar, lang, page) {
 
 function toggleInlineEditor(id, toolbar, lang, page) {
     const target = $(`#${id}`);
-    initSummernote(id, toolbar, { lang });
+    initSummernote(id, toolbar, { lang, inline: true });
 
     const initialValue = target.html();
 

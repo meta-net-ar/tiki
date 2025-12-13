@@ -62,11 +62,16 @@ class Search_MySql_Table extends TikiDb_Table
 
     public function drop()
     {
+        $stopwordTableName = $this->tableName . '_stopwords';
+        $escapedStopwordTable = $this->escapeIdentifier($stopwordTableName);
+        $this->db->query("DROP TABLE IF EXISTS $escapedStopwordTable", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+
         $tables = $this->indexTables();
         foreach ($tables as $table) {
             $table = $this->escapeIdentifier($table);
             $this->db->query("DROP TABLE IF EXISTS $table", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         }
+
         $this->definition = false;
         $this->exists = false;
 
@@ -298,9 +303,13 @@ class Search_MySql_Table extends TikiDb_Table
             }
             $tables = [$tableName];
             $result = $this->db->fetchAll("SHOW TABLES LIKE '" . $tableName . "_%'", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
-            foreach ($result as $row) {
-                $tables[] = array_shift($row);
-            }
+
+            $partitions = array_filter(
+                array_map(fn($row) => array_shift($row), $result),
+                fn($table) => preg_match('/_[0-9]+$/', $table)
+            );
+
+            $tables = array_merge($tables, $partitions);
         }
         return $tables;
     }
@@ -355,6 +364,7 @@ class Search_MySql_Table extends TikiDb_Table
         );
         $this->exists = true;
 
+        $this->setupStopwordTable();
         $this->emptyBuffer();
     }
 
@@ -416,13 +426,42 @@ class Search_MySql_Table extends TikiDb_Table
         $this->schemaBuffer->push("ADD INDEX $escapedIndex ($escapedField)");
     }
 
+    /**
+    * Creates and populates a custom stopword table for the current index.
+    * This allows Tiki to control InnoDB's stopword list directly during index creation.
+    * This method is called right before a FULLTEXT index is added.
+    *
+    * @return string The name of the created stopword table.
+    */
+    private function setupStopwordTable(): string
+    {
+        global $prefs;
+
+        $stopwordTableName = $this->tableName . '_stopwords';
+
+        $this->db->query("DROP TABLE IF EXISTS `{$stopwordTableName}`");
+        $this->db->query("CREATE TABLE `{$stopwordTableName}` (value VARCHAR(30)) ENGINE=INNODB");
+        $stopwords = $prefs['unified_stopwords'] ?? [];
+        if (! empty($stopwords)) {
+            $stopwordTable = $this->db->table($stopwordTableName, false);
+            foreach ($stopwords as $word) {
+                $stopwordTable->insert(['value' => $word]);
+            }
+        }
+
+        return $stopwordTableName;
+    }
+
     private function addFullText($fieldName)
     {
+        $stopwordTableName = $this->setupStopwordTable();
+        $dbName = $this->db->getOne("SELECT DATABASE()");
+        $this->db->query("SET SESSION innodb_ft_user_stopword_table = ?", ["{$dbName}/{$stopwordTableName}"]);
+
         $table = $this->escapeIdentifier($this->definition[$fieldName]['table']);
         $this->schemaBuffer->setPrefix("ALTER TABLE $table ");
 
         $indexName = $fieldName . '_fulltext';
-        $table = $this->escapeIdentifier($this->tableName);
         $escapedIndex = $this->escapeIdentifier($this->tfTranslator->shortenize($indexName));
         $escapedField = $this->escapeIdentifier($this->tfTranslator->shortenize($fieldName));
 

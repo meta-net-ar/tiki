@@ -36,10 +36,21 @@ function wikiplugin_smarty_info()
 
 function wikiplugin_smarty($data, $params)
 {
+    global $prefs;
     $smarty = TikiLib::lib('smarty');
     if (empty($params['name'])) {
         return tra('Incorrect parameter');
     }
+
+    // Enforce security preference to disable eval
+    if (
+        $params['name'] === 'eval'
+        && isset($prefs['smarty_enable_string_eval'])
+        && $prefs['smarty_enable_string_eval'] === 'n'
+    ) {
+        return tra('The use of "eval" and "string" has been disabled by the administrator for security reasons.');
+    }
+
     if ($params['name'] == 'eval') {
         $content = $smarty->fetch('string:' . $params['var']);
     } else {

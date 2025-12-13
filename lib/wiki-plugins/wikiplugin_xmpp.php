@@ -19,7 +19,6 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Room Name'),
                 'description' => tr('Room to auto-join'),
                 'since' => 19,
-                'default' => '',
                 'filter' => 'text',
             ],
             'view_mode' => [
@@ -108,7 +107,6 @@ function wikiplugin_xmpp_info()
             'groups' => [
                 'name' => tra('Groups (comma-separated)'),
                 'description' => tra('Allowed groups to use this resource'),
-                'default' => '',
                 'filter' => 'alpha',
                 'required' => false,
                 'separator' => ',',
@@ -172,19 +170,6 @@ function wikiplugin_xmpp($data, $params)
     $headerlib = TikiLib::lib('header');
     $servicelib = TikiLib::lib('service');
     $smarty = TikiLib::lib('smarty');
-
-    $defaults = [];
-    $plugininfo = wikiplugin_xmpp_info();
-
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
-    if (empty($params['room'])) {
-        Feedback::error(tr('PluginXMPP Error: No room specified'));
-        return '';
-    }
 
     $result = '<style type="text/css">#page-bar .dropdown-menu { z-index: 1031; }</style>'
         . '<div id="conversejs"'

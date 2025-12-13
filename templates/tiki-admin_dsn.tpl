@@ -109,7 +109,7 @@
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="col-sm-3 col-form-label" for="method">
+            <label class="col-sm-3 col-form-label" for="user_selector_auth">
                 {tr}User{/tr}
                 <a class="tikihelp text-info" title="{tr}User:{/tr} {tr}Limit usage of this content authentication to a specific user, e.g. when importing/exporting a tracker via tabular with remote API. Leave blank for usage regardless of user context.{/tr}">
                     {icon name=information}
@@ -210,8 +210,13 @@ $('#source-form').each(function () {
         reload = function () {
             $('option.added', form).remove();
             $.getJSON($.service('auth_source', 'list'), function (entries) {
+                const urlParams = new URLSearchParams(window.location.search);
                 $.each(entries, function (k, v) {
-                    $(form.existing).append($('<option class="added"/>').text(v));
+                    $(form.existing).append(
+                        $('<option class="added"/>')
+                            .text(v)
+                            .prop("selected", v === urlParams.get('identifier'))
+                    );
                 });
             });
         },
@@ -236,7 +241,7 @@ $('#source-form').each(function () {
                 $(form.identifier).val(id);
                 $(form.method).val(data.method).trigger("change");
                 $(form.url).val(data.url);
-                $(form.user).val(data.user);
+                $(form.user).val(data.user).trigger("change.select2");
 
                 switch (data.method) {
                 case 'basic':

@@ -23,8 +23,8 @@
 {/if}
 
 {if $preview eq 'y'}
-    <div align="center" class="attention" style="font-weight:bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
-    <article class="blogpost post post_single">
+    <div class="alert alert-warning fw-bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
+    <article class="blogpost post post_single border-0 pb-5 bg-transparent">
         {include file='blog_wrapper.tpl' blog_post_context='preview'}
     </article>
 {/if}

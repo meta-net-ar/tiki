@@ -57,7 +57,7 @@ class JsTransferList extends Base
         $headerlib->add_js_module("import '@vue-widgets/el-transfer';");
 
         $headerlib->add_js_module(<<<JS
-            import('@jquery-tiki/ui-utils').then(({ handleTransferList }) => {
+            import('@tiki/ui-utils').then(({ handleTransferList }) => {
                 handleTransferList('{$id}', '{$params['fieldName']}');
             });
         JS);

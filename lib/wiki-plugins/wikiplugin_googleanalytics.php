@@ -61,7 +61,7 @@ function wikiplugin_googleanalytics($data, $params)
     $account = htmlspecialchars($params['account'], ENT_QUOTES);
 
     // Maintain retro-compatibility with old preference
-    if (substr($account, 0, 3) !== "UA-" && substr($account, 0, 2) !== "G-") {
+    if (! str_starts_with($account, "UA-") && ! str_starts_with($account, "G-")) {
         $account = "UA-" . $account;
     }
 

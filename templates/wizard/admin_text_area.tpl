@@ -1,12 +1,12 @@
 <div class="d-flex">
     <div class="flex-shrink-0">
-        <span class="fa-stack fa-lg" style="width: 100px;" title="Configuration Wizard">
+        <span class="fa-stack fa-lg" style="width: 100px;" title="{tr}Configuration Wizard{/tr}">
             {icon name='admin_general' iclass='fa-stack-2x'}
             {icon name='magic' iclass='fa-flip-horizontal fa-stack-1x ms-4 mt-4'}
         </span>
     </div>
     <div class="flex-grow-1 ms-3">
-        {icon name="admin_textarea" size=3 iclass="adminWizardIconright"}
+        {icon name="admin_textarea" size=3 iclass="adminWizardIconright float-end ms-2"}
         <h4 class="mt-0 mb-4">{tr}Set up the text area environment (Editing and Plugins){/tr}</h4>
         <fieldset>
             <legend>{tr}General settings{/tr}</legend>

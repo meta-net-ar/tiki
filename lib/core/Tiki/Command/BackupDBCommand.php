@@ -44,7 +44,7 @@ class BackupDBCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
-        if (substr($path, -1) == '/') {
+        if (str_ends_with($path, '/')) {
             $path = substr($path, 0, strlen($path) - 1);
         }
 

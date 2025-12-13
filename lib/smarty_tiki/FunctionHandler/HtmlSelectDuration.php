@@ -45,7 +45,7 @@ class HtmlSelectDuration extends Base
         $id = ! empty($params['id']) ? ' id="' . $params['id'] . '" ' : '';
         $html_result .= '<div class="row"><div class="col-sm-5">';
         $html_result .= '<input ' . $id . 'name="' . $params['prefix'] . '" type="number" value="' . $params['default'] . '" class="form-control"></div>';
-        if (strstr($params['prefix'], '[]')) {
+        if (str_contains($params['prefix'], '[]')) {
             $prefix = str_replace('[]', '_unit[]', $params['prefix']);
         } else {
             $prefix = $params['prefix'] . '_unit';

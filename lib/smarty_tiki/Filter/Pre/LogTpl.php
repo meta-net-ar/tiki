@@ -23,8 +23,8 @@ class LogTpl implements \Smarty\Filter\FilterInterface
 
         // Refrain from logging for some templates
         if (
-            strpos($resource, 'eval:') === 0 || // Evaluated templates
-            strpos($resource, 'mail/') !== false // email tpls
+            str_starts_with($resource, 'eval:') || // Evaluated templates
+            str_contains($resource, 'mail/') // email tpls
         ) {
             return $source;
         }

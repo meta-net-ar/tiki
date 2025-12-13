@@ -141,15 +141,6 @@ function wikiplugin_remarksbox_info()
 
 function wikiplugin_remarksbox($data, $params)
 {
-    $plugininfo = wikiplugin_remarksbox_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $default[$key] = $param['default'];
-        }
-    }
-    $params = array_merge($default, $params);
-
     $smarty = TikiLib::lib('smarty');
     require_once('lib/smarty_tiki/block.remarksbox.php');
 

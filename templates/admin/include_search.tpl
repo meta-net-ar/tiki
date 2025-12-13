@@ -88,6 +88,7 @@
                             {tr}Elasticsearch is a tiki external service. You should set at least a daily full index rebuild to keep the MySQL index updated in case of Elastic unavailability{/tr}.
                         {/remarksbox}
                         {preference name="unified_elastic_mysql_search_fallback"}
+                        {preference name="unified_elastic_index_max_result_window"}
                     </div>
 
                     <div class="adminoptionboxchild unified_engine_childcontainer mysql">
@@ -127,6 +128,7 @@
 
                     {preference name=unified_user_cache}
                     {preference name=unified_cache_formatted_result}
+                    {preference name=unified_cache_relation}
                     {preference name=unified_cached_formatters}
                     {preference name=unified_list_cache_default_on}
                     {preference name=unified_list_cache_default_expiry}

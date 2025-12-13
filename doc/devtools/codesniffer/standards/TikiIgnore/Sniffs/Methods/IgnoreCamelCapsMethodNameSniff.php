@@ -6,9 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Standards\TikiIgnore\Sniffs\Methods;
 
+require_once __DIR__ . DIRECTORY_SEPARATOR . '../../Helpers/SafeIgnoreList.php';
+
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Standards\PSR1\Sniffs\Methods\CamelCapsMethodNameSniff;
-use PHP_CodeSniffer\Util\Common;
+use Tiki\Standards\TikiIgnore\Helpers\SafeIgnoreList;
 
 class IgnoreCamelCapsMethodNameSniff extends CamelCapsMethodNameSniff
 {
@@ -57,13 +59,19 @@ class IgnoreCamelCapsMethodNameSniff extends CamelCapsMethodNameSniff
         }
 
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
-        if ($methodName === null) {
+        if (empty($methodName)) {
             // Ignore closures.
             return;
         }
 
+
+        if ($tokens[$currScope]['code'] === T_ANON_CLASS) {
+            // Skipping anonymous class in {$phpcsFile->pat[$currScope]['line']}
+            return;
+        }
+
         $className = $phpcsFile->getDeclarationName($currScope);
-        if (isset($className) === false) {
+        if (! isset($className)) {
             // ignore anonymous class.
             return;
         }
@@ -88,8 +96,8 @@ class IgnoreCamelCapsMethodNameSniff extends CamelCapsMethodNameSniff
 
         $line = $tokens[$stackPtr]['line'];
         if (empty($phpcsFile->tokenizer->ignoredLines[$line])) {
-            $phpcsFile->tokenizer->ignoredLines[$line] = [];
+            $phpcsFile->tokenizer->ignoredLines[$line] = SafeIgnoreList::forLine();
         }
-        $phpcsFile->tokenizer->ignoredLines[$line][$this->ignoreSniff] = true;
+        SafeIgnoreList::markIgnored($phpcsFile->tokenizer->ignoredLines[$line], $this->ignoreSniff,);
     }
 }

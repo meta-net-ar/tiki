@@ -2,7 +2,6 @@
 
 namespace Tiki\Lib\core\Toolbar;
 
-use Smarty_Tiki;
 use TikiLib;
 
 class ToolbarFileGallery extends ToolbarUtilityItem
@@ -23,7 +22,7 @@ class ToolbarFileGallery extends ToolbarUtilityItem
     public function getOnClick(): string
     {
         global $prefs;
-        /** @var Smarty_Tiki $smarty */
+        /** @var Tiki\Smarty\SmartyTiki $smarty */
         $smarty = TikiLib::lib('smarty');
         if ($prefs['fgal_elfinder_feature'] !== 'y' || $prefs['fgal_elfinder_on_toolbar'] !== 'y') {
             return 'openFgalsWindow(\''

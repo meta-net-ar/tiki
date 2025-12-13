@@ -83,29 +83,29 @@
             {ticket}
             <input type="hidden" name="surveyId" value="{$surveyId|escape}">
             <input type="hidden" name="questionId" value="{$questionId|escape}">
-            </br>
+            <br/>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Question{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="question">{tr}Question{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
-                    <textarea name="question" class="form-control">{$info.question|escape}</textarea>
+                    <textarea name="question" id="question" class="form-control">{$info.question|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Answer is mandatory{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="mandatory">{tr}Answer is mandatory{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
-                    <input type="checkbox" name="mandatory" {if $info.mandatory eq 'y'}checked="checked"{/if}>
+                    <input type="checkbox" name="mandatory" id="mandatory" {if $info.mandatory eq 'y'}checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Position{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="question_position">{tr}Position{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
-                    <select name="position" class="form-control">{html_options values=$positions output=$positions selected=$info.position}</select>
+                    <select name="position" id="question_position" class="form-control">{html_options values=$positions output=$positions selected=$info.position}</select>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Type{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="question_type">{tr}Type{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
-                    <select name="type" class="form-control">
+                    <select name="type" id="question_type" class="form-control">
                         {foreach $types as $initial => $label}
                             <option value="{$initial}"{if $info.type eq $initial} selected=selected{/if}>{$label}</option>
                         {/foreach}
@@ -117,18 +117,18 @@
                 <div class="col-sm-7 offset-sm-1">
                     <div class="col-sm-6">
                         <div class="col-sm-3">
-                            <label class="col-form-label">{tr}Min{/tr}</label>
+                            <label class="col-form-label" for="min_answers">{tr}Min{/tr}</label>
                         </div>
                         <div class="col-sm-9">
-                            <input type="text" name="min_answers" maxlength="4" value="{$info.min_answers}" class="form-control">
+                            <input type="text" name="min_answers" id="min_answers" maxlength="4" value="{$info.min_answers}" class="form-control">
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="col-sm-3">
-                            <label class="col-form-label">{tr}Maximum{/tr}</label>
+                            <label class="col-form-label" for="max_answers">{tr}Maximum{/tr}</label>
                         </div>
                         <div class="col-sm-9">
-                            <input type="text" name="max_answers" maxlength="4" value="{$info.max_answers}" class="form-control">
+                            <input type="text" name="max_answers" id="max_answers" maxlength="4" value="{$info.max_answers}" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -152,9 +152,9 @@
                 {/jq}
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Options (if apply):{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="question_options">{tr}Options (if apply):{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
-                    <input type="text" name="options" value="{$info.options|escape}" maxlength="80" class="form-control">
+                    <input type="text" name="options" id="question_options" value="{$info.options|escape}" maxlength="80" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">

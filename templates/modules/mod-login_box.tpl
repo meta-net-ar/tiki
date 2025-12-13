@@ -15,6 +15,11 @@ $(document).ready(function () {
     var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
     var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
     var moduleLogoInstance = "{{$module_logo_instance}}";
+    var login_error = "{{$error_login}}";
+
+    if (login_error == {{TWO_FA_INCORRECT}}) {
+        displayFeedback("error", "{tr}Invalid two-factor authenticator code{/tr}");
+    }
 
     function show2FactorInputElement(btn, event) {
         const btnStep = parseInt(btn.attr('step')) + 1;
@@ -68,7 +73,7 @@ $(document).ready(function () {
 
     function displayFeedback(type, message) {
         const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
-        $("#tikifeedback").html(
+        $("#login_feeback").html(
             `<div class="alert ${feedbackClass} alert-dismissible">
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -98,6 +103,23 @@ $(document).ready(function () {
         });
     }
 
+    function validateUserCredentials(username, password) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: $.service("user", "ValidateUser"),
+                type: 'POST',
+                data: { username: username, password: password },
+                success: function (res) {
+                    resolve(res);
+                },
+                error: function (req, status, error) {
+                    displayFeedback("error", error);
+                    reject(error);
+                }
+            });
+        });
+    }
+
     $("#loginbox-{{$module_logo_instance}}").on("submit", async function (event) {
         event.preventDefault();
         var isWebAuthnIsChoosen = $("#webauthn_checkbox_login").is(':checked') && isWebauthnEnabled === 'y';
@@ -114,33 +136,73 @@ $(document).ready(function () {
             btn.attr('step', btnStep);
         }
 
-        var username = $("#login-user_{{$module_logo_instance}}").val();
-        var password = $("#login-pass_{{$module_logo_instance}}").val();
         var btn = $("button.submit", this);
-        var btnStep = parseInt(btn.attr('step'));
+        const originalBtnHtml = btn.html();
 
-        if (isNormalLogin === 'y') {
-            $(this).off('submit').submit();
-            return false;
-        }
+        const spinnerHtml = `
+            <div class="spinner-border spinner-border-sm text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+            </div>
+        `;
 
-        if ((username && password) || isWebauthnPassed === 'y' || isWebAuthnIsChoosen) {
-            if (is2FAEnabled === 'y') {
-                var twoFASecret = await getTwoFactorSecretGoogle2FA(username);
-                if (isNormalLogin != '2fa-regen' && (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === 'google2FA'))) {
+        // Replace the button text with the spinner and disable the button
+        btn.html(spinnerHtml + tr("Logging in..."));
+        btn.prop("disabled", true);
+
+        try {
+            const isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
+            const isNormalLogin = "{{$create2FaCodeNormalLogin}}";
+
+            if (isNormalLogin === 'y') {
+                let btnStep = parseInt(btn.attr('step')) + 1;
+                btn.attr('step', btnStep);
+            }
+
+            const username = $("#login-user_{{$module_logo_instance}}").val();
+            const password = $("#login-pass_{{$module_logo_instance}}").val();
+            let btnStep = parseInt(btn.attr('step'));
+
+            if (isNormalLogin === 'y') {
+                $(this).off('submit').submit();
+                return false;
+            }
+
+            if ((username && password) || isWebauthnPassed === 'y' || isWebAuthnIsChoosen) {
+                if (is2FAEnabled === 'y') {
+                    const twoFASecret = await getTwoFactorSecretGoogle2FA(username);
+
+                    // Step 1: Validate user credentials if needed
+                    if (btnStep === 1) {
+                        const isValidateUser = await validateUserCredentials(username, password);
+                        if (!isValidateUser) {
+                            displayFeedback("error", tr("Invalid username or password"));
+                            return false;
+                        }
+                    }
+
+                    // If step > 1, or no user screen, or 2FA is effectively "n", just submit
+                    if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === 'google2FA')) {
+                        $(this).off('submit').submit();
+                        return false;
+                    }
+                    await handleEmail2FA(username, btn, event);
+
+                } else {
+                    // No 2FA => submit directly
                     $(this).off('submit').submit();
-                    return false;
-                }
-                await handleEmail2FA(username, btn, event);
-                if (isNormalLogin == '2fa-regen') {
-                    $(this).data('normalLogin', 'y');
                 }
             } else {
-                $(this).off('submit').submit();
+                // Missing user/pass
+                $("#login-user_{{$module_logo_instance}}").trigger("focus");
+                return false;
             }
-        } else {
-            $("#login-user_{{$module_logo_instance}}").trigger("focus");
-            return false;
+
+        } catch (error) {
+            displayFeedback("error", tr("An unexpected error occurred"));
+        } finally {
+            // Restore the button HTML and re-enable the button
+            btn.html(originalBtnHtml);
+            btn.prop("disabled", false);
         }
     });
 });
@@ -330,9 +392,11 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             {remarksbox type='errors' title="{tr}Error{/tr}"}
                 {if $error_login == -5}{tr}Invalid username or password{/tr}
                 {elseif $error_login == -3}{tr}Invalid username or password{/tr}
+                {elseif $error_login == -13}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
         {/if}
+        <div id="login_feeback"></div>
         {if !empty($prefs.login_text_explanation) && !($mode eq "popup")}
         <div class="login-description my-2 {if $mode eq 'header'}mx-2{/if}">
             <label> {wiki} {$login_text_explanation} {/wiki}</label>
@@ -378,10 +442,15 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         <input type="hidden" name="login_mode" value="{$mode}" />
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
-        <div id="two_factor_div" class="my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
+        <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
-            <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+            {if $prefs.twoFactorAuthType eq 'email2FA'}
+                <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
+                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+            {else}
+                <small class="text-muted">{tr}Please type the 6 digit security code (TOTP) provided by your authenticator application{/tr}</small>
+            {/if}
         </div>
         {/if}
         {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n') and $create2FaCodeNormalLogin ne 'y'}

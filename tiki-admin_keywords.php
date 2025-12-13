@@ -12,7 +12,7 @@ require_once('tiki-setup.php');
 
 /***
  * @var \TikiAccessLib  $access
- * @var \Smarty_Tiki    $smarty
+ * @var \Tiki\Smarty\SmartyTiki  $smarty
  *
  */
 
@@ -88,7 +88,8 @@ $limit = $prefs['maxRecords'];
 //Check for offset, see if it's a multiple of the limit
 //This is done to stop arbitrary offsets being entered
 
-$offset = isset($_REQUEST['offset']) ? (int)$_REQUEST['offset'] : 0;
+$offset = (int)($_REQUEST['offset'] ?? 0);
+
 
 if (
     isset($_REQUEST['page']) && ((isset($_REQUEST['save_keywords']) && isset($_REQUEST['new_keywords']) && $access->checkCsrf())

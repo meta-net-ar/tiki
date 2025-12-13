@@ -21,7 +21,21 @@ class Tiki_Version_Upgrade
     public function getMessage()
     {
         $parts = [];
-        if ($this->isRequired) {
+        if (! $this->old->isStable()) {
+            if ($this->new->isStableUpgradeTo($this->old)) {
+                $parts[] = tr(
+                    'You are using a development version: %0. This version is intended for testing and development purposes. For stability, consider switching to the latest stable release: %1.',
+                    (string) $this->old,
+                    (string) $this->new
+                );
+            } else {
+                $parts[] = tr(
+                    'You are using a development version: %0. This version is intended for testing and development purposes. The latest stable release (%1) is older than your current version, so downgrading is not recommended.',
+                    (string) $this->old,
+                    (string) $this->new
+                );
+            }
+        } elseif ($this->isRequired) {
             $parts[] = tr('Version %0 is no longer supported.', (string) $this->old);
 
             if ($this->isMinor()) {
@@ -32,7 +46,7 @@ class Tiki_Version_Upgrade
         } else {
             // Do not encourage people to leave an LTS which is still supported. Just inform them
             $current = $this->old;
-            $current_major = (strstr($current, '.', true) != false) ? strstr($current, '.', true) : $current;
+            $current_major = strstr($current, '.', true) ?: $current;
             if (in_array($current_major, ['21', '24'])) {    // Keep list of LTS up to date or write method isLTS, whichever is less work
                 $current = "$current LTS";
                 $parts[] = tr('Version %0 is still supported. However, an upgrade to %1 is available.', $current, (string) $this->new);

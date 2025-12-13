@@ -11,7 +11,7 @@
                         <table>{include file="antibot.tpl"}</table>
                     {/if}
                     {if $prefs.feature_socialnetworks eq 'y' && $user neq ''}
-                        {if $prefs.socialnetworks_twitter_consumer_key neq '' && $tweet}
+                        {if $prefs.socialnetworks_twitter_client_id neq '' && $tweet}
                             <div class="form-check">
                                 <input type="hidden" name="tweet" value="-1" />
                                 <input type="checkbox" class="form-check-input" id="shout_tweet" name="shout_tweet" value='1' />

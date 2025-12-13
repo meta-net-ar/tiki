@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Wiki\XmlLib;
+
 $section = 'wiki page';
 $inputConfiguration = [
     [
@@ -36,7 +39,6 @@ if (isset($_REQUEST['import'])) {
         $zipFile = '';
     }
     if ($zipFile) {
-        include_once('lib/wiki/xmllib.php');
         $xmllib = new XmlLib();
         $config = [];
         if ($xmllib->import_pages($zipFile, $config)) {

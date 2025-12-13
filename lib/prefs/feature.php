@@ -559,8 +559,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-
-
         'feature_shadowbox' => [
             'name' => tra('Shadowbox / ColorBox'),
             'description' => tra('Display images in a modal popup window (also referred to as shadowbox, lightbox or colorbox).'),
@@ -697,13 +695,14 @@ function prefs_feature_list($partial = false)
             'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://summernote.org">Summernote</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'feature_ajax',
                 'ajax_autosave',
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
+            'tags' => ['experimental'],
         ],
 
         'feature_kaltura' => [
@@ -714,6 +713,15 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'admin' => 'video',
             'view' => 'tiki-list_kaltura_entries.php?list=media',
+        ],
+        'feature_peertube' => [
+            'name' => tra('PeerTube video management'),
+            'description' => tra('Integration with the PeerTube video platform'),
+            'help' => 'PeerTube',
+            'type' => 'flag',
+            'default' => 'n',
+            'admin' => 'video',
+            'view' => 'tiki-list_peertube_entries.php?list=videos',
         ],
         'feature_friends' => [
             'name' => tra('Friendship Network'),
@@ -1875,13 +1883,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-        'feature_jquery_reflection' => [
-            'name' => tra('Reflection'),
-            'description' => tra('Creates a reflection under an image. Used in Plugin Img with the parameter "class=reflect"'),
-            'type' => 'flag',
-            'help' => 'JQuery#Reflection',
-            'default' => 'n',       // reflection effects on images
-        ],
         'feature_jquery_ui' => [
             'name' => tra('JQuery UI'),
             'description' => tra('Include jQuery UI library. Enables a number of interface features.'),
@@ -1946,6 +1947,7 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'help' => 'JQuery#TableSorter',
             'default' => 'n',   // sortable tables ([will] override existing)
+            'tags' => ['experimental'],
         ],
         'feature_jquery_tagcanvas' => [
             'name' => tra('TagCanvas'),
@@ -2611,15 +2613,6 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['experimental'],
         ],
-        'feature_accounting' => [
-            'name' => tra('Accounting'),
-            'description' => tra('Double-entry accounting system'),
-            'help' => 'Accounting',
-            'type' => 'flag',
-            'default' => 'n',
-            'view' => 'tiki-accounting_books.php',
-            'tags' => ['experimental'],
-        ],
         'feature_syntax_highlighter' => [
             'name' => tra('Code editor (CodeMirror)'),
             'description' => tra('CodeMirror code editor, which provides syntax highlighting'),
@@ -2883,6 +2876,15 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'view' => 'tiki-admin_schedulers.php',
             'default' => 'y',
+            'tags' => ['advanced'],
+        ],
+        'feature_queued_tasks' => [
+            'name' => tra('Queued Tasks'),
+            'description' => tra('Enables the execution of tasks in the background.'),
+            'help' => 'Queued Tasks',
+            'type' => 'flag',
+            'view' => 'tiki-admin_queued_tasks.php',
+            'default' => 'n',
             'tags' => ['advanced'],
         ],
         'feature_absolute_to_relative_links' => [

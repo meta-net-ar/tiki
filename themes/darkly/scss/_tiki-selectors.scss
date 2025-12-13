@@ -1,11 +1,68 @@
-// Darkly tiki-selectors less file
+// Darkly for Tiki Bootstrap 5.3
 
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
 body.fullscreen { background: var(--#{$prefix}body-bg); }
 
-// Update for Smartmenus
+// Links
+// Components
+// Typography
+.blockquote-footer,
+.figure-caption {
+    color: #949494;
+}
+
+// Tables
+// Buttons
+.btn-outline-primary { --bs-btn-color: #299FD6; color: #299FD6; }
+.btn-outline-secondary { --bs-btn-color: #9C9C9C; }
+.btn-outline-success { --bs-btn-color: #85C700; }
+.btn-outline-danger { --bs-btn-color: #FF5252; }
+.btn-outline-warning { --bs-btn-color: #F08000; }
+.btn-outline-info { --bs-btn-color: #BC78DD; }
+.btn-outline-light { --bs-btn-color: #999999; }
+.btn-outline-dark { --bs-btn-color: #949494; }
+
+// Forms
+.invalid-feedback { --bs-form-invalid-color: #FF4D4D; }
+.valid-feedback { --bs-form-valid-color: #699E00; }
+
+// Navs
+// Navbar
+.navbar.bg-light {
+    background-color: rgba(55,90,127,1);
+}
+
+// Dropdowns
+// Pagination
+// Cards
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+// External libraries
+    // Update for Smartmenus
 $dropdown-item: $dropdown-link-color;
 .dropdown-menu.mega-menu a { color: $link-color !important; }
-
-
-

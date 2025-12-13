@@ -12,7 +12,7 @@ class Math_Formula_Function_Contains extends Math_Formula_Function
         try {
             $pattern = $this->evaluateChild($element[1]);
         } catch (Math_Formula_Runner_Exception $e) {
-            if (strstr($e->getMessage(), 'Unknown operation')) {
+            if (str_contains($e->getMessage(), 'Unknown operation')) {
                 $pattern = $element[1];
             } else {
                 $pattern = '';

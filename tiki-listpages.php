@@ -4,6 +4,8 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\OIntegrate\Response;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -33,8 +35,8 @@ $inputConfiguration = [
         'listonly'                              => 'bool',               //post
         'exclude_page'                          => 'string',             //post
         'find'                                  => 'string',             //post
-        'offset'                                => 'digits',             //get
-        'sort_mode'                            => 'word',                //get
+        'offset'                                => 'int',                //get
+        'sort_mode'                             => 'alnumdash',          //get
         ],
     ],
 ];
@@ -132,10 +134,9 @@ if (! empty($multiprint_pages)) {
     // for the information as the number of
     // days to get in the log 1,3,4,etc
     // it will default to 1 recovering information for today
-    if (isset($_REQUEST['maxRecords'])) {
+    if (! empty($_REQUEST['maxRecords'])) {
         $maxRecords = $_REQUEST['maxRecords'];
-    } else {
-        $maxRecords = $maxRecords;
+        $smarty->assign('maxRecords', $maxRecords);
     }
     if (! isset($_REQUEST['sort_mode'])) {
         $sort_mode = $prefs['wiki_list_sortorder'] . '_' . $prefs['wiki_list_sortdirection'];
@@ -247,11 +248,7 @@ if (! empty($multiprint_pages)) {
         $smarty->assign_by_ref('filter_values', $filter_values);
     }
 
-    if (isset($_REQUEST['initial'])) {
-        $initial = $_REQUEST['initial'];
-    } else {
-        $initial = '';
-    }
+    $initial = $_REQUEST['initial'] ?? '';
 
     $smarty->assign('initial', $initial);
     // What a checked checkbox returns is browser dependant. Don't test on the value, just presence
@@ -418,10 +415,10 @@ if (! empty($multiprint_pages)) {
         if ($remperm || $prefs['feature_wiki_multiprint'] === 'y') {
             array_unshift($cols, 'checkbox');
         }
-        if (strpos($sort_mode, '_desc') !== false) {
+        if (str_contains($sort_mode, '_desc')) {
             $pos = strlen($sort_mode) - 5;
             $sortdir = 1;
-        } elseif (strpos($sort_mode, '_asc') !== false) {
+        } elseif (str_contains($sort_mode, '_asc')) {
             $pos = strlen($sort_mode) - 4;
             $sortdir = 0;
         }
@@ -463,8 +460,8 @@ if (! empty($multiprint_pages)) {
 
     if ($access->is_serializable_request()) {
         $autocomplete_is_enabled = $prefs['elementplus_autocomplete'] == 'y';
+        $pages = [];
         if (isset($_REQUEST['listonly']) && ($autocomplete_is_enabled)) {
-            $pages = [];
             foreach ($listpages['data'] as $page) {
                 if (isset($_REQUEST['nonamespace'])) {
                     $pages[] = [
@@ -499,7 +496,6 @@ if (! empty($multiprint_pages)) {
             }
             $access->output_serialized($pages);
         } else {
-            $pages = [];
             $wikilib = TikiLib::lib('wiki');
             foreach ($listpages['data'] as $page) {
                 $pages[] = [
@@ -514,8 +510,7 @@ if (! empty($multiprint_pages)) {
                         'lang' => $page['lang'],
                 ];
             }
-            require_once 'lib/ointegratelib.php';
-            $response = OIntegrate_Response::create(['list' => $pages], '1.0');
+            $response = Response::create(['list' => $pages], '1.0');
             $response->addTemplate('smarty', 'tikiwiki', 'templates/smarty-tikiwiki-1.0-shortlist.txt');
             $response->schemaDocumentation = 'http://dev.tiki.org/WebserviceListpages';
             $response->send();

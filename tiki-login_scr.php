@@ -19,6 +19,8 @@ $inputConfiguration = [
         'twoFactorForm'        => 'string',         //post
         'clearmenucache'       => 'bool',           //post
         'user'                 => 'username',       //post
+        'create2FaCodeNormalLogin' => 'alpha',      //get
+        'tiki_username'        => 'username',       //get
         ],
     ],
 ];
@@ -26,9 +28,9 @@ include_once("tiki-setup.php");
 
 
 //Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["twoFactorForm"])) {
-    $twoFactorForm = 'y';
+$twoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["$twoFactorForm"])) {
+    $twoFactorForm = $_REQUEST["$twoFactorForm"];
 }
 $smarty->assign('twoFactorForm', $twoFactorForm);
 

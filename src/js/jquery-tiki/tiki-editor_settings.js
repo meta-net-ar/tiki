@@ -26,6 +26,7 @@ export default function () {
                 domId: domId,
                 domName: $textarea.attr("name"),
                 page: $form.find("input[name=page]").val(),
+                is_html: initialEditorType === "wysiwyg" && $syntaxInput.val() === "tiki" ? "y" : "n",
             },
             function (data) {
                 $.closeModal();

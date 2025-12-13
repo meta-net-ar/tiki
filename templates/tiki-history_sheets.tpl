@@ -117,9 +117,9 @@
                                 <a href="tiki-view_sheets.php?sheetId={$sheetId}&readdate={$history[revision_date].stamp}&parse=rollback" title="{tr}Roll back spreadsheet{/tr}">{tr}Roll back{/tr}</a>
                             </td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input type="radio" name="idx_0" class="compareSheet1" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
+                                <input type="radio" name="idx_0" class="compareSheet1 form-check-input" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input type="radio" name="idx_1" class="compareSheet2" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
+                                <input type="radio" name="idx_1" class="compareSheet2 form-check-input" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
                         </tr>
                     {/section}
                 </table>

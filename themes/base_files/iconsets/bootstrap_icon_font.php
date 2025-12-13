@@ -8,7 +8,7 @@
 //This the Bootstrap icon set, currently v1.9.0. Bootstrap Icons are SVGs, so they scale quickly and easily and can be styled with CSS. MIT license.
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }

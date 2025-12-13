@@ -1,11 +1,12 @@
-// Flatly 5.3.3 -- This overrides and suppplements node_modules/bootswatch/dist/flatly/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Flatly 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/flatly/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/flatly/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
 
 //$blue:    #2c3e50;  // default
 //$indigo:  #6610f2;  // default
@@ -18,13 +19,13 @@ $green:   #12826C; // #18bc9c !default; WCAG
 //$teal:    #20c997;  // default
 $cyan:    #207AB6; // #3498db !default; WCAG
 
-$red-300: tint-color($red, 40%);  // default
-$green-300: tint-color($green, 40%);  // default
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:       $blue;  // default
 $secondary:     #66797A; // $gray-600 !default; WCAG
 $success:       #15846E; // $green !default;
-$info:          #207AB6; // $cyan !default;
+$info:          #087E96; //#207AB6; // $cyan !default;
 $warning:       #A56909; // $yellow !default;
 $danger:        #DE2F1B; // $red !default;
 $light:         $gray-200;  // default
@@ -74,8 +75,8 @@ $body-tertiary-bg:          $gray-100;  // default
 $body-emphasis-color:       $black;  // default
 
 // Options
-// Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Components
 $component-active-color:      $white;  // default
@@ -85,6 +86,7 @@ $border-color: $gray-400 !important;
 // Links
 $link-color: #16836D;
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-decoration: underline;
 
 // Fonts
 $text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #707070 !important; // added for Tiki
@@ -110,9 +112,16 @@ $nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default //  #696
 
 // Navbar
 // Pagination
-// List group
+$pagination-color: #1C1C1C;
+
+// Cards
+// Accordion
+$accordion-button-active-color: #545E64;
+$accordion-button-active-bg: #d5d8dc;
+
+    // List group
 // Figures (added for Tiki)
-$figure-caption-color:              #707070 !important;
+$figure-caption-color:              #707070;
 
 // Breadcrumbs
 $breadcrumb-active-color: #696969; // Added for Tiki (WCAG)

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                    => [
@@ -17,12 +20,11 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-require_once('lib/auth/tokens.php');
 
 $access->check_feature('auth_token_access');
 $access->check_permission('tiki_p_admin');
 
-$tokenlib = AuthTokens::build($prefs);
+$tokenlib = Tokens::build($prefs);
 global $base_url;
 $action = '';
 $tokenId = 0;

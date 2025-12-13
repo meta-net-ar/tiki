@@ -9,6 +9,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@sentry/browser": "^6.19.7"
+    "@sentry/browser": "^10.0.0"
   }
 }

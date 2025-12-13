@@ -99,7 +99,7 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
 
         foreach ($movieIds as $id) {
             $params = array_merge($otherParams, ['id' => $id]);
-            $output .= wikiplugin_kaltura('', $params);
+            $output .= TikiLib::lib('parser')->invokePlugin('kaltura', '', $params);
         }
 
         return $output;

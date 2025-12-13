@@ -52,36 +52,36 @@ class GetStringsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp('Scans all Tiki files and adds new English strings to language files. Also reorganizes existing strings.')
+            ->setHelp(tra('Scans all Tiki files and adds new English strings to language files. Also reorganizes existing strings.'))
             ->addOption(
                 'lang',
                 'l',
                 InputOption::VALUE_OPTIONAL,
-                'Language code to process eg. lang=pt-br'
+                tra('Language code to process eg. lang=pt-br')
             )
             ->addOption(
                 'outputfiles',
                 null,
                 InputOption::VALUE_NONE,
-                'For each string add a line with the file where it was found'
+                tra('For each string add a line with the file where it was found')
             )
             ->addOption(
                 'exclude',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Directories that should be excluded from searching'
+                tra('Directories that should be excluded from searching')
             )
             ->addOption(
                 'include',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Individual files that should be included in otherwise excluded directories'
+                tra('Individual files that should be included in otherwise excluded directories')
             )
             ->addOption(
                 'basedir',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'The base directory to use. Will invalidate default exclude and include parameters'
+                tra('The base directory to use. Will invalidate default exclude and include parameters')
             )
             ->addOption(
                 'filename',
@@ -142,10 +142,10 @@ class GetStringsCommand extends Command
 
         $getStrings->run();
 
-        $output->writeln('Total time spent: ' . $timer->stop() . ' seconds');
-        $output->writeln('<comment>You may now review and commit</comment>');
+        $output->writeln(tra('Total time spent: %0 seconds', $timer->stop()));
+        $output->writeln('<comment>' . tra('You may now review and commit') . '</comment>');
         $output->writeln(
-            '<info>Warning: Committing the results of getstrings will prevent identifying broken strings with translation:englishupdate so englishupdate should be run first to prevent gradual translation loss. See englishupdate help for details.</info>'
+            '<info>' . tra('Warning: Committing the results of getstrings will prevent identifying broken strings with translation:englishupdate so englishupdate should be run first to prevent gradual translation loss. See englishupdate help for details.') . '</info>'
         );
         return Command::SUCCESS;
     }

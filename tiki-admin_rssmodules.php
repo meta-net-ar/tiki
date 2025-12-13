@@ -12,18 +12,22 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
             'rssId'            => 'int',      //post
-            'name'             => 'string',      //post
+            'name'             => 'text',        //post
             'url'              => 'url',         //post
             'description'      => 'xss',         //post
-            'refreshMinutes'   => 'digits',      //post
+            'refreshMinutes'   => 'int',         //post
             'showTitle'        => 'bool',        //post
             'showPubDate'      => 'bool',        //post
-            'save'             => 'bool',        //post
+            'save'             => 'alpha',       //post
+            'refresh_all'      => 'alpha',       //post
+            'refresh'          => 'int',         //post
+            'clear'            => 'int',         //post
             'remove'           => 'int',         //get
-            'offset'           => 'bool',        //get
-            'sort_mode'        => 'word',        //get
-            'article'          => 'digits',      //get
-            'view'             => 'digits',      //get
+            'offset'           => 'int',         //get
+            'sort_mode'        => 'alnumdash',   //get
+            'find'             => 'text',        //get
+            'article'          => 'int',         //get
+            'view'             => 'int',         //get
         ],
     ],
 ];
@@ -251,17 +255,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 if ($prefs['feature_multilingual'] == 'y') {
     $languages = [];
     $langLib = TikiLib::lib('language');

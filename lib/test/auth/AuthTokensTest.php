@@ -8,7 +8,7 @@
  * @group integration
  */
 
-require_once __DIR__ . '/../../auth/tokens.php';
+use Tiki\Lib\Auth\Tokens;
 
 class AuthTokensTest extends TikiDatabaseTestCase
 {
@@ -36,7 +36,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
         $this->table = $this->db->table('tiki_auth_tokens');
 
-        $this->obj = new AuthTokens($this->db, [], $this->dt);
+        $this->obj = new Tokens($this->db, [], $this->dt);
 
         global $prefs;
         $prefs['feature_sefurl'] = 'n'; // default
@@ -56,8 +56,8 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $expectedTable = $this->createMySQLXmlDataSet(__DIR__ . '/fixtures/auth_tokens_dataset_create.xml')
             ->getTable('tiki_auth_tokens');
 
-        $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered'], ['timeout' => 5]);
-        $this->db->query("UPDATE tiki_auth_tokens SET creation = '2012-02-03 15:25:07', token = '0ae3b4b86286ab68f5a66fb8c49da163' WHERE token = '$token'");
+        $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered'], ['timeout' => 5], ['destination' => 'message']);
+        $this->db->query("UPDATE tiki_auth_tokens SET creation = '2012-02-03 15:25:07', token = '0ae3b4b86286ab68f5a66fb8c49da163', user = 'admin' WHERE token = '$token'");
 
         $queryTable = $this->getConnection()->createQueryTable('tiki_auth_tokens', 'SELECT * FROM tiki_auth_tokens');
 
@@ -136,7 +136,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testMaximumTimeout(): void
     {
-        $lib = new AuthTokens(
+        $lib = new Tokens(
             $this->db,
             [
                 'maxTimeout' => 10,
@@ -157,7 +157,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testAllowMultipleHits(): void
     {
-        $lib = new AuthTokens($this->db, ['maxHits' => 100]);
+        $lib = new Tokens($this->db, ['maxHits' => 100]);
         $token = $lib->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered'], ['hits' => 3]);
         $lib->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']);
         $lib->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']);
@@ -168,7 +168,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testLimitOnAccessCount(): void
     {
-        $lib = new AuthTokens(
+        $lib = new Tokens(
             $this->db,
             [
                 'maxHits' => 10,

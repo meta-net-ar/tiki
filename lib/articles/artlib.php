@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -962,7 +962,7 @@ class ArtLib extends TikiLib
                 $data[$fields['image_alt']] = '';
             }
             if (! isset($data[$fields['lang']])) {
-                $data[$fields['lang']]                  = $prefs['language'];
+                $data[$fields['lang']]                  = Language::getCurrentLanguage();
             }
             if (! isset($data[$fields['rating']])) {
                 $data[$fields['rating']]                = 7;
@@ -1108,7 +1108,7 @@ class ArtLib extends TikiLib
             $invert = '';
             $connect = ' or ';
             // parameter list negated?
-            if (substr($type, 0, 1) == '!') {
+            if (str_starts_with($type, '!')) {
                 $type = substr($type, 1);
                 $invert = '!';
                 $connect = ' and ';
@@ -1138,7 +1138,7 @@ class ArtLib extends TikiLib
             $invert = '';
             $connect = ' or ';
             // parameter list negated?
-            if (substr($topicId, 0, 1) == '!') {
+            if (str_starts_with($topicId, '!')) {
                 $topicId = substr($topicId, 1);
                 $invert = '!';
                 $connect = ' and ';
@@ -1167,7 +1167,7 @@ class ArtLib extends TikiLib
         if ($topic) {
             $invert = '';
             // parameter list negated?
-            if (substr($topic, 0, 1) == '!') {
+            if (str_starts_with($topic, '!')) {
                 $topic = substr($topic, 1);
                 $invert = '!';
             }
@@ -1225,8 +1225,8 @@ class ArtLib extends TikiLib
         }
 
         if ($min_rating || $max_rating) {
-            $min_rating = isset($min_rating) ? $min_rating : '0.0';
-            $max_rating = isset($max_rating) ? $max_rating : '10.0';
+            $min_rating = $min_rating ?? '0.0';
+            $max_rating = $max_rating ?? '10.0';
             $mid2 .= ' and (`tiki_articles`.`rating` >= ? and `tiki_articles`.`rating` <= ? )';
             $bindvars[] = $min_rating;
             $bindvars[] = $max_rating;
@@ -1587,7 +1587,7 @@ class ArtLib extends TikiLib
         $allAttributes = $attributelib->get_attributes($type, $articleId);
         $ret = [];
         foreach ($allAttributes as $k => $att) {
-            if (substr($k, 0, 13) == 'tiki.article.') {
+            if (str_starts_with($k, 'tiki.article.')) {
                 $ret[$k] = $att;
             }
         }

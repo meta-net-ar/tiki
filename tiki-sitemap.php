@@ -32,7 +32,7 @@ if ($prefs['sitemap_enable'] == 'y') {
 
         foreach ($siteMap as $item) {
             $loc = $item->getElementsByTagName('loc');
-            if (strpos($loc->item(0)->nodeValue, $path) !== false) {
+            if (str_contains($loc->item(0)->nodeValue, $path)) {
                 if ($prefs['feature_sefurl'] === 'y') {
                     $loc->item(0)->nodeValue = str_replace($path, '', $loc->item(0)->nodeValue);
                 } else {

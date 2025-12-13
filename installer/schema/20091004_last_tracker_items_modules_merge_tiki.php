@@ -12,7 +12,7 @@ function upgrade_20091004_last_tracker_items_modules_merge_tiki($installer)
     $result = $installer->query("select moduleId, params from tiki_modules where name='last_modif_tracker_items'; ");
     while ($row = $result->fetchRow()) {
         $params = $row['params'];
-        if (strpos($params, "sort_mode=") === false) {
+        if (! str_contains($params, "sort_mode=")) {
             if ($params) {
                 $params .= "&";
             }

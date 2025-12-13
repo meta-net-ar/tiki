@@ -7,7 +7,7 @@
 //this script may only be included - so its better to die if called directly.
 declare(strict_types=1);
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -302,7 +302,7 @@ class Feedback
                         $message = $type . ': ' . str_replace('<br />', "\n", $message['mes']);
                     }
 
-                    if ($type === 'success' || $type === 'note') {
+                    if ($type === 'success' || $type === 'note' || $type === 'feedback') {
                         if (! $output->isVeryVerbose()) {
                             continue;
                         }
@@ -326,7 +326,7 @@ class Feedback
     /**
      * Print any feedback out to a log file
      *
-     * @param \Laminas\Log\Logger $log
+     * @param \Monolog\Logger $log
      * @param bool $clear - remove existing entries from the local storage after sending to log file
      */
     public static function printToLog($log, $clear = false)
@@ -348,10 +348,10 @@ class Feedback
 
                     switch ($type) {
                         case 'error':
-                            $log->err($message);
+                            $log->error($message);
                             break;
                         case 'warning':
-                            $log->warn($message);
+                            $log->warning($message);
                             break;
                         case 'feedback':
                         case 'success':
@@ -362,7 +362,7 @@ class Feedback
                             break;
                     }
                 } else {
-                    $log->err($message);
+                    $log->error($message);
                 }
             }
         }
@@ -444,12 +444,15 @@ class Feedback
                 foreach ($watches as $watch) {
                     $usersList[] = "<a href='tiki-user_information.php?user=" . $watch['user'] . "' class='fw-bold'>" . $watch['user'] . "</a>";
                 }
-                $message = implode(", ", $usersList);
-                self::note([
-                    'title' => tr('Notification sent to:'),
-                    'mes' => $message,
-                    'icon' => 'bell'
-                ]);
+
+                if (! empty($usersList)) {
+                    $message = implode(", ", $usersList);
+                    self::note([
+                        'title' => tr('Notification sent to:'),
+                        'mes' => $message,
+                        'icon' => 'bell'
+                    ]);
+                }
             }
         }
     }

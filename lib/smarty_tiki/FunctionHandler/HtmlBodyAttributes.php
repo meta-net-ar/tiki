@@ -11,8 +11,10 @@
 
  namespace SmartyTiki\FunctionHandler;
 
+use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use TikiLib;
 
 class HtmlBodyAttributes extends Base
 {
@@ -23,7 +25,7 @@ class HtmlBodyAttributes extends Base
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';
-        $class = 'tiki' . (isset($params['class']) ? ' ' . $params['class'] : '');
+        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . $params['class'] ?? '';
 
         //filename of script called (i.e. tiki-index, tiki-user_information, tiki-view_forum, etc), then sanitize chars
         $script_filename = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME);
@@ -108,7 +110,7 @@ class HtmlBodyAttributes extends Base
         if (! empty($pageLang)) {
             $class .= ' lang_' . $pageLang;
         } else {
-            $class .= ' lang_' . $prefs['language'];
+            $class .= ' lang_' . Language::getCurrentLanguage();
         }
 
         if (getCookie('hide_zone_left')) {

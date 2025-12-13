@@ -25,7 +25,7 @@ class RedactDBCommand extends Command
                 'force',
                 null,
                 InputOption::VALUE_NONE,
-                'Force installation. Overwrite any current database.'
+                tra('Force installation. Overwrite any current database.')
             );
     }
 
@@ -40,10 +40,10 @@ class RedactDBCommand extends Command
         // For $dbs_tiki - better way?
         require('db/redact/local.php');
 
-        $output->writeln('<info>Redacting database.</info>');
+        $output->writeln('<info>' . tra('Redacting database.') . '</info>');
 
         // Reset admin account
-        $output->writeln('<info>Resetting admin account.</info>');
+        $output->writeln('<info>' . tra('Resetting admin account.') . '</info>');
         $query = "UPDATE users_users SET email = ? WHERE login='admin';";
         $bindvars = ['admin@example.com'];
         $result = $tikilib->query($query, $bindvars);
@@ -64,10 +64,10 @@ class RedactDBCommand extends Command
                 $userprefixready = true;
             }
         }
-        $output->writeln('<comment>Using user names like ' . $userprefix . '123.</comment>');
+        $output->writeln('<comment>' . tra('Using user names like ') . $userprefix . '123.</comment>');
 
         // Pseudonymise e-mail
-        $output->writeln('<comment>Pseudonymising user e-mails.</comment>');
+        $output->writeln('<comment>' . tra('Pseudonymising user e-mails.') . '</comment>');
         $query = "    SELECT DISTINCT table_name
                 FROM information_schema.columns
                 WHERE column_name = 'email'
@@ -88,7 +88,7 @@ class RedactDBCommand extends Command
         }
 
         // Pseudonymise user name
-        $output->writeln('<comment>Pseudonymising user names.</comment>');
+        $output->writeln('<comment>' . tra('Pseudonymising user names.') . '</comment>');
         $query = "    SELECT DISTINCT table_name
                 FROM information_schema.columns
                 WHERE column_name = 'user'
@@ -107,7 +107,7 @@ class RedactDBCommand extends Command
         }
 
         // Pseudonymise user selector tracker fields
-        $output->writeln('<comment>Pseudonymising user selector tracker fields.</comment>');
+        $output->writeln('<comment>' . tra('Pseudonymising user selector tracker fields.') . '</comment>');
         $query = "SELECT fieldId, trackerId, name FROM tiki_tracker_fields WHERE type='u';";
         $result = $tikilib->query($query);
         $ret = [];
@@ -118,7 +118,7 @@ class RedactDBCommand extends Command
             unset($bindvars);
             $output->writeln('<info>Tracker ' . $field['trackerId'] . ' Field ' . $field['fieldId'] . ': ' . $field['name'] . '</info>');
             $trackername = $tikilib->getOne('SELECT name FROM tiki_trackers WHERE trackerId = ' . $field['trackerId'] . ';');
-            $output->writeln('<comment>Consider removing data from Tracker ' . $field['trackerId'] . ' (' . $trackername . ').</comment>');
+            $output->writeln('<comment>' . tra('Consider removing data from Tracker ') . $field['trackerId'] . ' (' . $trackername . ').</comment>');
             $query = "UPDATE tiki_tracker_item_fields t, users_users u SET t.value = CONCAT('" . $userprefix . "', u.userId) WHERE t.value = u.login AND u.login <> 'admin';";
             $result = $tikilib->query($query);
         }
@@ -136,20 +136,20 @@ class RedactDBCommand extends Command
         $result = $tikilib->query($query);
 
         // Remove user web-mail accounts
-        $output->writeln('<info>Removing user mail accounts.</info>');
+        $output->writeln('<info>' . tra('Removing user mail accounts.') . '</info>');
         $query = "DELETE FROM tiki_user_preferences WHERE prefName = 'cypht_user_config';";
         $result = $tikilib->query($query);
-        $output->writeln('<info>Removing mail queue.</info>');
+        $output->writeln('<info>' . tra('Removing mail queue.') . '</info>');
         $query = "TRUNCATE TABLE tiki_mail_queue;";
         $result = $tikilib->query($query);
 
         // Remove messu_messages
-        $output->writeln('<info>Removing user messu.</info>');
+        $output->writeln('<info>' . tra('Removing user messu.') . '</info>');
         $query = "TRUNCATE TABLE messu_messages;";
         $result = $tikilib->query($query);
 
         // Remove all session data
-        $output->writeln('<info>Removing session data.</info>');
+        $output->writeln('<info>' . tra('Removing session data.') . '</info>');
         $query = "TRUNCATE TABLE sessions;";
         $result = $tikilib->query($query);
         $query = "TRUNCATE TABLE tiki_cookies;";
@@ -158,31 +158,31 @@ class RedactDBCommand extends Command
         $result = $tikilib->query($query);
 
         // Remove payments
-        $output->writeln('<info>Removing payments data.</info>');
+        $output->writeln('<info>' . tra('Removing payments data.') . '</info>');
         $query = "TRUNCATE TABLE tiki_payment_received;";
         $result = $tikilib->query($query);
         $query = "TRUNCATE TABLE tiki_payment_requests;";
         $result = $tikilib->query($query);
 
         // Remove DSN and mailin
-        $output->writeln('<info>Removing DSN and mailin account data.</info>');
+        $output->writeln('<info>' . tra('Removing DSN and mailin account data.') . '</info>');
         $query = "TRUNCATE TABLE tiki_dsn;";
         $result = $tikilib->query($query);
         $query = "TRUNCATE TABLE tiki_mailin_accounts;";
         $result = $tikilib->query($query);
 
         // Remove auth tokens
-        $output->writeln('<info>Removing auth tokens.</info>');
+        $output->writeln('<info>' . tra('Removing auth tokens.') . '</info>');
         $query = "TRUNCATE TABLE tiki_auth_tokens;";
         $result = $tikilib->query($query);
 
         // Remove web services
-        $output->writeln('<info>Removing webservices info.</info>');
+        $output->writeln('<info>' . tra('Removing webservices info.') . '</info>');
         $query = "TRUNCATE TABLE tiki_webservice;";
         $result = $tikilib->query($query);
 
         // Remove google, intertiki, ldap and 3rd party data
-        $output->writeln('<info>Removing google, intertiki, ldap and other 3rd party app data.</info>');
+        $output->writeln('<info>' . tra('Removing google, intertiki, ldap and other 3rd party app data.') . '</info>');
         $query = "DELETE FROM tiki_preferences WHERE " .
             "name LIKE 'auth_ldap_%' OR " .
             "name LIKE '%key' OR " .
@@ -197,9 +197,9 @@ class RedactDBCommand extends Command
             "name LIKE '%intertiki%';";
         $result = $tikilib->query($query);
 
-        $output->writeln('<comment>Read the disclaimer!</comment>');
-        $output->writeln('<comment>The following means jack:</comment>');
-        $output->writeln('<info>Finished redacting database.</info>');
+        $output->writeln('<comment>' . tra('Read the disclaimer!') . '</comment>');
+        $output->writeln('<comment>' . tra('The following means jack:') . '</comment>');
+        $output->writeln('<info>' . tra('Finished redacting database.') . '</info>');
         return Command::SUCCESS;
     }
 }

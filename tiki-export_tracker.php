@@ -16,8 +16,6 @@ if (! isset($_REQUEST['trackerId'])) {
     Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $trklib = TikiLib::lib('trk');
 @ini_set('max_execution_time', 0);
 
@@ -78,7 +76,7 @@ $filterFields = [];
 $values = [];
 $exactValues = [];
 foreach ($_REQUEST as $key => $val) {
-    if (substr($key, 0, 2) == 'f_' && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
+    if (str_starts_with($key, 'f_') && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
         $fieldId = substr($key, 2);
         $filterFields[] = $fieldId;
         if (isset($_REQUEST["x_$fieldId"]) && $_REQUEST["x_$fieldId"] == 't') {

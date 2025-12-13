@@ -167,7 +167,7 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
         if (! empty($article)) {
             $artlib = TikiLib::lib('art');
             $article = $artlib->list_articles(0, -1, 'articleId_desc', $article);
-            $count = isset($article['count']) ? $article['count'] : 0;
+            $count = $article['count'] ?? 0;
             if (
                 $count == 1
                 && ! empty($article['data'][0]['articleId'])

@@ -10,7 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to err & die if called directly.
 //smarty is not there - we need setup
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -93,11 +93,7 @@ $fgal_options = [
 ];
 
 if (! array_key_exists('view', get_defined_vars())) {
-    if (isset($_REQUEST['view'])) {
-        $view = $_REQUEST['view'];
-    } else {
-        $view = null;
-    }
+    $view = $_REQUEST['view'] ?? null;
 }
 if ($view == 'admin') {
     $fgal_options['show_explorer']['value'] = 'n';

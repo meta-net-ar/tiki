@@ -23,8 +23,6 @@ class Search_Action_TrackerItemInsert implements Search_Action_Action
 
     public function validate(JitFilter $data)
     {
-        $object_type = $data->object_type->text();
-        $object_id = $data->object_id->int();
         $to_tracker = $data->to_tracker->int();
 
         $newItem = Tracker_Item::newItem($to_tracker);
@@ -37,7 +35,6 @@ class Search_Action_TrackerItemInsert implements Search_Action_Action
 
     public function execute(JitFilter $data)
     {
-        $object_id = $data->object_id->int();
         $to_tracker = $data->to_tracker->int();
         $field = $data->field->word();
         $value = $data->value->text();

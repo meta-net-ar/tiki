@@ -102,7 +102,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             $tags[] = $value;
         }
         return implode(' ', array_map(function ($t) {
-            return strstr($t, ' ') ? '"' . $t . '"' : $t;
+            return str_contains($t, ' ') ? '"' . $t . '"' : $t;
         }, $tags));
     }
 
@@ -114,7 +114,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             return $t != $value;
         });
         return implode(' ', array_map(function ($t) {
-            return strstr($t, ' ') ? '"' . $t . '"' : $t;
+            return str_contains($t, ' ') ? '"' . $t . '"' : $t;
         }, $tags));
     }
 

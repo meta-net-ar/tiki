@@ -17,7 +17,7 @@ $inputConfiguration = [
         'save'                 => 'bool',       //post
         'name'                 => 'string',     //post
         'data'                 => 'none',       //post
-        'parse_mode'           => 'string',     //post
+        'parse_mode'           => 'word',       //post
         ],
     ],
 ];

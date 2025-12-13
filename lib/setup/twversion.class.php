@@ -46,7 +46,7 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '29.0vcs';
+        $this->version  = '30.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
 
@@ -120,6 +120,7 @@ class TWVersion
                 37 => 'Alnilam',         // 26.x
                 38 => 'Miaplacidus',     // 27.x
                 39 => 'Castor',          // 28.x
+                40 => 'Bellatrix',       // 29.x
         ];
     }
 
@@ -381,6 +382,8 @@ class TWVersion
                 '24.6',
                 '24.7',
                 '24.8',
+                '24.9',
+                '24.10',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -401,6 +404,8 @@ class TWVersion
                 '27.0',
                 '27.1',
                 '27.2',
+                '27.3',
+                '27.4',
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
@@ -408,6 +413,11 @@ class TWVersion
                 '28.1',
                 '28.2',
                 '28.3',
+                '28.4',
+                '29.0alpha',
+                '29.0beta',
+                '29.0RC1',
+                '29.0',
             ];
     }
 

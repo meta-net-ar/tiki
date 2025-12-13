@@ -37,6 +37,15 @@ const cssLifecycle = singleSpaCss({
         {
             href: "public/generated/js/tracker-rules.css",
         },
+        {
+            href: "public/generated/js/element-plus-ui/input-root-css.css",
+        },
+        {
+            href: "public/generated/js/element-plus-ui/datepicker-root-css.css",
+        },
+        {
+            href: "public/generated/js/element-plus-ui/select-root-css.css",
+        },
     ],
 });
 

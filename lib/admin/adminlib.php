@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Config\Ini;
+
 /**
  *
  */
@@ -421,7 +424,6 @@ class AdminLib extends TikiLib
             $data = "<html>";
             $data .= "<head>";
             $data .= "<title>" . $res["pageName"] . "</title>";
-            // $data .= "<link rel='StyleSheet' href='styles/" . $prefs['style'] . "' type='text/css'>";
             $data .= '</head>';
             $data .= "<body><a class='wiki' href='" .
                 $prefs['wikiHomePage'] .
@@ -437,7 +439,7 @@ class AdminLib extends TikiLib
         $tar->toTar($dumpPath, false);
         unset($tar);
         $logslib = TikiLib::lib('logs');
-        $logslib->add_log('dump', 'wiki file dump created in ' . $dumpPath);
+        $logslib->add_log('dump', tra('wiki file dump created in ') . $dumpPath);
     }
 
     /**
@@ -669,7 +671,7 @@ class AdminLib extends TikiLib
         if ($retrieve_all_data || ! isset($system_configuration_identifier)) {
             $system_configuration_identifier = null;
         }
-        $configReader = new Tiki_Config_Ini();
+        $configReader = new Ini();
         $configReader->setFilterSection($system_configuration_identifier);
 
         if (preg_match('/\.ini.php$/', $system_configuration_file)) {

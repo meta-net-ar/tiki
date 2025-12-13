@@ -31,7 +31,6 @@ class ToolbarPicker extends ToolbarDialog
                 $wysiwyg = 'emoji';
                 $label = tra('Emojis');
                 $iconname = 'laugh-wink';
-                $rawList = [];
                 $tool_prefs[] = 'feature_smileys';
                 $list = [];
 

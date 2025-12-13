@@ -56,7 +56,7 @@ body.tiki-admin {
     padding-left: 0;
 }
 
-.tiki-admin .top_modules .box-login_box { margin-left: auto; }
+.tiki-admin .top_modules .box-login_box { padding: 0; }
 
 @media (min-width: 992px) {
     .tiki-admin.uab aside.admin-nav .navbar-expand-lg .offcanvas  .offcanvas-body {
@@ -72,8 +72,10 @@ body.tiki-admin {
 // Color rules - To implement color-neutral CSS variable names, the selectors for the rules have to be repeated for 'light' and 'dark' options. The file size increase caused by this
 // has been offset by removing rules not involving color where color classes were unnecessarily used repeatedly, one for light and one for dark.
 
-// Top nav light ------------------------------------------ Fixed-top position, light (background) option
-.tiki-admin header .tiki-top-nav-light {
+// Top nav light and dark ------------------------ Fixed-top position, light and dark (background) options
+// Appropriate values for light and dark are provided by themes' _css-variables.scss files.
+.tiki.tiki-admin .tiki-top-nav-light,
+.tiki.tiki-admin .tiki-top-nav-dark {
     background: var(--tiki-admin-top-nav-bg);
     border: var(--tiki-admin-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-admin-top-border-width); // For example, 1px, or 0px 0px 4px 0px
@@ -81,7 +83,8 @@ body.tiki-admin {
 }
 
 // Top links
-.tiki-admin .tiki-admin-top-nav-light .nav-item .nav-link { // Scope widened to include accordion.
+.tiki-admin .tiki-admin-top-nav-light .nav-item .nav-link,
+.tiki-admin .tiki-admin-top-nav-dark .nav-item .nav-link { // Scope widened to include accordion.
     color: var(--tiki-admin-top-nav-color);
     &:hover,
     &:focus {
@@ -92,38 +95,7 @@ body.tiki-admin {
 // Top and aside dropdowns
 .tiki-admin .admin-navbar.tiki-admin-top-nav-light .dropdown-menu,
 .tiki-admin .tiki-admin-top-nav-light .dropdown-menu,
-.tiki-admin-aside-nav-light .dropdown-menu {
-    color: var(--tiki-admin-dropdown-link-color);
-    background-color: var(--tiki-admin-dropdown-bg);
-    .dropdown-item:not(.active) {
-        color: var(--tiki-admin-dropdown-link-color);
-        &:focus,
-        &:hover,
-        & .active {
-            color: var(--tiki-admin-dropdown-link-hover-color);
-            background: var(--tiki-admin-dropdown-link-hover-bg);
-        }
-    }
-}
-
-// Top nav dark ------------------------------------------ Fixed-top position, dark (background) option
-.tiki.tiki-admin .tiki-top-nav-dark {
-    background: var(--tiki-admin-top-nav-bg);
-    border: var(--tiki-admin-top-border); // Style and color, for example, solid black
-    border-width: var(--tiki-admin-top-border-width); // For example, 1px, or 0px 0px 4px 0px
-    box-shadow: var(--tiki-admin-top-box-shadow);
-}
-
-// Top links
-.tiki-admin .tiki-admin-top-nav-dark .nav-item .nav-link { // Scope widened to include accordion.
-    color: var(--tiki-admin-top-nav-color);
-    &:hover,
-    &:focus {
-        color: var(--tiki-admin-top-nav-hover-color);
-    }
-}
-
-// Top and aside dropdowns
+.tiki-admin-aside-nav-light .dropdown-menu,
 .tiki-admin .admin-navbar.tiki-admin-top-nav-dark .dropdown-menu,
 .tiki-admin .tiki-admin-top-nav-dark .dropdown-menu,
 .tiki-admin-aside-nav-dark .dropdown-menu {
@@ -131,42 +103,31 @@ body.tiki-admin {
     background-color: var(--tiki-admin-dropdown-bg);
     .dropdown-item:not(.active) {
         color: var(--tiki-admin-dropdown-link-color);
+    }
+    & .dropdown-item {
         &:focus,
         &:hover,
-        & .active {
+        &.active {
             color: var(--tiki-admin-dropdown-link-hover-color);
             background: var(--tiki-admin-dropdown-link-hover-bg);
         }
     }
 }
 
-// Aside nav light -------------------------------------------------------
+
+
+// Aside nav light and dark -----------------------------------------------
 .tiki-admin-aside-nav-light,
-.tiki-admin aside.admin-nav .bg-light {
-    background: var(--tiki-admin-aside-nav-bg) !important;
-}
-
-.tiki-admin-aside-nav-light .nav-link {
-    color: var(--tiki-admin-aside-nav-color);
-    &:focus,
-    &:hover {
-        color: var(--tiki-admin-aside-nav-hover-color);
-        background: var(--tiki-admin-aside-nav-hover-bg);
-    }
-}
-.tiki-admin-aside-nav-light .admin-menu-collapser {
-    background-color: var(--tiki-admin-dropdown-bg);
-    color: var(--tiki-admin-dropdown-link-color);
-}
-
-// Aside nav dark ---------------------------------------------------------
+.tiki-admin aside.admin-nav .bg-light,
 .tiki-admin-aside-nav-dark,
 .tiki-admin aside.admin-nav .navbar-dark {
     background: var(--tiki-admin-aside-nav-bg) !important;
 }
 
+.tiki-admin-aside-nav-light .nav-link,
 .tiki-admin-aside-nav-dark .nav-link {
     color: var(--tiki-admin-aside-nav-color);
+    &:focus,
     &:hover {
         color: var(--tiki-admin-aside-nav-hover-color);
         background: var(--tiki-admin-aside-nav-hover-bg);
@@ -180,11 +141,13 @@ body.tiki-admin {
     top: 0;
 }
 
-.tiki-admin aside.admin-nav .navbar-light, .tiki-admin aside.admin-nav .navbar-dark {
+.tiki-admin aside.admin-nav .navbar-light,
+.tiki-admin aside.admin-nav .navbar-dark {
     z-index: 9998;
 }
 
-.tiki-admin .top_modules.navbar-dark-parent, .tiki-admin .top_modules.navbar-light-parent {
+.tiki-admin .top_modules.navbar-dark-parent,
+.tiki-admin .top_modules.navbar-light-parent {
     z-index: 9999;
 }
 
@@ -193,7 +156,6 @@ body.tiki-admin {
 }
 
 .tiki-admin .top_modules .box-quickadmin {
-    margin-left: auto !important;
     padding: 0 1.4rem;
     background-color: transparent !important;
 }
@@ -208,7 +170,7 @@ body.tiki-admin {
 }
 
 .tiki-admin .top_modules .module:nth-child(2) {
-    margin-left: initial;
+    margin-left: auto;
 }
 
 .tiki-admin .top_modules .dropdown-menu {
@@ -230,7 +192,7 @@ body.tiki-admin {
 .tiki-admin .top_modules { //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
     width: 100%;
     height: var(--tiki-admin-top-modules-height); // 50px;
-    padding: 0 1.6rem;
+//    padding: 0 1.6rem; This rule is being overridden by something.
 }
 .tiki-admin aside.admin-nav > nav {
     height: calc(100% - var(--tiki-admin-top-modules-height) - 2.3rem);
@@ -250,20 +212,6 @@ body.tiki-admin {
 
 .tiki-admin .col-md-12.side-col-toggle-container {
     display: none;
-}
-
-// Admin menu left
-.tiki-admin aside.admin-nav .narrow,
-.tiki-admin aside.admin-nav .narrow .admin-menu-collapser {
-    width: 80px !important;
-}
-
-.tiki-admin aside.admin-nav .admin-menu-collapser a {
-    width: 50px;
-}
-
-.tiki-admin aside.admin-nav .narrow .admin-menu-collapser a {
-    width: 100%;
 }
 
 .tiki-admin aside.admin-nav .navbar-dark.narrow .icon {
@@ -541,10 +489,10 @@ body.tiki-admin {
     }
 
     // other changes in mobile menu
-    .tiki-admin .admin-navbar > .navbar-collapse > .navbar-nav > .nav-item > .nav-link.show {
-        background-color: #007BFF !important;
-        color: white !important;
-    }
+//    .tiki-admin .admin-navbar > .navbar-collapse > .navbar-nav > .nav-item > .nav-link.show {
+//        background-color: #007BFF !important;
+//        color: white !important;
+//    }
 
     .tiki-admin .admin-navbar .navbar-nav .nav-link {
         display: flex;
@@ -585,18 +533,6 @@ body.tiki-admin {
     font-size: .875rem;
 }
 
-.tiki-admin .top_modules .nav-link {
-    margin-top: .9rem;
-}
-
-.tiki-admin .top_modules .btn.login_link {
-    margin-top: .8rem;
-}
-
-.tiki-admin .top_modules .nav-link, .tiki-admin .top_modules .btn.login_link {
-    padding: 0 .6rem;
-}
-
 .tiki-admin .top_modules .login-box .dropdown-menu {
     min-width: unset;
     right: 0;
@@ -618,9 +554,9 @@ body.tiki-admin {
 }
 
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-brand {
-    padding: 0;
+ //   padding: 0;
     height: var(--tiki-admin-top-modules-height); //50px;
-    width: 60px;
+ //   width: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -630,12 +566,24 @@ body.tiki-admin {
 }
 
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-brand img {
-    max-width: 32px;
-    max-height: 32px;
+    height: 100%;
+    width: auto;
+//    margin-left: 25px;
+//    max-width: 38px;
+//    max-height: 38px;
+}
+
+.tiki-admin .admin-icon {
+    color: var(--tiki-admin-top-nav-color);
 }
 
 .tiki-admin .box-logo {
-    display: none;
+    display: none !important;
+}
+
+.tiki-admin .siteloginbar_popup img {
+    max-width: 38px;
+    max-height: 38px;
 }
 
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-collapse form {
@@ -700,22 +648,6 @@ body.tiki-admin {
     align-items: center;
 }
 
-.tiki-admin aside.admin-nav .admin-menu-collapser {
-    text-align: right;
-    padding: 0;
-}
-
-.tiki-admin aside.admin-nav nav .admin-menu-collapser {
-    width: 300px; // 268px;
-    position: fixed;
-    bottom: 0;
-    height: 2.3rem;
-}
-
-.tiki-admin aside.admin-nav .bg-dark .admin-menu-collapser a.btn-link {
-    color: var(--tiki-admin-dropdown-dark-color) !important;
-}
-
 .tiki-admin .form-inline .form-check {
     padding-right: .5rem;
 }
@@ -750,11 +682,6 @@ body.tiki-admin {
     width: 2rem;
 }
 
-.tiki-admin .siteloginbar_popup.dropdown {
-    right: 0;
-    position: fixed;
-}
-
 // Preference bar
 .tiki-admin .admin-content nav.admin-navbar {
     background-color: transparent !important;
@@ -762,7 +689,7 @@ body.tiki-admin {
     border: none;
     position: fixed;
     left: 0;
-    padding-left: 7rem;
+//    padding-left: 7rem;
     z-index: 9999 !important;
 }
 
@@ -829,7 +756,7 @@ body.tiki-admin {
 
 // little tweak of the position
 .tiki-admin .admin-content nav.admin-navbar {
-    padding-left: 6rem;
+//    padding-left: 6rem;
     top: 0;
 }
 

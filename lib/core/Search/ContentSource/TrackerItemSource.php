@@ -59,6 +59,17 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         $fieldPermissions = [];
 
         foreach (self::getIndexableHandlers($definition, $item) as $handler) {
+            if ($handler) {
+                $fieldType = $handler->getConfiguration('type');
+                if ($fieldType === 't') {
+                    $optionsJson = $handler->getConfiguration('options');
+                    $optionsArray = json_decode($optionsJson, true);
+                    if (is_array($optionsArray) && ! empty($optionsArray['is_password'])) {
+                        // This is a password field. Skip it. Do not index it.
+                        continue;
+                    }
+                }
+            }
             if ($this->indexer) {
                 $this->indexer->errorContext = 'Field ' . $handler->getConfiguration('fieldId') . ' / ' . $handler->getConfiguration('name');
             }
@@ -298,5 +309,48 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
     public function setIndexer($indexer)
     {
         $this->indexer = $indexer;
+    }
+
+    public static function cacheRelationFields()
+    {
+        global $prefs;
+        if (empty($prefs['unified_cache_relation']) || $prefs['unified_cache_relation'] !== 'y') {
+            return;
+        }
+        if (! empty(Tracker_Field_Relation::$relationFieldCache)) {
+            return;
+        }
+        $selectionFields = [];
+        foreach (self::getAllIndexableHandlers() as $handler) {
+            if (! $handler instanceof Tracker_Field_Relation) {
+                continue;
+            }
+            $format = $handler->getOption('format');
+            $pattern = '/\{([\w\.]+)\}/';
+            if (preg_match_all($pattern, $format, $matches)) {
+                $selectionFields = array_merge($selectionFields, $matches[1]);
+            }
+        }
+        $selectionFields = array_unique($selectionFields);
+
+        if (empty($selectionFields)) {
+            return;
+        }
+
+        $relationlib = TikiLib::lib('relation');
+        $relatedItems = $relationlib->getAllRelatedTrackerItems();
+
+        $lib = TikiLib::lib('unifiedsearch');
+        foreach (array_chunk($relatedItems, 500) as $chunk) {
+            $query = $lib->buildQuery([]);
+            foreach ($chunk as $object) {
+                $query->addObject('trackeritem', $object);
+            }
+            $query->setSelectionFields($selectionFields);
+            $result = $query->search($lib->getIndex());
+            foreach ($result as $item) {
+                Tracker_Field_Relation::$relationFieldCache[$item['object_id']] = $item;
+            }
+        }
     }
 }

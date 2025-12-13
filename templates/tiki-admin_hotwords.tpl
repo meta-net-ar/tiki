@@ -5,15 +5,15 @@
 <form method="post" action="tiki-admin_hotwords.php">
     {ticket}
     <div class="tiki-form-group row">
-        <label class="col-sm-3 col-form-label">{tr}Word{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="word">{tr}Word{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" name="word" class="form-control">
+            <input type="text" name="word" class="form-control" id="word">
         </div>
     </div>
     <div class="tiki-form-group row">
-        <label class="col-sm-3 col-form-label">{tr}URL{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="url">{tr}URL{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" name="url" class="form-control">
+            <input type="text" name="url" class="form-control" id="url">
         </div>
     </div>
     <div class="tiki-form-group row">

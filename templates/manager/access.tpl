@@ -10,7 +10,7 @@
 
 {block name="content"}
    <div style="background: #ccc;" class="rounded p-3">
-        <p>You can't run this command on web browser, copy it and run it in your terminal!</p>
+        <p>{tr}You can't run this command in web browser, copy it and run it in your terminal!{/tr}</p>
         {include file='manager/command.tpl' command=$info}
    </div>
 {/block}

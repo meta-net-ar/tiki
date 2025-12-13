@@ -1,16 +1,5 @@
 {strip}
 {title help="Modules" admpage="module"}{tr}Admin Modules{/tr}{/title}
-{block name="toggleSwitch_modules"}
-    <div class="modules-admin-toggle-container fixed-top">
-        <div class="custom-toggle">
-            <label class="form-switch">
-                <input class="form-check-input toggle-switch-modules" type="checkbox" id="toggleSwitch-modules" checked>
-            </label>
-            <span class="form-check-label" style="color: #ddd;">{tr}Exit Modules{/tr}</span>
-        </div>
-    </div>   
-{/block}
-
 <div class="t_navbar mb-4">
     <form action="tiki-admin_modules.php" method="post" style="display: inline">
         {ticket}
@@ -65,7 +54,7 @@
         {/if}
         <h2>{tr}Assigned Modules{/tr}</h2>
         <div class="mb-4">
-            {button edit_assign=0 cookietab=2 _auto_args="edit_assign,cookietab" _text="{tr}Add module{/tr}"}
+            {button edit_assign=0 cookietab=1 href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Assign new module{/tr}"}
         </div>
 
         <div id="assigned_modules">
@@ -102,7 +91,7 @@
                                                 {actions}
                                                     {strip}
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
@@ -116,14 +105,14 @@
                                                             </form>
                                                         </action>
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
                                                                     name="moddown"
                                                                     value="{$module.moduleId}"
                                                                     class="btn btn-link link-list"
-                                                                    {if $module@last} disabled="disabled" class="disabled"{/if}
+                                                                    {if $module@last} disabled="disabled"{/if}
                                                                 >
                                                                     {icon name="down"} {tr}Move down{/tr}
                                                                 </button>
@@ -135,7 +124,7 @@
                                                             </a>
                                                         </action>
                                                         <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
+                                                            <form action="tiki-admin_modules.php" method="post">
                                                                 {ticket}
                                                                 <button
                                                                     type="submit"
@@ -168,11 +157,9 @@
         </form>
     {/tab}
     {if isset($smarty.request.edit_assign) or $preview eq "y"}
-        {tab name="{tr}Edit module{/tr}"}
+        {tab name="{tr}Configure new module{/tr}"}
             <a id="assign"></a>
-            {if $assign_name eq ''}
-                <h2>{tr}Assign new module{/tr}</h2>
-            {else}
+            {if $assign_name neq ''}
                 <h2>{tr}Edit this assigned module:{/tr} {$assign_name}</h2>
             {/if}
 
@@ -402,7 +389,7 @@
                         <label for="module_list_show_all" class="form-check-label">{tr}Show all modules{/tr}</label>
                     </div>
                 </div>
-                <ul id="module_list">
+                <ul id="module_list" class="p-0">
                     {foreach key=name item=info from=$all_modules_info}
                         <li class="{if !empty($info.enabled)}enabled{else}disabled{/if} clearfix">
                             <input type="hidden" value="{$name}">
@@ -422,12 +409,6 @@
         {jq}
 $("#module_list_show_all").on("click", function(){
     $("#module_list li.disabled").toggle($(this).prop("checked"));
-});
-
-document.getElementById('toggleSwitch-modules').addEventListener('change', function() {
-    if (!this.checked) {
-        window.location.href = "./";
-    }
 });
         {/jq}
     {/tab}

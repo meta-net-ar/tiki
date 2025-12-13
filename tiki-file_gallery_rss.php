@@ -41,8 +41,6 @@ if (empty($galleryIds)) {
     require_once('tiki-rss_error.php');
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $feed = 'filegal';
 $uniqueid = "$feed.id=" . md5(implode('_', $galleryIds));
 $output = $rsslib->get_from_cache($uniqueid);

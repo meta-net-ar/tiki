@@ -84,8 +84,13 @@ class TikiHybrid extends LogsLib
                 'id' => $prefs[$this->namedprefix . '_app_id'],
                 'secret' => $prefs[$this->namedprefix . '_app_secret'],
             ],
-            //'scope' => $value['scope'],  //TODO TEST hybridauth reaction to : 'scope' => null or empty?
             ];
+
+            // Add scope for Facebook to request permissions
+            if ($providerName === 'Facebook') {
+                // Request user_posts to access the feed
+                $this->config['scope'] = 'public_profile,user_posts';
+            }
 
 
     //  LLOG('tikiHybrid  constructor config:', $this -> config );

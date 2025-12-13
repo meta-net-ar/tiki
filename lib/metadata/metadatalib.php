@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -66,7 +66,7 @@ class FileMetadata
                     $this->error = 'The file is empty';
                 }
             //if not readable, see if it's an external file
-            } elseif (strpos($file, 'http') !== false) {
+            } elseif (str_contains($file, 'http')) {
                 $filegallib = TikiLib::lib('filegal');
                 $externalinfo = $filegallib->get_info_from_url($file);
                 $temppath = $this->temppathFromContent($externalinfo['data']);

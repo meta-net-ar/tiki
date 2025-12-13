@@ -11,7 +11,7 @@ $inputConfiguration = [
         'save'                     => 'bool',            //post
         ],
         'staticKeyFiltersForArrays' => [
-            'new_val'               => 'word',       //post
+            'new_val'               => 'text',       //post
             'additional_languages'  => 'lang',       //post
         ],
     ],

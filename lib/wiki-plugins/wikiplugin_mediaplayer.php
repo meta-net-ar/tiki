@@ -33,7 +33,6 @@ function wikiplugin_mediaplayer_info()
                 'since' => '6.0',
                 'accepted' => ALL_ACCEPTED_FORMATS,
                 'filter' => 'url',
-                'default' => '',
             ],
 
             'mp3' => [
@@ -43,7 +42,6 @@ function wikiplugin_mediaplayer_info()
                 'since' => '27.0',
                 'accepted' => AUDIO_ACCEPTED_FORMATS,
                 'filter' => 'url',
-                'default' => '',
             ],
 
             // The type parameter is verified for Quicktime, Windows Media Player, Real Player, iframe (PDF)
@@ -63,14 +61,12 @@ function wikiplugin_mediaplayer_info()
                 'name' => tra('Width'),
                 'description' => tra('Player width in px or %'),
                 'since' => '10.0',
-                'default' => '',
                 ],
             'height' => [
                 'required' => false,
                 'name' => tra('Height'),
                     'description' => tra('Player height in px or %'),
                 'since' => '10.0',
-                'default' => '',
                 ],
             'mediatype' => [
                 'required' => false,
@@ -99,12 +95,12 @@ function wikiplugin_mediaplayer($data, $params)
     $access = TikiLib::lib('access');
     static $iMEDIAPLAYER = 0;
     $id = 'mediaplayer' . ++$iMEDIAPLAYER;
-    $params['type'] = strtolower(isset($params['type']) ? $params['type'] : '');
+    $params['type'] = strtolower($params['type']);
     $extension = '';
-    if ((empty($params['src']) && empty($params['mp3']))) {
+    if ((is_null($params['src']) && is_null($params['mp3']))) {
         Feedback::error(['mes' => tr("PluginMediaPlayer : src and mp3 cannot both be empty")]);
         return '';
-    } elseif (! empty($params['src'])) {
+    } elseif (! is_null($params['src'])) {
         // This regex is used to extract the file ID from various URL formats:
         // - tiki-display.php?fileId=74
         // - display74
@@ -171,7 +167,7 @@ function wikiplugin_mediaplayer($data, $params)
             Feedback::error(tr("PluginMediaPlayer: Media format not supported. Here are the supported formats: ") . implode(", ", ALL_ACCEPTED_FORMATS));
             return '';
         }
-    } elseif (empty($params['src']) && ! empty($params['mp3'])) {
+    } elseif (is_null($params['src']) && ! is_null($params['mp3'])) {
         $extension = pathinfo($params['mp3'], PATHINFO_EXTENSION);
         if (! in_array($extension, AUDIO_ACCEPTED_FORMATS)) {
             Feedback::error(tr("PluginMediaPlayer: Media format not supported. Here are the audio supported formats: ") . implode(", ", AUDIO_ACCEPTED_FORMATS));
@@ -180,7 +176,7 @@ function wikiplugin_mediaplayer($data, $params)
         $params['src'] = $params['mp3'];
     }
 
-    if (empty($params['mediatype'])) {
+    if (is_null($params['mediatype'])) {
         if (in_array($extension, AUDIO_ACCEPTED_FORMATS)) {
             $params['mediatype'] = 'audio';
         } elseif (in_array($extension, VIDEO_ACCEPTED_FORMATS)) {
@@ -191,17 +187,9 @@ function wikiplugin_mediaplayer($data, $params)
     }
 
     //checking if pdf generation request
-    if (in_array($params['type'], ['pdf']) && isset($_GET['display']) && strstr($_GET['display'], 'pdf') != '') {
+    if (in_array($params['type'], ['pdf']) && defined('TIKI_DISPLAY_CONTAINS_PDF') && TIKI_DISPLAY_CONTAINS_PDF) {
         return "<pdfpage>.<pdfinclude src='" . $access->absoluteUrl($params['src']) . "' /></pdfpage>";
     }
-    $defaults_html5 = [
-        'width' => '',
-        'height' => '',
-    ];
-    $defaults = [
-        'width' => 320,
-        'height' => 240,
-    ];
 
     if (in_array($params['type'], DOCUMENT_ACCEPTED_FORMATS)) {
         $headerlib = TikiLib::lib('header');
@@ -214,11 +202,11 @@ function wikiplugin_mediaplayer($data, $params)
             $url = $access->absoluteUrl($params['src']);
             $smarty->assign('url', $url);
             $smarty->assign('mediaplayerId', $iMEDIAPLAYER);
-            $oldPdfJsFile = VendorHelper::getAvailableVendorPath('pdfjs', '/npm-asset/pdfjs-dist/build/pdf.js');
+            $oldPdfJsFile = VendorHelper::getAvailableVendorPath('pdfjs', 'npm-asset/pdfjs-dist/build/pdf.js');
             $oldPdfJsFileAvailable = file_exists($oldPdfJsFile);
             $smarty->assign('oldPdfJsFileAvailable', $oldPdfJsFileAvailable);
 
-            $pdfJsfile = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js');
+            $pdfJsfile = VendorHelper::getAvailableVendorPath('pdfjsviewer', 'npm-asset/pdfjs-dist-viewer-min/build/minified/build/pdf.js');
             $pdfJsAvailable = file_exists($pdfJsfile);
             $smarty->assign('pdfJsAvailable', $pdfJsAvailable);
 
@@ -291,7 +279,7 @@ function wikiplugin_mediaplayer($data, $params)
             }
 
             if (! empty($sourceLink)) {
-                $htmlViewFile = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html') . '?file=';
+                $htmlViewFile = VendorHelper::getAvailableVendorPath('pdfjsviewer', 'npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html') . '?file=';
                 $sourceLink = $htmlViewFile . urlencode($access->absoluteUrl($sourceLink));
             }
 
@@ -315,76 +303,19 @@ function wikiplugin_mediaplayer($data, $params)
                     $fileUrl = $access->absoluteUrl($params['src']);
                 }
 
-                if (! file_get_contents($fileUrl)) {
+                $file = Tiki\FileGallery\File::id($fileId);
+                $filecontent = $file->getContents() ?? '';
+
+                if (! $filecontent) {
                     Feedback::error(tr("PluginMediaPlayer: Unable to open the file %0. It may not exist or is inaccessible.", $fileUrl));
                     return;
                 }
 
-                $text = file_get_contents($fileUrl);
-                $text = html_entity_decode($text);
+                $smarty->assign('width', $params['width']);
+                $smarty->assign('height', $params['height']);
+                $smarty->assign('content', $filecontent);
 
-                if (! empty($text)) {
-                    $headerlibs = TikiLib::lib('header');
-                    $widthValue = ! empty($params['width']) ? $params['width'] : '100%';
-                    $heightValue = ! empty($params['height']) ? $params['height'] : '100%';
-
-                    $headerlibs->add_css('
-                        .iframe-media-wrapper {
-                            width: ' . $widthValue . ';
-                            height: ' . $heightValue . ';
-                            min-width: 480px;
-                            min-height: 420px;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        .iframe-media-wrapper .iframe-text-container {
-                            width: 100%;
-                            height: 100vh;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            background-color: #f1f1f1;
-                            padding: 20px;
-                            box-sizing: border-box;
-                            overflow: hidden;
-                        }
-
-                        .iframe-media-wrapper iframe.word-page {
-                            width: 90%;
-                            height: 100%;
-                            margin-top: auto;
-                            border: 1px solid #ccc;
-                            background-color: white;
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                            overflow: hidden;
-                            font-family: "Calibri", sans-serif;
-                            font-size: 12pt;
-                            line-height: 1.5;
-                            padding: 40px;
-                        }
-
-                        @media (max-width: 768px) {
-                            .iframe-media-wrapper {
-                                width: 100%;
-                                height: auto;
-                                min-width: unset;
-                                padding: 10px;
-                            }
-                            .iframe-media-wrapper .iframe-text-container {
-                                padding: 10px 10px;
-                            }
-                            .iframe-media-wrapper iframe.word-page {
-                                padding: 20px;
-                            }
-                        }
-                    ');
-
-                    $smarty->assign('content', $text);
-
-                    return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_mediaplayer_text.tpl') . '~/np~';
-                } else {
-                    return "<p>" . tr("Error: No text found.") . "</p>";
-                }
+                return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_mediaplayer_text.tpl') . '~/np~';
             }
 
             $smarty->assign('source_link', $sourceLink);
@@ -422,12 +353,12 @@ if (found) {
         return "<a href=\"" . $params['src'] . "\" id=\"$id\"></a>";
     }
 
-    if ((! empty($params['mediatype']) && ($params['mediatype'] == 'audio' || $params['mediatype'] == 'video'))) {
+    if ((! is_null($params['mediatype']) && ($params['mediatype'] == 'audio' || $params['mediatype'] == 'video'))) {
         $code = '<' . $params['mediatype'];
-        if (! empty($params['height'])) {
+        if (! is_null($params['height'])) {
             $code .= ' height="' . $params['height'] . '"';
         }
-        if (! empty($params['width'])) {
+        if (! is_null($params['width'])) {
             $code .= ' width="' . $params['width'] . '"';
         }
         $code .= ' style="max-width: 100%" controls>';

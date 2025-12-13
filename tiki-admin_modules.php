@@ -12,33 +12,35 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
             'wysiwyg'              => 'bool',        //post
-            'clear_cache'          => 'bool',        //post
+            'clear_cache'          => 'alpha',       //post
             'edit_assign'          => 'int',         //get
-            'preview'              => 'bool',        //post
+            'preview'              => 'alpha',       //post
             'unassign_module_id'   => 'int',        //post
-            'modup'                => 'bool',        //post
-            'moddown'              => 'bool',        //post
-            'module-order'         => 'string',      //post
-            'um_update'            => 'string',        //post
-            'um_name'              => 'string',      //post
+            'modup'                => 'int',         //post
+            'moddown'              => 'int',         //post
+            'module-order'         => 'text',        //post
+            'um_update'            => 'text',        //post
+            'um_name'              => 'text',        //post
             'um_data'              => 'none',        //post
-            'um_title'             => 'string',      //post
-            'um_parse'             => 'string',      //post
-            'um_tgt_module'        => 'string',      //post
-            'assign'               => 'bool',        //post
-            'assign_name'          => 'string',      //post
+            'um_title'             => 'text',        //post
+            'um_parse'             => 'alpha',       //post
+            'um_tgt_module'        => 'text',        //post
+            'assign'               => 'alpha',       //post
+            'assign_name'          => 'text',        //post
             'assign_rows'          => 'int',         //post
-            'assign_position'      => 'string',      //post
-            'assign_order'         => 'string',      //post
-            'assign_cache'         => 'string',      //post
-            'assign_type'          => 'string',      //post
-            'um_remove'            => 'string',      //post
-            'um_edit'              => 'string',      //get
+            'assign_position'      => 'alpha',       //post
+            'assign_order'         => 'digits',      //post
+            'assign_cache'         => 'digits',      //post
+            'assign_type'          => 'alpha',       //post
+            'um_remove'            => 'text',        //post
+            'um_edit'              => 'text',        //get
             'module_list_show_all' => 'bool',        //post
             'offset'               => 'int',         //get
             'edit_module'          => 'bool',        //post
             'moduleId'             => 'int',         //post
             'menuId'               => 'int',         //get
+            'sort_mode'            => 'alnumdash',   //get
+            'find'                 => 'text',        //get
         ],'staticKeyFiltersForArrays' => [
             'assign_params'        => 'striptags',   //post
             'groups'               => 'groupname',   //post
@@ -47,7 +49,7 @@ $inputConfiguration = [
 ];
 
 $section = 'admin';
-require_once('tiki-setup.php');
+require_once 'tiki-setup.php';
 
 $dcslib = TikiLib::lib('dcs');
 $bannerlib = TikiLib::lib('banner');
@@ -318,14 +320,14 @@ if (isset($_REQUEST['preview'])) {
         $phpfuncfile = 'modules/mod-func-' . $_REQUEST['assign_name'] . '.php';
         $template = 'modules/mod-' . $_REQUEST['assign_name'] . '.tpl';
         if ($file = $tikilib->safeFileExistsInPath($phpfile, MODULES_PATH)) {
-            include($file);
+            include $file;
         } elseif ($file = $tikilib->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             if (isset($_REQUEST['assign_params']['rows'])) {
                 $module_rows = $_REQUEST['assign_params']['rows'];
             } else {
                 $module_rows = 10;
             }
-            include_once($file);
+            include_once $file;
             $function = 'module_' . $_REQUEST['assign_name'];
             $assign_param = $_REQUEST['assign_params'] ?? [];
             if (function_exists($function)) {
@@ -359,7 +361,7 @@ if (isset($_REQUEST['preview'])) {
     $smarty->assign_by_ref('assign_order', $_REQUEST['assign_order']);
     $smarty->assign_by_ref('assign_cache', $_REQUEST['assign_cache']);
     $grps = '';
-    $module_groups = ! isset($_REQUEST['groups']) ? [] : $_REQUEST['groups'];
+    $module_groups = $_REQUEST['groups'] ?? [];
     foreach ($module_groups as $amodule) {
         $grps = $grps . ' $amodule ';
     }
@@ -389,14 +391,14 @@ if (isset($_REQUEST['assign']) && $access->checkCsrf()) {
     }
     $smarty->assign_by_ref('assign_type', $_REQUEST['assign_type']);
     $grps = '';
-    $module_groups = ! isset($_REQUEST['groups']) ? [] : $_REQUEST['groups'];
+    $module_groups = $_REQUEST['groups'] ?? [];
     foreach ($module_groups as $amodule) {
         $grps = $grps . " $amodule ";
     }
     $smarty->assign('module_groups', $grps);
     if (empty($missing_params)) {
         $result = $modlib->assign_module(
-            isset($_REQUEST['moduleId']) ? $_REQUEST['moduleId'] : 0,
+            $_REQUEST['moduleId'] ?? 0,
             $assign_name,
             '',
             $_REQUEST['assign_position'],
@@ -548,6 +550,7 @@ $prefs['feature_left_column'] = 'fixed';
 $prefs['feature_right_column'] = 'fixed';
 $prefs['module_zones_pagebottom'] = 'fixed';
 $prefs['module_zones_bottom'] = 'fixed';
+$prefs['module_sidebar_toggle_small_screen'] = 'fixed';
 
 $headerlib->add_css(
     '.module:hover {' . ' cursor: move;' . ' background-color: #ffa;' . ' }'
@@ -565,25 +568,36 @@ if ($prefs['feature_jquery_validation'] === 'y') {
             ],
             'um_data' => [
                 'required' => true,
-                'remote' => [
-                    'url' => 'validate-ajax.php',
-                    'type' => 'post',
-                    'data' => [
-                        'validator' => 'smarty',
-                        'input' => 'inputFunction',
-                        'parameter' => 'parameterFunction',
-                    ],
-                ],
             ],
         ],
         'submitHandler' => 'submitHandlerFunction',
     ];
+
+    // Add remote validator only if eval is allowed
+    if ($prefs['smarty_enable_string_eval'] === 'y') {
+        $rules['rules']['um_data']['remote'] = [
+            'url' => 'validate-ajax.php',
+            'type' => 'post',
+            'data' => [
+                'validator' => 'smarty',
+                'input' => 'inputFunction',
+                'parameter' => 'parameterFunction',
+            ],
+        ];
+    }
+
     $validationjs = '$("form[name=editusr]").validate(' . json_encode($rules) . ')';
     $validationjs = str_replace('"inputFunction"', 'function() { return $("#um_data").val(); }', $validationjs);
     $validationjs = str_replace('"parameterFunction"', 'function() { return $("#um_parse").val(); }', $validationjs);
-    $validationjs = str_replace('"submitHandlerFunction"', 'function(form, event){return process_submit(form, event);}', $validationjs);
+    $validationjs = str_replace(
+        '"submitHandlerFunction"',
+        'function(form, event){return process_submit(form, event);}',
+        $validationjs
+    );
+
     TikiLib::lib('header')->add_jq_onready($validationjs);
 }
+
 
 $sameurl_elements = ['offset', 'sort_mode', 'where', 'find'];
 
@@ -596,11 +610,7 @@ if (! isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $channels = $menulib->list_menus($offset, $maxRecords, $sort_mode, $find);
 foreach ($channels['data'] as $i => $channel) {
@@ -624,7 +634,7 @@ if (! empty($_REQUEST['edit_module'])) {    // pick up ajax calls
         unset($headerlib->css[100][array_search('#c1c2 #wrapper #col1.marginright { margin-right: 0; }', $headerlib->css[100])]);
     }
     $smarty->assign('padding_top_layout', true);
-    $smarty->assign('theme_navbar_fixed_topbar_offset', $prefs["theme_navbar_fixed_topbar_offset"] + 35);
+    $smarty->assign('layout_has_modules', true);
     $smarty->assign('mid', 'tiki-admin_modules.tpl');
     $smarty->display('tiki.tpl');
 }

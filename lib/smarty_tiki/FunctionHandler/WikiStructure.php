@@ -25,7 +25,7 @@ class WikiStructure extends Base
         if (! empty($params['id'])) {
             $params['structId'] = $params['id'];
         }
-        $html = wikiplugin_toc('', $params);
+        $html = \TikiLib::lib('parser')->invokePlugin('toc', '', $params);
         $html = str_replace(['~np~', '~/np~'], '', $html);
         return $html;
     }

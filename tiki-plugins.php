@@ -12,10 +12,15 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-        'approveone'               => 'bool',            //get
-        'clearone'                 => 'bool',            //get
+        'approveone'               => 'alnumdash',       //get
+        'clearone'                 => 'alnumdash',       //get
         'refresh'                  => 'bool',            //get
-        'offset'                   => 'digits',
+        'offset'                   => 'digits',          //get
+        'submit_mult'              => 'word',            //post
+        'approveall'               => 'bool',            //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'clear'                 => 'alnumdash',      //post
         ],
     ],
 ];

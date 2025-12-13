@@ -216,7 +216,7 @@
                 {/if}
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if} onclick="toggleBannerContent('useFixedURL')"> {tr}Use Image from URL{/tr}</label>
+                <label class="col-sm-4 col-form-label"><input type="radio" class="form-check-input" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if} onclick="toggleBannerContent('useFixedURL')"> {tr}Use Image from URL{/tr}</label>
                 <div class="col-sm-7" id="fixedURLContent">
                     <input type="text" name="fixedURLData" value="{$fixedURLData|escape}" class="form-control" {if $use neq 'useFixedURL'}disabled="disabled"{/if} required>
                     <div class="form-text">
@@ -225,7 +225,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if} onclick="toggleBannerContent('useText')"> {tr}Use Text{/tr}</label>
+                <label class="col-sm-4 col-form-label"><input type="radio" class="form-check-input" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if} onclick="toggleBannerContent('useText')"> {tr}Use Text{/tr}</label>
                 <div class="col-sm-7" id="textContent">
                     <textarea class="form-control" rows="5" name="textData" {if $use neq 'useText'}disabled="disabled"{/if} required>{$textData|escape}</textarea>
                 </div>

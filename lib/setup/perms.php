@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\Auth\Tokens;
+
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
@@ -13,7 +15,6 @@ $groupList = null;
 $is_token_access = false;
 $view_as_visitor = false;
 if ($prefs['auth_token_access'] == 'y' && isset($_REQUEST['TOKEN'])) {
-    require_once 'lib/auth/tokens.php';
     $token = $_REQUEST['TOKEN'];
 
     unset($_GET['TOKEN']);
@@ -38,7 +39,7 @@ if ($prefs['auth_token_access'] == 'y' && isset($_REQUEST['TOKEN'])) {
         }
     }
 
-    $tokenlib = AuthTokens::build($prefs);
+    $tokenlib = Tokens::build($prefs);
     if ($groups = $tokenlib->getGroups($token, $_SERVER['PHP_SELF'], $tokenParams)) {
         $groupList = $groups;
         $detailtoken = $tokenlib->getToken($token);

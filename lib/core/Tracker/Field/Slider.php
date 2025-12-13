@@ -113,7 +113,7 @@ class Tracker_Field_Slider extends Tracker_Field_Numeric implements \Tracker\Fie
         $value = $this->getValue();
 
         TikiLib::lib('header')->add_js_module(<<<JS
-             import('@jquery-tiki/ui-utils').then(({ handleSlider }) => {
+             import('@tiki/ui-utils').then(({ handleSlider }) => {
                 handleSlider('#{$this->getInsertId()}', '{$this->getHTMLFieldName()}');
             });
         JS);

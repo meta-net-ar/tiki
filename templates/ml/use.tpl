@@ -21,11 +21,11 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-2">{tr}Type{/tr}</label>
             <div class="col-sm-10">
-                <input type="radio" name="type" value="proba" {if $type neq 'predict'}checked{/if}>
+                <input type="radio" class="form-check-input" name="type" value="proba" {if $type neq 'predict'}checked{/if}>
                 {tr}Probability (closest matches){/tr}
                 <a href="https://doc.tiki.org/Machine-Learning" target="_blank" class="tikihelp text-info">{icon name=help}</a>
                 <br/>
-                <input type="radio" name="type" value="predict" {if $type eq 'predict'}checked{/if}> {tr}Prediction{/tr}
+                <input type="radio" class="form-check-input" name="type" value="predict" {if $type eq 'predict'}checked{/if}> {tr}Prediction{/tr}
                 <a href="https://doc.tiki.org/Machine-Learning" target="_blank" class="tikihelp text-info">{icon name=help}</a>
             </div>
         </div>

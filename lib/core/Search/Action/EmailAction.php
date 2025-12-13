@@ -208,8 +208,8 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return [];
         }
-        if (strpbrk($email_or_username, ',;') !== false) {
-            $list = preg_split('/\s*[,;]\s*/', $email_or_username);
+        if (strpbrk($email_or_username, ',; ') !== false) {
+            $list = preg_split('/\s*[,;\s]\s*/', $email_or_username);
             $res = [];
             foreach ($list as $email_or_username) {
                 $res = array_merge($res, $this->dereference($email_or_username));
@@ -228,7 +228,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             return array_map(function ($email) {
                 return trim($email, ",;\n\r\t ");
             }, $m[0]);
-        } elseif (strstr($email_or_username, '@')) {
+        } elseif (str_contains($email_or_username, '@')) {
             return [$email_or_username];
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
@@ -244,7 +244,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             return null;
         }
         $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        if (str_contains($email_or_username, '@')) {
             return null;
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
@@ -258,36 +258,18 @@ class Search_Action_EmailAction implements Search_Action_Action
 
     private function getPDFAttachment($pageName)
     {
-
         if (! Perms::get('wiki page', $pageName)->view) {
             return [];
         }
 
-        require_once('tiki-setup.php');
-        require_once 'lib/pdflib.php';
-        $generator = new PdfGenerator();
-        if (! empty($generator->error)) {
-            Feedback::error($generator->error);
+        try {
+            $exporter = new \Tiki\PagePdfExporter();
+            $pageInfo = $exporter->validatePageAccess($pageName);
+            $pageInfo['pageName'] = $pageName; // Ensure pageName is set
+            return $exporter->generatePdfFromWikiPage($pageInfo);
+        } catch (\Exception $e) {
+            Feedback::error($e->getMessage());
             return false;
-        } else {
-            $params = [ 'page' => $pageName ];
-
-            // If the page doesn't exist then display an error
-            if (! ($info = TikiLib::lib('tiki')->get_page_info($pageName))) {
-                Feedback::error(sprintf(tra('Page %s cannot be found'), $pageName));
-                return false;
-            }
-
-            $pdata = TikiLib::lib('parser')->parse_data($info["data"], [
-                'page' => $pageName,
-                'is_html' => $info["is_html"],
-                'print' => 'y',
-                'namespace' => $info["namespace"]
-            ]);
-            //replacing bootstrap classes for print version.
-            $pdata = str_replace(['col-sm','col-md','col-lg'], 'col-xs', $pdata);
-
-            return $generator->getPdf('tiki-print.php', $params, $pdata);
         }
     }
 

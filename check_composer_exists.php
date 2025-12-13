@@ -12,7 +12,7 @@
 // Don't call tiki-setup.php because it does the same test on composer's
 // installation and displays a web-ugly error message // which only looks nice in
 // command line mode
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }

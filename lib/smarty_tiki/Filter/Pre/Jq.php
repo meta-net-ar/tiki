@@ -18,7 +18,7 @@ class Jq implements \Smarty\Filter\FilterInterface
 {
     public function filter($source, \Smarty\Template $template)
     {
-        if (strpos($source, '{jq') === false) {
+        if (! str_contains($source, '{jq')) {
             return $source;         // quick escape if no jq tags
         }
         $return = preg_replace_callback('/(?s)(\{jq.*?\})(.+?)\{\/jq\}/', [$this, 'escapeSmartyJq'], $source);

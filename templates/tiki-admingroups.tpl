@@ -98,7 +98,17 @@
 
                         {if $prefs.useGroupHome eq 'y'}
                             <td class="text">
-                                <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {if !empty($users[user].groupHome)}
+                                    <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {else}
+                                    <span class="text-muted">
+                                        {tr}Group homepage is not defined{/tr}.
+                                        <a class="btn btn-link p-0 align-baseline"
+                                            href="tiki-admingroups.php?group={$users[user].groupName|escape:"url"}{if $prefs.feature_tabs ne 'y'}#tab2{/if}">
+                                            {tr}Configure{/tr}
+                                        </a>
+                                    </span>
+                                {/if}
                             </td>
                         {/if}
 
@@ -132,7 +142,7 @@
                 </div>
                     <div class="input-group col-sm-8">
                         <label for="submit_mult" class="col-form-label sr-only">{tr}Select action to perform with checked{/tr}</label>
-                            <select name="action" class="form-select">
+                            <select name="action" id="submit_mult" class="form-select">
                                 <option value="no_action" selected disabled>{tr}Select action to perform with checked{/tr}...</option>
                                 <option value="remove_groups">{tr}Remove{/tr}</option>
                             </select>
@@ -341,7 +351,7 @@
                             </div>
                             {if (isset($userstrackerid))}
                                 <div id="usersfielddiv"{if empty($userstrackerid) and $prefs.elementplus_select neq 'y'} style="display: none;"{/if}>
-                                    <label>{tr}Select user field{/tr}</label> <select name="usersfield" class="form-select">
+                                    <label for="users_field">{tr}Select user field{/tr}</label> <select name="usersfield" id="users_field" class="form-select">
                                         {if !empty($usersFields)}
                                             <option value="0">{tr}Choose a field ...{/tr}</option>
                                             {section name=ix loop=$usersFields}
@@ -401,9 +411,7 @@
                             <label class="col-form-label col-md-3">{tr}User Wizard Fields{/tr}</label>
                             <div class="col-md-9">
                                 {tr}By default, the same fields as in registration are used.{/tr} {tr _0="tiki-admin.php?page=login"}You can choose in the
-                                <a href="%0">Login admin
-                                    panel</a> to show different fields in User Wizard than the ones asked at Registration Time{/tr}
-                                .</td>
+                                <a href="%0">Login admin panel</a> to show different fields in User Wizard than the ones asked at Registration Time{/tr}
                             </div>
                         </div>
                     {/if}
@@ -412,9 +420,20 @@
                     <div id="registerfields" class="mb-3 row"{if empty($userstrackerid) && empty($grouptrackerid) && $prefs.elementplus_select != 'y'} style="display: none;"{/if}>
                         <label for="registrationUserFieldIds" class="col-form-label col-md-3">{tr}Group or User Tracker Registration Fields{/tr}</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="registrationUsersFieldIds" value="{$registrationUsersFieldIds|escape}">
+                            <input type="text" class="form-control" name="registrationUsersFieldIds" id="registrationUserFieldIds" value="{$registrationUsersFieldIds|escape}">
                             <div class="form-text">
                                 <p>{tr}If either a group information tracker or user registration tracker has been selected above, enter colon-separated field ID numbers for the tracker fields in the above tracker to include on the registration form for a new user to complete.{/tr}</p>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+                {if $prefs.twoFactorAuth eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-md-3">{tr}2FA Grace Period{/tr}</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$twoFactorAuthGracePeriod|escape}">
+                            <div class="form-text">
+                                {tr}Number of days to allow users in this group to access the site without 2FA before forcing them to set it up.{/tr}
                             </div>
                         </div>
                     </div>
@@ -434,11 +453,12 @@
                     <div class="mb-3 row">
                         <label class="col-form-label col-md-3">{tr}Membership expiry{/tr}</label>
                         <div class="col-md-9">
-                            <label>{tr}Anniversary{/tr}</label>
-                        <input type="text" name="anniversary" class="form-control" value="{if is_array($group_info)}{$group_info.anniversary|escape}{else}{/if}">
+                            <label for="anniversaryId">{tr}Anniversary{/tr}</label>
+                            <input type="text" name="anniversary" id="anniversaryId" class="form-control" value="{if is_array($group_info)}{$group_info.anniversary|escape}{else}{/if}">
                             <div class="form-text">{tr}Use MMDD to specify an annual date as of which all users will be unassigned from the group, or DD to specify a monthly date.{/tr}</div>
-                            <label>{tr}Or{/tr}</label><br> <label>{tr}Number of Days{/tr}</label>
-                        <input type="text" class="form-control" name="expireAfter" value="{if is_array($group_info)}{$group_info.expireAfter|escape}{else}{/if}">
+                            <label>{tr}Or{/tr}</label><br>
+                            <label>{tr}Number of Days{/tr}</label>
+                            <input type="text" class="form-control" name="expireAfter" value="{if is_array($group_info)}{$group_info.expireAfter|escape}{else}{/if}">
                             <div class="form-text">
                                 {tr}Number of days after which all users will be unassigned from the group.{/tr}
                             </div>
@@ -447,7 +467,7 @@
                     <div class="mb-3 row">
                         <label for="prorateInterval" class="col-form-label col-md-3">{tr}Pro-rata Membership{/tr}</label>
                         <div class="col-md-9">
-                            <select name="prorateInterval" class="form-select">
+                            <select name="prorateInterval" id="prorateInterval" class="form-select">
                                 <option value="day" {if is_array($group_info) && $group_info.prorateInterval eq 'day'}selected="selected"{/if}>{tr}Day{/tr}</option>
                                 <option value="month" {if is_array($group_info) && $group_info.prorateInterval eq 'month'}selected="selected"{/if}>{tr}Month{/tr}</option>
                                 <option value="year" {if is_array($group_info) && $group_info.prorateInterval eq 'year'}selected="selected"{/if}>{tr}Year{/tr}</option>
@@ -459,9 +479,9 @@
                     </div>
                 {/if}
                 <div class="mb-3 row">
-                    <label class="col-form-label col-md-3">{tr}Email Pattern{/tr}</label>
+                    <label class="col-form-label col-md-3" for="email_pattern">{tr}Email Pattern{/tr}</label>
                     <div class="col-md-9">
-                        <input class="form-control" type="text" size="40" name="emailPattern" value="{if is_array($group_info)}{$group_info.emailPattern|escape}{else}{/if}">
+                        <input class="form-control" type="text" size="40" name="emailPattern" id="email_pattern" value="{if is_array($group_info)}{$group_info.emailPattern|escape}{else}{/if}">
                         <div class="form-text">
                             <p>{tr}Users are automatically assigned at registration in the group if their emails match the pattern.{/tr}</p>
                             <p>{tr}Example:{/tr} /@(tw.org$)|(tw\.com$)/</p>
@@ -656,7 +676,7 @@
                             <div class="form-group">
                                 <select name="user[]" multiple="multiple" size="10" class="{*custom-select*} form-select"  style="width: 100%; display: block;">
                                     {foreach from=$userslist item=iuser}
-                                        <option>{$iuser|escape}</option>
+                                        <option value="{$iuser|escape}">{$iuser|escape}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -781,9 +801,9 @@
 
                     <h2>{tr}Export group users (CSV file){/tr}</h2>                <br>
                     <div class="mb-3 row">
-                        <label class="col-sm-3 col-form-label">{tr}Charset encoding{/tr}</label>
+                        <label class="col-sm-3 col-form-label" for="encoding">{tr}Charset encoding{/tr}</label>
                         <div class="col-sm-7">
-                            <select name="encoding" class="form-select">
+                            <select name="encoding" id="encoding" class="form-select">
                                 <option value="UTF-8" selected="selected">{tr}UTF-8{/tr}</option>
                                 <option value="ISO-8859-1">{tr}ISO-8859-1{/tr}</option>
                             </select>
@@ -820,13 +840,14 @@
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">
                             {tr}CSV File{/tr}
-                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a> </label>
+                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a>
+                        </label>
                         <div class="col-sm-7">
-                        <input name="csvlist" type="file" accept=".csv" class="form-control">
+                            <input name="csvlist" type="file" accept=".csv" class="form-control">
                             <div class="form-text">
                                 {tr}Imported users must already exist. To create users and assign them to groups, go to
-                                    <a href="tiki-adminusers.php">admin->users</a>
-                                    .{/tr}
+                                    <a href="tiki-adminusers.php">admin->users</a> .
+                                {/tr}
                             </div>
                         </div>
                     </div>

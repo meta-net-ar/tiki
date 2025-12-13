@@ -1,0 +1,99 @@
+// Cerulean for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+// Forms
+// Navs
+// Navbar
+// Dropdowns
+// Pagination
+// Cards
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+[data-bs-theme="light"] {
+    .list-group-item-primary {
+        color: #2C2F30BF;
+    }
+    .list-group-item-secondary {
+        color: #303536BF;
+    }
+    .list-group-item-success {
+        color: #303536BF;
+    }
+    .list-group-item-info {
+        color: #303536BF;
+    }
+    .list-group-item-warning {
+        color: #36393ABF;
+    }
+    .list-group-item-danger {
+        color: #333738BF;
+    }
+    //    .list-group-item-light {
+    //        color: #303536BF;
+    //    }
+    .list-group-item-dark {
+        color: #2F3132BF;
+    }
+}
+
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+[data-bs-theme=dark] {
+    mark {
+        color: #B9C0C6;
+    }
+    .accordion-button.collapsed {
+        color: #828282;
+    }
+    .alert.alert-primary {
+        color: #858585;
+        .alert-link {
+            color: #858585;
+        }
+    }
+    .btn.btn-outline-primary { color: #1697CA; border-color: #1697CA; }
+    .btn.btn-outline-secondary { color: #F7F8F880; border-color: #F7F8F880; }
+    .btn.btn-outline-success { color: #24A828; border-color: #24A828; }
+    .btn.btn-outline-danger { color: #FF473D; border-color: #FF473D; }
+    .btn.btn-outline-warning { color: #E06900; border-color: #E06900; }
+    .btn.btn-outline-info { color: #1B95C5; border-color: #1B95C5; }
+    .list-group-item.list-group-item-action.list-group-item-secondary { color: #B0B8BFBF; }
+    .list-group-item.list-group-item-action.list-group-item-light { color: #C1C6CDBF; }
+    .page-link {
+        --bs-pagination-bg: #313E49; // !important;
+    //    background-color: #313E49 !important;
+    }
+    .breadcrumb {
+        --bs-breadcrumb-bg: #313E49;
+    }
+}
+
+// External libraries

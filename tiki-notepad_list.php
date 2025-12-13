@@ -10,10 +10,10 @@ $inputConfiguration = [
         'staticKeyFilters'     => [
         'merge'                => 'bool',        //get
         'delete'               => 'bool',        //post
-        'merge_name'           => 'string',      //post
-        'sort_mode'            => 'string',      //post
+        'merge_name'           => 'text',        //post
+        'sort_mode'            => 'alnumdash',   //post
         'offset'               => 'int',         //post
-        'find'                 => 'string',      //post
+        'find'                 => 'text',        //post
         ],
         'staticKeyFiltersForArrays' => [
             'note' => 'int',
@@ -66,11 +66,10 @@ if (isset($_REQUEST["merge"])) {
         if ($first) {
             $first = false;
             $merge .= "---------" . tra('merged note:') . $data_c['name'] . "----" . "\n";
-            $merge .= $data;
         } else {
             $merge .= "\n---------" . tra('merged note:') . $data_c['name'] . "----" . "\n";
-            $merge .= $data;
         }
+        $merge .= $data;
     }
     // Now create the merged note
     $tikilib->replace_note($user, 0, $_REQUEST['merge_name'], $merge);
@@ -98,17 +97,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (isset($_SESSION['thedate'])) {

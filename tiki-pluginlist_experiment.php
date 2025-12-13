@@ -20,6 +20,8 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+$access = TikiLib::lib('access');
+$access->check_permission('tiki_p_edit');
 
 if ($tiki_p_edit !== 'y') {
     Feedback::errorAndDie(tra("You need permission to edit pages in order to experiment on plugin LIST."), \Laminas\Http\Response::STATUS_CODE_401);

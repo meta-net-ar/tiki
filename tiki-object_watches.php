@@ -14,14 +14,13 @@ $inputConfiguration = [
         'objectId'             => 'int',        //post
         'watch_event'          => 'bool',       //post
         'objectType'           => 'string',     //post
-        'referer'              => 'word',       //post
+        'referer'              => 'url',       //post this must be a valid URL
         'assign'               => 'bool',       //post
         'objectName'           => 'string',     //post
         'objectHref'           => 'string',     //post
         ],
         'staticKeyFiltersForArrays' => [
             'checked'              => 'string',   //post
-        $g                         => 'string', //post
         ],
     ],
 ];
@@ -33,7 +32,7 @@ if (! isset($_REQUEST['objectId']) || ! isset($_REQUEST['watch_event'])) {
     Feedback::errorPage(tr('Not enough information to display this page'));
 }
 
-$objectType = isset($_REQUEST['objectType']) ? $_REQUEST['objectType'] : null;
+$objectType = $_REQUEST['objectType'] ?? null;
 
 $auto_query_args = ['objectId', 'objectType', 'objectName', 'watch_event', 'referer', 'objectHref'];
 $all_groups = $userlib->list_all_groups();
@@ -62,8 +61,8 @@ if (isset($_REQUEST['referer'])) {
 }
 
 if (isset($_REQUEST['assign']) && $access->checkCsrf()) {
-    $objectName = isset($_REQUEST['objectName']) ? $_REQUEST['objectName'] : null;
-    $objectHref = isset($_REQUEST['objectHref']) ? $_REQUEST['objectHref'] : null;
+    $objectName = $_REQUEST['objectName'] ?? null;
+    $objectHref = $_REQUEST['objectHref'] ?? null;
     $addedGroups = [];
     $deletedGroups = [];
     if (! isset($_REQUEST['checked'])) {

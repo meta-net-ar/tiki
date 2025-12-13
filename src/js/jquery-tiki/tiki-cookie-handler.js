@@ -1,17 +1,16 @@
 window.CookieHandler = (() => {
+    const BUILTIN_COOKIE_CATEGORY_ESSENTIAL = JSON.parse(jqueryTiki.BUILTIN_COOKIE_CATEGORY_ESSENTIAL);
+
     function setConsentCookies(actionType = "customized") {
         const COOKIE_CONSENT_NAME = jqueryTiki.cookie_consent_name;
         const COOKIE_CATEGORIES = JSON.parse(jqueryTiki.cookie_consent_categories);
-        let getcookie_consent_value = JSON.parse(jqueryTiki.cookie_consent_value);
+        const getcookie_consent_value = {
+            action: "customized",
+            categories: {},
+            consentGiven: false,
+        };
 
-        if (getcookie_consent_value === null || getcookie_consent_value.length === 0) {
-            getcookie_consent_value = {
-                action: "customized",
-                categories: {},
-                consentGiven: false,
-            };
-        }
-
+        const ACTION_TYPES = { CUSTOMIZED: "customized", ACCEPT_ALL: "acceptAll", DECLINE_UNNECESSARY: "declineUnnecessary" };
         const COOKIE_CONSENT_VALUE = getcookie_consent_value;
         const exp = new Date();
         exp.setTime(exp.getTime() + 24 * 60 * 60 * 1000 * jqueryTiki.cookie_consent_expires);
@@ -38,12 +37,30 @@ window.CookieHandler = (() => {
             }
         });
 
-        if (allChecked) {
-            COOKIE_CONSENT_VALUE.action = "acceptAll";
-        } else if (noneChecked) {
-            COOKIE_CONSENT_VALUE.action = "declineUnnecessary";
-        } else {
-            COOKIE_CONSENT_VALUE.action = "customized";
+        $("#customConsentSectionBanner input[type='checkbox']").each(function () {
+            if (!$(this).prop("disabled")) {
+                if ($(this).is(":checked")) {
+                    noneChecked = false;
+                } else {
+                    allChecked = false;
+                }
+            }
+        });
+
+        if (actionType === ACTION_TYPES.ACCEPT_ALL) {
+            COOKIE_CONSENT_VALUE.action = ACTION_TYPES.ACCEPT_ALL;
+            COOKIE_CONSENT_VALUE.categories = {};
+            COOKIE_CATEGORIES.forEach((category) => {
+                COOKIE_CONSENT_VALUE.categories[category] = true;
+            });
+        } else if (actionType === ACTION_TYPES.CUSTOMIZED) {
+            COOKIE_CONSENT_VALUE.action = ACTION_TYPES.CUSTOMIZED;
+        } else if (actionType === ACTION_TYPES.DECLINE_UNNECESSARY) {
+            COOKIE_CONSENT_VALUE.action = ACTION_TYPES.DECLINE_UNNECESSARY;
+            COOKIE_CONSENT_VALUE.categories = {};
+            COOKIE_CATEGORIES.forEach((category) => {
+                COOKIE_CONSENT_VALUE.categories[category] = category === BUILTIN_COOKIE_CATEGORY_ESSENTIAL; // Only essential category is true
+            });
         }
 
         COOKIE_CONSENT_VALUE.consentGiven = true;
@@ -69,7 +86,17 @@ window.CookieHandler = (() => {
         let allNonEssentialUnchecked = true;
 
         $("#customConsentSection input[type='checkbox']").each(function () {
-            if ($(this).prop("disabled") || $(this).attr("name").includes("cookie_consent_essential")) {
+            if ($(this).prop("disabled") || $(this).attr("name").includes(BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+                return;
+            }
+            if ($(this).is(":checked")) {
+                allNonEssentialUnchecked = false;
+            } else {
+                allNonEssentialChecked = false;
+            }
+        });
+        $("#customConsentSectionBanner input[type='checkbox']").each(function () {
+            if ($(this).prop("disabled") || $(this).attr("name").includes(BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
                 return;
             }
             if ($(this).is(":checked")) {
@@ -104,6 +131,9 @@ window.CookieHandler = (() => {
 $(document).ready(() => {
     CookieHandler.updateTopLevelAction();
     $("#customConsentSection input[type='checkbox']").on("change", function () {
+        CookieHandler.updateTopLevelAction();
+    });
+    $("#customConsentSectionBanner input[type='checkbox']").on("change", function () {
         CookieHandler.updateTopLevelAction();
     });
 
@@ -152,6 +182,11 @@ $(document).ready(() => {
                     $(this).prop("checked", true);
                 }
             });
+            $('#customConsentSectionBanner input[type="checkbox"]').each(function () {
+                if (!$(this).prop("disabled")) {
+                    $(this).prop("checked", true);
+                }
+            });
         }
         CookieHandler.updateTopLevelAction();
     });
@@ -160,6 +195,11 @@ $(document).ready(() => {
         if ($(this).is(":checked")) {
             $("#acceptAllCheck").prop("checked", false);
             $("#customConsentSection input[type='checkbox']").each(function () {
+                if (!$(this).prop("disabled")) {
+                    $(this).prop("checked", false);
+                }
+            });
+            $('#customConsentSectionBanner input[type="checkbox"]').each(function () {
                 if (!$(this).prop("disabled")) {
                     $(this).prop("checked", false);
                 }

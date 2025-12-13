@@ -275,8 +275,6 @@ function wikiplugin_accordion($body, $params)
 {
     static $id = 0;
     $unique = 'accordion-' . ++$id;
-
-    $headers = [];
     $icons = [];
     if (! empty($params['headers'])) {
         $headers = explode('|', $params['headers']);
@@ -294,7 +292,7 @@ function wikiplugin_accordion($body, $params)
             }
         }
     } else {
-        return "''" . tra("No header title specified. At least one must be specified in order for the accordion to appear.") . "''";
+        return WikiParser_PluginOutput::argumentError(['headers']);
     }
 
     if (! empty($body)) {

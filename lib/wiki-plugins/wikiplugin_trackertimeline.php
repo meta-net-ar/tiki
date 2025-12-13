@@ -13,6 +13,7 @@ function wikiplugin_trackertimeline_info()
         'prefs' => [ 'wikiplugin_trackertimeline', 'feature_trackers' ],
         'iconname' => 'history',
         'introduced' => 3,
+        'filter' => 'wikicontent',
         'format' => 'html',
         'params' => [
             'tracker' => [
@@ -21,7 +22,6 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Numeric value representing the tracker ID'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker',
             ],
             'title' => [
@@ -31,6 +31,26 @@ function wikiplugin_trackertimeline_info()
                 'since' => '3.0',
                 'filter' => 'digits',
                 'default' => '',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[tracker]"]',
+                'parentkey' => 'tracker_id',
+            ],
+            'color' => [
+                'required' => false,
+                'name' => tra('Color Field'),
+                'description' => tra('Tracker Field ID containing the item color(that field must contains valid css color like : red, yellow,#FAEBD7,BlanchedAlmond , ... .'),
+                'since' => '29.0',
+                'filter' => 'digits',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[tracker]"]',
+                'parentkey' => 'tracker_id',
+            ],
+            'type' => [
+                'required' => false,
+                'name' => tra('Type Field'),
+                'description' => tra("Tracker Field ID containing the type of item. The type of the item can be 'box' (default), 'point', 'range', or 'background'. Types 'box' and 'point' need a start date, the types 'range' and 'background' needs both a start and end date."),
+                'since' => '29.0',
+                'filter' => 'digits',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -60,95 +80,101 @@ function wikiplugin_trackertimeline_info()
                 'parentkey' => 'tracker_id',
             ],
             'end' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('End Date'),
                 'description' => tra('Tracker Field ID containing the element end date. The field must be a
                     datetime/jscalendar field.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
             ],
             'group' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Element Group'),
                 'description' => tra('Tracker Field ID containing the element\'s group. Elements of a same group are
                     displayed on the same row.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
             ],
             'lower' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Lower Bound'),
-                'description' => tr('Date from which element should be displayed. Date must be provided in
-                    %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'description' => tr('The initial start date for the axis of the timeline.
+                    If not provided, the latest date present in the items set is taken as end date.
+                    Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'upper' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Upper Bound'),
-                'description' => tr('Date until which element should be displayed. Date must be provided in
-                    %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'description' => tr('The initial end date for the axis of the timeline.
+                    If not provided, the latest date present in the items set is taken as end date.
+                    Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
-            'scale1' => [
+            'max' => [
+                'required' => false,
+                'name' => tra('Max Bound'),
+                'description' => tr('TSet a maximum Date for the visible range.
+                    It will not be possible to move beyond this maximum.Date must be provided
+                    in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '29.0',
+                'filter' => 'datetime',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
+            ],
+            'min' => [
+                'required' => false,
+                'name' => tra('Min Bound'),
+                'description' => tr('TSet a minimum Date for the visible range.
+                    It will not be possible to move beyond this minimum.Date must be provided
+                    in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
+                'since' => '29.0',
+                'filter' => 'datetime',
+                'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
+            ],
+            'scale' => [
                 'required' => false,
                 'name' => tra('Primary Scale Unit'),
-                'description' => tra('Unit of time to use for the primary scale (default to hour - * SIMILE only)'),
-                'since' => '3.0',
+                'description' => tra("Set a fixed scale for the time axis of the Timeline. Choose from 'millisecond',
+                    'second', 'minute', 'hour', 'weekday', 'week', 'day', 'month', 'year'"),
+                'since' => '29.0',
                 'filter' => 'alpha',
-                'default' => 'hour',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Hour'), 'value' => 'hour'],
-                    ['text' => tra('Day'), 'value' => 'day'],
-                    ['text' => tra('Week'), 'value' => 'week'],
-                    ['text' => tra('Month'), 'value' => 'month'],
-                    ['text' => tra('Year'), 'value' => 'year'],
-                    ['text' => tra('Decade *'), 'value' => 'decade'],
-                    ['text' => tra('Century *'), 'value' => 'century'],
-                ]
             ],
-            'scale2' => [
+            'step' => [
                 'required' => false,
                 'name' => tra('Secondary Scale Unit'),
-                'description' => tra('Unit of time to use for the secondary scale (default to empty - * SIMILE only)'),
-                'since' => '3.0',
-                'filter' => 'alpha',
-                'default' => '',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Hour'), 'value' => 'hour'],
-                    ['text' => tra('Day'), 'value' => 'day'],
-                    ['text' => tra('Week'), 'value' => 'week'],
-                    ['text' => tra('Month'), 'value' => 'month'],
-                    ['text' => tra('Year'), 'value' => 'year'],
-                    ['text' => tra('Decade *'), 'value' => 'decade'],
-                    ['text' => tra('Century *'), 'value' => 'century'],
-                ]
+                'description' => tra("Set a fixed step size for the time axis. Only applicable when used together with scale parameter. Choose for example 1, 2, 5, or 10"),
+                'since' => '29.0',
+                'filter' => 'number',
             ],
             'height' => [
                 'required' => false,
                 'name' => tra('Timeline height'),
                 'description' => tr(
-                    'Height of the timeline band as a CSS unit (default: %0 -  - * SIMILE only)',
+                    'Height of the timeline band as a CSS unit (for example 250px, 75%,...)',
                     '<code>250p</code>'
                 ),
                 'since' => '9.0',
                 'filter' => 'text',
-                'default' => '250px',
+            ],
+            'orientation' => [
+                'required' => false,
+                'name' => tra('Timeline orientation'),
+                'description' => tr(
+                    "Orientation of the timeline axis and items. When orientation is a string, the value is applied
+                    to both items and axis. Can be 'top', 'bottom' (default), 'both' or 'none'."
+                ),
+                'since' => '29.0',
+                'filter' => 'text',
             ],
             'band2_height' => [
                 'required' => false,
@@ -180,30 +206,16 @@ function wikiplugin_trackertimeline_info()
                 'description' => tra('Tracker Field ID containing the page name for item details.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
             ],
-            'simile_timeline' => [
-                'required' => false,
-                'name' => tra('SIMILE Timeline'),
-                'description' => tra('Use the SIMILE Timeline Widget.'),
-                'since' => '7.0',
-                'filter' => 'alpha',
-                'default' => 'n',
-                'options' => [
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n'],
-                ],
-            ],
             'image_field' => [
                 'required' => false,
                 'name' => tra('Image Field'),
-                'description' => tra('Tracker Field ID containing in image.'),
+                'description' => tra('Tracker Field ID containing the image file.'),
                 'since' => '7.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -216,42 +228,73 @@ function wikiplugin_trackertimeline($data, $params)
 {
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
-
+    $js = '';
     static $instance = 0;
     $instance++;
 
-    if (! isset($params['tracker'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
+    $max = 0;
+    $min = 0;
+    $step = ! empty($params['step']) ? ($params['step']) : '1';
+    $start = ! is_null($params['lower']) ? strtotime($params['lower']) : null;
+    $end = ! is_null($params['upper']) ? strtotime($params['upper']) : null;
+
+    if ($start && $end) {
+        $size = $end - $start;
+        if ($size <= 0) {
+            return '{BOX(class="text-bg-light")}' . tr("Start date after end date.") . '{BOX}';
+        }
     }
 
-    $default = ['scale1' => 'hour', 'simile_timeline' => 'n', 'height' => '250px', 'band2_height' => 30];
-    $params = array_merge($default, $params);
-    $formats = ['hour' => 'H:i', 'day' => 'jS', 'week' => 'jS', 'month' => 'm', 'year' => 'y'];
+    if (! is_null($params['max'])) {
+        $fieldIds[ $params['max'] ] = 'max';
+        $max = strtotime($params['max']);
+    }
 
-    $start = strtotime($params['lower']);
-    $end = strtotime($params['upper']);
-    $size = $end - $start;
-    $paramScale1 = $params['scale1'] ?? null;
-    $paramScale2 = $params['scale2'] ?? null;
+    if (! is_null($params['min'])) {
+        $fieldIds[ $params['min'] ] = 'min';
+        $min = strtotime($params['min']);
+    }
 
-    if ($size <= 0) {
-        return '{BOX(class="text-bg-light")}' . tr("Start date after end date.") . '{BOX}';
+    if (! is_null($params['orientation'])) {
+        $fieldIds[ $params['orientation'] ] = 'orientation';
+    }
+
+    if (! is_null($params['scale'])) {
+        $fieldIds[ $params['scale'] ] = 'scale';
+    }
+
+    if (! is_null($params['step'])) {
+        $fieldIds[ $params['step'] ] = 'step';
+    }
+
+    if (! is_null($params['type'])) {
+        $fieldIds[ $params['type'] ] = 'type';
     }
 
     $fieldIds = [
         $params['title'] => 'title',
         $params['summary'] => 'summary',
         $params['start'] => 'start',
-        $params['end'] => 'end',
-        $params['group'] => 'group',
     ];
 
-    if (isset($params['link_page'])) {
-        $fieldIds[ $params['link_page'] ] = 'link';
+    if (! is_null($params['end'])) {
+        $fieldIds[ $params['end'] ] = 'end';
     }
 
-    if (! empty($params['image_field'])) {
+    if (! is_null($params['link_page'])) {
+        $fieldIds[ $params['link_page'] ] = 'link_page';
+    }
+
+    if (! is_null($params['image_field'])) {
         $fieldIds[ $params['image_field'] ] = 'image';
+    }
+
+    if (! is_null($params['color'])) {
+        $fieldIds[ $params['color'] ] = 'color';
+    }
+
+    if (! is_null($params['group'])) {
+        $fieldIds[ $params['group'] ] = 'group';
     }
 
     $fields = [];
@@ -269,38 +312,8 @@ function wikiplugin_trackertimeline($data, $params)
             $detail[ $fieldIds[$field['fieldId']] ] = $field['value'];
         }
 
-        $detailStart = $detail['start'] ?? null;
-        $detailEnd = $detail['end'] ?? null;
-        $detailSummary = $detail['summary'] ?? null;
         $detailGroup = $detail['group'] ?? null;
-
-        // Filter elements
-        if ($params['simile_timeline'] !== 'y') {
-            if ($detailStart >= $detailEnd) {
-                continue;
-            }
-            if ($detailEnd <= $start || $detailStart > $end) {
-                continue;
-            }
-        } else {
-            if (! empty($detailEnd) && $detailStart > $detailEnd) {
-                continue;
-            }
-            if ((! empty($detailEnd) && $detailEnd < $start) || $detailStart > $end) {
-                continue;
-            }
-        }
-
-        $detail['lstart'] = max($start, $detailStart);
-        $detail['lend'] = min($end, $detailEnd);
-        $detail['lsize'] = round(( $detail['lend'] - $detail['lstart'] ) / $size * 80);
-
-        $detail['fstart'] = date($formats[$params['scale1']], $detailStart);
-        $detail['fend'] = date($formats[$params['scale1']], $detailEnd);
-        $detail['psummary'] = TikiLib::lib('parser')->parse_data($detailSummary);
-
         $detail['encoded'] = json_encode($detail);
-
         // Add to data list
         if (! array_key_exists($detailGroup, $data)) {
             $data[$detailGroup] = [];
@@ -308,212 +321,88 @@ function wikiplugin_trackertimeline($data, $params)
         $data[ $detailGroup ][] = $detail;
     }
 
-    if ($params['simile_timeline'] !== 'y') {
-        $new = [];
-        foreach ($data as $group => &$list) {
-            wp_ttl_organize($group, $start, $size, $list, $new);
-        }
-        $data = array_merge($data, $new);
-        ksort($data);
+    $headerlib = TikiLib::lib('header');
+    // prepare the data - to be included in the page for now (ajax feed to come)
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/vis-timeline/dist/vis-timeline-graph2d.min.css');
+    $events = [];
+    $css = '';
+    $groups = [];
+    foreach ($data as $list) {
+        foreach ($list as $item) {
+            $itemStart = $item['start'] ?? null;
+            $itemSummary = $item['summary'] ?? null;
+            $itemImage = $item['image'] ?? null;
 
-        $smarty->assign('wp_ttl_data', $data);
-        $layouts = [];
-        if (isset($params['scale2']) && $layout = wp_ttl_genlayout($start, $end, $size, $params['scale2'])) {
-            $layouts[] = $layout;
-        }
-        $layouts[] = wp_ttl_genlayout($start, $end, $size, isset($params['scale1']) ? $params['scale1'] : 'hour');
-        $smarty->assign('layouts', $layouts);
-        $smarty->assign('link_group_names', isset($params['link_group']) && $params['link_group'] == 'y');
-        return $smarty->fetch('wiki-plugins/wikiplugin_trackertimeline.tpl');
-    } else {    // SIMILE Timeline Widget setup
-        $headerlib = TikiLib::lib('header');
-
-        // static js moved to lib
-        $headerlib->add_jsfile('lib/simile_tiki/tiki-timeline.js');
-
-        // prepare the data for SIMILE widget - to be included in the page for now (ajax feed to come)
-        $ttl_data = [];
-        $events = [];
-        foreach ($data as $group => $list) {    // ignoring group for now
-            foreach ($list as $item) {
-                $itemStart = $item['start'] ?? null;
-                $itemSummary = $item['summary'] ?? null;
-                $itemImage = $item['image'] ?? null;
-
-                $event = [
-                    'title' => $item['title'],
-                    'start' => date('r', $itemStart),
-                    'description' => $itemSummary,
-                ];
-                if (! empty($item['end'])) {
-                    $event['end'] = date('r', $item['end']);
-                    $event['isDuration'] = true;
-                }
-                if (! empty($item['link'])) {
-                    $event['link'] = $item['link'];
-                }
-                $image = $itemImage;
-                if (! empty($image)) {
-                    if (strpos($image, ',') !== false) {
-                        // just the first one
-                        $image = substr($image, 0, strpos($image, ','));
-                    }
-                    if (is_numeric($image)) {
-                        // a fileId
-                        $image = smarty_modifier_sefurl($image, 'thumbnail');
-                    }
-                    $event['image'] = $image;
-                }
-                $events[] = $event;
-            }
-            $ttl_data = [
-                'dateTimeFormat' => '', // iso8601
-//              'wikiURL' => '',
-//              'wikiSection' => '',
-                'events' => $events,
+            $event = [
+                'content' => $item['title'],
+                'start' => date('r', $itemStart),
+                'title' => $itemSummary,
             ];
-        }
-        $js = 'var ttl_eventData_' . $instance . ' = ' . json_encode($ttl_data) . ";\n";
 
-        $js .= '
-setTimeout( function(){ ttlInit("ttl_timeline_' . $instance . '",ttl_eventData_' . $instance . ',"' . $paramScale1 . '","' . $paramScale2 . '","' . $params['band2_height'] . '"); }, 1000);
-';
-
-        $headerlib->add_jq_onready($js, 10);
-        $out = '<div id="ttl_timeline_' . $instance . '" style="height: ' . $params['height'] . '; border: 1px solid #aaa"></div>';
-        return $out;
-    }
-}
-
-function wp_ttl_organize($name, $base, $size, &$list, &$new)
-{
-    usort($list, 'wp_ttl_sort_cb');
-
-    $first = $list;
-    $list = [];
-    $remaining = [];
-
-    $pos = $base;
-    foreach ($first as $item) {
-        if ($item['lstart'] < $pos) {
-            $remaining[] = $item;
-            continue;
-        }
-
-        $item['lpad'] = round(($item['lstart'] - $pos ) / $size * 80);
-        $pos = $item['lend'];
-
-        $list[] = $item;
-    }
-
-    if (count($remaining)) {
-        wp_ttl_organize("$name ", $base, $size, $remaining, $new);
-        $new["$name "] = $remaining;
-    }
-}
-
-function wp_ttl_sort_cb($a, $b)
-{
-    if ($a['start'] == $b['start']) {
-        return 0;
-    }
-    if ($a['start'] < $b['start']) {
-        return -1;
-    }
-    if ($a['start'] > $b['start']) {
-        return 1;
-    }
-}
-
-function wp_ttl_genlayout($start, $end, $full, $type)
-{
-    switch ($type) {
-        case 'empty':
-        case '':
-            return;
-        case 'hour':
-            $size = 3600;
-            $pos = $start - ( $start + $size ) % $size;
-            break;
-        case 'day':
-            $size = 86400;
-
-            if (date('H:i:s', $start) == '00:00:00') {
-                $pos = $start;
-            } else {
-                $pos = strtotime(date('Y-m-d 00:00:00', $start + $size));
-            }
-            break;
-        case 'week':
-            $size = 604800;
-
-            if (date('H:i:sw', $start) == '00:00:000') {
-                $pos = $start;
-            } else {
-                $pos = strtotime(date('Y-m-d 00:00:00', $start + $size));
+            if (! empty($item['end'])) {
+                $event['end'] = date('r', $item['end']);
+                $event['isDuration'] = true;
             }
 
-            $pos += 86400 * ( 6 - date('w', $start) );
-
-            break;
-        case 'month':
-            if (date('d H:i:s', $start) == '01 00:00:00') {
-                $pos = $start;
-            } else {
-                $pos = strtotime(date('Y-m-01 00:00:00', strtotime('next month', $start)));
+            if (! empty($item['link_page'])) {
+                $event['link_page'] = $item['link_page'];
+                $js .= "console.log('" . $item['link_page'] . "');";
+                $event['content'] .= "<br><a href='./tiki-index.php?page=" . urlencode($item['link_page']) . "#View page'>click here</a>";
             }
 
-            $size = date('t', $pos) * 86400;
-
-            break;
-        case 'year':
-        default:
-            if (date('m-d H:i:s', $start) == '01-01 00:00:00') {
-                $pos = $start;
-            } else {
-                $pos = strtotime(date('Y-01-01 00:00:00', strtotime('next year', $start)));
+            if (! empty($item['type'])) {
+                $event['type'] = $item['type'];
             }
 
-            $size = date('L', $pos) * 86400 + 86400 * 365;
-            break;
-    }
+            if (! empty($item['group'])) {
+                $groups[] = $item['group'];
+                $event['group'] = $item['group'];
+            }
 
-    $layout = [
-        'size' => round($size / $full * 80),
-        'blocks' => [
-        ],
-    ];
-
-    $layout['pad'] = round(($pos - $start) / $full * 80);
-
-    for ($i = $pos; $end > $i + $size; $i += $size) {
-        switch ($type) {
-            case 'hour':
-                $layout['blocks'][] = date('H:i', $i);
-                break;
-            case 'day':
-                $layout['blocks'][] = date('j', $i);
-                break;
-            case 'week':
-                $layout['blocks'][] = date('j', $i);
-                break;
-            case 'month':
-                $layout['blocks'][] = date('M', $i);
-                break;
-            case 'year':
-                $layout['blocks'][] = date('Y', $i);
-                break;
-        }
-
-        switch ($type) {
-            case 'month':
-                $size = date('t', $i) * 86400;
-                break;
-            case 'year':
-                $size = date('L', $i) * 86400 + 86400 * 365;
-                break;
+            if (! empty($item['color'])) {
+                $css .= ".vis-item." . $item['color'] . " {
+                    color: black;
+                    background-color: " . $item['color'] . ";
+                    }";
+                $event['className'] = $item['color'];
+            }
+            $image = $itemImage;
+            if (! empty($image)) {
+                if (str_contains($image, ',')) {
+                    // just the first one
+                    $image = substr($image, 0, strpos($image, ','));
+                }
+                if (is_numeric($image)) {
+                    // a fileId
+                    $image = smarty_modifier_sefurl($image, 'thumbnail');
+                }
+                $js .= "console.log('" . $image . "');";
+                $event['content'] .= "<br><img src='./" . $image . "'>";
+                $event['image'] = $image;
+            }
+            $events[] = $event;
         }
     }
-
-    return $layout;
+    $js .= 'var data = ' . json_encode($events) . "; const options = {}; console.log(data);";
+    $js .= ! is_null($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
+    $js .= ! is_null($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
+    $js .= ! is_null($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
+    $js .= ! empty($max) ? "let max = new Date(" . $max * 1000 . "); options.max = max;" : "";
+    $js .= ! empty($min) ? "let min = new Date(" . $min * 1000 . "); options.min = min;" : "";
+    $js .= ! is_null($params['scale']) ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
+    $js .= ! is_null($params['orientation']) ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
+    $codeHandleGroupParameter = "const removeDuplicationInGroup = new Set(groups);
+        let arrayOfGroupWithoutDuplication = [ ...removeDuplicationInGroup ];
+        let groupsOption = [];\n
+        for(let i = 0; i < arrayOfGroupWithoutDuplication.length; i++){
+            groupsOption.push({id: arrayOfGroupWithoutDuplication[i], content: arrayOfGroupWithoutDuplication[i]})
+        };\n;
+    ";
+    $js .= ! is_null($params['group']) ? "var groups = " . json_encode($groups) . ";console.log('franck'); console.log('$groups');\n" . $codeHandleGroupParameter : "";
+    $js .= "const container = document.getElementById('container-timeline');\n";
+    $js .= "const items = new DataSet(data);";
+    $js .= ! is_null($params['group']) ? "const timeline = new Timeline(container, items, groupsOption, options);" : "const timeline = new Timeline(container, items, options);";
+    $headerlib->add_js_module('import { Timeline, DataSet } from "timeline";' . $js);
+    $smarty->assign('css', $css);
+    return $smarty->fetch('wiki-plugins/wikiplugin_trackertimeline.tpl');
 }

@@ -21,9 +21,7 @@ function wikiplugin_sharethis_info()
                 'description' => tr('By default, %0email%1, %0aim%1 and %0sms%1 are available. Input one or two of the
                     services separated by a %0|%1 to limit the choice of send services.', '<code>', '</code>'),
                 'since' => '3.2',
-                'default' => '',
                 'advanced' => true,
-                'separator' => '|',
                 'filter' => 'word',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -72,7 +70,6 @@ function wikiplugin_sharethis_info()
                 'since' => '5.0',
                 'separator' => '|',
                 'filter' => 'word',
-                'default' => '',
             ],
             'postfirst' => [
                 'required' => false,
@@ -80,10 +77,8 @@ function wikiplugin_sharethis_info()
                 'description' => tr('Input a list of post services (like %0Facebook|Myspace|Digg%1, etc.) separated by a
                     %0|%1 to customize the services that are shown in the opening panel of the widget.', '<code>', '</code>'),
                 'since' => '3.2',
-                'separator' => '|',
                 'filter' => 'word',
                 'advanced' => true,
-                'default' => '',
             ],
             'buttontext' => [
                 'required' => false,
@@ -187,11 +182,11 @@ function wikiplugin_sharethis($data, $params)
     // load setting options from $params
 
     // set post services that appear upon widget opening
-    if (! empty($postfirst)) {
+    if (! is_null($postfirst)) {
         $sharethis_options['postfirst'] = str_replace('|', $comma, $postfirst);
     }
     // limit send services that will appear
-    if (! empty($sendsvcs)) {
+    if (! is_null($sendsvcs)) {
         $sharethis_options['sendsvcs'] = str_replace('|', $comma, $sendsvcs);
     }
     // set icon style
@@ -204,11 +199,11 @@ function wikiplugin_sharethis($data, $params)
             $sharethis_options['style'] = 'vertical';
         }
     }
-    if (! empty($multiple)) {
+    if (! is_null($multiple)) {
         $headerlib->add_css('body {font-family:helvetica,sans-serif;font-size:12px;}');
         $headerlib->add_css('a.stbar.chicklet img {border:0;height:16px;width:16px;margin-right:3px;vertical-align:middle;}');
         $headerlib->add_css('a.stbar.chicklet {height:16px;line-height:16px;}');
-        $icons = explode('|', $multiple);
+        $icons = is_array($multiple) ? $multiple : explode('|', $multiple);
         foreach ($icons as $icon) {
             $iconcode .= '<a id="ck_' . $icon . '" class="stbar chicklet" href="javascript:void(0);">'
                             . '<img src="https://ws.sharethis.com/chicklets/' . $icon . '.gif" style="margin-right:3px;" />';

@@ -20,12 +20,7 @@
             <div class="adminoptionboxchild" id="comments_allow_correction_childcontainer">
                 {preference name=comments_correction_timeout}
             </div>
-            {preference name=comments_akismet_filter}
             {preference name=tracker_show_comments_below}
-            <div class="adminoptionboxchild" id="comments_akismet_filter_childcontainer">
-                {preference name=comments_akismet_apikey}
-                {preference name=comments_akismet_check_users}
-            </div>
         </div>
     </fieldset>
     <fieldset>

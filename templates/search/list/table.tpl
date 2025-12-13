@@ -12,8 +12,6 @@
 {/if}
 {$showFacets = not empty($facets) and isset($tableparams.facets) and $tableparams.facets eq 'y'}
 {if $showFacets}
-{*    <pre>{$facets|var_dump}</pre>*}
-{*    <pre>{$results|var_dump}</pre>*}
     <div class="row">
         <div class="col-sm-2">
             <div class="facets filters" id="filters">
@@ -45,7 +43,7 @@
         {/if}
 {/if}
 {if $actions}
-<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
+<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}"{if $tsOn} data-page-reload="1"{/if}>
 <input type="hidden" name="plugin" value="{$fingerprint}">
 {ticket}
 {/if}

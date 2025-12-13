@@ -47,7 +47,15 @@
             {elseif $format eq 'ical'}
                 {createFileInput format='ical' label='iCal File' fileInputId='icalInputFile' fileAccept='text/calendar'}
             {else}
-                {createFileInput format='csv' label='CSV File' fileInputId='inputFile' fileAccept='text/csv'}
+                {createFileInput format='csv' label='CSV File' fileInputId='inputFile' fileAccept='text/csv, .tsv'}
+                <div class="form-group">
+                    <label for="separator">{tr}Select separator:{/tr}</label>
+                    <select name="separator" class="form-select" aria-label="CSV File delimiter">
+                        <option value=",">{tr}Comma{/tr}(,)</option>
+                        <option value=";">{tr}Semicolon{/tr}(;)</option>
+                        <option value="\t">{tr}Tab{/tr}(\t)</option>
+                    </select>
+                </div>
             {/if}     
             <div class="submit">
                 <input class="btn btn-primary" type="submit" value="{tr}Import{/tr}">

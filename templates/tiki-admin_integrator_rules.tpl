@@ -16,9 +16,9 @@
     <div id="rules-copy-panel">
         <form action="tiki-admin_integrator_rules.php?repID={$repID|escape}" method="post">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Source repository{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="srcrep">{tr}Source repository{/tr}</label>
                 <div class="col-sm-6 offset-sm-1">
-                    <select name="srcrep" class="form-control">{html_options options=$reps}</select>
+                    <select name="srcrep" id="srcrep" class="form-control">{html_options options=$reps}</select>
                 </div>
                 <div class="col-sm-1">
                     <input type="submit" class="btn btn-primary btn-sm" name="copy" value="{tr}Copy{/tr}">
@@ -35,51 +35,51 @@
     <input type="hidden" name="repID" value="{$repID|escape}">
 
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Rules will be applied in this order ('0' or empty = auto){/tr}">{tr}Rule order{/tr}</label>
+        <label class="col-sm-3 col-form-label" title="{tr}Rules will be applied in this order ('0' or empty = auto){/tr}" for="ord">{tr}Rule order{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" maxlength="2" size="2" class="form-control" name="ord" value="{$ord|escape}" title="{tr}Rules will be applied in this order ('0' or empty = auto){/tr}">
+            <input type="text" maxlength="2" size="2" class="form-control" name="ord" id="ord" value="{$ord|escape}" title="{tr}Rules will be applied in this order ('0' or empty = auto){/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Text to search for{/tr}">{tr}Search{/tr}</label>
+        <label class="col-sm-3 col-form-label" title="{tr}Text to search for{/tr}" for="srch">{tr}Search{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" name="srch" value="{$srch|escape}" title="{tr}Text to search for{/tr}" class="form-control">
+            <input type="text" name="srch" id="srch" value="{$srch|escape}" title="{tr}Text to search for{/tr}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Text to replace{/tr}">{tr}Replace{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="repl" title="{tr}Text to replace{/tr}">{tr}Replace{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" name="repl" value="{$repl|escape}" title="{tr}Text to replace{/tr}" class="form-control">
+            <input type="text" name="repl" id="repl" value="{$repl|escape}" title="{tr}Text to replace{/tr}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Is this regular expression or simple search/replacer{/tr}">{tr}Regex{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="type" title="{tr}Is this regular expression or simple search/replacer{/tr}">{tr}Regex{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="type" {if $type eq 'y'}checked="checked"{/if} title="{tr}Is this regular expression or simple search/replacer{/tr}">
+            <input type="checkbox" name="type" id="type" {if $type eq 'y'}checked="checked"{/if} title="{tr}Is this regular expression or simple search/replacer{/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Is case sensitive (for simple replacer){/tr}">{tr}Case sensitive{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="casesense" title="{tr}Is case sensitive (for simple replacer){/tr}">{tr}Case sensitive{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="casesense" {if $casesense eq 'y'}checked="checked"{/if} title="{tr}Is case sensitive (for simple replacer){/tr}">
+            <input type="checkbox" name="casesense" id="casesense" {if $casesense eq 'y'}checked="checked"{/if} title="{tr}Is case sensitive (for simple replacer){/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}subset of chars: imsxeADSXUu, which are regex modifiers{/tr}">{tr}Regex modifiers{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="rxmod" title="{tr}subset of chars: imsxeADSXUu, which are regex modifiers{/tr}">{tr}Regex modifiers{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" maxlength="20" size="20" class="form-control" name="rxmod" value="{$rxmod|escape}" title="{tr}subset of chars: imsxeADSXUu, which are regex modifiers{/tr}">
+            <input type="text" maxlength="20" size="20" class="form-control" name="rxmod" id="rxmod" value="{$rxmod|escape}" title="{tr}subset of chars: imsxeADSXUu, which are regex modifiers{/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Human-readable text description of rule{/tr}">{tr}Description{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="description" title="{tr}Human-readable text description of rule{/tr}">{tr}Description{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <textarea name="description" class="form-control" rows="4" title="{tr}Human-readable text description of rule{/tr}">{$description|escape}</textarea>
+            <textarea name="description" id="description" class="form-control" rows="4" title="{tr}Human-readable text description of rule{/tr}">{$description|escape}</textarea>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Enabled{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="enable">{tr}Enabled{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="enabled" {if $enabled eq 'y'}checked="checked"{/if} title="{tr}Check to enable this rule{/tr}">&nbsp;
+            <input type="checkbox" name="enabled" id="enable" {if $enabled eq 'y'}checked="checked"{/if} title="{tr}Check to enable this rule{/tr}">&nbsp;
         </div>
     </div>
     <div class="mb-3 row">
@@ -92,33 +92,34 @@
         <label class="col-sm-3 col-form-label">{tr}Preview options{/tr}</label>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Apply all rules or just this to generate preview{/tr}">{tr}Apply all rules{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="all" title="{tr}Apply all rules or just this to generate preview{/tr}">{tr}Apply all rules{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="all" {if $all eq 'y'}checked="checked"{/if} title="{tr}Apply all rules or just this to generate preview{/tr}">
+            <input type="checkbox" name="all" id="all" {if $all eq 'y'}checked="checked"{/if} title="{tr}Apply all rules or just this to generate preview{/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}View source code after rules applied{/tr}">{tr}Code preview{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="code" title="{tr}View source code after rules applied{/tr}">{tr}Code preview{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="code" {if $code eq 'y'}checked="checked"{/if} title="{tr}View source code after rules applied{/tr}">
+            <input type="checkbox" name="code" id="code" {if $code eq 'y'}checked="checked"{/if} title="{tr}View source code after rules applied{/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Generate HTML preview{/tr}">{tr}HTML preview{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="html" title="{tr}Generate HTML preview{/tr}">{tr}HTML preview{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="html" {if $html eq 'y'}checked="checked"{/if} title="{tr}Generate HTML preview{/tr}">
+            <input type="checkbox" name="html" id="html" {if $html eq 'y'}checked="checked"{/if} title="{tr}Generate HTML preview{/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}Test file from repository to generate preview for (empty = configured start page){/tr}">{tr}File{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="file" title="{tr}Test file from repository to generate preview for (empty = configured start page){/tr}">{tr}File{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="text" name="file" value="{$file|escape}" class="form-control" title="{tr}Test file from repository to generate preview for (empty = configured start page){/tr}">
+            <input type="text" name="file" id="file" value="{$file|escape}" class="form-control" title="{tr}Test file from repository to generate preview for (empty = configured start page){/tr}">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" title="{tr}View source code after rules applied{/tr}">{tr}Code preview{/tr}</label>
+        <label class="col-sm-3 col-form-label" title="{tr}View source code after rules applied{/tr}" for="check_code">{tr}Code preview{/tr}</label>
         <div class="col-sm-7 offset-sm-1">
-            <input type="checkbox" name="code" {if $code eq 'y'}checked="checked"{/if} title="{tr}View source code after rules applied{/tr}">
+            <input type="checkbox" name="code" id="check_code" {if $code eq 'y'}checked="checked" {/if}
+            title="{tr}View source code after rules applied{/tr}">
         </div>
     </div>
     <div class="mb-3 row">

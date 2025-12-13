@@ -26,7 +26,7 @@ use Smarty\Template;
  *      title:  string title of the dropdown
  *      icon:   string icon name for the icon that is clicked or hovered over to display the popup
  * @param $content      string  HTML within the {actions} block tags. Usually within {strip} tags
- * @param $smarty       Smarty_Tiki
+ * @param $smarty       \Tiki\Smarty\SmartyTiki
  * @param bool $repeat
  * @return mixed|string
  * @throws \Smarty\Exception

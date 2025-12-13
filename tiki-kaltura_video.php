@@ -135,7 +135,6 @@ try {
 
             case 'default':
                 Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
-                exit;
         }
     } else {
         if (isset($videoId[0])) {

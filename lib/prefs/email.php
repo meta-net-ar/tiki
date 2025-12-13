@@ -31,5 +31,16 @@ function prefs_email_list()
             //'help' => '', TODO
             'default' => 'n',
         ],
+        'email_to_tracker_mode' => [
+            'name' => tra('When creating tracker items from email'),
+            'description' => tra('Choose whether emails are deleted (move mode) or kept on the original server (copy mode)'),
+            'type' => 'list',
+            'options' => [
+                'move' => tra('Delete from server (move)'),
+                'copy' => tra('Keep on server (copy)'),
+            ],
+            'default' => 'move',
+            'tags' => ['advanced', 'email'],
+        ],
     ];
 }

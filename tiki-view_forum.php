@@ -15,33 +15,43 @@ $inputConfiguration = [
             'forumId'                    => 'int',     //post
             'comments_threadId'          => 'int',     //post
             'comments_title'             => 'topicname',   //post
-            'openpost'                   => 'word',     //post
-            'sort_mode'                  => 'word',    //get
-            'report'                     => 'int',     //get
-            'remove_attachment'          => 'int',     //get
-            'lock'                       => 'bool',    //get
-            'comments_threshold'         => 'int',     //post
-            'comments_postComment'       => 'bool',    //post
-            'comments_vote'              => 'word',    //get
-            'comments_remove'            => 'none',    //get
-            'comments_data'              => 'xss',     //post
-            'comment_topictype'          => 'word',    //post
-            'comment_topicsummary'       => 'word',    //post
-            'comments_previewComment'    => 'bool',    //post
-            'comments_per_page'          => 'int',     //get
-            'thread_sort_mode'           => 'word',    //get
-            'comments_commentFind'       => 'word',    //post
-            'comments_offset'            => 'int',     //get
-            'comments_parentId'          => 'int',     //get
-            'time_control'               => 'word',    //post
-            'show_archived'              => 'int',     //post
-            'poster'                     => 'word',    //post
-            'filter_type'                => 'word',    //post
-            'watch_event'                => 'word',    //post
-            'watch_action'               => 'word',    //post
-            'watch_object'               => 'int',     //post
-            'freetag_string'             => 'string',  //get
-        ]
+            'openpost'                   => 'alpha',       //get/post
+            'sort_mode'                  => 'alnumdash',   //get
+            'report'                     => 'int',         //get
+            'remove_attachment'          => 'int',         //get
+            'lock'                       => 'alpha',       //get
+            'comments_threshold'         => 'int',         //get/post
+            'comments_postComment'       => 'bool',        //post
+            'comments_postCancel'        => 'bool',        //post
+            'comments_vote'              => 'int',         //get
+            'comments_remove'            => 'none',        //get
+            'comments_data'              => 'xss',         //post
+            'comment_topictype'          => 'alpha',       //post
+            'comment_topicsummary'       => 'text',        //post
+            'comment_topicsmiley'         => 'text',        //post
+            'comment_password'           => 'password',     //post
+            'comments_previewComment'    => 'bool',        //post
+            'comments_per_page'          => 'int',         //get
+            'thread_sort_mode'           => 'alnumdash',   //get/post
+            'comments_commentFind'       => 'text',        //post
+            'comments_offset'            => 'int',         //get/post
+            'comments_parentId'          => 'int',         //get
+            'time_control'               => 'int',         //post
+            'show_archived'              => 'bool',        //post
+            'poster'                     => 'text',        //post
+            'filter_type'                => 'word',        //post
+            'reply_state'                => 'text',        //post
+            'watch_event'                => 'word',        //post
+            'watch_action'               => 'word',        //post
+            'watch_object'               => 'int',         //post
+            'freetag_string'             => 'string',      //post
+            'anonymous_email'            => 'email',       //post
+            'anonymous_name'             => 'text',        //post
+            'set_thread_watch'            => 'alpha',       //post
+        ],
+        'staticKeyFiltersForArrays'      => [
+            'forumtopic'                 => 'int',         //post
+        ],
     ],
 ];
 require_once('tiki-setup.php');
@@ -165,7 +175,7 @@ $comments_vars = ['forumId'];
 $comments_prefix_var = 'forum:';
 $comments_object_var = 'forumId';
 
-if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info['inbound_pop_server'])) {
+if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info['inbound_imap_server'])) {
     $commentslib->process_inbound_mail($_REQUEST['forumId']);
 }
 
@@ -271,27 +281,28 @@ if (isset($_REQUEST['comments_remove']) && isset($_REQUEST['comments_threadId'])
     $smarty->assign('comments_threadId', 0);
 }
 
+if (isset($_comments_title_decoded)) {
+    // Encode back comment_title before display to avoid specials characters
+    $_comments_title_encoded = htmlspecialchars($_comments_title_decoded);
+}
+
 if ($_REQUEST['comments_threadId'] > 0) {
     $comment_info = $commentslib->get_comment($_REQUEST['comments_threadId']);
-    if (isset($_comments_title_decoded)) {
-        // Encode back comment_title before display to avoid specials characters
-        $_comments_title_encoded = htmlspecialchars($_comments_title_decoded);
-    }
-    $smarty->assign('comment_title', isset($_comments_title_encoded) ? $_comments_title_encoded : $comment_info['title']);
-    $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : $comment_info['data']);
+    $smarty->assign('comment_title', $_comments_title_encoded ?? $comment_info['title']);
+    $smarty->assign('comment_data', $_REQUEST['comments_data'] ?? $comment_info['data']);
     $smarty->assign(
         'comment_topictype',
-        isset($_REQUEST['comment_topictype']) ? $_REQUEST['comment_topictype'] : $comment_info['type']
+        $_REQUEST['comment_topictype'] ?? $comment_info['type']
     );
     $smarty->assign(
         'comment_topicsummary',
-        isset($_REQUEST['comment_topicsummary']) ? $_REQUEST['comment_topicsummary'] : $comment_info['summary']
+        $_REQUEST['comment_topicsummary'] ?? $comment_info['summary']
     );
     $smarty->assign('comment_topicsmiley', $comment_info['smiley']);
 } else {
-    $smarty->assign('comment_title', isset($_comments_title_encoded) ? $_comments_title_encoded : '');
-    $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : '');
-    $smarty->assign('comment_topictype', isset($_REQUEST['comment_topictype']) ? $_REQUEST['comment_topictype'] : '');
+    $smarty->assign('comment_title', $_comments_title_encoded ?? '');
+    $smarty->assign('comment_data', $_REQUEST['comments_data'] ?? '');
+    $smarty->assign('comment_topictype', $_REQUEST['comment_topictype'] ?? '');
     $smarty->assign('comment_topictype', 'n');
     $smarty->assign('comment_topicsummary', '');
     $smarty->assign('comment_topicsmiley', '');

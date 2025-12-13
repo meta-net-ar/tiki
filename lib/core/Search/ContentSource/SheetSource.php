@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\CSVHandler;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 class Search_ContentSource_SheetSource implements Search_ContentSource_Interface
 {
     private $db;
@@ -42,10 +47,10 @@ class Search_ContentSource_SheetSource implements Search_ContentSource_Interface
             ]
         );
 
-        $loader = new TikiSheetDatabaseHandler($objectId);
-        $writer = new TikiSheetCSVHandler('php://output');
+        $loader = new DatabaseHandler($objectId);
+        $writer = new CSVHandler('php://output');
 
-        $grid = new TikiSheet();
+        $grid = new Sheet();
         $grid->import($loader);
 
         $grid->export($writer);

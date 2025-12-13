@@ -169,7 +169,7 @@ class FilesBatchuploadCommand extends Command
             ]);
 
             foreach ($feedback as $message) {
-                if (strpos($message, '<span class="text-danger">') !== false) {
+                if (str_contains($message, '<span class="text-danger">')) {
                     $error = true;
                 } else {
                     $error = false;
@@ -192,11 +192,11 @@ class FilesBatchuploadCommand extends Command
                 'files batch upload',
                 'system',
                 'system',
-                'Files batch uploaded from ' . $prefs['fgal_batch_dir'] . ' to gallery #' . $galleryId
+                tra('Files batch uploaded from ') . $prefs['fgal_batch_dir'] . ' to gallery #' . $galleryId
             );
         } else {
             if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                $output->writeln("<comment>Files to upload from {$prefs['fgal_batch_dir']} to gallery #$galleryId</comment>");
+                $output->writeln("<comment>" . tra('Files to upload from %0 to gallery #%1', $prefs['fgal_batch_dir'], $galleryId) . "</comment>");
             }
 
             foreach ($files as $file) {

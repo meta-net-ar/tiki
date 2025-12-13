@@ -55,7 +55,6 @@ function get_data($options)
         curl_setopt($crl, CURLOPT_USERPWD, $options['user'] . ":" . $options['pass']);
     }
     $ret = curl_exec($crl);
-    curl_close($crl);
     $ret = json_decode($ret);
     $ret = get_object_vars($ret);
     return $ret;

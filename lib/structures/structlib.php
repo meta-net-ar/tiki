@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -262,23 +262,23 @@ class StructLib extends TikiLib
         global $prefs;
         $ret = null;
 
-        $hide_toc = isset($options['hide_toc']) ? $options['hide_toc'] : 'n';
-        $creator = isset($options['creator']) ? $options['creator'] : tra('system');
-        $creator_msg = isset($options['creator_msg']) ? $options['creator_msg'] : tra('created from structure');
-        $ip_source = isset($options['ip_source']) ? $options['ip_source'] : '0.0.0.0';
-        $description = isset($options['description']) ? $options['description'] : '';
-        $lang = isset($options['lang']) ? $options['lang'] : '';
-        $is_html = isset($options['is_html']) ? $options['is_html'] : false;
-        $hash = isset($options['hash']) ? $options['hash'] : null;
-        $wysiwyg = isset($options['wysiwyg']) ? $options['wysiwyg'] : null;
-        $wiki_authors_style = isset($options['wiki_authors_style']) ? $options['wiki_authors_style'] : '';
+        $hide_toc = $options['hide_toc'] ?? 'n';
+        $creator = $options['creator'] ?? tra('system');
+        $creator_msg = $options['creator_msg'] ?? tra('created from structure');
+        $ip_source = $options['ip_source'] ?? '0.0.0.0';
+        $description = $options['description'] ?? '';
+        $lang = $options['lang'] ?? '';
+        $is_html = $options['is_html'] ?? false;
+        $hash = $options['hash'] ?? null;
+        $wysiwyg = $options['wysiwyg'] ?? null;
+        $wiki_authors_style = $options['wiki_authors_style'] ?? '';
 
         // If the page doesn't exist then create a new wiki page!
         $newpagebody = '';
         if ($hide_toc !== 'y') {
             $newpagebody = tra("Table of contents") . ":" . "{toc}\n\n";
         }
-        $newpagebody .= isset($options['content']) ? $options['content'] : '';
+        $newpagebody .= $options['content'] ?? '';
 
         $created = $this->page_exists($name);
         // If page exists

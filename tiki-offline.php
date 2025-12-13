@@ -28,7 +28,7 @@ TikiLib::lib('header')->add_js_module('
     import "@vue-mf/root-config";
     import "@vue-mf/tiki-offline";
     import "@vue-widgets/el-date-picker";
-    import handleDatePicker from "@jquery-tiki/ui-utils";
+    import handleDatePicker from "@tiki/ui-utils";
 ');
 
 $smarty->assign('mid', 'tiki-offline.tpl');

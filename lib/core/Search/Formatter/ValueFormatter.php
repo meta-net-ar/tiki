@@ -38,7 +38,7 @@ class Search_Formatter_ValueFormatter
         }
 
         $value = null;
-        if (strstr($name, '.')) {
+        if (str_contains($name, '.')) {
             $parts = explode('.', $name);
             $value = $this->valueSet;
             while ($part = array_shift($parts)) {

@@ -63,13 +63,13 @@
                             </label>
                             <div class="col-md-8">
                                 <label>
-                                    <input type="radio" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
                                 </label>
                             </div>
                         </div>
@@ -100,10 +100,19 @@
                         <label class="col-form-label col-md-4" for="location">
                             {tr}Location{/tr}
                         </label>
-                        <div class="col-md-8 mb-5" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location">
-                            <div class="map-container" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location"></div>
-                        </div>
-                        <input type="hidden" name="location" id="location" value="{$location|escape}">
+                        {if $prefs.geo_enabled eq 'n'}
+                            <div class="col-md-8 mb-5 w-full" style="height: auto">
+                                <p class="ml-2 text-warning">{tr}Geolocation features are not enabled.{/tr}</p>
+                                {if $tiki_p_admin eq 'y'}
+                                    <a href="tiki-admin.php?page=maps" class="ml-2 text-primary text-decoration-none">{tr}Enable{/tr}</a>
+                                {/if}
+                            </div>
+                        {else}
+                            <div class="col-md-8 mb-5" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location">
+                                <div class="map-container" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location"></div>
+                            </div>
+                            <input type="hidden" name="location" id="location" value="{$location|escape}">
+                        {/if}
                     </div>
                     <div class="tiki-form-group row">
                         <label class="col-form-label col-md-4" for="homePage">
@@ -719,6 +728,11 @@
                                 {/remarksbox}
                             {/if}
                         {/if}
+                        {if $intertiki_no_password_change_warning neq ''}
+                            {remarksbox type="tip" title="{tr}Information{/tr}" close="n"}
+                                {tr}{$intertiki_no_password_change_warning}{/tr}
+                            {/remarksbox}
+                        {/if}
                         <div class="tiki-form-group row">
                             <label class="col-md-4 col-form-label" for="username-autocomplete">
                                 {tr}Username:{/tr}
@@ -792,48 +806,65 @@
             {remarksbox type="error" title="{tr}Two-factor authentication is required{/tr}" close="n"}{tr}Your access to the site is restricted until you enable <strong>Two-factor authentication</strong>. Please enable Two-factor authentication to keep using normally the site.{/tr}{/remarksbox}
         {/if}
         {remarksbox type="tip"}
-        {if $prefs.twoFactorAuthType eq 'google2FA'}
-            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
-                Tiki will require a code from your mobile phone during login. This code is created by an authenticator app.{/tr}
-        {elseif $prefs.twoFactorAuthType eq 'email2FA'}
-            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
-                Tiki will send a code to your email address and you will have to enter it to login.{/tr}
-        {/if}
+            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. 
+            When enabled, Tiki will prompt you for a TOTP code generated by any authenticator app 
+            (FreeOTP, Authy, Google Authenticator, etc.).{/tr}
         {/remarksbox}
-        {if $prefs.twoFactorAuthType eq 'google2FA'}
-            {if $tfaSecret }
-                <form action="tiki-user_preferences.php" method="post">
-                    {ticket}
-                    <div class="tiki-form-group row">
-                        <div class="col-md-5">
-                            <img class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
+        {if $tfaSecret }
+            <form action="tiki-user_preferences.php" method="post">
+                {ticket}
+                <div class="tiki-form-group row">
+                    <div class="col-md-5">
+                        <img id="tfaQrCodeImage" class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
+                        {if $imageType eq 'svg+xml'}
+                            {assign var="fileExtension" value="svg"}
+                        {else}
+                            {assign var="fileExtension" value="png"} 
+                        {/if}
+                        {capture assign="downloadFileName"}tfa_qr_code.{$fileExtension}{/capture}
+                      
+
+                        <div class="mt-1 d-flex justify-content-center align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-secondary" id="downloadQrCode">
+                                {tr}Download QR Code{/tr}
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" id="showSecret">
+                                {tr}Show Secret Code{/tr}
+                            </button>
                         </div>
-                        <div class="col-md-7 align-content-center">
-                            <div class="d-flex align-items-center" style="height: 100%">
-                                <div class="well">
-                                    {tr}Install a soft token authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>
-                                    <div style="margin-top: 20px" class="tiki-form-group">
-                                        <label for="exampleInputEmail1">Pin Code</label>
-                                        <input type="text" class="form-control" name="tfaPin">
-                                    </div>
-                                </div>
+                    
+                        <div id="secretContainer" class="d-none mt-3 text-center">
+                            <strong>{tr}Secret Code:{/tr}</strong>
+                            <span id="secretField">{$tfaSecret}</span>
+
+                            <div class="mt-2">
+                                <small class="text-secondary">{tr}Save this secret code in a safe place. It is required to restore your Two-Factor Authentication if you lose your device.{/tr}</small>
                             </div>
                         </div>
                     </div>
-                    <input type="text" value="{$tfaSecret}" hidden name="tfaSecret">
-                    <div class="submit text-center">
-                        <input type="submit" class="btn btn-secondary btn-sm" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
+                    <div class="col-md-7">
+                        <div class="d-flex mt-4">
+                            <div class="well">
+                                {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>
+                                
+                                <div class="well mt-3">
+                                    {tr}Scan this QR code with your TOTP authenticator app (FreeOTP, Google Authenticator, etc.). For security, consider saving this QR code or secret key as a backup so you can restore it if you lose or change your device.{/tr}
+                                </div>
+
+                                <div style="margin-top: 20px" class="tiki-form-group">
+                                    <label for="authCode">{tr}2FA Code{/tr}</label>
+                                    <input type="text" class="form-control" name="tfaPin" id="authCode" placeholder="{tr}Enter the 6-digit code from your authenticator app{/tr}">                                
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" value="{$tfaSecret}" hidden name="tfaSecret">
+                        <div class="submit d-flex justify-content-end mt-2">
+                            <input type="submit" class="btn btn-primary btn-md" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
+                        </div>
                     </div>
-                </form>
-            {else}
-                <form action="tiki-user_preferences.php" method="post">
-                    {ticket}
-                    <div class="submit text-center">
-                        <input type="submit" class="btn btn-danger btn-sm" name="removetwofactor" value="{tr}Disable Two-Factor Auth{/tr}">
-                        <a href="tiki-user_preferences.php?tfagenerate=true" class="btn btn-secondary btn-sm">{tr}Regenerate Two-Factor Auth{/tr}</a>
-                    </div>
-                </form>
-            {/if}
+                </div>
+                
+            </form>
         {else}
             <form action="tiki-user_preferences.php" method="post">
                 {ticket}
@@ -876,3 +907,25 @@
         {/if}
     {/if}
 {/tabset}
+
+{jq}
+    $('#downloadQrCode').on('click', function() {
+        const dataUrl = $('#tfaQrCodeImage').attr('src');
+        if (!dataUrl || !dataUrl.includes(';base64,')) {
+            alert('No valid QR code data found. Please generate a new code first.');
+            return;
+        }
+        downloadBase64ImageAsFile(dataUrl);
+    });
+
+    $('#showSecret').on('click', function() {
+        const secretContainer = $('#secretContainer');
+        if (secretContainer.is(':visible')) {
+            secretContainer.hide();
+            $(this).text('{tr}Show Secret Code{/tr}');
+        } else {
+            secretContainer.show();
+            $(this).text('{tr}Hide Secret Code{/tr}');
+        }
+    });
+{/jq}

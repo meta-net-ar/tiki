@@ -1,4 +1,4 @@
-import stylisticJs from "@stylistic/eslint-plugin-js";
+import stylistic from "@stylistic/eslint-plugin";
 import pluginVue from "eslint-plugin-vue";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 export default [
@@ -24,40 +24,40 @@ export default [
             // Ignore Generated Files
             "public/generated/**",
             "temp/**",
-            ".gitlab-ci-local/**"
-        ]
+            ".gitlab-ci-local/**",
+        ],
     },
     {
         files: ["*.vue"],
         plugins: {
-            vue: pluginVue
+            vue: pluginVue,
         },
         rules: {
             indent: "off",
             "vue/script-indent": ["error", 4],
             "vue/no-unused-vars": "off", //vue/no-unused-vars does not support args: none
             "no-unused-vars": ["error", { args: "none" }],
-            "vue/component-name-in-template-casing": ["error", "PascalCase"]
-        }
+            "vue/component-name-in-template-casing": ["error", "PascalCase"],
+        },
     },
     {
         ...eslintPluginPrettierRecommended,
-        files: ["src/js/**/*.js"]
+        files: ["src/js/**/*.js"],
     },
     {
         plugins: {
-            "@stylistic/js": stylisticJs
+            "@stylistic": stylistic,
         },
         rules: {
-            "@stylistic/js/no-trailing-spaces": "error",
-            "@stylistic/js/linebreak-style": ["error", "unix"],
-            "@stylistic/js/semi": ["error", "always"]
+            "@stylistic/no-trailing-spaces": "error",
+            "@stylistic/linebreak-style": ["error", "unix"],
+            "@stylistic/semi": ["error", "always"],
         },
         languageOptions: {
             ecmaVersion: 11,
-            sourceType: "module"
+            sourceType: "module",
             //browser: true,
             //jquery: true,
-        }
-    }
+        },
+    },
 ];

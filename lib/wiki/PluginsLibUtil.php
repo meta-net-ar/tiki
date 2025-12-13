@@ -101,23 +101,23 @@ class PluginsLibUtil
                             $i = $pcount;
                             foreach ($aPage[$sInfo] as $sInfokey => $sInfoitem) {
                                 //Potential sub-rows
-                                if ($i < $pcount && strpos($sInfokey, 'rowspan') === false) {
+                                if ($i < $pcount && ! str_contains($sInfokey, 'rowspan')) {
                                     $begrow = "\n\t" . '<tr>';
                                     $endrow = "\n\t" . '</tr>';
                                 } else {
                                     $begrow = '';
-                                    if ($colcounter == $iNumCol && strpos($sInfokey, 'rowspan') === false) {
+                                    if ($colcounter == $iNumCol && ! str_contains($sInfokey, 'rowspan')) {
                                         $endrow = "\n\t" . '</tr>';
                                     } else {
                                         $endrow = '';
                                     }
                                 }
                                 //Ignore field added to hold rowspan
-                                if (strpos($sInfokey, 'rowspan') !== false) {
+                                if (str_contains($sInfokey, 'rowspan')) {
                                     $sOutput .= '';
                                 } else {
                                     $sOutput .= $begrow . "\n\t\t" . '<td class="' . $sClass . '"' . $rowspan2 . '>';
-                                    if (strpos($sInfokey, 'onekey') !== false) {
+                                    if (str_contains($sInfokey, 'onekey')) {
                                         $sOutput .= $sInfoitem;
                                     } else {
                                         $sOutput .= $sInfokey;

@@ -19,3 +19,7 @@ el-select, el-autocomplete, el-input {
 el-autocomplete ~ .search_mod_magnifier {
   margin-top: unset !important;
 }
+
+.el-message {
+  z-index: 9999 !important;
+}

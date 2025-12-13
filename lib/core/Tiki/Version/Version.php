@@ -42,6 +42,11 @@ class Tiki_Version_Version
         return $this->major;
     }
 
+    public function isStable()
+    {
+        return empty($this->sub);
+    }
+
     public function isUpgradeTo($version)
     {
         // Note that this does not cover all cases, upgrades are only official releases
@@ -57,6 +62,15 @@ class Tiki_Version_Version
         } else {
             return false;
         }
+    }
+
+    public function isStableUpgradeTo($version)
+    {
+        if (! $this->isStable()) {
+            return false;
+        }
+
+        return $this->isUpgradeTo($version);
     }
 
     public function __toString()

@@ -61,7 +61,7 @@ if (! empty($_REQUEST['del'])) {
 
 if (! empty($_REQUEST['id'])) {
     if ($info = $discountlib->get_discount($_REQUEST['id'])) {
-        if (strstr($info['value'], '%')) {
+        if (str_contains($info['value'], '%')) {
             $info['percent'] = (int)$info['value'];
         }
         $smarty->assign_by_ref('info', $info);
@@ -69,7 +69,7 @@ if (! empty($_REQUEST['id'])) {
     }
 }
 
-$offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+$offset = $_REQUEST['offset'] ?? 0;
 $max = $prefs['maxRecords'];
 $discounts = $discountlib->list_discounts($offset, $max);
 $discounts['offset'] = $offset;

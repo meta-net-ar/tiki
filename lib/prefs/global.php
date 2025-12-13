@@ -259,6 +259,15 @@ function prefs_global_list($partial = false)
             ],
             'default' => 'n',
         ],
+        'twoFactorAuthGracePeriod' => [
+            'name' => tra('2FA Grace Period'),
+            'description' => tra('Number of days to allow users to access the site without 2FA before forcing them to set it up. Note: this applies globally. If you want specific periods per groups, visit the groups settings.'),
+            'type' => 'text',
+            'default' => '0',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+        ],
         'twoFactorAuthIncludedGroup' => [
             'name' => tra('Force users in the indicated groups to enable 2FA'),
             'description' => tra('List of group names.'),

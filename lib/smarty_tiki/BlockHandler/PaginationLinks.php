@@ -95,7 +95,7 @@ class PaginationLinks extends Base
             $zero_based_min = 0;
             $zero_based_maxminus = 1;
         }
-        $params['_ajax'] = isset($params['_ajax']) ? $params['_ajax'] : 'y';
+        $params['_ajax'] = $params['_ajax'] ?? 'y';
         if (
             isset($params['reloff']) && (
                 $params['reloff'] + $params['offset'] >= $params['count']

@@ -170,19 +170,8 @@ function wikiplugin_googlechart($data, $params)
     $unique = 'wpdialog_' . ++$id;
     $headerlib = TikiLib::lib('header');
 
-    $defaults = [];
-    $plugininfo = wikiplugin_googlechart_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if ($id === 1 && (empty($params['credentials']) || ! is_readable($params['credentials']))) {
-        return tra('googlechart: No credentials file.');
-    }
-
-    if (empty($params['query_ids'])) {
-        return tra('googlechart: No query_ids supplied.');
+        return WikiParser_PluginOutput::error(tr('Error'), tra('googlechart: No credentials file.'));
     }
 
     if (empty($params['chart_container'])) {
@@ -238,7 +227,7 @@ function wikiplugin_googlechart($data, $params)
     }
     $queryp = [];
     foreach ($params as $key => $param) {
-        if (strpos($key, 'query_') === 0) {
+        if (str_starts_with($key, 'query_')) {
             $queryp[substr($key, strlen('query_'))] = $param;
         }
     }
@@ -248,7 +237,7 @@ function wikiplugin_googlechart($data, $params)
     $chart = ['options' => ['width' => '100%']];
 
     foreach ($params as $key => $param) {
-        if (strpos($key, 'chart_') === 0) {
+        if (str_starts_with($key, 'chart_')) {
             $chart[substr($key, strlen('query_'))] = $param;
         }
     }

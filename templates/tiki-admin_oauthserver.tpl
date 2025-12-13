@@ -8,7 +8,6 @@
         htmlId=""
         entityId=""
         entityName=""
-        entityName=""
         entityClientId=""
         entityClientSecret=""
         entityRedirectUri=""
@@ -28,7 +27,7 @@
             <div class="tiki-form-group col-md-6 col-sm-12 form-group-name">
                 <label for="oauth-name">{tr}Name{/tr}</label>
                 <input type="text" class="form-control"
-                    name="name"
+                    name="name" id="oauth-name"
                     value="{$entityName}"
                     />
             </div>
@@ -36,7 +35,7 @@
             <div class="tiki-form-group col-md-6 col-sm-12 form-group-client_id">
                 <label for="oauth-client_id">{tr}Client_id{/tr}</label>
                 <input type="text" class="form-control"
-                    name="client_id"
+                    name="client_id" id="oauth-client_id"
                     value="{$entityClientId}"
                     />
             </div>
@@ -44,7 +43,7 @@
             <div class="tiki-form-group col-sm-12 form-group-client_secret">
                 <label for="oauth-client_secret">{tr}Client_secret{/tr}</label>
                 <input type="text" class="form-control"
-                    name="client_secret"
+                    name="client_secret" id="oauth-client_secret"
                     style="font-family: monospace;"
                     value="{$entityClientSecret}"
                     />
@@ -53,7 +52,7 @@
             <div class="tiki-form-group col-sm-12 form-group-redirect_uri">
                 <label for="oauth-redirect_uri">{tr}Redirect_uri{/tr}</label>
                 <input type="text" class="form-control"
-                    name="redirect_uri"
+                    name="redirect_uri" id="oauth-redirect_uri"
                     value="{$entityRedirectUri}"
                     />
             </div>

@@ -2,7 +2,7 @@ import { parseData } from "./formSubmission.helpers";
 
 export default function (textarea) {
     const form = textarea.closest("form");
-    form.data("should-parse-editor-data", true);
+    form.data("should-parse-editor-data", form.data("should-parse-editor-data") ?? true);
     const currentHandlerCounter = form.data("handlerCounter") || 0;
     form.data("handlerCounter", currentHandlerCounter + 1);
 
@@ -21,6 +21,8 @@ export default function (textarea) {
             Another submit event usually gets triggered by the jquery validation plugin, and when this happens,
             data-parsing is already done. So this flag ensure that the data-parsing and submission are not done twice.
             */
+
+            textarea.data("is-submitting", true); // prevent the browser from warning about unsaved changes
             return;
         }
         e.preventDefault();

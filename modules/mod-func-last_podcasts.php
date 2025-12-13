@@ -68,9 +68,9 @@ function module_last_podcasts($mod_reference, $module_params)
     $mediaplayer = (isset($module_params['mediaplayer']) && is_readable($module_params['mediaplayer'])) ? $module_params['mediaplayer'] : '';
 
     $smarty->assign('modLastFiles', $mediafiles['data']);
-    $smarty->assign('nonums', isset($module_params['nonums']) ? $module_params['nonums'] : 'n');
-    $smarty->assign('verbose', isset($module_params['verbose']) ? $module_params['verbose'] : 'y');
-    $smarty->assign('link_url', isset($module_params['link_url']) ? $module_params['link_url'] : '');
-    $smarty->assign('link_text', isset($module_params['link_text']) ? $module_params['link_text'] : 'More Podcasts');
+    $smarty->assign('nonums', $module_params['nonums'] ?? 'n');
+    $smarty->assign('verbose', $module_params['verbose'] ?? 'y');
+    $smarty->assign('link_url', $module_params['link_url'] ?? '');
+    $smarty->assign('link_text', $module_params['link_text'] ?? 'More Podcasts');
     $smarty->assign('module_rows', $mod_reference["rows"]);
 }

@@ -41,7 +41,7 @@ if (isset($_REQUEST['clean'])) {
     $logslib->clean_logsql();
 }
 $auto_query_args = ['offset', 'numrows', 'find', 'sort_mode'];
-$numrows = (isset($_REQUEST['numrows'])) ? $_REQUEST['numrows'] : (isset($_REQUEST['maxRecords']) ? $_REQUEST['maxRecords'] : $prefs['maxRecords']);
+$numrows = $_REQUEST['numrows'] ?? $_REQUEST['maxRecords'] ?? $prefs['maxRecords'];
 $smarty->assign_by_ref('numrows', $numrows);
 $smarty->assign_by_ref('maxRecords', $numrows);
 $offset = (isset($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;

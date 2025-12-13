@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_performance` MODIFY `url` text NOT NULL;

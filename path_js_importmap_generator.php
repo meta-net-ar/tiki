@@ -25,13 +25,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             // NOTE: Keep the list alphabetically sorted.
             "imports" => [
                 /* common_externals available in ESM format */
-                "@event-calendar/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/index.js",
-                "@event-calendar/day-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/day-grid/index.js",
-                "@event-calendar/interaction" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/interaction/index.js",
-                "@event-calendar/list" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/list/index.js",
-                "@event-calendar/resource-time-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/resource-time-grid/index.js",
-                "@event-calendar/resource-timeline" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/resource-timeline/index.js",
-                "@event-calendar/time-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/time-grid/index.js",
                 "@kurkle/color" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@kurkle/color/dist/color.esm.js",
                 "@popperjs/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@popperjs/core/dist/esm/index.js",
                 "animejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/anime/dist/anime.es.js",
@@ -41,6 +34,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "clipboard" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/clipboard/dist/clipboard.min.js",
                 "dompurify" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/dompurify/dist/purify.es.js",
                 "driver.js" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/driver.js/dist/driver.js.mjs",
+                "fieldslinker" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/fieldslinker/dist/fieldsLinker.js",
                 "jquery" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.js",
                 // We can't add jquery-validation because it's not available as ESM
                 "moment" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/moment/dist/moment.js",
@@ -48,8 +42,15 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "smartmenus" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/smartmenus/dist/js/smartmenus.esm.js",
                 "sortablejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/sortablejs/modular/sortable.esm.js",
                 "summernote" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/summernote/dist/summernote-bs5.min.js",
+                "timeline" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vis-timeline/dist/vis-timeline-graph2d.esm.js",
                 // currently we don't use the prod build to improve the experience for SFC
                 "vue" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue/dist/vue.esm-browser.js",
+
+                /* html5-qrcode */
+                "@html5-qrcode/html5-qrcode" => $tikiUrl . JS_ASSETS_PATH . "/tiki-html5-qrcode.js",
+
+                /* common_reexported */
+                "common-reexported/jspdf" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/jspdf/index.js",
 
                 /* jquery_tiki */
                 "@jquery-tiki/asyncLoop" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-async-loop.js",
@@ -66,18 +67,27 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-svgedit_draw" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-svgedit_draw.js",
                 "@jquery-tiki/tiki-handle_svgedit" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-handle_svgedit.js",
                 "@jquery-tiki/tiki-admin_menu_options" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_menu_options.js",
+                "@jquery-tiki/tiki-admin_2fa" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_2fa.js",
                 "@jquery-tiki/tiki-edit_structure" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-edit_structure.js",
-                "@jquery-tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/ui-utils/index.js",
                 "@jquery-tiki/wikiplugin-trackercalendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-trackercalendar.js",
-                "@jquery-tiki/fullcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/fullcalendar_to_pdf.js",
+                "@jquery-tiki/eventcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/eventcalendar_to_pdf.js",
                 "@jquery-tiki/tiki-maps-ol3" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js",
                 "@jquery-tiki/tiki-password" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-password.js",
+                "@jquery-tiki/tiki-field_limiter" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-field_limiter.js",
                 "@jquery-tiki/timeago" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/timeago.js",
+                "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/emailFolder.js",
+                "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/files.js",
+                "@jquery-tiki/tracker-fields/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/all.dirtyCheck.js",
+                "@jquery-tiki/validate-alt-image" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/validate-alt-image.js",
                 "@tiki-modules/sentryBrowser" => $tikiUrl . JS_ASSETS_PATH . "/tiki-sentry-browser.js",
                 "@mermaidPack" => $tikiUrl . JS_ASSETS_PATH . "/tiki-mermaid.js",
+                "@tiki-glightbox" => $tikiUrl . JS_ASSETS_PATH . "/tiki-glightbox.js",
+                "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
 
                 /* Toast-ui editor */
                 "@tiki-toast-ui/editor-index" => $tikiUrl . JS_ASSETS_PATH . "/tiki-toast-ui.js",
+
+                "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
 
                 /* single-spa microfrontends and common files (root and styleguide) */
                 "@vue-mf/duration-picker" => $tikiUrl . JS_ASSETS_PATH . "/duration-picker.js",
@@ -99,6 +109,10 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-select" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/select.js",
                 "@vue-widgets/el-slider" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/slider.js",
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
+                "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backTop.js",
+
+                /* tiki-3d-model-viewer */
+                "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
 
                 /* tiki-iot */
                 "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",

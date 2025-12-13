@@ -23,7 +23,6 @@ function wikiplugin_checkreferer_info()
                 'since' => '14.0',
                 'separator' => ',',
                 'filter' => 'text',
-                'default' => '',
             ],
         ],
     ];

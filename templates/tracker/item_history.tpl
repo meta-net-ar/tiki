@@ -23,7 +23,7 @@
             <div class="row align-items-end">
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Version{/tr}
-                        <input type="number" name="version" value="{if !empty($filter.version)}{$filter.version|escape}{/if}" class="form-control">
+                        <input type="number" name="version" value="{if isset($filter.version)}{$filter.version|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">
@@ -77,7 +77,7 @@
                 {if $hist.value neq $hist.new or $hist.version == 0}
                     {$fieldId=$hist.fieldId}
                     {$field_value=$field_option[$fieldId]}
-                    {if $field_value.visibleInHistoryMode eq 'y' or $hist.version == 0}
+                    {if is_array($field_value) and ($field_value.visibleInHistoryMode eq 'y' or $hist.version == 0)}
                         <tr>
                             <td class="id"><strong>{$hist.version|escape}</strong></td>
                             <td class="date"><strong>{if not empty($hist.lastModif)}{$hist.lastModif|tiki_short_datetime}{/if}</strong></td>

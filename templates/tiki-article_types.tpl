@@ -107,31 +107,53 @@
             </table>
         </div>
         {if $prefs.article_custom_attributes eq 'y'}
-            <div class="table-responsive article-types mb-4">
-                <table class="table table-striped table-hover">
+        <div class="table-responsive article-types mb-4">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
                         <th>{tr}Custom attribute{/tr}</th>
-                        <td></td> {* th changed to td to prevent ARIA empty header error *}
+                        <th class="text-end">{tr}Action{/tr}</th>
                     </tr>
+                </thead>
+                <tbody>
                     {foreach from=$types[user].attributes item=att key=attname}
                         <tr>
                             <td>{$attname|escape}</td>
-                            <td class="action">
-                                <a class="tips" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
+                            <td class="text-end">
+                                <a id="remove_attr-{$attname}" class="btn btn-sm btn-outline-danger tips" title=":{tr}Remove{/tr}" aria-label="{tr}Remove custom attribute{/tr} {$attname|escape}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
                                     {icon name='remove' alt="{tr}Remove{/tr}"}
                                 </a>
                             </td>
                         </tr>
+                    {foreachelse}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted fst-italic py-3">
+                                {tr}No custom attributes defined for this type.{/tr}
+                            </td>
+                        </tr>
                     {/foreach}
+                </tbody>
+                <tfoot>
                     <tr>
-                        <td><input type="text" name="new_attribute[{$types[user].type|escape}]" aria-label="{tr}Custom attribute{/tr}" value="" class="form-control"></td>
-                        <td>&nbsp;</td>
+                        <td colspan="2" class="p-2">
+                            <label for="new_attribute_{$types[user].type|escape}" class="visually-hidden">{tr}Add new custom attribute{/tr}</label>
+                            <input type="text" id="new_attribute_{$types[user].type|escape}" name="new_attribute[{$types[user].type|escape}]" class="form-control" placeholder="{tr}Add new custom attribute and click Save below{/tr}">
+                        </td>
                     </tr>
-                </table>
-            </div>
+                </tfoot>
+            </table>
+        </div>
         {/if}
         <div class="text-center my-3">
             <input type="submit" class="btn btn-primary" name="update_type" value="{tr}Save{/tr}">
         </div>
     {/section}
 </form>
+{jq}
+    $(document).on("click", "[id^='remove_attr-']", function(e){
+        const confirmed = confirm("Are you sure you want to permanently remove this ?");
+        if (!confirmed) {
+            e.preventDefault();
+        }
+    });
+{/jq}

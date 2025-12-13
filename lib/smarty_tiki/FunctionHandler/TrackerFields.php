@@ -43,8 +43,8 @@ class TrackerFields extends Base
             $sectionFormat = $params['format'];
         }
 
-        $editItemPretty = isset($params['editItemPretty']) ? $params['editItemPretty'] : '';
-        $viewItemPretty = isset($params['viewItemPretty']) ? $params['viewItemPretty'] : '';
+        $editItemPretty = $params['editItemPretty'] ?? '';
+        $viewItemPretty = $params['viewItemPretty'] ?? '';
 
         $smarty = TikiLib::lib('smarty');
         $trklib = TikiLib::lib('trk');
@@ -81,7 +81,7 @@ class TrackerFields extends Base
             }
             $permName = $field['permName'];
 
-            $itemId = isset($params['itemId']) ? $params['itemId'] : null;
+            $itemId = $params['itemId'] ?? null;
             if ($itemId) {
                 $item = ['itemId' => $itemId];
             } else {

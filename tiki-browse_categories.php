@@ -18,7 +18,7 @@ $inputConfiguration = [
             'type'                        => 'string',        //get
             'offset'                      => 'int',           //get
             'find'                        => 'string',        //post
-            'deep'                        => 'bool',          //get
+            'deep'                        => 'string',          //get
             'watch_event'                 => 'word',          //get
             'watch_action'                => 'word',          //get
             'watch_object'                => 'int',           //get
@@ -192,7 +192,7 @@ $fetchCountIcon = smarty_function_icon(
 
 $tree_nodes = [];
 foreach ($ctall as $c) {
-    if ($prefs['category_browse_count_objects'] === 'y' || isset($_REQUEST['deep'])) {
+    if ($prefs['category_browse_count_objects'] === 'y' || $deep == 'on') {
         // display correct count of objects depending on browse in and find filters -- luci Thu 05 Sep 2013 10:15:50 PM UTC
         $objectcount = $categlib->list_category_objects(
             $c['categId'],

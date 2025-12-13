@@ -37,7 +37,7 @@ function wikiplugin_casperjs($data, $params)
     // Generate Link
     $label = tra('Execute CasperJS script');
     $urlParts = parse_url($_SERVER['REQUEST_URI']);
-    $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+    $path = $urlParts['path'] ?? '/';
     $requestParams = [];
     if (isset($urlParts['query'])) {
         parse_str($urlParts['query'], $requestParams);

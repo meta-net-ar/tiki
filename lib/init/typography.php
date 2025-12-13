@@ -27,17 +27,7 @@ function typography($content, $lg = '', $ui_flag = false)
         return $content;
     }
 
-    if ($lg == '') {
-        if (! empty($prefs['language'])) {
-            $lang = $prefs['language'];
-        } elseif (! empty($prefs['site_language'])) {
-            $lang = $prefs['site_language'];
-        } else {
-            $lang = 'en';
-        }
-    } else {
-        $lang = $lg;
-    }
+    $lang = $lg ?: Language::getCurrentLanguage();
 
     $parser_key = "$ui_flag:$lang";
     if (! isset($prefs['feature_typo_quotes'])) {

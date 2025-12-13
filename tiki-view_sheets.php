@@ -4,6 +4,10 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\CSVHandler;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -15,16 +19,16 @@ $inputConfiguration = [
         'staticKeyFilters' => [
             'sheetId'      => 'int',     //get
             'file'         => 'word',    //get
-            'fileId'       => 'word',    //get
+            'fileId'       => 'int',     //get
             'page'         => 'page',    //get
             'height'       => 'int',     //get
-            'parse'        => 'word',    //get
+            'parse'        => 'alpha',    //get
             's'            => 'string',  //get
             'readdate'     => 'int',     //get
-            'relate'       => 'int',     //get
+            'relate'       => 'alpha',   //get
             'trackerId'    => 'int',     //get
             'childSheetId' => 'int',     //get
-            'sheetonly'    => 'bool',    //get
+            'sheetonly'    => 'alpha',   //get
         ]
     ],
 ];
@@ -66,7 +70,7 @@ if (! $sheetlib->user_can_view($_REQUEST['sheetId'])) {
     Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$smarty->assign('page', isset($_REQUEST['page']) ? $_REQUEST['page'] : '');
+$smarty->assign('page', $_REQUEST['page'] ?? '');
 $smarty->assign('objectperms', $objectperms);
 
 if (isset($_REQUEST['height'])) {
@@ -169,8 +173,8 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
     $filegallib = TikiLib::lib('filegal');
     $access->check_feature('feature_file_galleries');
     $fileInfo = $filegallib->get_file_info($_REQUEST['fileId']);
-    $handler = new TikiSheetCSVHandler($fileInfo);
-    $grid = new TikiSheet();
+    $handler = new CSVHandler($fileInfo);
+    $grid = new Sheet();
     $grid->import($handler);
     $tableHtml[0] = $grid->getTableHtml();
     $smarty->assign('notEditable', 'true');
@@ -180,14 +184,14 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
     }
 } else {
     //Database sheet
-    $handler = new TikiSheetDatabaseHandler($_REQUEST['sheetId']);
+    $handler = new DatabaseHandler($_REQUEST['sheetId']);
     //We make sheet able to look at other date save
     if (isset($_REQUEST['readdate']) && ! empty($_REQUEST['readdate'])) {
         $smarty->assign('read_date', $_REQUEST['readdate']);
         $handler->setReadDate($_REQUEST['readdate']);
     }
 
-    $grid = new TikiSheet();
+    $grid = new Sheet();
     $grid->import($handler);
 
     //ensure that sheet isn't being edited, then parse values if needed
@@ -199,7 +203,7 @@ if (isset($_REQUEST['relate']) && isset($_REQUEST['trackerId'])) {
 
     $smarty->assign('parseValues', $grid->parseValues);
 
-    $tableHtml[0] = $grid->getTableHtml(true, isset($_REQUEST['readdate']) ? $_REQUEST['readdate'] : null);
+    $tableHtml[0] = $grid->getTableHtml(true, $_REQUEST['readdate'] ?? null);
 
     if (! empty($relatedTrackersAsHtml)) {
         $tableHtml[0] .= $relatedTrackersAsHtml;

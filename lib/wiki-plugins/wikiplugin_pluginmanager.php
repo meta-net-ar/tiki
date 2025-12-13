@@ -47,7 +47,6 @@ class WikiPluginPluginManager extends PluginsLib
     {
         global $helpurl;
         $wikilib = TikiLib::lib('wiki');
-        $tikilib = TikiLib::lib('tiki');
         if (empty($helpurl)) {
             $helpurl = 'http://doc.tiki.org/';
         }
@@ -86,7 +85,7 @@ class WikiPluginPluginManager extends PluginsLib
         //$aPlugins and $all now has the complete list of plugin or module file names - the code below modifies $aPlugins
         //if necessary based on user settings
         if (! empty($plugin)) {
-            if (strpos($plugin, '|') !== false) {
+            if (str_contains($plugin, '|')) {
                 $aPlugins = [];
                 $userlist = explode('|', $plugin);
                 foreach ($userlist as $useritem) {
@@ -98,7 +97,7 @@ class WikiPluginPluginManager extends PluginsLib
                         $aPlugins[] = $file;
                     }
                 }
-            } elseif (strpos($plugin, '-') !== false) {
+            } elseif (str_contains($plugin, '-')) {
                 $userrange = explode('-', $plugin);
                 $begin = array_search($filepath . $userrange[0] . '.php', $aPlugins);
                 $end = array_search($filepath . $userrange[1] . '.php', $aPlugins);
@@ -196,15 +195,13 @@ class WikiPluginPluginManager extends PluginsLib
                             }
                             if (isset($param['options']) && is_array($param['options'])) {
                                 $paramblock .= '<br /><em>' . tra('Options:') . '</em> ';
-                                $i = 0;
-                                foreach ($param['options'] as $oplist => $opitem) {
+                                foreach ($param['options'] as $opitem) {
                                     if (isset($opitem['value'])) {
                                         $paramblock .= $opitem['value'];
                                     } else {
                                         $paramblock .= $opitem['text'];
                                     }
                                     $paramblock .= ' | ';
-                                    $i++;
                                 }
                                 $paramblock = substr($paramblock, 0, -3);
                             }
@@ -260,7 +257,6 @@ class WikiPluginPluginManager extends PluginsLib
                     $body = ['(body of plugin)' => ['description' => $infoPlugin['body']]];
                     $infoPlugin['params'] = array_merge($body, $infoPlugin['params']);
                 }
-                $count = 1;
                 foreach ($infoPlugin['params'] as $paramname => $paraminfo) {
                     unset($sep, $septext);
                     //check is paramtype filter is set
@@ -314,7 +310,7 @@ class WikiPluginPluginManager extends PluginsLib
                         } elseif (isset($paraminfo['options'])) {
                             $optcounter = 1;
                             $numoptions = count($paraminfo['options']);
-                            foreach ($paraminfo['options'] as $oplist => $opitem) {
+                            foreach ($paraminfo['options'] as $opitem) {
                                 if (isset($opitem['value'])) {
                                     $rows .= strlen($opitem['value']) == 0 ? tra('(blank)') : $opitem['value'];
                                 } else {
@@ -480,7 +476,7 @@ function wikiplugin_pluginmanager_info()
                 'name' => tra('Preferences export'),
                 'description' => tr('Default preferences export with columns name, description, location or list more separated by %0|%1.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => 'name | description | locations',
+                'default' => '',
                 'since' => '27',
             ],
             'type' => [

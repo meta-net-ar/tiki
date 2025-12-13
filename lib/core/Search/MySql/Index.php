@@ -409,6 +409,14 @@ SQL;
         }
     }
 
+    public function isDateField($field)
+    {
+        $type = $this->table->getFieldType($field);
+        if (! empty($type) && in_array($type, ['date', 'datetime'])) {
+            return true;
+        }
+        return false;
+    }
     public function isTextField($field)
     {
         $type = $this->table->getFieldType($field);

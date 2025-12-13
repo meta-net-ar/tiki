@@ -8,38 +8,42 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Importer\Base as BaseImporter;
+use Tiki\Lib\Importer\BlogWordpress;
+use Tiki\Lib\Importer\WikiMediawiki;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'importerClassName'               => 'word',              //post
+        'importerClassName'               => 'text',              //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
-require_once('lib/importer/tikiimporter.php');
-require_once('lib/importer/tikiimporter_wiki.php');
 require_once('lib/wiki/editlib.php');
 
 $access->check_permission('tiki_p_admin_importer');
 
+/**
+ * $availableSoftwares is an array that control the list of available software importers.
+ * The array key is the name of the importer class and the value is the name of the software
+ */
+$availableSoftwares = [
+    WikiMediawiki::class => 'MediaWiki',
+    BlogWordpress::class => 'WordPress',
+];
+
 if (! empty($_POST['importerClassName'])) {
     $importerClassName = filter_input(INPUT_POST, 'importerClassName', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-    switch ($importerClassName) {
-        case 'TikiImporter_Wiki_Mediawiki':
-            require_once('lib/importer/tikiimporter_wiki_mediawiki.php');
-            break;
-        case 'TikiImporter_Blog_Wordpress':
-            require_once('lib/importer/tikiimporter_blog_wordpress.php');
-            break;
-        case 'default':
-            break;
+    if (! isset($availableSoftwares[$importerClassName])) {
+        Feedback::errorAndDie(tra("Invalid software name"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 
     $importer = new $importerClassName();
     $smarty->assign('softwareName', $importer->softwareName);
-
-    TikiImporter::changePhpSettings();
+    BaseImporter::changePhpSettings();
 }
 
 if (isset($_SESSION['tiki_importer_feedback'])) {
@@ -65,7 +69,7 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
             Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
-        $msg = TikiImporter::displayPhpUploadError($_FILES['importFile']['error']);
+        $msg = BaseImporter::displayPhpUploadError($_FILES['importFile']['error']);
         Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
     }
 
@@ -89,13 +93,6 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
     $smarty->assign('importerClassName', $importerClassName);
 } else {
     // first step: display the list of available software importers
-
-    // $availableSoftwares is an array that control the list of available software importers.
-    // The array key is the name of the importer class and the value is the name of the software
-    $availableSoftwares = [
-        'TikiImporter_Wiki_Mediawiki' => 'MediaWiki',
-        'TikiImporter_Blog_Wordpress' => 'WordPress',
-    ];
 
     $smarty->assign('availableSoftwares', $availableSoftwares);
     $smarty->assign('chooseSoftware', true);

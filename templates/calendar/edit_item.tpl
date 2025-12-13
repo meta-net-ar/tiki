@@ -5,7 +5,8 @@
 {/block}
 
 {block name="content"}
-    <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form">
+
+    <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form" data-should-parse-editor-data="false">
         <div class="form-contents">
             <div class="preview d-none">
                 <button type="button" class="btn-close" style="position:absolute;right:2rem;top:2rem;z-index:1;" aria-label="{tr}Close{/tr}"></button>
@@ -19,7 +20,7 @@
                 {/if}
             </div>
             <input type="hidden" name="calitem[user]" value="{$calitem.user|escape}">
-            <input type="hidden" name="return_url" value="tiki-calendar.php">
+            <input type="hidden" id="return_url" name="return_url" value="{$calitem.returnURL}">
             {if $calitemId}
                 <input type="hidden" name="calitemId" value="{$calitemId|escape}">
             {/if}
@@ -38,8 +39,7 @@
                 <label for="calid" class="col-form-label col-sm-3">{tr}Calendar{/tr}</label>
                 <div class="col-sm-9">
                     <input name="calendarchanged" type="hidden">
-                    <select name="calitem[calendarId]" id="calid" class="form-control" required
-                            onchange="$(this).parents('.edit-event-form').tikiModal(tr('Loading...')); needToConfirm=false; $('input[name=calendarchanged]').val(1); $('input[name=saveitem]').trigger('click');">
+                    <select name="calitem[calendarId]" id="calid" class="form-control" required>
                         {foreach $calendars as $aCalendar}
                             {$calstyle = ''}
                             {if not empty($aCalendar.custombgcolor)}
@@ -81,10 +81,22 @@
                     <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
                 </div>
             </div>
+            {if !empty($trackerItems)}
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr}</label>
+                    <div class="col-sm-9 mb-0 pt-2">
+                        <ul>
+                            {foreach from=$trackerItems item=trackerItem}
+                                <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Created by{/tr}</label>
                 <div class="col-sm-9">
-                    <div class="summary" style="margin-bottom: 0; padding-top: 7px;">
+                    <div class="summary mb-0 pt-2">
                         {$calitem.user|escape}
                     </div>
 
@@ -410,8 +422,14 @@
                             </div>
                             <div><a href="#" class="btn btn-secondary btn-sm availability-check" role="button">{tr}Check availability{/tr}</a></div>
                             <br/>
-                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
-                            Send calendar invitations and event updates via email
+                            <div>
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
+                                Send calendar invitations and event updates via email
+                            </div>
+                            <div>
+                                <input type="checkbox" class="form-check-input" name="calitem[hideParticipants]" aria-label="{tr}Hide participants list from others{/tr}" {if $calitem.hideParticipants}checked="checked"{/if}/>
+                                {tr}Hide participants list from others{/tr}
+                            </div>
                         {/if}
                     </div>
                 </div> {* / .mb-3.row *}
@@ -450,10 +468,10 @@
             {/if}
             {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
-                       class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" value="{tr}Delete event{/tr}">
+                       class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" data-bs-dismiss="modal" value="{tr}Delete event{/tr}">
             {/if}
             {if $recurrence.id}
-                <div class="dropdown">
+                <div class="dropdown" data-cb-close-all="true">
                     <button class="btn btn-danger dropdown-toggle" type="button" id="deleteMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         {tr}Delete event(s){/tr}
                     </button>

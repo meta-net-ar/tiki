@@ -12,11 +12,11 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
         'taskId'                    => 'int',          //post
-        'move_task_into_trash'      => 'striptags',    //post
+        'move_task_into_trash'      => 'bool',         //post
         'update_tasks'              => 'bool',         //post
-        'remove_task_from_trash'    => 'striptags',    //post
-        'update_percentage'         => 'striptags',    //post
-        'action'                    => 'striptags',    //post
+        'remove_task_from_trash'    => 'bool',         //post
+        'update_percentage'         => 'bool',         //post
+        'action'                    => 'word',         //post
         'reload'                    => 'bool',         //post
         'show_trash'                => 'bool',         //post
         'show_completed'            => 'bool',         //post
@@ -28,17 +28,17 @@ $inputConfiguration = [
         'tasks_maxRecords'          => 'int',          //post
         'admin_mode'                => 'bool',         //get
         'admin_mode_off'            => 'bool',         //get
-        'emty_trash'                => 'striptags',    //get
-        'show_form'                 => 'striptags',    //get
-        'show_history'              => 'striptags',    //get
-        'preview'                   => 'striptags',    //post
-        'tiki_view_mode'            => 'striptags',    //post
+        'emty_trash'                => 'bool',         //get
+        'show_form'                 => 'alpha',        //get
+        'show_history'              => 'alpha',        //get
+        'preview'                   => 'bool',         //post
+        'tiki_view_mode'            => 'alpha',        //post
         'save'                      => 'bool',         //post
         'title'                     => 'striptags',    //post
         'description'               => 'xss',          //post
-        'start_Meridian'            => 'digits',       //post
+        'start_Meridian'            => 'alpha',        //post
         'start_Hour'                => 'digits',       //post
-        'end_Meridian'              => 'digits',       //post
+        'end_Meridian'              => 'alpha',        //post
         'use_start_date'            => 'bool',         //post
         'start_Minute'              => 'digits',       //post
         'start_Month'               => 'digits',       //post
@@ -54,21 +54,21 @@ $inputConfiguration = [
         'task_user'                 => 'striptags',    //post
         'rights_by_creator'         => 'bool',         //post
         'priority'                  => 'int',          //post
-        'status'                    => 'striptags',    //post
-        'percentage'                => 'striptags',    //post
+        'status'                    => 'alpha',        //post
+        'percentage'                => 'alnum',        //post
         'task_accept'               => 'striptags',    //post
-        'task_not_accept'           => 'striptags',    //post
+        'task_not_accept'           => 'bool',         //post
         'remove_from_trash'         => 'bool',         //post
         'move_into_trash'           => 'bool',         //post
         'task_send_changes_message' => 'bool',         //post
         'task_version'              => 'digits',       //post
         'creator'                   => 'striptags',    //post
-        'created'                   => 'striptags',    //post
+        'created'                   => 'digits',       //post
         'task_info_message'         => 'striptags',    //post
         'send_email_newtask'        => 'bool',         //post
         'HTTP_HOST'                 => 'striptags',    //post
         'REQUEST_URI'               => 'striptags',    //post
-        'sort_mode'                 => 'striptags',    //post
+        'sort_mode'                 => 'alnumdash',    //post
         'offset'                    => 'int',          //get
         'find'                      => 'striptags',    //get
         ],
@@ -154,11 +154,10 @@ if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_task_as_trash($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('was moved to the trash');
@@ -175,11 +174,10 @@ if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->open_task($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('open / in process');
@@ -196,11 +194,10 @@ if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_complete_task($task, $user);
             $trashed_task = $tasklib->get_task($user, $task);
+            $msg_from = $user;
             if ($trashed_task['user'] == $user) {
-                $msg_from = $user;
                 $msg_to = $trashed_task['creator'];
             } else {
-                $msg_from = $user;
                 $msg_to = $trashed_task['user'];
             }
             $msg_title = tra('Task') . ' "' . $trashed_task['title'] . '" ' . tra('completed (100%)');
@@ -451,11 +448,7 @@ if ((isset($_REQUEST['save'])) || (isset($_REQUEST['preview']))) {
             $msg_changes .= tra('Rights by creator') . ': ' . $info['rights_by_creator'] . ' --> ' . $save_head['rights_by_creator'] . "\n";
         }
     }
-    if (isset($_REQUEST['public_for_group'])) {
-        $public_for_group = $_REQUEST['public_for_group'];
-    } else {
-        $public_for_group = null;
-    }
+    $public_for_group = $_REQUEST['public_for_group'] ?? null;
     if (isset($_REQUEST['title']) and $info['title'] != $_REQUEST['title']) {
         $save['title'] = $_REQUEST['title'];
         $msg_changes .= tra('Title') . ': ' . $info['title'] . ' --> ' . $save['title'] . "\n";
@@ -665,7 +658,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $mail_data .= tra("You must finish your work on") . ": " . $tikilib->date_format($prefs['short_date_format'] . ' ' . $prefs['short_time_format'], $info['end']) . "\n";
         }
         $mail_data .= "\n" . tra("Log in and click the link below") . "\n";
-        $mail_data .= "http://" . $_REQUEST['HTTP_HOST'] . $_REQUEST['REQUEST_URI'] . "?tiki_view_mode=view&taskId=" . $taskId . "\n\n";
+        $mail_data .= "{$base_url}tiki-user_tasks.php?tiki_view_mode=view&taskId={$taskId}\n\n";
         $mail_data .= tra("Please read the task and work on it!");
         $mail->setText($mail_data);
         $mail->send([$email]);
@@ -714,12 +707,8 @@ $smarty->assign('created_Day', $tikilib->date_format('%d', $info['created']));
 $smarty->assign('created_Year', $tikilib->date_format('%Y', $info['created']));
 $smarty->assign('created_Hour', $tikilib->date_format('%H', $info['created']));
 $smarty->assign('created_Minute', $tikilib->date_format('%M', $info['created']));
-if ((! isset($info['start'])) || ($info['start'] == null)) {
-    $info['start'] = $tikilib->now;
-    $smarty->assign('start_date', $info['start']);
-} else {
-    $smarty->assign('start_date', $info['start']);
-}
+$info['start'] = $info['start'] ?? $tikilib->now;
+$smarty->assign('start_date', $info['start']);
 if ((! isset($info['end'])) || ($info['end'] == null)) {
     $smarty->assign('end_date', ($info['start'] + 86400));
 } else {
@@ -736,11 +725,7 @@ if (! isset($_REQUEST['offset'])) {
     $offset = $_REQUEST['offset'];
 }
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = null;
-}
+$find = $_REQUEST['find'] ?? null;
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (! $show_form) {

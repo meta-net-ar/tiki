@@ -8,7 +8,6 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 function wikiplugin_cookieconsent_info()
 {
-    global $prefs;
     return [
         'name' => tra('Cookie Consent'),
         'documentation' => 'PluginCookieConsent',
@@ -56,14 +55,6 @@ function wikiplugin_cookieconsent($body, $params)
         return $body;
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_cookieconsent_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $class = $params['element_class'];
 
     if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
@@ -72,7 +63,7 @@ function wikiplugin_cookieconsent($body, $params)
     }
 
     $tag1 = $tag2 = '';
-    if ($params['element'] && $params['element'] !== 'none') {
+    if ($params['element'] !== 'none') {
         if ($class) {
             $class = " class=\"{$class}\"";
         }

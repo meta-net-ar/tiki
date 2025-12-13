@@ -72,9 +72,9 @@ describe("adminToolbar.helpers", () => {
             const givenInput = $(`<el-input>`);
             const givenContainer = $(`
                 <div>
-                    <div class="row"><button data-name="Wikiplugin_Color" data-token="color" data-name="color-name">Pick a color</button></div>
-                    <div class="row"><button data-name="Wikiplugin_Font" data-token="font" data-name="font-name">Choose a font</button></div>
-                    <div class="row"><button data-name="Wikiplugin_Style" data-token="style" data-name="style-name">Change style</button></div>
+                    <div class="row"><button data-token="color" data-name="color-name">Pick a color</button></div>
+                    <div class="row"><button data-token="font" data-name="font-name">Choose a font</button></div>
+                    <div class="row"><button data-token="style" data-name="style-name">Change style</button></div>
                 </div>`);
             givenContainer.prepend(givenInput);
 

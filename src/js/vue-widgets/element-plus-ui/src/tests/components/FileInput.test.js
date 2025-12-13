@@ -80,7 +80,7 @@ describe("FileInput", () => {
                 {
                     ...props,
                     ref: (el) => {
-                        el.handleRemove = mockHandleRemove;
+                        if (el) el.handleRemove = mockHandleRemove;
                     },
                 },
                 slots

@@ -23,7 +23,7 @@ class PatchCypht
         $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
         $io = $event->getIO();
 
-        if (substr($vendors, -1, 1) !== DIRECTORY_SEPARATOR) {
+        if (! str_ends_with($vendors, DIRECTORY_SEPARATOR)) {
             if (DIRECTORY_SEPARATOR == "/") {
                 $vendors .= DIRECTORY_SEPARATOR;
             } else {
@@ -67,9 +67,9 @@ class PatchCypht
         $contents = file_get_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript);
         $contents = preg_replace('/define.*?VENDOR_PATH.*?;/', "define('VENDOR_PATH', '$vendors');", $contents);
         file_put_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript, $contents);
-        $output = `cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}`;
+        $output = shell_exec("cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}");
 
-        if (! is_string($output)  || ! strstr($output, 'dynamic.php file written')) {
+        if (! is_string($output)  || ! str_contains($output, 'dynamic.php file written')) {
             $io->write('Could not build Cypht package configuration. Check the output below and make sure minimum PHP version is available and executable as CLI.');
             if ($output === false) {
                 $io->write('The pipe cannot be established.');

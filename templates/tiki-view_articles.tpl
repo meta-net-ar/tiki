@@ -207,7 +207,7 @@
                         {/if}
                     {/if}
                 </div>
-                <div class="articleheadingtext{if $listpages[ix].isfloat eq 'n'} flex-grow-1 ms-3{/if}">{$listpages[ix].parsed_heading}</div>
+                <div class="articleheadingtext{if $listpages[ix].isfloat eq 'n'} flex-grow-1{/if}">{$listpages[ix].parsed_heading}</div>
             </div>
                     {if isset($fullbody) and $fullbody eq "y"}
             <div class="articlebody py-3">{$listpages[ix].parsed_body}</div>
@@ -306,12 +306,12 @@
 
 {if !isset($actions) or $actions eq "y"}
     {if $tiki_p_edit_article eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_cms eq 'y'}
-        <br/><a href="tiki-edit_article.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="alert-link">
+        <br/><a href="tiki-edit_article.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="btn btn-link">
             {icon name="create"} {tr}New Article{/tr}
         </a>
     {/if}
     {if $prefs.feature_submissions == 'y' && $tiki_p_edit_submission == "y" && $tiki_p_edit_article neq 'y' && $tiki_p_admin neq 'y' && $tiki_p_admin_cms neq 'y'}
-        <br/><a href="tiki-edit_submission.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="alert-link">
+        <br/><a href="tiki-edit_submission.php{if (isset($topicId) && !empty($topicId)) or (isset($type) && !empty($type))}?{/if}{if isset($topicId) && !empty($topicId) and is_numeric($topicId)}topicId={$topicId|escape}{/if}{if isset($type) && !empty($type)}&type={$type|escape}{/if}" class="btn btn-link">
             {icon name="create"} {tr}New Submission{/tr}
         </a>
     {/if}

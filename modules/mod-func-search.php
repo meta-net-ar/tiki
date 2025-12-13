@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -183,16 +183,16 @@ function module_search($mod_reference, $smod_params)    // modifies $smod_params
             $smod_params['show_search_button'] = 'n';
             $smod_params['show_go_button'] = 'n';
             $smod_params['show_edit_button'] = 'y';
-            $smod_params['edit_submit'] = isset($smod_params['submit']) ? $smod_params['submit'] : tra("Create/Edit");
+            $smod_params['edit_submit'] = $smod_params['submit'] ?? tra("Create/Edit");
             $smod_params['default_button'] = 'edit';
-            $smod_params['edit_action'] = isset($smod_params['action']) ? $smod_params['action'] : 'tiki-editpage.php';
-            $smod_params['input_size'] = isset($smod_params['size']) ? $smod_params['size'] : 15;
-            $smod_params['search_heading'] = isset($smod_params['mod_quickedit_heading']) ? $smod_params['mod_quickedit_heading'] : $smod_params['search_heading'];
+            $smod_params['edit_action'] = $smod_params['action'] ?? 'tiki-editpage.php';
+            $smod_params['input_size'] = $smod_params['size'] ?? 15;
+            $smod_params['search_heading'] = $smod_params['mod_quickedit_heading'] ?? $smod_params['search_heading'];
             $smod_params['title'] = tra('Quick Edit a Wiki Page');
             break;
 
         case 'search':      // params from old search_box module
-            $smod_params['tiki_search'] = isset($smod_params['tiki']) ? $smod_params['tiki'] : 'n';
+            $smod_params['tiki_search'] = $smod_params['tiki'] ?? 'n';
             $smod_params['show_search_button'] = 'y';
             $smod_params['show_go_button'] = 'n';
             $smod_params['show_edit_button'] = 'n';

@@ -22,7 +22,6 @@ function wikiplugin_modulelist_info()
                 'description' => tra('The name of the module zone to include. Can be a custom zone name.'),
                 'since' => '11.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Top'), 'value' => 'top'],
@@ -45,10 +44,6 @@ function wikiplugin_modulelist($data, $params)
     include_once 'tiki-modules.php';
 
     $smarty = TikiLib::lib('smarty');
-
-    if (! isset($params['zone'])) {
-        return WikiParser_PluginOutput::argumentError(['zone']);
-    }
 
     return smarty_function_modulelist(
         [

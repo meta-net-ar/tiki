@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -226,6 +226,8 @@ class ObjectLib extends TikiLib
     {
         return [
             'article',
+            'article_topic',
+            'article_type',
             'blog',
             'calendar',
             'directory',
@@ -251,6 +253,9 @@ class ObjectLib extends TikiLib
     public function getSelectorType($type)
     {
         $supported = [
+            'article' => 'article',
+            'article_topic' => 'article_topic',
+            'article_type' => 'article_type',
             'blog' => 'blog',
             'calendar' => 'calendar',
             'category' => 'category',
@@ -513,7 +518,7 @@ class ObjectLib extends TikiLib
             case 'wiki page':
                 $tikilib = TikiLib::lib('tiki');
                 $info = $tikilib->get_page_info($object);
-                return ['title' => $object ?? "", 'data' => isset($info['data']) ? $info['data'] : "", 'is_html' => isset($info['is_html']) ? $info['is_html'] : ""];
+                return ['title' => $object ?? "", 'data' => $info['data'] ?? "", 'is_html' => $info['is_html'] ?? ""];
 
             case 'article':
                 $artlib = TikiLib::lib('art');
@@ -579,6 +584,11 @@ class ObjectLib extends TikiLib
             if ($post_info) {
                 return true;
             }
+        } elseif ($type === 'blog') {
+            $blog = TikiLib::lib('blog')->get_blog($objectId);
+            if ($blog) {
+                return true;
+            }
         } elseif ($type === 'article') {
             $article_info = TikiLib::lib('art')->get_article($objectId, false);
             if ($article_info !== '') {
@@ -602,6 +612,12 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'file gallery') {
             $file = TikiLib::lib('filegal')->get_file_gallery_info($objectId);
             if ($file != false) {
+                return true;
+            }
+        } elseif ($type === 'file') {
+            $filegallib = TikiLib::lib('filegal');
+            $info = $filegallib->get_file_info($objectId, false, false, false);
+            if ($info != false) {
                 return true;
             }
         } elseif ($type === 'forum') {
@@ -886,7 +902,7 @@ class ObjectLib extends TikiLib
                 return TikiLib::lib('user')->clean_user($id);
             case 'calendar':
                 $info = TikiLib::lib('calendar')->get_calendar($id);
-                return isset($info['name']) ? $info['name'] : "";
+                return $info['name'] ?? "";
             case 'calendar event':
             case 'calendaritem':
                 $info = TikiLib::lib('calendar')->get_item($id);
@@ -971,7 +987,7 @@ class ObjectLib extends TikiLib
                 if (isset($item[$key])) {
                     $values[$value_key] = $item[$key];
                     return $item[$key];
-                } elseif (substr($key, 0, 5) == 'meta.') {
+                } elseif (str_starts_with($key, 'meta.')) {
                     $values[$value_key] = $metadata[$item['object_type'] . ':' . $item['object_id']][substr($key, 5)] ?? '';
                 } elseif (! $format || $format == '{title}') {
                     $values[$value_key] = '';
@@ -1041,7 +1057,7 @@ class ObjectLib extends TikiLib
                     $key = $matches[1];
                     if (isset($item[$key])) {
                         return $item[$key];
-                    } elseif (substr($key, 0, 5) == 'meta.') {
+                    } elseif (str_starts_with($key, 'meta.')) {
                         return $metadata[substr($key, 5)] ?? '';
                     } elseif (! $format || $format == '{title}') {
                         return tr('empty');
@@ -1077,7 +1093,7 @@ class ObjectLib extends TikiLib
      */
     public function get_wiki_content($type, $objectId)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $comment_info = TikiLib::lib('comments')->get_comment((int)$objectId);
             return $comment_info['data'];
         }
@@ -1117,7 +1133,7 @@ class ObjectLib extends TikiLib
      */
     public function get_verbose_type($type)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $isComment = true;
             $type = substr($type, 0, strlen($type) - 8);
         } else {

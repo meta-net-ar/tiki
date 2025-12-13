@@ -27,46 +27,51 @@ class ZoteroLib extends TikiDb_Bridge
     {
         global $prefs;
 
-        $subset = null;
-        if ($tag) {
-            $subset = '/tags/' . rawurlencode($tag);
-        }
-
-        $arguments = [
-            'content' => 'bib',
-            'limit' => $limit,
-        ];
-
-        if (! empty($prefs['zotero_style'])) {
-            $arguments['style'] = $prefs['zotero_style'];
-        }
-
-        $oauthlib = TikiLib::lib('oauth');
-        $response = $oauthlib->do_request(
-            'zotero',
-            [
-                'url' => "https://api.zotero.org/groups/{$prefs['zotero_group_id']}$subset/items",
-                'get' => $arguments,
-            ]
-        );
-
-        if ($response && $response->isSuccessful()) {
-            $feed = Laminas\Feed\Reader\Reader::importString($response->getBody());
-
-            $data = [];
-            foreach ($feed as $entry) {
-                $data[] = [
-                    'key' => basename($entry->getLink()),
-                    'url' => $entry->getLink(),
-                    'title' => $entry->getTitle(),
-                    'content' => $entry->getDescription(),
-                ];
+        try {
+            $subset = null;
+            if ($tag) {
+                $subset = '/tags/' . rawurlencode($tag);
             }
 
-            return $data;
-        }
+            $arguments = [
+                'content' => 'bib',
+                'limit' => $limit,
+            ];
 
-        return false;
+            if (! empty($prefs['zotero_style'])) {
+                $arguments['style'] = $prefs['zotero_style'];
+            }
+
+            $oauthlib = TikiLib::lib('oauth');
+            $response = $oauthlib->do_request(
+                'zotero',
+                [
+                    'url' => "https://api.zotero.org/groups/{$prefs['zotero_group_id']}$subset/items",
+                    'get' => $arguments,
+                ]
+            );
+
+            if ($response && $response->isSuccess()) {
+                $feed = Laminas\Feed\Reader\Reader::importString($response->getBody());
+
+                $data = [];
+                foreach ($feed as $entry) {
+                    $data[] = [
+                        'key' => basename($entry->getLink()),
+                        'url' => $entry->getLink(),
+                        'title' => $entry->getTitle(),
+                        'content' => $entry->getDescription(),
+                    ];
+                }
+
+                return $data;
+            }
+
+            return false;
+        } catch (Exception $e) {
+            error_log("Zotero get_references error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -107,7 +112,7 @@ class ZoteroLib extends TikiDb_Bridge
             ]
         );
 
-        if ($response->isSuccessful()) {
+        if ($response->isSuccess()) {
             $entry = $response->getBody();
             $entry = str_replace('<entry ', '<feed xmlns="http://www.w3.org/2005/Atom"><entry ', $entry) . '</feed>';
             $feed = Laminas\Feed\Reader\Reader::importString($entry);
@@ -157,7 +162,7 @@ class ZoteroLib extends TikiDb_Bridge
             ]
         );
 
-        if ($response->isSuccessful()) {
+        if ($response->isSuccess()) {
             $entry = $response->getBody();
 
             return $entry;

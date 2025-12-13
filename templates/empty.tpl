@@ -1,1 +1,1 @@
-{* Empty template on purpose, see \Smarty_Tiki::getEmptyInternalTemplate *}
+{* Empty template on purpose, see \Tiki\Smarty\SmartyTiki::getEmptyInternalTemplate *}

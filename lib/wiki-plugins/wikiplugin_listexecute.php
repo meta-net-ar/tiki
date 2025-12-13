@@ -65,7 +65,8 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
             'tracker_item_modify' => 'Search_Action_TrackerItemModify',
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
-            'categorize_object' => 'Search_Action_CategorizeObjectAction'
+            'categorize_object' => 'Search_Action_CategorizeObjectAction',
+            'export_pdf' => 'SearchActionExportPDF',
         ]
     );
 
@@ -139,7 +140,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
     $result->setId('wplistexecute-' . $iListExecute);
 
     $resultBuilder = new Search_ResultSet_WikiBuilder($result);
-    $resultBuilder->apply($matches, $params);
+    $resultBuilder->apply($matches);
 
     $dataSource = $unifiedsearchlib->getDataSource();
     $builder = new Search_Formatter_Builder();
@@ -290,7 +291,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
             // remove any tablesorter header js that will be added twice otherwise
             foreach (TikiLib::lib('header')->jq_onready as &$scripts) {
                 foreach ($scripts as $key => $js) {
-                    if (strstr($js, '$(\'table#wplistexecute-' . $iListExecute . '\').tablesorter(')) {
+                    if (str_contains($js, '$(\'table#wplistexecute-' . $iListExecute . '\').tablesorter(')) {
                         unset($scripts[$key]);
                     }
                 }
@@ -307,7 +308,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
 
     $formatted = $formatter->format($result);
 
-    if (! strstr($formatted, "listexecute-$iListExecute")) {
+    if (! str_contains($formatted, "listexecute-$iListExecute")) {
         $formatted = '~np~
 <form method="post" class="list-executable" id="listexecute-' . $iListExecute . '" data-id="wplistexecute-' . $iListExecute . '">
     <input type="hidden" name="plugin" value="' . $fingerprint . '">~/np~' . $formatted . '~np~

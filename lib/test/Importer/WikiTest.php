@@ -4,7 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 namespace Tiki\Lib\Test\Importer;
+
+use Tiki\Lib\Importer\Wiki;
 
 /**
  * @group importer
@@ -14,7 +17,7 @@ class WikiTest extends AbstractImporterTestCase
     public function testImportShouldCallMethodsToStartImportProcess(): void
     {
         ob_start();
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['validateInput', 'parseData', 'insertData'])
            ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -31,7 +34,7 @@ class WikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['validateInput', 'parseData', 'insertData'])
            ->getMock();
         $_POST['alreadyExistentPageName'] = 'override';
@@ -56,7 +59,7 @@ class WikiTest extends AbstractImporterTestCase
         ob_start();
 
         $expectedImportFeedback = ['importedPages' => 10, 'totalPages' => '13'];
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['validateInput', 'parseData', 'insertData', 'saveAndDisplayLog'])
            ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -77,7 +80,7 @@ class WikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['insertPage'])
            ->getMock();
         $obj->expects($this->exactly(4))->method('insertPage');
@@ -91,7 +94,7 @@ class WikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['insertPage'])
            ->getMock();
         $obj->expects($this->once())->method('insertPage')->with(['name' => '1']);
@@ -105,7 +108,7 @@ class WikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['insertPage'])
            ->getMock();
         $obj->expects($this->never())->method('insertPage');
@@ -119,7 +122,7 @@ class WikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki')
+        $obj = $this->getMockBuilder(Wiki::class)
            ->onlyMethods(['insertPage'])
            ->getMock();
         $obj->expects($this->exactly(6))->method('insertPage')->willReturnOnConsecutiveCalls(true, true, false, true, false, true);

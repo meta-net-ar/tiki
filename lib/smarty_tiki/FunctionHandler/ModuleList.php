@@ -28,10 +28,10 @@ class ModuleList extends Base
         $class = 'modules';
         if (! empty($params['class'])) {
             $class .= ' ' . $params['class'];
-            if (strpos($class, 'navbar') !== false) {
+            if (str_contains($class, 'navbar')) {
                 $tag = 'nav';
             }
-            if (strpos($class, 'aside') !== false) {
+            if (str_contains($class, 'aside')) {
                 $tag = 'aside';
             }
         }
@@ -78,7 +78,7 @@ class ModuleList extends Base
                 array_map(
                     function ($module) use ($legacy_to_new) {
                         $devices = $module["params"]["device"] ?? null;
-                        $moduleContent = (isset($module['data']) ? $module['data'] : '');
+                        $moduleContent = ($module['data'] ?? '');
                         $device_classes = '';
 
                         if (isset($devices) && is_array($devices) && ! empty($devices)) {
@@ -117,7 +117,7 @@ class ModuleList extends Base
 
                             $device_classes = implode(' ', $device_classes);
                         } else {
-                            $device_classes = 'd-block';
+                            $device_classes = 'd-flex';
                         }
 
                         $moduleContent = preg_replace('/ class="([^"]*\bmodule\b[^"]*)"/', ' class="$1 ' . $device_classes . '"', $moduleContent);

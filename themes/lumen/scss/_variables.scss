@@ -1,11 +1,12 @@
-// Lumen 5.2.0 -- This is a copy of node_modules/bootswatch/dist/lumen/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Lumen 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/zephyr/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/lumen/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
 
 $blue:    #137FAA; // #158cba;  // default WCAG
 //$indigo:  #6610f2;  // default
@@ -18,6 +19,9 @@ $green:   #1D8621; // #28b62c;  // default WCAG
 //$teal:    #20c997;  // default
 $cyan:    #187DA5; // #75caeb;  // default WCAG
 
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
+
 $primary:       #137FAA; //$blue;  // default
 $secondary:     $gray-300; // $gray-200;  // default
 $success:       #1D8720; // $green;  // default
@@ -27,12 +31,9 @@ $danger:        #EB0C00; // $red;  // default
 //$light:         $gray-100;  // default
 //$dark:          $gray-700;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
 // Options
-//Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-color: $gray-800;  // default
@@ -120,5 +121,3 @@ $code-color:                     $body-color; //    $pink;  // default // Bootst
 // Bootswatch overrides
 
 $web-font-path: none; // Override value in vendor file
-
-

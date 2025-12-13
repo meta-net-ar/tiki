@@ -28,7 +28,7 @@ class ActivityFrame extends Base
             $likeMode = 'disabled';
         }
 
-        $likes = isset($params['activity']['like_list']) ? $params['activity']['like_list'] : [];
+        $likes = $params['activity']['like_list'] ?? [];
         if (! is_array($likes)) {
             $params['activity']['like_list'] = $likes = [];
         }
@@ -96,7 +96,7 @@ class ActivityFrame extends Base
                 'like' => in_array($GLOBALS['user'], $likes),
                 'likeactive' => $likeMode != 'disabled',
                 'sharedgroups' => $sharedGroups,
-                'summary' => isset($params['summary']) ? $params['summary'] : null,
+                'summary' => $params['summary'] ?? null,
                 'params' => $params,
             ]
         );

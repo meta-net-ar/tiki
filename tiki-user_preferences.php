@@ -5,6 +5,7 @@
  */
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
 
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
@@ -51,13 +52,17 @@ $inputConfiguration = [
         'mytiki_forum_topics'             => 'bool',         //post
         'mytiki_forum_replies'            => 'bool',         //post
         'mytiki_items'                    => 'bool',         //post
+        'mytiki_articles'                 => 'bool',         //post
         'tasks_maxRecords'                => 'digits',       //post
         'xmpp_jid'                        => 'striptags',    //post
-        'xmpp_password'                   => 'striptags',    //post
+        'xmpp_password'                   => 'password',     //post
         'xmpp_custom_server_http_bind'    => 'striptags',    //post
-        'perspective_preferred'           => 'striptags',    //post
+        'perspective_preferred'           => 'digits',      //post
         'webmonetization_payment_pointer' => 'striptags',    //post
         'webmonetization_paywall_text'    => 'striptags',    //post
+        'notify_oneself'                  => 'bool',         //post
+        'switch_user_notification'        => 'bool',         //post
+        'cookie_consent_update'           => 'word',         //post
         'chgadmin'                        => 'bool',         //post
         'pass'                            => 'password',     //post
         'email'                           => 'email',        //post
@@ -88,6 +93,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Tiki\Lib\TikiDate;
 
 // User preferences screen
 if ($prefs['feature_userPreferences'] != 'y' && $prefs['change_password'] != 'y' && $tiki_p_admin_users != 'y') {
@@ -130,7 +136,7 @@ $foo1 = str_replace("tiki-user_preferences", "tiki-editpage", $foo["path"]);
 $foo2 = str_replace("tiki-user_preferences", "tiki-index", $foo["path"]);
 $smarty->assign('url_edit', $tikilib->httpPrefix() . $foo1);
 $smarty->assign('url_visit', $tikilib->httpPrefix() . $foo2);
-$smarty->assign('show_mouseover_user_info', isset($prefs['show_mouseover_user_info']) ? $prefs['show_mouseover_user_info'] : $prefs['feature_community_mouseover']);
+$smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
 
 if ($prefs['feature_perspective'] === 'y') {
     $smarty->assign('perspectives', $perspectivelib->list_perspectives());
@@ -412,7 +418,11 @@ if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_adm
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
-
+if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] == 'n') {
+    $prefs['change_password'] = 'n';
+    $warning = "New password fields are hidden on Intertiki clients.\nTo update your password, please log in directly to the Intertiki server.";
+    $smarty->assign('intertiki_no_password_change_warning', $warning);
+}
 
 $tfaSecret = $userlib->get_2_factor_secret($userwatch);
 if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
@@ -488,9 +498,9 @@ if (
         );
     } else {
         if (empty($_POST['tfaPin'])) {
-            Feedback::error(tr('Field Pin Code is required.'));
+            Feedback::error(tr('Field 2FA Code is required.'));
         } else {
-            Feedback::error(tr('Invalid Pin Code.'));
+            Feedback::error(tr('Invalid 2FA Code.'));
         }
         header('Location: ' . basename(__FILE__) . '?tfagenerate=true');
         die;

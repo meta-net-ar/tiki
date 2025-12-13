@@ -43,7 +43,7 @@ class JsCalendar extends Base
         }
 
         $fieldName = $params['fieldname'];
-        $enableTimezonePicker = $params['showtimezone'] === 'y' ? "true" : "false";
+        $enableTimezonePicker = ($params['showtimezone'] ?? '') === 'y' ? "true" : "false";
         $enableTimePicker = $params['showtime'] === 'y' ? 1 : 0;
         $goto = $params['goto'] ?? '';
         $id = $params['id'] ?? "date-picker-" . uniqid();
@@ -66,7 +66,7 @@ class JsCalendar extends Base
 
         $headerlib->add_js_module(<<<JS
             if (typeof handleDatePicker === 'undefined') {
-                import('@jquery-tiki/ui-utils').then(({ handleDatePicker }) => {
+                import('@tiki/ui-utils').then(({ handleDatePicker }) => {
                     handleDatePicker('#{$id}', {
                         fieldName: '{$fieldName}',
                         endFieldName: '{$endfieldname}',

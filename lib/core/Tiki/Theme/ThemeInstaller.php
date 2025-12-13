@@ -64,16 +64,16 @@ class ThemeInstaller
             $fileName = $info->getPathname();
             $fileInfo = pathinfo($fileName);
             $fileExtension = ! empty($fileInfo['extension']) ? $fileInfo['extension'] : '';
-            if ($fileExtension == 'sql' && strpos($fileInfo['dirname'], TIKI_UPGRADE_SQL_SCHEMA_PATH) !== false) {
+            if ($fileExtension == 'sql' && str_contains($fileInfo['dirname'], TIKI_UPGRADE_SQL_SCHEMA_PATH)) {
                 $this->schemas[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'yaml' && strpos($fileInfo['dirname'], '/profiles') !== false) {
+            if ($fileExtension == 'yaml' && str_contains($fileInfo['dirname'], '/profiles')) {
                 $this->profiles[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'ini' && strpos($fileInfo['dirname'], '/config') !== false) {
+            if ($fileExtension == 'ini' && str_contains($fileInfo['dirname'], '/config')) {
                 $this->configFiles[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'css' && strpos($fileInfo['dirname'], '/css') !== false) {
+            if ($fileExtension == 'css' && str_contains($fileInfo['dirname'], '/css')) {
                 $this->existCssFolder = true;
                 $themeName = $this->getThemeName();
                 if (empty($themeName) && preg_match('/themes\/([^\/]*)/', dirname($fileInfo['dirname']), $matches)) {

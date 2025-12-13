@@ -52,15 +52,18 @@ class Perms_Context
         $perms = Perms::getInstance();
         $this->previousUser = $user;
         $this->previousGroupList = $perms->getGroups();
-        $smarty = TikiLib::lib('smarty');
         $user = $this->user;
         $perms->setGroups($this->groupList);
 
-        $globalperms = Perms::get();
-        $globalperms->globalize(self::$permissionList, $smarty, false);
+        if ($globalize) {
+            $smarty = TikiLib::lib('smarty');
+            $globalperms = Perms::get();
 
-        if (is_object($smarty)) {
-            $smarty->assign('globalperms', $globalperms);
+            $globalperms->globalize(self::$permissionList, $smarty, false);
+
+            if (is_object($smarty)) {
+                $smarty->assign('globalperms', $globalperms);
+            }
         }
     }
 

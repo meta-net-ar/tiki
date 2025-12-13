@@ -12,7 +12,7 @@
 namespace Tiki\Lib;
 
 use Feedback;
-use OIntegrate_Response;
+use Tiki\Lib\OIntegrate\Response;
 
 class TikiWebServiceTemplate
 {
@@ -70,11 +70,11 @@ class TikiWebServiceTemplate
     }
 
     /**
-     * @param OIntegrate_Response $response
+     * @param Tiki\Lib\OIntegrate\Response $response
      * @param $outputContext
      * @return mixed|string
      */
-    public function render(OIntegrate_Response $response, $outputContext)
+    public function render(Response $response, $outputContext)
     {
         return $response->render($this->engine, $this->output, $outputContext, $this->getTemplateFile());
     }

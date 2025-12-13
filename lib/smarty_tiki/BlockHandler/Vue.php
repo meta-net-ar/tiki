@@ -58,7 +58,7 @@ class Vue extends Base
         }
 
         $app = ! (empty($params['app']) || $params['app'] === 'n');
-        $name = ! isset($params['name']) ? '' : $params['name'];
+        $name = $params['name'] ?? '';
 
         return \TikiLib::lib('vuejs')->processVue($content, $name, $app);
     }

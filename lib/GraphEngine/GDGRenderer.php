@@ -155,8 +155,6 @@ class GDGRenderer extends GRenderer // {{{1
             default:
                 echo "Unknown Format: {$this->format}\n";
         }
-
-        imagedestroy($this->gd);
     }
 
     public function writeToStream($stream) // {{{2
@@ -174,7 +172,6 @@ class GDGRenderer extends GRenderer // {{{1
         }
         fwrite($stream, ob_get_contents());
         ob_end_clean();
-        imagedestroy($this->gd);
     }
 
     public function getMapContent() // {{{2

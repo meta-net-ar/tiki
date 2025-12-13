@@ -46,7 +46,7 @@ class PackageEnableCommand extends Command
         }
 
         $extensionPackage = ExtensionManager::get($packageName);
-        $update = isset($extensionPackage) ? $extensionPackage->hasUpdate() : false;
+        $update = isset($extensionPackage) && $extensionPackage->hasUpdate();
 
         $success = ExtensionManager::enableExtension($packageName, $path);
         $messages = ExtensionManager::getMessages();

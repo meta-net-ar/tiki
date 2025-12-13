@@ -1,0 +1,63 @@
+/*!
+ * Bootswatch brite theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Bootswatch v5.3.6 (https://bootswatch.com)
+ * Theme: brite
+ * Copyright 2012-2025 Thomas Park
+ * Licensed under MIT
+ * Based on Bootstrap
+*/
+/*!
+ * Bootstrap  v5.3.6 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+
+// The order of these imports was changed for this theme because the values for $primary and other colors weren't being used with the original order.
+@import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
+@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+@import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
+@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
+@import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
+@import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
+@import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
+
+@import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
+
+@import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 8. Remainder of required Bootstrap parts.
+@import "../../../node_modules/bootswatch/dist/brite/bootswatch"; // 9. Bootswatch theme selectors
+@import "../../base_files/scss/_tiki-selectors.scss"; // 10. Tiki CSS selectors used globally.
+@import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 11. Optionally imported to group (separately) the top and topbar zone components for styling.
+//@import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+
+@import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
+
+
+// ----------------------------- Overrides and adjustments ----------------------------- //
+
+.btn.btn-link { color: var(--bs-link-color);}
+
+.btn-group .btn { margin-bottom: 0; }
+
+.btn.btn-link.tips { padding: 0.25rem 0.25rem; }
+
+.breadcrumb a { color: var(--bs-link-color); }
+
+.pagetitle a,
+.accordion-toggle { text-decoration: none; }
+
+.alert.alert-dark .alert-link { color: #fff; }
+
+.odd { background-color: var(--bs-secondary-bg); }
+
+.module.card .navbar { border: none; }
+
+.btn { margin-bottom: 0.5rem; }
+
+.btn.btn-link { color: var(--bs-body-color); text-decoration: none; }
+
+.accordion-body .dropdown-menu { border-radius: 0px; }

@@ -18,9 +18,23 @@ function wikiplugin_article_info()
             'Field' => [
                 'required' => false,
                 'name' => tra('Field'),
-                'description' => tra('The article field (component) to display. The default field is "Heading".'),
+                'description' => tra('The article field (component) to display.'),
                 'filter' => 'word',
-                'default' => 'heading',
+                'options' => [
+                    ['text' => tra('Title'), 'value' => 'title'],
+                    ['text' => tra('Heading'), 'value' => 'heading'],
+                    ['text' => tra('Body'), 'value' => 'body'],
+                    ['text' => tra('Topline'), 'value' => 'topline'],
+                    ['text' => tra('Subtitle'), 'value' => 'subtitle'],
+                    ['text' => tra('Author Name'), 'value' => 'authorName'],
+                    ['text' => tra('Author'), 'value' => 'author'],
+                    ['text' => tra('Publication Date'), 'value' => 'publishDate'],
+                    ['text' => tra('Rating'), 'value' => 'rating'],
+                    ['text' => tra('Topic Name'), 'value' => 'topicName'],
+                    ['text' => tra('Type'), 'value' => 'type'],
+                    ['text' => tra('Language'), 'value' => 'lang'],
+                ],
+                'default' => 'body',
                 'since' => '1',
             ],
             'Id' => [
@@ -39,20 +53,15 @@ function wikiplugin_article_info()
 function wikiplugin_article($data, $params)
 {
     global $user, $tiki_p_admin_cms;
-    $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
-    $statslib = TikiLib::lib('stats');
     $artlib = TikiLib::lib('art');
     $smarty = TikiLib::lib('smarty');
-
     extract($params, EXTR_SKIP);
 
     if (empty($Id)) {
         $Id = $artlib->get_most_recent_article_id();
     }
-    if (! isset($Field)) {
-        $Field = 'heading';
-    }
+
 
     if (
         $tiki_p_admin_cms == 'y' || $tikilib->user_has_perm_on_object($user, $Id, 'article', 'tiki_p_edit_article')

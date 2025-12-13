@@ -1,20 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-.header_outer,
-.layout_basic #top_modules,
-.postbody-title//  ,
-    //.tiki > .navbar.fixed-top.bg-dark,
-    //.topbar, .navbar-dark, .topbar .navbar-dark .navbar-nav > li, .topbar .nav > li,
-//.bg-dark
-{
-    background: #bebc24;
-    background: linear-gradient(to right,  #bebc24 0%,#ded319 53%,#e7d915 100%);
-}
-
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 .text-danger {
     color: #D63D00 !important;
@@ -22,10 +11,6 @@
 .text-dark {
     color: $dark !important;
 }
-
-//.bg-dark {
-//    background-color: $dark !important;
-//}
 
 .btn-dark {
     color: #fff;
@@ -69,23 +54,54 @@
 }
 
 .badge.bg-primary,
-    //.badge.bg-danger,
 .badge.bg-warning,
 .badge.bg-success,
 .badge.bg-info {
     color: #000;
 }
+
 .page-item.disabled, .list-group-item.disabled {
     color: $text-muted !important;
 }
 
-.progress-bar.bg-warning,
-.progress-bar.bg-info,
-.progress-bar.bg-success {
-    color: #000;
+// Progress bars
+.progress-bar {
+    --bs-progress-bar-bg: #{$info};
 }
 
 .text-primary { color: #80780A !important; }
 .text-warning { color: #A0630E !important; }
 .text-success { color: #3A833A !important; }
 .text-info { color: #6E7425 !important; }
+
+
+// Dropdown partial isn't available to these theme options.
+//:root .tiki-admin .dropdown-item.active {
+//    background-color: #{$component-active-bg};
+//}
+
+.tiki-admin-aside-nav-dark .dropdown-item.active {
+    background-color: $dropdown-dark-link-active-bg;
+}
+
+//.dropdown-menu {
+//     background: var(--bs-dropdown-bg);
+//    background: lightyellow;
+// }
+
+// Dark color mode
+[data-bs-theme=dark] {
+    .blockquote-footer { color: #848D94; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #FF4800 !important; }
+
+    .btn.btn-outline-primary { color: #A79D0C; border-color: #A79D0C; }
+    .btn.btn-outline-secondary { color: #71983E; border-color: #71983E; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #FF4800; border-color: #FF4800; }
+    .btn.btn-outline-warning { color: #C87B0E; border-color: #C87B0E; }
+    .btn.btn-outline-info { color: #8B932F; border-color: #8B932F; }
+    .btn.btn-outline-dark { color: #9A9004; border-color: #9A9004; }
+
+    .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
+}

@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Files;
 
-use FileGalLib;
 use TikiLib;
 
 /**
@@ -133,7 +132,7 @@ class CheckFileGallery extends AbstractCheckGallery
      */
     protected function getGalleryList()
     {
-        /** @var FileGalLib $fileGalleryLib */
+        /** @var Tiki\Lib\Filegals\FileGalLib $fileGalleryLib */
         $fileGalleryLib = TikiLib::lib('filegal');
         $fileGalleryLib->getGalleryIds($galleryIdList, -1, 'list');
 
@@ -152,7 +151,7 @@ class CheckFileGallery extends AbstractCheckGallery
      */
     protected function getFileList($gallery)
     {
-        /** @var FileGalLib $fileGalleryLib */
+        /** @var Tiki\Lib\Filegals\FileGalLib $fileGalleryLib */
         $fileGalleryLib = TikiLib::lib('filegal');
         $list = $fileGalleryLib->get_files_info($gallery, null, false, false, -1);
 

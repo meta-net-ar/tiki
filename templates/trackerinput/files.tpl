@@ -62,7 +62,7 @@
             {wikiplugin _name='vimeo' fromFieldId=$field.fieldId|escape fromItemId=$item.itemId|escape galleryId=$field.galleryId|escape}{/wikiplugin}
         {else}
             {if $field.options_map.uploadInModal neq 'n'}
-                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files" role="button">
+                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload changeFileNameOnUpload=$data.changeFileNameOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files" role="button">
                     {if $actual_limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
                 </a>
             {else}
@@ -77,6 +77,31 @@
             {else}
                 <a href="{service controller=file action=browse galleryId=$context.galleryId limit=$actual_limit type=$field.filter image_x=$field.image_x image_y=$field.image_y}" class="btn btn-primary browse-files" role="button">{tr}Browse Files{/tr}</a>
             {/if}
+        {/if}
+        {if $field.options_map.liveRecord neq 'n'}
+            {$liveRecord=$field.options_map.liveRecord}
+            {if $liveRecord eq 'audio'}
+                {$recordLabel="{tr}Record an audio{/tr}"}
+                {$recordIcon="microphone"}
+            {elseif $liveRecord eq 'screen'}
+                {$recordLabel="{tr}Record the screen{/tr}"}
+                {$recordIcon="desktop"}
+            {elseif $liveRecord eq 'screenandaudio'}
+                {$recordLabel="{tr}Record the screen with audio{/tr}"}
+                {$recordIcon="desktop"}
+            {elseif $liveRecord eq 'camera'}
+                {$recordLabel="{tr}Record the camera{/tr}"}
+                {$recordIcon="camera"}
+            {elseif $liveRecord eq 'cameraandaudio'}
+                {$recordLabel="{tr}Record the camera with audio{/tr}"}
+                {$recordIcon="camera"}
+            {/if}
+            <button class="btn btn-secondary start-recording" data-tracker-files="true" data-type="{$liveRecord}" data-gallery-id="{$field.galleryId}" data-field-id="{$field.fieldId}">{icon name=$recordIcon} {$recordLabel}</button>
+            <button class="btn btn-secondary stop-recording d-none">{icon name="stop"} {tr}Stop recording{/tr}</button>
+            <span class="recording-timer" data-field-id="{$field.fieldId}">00:00</span>
+            <div id="waveform-canvas-{$field.fieldId}" class="waveform-container">
+                <canvas id="wave-canvas-{$field.fieldId}" class="w-100 h-100"></canvas>
+            </div>
         {/if}
         {if $prefs.fgal_upload_from_source eq 'y' and $field.canUpload}
             <fieldset>
@@ -155,6 +180,8 @@
 
                 toggleWarning();
             }
+
+            window[`addFile_${$self.data('field-id')}`] = addFile;
 
             function checkFile(fileName, $form) {
                 if (! $self.data('namefilter')) {

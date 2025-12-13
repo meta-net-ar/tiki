@@ -57,17 +57,25 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         return $i['id'];
     }, $items);
 
-    $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->raw(), $items);
-    $info = [
-        'name' => '',
-        'extwiki' => '',
-        'indexname' => '',
-        'groups' => [],
-    ];
-    if ($result) {
-        Feedback::success(tr('External wiki saved'));
+    if (empty($_REQUEST['name']) || empty($_REQUEST["extwiki"])) {
+        Feedback::error(tr('extwiki or name field is empty ! The external wiki has not been created'));
+        $info['name'] = $_REQUEST['name'];
+        $info['extwiki'] = $_REQUEST['extwiki'];
+        $info['indexname'] = $jitRequest->indexname->raw();
+        $info['groups'] = $items;
     } else {
-        Feedback::error(tr('External wiki not saved'));
+        $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->raw(), $items);
+        $info = [
+            'name' => '',
+            'extwiki' => '',
+            'indexname' => '',
+            'groups' => [],
+        ];
+        if ($result) {
+            Feedback::success(tr('External wiki saved'));
+        } else {
+            Feedback::error(tr('External wiki not saved'));
+        }
     }
     $smarty->assign('info', $info);
     $smarty->assign('name', '');
@@ -77,17 +85,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $adminlib->list_extwiki($offset, $maxRecords, $sort_mode, $find);

@@ -48,7 +48,7 @@ class MysqlSearchIndexManager
                 }
 
                 // Skip the current active index
-                if ($indexName === $this->currentIndex) {
+                if (preg_match("/^{$this->currentIndex}(_\d*)?$/", $indexName)) {
                     return false;
                 }
 
@@ -91,7 +91,7 @@ class MysqlSearchIndexManager
         try {
             $pattern = null;
 
-            if (strncmp($indexName, $this->preferenceIndex, strlen($this->indexPrefix)) === 0) {
+            if (strncmp($indexName, $this->preferenceIndex, strlen($this->preferenceIndex)) === 0) {
                 $pattern = '/^' . preg_quote($this->preferenceIndex, '/') . '[a-zA-Z_-]+$/';
             } elseif (strncmp($indexName, $this->indexPrefix, strlen($this->indexPrefix)) === 0) {
                 $pattern = '/^' . preg_quote($this->indexPrefix, '/') . '[a-zA-Z0-9_-]+$/';

@@ -8,11 +8,7 @@ class Tiki_Hm_Output_HTTP
 {
     public function send_response($response, $input = [])
     {
-        if (array_key_exists('http_headers', $input)) {
-            return $this->output_content($response, $input['http_headers']);
-        } else {
-            return $this->output_content($response, []);
-        }
+        return $this->output_content($response, $input['http_headers'] ?? []);
     }
 
     protected function output_headers($headers)

@@ -1,5 +1,7 @@
 // Custom variables for the Trontastic theme option of the Jqui theme
 
+@import "../../../../default/scss/variables";
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 // Variables needed for button color variants (start)
 
@@ -156,8 +158,8 @@ $topbar-link-color: #fff;
 $navbar-light-color: $link-color;
 
 // navbar link hover colors
-$bg-dark-link-hover-color: #f2f2f2;
-$bg-dark-link-hover-bg: #003c4a;
+$tiki-bg-dark-link-hover-color: #f2f2f2;
+$tiki-bg-dark-link-hover-bg: #003c4a;
 
 // Dropdowns
 $dropdown-bg: #000;

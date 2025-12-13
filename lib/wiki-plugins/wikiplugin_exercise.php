@@ -38,7 +38,6 @@ function wikiplugin_exercise_info()
 function wikiplugin_exercise($data, $params)
 {
     static $nextId = 1;
-    $smarty = TikiLib::lib('smarty');
 
     $params = new JitFilter($params);
     $answer = $params->answer->text();
@@ -78,7 +77,7 @@ function wikiplugin_exercise_parse_data($data)
             continue;
         }
 
-        if (substr($line, 0, 3) === '---') {
+        if (str_starts_with($line, '---')) {
             $key = count($exercises);
             $exercises[] = [];
         } elseif ($key !== -1) {
@@ -96,7 +95,7 @@ function wikiplugin_exercise_parse_argument($data)
     $answers = explode('+', $data);
     foreach ($answers as $possibility) {
         if (preg_match('/^\s*([^\(]+)(:\s*\(\s*(.*)\s*\))?\s*/', $possibility, $parts)) {
-            $out[] = ['option' => $parts[1], 'justification' => isset($parts[2]) ? $parts[2] : false];
+            $out[] = ['option' => $parts[1], 'justification' => $parts[2] ?? false];
         }
     }
 

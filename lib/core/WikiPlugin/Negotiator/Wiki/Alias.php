@@ -135,8 +135,8 @@ class WikiPlugin_Negotiator_Wiki_Alias
             if (isset($info['body'])) {
                 if (! empty($info['body']['input'])) {
                     if (($info['body']['input'] == 'ignore' ) || empty($data)) {
-                        $data = isset($info['body']['default']) ? $info['body']['default'] : '';
-                    } elseif (strpos($info['body']['default'], '%body%') !== false) {
+                        $data = $info['body']['default'] ?? '';
+                    } elseif (str_contains($info['body']['default'], '%body%')) {
                         // replace the string %body% with the provided body text if not ignoring user input
                         $rules = [
                             'body' => [
@@ -199,10 +199,10 @@ class WikiPlugin_Negotiator_Wiki_Alias
             if (isset($args[$token])) {
                 $value = $args[$token];
             } else {
-                $value = isset($info['default']) ? $info['default'] : '';
+                $value = $info['default'] ?? '';
             }
 
-            switch (isset($info['encoding']) ? $info['encoding'] : 'none') {
+            switch ($info['encoding'] ?? 'none') {
                 case 'html':
                     $replacements[] = htmlentities($value, ENT_QUOTES, 'UTF-8');
                     break;

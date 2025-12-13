@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 use function Sabre\Uri\split;
 
 function wikiplugin_convene_info(): array
@@ -138,7 +141,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of usernames to pre-fill as participants'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
             'defaultgroups' => [
@@ -147,7 +149,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of group names to pre-fill as participants'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
             'defaultdates' => [
@@ -156,7 +157,6 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Comma-separated list of strtotime-compatible date strings to pre-fill (e.g., "next Friday", "+2 weeks 10:00")'),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ',',
             ],
         ]
@@ -165,19 +165,14 @@ function wikiplugin_convene_info(): array
 
 function wikiplugin_convene($data, $params): string
 {
-    global $page;
     /** @var HeaderLib $headerlib */
     $headerlib = TikiLib::lib('header');
     /** @var TikiLib $tikilib */
     $tikilib = TikiLib::lib('tiki');
-    /** @var Smarty_Tiki $smarty */
+    /** @var \Tiki\Smarty\SmartyTiki $smarty */
     $smarty = TikiLib::lib('smarty');
     /** @var UserLib $userlib */
     $userlib = TikiLib::lib('user');
-
-    if (! isset($params['voteoptions'])) {
-        $params['voteoptions'] = default_voteoptions();
-    }
 
     if (! is_array($params['voteoptions'])) {
         $params['voteoptions'] = explode(',', $params['voteoptions']);
@@ -197,30 +192,22 @@ function wikiplugin_convene($data, $params): string
     static $convenePluginIndex = 0;
     ++$convenePluginIndex;
 
-    //set defaults
-    $plugininfo = wikiplugin_convene_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $params['index'] = $convenePluginIndex;
     $params['id'] = empty($params['id']) ? 'pluginConvene' . $convenePluginIndex : $params['id'];
 
     // Handle new parameters
-    $default_users = ! empty($params['defaultusers'])
+    $default_users = ! is_null($params['defaultusers'])
         ? (is_array($params['defaultusers']) ? $params['defaultusers'] : explode(',', $params['defaultusers']))
         : [];
-    $default_groups = ! empty($params['defaultgroups'])
+    $default_groups = ! is_null($params['defaultgroups'])
         ? (is_array($params['defaultgroups']) ? $params['defaultgroups'] : explode(',', $params['defaultgroups']))
         : [];
-    $default_dates = ! empty($params['defaultdates'])
+    $default_dates = ! is_null($params['defaultdates'])
         ? (is_array($params['defaultdates']) ? $params['defaultdates'] : explode(',', $params['defaultdates']))
         : [];
 
     /** For new data structure */
-    if (substr($data, 0, 1) == "[") {
+    if (str_starts_with($data, "[")) {
         $dataArrays = json_decode($data, true);
         $dataArray = $dataArrays[0]; // Default data votes
         $dataArrayComments = $dataArrays[1]; //Data comments
@@ -233,7 +220,6 @@ function wikiplugin_convene($data, $params): string
 
     if (! is_array($dataArray)) {
         //start flat static text to prepared array
-        $dataString = $data . '';
         $dataArray = [];
 
         $lines = explode("\n", trim($data));
@@ -296,7 +282,7 @@ function wikiplugin_convene($data, $params): string
                     foreach ($users as $user) {
                         $data[$timestamp][$user] = 0;
                     }
-                } catch (Exception $e) {
+                } catch (Exception) {
                     Feedback::error(tr('Invalid date string: "%0". Please use a valid strtotime-compatible format.', $date_str));
                 }
             }
@@ -310,7 +296,7 @@ function wikiplugin_convene($data, $params): string
     $votes = [];
     $dateLabels = [];
     foreach ($data as $stamp => & $date) {
-        foreach ($date as $user => $vote) {
+        foreach ($date as $vote) {
             if (empty($votes[$stamp])) {
                 $votes[$stamp] = 0;
             }
@@ -321,7 +307,7 @@ function wikiplugin_convene($data, $params): string
             $dateLabels[$stamp]['formatted'] = $tikilib->get_long_datetime($stamp);
         } elseif ($params['dateformat'] === 'other') {
             $format = $params['dateformatother'];
-            if (strpos($format, '%') === 0) {   // assuming a strftime format starts with %
+            if (str_starts_with($format, '%')) {   // assuming a strftime format starts with %
                 $dateLabels[$stamp]['formatted'] = TikiLib::date_format($format, $stamp);
             } else {
                 $dateLabels[$stamp]['formatted'] = TikiLib::date_format2($format, $stamp);
@@ -469,7 +455,6 @@ function send_email_result_vote($vote_infos)
 
         $userlib = TikiLib::lib('user');
         $smarty = TikiLib::lib('smarty');
-        $tikilib = TikiLib::lib('tiki');
 
         $mail = new TikiMail();
 

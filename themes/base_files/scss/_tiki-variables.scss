@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Values are specified here to be used in the files imported by tiki_base.scss and theme style sheets.
 
 @import "../../default/scss/variables";
@@ -10,7 +12,7 @@ $form-text: $text-muted !default;
 $padding-y: .5rem !default; // node_modules/bootstrap/scss/bootstrap-grid
 $padding-x: .75rem !default;
 
-$tiki-module-h3-card-title-font-size: $h4-font-size !default;
+//$tiki-module-h3-card-title-font-size: $h4-font-size !default; --- card-title is incorrect class for card-header heading but this rule doesn't seem to be in use anyway -g_c-l
 // Older
 $tiki-topmodules-row-sidemargins: 0 !default;
 $tiki-topbar-row-sidemargins: 0 !default;
@@ -70,7 +72,7 @@ $tiki-pvtAttr-border-color: var(--bs-input-border-color); // $input-border-color
 $tiki-pvtAttr-border-radius: $input-border-radius;
 $tiki-pvtFilterBox-button-color: var(--bs-primary-color); // $dark; // $btn-primary-color !default;
 $tiki-pvtFilterBox-button-bg: var(--bs-primary-bg); //$light; // $btn-primary-bg !default;
-$tiki-pvtFilterBox-button-hover-bg: darken($light,10%); // adjust-hue($btn-primary-bg, 10%) !default;
+$tiki-pvtFilterBox-button-hover-bg: color.adjust($light,$lightness: -10%, $space: hsl); // adjust-hue($btn-primary-bg, 10%) !default;
 $tiki-pvtAggregator-color: var(--bs-body-color); // $input-color !default;
 $tiki-pvtAggregator-bg: var(--bs-body-bg); // $input-bg !default;
 $tiki-pvtAggregator-border: var(--bs-body-color); //$input-border-color !default;
@@ -158,4 +160,9 @@ header.navbar.fixed-top {
 // Added for Smartmenus 2
 .tiki .sm-navbar {
     --sm-navbar-z-index: 1000; // reset; // 1050; // 9999;
+}
+
+:root {
+    --tiki-list-top-margin: 0;
+    --tiki-list-bottom-margin: 0;
 }

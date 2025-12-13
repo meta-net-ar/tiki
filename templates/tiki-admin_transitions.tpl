@@ -11,14 +11,14 @@
                     {if $prefs.feature_categories eq 'y'}
                         <div class="col-sm-3">
                             <label>
-                                <input type="radio" name="transition_mode" value="category" id="transition-mode-category"{if $transition_mode eq 'category'} checked="checked"{/if}>
+                                <input type="radio" class="form-check-input" name="transition_mode" value="category" id="transition-mode-category"{if $transition_mode eq 'category'} checked="checked"{/if}>
                                 {tr}Category{/tr}
                             </label>
                         </div>
                     {/if}
                     <div class="col-sm-3">
                         <label>
-                            <input type="radio" name="transition_mode" value="group" id="transition-mode-group"{if $transition_mode eq 'group' or $prefs.feature_categories ne 'y'} checked="checked"{/if}>
+                            <input type="radio" class="form-check-input" name="transition_mode" value="group" id="transition-mode-group"{if $transition_mode eq 'group' or $prefs.feature_categories ne 'y'} checked="checked"{/if}>
                             {tr}Group{/tr}
                         </label>
                     </div>
@@ -90,20 +90,26 @@
 
     {if $available_states|@count > 0}
         {tab name="{tr}Transitions{/tr}"}
-            <h2>{tr}Transitions{/tr}</h2>
-            {* former add_dracula() *}
-            {$headerlib->add_jsfile('lib/dracula/raphael-min.js', true)}
-            {$headerlib->add_jsfile('lib/dracula/graffle.js')}
-            {$headerlib->add_jsfile('lib/dracula/graph.js')}
-            <div id="graph-canvas" class="graph-canvas" data-graph-nodes="{$graph_nodes|escape}" data-graph-edges="{$graph_edges|escape}"></div>
-            <a href="#" id="graph-draw" class="button" role="button">{tr}Draw Transition Diagram{/tr}</a>
+            <div class="d-flex justify-content-between align-items-center mb-3">    
+                <h2>{tr}Transitions{/tr}</h2>
+                <button type="button" id="toggle-diagram" class="btn btn-light">
+                    {tr}Hide Transition Diagram{/tr}
+                </button>
+            </div>
+
+            <div id="transitions-diagram" class="mermaid-container p-3 mb-3 card card-body">
+                <textarea class="code d-none">{$mermaid_transition_data|escape}</textarea>
+                <div class="mermaid"></div>
+            </div>
+
             {jq}
-            $('#graph-draw').on("click", function( e ) {
-                $(this).hide();
-                $('#graph-canvas').drawGraph();
-                return false;
-            } );
+            $('#toggle-diagram').on('click', function() {
+                $('#transitions-diagram').toggle();
+                const isVisible = $('#transitions-diagram').is(':visible');
+                $(this).text(isVisible ? '{tr}Hide Transition Diagram{/tr}' : '{tr}Show Transition Diagram{/tr}');
+            });
             {/jq}
+
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                 <table class="table table-striped table-hover">
                     <thead>
@@ -172,7 +178,7 @@
                     <legend>{tr}General{/tr}</legend>
                     <div class="tiki-form-group row mt-0">
                         <label class="col-form-label" for="new-transition-name">{tr}Label{/tr}</label>
-                        <input type="text" name="label" {if $selected_transition}value="{$selected_transition.name|escape}"{/if} class="form-control">
+                        <input type="text" name="label" id="new-transition-name" {if $selected_transition}value="{$selected_transition.name|escape}"{/if} class="form-control">
                     </div>
                     <div class="form-check">
                         <label class="form-check-label">
@@ -268,7 +274,7 @@
                         </div>
                         <div class="tiki-form-group row">
                             <label for="guard-count" class="col-form-label">{tr}Count{/tr}</label>
-                            <input type="text" name="count" class="form-control">
+                            <input type="text" name="count" id="guard-count" class="form-control">
                         </div>
                     </fieldset>
                     <div class="mb-3 row mt-2">

@@ -5,6 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // Make sure script is run from a shell
+
+use Tiki\Lib\Test\AcceptanceTests\DBRestorerSQLDumps;
+
 if (PHP_SAPI !== 'cli') {
     die("Please run from a shell");
 }
@@ -17,7 +20,7 @@ if ($argc != 2) {
     die("Missing argument. USAGE: $argv[0] <dump_filename>");
 }
 
-$test_TikiAcceptanceTestDBRestorer = new TikiAcceptanceTestDBRestorerSQLDumps();
+$test_TikiAcceptanceTestDBRestorer = new DBRestorerSQLDumps();
 $test_TikiAcceptanceTestDBRestorer->restoreDB($argv[1]);
 
 $local_php = 'db/local.php';

@@ -31,7 +31,7 @@
       <directory>./lib/test</directory>
       <!-- Exclude files where all tests are marked as skipped -->
       <exclude>./lib/test/AcceptanceTests/</exclude>
-      <exclude>./lib/test/core/Reports/ReportsEndToEndTest.php</exclude>
+      <exclude>./lib/test/Core/Reports/ReportsEndToEndTest.php</exclude>
     </testsuite>
   </testsuites>
   <groups>

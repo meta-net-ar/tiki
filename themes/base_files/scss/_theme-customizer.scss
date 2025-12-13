@@ -1,3 +1,5 @@
+@use "sass:color";
+
 @import "../../../node_modules/bootstrap/scss/_mixins.scss";
 @import "../../../node_modules/bootstrap/scss/_functions.scss";
 @import "../../default/scss/variables";
@@ -362,7 +364,7 @@ Theme Customizer Main Styles
     .dropup {
         float:right;
         > a { display:block; padding:15px; color:#fff; }
-        &.open > a, > a:hover { background-color:lighten(#000, 15%); }
+        &.open > a, > a:hover { background-color:color.adjust(#000, $lightness: 15%, $space: hsl); }
         a:hover { text-decoration:none; }
 
         .dropdown-menu {

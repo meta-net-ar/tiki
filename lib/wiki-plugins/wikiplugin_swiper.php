@@ -394,16 +394,14 @@ function wikiplugin_swiper($data, $params)
     }
     static $uid = 0;
     $uid++;
-    $defaults = [];
+
     $plugininfo = wikiplugin_swiper_info();
     foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = (! empty($param['default']) ? $param['default'] : '');
         //separating digits filter parameters
         if (! empty($param['filter']) && $param['filter'] == "digits") {
             $swiperDigitsParams[] = $key;
         }
     }
-    $params = array_merge($defaults, $params);
 
     // Handle swiper height
     $heightMode = 'tallest';
@@ -412,7 +410,7 @@ function wikiplugin_swiper($data, $params)
     if ($params['autoHeight'] === 'y') {
         $heightMode = 'variable';
         $heightCSS = 'height: auto;';
-    } else if (! empty($params['height']) && preg_match('/^\d+(px|%)$/', $params['height'])) {
+    } elseif (! empty($params['height']) && preg_match('/^\d+(px|%)$/', $params['height'])) {
         $heightMode = 'custom';
         $heightCSS = 'height: ' . $params['height'] . ';';
     }

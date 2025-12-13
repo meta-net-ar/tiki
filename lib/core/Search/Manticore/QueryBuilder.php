@@ -326,7 +326,7 @@ class QueryBuilder
             $qs = str_replace($special, '\\' . $special, $qs);
         }
         // minus at the beginning means exclude term search - leave it unescaped
-        if (substr($qs, 0, 3) === '\\\\-') {
+        if (str_starts_with($qs, '\\\\-')) {
             $qs = '-' . substr($qs, 3);
         }
         // single quotes require only one slash escape

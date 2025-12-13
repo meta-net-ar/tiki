@@ -12,8 +12,8 @@ Example wiki page "chart" contents:
   {facet name="tracker_field_testUser"}
   {facet name="deep_categories_under_1"}
   {OUTPUT(template="templates/examples/search/facet_charts2.tpl")}
-    {chart _type="pie" _class="col-sm-4" label="Users" backgroundColor="orange:yellow:red:purple:grey:blue:green:pink:black" borderColor="black"}
-    {chart _type="line" _class="col-sm-8" label="Countries" borderColor="orange" hoverColor="pink" lineTension="0"}
+    {chart _type="pie" _class="col-sm-4" label="{tr}Users{/tr}" backgroundColor="orange:yellow:red:purple:grey:blue:green:pink:black" borderColor="black"}
+    {chart _type="line" _class="col-sm-8" label="{tr}Countries{/tr}" borderColor="orange" hoverColor="pink" lineTension="0"}
   {OUTPUT}
 {LIST}
 
@@ -24,7 +24,7 @@ ChartJS options can be added in JSON format only so far (sorry), but single quot
 
 Debugging:
     Add _debug="1" to the first chart adds var_dump output on most useful parameters and variables, e.g.
-    {chart _type="pie" label="Test" backgroundColor="red:grey:pink:black" _debug="1"}
+    {chart _type="pie" label="{tr}Test{/tr}" backgroundColor="red:grey:pink:black" _debug="1"}
  *}
 
 {* if only one chart plugin is used it arrives on it's own, not in an array *}

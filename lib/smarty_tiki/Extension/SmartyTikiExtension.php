@@ -47,6 +47,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getModifierCallback(string $modifierName)
     {
+        if ($tikilib = TikiLib::lib('tiki')) {
+            $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+            if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
+                return function (...$args) use ($modifierName) {
+                    return call_user_func_array($modifierName, $args);
+                };
+            }
+        }
+
         switch ($modifierName) {
             case 'a_or_an':
                 return [new \SmartyTiki\Modifier\AorAn(), 'handle'];
@@ -88,6 +97,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\FileCanConvertToPdf(), 'handle'];
             case 'file_diagram':
                 return [new \SmartyTiki\Modifier\FileDiagram(), 'handle'];
+            case 'forummaskemail':
+                return [new \SmartyTiki\Modifier\ForumMaskEmail(), 'handle'];
             case 'forumname':
                 return [new \SmartyTiki\Modifier\ForumName(), 'handle'];
             case 'forumtopiccount':
@@ -232,6 +243,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\YesNo(), 'handle'];
             case 'zone_is_empty':
                 return [$this, 'smartyModifierZoneIsEmpty'];
+            case 'safe_html':
+                return [$this, 'smartyModifierSafeHtml'];
         }
         return null;
     }
@@ -419,6 +432,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'queued_tasks_banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\QueuedTasksBanner();
+                break;
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;
@@ -451,6 +467,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
+                break;
+            case 'inline_audio_player':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InlineAudioPlayer();
                 break;
             case 'initials_filter_links':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
@@ -1064,5 +1083,34 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smartyModifierStrtotime($datetime, $baseTimestamp = null)
     {
         return strtotime($datetime, $baseTimestamp);
+    }
+
+    /**
+     * @param string|null $string The HTML string to sanitize.
+     * @return string The sanitized, safe HTML.
+    */
+    public function smartyModifierSafeHtml(?string $string): string
+    {
+        if (empty($string)) {
+            return '';
+        }
+
+        // Use a static instance to ensure the expensive purifier setup runs only once per request.
+        static $purifier = null;
+        if ($purifier === null) {
+            $config = \HTMLPurifier_HTML5Config::createDefault();
+
+            // Define a strict security policy based on a whitelist of allowed elements and attributes.
+            $config->set('HTML.Allowed', 'a[href|title],b,strong,i,em,br,p,u');
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
+
+            // Add defense-in-depth attributes for all links.
+            $config->set('HTML.TargetBlank', true);
+            $config->set('HTML.Nofollow', true);
+
+            $purifier = new \HTMLPurifier($config);
+        }
+
+        return $purifier->purify($string);
     }
 }

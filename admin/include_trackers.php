@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -20,7 +20,7 @@ $sort_mode = 'created_desc';
 // TODO avoid altering $_POST variable directly
 if (isset($_POST['trkset']) && $access->checkCsrf()) {
     $tikilib->set_preference('t_use_db', $_POST['t_use_db']);
-    if (substr($_POST['t_use_dir'], -1) != '\\' && substr($_POST['t_use_dir'], -1) != '/' && $_POST['t_use_dir'] != '') {
+    if (! str_ends_with($_POST['t_use_dir'], '\\') && ! str_ends_with($_POST['t_use_dir'], '/') && $_POST['t_use_dir'] != '') {
         $_POST['t_use_dir'] .= '/';
     }
     $tikilib->set_preference('t_use_dir', $_POST['t_use_dir']);

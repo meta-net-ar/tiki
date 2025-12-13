@@ -1,10 +1,25 @@
-// Files for the Boosted theme for Tiki Wiki CMS Groupware, Bootstrap 5+.
-/* Boosted is an implementation for Tiki Wiki CMS Groupware of Orange Boosted (MIT license).
-/* "Orange Boosted is a Bootstrap based, Orange branded accessible and ergonomic components library."  */
-// Because Tiki already has the Bootstrap vendor files, this implementation uses just parts of the Orange Boosted package.
-// The Orange Boosted files and directories are used unedited and identified in comments.
-// This implementation is a work in progress and not all details are integrated at this time.
-// Original source: https://boosted.orange.com/
+@charset "UTF-8";
+/*!
+ * The Boosted theme -- an implementation by the Tiki Community of Orange Boosted for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Boosted  v5.2.3 (https://boosted.orange.com/)
+ * Copyright 2014-2022 The Boosted Authors
+ * Copyright 2014-2022 Orange SA
+ * Licensed under MIT (https://github.com/Orange-OpenSource/Orange-Boosted-Bootstrap/blob/main/LICENSE)
+ * This a fork of Bootstrap: Initial license below
+ * Bootstrap  v5.2.3 (https://getbootstrap.com/)
+ * Copyright 2011-2022 The Bootstrap Authors
+ * Copyright 2011-2022 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+/*!
+ * Bootstrap  v5.3.7 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
@@ -90,4 +105,13 @@
     & .active {
         color: #ff7900;
     }
+}
+
+.accordion { --bs-accordion-body-padding-start: 1.25rem; }
+.accordion-button { --bs-accordion-btn-padding-x: 1.25rem; }
+.accordion-body.p-0 {
+    --bs-accordion-body-padding-top: 0px;
+    --bs-accordion-body-padding-end: 0rem;
+    --bs-accordion-body-padding-bottom: 0rem;
+    --bs-accordion-body-padding-start: 0;
 }

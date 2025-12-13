@@ -114,7 +114,7 @@ class RatingLib extends TikiDb_Bridge
 
         $query = 'SELECT ' . $aggregate . '(`uv`.`optionId`) FROM ' . implode(' ', $joins) . ' WHERE ' . implode(' AND ', $where);
 
-        return (double) $this->getOne($query, $bindvars);
+        return (float) $this->getOne($query, $bindvars);
     }
 
     public function get_token($type, $objectId)

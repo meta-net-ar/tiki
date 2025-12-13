@@ -132,6 +132,14 @@ function prefs_unified_list()
             'default' => 'n',
             'tags' => ['advanced'],
         ],
+        'unified_cache_relation' => [
+            'name' => tra('Cache relation field formatted values'),
+            'description' => tr('Relation field formats related objects by searching existing index on each record rebuild. This might be very slow if you have relation fields on many tracker items. Enable this option to pre-cache all possible relation formatted values at indexing time.'),
+            'warning' => tr('This could potentially use a lot of memory (if you have relations on big trackers) or be less efficient (if you have little density of populated relation fields).'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced'],
+        ],
         'unified_excluded_categories' => [
             'name' => tra('Excluded categories'),
             'description' => tra('List of category IDs to exclude from the search index'),
@@ -274,6 +282,14 @@ function prefs_unified_list()
             'description' => tra('In case of Elasticsearch is active and unavailable, use MySQL Full-Text Search as fallback'),
             'default' => 'n',
         ],
+        'unified_elastic_index_max_result_window' => [
+            'name' => tra('Index max result window for ElasticSearch'),
+            'description' => tra('This allows a larger amount of data to be recorded.'),
+            'type' => 'text',
+            'size' => '3',
+            'units' => tra('records'),
+            'default' => '',
+        ],
         'unified_mysql_index_current' => [
             'name' => tra('MySQL full-text search current index'),
             'description' => tra('A new index is created upon rebuilding, and the old one is then destroyed. This setting enables seeing the currently active index.'),
@@ -390,7 +406,7 @@ function prefs_unified_list()
             'type' => 'text',
             'default' => ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "not", "of", "on", "or", "s", "such", "t", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with"],
             'separator' => ',',
-            'hint' => tr('MySQL full-text search has its own list of stop words configured in the server.'),
+            'hint' => tr('This list is applied to the selected search engine. Note for MySQL: It completely replaces the native InnoDB stopword list. If left empty, will disable stopword filtering.'),
         ],
         'unified_trim_sorted_search' => [
             'name' => tra('Automatically trim Elasticsearch results on date-sorted query'),
@@ -441,9 +457,25 @@ function prefs_unified_list()
             'tags' => ['advanced'],
             'help' => 'PluginList',
         ],
-        'unified_last_rebuild_stats' => [
+        'unified_last_rebuild_stats_mysql' => [
             'name' => tra('Last rebuild statistics'),
-            'description' => tra('Record of last rebuild object counts and timings.'),
+            'description' => tra('Record of last rebuild object counts and timings for mysql.'),
+            'hint' => tra('Do not change this value unless you know what you are doing.'),
+            'type' => 'text',
+            'default' => [],
+            'tags' => ['advanced'],
+        ],
+        'unified_last_rebuild_stats_elastic' => [
+            'name' => tra('Last rebuild statistics'),
+            'description' => tra('Record of last rebuild object counts and timings for elastic search.'),
+            'hint' => tra('Do not change this value unless you know what you are doing.'),
+            'type' => 'text',
+            'default' => [],
+            'tags' => ['advanced'],
+        ],
+        'unified_last_rebuild_stats_manticore' => [
+            'name' => tra('Last rebuild statistics'),
+            'description' => tra('Record of last rebuild object counts and timings for manticore search.'),
             'hint' => tra('Do not change this value unless you know what you are doing.'),
             'type' => 'text',
             'default' => [],

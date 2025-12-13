@@ -34,7 +34,6 @@ function wikiplugin_regex($data, $params)
     global $tikilib;
 
     extract($params, EXTR_SKIP);
-    $pageName = (isset($pageName)) ? $pageName : 'pageName';//gets a page
     $info = $tikilib->get_page_info($pageName);
     $content = $info['data'];
     $lines = explode("\n", $content); // separate lines into array no emtpy lines at beginning mid or end

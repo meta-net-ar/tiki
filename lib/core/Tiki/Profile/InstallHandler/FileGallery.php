@@ -56,8 +56,8 @@ class Tiki_Profile_InstallHandler_FileGallery extends Tiki_Profile_InstallHandle
 
         $data = Tiki_Profile::convertLists($data, ['flags' => 'y']);
 
-        $column = isset($data['column']) ? $data['column'] : [];
-        $popup = isset($data['popup']) ? $data['popup'] : [];
+        $column = $data['column'] ?? [];
+        $popup = $data['popup'] ?? [];
 
         if (in_array('name', $column) && in_array('filename', $column)) {
             $data['show_name'] = 'a';
@@ -285,7 +285,7 @@ class Tiki_Profile_InstallHandler_FileGallery extends Tiki_Profile_InstallHandle
                 continue; // Skip default values
             }
 
-            if (substr($field, 0, 5) == 'show_') {
+            if (str_starts_with($field, 'show_')) {
                 $short = substr($field, 5);
                 if ($value == 'a' || $value == 'o') {
                     $popup[] = $short;

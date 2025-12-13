@@ -8,7 +8,7 @@
 
 use Tiki\Lib\Wiki\WikiLibOutput;
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -1335,7 +1335,7 @@ class WikiLib extends TikiLib
             return false;
         }
 
-        return ($this->is_locked($page, $info) == null || $user == $this->is_locked($page, $info)) ? true : false;
+        return $this->is_locked($page, $info) == null || $user == $this->is_locked($page, $info);
     }
 
     /**
@@ -1434,7 +1434,7 @@ class WikiLib extends TikiLib
                 $objectId = substr($res['fromPage'], strlen($type) + 12);
                 if ($type == 'trackeritemfield') {
                     $feature = 'wiki_backlinks_show_trackeritem';
-                } elseif (substr($type, -7) == 'comment') {
+                } elseif (str_ends_with($type, 'comment')) {
                     $feature = 'wiki_backlinks_show_comment';
                 } else {
                     $feature = 'wiki_backlinks_show_' . str_replace(" ", "_", $type);
@@ -1506,7 +1506,7 @@ class WikiLib extends TikiLib
 
         while ($res = $result->fetchRow()) {
             $frompage = $res['fromPage'];
-            if (substr($frompage, 0, 11) != 'objectlink:') {
+            if (! str_starts_with($frompage, 'objectlink:')) {
                 $wikiLastModif = (int) $tikilib->get_page_info($frompage)[$lastModif];
                 $tikilib->query($updateQuery, [$wikiLastModif, $frompage, $page]);
             } else {
@@ -1653,9 +1653,12 @@ class WikiLib extends TikiLib
         }
 
         $pageExists = TikiLib::lib('tiki')->page_exists($requestedPageName);
+        $pageFromSlug = TikiLib::lib('tiki')->getPageBySlug($requestedPageName);
         $finalPageName = '';
 
-        if ($pageExists) {
+        if ($pageFromSlug) {
+            $finalPageName = $pageFromSlug;
+        } elseif ($pageExists) {
             $finalPageName = $requestedPageName;
         } else {
             $pagesByAlias = $this->get_pages_by_alias($requestedPageName);
@@ -1666,7 +1669,8 @@ class WikiLib extends TikiLib
 
         if ($finalPageName) {
             if ($prefs['feature_sefurl'] === 'y') {
-                    $href = urlencode($finalPageName);
+                $tiki_pages = TikiDb::get()->table('tiki_pages');
+                $href = urlencode($tiki_pages->fetchOne('pageSlug', ['pageName' => $finalPageName]));
             } else {
                 $href = "$view_script?page=" . urlencode($finalPageName);
             }
@@ -1834,7 +1838,7 @@ class WikiLib extends TikiLib
     public function get_explicit_namespace($pageName)
     {
         $attributes = TikiLib::lib('attribute')->get_attributes('wiki page', $pageName);
-        return isset($attributes['tiki.wiki.namespace']) ? $attributes['tiki.wiki.namespace'] : '';
+        return $attributes['tiki.wiki.namespace'] ?? '';
     }
 
     public function set_explicit_namespace($pageName, $namespace)
@@ -1921,11 +1925,11 @@ class WikiLib extends TikiLib
     {
         global  $prefs;
 
-        $currPage = isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
+        $currPage = $_REQUEST['page'] ?? '';
         if (
             ! empty($currPage) &&
-            (strstr($_SERVER["SCRIPT_NAME"], "tiki-editpage.php") === false) &&
-            (strstr($_SERVER["SCRIPT_NAME"], 'tiki-pagehistory.php') === false)
+            (! str_contains($_SERVER["SCRIPT_NAME"], "tiki-editpage.php")) &&
+            (! str_contains($_SERVER["SCRIPT_NAME"], 'tiki-pagehistory.php'))
         ) {
             // Determine the auto TOC setting
             if ($prefs['wiki_auto_toc'] === 'y') {
@@ -1948,7 +1952,7 @@ class WikiLib extends TikiLib
                     $tocOffset = ! empty($prefs['wiki_toc_offset']) ? $prefs['wiki_toc_offset'] : 10;
 
                     // Show/Hide the static inline TOC
-                    $isAddInlineToc = isset($prefs['wiki_inline_auto_toc']) ? $prefs['wiki_inline_auto_toc'] === 'y' : false;
+                    $isAddInlineToc = isset($prefs['wiki_inline_auto_toc']) && $prefs['wiki_inline_auto_toc'] === 'y';
                     if ($isAddInlineToc) {
                         // Enable static, inline TOC
                         //$headerlib->add_css('#autotoc {display: block;}');
@@ -1979,14 +1983,14 @@ class WikiLib extends TikiLib
             }
 
             // Hide title per page
-            $isHideTitlePerPage = isset($prefs['wiki_page_hide_title']) ? $prefs['wiki_page_hide_title'] === 'y' : false;
+            $isHideTitlePerPage = isset($prefs['wiki_page_hide_title']) && $prefs['wiki_page_hide_title'] === 'y';
             if ($isHideTitlePerPage) {
                 $isHideTitle = false;
                 if (! empty($currPage)) {
                     $isPageHideTitle = $this->get_page_hide_title($currPage);
                     if ($isPageHideTitle != 0) {
                         // Use page specific setting
-                        $isHideTitle = $isPageHideTitle < 0 ? true : false;
+                        $isHideTitle = $isPageHideTitle < 0;
                     }
                 }
                 if ($isHideTitle) {

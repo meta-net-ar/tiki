@@ -22,7 +22,6 @@ function wikiplugin_include_info()
                 'description' => tr('Name of the source wiki page (which contains the included portion)'),
                 'since' => '1',
                 'filter' => 'pagename',
-                'default' => '',
                 'profile_reference' => 'wiki_page',
             ],
             'start' => [
@@ -31,7 +30,6 @@ function wikiplugin_include_info()
                 'description' => tr('When only a portion of the page should be included, full text of the line after which
                     inclusion should start'),
                 'since' => '1',
-                'default' => '',
             ],
             'stop' => [
                 'required' => false,
@@ -39,7 +37,6 @@ function wikiplugin_include_info()
                 'description' => tr('When only a portion of the page should be included, full text of the line before which
                     inclusion should end'),
                 'since' => '1',
-                'default' => '',
             ],
             'linkoriginal' => [
                 'required' => false,
@@ -59,7 +56,7 @@ function wikiplugin_include_info()
                 'description' => tr('Label of the button linking to the source page (if it is displayed)'),
                 'since' => '18.0',
                 'filter' => 'text',
-                'default' => '',
+                'default' => tr('Read more'),
             ],
             'nopage_text' => [
                 'required' => false,
@@ -137,7 +134,6 @@ function wikiplugin_include_info()
                 'description' => tr('Limit the length of the included text'),
                 'since' => '20.0',
                 'filter' => 'int',
-                'default' => '',
             ],
             'page_version' => [
                 'required' => false,
@@ -145,7 +141,6 @@ function wikiplugin_include_info()
                 'description' => tr('Get the version of page included'),
                 'since' => '26.0',
                 'filter' => 'int',
-                'default' => '',
             ],
             'recursive_include_warning' => [
                 'required' => false,
@@ -180,23 +175,11 @@ function wikiplugin_include($dataIn, $params)
 
     $killtoc = true;
     $params = array_merge([
-        'nopage_text' => '',
-        'pagedenied_text' => '',
         'page_edit_icon' => $prefs['wiki_edit_plugin'],
-        'parse_included_page' => 'n',
         'page_replace_icon' => $prefs['wiki_edit_plugin'],
         'pagenotapproved_text' => tr('There are no approved versions of this page.'),
     ], $params);
     extract($params, EXTR_SKIP);
-    if (! isset($page)) {
-        return ("<b>missing page for plugin INCLUDE</b><br />");
-    }
-    if (! isset($max_inclusions)) {
-        $max_inclusions = 5;
-    }
-    if (! isset($recursive_include_warning)) {
-        $recursive_include_warning = 'y';
-    }
 
     if (isset($replace) && (int) $replace === 1) {
         $linkoriginal = 'n';
@@ -218,15 +201,16 @@ function wikiplugin_include($dataIn, $params)
 
     /** @var string $fragmentIdentifier Identifier of included fragment */
     $fragmentIdentifier = $page;
-    if (isset($start)) {
+    if (! is_null($start)) {
         $fragmentIdentifier .= "/$start";
     }
-    if (isset($stop)) {
+    if (! is_null($stop)) {
         $fragmentIdentifier .= "/$stop";
     }
 
     if (isset($pluginIncludeNumberOfInclusions[$fragmentIdentifier])) {
         if ($pluginIncludeNumberOfInclusions[$fragmentIdentifier] >= $max_inclusions) {
+            Feedback::warning(tr('Too many inclusions for "%0" (%1)', $page, $max_inclusions));
             trigger_error(tr('Too many inclusions for "%0" (%1)', $page, $max_inclusions), E_USER_WARNING);
             return '';
         }
@@ -261,13 +245,9 @@ function wikiplugin_include($dataIn, $params)
         }
     }
 
-    if (! empty($params['linkoriginal_text'])) {
-        $linkoriginal_text = tr($params['linkoriginal_text']);
-    } else {
-        $linkoriginal_text = tr('Read more');
-    }
+    $linkoriginal_text = $params['linkoriginal_text'];
 
-    if (! empty($page_version)) {
+    if (! is_null($page_version)) {
         $history = $histlib->get_version($page, $page_version);
         if ($history['data'] !== null) {
             $data[$fragmentIdentifier]['data'] = $history['data'];
@@ -277,9 +257,9 @@ function wikiplugin_include($dataIn, $params)
 
     if ($data[$fragmentIdentifier]) {
         $text = $data[$fragmentIdentifier]['data'];
-        if (isset($start) || isset($stop)) {
+        if (! is_null($start) || ! is_null($stop)) {
             $lines = explode("\n", $text);
-            if (isset($start) && isset($stop)) {
+            if (! is_null($start) && ! is_null($stop)) {
                 $state = 0;
                 foreach ($lines as $i => $line) {
                     if ($state == 0) {
@@ -296,7 +276,7 @@ function wikiplugin_include($dataIn, $params)
                         }
                     }
                 }
-            } elseif (isset($start)) {
+            } elseif (! is_null($start)) {
                 // Only start marker is set. Search for it, dropping all lines until
                 // it is found.
                 foreach ($lines as $i => $line) {
@@ -326,7 +306,7 @@ function wikiplugin_include($dataIn, $params)
         }
     }
 
-    if (isset($params['max_chars_included']) && mb_strlen($text) > $params['max_chars_included']) {
+    if (! is_null($params['max_chars_included']) && mb_strlen($text) > $params['max_chars_included']) {
         $text = substr($text, 0, $params['max_chars_included']) . '…';
     }
 
@@ -352,7 +332,7 @@ function wikiplugin_include($dataIn, $params)
             if (
                 ! isset($_GET['replaceby'])
                 || (isset($_GET['replaceby']) && (int) $_GET['replaceby'] != $includeId)
-                && (empty($_REQUEST['display']) || $_REQUEST['display'] != 'pdf')
+                && (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF)
             ) {
                 $text .= '<a id="' . $id . '" class="editplugin wikiplugin-include-replace" href="javascript:void(1)" data-index="' . $includeId . '" data-page="' . htmlentities($returnto, ENT_COMPAT) . '" data-ticket="' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '">' .
                     smarty_function_icon(['name' => 'exchange', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
@@ -385,7 +365,7 @@ function wikiplugin_include($dataIn, $params)
 
     global $smarty;
     // append a "See full page" link at end of text if only a portion of page is being included
-    if (($prefs['wiki_plugin_include_link_original'] == 'y' && (isset($start) || isset($stop))) || (isset($linkoriginal) && $linkoriginal == 'y')) {
+    if (($prefs['wiki_plugin_include_link_original'] == 'y' && (! is_null($start) || ! is_null($stop))) || ($linkoriginal == 'y')) {
         $wikilib = TikiLib::lib('wiki');
         $text .= '<p><a href="' . $wikilib->sefurl($page) . '" class="btn btn-primary"';
         $text .= 'title="' . sprintf(tr('The text above comes from page "%s". Click to go to that page.'), htmlspecialchars($page)) . '">';
@@ -399,9 +379,9 @@ function wikiplugin_include($dataIn, $params)
         if (isset($perms) && $perms['tiki_p_edit'] === 'y' && strpos($_SERVER['PHP_SELF'], 'tiki-send_newsletters.php') === false) {
             $smarty = TikiLib::lib('smarty');
             $tip = tr('Include Plugin') . ' | ' . tr('Edit the included page:') . ' &quot;' . $page . '&quot;';
-            if (empty($_REQUEST['display']) || $_REQUEST['display'] != 'pdf') {
+            if (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF) {
                 $text .= '<a class="editplugin" ' . // ironically smarty_block_self_link doesn't work for this! ;)
-                smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), $tmp = false) . '>' .
+                smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), false) . '>' .
                 smarty_function_icon(['name' => 'edit', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
             }
         }

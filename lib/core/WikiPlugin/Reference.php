@@ -90,7 +90,7 @@ class Reference
 
                     if ($pos > 0) {
                         $prevWhiteSpace = $text[$pos - 1];
-                        if (strpos($charsUsedForSpace, $prevWhiteSpace) !== false && $pos) {
+                        if (str_contains($charsUsedForSpace, $prevWhiteSpace) && $pos) {
                             $replaceTag = $text[$pos - 1] . $replaceTag;
                         }
                     }
@@ -98,7 +98,7 @@ class Reference
                     $endPos = $pos + $len;
                     if ($endPos < strlen($text)) {
                         $postWhiteSpace = $text[$endPos];
-                        if (strpos($charsUsedForSpace, $postWhiteSpace) !== false && $pos) {
+                        if (str_contains($charsUsedForSpace, $postWhiteSpace) && $pos) {
                             $replaceTag .= $text[$endPos];
                         }
                     }

@@ -4,15 +4,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/auth/tokens.php';
-require_once __DIR__ . '/ConverseJS.php';
-require_once __DIR__ . '/TikiXmppChat.php';
-require_once __DIR__ . '/TikiXmppPrebind.php';
 
 use Fabiang\Xmpp\Protocol\Presence;
 use Fabiang\Xmpp\Protocol\Message;
 use Fabiang\Xmpp\Protocol\Invitation;
 use Fabiang\Xmpp\Util\JID;
+use Tiki\Lib\Auth\Tokens;
+
+require_once __DIR__ . '/ConverseJS.php';
+require_once __DIR__ . '/TikiXmppChat.php';
+require_once __DIR__ . '/TikiXmppPrebind.php';
 
 class XMPPLib extends TikiLib
 {
@@ -89,7 +90,7 @@ class XMPPLib extends TikiLib
     {
         global $prefs;
 
-        $tokenlib = AuthTokens::build($prefs);
+        $tokenlib = Tokens::build($prefs);
         $token = $tokenlib->getToken($givenToken);
 
         if (! $token || $token['entry'] !== 'openfireauthtoken') {
@@ -219,7 +220,7 @@ class XMPPLib extends TikiLib
         $browser_title = $this->sanitize_name($browser_title);
         $resource_name = "{$browser_title}-{$session_id}";
 
-        $tokenlib = AuthTokens::build($prefs);
+        $tokenlib = Tokens::build($prefs);
 
         if (empty($this->server_host) ||  empty($this->server_http_bind)) {
             header("HTTP/1.0 500 Internal Server Error");

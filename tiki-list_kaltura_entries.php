@@ -111,8 +111,8 @@ try {
     $page = ($offset / $page_size) + 1;
 
     if ($_REQUEST['list'] == 'mix' or ! isset($_REQUEST['list'])) {
+        $kalturaadminlib = TikiLib::lib('kalturaadmin');
         if ($_REQUEST['view'] != 'browse') {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
 
             for ($i = 0; $i < $kmixlist->totalCount; $i++) {
@@ -137,7 +137,6 @@ try {
                 }
             }
         } else {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
         }
 

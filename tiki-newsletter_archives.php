@@ -10,8 +10,8 @@ $inputConfiguration = [
         'nlId'                 => 'int',        //post
         'remove'               => 'int',        //get
         'error'                => 'string',     //post
-        'deleteError'          => 'bool',       //post
-        'ed_sort_mode'         => 'string',     //get
+        'deleteError'          => 'int',        //get
+        'ed_sort_mode'         => 'alnumdash',  //get
         'ed_offset'            => 'digits',     //get
         'ed_find'              => 'string',     //post
         'editionId'            => 'int',        //get
@@ -46,7 +46,7 @@ if (! empty($_REQUEST['error'])) {
     $smarty->assign_by_ref('edition_info', $edition_info);
 }
 if (! empty($_REQUEST['deleteError'])) {
-    $edition_errors = $nllib->remove_edition_errors($_REQUEST['deleteError']);
+    $nllib->remove_edition_errors($_REQUEST['deleteError']);
 }
 if (! isset($_REQUEST["ed_sort_mode"])) {
     $ed_sort_mode = 'sent_desc';
@@ -59,11 +59,7 @@ if (! isset($_REQUEST["ed_offset"])) {
     $ed_offset = $_REQUEST["ed_offset"];
 }
 $smarty->assign_by_ref('ed_offset', $ed_offset);
-if (isset($_REQUEST["ed_find"])) {
-    $ed_find = $_REQUEST["ed_find"];
-} else {
-    $ed_find = '';
-}
+$ed_find = $_REQUEST["ed_find"] ?? '';
 $smarty->assign('ed_find', $ed_find);
 $smarty->assign_by_ref('ed_sort_mode', $ed_sort_mode);
 if (isset($_REQUEST["nlId"])) {

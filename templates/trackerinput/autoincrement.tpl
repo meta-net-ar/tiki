@@ -1,3 +1,4 @@
+<input type="hidden" name="{$field.ins_id}">
 {if !empty($item.itemId)}
     <div{if $field.options_map.prepend or $field.options_map.append} class="input-group"{/if}>
         {if !empty($field.options_map.prepend)}

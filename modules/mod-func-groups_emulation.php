@@ -52,10 +52,10 @@ function module_groups_emulation($mod_reference, $module_params)
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
-    $showallgroups = isset($module_params['showallgroups']) ? $module_params['showallgroups'] : 'y';
-    $showyourgroups = isset($module_params['showyourgroups']) ? $module_params['showyourgroups'] : 'y';
+    $showallgroups = $module_params['showallgroups'] ?? 'y';
+    $showyourgroups = $module_params['showyourgroups'] ?? 'y';
 
-    $groups_are_emulated = isset($_SESSION['groups_are_emulated']) ? $_SESSION['groups_are_emulated'] : 'n';
+    $groups_are_emulated = $_SESSION['groups_are_emulated'] ?? 'n';
     $smarty->assign('groups_are_emulated', $groups_are_emulated);
     if (isset($_SESSION['groups_emulated'])) {
         $smarty->assign('groups_emulated', unserialize($_SESSION['groups_emulated']));

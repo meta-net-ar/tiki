@@ -7,21 +7,27 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'galleryId'                   => 'int',          //post
             'newDiagram'                  => 'bool',         //post
-            'fileName'                    => 'int',          //post
+            'fileName'                    => 'text',          //post
             'fileId'                      => 'int',          //post
             'template'                    => 'int',          //post
+            'page'                        => 'pagename',     //post
+            'xml'                         => 'none',         //post (base64/XML)
+            'index'                       => 'int',          //post
+            'compressXmlParam'            => 'bool',         //post
+            'compressXml'                 => 'alpha',        //post ("true"/"false")
         ],
     ],
 ];
 
 require_once('tiki-setup.php');
+$filegallib = TikiLib::lib('filegal');
 
 $exportImageCache = (int)($prefs['fgal_export_diagram_on_image_save'] == 'y');
 
-$xmlContent = isset($_POST['xml']) ? $_POST['xml'] : false;
-$page = isset($_POST['page']) ? $_POST['page'] : false;
-$index = isset($_POST['index']) ? $_POST['index'] : null;
-$compressXml = ($prefs['fgal_use_diagram_compression_by_default'] !== 'y') ? false : true;
+$xmlContent = $_POST['xml'] ?? false;
+$page = $_POST['page'] ?? false;
+$index = $_POST['index'] ?? null;
+$compressXml = ! (($prefs['fgal_use_diagram_compression_by_default'] !== 'y'));
 
 if (! empty($_POST['compressXmlParam']) && ! empty($_POST['compressXml']) && $_POST['compressXml'] === 'false') {
     $compressXml = false;
@@ -29,6 +35,66 @@ if (! empty($_POST['compressXmlParam']) && ! empty($_POST['compressXml']) && $_P
 
 $galleryId = $_REQUEST['galleryId'] ? $_REQUEST['galleryId'] : 0;
 $backLocation = '';
+
+$baseUrl = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']) . '/';
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+
+if (! empty($galleryId)) {
+    if (is_numeric($galleryId)) {
+        $type = 'file gallery';
+        $objectId = $_REQUEST['fileId'] ?? null;
+    } else {
+        if (str_starts_with($referer, $baseUrl)) {
+            header('Location: ' . $referer);
+        } else {
+            header("Location: " . $baseUrl . "tiki-list_file_gallery.php");
+        }
+        Feedback::error(tr('Invalid %0%1%2: must be numeric', '<code>', 'galleryId', '</code>'));
+        return '';
+    }
+} elseif (! empty($page)) {
+    $type = 'wiki page';
+    $objectId = $page;
+} else {
+    if (str_starts_with($referer, $baseUrl)) {
+        header('Location: ' . $referer);
+    } else {
+        header("Location: " . $baseUrl . "tiki-list_file_gallery.php");
+    }
+    Feedback::error(tr('Missing parameters: either %0%1%2 or %0%3%2 is required.', '<code>', 'galleryId', '</code>', 'page'));
+    return '';
+}
+
+$objectperms = Perms::get([
+    'type' => $type,
+    'object' => $objectId,
+]);
+
+if ($type === 'file gallery' && $galleryId == 0) {
+    throw new LogicException("Invalid state: type is 'file gallery' but galleryId is 0.");
+}
+
+if ($objectperms->getContext()['type'] == 'file gallery' && $galleryId != 0) {
+    $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
+    $current_galInfos = array_filter($gals['data'], function ($gal) use ($galleryId) {
+        return isset($gal['id']) && $gal['id'] === $galleryId
+        && isset($gal['isgal']) && $gal['isgal'] === 1;
+    });
+    $current_galInfos = array_values($current_galInfos);
+    if (isset($current_galInfos) && ($current_galInfos[0]['perms']['tiki_p_upload_files'] !== 'y')) {
+        if (str_starts_with($referer, $baseUrl)) {
+            header('Location: ' . $referer);
+        } else {
+            header("Location: " . $baseUrl . "tiki-list_file_gallery.php");
+        }
+        Feedback::error(tr('Tiki wasn\'t able to use the Diagram on file gallery %1%0%3. Please check the %1%2%3 permission on this %4.', $current_galInfos[0]['name'], '<code>', 'tiki_p_upload_files', '</code>', '<a href="tiki-objectpermissions.php?objectType=file+gallery&objectId=' . $current_galInfos[0]['id'] . '&permType=file+galleries&objectName=' . $current_galInfos[0]['name'] . '#contenttabs_objectpermissions-1">permission page</a>'));
+        return '';
+    }
+} elseif ($objectperms->getContext()['type'] == 'wiki page' && $galleryId == 0 && ! $objectperms->edit) {
+    Feedback::error(tr('It seems that you are not allowed to edit this page. If you think this is an error, please check the %0%1%2 permission.', '<code>', 'tiki_p_edit', '</code>'));
+    header("Location: " . $baseUrl . "tiki-index.php?page=" . $page);
+    return '';
+}
 
 if ($xmlContent) {
     $xmlContent = base64_decode($xmlContent);

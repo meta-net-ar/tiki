@@ -21,7 +21,6 @@ function wikiplugin_poll_info()
                 'name' => tra('Poll'),
                 'description' => tra('Select the poll to display'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'digits',
                 'profile_reference' => 'poll',
             ],
@@ -71,21 +70,12 @@ function wikiplugin_poll_info()
 
 function wikiplugin_poll($data, $params)
 {
-    global $tiki_p_admin, $prefs, $user;
-    $userlib = TikiLib::lib('user');
+    global $prefs, $user;
     $tikilib = TikiLib::lib('tiki');
-    $polllib = TikiLib::lib('poll');
     $smarty = TikiLib::lib('smarty');
-    $trklib = TikiLib::lib('trk');
-
-    $default = ['showtitle' => 'y', 'showresult' => 'link', 'showtotal' => 'y'];
-    $params = array_merge($default, $params);
 
     extract($params, EXTR_SKIP);
 
-    if (! isset($pollId)) {
-        return WikiParser_PluginOutput::argumentError(['pollId']);
-    }
     $polllib = TikiLib::lib('poll');
 
 
@@ -108,7 +98,7 @@ function wikiplugin_poll($data, $params)
         $ret = $smarty->fetch('tiki-plugin_poll.tpl');
     }
     if (($showresult == 'voted' && $hasVoted) || $showresult == 'always') {
-        $total = $polllib->options_percent($poll_info, $options);
+        $polllib->options_percent($poll_info, $options);
         $poll_info['options'] = $options;
         $smarty->assign_by_ref('poll_info', $poll_info);
         $smarty->assign_by_ref('user_vote', $userVote);

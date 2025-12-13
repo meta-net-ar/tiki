@@ -126,14 +126,6 @@ function wikiplugin_paymentlist($data, $params)
 
     $instance++;
 
-    // process defaults
-    $default = [];
-    $plugininfo = wikiplugin_paymentlist_info();
-    foreach ($plugininfo['params'] as $key => $p) {
-        $default[$key] = $p['default'];
-    }
-    $params = array_merge($default, $params);
-
     $output = '';
     $paymentlib = TikiLib::lib('payment');
     $payments = [];

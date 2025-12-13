@@ -4,6 +4,7 @@ import initSummernote, { loadLanguage } from "..";
 import * as formatTikiToolbarsModule from "../formatTikiToolbars";
 import * as Handlers from "../handlers/index";
 import showMessage from "../../../vue-widgets/element-plus-ui/src/utils/showMessage";
+import { parseData } from "../handlers/formSubmission.helpers";
 
 vi.mock("summernote", () => {
     $.fn.summernote = vi.fn();
@@ -15,6 +16,10 @@ vi.mock("../handlers/index", () => ({
     pluginEdit: vi.fn(),
     customCodeview: vi.fn(),
     dirtyCheck: vi.fn(),
+}));
+
+vi.mock("../handlers/formSubmission.helpers", () => ({
+    parseData: vi.fn(),
 }));
 
 vi.mock("../../../vue-widgets/element-plus-ui/src/utils/showMessage", () => {
@@ -81,12 +86,14 @@ describe("initSummernote", () => {
 
         givenTextarea.summernote.mock.calls[0][0].callbacks.onInit.call(givenTextarea[0]);
 
+        parseData.mock.calls[0][1].call(givenTextarea[0]);
+
         expect(Handlers.formSubmission).toHaveBeenCalledWith(givenTextarea);
         expect(Handlers.dirtyCheck).toHaveBeenCalledWith(givenTextarea);
         expect(Handlers.pluginEdit).toHaveBeenCalledWith(id);
     });
 
-    test("should unwrap custom buttons on init", () => {
+    test("on init, should unwrap custom buttons", () => {
         const id = "foo";
         const givenTextarea = $(`<textarea id="${id}"></textarea>`);
         const toolbar = $(`<div>
@@ -120,6 +127,33 @@ describe("initSummernote", () => {
         givenTextarea.summernote.mock.calls[0][0].callbacks.onInit.call(givenTextarea[0]);
 
         expect(toolbar.html()).toMatchSnapshot();
+    });
+
+    test.each([
+        ["not parse but call the dirtyCheck handler", true],
+        ["parse and call the dirtyCheck handler afterward", false],
+    ])("on init, should %s when editing inline is %s", (_, inline) => {
+        const id = "foo";
+        const givenTextarea = $(`<textarea id="${id}"></textarea>`);
+        givenTextarea.data("summernote", {
+            layoutInfo: {
+                toolbar: $("<div></div>"),
+            },
+        });
+        $("body").append(givenTextarea);
+
+        initSummernote(id, [], { lang: "en-US", inline });
+
+        givenTextarea.summernote.mock.calls[0][0].callbacks.onInit.call(givenTextarea[0]);
+
+        if (inline) {
+            expect(parseData).not.toHaveBeenCalled();
+            expect(Handlers.dirtyCheck).toHaveBeenCalledWith(givenTextarea);
+        } else {
+            expect(parseData).toHaveBeenCalledWith(givenTextarea, expect.any(Function), false);
+            parseData.mock.calls[0][1].call(givenTextarea[0]);
+            expect(Handlers.dirtyCheck).toHaveBeenCalledWith(givenTextarea);
+        }
     });
 
     test("should render the user mention modal when the @ key is pressed", () => {

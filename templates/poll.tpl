@@ -24,7 +24,7 @@
                             {foreach from=$r.options item=option}
                                 <tr>
                                     <td valign="top" {if $r.vote eq $option.optionId}class="highlight"{/if}>
-                                        <input type="radio" name="polls_optionId" value="{$option.optionId|escape}" id="poll{$r.info.pollId|escape}{$option.optionId|escape}" {if $r.vote eq $option.optionId} checked="checked"{/if}>
+                                        <input type="radio" class="form-check-input" name="polls_optionId" value="{$option.optionId|escape}" id="poll{$r.info.pollId|escape}{$option.optionId|escape}" {if $r.vote eq $option.optionId} checked="checked"{/if}>
                                     </td>
                                     <td valign="top" {if $r.vote eq $option.optionId}class="highlight"{/if}>
                                         <label for="poll{$r.info.pollId|escape}{$option.optionId|escape}">{$option.title|escape}</label>

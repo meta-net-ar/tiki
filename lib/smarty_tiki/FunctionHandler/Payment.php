@@ -113,7 +113,7 @@ class Payment extends Base
 
             if (! empty($params['returnurl']) && empty($result)) {
                 $info['returnurl'] = TikiLib::tikiUrl($params['returnurl']);
-                $info['returnurl'] .= (strstr($params['returnurl'], '?') ? '&' : '?') . "invoice=$invoice";
+                $info['returnurl'] .= (str_contains($params['returnurl'], '?') ? '&' : '?') . "invoice=$invoice";
             }
             $smarty->assign('payment_info', $info);
             $smarty->assign('payment_detail', TikiLib::lib('parser')->parse_data(htmlspecialchars($info['detail'] ?? "")));

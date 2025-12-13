@@ -22,6 +22,7 @@ $inputConfiguration = [
         'clearpages'               => 'bool',                //post
         'clearstructures'          => 'bool',                //post
         'addstructurepages'        => 'bool',                //post
+        'addstructure'             => 'bool',                //post
         ],
         'staticKeyFiltersForArrays' => [
             'structureId'           => 'digits',       //post
@@ -63,11 +64,7 @@ if (! isset($_REQUEST['printpages']) && ! isset($_REQUEST['printstructures'])) {
         $printstructures = [];
     }
 }
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (isset($_REQUEST["addpage"])) {
     if (! isset($_REQUEST["pageName"])) {

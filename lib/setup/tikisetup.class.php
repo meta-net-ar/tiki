@@ -39,11 +39,9 @@ class TikiSetup extends TikiInit
         $errors = self::checkSession();
 
         $wwwuser = '';
-        $wwwgroup = '';
 
         if (TikiSetup::isWindows()) {
             $wwwuser = 'SYSTEM';
-            $wwwgroup = 'SYSTEM';
         }
 
         if (function_exists('posix_getuid')) {
@@ -51,15 +49,10 @@ class TikiSetup extends TikiInit
 
             $group = @posix_getpwuid(@posix_getgid());
             $wwwuser = $user ? $user['name'] : false;
-            $wwwgroup = $group ? $group['name'] : false;
         }
 
         if (! $wwwuser) {
             $wwwuser = 'nobody (or the user account the web server is running under)';
-        }
-
-        if (! $wwwgroup) {
-            $wwwgroup = 'nobody (or the group account the web server is running under)';
         }
 
         static $dirs = [

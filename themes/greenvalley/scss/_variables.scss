@@ -1,126 +1,15 @@
+// Variables for Greenvalley theme, including overrides of Bootstrap SCSS variables as well as any Tiki SCSS variables
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-
-// scss-docs-start gray-color-variables
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #6c757d;  // default
-$gray-700: #495057;  // default
-$gray-800: #222; // #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-// scss-docs-end gray-color-variables
-
-// fusv-disable
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-);  // default
-// scss-docs-end gray-colors-map
-
-// scss-docs-start color-variables
-$blue:    #0d6efd;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #d63384;  // default
-$red:     #dc3545;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #ffc107;  // default
-$green:   #198754;  // default // Bootstrap 5.3
-$teal:    #20c997;  // default
-$cyan:    #0dcaf0;  // default
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-);  // default
-// scss-docs-end colors-map
-
-// The contrast ratio to reach against white, to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3, 4.5 and 7.
-// See https://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast
-$min-contrast-ratio:   4.5;  // default
-
-$blue-100: tint-color($blue, 80%);  // default
-$blue-200: tint-color($blue, 60%);  // default
-$blue-300: tint-color($blue, 40%);  // default
-$blue-400: tint-color($blue, 20%);  // default
-$blue-500: $blue;  // default
-$blue-600: shade-color($blue, 20%);  // default
-$blue-700: shade-color($blue, 40%);  // default
-$blue-800: shade-color($blue, 60%);  // default
-$blue-900: shade-color($blue, 80%);  // default
-
-$red-100: tint-color($red, 80%);  // default
-$red-200: tint-color($red, 60%);  // default
-$red-300: tint-color($red, 40%);  // default
-$red-400: tint-color($red, 20%);  // default
-$red-500: $red;  // default
-$red-600: shade-color($red, 20%);  // default
-$red-700: shade-color($red, 40%);  // default
-$red-800: shade-color($red, 60%);  // default
-$red-900: shade-color($red, 80%);  // default
-
-$green-100: tint-color($green, 80%);  // default
-$green-200: tint-color($green, 60%);  // default
-$green-300: tint-color($green, 40%);  // default
-$green-400: tint-color($green, 20%);  // default
-$green-500: $green;  // default
-$green-600: shade-color($green, 20%);  // default
-$green-700: shade-color($green, 40%);  // default
-$green-800: shade-color($green, 60%);  // default
-$green-900: shade-color($green, 80%);  // default
-
-$blues: (
-    "blue-100": $blue-100,
-    "blue-200": $blue-200,
-    "blue-300": $blue-300,
-    "blue-400": $blue-400,
-    "blue-500": $blue-500,
-    "blue-600": $blue-600,
-    "blue-700": $blue-700,
-    "blue-800": $blue-800,
-    "blue-900": $blue-900
-);  // default
-
-$reds: (
-    "red-100": $red-100,
-    "red-200": $red-200,
-    "red-300": $red-300,
-    "red-400": $red-400,
-    "red-500": $red-500,
-    "red-600": $red-600,
-    "red-700": $red-700,
-    "red-800": $red-800,
-    "red-900": $red-900
-);  // default
-
 $primary:           #B52170; // rgb(218, 56, 143); Darkened for WCAG2 compliance
 $secondary:         #8d7b74;
 $success:           #5cb85c;
@@ -128,81 +17,39 @@ $info:              #4e291b; //#5bc0de;
 $warning:           #f0ad4e;
 $danger:            #d9534f;
 $white:             #fff;
-
+$light: #fff;
+$dark: #000;
 
 $theme-colors: (
-     "primary":           #B52170, //rgb(218, 56, 143),
-     "secondary":         #8d7b74,
-     "success":           #5cb85c,
-     "info":              #4e291b, //#5bc0de,
-     "warning":           #f0ad4e,
-     "danger":            #d9534f,
-    "light":            #ffffff,
-    "dark":            #000000
+    "primary":           $primary,
+    "secondary":         $secondary,
+    "success":           $success,
+    "info":              $info,
+    "warning":           $warning,
+    "danger":            $danger,
+    "light":            $light,
+    "dark":            $dark
 );
 
-// scss-docs-start theme-text-variables
-$primary-text-emphasis:   shade-color($primary, 60%);  // default
-$secondary-text-emphasis: shade-color($secondary, 60%);  // default
-$success-text-emphasis:   shade-color($success, 60%);  // default
-$info-text-emphasis:      shade-color($info, 60%);  // default
-$warning-text-emphasis:   shade-color($warning, 60%);  // default
-$danger-text-emphasis:    shade-color($danger, 60%);  // default
-$light-text-emphasis:     $gray-700;  // default
-$dark-text-emphasis:      $gray-700;  // default
-// scss-docs-end theme-text-variables
-
-// scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:       tint-color($primary, 80%);  // default
-$secondary-bg-subtle:     tint-color($secondary, 80%);  // default
-$success-bg-subtle:       tint-color($success, 80%);  // default
-$info-bg-subtle:          tint-color($info, 80%);  // default
-$warning-bg-subtle:       tint-color($warning, 80%);  // default
-$danger-bg-subtle:        tint-color($danger, 80%);  // default
-$light-bg-subtle:         mix($gray-100, $white);  // default
-$dark-bg-subtle:          $gray-400;  // default
-// scss-docs-end theme-bg-subtle-variables
-
-// scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:   tint-color($primary, 60%);  // default
-$secondary-border-subtle: tint-color($secondary, 60%);  // default
-$success-border-subtle:   tint-color($success, 60%);  // default
-$info-border-subtle:      tint-color($info, 60%);  // default
-$warning-border-subtle:   tint-color($warning, 60%);  // default
-$danger-border-subtle:    tint-color($danger, 60%);  // default
-$light-border-subtle:     $gray-200;  // default
-$dark-border-subtle:      $gray-500;  // default
-// scss-docs-end theme-border-subtle-variable
-$body-color: $gray-900;
-$body-secondary-color:      rgba($body-color, .75);  // default
-$body-secondary-bg:         $gray-200;  // default
-
-$body-tertiary-color:       rgba($body-color, .5);  // default
-$body-tertiary-bg:          $gray-100;  // default
-
-$body-emphasis-color:       $black;  // default
 
 // Options
-// Prefix for :root CSS variables
-$prefix : bs-;  // default
 $enable-gradients:            true;
 $enable-shadows:              true;
 
-// Spacing
-
 // Body
 $body-bg: #fff; // #addd63;// darken(#bce380, 7%);
-//$body-color: $gray-900;
+$body-color: $gray-900;
 
 // Links
 $link-color: $primary;
-$link-hover-color: lighten($link-color, 15%);
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-hover-color: color.adjust($link-color, $lightness: 15%, $space: hsl);
 
 // Components
+$component-active-color: #ffffff;
 $component-active-bg: #cda256;
 $border-color:                $gray-400;  // default
 
+// Typography
 // Fonts
 $font-family-sans-serif: Century Gothic, Lucida Grande, Arial, Helvetica, sans-serif;
 $font-family-base: $font-family-sans-serif;
@@ -211,28 +58,55 @@ $font-size-base: 1rem;
 // Tables
 // Buttons
 // Forms
-// Dropdowns
-// Navs
-$nav-link-color: var(--#{$prefix}link-color);  // default // $link-color;
-//$navbar-light-color: $link-color; // #e0d6cc;
-$navbar-light-bg: $link-hover-color; //#f8f8f8;
-$navbar-light-border: darken($navbar-light-bg, 6.5%);
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
-// Navbar links
-$navbar-light-color: $nav-link-color;
+// Dropdowns
+$dropdown-color:                    var(--#{$prefix}body-color); // !default;
+$dropdown-bg:                       var(--#{$prefix}body-bg); //  !default;
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-color:               var(--#{$prefix}body-color); // !default;
+$dropdown-link-hover-color:         $dropdown-link-color; // !default;
+$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg); // !default;
+
+$dropdown-link-active-color:        $component-active-color; // !default;
+$dropdown-link-active-bg:           $component-active-bg; // !default;
+
+$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color); // !default;
+
+// Navbar
+//$nav-link-color: var(--#{$prefix}link-color);  // default // $link-color;
+$navbar-light-color: $link-color; // #e0d6cc;
+//$navbar-light-color: $nav-link-color;
 $navbar-light-hover-color: $link-hover-color;
 $navbar-light-hover-bg: #42281d;
 $navbar-light-active-color: #555555;
 $navbar-light-toggle-hover-bg: transparent;
 
 $navbar-dark-color:                 rgba($white, .95);
-$navbar-dark-hover-color:           rgba($white, .75);  // default
-$navbar-dark-active-color:          $white;  // default
-$navbar-dark-disabled-color:        rgba($white, .25);  // default
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
-$navbar-dark-toggler-border-color:  rgba($white, .1);  // default
-$navbar-dark-brand-color:           $navbar-dark-active-color;  // default
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color;  // default
+//$navbar-dark-color:                 rgba($white, .55) !default;
+$navbar-dark-hover-color:           rgba($white, .75); // !default;
+$navbar-dark-active-color:          $white; // !default;
+$navbar-dark-disabled-color:        rgba($white, .25); // !default;
+$navbar-dark-icon-color:            $navbar-dark-color; // !default;
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // !default;
+$navbar-dark-toggler-border-color:  rgba($white, .1); // !default;
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
+
+// Dropdowns
+$dropdown-color:                    var(--#{$prefix}body-color) !default;
+$dropdown-bg:                       #EDF3E9; // var(--#{$prefix}body-bg) !default;
+// $dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-color:               var(--#{$prefix}body-color) !default;
+$dropdown-link-hover-color:         $dropdown-link-color !default;
+$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
+
+$dropdown-link-active-color:        $component-active-color !default;
+$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 
 // Pagination
 $pagination-active-color: #ffffff;
@@ -240,14 +114,11 @@ $pagination-active-bg: #cda256;
 $pagination-active-border: #cda256;
 
 // Jumbotron
-$jumbotron-bg: lighten(#E6FFB2, 10%);
+$jumbotron-bg: color.adjust(#E6FFB2, $lightness: 10%, $space: hsl);
 $jumbotron-font-size: ceil(($font-size-base * 1.5));
 
 // Cards
 $card-bg:                           var(--tiki-card-bg);
-$card-cap-color:                    #222;
-
-//$card-bg: #e6ffb2;
 $card-inner-border: #53b042;
 $card-footer-bg: #e6ffb2;
 
@@ -272,10 +143,8 @@ $accordion-button-active-color:           $white;
 // Image thumbnails
 // Figures
 // Breadcrumbs
-// Carousel
 // Close
 // Code
 $code-color:                        $pink;  // default // Bootstrap 5.3
 
-// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
-$imagePath: "../images/";
+// - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //

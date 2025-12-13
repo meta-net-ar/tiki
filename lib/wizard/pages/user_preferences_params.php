@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 require_once('lib/wizard/wizard.php');
 $userprefslib = TikiLib::lib('userprefs');
 
@@ -52,7 +55,7 @@ class UserWizardPreferencesParams extends Wizard
         $userwatch = $user;
 
         $smarty->assign('userwatch', $userwatch);
-        $smarty->assign('show_mouseover_user_info', isset($prefs['show_mouseover_user_info']) ? $prefs['show_mouseover_user_info'] : $prefs['feature_community_mouseover']);
+        $smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
 
         $mailCharsets = ['utf-8', 'iso-8859-1'];
         $smarty->assign_by_ref('mailCharsets', $mailCharsets);
@@ -237,7 +240,7 @@ class UserWizardPreferencesParams extends Wizard
                 $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
             }
         }
-        $email_isPublic = isset($_REQUEST['email_isPublic']) ? $_REQUEST['email_isPublic'] : 'n';
+        $email_isPublic = $_REQUEST['email_isPublic'] ?? 'n';
         $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);
         $tikilib->set_user_preference($userwatch, 'mailCharset', $_REQUEST['mailCharset']);
         //// Custom fields

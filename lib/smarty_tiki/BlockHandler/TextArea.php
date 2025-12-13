@@ -28,7 +28,7 @@ use TikiLib;
 /**
  * @param array $params
  * @param string $content
- * @param Smarty_Tiki $smarty
+ * @param \Tiki\Smarty\SmartyTiki $smarty
  * @param boolean $repeat
  * @return string
  * @throws Exception
@@ -46,9 +46,9 @@ class TextArea extends Base
         }
 
         // some defaults
-        $params['_toolbars'] = isset($params['_toolbars']) ? $params['_toolbars'] : 'y';
-        $params['_simple'] = isset($params['_simple']) ? $params['_simple'] : 'n';
-        $params['_preview'] = isset($params['_preview']) ? $params['_preview'] : 'n';
+        $params['_toolbars'] = $params['_toolbars'] ?? 'y';
+        $params['_simple'] = $params['_simple'] ?? 'n';
+        $params['_preview'] = $params['_preview'] ?? 'n';
 
         if (! isset($params['_wysiwyg'])) {
             if ($params['_simple'] === 'n') {
@@ -66,14 +66,14 @@ class TextArea extends Base
             }
         }
 
-        $params['_is_html'] = isset($params['_is_html']) ? $params['_is_html'] : $is_html;
+        $params['_is_html'] = $params['_is_html'] ?? $is_html;
 
-        $params['name'] = isset($params['name']) ? $params['name'] : 'edit';
-        $params['id'] = isset($params['id']) ? $params['id'] : 'editwiki';
-        $params['area_id'] = isset($params['area_id']) ? $params['area_id'] : $params['id'];    // legacy param for toolbars?
-        $params['class'] = isset($params['class']) ? $params['class'] : 'wikiedit form-control';
-        $params['comments'] = isset($params['comments']) ? $params['comments'] : 'n';
-        $params['autosave'] = isset($params['autosave']) ? $params['autosave'] : 'y';
+        $params['name'] = $params['name'] ?? 'edit';
+        $params['id'] = $params['id'] ?? 'editwiki';
+        $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
+        $params['class'] = $params['class'] ?? 'wikiedit form-control check_character_limit';
+        $params['comments'] = $params['comments'] ?? 'n';
+        $params['autosave'] = $params['autosave'] ?? 'y';
 
         $smarty->assign('textarea_id', $params['id']);
 
@@ -92,18 +92,20 @@ class TextArea extends Base
 
         //codemirror integration
         if ($prefs['feature_syntax_highlighter'] === 'y') {
-            $params['data-codemirror'] = isset($params['codemirror']) ? $params['codemirror'] : '';
+            $params['data-codemirror'] = $params['codemirror'] ?? '';
             $params['data-syntax'] = $params['syntax'];
         }
         //keep params html5 friendly
         unset($params['codemirror']);
 
         // mainly for modules admin - preview is for the module, not the custom module so don;t need to confirmExit
-        $params['_previewConfirmExit'] = isset($params['_previewConfirmExit']) ? $params['_previewConfirmExit'] : 'y';
+        $params['_previewConfirmExit'] = $params['_previewConfirmExit'] ?? 'y';
 
         if (empty($params['section'])) {
             global $section;
-            $params['section'] = $section ? $section : 'wiki page';
+            $params['section'] = $section ?: 'wiki page';
+        } elseif ($params['section'] === 'trackeritem') {
+            $params['section'] = 'trackers';
         }
         $html = '';
         $html .= '<input type="hidden" name="mode_wysiwyg" value="" /><input type="hidden" name="mode_normal" value="" />';
@@ -132,7 +134,7 @@ class TextArea extends Base
             ) . "\n";
                 $html = str_replace('class="alert alert-warning alert-dismissible"', 'class="alert alert-warning alert-dismissible" style="display:none;"', $html); // quickfix to stop this box appearing before doc.ready
         }
-        $params['switcheditor'] = isset($params['switcheditor']) ? $params['switcheditor'] : 'y';
+        $params['switcheditor'] = $params['switcheditor'] ?? 'y';
         $smarty->assign('comments', $params['comments']);   // 3 probably removable assigns
         $smarty->assign('switcheditor', $params['switcheditor']);
         $smarty->assign('toolbar_section', $params['section']);
@@ -184,10 +186,9 @@ class TextArea extends Base
                 $html .= '<div id="' . $as_id . '_editor"></div>';
             } else {
                 $params['_is_html'] = true;
-                $parsedContent = TikiLib::lib('edit')->parseToWysiwyg($content, false, false, ['wysiwyg' => true, 'html_editor' => true]);
                 $html .= <<<HTML
                 <textarea class="wikiedit d-none" name="{$params['name']}" id="{$as_id}">
-                    {$parsedContent}
+                    {$content}
                 </textarea>
                 <input type="hidden" name="wysiwyg" value="y" />
                 HTML;
@@ -213,7 +214,7 @@ class TextArea extends Base
                 $smarty->assign('textarea_attributes', $textarea_attributes);
             }
             $smarty->assign('textarea_syntax', $params['syntax']);
-            $smarty->assign('objectId', isset($params['objectId']) ? $params['objectId'] : null);
+            $smarty->assign('objectId', $params['objectId'] ?? null);
             $smarty->assign_by_ref('textareadata', $content);
             $html .= $smarty->fetch('wiki_edit.tpl');
 

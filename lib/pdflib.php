@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+use Tiki\Lib\Theme\ThemeLib;
+
 /**
  *
  */
@@ -110,8 +114,7 @@ class PdfGenerator
                 if ($prefs['auth_token_access'] == 'y') {
                     $perms = Perms::get();
 
-                    require_once 'lib/auth/tokens.php';
-                    $tokenlib = AuthTokens::build($prefs);
+                    $tokenlib = Tokens::build($prefs);
                     $params['TOKEN'] = $tokenlib->createToken(
                         $tikiroot . $file,
                         $params,
@@ -186,7 +189,7 @@ class PdfGenerator
         $quotedFilename = '"' . $filename . '"';
         $quotedCommand = '"' . $this->location . '"';
 
-        `$quotedCommand -q $arg $quotedFilename`;
+        shell_exec("$quotedCommand -q $arg $quotedFilename");
 
         // Read the out file
         $pdf = file_get_contents($filename);
@@ -225,7 +228,7 @@ class PdfGenerator
         $quotedCommand = '"' . $this->location . '"';
 
         // redirect STDERR to null with 2>/dev/null becasue it outputs plenty of irrelevant warnings (hopefully nothing critical)
-        `$quotedCommand $arg $quotedFilename 2>/dev/null`;
+        shell_exec("$quotedCommand $arg $quotedFilename 2>/dev/null");
 
         // Read the out file
         $pdf = file_get_contents($filename);
@@ -321,6 +324,9 @@ class PdfGenerator
         $mpdf = new \Mpdf\Mpdf($mpdfConfig);
         $mpdf->curlAllowUnsafeSslRequests = ($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] ?? 'y') === 'y';
 
+        $basePath = $params['base_path'] ?? TIKI_PATH ;
+        $mpdf->SetBasePath($basePath);
+
         //custom fonts add, currently fontawesome support is added, more fonts can be added in future
         $custom_fontdata = [
          'fontawesome' => [
@@ -361,9 +367,9 @@ class PdfGenerator
         } else {
             $extcss = '';
         }
-
         // checking if print friendly preference is enabled if so then attach print css
         // otherwise theme styles will be retained by theme css
+        $themecss = '';
         if ($pdfSettings['print_pdf_mpdf_printfriendly'] === 'y') {
             $printcss = file_get_contents('themes/base_files/css/printpdf.css'); // external css
             $bodycss = 'tiki tiki-print'; //execluding theme css in case print friendly is set to yes.
@@ -400,6 +406,26 @@ class PdfGenerator
                 $prefs['theme'],
                 $prefs['theme_option'],
                 'css/custom.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            // and a theme pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                '',
+                'css/pdf.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            // and an option pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'css/pdf.css'
             );
             if ($themePath) {
                 $themecss .= file_get_contents($themePath);
@@ -491,6 +517,9 @@ class PdfGenerator
             }
         }
 
+        // Insert <a name="id"></a> immediately before each element with an id
+        $html = $this->addNamedAnchorsBeforeIdTags($html);
+
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
         //adding css styles with first page content
         $allCss = '<style>' .
@@ -581,7 +610,7 @@ class PdfGenerator
             }
 
             if (strip_tags(trim($pdfPage['pageContent']), "img,pdfinclude") != '') { //including external pdf
-                if (strpos($pdfPage['pageContent'], "<pdfinclude")) {
+                if (str_contains($pdfPage['pageContent'], "<pdfinclude")) {
                     //getting src
                     $breakPageContent = str_replace(["<pdfpage>.","</pdfpage>","<pdfinclude src=","/>","\""], "", $pdfPage['pageContent']);
                     $breakPageContent = trim($breakPageContent);
@@ -590,30 +619,29 @@ class PdfGenerator
                         global $tikiroot;
                         $fileId = 0;
                         if (preg_match('/dl(\d+)/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId];
                             $tokenParam = '?TOKEN';
                         }
                         if (preg_match('/display(\d+)/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId, 'display' => ''];
                             $tokenParam = '?TOKEN';
                         }
                         if (preg_match('/fileId=(\d+)/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId];
                             $tokenParam = '&TOKEN';
                         }
                         if (preg_match('/fileId=(\d+)(.*)display/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId, 'display' => ''];
                             $tokenParam = '&TOKEN';
                         }
 
                         if ($fileId > 0) {
                             $perms = Perms::get();
-                            require_once 'lib/auth/tokens.php';
-                            $tokenlib = AuthTokens::build($prefs);
+                            $tokenlib = Tokens::build($prefs);
                             $token = $tokenlib->createToken(
                                 $tikiroot . 'tiki-download_file.php',
                                 $params,
@@ -637,7 +665,7 @@ class PdfGenerator
                             for ($i = 1; $i <= $pagecount; $i++) {
                                 $tplId = $mpdf->importPage($i);
                                 $size = $mpdf->getTemplateSize($tplId);
-                                $orientation = isset($size['orientation']) ? $size['orientation'] : '';
+                                $orientation = $size['orientation'] ?? '';
 
                                 $mpdf->SetHTMLHeader();
                                 $mpdf->AddPage($orientation);
@@ -690,7 +718,7 @@ class PdfGenerator
                         $mpdf->SetColumns(1, 'justify');
                     }
                     $backgroundImage = '';
-                    if (isset($_GET['display']) && strstr($_GET['display'], 'pdf') !== false) {
+                    if (defined('TIKI_DISPLAY_CONTAINS_PDF') && TIKI_DISPLAY_CONTAINS_PDF) {
                         $bgColor = "background: linear-gradient(top, '','');";
                     }
                     if ($pdfPage['background'] != '') {
@@ -728,6 +756,29 @@ class PdfGenerator
         $tempFile = fopen("temp/public/pdffile_" . session_id() . ".txt", "w");
         fwrite($tempFile, ($pagesTotal * 30));
         return $mpdf->Output('', 'S');                  // Return as a string
+    }
+
+    public function addNamedAnchorsBeforeIdTags(string $html): string
+    {
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//*[@id]'); // all elements with an id
+
+        foreach ($nodes as $node) {
+            $id = $node->getAttribute('id');
+
+            // Create <a name="id"></a>
+            $a = $dom->createElement("a");
+            $a->setAttribute("name", $id);
+
+            // Insert it just before the node with the id
+            $node->parentNode->insertBefore($a, $node);
+        }
+
+        return $dom->saveHTML();
     }
 
     public function getHtmlLayout($pageContent)
@@ -779,7 +830,7 @@ class PdfGenerator
                                 '',
                                 array_map(
                                     function ($module) {
-                                        return (isset($module['data']) ? $module['data'] : '');
+                                        return ($module['data'] ?? '');
                                     },
                                     $modules[$module_key]
                                 )
@@ -1031,7 +1082,7 @@ class PdfGenerator
         foreach ($tags as $tag) {
             $imgSrc = $tag->getAttribute('src');
             //bypassing base64 encoded images
-            if (! strstr($imgSrc, ';base64')) {
+            if (! empty($imgSrc) && ! str_contains($imgSrc, ';base64')) {
                 //replacing image with new temp image, all these images will be unlinked after pdf creation
                 $newFile = $this->file_get_contents_by_fget($imgSrc);
                 //replacing old protected image path with temp image
@@ -1056,7 +1107,7 @@ class PdfGenerator
         global $base_url, $prefs;
         //check if image is internal with full path
         $internalImg = 0;
-        if (substr($url, 0, strlen($base_url)) == $base_url) {
+        if (str_starts_with($url, $base_url)) {
             $internalImg = 1;
         }
         //checking for external images
@@ -1072,7 +1123,7 @@ class PdfGenerator
             mkdir('temp/pdfimg');
             chmod('temp/pdfimg', 0755);
         }
-        $cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
+        $cookie = $_SERVER['HTTP_COOKIE'] ?? '';
         $opts = [];
         if (! empty($cookie)) {
             $opts['http'] = ['header' => 'Cookie: ' . $cookie . "\r\n"];
@@ -1167,6 +1218,8 @@ class PdfGenerator
 
     private function checkLargeTables(&$doc)
     {
+        $xpath = new DOMXPath($doc);
+
         //new code to split table large cells
         foreach ($doc->getElementsByTagName('table') as $table) {
             // iterate over each row in the table
@@ -1174,18 +1227,16 @@ class PdfGenerator
             $cloneArr = [];
             foreach ($trs as $tr) {
                 $cloned = 0;
-                foreach ($tr->getElementsByTagName('td') as $td) { // get the columns in this row
-                    if (strlen($td->textContent) > 2000) {
-                        $longValue = $td->nodeValue;
-                        $breaktill = strpos($td->nodeValue, '.', 1000);
+                $directTds = $xpath->query('./td', $tr);
+                foreach ($directTds as $td) { // get the columns in this row
+                    $clones = $this->checkLongTd($td);
+                    if (count($clones)) {
                         if ($cloned == 0) {
-                            $cloneNode = $tr->cloneNode(true);
                             $cloned = 1;
-                            $cloneArr[] = ["node" => $cloneNode,'row' => $tr,'breaktill' => $breaktill];
+                            foreach ($clones as $clone) {
+                                $cloneArr[] = $clone;
+                            }
                         }
-                        $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
-                        $td->setAttribute("style:", "white-space: nowrap");
-                        $td->setAttribute("width", "20%");
                     }
                 }
             }
@@ -1196,6 +1247,33 @@ class PdfGenerator
             }
         }
         $html = @$doc->saveHTML();
+    }
+
+    private function checkLongTd(&$td)
+    {
+        $cloneArr = [];
+        $xpath = new DOMXPath($td->ownerDocument);
+        $directTds = $xpath->query('./td', $td);
+        if (count($directTds)) {
+            array_walk(iterator_to_array($directTds), function ($childTd) use (&$cloneArr) {
+                $cloneArr = array_merge($cloneArr, $this->checkLongTd($childTd));
+            });
+        }
+
+        if ($td->nodeType === XML_TEXT_NODE) {
+            if (strlen($td->textContent) > 2000) {
+                $longValue = $td->nodeValue;
+                $breaktill = strpos($td->nodeValue, '.', 1000);
+                $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
+                $td->setAttribute("style:", "white-space: nowrap");
+                $td->setAttribute("width", "20%");
+                $parentTr = $td->parentNode;
+                $cloneNode = $parentTr->cloneNode(true);
+                $cloneArr[] = ['breaktill' => $breaktill, 'node' => $cloneNode, 'row' => $parentTr];
+            }
+        }
+
+        return $cloneArr;
     }
 
     private function insertNewNodes(&$cloneData, &$table, $start = 1000)
@@ -1289,13 +1367,13 @@ class PdfGenerator
 .col-xs-2 { width: 12.2%; float:left; }
 .col-xs-1 { width: 3.92%; float:left; }
 .table-striped { border: 0.75pt solid #ccc; }
-.table-striped td { 
+.table-striped td {
     padding: 6pt;
     line-height: 1.42857143;
     vertical-align: center;
-    border-top: 0.75pt solid #ccc; 
+    border-top: 0.75pt solid #ccc;
 }
-.table-striped th { 
+.table-striped th {
     padding: 7.5pt;
     line-height: 1.42857143;
     vertical-align: center;
@@ -1467,7 +1545,7 @@ TEXT;
     public function processHeaderFooter($value = '', $page = '', $border = 'bottom', $withPagination = true)
     {
         //evaluating type
-        if (strpos($value, '|') !== false) {
+        if (str_contains($value, '|')) {
             //checking if legacy header/footer is used. Important since not all users are good to add HTML formatted values
             $valueText = explode("|", $value);
             //formatting in table
@@ -1605,7 +1683,7 @@ TEXT;
     {
         return preg_replace_callback('/var\(--([a-zA-Z0-9-]+)(?:,\s*(.+?))?\)/', function ($matches) use ($variables) {
             $var_name = $matches[1];
-            $fallback = isset($matches[2]) ? $matches[2] : null;  // Optional fallback value
+            $fallback = $matches[2] ?? null;  // Optional fallback value
 
             // Check if the variable exists
             if (isset($variables[$var_name])) {
@@ -1669,7 +1747,8 @@ function cleanHtml($html, $config = null, $encoding = 'utf8')
     if (extension_loaded('tidy') == true) {
         $default = [
             'clean' => true,
-            'output-xhtml' => true,
+            'output-xhtml' => false,
+            'merge-divs' => false,
             'show-body-only' => false,
             'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
             'new-empty-tags' => 'embed keygen source track wbr',

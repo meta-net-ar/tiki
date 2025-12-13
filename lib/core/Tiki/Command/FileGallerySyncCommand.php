@@ -25,7 +25,7 @@ class FileGallerySyncCommand extends Command
                 'gallery',
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Gallery to synchronize'
+                tra('Gallery to synchronize')
             )
         ;
     }

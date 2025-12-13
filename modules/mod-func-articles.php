@@ -110,7 +110,7 @@ function module_articles($mod_reference, $module_params)
         if (isset($$p)) {
             continue;
         }
-        $$p = isset($module_params[$p]) ? $module_params[$p] : '';
+        $$p = $module_params[$p] ?? '';
     }
     if ($start == '') {
         $start = 0;
@@ -119,8 +119,8 @@ function module_articles($mod_reference, $module_params)
         $sort = 'publishDate_desc';
     }
 
-    $min_rating = isset($_REQUEST['min_rating']) ? $_REQUEST['min_rating'] : 0;
-    $max_rating = isset($_REQUEST['max_rating']) ? $_REQUEST['max_rating'] : 10;
+    $min_rating = $_REQUEST['min_rating'] ?? 0;
+    $max_rating = $_REQUEST['max_rating'] ?? 10;
     $smarty->assign('min_rating', $min_rating);
     $smarty->assign('max_rating', $max_rating);
 
@@ -128,9 +128,9 @@ function module_articles($mod_reference, $module_params)
 
     $smarty->assign_by_ref('urlParams', $urlParams);
     $smarty->assign('modArticles', $ranking["data"]);
-    $smarty->assign('more', isset($module_params['more']) ? $module_params['more'] : 'n');
-    $smarty->assign('absurl', isset($module_params["absurl"]) ? $module_params["absurl"] : 'n');
-    $smarty->assign('showcreated', isset($module_params['showcreated']) ? $module_params['showcreated'] : 'n');
-    $smarty->assign('showpubl', isset($module_params['showpubl']) ? $module_params['showpubl'] : 'n');
-    $smarty->assign('show_rating_selector', isset($module_params['show_rating_selector']) ? $module_params['show_rating_selector'] : 'n');
+    $smarty->assign('more', $module_params['more'] ?? 'n');
+    $smarty->assign('absurl', $module_params["absurl"] ?? 'n');
+    $smarty->assign('showcreated', $module_params['showcreated'] ?? 'n');
+    $smarty->assign('showpubl', $module_params['showpubl'] ?? 'n');
+    $smarty->assign('show_rating_selector', $module_params['show_rating_selector'] ?? 'n');
 }

@@ -20,7 +20,7 @@ class InitialsFilterLinks extends Base
         if (! isset($params['_initial'])) {
             $params['_initial'] = 'initial';
         }
-        $current_initial = isset($_REQUEST[$params['_initial']]) ? $_REQUEST[$params['_initial']] : '';
+        $current_initial = $_REQUEST[$params['_initial']] ?? '';
         if (! isset($params['_htmlelement'])) {
             $params['_htmlelement'] = 'tiki-center';
         }

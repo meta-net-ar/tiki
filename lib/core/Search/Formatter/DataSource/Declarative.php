@@ -24,7 +24,7 @@ class Search_Formatter_DataSource_Declarative implements Search_Formatter_DataSo
     {
         $type = $entry['object_type'];
         $object = $entry['object_id'];
-        $hash = isset($entry['hash']) ? $entry['hash'] : null;
+        $hash = $entry['hash'] ?? null;
         $missingFields = $this->handlePrefilter([$requestedField], $entry);
 
         $primaryFields = $this->obtainFromContentSource($type, $object, $hash, $missingFields);

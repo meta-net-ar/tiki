@@ -30,19 +30,19 @@ class IndexCleanupCommand extends Command
                 'index-to-remove',
                 'i',
                 InputOption::VALUE_REQUIRED,
-                'Specify a single index to remove'
+                tra('Specify a single index to remove')
             )
             ->addOption(
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Delete all indexes, ignoring prefix'
+                tra('Delete all indexes, ignoring prefix')
             )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'List indexes that would be removed, without actually deleting them'
+                tra('List indexes that would be removed, without actually deleting them')
             );
     }
 

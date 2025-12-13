@@ -16,6 +16,9 @@
 // will be serialized and sent to the browser.
 //
 // Otherwise, the procedural script remains
+
+use Tiki\Lib\Shipping\ShippingLib;
+
 $inputConfiguration = [[
     'staticKeyFilters' => [
         'action' => 'word',         //get
@@ -40,7 +43,7 @@ if (isset($_REQUEST['controller'])) {
     $controller = $_REQUEST['controller'];
     $extensionPackage = '';
 
-    if (strpos($_REQUEST['controller'], ".") !== false) {
+    if (str_contains($_REQUEST['controller'], ".")) {
         $parts = explode(".", $_REQUEST['controller']);
         if (count($parts) == 3) {
             $extensionPackage = $parts[0] . "." . $parts[1];
@@ -88,7 +91,8 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($grs);
     } elseif ($listonly == 'users') {
         $names_array = explode(',', str_replace(';', ',', $query));
-        $last_name = trim(end(array_filter($names_array)));
+        $filterNames = array_filter($names_array);
+        $last_name = trim(end($filterNames));
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
 
@@ -142,13 +146,9 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
                             $finalusers[$oldkey] = $done[$usr];
                         }
                     }
-                    if (stripos($longusr, $last_name) !== false) {
-                        $finalusers[] = $longusr;
-                    }
-                } else {
-                    if (stripos($longusr, $last_name) !== false) {
-                        $finalusers[] = $longusr;
-                    }
+                }
+                if (stripos($longusr, $last_name) !== false) {
+                    $finalusers[] = $longusr;
                 }
                 $done[$usr] = $longusr;
             }
@@ -162,7 +162,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($tags);
     } elseif ($listonly == 'icons') {
         $dir = 'img/icons';
-        $max = isset($_REQUEST['max']) ? $_REQUEST['max'] : 10;
+        $max = $_REQUEST['max'] ?? 10;
         $icons = [];
         $style_dir = $tikilib->get_theme_path($prefs['style'], $prefs['style_option']);
         if ($style_dir && is_dir($style_dir . $dir)) {
@@ -171,8 +171,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         read_icon_dir($dir, $icons, $max, $query);
         $access->output_serialized($icons);
     } elseif ($listonly == 'shipping' && $prefs['shipping_service'] == 'y') {
-        global $shippinglib;
-        require_once 'lib/shipping/shippinglib.php';
+        $shippinglib = new ShippingLib();
 
         $access->output_serialized($shippinglib->getRates($_REQUEST['from'], $_REQUEST['to'], $_REQUEST['packages']));
     } elseif ($listonly == 'trackername') {
@@ -187,14 +186,24 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     }
 } elseif ($access->is_serializable_request() && isset($_REQUEST['zotero_tags'])) { // Handle Zotero Requests
     $access->check_feature([ 'zotero_enabled' ]);
-    $zoterolib = TikiLib::lib('zotero');
 
-    $references = $zoterolib->get_references($_REQUEST['zotero_tags']);
+    try {
+        $zoterolib = TikiLib::lib('zotero');
+        $references = $zoterolib->get_references($_REQUEST['zotero_tags']);
 
-    if ($references === false) {
-        $access->output_serialized(['type' => 'unauthorized', 'results' => []]);
-    } else {
-        $access->output_serialized(['type' => 'success', 'results' => $references]);
+        if ($references === false) {
+            $oauthlib = TikiLib::lib('oauth');
+            if (! $oauthlib->is_authorized('zotero')) {
+                $access->output_serialized(['type' => 'unauthorized', 'results' => []]);
+            } else {
+                $access->output_serialized(['type' => 'no_results', 'results' => []]);
+            }
+        } else {
+            $access->output_serialized(['type' => 'success', 'results' => $references]);
+        }
+    } catch (Exception $e) {
+        error_log("Zotero error: " . $e->getMessage());
+        $access->output_serialized(['type' => 'error', 'message' => $e->getMessage(), 'results' => []]);
     }
 } elseif (isset($_REQUEST['geocode']) && $access->is_serializable_request()) {
     $access->output_serialized(TikiLib::lib('geo')->geocode($_REQUEST['geocode']));

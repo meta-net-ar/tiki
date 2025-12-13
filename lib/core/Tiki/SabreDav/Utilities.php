@@ -11,6 +11,7 @@ use Sabre\CardDAV;
 use Sabre\DAV;
 use Sabre\DAVACL;
 use Sabre\VObject;
+use Tiki\Lib\TikiDate;
 use TikiLib;
 use TikiMail;
 
@@ -269,7 +270,7 @@ class Utilities
             }
             if (isset($component->RRULE)) {
                 $rec = self::mapRRuleToRecurrence($component);
-                $rec->setStartPeriod(\TikiDate::getStartDay($firstOccurence, 'UTC'));
+                $rec->setStartPeriod(TikiDate::getStartDay($firstOccurence, 'UTC'));
             }
 
             // Ensure Occurence values are positive
@@ -369,6 +370,9 @@ class Utilities
         if (isset($component->{'X-Tiki-UpdateManuallyChangedEvents'})) {
             $result['updateManuallyChangedEvents'] = intval($convertToString($component->{'X-Tiki-UpdateManuallyChangedEvents'}));
         }
+        if (isset($component->{'X-Tiki-HideParticipants'})) {
+            $result['hideParticipants'] = intval($convertToString($component->{'X-Tiki-HideParticipants'}));
+        }
         if (isset($component->ORGANIZER)) {
             $result['organizers'] = [];
             $result['real_organizers'] = [];
@@ -378,7 +382,7 @@ class Utilities
                 if ($user) {
                     $result['organizers'][] = $user;
                 }
-                $cn = isset($organizer->CN) ? (string)$organizer->CN : '';
+                $cn = (string)($organizer->CN ?? '');
                 if (empty($cn)) {
                     $result['real_organizers'][] = $email;
                 } else {
@@ -412,7 +416,7 @@ class Utilities
             $result['attendees'] = [];
             foreach ($component->ATTENDEE as $attendee) {
                 $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                $cn = isset($attendee->CN) ? (string)$attendee->CN : '';
+                $cn = (string)($organizer->CN ?? '');
                 if (empty($cn)) {
                     $result['attendees'][] = $email;
                 } else {
@@ -664,6 +668,9 @@ class Utilities
         if (! empty($row['changed'])) {
             $data['X-Tiki-Changed'] = $row['changed'];
         }
+        if ($row['hideParticipants'] ?? false) {
+            $data['X-Tiki-HideParticipants'] = '1';
+        }
 
         $vcalendar = new VObject\Component\VCalendar();
         $vevent = $vcalendar->add('VEVENT', $data);
@@ -726,6 +733,7 @@ class Utilities
             $old_vcalendar = null;
         }
         $calitem = TikiLib::lib('calendar')->get_item($args['object']);
+
         if ($calitem) {
             // create or update operation
             $vcalendar = self::constructCalendarData($calitem);
@@ -733,12 +741,14 @@ class Utilities
             // delete operation
             $vcalendar = null;
         }
+
         $broker = new VObject\ITip\Broker();
         $messages = $broker->parseEvent(
             $vcalendar,
             'mailto:' . TikiLib::lib('user')->get_user_email($args['user']),
             $old_vcalendar
         );
+
         foreach ($messages as $message) {
             if (! $message->significantChange) {
                 continue;
@@ -765,7 +775,23 @@ class Utilities
                 default:
                     throw new Exception("Unsupported ITip method: " . $message->method);
             }
+
+            $organizers = [];
+            foreach ($message->message->VEVENT->ORGANIZER as $organizer) {
+                $email = preg_replace("/MAILTO:\s*/i", "", (string)$organizer);
+                $organizers[] = $email;
+            }
+
             $attendees = [];
+            $hideParticipants = false;
+            if ($calitem && $calitem['hideParticipants'] && ! in_array($recipient_email, $organizers)) {
+                $hideParticipants = true;
+                foreach ($message->message->VEVENT->select('ATTENDEE') as $attendee) {
+                    if ((string)$attendee !== $message->recipient) {
+                        $message->message->VEVENT->remove($attendee);
+                    }
+                }
+            }
             foreach ($message->message->VEVENT->ATTENDEE as $attendee) {
                 $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
                 $cn = (string)$attendee->CN;
@@ -780,7 +806,7 @@ class Utilities
 
 When: " . TikiLib::lib('tiki')->get_long_datetime($message->message->VEVENT->DTSTART->getDateTime()->getTimeStamp()) . " - " . TikiLib::lib('tiki')->get_long_datetime($message->message->VEVENT->DTEND->getDateTime()->getTimeStamp()) . "
 
-Invitees: " . implode(",\n", $attendees);
+Invitees: " . ($hideParticipants ? "Participants list has been hidden at organizer's request" : implode(",\n", $attendees));
             // TODO: IMip messages are using configured Tiki SMTP server for now, but we might want to use cypht SMTP server for the sender user in order to get the replies back in cypht and be able to update participant statuses.
             // The other way would be via Mail-in to calendars and a reply-to address configured as a mail-in source.
             $mail = new TikiMail($args['user'], $sender_email, $sender_name);

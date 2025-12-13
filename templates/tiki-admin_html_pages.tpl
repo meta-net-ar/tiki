@@ -23,16 +23,16 @@
     {ticket}
     <input type="hidden" name="pageName" value="{$pageName|escape}">
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Page name{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="pageName">{tr}Page name{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <input type="text" maxlength="255" size="40" name="pageName" value="{$info.pageName|escape}" class="form-control">
+            <input type="text" maxlength="255" size="40" name="pageName" id="pageName" value="{$info.pageName|escape}" class="form-control">
         </div>
     </div>
     {if $tiki_p_use_content_templates eq 'y'}
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Apply template{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="templateId">{tr}Apply template{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <select name="templateId"{if !$templates} disabled="disabled"{/if} onchange="javascript:document.getElementById('editpageform').submit();" class="form-control">
+            <select name="templateId" id="templateId" {if !$templates} disabled="disabled"{/if} onchange="javascript:document.getElementById('editpageform').submit();" class="form-control">
                 <option value="0">{tr}none{/tr}</option>
                 {section name=ix loop=$templates}
                     <option value="{$templates[ix].templateId|escape}">{tr}{$templates[ix].name}{/tr}</option>
@@ -42,25 +42,25 @@
     </div>
     {/if}
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Type{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="type">{tr}Type{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <select name="type" class="form-control">
+            <select name="type" class="form-control" id="type">
                 <option value='d'{if $info.type eq 'd'} selected="selected"{/if}>{tr}Dynamic{/tr}</option>
                 <option value='s'{if $info.type eq 's'} selected="selected"{/if}>{tr}Static{/tr}</option>
             </select>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Refresh rate (if dynamic){/tr}</label>
+        <label class="col-sm-3 col-form-label" for="refresh">{tr}Refresh rate (if dynamic){/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <input type="text" name="refresh" value="{$info.refresh|escape}" class="form-control">
+            <input type="text" name="refresh" value="{$info.refresh|escape}" class="form-control" id="refresh">
             <div class="form-text">
                 {tr}seconds{/tr}
             </div>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Content{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="htmlcode">{tr}Content{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
             <textarea name="content" id="htmlcode" rows="15" class="form-control">{$info.content|escape}</textarea>
         </div>

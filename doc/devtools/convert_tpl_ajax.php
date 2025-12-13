@@ -83,7 +83,7 @@ function replace_with_self_links($original, $template_base)
  */
 function process_value($var)
 {
-    if (strpos($var, '{$') === 0) {
+    if (str_starts_with($var, '{$')) {
         $var = trim($var, '{}');
         $q = '';
     } else {

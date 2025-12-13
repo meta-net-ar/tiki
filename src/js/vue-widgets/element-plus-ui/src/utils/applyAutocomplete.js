@@ -1,3 +1,5 @@
+import enterKeypressHandler from "../helpers/shared/enterKeypressHandler";
+
 export const TEXT = {
     ERROR_NO_ELEMENT: "The element must be provided to apply the autocompletion",
     ERROR_NO_SOURCE: "Either remoteSourceUrl or sourceList must be provided to apply the autocompletion",
@@ -29,6 +31,11 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
         elementPlusInput.remove();
     }
 
+    const uiRef = element.getAttribute("element-plus-ref");
+    if (uiRef && document.querySelector(`el-autocomplete#${uiRef}`)) {
+        return document.querySelector(`el-autocomplete#${uiRef}`);
+    }
+
     const elementUniqueId = Math.random().toString(36).substring(7);
     const elementPlusUi = document.createElement("el-autocomplete");
     elementPlusUi.setAttribute("id", elementUniqueId);
@@ -51,9 +58,16 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
         }
     });
 
-    if (selectCb) {
-        elementPlusUi.addEventListener("select", selectCb);
-    }
+    elementPlusUi.addEventListener("select", (event) => {
+        const key = valueKey || "value";
+        element.value = event.detail[0][key];
+        element.dispatchEvent(new Event("change"));
+        if (selectCb) {
+            selectCb(event);
+        }
+    });
+
+    elementPlusUi.addEventListener("pressEnter", () => enterKeypressHandler($(element), $(elementPlusUi)));
 
     element.setAttribute("element-plus-ref", elementUniqueId);
     element.style.display = "none";

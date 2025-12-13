@@ -110,6 +110,20 @@ describe("applyInput", () => {
         expect($("body").html()).toBe(input.prop("outerHTML"));
     });
 
+    test.each([["cypht-layout"], ["tiki-webmail"], ["el-input__wrapper"], "el-select__wrapper"])(
+        "should not transform inputs inside %s",
+        async (givenClass) => {
+            applyInput();
+            const input = $("<input>");
+            const layout = $(`<div class='${givenClass}'></div>`);
+            layout.append(input);
+            $("body").append(layout);
+
+            await window.happyDOM.waitUntilComplete();
+            expect($("body").html()).toBe(`<div class="${givenClass}"><input></div>`);
+        }
+    );
+
     test.each([["change", ["new value"]], ["input", ["new value"]], ["input", ["input value"]], ["blur"], ["focus"], ["keyup"], ["keydown"]])(
         "handles correctly the %s event",
         async (eventName, eventDetail) => {
@@ -145,14 +159,15 @@ describe("applyInput", () => {
     );
 
     test.each([
-        ["should submit the form for seach input type", true],
-        ["should not submit the form for non search input type", false],
-    ])("the enter event %s", async (_, isSearch) => {
+        ["submit", "type", "search", true],
+        ["submit", "role", "search", true],
+        ["submit", "type", "text", true],
+    ])("the enter event should %s when the %s is %s", async (_, attr, attrValue, shouldSubmit) => {
         applyInput();
 
         const input = $("<input>");
         input.attr("placeholder", "Input");
-        input.attr("type", isSearch ? "search" : "text");
+        input.attr(attr, attrValue);
         input.attr("value", "Value");
 
         const form = $("<form></form>");
@@ -171,10 +186,51 @@ describe("applyInput", () => {
 
         await window.happyDOM.waitUntilComplete();
 
-        if (isSearch) {
+        if (shouldSubmit) {
             expect(submitHandler).toHaveBeenCalled();
         } else {
             expect(submitHandler).not.toHaveBeenCalled();
         }
+    });
+
+    test.each([
+        ["text"],
+        ["search"],
+        ["tel"],
+        ["url"],
+        ["email"],
+        ["password"],
+        ["date"],
+        ["month"],
+        ["week"],
+        ["time"],
+        ["datetime-local"],
+        ["number"],
+    ])("should not implicitly submit the form when the when a %s type input is found in the form", async (givenType) => {
+        applyInput();
+
+        const input = $("<input>");
+        input.attr("placeholder", "Input");
+        input.attr("type", "text");
+        input.attr("value", "Value");
+
+        const form = $("<form></form>");
+        form.append(input);
+        form.append(`<input type="${givenType}"/>`);
+        $("body").append(form);
+
+        const submitHandler = vi.fn();
+        form.on("submit", submitHandler);
+
+        await window.happyDOM.waitUntilComplete();
+
+        const elInput = $(`el-input#${input.attr("element-plus-ref")}`);
+
+        const event = $.Event("enter");
+        elInput.trigger(event);
+
+        await window.happyDOM.waitUntilComplete();
+
+        expect(submitHandler).not.toHaveBeenCalled();
     });
 });

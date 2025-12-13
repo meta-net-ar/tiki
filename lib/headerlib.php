@@ -192,7 +192,7 @@ class HeaderLib
 
         // using this method, also reverse proxy / ssl offloading will continue to work
         $httpScheme = TikiLib::httpScheme();
-        $https_mode = ($httpScheme == 'https') ? true : false;
+        $https_mode = $httpScheme == 'https';
 
         $cdn_ssl_uri = array_filter(preg_split('/\s+/', $prefs['tiki_cdn_ssl']));
         $cdn_uri = array_filter(preg_split('/\s+/', $prefs['tiki_cdn']));
@@ -664,7 +664,7 @@ class HeaderLib
         // all other ranks could be minified - minification only happens if activated and if the file was not blocked by $skip_minify
 
         // check whether we need to minify. minify also includes to put the minified files into one single file
-        $minifyActive = isset($prefs['tiki_minify_javascript']) && $prefs['tiki_minify_javascript'] == 'y' ? true : false;
+        $minifyActive = isset($prefs['tiki_minify_javascript']) && $prefs['tiki_minify_javascript'] == 'y';
 
         if (! $minifyActive) {
             $ranks = ['30dependency', '40external', '50standard', '60late'];
@@ -687,7 +687,7 @@ class HeaderLib
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
             $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
 
-            $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y' ? true : false;
+            $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y';
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
@@ -747,7 +747,7 @@ class HeaderLib
             $cacheType = 'cdn_minify_check';
             if ($prefs['tiki_cdn_check'] === 'y' && ! $cachelib->isCached($cdnFile, $cacheType)) {
                 $cdnHeaders = get_headers($cdnFile);
-                if (strpos(current($cdnHeaders), '200') !== false) {    // check the file is really there
+                if (str_contains(current($cdnHeaders), '200')) {    // check the file is really there
                     $cachelib->cacheItem($cdnFile, $cdnHeaders, $cacheType);
                 }
             } else {
@@ -1140,7 +1140,7 @@ class HeaderLib
         $publicDirectory = 'temp/public/' . $tikidomainslash;
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
-            I tested on Windows 8 with an HDD and a filesystem-based CacheLib. CacheLibFileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using CacheLibMemcache. Chealer 2018-08-31 */
+            I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
             $fileContentsHash = md5_file($originalFile);
             $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
             if (! file_exists($minimalFilePath)) {
@@ -1298,44 +1298,6 @@ window.onload = loadScript;');
         );
 
         return $this;
-    }
-
-    /**
-     * Get robots tag based on robots.txt file
-     *
-     * @return string|null
-     */
-    public function getRobots()
-    {
-        $robotsContent = file_get_contents('robots.txt');
-        $scriptUri = preg_quote(basename($_SERVER['SCRIPT_NAME']));
-        $requestUri = preg_quote(basename($_SERVER['REQUEST_URI']));
-
-        if (preg_match('/^Disallow: \/(' . $scriptUri . '|' . $requestUri . ')/m', $robotsContent)) {
-            return 'NOINDEX, NOFOLLOW';
-        }
-
-        return null;
-    }
-
-    /**
-     * Sets the X-Robots-Tag HTTP header.
-     *
-     * This method sets the X-Robots-Tag header with the provided value, typically used to control
-     * how search engines index and follow the page. If no value is provided, no header is set.
-     *
-     * @param string|null $robots The value for the X-Robots-Tag header (e.g., "noindex, nofollow").
-     * If null or empty, no header will be set.
-     * @return string|null The value of the X-Robots-Tag header that was set, or null if no header was set.
-     */
-    public function setXRobotsTag(?string $robots = null): ?string
-    {
-        if (! empty($robots)) {
-            header('X-Robots-Tag: noindex');
-            return $robots;
-        }
-
-        return null;
     }
 
     public function __toString()

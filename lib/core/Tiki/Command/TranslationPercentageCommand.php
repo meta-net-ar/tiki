@@ -31,12 +31,12 @@ class TranslationPercentageCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp('Calculate translation percentage for each language.php file by scanning all Tiki files and output the result as wiki syntax.')
+            ->setHelp(tra('Calculate translation percentage for each language.php file by scanning all Tiki files and output the result as wiki syntax.'))
             ->addOption(
                 'page',
                 'p',
                 InputOption::VALUE_REQUIRED,
-                'Wiki Page name to output percentage results eg. --page=i18nStats'
+                tra('Wiki Page name to output percentage results eg. --page=i18nStats')
             );
     }
 

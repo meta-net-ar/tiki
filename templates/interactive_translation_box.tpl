@@ -44,6 +44,7 @@
                     <div class="text-center" id="intertrans-empty" style="display: none">
                         {remarksbox type="note" title="{tr}Information{/tr}" close="n"}
                             {tr}Couldn't find any translatable string.{/tr}
+                            <span id="intertrans-string-to-translate"></span>
                         {/remarksbox}
                     </div>
                 </div>

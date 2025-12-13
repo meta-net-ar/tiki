@@ -4,8 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Diff\DiffUtils;
+
 require_once('../tiki-setup.php');
-require_once('lib/diff/difflib.php');
 
 if ($prefs['feature_tikitests'] != 'y') {
     Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_403);
@@ -140,7 +141,6 @@ function verif_url($url, $use_tidy = true)
 
         $cookies = array_merge($cookies, $cookies_titi);
         $buffer = $body;
-        curl_close($curl);
     }
 
     if (extension_loaded('tidy')) {
@@ -201,7 +201,7 @@ function verif_url($url, $use_tidy = true)
         $buffer = $new_buffer->saveHTML();
     }
 
-    $tmp = diff2($data, $buffer, "htmldiff");
+    $tmp = DiffUtils::diff2($data, $buffer, "htmldiff");
     if (trim($xpath) != '') {
         $result['html'] = preg_replace(
             ["/<html>/", "/<\/html>/"],

@@ -16,11 +16,15 @@ class Search_MySql_HighlightHelper implements Laminas\Filter\FilterInterface
             return strlen($word) > 2;
         });
 
-        $counter = -1;
+        $this->words = array_map(function ($word) {
+            return trim($word, '*');
+        }, $this->words);
 
+        $counter = -1;
         $this->replacements = array_map(
             function ($word) use (&$counter) {
-                $counter++;
+                ++$counter;
+
                 return "<b class=\"highlight_word highlight_word_$counter\">$word</b>";
             },
             $this->words
@@ -32,6 +36,7 @@ class Search_MySql_HighlightHelper implements Laminas\Filter\FilterInterface
     {
         $content = $this->snippetHelper->filter($content);
         $content = str_ireplace($this->words, $this->replacements, $content);
+
         return trim(strip_tags($content, '<b><i><em><strong><pre><code><span>'));
     }
 }

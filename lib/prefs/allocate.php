@@ -11,7 +11,7 @@ function prefs_allocate_list()
         if (strlen($value) > 0) {
             $units = 'BKMGTP';
             $last_char = substr($value, -1);
-            if (strpos($units, $last_char) === false && $value > 0) {
+            if (! str_contains($units, $last_char) && $value > 0) {
                 $index = 0;
                 $prefix = $value;
                 while ($prefix > 1023) {

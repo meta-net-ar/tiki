@@ -1,0 +1,2 @@
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Tiki Share','tiki-ajax_services.php?controller=share&action=index', 47, 'feature_share', '', 'Registered', 0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'List Shared URLs','tiki-ajax_services.php?controller=share&action=index', 49, 'feature_share', '', 'Registered', 0);

@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use TikiLib;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------

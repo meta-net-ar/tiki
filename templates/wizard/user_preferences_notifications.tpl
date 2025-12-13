@@ -9,10 +9,10 @@
     {/remarksbox}
 {/if}
 
-<div class="adminWizardContent">
-    <fieldset>
+<div class="adminWizardContent align-top">
+    <fieldset class="my-3 mx-0">
         {if $prefs.feature_user_watches eq 'y'}
-            <legend>{tr}Notification Preferences{/tr}</legend>
+            <legend class="mb-3 fw-bold">{tr}Notification Preferences{/tr}</legend>
             <div class="userWizardIconright">{icon name='envelope-open' alt="{tr}Notification Preferences{/tr}"}</div>
             <table class="formcolor" style="width:80%">
                 {tr}Send notification when I am the editor:{/tr}

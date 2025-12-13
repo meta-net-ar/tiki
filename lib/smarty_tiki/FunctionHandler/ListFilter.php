@@ -40,8 +40,8 @@ class ListFilter extends Base
         $headerlib = \TikiLib::lib('header');
 
             extract($params);
-            $childPrefix = isset($childPrefix) ? $childPrefix : 'child-of-';
-            $exclude = isset($exclude) ? $exclude : '';
+            $childPrefix = $childPrefix ?? 'child-of-';
+            $exclude = $exclude ?? '';
 
             $input = ' <div class="form-horizontal my-2"><div class="tiki-form-group form-row"><div class="col"><div class="input-group"><div class="input-group-text" id="filter_label">';
 

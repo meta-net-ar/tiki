@@ -95,10 +95,10 @@
                                 {capture name=i_f}f_{$filter.fieldId}{/capture}
                                 {initials_filter_links _initial=$smarty.capture.i_f}
                             {/if}
-                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected}" class="form-control">
+                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected|escape}" class="form-control">
     {*------sqlsearch *}
                         {elseif $filter.format eq 'sqlsearch'}
-                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected}" class="form-control">
+                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected|escape}" class="form-control">
                             <a href="{bootstrap_modal controller=tracker action=search_help}">{icon name='help'}</a>
     {*------rating *}
                         {elseif $filter.format eq '*'}
@@ -111,7 +111,7 @@
     {*------relation *}
                         {elseif $filter.format eq 'REL'}
                             <textarea name="f_{$filter.fieldId}" class="d-none">
-                                {$filter.opts.field_selection}
+                                {$filter.opts.field_selection|escape}
                             </textarea>
                             {object_selector_multi _id="object_filter_{$filter.fieldId}" _name="object_filter_{$filter.fieldId}" _filter=$filter.opts.field_filter _value=$filter.opts.field_selection _format=$filter.opts.field_format }
                             <div class="text-center mt-3 mb-3">{tr}Or{/tr}</div>

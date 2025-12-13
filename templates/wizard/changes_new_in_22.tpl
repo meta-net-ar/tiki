@@ -20,7 +20,7 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Features{/tr}</legend>
             {preference name='feature_system_suggestions'}
-            {preference name='zend_mail_redirect'}
+            {preference name='mailer_redirect'}
             <div class="adminoption mb-3 row">
                 <label class="col-sm-3 col-form-label"><b>{tr}Security{/tr}</b>:</label>
                 <div class="offset-sm-1 col-sm-11">

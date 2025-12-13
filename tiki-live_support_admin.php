@@ -16,6 +16,7 @@ $inputConfiguration = [
         'offline'              => 'bool',               //post
         'removeuser'           => 'username',           //post
         'find_users'           => 'string',             //post
+        'show_html'            => 'alpha',              //get
         ],
     ],
 ];
@@ -36,8 +37,12 @@ if (isset($_REQUEST['show_html'])) {
 }
 if ($tiki_p_live_support_admin == 'y') {
     if (isset($_REQUEST['adduser'])) {
-        $access->checkCsrf();
-        $lsadminlib->add_operator($_REQUEST['user']);
+        if (isset($_REQUEST['user'])) {
+            $access->checkCsrf();
+            $lsadminlib->add_operator($_REQUEST['user']);
+        } else {
+            Feedback::error(tr('No Tiki User Selected'));
+        }
     }
     if (isset($_REQUEST['offline'])) {
         $access->checkCsrf();

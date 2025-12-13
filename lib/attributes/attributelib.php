@@ -77,13 +77,18 @@ class AttributeLib extends TikiDb_Bridge
      * @param $type string          One of \ObjectLib::get_supported_types()
      * @param $objectId mixed       Object id (or name for wiki pages)
      * @param $attribute string     At least two dots and only lowercase letters
+     * @param $fieldId int          Field id (optional)
      * @return string|boolean       Contents of the attribute on the object or false if not present
      */
-    public function get_attribute($type, $objectId, $attribute)
+    public function get_attribute($type, $objectId, $attribute, $fieldId = null)
     {
+        $search = ['type' => $type, 'itemId' => $objectId, 'attribute' => $attribute];
+        if ($fieldId) {
+            $search['fieldId'] = $fieldId;
+        }
         return $this->attributes->fetchOne(
             'value',
-            ['type' => $type, 'itemId' => $objectId, 'attribute' => $attribute]
+            $search
         );
     }
 
@@ -97,19 +102,20 @@ class AttributeLib extends TikiDb_Bridge
      * attribute naming, and document new tiki.*.* names that you add
      * (also grep "set_attribute" just in case there are undocumented names already used)
      */
-    public function set_attribute($type, $objectId, $attribute, $value, $comment = null)
+    public function set_attribute($type, $objectId, $attribute, $value, $comment = null, $fieldId = null)
     {
         if (false === $name = $this->get_valid($attribute)) {
             return false;
         }
 
+        $search = ['type' => $type, 'itemId' => $objectId, 'attribute' => $name];
+        if ($fieldId) {
+            $search['fieldId'] = $fieldId;
+        }
+
         if ($value === '') {
             $this->attributes->delete(
-                [
-                    'type' => $type,
-                    'itemId' => $objectId,
-                    'attribute' => $name,
-                ]
+                $search
             );
         } else {
             $this->attributes->insertOrUpdate(
@@ -117,11 +123,7 @@ class AttributeLib extends TikiDb_Bridge
                     'value' => $value,
                     'comment' => $comment,
                 ],
-                [
-                    'type' => $type,
-                    'itemId' => $objectId,
-                    'attribute' => $name,
-                ]
+                $search
             );
         }
 
@@ -150,13 +152,16 @@ class AttributeLib extends TikiDb_Bridge
          * @param $value
          * @return mixed
          */
-    public function find_objects_with($attribute, $value)
+    public function find_objects_with($attribute, $value, $fieldId = null)
     {
         $attribute = $this->get_valid($attribute);
-
+        $search = ['attribute' => $attribute, 'value' => $value];
+        if ($fieldId) {
+            $search['fieldId'] = $fieldId;
+        }
         return $this->attributes->fetchAll(
-            ['type', 'itemId', 'comment'],
-            ['attribute' => $attribute, 'value' => $value,]
+            ['type', 'itemId', 'comment', 'fieldId'],
+            $search
         );
     }
 
@@ -165,11 +170,16 @@ class AttributeLib extends TikiDb_Bridge
      * @param $value
      * @return mixed
      */
-    public function delete_objects_with($attribute, $value)
+    public function delete_objects_with($attribute, $value, $fieldId = null)
     {
         $attribute = $this->get_valid($attribute);
+
+        $search = ['attribute' => $attribute, 'value' => $value];
+        if ($fieldId) {
+            $search['fieldId'] = $fieldId;
+        }
         return $this->attributes->delete(
-            ['attribute' => $attribute, 'value' => $value]
+            $search
         );
     }
 }

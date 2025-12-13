@@ -11,7 +11,7 @@ use Tiki\Errors;
 require_once 'lib/tikilib.php';
 
 global $prefs, $tiki_p_admin;
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }

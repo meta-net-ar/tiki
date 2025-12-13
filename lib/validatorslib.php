@@ -85,7 +85,7 @@ class Validators
                 } else {
                     $validationjs .= '"' . $field_name . '"' . ': { ';
                 }
-                if ($isMandatory) {
+                if ($isMandatory && $handler->isClientSideMandatory()) {
                     if ($field_value['type'] == 'D') {
                         $validationjs .= 'required_in_group: [1, ".group_' . $field_name . '", "other"], ';
                     } elseif ($field_value['type'] == 'A') {

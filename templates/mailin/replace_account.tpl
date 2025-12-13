@@ -9,7 +9,6 @@
         {ticket mode=confirm}
         <input type="hidden" name="accountId" value="{$accountId|escape}">
         <input type="hidden" name="preferences" value="{$info.preferences|escape}">
-        <input type="hidden" id="checkPackage" value="{$checkPackage|escape}">
         <input type="hidden" name="trackerAcc" id="trackerAcc" value="{$info.trackerId|escape}">
         <div class="mb-3 row">
             <div class="offset-md-3 col-md-9">
@@ -119,17 +118,9 @@
                 <div class="col-md-9">
                     <select name="trackerId" id="trackerId" class="form-select">
                         <option value="">{tr}None{/tr}</option>
-                        {if $checkPackage eq 'y'}
-                            {foreach $trackers as $key => $tracker}
-                                <option value="{$key}" {if $key eq $info.trackerId}selected="selected"{/if}>{$tracker}</option>
-                            {/foreach}
-                        {else}
-                            {foreach $trackers as $key => $tracker}
-                                {if $key eq $info.trackerId}
-                                    <option value="{$key}" selected="selected">{$tracker}</option>
-                                {/if}
-                            {/foreach}
-                        {/if}
+                        {foreach $trackers as $key => $tracker}
+                            <option value="{$key}" {if $key eq $info.trackerId}selected="selected"{/if}>{$tracker}</option>
+                        {/foreach}
                     </select>
                     <div class="form-text">
                         <a href="tiki-list_trackers.php" target="_blank" class="link">{tr}View trackers{/tr}</a>
@@ -333,7 +324,6 @@
         $("#zone_fields").hide();
         var trackerId = document.getElementById("trackerId");
         var trackerAcc = document.getElementById("trackerAcc").value;
-        var checkPackage = document.getElementById("checkPackage").value;
         if (trackerId.value != trackerAcc) {
             $('input[name=preferences]').val('');
         }
@@ -341,7 +331,7 @@
             links = $('input[name=preferences]').val();
         }
         trackerId.addEventListener("change", function() {
-            if (trackerId.value != '' && checkPackage == 'y') {
+            if (trackerId.value != '') {
                 if (trackerId.value == trackerAcc) {
                     $('input[name=preferences]').val(links);
                 }
@@ -356,7 +346,7 @@
             }
         });
 
-        if (trackerId.value != '' && checkPackage == 'y') {
+        if (trackerId.value != '') {
             getFields(trackerId.value);
         }
 

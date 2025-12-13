@@ -5,15 +5,15 @@
     {ticket}
     <input type="hidden" name="extwikiId" value="{$extwikiId|escape}">
     <div class="mb-3 row">
-        <label for="name" class="col-sm-3 col-form-label">{tr}Name{/tr}</label>
+        <label for="name" class="col-sm-3 col-form-label">{tr}Name{/tr}<span class="text-danger"> *</span></label>
         <div class="col-sm-9">
-            <input type="text" maxlength="255" class="form-control" name="name" value="{$info.name|escape}">
+            <input type="text" maxlength="255" class="form-control" name="name" id="name" value="{$info.name|escape}" required>
         </div>
     </div>
     <div class="mb-3 row">
-        <label for="extwiki" class="col-sm-3 col-form-label">{tr}URL{/tr}</label>
+        <label for="extwiki" class="col-sm-3 col-form-label">{tr}URL{/tr}<span class="text-danger"> *</span></label>
         <div class="col-sm-9">
-            <input type="text" maxlength="255" class="form-control" name="extwiki" id="extwiki" value="{$info.extwiki|escape}">
+            <input type="text" maxlength="255" class="form-control" name="extwiki" id="extwiki" value="{$info.extwiki|escape}" required>
             <p class="form-text">{tr}URL (use $page to be replaced by the page name in the URL example: http://www.example.com/tiki-index.php?page=$page):{/tr}</p>
         </div>
     </div>

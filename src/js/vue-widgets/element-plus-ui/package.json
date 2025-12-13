@@ -8,7 +8,7 @@
     "author": "Tiki Wiki CMS",
     "license": "LGPL-2.0-only",
     "devDependencies": {
-        "element-plus": "^2.8.5",
+        "element-plus": "^2.11.3",
         "sortablejs": "1.14.0"
     },
     "devDependenciesComment": {

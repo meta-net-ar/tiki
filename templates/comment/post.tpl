@@ -20,7 +20,7 @@
                 {if ! $user or $prefs.feature_comments_post_as_anonymous eq 'y'}
                     <div class="card-header">
                         {if $user}
-                            {remarksbox type=warning title="Anonymous posting"}
+                            {remarksbox type=warning title="{tr}Anonymous posting{/tr}"}
                                 {tr}You are currently registered on this site. This section is optional. By filling it, you will not link this post to your account and preserve your anonymity.{/tr}
                             {/remarksbox}
                         {/if}
@@ -48,11 +48,11 @@
                     {if $prefs.comments_notitle neq 'y'}
                         <div class="mb-3">
                             <label for="comment-title" class="clearfix comment-title">{tr}Title{/tr}</label>
-                            <input type="text" id="comment-title" name="title" value="{$title|escape}" class="form-control" placeholder="Comment title"/>
+                            <input type="text" id="comment-title" name="title" value="{$title|escape}" class="form-control check_character_limit" placeholder="Comment title" maxlength="{$max_comment_title_length}"/>
                         </div>
                     {/if}
                     {capture name=rows}{if $type eq 'forum'}{$prefs.default_rows_textarea_forum}{else}{$prefs.default_rows_textarea_comment}{/if}{/capture}
-                    {textarea codemirror='true' name="data" comments="y" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows class="form-control wikiedit" placeholder="{tr}Post new comment{/tr}..." _preview=$prefs.ajax_edit_previews}{$data|escape}{/textarea}
+                    {textarea codemirror='true' name="data" comments="y" maxlength="{$max_comment_data_length}" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows class="form-control wikiedit check_character_limit" placeholder="{tr}Post new comment{/tr}..." _preview=$prefs.ajax_edit_previews}{$data|escape}{/textarea}
                     {if  $user and $prefs.feature_user_watches eq 'y'}
                         <div class="form-check">
                             <input id="watch_thread" type="checkbox" class="form-check-input" name="watch" value="y"{if $smarty.request.watch eq 'y'} checked="checked"{/if}>

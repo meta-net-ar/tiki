@@ -13,7 +13,7 @@
             {preference name=bigbluebutton_feature}
             <div class="adminoptionboxchild" id="bigbluebutton_feature_childcontainer">
                 {preference name=bigbluebutton_server_location}
-                {preference name=bigbluebutton_server_salt}
+                {preference name=bigbluebutton_shared_secret}
                 {preference name=bigbluebutton_recording_max_duration}
                 {preference name=bigbluebutton_dynamic_configuration}
                 {preference name=wikiplugin_bigbluebutton}

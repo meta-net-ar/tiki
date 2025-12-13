@@ -10,6 +10,7 @@ use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
+use Tiki\Lib\Auth\ApiTokenException;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {

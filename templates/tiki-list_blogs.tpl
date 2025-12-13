@@ -123,7 +123,7 @@
                                     {/if}
                                 {/if}
                             {/if}
-                            {if $tiki_p_blog_admin eq 'y' and $listpages[changes].allow_comments eq 'y'}
+                            {if $tiki_p_blog_admin eq 'y' and $listpages[changes].allow_comments eq 'y' and $listpages[changes].posts ne 0}
                                 <action>
                                     <a href='tiki-list_comments.php?types_section=blogs&amp;blogId={$listpages[changes].blogId}'>
                                         {icon name="comments" _menu_text='y' _menu_icon='y' alt="{tr}Comments{/tr}"}

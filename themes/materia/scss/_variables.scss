@@ -1,13 +1,14 @@
-// Materia 5.3,3 -- This overrids and adds to node_modules/bootswatch/dist/materia/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Materia 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/materia/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/materia/_variables.scss"; // Bootswatch theme variables file
+
 //
 // Color system
-//
-
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:   #0B78D0; // $blue;  // default
 $secondary: #567476;
@@ -17,8 +18,8 @@ $warning: #ff9800;
 $danger: #e51c23;
 
 // Options
-// Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 // Typography
@@ -29,11 +30,9 @@ $font-family-sans-serif:    Optima, Candara, 'Noto Sans', source-sans-pro, sans-
 $font-size-base:            1.05rem; // 1rem;  // default
 
 $headings-font-weight:      600; //  500;  // default
-
+// Tables
 // Buttons
-
 // Forms
-
 $input-bg:                       var(--#{$prefix}body-bg);  // default // transparent;  // default
 $input-color:                    var(--#{$prefix}body-color);  // default // $gray-600;  // default
 $input-placeholder-color:        var(--#{$prefix}secondary-color);  // default // rgba(0, 0, 0, .4);  // default
@@ -41,15 +40,22 @@ $input-placeholder-color:        var(--#{$prefix}secondary-color);  // default /
 // Form validation
 $form-valid-color: #3A833C;
 // Navs
-
 $nav-link-disabled-color:       var(--#{$prefix}secondary-color);  // default // $gray-500;  // default
 
 // Navbar
+// Dropdowns
+// Pagination
 // Cards
+// Accordion
+// Popovers
 // Tooltips
+// Badges
 // Modals
+// Alerts
 // Progress bars
-// Close
+// Listgroup
+// Figures
+// Breadcrumbs
 // Code
 $code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
 
@@ -58,7 +64,3 @@ $code-color:                      $body-color; //   $pink;  // default // Bootst
 // Bootswatch overrides
 
 $web-font-path: none; // Override value in vendor file
-
-.btn-info.skipnav {
-    position: absolute !important; // Override vendor file's btn-info { position: relative; }
-}

@@ -1,6 +1,6 @@
 stages:
   - build
-  - lint
+  - code-quality
   - tiki-check
   - unit-tests
   - package-tiki
@@ -9,6 +9,7 @@ stages:
   - composer-stability
 
 variables:
+  TZ: "UTC"
   MYSQL_ROOT_PASSWORD: secret
   MYSQL_DATABASE: tikitest
   MYSQL_USER: tikiuser
@@ -112,12 +113,14 @@ node_build:
 #
 
 .cache-vendor_bundled: &cache-vendor_bundled
+    #I'm actually not sure this speeds up anything - benoitg - 2025-12-11
     key:
       prefix: "vendor_bundled"
       files:
           - vendor_bundled/composer.lock
     paths:
-      - vendor_bundled/vendor
+      - vendor_bundled/vendor/
+      - bin/
     policy: pull
 
 .cache-composercache: &cache-composercache
@@ -128,6 +131,13 @@ node_build:
     paths:
       - .composercache/
     policy: pull-push
+
+composer-ext-check:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php doc/devtools/check_composer_extensions.php
 
 composer:
   stage: build
@@ -143,6 +153,7 @@ composer:
   artifacts:
     paths:
       - vendor_bundled/vendor/
+      - bin/
     expire_in: 2 days
 
 composer-dbdiff:
@@ -172,11 +183,11 @@ composer-dbdiff:
 
 
 #
-# Lint
+# Code quality:  linting, coding standards, etc.
 #
 
 phpcs:
-  stage: lint
+  stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
@@ -193,7 +204,7 @@ phpcs:
       policy: pull-push
 
 phplint:
-  stage: lint
+  stage: code-quality
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
@@ -205,21 +216,18 @@ phplint:
       - phplint.cache
   parallel:
     matrix:
-      - PHP_VERSION: "8.1"
-      - PHP_VERSION: "8.2"
-      - PHP_VERSION: "8.3"
+      - PHP_VERSION: ['8.1', '8.2', '8.3', '8.4', '8.5']
 
 smarty-lint:
-  stage: lint
+  stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    # - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
-    - echo "SmartyLint temporarily disabled"
+    - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
 
 eslint:
-  stage: lint
+  stage: code-quality
   needs: 
     - node_modules
   image:
@@ -229,7 +237,7 @@ eslint:
     - npx eslint .
       
 shlint:
-  stage: lint
+  stage: code-quality
   needs: []
   image: koalaman/shellcheck-alpine:latest
   script:
@@ -237,22 +245,53 @@ shlint:
     - shellcheck ./doc/devtools/*.sh
 
 check-bom-encoding:
-  stage: lint
+  stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php doc/devtools/check_bom_encoding.php
 
 unix-ending-line:
-  stage: lint
+  stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php doc/devtools/check_unix_ending_line.php
 
+translation-standards:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php doc/devtools/check_template_translation_standards.php --all
+
+rector:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    # If rector would have changed any files, it will return a non-zero code
+    - php bin/rector process --dry-run
+  cache:
+    - key:
+        prefix: "rector"
+        files:
+          - rector.php
+      paths:
+        - temp/dev/rector_cache
+      policy: pull-push
 #
 # Check Tikiwiki development specific check (related also with release)
 #
+
+check-platform-binaries:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - sh doc/devtools/check_platform_binaries.sh
 
 sql-engine:
   stage: tiki-check
@@ -284,23 +323,15 @@ translation:
     - git log --first-parent --pretty="format:%h" -1 --skip=1 | xargs -I gitHash php -d display_errors=On console.php translation:englishupdate --audit
   allow_failure: true
 
-translation-standards:
-  stage: tiki-check
-  needs:
-    - composer
-  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    - php doc/devtools/check_template_translation_standards.php --all
-
-satis-validates:
-  stage: tiki-check
-  needs: []
-  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    - php doc/devtools/check_satis_validation.php
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+#satis-validates:
+#  stage: tiki-check
+#  needs: []
+#  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+#  script:
+#    - php doc/devtools/check_satis_validation.php
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "master"'
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
 
 #This is a non-network check
 composer-validates:
@@ -526,6 +557,10 @@ unit-tests:
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.3"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.4"
+        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.5"
+        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
 
 unit-tests-node:
   stage: unit-tests
@@ -618,7 +653,6 @@ check-directories:
     # It wasn't automated before, and I don't know how we were supposed to get some of these packages locally.  php console.php package:list can generate the list, but I can find no command to install them all - benoitg - 2023-05-04
     - composer require jerome-breton/casperjs-installer:dev-master --no-progress
     - composer require enygma/expose:^3.0 --no-progress
-    - composer require fullcalendar/fullcalendar-scheduler ^1.9 --no-progress
     - composer require fakerphp/faker dev-master --no-progress
     - composer require google/apiclient ^2.2.2 --no-progress
     - composer require mpdf/mpdf ^8.0.0 --no-progress
@@ -626,7 +660,7 @@ check-directories:
     - composer require tikiwiki/diagram ^10 --no-progress
     - composer require thiagoalessio/tesseract_ocr ^2.7.0 --no-progress
     - composer require mathjax/mathjax ^2.7 --no-progress
-    - composer require media-alchemyst/media-alchemyst ^0.5.1 --no-progress
+    - composer require tikiwiki/media-alchemyst ^4.2 --no-progress
     - composer require npm-asset/pdfjs-dist ~2.0.487 --no-progress
     - composer require bower-asset/wodo.texteditor ^0.5.9 --no-progress
     - composer require j0k3r/php-readability ^1.1.10 --no-progress
@@ -704,3 +738,34 @@ composer-stability:
   artifacts:
     when: always  # Always upload artifacts even if job fails
   allow_failure: true  # Allow job to fail without failing the pipeline
+
+composer-operator-check:
+  stage: composer-stability
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  needs:
+    - composer
+  script:
+  - apt-get update && apt-get install -y jq
+  - chmod +x doc/devtools/check_caret_operator.sh
+  - ./doc/devtools/check_caret_operator.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+  allow_failure: false
+
+check-alphabetical-list:
+  stage: unit-tests
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  needs:
+    - composer
+  script:
+    - chmod +x doc/devtools/check_alphabetical_list.php
+    - php doc/devtools/check_alphabetical_list.php
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+  allow_failure: false

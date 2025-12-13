@@ -18,7 +18,7 @@
             {if ( $prefs.use_context_menu_icon eq 'y' or $prefs.use_context_menu_text eq 'y' )
                 and (!isset($gal_info.show_action) or $gal_info.show_action eq 'y')}
                 {if isset($nbCols)}
-                    {$nbCols++}
+                    {$nbCols=$nbCols+1}
                 {else}
                     {$nbCols = 1}
                 {/if}
@@ -145,6 +145,18 @@
                     {tr}Actions{/tr}
                 </th>
             {/if}
+            
+            {if ( $prefs.feature_categories eq 'y')}
+                {if isset($nbCols)}
+                    {$nbCols=$nbCols+1}
+                {else}
+                    {$nbCols=1}
+                {/if}
+                <th>
+                    {tr}Categories{/tr}
+                </th>
+            {/if}
+
 
             {if ( !empty($other_columns) or !empty($other_columns_selected))}
                 {if isset($nbCols)}
@@ -413,7 +425,7 @@
                             {if isset($files[changes].isgal) && $files[changes].isgal eq 1}
                                 {capture assign=propval}{icon name='file-archive-open' class=''}{/capture}
                             {else}
-                                {$propval=$files[changes].filename|iconify:$files[changes].type}
+                                {$propval=$files[changes].filename|iconify:$files[changes].type:$files[changes].id}
                             {/if}
                         {elseif $propname eq 'description' and $gal_info.max_desc gt 0}
                             {$propval=$propval|truncate:$gal_info.max_desc:"...":false|nl2br}
@@ -510,6 +522,19 @@
                     or (isset($gal_info.show_action) and $gal_info.show_action eq 'y')}
                     {$file=$files[changes]}{* For fgal_context_menu.tpl. Cannot be an include parameter, because "file" is a reserved name. *}
                     <td>{include file='fgal_context_menu.tpl'}</td>
+                {/if}
+                {if ( $prefs.feature_categories eq 'y')}
+                    <td>
+                    {if !empty($files[changes].categories)}
+                        {foreach from=$files[changes].categories item=cat name=cat}
+                            <a href="tiki-browse_categories.php?parentId={$cat.categId|escape}">
+                                {$cat.name|escape}
+                            </a>{if not $smarty.foreach.cat.last}, {/if}
+                        {/foreach}
+                    {else}
+                        <span class="text-muted">{tr}Uncategorized{/tr}</span>
+                    {/if}
+                    </td>
                 {/if}
 
                 {if isset($other_columns) and isset($other_columns_selected) and ( $other_columns neq '' or $other_columns_selected neq '' )}

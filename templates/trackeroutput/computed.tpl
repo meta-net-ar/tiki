@@ -1,3 +1,4 @@
+<input type="hidden" name="{$field.ins_id}">
 {if $prefs.trackerfield_computed eq 'y'}
     {if isset($field.computedtype) and $field.computedtype eq 'duration'}
         {if !empty($field.value)}

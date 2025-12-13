@@ -53,7 +53,6 @@ function wikiplugin_lsdir_info()
                 'description' => tra('Only list files with file names that contain this filter. Example:')
                     . ' <code>.jpg</code>',
                 'since' => '1',
-                'default' => null
             ],
             'limit' => [
                 'required' => false,
@@ -69,16 +68,12 @@ function wikiplugin_lsdir_info()
 
 function wikiplugin_lsdir($data, $params)
 {
-    global $tikilib;
-//  $dir = '';
     $dir = $params['dir'];
-//  $urlprefix = NULL;
     $urlprefix = $params['urlprefix'];
-//  $sort = 'name';
-    $sort = 'size';
+    $sort = $params['sort'];
     $sortmode = 'asc';
-    $filter = null;
-    $limit = 0;
+    $filter = $params['filter'];
+    $limit = $params['limit'];
     $tmp_array = [];
     $ret = '';
 
@@ -96,7 +91,7 @@ function wikiplugin_lsdir($data, $params)
 
     // make sure dir has starting slash
     if (! empty($dir)) {
-        if (substr($dir, 0, 1) != '/') {
+        if (! str_starts_with($dir, '/')) {
             $dir = '/' . $dir;
         }
     }

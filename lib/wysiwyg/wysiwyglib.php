@@ -69,7 +69,7 @@ class WYSIWYGLib
             $lang = 'en-US';
         } else {
             $parts = explode('-', $lang);
-            $lang = $parts[0] . '-' . strtoupper(isset($parts[1]) ? $parts[1] : $parts[0]);
+            $lang = $parts[0] . '-' . strtoupper($parts[1] ?? $parts[0]);
         }
 
         $langFilePath = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/summernote-' . $lang . '.min.js';
@@ -141,7 +141,7 @@ class WYSIWYGLib
                 continue;
             }
 
-            if (strpos($pluginMarkup, ' ') === false) {
+            if (! str_contains($pluginMarkup, ' ')) {
                 // custom blocks without spaces seem to trigger an error in toast rendering code, so add a "harlmess" space if we don't find one
                 $pluginMarkup = str_replace('}', ' }', $pluginMarkup);
             }
@@ -191,7 +191,7 @@ class WYSIWYGLib
         }
 
         if (! empty($params['_toolbars'])  && $params['_toolbars'] === 'y') {
-            /** @var Smarty_Tiki $smarty */
+            /** @var \Tiki\Smarty\SmartyTiki $smarty */
             $smarty = TikiLib::lib('smarty');
             $toolbarParams = [
                 'syntax' => 'markdown',
@@ -283,7 +283,7 @@ class WYSIWYGLib
             //'vi' => 'vi',         // Vietnamese
         ];
 
-        return isset($langMap[$lang]) ? $langMap[$lang] : '';
+        return $langMap[$lang] ?? '';
     }
 
     private function processSpecialHeadings($content)

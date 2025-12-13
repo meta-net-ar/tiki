@@ -19,7 +19,6 @@ function wikiplugin_showpages_info()
                 'name' => tra('Find'),
                 'description' => tra('Search criteria'),
                 'since' => '1',
-                'default' => '',
             ],
             'max' => [
                 'required' => false,
@@ -27,7 +26,6 @@ function wikiplugin_showpages_info()
                 'description' => tra('Maximum amount of results displayed.'),
                 'since' => '1',
                 'filter' => 'int',
-                'default' => '',
             ],
             'display' => [
                 'required' => false,
@@ -52,15 +50,12 @@ function wikiplugin_showpages($data, $params)
     global $tikilib, $prefs;
 
     extract($params, EXTR_SKIP);
-    if (! isset($find)) {
-        return ("<b>missing find parameter for plugin SHOWPAGES</b><br />");
-    }
 
-    if (! isset($max)) {
+    if (is_null($max)) {
         $max = -1;
     }
 
-    if (! isset($display) || (strpos($display, 'name') === false && strpos($display, 'desc') === false)) {
+    if ((strpos($display, 'name') === false && strpos($display, 'desc') === false)) {
         $display = 'name|desc';
     }
 

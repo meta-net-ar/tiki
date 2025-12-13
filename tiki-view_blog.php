@@ -12,15 +12,18 @@ $section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
-            'blogTitle'         => 'word',     //get
+            'blogTitle'         => 'striptags', //get
             'blogId'            => 'int',      //get
             'remove'            => 'int',      //get
             'offset'            => 'int',      //get
-            'sort_mode'         => 'word',     //get
-            'find'              => 'word',     //get
-            'date_min'          => 'word',     //get
-            'date_max'          => 'word',     //get
-            'savenotepad'       => 'none',     //get
+            'sort_mode'         => 'alnumdash',     //get
+            'find'              => 'striptags',     //get
+            'date_min'          => 'digits',        //get
+            'date_max'          => 'digits',        //get
+            'savenotepad'       => 'int',           //get
+            'watch_event'       => 'striptags',     //get
+            'watch_action'      => 'alpha',     //get
+            'watch_object'      => 'int',      //get
         ]
     ],
 ];
@@ -121,21 +124,13 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // Get a list of last changes to the blog database
-$date_min = isset($_REQUEST['date_min']) ? $_REQUEST['date_min'] : '';
-$date_max = isset($_REQUEST['date_max']) ? $_REQUEST['date_max'] : $tikilib->now;
+$date_min = $_REQUEST['date_min'] ?? '';
+$date_max = $_REQUEST['date_max'] ?? $tikilib->now;
 $listpages = $bloglib->list_blog_posts($_REQUEST["blogId"], true, $offset, $blog_data["maxPosts"], $sort_mode, $find, $date_min, $date_max);
 //Keep track of month of last viewed posts for months_links module foldable display
 $_SESSION['blogs_last_viewed_month'] = TikiLib::date_format("%Y-%m", $date_max);

@@ -14,22 +14,23 @@ $inputConfiguration = [
         'objectId'               => 'string',        //get
         'objectType'             => 'string',       //post
         'objectName'             => 'string',       //post
-        'referer'                => 'string',     //post
-        'parentId'               => 'int',        //post
-        'permType'               => 'string',     //post
-        'assignstructure'        => 'bool',       //post
-        'propagate_category'     => 'bool',       //post
-        'feature_select'         => 'bool',       //post
-        'group_select'           => 'bool',       //post
-        'group'                  => 'grouname',   //post
-        'assign'                 => 'bool',       //post
-        'quick_perms'            => 'bool',       //post
-        'remove'                 => 'bool',       //post
-        'copy'                   => 'bool',       //post
-        'paste'                  => 'bool',       //post
-        'used_groups'            => 'bool',       //post
-        'show_disabled_features' => 'bool',       //post
-        'filegals_manager'       => 'word',       //post
+        'referer'                => 'url',          //post
+        'parentId'               => 'int',         //post
+        'permType'               => 'string',      //post
+        'assignstructure'        => 'bool',        //post
+        'propagate_category'     => 'bool',        //post
+        'feature_select'         => 'bool',        //post
+        'group_select'           => 'bool',        //post
+        'group'                  => 'groupname',   //post
+        'assign'                 => 'bool',        //post
+        'quick_perms'            => 'bool',        //post
+        'remove'                 => 'bool',        //post
+        'copy'                   => 'bool',        //post
+        'paste'                  => 'bool',        //post
+        'used_groups'            => 'bool',        //post
+        'show_disabled_features' => 'bool',        //post
+        'filegals_manager'       => 'word',        //post
+        'permission_scope_behavior' => 'word',     //post
         ],
         'staticKeyFiltersForArrays' => [
         'feature_filter'            => 'bool',       //post
@@ -90,7 +91,7 @@ if (! ($tiki_p_admin_objects == 'y' || (isset($$perm) && $$perm == 'y') || (isse
 }
 
 if (! isset($_REQUEST['referer'])) {
-    if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'tiki-objectpermissions.php') === false) {
+    if (isset($_SERVER['HTTP_REFERER']) && ! str_contains($_SERVER['HTTP_REFERER'], 'tiki-objectpermissions.php')) {
         $_REQUEST['referer'] = $_SERVER['HTTP_REFERER'];
     } else {
         unset($_REQUEST['referer']);
@@ -244,8 +245,9 @@ if (isset($_REQUEST['assign']) && ! isset($_REQUEST['quick_perms']) && $access->
     $groupNames = array_unique(array_merge(array_keys($newPerms), array_keys($oldPerms)));
     $changed = [];
     foreach ($groupNames as $groupName) {
-        $newPerms[$groupName] = ! isset($newPerms[$groupName]) ? [] : $newPerms[$groupName];
-        $oldPerms[$groupName] = ! isset($oldPerms[$groupName]) ? [] : $oldPerms[$groupName];
+        // https://www.php.net/manual/en/migration74.new-features.php#migration74.new-features.core.null-coalescing-assignment-operator
+        $newPerms[$groupName] ??= [];
+        $oldPerms[$groupName] ??= [];
         $changed['added'][$groupName] = array_diff($newPerms[$groupName], $oldPerms[$groupName]);
         $changed['deleted'][$groupName] = array_diff($oldPerms[$groupName], $newPerms[$groupName]);
     }
@@ -372,6 +374,11 @@ if (! empty($_SESSION['perms_clipboard'])) {
         $permissionApplier->apply($set);
         $smarty->assign('perms_clipboard_source', '');
     }
+}
+
+if (! empty($_POST['preference_update'])) {
+    $tikilib->set_preference('permission_scope_behavior', $_POST['permission_scope_behavior']);
+    TikiLib::lib('cache')->invalidate('allperms');
 }
 
 // Prepare display

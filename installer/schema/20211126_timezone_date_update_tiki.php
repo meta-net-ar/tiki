@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Installer\Installer;
+use Tiki\Lib\TikiDate;
 
 /**
  * Tracker field date-only JsCalendar and DateTime fields store 12am GMT time of the dates as of Tiki 24.
@@ -43,7 +44,7 @@ function upgrade_20211126_timezone_date_update_tiki(Installer $installer): bool
         if (empty($row['value'])) {
             continue;
         }
-        $timestamp = \TikiDate::shiftToNearestGMT($row['value']);
+        $timestamp = TikiDate::shiftToNearestGMT($row['value']);
         $installer->query("UPDATE tiki_tracker_item_fields SET value = ? WHERE itemId = ? and fieldId = ?", [$timestamp, $row['itemId'], $row['fieldId']]);
     }
 

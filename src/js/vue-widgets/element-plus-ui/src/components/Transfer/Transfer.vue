@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { Menu } from "@element-plus/icons-vue";
 import Sortable from "sortablejs";
 import ConfigWrapper from '../ConfigWrapper.vue';
 
@@ -8,7 +7,7 @@ const props = defineProps(['data', 'fieldName', 'filterable', 'defaultValue', 's
 const data = typeof props.data === 'string' ? JSON.parse(props.data) : props.data;
 const defaultValue = typeof props.defaultValue === 'string' ? JSON.parse(props.defaultValue) : props.defaultValue;
 
-const selected = ref(defaultValue ?? []);
+const selected = ref(defaultValue ? [...defaultValue]: []);
 
 const arrayData = Object.entries(data).map(([key, value]) => ({ key, label: value }));
 
@@ -32,27 +31,56 @@ const handleValueChange = (value, direction) => {
 };
 
 onMounted(() => {
-    if(elTransferContainer.value && JSON.parse(props.ordering)) {
-        const list = elTransferContainer.value.querySelectorAll(".el-transfer-panel__list")[1];
-        new Sortable(list, {
-            animation: 150,
-            handle: '.' + DRAG_HANDLER_CLASS,
-            onSort: () => {
-                const items = list.querySelectorAll(".el-transfer-panel__item");
-                const sorted = [];
-                items.forEach((item) => {
-                    const value = item.querySelector(".el-checkbox__label > span").dataset.key;
-                    sorted.push(value);
-                });
-                selected.value = sorted;
-                props.emitValueChange({
-                    value: sorted
-                })
-            },
-        });
-    
-    }
+    const list = elTransferContainer.value.querySelectorAll(".el-transfer-panel__list")[1];
+    new Sortable(list, {
+        animation: 150,
+        group: props.fieldName,
+        sorting: JSON.parse(props.ordering),
+        onAdd: (event) => {
+            const item = event.item.querySelector(".el-checkbox__label > span").dataset.key;
+            selected.value.push(item);
+            props.emitValueChange({
+                value: selected.value
+            });
+            // remove item to prevent duplication
+            event.item.remove();
+        },
+        onUpdate: () => {
+            if (!JSON.parse(props.ordering)) return;
+
+            const items = list.querySelectorAll(".el-transfer-panel__item");
+            const sorted = [];
+
+            items.forEach((item) => {
+                const value = item.querySelector(".el-checkbox__label > span").dataset.key;
+                sorted.push(value);
+            });
+
+            selected.value = sorted;
+            props.emitValueChange({
+                value: sorted
+            })
+        },
+    });
+
+    new Sortable(elTransferContainer.value.querySelectorAll(".el-transfer-panel__list")[0], {
+        animation: 150,
+        group: props.fieldName,
+        sorting: false,
+        onAdd: (event) => {
+            const item = event.item.querySelector(".el-checkbox__label > span").dataset.key;
+            const index = selected.value.indexOf(item);
+            selected.value.splice(index, 1);
+            props.emitValueChange({
+                value: selected.value
+            });
+            // remove item to prevent duplication
+            event.item.remove();
+        },
+    });
 });
+
+const translateFn = window.tr;
 </script>
 
 <script>
@@ -62,7 +90,6 @@ export const DATA_TEST_ID = {
     TRANSFER_CONTAINER: `transfer-container-${uniqueId}`,
     HELPER_TEXT: `helper-text-${uniqueId}`,
 };
-export const DRAG_HANDLER_CLASS = "handle-drag";
 </script>
 
 <template>
@@ -74,10 +101,11 @@ export const DRAG_HANDLER_CLASS = "handle-drag";
             <el-alert :type="isInvalid ? 'error': 'info'" show-icon :closable="false" class="mb-2" v-if="infoMessage">
                 <p :data-testid="DATA_TEST_ID.HELPER_TEXT">{{ infoMessage }}</p>
             </el-alert>
+            <el-alert type="info" show-icon class="mb-2">{{ translateFn('You can drag and drop items between the lists.') }}</el-alert>
             <div ref="elTransferContainer" :class="['transfer-container', { 'invalid': isInvalid }]" :data-testid="DATA_TEST_ID.TRANSFER_CONTAINER">
                 <el-transfer v-model="selected" :data="arrayData" :filterable="JSON.parse(filterable)" :titles="[sourceListTitle, targetListTitle]" :filter-placeholder="filterPlaceholder" :target-order="JSON.parse(ordering) ? 'push': 'original'" @change="handleValueChange">
                     <template #default="{ option }">
-                        <el-button v-if="selected.includes(option.key) && JSON.parse(ordering)" :class="DRAG_HANDLER_CLASS" :icon="Menu" size="small" link /> <span :data-key="option.key">{{ option.label }}</span>
+                        <span :data-key="option.key">{{ option.label }}</span>
                     </template>
                 </el-transfer>
             </div>

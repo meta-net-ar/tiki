@@ -5,9 +5,9 @@
 {/block}
 
 {block name="content"}
-    {if !empty($prefs.unified_last_rebuild)}
+    {if !empty($unified_last_rebuild)}
         <div class="alert alert-warning">
-            <p>{tr _0=$prefs.unified_last_rebuild|tiki_long_datetime}Your index was last fully rebuilt on %0.{/tr}</p>
+            <p>{tr _0=$unified_last_rebuild|tiki_long_datetime}Your index was last fully rebuilt on %0.{/tr}</p>
         </div>
     {/if}
 

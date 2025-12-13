@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -161,6 +161,6 @@ function module_wiki_last_comments($mod_reference, $module_params)
 
     $comments = module_last_comments($mod_reference['rows'], $module_params);
     $smarty->assign_by_ref('comments', $comments);
-    $smarty->assign('moretooltips', isset($module_params['moretooltips']) ? $module_params['moretooltips'] : 'n');
+    $smarty->assign('moretooltips', $module_params['moretooltips'] ?? 'n');
     $smarty->assign('type', $module_params['type']);
 }

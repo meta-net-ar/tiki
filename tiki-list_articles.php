@@ -26,9 +26,9 @@ $inputConfiguration = [
         'find_to_Month'                   => 'int',               //post
         'find_to_Day'                     => 'int',               //post
         'find_to_Year'                    => 'int',               //post
-        'find'                            => 'word',              //post
-        'type'                            => 'word',              //post
-        'topic'                           => 'word',              //post
+        'find'                            => 'string',              //post
+        'type'                            => 'string',              //post
+        'topic'                           => 'string',              //post
         'find_show_categories_multi'      => 'bool',              //post
         'categId'                         => 'int',               //get
         'lang'                            => 'lang',              //get
@@ -90,17 +90,12 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
-} else {
-    $maxRecords = $maxRecords;
 }
+
 $smarty->assign_by_ref('maxRecords', $maxRecords);
 
 $visible_only = 'y';
@@ -133,11 +128,7 @@ if (isset($_REQUEST["find_to_Month"]) && isset($_REQUEST["find_to_Day"]) && isse
     }
 }
 $smarty->assign('find_date_to', $date_max);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST["type"])) {
     $_REQUEST["type"] = '';

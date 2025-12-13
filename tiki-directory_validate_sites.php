@@ -11,13 +11,15 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'sites'                       => 'string',        //get
             'validate'                    => 'bool',          //get
             'remove'                      => 'int',           //get
             'del'                         => 'bool',          //get
             'sort_mode'                   => 'string',        //get
             'offset'                      => 'int',           //get
             'find'                        => 'string',        //get
+        ],
+        'staticKeyFiltersForArrays'      => [
+            'sites'                       => 'int',           //get
         ],
     ],
 ];
@@ -47,16 +49,8 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$offset = $_REQUEST["offset"] ?? 0;
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);

@@ -41,10 +41,6 @@ function wikiplugin_together_info()
 
 function wikiplugin_together($data, $params)
 {
-
-    if (! isset($params['buttonname'])) {
-        $params['buttonname'] = tra('CoWrite with TogetherJS');
-    }
     TikiLib::lib('header')->add_jq_onready('
 if(! window.startTogetherJS) {
     ' . (! empty($params['serverurl']) ? "window.TogetherJSConfig_hubBase = " . json_encode($params['serverurl']) . ";\n" : '') . '

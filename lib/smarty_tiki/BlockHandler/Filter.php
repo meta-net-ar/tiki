@@ -44,7 +44,7 @@ class Filter extends Base
         $smarty->assign('filter_type', $filter->type->wordspace() ? $filter->type->wordspace() : $prefs['search_default_where']);
         $smarty->assign('filter_types', $types);
 
-        $sort_mode = isset($_REQUEST['sort_mode']) ? $_REQUEST['sort_mode'] : 'score_ndesc';
+        $sort_mode = $_REQUEST['sort_mode'] ?? 'score_ndesc';
         $sort_modes = [
             'score_ndesc' => tra('Relevance'),
             'object_type_asc' => tra('Type'),
@@ -58,7 +58,7 @@ class Filter extends Base
         // Categories
         if ($prefs['feature_categories'] == 'y' && $prefs['search_show_category_filter'] == 'y') {
             $smarty->assign('filter_deep', $filter->offsetExists('deep'));
-            $smarty->assign('filter_categories', explode(' ', $filter->categories->wordspace()));
+            $smarty->assign('filter_categories', explode(' ', $filter->categories->wordspace() ?? ''));
 
             $categlib = \TikiLib::lib('categ');
             $ctall = $categlib->getCategories();
@@ -73,7 +73,10 @@ class Filter extends Base
         if ($prefs['feature_freetags'] == 'y' && $prefs['search_show_tag_filter'] == 'y') {
             $freetaglib = \TikiLib::lib('freetag');
 
-            $smarty->assign('filter_tags', explode(' ', $filter->tags->wordspace()));
+            $tags_string = $filter->tags->wordspace();
+            $filter_tags = $tags_string === null ? [] : explode(' ', $tags_string);
+
+            $smarty->assign('filter_tags', $filter_tags);
             $smarty->assign('tags', \TikiDb::get()->fetchAll('SELECT tagId, tag FROM tiki_freetags'));
         }
 

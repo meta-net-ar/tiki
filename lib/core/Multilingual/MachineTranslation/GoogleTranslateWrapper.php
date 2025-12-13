@@ -9,6 +9,8 @@
  *
  */
 
+use Tiki\Lib\OIntegrate\OIntegrate;
+
 class Multilingual_MachineTranslation_GoogleTranslateWrapper implements Multilingual_MachineTranslation_Interface
 {
     private const SERVICE_URL = "https://www.googleapis.com/language/translate/v2";
@@ -131,7 +133,6 @@ class Multilingual_MachineTranslation_GoogleTranslateWrapper implements Multilin
 
     private function getTranslationFromGoogle($text)
     {
-        require_once 'lib/ointegratelib.php';
         $ointegrate = new OIntegrate();
         $params = [
             'key' => $this->key,

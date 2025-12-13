@@ -1,27 +1,28 @@
-// Morph 5.2.0 -- This is a copy of node_modules/bootswatch/dist/morph/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Morph 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/morph/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/morph/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
+$dark: #24426d; // More interesting dark background color
 
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
+
+$secondary:     $gray-600 !default;
 
 $gray-700: #506925; //#7b8ab8;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
 // Options
-// Prefix for :root CSS variables
-
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
-
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-color:                #506295;
+$body-secondary-color:      #333D5BBF;
 
 // Links
 $link-color: #035BCE;
@@ -30,6 +31,9 @@ $link-color: #035BCE;
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 
 // Components
+$component-active-color:       $white;  // default
+$component-active-bg:        $info; // $primary;  // default
+
 // Fonts
 
 // stylelint-disable-next-line value-keyword-case
@@ -47,6 +51,10 @@ $form-select-indicator-color:       var(--#{$prefix}body-color);
 $form-range-track-bg:             var(--#{$prefix}tertiary-bg);  // default // rgba(darken($body-bg, 50%), .15);  // default
 $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color);  // default // $gray-200;  // default
 $form-file-button-bg:             var(--#{$prefix}tertiary-bg);  // default // $gray-100;  // default
+
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Navs
 $nav-link-color:                    var(--#{$prefix}body-color);
@@ -70,12 +78,14 @@ $dropdown-dark-bg:                  $gray-800;  // default
 $dropdown-dark-link-color:          $dropdown-dark-color;  // default
 $dropdown-dark-link-hover-color:    $white;  // default
 $dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 $pagination-bg:                     var(--#{$prefix}body-bg);
+$pagination-color:                  #506295;
 
 // Cards
-$card-bg:                           lighten($body-bg, 3%);  // default
+$card-bg:                           color.adjust($body-bg, $lightness: 3%, $space: hsl);  // default
 
 // Bootswatch overrides
 $web-font-path: none; // Override value in vendor file

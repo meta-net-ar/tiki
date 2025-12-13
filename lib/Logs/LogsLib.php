@@ -17,6 +17,22 @@ use function mb_convert_encoding;
 
 class LogsLib extends TikiLib
 {
+    /**
+     * @var array|null Caches the action log configuration to avoid repeated DB queries.
+     */
+
+    private static $cachedActionlogConf = null;
+
+    /**
+     * Clears the internal static cache for the action log configuration.
+     * This ensures that the next call to get_all_actionlog_conf() will fetch fresh data.
+     */
+
+    private function clearActionlogConfCache()
+    {
+        self::$cachedActionlogConf = null;
+    }
+
     public function add_log($type, $message, $who = '', $ip = '', $client = '', $time = '', $log = '')
     {
         global $user, $prefs;
@@ -228,7 +244,7 @@ class LogsLib extends TikiLib
             'shipping_fedex_password',
             'shipping_ups_password',
             'auth_phpbb_dbpasswd',
-            'zend_mail_smtp_pass',
+            'mailer_smtp_pass',
             'unified_elastic_url',
             'proxy_pass',
         ];
@@ -287,7 +303,7 @@ class LogsLib extends TikiLib
             }
         }
 
-        return isset($actions[0]) ? $actions[0] : 0;
+        return $actions[0] ?? 0;
     }
 
     /**
@@ -426,12 +442,11 @@ class LogsLib extends TikiLib
 
     public function set_actionlog_conf($action, $objectType, $status)
     {
-        global $actionlogConf;
         $this->delete_actionlog_conf($action, $objectType);
         $action = str_replace('*', '%', $action);
         $query = "insert into `tiki_actionlog_conf` (`action`, `objectType`, `status`) values(?, ?, ?)";
         $this->query($query, [$action, $objectType, $status]);
-        unset($actionlogConf);
+        $this->clearActionlogConfCache();
     }
 
     public function delete_actionlog_conf($action, $objectType)
@@ -445,13 +460,11 @@ class LogsLib extends TikiLib
 
     public function get_all_actionlog_conf()
     {
-        global $actionlogConf;
-
-        if (! isset($actionlogConf)) {
-            $actionlogConf = self::get_actionlog_conf();
+        if (self::$cachedActionlogConf === null) {
+            self::$cachedActionlogConf = self::get_actionlog_conf();
         }
 
-        return $actionlogConf;
+        return self::$cachedActionlogConf;
     }
 
     public function get_actionlog_conf($type = '%', $action = '%')
@@ -540,7 +553,9 @@ class LogsLib extends TikiLib
 
         if ($find) {
             $findesc = '%' . $find . '%';
-            $amid[] = "(`comment` like ? or a.`action` like ? or `object` like ?)";
+            $amid[] = "(`comment` like ? or a.`action` like ? or `object` like ? or `user` like ? or `ip` like ?)";
+            $bindvars[] = $findesc;
+            $bindvars[] = $findesc;
             $bindvars[] = $findesc;
             $bindvars[] = $findesc;
             $bindvars[] = $findesc;
@@ -685,8 +700,8 @@ class LogsLib extends TikiLib
                 $logTimes[$login['user']]['nbLogins'] = 0;
             }
 
-            if (strstr($login['comment'], 'logged from') || $login['comment'] == 'back') {
-                if (strstr($login['comment'], 'logged from')) {
+            if (str_contains($login['comment'], 'logged from') || $login['comment'] == 'back') {
+                if (str_contains($login['comment'], 'logged from')) {
                     ++$logTimes[$login['user']]['nbLogins'];
                 }
                 // can be already log in
@@ -777,10 +792,10 @@ class LogsLib extends TikiLib
         $actionlogConf = $this->get_all_actionlog_conf();
 
         foreach ($actions as $action) {
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
             $name = $action['action'] . '/' . $action['objectType'];
@@ -801,7 +816,7 @@ class LogsLib extends TikiLib
             $name = $action['action'] . '/' . $action['objectType'];
             if (($index = array_search($name, $actions_name)) !== false) {
                 if ($field == 'object') {
-                    $stats[$key]['link'] = isset($action['link']) ? $action['link'] : null;
+                    $stats[$key]['link'] = $action['link'] ?? null;
                 }
                 ++$stats[$key][$name];
             }
@@ -831,11 +846,11 @@ class LogsLib extends TikiLib
                 continue;
             }
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
@@ -883,11 +898,11 @@ class LogsLib extends TikiLib
             //if ($action['categId'] == 0) print also stat for non categ object
             //  continue;
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
             $key = $action['categId'];
@@ -918,11 +933,11 @@ class LogsLib extends TikiLib
             //if ($action['categId'] == 0) print also stat for non categ object
             //  continue;
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
@@ -968,11 +983,11 @@ class LogsLib extends TikiLib
             //if ($action['categId'] == 0) print also stat for non categ object
             //  continue;
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
@@ -1035,11 +1050,11 @@ class LogsLib extends TikiLib
                 continue;
             }
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
@@ -1282,11 +1297,11 @@ class LogsLib extends TikiLib
         $tab = [];
 
         foreach ($actions as $action) {
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
@@ -1545,15 +1560,15 @@ class LogsLib extends TikiLib
         foreach ($actions as $action) {
             $bytes = $this->get_volume_action($action);
 
-            if (strpos($action['comment'], 'logged from') === 0) {
+            if (str_starts_with($action['comment'], 'logged from')) {
                 $action['action'] = 'login';
             }
 
-            if (strpos($action['comment'], 'logged out') === 0) {
+            if (str_starts_with($action['comment'], 'logged out')) {
                 $action['action'] = 'login';
             }
 
-            $nbC = isset($action['nbContributors']) ? $action['nbContributors'] : 1;
+            $nbC = $action['nbContributors'] ?? 1;
 
             if (isset($bytes['add'])) {
                 $action['add'] = $bytes['add'];

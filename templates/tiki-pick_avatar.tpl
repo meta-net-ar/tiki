@@ -5,8 +5,6 @@
         {tr}Pick your profile picture{/tr}
     {/if}
 {/title}
-
-
 {if $user eq $userwatch}
     {include file='tiki-mytiki_bar.tpl'}
 {else}
@@ -15,24 +13,8 @@
         {button href="tiki-user_preferences.php?view_user=$thisuserwatch" class="btn btn-primary" _text="{tr}User Preferences{/tr}"}
     </div>
 {/if}
-
 <h2>{if $user eq $userwatch}{tr}Your current profile picture{/tr}{else}{tr}Profile picture{/tr}{/if}</h2>
-<div class="d-flex gap-2 align-items-center mb-4">
-    {if $avatar}
-        <div class="d-inline-block" id="user-picture">
-            {if isset($user_picture_id)}{tr}Thumbnail{/tr}<br>{/if}
-            {$avatar}
-        </div>
-        {if isset($user_picture_id)}
-            <div>{tr}Full size{/tr}<br>
-                <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y">
-            </div>
-        {/if}
-    {else}
-        {tr}no profile picture{/tr}
-    {/if}
-
-    <div class="d-flex flex-column gap-1">
+    <div class="d-flex gap-1 mt-2">
         {if sizeof($avatars) eq 0 and $avatar}
             <a class="tips btn btn-sm btn-outline-secondary rounded" href="tiki-pick_avatar.php?reset=y&amp;view_user{$userwatch|escape}" title=":{tr}Reset{/tr}">
                 {icon name='remove'}
@@ -40,6 +22,21 @@
         {/if}
         <button class="btn btn-sm btn-outline-secondary rounded tips" id="show-avatar-picker" title=":{tr}Choose an avatar{/tr}">{icon name="user-edit"}</button>
     </div>
+<div class="d-flex flex-column gap-2 mb-2 mt-4 border-top border-light p-2">
+    {if $avatar}
+        <div class="d-inline-block" id="user-picture">
+            {if isset($user_picture_id)}{tr}Thumbnail{/tr}<br>{/if}
+            {$avatar}
+        </div>
+        
+        {if isset($user_picture_id)}
+            <div>{tr}Full size{/tr}<br>
+                <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y" class="w-50 rounded-1" style="max-height: 300px;object-fit:cover">
+            </div>
+        {/if}
+    {else}
+        {tr}no profile picture{/tr}
+    {/if}
 </div>
 
 {ticket}

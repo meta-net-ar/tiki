@@ -29,8 +29,24 @@ $auto_query_args = ['userId', 'view_user'];
 
 $access->check_user($user);
 $access->check_feature('feature_user_watches');
-
 if ($access->checkCsrf()) {
+    $watchFields = [
+        'user_calendar_watch_editor',
+        'user_article_watch_editor',
+        'user_wiki_watch_editor',
+        'user_blog_watch_editor',
+        'user_tracker_watch_editor',
+        'user_comment_watch_editor',
+        'user_category_watch_editor',
+        'user_plugin_approval_watch_editor',
+    ];
+
+    $atLeastOneSet = false;
+    foreach ($watchFields as $field) {
+        if (! empty($_REQUEST[$field])) {
+            $atLeastOneSet = true;
+        }
+    }
     if (isset($_REQUEST['user_calendar_watch_editor']) && $_REQUEST['user_calendar_watch_editor'] == true) {
         $result[] = $tikilib->set_user_preference($user, 'user_calendar_watch_editor', 'y');
     } else {
@@ -75,11 +91,14 @@ if ($access->checkCsrf()) {
         $result[] = $tikilib->set_user_preference($user, 'user_plugin_approval_watch_editor', 'n');
     }
     if (! in_array(false, $result)) {
-        Feedback::success(tr('Notification preferences set'));
+        if (! $atLeastOneSet) {
+            Feedback::warning(tr('Notification preferences updated. No type of notification to watch activated.'));
+        } else {
+            Feedback::success(tr('Notification preferences set successfully'));
+        }
     } else {
         Feedback::error(tr('Errors were encountered when setting notification preferences'));
     }
 }
 
-header('Location: tiki-user_watches.php');
-die;
+$access->redirect('tiki-user_watches.php');

@@ -16,9 +16,9 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
 
 
         if ($prefs['markdown_enabled'] === 'y') {
-            $label = 'Syntax and Editor Settings';
+            $label = tra('Syntax and Editor Settings');
         } else {
-            $label = 'Switch Editor (wiki or WYSIWYG)';
+            $label = tra('Switch Editor (wiki or WYSIWYG)');
         }
 
         $this->setLabel(tra($label))

@@ -600,12 +600,12 @@ class TikiAccessLib extends TikiLib
         }
         //identify server host + port
         $base = parse_url($base_url);
-        $baseHost = isset($base['host']) ? $base['host'] : '';
+        $baseHost = $base['host'] ?? '';
         $basePort = isset($base['port']) ? ':' . $base['port'] : '';
         $this->base = $baseHost . $basePort;
         //identify requesting host + port
         $origin = parse_url($this->origin);
-        $originHost = isset($origin['host']) ? $origin['host'] : '';
+        $originHost = $origin['host'] ?? '';
         $originPort = isset($origin['port']) ? ':' . $origin['port'] : '';
         $this->origin = $originHost . $originPort;
         //perform compare
@@ -668,7 +668,7 @@ class TikiAccessLib extends TikiLib
             $this->ticket = false;
         }
         //just in case url decoding is needed
-        if (strpos($this->ticket, '%') !== false) {
+        if (str_contains($this->ticket, '%')) {
             $this->ticket = urldecode($this->ticket);
         }
 
@@ -676,7 +676,11 @@ class TikiAccessLib extends TikiLib
 
         global $prefs;
 
-        if ($this->ticket && ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' && ($this->ticket === (isset($_SESSION['CSRF_TOKEN']) ? $_SESSION['CSRF_TOKEN'] : $this->retrieveTicketFromCookie()))) {
+        if (
+            $this->ticket &&
+            ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' &&
+            ($this->ticket === ($_SESSION['CSRF_TOKEN'] ?? $this->retrieveTicketFromCookie()))
+        ) {
             $this->ticketMatch = true;
         } elseif ($this->ticket && ! empty($_SESSION['tickets'][$this->ticket])) {
             //check that request ticket matches server ticket
@@ -891,10 +895,12 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log(PHP_EOL
+        error_log(
+            PHP_EOL
             . '  $_GET: ' . $get . PHP_EOL
             . '  $_POST: ' . $post . PHP_EOL
-            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****');
+            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****'
+        );
     }
 
 
@@ -1051,6 +1057,7 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('errortitle', $detail['errortitle']);
             $smarty->assign('msg', $detail['message']);
             $smarty->assign('errortype', $detail['code']);
+            $smarty->assign('twoFactorForm', $prefs['twoFactorAuth']);
             if (isset($detail['page'])) {
                 $smarty->assign('page', $page);
             }
@@ -1365,15 +1372,15 @@ class TikiAccessLib extends TikiLib
         foreach ($accept as $type) {
             $known = null;
 
-            if (strpos($type, $t = 'application/json') !== false) {
+            if (str_contains($type, $t = 'application/json')) {
                 $known = 'json';
-            } elseif (strpos($type, $t = 'text/javascript') !== false) {
+            } elseif (str_contains($type, $t = 'text/javascript')) {
                 $known = 'json';
-            } elseif (strpos($type, $t = 'text/x-yaml') !== false) {
+            } elseif (str_contains($type, $t = 'text/x-yaml')) {
                 $known = 'yaml';
-            } elseif (strpos($type, $t = 'application/rss+xml') !== false) {
+            } elseif (str_contains($type, $t = 'application/rss+xml')) {
                 $known = 'rss';
-            } elseif (strpos($type, $t = 'application/atom+xml') !== false) {
+            } elseif (str_contains($type, $t = 'application/atom+xml')) {
                 $known = 'atom';
             }
 
@@ -1528,7 +1535,7 @@ class TikiAccessLib extends TikiLib
     {
         global $tikipath, $base_url_http, $base_url_https;
         // if the directory is within the Tiki root, then remove the prefixed Tiki root
-        if (0 === strpos($filename, $tikipath)) {
+        if (str_starts_with($filename, $tikipath)) {
             $filename = substr($filename, strlen($tikipath));
         }
 
@@ -1660,7 +1667,7 @@ class TikiAccessLib extends TikiLib
         $logslib = TikiLib::lib('logs');
 
         $redactPass = function (&$item, $key) {
-            if (strpos($key, 'pass') !== false) {
+            if (str_contains($key, 'pass')) {
                 $item = '** ' . tr('redacted') . ' **';
             }
         };
@@ -1682,7 +1689,7 @@ class TikiAccessLib extends TikiLib
             'siteSecurityTimeout' => tr('preference:') . ' ' . $prefs['site_security_timeout'] . tr('seconds') . ' (' . $prefs['site_security_timeout'] / 60 . ' minutes)',
             'scriptName' => $_SERVER['SCRIPT_NAME'],
             'requestURI' => $_SERVER['REQUEST_URI'],
-            'httpOrigin' => isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null,
+            'httpOrigin' => $_SERVER['HTTP_ORIGIN'] ?? null,
             'httpReferer' => $_SERVER['HTTP_REFERER'],
             'requestMethod' => $_SERVER['REQUEST_METHOD'],
             'queryString' => $_SERVER['QUERY_STRING'] ?? tr('empty'),

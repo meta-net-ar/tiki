@@ -15,7 +15,7 @@
     <h2>{tr}Preview{/tr}</h2>
     {include file='article.tpl'}
 {/if}
-<form enctype="multipart/form-data" method="post" action="tiki-edit_article.php" id='editpageform'>
+<form enctype="multipart/form-data" method="post" action="tiki-edit_article.php" id='editpageform' novalidate>
     {ticket}
     <input type="hidden" name="articleId" value="{$articleId|escape}">
     <input type="hidden" name="previewId" value="{$previewId|escape}">
@@ -82,7 +82,7 @@
                                         <li>
                                             {section loop=$translations name=t}
                                                 {if $articleId != $translations[t].objId}
-                                                    {$translations[t].lang|escape}: <a href="tiki-edit_article.php?articleId={$translations[t].objId|escape}" class="alert-link">{$translations[t].objName|escape}</a><br>
+                                                    {$translations[t].lang|escape}: <a href="tiki-edit_article.php?articleId={$translations[t].objId|escape}" class="btn btn-link">{$translations[t].objName|escape}</a><br>
                                                 {/if}
                                             {/section}
                                         </li>
@@ -164,7 +164,7 @@
                     <input type="text" name="authorName" id="authorName" value="{$authorName|escape}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row{if $tiki_p_edit_article_user neq 'y'}hidden{/if} clearfix">
+            <div class="mb-3 row {if $tiki_p_edit_article_user neq 'y'}hidden{/if} clearfix">
                 <label for="author" class="col-form-label col-md-4">{tr}User (article owner){/tr}</label>
                 <div class="col-md-4">
                     <input id="author" type="text" name="author" value="{$author|escape}" class="form-control">
@@ -184,7 +184,7 @@
                 <input type="hidden" name="MAX_FILE_SIZE" value="{$prefs.article_image_file_size_max}">
                 <label for="userfile1" class="col-form-label col-md-4">{tr}Own Image{/tr}</label>
                 <div class="col-md-8">
-                    <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
+                    <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true;">
                     <span class="form-text">{tr}If not the topic image{/tr} - {tr}Max file size : {$prefs.article_image_file_size_max/1000} KB{/tr}</span>
                 </div>
             </div>
@@ -204,6 +204,9 @@
                 <label class="col-md-4 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
                 <div class="col-md-8">
                     <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
+                    <div class="invalid-feedback">
+                        {tr}Please enter an alternative text when using your own image.{/tr}
+                    </div>
                 </div>
             </div>
             <div class="mb-3 {if $types.$type.show_image_caption neq 'y'}hidden{/if}">
@@ -347,11 +350,11 @@
                         {if !empty($userEmail) and $userEmail neq $prefs.sender_email}
                             {tr}From:{/tr}
                             <label>
-                                <input type="radio" name="from" value="{$userEmail|escape}"{if empty($from) or $from eq $userEmail} checked="checked"{/if}>
+                                <input type="radio" class="form-check-input" name="from" value="{$userEmail|escape}"{if empty($from) or $from eq $userEmail} checked="checked"{/if}>
                                 {$userEmail|escape}
                             </label>
                             <label>
-                                <input type="radio" name="from" value="{$prefs.sender_email|escape}"{if $from eq $prefs.sender_email} checked="checked"{/if}>
+                                <input type="radio" class="form-check-input" name="from" value="{$prefs.sender_email|escape}"{if $from eq $prefs.sender_email} checked="checked"{/if}>
                                 {$prefs.sender_email|escape}
                             </label>
                         {/if}
@@ -382,21 +385,21 @@
     </div>
     {if $smarty.session.wysiwyg neq 'y'}
         {jq}
-$("#editpageform").on("submit", function(evt) {
-    var isHtml = false;
-    if (this.saving && !$("input[name=allowhtml]:checked").length) {
-        $("textarea", this).each(function(){
-            if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
-                isHtml = true;
-            }
-        });
-        if (isHtml) {
-            this.saving = false;
-            return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
-        }
-    }
-    return true;
-}).attr('saving', false);
+            $("#editpageform").on("submit", function(evt) {
+                var isHtml = false;
+                if (this.saving && !$("input[name=allowhtml]:checked").length) {
+                    $("textarea", this).each(function(){
+                        if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
+                            isHtml = true;
+                        }
+                    });
+                    if (isHtml) {
+                        this.saving = false;
+                        return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
+                    }
+                }
+                return true;
+            }).attr('saving', false);
         {/jq}
     {/if}
 </form>

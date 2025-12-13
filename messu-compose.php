@@ -57,7 +57,7 @@ foreach (
               ] as $dest
 ) {
     if (is_array($_REQUEST[$dest])) {
-        $sep = strstr(implode('', $_REQUEST[$dest]), ',') === false ? ', ' : '; ';
+        $sep = ! str_contains(implode('', $_REQUEST[$dest]), ',') ? ', ' : '; ';
         $_REQUEST[$dest] = implode($sep, $_REQUEST[$dest]);
     }
 }

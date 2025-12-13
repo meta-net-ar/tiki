@@ -91,14 +91,20 @@ class MenuLib extends TikiLib
     public function reset_app_menu()
     {
         $tiki_sql = file_get_contents('db/tiki.sql');
-        preg_match_all('/^(?:INSERT|UPDATE) (?:INTO )?`?tiki_menu_options`? .*$/mi', $tiki_sql, $matches);
+
+        //handle multi-line INSERT statements
+        preg_match_all('/(?:INSERT\s+INTO\s+`?tiki_menu_options`?.*?;|UPDATE\s+tiki_menu_options\s+SET.*?;)/ims', $tiki_sql, $matches);
 
         if ($matches && count($matches[0])) {
             $menuoptions = $this->table('tiki_menu_options');
             $menuoptions->deleteMultiple([ 'menuId' => 42 ]);
 
             foreach ($matches[0] as $query) {
-                $this->query($query);
+                // remove extra whitespace and newlines
+                $query = preg_replace('/\s+/', ' ', trim($query));
+                if (! empty($query)) {
+                    $this->query($query);
+                }
             }
             $this->empty_menu_cache(42);
         }
@@ -326,7 +332,7 @@ class MenuLib extends TikiLib
         }
         $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'])));
         $option['url'] = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($option['url'])));
-        if (strstr($option['url'], 'structure=') && ! strstr($url, 'structure=')) {
+        if (str_contains($option['url'], 'structure=') && ! str_contains($url, 'structure=')) {
             // try to find al the occurence of the page in structures
             $option['url'] = preg_replace('/&structure=.*/', '', $option['url']);
         }
@@ -708,7 +714,7 @@ class MenuLib extends TikiLib
             if (! $full) {
                 $display = true;
                 if (isset($res['section']) and $res['section']) {
-                    if (strstr($res['section'], '|')) {
+                    if (str_contains($res['section'], '|')) {
                         $display = false;
                         $sections = preg_split('/\s*\|\s*/', $res['section']);
                         foreach ($sections as $sec) {
@@ -730,7 +736,7 @@ class MenuLib extends TikiLib
                 }
                 if ($display && $tiki_p_admin != 'y') {
                     if (isset($res['perm']) and $res['perm']) {
-                        if (strstr($res['perm'], '|')) {
+                        if (str_contains($res['perm'], '|')) {
                             $display = false;
                             $sections = preg_split('/\s*\|\s*/', $res['perm']);
                             foreach ($sections as $sec) {

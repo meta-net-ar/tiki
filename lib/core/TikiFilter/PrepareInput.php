@@ -24,7 +24,7 @@ class TikiFilter_PrepareInput
         $output = [];
 
         foreach ($input as $key => $value) {
-            if (strpos($key, $this->delimiter) === false) {
+            if (! str_contains($key, $this->delimiter)) {
                 $output[$key] = $value;
             } else {
                 list ($base, $remain) = explode($this->delimiter, $key, 2);

@@ -90,7 +90,7 @@ function prefs_memcache_unserialize_servers(string $string)
             $data[] = [
                 'host' => $parts[1],
                 'port' => $parts[2],
-                'weight' => isset($parts[4]) ? $parts[4] : 1,
+                'weight' => $parts[4] ?? 1,
             ];
         }
     }

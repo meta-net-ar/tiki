@@ -45,7 +45,7 @@ if (! empty($prefs['feature_alternate_registration_page']) && $prefs['feature_al
 }
 $smarty->assign('user_exists', TikiLib::lib('user')->user_exists($user));
 
-$re = $userlib->get_group_info(isset($_REQUEST['chosenGroup']) ? $_REQUEST['chosenGroup'] : 'Registered');
+$re = $userlib->get_group_info($_REQUEST['chosenGroup'] ?? 'Registered');
 $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
 if (! empty($tr['description'])) {
     $smarty->assign('userTrackerHasDescription', true);

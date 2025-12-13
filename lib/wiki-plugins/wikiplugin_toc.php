@@ -124,16 +124,9 @@ function wikiplugin_toc_info()
 function wikiplugin_toc($data, $params)
 {
     $defaults = [
-        'order' => 'asc',
         'showdesc' => false,
         'shownum' => false,
-        'type' => 'plain',
-        'structId' => '',
-        'maxdepth' => 0,
-        'mindepth' => 0,
-        'sortalpha' => 'struct',
         'numberPrefix' => '',
-        'pagename' => '',
     ];
 
     $params = array_merge($defaults, $params);

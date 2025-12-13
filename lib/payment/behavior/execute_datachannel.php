@@ -15,5 +15,5 @@ function payment_behavior_execute_datachannel($data, $params, $posts, $execution
         $_POST[$key] = $post;
     }
 
-    wikiplugin_datachannel($data, $params);
+    TikiLib::lib('parser')->invokePlugin('datachannel', $data, $params);
 }

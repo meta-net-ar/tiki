@@ -59,7 +59,7 @@ class Services_ShowTikiOrg_Controller
 
         $ret['debugoutput'] = $infooutput;
 
-        if (strpos($infooutput, 'MAINTENANCE: ') !== false) {
+        if (str_contains($infooutput, 'MAINTENANCE: ')) {
             $maintpos = strpos($infooutput, 'MAINTENANCE: ');
             $maintreason = substr($infooutput, $maintpos + 13);
             $maintreason = substr($maintreason, 0, strpos($maintreason, '"'));
@@ -87,7 +87,7 @@ class Services_ShowTikiOrg_Controller
              $ret['showurl'] = $site;
             $ret['showlogurl'] = $site . '/info.txt';
             $ret['snapshoturl'] = $site . '/snapshots/';
-            $cloneExist = strpos($infooutput, 'CLONED: YES') !== false;
+            $cloneExist = str_contains($infooutput, 'CLONED: YES');
             $ret['cloneExist'] = $cloneExist;
             if ($cloneExist) {
                 $clone = substr($infooutput, strpos($infooutput, 'CLONE: ') + 7);
@@ -130,7 +130,7 @@ class Services_ShowTikiOrg_Controller
             } elseif ($command == 'create' || $command == 'update') {
                 $ret['status'] = 'BUILD';
             } elseif ($command == 'reset') {
-                if (strpos('ERROR', $fullstring) !== false) {
+                if (str_contains('ERROR', $fullstring)) {
                     $ret['status'] = 'RENOK';
                 } else {
                     $ret['status'] = 'RESOK';

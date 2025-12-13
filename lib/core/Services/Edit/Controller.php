@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\core\Toolbar\ToolbarItem;
+use Tiki\Lib\Diff\DiffUtils;
 
 /**
  * Class Services_Edit_Controller
@@ -40,8 +41,8 @@ class Services_Edit_Controller
 
     public function action_tohtml($input)
     {
-        $wysiwyg = $input->allowhtml->int() ? true : false;
-        $htmlEditor = $input->htmleditor->int() ? true : false;
+        $htmlEditor = (bool)$input->htmleditor->int();
+        $wysiwyg = $input->allowhtml->int() ? true : $htmlEditor;
         $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), false, $wysiwyg, ['wysiwyg' => $wysiwyg, 'html_editor' => $htmlEditor]);
 
         return [
@@ -154,7 +155,7 @@ class Services_Edit_Controller
                         }
                         $info['data'] = substr($info['data'], $real_start, $real_len);
                     }
-                    require_once('lib/diff/difflib.php');
+
                     if ($info['is_html'] == 1) {
                         $diffold = $tikilib->htmldecode($info['data']);
                     } else {
@@ -169,7 +170,7 @@ class Services_Edit_Controller
                         $diffnew = $parserlib->parse_data($diffnew, $options);
                         $diffold = $parserlib->parse_data($diffold, $options);
                     }
-                    $data = diff2($diffold, $diffnew, $diffstyle);
+                    $data = DiffUtils::diff2($diffold, $diffnew, $diffstyle);
                     $smarty->assign_by_ref('diffdata', $data);
 
                     $smarty->assign('translation_mode', 'y');   // disables the headings etc
@@ -331,6 +332,16 @@ $(window).on("load", function(){
         ];
     }
 
+    /**
+     * While the editor settings form is submitted,
+     * parsed the data and convert to ma
+     * and save it back to the textarea
+     *
+     * @param $input
+     *
+     * @return array
+     * @throws Exception
+     */
     public function actionPostEditorSettings($input)
     {
         global $tikilib;
@@ -339,13 +350,21 @@ $(window).on("load", function(){
         $data = $input->data->none();
         $page_name = $input->page->pagename();
         $converted = $data;
+        // check if the data is html and convert it to wiki
+        if ($input->is_html->word() === 'y') {
+            $converted = TikiLib::lib('edit')->parseToWiki($data);
+        }
 
         $page_infos = $tikilib->get_page_info($page_name);
-        $wikiParserParsable = new WikiParser_Parsable($data);
+        $wikiParserParsable = new WikiParser_Parsable($converted);
         $syntaxPluginResult = $wikiParserParsable->guess_syntax($page_infos['data']);
         $source_syntax = $syntaxPluginResult['syntax'];
 
         if ($source_syntax !== $syntax) {
+            if (! str_starts_with('{syntax type=', $data)) {
+                $converted = '{syntax type="' . $source_syntax . '" editor="' . $editor . '"} ' . $converted;
+            }
+
             $converted = TikiLib::lib('edit')->convertWikiSyntax(
                 $converted,
                 $syntax,
@@ -353,12 +372,8 @@ $(window).on("load", function(){
             );
         }
 
-        if ($syntax === 'tiki') {
-            if ($editor === 'wysiwyg') {
-                $converted = TikiLib::lib('edit')->parseToWysiwyg($converted, true, false, ['wysiwyg' => true, 'html_editor' => true]);
-            } else {
-                $converted = TikiLib::lib('edit')->parseToWiki($converted);
-            }
+        if ($syntax === 'tiki' && $editor === 'wysiwyg') {
+            $converted = TikiLib::lib('edit')->parseToWysiwyg($converted, true, false, ['wysiwyg' => true, 'html_editor' => true]);
         }
 
         return [
@@ -526,7 +541,7 @@ $(window).on("load", function(){
 
             if (in_array($name, $sectionToolbar)) {
                 $active[] = $tool;
-            } elseif (strpos($name, 'wikiplugin_') !== false) {
+            } elseif (str_contains($name, 'wikiplugin_')) {
                 $plugins[] = $tool;
             } else {
                 $tools[] = $tool;

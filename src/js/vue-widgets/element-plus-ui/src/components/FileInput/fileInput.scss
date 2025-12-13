@@ -1,3 +1,8 @@
 @use 'element-plus/theme-chalk/el-upload.css';
 @use 'element-plus/theme-chalk/el-icon.css';
 @use '../all.scss';
+
+.el-input__wrapper {
+    --el-font-family: var(--bs-body-font-family);
+    --el-font-size-base: var(--bs-body-font-size);
+}

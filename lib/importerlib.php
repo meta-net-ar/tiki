@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included! Die if called directly...
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -162,7 +162,7 @@ class Importer extends Comments
 
         while ($a = strpos($record, ',')) {
             // If field is a string...
-            if (preg_match("/^'/", substr($record, 0, $a))) {
+            if (str_starts_with(substr($record, 0, $a), "'")) {
                 $offset = 1;
                 while ($b = strpos($record, "'", $offset)) {
                     // If close quote is not escaped
@@ -179,7 +179,7 @@ class Importer extends Comments
                 // Otherwise, it is numeric.
             } else {
                 $field = substr($record, 0, $a);
-                if (strpos($field, 'NULL') !== false && strlen($field) == 4) {
+                if (str_contains($field, 'NULL') && strlen($field) == 4) {
                     $field = null;
                 }
                 $fields[] = $field;
@@ -249,7 +249,7 @@ class Importer extends Comments
                     }
 
                     //first row may have column names - get rid of these
-                    if (strpos($records[0], ') VALUES (') !== false) {
+                    if (str_contains($records[0], ') VALUES (')) {
                         $split = strpos($records[0], ') VALUES (');
                         $records[0] = substr($records[0], $split + 10);
                     }

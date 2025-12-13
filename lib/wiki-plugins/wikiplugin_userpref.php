@@ -24,14 +24,13 @@ function wikiplugin_userpref_info()
 
 function wikiplugin_userpref($data, $params)
 {
-    global $user, $prefs, $tikilib;
+    global $user, $tikilib;
     $dataelse = '';
-    if (strpos($data, '{ELSE}')) {
+    if (str_contains($data, '{ELSE}')) {
         $dataelse = substr($data, strpos($data, '{ELSE}') + 6);
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
-    $else = false;
     foreach ($params as $prefName => $prefValue) {
         if ($tikilib->get_user_preference($user, $prefName) != $prefValue) {
             return $dataelse;

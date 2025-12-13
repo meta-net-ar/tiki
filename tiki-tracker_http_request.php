@@ -29,18 +29,18 @@ if ($prefs['feature_trackers'] != 'y') {
 }
 $access = TikiLib::lib('access');
 
-$filterFieldIdHere = isset($_GET["filterFieldIdHere"]) ? $_GET["filterFieldIdHere"] : null;
-$trackerIdThere = isset($_GET["trackerIdThere"]) ? $_GET["trackerIdThere"] : null;
-$filterFieldValueHere = isset($_GET["filterFieldValueHere"]) ? $_GET["filterFieldValueHere"] : null;
-$filterFieldIdThere = isset($_GET["filterFieldIdThere"]) ? $_GET["filterFieldIdThere"] : null;
-$listFieldIdThere = isset($_GET["listFieldIdThere"]) ? $_GET["listFieldIdThere"] : null;
-$statusThere = isset($_GET["statusThere"]) ? $_GET["statusThere"] : null;
-$mandatory = isset($_GET["mandatory"]) ? $_GET["mandatory"] == 'y' : false;
+$filterFieldIdHere = $_GET["filterFieldIdHere"] ?? null;
+$trackerIdThere = $_GET["trackerIdThere"] ?? null;
+$filterFieldValueHere = $_GET["filterFieldValueHere"] ?? null;
+$filterFieldIdThere = $_GET["filterFieldIdThere"] ?? null;
+$listFieldIdThere = $_GET["listFieldIdThere"] ?? null;
+$statusThere = $_GET["statusThere"] ?? null;
+$mandatory = isset($_GET["mandatory"]) && $_GET["mandatory"] == 'y';
 // needed when multiple fields are bound to the same selection i.e $filterFieldValueHere
-$insertId = isset($_GET["insertId"]) ? $_GET["insertId"] : null;
+$insertId = $_GET["insertId"] ?? null;
 // needed when the default should be passed back to the frontend
-$originalValue = isset($_GET["originalValue"]) ? $_GET["originalValue"] : null;
-$hideBlank = isset($_GET['hideBlank']) ? $_GET['hideBlank'] : false;
+$originalValue = $_GET["originalValue"] ?? null;
+$hideBlank = $_GET['hideBlank'] ?? false;
 
 header('Cache-Control: no-cache');
 header('content-type: application/x-javascript');

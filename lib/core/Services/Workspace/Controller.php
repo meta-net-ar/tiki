@@ -310,7 +310,7 @@ class Services_Workspace_Controller
         $prefix = 'wikicontent:';
         if ($page = $input->page->pagename()) {
             $content = null;
-        } elseif (substr($text, 0, strlen($prefix)) === $prefix) {
+        } elseif (str_starts_with($text, $prefix)) {
             $page = substr($text, strlen($prefix));
             $content = null;
         }

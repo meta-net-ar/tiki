@@ -12,7 +12,7 @@ class TikiLongDateTime
     public function handle($string)
     {
         global $prefs;
-        $smarty = \TikiLib::lib('smarty');
+        \TikiLib::lib('smarty'); //Load SmartyLib for side effects
         // if you change the separator do not forget to change the translation instruction in lib/prefs/long.php
         return smarty_modifier_tiki_date_format($string, $prefs['long_date_format'] . ' ' . $prefs['long_time_format']);
     }

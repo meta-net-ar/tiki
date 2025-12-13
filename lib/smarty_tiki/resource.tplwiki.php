@@ -17,7 +17,7 @@ class Smarty_Resource_Tplwiki extends \Smarty\Resource\CustomPlugin
 {
     protected function fetch($name, &$source, &$mtime)
     {
-        /** @var \Smarty_Tiki $smarty */
+        /** @var \Tiki\Smarty\SmartyTiki $smarty */
         $smarty = TikiLib::lib('smarty');
         $info = $smarty->checkWikiPageTemplatePerms($name, $source);
 

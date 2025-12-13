@@ -10,6 +10,7 @@ require_once('tiki-setup.php');
 
 global $user;
 $accesslib = TikiLib::lib('access');
+$accesslib->check_feature('feature_file_galleries');
 
 if (! isset($_GET['fileId'])) {
     $accesslib->display_error('tiki-display.php', tr('Invalid fileId. Please provide a valid fileId to preview a specific file.'));

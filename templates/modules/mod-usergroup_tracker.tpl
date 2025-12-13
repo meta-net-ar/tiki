@@ -15,7 +15,13 @@
 {if $prefs.groupTracker eq 'y'}
 <div>{tr}Group information:{/tr}</div>
 <div class="card-body">
-&nbsp;&nbsp;<a href="tiki-view_tracker_item.php?view=+group" class="linkmodule">{$default_group|escape}</a>
+{if $user_groups && count($user_groups) > 0}
+    {foreach from=$user_groups item=group}
+        &nbsp;&nbsp;<a href="tiki-view_tracker_item.php?view=+group&group={$group|escape}" class="linkmodule">{$group|escape}</a><br>
+    {/foreach}
+{else}
+    &nbsp;&nbsp;<span class="text-muted">{tr}No groups available{/tr}</span>
+{/if}
 </div>
 {/if}
 

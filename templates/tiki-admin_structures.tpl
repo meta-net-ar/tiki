@@ -187,7 +187,7 @@
                 <div class="mb-3 row mx-0">
                     <label for="batchaction" class="col-form-label">{tr}Perform action with selected{/tr}</label>
                     <div class="input-group col-sm-6">
-                        <select name="batchaction" class="form-control">
+                        <select name="batchaction" id="batchaction" class="form-control">
                             <option value="" selected>{tr}...{/tr}</option>
                             <option value="delete">{tr}Delete{/tr}</option>
                             <option value="delete_with_page">{tr}Delete with the pages{/tr}</option>
@@ -198,7 +198,9 @@
             </form>
         {/if}
 
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if !empty($count) && $count > 0 && !empty($maxRecords) && $maxRecords > 0 && $count > $maxRecords}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_edit_structures == 'y'}

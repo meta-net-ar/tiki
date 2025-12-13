@@ -50,9 +50,6 @@ class WebmailUnreadGlobalCommand extends Command
 
         require_once $tikipath . '/lib/cypht/integration/Tiki_Hm_Functions.php';
 
-        $init = Tiki_Hm_Functions::initCyphtForBackend('servers');
-        extract($init, EXTR_PREFIX_ALL, 'cypht');
-
         $userlib = TikiLib::lib('user');
         $monitorlib = TikiLib::lib('monitor');
         $activitylib = TikiLib::lib('activity');
@@ -80,15 +77,10 @@ class WebmailUnreadGlobalCommand extends Command
 
             foreach ($config['imap_servers'] as $idx => $mailbox) {
                 $output->writeln(tr('Checking account %0', $mailbox['name']));
-                Hm_IMAP_List::add($mailbox, true);
 
-                $output->writeln(tr('Retrieving messages'));
-                $since = date('j-M-Y', $last_timestamp);
-                list($status, $msg_list) = merge_imap_search_results([$idx], 'ALL', $cypht_session, $cypht_cache, ['INBOX'], 1000, [['SINCE', $since]]);
+                list($msg_count, $msg_list) = Tiki_Hm_Functions::getLastUnreadMessageFromMailbox($idx, $mailbox, $last_timestamp);
 
-                Hm_IMAP_List::del($idx);
-
-                if (empty($msg_list)) {
+                if (! $msg_count) {
                     continue;
                 }
 

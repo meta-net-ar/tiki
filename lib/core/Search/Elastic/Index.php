@@ -264,6 +264,12 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             ],
         ];
 
+        if (! empty($prefs['unified_elastic_index_max_result_window'])) {
+            $definition['index'] = [
+                'max_result_window' => (int) $prefs['unified_elastic_index_max_result_window'],
+            ];
+        }
+
         // optionally removes 's from the end of words
         if ($this->possessiveStemmer) {
             $definition['analysis']['analyzer']['default']['filter'][] = 'english_possessive_stemmer';
@@ -403,6 +409,14 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 ]];
             }
 
+            if ($selectFields = $query->getSelectionFields()) {
+                $sourcePart = [
+                    "_source" => $selectFields,
+                ];
+            } else {
+                $sourcePart = [];
+            }
+
             $indices = [$this->index];
 
             $foreign = array_map(function ($query) use ($builder) {
@@ -453,6 +467,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 $facetPart,
                 $rescorePart,
                 $postFilterPart,
+                $sourcePart,
                 [
                     "from" => $resultStart,
                     "size" => $resultCount,
@@ -549,7 +564,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                     $index = $indicesMap[$index];
                 } else {
                     foreach ($indicesMap as $candidate) {
-                        if (0 === strpos($index, $candidate . '_')) {
+                        if (str_starts_with($index, $candidate . '_')) {
                             $indicesMap[$index] = $candidate;
                             $index = $candidate;
                             break;
@@ -670,7 +685,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                     $data[$key] = $correctQueryImploded;
                 } else {
                     foreach ($wrongKeywords as $index => $wrongKeyword) {
-                        if (strpos($value, $wrongKeyword) !== false) {
+                        if (str_contains($value, $wrongKeyword)) {
                             $data[$key] = str_replace($wrongKeyword, $correctKeywords[$index], $value);
                         }
                     }
@@ -805,6 +820,14 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         return new stdClass();
     }
 
+    public function isDateField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping->type) && in_array($mapping->type, ['date', 'datetime'])) {
+            return true;
+        }
+        return false;
+    }
     public function isTextField($field)
     {
         $mapping = $this->getFieldMapping($field);

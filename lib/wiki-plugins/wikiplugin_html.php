@@ -50,11 +50,6 @@ function wikiplugin_html_info()
 
 function wikiplugin_html($data, $params)
 {
-
-    if (! isset($params['wiki'])) {
-        $params['wiki'] = 0;
-    }
-
     // strip out sanitation which may have occurred when using nested plugins
     $html = str_replace('<x>', '', $data);
 
@@ -65,7 +60,7 @@ function wikiplugin_html($data, $params)
         $html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
     }
     // exit($html);
-    if (isset($params['tohead']) && $params['tohead'] == 1) {
+    if ($params['tohead'] == 1) {
         // Insert in HTML head rather than in body
         TikiLib::lib('header')->add_rawhtml($html);
     } else {

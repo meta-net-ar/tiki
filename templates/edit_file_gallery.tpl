@@ -224,6 +224,21 @@ if ($(this).val() != '') {
                     </div>
                 </div>
                 <div class="tiki-form-group row">
+                    <label class="col-sm-4 col-form-label">{tr}Default Display Name Generation{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="display_name_generation" id="dng_default" value="" {if $gal_info.display_name_generation|default:'' eq ''}checked{/if}>
+                            <label class="form-check-label" for="dng_default">{tr}Use site-wide default{/tr} ({$prefs.fgal_filename_to_display_name|default:'preserve'})</label>
+                        </div>
+                        {foreach from=$displayNameGenerationOptions key=value item=label}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="display_name_generation" id="dng_{$value}" value="{$value}" {if $gal_info.display_name_generation eq $value}checked{/if}>
+                                <label class="form-check-label" for="dng_{$value}">{$label}</label>
+                            </div>
+                        {/foreach}
+                    </div>
+                </div>
+                <div class="tiki-form-group row">
                     <label for="visible" class="col-sm-4">{tr}Gallery is visible to non-admin users{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
@@ -432,11 +447,11 @@ if ($(this).val() != '') {
                         <fieldset class="form-text">
                             <legend class="visually-hidden">{tr}Default sort order{/tr}</legend>
                             <label  for="fgal_sortdirection1">
-                                <input type="radio" id="fgal_sortdirection1" name="sortdirection" value="desc" {if $sortdirection == 'desc'}checked="checked"{/if} />
+                                <input type="radio" class="form-check-input" id="fgal_sortdirection1" name="sortdirection" value="desc" {if $sortdirection == 'desc'}checked="checked"{/if} />
                                 &nbsp;{tr}Descending{/tr}&nbsp;
                             </label>
                             <label for="fgal_sortdirection2">
-                                <input type="radio" id="fgal_sortdirection2" name="sortdirection" value="asc" {if $sortdirection == 'asc'}checked="checked"{/if} />
+                                <input type="radio" class="form-check-input" id="fgal_sortdirection2" name="sortdirection" value="asc" {if $sortdirection == 'asc'}checked="checked"{/if} />
                                 &nbsp;{tr}Ascending{/tr}&nbsp;
                             </label>
                         </fieldset>

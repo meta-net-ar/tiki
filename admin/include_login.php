@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -133,7 +133,7 @@ if (isset($_POST['uploadIndex']) && $access->checkCsrf()) {
         $blackL->set_preference('pass_blacklist_file', $blackL->generateBlacklistName(false));
         $blackL->loadBlacklist($filename);
     } else {
-        Feedback::error(tr('Unable to Write Password File to Disk'));
+        Feedback::error(tra('Unable to Write Password File to Disk'));
     }
 } elseif (isset($_POST['deleteIndex']) && $access->checkCsrf(true)) {
     $blackL->deletePassIndex();

@@ -61,13 +61,3 @@ time.timeago:hover {
         border-bottom-color: rgba(255, 255, 255, 0.4);
     }
 }
-
-/* Additional popover customization */
-.popover {
-    border: none;
-    background-color: transparent;
-}
-
-.popover-body {
-    border-radius: 4px;
-}

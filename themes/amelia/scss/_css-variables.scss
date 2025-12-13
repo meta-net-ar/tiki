@@ -1,41 +1,56 @@
-//------- Tiki CSS variables
+// CSS variables for the Amelia theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
 
-// CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
-// Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
-    --tiki-top-bg: #{$navbar-dark-bg};
-    --tiki-top-color: #FCF6E8;
+    --tiki-top-bg: #{$dark};
+    --tiki-top-color: #{$link-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
-    --tiki-top-text-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #5e0a0a;
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: #6e0d0d; //#{$navbar-dark-bg};
+    --tiki-topbar-bg: #{$dark};
     --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
-    --tiki-topbar-text-color: #{$navbar-dark-brand-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
-$navbar-light-hover-bg: red;
+//$navbar-light-hover-bg: red;
 
 @mixin top-nav-light {
-    --tiki-top-bg: #5AE3ED;
-    --tiki-top-color: #322B0B;
-    --tiki-top-hover-color: #5B5015;
-    --tiki-top-text-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-top-bg: #{$light};
+    --tiki-top-color: #{$navbar-light-color};
+    --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
+    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #bed9db;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #68D6DE; //#{$light};
-    --tiki-topbar-color: #3C320B;
-    --tiki-topbar-hover-color: #615314;
-    --tiki-topbar-text-color: #615314;
+    --tiki-topbar-bg: #{$light};
+    --tiki-topbar-color: #{$navbar-light-color};
+    --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-hover-color};
 }
 
 .tiki-top-nav-light {
@@ -58,10 +73,15 @@ $navbar-light-hover-bg: red;
 [data-bs-theme=dark] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
+        --tiki-site-title-color: #{$navbar-dark-color};
+        --tiki-site-subtitle-color: #{$navbar-dark-color};
     }
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
+}
+.navbar-light.bg-light {
+    background-color: $light;
 }
 
 // Color mode preference trumps L&F admin dark navbar option
@@ -78,14 +98,16 @@ $navbar-light-hover-bg: red;
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: #68D6DE;
-    --tiki-admin-navbar-bg: #68D6DE; //#68D6DE !important;
-    --tiki-admin-top-nav-color: #322B0B; // --tiki-top-color
-    --tiki-admin-top-nav-hover-color: #5B5015; // --tiki-topbar-hover-color
-    --tiki-admin-top-nav-hover-bg: none ;
-    --tiki-admin-aside-nav-bg: #68D6DE;
-    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
-    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-top-nav-bg: #{$light};
+    --tiki-admin-top-nav-color: #{$navbar-light-color};
+    --tiki-admin-top-nav-hover-color: #{$navbar-light-hover-color};
+    --tiki-admin-top-nav-hover-bg: none;
+    --tiki-admin-top-border: null;
+    --tiki-admin-top-border-width: null;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #98bbbe;
+    --tiki-admin-aside-nav-bg: #{$light};
+    --tiki-admin-aside-nav-color: #{$navbar-light-color};
+    --tiki-admin-aside-nav-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
@@ -102,16 +124,19 @@ $navbar-light-hover-bg: red;
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: #ad1d28;
-    --tiki-admin-top-nav-color: #{$link-color};
-    --tiki-admin-top-nav-hover-color: #{$link-color};
-    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: #ad1d28;
+    --tiki-admin-top-nav-bg: #{$dark}; //  #ad1d28;
+    --tiki-admin-top-nav-color: #{$navbar-dark-color}; // #{$link-color};
+    --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color}; // #{$link-color};
+    --tiki-admin-top-nav-hover-bg: none;
+    --tiki-admin-top-border: null;
+    --tiki-admin-top-border-width: null;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #5e0a0a;
+    --tiki-admin-aside-nav-bg: #{$dark}; // #ad1d28;
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-link-color: #{$link-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
-    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
+    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color}; // #{$link-color};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     .accordion-item {
         border-width: 0 !important;
@@ -124,27 +149,26 @@ $navbar-light-hover-bg: red;
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 // Color mode preference trumps L&F admin light navbar option
-//[data-bs-theme=dark] {                              // dark color mode
-//    .tiki .tiki-admin-top-nav-light,
-//    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-//    .tiki .tiki-admin-aside-nav-light {               // light top selectors
-//        @include admin-nav-dark;                      // dark values
-//    }
-//}
+[data-bs-theme=dark] {                              // dark color mode
+    .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+        @include admin-nav-dark;                      // dark values
+    }
+}
 // Color mode preference trumps L&F admin dark navbar option
 //[data-bs-theme=light] {                              // light color mode
 //    .tiki .tiki-admin-top-nav-dark,

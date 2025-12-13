@@ -160,37 +160,31 @@ class WikiPluginWantedPages extends PluginsLib
         return preg_replace("/[Revision: $]/", '', "\$Revision: 1.7 $");
     }
 
+    /**
+     * Check if a link is escaped (wrapped in ~np~ tags) in the source page
+     * @param string $fromPageContent The content of the page containing the link
+     * @param string $toPage The target page of the link
+     * @return bool True if the link is escaped, false otherwise
+     */
+    private function isEscapedLink($fromPageContent, $toPage)
+    {
+        if (empty($fromPageContent)) {
+            return false;
+        }
+
+        // Check if link is wrapped in ~np~ tags (exact or partial matches within np blocks)
+        // Pattern: ~np~...((PageName))...~/np~
+        $escapedPattern = '/~np~[^~]*?\(\(' . preg_quote($toPage, '/') . '\)\).*?~\/np~/s';
+
+        return preg_match($escapedPattern, $fromPageContent) === 1;
+    }
+
     public function run($data, $params)
     {
         global $prefs, $page_regex;
 
         // Grab and handle our Tiki parameters...
         extract($params, EXTR_SKIP);
-        if (! isset($ignore)) {
-            $ignore = '';
-        }
-        if (! isset($splitby)) {
-            $splitby = '+';
-        }
-        if (! isset($skipalias)) {
-            $skipalias = 1;
-        }
-        if (! isset($skipext)) {
-            $skipext = false;
-        }
-        if (! isset($debug)) {
-            $debug = false;
-        }
-        if (! isset($collect)) {
-            $collect = 'from';
-        }
-        if (! isset($table)) {
-            $table = 'sep';
-        }
-        if (! isset($level)) {
-            $level = '';
-        }
-
         // for regexes and external wiki details, see tikilib.php
         if ($level == 'strict') {
             $level_reg = '([A-Za-z0-9_])([\.: A-Za-z0-9_\-])*([A-Za-z0-9_])';
@@ -202,7 +196,7 @@ class WikiPluginWantedPages extends PluginsLib
             if (preg_ispreg($data)) { // custom regular expression
                 $level_reg = $data;
             } elseif ($debug == 2) {
-                echo $data . ': ' . tra('non-valid custom regex') . '<br />';
+                echo tr('%0: non-valid custom regex', $data) . '<br />';
             }
         } else { // default
             $level_reg = $page_regex;
@@ -222,8 +216,9 @@ class WikiPluginWantedPages extends PluginsLib
 
         // Currently we only look in wiki pages.
         // Wiki links in articles, blogs, etc are ignored.
-        $query = 'select distinct tl.`toPage`, tl.`fromPage` from `tiki_links` tl';
+        $query = 'select distinct tl.`toPage`, tl.`fromPage`, tpf.`data` as fromPageContent from `tiki_links` tl';
         $query .= ' left join `tiki_pages` tp on (tl.`toPage` = tp.`pageName`)';
+        $query .= ' left join `tiki_pages` tpf on (tl.`fromPage` = tpf.`pageName`)';
         if ($skipalias) {
             $query .= ' left join `tiki_object_relations` tor on (tl.`toPage` = tor.`target_itemId`)';
         }
@@ -240,11 +235,25 @@ class WikiPluginWantedPages extends PluginsLib
         $tmp = [];
 
         while ($row = $result->fetchRow()) {
+            // Skip links that were escaped with ~np~ tags
+            // For object links, we don't have page content to check, so skip the escape check
+            if (
+                ! str_starts_with($row['fromPage'], 'objectlink:') &&
+                $this->isEscapedLink($row['fromPageContent'] ?? '', $row['toPage'])
+            ) {
+                if ($debug == 2) {
+                    echo tr('%0 [from: %1]: escaped with ~np~ tags', $row['toPage'], $row['fromPage']) . '<br />';
+                } elseif ($debug) {
+                    $tmp[] = [$row['toPage'], $row['fromPage'], 'escaped with ~np~ tags'];
+                }
+                continue;
+            }
+
             foreach ($ignorepages as $ipage) {
                 // test whether a substring ignores this page, ignore case
                 if (fnmatch(mb_strtolower($ipage), mb_strtolower($row['fromPage'])) === true) {
                     if ($debug == 2) { // the "hardcore case"
-                        echo $row['toPage'] . ' [from: ' . $row['fromPage'] . ']: ' . tra('ignored') . '<br />';
+                        echo tr('%0 [from: %1]: ignored', $row['toPage'], $row['fromPage']) . '<br />';
                     } elseif ($debug) { // add this page to the table
                         $tmp[] = [$row['toPage'], $row['fromPage'], 'ignored'];
                     }
@@ -253,11 +262,11 @@ class WikiPluginWantedPages extends PluginsLib
             } // foreach ignorepage
 
             // if toPage contains colon, and exloding yields two parts => external Wiki
-            if (($skipext) && (strstr($row['toPage'], ':') !== false)) {
+            if (($skipext) && (str_contains($row['toPage'], ':'))) {
                 $parts = explode(':', $row['toPage']);
                 if (count($parts) == 2) {
                     if ($debug == 2) {
-                        echo $row['toPage'] . ' [from: ' . $row['fromPage'] . ']: ' . tra('External Wiki') . '<br />';
+                        echo tr('%0 [from: %1]: External Wiki', $row['toPage'], $row['fromPage']) . '<br />';
                     } elseif ($debug) {
                         $tmp[] = [$row['toPage'], $row['fromPage'], 'External Wiki'];
                     }
@@ -312,7 +321,7 @@ class WikiPluginWantedPages extends PluginsLib
         if (is_array($tmp)) {
             foreach ($tmp as $row) { // row[toPage, fromPage, reason]
                 if ($debug) { // modified rejected toPages with reason
-                    $row[0] = '<em>' . tra($row[2]) . '</em>: ' . $row[0];
+                    $row[0] = tr('<em>%0</em>: %1', $row[2], $row[0]);
                 }
                 $row[0] = is_object_link($row[0]) ? parse_object_link($row[0]) : ($linkin . $row[0] . $linkout); // toPages
                 $row[1] = is_object_link($row[1]) ? parse_object_link($row[1]) : '((' . $row[1] . '))'; // fromPages
@@ -390,6 +399,7 @@ class WikiPluginWantedPages extends PluginsLib
         if (TikiLib::lib('parser')->option['is_markdown']) {
             $sOutput = TikiLib::lib('parser')->parse_data($sOutput, ['is_markdown' => false, 'is_html' => true]);
         }
+
         return $sOutput;
     }
 }
@@ -478,7 +488,7 @@ if (! function_exists('debug_print')) {
     function debug_print($row, $debug, $message)
     {
         if ($debug == 2) {
-            echo $row['toPage'] . ' [from: ' . $row['fromPage'] . ']: ' . $message . '<br />';
+            echo tr('%0 [from: %1]: %2', $row['toPage'], $row['fromPage'], $message) . '<br />';
             return;
         } elseif ($debug) {
             $tmp[] = [$row['toPage'], $row['fromPage'], $message];
@@ -493,7 +503,7 @@ if (! function_exists('is_object_link')) {
     function is_object_link($link)
     {
         $parts = explode(':', $link);
-        if (strstr($link, 'objectlink:') && count($parts) >= 3) {
+        if (str_contains($link, 'objectlink:') && count($parts) >= 3) {
             return true;
         }
         return false;
