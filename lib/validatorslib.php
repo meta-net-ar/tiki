@@ -76,7 +76,7 @@ class Validators
                         $validationjs .= $prefix . $field_value['fieldId'] . ': { ';
                     }
                 }
-                if ($isMandatory) {
+                if ($isMandatory && $handler->isClientSideMandatory()) {
                     if ($field_value['type'] == 'D') {
                         $validationjs .= 'required_in_group: [1, ".group_' . $prefix . $field_value['fieldId'] . '", "other"], ';
                     } elseif ($field_value['type'] == 'A') {
