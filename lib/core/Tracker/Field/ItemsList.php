@@ -240,6 +240,9 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
     {
         if (isset($context['search_render']) && $context['search_render'] == 'y') {
             $itemIds = $this->getData($this->getConfiguration('fieldId'));
+            if (empty($itemIds) && ! is_array($itemIds)) {
+                $itemIds = [];
+            }
         } else {
             $itemIds = $this->getItemIds();
         }
