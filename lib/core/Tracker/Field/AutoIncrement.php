@@ -137,6 +137,18 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
         ];
     }
 
+    /**
+     * Overrides the default client-side validation behavior.
+     * An auto-increment field's value is generated on the server, so it should
+     * never be considered mandatory by client-side JavaScript validation.
+     *
+     * @return bool Always returns false.
+     */
+    public function isClientSideMandatory(): bool
+    {
+        return false;
+    }
+
     public function getTabularSchema()
     {
         $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
