@@ -42,6 +42,12 @@ class IndexRebuildCommand extends Command
                 'p',
                 InputOption::VALUE_NONE,
                 'Show progress bar'
+            )
+            ->addOption(
+                'skip-error-tracking',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip Tiki error tracking and only log errors to log file (if enabled). Useful if you rebuild generates a lot of noise in your external error tracking system.'
             );
     }
 
@@ -134,7 +140,9 @@ class IndexRebuildCommand extends Command
             $progress = null;
         }
 
-        $result = $unifiedsearchlib->rebuild($log, false, $progress);
+        $skipErrorTracking = $input->getOption('skip-error-tracking') ? true : false;
+
+        $result = $unifiedsearchlib->rebuild($log, false, $progress, $skipErrorTracking);
 
         if ($progress) {
             $progress->setMessage(tr('Rebuilding preferences index'));

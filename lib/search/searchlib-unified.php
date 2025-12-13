@@ -167,7 +167,7 @@ class UnifiedSearchLib
      * @return array|bool
      * @throws Exception
      */
-    public function rebuild($loggit = 0, $fallback = false, $progress = null)
+    public function rebuild($loggit = 0, $fallback = false, $progress = null, $skipErrorTracking = false)
     {
         global $prefs;
         $engineResults = null;
@@ -261,6 +261,7 @@ class UnifiedSearchLib
         try {
             $indexDecorator = new Search_Index_TypeAnalysisDecorator($index);
             $indexer = $this->buildIndexer($indexDecorator, $loggit);
+            $indexer->setErrorTrackingEnabled(! $skipErrorTracking);
             $lastStats = $tikilib->get_preference('unified_last_rebuild_stats', [], true);
 
             $stat = $tikilib->allocate_extra(
