@@ -214,6 +214,19 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $this->updatePercolateIndex($this->index, $pq_mapping);
         }
 
+        if ($mapping) {
+            // store prefs on each index schema update as doing in __destruct is not reliable - various cases omit storing these prefs
+            // and search results are missing fields later
+            $fieldMapping = json_encode($this->fieldMapping);
+            if (empty($prefs['unified_field_mapping']) || $prefs['unified_field_mapping'] != $fieldMapping) {
+                TikiLib::lib('tiki')->set_preference('unified_field_mapping', $fieldMapping);
+            }
+            $dateFields = json_encode($this->dateFields);
+            if (empty($prefs['unified_date_fields']) || $prefs['unified_date_fields'] != $dateFields) {
+                TikiLib::lib('tiki')->set_preference('unified_date_fields', $dateFields);
+            }
+        }
+
         $this->dirty = true;
     }
 
