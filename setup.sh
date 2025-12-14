@@ -839,20 +839,6 @@ what to answer, just press enter to each question (to use default value)"
         fi
     done
 
-    # H5P: ensure subdirectories exist
-    if [ -n "${STORAGE_PUBLIC_H5P_PATH}" ]; then
-        H5P_SUBDIRS="cachedassets content exports libraries temp"
-        for sd in $H5P_SUBDIRS; do
-            printf "  %s/%s ... " "$STORAGE_PUBLIC_H5P_PATH" "$sd"
-            if [ ! -d "${STORAGE_PUBLIC_H5P_PATH}/$sd" ]; then
-                ${MKDIR} -p "${STORAGE_PUBLIC_H5P_PATH}/$sd"
-                echo "created."
-            else
-                echo "ok."
-            fi
-        done
-    fi
-
     # Check that the USER is in AGROUP
     USERINAGROUP="no"
     for grp in $(${ID} -Gn "$USER"); do

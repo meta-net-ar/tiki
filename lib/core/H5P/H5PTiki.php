@@ -12,6 +12,9 @@
  */
 class H5P_H5PTiki implements H5PFrameworkInterface
 {
+    // H5P required subdirectories (used by the H5P library for content, cache, exports, and temporary uploads)
+    public const H5P_REQUIRED_SUBDIRS = ['cachedassets', 'content', 'exports', 'libraries', 'temp'];
+
     // properties for table objects
     private $tiki_h5p_contents = null;
     private $tiki_h5p_contents_libraries = null;
@@ -58,7 +61,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         }
 
         // double check that  subdirectories exist and are writable
-        foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
+        foreach (self::H5P_REQUIRED_SUBDIRS as $dir) {
             $path = $abs . '/' . $dir;
             if (! is_dir($path)) {
                 @mkdir($path, 0775, true);
@@ -99,7 +102,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             @mkdir($abs, 0775, true);
         }
         if ($createSubdirs) {
-            foreach (['cachedassets','content','exports','libraries','temp'] as $d) {
+            foreach (self::H5P_REQUIRED_SUBDIRS as $d) {
                 $sub = $abs . '/' . $d;
                 if (! is_dir($sub)) {
                     @mkdir($sub, 0775, true);
@@ -1787,19 +1790,13 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
     // Helper functions to resolve H5P paths
     private static function resolveRelH5PPath(): string
     {
-        if (defined('STORAGE_PUBLIC_H5P_PATH')) {
-            return rtrim(STORAGE_PUBLIC_H5P_PATH, '/');
-        }
-
-        $base = defined('STORAGE_PUBLIC_PATH') ? rtrim(STORAGE_PUBLIC_PATH, '/') : 'storage/public';
-
         global $tikidomainslash;
+        // For multi-domain setups, adjust the path
         if (! empty($tikidomainslash)) {
             $site = trim($tikidomainslash, '/');
-            $base = "storage/{$site}/public";
+            return "storage/{$site}/public/h5p";
         }
-
-        return $base . '/h5p';
+        return STORAGE_PUBLIC_H5P_PATH;
     }
 
     private static function resolveAbsH5PPath(): string

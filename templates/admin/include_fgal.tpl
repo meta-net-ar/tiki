@@ -410,8 +410,8 @@
                     {preference name='h5p_custom_js_files'}
                     {preference name='h5p_custom_css_files'}
 
-                    {* H5P storage status *}
-                    {if isset($h5p_storage_ok)}
+                    {* H5P storage status - H5P content is stored as file gallery items *}
+                    {if $prefs.feature_h5p eq 'y' && isset($h5p_storage_ok)}
                         {if $h5p_storage_ok}
                             {remarksbox type="success" title="{tr}H5P storage{/tr}"}
                                 {tr}OK:{/tr} <code>{$h5p_storage_abs|escape}</code>
