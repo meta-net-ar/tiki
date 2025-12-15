@@ -120,7 +120,7 @@ class ODBCManager
             $sql = "SELECT \"{$pk}\" FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
             $rs = odbc_prepare($conn, $sql);
             odbc_execute($rs, [$id]);
-            $exists = odbc_num_rows($rs) > 0;
+            $exists = odbc_fetch_array($rs) ? true : false;
         } else {
             $exists = false;
             $id = null;
@@ -291,7 +291,7 @@ class ODBCManager
         $rs = odbc_prepare($conn, $sql);
         if ($rs) {
             odbc_execute($rs, [$value]);
-            $exists = odbc_num_rows($rs) > 0;
+            $exists = odbc_fetch_array($rs) ? true : false;
         } else {
             $exists = false;
         }
