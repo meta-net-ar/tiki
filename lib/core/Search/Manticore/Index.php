@@ -135,7 +135,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         );
 
         foreach ($data as $field => $value) {
-            if (isset($this->providedMappings[$field . '_nsort'])) {
+            if (isset($this->providedMappings[$field . '_nsort']) || isset($this->providedMappings[strtolower($field) . '_nsort'])) {
                 $data[$field . '_nsort'] = @floatval($value);
             }
         }
