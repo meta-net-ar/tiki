@@ -1318,7 +1318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $getParseIntoTransformFunction = function ($separator) use ($permName, $invertField) {
                     return function (&$info, $value) use ($separator, $permName, $invertField) {
                         $itemIds = [];
-                        foreach (explode($separator, $value) as $val) {
+                        foreach (explode($separator, (string) $value) as $val) {
                             if ($id = $invertField->get($val)) {
                                 $itemIds[] = $id;
                             }
