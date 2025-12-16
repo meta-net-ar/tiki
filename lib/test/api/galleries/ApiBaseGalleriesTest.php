@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-namespace Tiki\Test\Api\Galleries;
+namespace Tiki\Lib\Test\Api\Galleries;
 
 use ApiTestCase;
 use TikiLib;
@@ -254,7 +254,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
 
     private function getGalleriesListResultSchema()
     {
-        return                 [
+        return [
             'isgal' => 'int',
             'id' => 'int',
             'parentId' => 'int',

@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-namespace Tiki\Test\Api\Galleries;
+namespace Tiki\Lib\Test\Api\Galleries;
 
 /**
  * Tests for File Galleries API POST endpoints
