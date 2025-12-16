@@ -746,7 +746,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($value)) {
+        if (count($indexRemote) && is_numeric($value) && $value > 0) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
             $item = $trklib->get_tracker_item($value);
