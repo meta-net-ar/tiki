@@ -912,8 +912,10 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $tikidateStart->setDate($calitem['start']);
         $tikidateEnd = new TikiDate();
         $tikidateEnd->setDate($calitem['end']);
+        $duration = ($calitem['end'] - $calitem['start']);
         $recurrence->setStart($tikidateStart->format("%H%M", true));
         $recurrence->setEnd($tikidateEnd->format("%H%M", true));
+        $recurrence->setDuration($duration);
         date_default_timezone_set($tz);
         $recurrence->setAllday($calitem['allday']);
         $recurrence->setLocationId($calitem['locationId']);
