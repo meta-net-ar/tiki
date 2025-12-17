@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
@@ -3767,6 +3767,7 @@ $lang_current = array(
 "Use a rich text editor instead of inputting plain text" => "Utiliser un éditeur de texte riche à la place de la boite de texte",
 "Preview Tabs" => "Onglets d'aperçu",
 "Enable edit and preview tabs for this field" => "Activer les onglets de modification et d'aperçu pour ce champ",
+"You need to activate WYSIWYG (feature_wysiwyg) feature to benefit from it." => "Vous devez activer WYSIWYG(feature_wysiwyg) pour en benifier",
 "Word Limit Exceeded" => "Nombre maximum de mots atteint",
 "Character Limit Exceeded" => "Nombre de caractères dépassé",
 "Text Field" => "Champ texte",
@@ -12010,6 +12011,7 @@ $lang_current = array(
 "Please configure the username and password of your mautic account to get the contacts in the API" => "Veuillez configurer le nom d'utilisateur et le mot de passe de votre compte Mautic pour récupérer les contacts dans l'API",
 "Mautic Form" => "Formulaire Mautic",
 "Mautic Contact" => "Contact Mautic",
+"Can't render Markdown editor in WYSIWYG mode; you need to enable '%0' first." => "Impossible d'afficher l'editeur markdown en mode WYSIWYG, vous devez d'abord activer %0.",
 "Mayan Calendars" => "Calendriers Mayas",
 "Convert a Gregorian date to a Mayan calendar date" => "Convertir une date du calendrier Grégorien en calendrier Maya",
 "You must use the variable substitution" => "Vous devez utiliser la variable de substitution",

@@ -1158,8 +1158,9 @@ if ($prefs['feature_elementplus'] == 'y') {
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
 $headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
 
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
-
+if ($prefs['feature_wysiwyg'] === 'y') {
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
+}
 if ($prefs['fgal_use_record_rtc_screen'] == 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
