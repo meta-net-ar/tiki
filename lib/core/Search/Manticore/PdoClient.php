@@ -195,6 +195,10 @@ class PdoClient
 
     public function possibleFacetFields($table)
     {
+        static $cache = [];
+        if (isset($cache[$table])) {
+            return $cache[$table];
+        }
         if ($table == self::distributedIndexName()) {
             $stmt = $this->query("DESC $table");
             $result = $stmt->fetchAll();
@@ -220,7 +224,8 @@ class PdoClient
             }
         }
         if (count($fields) == 1) {
-            return array_keys(array_shift($fields));
+            $cache[$table] = array_keys(array_shift($fields));
+            return $cache[$table];
         }
         $common = [];
         $result = array_shift($fields);
@@ -241,7 +246,8 @@ class PdoClient
             }
             $common[] = $field;
         }
-        return $common;
+        $cache[$table] = $common;
+        return $cache[$table];
     }
 
     public function deleteIndex($index)
