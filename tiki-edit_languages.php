@@ -44,8 +44,9 @@ if (isset($_REQUEST["edit_language"])) {
     $smarty->assign('edit_language', $_REQUEST["edit_language"]);
     $edit_language = $_REQUEST["edit_language"];
 } else {
-    $smarty->assign('edit_language', $prefs['language']);
-    $edit_language = $prefs['language'];
+    $lang = Language::getCurrentLanguage();
+    $smarty->assign('edit_language', $lang);
+    $edit_language = $lang;
 }
 
 $translations = new LanguageTranslations($edit_language);
@@ -87,11 +88,7 @@ if (isset($_REQUEST['delete_all']) && $tiki_p_admin) {
 }
 
 //Selection for untranslated Strings and edit translations
-if (isset($_REQUEST["action"])) {
-    $action = $_REQUEST["action"];
-} else {
-    $action = "";
-}
+$action = $_REQUEST["action"] ?? "";
 
 if ($action == "edit_rec_sw" || $action == "edit_tran_sw") {
     $access->checkCsrf();

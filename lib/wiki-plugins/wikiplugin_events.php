@@ -132,11 +132,7 @@ function wikiplugin_events($data, $params)
     extract($params, EXTR_SKIP);
 
     if ($usePagination == 'y') {
-        if (! isset($_REQUEST["offset"])) {
-            $start = 0;
-        } else {
-            $start = $_REQUEST["offset"];
-        }
+        $start = $_REQUEST["offset"] ?? 0;
     }
 
 

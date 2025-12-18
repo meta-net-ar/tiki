@@ -32,6 +32,11 @@ $theme-colors: (
     "dark":         $dark
 );
 
+:root {
+    --tiki-business-dark-bg: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%);
+    --tiki-business-light-bg: linear-gradient(to bottom, #e8e8e8 0%, #f2f2f2 50%, #f2f2f2 100%);
+}
+
 // Options
 // Prefix for :root CSS variables
 $enable-shadows:              true;
@@ -86,27 +91,24 @@ $nav-link-color:                    var(--#{$prefix}link-color); // !important;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color); // !important;
 
 //Navbar
-$navbar-dark-color:             #ffffff;
-$navbar-dark-bg:                 #1f5daa;
-$navbar-dark-border:             color.adjust($navbar-dark-bg, $lightness: -6.5%, $space: hsl);
-
-
-
-// Navbar links
-$navbar-dark-color:                  #ffffff;
-$navbar-dark-hover-color:          rgba($white, .75); // !default;
-$navbar-dark-hover-bg:              transparent;
-$navbar-dark-active-color:          #ffffff;
-$navbar-dark-active-bg:              #3270bd;
-$navbar-dark-disabled-color:         #cccccc;
-
 $navbar-light-color:                $link-color;
 $navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
 $navbar-light-active-color:         $navbar-light-hover-color;
 $navbar-light-disabled-color:       rgba($black, .3);  // default
 $navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-light-toggler-border-color: rgba($black, .1);  // default
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 
+$navbar-dark-color:             #ffffff;
+$navbar-dark-bg:                 #1f5daa;
+$navbar-dark-border:             color.adjust($navbar-dark-bg, $lightness: -6.5%, $space: hsl);
+$navbar-dark-hover-bg:              transparent;
+$navbar-dark-active-color:          #ffffff;
+$navbar-dark-active-bg:              #3270bd;
+$navbar-dark-disabled-color:         #cccccc;
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-color:                    $body-color;  // default

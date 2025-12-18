@@ -35,7 +35,7 @@
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label">{tr}Votes to show{/tr}</label>
         <div class="col-sm-9">
-            <input type="radio" name="which_date" value="between"{if $which_date eq 'between'} checked="checked"{/if} class="me-2"><label class="col-form-label-sm">{tr}Within a date range{/tr}</label>
+            <input type="radio" name="which_date" value="between"{if $which_date eq 'between'} checked="checked"{/if} class="form-check-input me-2"><label class="col-form-label-sm">{tr}Within a date range{/tr}</label>
             <div class="mb-3 row mt-2">
                 <label class="col-sm-2 col-form-label-sm">{tr}Start{/tr}</label>
                 <div class="col-sm-7">
@@ -50,16 +50,16 @@
             </div>
             {if empty($pollId) or $poll_info.voteConsiderationSpan > 0}
                 <label>
-                    <input type="radio" name="which_date" value="all"{if $which_date eq 'all'} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="which_date" value="all"{if $which_date eq 'all'} checked="checked"{/if}>
                     {tr}All votes with no time span consideration{/tr}
                 </label>
                 <br>
                 <label>
-                    <input type="radio" name="which_date" value="consideration"{if $which_date eq 'consideration' or $which_date eq ''} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="which_date" value="consideration"{if $which_date eq 'consideration' or $which_date eq ''} checked="checked"{/if}>
                     {tr}All votes with time span consideration{/tr}
                 </label>
             {else}
-                <input type="radio" name="which_date" value="all"{if $which_date eq 'all' or $which_date eq ''} checked="checked"{/if} class="me-2"><label class="col-form-label-sm">{tr}All votes{/tr}</label>
+                <input type="radio" name="which_date" value="all"{if $which_date eq 'all' or $which_date eq ''} checked="checked"{/if} class="me-2 form-check-input"><label class="col-form-label-sm">{tr}All votes{/tr}</label>
             {/if}
             <input type="submit" class="btn btn-primary btn-sm" name="search" value="{tr}Find{/tr}">
         </div>

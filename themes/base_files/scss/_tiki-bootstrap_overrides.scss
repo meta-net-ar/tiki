@@ -135,6 +135,14 @@ body.fullscreen.tiki.navbar-padding {
 //    word-wrap: normal;
 //    word-break: normal;
 }
+@media (max-width: 768px) {
+    .tiki.tiki-list_file_gallery .popover,
+    .tiki.tiki_file_galleries .popover,
+    .tiki.tiki_trackers .popover,
+    .tiki .wikiplugin-trackerlist .popover {
+        max-width: 90vw;
+    }
+}
 
 .tiki.tiki_wiki_page .popover {
     max-width: 50vw;
@@ -465,8 +473,11 @@ body.fullscreen.tiki.navbar-padding {
     .tiki.tiki_wiki_page .popover { max-width: 75%; }
 }
 
-// Override the default Bootstrap separator.
-.breadcrumb-item + .breadcrumb-item::before { content: none !important; }
+// Use Bootstrap's default separator mechanism driven by the CSS variable.
+// Individual templates can set --bs-breadcrumb-divider (e.g., via user pref site_crumb_seper).
+.breadcrumb-item + .breadcrumb-item::before {
+  content: var(--bs-breadcrumb-divider, "/");
+}
 
 // Restore pre-Bootstrap 5 top and bottom padding on vertical menu items
 .navbar-nav.me-auto.bs-vertical .nav-link,
@@ -480,10 +491,19 @@ body.fullscreen.tiki.navbar-padding {
     flex-direction: column !important;
 }
 
+// These classes are used in templates and should resist being overridden.
 .p-0 {
     padding: 0 !important;
 }
 
 .m-0 {
     margin: 0 !important;
+}
+
+.border-0 {
+    border: 0 !important;
+}
+
+.shadow-none {
+    box-shadow: none !important;
 }

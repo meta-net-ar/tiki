@@ -65,11 +65,7 @@ if (! ($info = $tikilib->page_exists($page))) {
     die;
 }
 
-if (isset($_REQUEST['theme'])) {
-    $theme = $_REQUEST['theme'];
-} else {
-    $theme = "black";
-}
+$theme = $_REQUEST['theme'] ?? "black";
 
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);
@@ -241,7 +237,6 @@ if (isset($_REQUEST['pdf'])) {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
         exit(0);
     }

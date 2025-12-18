@@ -33,6 +33,7 @@ require_once __DIR__ . '/Tiki_Hm_User_Config.php';
 require_once __DIR__ . '/Tiki_Hm_Sieve_Custom_Client.php';
 require_once __DIR__ . '/Tiki_Hm_Sieve_Client_Factory.php';
 require_once __DIR__ . '/Tiki_Hm_Functions.php';
+require_once __DIR__ . '/Tiki_Hm_Dispatch.php';
 
 putenv('WORKER_CUSTOM_IMPORTS=' . __DIR__ . '/Tiki_Hm_User_Config.php,' . realpath(__DIR__ . '/../../core/Cache/CacheLib.php') . ',' . __DIR__ . '/Tiki_Hm_Tiki_Cache.php,' . __DIR__ . '/Tiki_Hm_Custom_Cache.php');
 

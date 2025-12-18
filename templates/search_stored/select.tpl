@@ -20,7 +20,7 @@
                 <span class="form-text">{tr}This will help you recognize your stored queries if ever you want to modify or remove them.{/tr}</span>
             </div>
             <div class="mb-3 row">
-                <label for="priority" class="col-form-label">Priority</label>
+                <label for="priority" class="col-form-label">{tr}Priority{/tr}</label>
                 <select id="priority" name="priority" class="form-select">
                     {foreach $priorities as $key => $info}
                         <option value="{$key|escape}">{$info.label|escape} - {$info.description|escape}</option>

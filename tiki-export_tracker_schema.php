@@ -66,11 +66,7 @@ $smarty = TikiLib::lib('smarty');
 require_once("export-tracker_schema.php");
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames);
 $mermaidOutput = handleMermaid($mermaidText);
-if (isset($_REQUEST['export'])) {
-    $export = $_REQUEST['export'];
-} else {
-    $export = 'svgFormat';
-}
+$export = $_REQUEST['export'] ?? 'svgFormat';
 
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames, true);
 $smarty->assign('export', $export);

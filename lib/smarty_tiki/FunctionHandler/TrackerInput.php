@@ -51,7 +51,7 @@ class TrackerInput extends Base
                     $key = new \Tiki\Encryption\Key($field['encryptionKeyId']);
                     $field['value'] = $key->decryptData($handler->getValue());
                     $info = tr('Field data is encrypted using key "%0".', $key->get('name'));
-                } catch (\Tiki\Encryption\NotFoundException $e) {
+                } catch (\Tiki\Encryption\NotFoundException) {
                     return tr('Field is encrypted with a key that no longer exists!');
                 } catch (\Tiki\Encryption\Exception $e) {
                     $field['value'] = '';

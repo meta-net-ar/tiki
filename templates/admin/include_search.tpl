@@ -128,6 +128,7 @@
 
                     {preference name=unified_user_cache}
                     {preference name=unified_cache_formatted_result}
+                    {preference name=unified_cache_relation}
                     {preference name=unified_cached_formatters}
                     {preference name=unified_list_cache_default_on}
                     {preference name=unified_list_cache_default_expiry}

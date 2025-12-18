@@ -59,6 +59,7 @@
                     {preference name=smarty_security_disabled_tags}
                     {preference name=smarty_security_allowed_modifiers}
                     {preference name=smarty_security_disabled_modifiers}
+                    {preference name=smarty_security_allowed_builtin_php_functions}
                     {preference name=smarty_security_dirs}
                 </div>
                 {preference name=feature_purifier}
@@ -467,7 +468,7 @@
                                 {if $prefs.feature_user_encryption eq 'y'}
                                     {user_selector multiple='true' name='users' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
                                 {else}
-                                    Depends on "User encryption".
+                                    {tr}Depends on "User encryption".{/tr}
                                 {/if}
                             </div>
                         </div><br>

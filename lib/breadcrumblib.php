@@ -158,9 +158,13 @@ function _breadcrumb_buildTrail($crumbs, $len = -1, $cnt = -1, $showLinks = true
             }
         }
         $ret = array_filter($ret);
-        return implode($seper, $ret);
+        $wrapped = array_map(function ($crumb) {
+            return '<li class="breadcrumb-item pe-2">' . $crumb . '</li>';
+        }, $ret);
+        return implode('', $wrapped);
     } else {
-        return _breadcrumb_buildCrumb($crumbs, $cnt, $loclass, $showLinks);
+        $crumb = _breadcrumb_buildCrumb($crumbs, $cnt, $loclass, $showLinks);
+        return $crumb ? '<li class="breadcrumb-item pe-2">' . $crumb . '</li>' : '';
     }
 }
 

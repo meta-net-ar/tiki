@@ -934,6 +934,20 @@ function wikiplugin_trackerFilter_get_filters($trackerId = 0, array $listfields 
                     }
 
                     break;
+                case 'usergroups':
+                    $groups = TikiLib::lib('user')->list_all_groups();
+                    foreach ($groups as $group) {
+                        $opt['id'] = $group;
+                        $opt['name'] = $group;
+                        if (! empty($_REQUEST['f_' . $fieldId]) && ((! is_array($_REQUEST['f_' . $fieldId]) && $_REQUEST['f_' . $fieldId] == $group) || (is_array($_REQUEST['f_' . $fieldId]) && in_array($group, $_REQUEST['f_' . $fieldId])))) {
+                            $opt['selected'] = 'y';
+                            $selected = true;
+                        } else {
+                            $opt['selected'] = 'n';
+                        }
+                        $opts[] = $opt;
+                    }
+                    break;
                 default:
                     return tra('tracker field type not processed yet:') . ' ' . $field['type'];
             }

@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Paths;
 
+use Language;
+use TikiLib;
+
 class Customization
 {
     private static function getCurrentSitePathImpl(bool $wantPublicPath, ?string $pathFragment = null)
@@ -57,8 +60,7 @@ class Customization
 
     public static function getCustomLangFragment()
     {
-        global $prefs;
-        $language = $prefs['language'];
+        $language = Language::getCurrentLanguage();
         return "lang/$language/custom.js";
     }
 }

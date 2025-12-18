@@ -7,15 +7,6 @@
 function prefs_metatag_list()
 {
     return [
-        'metatag_keywords' => [
-            'name' => tra('Keywords'),
-            'description' => tra('A list of keywords (separated by commas) that describe this website.'),
-            'type' => 'textarea',
-            'size' => '4',
-            'default' => '',
-            'tags' => ['basic'],
-            'translatable' => true,
-        ],
         'metatag_freetags' => [
             'name' => tra('Include tags'),
             'description' => tra('If the Tags feature is enabled, the tags for each page with tags set will be used as meta keywords. This allows individual pages at the site to have different meta tags.'),
@@ -55,14 +46,6 @@ function prefs_metatag_list()
             'type' => 'flag',
             'default' => 'n',
         ],
-        'metatag_author' => [
-            'name' => tra('Author'),
-            'description' => tra('The author of this website. Typically this is the Admin or Webmaster.'),
-            'type' => 'text',
-            'size' => '50',
-            'default' => '',
-            'tags' => ['basic'],
-        ],
         'metatag_geoposition' => [
             'name' => tra('geo.position'),
             'description' => tra('The latitude and longitude of the physical location of the site. For example "38.898748, -77.037684".'),
@@ -95,14 +78,17 @@ function prefs_metatag_list()
             'size' => '50',
             'default' => '',
         ],
-        'metatag_revisitafter' => [
-            'name' => tra('Revisit after'),
-            'description' => tra('Specify how often (in days) Web robots should visit your site.'),
-            'type' => 'text',
-            'unit' => tr('days'),
-            'size' => '50',
-            'default' => '',
-            'tags' => ['experimental'],
+        'metatag_nositelinkssearchbox' => [
+            'name' => tra('Meta no site links searchbox'),
+            'description' => tra('The sitelinks search box will be disabled as part of the normal Googlebot crawling.'),
+            'type' => 'flag',
+            'default' => 'n',
         ],
+        'metatag_google_notranslate' => [
+            'name' => tra('Google No Translate'),
+            'description' => tra('If google finds that websites content is in different language than users language then to provide better content for users google often offers a link to translate content in to native language.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ]
     ];
 }

@@ -21,7 +21,6 @@
 // response time of this script which is critical.
 
 include "tiki-setup.php";
-TikiLib::lib('header')->setXRobotsTag($robots);
 
 header('Content-Type: text/xml');
 if ($prefs['feature_live_support'] != 'y') {

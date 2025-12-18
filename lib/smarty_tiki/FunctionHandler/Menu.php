@@ -126,30 +126,35 @@ class Menu extends Base
                         $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
                         $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
                     }
-                    if ($element['type'] !== '-') {
-                        $level = $element['sectionLevel'];
-                        // Creates new branch at level 0
-                        if ($level === 0) {
-                            $structured[] = $element;
-                            continue;
-                        }
 
-                        // Always selects last branch at level 0
-                        $branch = &$structured[count($structured) - 1];
+                    // Separators are added at level 0 without hierarchy processing
+                    if ($element['type'] === '-') {
+                        $structured[] = $element;
+                        continue;
+                    }
 
-                        // Selects nested part of the branch at element level
-                        for ($i = 0; $i < $level - 1; $i++) {
-                            if ($branch['children']) {
-                                $branch = &$branch['children'][count($branch['children']) - 1];
-                            }
-                        }
+                    $level = $element['sectionLevel'];
+                    // Creates new branch at level 0
+                    if ($level === 0) {
+                        $structured[] = $element;
+                        continue;
+                    }
 
-                        // Pushes the element at the end of selected element children.
-                        if (! empty($branch['children'])) {
-                            $branch['children'][] = $element;
-                        } else {
-                            $branch['children'] = [$element];
+                    // Always selects last branch at level 0
+                    $branch = &$structured[count($structured) - 1];
+
+                    // Selects nested part of the branch at element level
+                    for ($i = 0; $i < $level - 1; $i++) {
+                        if ($branch['children']) {
+                            $branch = &$branch['children'][count($branch['children']) - 1];
                         }
+                    }
+
+                    // Pushes the element at the end of selected element children.
+                    if (! empty($branch['children'])) {
+                        $branch['children'][] = $element;
+                    } else {
+                        $branch['children'] = [$element];
                     }
                 }
             }

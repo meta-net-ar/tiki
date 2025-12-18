@@ -18,7 +18,7 @@ $info: #17a2b8;
 $warning: #ffc107;
 $danger: #dc3545;
 $light: #ffffff;
-$dark: #000000;
+$dark: #252729;
 
 $theme-colors: (
      "primary":           $primary, //#757575, // #ababab, -- Darkened to meet wcag guidelines
@@ -137,29 +137,20 @@ $nav-link-transition:               color .15s ease-in-out, background-color .15
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default
 
 // Navbar
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
+$navbar-light-color:                #595959; // rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
 $navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);  // default
 $navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);  // default
 $navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);  // default
+$navbar-light-brand-color:          $navbar-light-active-color; // default
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // default
 
-//$navbar-light-color: #888888;
-//$bg-light: #fafafa;
-//$navbar-light-border: darken($bg-light, 6.5%);
+$navbar-dark-color:                 rgba($white, .55); // default
+$navbar-dark-hover-color:           rgba($white, .75); // default
+$navbar-dark-active-color:          $white; // default
+$navbar-dark-disabled-color:        rgba($white, .25); // default
+$navbar-dark-brand-color:           $navbar-dark-active-color; // default
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
 
-// Navbar links
-$navbar-light-color: #595959; //#888888; Darkened to meet WCAG
-
-// Navbarlinks ??
-//$navbar-dark-color: #ffffff;
-//$navbar-dark-hover-color: darken(#fff, 10%);
-//$navbar-dark-hover-bg: #3270bd;
-//$navbar-dark-active-color: #ffffff;
-//$navbar-dark-active-bg: #3270bd;
-//$navbar-dark-disabled-color: #cccccc;
-$navbar-dark-color:                 rgba($white, .55);  // default
-$navbar-dark-hover-color:           rgba($white, .75);  // default
-$navbar-dark-active-color:          $white;  // default
-$navbar-dark-disabled-color:        rgba($white, .25);  // default
 
 // Dropdowns
 $dropdown-dark-color:               $gray-300;  // default

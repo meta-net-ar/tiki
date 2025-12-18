@@ -81,24 +81,28 @@ $form-invalid-border-color:         #A01C2A; // $form-feedback-invalid-color !de
 
 // Navs
 // Navbar
-$navbar-dark-color: $gray-200;
-$tiki-navbar-dark-bg: $dark;
-$navbar-dark-border: $border-color;
+$navbar-light-color:                rgba($black, .6); // rgba(var(--#{$prefix}emphasis-color-rgb), .65); // default
+$navbar-light-hover-color:          rgba($black, .7); // rgba(var(--#{$prefix}emphasis-color-rgb), .8); // default
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // default
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // default
+$navbar-light-icon-color:           rgba($body-color, .75); // default
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15); // default
+$navbar-light-brand-color:          $navbar-light-active-color; // default
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // default
 
-//// Navbarlinks ??
-$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
-$navbar-dark-hover-color:           #fff;
-//$navbar-dark-active-color:          $white;  // default
-//$navbar-dark-disabled-color:        rgba($white, .25);  // default
-//$navbar-dark-toggler-icon-bg:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-dark-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23");  // default
-//$navbar-dark-toggler-border-color:  rgba($white, .1);  // default
+$navbar-dark-color:                 $gray-200; // rgba($white, .55); // default
+$navbar-dark-hover-color:           #fff; // rgba($white, .75); // default
+$navbar-dark-active-color:          $white; // default
+$navbar-dark-disabled-color:        rgba($white, .25); // default
+$navbar-dark-icon-color:            $navbar-dark-color; // default
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // default
+$navbar-dark-toggler-border-color:  rgba($white, .1); // default
+$navbar-dark-brand-color:           $navbar-dark-active-color; // default
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
 
-$navbar-light-color:                rgba($black, .6);
-$navbar-light-hover-color:          rgba($black, .7);  // default
-//$navbar-light-active-color:         rgba($black, .9);  // default
-//$navbar-light-disabled-color:       rgba($black, .3);  // default
-//$navbar-light-toggler-icon-bg:      str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23");  // default
-//$navbar-light-toggler-border-color: rgba($black, .1);  // default
+//$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
+
 
 // Dropdowns
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default

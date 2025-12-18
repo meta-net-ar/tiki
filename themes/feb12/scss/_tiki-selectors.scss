@@ -80,8 +80,7 @@ header.container {
 .admin-navbar.bg-dark .bg-dark {
     color: #f5f5f5 !important;
     border: none;
-    background: #3e7ca1; /* Old browsers */
-    background: linear-gradient(to bottom,  #3e7ca1 0%,#609ec3 3%,#163866 5%,#0b2d5b 8%,#0f2658 11%,#002552 16%,#002d57 24%,#052b58 27%,#0c3867 43%,#11406e 57%,#1b507c 76%,#235685 86%,#1c5b87 100%) !important; /* W3C */
+    background: var(--tiki-feb12-dark-bg); // linear-gradient(to bottom,  #3e7ca1 0%,#609ec3 3%,#163866 5%,#0b2d5b 8%,#0f2658 11%,#002552 16%,#002d57 24%,#052b58 27%,#0c3867 43%,#11406e 57%,#1b507c 76%,#235685 86%,#1c5b87 100%) !important; /* W3C */
 }
 
 .bg-dark {
@@ -108,8 +107,7 @@ header.container {
 #topbar_modules.navbar-light .navbar-nav > .active > a:hover,
 #topbar_modules.navbar-light .navbar-nav > .active > a:focus {
     color: #3e7ca1 !important;
-    background: #dbdbdb; /* Old browsers */
-    background: linear-gradient(to bottom,  #dbdbdb 0%,#b6b6b6 2%,#acacac 3%,#ababab 5%,#c8c8c8 10%,#d4d4d4 17%,#e6e6e6 48%,#eaeaea 60%,#f3f3f3 77%,#fdfdfd 90%,#ffffff 100%); /* W3C */
+    background: var(--tiki-feb12-light-bg); // linear-gradient(to bottom,  #dbdbdb 0%,#b6b6b6 2%,#acacac 3%,#ababab 5%,#c8c8c8 10%,#d4d4d4 17%,#e6e6e6 48%,#eaeaea 60%,#f3f3f3 77%,#fdfdfd 90%,#ffffff 100%); /* W3C */
 }
 
 .bg-light {

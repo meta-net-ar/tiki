@@ -288,17 +288,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $items = $banlib->list_rules($offset, $maxRecords, $sort_mode, $find);
@@ -306,7 +298,7 @@ $items = $banlib->list_rules($offset, $maxRecords, $sort_mode, $find);
 if (isset($_REQUEST['export']) || isset($_REQUEST['csv'])) {
     // export banning rules //
     $csv = $banlib->export_rules($items['data']);
-    TikiLib::lib('header')->setXRobotsTag($robots);
+
     header("Content-type: text/comma-separated-values; charset:UTF-8");
     header('Content-Disposition: attachment; filename="tiki-admin_banning.csv"');
     if (function_exists('mb_strlen')) {

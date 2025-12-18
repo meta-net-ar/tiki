@@ -11,14 +11,14 @@
                     {if $prefs.feature_categories eq 'y'}
                         <div class="col-sm-3">
                             <label>
-                                <input type="radio" name="transition_mode" value="category" id="transition-mode-category"{if $transition_mode eq 'category'} checked="checked"{/if}>
+                                <input type="radio" class="form-check-input" name="transition_mode" value="category" id="transition-mode-category"{if $transition_mode eq 'category'} checked="checked"{/if}>
                                 {tr}Category{/tr}
                             </label>
                         </div>
                     {/if}
                     <div class="col-sm-3">
                         <label>
-                            <input type="radio" name="transition_mode" value="group" id="transition-mode-group"{if $transition_mode eq 'group' or $prefs.feature_categories ne 'y'} checked="checked"{/if}>
+                            <input type="radio" class="form-check-input" name="transition_mode" value="group" id="transition-mode-group"{if $transition_mode eq 'group' or $prefs.feature_categories ne 'y'} checked="checked"{/if}>
                             {tr}Group{/tr}
                         </label>
                     </div>

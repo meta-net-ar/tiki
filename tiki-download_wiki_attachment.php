@@ -36,8 +36,6 @@ $content = $info["data"];
 session_write_close();
 header("Content-type: $type");
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 // This used to say "header("Content-Disposition: attachment; filename=\"$file\"");"
 // which made everything try to download instead of the browser picking what to do.
 // If people want the old behaviour, the right thing is probably to add an argument to

@@ -125,15 +125,14 @@ $prefs = [
     'feature_scheduler' => 'y',
     'feature_wiki_sharethis' => 'n',
     // lib/prefs/metatag.php
-    'metatag_keywords' => '',
-    'metatag_author' => '',
     'metatag_threadtitle' => 'n',
     'metatag_pagedesc' => 'n',
     'metatag_geoposition' => '',
     'metatag_georegion' => '',
     'metatag_geoplacename' => '',
     'metatag_robotscustom' => 'n',
-    'metatag_revisitafter' => '',
+    'metatag_nositelinkssearchbox' => 'n',
+    'metatag_google_notranslate' => 'n',
     // lib/prefs/site.php
     'site_nav_seper' => '|',
     'site_title_location' => 'after',
@@ -799,6 +798,7 @@ $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 $headerlib->add_cssfile('themes/base_files/css/tiki_base.css');
 $headerlib->add_jsfile('lib/tiki-js.js');
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
+$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.min.js");
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-ui/dist/jquery-ui.js");

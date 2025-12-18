@@ -962,7 +962,7 @@ class ArtLib extends TikiLib
                 $data[$fields['image_alt']] = '';
             }
             if (! isset($data[$fields['lang']])) {
-                $data[$fields['lang']]                  = $prefs['language'];
+                $data[$fields['lang']]                  = Language::getCurrentLanguage();
             }
             if (! isset($data[$fields['rating']])) {
                 $data[$fields['rating']]                = 7;

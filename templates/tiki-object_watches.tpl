@@ -86,11 +86,11 @@
                                                                                          value="{$g|escape}"{if in_array($g, $group_watches)} checked="checked"{/if}></td>
                             {/if}
                             <td class="text">
-                                <input id="group_watch{$i}" type="radio" name="{$g|escape}" value="cat_leave_desc" checked="checked">
+                                <input id="group_watch{$i}" type="radio" class="form-check-input" name="{$g|escape}" value="cat_leave_desc" checked="checked">
                                 <label for="group_watch{$i}">Leave unchanged &nbsp;&nbsp;&nbsp;</label>
-                                <input id="group_watch{$i}" type="radio" name="{$g|escape}" value="cat_add_desc">
+                                <input id="group_watch{$i}" type="radio" class="form-check-input" name="{$g|escape}" value="cat_add_desc">
                                 <label for="group_watch{$i}">Add &nbsp;&nbsp;&nbsp;</label>
-                                <input id="group_watch{$i}" type="radio" name="{$g|escape}" value="cat_remove_desc">
+                                <input id="group_watch{$i}" type="radio" class="form-check-input" name="{$g|escape}" value="cat_remove_desc">
                                 <label for="group_watch{$i}">Remove</label>
                             </td>
 

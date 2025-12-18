@@ -131,6 +131,9 @@ if (
         $prefs['site_layout_admin'] = 'admin';
         /* Force the admin layout on setup/management pages too */
         $prefs['site_layout'] = 'admin';
+        /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
+        $section = 'admin';
+
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
             foreach ($admin_icon['children'] as & $child) {

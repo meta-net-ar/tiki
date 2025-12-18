@@ -10,7 +10,7 @@
 
     <div
     id="minichat"
-    class="card card-body mb-2 overflow-auto"
+    class="mb-2 overflow-auto"
     style="height: {$module_rows}em;">
     </div>
 

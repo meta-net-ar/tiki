@@ -74,7 +74,7 @@ $process = [
 
         return $matches[1] . ':' . $matches[2];
     },
-    'Squiz.Classes.ValidClassName.NotCamelCaps' => function ($file, $message) {
+    'Squiz.Classes.ValidClassName.NotPascalCase' => function ($file, $message) {
         $parts = explode('"', $message['message']);
         return $parts[1];
     },

@@ -64,6 +64,7 @@ class UsersLib extends TikiLib
     public $get_object_permissions_for_user_cache;
     public static $cas_initialized = false;
     public static $userexists_cache = [];
+    public const USERNAME_MANDATORY_VALIDATION_PATTERN = '/^\S*$/';
 
     public function __construct()
     {
@@ -7033,6 +7034,7 @@ class UsersLib extends TikiLib
         global $prefs;
         $cachelib = TikiLib::lib('cache');
         $tikilib = TikiLib::lib('tiki');
+        $userlib = TikiLib::lib('user');
 
         $autogenerate_uname = false;
         if ($prefs['login_autogenerate'] == 'y' && $user == '') {
@@ -7043,11 +7045,11 @@ class UsersLib extends TikiLib
         }
 
         $user = trim($user);
-
         if (
             $this->user_exists($user)
                 || empty($user)
                 || (! empty($prefs['username_pattern']) && ! preg_match($prefs['username_pattern'], $user))
+                || (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $user))
                 || strtolower($user) == 'anonymous'
                 || strtolower($user) == 'registered'
         ) {

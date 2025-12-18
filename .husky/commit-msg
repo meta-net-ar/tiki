@@ -77,6 +77,8 @@ fi
 if echo "$msg" | grep -Eq "^(\[[A-Z]+\]){1,5}[[:space:]]+.+$"; then
     tags_part=$(echo "$msg" | grep -Eo "^(\[[A-Z]+\]){1,5}" || echo "")
     body_part=$(echo "$msg" | sed -E "s/^(\[[A-Z]+\]){1,5}[[:space:]]+//")
+    # Remove Git comment lines from body
+    body_part=$(echo "$body_part" | sed '/^[[:space:]]*#/d')
 
     if [ -z "$body_part" ] || echo "$body_part" | grep -Eq "^[[:space:]]*$"; then
         echo "❌ Error: Commit body is empty after tags."

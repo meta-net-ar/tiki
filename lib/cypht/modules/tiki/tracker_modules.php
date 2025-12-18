@@ -54,7 +54,6 @@ class Hm_Handler_check_path_redirect extends Hm_Handler_Module
     public $request;
     public function process()
     {
-        global $smarty;
         $path = $this->request->get['list_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
             $url = smarty_modifier_sefurl($m[1], 'trackeritem');
@@ -72,7 +71,6 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
     public $request;
     public function process()
     {
-        global $smarty;
         if (! $this->get('msg_sent')) {
             return;
         }
@@ -93,8 +91,6 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
     public $session;
     public function process()
     {
-        global $smarty;
-
         list($success, $form) = $this->process_form(['tracker_field_id', 'tracker_item_id', 'imap_msg_ids', 'list_path', 'folder']);
         if (! $success) {
             return;
@@ -162,7 +158,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                     ]);
                 }
             }, ['email' => $email]);
-        } elseif (in_array($form['list_path'], ['sent', 'unread', 'combined_inbox', 'flagged'])) {
+        } elseif (in_array($form['list_path'], ['sent', 'unread', 'combined_inbox', 'flagged', 'search'])) {
             $imaps = [];
             $ids = [];
             foreach ($msg_ids as $msg_id) {
@@ -807,7 +803,6 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             }
         }
         $msg_struct = tiki_mime_part_to_bodystructure($message);
-        $msg_struct_current = [];
 
         if ($part_num !== false) {
             $part = tiki_get_mime_part($message, $part_num);

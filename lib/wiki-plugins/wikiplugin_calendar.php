@@ -79,6 +79,8 @@ function wikiplugin_calendar_info()
 
 function wikiplugin_calendar($data, $params)
 {
+    global $prefs, $tiki_p_admin, $tiki_p_view_calendar, $base_uri;
+
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
     $calendarlib = TikiLib::lib('calendar');
@@ -116,6 +118,8 @@ function wikiplugin_calendar($data, $params)
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
     $calendars = $calendarInitialParams['calendars'];
+    $current_url = $base_uri;
+    $smarty->assign('returnURL', $current_url);
     $smarty->assign(
         'eventCalendarParams',
         $calendarInitialParams

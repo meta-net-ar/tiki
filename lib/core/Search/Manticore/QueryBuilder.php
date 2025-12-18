@@ -215,7 +215,11 @@ class QueryBuilder
             } else {
                 $from = $this->getQuoted($node->getToken('from'));
                 $to = $this->getQuoted($node->getToken('to'));
-                return "$field BETWEEN $from AND $to";
+                if ($this->isFullText($node)) {
+                    return "($field >= $from AND $field <= $to)";
+                } else {
+                    return "$field BETWEEN $from AND $to";
+                }
             }
         } elseif ($node instanceof Distance) {
             $field = $this->getField($node);

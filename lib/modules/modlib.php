@@ -528,11 +528,11 @@ class ModLib extends TikiLib
                 return true;
             }
         }
-        // TODO: Check this if it behaves well on other "Admin" pages when UAB is enabled
+        // Load only the Unified Admin Interface (UAB) specific modules for Admins on admin panels/management pages
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = $section === 'admin' && strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') !== false;
+        $isControlPanel = $section === 'admin';
 
         if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
             return false;
@@ -858,7 +858,7 @@ class ModLib extends TikiLib
         global $prefs;
 
         $cachelib = TikiLib::lib('cache');
-        $cacheKey = 'module.' . $moduleName . $prefs['language'];
+        $cacheKey = 'module.' . $moduleName . Language::getCurrentLanguage();
         $info = $cachelib->getSerialized($cacheKey, 'module');
 
         if ($info) {
@@ -1123,8 +1123,11 @@ class ModLib extends TikiLib
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
 
+            $prefslib = TikiLib::lib('prefs');
+
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
+                    $this->add_pref_error($mod_reference['name'], $preference);
                     return smarty_block_remarksbox(
                         [
                             'type' => 'warning',

@@ -1,14 +1,14 @@
 {* Currently this needs to be copy and pasted into a wiki page and used as the wiki template for a custom_search plugin *}
 {literal}
     <div class="clearfix cs_topbar">
-        <b>Any text:</b> {input _filter="content" type="text" class="cs_content_input"} {input type="submit" class="btn btn-info btn-sm" value="Search"}
+        <b>{tr}Any text:{/tr}</b> {input _filter="content" type="text" class="cs_content_input"} {input type="submit" class="btn btn-info btn-sm" value="Search"}
         Sort by:
         <select class="cs_sortby" name="cs_sortby">
             <option value=""></option>
-            <option value="title:asc">Name a-z</option>
-            <option value="title:desc">Name z-a</option>
-            <option value="price:asc">Price low-high</option>
-            <option value="price:desc">Price high-low</option>
+            <option value="title:asc">{tr}Name a-z{/tr}</option>
+            <option value="title:desc">{tr}Name z-a{/tr}</option>
+            <option value="price:asc">{tr}Price low-high{/tr}</option>
+            <option value="price:desc">{tr}Price high-low{/tr}</option>
         </select>
         Category: <img src="img/trans.png" width="16" height="16" class="badge bg-secondary icon" /> {input value="" class="cs_catlabel" readonly="readonly" style="font-weight: bold;"}<a href="#" class="cs_cat_all" role="button">All</a>{input _filter="content" _field="tracker_field_category" value="" type="hidden" class="cs_category"}
         <div class="clearfix cs_catdiv">{/literal}{menu id="44" type="vert"}{literal}</div>

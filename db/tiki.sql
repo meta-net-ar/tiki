@@ -717,21 +717,21 @@ CREATE TABLE `tiki_comments` (
   `user_ip` varchar(39) default NULL,
   `summary` varchar(240) default NULL,
   `smiley` varchar(80) default NULL,
-  `message_id` varchar(128) default NULL,
-  `in_reply_to` varchar(128) default NULL,
+  `message_id` TEXT,
+  `in_reply_to` varchar(255) default NULL,
   `comment_rating` tinyint(2) default NULL,
   `archived` char(1) default NULL,
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
-  UNIQUE KEY `no_repeats` (`parentId`, `userName`(40), `title`(43), `commentDate`, `message_id`(40), `in_reply_to`(40)),
+  UNIQUE KEY `no_repeats` (`parentId`, `userName`(20), `title`(30), `commentDate`, `message_id`(30), `in_reply_to`(30)),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
   KEY `hits` (hits),
   KEY `tc_pi` (`parentId`),
   KEY `objectType` (object(160), `objectType`),
   KEY `commentDate` (`commentDate`),
-  KEY `threaded` (message_id(89), in_reply_to(88), `parentId`),
+  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`),
   KEY `idx_slvn_commentDate` (`commentDate`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -3958,11 +3958,12 @@ CREATE TABLE `tiki_credits_types` (
 
 DROP TABLE IF EXISTS `tiki_queue`;
 CREATE TABLE `tiki_queue` (
-    `entryId` INT PRIMARY KEY AUTO_INCREMENT,
+    `entryId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `queue` VARCHAR(25) NOT NULL,
     `timestamp` INT NOT NULL,
     `handler` VARCHAR(64) NULL,
     `message` TEXT NOT NULL,
+    PRIMARY KEY (`entryId`),
     KEY `queue_name_ix` (`queue`),
     KEY `queue_handler_ix` (`handler`)
 ) ENGINE=MyISAM;

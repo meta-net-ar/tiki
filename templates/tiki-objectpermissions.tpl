@@ -288,11 +288,11 @@
                         </td>
                         {foreach item=permgroup from=$quickperms}
                         <td>
-                            <input type="radio" name="perm_{$groups[grp].groupName|escape:url}" value="{$permgroup.name}" {if $groups[grp].groupSumm eq $permgroup.name}checked{/if}>
+                            <input type="radio" class="form-check-input" name="perm_{$groups[grp].groupName|escape:url}" value="{$permgroup.name}" {if $groups[grp].groupSumm eq $permgroup.name}checked{/if}>
                         </td>
                         {/foreach}
                         <td>
-                            <input type="radio" name="perm_{$groups[grp].groupName|escape:url}" value="userdefined" {if $groups[grp].groupSumm eq 'userdefined'}checked{/if} onclick="return false;">
+                            <input type="radio" class="form-check-input" name="perm_{$groups[grp].groupName|escape:url}" value="userdefined" {if $groups[grp].groupSumm eq 'userdefined'}checked{/if} onclick="return false;">
                         </td>
                     </tr>
                 {/if}

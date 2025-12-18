@@ -50,17 +50,17 @@
         </th>
         <td>
             {if $row.stock|nonp gt 0}
-                <strong>In stock</strong>
+                <strong>{tr}In stock{/tr}</strong>
                 <meta itemprop="availability" content="InStock">
             {else}
-                <em>Awaiting stock</em>
+                <em>{tr}Awaiting stock{/tr}</em>
                 <meta itemprop="availability" content="OutOfStock">
             {/if}
         </td>
     </tr>
     <tr>
         <th>
-            <strong>Price:</strong>
+            <strong>{tr}Price:{/tr}</strong>
         </th>
         <td>
             <strong itemprop="price">{$row.price}</strong>

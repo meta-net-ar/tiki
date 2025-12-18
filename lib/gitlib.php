@@ -178,7 +178,7 @@ class GitLib extends TikiLib
         $cachelib = TikiLib::lib('cache');
         $object = null;
 
-        if (is_dir('.git') && is_readable('.git')) {
+        if ($this->isGitInstall()) {
             if (! $cachelib->isCached('.git', 'head')) {
                 $cachelib->cacheItem('.git', md5_file('.git/HEAD'), 'head');
             } else {
@@ -206,6 +206,47 @@ class GitLib extends TikiLib
         }
 
         return $object;
+    }
+
+    /**
+     * Check if this is a Git-based installation.
+     *
+     * @return bool
+     */
+    public function isGitInstall()
+    {
+        return is_dir('.git') && is_readable('.git');
+    }
+
+    /**
+     * Get git info with error handling.
+     * This method safely wraps get_info() and handles exceptions.
+     * Should only be called after verifying isGitInstall() returns true.
+     *
+     * @return array ['content' => array, 'error' => string]
+     */
+    public function getGitDetails()
+    {
+        include_once('lib/setup/twversion.class.php');
+        $TWV = new TWVersion();
+        $version = $TWV->getVersion();
+
+        $error = '';
+        $content = [];
+
+        try {
+            $content = $this->get_info();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        } catch (Error $e) {
+            $error = $e->getMessage();
+        } catch (Throwable $e) {
+            $error = $e->getMessage();
+        }
+
+        $content['version'] = $version;
+
+        return ['content' => $content, 'error' => $error];
     }
 
     /**

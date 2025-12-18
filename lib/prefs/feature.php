@@ -2972,5 +2972,13 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
         ],
+        'feature_language_check' => [
+            'name' => tra('Language checking in editors'),
+            'description' => tra('Enable real-time grammar and spelling checking in editors using LanguageTool.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
+        ],
     ];
 }

@@ -22,12 +22,12 @@ $inputConfiguration = [
             'grouptracker'     => 'bool',          //get
             'group'            => 'groupname',     //get
             'offset'           => 'int',           //get
-            'sort_mode'        => 'word',          //get
-            'find'             => 'word',          //post
+            'sort_mode'        => 'alnumdash',     //get
+            'find'             => 'text',          //post
             'filterfield'      => 'word',          //get
             'filtervalue'      => 'word',          //get
             'exactvalue'       => 'word',          //get
-            'reloff'           => 'word',          //get
+            'reloff'           => 'int',           //get
             'move'             => 'word',          //get
             'count'             => 'int',           //get
             'remove'           => 'int',           //post
@@ -54,6 +54,11 @@ $inputConfiguration = [
             'attach_longdesc'  => 'word',          //get
             'status'           => 'word',          //get
             'conflictoverride' => 'bool',          //get
+            'editattach'       => 'int',           //get
+            'vi_tpl'           => 'text',          //get
+            'ei_tpl'           => 'text',          //get
+            'maxRecords'       => 'int',           //get
+            'initial'          => 'text',          //get
         ]
     ],
 ];
@@ -295,17 +300,9 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // ************* previous/next **************
 foreach (
@@ -852,11 +849,7 @@ if (isset($_REQUEST['show'])) {
         }
     }
 }
-if (isset($_REQUEST['from'])) {
-    $from = $_REQUEST['from'];
-} else {
-    $from = false;
-}
+$from = $_REQUEST['from'] ?? false;
 $smarty->assign('from', $from);
 if (isset($_REQUEST['status'])) {
     $smarty->assign_by_ref('status', $_REQUEST['status']);
@@ -1003,7 +996,6 @@ try {
             header("Content-Type: application/pdf");
             header("Content-Transfer-Encoding: binary");
             header('Content-Length: ' . $length);
-            TikiLib::lib('header')->setXRobotsTag($robots);
             echo $pdf;
         }
          //end of pdf

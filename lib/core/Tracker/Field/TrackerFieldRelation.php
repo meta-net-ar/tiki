@@ -93,8 +93,6 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
     public function getRelationInfo(): ?RelationInfoRelation
     {
         //$relationshipTracker = $this->getRelationshipTracker();
-
-        $filter = $this->getParsedFilter();
         $distantTrackerId = $this->getDistantTrackerId();
         if ($distantTrackerId) {
             $distantTracker = Tracker_Definition::get($distantTrackerId);

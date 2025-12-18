@@ -266,6 +266,15 @@ class SchedulersLib extends TikiLib
             $end_time = time();
         }
 
+        // TEXT column has a 65,535 byte limit. Truncate if output exceeds this size.
+        $maxOutputBytes = 65535;
+        $truncationMsg = "\n\n[Output truncated - exceeded TEXT column limit]";
+        $maxContentBytes = $maxOutputBytes - strlen($truncationMsg);
+
+        if (strlen($errorMessage) > $maxOutputBytes) {
+            $errorMessage = substr($errorMessage, 0, $maxContentBytes) . $truncationMsg;
+        }
+
         $schedulersRunTable = $this->table('tiki_scheduler_run');
         $schedulersRunTable->update([
             'status' => $executionStatus,

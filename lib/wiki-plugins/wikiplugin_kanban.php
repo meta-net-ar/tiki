@@ -205,6 +205,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 {
     global $user, $prefs;
     static $id = 0;
+    $plugininfo = wikiplugin_kanban_info();
 
     if ($prefs['auth_api_tokens'] !== 'y') {
         //This is a proof of concept, this should really be handled by a parent class of wikiplugin, using a dependencies definition

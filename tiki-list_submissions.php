@@ -86,11 +86,7 @@ if (! empty($_REQUEST['maxRecords'])) {
 } else {
     $maxRecords = $prefs['maxRecords'];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (($tiki_p_admin == 'y') || ($tiki_p_admin_cms == 'y')) {
     $pdate = '';
@@ -103,11 +99,7 @@ if (($tiki_p_admin == 'y') || ($tiki_p_admin_cms == 'y')) {
 } else {
     $pdate = $tikilib->now;
 }
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST['topic'])) {
     $_REQUEST['topic'] = '';

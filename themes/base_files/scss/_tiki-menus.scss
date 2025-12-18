@@ -160,18 +160,34 @@
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
-    max-height: 65vh;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.dropdown-menu-top,
-.dropdown-menu-end,
-.dropdown-menu-start {
+.dropdown-menu-top-t,
+.dropdown-menu-end-l,
+.dropdown-menu-start-r {
   top: 100%;
   bottom: auto;
   max-height: 40vh;
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: 3000;
+  z-index: 2000 !important;
+}
+
+.dropdown-menu-bottom-b {
+    max-height: 65vh;
+    z-index: 3000;
+}
+
+/* Menu separator styling */
+.menu-separator {
+  border: none;
+  border-top: 1px solid #343a40;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.form-control .menu-separator {
+  margin: 0;
 }

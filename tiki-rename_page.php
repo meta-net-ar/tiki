@@ -83,6 +83,9 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
                 case 2:
                     Feedback::error(tr('Page already exists'));
                     break;
+                case 3:
+                    Feedback::error(tr('Cannot rename page to the same name'));
+                    break;
                 default:
                     throw $e;
             }

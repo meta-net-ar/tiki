@@ -36,7 +36,6 @@ if ($tiki_p_forum_read != 'y') {
     require_once('tiki-rss_error.php');
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
 $commentslib = TikiLib::lib('comments');
 
 $feed = "forum";

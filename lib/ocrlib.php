@@ -8,6 +8,7 @@ use thiagoalessio\TesseractOCR\TesseractOCR;
 use thiagoalessio\TesseractOCR\FriendlyErrors;
 use Tiki\Lib\Alchemy;
 use Symfony\Component\Filesystem\Filesystem;
+use Tiki\TikiInit;
 
 /**
  *
@@ -84,17 +85,26 @@ class ocrLib extends TikiLib
         }
         $executable = escapeshellarg($executable);
 
-        $possibleCommands = [
-            'type -p ' . $executable . ' 2>&1',
-            'where ' . $executable . ' 2>&1',
-            'which ' . $executable . ' 2>&1'
-        ];
+        if (TikiInit::isWindows()) {
+            $possibleCommands = [
+                'where ' . $executable . ' 2>&1'
+            ];
+        } else {
+            $possibleCommands = [
+                'command -v ' . $executable . ' 2>/dev/null',
+                'which ' . $executable . ' 2>/dev/null'
+            ];
+        }
+
         foreach ($possibleCommands as $cmd) {
             $output = [];
             $return = 0;
             exec($cmd, $output, $return);
             if ($return === 0) {
-                return array_shift($output);
+                $result = trim(array_shift($output));
+                if (! empty($result)) {
+                    return $result;
+                }
             }
         }
 
@@ -285,6 +295,16 @@ class ocrLib extends TikiLib
         $tesseract = new TesseractOCR($fileName);
         if (! empty($prefs['ocr_tesseract_path']) && file_exists($prefs['ocr_tesseract_path'])) {
             $tesseract->executable($prefs['ocr_tesseract_path']);
+        } else {
+            try {
+                $autoExecutable = $this->whereIsExecutable('tesseract');
+            } catch (Exception $e) {
+                $autoExecutable = null;
+            }
+
+            if (! empty($autoExecutable) && file_exists($autoExecutable)) {
+                $tesseract->executable($autoExecutable);
+            }
         }
         return $tesseract;
     }

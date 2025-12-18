@@ -24,7 +24,13 @@ class QueueManagerController
 
     public function actionUpdateQueuedJobsLiveStatus($input)
     {
+        global $prefs;
         $response = [];
+
+        if ($prefs['feature_queued_tasks'] !== 'y') {
+            return $response;
+        }
+
         $jobsTobeUpdatedIds = array_column(QueuedTaskBanner::get(), 'id');
 
         if (empty($jobsTobeUpdatedIds)) {
@@ -61,6 +67,12 @@ class QueueManagerController
 
     public function actionProcessPendingTasks($input)
     {
+        global $prefs;
+
+        if ($prefs['feature_queued_tasks'] !== 'y') {
+            return false;
+        }
+
         session_write_close();
         $console = new Application();
         $console->add(new TaskQueueProcessCommand());

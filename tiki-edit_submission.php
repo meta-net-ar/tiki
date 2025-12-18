@@ -72,11 +72,7 @@ if ($tiki_p_admin != 'y') {
     }
 }
 
-if (isset($_REQUEST['subId'])) {
-    $subId = $_REQUEST['subId'];
-} else {
-    $subId = 0;
-}
+$subId = $_REQUEST['subId'] ?? 0;
 
 if (! empty($_REQUEST['topicId'])) {
     $topicId = $_REQUEST['topicId'];
@@ -91,11 +87,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('subId', $subId);
 $smarty->assign('articleId', $subId);
@@ -108,7 +100,7 @@ $smarty->assign(
 $templateslib = TikiLib::lib('template');
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
     if ($templateslib->template_is_in_section($_REQUEST['templateId'], 'wiki_html')) {
@@ -127,7 +119,7 @@ $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
 $smarty->assign('image_alt', '');
-$smarty->assign('lang', $prefs['language']);
+$smarty->assign('lang', Language::getCurrentLanguage());
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
 $smarty->assign('topicId', $topicId);
@@ -149,7 +141,7 @@ $smarty->assign('rating', 7);
 $smarty->assign('edit_data', 'n');
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
 }
@@ -660,6 +652,9 @@ include_once('tiki-section_options.php');
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_submission.tpl');

@@ -110,7 +110,7 @@ class TrackerConvertAttachmentsCommand extends Command
 
         try {
             $fgField = $trackerUtilities->getFieldsFromIds($definition, [$fieldId]);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $output->writeln("<error>Error: Field \"$fieldId\" does not exist in the tracker \"$trackerId\"</error>");
             return Command::INVALID;
         }
@@ -134,7 +134,7 @@ class TrackerConvertAttachmentsCommand extends Command
         try {
             $fileUtilities = new Services_File_Utilities();
             $galInfo = $fileUtilities->checkTargetGallery($galleryId);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $output->writeln("<error>Error: Invalid galleryId \"$galleryId\"</error>");
             return Command::INVALID;
         }

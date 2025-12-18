@@ -7,6 +7,9 @@
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
 @import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
 
+$imagePath: "../images/";
+$adminImagePath: "../../../darkshine/images/";
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
@@ -37,6 +40,14 @@ $theme-colors: (
 );
 
 $min-contrast-ratio:   3;
+
+:root {
+    --tiki-darkshine-navbar-bg: linear-gradient(to bottom, #040404 0%, #060606 2%, #121212 55%, #0f0f0f 57%, #030303 59%, #000000 61%, #000000 100%);
+    --tiki-darkshine-navbar-link-hover-bg: linear-gradient(to bottom, #545454 0%, #4e4e4e 5%, #3d3d3d 51%, #3a3a3a 53%, #303030 54%, #2d2d2d 56%, #111111 97%, #0e0e0f 98%, #4a0000 100%);
+    --tiki-darkshine-diagonals-bg: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0;
+    --tiki-darkshine-admin-diagonals-bg: #90140c url('#{$adminImagePath}stripes.png') repeat-x 50% 0;
+    --tiki-darkshine-stripes-small-bg: #000 url('#{$imagePath}stripes_small.gif') repeat-x;
+}
 
 // Options
 $enable-gradients:            true;
@@ -90,10 +101,12 @@ $navbar-light-color:                $nav-link-color; // rgba($black, .5);  // de
 $navbar-light-hover-color:          rgba($nav-link-color, .7);  // default
 $navbar-light-active-color:         rgba($nav-link-color, .9);  // default
 $navbar-light-disabled-color:       rgba($nav-link-color, .3);  // default
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 
 $navbar-dark-color:                 rgba($white, .55);  // default
 $navbar-dark-hover-color:           rgba($white, .75);  // default
-$navbar-dark-active-color:          $white;  // default
+$navbar-dark-active-color:          #f3f3f3; // $white;  // default
 $navbar-dark-disabled-color:        rgba($white, .25);  // default
 $navbar-dark-icon-color:            $navbar-dark-color;  // default
 $navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
@@ -147,5 +160,3 @@ $pre-scrollable-max-height: 340px;
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
-$tiki-top-navbar-bg: linear-gradient(to bottom, #040404 0%,#060606 2%,#121212 55%,#0f0f0f 57%,#030303 59%,#000000 61%,#000000 100%);
-$top-navbar-link-hover-bg: linear-gradient(to bottom, #545454 0%,#4e4e4e 5%,#3d3d3d 51%,#3a3a3a 53%,#303030 54%,#2d2d2d 56%,#111111 97%,#0e0e0f 98%,#4a0000 100%);

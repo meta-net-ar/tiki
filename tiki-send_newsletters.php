@@ -305,16 +305,8 @@ foreach ($info['files'] as $k => $newsletterfile) {
 $smarty->assign('preview', 'n');
 if (isset($_REQUEST["preview"])) {
     $smarty->assign('preview', 'y');
-    if (isset($_REQUEST["subject"])) {
-        $info["subject"] = $_REQUEST["subject"];
-    } else {
-        $info["subject"] = '';
-    }
-    if (isset($_REQUEST["data"])) {
-        $info["data"] = $_REQUEST["data"];
-    } else {
-        $info["data"] = '';
-    }
+    $info["subject"] = $_REQUEST["subject"] ?? '';
+    $info["data"] = $_REQUEST["data"] ?? '';
     if (isset($_REQUEST['wikiparse']) && $_REQUEST['wikiparse'] == 'on') {
         $info['wikiparse'] = 'y';
     } else {

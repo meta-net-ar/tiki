@@ -238,11 +238,7 @@ if (
 $wikilib->processPageDisplayOptions(TikiLib::lib('header'));
 
 #Propagate the fullscreen parameter to templates
-if (isset($_REQUEST['fullscreen'])) {
-    $fullscreen = $_REQUEST['fullscreen'];
-} else {
-    $fullscreen = 'n';
-}
+$fullscreen = $_REQUEST['fullscreen'] ?? 'n';
 $smarty->assign('fullscreen', $fullscreen);
 
 if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
@@ -521,7 +517,7 @@ $pageCache = Tiki_PageCache::create()
     ->requiresPreference('memcache_wiki_output')
     ->addValue('role', 'wiki-page-output')
     ->addValue('page', $page)
-    ->addValue('locale', $prefs['language'])
+    ->addValue('locale', Language::getCurrentLanguage())
     ->addKeys($_GET, array_keys($_GET))
     ->checkMeta('wiki-page-output-meta-timestamp', ['page' => $page,])
     ->dieAndOutputOrStore();

@@ -24,6 +24,7 @@ global $prefs, $user;
 
 clearstatcache();
 $modules = $modlib->get_modules_for_user($user);
+$smarty->assign('modlib', $modlib);
 
 if (Perms::get()->admin) {
     $smarty->assign('module_pref_errors', $modlib->pref_errors);

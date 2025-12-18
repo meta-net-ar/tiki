@@ -21,7 +21,21 @@ class Tiki_Version_Upgrade
     public function getMessage()
     {
         $parts = [];
-        if ($this->isRequired) {
+        if (! $this->old->isStable()) {
+            if ($this->new->isStableUpgradeTo($this->old)) {
+                $parts[] = tr(
+                    'You are using a development version: %0. This version is intended for testing and development purposes. For stability, consider switching to the latest stable release: %1.',
+                    (string) $this->old,
+                    (string) $this->new
+                );
+            } else {
+                $parts[] = tr(
+                    'You are using a development version: %0. This version is intended for testing and development purposes. The latest stable release (%1) is older than your current version, so downgrading is not recommended.',
+                    (string) $this->old,
+                    (string) $this->new
+                );
+            }
+        } elseif ($this->isRequired) {
             $parts[] = tr('Version %0 is no longer supported.', (string) $this->old);
 
             if ($this->isMinor()) {

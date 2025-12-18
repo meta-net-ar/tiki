@@ -197,6 +197,33 @@ O;
             ['Version 8.2 is no longer supported. A minor upgrade to 8.4 is strongly recommended.', new Tiki_Version_Upgrade('8.2', '8.4', true)],
             ['Version 4.3 is no longer supported. A major upgrade to 9.0 is strongly recommended.', new Tiki_Version_Upgrade('4.3', '9.0', true)],
             ['Version 8.4 is still supported. However, a major upgrade to 9.0 is available.', new Tiki_Version_Upgrade('8.4', '9.0', false)],
+            ['You are using a development version: 9.0beta2. This version is intended for testing and development purposes. For stability, consider switching to the latest stable release: 9.0.', new Tiki_Version_Upgrade('9.0beta2', '9.0', false)],
+            ['You are using a development version: 10.0vcs. This version is intended for testing and development purposes. The latest stable release (9.0) is older than your current version, so downgrading is not recommended.', new Tiki_Version_Upgrade('10.0vcs', '9.0', false)],
         ];
+    }
+
+    public function testIsStable()
+    {
+        $this->assertTrue(Tiki_Version_Version::get('27.1')->isStable());
+        $this->assertFalse(Tiki_Version_Version::get('27.1vcs')->isStable());
+        $this->assertFalse(Tiki_Version_Version::get('28.0beta')->isStable());
+        $this->assertFalse(Tiki_Version_Version::get('27.0rc')->isStable());
+        $this->assertFalse(Tiki_Version_Version::get('27.0pre')->isStable());
+        $this->assertTrue(Tiki_Version_Version::get('25.5')->isStable());
+    }
+
+    public function testUnstableVersionComparison()
+    {
+        // Upgrade: unstable to stable (e.g., beta → final)
+        $unstable = Tiki_Version_Version::get('27.0beta');
+        $stable = Tiki_Version_Version::get('27.0');
+        $this->assertTrue($stable->isStableUpgradeTo($unstable));
+        $this->assertFalse($unstable->isStableUpgradeTo($stable));
+
+        // Downgrade: unstable version is newer than last stable
+        $unstable = Tiki_Version_Version::get('29.0vcs');
+        $stable = Tiki_Version_Version::get('28.4');
+        $this->assertFalse($unstable->isStableUpgradeTo($stable));
+        $this->assertFalse($stable->isStableUpgradeTo($unstable));
     }
 }

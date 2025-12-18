@@ -584,6 +584,11 @@ class ObjectLib extends TikiLib
             if ($post_info) {
                 return true;
             }
+        } elseif ($type === 'blog') {
+            $blog = TikiLib::lib('blog')->get_blog($objectId);
+            if ($blog) {
+                return true;
+            }
         } elseif ($type === 'article') {
             $article_info = TikiLib::lib('art')->get_article($objectId, false);
             if ($article_info !== '') {
@@ -607,6 +612,12 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'file gallery') {
             $file = TikiLib::lib('filegal')->get_file_gallery_info($objectId);
             if ($file != false) {
+                return true;
+            }
+        } elseif ($type === 'file') {
+            $filegallib = TikiLib::lib('filegal');
+            $info = $filegallib->get_file_info($objectId, false, false, false);
+            if ($info != false) {
                 return true;
             }
         } elseif ($type === 'forum') {

@@ -30,9 +30,9 @@ function prefs_bigbluebutton_list()
             'tags' => ['basic'],
             'default' => '',
         ],
-        'bigbluebutton_server_salt' => [
-            'name' => tra('BigBlueButton server salt'),
-            'description' => tra('A salt key used to generate checksums for the BigBlueButton server to assure that requests are authentic.'),
+        'bigbluebutton_shared_secret' => [
+            'name' => tra('BigBlueButton shared secret'),
+            'description' => tra('A secret key used to generate checksums for the BigBlueButton server to assure that requests are authentic.'),
             'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
             'type' => 'text',
             'size' => 40,

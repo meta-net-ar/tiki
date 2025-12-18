@@ -26,7 +26,6 @@
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if Language::isRTL()} dir="rtl"{/if}{if !empty($page_id)} id="page_{$page_id}"{/if}>
 <head>
     {include file='header.tpl'}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {* The following style block makes sense to be used only with this fixed top bar layout so lets put it here only *}
     {if $prefs.theme_navbar_fixed_topbar_offset ne ''}<style>
     {literal}

@@ -34,7 +34,7 @@
                 <div class="quizquestion">{$questions[ix].question|escape}</div>
                 <div class="quizoptions">
                     {section name=jx loop=$questions[ix].options}
-                        <input type="radio" value="{$questions[ix].options[jx].optionId|escape}" name="question_{$questions[ix].questionId}">{$questions[ix].options[jx].optionText|escape}<br>
+                        <input type="radio" class="form-check-input" value="{$questions[ix].options[jx].optionId|escape}" name="question_{$questions[ix].questionId}">{$questions[ix].options[jx].optionText|escape}<br>
                     {/section}
                 </div>
                 {if $questions[ix].type eq "f"}

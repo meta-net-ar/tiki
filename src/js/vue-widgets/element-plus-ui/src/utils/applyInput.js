@@ -58,7 +58,11 @@ function transformContainerInputs(containerElement) {
         // --- Event Synchronization ---
 
         elementPlusUi.on("change", (e) => originalInput.val(e.detail[0]).trigger("change"));
-        elementPlusUi.on("input", (e) => originalInput.val(e.detail?.[0]).trigger("input"));
+        elementPlusUi.on("input", (e) => {
+            if (e.detail?.[0]) {
+                originalInput.val(e.detail?.[0]).trigger("input");
+            }
+        });
 
         ["blur", "focus", "keyup", "keydown"].forEach((event) => {
             elementPlusUi.on(event, (e) => {

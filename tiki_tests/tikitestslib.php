@@ -44,7 +44,7 @@ if (isset($_COOKIE['tikitest_record'])) {
  */
 function test_callback($buffer)
 {
-    global $test_cookie, $test_post, $test_get, $test_url;
+    global $test_post, $test_get;
 
     if (! isset($_COOKIE['tikitest_record']) or $_COOKIE['tikitest_record'] >= 2) {
         return $buffer;

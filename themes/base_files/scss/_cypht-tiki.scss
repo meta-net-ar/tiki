@@ -10,7 +10,9 @@
     .hide { display: none; }
     // override colors when not using cypht default theme
     img { opacity: 1 !important; max-width: 100%; }
+    a.text-decoration-none { text-decoration: none; }
     a i.bi, .menu-toggle i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
+    a i.bi.bi-person-plus { color: var(--bs-secondary) !important; }
     .ui-widget-content { background-color: $tiki-ui-default-bg !important; }
     .ui-menu-item-wrapper { color: var(--bs-body-color) !important; }
     .ui-state-active { color: $tiki-ui-default-link-active-color !important; }
@@ -170,6 +172,7 @@
         .js-header_subject { color: var(--bs-body-color); font-size: 1.4rem; }
         .header_event_addtocal el-select { width: auto; }
     }
+    .subject div { color: var(--bs-body-color); }
 
     .src_name, .content_title, .list_controls {
         background-color: inherit !important;
@@ -188,8 +191,14 @@
     .msg_headers th:hover, .settings_subtitle,
     .server_section { color: inherit !important; }
 
-    .total_unread_count, .unread_count { color: #000; }
-    .btn-outline-secondary:hover { color: #fff; text-decoration: none;}
+    .total_unread_count, .unread_count {
+        background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1));
+        color: var(--bs-body-bg);
+    }
+    .btn-outline-secondary:hover {
+        color: var(--bs-btn-hover-color); text-decoration: none;
+        background-color: var(--bs-secondary) !important;
+    }
     .msg_controls {
         .btn-outline-secondary:hover { color: var(--bs-btn-hover-color); }
     }
@@ -243,6 +252,15 @@
         .msg_controls {
             flex-flow: wrap; margin-bottom: 10px;
             a { text-decoration: none; }
+//            .btn-light:not(.btn-outline-secondary) { color: var(--bs-body-color); }
+            .btn-light, .btn-secondary {
+                color: var(--bs-secondary); background: none !important;
+                border-color: var(--bs-secondary);
+                &:hover {
+                    color: var(--bs-secondary-bg);
+                    background-color: var(--bs-secondary) !important;
+                }
+            }
         }
         .search_terms { width: 90% !important; margin: 0; padding: 4px 12px; }
         .search_form {
@@ -367,12 +385,23 @@
         width: auto !important;
     }
 
-    .nux_welcome { margin-bottom: 15px; }
+    .nux_welcome {
+        margin-bottom: 15px;
+        .mb-3 a.btn-light {
+            background: none; color: var(--bs-secondary); border-color: var(--bs-secondary);
+            &:hover {
+                color: var(--bs-secondary-bg);
+                background-color: var(--bs-secondary);
+                .bi-person-plus { color: var(--bs-secondary-bg) !important; }
+            }
+        }
+    }
     .block_sender_link.btn-outline-danger {
-        color: var(--bs-btn-color);
+        color: var(--bs-btn-color); background: none !important;
         i.bi { color: var(--bs-btn-color) !important; }
         &:hover, &:active {
             color: var(--bs-btn-hover-color); text-decoration: none;
+            background-color: var(--bs-danger) !important;
             i.bi { color: var(--bs-btn-hover-color) !important; }
         }
     }
@@ -398,9 +427,10 @@
     }
 
     #middle_outer {
-        margin-top: 15px !important;
-        .middle-wrapper { padding-top: 0; }
+        margin-top: 0px !important;
+        .middle-wrapper { padding-top: 20px; }
     }
+    .page-content-top-margin { height: 0px !important; }
 }
 
 //
@@ -408,9 +438,7 @@
 //
 .mobile {
     .inline-cypht {
-        .app-container {
-            padding: 20px 0;
-        }
+        .app-container { padding: 2px 0 10px; }
         nav.folder_cell {
             position: fixed;
             z-index: 9999;
@@ -453,7 +481,6 @@
         }
 
         .list_controls i.bi-filter-circle {
-            position: absolute; top: 11px; right: 15px; z-index: 100;
             color: var(--bs-body-color);
         }
         .imap_filter_form { margin-left: 10px; margin-right: 10px; }
@@ -468,10 +495,13 @@
         .msg_headers th { width: 20%; }
 
         .sys_messages {
-            top: 45px; right: 0; width: 100%; min-height: 5px;
-            padding-bottom: 15px; white-space: normal;
+            top: 0px; right: 0; width: 100%; min-height: 5px; margin-top: 5px;
+            white-space: normal;
         }
-        .offline { height: 55px; }
+        .offline {
+            position: fixed; top: 0; right: 0; height: auto; padding: 12px 35px;
+            z-index: 1000;
+        }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
@@ -559,11 +589,11 @@
         .msg_text_inner { width: 100%; padding: 15px !important; }
         .msg_parts { table-layout: auto; }
         .msg_controls {
-            top: 0.3rem; height: auto; padding-left: 0; z-index: 1200;
-            background-color: var(--bs-body-bg);
+            top: 0.3rem; height: auto; padding-left: 0; padding-bottom: 5px;
+            z-index: 1200; background-color: var(--bs-body-bg);
         }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 1rem; }
+        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 0.5rem; }
         .msg_text table { word-break: normal; }
         .checkbox_cell { padding-top: 8px !important; }
 
@@ -614,23 +644,17 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
 
 
 // responsive specific stuff
-// desktop (1199.98px)
-@include media-breakpoint-down(xl) {
-    .tiki-webmail {
-        .container {
-            max-width: 1420px;
-        }
-    }
-}
-
-// landscape phones (767.98px)
-@include media-breakpoint-down(md) {
+// tablets (991.98px)
+@include media-breakpoint-down(lg) {
     html body.tiki.tiki-webmail #middle.container.container-std.middle {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 100% !important;
     }
-    .mobile .inline-cypht .list_controls i.bi-filter-circle { top: 2px; right: 0; }
+}
+
+// landscape phones (767.98px)
+@include media-breakpoint-down(md) {
     .mobile #list_controls_menu.show { top: 25px; right: 0; }
 }
 

@@ -309,6 +309,9 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
         $errors[] = sprintf(tra('User %s already exists'), $_REQUEST['login']);
         $AddUser = false;
     }
+    if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $_REQUEST['login'])) {
+        return tra("Username cannot contain any spaces");
+    }
     if ($prefs['login_is_email'] == 'y' && ! validate_email($_REQUEST['login'])) {
         $errors[] = tra('Invalid email') . ' ' . $_REQUEST['login'];
         $AddUser = false;
@@ -430,25 +433,13 @@ if (empty($_REQUEST['offset'])) {
 }
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST['initial'])) {
-    $initial = $_REQUEST['initial'];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST['initial'] ?? '';
 $smarty->assign('initial', $initial);
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 $smarty->assign('find', $find);
 
-if (isset($_REQUEST['filterGroup'])) {
-    $filterGroup = $_REQUEST['filterGroup'];
-} else {
-    $filterGroup = '';
-}
+$filterGroup = $_REQUEST['filterGroup'] ?? '';
 $smarty->assign('filterGroup', $filterGroup);
 
 list($username, $usermail, $usersTrackerId, $chlogin) = ['', '', '',    false];
@@ -480,6 +471,8 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
                 if ($userinfo['login'] != $_POST['login'] && $userinfo['login'] != 'admin') {
                     if ($userlib->user_exists($_POST['login'])) {
                         $errors[] = tra('User already exists');
+                    } elseif (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $_POST['login'])) {
+                        $errors[] = tra('Username cannot contain any spaces');
                     } elseif (! empty($prefs['username_pattern']) && ! preg_match($prefs['username_pattern'], $_POST['login'])) {
                         $errors[] = tra('User login contains invalid characters.');
                     } elseif ($userlib->change_login($userinfo['login'], $_POST['login'])) {

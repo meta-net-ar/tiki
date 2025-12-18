@@ -38,11 +38,7 @@ if (! isset($calendarViewMode)) {
 
 # If specified, limit the export to the maximum number of records (events)
 # indicated in the request; otherwise, the limit is from the global preferences.
-if (isset($_REQUEST['maxRecords'])) {
-    $maxRecords = $_REQUEST['maxRecords'];
-} else {
-    $maxRecords = -1;
-}
+$maxRecords = $_REQUEST['maxRecords'] ?? -1;
 
 if (isset($_SESSION['CalendarFocusDate'])) {
     $startTime = $_SESSION['CalendarFocusDate'];
@@ -111,8 +107,6 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
     } else {
         $events = $calendarlib->getItemWithRecurrence($_REQUEST["calendarItem"]);
     }
-
-    TikiLib::lib('header')->setXRobotsTag($robots);
 
     if (isset($_REQUEST['csv'])) {
         header('Content-type: text/csv');

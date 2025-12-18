@@ -102,11 +102,28 @@ function wikiplugin_subscribenewsletter($data, $params)
         return;
     }
 
+    $alreadySubscribed = false;
+    $alreadySubscribedMessage = '';
     if ($user) {
         $alls = $nllib->get_all_subscribers($nlId, false);
         foreach ($alls as $all) {
             if (strtolower($all['db_email']) == strtolower($user)) {
-                return;
+                $alreadySubscribed = true;
+                $alreadySubscribedMessage = tra('You are already subscribed to this newsletter.');
+                break;
+            }
+        }
+    }
+
+    // Check for anonymous users by email
+    if (! $user && isset($_REQUEST['wpSubscribe'], $_REQUEST['wpNlId']) && $_REQUEST['wpNlId'] == $nlId) {
+        $subscribers = $nllib->get_all_subscribers($nlId, false);
+        $submittedEmail = strtolower($_REQUEST['wpEmail']);
+        foreach ($subscribers as $subscriber) {
+            if (strtolower($subscriber['db_email']) == $submittedEmail) {
+                $alreadySubscribed = true;
+                $alreadySubscribedMessage = tra('This email address is already subscribed to this newsletter.');
+                break;
             }
         }
     }
@@ -134,22 +151,40 @@ function wikiplugin_subscribenewsletter($data, $params)
         $useCaptcha = 1;
     }
     if (isset($_REQUEST['wpSubscribe']) && $_REQUEST['wpNlId'] == $nlId) {
-        $captchalib = TikiLib::lib('captcha');
-        if ($useCaptcha != 0 && ! $user && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
-            $wpError = $captchalib->getErrors();
-        } elseif (! $user && empty($_REQUEST['wpEmail'])) {
-            $wpError = tra('Invalid Email');
-        } elseif (! $user && ! validate_email($_REQUEST['wpEmail'], $prefs['validateEmail'])) {
-            $wpError = tra('Invalid Email');
+        if ($alreadySubscribed) {
+            $wpError = $alreadySubscribedMessage;
             $subscribeEmail = $_REQUEST['wpEmail'];
-        } elseif (
-            ($user && $nllib->newsletter_subscribe($nlId, $user, 'y', 'n'))
-            || (! $user && $nllib->newsletter_subscribe($nlId, $_REQUEST['wpEmail'], 'n', $info['validateAddr']))
-        ) {
-            $wpSubscribe = 'y';
-            $smarty->assign('subscribeThanks', empty($thanks) ? $data : $thanks);
         } else {
-            $wpError = tra('Already subscribed');
+            $captchalib = TikiLib::lib('captcha');
+            if ($useCaptcha != 0 && ! $user && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
+                $wpError = $captchalib->getErrors();
+            } elseif (! $user && empty($_REQUEST['wpEmail'])) {
+                $wpError = tra('Email address is missing');
+            } elseif (! $user && ! validate_email($_REQUEST['wpEmail'], $prefs['validateEmail'])) {
+                $wpError = tra('Invalid Email');
+                $subscribeEmail = $_REQUEST['wpEmail'];
+            } else {
+                if ($user) {
+                    $result = $nllib->newsletter_subscribe($nlId, $user, 'y', 'n');
+                } else {
+                    $result = $nllib->newsletter_subscribe($nlId, $_REQUEST['wpEmail'], 'n', $info['validateAddr']);
+                }
+                if ($result) {
+                    $wpSubscribe = 'y';
+                    $smarty->assign('subscribeThanks', empty($thanks) ? $data : $thanks);
+                    if ($info['validateAddr'] == 'y' && ! $user) {
+                        // For anonymous users with email validation required
+                        $smarty->assign('confirmationSent', true);
+                        $smarty->assign('confirmationMessage', tra('A confirmation email has been sent to your email address. Please check your inbox and click the confirmation link to activate your subscription.'));
+                    } else {
+                        // For immediate subscription or logged-in users
+                        $smarty->assign('subscriptionActive', true);
+                        $smarty->assign('confirmationMessage', tra('Your subscription has been activated. You will now receive newsletters.'));
+                    }
+                } else {
+                    $wpError = tra('Subscription failed. Please try again.');
+                }
+            }
         }
     }
     $smarty->assign_by_ref('wpSubscribe', $wpSubscribe);
@@ -159,6 +194,8 @@ function wikiplugin_subscribenewsletter($data, $params)
     $smarty->assign('inmodule', ! empty($inmodule) ? "moduleSubscribeNL" : "");
     $smarty->assign_by_ref('subscribeInfo', $info);
     $smarty->assign('useCaptcha', $useCaptcha);
+    $smarty->assign('alreadySubscribed', $alreadySubscribed);
+    $smarty->assign('alreadySubscribedMessage', $alreadySubscribedMessage);
     $res = $smarty->fetch('wiki-plugins/wikiplugin_subscribenewsletter.tpl');
     if ($params["wikisyntax"] == 1) {
         return $res;

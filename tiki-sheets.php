@@ -71,12 +71,7 @@ if (! isset($_REQUEST["sheetId"])) {
 }
 
 $access->check_permission('tiki_p_view_sheet');
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign('sheetId', $_REQUEST["sheetId"]);
 // Init smarty variables to blank values
@@ -161,11 +156,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 // Get the list of sheets available for this user (or public galleries)
 $sheets = $sheetlib->list_sheets($offset, $maxRecords, $sort_mode, $find);

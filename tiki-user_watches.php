@@ -15,10 +15,11 @@ $inputConfiguration = [
             'categwatch'        => 'int',          //post
             'id'                => 'int',          //post
             'add'               => 'bool',         //post
-            'event'             => 'string',       //post
+            'event'             => 'striptags',    //post
             'delete'            => 'bool',         //post
+            'langwatch'         => 'lang',         //post
         ],'staticKeyFiltersForArrays' => [
-            'cat_categories'          => 'string',    //post
+            'cat_categories'          => 'int',       //post
             'checked'                 => 'int',       //post
         ],
     ],

@@ -16,13 +16,14 @@
             <fieldset>
                 <legend class="h3">{tr}General{/tr}</legend>
                     <div class="adminoptionbox">
-                        {preference name=metatag_keywords}
                         {preference name=metatag_freetags}
                         {preference name=metatag_threadtitle}
                         {preference name=metatag_description}
                         {preference name=metatag_pagedesc}
                         {preference name=metatag_robotscustom}
-                        {preference name=metatag_author}
+                        {preference name=metatag_nositelinkssearchbox}
+                        {preference name=metatag_google_notranslate}
+                        {preference name=site_google_analytics_site_ownership}
                     </div>
             </fieldset>
 
@@ -56,7 +57,6 @@
             {* Need to show site_metatag_robots as real metatags are overridden at runtime *}
 
             {preference name=metatag_robots}
-            {preference name=metatag_revisitafter}
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

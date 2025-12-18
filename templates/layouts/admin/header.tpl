@@ -2,14 +2,13 @@
 {if $base_uri and ($dir_level gt 0 or $prefs.feature_html_head_base_tag eq 'y')}
     <base href="{$base_uri|escape}">
 {/if}
-{* --- Latest IE Compatibility --- *}
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+{* --- Essential meta tags must come first --- *}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Tiki Wiki CMS Groupware - https://tiki.org">
 
-    <meta content="{$base_url_canonical}" name="twitter:domain"> {* may be obsolete when using twitter:card *}
+    <meta name="twitter:domain" content="{$base_url_canonical}"> {* may be obsolete when using twitter:card *}
 {strip}
 {* --- Canonical URL --- *}
     {include file="canonical.tpl"}
@@ -29,9 +28,6 @@
     {if (isset($prefs.metatag_robots) and $prefs.metatag_robots neq '') and (isset($metatag_robots) and $metatag_robots neq '')}
         <meta name="robots" content="{$prefs.metatag_robots|escape}, {$metatag_robots|escape}">
     {/if}
-{/if}
-{if $prefs.metatag_revisitafter neq ''}
-    <meta name="revisit-after" content="{$prefs.metatag_revisitafter|escape}">
 {/if}
 
 {capture assign='header_title'}{strip}

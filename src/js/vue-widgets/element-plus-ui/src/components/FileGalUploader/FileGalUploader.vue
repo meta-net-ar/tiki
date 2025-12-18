@@ -1,9 +1,12 @@
 <script setup>
 import { UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { ajaxUpload as defaultHttpRequest } from 'element-plus/es/components/upload/src/ajax';
 import { ref, onMounted } from 'vue'
 import getUploadData from '../../helpers/fileGalUploader/getUploadData';
 import ConfigWrapper from '../ConfigWrapper.vue';
+import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
+import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
 
 const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language']);
 const maxSize = JSON.parse(props.maxSize);
@@ -63,6 +66,15 @@ const copyToClipboard = (text) => {
         ElMessage.error('Failed to copy');
     });
 }
+
+const httpRequest = (option) => {
+    const xhr = defaultHttpRequest(option);
+    const originalOnError = option.onError;
+    option.onError = () => {
+        originalOnError(getUploadAjaxError(option, xhr));
+        handleTikiFeedback(xhr);
+    };
+}
 </script>
 
 <script>
@@ -93,6 +105,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             :action="vimeoUrl ? vimeoUrl : DEFAULT_ACTION_URL"
             :method="vimeoUrl ? 'PUT' : 'POST'"
             :data-testid="DATA_TEST_ID.UPLOAD_ELEMENT"
+            :http-request="httpRequest"
         >
             <el-icon class="el-icon--upload" :data-testid="DATA_TEST_ID.UPLOAD_ICON"><upload-filled /></el-icon>
             <div class="el-upload__text" :data-testid="DATA_TEST_ID.UPLOAD_TEXT">

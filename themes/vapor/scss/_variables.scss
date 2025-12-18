@@ -11,7 +11,7 @@ $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be decla
 
 $yellow-800: shade-color($yellow, 60%) !default;
 
-//$primary:       $purple !default;
+$primary:       $purple; // !default;
 $secondary:     #D917A2; // $pink !default;
 $success:       #068938; // $green !default;
 $info:         #0879BF; // $blue !default;
@@ -54,6 +54,22 @@ $mark-bg:                     $yellow-800;
 $input-bg: #30115e;  // Copied from Bootswatch demo page.
 
 // Navs
+$nav-link-color:                    #000; // var(--#{$prefix}link-color) !default;
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
+
+// Navbar
+$navbar-light-color:                #000;
+$navbar-light-hover-color:          $gray-800;
+$navbar-light-active-color:         $gray-900;
+$navbar-light-disabled-color:       $gray-700;
+//$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .95); // !default;
+//$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
+//$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
+//$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
+
+
 // Dropdowns
 // Pagination
 // Cards

@@ -38,7 +38,7 @@ function wikiplugin_lang($data, $params)
 {
     global $prefs;
 
-    $reqlang = $_REQUEST['lang'] ?? $prefs['language'];
+    $reqlang = $_REQUEST['lang'] ?? Language::getCurrentLanguage();
     extract($params, EXTR_SKIP);
     if (! is_null($lang)) {
         return in_array($reqlang, explode('+', $lang)) ? $data : '';

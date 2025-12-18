@@ -52,21 +52,6 @@ __Fix smartylint syntax with curly braces.__
 
 Related to the previous one, this patch replaces the usage of curly-braces syntax to access element or character at a specific index in an array or a string with the square bracket syntax.
 
-### [text_wiki_mediawiki__func_collision.patch](./text_wiki_mediawiki__func_collision.patch)
-__Renamed method to avoid collision with func from parent class__
-
-Basically, this change renames the method `process()` to `process_emphasis()` in the  `Text_Wiki_Parse_Emphasis` class to avoid naming conflicts with the `process()` method in the parent class `Text_Wiki_Parse`. Yes, this patch is needed because the lib [pear/Text_Wiki_Mediawiki](https://github.com/pear/Text_Wiki_Mediawiki) hasn't been updated on this part, and it's less likely that it will, because its GitHub repository doesn't show any activity in almost six years.
-
-### [text_wiki_mediawiki__php7fixes.patch](./text_wiki_mediawiki__php7fixes.patch)
-__Removed deprecated syntax in PHP7.__
-
-This patch adapts the library to run on newer PHP versions, starting from PHP 7. Specifically, it removes redundant assignments of objects to variables by reference and illegal assignments.
-
-### [text_wiki_mediawiki__php8fixes.patch](./text_wiki_mediawiki__php8fixes.patch)
-__Removed string access with curly braces syntax in PHP8.__
-
-This patch replaces the usage of curly-braces syntax to access array elements and string characters.
-
 ### [xmpp-prebind-php__php8fixes.patch](./xmpp-prebind-php__php8fixes.patch)
 __Removed string access with curly braces syntax in PHP8.__
 

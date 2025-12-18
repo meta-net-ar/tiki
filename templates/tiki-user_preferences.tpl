@@ -63,13 +63,13 @@
                             </label>
                             <div class="col-md-8">
                                 <label>
-                                    <input type="radio" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
                                 </label>
                             </div>
                         </div>

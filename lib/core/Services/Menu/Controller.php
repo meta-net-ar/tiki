@@ -246,7 +246,9 @@ class Services_Menu_Controller
             }
 
             $name = $input->name->text();
-            if (! $name) {
+            $type = $input->type->text();
+
+            if (! $name && $type !== '-') {
                 throw new Services_Exception_MissingValue('name');
             }
 
@@ -264,7 +266,6 @@ class Services_Menu_Controller
             }
 
             $url = $input->url->text();
-            $type = $input->type->text();
             $section = $input->section->text();
             $perm = $input->perm->text();
             $groupname = $input->asArray('groupname');

@@ -10,7 +10,6 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Colors
-
 $primary:       #906060; // #e2d4d4; Here and below darkened for WCAG compliance
 $secondary:     #555B62; // #868e96;
 $success:       #16794B; //#28a745;
@@ -36,7 +35,6 @@ $theme-colors: (
 $prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
 
 // Spacing
-
 // Body
 $body-bg:               #f0f0f0;
 $body-color:            #4F5963; // $gray-500;
@@ -50,15 +48,13 @@ $link-hover-decoration: none;
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 
 // Components
-//$border-color: $gray-300;
-$border-color: $gray-400;
-$border-radius-base:        0;
-$border-radius-large:       0;
-$border-radius-small:       0;
-//$component-active-color:      $white;  // default
 $component-active-bg:         $primary;  // default
 $component-active-color:    $gray-500;
 
+$border-color:              $gray-400;
+$border-radius-base:        0;
+$border-radius-large:       0;
+$border-radius-small:       0;
 
 // Typography
 $font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -86,7 +82,7 @@ $btn-secondary-bg:               $body-bg;
 $btn-secondary-border:           $btn-primary-border;
 
 // Forms
-$input-border-color:                    var(--#{$prefix}border-color);  // default
+$input-border-color:            var(--#{$prefix}border-color);  // default
 $input-border:                  $input-border-color; //   $body-bg;
 $input-border-focus:            $primary;
 $input-color-placeholder:       #646C73; // Darkened for WCAG compliance
@@ -110,12 +106,10 @@ $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Navs
 // Navbar
-$navbar-height:                    35px;
-$navbar-light-color:             $gray-500;
+$navbar-light-color:             #6E7481;
 $tiki-navbar-light-bg:                #ffffff;
 $navbar-light-border:            transparent;
 
-// Navbar
 $navbar-light-hover-color:          $gray-800;
 $navbar-light-toggle-icon-bar-bg:        #cccccc;
 
@@ -130,6 +124,10 @@ $navbar-dark-active-bg:            color.adjust($tiki-navbar-dark-bg, $lightness
 $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
+$pagination-active-color: #fff;
+$pagination-active-bg: $primary;
+$pagination-active-border: $primary;
+
 // Cards
 $card-bg: var(--tiki-lighty-col1-bg);
 

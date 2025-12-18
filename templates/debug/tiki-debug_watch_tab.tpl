@@ -1,8 +1,8 @@
 <table id="watchlist">
     <caption> {tr}Watchlist{/tr} </caption>
     <tr>
-        <th>Variable</th>
-        <th>Value</th>
+        <th>{tr}Variable{/tr}</th>
+        <th>{tr}Value{/tr}</th>
     </tr>
 
     {section name=i loop=$watchlist}

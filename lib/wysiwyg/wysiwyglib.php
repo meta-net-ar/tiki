@@ -79,10 +79,9 @@ class WYSIWYGLib
 
     public function setUpEditor($dom_id, $params = [])
     {
+        global $prefs, $user;
         $headerlib = TikiLib::lib('header');
         $smarty = TikiLib::lib('smarty');
-
-
 
         if ($params['_toolbars'] !== 'n') {
             $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
@@ -93,7 +92,64 @@ class WYSIWYGLib
 
         ['lang' => $lang, 'filePath' => $langFilePath] = $this->getEditorLang();
 
+        // Prepare language check options from prefs with effective language fallback chain
+        $lcEnabled = $prefs['feature_language_check'] === 'y' ? 'true' : 'false';
+        $lcDebounce = (int) $prefs['language_check_debounce_ms'];
+        $lcAutoBool = $prefs['language_check_auto_detect'] === 'y';
+        $lcAuto = $lcAutoBool ? 'true' : 'false';
+
+        // Determine effective language for validation
+        $contentLang = isset($params['lang']) && $params['lang'] ? $params['lang'] : '';
+        if (! $contentLang && ! empty($params['objectId']) && ! empty($params['section']) && $params['section'] === 'wiki page') {
+            $info = TikiLib::lib('tiki')->get_page_info($params['objectId']);
+            if (! empty($info['lang'])) {
+                $contentLang = $info['lang'];
+            }
+        }
+        if ($contentLang) {
+            $effectiveLanguage = $contentLang;
+        } else {
+            $effectiveLanguage = Language::getCurrentLanguage();
+        }
+
+        // Always check if language is supported by LanguageTool (regardless of auto-detect setting)
+        $isLanguageSupported = false;
+        try {
+            $ltUrl = Services_LanguageCheck_Controller::getLanguageToolUrl($prefs);
+            $client = TikiLib::lib('tiki')->get_http_client();
+            $client->setUri(rtrim($ltUrl, '/') . '/v2/languages');
+            $client->setMethod(Laminas\Http\Request::METHOD_GET);
+            $client->setOptions(['timeout' => 5]);
+            $response = $client->send();
+            if ($response->isSuccess()) {
+                $data = json_decode($response->getBody(), true);
+                if (is_array($data)) {
+                    $supportedCodes = [];
+                    foreach ($data as $langInfo) {
+                        $code = $langInfo['code'] ?? ($langInfo['longCode'] ?? null);
+                        if ($code) {
+                            $supportedCodes[] = strtolower($code);
+                            // Also check short code (e.g., 'en' matches 'en-US')
+                            $shortCode = explode('-', $code)[0];
+                            if ($shortCode) {
+                                $supportedCodes[] = strtolower($shortCode);
+                            }
+                        }
+                    }
+                    $effectiveLangLower = strtolower($effectiveLanguage);
+                    $effectiveLangShort = strtolower(explode('-', $effectiveLanguage)[0]);
+                    $isLanguageSupported = in_array($effectiveLangLower, $supportedCodes) || in_array($effectiveLangShort, $supportedCodes);
+                }
+            }
+        } catch (Exception $e) {
+            $isLanguageSupported = false;
+        }
+
+        $lcDefault = json_encode($effectiveLanguage);
+        $lcIsSupported = $isLanguageSupported ? 'true' : 'false';
+
         $loadingIndicatorVar = 'loadingIndicator' . $dom_id;
+        $enableSummernoteLC = ($prefs['feature_language_check'] === 'y') ? 'true' : 'false';
         $headerlib->add_js_module(<<<JS
             const $loadingIndicatorVar = $($.IMPORT_LOADER_MARKUP);
             $('#{$dom_id}').after($loadingIndicatorVar);
@@ -105,6 +161,15 @@ class WYSIWYGLib
                     const options = {lang: '{$lang}'};
                     if ($.editorSection === 'wiki page') {
                         options.height = 600;
+                    }
+                    if ({$enableSummernoteLC}) {
+                        options.languageCheck = {
+                            enabled: {$lcEnabled},
+                            debounceMs: {$lcDebounce},
+                            autoDetect: {$lcAuto},
+                            defaultLanguage: {$lcDefault},
+                            isLanguageSupported: {$lcIsSupported}
+                        };
                     }
                     module.default('{$dom_id}', JSON.parse(`{$tools}`), options);
                 });
@@ -155,7 +220,7 @@ class WYSIWYGLib
             } else {
                 $endNewLine = '';
             }
-            $mdCustomBlock = "$startNewLine\$\$tiki\n$pluginMarkup\n\$\$$endNewLine";
+            $mdCustomBlock = "{$startNewLine}\$\$tiki\n{$pluginMarkup}\n\$\${$endNewLine}";
             $newContent .= $mdCustomBlock;
 
             $position = $match->getEnd();

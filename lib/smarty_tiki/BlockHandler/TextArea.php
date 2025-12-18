@@ -10,6 +10,9 @@ namespace SmartyTiki\BlockHandler;
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use Language;
+use Services_LanguageCheck_Controller;
+use Exception;
 
 /**
  * smarty_block_textarea : add a textarea to a template.
@@ -71,7 +74,7 @@ class TextArea extends Base
         $params['name'] = $params['name'] ?? 'edit';
         $params['id'] = $params['id'] ?? 'editwiki';
         $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
-        $params['class'] = $params['class'] ?? 'wikiedit form-control';
+        $params['class'] = $params['class'] ?? 'wikiedit form-control check_character_limit';
         $params['comments'] = $params['comments'] ?? 'n';
         $params['autosave'] = $params['autosave'] ?? 'y';
 
@@ -219,6 +222,66 @@ class TextArea extends Base
             $html .= $smarty->fetch('wiki_edit.tpl');
 
             $html .= "\n" . '<input type="hidden" name="wysiwyg" value="n" />';
+
+            // Attach language checker for plain textarea if enabled
+            if ($prefs['feature_language_check'] === 'y') {
+                global $user;
+
+                $lcAutoBool = $prefs['language_check_auto_detect'] === 'y';
+
+                // Always determine the effective language (even when auto-detect is on, we need to know it for validation)
+                $contentLang = isset($params['lang']) && $params['lang'] ? $params['lang'] : '';
+                if (! $contentLang && ! empty($params['objectId']) && ! empty($params['section']) && $params['section'] === 'wiki page') {
+                    $info = TikiLib::lib('tiki')->get_page_info($params['objectId']);
+                    if (! empty($info['lang'])) {
+                        $contentLang = $info['lang'];
+                    }
+                }
+                if ($contentLang) {
+                    $effectiveLanguage = $contentLang;
+                } else {
+                    $effectiveLanguage = Language::getCurrentLanguage();
+                }
+
+                // Always check if language is supported by LanguageTool (regardless of auto-detect setting)
+                $isLanguageSupported = false;
+                try {
+                    $ltUrl = Services_LanguageCheck_Controller::getLanguageToolUrl($prefs);
+                    $client = TikiLib::lib('tiki')->get_http_client();
+                    $client->setUri(rtrim($ltUrl, '/') . '/v2/languages');
+                    $client->setMethod(\Laminas\Http\Request::METHOD_GET);
+                    $client->setOptions(['timeout' => 5]);
+                    $response = $client->send();
+                    if ($response->isSuccess()) {
+                        $data = json_decode($response->getBody(), true);
+                        if (is_array($data)) {
+                            $supportedCodes = [];
+                            foreach ($data as $langInfo) {
+                                $code = $langInfo['code'] ?? ($langInfo['longCode'] ?? null);
+                                if ($code) {
+                                    $supportedCodes[] = strtolower($code);
+                                    $shortCode = explode('-', $code)[0];
+                                    if ($shortCode) {
+                                        $supportedCodes[] = strtolower($shortCode);
+                                    }
+                                }
+                            }
+                            $effectiveLangLower = strtolower($effectiveLanguage);
+                            $effectiveLangShort = strtolower(explode('-', $effectiveLanguage)[0]);
+                            $isLanguageSupported = in_array($effectiveLangLower, $supportedCodes) || in_array($effectiveLangShort, $supportedCodes);
+                        }
+                    }
+                } catch (Exception $e) {
+                    // If we can't check, assume unsupported to avoid silent failures
+                    $isLanguageSupported = false;
+                }
+
+                $auto = $lcAutoBool ? 'true' : 'false';
+                $debounce = (int) ($prefs['language_check_debounce_ms'] ?? 1000);
+                $lcDefault = json_encode($effectiveLanguage);
+                $lcIsSupported = $isLanguageSupported ? 'true' : 'false';
+                $headerlib->add_js_module("import initTextareaLanguageCheck from \"@jquery-tiki/languageCheckTextarea\"; initTextareaLanguageCheck('#$as_id', { enabled: true, debounceMs: $debounce, autoDetect: $auto, defaultLanguage: $lcDefault, actualLanguage: $lcDefault, isLanguageSupported: $lcIsSupported });");
+            }
         }   // wiki or wysiwyg
 
         $js_editconfirm = '';

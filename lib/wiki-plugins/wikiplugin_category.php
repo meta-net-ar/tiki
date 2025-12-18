@@ -242,7 +242,7 @@ function wikiplugin_category($data, $params)
     $split = strtolower($split) == 'y';
     $sub = strtolower($sub) == 'y';
     $and = strtolower($and) == 'y';
-    $filter['language'] = $lang ?: $prefs['language'];
+    $filter['language'] = $lang ?: Language::getCurrentLanguage();
 
     if (! empty($sort)) {
         $list = explode(',', $sort);

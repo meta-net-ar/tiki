@@ -18,9 +18,7 @@ $imagePath: "../images/";
 
 // Color system
 .bg-dark {
-    background: #1f5daa !important; /* Old browsers */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1f5daa), color-stop(2%, #3977c4), color-stop(3%, #3b7ac7), color-stop(5%, #3877c6), color-stop(7%, #3a7cca), color-stop(9%, #3778c8), color-stop(19%, #3674c7), color-stop(43%, #2c6abf), color-stop(69%, #1c5cb3), color-stop(93%, #1454ac), color-stop(97%, #1455a9), color-stop(98%, #1a57a8), color-stop(100%, #346dba)) !important; /* Chrome,Safari4+ */
-    background: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%) !important; /* W3C */
+    background: var(--tiki-business-dark-bg);
     border-left: 1px solid #3676C4;
     border-right: 1px solid #1957AA;
 }
@@ -52,14 +50,14 @@ h2.sitesubtitle {
 
 // Navs
 // Navbar
-.navbar-dark-parent {
-    .sitetitles a {
-        color: #ffffff;
-    }
-    .sitesubtitle {
-        color: #91bef5;
-    }
-}
+//.navbar-dark-parent {
+//    .sitetitles a {
+//        color: #ffffff;
+//    }
+//    .sitesubtitle {
+//        color: #91bef5;
+//    }
+//}
 
 .topbar .navbar-dark .navbar-nav > li > a {
   text-transform: uppercase;

@@ -7,8 +7,8 @@
 
 namespace I18n;
 
-use Language_Exception;
 use Tiki\Lib\Theme\ThemeLib;
+use TikiLib;
 
 require_once('lib/tikilib.php');
 require_once('lib/init/typography.php');
@@ -31,21 +31,6 @@ class LanguageTranslator
             self::$instances[$hash] = new self($lang, $options);
         }
         return self::$instances[$hash];
-    }
-
-    public static function getLanguageFromPrefs()
-    {
-        global $user, $user_preferences;
-        if (isset($user) && isset($user_preferences[$user]['language'])) {
-            $retval = $user_preferences[$user]['language'];
-        } else {
-            global $prefs;
-            $retval = $prefs['language'];
-        }
-        if (! $retval) {
-            throw new Language_Exception("Unable to find a language in preferences.  This isn't supposed to happen");
-        }
-        return $retval;
     }
 
     private function __construct(string $lang, array $options)

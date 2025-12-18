@@ -30,7 +30,7 @@ class SearchIndexRebuilder
      * @param mixed $progress Progress bar object for console output (optional)
      * @return array|null Statistics from rebuild if executed directly, null if queued
      */
-    public function executeOrQueueIndexRebuild(int $logLevel = 0, bool $cleanupErrors = true, $progress = null): ?array
+    public function executeOrQueueIndexRebuild(int $logLevel = 0, bool $cleanupErrors = true, $progress = null, $skipErrorTracking = false): ?array
     {
         global $prefs;
 
@@ -66,7 +66,7 @@ class SearchIndexRebuilder
             return null; // Indicates task was queued
         } else {
             // Execute directly
-            return $this->rebuildIndex($logLevel, $cleanupErrors, $progress);
+            return $this->rebuildIndex($logLevel, $cleanupErrors, $progress, $skipErrorTracking);
         }
     }
 
@@ -79,7 +79,7 @@ class SearchIndexRebuilder
      * @param mixed $progress Progress bar object for console output (optional)
      * @return array|null Statistics from the rebuild operation
      */
-    public function rebuildIndex(int $logLevel = 0, bool $cleanupErrors = true, $progress = null): ?array
+    public function rebuildIndex(int $logLevel = 0, bool $cleanupErrors = true, $progress = null, $skipErrorTracking = false): ?array
     {
         global $prefs;
 
@@ -94,7 +94,7 @@ class SearchIndexRebuilder
             $unifiedsearchlib = TikiLib::lib('unifiedsearch');
 
             // Rebuild the main search index
-            $stat = $unifiedsearchlib->rebuild($logLevel, false, $progress);
+            $stat = $unifiedsearchlib->rebuild($logLevel, false, $progress, $skipErrorTracking);
 
             // Handle progress bar if provided
             if ($progress) {

@@ -17,7 +17,7 @@ $inputConfiguration = [
         'wikify'               => 'bool',        //post
         'over'                 => 'bool',        //post
         'wiki_name'            => 'pagename',    //post
-        'parse_mode'           => 'string',      //post
+        'parse_mode'           => 'word',        //post
         ],
         'staticKeyFiltersForArrays' => [
             'note' => 'int',

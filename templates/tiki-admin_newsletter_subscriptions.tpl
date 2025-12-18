@@ -263,7 +263,7 @@
                 <label class="col-sm-3 form-check-label" for="add_email">{tr}Add email{/tr}</label>
                 <div class="col-sm-3">
                     <div class="form-check">
-                        <input type="radio" name="addemail" id="add_email" value="y" class="form-check-input">
+                        <input type="radio" class="form-check-input" name="addemail" id="add_email" value="y" class="form-check-input">
                     </div>
                 </div>
                 <label class="col-sm-3 form-check-label" for="add_user">{tr}Add user{/tr}</label>

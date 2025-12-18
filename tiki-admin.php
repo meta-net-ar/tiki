@@ -363,15 +363,25 @@ $smarty->assign('ProblemsLoadingCacheSubSystem', TikiLib::lib('cache')->reportOp
 // VERSION TRACKING
 $forcecheck = ! empty($_GET['forcecheck']);
 
+$versionObj = Tiki_Version_Version::get($TWV->version);
+$is_stable = $versionObj->isStable();
+
 // Versioning feature has been enabled, so if the time is right, do a live
 // check, otherwise display the stored data.
 if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $versionUtils = new Tiki_Version_Utils();
     $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
 
+    $gitlib = TikiLib::lib('git');
+    $gitDetails = $gitlib->isGitInstall() ? $gitlib->getGitDetails()['content'] : [];
+
     $smarty->assign('upgrade_messages', $upgrades);
+    $smarty->assign('git_details', $gitDetails);
+    $smarty->assign('is_stable', $is_stable);
 } else {
     $smarty->assign('upgrade_messages', []);
+    $smarty->assign('git_details', []);
+    $smarty->assign('is_stable', $is_stable);
 }
 
 // SSL setup

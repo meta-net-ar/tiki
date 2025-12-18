@@ -746,10 +746,17 @@ class Services_File_Controller
             throw new Services_Exception_Denied();
         }
 
+        $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId);
+        if (! $fileInfo) {
+            throw new Services_Exception_NotFound(tr('Requested file does not exist'));
+        }
+        // when stored in the database the file contents is here and should not be sent back to the client
+        $fileInfo['data'] = null;
+
         return [
             'title' => tr('File Info'),
             'fileId' => $fileId,
-            'info' => TikiLib::lib('filegal')->get_file_info($fileId)
+            'info' => $fileInfo
         ];
     }
 

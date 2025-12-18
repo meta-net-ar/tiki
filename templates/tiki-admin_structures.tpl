@@ -198,7 +198,9 @@
             </form>
         {/if}
 
-        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {if !empty($count) && $count > 0 && !empty($maxRecords) && $maxRecords > 0 && $count > $maxRecords}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+        {/if}
     {/tab}
 
     {if $tiki_p_edit_structures == 'y'}

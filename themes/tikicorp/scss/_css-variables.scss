@@ -19,40 +19,36 @@
     --tiki-top-bg: var(--tiki-brand-bg-dark);
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
-//    --tiki-top-hover-bg:  ;
-    --tiki-top-text-color: #{$white};
-//    --tiki-top-border: solid #{$border-color};
-//    --tiki-top-box-shadow:  ;
+    --tiki-top-text-color:#{$navbar-dark-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: 0px 1px 10px #3e4044;
 }
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: var(--tiki-brand-bg-dark);
-    --tiki-topbar-color: #{$navbar-dark-color}; // (con't.) To take care of complexity, just map the alts to the defaults and then diverge per theme, etc.
+    --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
-//    --tiki-topbar-hover-bg:   ;
-    --tiki-topbar-text-color: var(--tiki-top-text-color); //#fff;
-//    --tiki-topbar-border: solid #{$border-color};
-//    --tiki-topbar-box-shadow:  ;
+    --tiki-topbar-text-color: var(--tiki-top-text-color);
 }
 
 @mixin top-nav-light {
     --tiki-top-bg: rgb(255, 255, 255);  // Only instance, along with --tiki-topbar-bg below.
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
-//    --tiki-top-hover-bg: ;
-//    --tiki-top-text-color:  ;
-//    --tiki-top-border: solid  ;
-//    --tiki-top-box-shadow:  ;
+    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-top-border: none;
+    --tiki-top-box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 8px 0px;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: rgb(255, 255, 255); // var(--tiki-top-bg); <-- This CSS variable failed "not defined"; I guess due to use in mixin, the reference wasn't found
-    --tiki-topbar-color: #{$navbar-light-color}; // (con't.) To take care of complexity, just map the alts to the defaults and then diverge per theme, etc. (Update: I don't know what that means. :-) )
+    --tiki-topbar-bg: rgb(255, 255, 255);
+    --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-hover-color};
-//    --tiki-topbar-hover-bg:  ;
     --tiki-topbar-text-color: rgba(0, 0, 0, 0.7);
-//    --tiki-topbar-border: solid ;
-//    --tiki-topbar-box-shadow: ;
+    --tiki-topbar-box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 8px 0px;
 }
 
 .tiki-top-nav-light {
@@ -115,9 +111,10 @@
 // Light navbar minus top nav
 @mixin admin-nav-light {
     --tiki-admin-top-nav-bg: #F0F0F0; // Only instance
-    --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.55); // Only instance, was rgba(0, 0, 0, 0.9);
-    --tiki-admin-top-nav-hover-color: var(--tiki-topbar-text-color); // rgba(0, 0, 0, 0.7);
+    --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.55); // Only instance
+    --tiki-admin-top-nav-hover-color: var(--tiki-topbar-text-color);
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 8px 0px;
     --tiki-admin-aside-nav-bg: var(--tiki-admin-top-nav-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
@@ -129,11 +126,12 @@
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: var(--tiki-brand-bg-dark); // #{$gray-900}; // #2C2C2C;
+    --tiki-admin-top-nav-bg: var(--tiki-brand-bg-dark);
     --tiki-admin-top-nav-color: #{$white};
     --tiki-admin-top-nav-hover-color: #{$white};
     --tiki-admin-top-nav-hover-bg: #{$white};
-    --tiki-admin-aside-nav-bg: var(--tiki-brand-bg-dark); // #2C2C2C; // Only instance
+    --tiki-admin-top-box-shadow: 0px 1px 10px #3e4044;
+    --tiki-admin-aside-nav-bg: var(--tiki-brand-bg-dark);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-color};
@@ -158,17 +156,16 @@
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 // Color mode preference trumps L&F admin light navbar option

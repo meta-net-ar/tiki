@@ -41,11 +41,6 @@ $maxRecords = $messulib->get_user_preference($user, 'maxRecords', 20);
 
 //set defaults
 $sort_mode = 'date_desc';
-$offset = 0;
-$find = '';
-$flag = '';
-$flagval = '';
-$priority = '';
 
 // Delete messages if the delete button was pressed
 if (isset($_POST["delete"])) {
@@ -109,6 +104,10 @@ if (isset($_POST["unarchive"])) {
     }
 }
 
+
+$flag = $_REQUEST["flag"] ?? '';
+$flagval = $_REQUEST["flagval"] ?? '';
+
 if (isset($_REQUEST['filter'])) {
     if (empty($_REQUEST['find']) && empty($_REQUEST['flags']) && empty($_REQUEST['priority'])) {
         Feedback::warning(tra('Please specify at least one search criterion: Contain, Message status or Priority!'));
@@ -118,27 +117,14 @@ if (isset($_REQUEST['filter'])) {
         $flag = $parts[0];
         $flagval = $parts[1];
     }
-} else {
-    if (isset($_REQUEST["flag"])) {
-        $flag = $_REQUEST["flag"];
-    }
-    if (isset($_REQUEST["flagval"])) {
-        $flagval = $_REQUEST["flagval"];
-    }
 }
-
 if (isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-}
-if (isset($_REQUEST["priority"])) {
-    $priority = $_REQUEST["priority"];
-}
+
+$offset = $_REQUEST["offset"] ?? 0;
+$find = $_REQUEST["find"] ?? '';
+$priority = $_REQUEST["priority"] ?? '';
 
 $smarty->assign_by_ref('flag', $flag);
 $smarty->assign_by_ref('flagval', $flagval);

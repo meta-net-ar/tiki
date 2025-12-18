@@ -11,8 +11,10 @@ style="{$module_params.style}"
 }
 {if empty($error)}
     <div class="mod-git_detail cvsup">
-        <span class="label">{tr}Git information:{/tr}</span>&nbsp;
-        <span class="branch">{$content.branch}:<a href="https://gitlab.com/tikiwiki/tiki/-/commit/{$content.commit.hash}">{$content.commit.hash|substr:0:8}</a></span>&nbsp;
+        <span class="label">{tr}Branch:{/tr}</span>&nbsp;
+        <span class="branch">{$content.branch}</span><br>
+        <span class="label">{tr}Commit:{/tr}</span>&nbsp;
+        <a href="https://gitlab.com/tikiwiki/tiki/-/commit/{$content.commit.hash}">{$content.commit.hash|substr:0:8}</a>&nbsp;
         <span class="date">{tr}from{/tr} {$content.mdate|tiki_short_datetime}</span>
     </div>
 {else}

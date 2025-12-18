@@ -323,11 +323,7 @@ function wikiplugin_listpages($data, $params)
     extract($params, EXTR_SKIP);
     $filter = [];
     if (is_null($initial)) {
-        if (isset($_REQUEST['initial'])) {
-            $initial = $_REQUEST['initial'];
-        } else {
-            $initial = '';
-        }
+        $initial = $_REQUEST['initial'] ?? '';
     }
 
     $ts = Table_Check::setVars('listpages', true);

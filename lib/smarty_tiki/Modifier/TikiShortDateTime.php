@@ -22,7 +22,7 @@ class TikiShortDateTime
     public function handle($string, $intro = '', $same = 'y', $forceTimezone = false)
     {
         global $prefs;
-        $smarty = TikiLib::lib('smarty');
+        \TikiLib::lib('smarty'); //Load SmartyLib for side effects
         $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format'], false, $forceTimezone);
         $time = smarty_modifier_tiki_date_format($string, $prefs['short_time_format'], false, $forceTimezone);
 

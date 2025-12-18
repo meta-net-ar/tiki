@@ -27,15 +27,19 @@ class ErrorTracking
 
     protected bool $phpEnabled;
     protected bool $jsEnabled;
+    protected bool $tracingEnabledPhp;
+    protected bool $tracingEnabledJs;
 
     protected string $dsn;
     private bool $dsnIsInvalid = false;
     private bool $isInitialised = false;
     protected float $sampleRate;
+    protected float $tracesSampleRate;
 
     protected array $stack = [];
 
     private ?closure $previousErrorHandler = null;
+    private $currentTransaction = null;
 
     /**
      * Check if external error reporting for JavaScript is enabled.
@@ -45,6 +49,26 @@ class ErrorTracking
     public function isJSEnabled(): bool
     {
         return isset($this->dsn) && $this->jsEnabled;
+    }
+
+    /**
+     * Check if performance tracing for PHP is enabled.
+     *
+     * @return bool
+     */
+    public function isTracingEnabledPhp(): bool
+    {
+        return isset($this->dsn) && $this->phpEnabled && $this->tracingEnabledPhp;
+    }
+
+    /**
+     * Check if performance tracing for JavaScript is enabled.
+     *
+     * @return bool
+     */
+    public function isTracingEnabledJs(): bool
+    {
+        return isset($this->dsn) && $this->jsEnabled && $this->tracingEnabledJs;
     }
 
     /**
@@ -58,6 +82,137 @@ class ErrorTracking
             return;
         }
         \Sentry\captureException($exception);
+    }
+
+    /**
+     * Start a new transaction for performance tracing
+     *
+     * @param string $name Transaction name (e.g., 'GET /tiki-index.php')
+     * @param string $op Operation type (e.g., 'http.server', 'db.query', 'cache.get')
+     * @return \Sentry\Tracing\Transaction|null
+     */
+    public function startTransaction(string $name, string $op = 'http.server')
+    {
+        if ($this->state === self::STATE_DISABLED) {
+            return null;
+        }
+
+        $transactionContext = \Sentry\Tracing\TransactionContext::make()
+            ->setName($name)
+            ->setOp($op);
+
+        $transaction = \Sentry\startTransaction($transactionContext);
+
+        // Set as current span to maintain proper hierarchy
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($transaction);
+
+        return $transaction;
+    }
+
+    /**
+     * Start a child span within a transaction
+     *
+     * @param string $op Operation type (e.g., 'db.query', 'http.client', 'cache.get')
+     * @param string|null $description Optional description
+     * @param array $data Optional data to attach to the span
+     * @return \Sentry\Tracing\Span|null
+     */
+    public function startSpan(string $op, ?string $description = null, array $data = [])
+    {
+        if ($this->state === self::STATE_DISABLED) {
+            return null;
+        }
+
+        $parent = \Sentry\SentrySdk::getCurrentHub()->getSpan();
+        if (! $parent) {
+            // No active transaction/span, cannot create child span
+            return null;
+        }
+
+        $context = \Sentry\Tracing\SpanContext::make()
+            ->setOp($op);
+
+        if ($description) {
+            $context->setDescription($description);
+        }
+
+        if (! empty($data)) {
+            $context->setData($data);
+        }
+
+        $span = $parent->startChild($context);
+
+        // Set as current span to maintain hierarchy
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span);
+
+        return $span;
+    }
+
+    /**
+     * Finish a span and restore parent context
+     *
+     * @param \Sentry\Tracing\Span|null $span The span to finish
+     * @return void
+     */
+    public function finishSpan($span): void
+    {
+        if (! $span) {
+            return;
+        }
+
+        // Get parent before finishing
+        $parent = $span->getParentSpanId() !== null ? $span : null;
+
+        $span->finish();
+
+        // Restore parent span context if available
+        $hub = \Sentry\SentrySdk::getCurrentHub();
+        if ($parent && $hub->getSpan() === $span) {
+            // Restore to transaction or parent span
+            $transaction = $this->currentTransaction;
+            if ($transaction) {
+                $hub->setSpan($transaction);
+            }
+        }
+    }
+
+    /**
+     * Trace a callable with automatic span management (recommended approach)
+     *
+     * This is a convenience wrapper that automatically creates, manages, and finishes
+     * a span around the provided callable, following Sentry best practices.
+     *
+     * @param callable $callback The function to trace
+     * @param string $op Operation type (e.g., 'db.query', 'http.client')
+     * @param string|null $description Optional description
+     * @param array $data Optional data to attach to the span
+     * @return mixed The return value of the callback
+     *
+     * @example
+     * $result = $errorTracking->trace(function() {
+     *     return performDatabaseQuery();
+     * }, 'db.query', 'SELECT * FROM users');
+     */
+    public function trace(callable $callback, string $op, ?string $description = null, array $data = [])
+    {
+        if (! $this->isTracingEnabledPhp()) {
+            // Tracing disabled, just execute callback
+            return $callback();
+        }
+
+        $context = \Sentry\Tracing\SpanContext::make()
+            ->setOp($op);
+
+        if ($description) {
+            $context->setDescription($description);
+        }
+
+        if (! empty($data)) {
+            $context->setData($data);
+        }
+
+        // Use Sentry's trace function which handles everything automatically
+        return \Sentry\trace($callback, $context);
     }
 
     /**
@@ -82,6 +237,9 @@ class ErrorTracking
         global $prefs;
         $this->phpEnabled = ($prefs['error_tracking_enabled_php'] ?? 'n') === 'y';
         $this->jsEnabled = ($prefs['error_tracking_enabled_js'] ?? 'n') === 'y';
+        $this->tracingEnabledPhp = ($prefs['error_tracking_tracing_enabled_php'] ?? 'n') === 'y';
+        $this->tracingEnabledJs = ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y';
+
         if (! self::LOCAL_DEBUG_MODE) {
             $this->dsn = $prefs['error_tracking_dsn'] ?? false;
         } else {
@@ -92,6 +250,9 @@ class ErrorTracking
 
         $sampleRate = $prefs['error_tracking_sample_rate'] ?? 1;
         $this->sampleRate = is_numeric($sampleRate) ? $sampleRate : 1;
+
+        $tracesSampleRate = $prefs['error_tracking_traces_sample_rate'] ?? 0.1;
+        $this->tracesSampleRate = is_numeric($tracesSampleRate) ? $tracesSampleRate : 0.1;
     }
 
     public function init()
@@ -110,6 +271,41 @@ class ErrorTracking
                 'sample_rate'             => $this->getSampleRate(),
                 'error_types'             => Errors::getErrorReportingLevel(),
                 'attach_stacktrace'       => true,
+                'traces_sampler' => function (\Sentry\Tracing\SamplingContext $context): float {
+                    // If tracing is not enabled, don't sample any transactions
+                    if (! $this->isTracingEnabledPhp()) {
+                        return 0.0;
+                    }
+
+                    // Custom sampling logic based on transaction name and context
+                    $transactionContext = $context->getTransactionContext();
+                    $parentSampled = $context->getParentSampled();
+
+                    // Inherit parent sampling decision if available
+                    if ($parentSampled !== null) {
+                        return $parentSampled ? 1.0 : 0.0;
+                    }
+
+                    $transactionName = $transactionContext->getName();
+
+                    // Don't trace health checks or status endpoints
+                    if (preg_match('/\/(health|status|ping)/', $transactionName)) {
+                        return 0.0;
+                    }
+
+                    // Sample AJAX/API calls at a higher rate (tiki-ajax_services.php)
+                    if (strpos($transactionName, 'tiki-ajax_services.php') !== false) {
+                        return min($this->getTracesSampleRate() * 2.0, 1.0);
+                    }
+
+                    // Sample admin pages at a lower rate (they're usually slower)
+                    if (strpos($transactionName, 'tiki-admin') !== false) {
+                        return min($this->getTracesSampleRate() * 0.5, 1.0);
+                    }
+
+                    // Use the configured default sample rate
+                    return $this->getTracesSampleRate();
+                },
                 'before_send'             => function (Event $event, ?EventHint $hint): ?Event {
                     if (true && self::LOCAL_DEBUG_MODE) {
                         echo '<pre>';
@@ -244,6 +440,16 @@ class ErrorTracking
     }
 
     /**
+     * Get currently configured traces sample rate
+     *
+     * @return float
+     */
+    public function getTracesSampleRate(): float
+    {
+        return (float) $this->tracesSampleRate;
+    }
+
+    /**
      * Get the proxy connection url
      *
      * @return string
@@ -267,12 +473,59 @@ class ErrorTracking
         return $proxy;
     }
 
+    /**
+     * Start an automatic transaction for the current HTTP request
+     *
+     * @return void
+     */
+    public function startHttpTransaction(): void
+    {
+        if (! $this->isTracingEnabledPhp() || $this->currentTransaction !== null) {
+            return;
+        }
+
+        // Build transaction name from request
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $uri = $_SERVER['REQUEST_URI'] ?? '/';
+
+        // Remove query string for cleaner transaction names
+        $path = parse_url($uri, PHP_URL_PATH) ?? $uri;
+
+        $transactionName = "$method $path";
+
+        $this->currentTransaction = $this->startTransaction($transactionName, 'http.server');
+
+        if ($this->currentTransaction) {
+            // Add request context
+            \Sentry\configureScope(function (\Sentry\State\Scope $scope) use ($method, $uri) {
+                $scope->setTag('http.method', $method);
+                $scope->setTag('http.url', $uri);
+            });
+        }
+    }
+
+    /**
+     * Finish the current transaction
+     *
+     * @return void
+     */
+    public function finishTransaction(): void
+    {
+        if ($this->currentTransaction) {
+            $this->currentTransaction->finish();
+            $this->currentTransaction = null;
+        }
+    }
+
     public function bindEvents(Tiki_Event_Manager $manager)
     {
         if ($this->state !== self::STATE_DISABLED) {
             $manager->bind(
                 'tiki.process.shutdown',
                 function () {
+                    // Finish any open transaction before shutdown
+                    $this->finishTransaction();
+
                     // Events were already sampled when prepared
                     // Setting to 1 will send all of them
                     $this->setSampleRate(1);

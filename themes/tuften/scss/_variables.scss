@@ -108,57 +108,57 @@ $form-check-input-checked-color:          $component-active-color; // !default; 
 $form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
 $form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
-// Navs
-// Navbar
-$navbar-light-color:             var(--#{$prefix}body-color); // #777;
-//$navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
-//$navbar-light-border:            darken( $navbar-light-bg, 6.5% );
-$nav-link-font-size:                1.1rem;
-
-// Navbar links
-$navbar-light-color:                $link-color; //#777;
-$navbar-light-hover-color:          $link-hover-color; // #333;
-//$navbar-light-hover-bg:             transparent;
-$navbar-light-active-color:         #555;
-//$navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
-$navbar-light-disabled-color:       #ccc;
-//$navbar-light-disabled-bg:          transparent;
-
-// Navbar brand label
-$navbar-light-brand-color:               $navbar-light-color;
-$navbar-light-brand-hover-color:         color.adjust( $navbar-light-brand-color, $lightness: -10%, $space: hsl );
-$navbar-light-brand-hover-bg:            transparent;
-
-$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
-//$navbar-dark-bg:                         #222;
-//$navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
-
-// Inverted navbar links
-$navbar-dark-hover-color:           #fff;
-//$navbar-dark-hover-bg:              transparent;
-$navbar-dark-active-color:          $navbar-dark-hover-color;
-//$navbar-dark-active-bg:             darken($tiki-navbar-dark-bg, 10%);
-$navbar-dark-disabled-color:        #444;
-//$navbar-dark-disabled-bg:           transparent;
-
-// Inverted navbar brand label
-$navbar-dark-brand-color:                $navbar-dark-color;
-$navbar-dark-brand-hover-color:          #fff;
-//$navbar-dark-brand-hover-bg:             transparent;
-
-//$navbar-dark-toggle-hover-bg:            #333;
-//$navbar-dark-toggle-icon-bar-bg:         #fff;
-$navbar-dark-toggle-border-color:        #333;
-
-$nav-tabs-border-color:                     #ddd;
-
-$nav-tabs-link-hover-border-color:          $gray-300;
-
-$nav-tabs-link-active-hover-bg:             $body-bg;
-$nav-tabs-link-active-hover-color:          $gray-500;
-$nav-tabs-link-active-hover-border-color:   #ddd;
-
-$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
+//// Navs
+//// Navbar
+//$navbar-light-color:             var(--#{$prefix}body-color); // #777;
+////$navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
+////$navbar-light-border:            darken( $navbar-light-bg, 6.5% );
+//$nav-link-font-size:                1.1rem;
+//
+//// Navbar links
+//$navbar-light-color:                $link-color; //#777;
+//$navbar-light-hover-color:          $link-hover-color; // #333;
+////$navbar-light-hover-bg:             transparent;
+//$navbar-light-active-color:         #555;
+////$navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
+//$navbar-light-disabled-color:       #ccc;
+////$navbar-light-disabled-bg:          transparent;
+//
+//// Navbar brand label
+//$navbar-light-brand-color:               $navbar-light-color;
+//$navbar-light-brand-hover-color:         color.adjust( $navbar-light-brand-color, $lightness: -10%, $space: hsl );
+//$navbar-light-brand-hover-bg:            transparent;
+//
+//$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
+////$navbar-dark-bg:                         #222;
+////$navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
+//
+//// Inverted navbar links
+//$navbar-dark-hover-color: #242424;
+////$navbar-dark-hover-bg:              transparent;
+//$navbar-dark-active-color:          $navbar-dark-hover-color;
+////$navbar-dark-active-bg:             darken($tiki-navbar-dark-bg, 10%);
+//$navbar-dark-disabled-color:        #444;
+////$navbar-dark-disabled-bg:           transparent;
+//
+//// Inverted navbar brand label
+//$navbar-dark-brand-color:                $navbar-dark-color;
+//$navbar-dark-brand-hover-color:          #fff;
+////$navbar-dark-brand-hover-bg:             transparent;
+//
+////$navbar-dark-toggle-hover-bg:            #333;
+////$navbar-dark-toggle-icon-bar-bg:         #fff;
+//$navbar-dark-toggle-border-color:        #333;
+//
+//$nav-tabs-border-color:                     #ddd;
+//
+//$nav-tabs-link-hover-border-color:          $gray-300;
+//
+//$nav-tabs-link-active-hover-bg:             $body-bg;
+//$nav-tabs-link-active-hover-color:          $gray-500;
+//$nav-tabs-link-active-hover-border-color:   #ddd;
+//
+//$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
 
 // Dropdowns
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
@@ -199,7 +199,11 @@ $pagination-disabled-color: $btn-link-disabled-color;
 // Jumbotron
 $jumbotron-bg: #f5f5e9;
 
-// Cards
+// Cards #fbebe0
+
+// Accordion
+$accordion-button-active-bg: #f5f5e9;
+
 // $card-bg:                    lighten($body-bg, 2.5%); // #fff; Todo
 
 // Tooltips

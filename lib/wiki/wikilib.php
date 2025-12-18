@@ -244,6 +244,12 @@ class WikiLib extends TikiLib
         $tikilib = TikiLib::lib('tiki');
         // if page already exists, stop here
         $newName = trim($newName);
+        $oldName = trim($oldName);
+
+        // Check if trying to rename to the same name
+        if ($oldName === $newName) {
+            throw new Exception("Cannot rename page to the same name", 3);
+        }
         if ($this->get_page_info($newName, false, true)) {
             // if it is a case change of same page: allow it, else stop here
             if (strcasecmp(trim($oldName), $newName) <> 0) {

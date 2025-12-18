@@ -62,9 +62,18 @@ blockquote,
 // Navs
 // Navbar
 // Dropdowns
+
 .dropdown-menu {
     backdrop-filter: blur(5px);
-    background-image: linear-gradient(125deg, rgba(230, 230, 230, 0.35), rgb(226, 232, 234, 0.8) 50%); // Increased opacity from 255,255,255, 0.3, 0.2, 70%.
+    background-image: linear-gradient(125deg, rgba(230, 230, 230, 0.80), rgb(226, 232, 234, 0.85) 50%); // Increased opacity from 255,255,255, 0.3, 0.2, 70%.
+}
+
+.dropdown-item,
+.dropdown-menu a {
+    color: #6062b0;
+    &:hover {
+        color: #4a4b8d;
+    }
 }
 
 // Cards

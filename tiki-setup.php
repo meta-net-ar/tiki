@@ -530,6 +530,25 @@ if (isset($prefs['fgal_elfinder_feature']) && $prefs['fgal_elfinder_feature'] ==
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
+
+if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking_dsn'])) {
+    // Sentry configuration passed to ES module
+    $sentryConfig = json_encode([
+        'dsn' => $prefs['error_tracking_dsn'],
+        'sampleRate' => isset($prefs['error_tracking_sample_rate']) && is_numeric($prefs['error_tracking_sample_rate'])
+            ? (float) $prefs['error_tracking_sample_rate']
+            : 1,
+        'tracingEnabled' => ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y',
+        'tracesSampleRate' => isset($prefs['error_tracking_traces_sample_rate']) && is_numeric($prefs['error_tracking_traces_sample_rate'])
+            ? (float) $prefs['error_tracking_traces_sample_rate']
+            : 0.1,
+    ]);
+
+    // Sentry initialization via ES module
+    // Loaded with priority -10 to ensure it initializes before other modules
+    $headerlib->add_js_module("import { initSentry } from '@tiki-modules/sentryBrowser'; initSentry($sentryConfig);", -10);
+}
+
 //This is applied globally so all menus can open upward when space is limited.
 //Since menus appear in many places in Tiki, we can’t handle them individually, so we load it once on page load to make it available site-wide.
 //templates/menu/clone.tpl
@@ -539,11 +558,7 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
 
-if (isset($_REQUEST['geo_zoomlevel_to_found_location'])) {
-    $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'];
-} else {
-    $zoomToFoundLocation = $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-}
+$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
 $headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
 
 if ($prefs['geo_enabled'] === 'y') {
@@ -707,7 +722,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
 }
 
 if ($prefs['jquery_timeago'] === 'y') {
-    $language = $prefs['language'];
+    $language = Language::getCurrentLanguage();
     $locale_file = '';
 
     $full_locale_path = NODE_PUBLIC_DIST_PATH . "/timeago/dist/locales/jquery.timeago.{$language}.js";
@@ -1028,11 +1043,6 @@ if ($prefs['feature_tiki_manager'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-manager.js');
 }
 
-$robots = $headerlib->getRobots();
-if (! empty($robots)) {
-    $smarty->assign('metatag_robots', $robots);
-}
-
 if ($prefs['feature_realtime'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-websockets.js');
 }
@@ -1049,19 +1059,6 @@ if ($prefs['tiki_monitor_performance'] == 'y') {
     $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/boomerangjs/plugins/rt.js");
 }
 
-if ($prefs['error_tracking_enabled_js'] == 'y' &&  ! empty($prefs['error_tracking_dsn'])) {
-    //GlitchTip reporting script should be load before any other JS to capture issues/failures on other JS scripts
-
-    $sampleRate = isset($prefs['error_tracking_sample_rate']) && is_numeric($prefs['error_tracking_sample_rate'])
-            ? $prefs['error_tracking_sample_rate']
-            : 1;
-            $dsn = addslashes($prefs['error_tracking_dsn']);
-            $script = <<<JS
-            import {Sentry} from "@tiki-modules/sentryBrowser";
-            Sentry.init({dsn: '$dsn', sampleRate: $sampleRate});
-            JS;
-        $headerlib->add_js_module($script, -10);
-}
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
@@ -1090,6 +1087,8 @@ if ($prefs['feature_elementplus'] == 'y') {
 
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
 $headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
+// module allowing you to limit the number of characters allowed in the fields.
+$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 
 $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
 

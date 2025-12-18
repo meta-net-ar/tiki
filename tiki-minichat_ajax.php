@@ -164,11 +164,12 @@ foreach ($chans as $chan) {
             $show_header = ($prev_user !== $row['user']);
 
             $align_class = ($side_class === 'mine') ? 'justify-content-end' : 'justify-content-start';
-            $card_classes = ($side_class === 'mine') ? 'card text-white bg-info' : 'card bg-light';
+            $card_classes = ($side_class === 'mine') ? 'bg-info-subtle text-info-emphasis' : 'bg-light-subtle text-body';
+
 
             $bubble = "<div class='d-flex mb-2 {$align_class}'>";
             $bubble .= "<div class='{$card_classes}' style='max-width:70%'>";
-            $bubble .= "<div class='card-body p-2'>";
+            $bubble .= "<div class='p-2'>";
             if ($show_header) {
                 $bubble .= "<div class='fw-bold small'>" . $nick_html . "</div>";
             }

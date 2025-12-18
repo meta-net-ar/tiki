@@ -446,6 +446,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
                 'organizers'            => [$user],
                 'participants'          => $participants,
+                'returnURL'             => $return_url,
             ];
         }
 

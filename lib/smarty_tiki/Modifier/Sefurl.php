@@ -11,6 +11,11 @@ class Sefurl
 {
     public function handle($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
+
+        if ($source === null) {
+            throw new \InvalidArgumentException('sefurl modifier requires a non-null source value.');
+        }
+
         global $prefs;
         $wikilib = \TikiLib::lib('wiki');
         $tikilib = \TikiLib::lib('tiki');
@@ -79,7 +84,7 @@ class Sefurl
                 $attributes = $attributelib->get_attributes('file', $source);
 
                 if ($type == 'file') {
-                    $prefix = 'display';
+                    $prefix = 'dl';
                     $suffix = null;
                 } else {
                     $prefix = $type;

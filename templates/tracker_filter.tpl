@@ -67,7 +67,7 @@
                     {elseif $field.type eq 'R'}
                         <div style="display:{if $filterfield eq $fid}block{else}none{/if};" id="fid{$fid}">
                             {foreach from=$field.possibilities key=radio_key item=radio_value}
-                                <input type="radio" name="filtervalue[{$fid}]" value="{$radio_key|escape}" {if $fid == $filterfield}{if $filtervalue eq $radio_key}checked="checked"{/if}{/if}>{$radio_value|escape}
+                                <input type="radio" class="form-check-input" name="filtervalue[{$fid}]" value="{$radio_key|escape}" {if $fid == $filterfield}{if $filtervalue eq $radio_key}checked="checked"{/if}{/if}>{$radio_value|escape}
                             {/foreach}
                         </div>
 

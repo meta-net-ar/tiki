@@ -195,6 +195,7 @@ class TodoLib
     {
         $db = TikiDb::get();
         $query = 'DELETE FROM `tiki_todo_notif` WHERE `todoId` NOT IN (SELECT `todoId` FROM `tiki_todo`)';
+        $db->query($query);
     }
 
     /**
@@ -305,10 +306,9 @@ class TodoLib
      */
     public function notifyTodo_tracker($todo, $objects)
     {
-        global $prefs;
         $smarty = TikiLib::lib('smarty');
         $trklib = TikiLib::lib('trk');
-        $tikilib = TikiLib::lib('tiki');
+        \TikiLib::lib('tiki'); //Load TikiLib for side effects
         foreach ($objects as $object) {
             // get the creator
             $creators = [$object['field_values'][0]['value']];

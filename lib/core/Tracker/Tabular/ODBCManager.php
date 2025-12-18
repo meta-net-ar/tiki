@@ -105,7 +105,7 @@ class ODBCManager
         }
         if ($rs) {
             while ($row = odbc_fetch_array($rs)) {
-                $row = $this->reverseMapFieldsFromConfig($row);
+                $row = $this->reverseMapFieldsFromConfig($row, $conn);
                 yield $row;
             }
         }
@@ -120,7 +120,7 @@ class ODBCManager
             $sql = "SELECT \"{$pk}\" FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
             $rs = odbc_prepare($conn, $sql);
             odbc_execute($rs, [$id]);
-            $exists = odbc_num_rows($rs) > 0;
+            $exists = odbc_fetch_array($rs) ? true : false;
         } else {
             $exists = false;
             $id = null;
@@ -291,7 +291,7 @@ class ODBCManager
         $rs = odbc_prepare($conn, $sql);
         if ($rs) {
             odbc_execute($rs, [$value]);
-            $exists = odbc_num_rows($rs) > 0;
+            $exists = odbc_fetch_array($rs) ? true : false;
         } else {
             $exists = false;
         }
@@ -503,7 +503,7 @@ class ODBCManager
         return $row;
     }
 
-    private function reverseMapFieldsFromConfig(array $row): array
+    private function reverseMapFieldsFromConfig(array $row, $conn = null): array
     {
         $userslib = TikiLib::lib('user');
         if (! empty($this->config['value_mappings'])) {
@@ -513,7 +513,9 @@ class ODBCManager
                     continue;
                 }
                 if (isset($mapping['type']) && $mapping['type'] === 'user') {
-                    $conn = $this->getConnection();
+                    if (! $conn) {
+                        $conn = $this->getConnection();
+                    }
                     $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = ?");
                     if ($rs) {
                         odbc_execute($rs, [$row[$field]]);

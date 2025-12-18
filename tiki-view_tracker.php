@@ -17,10 +17,10 @@ $inputConfiguration = [
             'show'               => 'word',          //get
             'cookietab'          => 'word',          //get
             'new'                => 'word',          //get
-            'my'                 => 'word',          //get
+            'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'word',          //get
+            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -180,19 +180,46 @@ if (isset($_REQUEST['status'])) {
     $sts = preg_split('//', $tracker_info["defaultStatus"], -1, PREG_SPLIT_NO_EMPTY);
     $_REQUEST['status'] = $tracker_info["defaultStatus"];
 } else {
-    $sts = [
-        'o'
-    ];
+    $sts = ['o'];
     $_REQUEST['status'] = 'o';
 }
+
+/**
+ * Keep a consistent order for combined statuses, based on tracker’s declared statuses.
+ * Example typical order: ['o','p','c'].
+ */
+$statusOrder = array_keys($status_raw);
+
 foreach ($status_raw as $let => $sta) {
     if (isset($sta['perm']) || ($my || $ours)) {
-        if (in_array($let, $sts)) {
+        // Visual state
+        if (in_array($let, $sts, true)) {
             $sta['class'] = 'statuson';
         } else {
             $sta['class'] = 'statusoff';
         }
-        $sta['statuslink'] = $let;
+
+        // Build toggled set against current selection
+        $newSet = $sts;
+
+        if (in_array($let, $newSet, true)) {
+            // Remove this status from the set
+            $newSet = array_values(array_diff($newSet, [$let]));
+            // If that would leave empty, show all OTHER statuses instead
+            if (empty($newSet)) {
+                $newSet = array_values(array_diff($statusOrder, [$let]));
+            }
+        } else {
+            // Add clicked status
+            $newSet[] = $let;
+        }
+
+        // Normalize order to tracker's order, and ensure uniqueness
+        $newSet = array_values(array_intersect($statusOrder, $newSet));
+
+        // Link carries the combined status string (e.g. 'op', 'pc', 'opc', etc.)
+        $sta['statuslink'] = implode('', $newSet);
+
         $status_types[$let] = $sta;
     }
 }
@@ -467,29 +494,17 @@ if (isset($_REQUEST["save"])) {
         }
     }
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST["maxRecords"])) {
     $maxRecords = $_REQUEST['maxRecords'];
 }
-if (isset($_REQUEST["initial"])) {
-    $initial = $_REQUEST["initial"];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
 $writerfield = $trackerDefinition->getWriterField();
 $writergroupfield = $trackerDefinition->getWriterGroupField();
 
-if (isset($_REQUEST["filterfield"])) {
-    $filterfield = $_REQUEST["filterfield"];
-} else {
-    $filterfield = '';
-}
+$filterfield = $_REQUEST["filterfield"] ?? '';
 $smarty->assign('filterfield', $filterfield);
 if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and isset($_REQUEST["filtervalue"]["$filterfield"])) {
     $filtervalue = $_REQUEST["filtervalue"]["$filterfield"];

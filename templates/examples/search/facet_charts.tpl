@@ -6,15 +6,15 @@ Example wiki page "chart" contents:
   {facet name="tracker_field_testUser"}
   {facet name="deep_categories_under_1"}
   {OUTPUT(template="templates/examples/search/facet_charts.tpl")}
-    {chart type="pie" title="Users" colors="orange:yellow:red:purple:grey:blue:green:pink:black" class="col-sm-4" size="300:600"}
-    {chart type="bar" title="Countries" colors="#888:#aaa:#ccc:#eee:#888:#aaa:#ccc:#eee:#888:#aaa:#ccc:#eee" class="col-sm-8" size="300:400"}
+    {chart type="pie" title="{tr}Users{/tr}" colors="orange:yellow:red:purple:grey:blue:green:pink:black" class="col-sm-4" size="300:600"}
+    {chart type="bar" title="{tr}Countries{/tr}" colors="#888:#aaa:#ccc:#eee:#888:#aaa:#ccc:#eee:#888:#aaa:#ccc:#eee" class="col-sm-8" size="300:400"}
   {OUTPUT}
 {CUSTOMSEARCH}
 
 Example wiki page "chart tpl" contents for the form:
 
 {literal}<div  class="row"><div class="col-sm-4 offset-sm-4"><div class="input-group">
-  {input _filter="content" type="text" class="form-control" placeholder="Search..."}
+  {input _filter="content" type="text" class="form-control" placeholder="{tr}Search...{/tr}"}
   <div class="input-group-text">
     {input type="submit" value="Go" class="btn btn-primary"}
     {input _filter="content" type="hidden" _field="tracker_status" id="tracker_status"}

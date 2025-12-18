@@ -37,6 +37,16 @@
         {preference name="wysiwyg_fonts"}
     </fieldset>
     <fieldset>
+        <legend class="h3">{tr}Language Checking{/tr}</legend>
+        {preference name=feature_language_check}
+        <div class="adminoptionboxchild" id="feature_language_check_childcontainer">
+            {preference name=language_tool_url}
+            {preference name=language_tool_username}
+            {preference name=language_check_auto_detect}
+            {preference name=language_check_debounce_ms}
+        </div>
+    </fieldset>
+    <fieldset>
         <legend class="heading">{tr}Related features{/tr}</legend>
         {preference name=feature_wiki_paragraph_formatting}
         <div class="adminoptionboxchild" id="feature_wiki_paragraph_formatting_childcontainer">

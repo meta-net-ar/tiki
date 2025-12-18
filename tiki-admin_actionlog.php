@@ -148,22 +148,14 @@ $confs = $logslib->get_all_actionlog_conf();
 $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type, $action_log_action);
 $nbViewedConfs = 0;
 
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST['offset']) || ! empty($_REQUEST['export'])) {
     $offset = 0;
 } else {
     $offset = $_REQUEST["offset"];
 }
-if (isset($_REQUEST['max'])) {
-    $maxRecords = $_REQUEST['max'];
-} else {
-    $maxRecords = $prefs['maxRecords'];
-}
+$maxRecords = $_REQUEST['max'] ?? $prefs['maxRecords'];
 
 if ($tiki_p_view_actionlog == 'y') {
     if (isset($_POST['unset']) && $access->checkCsrf()) {

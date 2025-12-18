@@ -139,7 +139,8 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
                 $group_info = $usersLib->get_group_info($groupId);
             }
             if ($group_info) {
-                $templatedGroup = array_shift($usersLib->get_included_container_groups($usersLib->get_user_default_group($user)));
+                $includedContainerGroups = $usersLib->get_included_container_groups($usersLib->get_user_default_group($user));
+                $templatedGroup = array_shift($includedContainerGroups);
                 if ($templatedGroup && $templatedGroup['id'] == $group_info['id']) {
                     $clientGroups = $usersLib->get_including_groups($templatedGroup['groupName']);
                     foreach (array_intersect(array_keys($userGroups), $clientGroups) as $userGroup) {

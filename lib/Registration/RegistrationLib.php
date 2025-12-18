@@ -266,6 +266,10 @@ class RegistrationLib extends TikiLib
                 $errors[] = new RegistrationError('name', tra('Username is too long'));
             }
 
+            if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $registration['name'])) {
+                return tra("Username cannot contain any spaces");
+            }
+
             if ($prefs['login_is_email'] != 'y') {
                 if ($this->merged_prefs['lowercase_username'] == 'y' && $validateName) {
                     if (preg_match('/[[:upper:]]/', $registration['name'])) {
@@ -297,6 +301,10 @@ class RegistrationLib extends TikiLib
 
             if (! empty($this->merged_prefs['username_pattern']) && ! preg_match($this->merged_prefs['username_pattern'], $registration['name']) && $validateName) {
                 $errors[] = new RegistrationError('name', tra('Invalid username'));
+            }
+
+            if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $registration['name'])) {
+                return tra("Username cannot contain any spaces.");
             }
 
             // Check the mode

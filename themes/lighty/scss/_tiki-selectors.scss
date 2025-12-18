@@ -74,12 +74,6 @@ body:not(.tiki-admin) #col1 {
         }
     }
 }
-.tab-content {
-    >.active {
-        border-top: 3px solid #f0f0f0;
-    }
-}
-
 .nav-tabs {
     >li {
         >a {
@@ -252,24 +246,6 @@ ul.dropdown-menu {
     border-width: 3px;
 }
 
-.btn-primary {
-&:hover,
-  &:focus,
-  &.focus {
-   background: $primary;
-   border:  3px solid #e2d4d4;
-  }
-}
-.btn-primary { // updated from obsolete btn-default
-   border:  3px solid #f0f0f0;
-  &:hover,
-  &:focus,
-  &.focus {
-   background: $body-bg;
-   border:  3px solid #f0f0f0;
-  }
-}
-
 // Forms
 .label {
     border-radius: 0;
@@ -278,7 +254,7 @@ ul.dropdown-menu {
 .form-control,
 .form-check-input {
 //  height: 38px; Textareas are also form-control so a height can't be set by CSS.
-  border: 3px solid $input-border;
+  border: 3px solid $input-border-color;
 }
 
 // Cards

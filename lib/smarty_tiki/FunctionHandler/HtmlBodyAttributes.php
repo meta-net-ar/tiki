@@ -11,8 +11,10 @@
 
  namespace SmartyTiki\FunctionHandler;
 
+use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use TikiLib;
 
 class HtmlBodyAttributes extends Base
 {
@@ -108,7 +110,7 @@ class HtmlBodyAttributes extends Base
         if (! empty($pageLang)) {
             $class .= ' lang_' . $pageLang;
         } else {
-            $class .= ' lang_' . $prefs['language'];
+            $class .= ' lang_' . Language::getCurrentLanguage();
         }
 
         if (getCookie('hide_zone_left')) {

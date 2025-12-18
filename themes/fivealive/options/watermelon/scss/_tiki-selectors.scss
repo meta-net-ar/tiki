@@ -1,16 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-h3.tiki-card-header-title {
-    color: #fff;
-}
-
-.postbody-title,
-.bg-dark {
-    background: linear-gradient(to bottom,  #c51e3c 0%,#e71e40 100%);
-}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 .breadcrumb-item.active {
     color: $text-muted !important;
@@ -22,6 +15,7 @@ h3.tiki-card-header-title {
 }
 
 // Dark color mode
+
 [data-bs-theme=dark] {
     .btn.btn-outline-primary { color: #F05670; border-color: #F05670; }
     .btn.btn-outline-secondary { color: #E35F7B; border-color: #E35F7B; }

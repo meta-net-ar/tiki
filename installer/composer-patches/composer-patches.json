@@ -6,11 +6,6 @@
     "jquery/jquery-sheet": {
       "Fix visibility issues": "../installer/composer-patches/jquery-sheet_fix-visibility-issues.patch"
     },
-    "pear/text_wiki_mediawiki": {
-      "Removed deprecated syntax in PHP7": "../installer/composer-patches/text_wiki_mediawiki__php7fixes.patch",
-      "Renamed method to avoid collision with func from parent class": "../installer/composer-patches/text_wiki_mediawiki__func_collision.patch",
-      "Removed string access with curly braces syntax in PHP8": "../installer/composer-patches/text_wiki_mediawiki__php8fixes.patch"
-    },
     "nicolaskruchten/pivottable": {
       "Sort rows and columns by key_z_to_a": "../installer/composer-patches/nicolaskruchten_pivottable__sort_by_key_z_to_a.patch",
       "Drag and drop via touch": "../installer/composer-patches/nicolaskruchten_pivottable_drag_and_drop_via_touch.patch"

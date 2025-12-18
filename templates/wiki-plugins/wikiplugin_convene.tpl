@@ -26,7 +26,7 @@
                                     {$defautDate=$smarty.now+86400}
                                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;" class="divAddDate">
                                         <span class="inputAddDate">{jscalendar date=$defautDate fieldname="conveneAddDate" showtime='y' showtimezone="n"}</span> 
-                                        <button type="button" class="conveneAddDate btn btn-primary btn-sm" data-field="conveneAddDate">Add Date</button>
+                                        <button type="button" class="conveneAddDate btn btn-primary btn-sm" data-field="conveneAddDate">{tr}Add Date{/tr}</button>
                                     </div>          
                                 {/if}
                             {else}

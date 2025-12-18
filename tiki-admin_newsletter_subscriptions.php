@@ -64,7 +64,7 @@ $auto_query_args = [
 $access->check_feature('feature_newsletters');
 
 $nlId = 0;
-$offset = 0;
+
 
 if (! isset($_REQUEST["nlId"])) {
     Feedback::errorAndDie(tr('No newsletter indicated'), \Laminas\Http\Response::STATUS_CODE_409);
@@ -337,10 +337,7 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
             $sort_mode = $_REQUEST["sort_mode"];
 }
-
-if (isset($_REQUEST["offset"])) {
-            $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
         $find = $_REQUEST["find"] ?? '';
 

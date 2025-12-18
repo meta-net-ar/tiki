@@ -116,9 +116,9 @@
                                 </div>
                                 <div class="mb-3 col-sm-4">
                                     <label for="unit_bytes">{tr}bytes{/tr}</label>
-                                    <input class="radio" type="radio" name="unit" id="unit_bytes" value="bytes"{if $unit ne 'kb'} checked="checked"{/if}>
+                                    <input type="radio" class="form-check-input" type="radio" name="unit" id="unit_bytes" value="bytes"{if $unit ne 'kb'} checked="checked"{/if}>
                                     <label class="offset-sm-1" for="unit_kb">{tr}kb{/tr}</label>
-                                    <input type="radio" name="unit" id="unit_kb" value="kb"{if $unit eq 'kb'} checked="checked"{/if}>
+                                    <input type="radio" class="form-check-input" name="unit" id="unit_kb" value="kb"{if $unit eq 'kb'} checked="checked"{/if}>
                                 </div>
                             </div>
                         </div>
@@ -132,7 +132,7 @@
                                 </div>
                                 <div class="mb-3 col-sm-4">
                                     <label for="contrib_week">{tr}Week{/tr}</label>
-                                    <input type="radio" id="contrib_week" name="contribTime" value="w"{if $contribTime ne 'd'} checked="checked"{/if}>
+                                    <input type="radio" class="form-check-input" id="contrib_week" name="contribTime" value="w"{if $contribTime ne 'd'} checked="checked"{/if}>
                                     <label class="offset-sm-1" for="contrib_day">{tr}Day{/tr}</label>
                                     <input type="radio" name="contribTime" id="contrib_day" value="d"{if $contribTime eq 'd'} checked="checked"{/if}>
                                 </div>

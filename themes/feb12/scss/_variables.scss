@@ -10,7 +10,6 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-
 $blue:    #124987; // #2780e3 !default;
 $red:     #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
 $yellow:  #C75000; // #ff7518 Updated for Tiki to meet WCAG color contrast guidelines
@@ -36,6 +35,11 @@ $theme-colors: (
     "dark":       $dark
 );
 
+:root {
+    --tiki-feb12-dark-bg: linear-gradient(to bottom,  #3e7ca1 0%,#609ec3 3%,#163866 5%,#0b2d5b 8%,#0f2658 11%,#002552 16%,#002d57 24%,#052b58 27%,#0c3867 43%,#11406e 57%,#1b507c 76%,#235685 86%,#1c5b87 100%);
+    --tiki-feb12-light-bg: linear-gradient(to bottom,  #dbdbdb 0%,#b6b6b6 2%,#acacac 3%,#ababab 5%,#c8c8c8 10%,#d4d4d4 17%,#e6e6e6 48%,#eaeaea 60%,#f3f3f3 77%,#fdfdfd 90%,#ffffff 100%);
+}
+
 // Options
 $enable-gradients:          true;
 $enable-negative-margins:     true;
@@ -49,6 +53,7 @@ $link-color: $primary; // default
 $link-hover-decoration: none; // underline !default
 
 // Components
+$component-active-color: #ffffff;
 $component-active-bg: #5bacd7; // $primary !default
 
 // Typography
@@ -61,8 +66,6 @@ $blockquote-footer-color: var(--bs-body-secondary-color); // #4D4D4D; // inherit
 
 // Tables
 // Buttons
-// $btn-primary: yellow; /// $primary; (Can't find this used anywhere.)
-
 // Forms
 $form-text: #3D4248BF;
 $form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
@@ -75,6 +78,16 @@ $form-feedback-invalid-color: $danger;
 
 // Navs
 // Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8) !default;
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3) !default;
+$navbar-light-icon-color:           rgba($body-color, .75) !default;
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15) !default;
+$navbar-light-brand-color:          $navbar-light-active-color !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color !default;
+
 $navbar-dark-color:                 rgba($white, .75);
 $navbar-dark-hover-color:           rgba($white, .85);
 $navbar-dark-active-color:          $white;
@@ -94,9 +107,10 @@ $dropdown-dark-color: $dropdown-color;
 $dropdown-dark-bg: $dropdown-bg;
 $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
-
 // Pagination
 // Cards
+ // Accordion
+
 // Badges
 // Modals
 // Alerts

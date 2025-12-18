@@ -219,7 +219,7 @@ class Perms
      * @param $permission string|array The permission name to validate on each record.
      * @return array What remains of the dataset after filtering.
      */
-    public static function filter(array $baseContext, $bulkKey, array $data, array $contextMap, $permission)
+    public static function filter(array $baseContext, $bulkKey, array $data, array $contextMap, $permission): array
     {
         $cacheKey = md5(serialize($baseContext) . serialize($bulkKey) . serialize($data) . serialize($contextMap) . serialize($permission));
 

@@ -52,6 +52,7 @@
                                 <form action="tiki-user_assigned_modules.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="redirect" value="1">
+                                    {if $smarty.section.ix.index > 0}
                                     <button
                                             type="submit"
                                             name="up"
@@ -62,6 +63,8 @@
                                     >
                                         {icon name="up"}
                                     </button>
+                                    {/if}
+                                    {if $smarty.section.ix.index < $smarty.section.ix.total - 1}
                                     <button
                                             type="submit"
                                             name="down"
@@ -72,6 +75,7 @@
                                     >
                                         {icon name="down"}
                                     </button>
+                                    {/if}
                                     {if $prefs.feature_right_column ne 'n'}
                                         <button
                                                 type="submit"
@@ -125,6 +129,7 @@
                                 <form action="tiki-user_assigned_modules.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="redirect" value="1">
+                                    {if $smarty.section.ix.index > 0}
                                     <button
                                             type="submit"
                                             name="up"
@@ -135,6 +140,8 @@
                                     >
                                         {icon name="up"}
                                     </button>
+                                    {/if}
+                                    {if $smarty.section.ix.index < $smarty.section.ix.total - 1}
                                     <button
                                             type="submit"
                                             name="down"
@@ -145,6 +152,7 @@
                                     >
                                         {icon name="down"}
                                     </button>
+                                    {/if}
                                     {if $prefs.feature_left_column ne 'n'}
                                         <button
                                                 type="submit"

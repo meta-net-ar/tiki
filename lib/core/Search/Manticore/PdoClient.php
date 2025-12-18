@@ -404,7 +404,9 @@ class PdoClient
             'total' => 0,
         ];
         if ($selectFields) {
-            $sql = 'SELECT ' . implode(', ', $selectFields);
+            $sql = 'SELECT ' . implode(', ', array_filter($selectFields, function ($field) use ($indexFields) {
+                return in_array($field, $indexFields);
+            }));
         } else {
             $sql = 'SELECT object_type, object_id' . (in_array('tracker_id', $indexFields) ? ', tracker_id' : '');
         }
@@ -415,7 +417,7 @@ class PdoClient
         if ($order) {
             $sql .= " ORDER BY $order";
         }
-        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0";
+        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {
             $sql .= ',max_matches=' . ($resultStart + $resultCount);
         }
@@ -473,6 +475,9 @@ class PdoClient
                     $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
                     //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
                     $sql .= " LIMIT 0, $resultCount ";
+                    if ($resultCount > 1000) {
+                        $sql .= ' option max_matches=' . $resultCount;
+                    }
                     $stmt = $this->prepareAndExecute($sql, $object_ids);
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;

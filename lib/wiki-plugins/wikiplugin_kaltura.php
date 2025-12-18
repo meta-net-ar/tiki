@@ -54,17 +54,17 @@ function wikiplugin_kaltura_info()
             'width' => [
                 'required' => false,
                 'name' => tra('Width'),
-                'description' => tra('Width of the player in pixels or percent'),
+                'description' => tra('Max width of the player (px, %, etc). Leave empty for full width.'),
                 'since' => '10.0',
-                'default' => 595,
+                'default' => '',
                 'filter' => 'text',
             ],
             'height' => [
                 'required' => false,
                 'name' => tra('Height'),
-                'description' => tra('Height of the player in pixels or percent'),
+                'description' => tra('Height of the player in pixels. Leave empty to use the player ratio.'),
                 'since' => '10.0',
-                'default' => 365,
+                'default' => '',
                 'filter' => 'text',
             ],
             'align' => [
@@ -93,7 +93,37 @@ function wikiplugin_kaltura_info()
                     ['text' => tra('Left'), 'value' => 'left'],
                     ['text' => tra('Right'), 'value' => 'right'],
                 ],
-            ]
+            ],
+            'bg' => [
+                'required' => false,
+                'name' => tra('Background'),
+                'description' => tra('Object background color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
+                'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
+                'filter' => 'text',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'border' => [
+                'required' => false,
+                'name' => tra('Borders'),
+                'description' => tra('Object border color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
+                'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
+                'filter' => 'text',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'borderRadius' => [
+                'required' => false,
+                'name' => tra('Border Radius'),
+                'description' => tra('Apply rounded corners to the container. Default: ') . '<code>Yes</code>',
+                'default' => 'y',
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+                'advanced' => true,
+            ],
         ],
     ];
 }
@@ -110,24 +140,33 @@ function wikiplugin_kaltura($data, $params)
         $params['player_id'] = $prefs['kaltura_kdpUIConf'];
     }
 
-    if (empty($params['width']) || empty($params['height'])) {
+    $rawWidth = isset($params['width']) ? trim($params['width']) : '';
+    $rawHeight = isset($params['height']) ? trim($params['height']) : '';
+
+    /*
+     * Determine aspect ratio:
+     * 1) user width/height
+     * 2) Kaltura player config
+     * 3) fallback 16:9
+     */
+    $aspectRatio = '16 / 9';
+    if (is_numeric($rawWidth) && is_numeric($rawHeight) && $rawHeight > 0) {
+        $aspectRatio = $rawWidth . ' / ' . $rawHeight;
+    } else {
         $kalturaadminlib = TikiLib::lib('kalturaadmin');
         $player = $kalturaadminlib->getPlayersUiConf($params['player_id']);
         if (! empty($player)) {
-            if (empty($params['width'])) {
-                $params['width'] = $player['width'];
-            }
-            if (empty($params['height'])) {
-                $params['height'] = $player['height'];
+            if (is_numeric($player['width']) && is_numeric($player['height']) && $player['height'] > 0) {
+                $aspectRatio = $player['width'] . ' / ' . $player['height'];
             }
         } else {
             return '<span class="alert-warning">' . tra('Player not found') . '</span>';
         }
     }
 
+    // Prepare Kaltura session
     $kalturalib = TikiLib::lib('kalturauser');
-    $params['session'] = $kalturalib->getSessionKey();
-    $params['media_url'] = $kalturalib->getMediaUrl($params['id'], $params['player_id']);
+    $kalturalib->getSessionKey();
 
     try {
         $playlistObject = $kalturalib->getPlaylist($params['id']);
@@ -135,17 +174,49 @@ function wikiplugin_kaltura($data, $params)
         $playlistObject = null;
     }
 
-    $style = '';
-    if (! empty($params['align'])) {
-        $style .= "text-align:{$params['align']};";
-    }
-    if (! empty($params['float'])) {
-        $style .= "float:{$params['float']};";
+    // Responsive container styles
+    $containerStyles = [
+        'position' => 'relative',
+        'width' => '100%',
+        'max-width' => '100%',
+        'aspect-ratio' => $aspectRatio,
+        'overflow' => 'hidden',
+        'margin' => '0 auto',
+        'max-height' => '90vh',
+    ];
+
+    if ($rawWidth !== '') {
+        $containerStyles['max-width'] = is_numeric($rawWidth) ? $rawWidth . 'px' : $rawWidth;
     }
 
+    if (! empty($params['align'])) {
+        $containerStyles['text-align'] = $params['align'];
+    }
+    if (! empty($params['float'])) {
+        $containerStyles['float'] = $params['float'];
+    }
+    if (($params['borderRadius'] ?? 'y') === 'y') {
+        $containerStyles['border-radius'] = '12px';
+    }
+    if (! empty($params['bg'])) {
+        $containerStyles['background-color'] = $params['bg'];
+    }
+    if (! empty($params['border'])) {
+        $containerStyles['border'] = '1px solid ' . $params['border'];
+    }
+
+    $containerStyle = implode(';', array_map(fn($k, $v) => "$k:$v", array_keys($containerStyles), $containerStyles));
+
+    $playerStyles = [
+        'position' => 'absolute',
+        'top' => '0',
+        'left' => '0',
+        'width' => '100%',
+        'height' => '100%',
+    ];
+    $playerStyle = implode(';', array_map(fn($k, $v) => "$k:$v", array_keys($playerStyles), $playerStyles));
+
     $embedIframeJs = '/embedIframeJs';  // TODO add as params?
-    $leadWithHTML5 = 'true';
-    $autoPlay = 'false';
 
     if ($playlistObject) {
         parse_str(str_replace(['k_pl_0_u', 'k_pl_0_n'], ['kpl0U', 'kpl0N'], $playlistObject->executeUrl), $playlistAPI);
@@ -159,7 +230,7 @@ function wikiplugin_kaltura($data, $params)
         ->add_jsfile_cdn("{$prefs['kaltura_kServiceUrl']}/p/{$prefs['kaltura_partnerId']}/sp/{$prefs['kaltura_partnerId']}00{$embedIframeJs}/uiconf_id/{$params['player_id']}/partner_id/{$prefs['kaltura_partnerId']}")
         ->add_jq_onready(
             "
-mw.setConfig('Kaltura.LeadWithHTML5', $leadWithHTML5);
+mw.setConfig('Kaltura.LeadWithHTML5', true);
 
 kWidget.embed({
     targetId: 'kaltura_player$instance',
@@ -167,23 +238,16 @@ kWidget.embed({
     uiconf_id: '{$params['player_id']}',
     entry_id: '{$params['id']}',
     flashvars: { // flashvars allows you to set runtime uiVar configuration overrides.
-        //autoPlay: $autoPlay
         $playlistAPI
     },
     params: { // params allows you to set flash embed params such as wmode, allowFullScreen etc
         wmode: 'transparent'
-    },
-    readyCallback: function (playerId) {
-        \$ = \$jq;    // restore our jQuery after Kaltura has finished with it
-        console.log('Player:' + playerId + ' is ready ');
     }
 });"
         );
-    if (is_numeric($params['width'])) {
-        $params['width'] .= 'px';
-    }
-    if (is_numeric($params['height'])) {
-        $params['height'] .= 'px';
-    }
-    return "<div id='kaltura_player$instance' style='width:{$params['width']};height:{$params['height']};$style'></div>";
+    return "
+<div style=\"$containerStyle\">
+    <div id=\"kaltura_player$instance\" style=\"$playerStyle\"></div>
+</div>
+";
 }

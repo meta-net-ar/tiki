@@ -48,11 +48,7 @@ $bloglib = TikiLib::lib('blog');
 $access->check_feature('feature_blogs');
 $access->check_permission('tiki_p_create_blogs');
 
-if (isset($_REQUEST["blogId"])) {
-    $blogId = $_REQUEST["blogId"];
-} else {
-    $blogId = 0;
-}
+$blogId = $_REQUEST["blogId"] ?? 0;
 
 $smarty->assign('individual', 'n');
 

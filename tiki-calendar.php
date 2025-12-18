@@ -171,6 +171,9 @@ if (! empty($_REQUEST["calitemId"])) {
 } else {
     $calitemId = '';
 }
+global $base_uri;
+$current_url = $base_uri;
+$smarty->assign('returnURL', $current_url);
 $smarty->assign('currentcalitemId', $calitemId);
 
 $smarty->assign('displayedcals', $_SESSION['CalendarViewGroups']);
@@ -185,12 +188,7 @@ if (is_array($_SESSION['CalendarViewGroups'])) {
     }
 }
 $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 if (! empty($_REQUEST['mon'])) {

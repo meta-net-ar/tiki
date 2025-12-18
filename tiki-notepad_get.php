@@ -21,8 +21,6 @@ if (! isset($_REQUEST["noteId"])) {
     Feedback::errorAndDie(tra("No note indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 if (isset($_REQUEST["save"])) {
     $disposition = "attachment";
 } else {

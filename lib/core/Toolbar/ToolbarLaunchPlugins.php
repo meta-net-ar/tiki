@@ -64,8 +64,6 @@ class ToolbarLaunchPlugins extends ToolbarUtilityItem
 
     public function getWysiwygJs(): string
     {
-        global $section;
-
         $servicelib = TikiLib::lib('service');
 
         $params = ['controller' => 'edit', 'action' => 'help', 'modal' => 1];

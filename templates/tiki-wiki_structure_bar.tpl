@@ -1,6 +1,6 @@
 {*<div class="tocnav row mx-0 justify-content-between">*}
 <nav class="nav-breadcrumb" aria-label="breadcrumb">
-        <ol class="breadcrumb mt-2 me-3 p-1 d-inline-flex justify-content-start align-content-center">
+        <div class="mt-2 me-3 p-1 d-inline-flex justify-content-start align-content-center">
             {if $home_info}{if !empty($home_info.page_alias)}{$icon_title=$home_info.page_alias}{else}{$icon_title=$home_info.pageName}{/if}
                 {if $prefs.feature_wiki_structure_drilldownmenu eq 'y'}
                     <span class="dropdown">
@@ -12,51 +12,50 @@
                         </ul>
                     </span>
                 {else}
-                    {self_link page=$home_info.pageName structure=$home_info.pageName page_ref_id=$home_info.page_ref_id _title="{tr}Structure:{/tr}$icon_title" _class="tips"}{icon name="home"}{/self_link}
+                    {self_link page=$home_info.pageName structure=$home_info.pageName page_ref_id=$home_info.page_ref_id _title="{tr}Structure:{/tr}$icon_title" _class="tips pe-2"}{icon name="home"}{/self_link}
                 {/if}
             {/if}
             {if $prev_info and $prev_info.page_ref_id}{if !empty($prev_info.page_alias)}{$icon_title=$prev_info.page_alias}{else}{$icon_title=$prev_info.pageName}{/if}
-                <a href="{sefurl page=$prev_info.pageName structure=$home_info.pageName page_ref_id=$prev_info.page_ref_id}" class="tips" title="{tr}Previous page:{/tr}{$icon_title}">
+                <a href="{sefurl page=$prev_info.pageName structure=$home_info.pageName page_ref_id=$prev_info.page_ref_id}" class="tips pe-2" title="{tr}Previous page:{/tr}{$icon_title}">
                     {icon name="caret-left"}
                 </a>
             {/if}
             {if $parent_info}{if !empty($parent_info.page_alias)}{$icon_title=$parent_info.page_alias}{else}{$icon_title=$parent_info.pageName}{/if}
-                <a href="{sefurl page=$parent_info.pageName structure=$home_info.pageName page_ref_id=$parent_info.page_ref_id}" class="tips" title="{tr}Parent page:{/tr}{$icon_title}">
+                <a href="{sefurl page=$parent_info.pageName structure=$home_info.pageName page_ref_id=$parent_info.page_ref_id}" class="tips pe-2" title="{tr}Parent page:{/tr}{$icon_title}">
                     {icon name="up"}
                 </a>
             {/if}
             {if $next_info and $next_info.page_ref_id}{if !empty($next_info.page_alias)}{$icon_title=$next_info.page_alias}{else}{$icon_title=$next_info.pageName}{/if}
-                <a href="{sefurl page=$next_info.pageName structure=$home_info.pageName page_ref_id=$next_info.page_ref_id}" class="tips" title="{tr}Next page:{/tr}{$icon_title}">
+                <a href="{sefurl page=$next_info.pageName structure=$home_info.pageName page_ref_id=$next_info.page_ref_id}" class="tips pe-2" title="{tr}Next page:{/tr}{$icon_title}">
                     {icon name="caret-right"}
                 </a>
             {/if}
-        </ol>
-        <ol class="breadcrumb mt-2 me-3 p-1 d-inline-flex align-content-center me-auto">
+        </div>
+        <ol class="breadcrumb mt-2 me-3 p-1 d-inline-flex align-content-center me-auto"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
             {section loop=$structure_path name=ix}
-                {if $structure_path[ix].parent_id}&nbsp;{$prefs.site_crumb_seper}&nbsp;{/if}
-                    <li class="breadcrumb-item">
+                <li class="breadcrumb-item pe-2">
 
-                        {if !empty($smarty.section.ix.last) }
+                    {if !empty($smarty.section.ix.last) }
 
+                        {if $structure_path[ix].page_alias}
+                            {$structure_path[ix].page_alias|escape}
+                        {else}
+                            {$structure_path[ix].stripped_pageName|pagename}
+                        {/if}
+
+                    {else}
+
+                        <a href="{sefurl page=$structure_path[ix].pageName structure=$home_info.pageName page_ref_id=$structure_path[ix].page_ref_id}">
                             {if $structure_path[ix].page_alias}
                                 {$structure_path[ix].page_alias|escape}
                             {else}
                                 {$structure_path[ix].stripped_pageName|pagename}
                             {/if}
+                        </a>
 
-                        {else}
+                    {/if}
 
-                            <a href="{sefurl page=$structure_path[ix].pageName structure=$home_info.pageName page_ref_id=$structure_path[ix].page_ref_id}">
-                                {if $structure_path[ix].page_alias}
-                                    {$structure_path[ix].page_alias|escape}
-                                {else}
-                                    {$structure_path[ix].stripped_pageName|pagename}
-                                {/if}
-                            </a>
-
-                        {/if}
-
-                    </li>
+                </li>
             {/section}
         </ol>
         {if $struct_editable eq 'a'}
@@ -65,7 +64,7 @@
                         <input type="hidden" name="current_page_id" value="{$page_info.page_ref_id}">
                         <div class="input-group">
                             <div class="input-group-text" style="font-size:50% !important">
-                                {self_link _script="tiki-edit_structure.php" page_ref_id=$home_info.page_ref_id _class="tips" _title="{tr}Manage Stucture:{/tr}{$home_info.pageName} ($cur_pos)"}{icon name="structure"}{/self_link}
+                                {self_link _script="tiki-edit_structure.php" page_ref_id=$home_info.page_ref_id _class="tips pe-2" _title="{tr}Manage Stucture:{/tr}{$home_info.pageName} ($cur_pos)"}{icon name="structure"}{/self_link}
                             </div>
                             <input type="text" id="structure_add_page" name="page" class="form-control form-control-sm">
                             {autocomplete element='#structure_add_page' type='pagename'}

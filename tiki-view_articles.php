@@ -15,17 +15,19 @@ $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'remove'            => 'int',           //post
-            'sort_mode'         => 'word',          //get
-            'offset'            => 'digits',        //get
+            'sort_mode'         => 'alnumdash',     //get
+            'offset'            => 'int',           //get
             'date_min'          => 'digits',        //post
             'date_max'          => 'digits',        //post
-            'min_rating'        => 'string',        //post
-            'max_rating'        => 'string',        //post
-            'type'              => 'string',        //post
-            'topic'             => 'string',        //post
-            'topicName'         => 'string',        //post
+            'min_rating'        => 'digits',        //post
+            'max_rating'        => 'digits',        //post
+            'type'              => 'striptags',        //post
+            'topic'             => 'int',        //post
+            'topicName'         => 'striptags',        //post
             'categId'           => 'int',           //post
             'lang'              => 'lang',          //post
+            'find'              => 'striptags',     //get
+            'watch_action'      => 'alpha',     //get
         ]
     ],
 ];
@@ -67,11 +69,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (isset($_REQUEST['date_min']) || isset($_REQUEST['date_max'])) {
     $date_min = $_REQUEST['date_min'] ?? 0;
