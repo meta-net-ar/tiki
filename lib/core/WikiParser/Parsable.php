@@ -454,8 +454,9 @@ if ( \$('#$id') ) {
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $this->parse_wiki_argvariable($data);
-        foreach ($args as &$arg) {
+        foreach ($args as $key => $arg) {
             $this->parse_wiki_argvariable($arg);
+            $args[$key] = $arg;
         }
 
         $outputFormat = 'wiki';
