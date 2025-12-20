@@ -13,7 +13,7 @@ function transformContainerSelects(containerElement) {
     const selects = $(containerElement)
         .find("select:not([element-plus-ref])")
         .filter(function () {
-            if ($(this).attr("needs-element-plus") === "false") {
+            if ($(this).attr("data-needs-element-plus") === "false") {
                 return false;
             }
             return true;

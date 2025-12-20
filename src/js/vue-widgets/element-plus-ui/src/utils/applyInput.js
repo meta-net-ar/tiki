@@ -21,7 +21,7 @@ function transformContainerInputs(containerElement) {
                 $(this).attr("element-plus-ref") ||
                 $(this).css("display") === "none" ||
                 $(this).closest(".cypht-layout, .tiki-webmail").length ||
-                $(this).attr("needs-element-plus") === "false"
+                $(this).attr("data-needs-element-plus") === "false"
             ) {
                 return false;
             }
