@@ -1,7 +1,7 @@
-{if "$userwatch" eq "$user" }
+{if $userwatch eq $user}
     {include file='tiki-mytiki_bar.tpl'}
 {/if}
-{if $infoPublic eq 'y' || true}
+{if $infoPublic eq 'y'}
     <div class="clearfix">
         <div class="float-sm-end">
             {if $tiki_p_admin eq 'y' or $userinfo.object_id eq $user}
@@ -131,14 +131,14 @@
                         {foreach $template_fields as $field}
                             <tr class="profile-info">
                                 <td class="profile-info-label">{$field.label}:</td>
-                                <td class="profile-info-value">{$userinfo["tracker_field_`$field.permName`"]}</td>
+                                <td class="profile-info-value">{$userinfo["tracker_field_`$field.permName`"]|escape}</td>
                             </tr>
                         {/foreach}
                     </table>
                     </div>
 
                     {* Wikis Tab *}
-                    <div id="tab_wikis" class="profile-tab-content collapse">
+                    <div id="tab_wikis" class="profile-tab-content" style="display:none">
                         <h2>{tr}Wiki Pages{/tr}</h2>
                         <p>{tr}This user has contributed to the following wiki pages:{/tr}</p>
                         <div class="card">
