@@ -5,14 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\core\RSS\CustomEntryField;
-
-enum TimeUnit: string
-{
-    case SECONDS = 'seconds';
-    case MINUTES = 'minutes';
-    case HOURS = 'hours';
-    case DAYS = 'days';
-}
+use Tiki\Lib\core\RSS\Enums\TimeUnit;
 
 class RSSLib extends TikiDb_Bridge
 {
@@ -134,7 +127,7 @@ class RSSLib extends TikiDb_Bridge
             // entry found in db:
             $output["data"] = $res["cache"];
             // $refresh = $res["refresh"]; // global cache time currently
-            $refresh = $this->cacheLifetime($prefs['feed_cache_time']); // global cache time currently
+            $refresh = $this->cacheLifetime($prefs['feed_cache_time'], TimeUnit::SECONDS); // global cache time currently
             $lastUpdated = $res["lastUpdated"];
             // up to date? if not, then set trigger to reload data:
             if ($tikilib->now - $lastUpdated >= $refresh) {
@@ -388,7 +381,7 @@ class RSSLib extends TikiDb_Bridge
         $ret = $this->modules->fetchAll($this->modules->all(), $conditions, $maxRecords, $offset, $this->modules->sortMode($sort_mode));
 
         foreach ($ret as &$res) {
-            $res["minutes"] = $this->cacheLifetime($res["refresh"]) / 60;
+            $res["minutes"] = $this->cacheLifetime($res["refresh"], TimeUnit::SECONDS) / 60;
         }
 
         return [
@@ -1130,19 +1123,19 @@ class RSSLib extends TikiDb_Bridge
             $maxTime = $cache_time + $refresh_time;
             if ($maxTime <= $tikilib->now) {
                 self::$cachelib->invalidate($cache_feed_key);
-                $cache_feed_result = null;
+                $result = null;
+            } else {
+                $result = $cache_feed_result;
             }
         }
 
-        if ($cache_feed_result) {
-            $items = $cache_feed_result['feedData'];
-            $title = $cache_feed_result['siteMeta'];
-        } else {
+        if (! $result) {
             $result = $this->update_feed($url);
-            $items = $result['feedData'];
-            $title = $result['siteMeta'];
             self::$cachelib->cacheItem($cache_feed_key, serialize($result));
         }
+
+        $items = $result['feedData'];
+        $title = $result['siteMeta'];
 
         $params = array_merge($params, [
             'date' => 1,
