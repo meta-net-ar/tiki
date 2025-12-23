@@ -6,6 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\core\RSS\CustomEntryField;
 
+enum TimeUnit: string
+{
+    case SECONDS = 'seconds';
+    case MINUTES = 'minutes';
+    case HOURS = 'hours';
+    case DAYS = 'days';
+}
+
 class RSSLib extends TikiDb_Bridge
 {
     private $items;
@@ -35,16 +43,16 @@ class RSSLib extends TikiDb_Bridge
      * @param string $unit
      * @return int
      */
-    private function cacheLifetime($time, $unit = 'seconds')
+    private function cacheLifetime(int $time, TimeUnit $unit = TimeUnit::SECONDS): int
     {
         switch ($unit) {
-            case 'minutes':
+            case TimeUnit::MINUTES:
                 return $time * 60;
-            case 'hours':
+            case TimeUnit::HOURS:
                 return $time * 3600;
-            case 'days':
+            case TimeUnit::DAYS:
                 return $time * 86400;
-            case 'seconds':
+            case TimeUnit::SECONDS:
             default:
                 return $time;
         }
@@ -392,7 +400,7 @@ class RSSLib extends TikiDb_Bridge
     /* replace rss feed in db */
     public function replace_rss_module($rssId, $name, $description, $url, $refreshMinutes, $showTitle, $showPubDate, $noUpdate = false)
     {
-        $refresh = $this->cacheLifetime($refreshMinutes, 'minutes');
+        $refresh = $this->cacheLifetime($refreshMinutes, TimeUnit::MINUTES);
 
         $data = [
             'name' => $name,
@@ -1117,7 +1125,7 @@ class RSSLib extends TikiDb_Bridge
         $cache_feed_result = self::$cachelib->getSerialized($cache_feed_key);
 
         if ($cache_feed_result) {
-            $refresh_time = max($this->cacheLifetime($cache_feed_result['ttl'], 'minutes'), $this->cacheLifetime($params['refresh'], 'minutes'));
+            $refresh_time = max($this->cacheLifetime($cache_feed_result['ttl'], TimeUnit::MINUTES), $this->cacheLifetime($params['refresh'], TimeUnit::MINUTES));
             $cache_time = $cache_feed_result['lastUpdated'];
             $maxTime = $cache_time + $refresh_time;
             if ($maxTime <= $tikilib->now) {
