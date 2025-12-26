@@ -284,11 +284,15 @@ class ToolbarPicker extends ToolbarDialog
      */
     public function setupPickerJS(): void
     {
+        $clean = array_map(function ($v) {
+            return is_string($v) ? mb_convert_encoding($v, 'UTF-8', 'auto') : $v;
+        }, $this->list);
+
         TikiLib::lib('header')->add_js(
             "if (! window.pickerData) { window.pickerData = {}; } window.pickerData['$this->name'] = " . str_replace(
                 '\/',
                 '/',
-                json_encode($this->list)
+                json_encode($clean, JSON_INVALID_UTF8_SUBSTITUTE)
             ) . ";"
         );
     }
