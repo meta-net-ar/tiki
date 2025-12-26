@@ -272,7 +272,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         $fieldId = $trklib->replace_tracker_field(
             $trackerId,
             0,
-            'Name',
+            $name,
             't',
             'y',
             'y',
