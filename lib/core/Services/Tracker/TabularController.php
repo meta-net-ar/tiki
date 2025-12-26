@@ -116,6 +116,10 @@ class Services_Tracker_TabularController
         $prefill_odbc = $input->prefill_odbc->bool();
         $trackerId = $info['trackerId'];
 
+        if (! $info['tabularId']) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
+
         Services_Exception_Denied::checkObject('tiki_p_tabular_admin', 'tabular', $info['tabularId']);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -351,6 +355,10 @@ class Services_Tracker_TabularController
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
 
+        if (! $info['tabularId']) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
+
         Services_Exception_Denied::checkObject('tiki_p_tabular_export', 'tabular', $info['tabularId']);
 
         $schema = $this->getSchema($info);
@@ -559,7 +567,7 @@ class Services_Tracker_TabularController
         $successImportMsg = tr('Your import was completed successfully.');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            if ($fileIsTSV) {
+            if ($fileIsTsv) {
                 Services_Tracker_Utilities::parseTsvContentToCsv('file');
                 $separator = ',';
             }
