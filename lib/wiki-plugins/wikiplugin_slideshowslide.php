@@ -103,6 +103,7 @@ function wikiplugin_slideshowslide_info()
                 'filter' => 'word',
                 'default' => '',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
@@ -119,6 +120,7 @@ function wikiplugin_slideshowslide_info()
                 'filter' => 'word',
                 'default' => '',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
