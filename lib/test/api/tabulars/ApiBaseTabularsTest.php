@@ -91,19 +91,23 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
      */
     private static function createDefaultTestData()
     {
-        static::$defaultTrackerId = static::createTrackerTabular('API_Tracker_Tabular');
+        static::$defaultTabularId = static::createTrackerTabular('API_Tracker_Tabular');
+
+        $info = TikiLib::lib('tabular')->getInfo(static::$defaultTabularId);
+        static::$defaultTrackerId = $info['trackerId'];
     }
 
     /**
      * Create a tracker tabular for testing
      * @param string $name Tracker name
-     * @return int|null The tracker ID or null on failure
+     * @return int|null The tabular ID or null on failure
      */
     protected static function createTrackerTabular($trackerName)
     {
         $trklib = TikiLib::lib('trk');
 
         $trackerId = $trklib->replace_tracker(0, $trackerName, 'Test tracker for Tabulars', [], 'n');
+        $tabularId = null;
 
         if ($trackerId) {
             static::$testTrackers[] = $trackerId;
@@ -152,10 +156,10 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
                     "isUniqueKey" => false
                 ],
             ];
-            static::$defaultTabularId = static::createTabular("{$trackerName}_Format", $trackerId, $format);            
+            $tabularId = static::createTabular("{$trackerName}_Format", $trackerId, $format);            
         }
 
-        return $trackerId ?: null;
+        return $tabularId;
     }
 
     /**
@@ -273,25 +277,6 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
     }
 
     /**
-     * Create CSV content for import testing
-     * @param array $headers Column headers
-     * @param array $rows Data rows
-     * @return string CSV content
-     */
-    protected function createCsvContent($headers, $rows)
-    {
-        $output = fopen('php://temp', 'r+');
-        fputcsv($output, $headers);
-        foreach ($rows as $row) {
-            fputcsv($output, $row);
-        }
-        rewind($output);
-        $content = stream_get_contents($output);
-        fclose($output);
-        return $content;
-    }
-
-    /**
      * Create a temporary CSV file for upload
      * @param string $content CSV content
      * @return string Temporary file path
@@ -390,5 +375,9 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
     protected function assertValidImportResponse($response)
     {
         $this->assertIsArray($response, 'Response should be an array');
+        foreach ($response as $row) {
+            $this->assertIsArray($row, 'Each imported row should be an array');
+            $this->assertArrayHasKey('itemId', $row, 'Each imported row should have itemId');
+        }
     }
 }

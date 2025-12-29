@@ -558,6 +558,14 @@ class Services_Tracker_TabularController
         $separator = $input->separator->text();
         $fileIsTsv = ! ($separator == "," || $separator == ';');
 
+        if (empty($info['format_descriptor']) && 
+            empty($info['filter_descriptor']) && 
+            empty($info['config']) && 
+            empty($info['odbc_config']) && 
+            empty($info['api_config'])) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
+
         Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
 
         $schema = $this->getSchema($info);
@@ -565,13 +573,40 @@ class Services_Tracker_TabularController
 
         $done = false;
         $successImportMsg = tr('Your import was completed successfully.');
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $hasUploadedFile = isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name']);
+            $hasBase64File = ! empty($input->file->text());
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            if (! $hasUploadedFile && ! $hasBase64File) {
+                throw new Services_Exception_MissingValue("file");
+            }
+
+            if ($hasUploadedFile) {
+                $tmpFile = $_FILES['file']['tmp_name'];
+            } else {
+                // Base64 fallback for API/tests
+                $fileData = base64_decode($input->file->text());
+                $fileName = $input->file_name->text();
+
+                $tikiFile = new \Tiki\FileGallery\File([
+                    'galleryId' => 0,
+                    'filename' => $fileName,
+                    'name' => $fileName,
+                ]);
+
+                if ($tikiFile->replaceContents($fileData)) {
+                    $wrapper = $tikiFile->getWrapper();
+                    $tmpFile = $wrapper->getReadableFile();
+                } else {
+                    throw new Services_Exception(tra('Failed to process file content'));
+                }
+            }
+
             if ($fileIsTsv) {
                 Services_Tracker_Utilities::parseTsvContentToCsv('file');
                 $separator = ',';
             }
-            $source = $schema->getSource($_FILES['file']['tmp_name'], $separator);
+            $source = $schema->getSource($tmpFile, $separator);
             $writer = new TrackerWriter();
 
             return TikiLib::lib('tiki')->allocate_extra(
@@ -579,7 +614,7 @@ class Services_Tracker_TabularController
                 function () use ($writer, $source, $info, $schema) {
                     $result = $writer->write($source);
 
-                    unlink($_FILES['file']['tmp_name']);
+                    unlink($tmpFile);
 
                     if (TIKI_API) {
                         $data = [];

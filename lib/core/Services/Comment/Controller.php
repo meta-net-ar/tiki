@@ -285,8 +285,8 @@ class Services_Comment_Controller
                     if ($watch_event) {
                         Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
                         if (! TIKI_API) {
-                        Feedback::sendHeaders();
-                    }
+                            Feedback::sendHeaders();
+                        }
                     }
 
                     // Set watch if requested
