@@ -59,7 +59,9 @@ const LANG_CUSTOM_PHP_BASENAME = 'custom.php';
 /** This is actually a route, will disapear in path_rework */
 const LISTS_PATH = 'lists';
 const LIB_PATH = 'lib';
-/** The path for php source code, mostly fro rector and phpstan */
+/** Path to test library files */
+const LIB_TEST_PATH = 'lib/test';
+/** The path for php source code, mostly for rector and phpstan */
 const PHP_SOURCES_PATH = 'src/php';
 
 /** This was for the Mods feature, replaced by packages.  Do not confuse with MODULES_PATH */
@@ -170,6 +172,8 @@ const PRIMARY_EXTERNAL_PACKAGEJSON_FILE_PATH = 'src/js/common-externals/package.
 
 /* BEGIN - HTTP PATHS */
 const HTTP_PUBLIC_PATH = 'public';
+/** Path to generated files that are servable over HTTP */
+const PUBLIC_GENERATED_PATH = 'public/generated';
 /* Javascript assets servable over http, including css generated from js files. */
 const JS_ASSETS_PATH = 'public/generated/js';
 /** This is the path for JS vendor files that would normally be served by a content delivery network.  We both bundle these files in the tarball, and (usually) serve them locally. */

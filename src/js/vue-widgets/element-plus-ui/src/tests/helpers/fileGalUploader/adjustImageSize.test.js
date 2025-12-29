@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vitest";
 import adjustImageSize from "../../../helpers/fileGalUploader/adjustImageSize";
 import { waitFor } from "@testing-library/vue";
 
@@ -10,17 +10,24 @@ describe("fileGalUploader adjustImageSize helper", () => {
         */
     });
 
+    afterAll(() => {
+        vi.unstubAllGlobals();
+    });
+
     test("rejects with an error when the image data cannot be loaded", async () => {
         const givenImageData = "data:image/jpeg;base64,base64 Mock data";
         const givenMaxWidth = 100;
         const givenMaxHeight = 200;
         const givenImageType = "image/jpeg";
 
-        const imageInstance = new Image();
-
-        vi.spyOn(window, "Image").mockImplementation(() => {
-            return imageInstance;
-        });
+        let imageInstance;
+        class MockImage extends Image {
+            constructor() {
+                super();
+                imageInstance = this;
+            }
+        }
+        vi.stubGlobal("Image", MockImage);
 
         const result = adjustImageSize(givenImageData, givenMaxWidth, givenMaxHeight, givenImageType);
 

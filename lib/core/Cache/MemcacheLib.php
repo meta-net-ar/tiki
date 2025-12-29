@@ -54,8 +54,8 @@ class MemcacheLib
 
         if (! $memcached_options) {
             $memcached_options = [
-            'expiration' => (int) $prefs['memcache_expiration'],
-            'key_prefix' => $prefs['memcache_prefix'],
+                'expiration' => (int) $prefs['memcache_expiration'],
+                'key_prefix' => $prefs['memcache_prefix'],
             ];
         }
         $localphp = "db/{$tikidomainslash}local.php";
@@ -77,7 +77,7 @@ class MemcacheLib
             //50ms is already pretty long for a memcache server.  If it's that slow to respond, may as well not use it.
             \Memcached::OPT_CONNECT_TIMEOUT => 50,
             \Memcached::OPT_SERVER_FAILURE_LIMIT => 1
-            ]);
+        ]);
         foreach ($memcached_servers as $server) {
             if ($server['host'] == 'localhost') {
                 $server['host'] = '127.0.0.1';
@@ -239,7 +239,7 @@ class MemcacheLib
     {
         if (is_string($key)) {
             return (strpos($key, $this->key_prefix) !== 0) ?
-            $this->key_prefix . $key : $key;
+                $this->key_prefix . $key : $key;
         }
 
         if (is_array($key)) {
@@ -256,7 +256,9 @@ class MemcacheLib
 
             $str_key = join(':', $parts);
             return $this->key_prefix .
-            ( $use_md5 ? md5($str_key) : '[' . $str_key . ']' );
+                ($use_md5 ? md5($str_key) : '[' . $str_key . ']');
         }
+
+        throw new InvalidArgumentException("key parameter is neither an array or string");
     }
 }

@@ -224,6 +224,11 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
 
         $data = $this->getFieldData();
 
+        if (! empty($data['relations']) && count($data['relations']) > 1) {
+            // cache the titles with just 1 query for all related objects
+            $this->getItemValues();
+        }
+
         $filter = $this->trackerField->getParsedFilter();
 
         if (
@@ -292,25 +297,20 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                 return ! empty($returnValue) ? $returnValue : $itemData;
             }
             return $this->getConfiguration('value');
-        } elseif ($context['list_mode'] === 'text') {
-            return implode(
-                "\n",
-                array_map(
-                    function ($rel) {
-                        return $rel->target->getTitle($this->trackerField->getOption('format'));
-                    },
-                    $this->getObjectRelationInstances()
-                )
-            );
         } else {
+            $relations = $this->getObjectRelationInstances();
+            if (! empty($relations) && count($relations) > 1) {
+                // cache the titles with just 1 query for all related objects
+                $this->getItemValues();
+            }
             // TODO: render metadata as well
             return implode(
-                "<br/>",
+                $context['list_mode'] === 'text' ? "\n" : '<br/>',
                 array_map(
                     function ($rel) {
                         return $rel->target->getTitle($this->trackerField->getOption('format'));
                     },
-                    $this->getObjectRelationInstances()
+                    $relations
                 )
             );
         }
@@ -318,6 +318,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
 
     public function renderOutput($context = [])
     {
+        $this->getItemValues(); // this caches the titles and is faster as it does 1 query for all related objects
         $list_mode = $context['list_mode'] ?? '';
         if ($list_mode === 'csv' || $list_mode === 'text') {
             return $this->renderInnerOutput($context);
@@ -337,6 +338,10 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                 }
             }
             $relations = array_values($relations);
+            if (! empty($relations) && count($relations) > 1) {
+                // cache the titles with just 1 query for all related objects
+                $this->getItemValues();
+            }
 
             return $this->renderTemplate(
                 'trackeroutput/relation.tpl',

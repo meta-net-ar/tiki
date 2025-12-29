@@ -21,6 +21,7 @@ class XMPPLib extends TikiLib
     private $server_http_bind = '';
     private $restapi = null;
     private $xmppapi = null;
+    private ?\Fabiang\Xmpp\Client $adminClient = null;
 
     /**
      * @return string
@@ -36,15 +37,202 @@ class XMPPLib extends TikiLib
 
         $this->server_host = $prefs['xmpp_server_host'];
         $this->server_http_bind = $prefs['xmpp_server_http_bind'];
+    }
 
-        if (! class_exists('XmppPrebind')) {
-            throw new Exception(
-                "class 'XmppPrebind' does not exists."
-                . " Install with `composer require candy-chat/xmpp-prebind-php:dev-master`.",
-                1
-            );
+    /**
+     * ===== Prosody integration helpers =====
+     * These methods are designed for Prosody (mod_auth_http, group mapping, etc.)
+     * They do not depend on Openfire REST API or XmppPrebind.
+     */
+
+    /**
+     * Return the JID of a user (custom preference or built from the domain)
+     */
+    public function getUserJidForLogin(string $login): string
+    {
+        global $prefs;
+
+        $domain = $prefs['xmpp_domain_users'] ?: $this->server_host;
+        return sprintf('%s@%s', $login, $domain);
+    }
+
+    /**
+     * Return auto-join rooms for a given user
+     */
+    public function getXmppRoomsForUser(string $login): array
+    {
+        global $prefs;
+        $cachelib = TikiLib::lib('cache');
+        $key = 'xmpp_rooms_' . md5($login);
+        if ($c = $cachelib->getSerialized($key)) {
+            return $c;
+        }
+
+        $rooms = [];
+        $tikilib = TikiLib::lib('tiki');
+        $saved = json_decode($tikilib->get_user_preference($login, 'xmpp_rooms', '[]'), true);
+        if (is_array($saved)) {
+            $rooms = $saved;
+        }
+
+        $strategy = $prefs['xmpp_auto_join_strategy'] ?? 'by-groups';
+        if ($strategy === 'none') {
+            return $rooms;
+        }
+
+        if ($strategy === 'static' && ! empty($prefs['xmpp_registered_room'])) {
+            $rooms[] = $prefs['xmpp_registered_room'];
+        }
+
+        if ($strategy === 'by-groups') {
+            $map = json_decode($prefs['xmpp_group_room_map'] ?? '{}', true) ?: [];
+            $groups = TikiLib::lib('user')->get_user_groups($login);
+            foreach ($groups as $g) {
+                if (! empty($map[$g])) {
+                    $rooms[] = $map[$g];
+                }
+            }
+            if (! empty($prefs['xmpp_registered_room'])) {
+                $rooms[] = $prefs['xmpp_registered_room'];
+            }
+        }
+
+        // Admins should always see/respond in anonymous/support rooms (community)
+        $userslib = TikiLib::lib('user');
+        $isAdmin = $login && $userslib->user_has_permission($login, 'tiki_p_admin');
+        if ($isAdmin) {
+            if (! empty($prefs['xmpp_anonymous_room'])) {
+                $rooms[] = $prefs['xmpp_anonymous_room'];
+            }
+            if (! empty($prefs['xmpp_anonymous_support_room'])) {
+                $rooms[] = $prefs['xmpp_anonymous_support_room'];
+            }
+        }
+
+        $rooms = array_values(array_unique(array_filter($rooms)));
+        $cachelib->cacheItem($key, serialize($rooms), 300);
+        return $rooms;
+    }
+
+
+    public function saveUserRooms(string $user, array $rooms): void
+    {
+        $tikilib = TikiLib::lib('tiki');
+        $existing = json_decode($tikilib->get_user_preference($user, 'xmpp_rooms', '[]'), true);
+        if (! is_array($existing)) {
+            $existing = [];
+        }
+
+        $all = array_values(array_unique(array_merge($existing, $rooms)));
+        $tikilib->set_user_preference($user, 'xmpp_rooms', json_encode($all));
+
+        error_log("[XMPP] Saved rooms for {$user}: " . implode(', ', $all));
+    }
+
+    /**
+     * Build a full room JID with the MUC component domain
+     */
+    public function buildRoomJid(string $roomName): string
+    {
+        global $prefs;
+        $mucDomain = $prefs['xmpp_muc_component_domain'] ?: 'conference.' . $this->server_host;
+
+        // If it's already a full JID, do not add anything
+        if (strpos($roomName, '@') !== false) {
+            return $roomName;
+        }
+
+        return $roomName . '@' . $mucDomain;
+    }
+
+    public function checkXmppSessionToken(string $user, string $token): bool
+    {
+        global $prefs;
+        $tokenlib = Tokens::build($prefs);
+        $data = $tokenlib->getToken($token);
+
+        if (! $data || $data['entry'] !== 'xmppauthtoken') {
+            return false;
+        }
+
+        $params = json_decode($data['parameters'], true);
+        $valid = is_array($params) && ($params['user'] ?? null) === $user;
+
+        if ($valid) {
+            $tokenlib->deleteToken($data['tokenId']);
+        }
+
+        return $valid;
+    }
+
+    /**
+     * Get effective JID (external preferred or local JID with fallback)
+     */
+    public function getEffectiveJidForUser(string $username): string
+    {
+        if (empty($username)) {
+            return '';
+        }
+
+        $userslib = TikiLib::lib('user');
+        $info = $userslib->get_user_info($username);
+
+        $ext = trim($info['preferences']['xmpp_jid'] ?? '');
+        if (! empty($ext) && strpos($ext, '@') !== false) {
+            return $ext;
+        }
+
+        global $prefs;
+        $domain = '';
+        if (! empty($prefs['xmpp_domain_users'])) {
+            $domain = $prefs['xmpp_domain_users'];
+        } elseif (! empty($prefs['xmpp_domain'])) {
+            $domain = $prefs['xmpp_domain'];
+        } else {
+            $domain = parse_url($prefs['tiki_url'], PHP_URL_HOST);
+        }
+
+        return "{$username}@{$domain}";
+    }
+
+    /**
+     * Sync user's Tiki groups -> XMPP MUC affiliations (member).
+     * Minimal: ensure room exists and set affiliation member.
+     */
+    public function syncUserGroupsToXmpp(string $u): void
+    {
+        global $prefs;
+        if ($prefs['xmpp_feature'] !== 'y') {
+            return;
+        }
+        $this->invalidateUserCache($u);
+        $jid = $this->getEffectiveJidForUser($u);
+        if (! $jid) {
+            return;
+        }
+        $rooms = $this->getXmppRoomsForUser($u);
+        foreach ($rooms as $r) {
+            try {
+                $room = $this->buildRoomJid($r);
+                $this->ensureRoomExists($room);
+                $this->setUserAffiliation($room, $jid, 'member');
+            } catch (\Throwable $e) {
+                error_log("[XMPP] Sync error {$u} -> {$r}: " . $e->getMessage());
+            }
         }
     }
+
+    public function invalidateUserCache(string $u): void
+    {
+        TikiLib::lib('cache')->invalidate('xmpp_rooms_' . md5($u));
+        error_log("[XMPP] Cache invalidated for {$u}");
+    }
+
+    /**
+     * ===== Legacy Openfire integration =====
+     * Methods kept for compatibility with Openfire (REST API, prebind, tokens).
+     * Some are reused internally for Prosody (e.g. render_xmpp_client).
+     */
 
     public function get_user_connection_info($user)
     {
@@ -215,6 +403,14 @@ class XMPPLib extends TikiLib
         global $prefs;
         global $tikilib;
 
+        if (! class_exists('XmppPrebind')) {
+            throw new Exception(
+                "class 'XmppPrebind' does not exists."
+                . " Install with `composer require candy-chat/xmpp-prebind-php:dev-master`.",
+                1
+            );
+        }
+
         $session_id = substr($tikilib->sessionId, 0, 5);
         $browser_title = $prefs['browsertitle'];
         $browser_title = $this->sanitize_name($browser_title);
@@ -310,17 +506,52 @@ class XMPPLib extends TikiLib
 
         $xmppclient = new ConverseJS();
         $xmppclient->set_auth($params);
+
+        $nickname = '';
+
+        // Auto-join only if user is logged in
+        if (! empty($user)) {
+            $allowedRooms = $xmpplib->getXmppRoomsForUser($user);
+            $allowedFullJids = array_map(fn($r) => $xmpplib->buildRoomJid($r), $allowedRooms);
+
+            $joinRooms = [];
+
+            if (! empty($params['room'])) {
+                $requestedRoom = $xmpplib->buildRoomJid($params['room']);
+
+                if (in_array($requestedRoom, $allowedFullJids, true)) {
+                    $joinRooms[] = $requestedRoom;
+                } else {
+                    if (! empty($prefs['xmpp_conversejs_debug']) && $prefs['xmpp_conversejs_debug'] === 'y') {
+                        error_log("[XMPP] User {$user} requested {$requestedRoom} but not authorized");
+                    }
+                }
+            }
+
+            if ($joinRooms) {
+                $xmppclient->set_auto_join_rooms(implode(',', $joinRooms));
+            }
+        }
+
         $xmppclient->set_options(
             [
                 'bosh_service_url'           => $xmpp['http_bind'],
-                'jid'                        => $xmpp['jid'],
-                'nickname'                   => $xmpp['nickname'] ?: 'visitor-' . time(),
+                'websocket_url'              => isset($xmpp['websocket_url']) ? $xmpp['websocket_url'] : '',
+                'jid'                        => $xmppclient->get_option('jid') ?: $xmpp['jid'],
+                'nickname'                   => $nickname,
                 'view_mode'                  => $params['view_mode'],
                 'show_controlbox_by_default' => $params['show_controlbox_by_default'] === 'y',
                 'show_occupants_by_default'  => $params['show_occupants_by_default'] === 'y',
+                'dm_target'                  => $params['dm_target'] ?? '',
+                'anonymous'                  => $params['anonymous'] ?? '',
             ]
         );
-        $xmppclient->set_auto_join_rooms($params['room']);
+
+        // Auto-join only if user is logged in
+        if (! empty($user)) {
+            $xmppclient->set_auto_join_rooms($params['room']);
+        }
+
         $xmppclient->render();
     }
 
@@ -362,7 +593,7 @@ class XMPPLib extends TikiLib
             $params = [
                 "scheme" => "tcp",
                 "host" => $this->server_host,
-                "port" => 5222,
+                "port" => (int) ($prefs['xmpp_client_port'] ?? 5222) ?: 5222,
                 "user" => $prefs['xmpp_openfire_rest_api_username'],
                 "pass" => $prefs['xmpp_openfire_rest_api_password'],
             ];
@@ -454,7 +685,7 @@ class XMPPLib extends TikiLib
                 return $item;
             }
 
-            $response = $self->add_group_to_room(item['room'], $item['name'], $item['role']);
+            $response = $self->add_group_to_room($item['room'], $item['name'], $item['role']);
             return array_merge($item, $response);
         }, $params);
     }
@@ -481,6 +712,10 @@ class XMPPLib extends TikiLib
         }, $items);
     }
 
+    /**
+     * Return all known users with their JIDs
+     * Works for both Prosody and Openfire setups.
+     */
     public function getUsers()
     {
         $cachelib = TikiLib::lib('cache');
@@ -509,5 +744,125 @@ class XMPPLib extends TikiLib
 
         $cachelib->cacheItem($cache_key, serialize($items));
         return $items;
+    }
+
+    /** Reusable admin connection */
+    private function getAdminXmppClient(): ?\Fabiang\Xmpp\Client
+    {
+        if ($this->adminClient instanceof \Fabiang\Xmpp\Client) {
+            return $this->adminClient;
+        }
+
+        global $prefs;
+        if (empty($prefs['xmpp_admin_jid']) || empty($prefs['xmpp_admin_password'])) {
+            error_log('[XMPP] Missing xmpp_admin_jid/password in prefs');
+            return null;
+        }
+
+        try {
+            $port = (int) ($prefs['xmpp_client_port'] ?? 5222) ?: 5222;
+            $options = new \Fabiang\Xmpp\Options("tcp://{$this->server_host}:{$port}");
+
+            $admin = $prefs['xmpp_admin_jid'];
+            if (strpos($admin, '@') !== false) {
+                [$node, $domain] = explode('@', $admin, 2);
+            } else {
+                $node = $admin;
+                $domain = $this->server_host; // e.g.: xmpp.local.test
+            }
+            $options->setUsername($node);
+            $options->setPassword($prefs['xmpp_admin_password']);
+
+            // Dev/local setup: allow self-signed SSL certificates for XMPP TCP connection
+            $options->setContextOptions(['ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ]]);
+
+            $this->adminClient = new \Fabiang\Xmpp\Client($options);
+            $this->adminClient->connect();
+
+            register_shutdown_function(function () {
+                if ($this->adminClient) {
+                    try {
+                        $this->adminClient->disconnect();
+                    } catch (\Throwable $e) {
+                        error_log('[XMPP] Admin disconnect error: ' . $e->getMessage());
+                    }
+                }
+            });
+
+            return $this->adminClient;
+        } catch (\Throwable $e) {
+            error_log('[XMPP] Admin connect failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /** Create/configure the room (persistent + logging) if necessary */
+    public function ensureRoomExists(string $roomJid): bool
+    {
+        $client = $this->getAdminXmppClient();
+        if (! $client) {
+            return false;
+        }
+
+        try {
+            require_once __DIR__ . '/MucJoin.php';
+            $client->send(new \Tiki\Xmpp\MucJoin($roomJid, 'admin'));
+
+            if (class_exists('\Tiki\Xmpp\MucConfigure')) {
+                require_once __DIR__ . '/MucConfigure.php';
+                $cfg = new \Tiki\Xmpp\MucConfigure($roomJid);
+                $client->send($cfg);
+                error_log("[XMPP] MUC configured for {$roomJid}");
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            error_log('[XMPP] ensureRoomExists error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /** Set a user's affiliation in the room (member/admin/owner) */
+    public function setUserAffiliation(string $roomJid, string $userJid, string $affiliation = 'member'): bool
+    {
+        $client = $this->getAdminXmppClient();
+        if (! $client) {
+            return false;
+        }
+
+        try {
+            require_once __DIR__ . '/MucAdmin.php';
+            $iq = new \Tiki\Xmpp\MucAdmin($roomJid, $userJid, $affiliation);
+            $client->send($iq);
+
+            error_log("[XMPP] Set affiliation {$affiliation} for {$userJid} in {$roomJid}");
+            return true;
+        } catch (\Throwable $e) {
+            error_log('[XMPP] setUserAffiliation error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getXmppSessionToken(string $username): string
+    {
+        global $prefs;
+
+        $tokenlib = Tokens::build($prefs);
+
+        $token = $tokenlib->createToken(
+            'xmppauthtoken',
+            ['user' => $username],
+            [],
+            [
+                'timeout' => 300,
+                'createUser' => 'n',
+            ]
+        );
+
+        return $token;
     }
 }

@@ -126,10 +126,7 @@ class Comments extends TikiLib
                 || ($forum_info['att'] == 'att_admin' && $perms->admin_forum == 'y')
                 || ($forum_info['att'] == 'att_perm' && $perms->forum_attach == 'y'))
         ) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra('Permission denied'));
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie(tra('Permission denied'), 401);
             die;
         }
         if (! empty($prefs['forum_match_regex']) && ! preg_match($prefs['forum_match_regex'], $name)) {

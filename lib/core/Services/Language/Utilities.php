@@ -212,7 +212,7 @@ class Services_Language_Utilities
         $langDirIsReadable = is_readable($directory);
 
         if (! $langDirIsReadable) {
-            throw new Services_Exception(tra('The language directory is not readable'), 400);
+            throw new Services_Exception(tr('The language directory %0 is missing or not readable. Please ask the administrator to check its existence and permissions.', $directory), 400);
         } else {
             return $langDirIsReadable;
         }
@@ -233,7 +233,7 @@ class Services_Language_Utilities
         $langDirIsWritable = is_writable($directory);
 
         if (! $langDirIsWritable) {
-            throw new Services_Exception(tra('The language directory is not writeable'), 400);
+            throw new Services_Exception(tr('The language directory %0 is missing or not writable. Please ask the administrator to check its existence and permissions.', $directory), 400);
         } else {
             return $langDirIsWritable;
         }
@@ -337,10 +337,10 @@ class Services_Language_Utilities
 
         //write the strings to custom.php file
         if (! ($fp = fopen($custom_file, 'w+'))) {
-            throw new Services_Exception(tra('Can not fopen custom.php'), 400);
+            throw new Services_Exception(tra('Can not read custom.php translation file. Please ask the administrator to check its existence and permissions.'), 400);
         } else {
             if (! fwrite($fp, $custom_code)) {
-                throw new Services_Exception(tra('Can not fwrite custom.php'), 400);
+                throw new Services_Exception(tra('Can not write custom.php translation file. Please ask the administrator to check its existence and permissions.'), 400);
             }
             fclose($fp);
             return true;
@@ -428,10 +428,10 @@ class Services_Language_Utilities
     {
         //validate input
         if (! is_array($sourceStringTranslationSet)) {
-            throw new Services_Exception(tr('Source string translation set is not an array'), 400);
+            throw new Services_Exception(tr('The source translation set is missing or invalid. Please ask the administrator to verify the translation file.'), 400);
         }
         if (! is_array($targetStringTranslationSet)) {
-            throw new Services_Exception(tr('Target string translation set is not an array'), 400);
+            throw new Services_Exception(tr('The target translation set is missing or invalid. Please ask the administrator to verify the translation file.'), 400);
         }
         //merge means that existing translations in the target are replaced and new ones are added to the set
         if ($process_type === 'merge') {

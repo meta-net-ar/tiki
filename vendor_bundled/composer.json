@@ -479,7 +479,8 @@
             "../lib/test/"
         ],
         "psr-4": {
-            "Tiki\\Lib\\Test\\": "../lib/test"
+            "Tiki\\Lib\\Test\\": "../lib/test",
+            "PHP_CodeSniffer\\": "vendor/squizlabs/php_codesniffer/src"
         }
     },
     "include-path": [

@@ -133,8 +133,19 @@ function wikiplugin_autotoc($data, $params)
             $jqueryAutoToc['plugin_autoToc_tabset_names'] = $params['tabset_names'] ?? '';
             $jqueryAutoToc['plugin_autoToc_tabset_panes'] = $params['tabset_panes'] ?? '';
             $jqueryAutoToc['plugin_autoToc_levels'] = $params['levels'] ?? '';
-            $jq_autotoc = json_encode($jqueryAutoToc, JSON_UNESCAPED_SLASHES);
-            $headerlib->add_js('var jqueryAutoToc = ' . $jq_autotoc . '"\n";');
+
+            if (! empty($params['levels'])) {
+                $autoTocLevels = $params['levels'];
+            } else {
+                $autoTocLevels = null;
+            }
+            $jqueryAutoToc['plugin_autoToc_levels'] = $autoTocLevels;
+
+            $js = '
+            var jqueryAutoToc = ' . json_encode($jqueryAutoToc, JSON_UNESCAPED_SLASHES) . "\n";
+
+            $headerlib->add_js($js);
+
             if ($prefs['wiki_auto_toc'] !== 'y' || $prefs['wiki_toc_default'] !== 'on') {
                 $headerlib->add_jsfile('lib/jquery_tiki/autoToc.js');
             }
@@ -157,7 +168,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-width: 1px;
-                        border-left-style: solid; // #0075ff;
+                        border-left-style: solid;
                     }');
 
                 return "<div id='autotoc'></div>";
@@ -180,7 +191,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-style: solid;
-                        bordr-left-width: 1px; // #0075ff;
+                        border-left-width: 1px;
                     }
 
                     #autotoc .nav-link.active,
@@ -190,11 +201,11 @@ function wikiplugin_autotoc($data, $params)
                         font-weight: bold;
                         background-color: transparent;
                         border-left-style: solid;
-                        border-left-width: 2px;// solid #0075ff;
+                        border-left-width: 2px;
+                        border-left-color: var(--bs-primary);
                     }
 
                     #autotoc .nav-link + ul {
-                        display: none;
                         padding-bottom: 10px;
                     }
 

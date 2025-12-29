@@ -30,6 +30,8 @@ class ObjectLib extends TikiLib
     'comments_locked'//?
     ];
 
+    public static $titleCache = [];
+
     /**
      *  Create an object record for the given Tiki object if one doesn't already exist.
      * Returns the object record OID. If the designated object does not exist, may return NULL.
@@ -947,6 +949,26 @@ class ObjectLib extends TikiLib
         if (empty($objects)) {
             return [];
         }
+        $itemsValues = [];
+        if (ObjectLib::$titleCache) {
+            foreach ($objects as $key => $object) {
+                $cacheKey = $object['type'] . ':' . $object['id'] . ':' . $format;
+                if (isset(ObjectLib::$titleCache[$cacheKey])) {
+                    $itemsValues[] = [
+                        'object_type' => $object['type'],
+                        'object_id' => $object['id'],
+                        'title' => ObjectLib::$titleCache[$cacheKey],
+                    ];
+                    unset($objects[$key]);
+                }
+            }
+        }
+        if (empty($objects)) {
+            return $itemsValues;
+        }
+        if (TikiLib::lib('tiki')->isMemoryLow()) {
+            ObjectLib::$titleCache = [];
+        }
         $lib = TikiLib::lib('unifiedsearch');
         $metaItemIds = [];
         $query = $lib->buildQuery([]);
@@ -975,7 +997,6 @@ class ObjectLib extends TikiLib
                 }
             }
         }
-        $itemsValues = [];
         foreach ($result as $item) {
             $values = [
                 'object_type' => $item['object_type'],
@@ -997,6 +1018,8 @@ class ObjectLib extends TikiLib
                     return '';
                 }
             }, $format);
+            $cacheKey = $item['object_type'] . ':' . $item['object_id'] . ':' . $format;
+            ObjectLib::$titleCache[$cacheKey] = $values['title'];
             $itemsValues[] = $values;
         }
         return $itemsValues;
@@ -1032,6 +1055,13 @@ class ObjectLib extends TikiLib
     public function getFormattedTitle(string $type, string $id, ?string $defaultTitle, ?string $format = '', ?string $extra = '', ?string $metaItemId = null): string
     {
         if ($format) {
+            $cacheKey = $type . ':' . $id . ':' . $format;
+            if (isset(ObjectLib::$titleCache[$cacheKey])) {
+                return ObjectLib::$titleCache[$cacheKey];
+            }
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                ObjectLib::$titleCache = [];
+            }
             $lib = TikiLib::lib('unifiedsearch');
             if ($metaItemId) {
                 $query = $lib->buildQuery([
@@ -1068,6 +1098,7 @@ class ObjectLib extends TikiLib
             });
             $titles = $result->getArrayCopy();
             $title = array_shift($titles);
+            ObjectLib::$titleCache[$cacheKey] = $title;
         } else {
             $title = $defaultTitle;
         }

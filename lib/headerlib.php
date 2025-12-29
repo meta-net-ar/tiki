@@ -685,20 +685,20 @@ class HeaderLib
 
             $ranks = ['30dependency', '40external', '50standard'];
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
-            $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+            $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
 
             $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y';
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
                     if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
-                        $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
                 }
                 // handling of user defined cdn servers is done inside minifyJSFiles()
                 $entry = $this->minifyJSFiles($jsfiles, [$rank]);
-                $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
             } else {
                 foreach ($jsfiles[$rank] as $entry) {
                     $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';

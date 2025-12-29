@@ -507,7 +507,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                                 &nbsp;|&nbsp;
                             {/if}
                             <li class="pass{if $mode eq 'popup'} dropdown-item{/if} list-item">
-                                <a href="tiki-login_scr.php?twoFactorForm" title="{if $prefs.twoFactorAuthType eq 'email2FA'}{tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}">
+                                <a href="tiki-login_scr.php?showTwoFactorForm" title="{if $prefs.twoFactorAuthType eq 'email2FA'}{tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}">
                                     {if $mode eq 'popup'}
                                         {if $prefs.twoFactorAuthType eq 'email2FA'}{tr}Login with 2FA{/tr}{elseif $prefs.twoFactorAuthType eq 'google2FA'}{tr}Login with two-factor authenticator{/tr}{/if}
                                     {/if}

@@ -174,7 +174,21 @@ if (! isset($_GET['thumbnail']) && ! isset($_GET['icon'])) {
 
     if ($prefs['feature_actionlog'] == 'y') {
         $logslib = TikiLib::lib('logs');
-        $logslib->add_action('Downloaded', $info['galleryId'], 'file gallery', 'fileId=' . $info['fileId']);
+        if (! empty($info['galleryId']) && ! empty($info['fileId'])) {
+            $logslib->add_action(
+                'Downloaded',
+                $info['galleryId'],
+                'file gallery',
+                'fileId=' . $info['fileId']
+            );
+        } else {
+            $logslib->add_action(
+                'Downloaded',
+                'external',
+                'file gallery',
+                'source_url=' . $src
+            );
+        }
     }
 
     if (! empty($_REQUEST['lock']) && $access->checkCsrf(true)) {

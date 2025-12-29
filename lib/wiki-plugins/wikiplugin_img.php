@@ -817,6 +817,7 @@ function wikiplugin_img($data, $params)
     }
 
     $browse_full_image = $src;
+    $browse_full_image_for_popup = $src;
     $srcIsEditable = false;
     ///////////////////////////Get DB info for image size and metadata/////////////////////////////
     if (
@@ -1380,21 +1381,21 @@ function wikiplugin_img($data, $params)
             }
         } elseif ($javaset == 'true') {
             $link = 'javascript:void(0)';
-            $fwidth = empty($fwidth) ? '' : $fwidth;
-            $fheight = empty($fheight) ? '' : $fheight;
-            $popup_params = [ 'text' => $data, 'width' => $fwidth, 'height' => $fheight, 'background' => $browse_full_image];
+            // Convert SEF URL and add &display parameter for file gallery images
+            $popup_image_url = filter_out_sefurl($browse_full_image_for_popup);
+            if (! empty($imgdata['fileId']) && ! str_contains($popup_image_url, 'display')) {
+                $popup_image_url .= (str_contains($popup_image_url, '?') ? '&' : '?') . 'display';
+            }
+
+            // Use <img> tag instead of background-image for better responsive behavior
+            $popup_image_html = '<img src="' . htmlspecialchars($popup_image_url, ENT_QUOTES) . '" alt="' . htmlspecialchars($altText, ENT_QUOTES) . '" class="img-popover-image">';
+            $popup_params = ['text' => $popup_image_html, 'fullhtml' => true];
+
             if ($imgdata['thumb'] == 'mousesticky') {
                 $popup_params['sticky'] = true;
             }
 
-            if ($imgdata['thumb'] == 'mouseover') {
-                $popup_params['trigger'] = 'hover';
-            }
-            // avoid big images will not be closeable on hover if repsonsive is not set. Fallback to require a click to open and a second click somewhere to close.
-            if ((isset($imgdata['responsive']) && $imgdata['responsive'] != 'y') && ($fwidth > 400 || $fheight > 400)) {
-                $popup_params['trigger'] = 'focus';
-            }
-
+            // Let tiki_popover() and $.tikiPopoverWhereToPlace() handle placement and initialization
             $mouseover = ' ' . smarty_function_popup($popup_params, $smarty->getEmptyInternalTemplate());
         } else {
             if (! empty($imgdata['fileId']) && $imgdata['thumb'] != 'download' && empty($urldisp)) {
@@ -1451,24 +1452,9 @@ function wikiplugin_img($data, $params)
             $style = 'style="float: right;"';
         }
 
-        //Final link string
+        //Final link string - let tiki_popover() handle popover initialization
         $replimg = "\r\t" . '<a href="' . $link . '"' . $style . ' class="internal" ' . $linkrel . $imgtarget . $linktitle
                     . $mouseover . '>' . "\r\t\t" . $replimg . "\r\t" . '</a>';
-        if ($imgdata['thumb'] == 'mouseover') {
-            $mouseevent = "$('.internal').popover({
-                          html : true,
-                          placement :wheretoplace
-                          });
-                            function wheretoplace(pop, dom_el) {
-                              var width = window.innerWidth;
-                              if (width<500) return 'bottom';
-                              var left_pos = $(dom_el).offset().left;
-                              if (width - left_pos > 400) return 'right';
-                              return 'left';
-                            }
-                            ";
-            TikiLib::lib('header')->add_jq_onready($mouseevent);
-        }
     }
 
     //Add link string to rest of string

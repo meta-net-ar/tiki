@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "svgedit": "^7.3.3"
+    "svgedit": "~7.3.3"
+  },
+  "dependenciesComment": {
+    "svgedit": "version 7.4.0 switched to pnpm and causes build failures if used"
   },
   "devDependenciesComment": {
     "@svgedit/svgcanvas": "https://github.com/SVG-Edit/svgedit/blob/master/packages/svgcanvas/CHANGES.md"

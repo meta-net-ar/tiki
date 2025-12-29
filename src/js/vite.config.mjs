@@ -269,7 +269,8 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/boomerangjs/boomerang.js",
                         dest: "vendor_dist/boomerangjs/",
-                    },{
+                    },
+                    {
                         src: "node_modules/boomerangjs/plugins/rt.js",
                         dest: "vendor_dist/boomerangjs/plugins",
                     },
@@ -627,9 +628,11 @@ export default defineConfig(({ command, mode }) => {
                 ],
             }),
             AutoImport({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             Components({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */

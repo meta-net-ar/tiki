@@ -581,9 +581,8 @@ class AdminLib extends TikiLib
         global $system_configuration_file;
         $show_warning = false;
 
-        $db_file = TIKI_CONFIG_FILE_PATH;
-        if (file_exists($db_file)) {
-            include($db_file);
+        if (file_exists(TIKI_CONFIG_FILE_PATH)) {
+            include(TIKI_CONFIG_FILE_PATH);
 
             if (isset($system_configuration_file) && file_exists($system_configuration_file)) {
                 $tikiPath = realpath(TIKI_PATH);

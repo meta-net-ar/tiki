@@ -1273,22 +1273,19 @@ class NlLib extends TikiLib
         $articles = [];
         $articleClip = '';
         # Order array by publishDate
-        if (! function_exists('cmp')) {
-            function cmp($a, $b)
-            {
-                if ($a['publishDate'] == $b['publishDate']) {
-                    return 0;
-                }
-                return ($a['publishDate'] > $b['publishDate']) ? -1 : 1;
+        $cmpFunc = function ($a, $b) {
+            if ($a['publishDate'] == $b['publishDate']) {
+                return 0;
             }
-        }
+            return ($a['publishDate'] > $b['publishDate']) ? -1 : 1;
+        };
         foreach ($articleClipTypes as $articleType) {
             $t_articles = $artlib->list_articles(0, -1, 'publishDate_desc', '', $date_min, $date_max, false, $articleType);
             foreach ($t_articles["data"] as $t) {
                 $articles[$t["articleId"]] = $t;
             }
         }
-        usort($articles, 'cmp');
+        usort($articles, $cmpFunc);
         foreach ($articles as $art) {
             $smarty->assign("nlArticleClipId", $art["articleId"]);
             $smarty->assign("nlArticleClipTitle", $art["title"]);

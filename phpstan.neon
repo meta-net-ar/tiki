@@ -1,60 +1,26 @@
 # Tiki Help: 
 # The config in this file is meant mostly for manual usage:
 #
-# php vendor_bundled/vendor/phpstan/phpstan/phpstan
+# php bib/phpstan
 #
 # But as of 2023-11-20, this still returns over 600 errors
 #
 # When reviewing an entire file, you'll usually want a higher level of check (probably 3), which is:
-# php vendor_bundled/vendor/phpstan/phpstan/phpstan analyse --level=3  ./lib/tikilib.php
+# php bib/phpstan analyse --level=3  ./lib/tikilib.php
 # You can also do this for directories: 
-# php vendor_bundled/vendor/phpstan/phpstan/phpstan analyse --level=3  ./lib/core/Tracker/
+# php bib/phpstan analyse --level=3  ./lib/core/Tracker/
 #
 # The ultimate goal is to define our own custom rules for the worst problems and integrate this to the CI process
 
 includes:
-    - vendor_bundled/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - phpstan-tikiPaths.neon
+    #- vendor_bundled/vendor/phpstan/phpstan-deprecation-rules/rules.neon
 
 parameters:
   level: 0
-  paths:
-    - .
-  scanDirectories:
-    #- vendor
-    #- vendor_custom
-  scanFiles:
-    # The following allows analysing our custom phpcs sniffs properly.  
-    - vendor_bundled/vendor/squizlabs/php_codesniffer/src/Files/File.php
-    - vendor_bundled/vendor/squizlabs/php_codesniffer/src/Sniffs/Sniff.php
 
-  excludePaths:
-    - vendor_bundled
-    - vendor
-    - vendor_custom
-    - */vendor/*
-    - temp
-    # TODO, but too complicated for now
-    #  Cypth-related
-    - lib/cypht
-    - lib/wiki-plugins/wikiplugin_cypht.php 
-    - lib/core/Tiki/Command/SieveFiltersCommand.php
-    - lib/test
-
-    # DEPRECATED code
-    - lib/Sheet
-    - lib/wiki-plugins/wikiplugin_sheet.php
-    - lib/core/Tiki/Profile/InstallHandler/Sheet.php 
-    - tiki-export_sheet.php
-    - lib/accounting
-    # DEPRECATED tests
-    - tiki_tests
-    - lib/test/AcceptanceTests
-    # lang/ takes too long to process
-    - lang
-
-
-  # This must be fixed, but we can't do it all at once.
-  #There tikiroot, tikipath, tikilib, prefs, user
+  # Globals.  This must be fixed, but we can't do it all at once.
+  # They are tikiroot, tikipath, tikilib, prefs, user
   ignoreErrors:
     # From lib/setup/prefs.pĥp, but written to several other places
     - '#Variable \$prefs might not be defined.#'
@@ -88,5 +54,3 @@ parameters:
       - '#unknown class TikiManager#'
       - '#Method .* should return .*but return statement is missing.#'
       #Known missing libraries
-  
-  tmpDir: temp/dev/phpstan_cache

@@ -79,6 +79,20 @@ class Feedback
 
     public static function errorAndDie(string $message, int $httpCode, ?string $errorPage = null): never
     {
+        global $access, $user, $prefs;
+        if (($httpCode == 401 || $httpCode == 403) && ! $user && $prefs['permission_denied_login_box'] == 'y') {
+            if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
+                $url = $prefs['login_autologin_redirectlogin_url'];
+            } else {
+                $url = $prefs['permission_denied_url'] ?: 'tiki-login.php';
+            }
+
+            $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
+
+            $access->redirect($url, $message, msgtype: 'error');
+            die;
+        }
+
         $errorPage = $errorPage ?? "error.tpl";
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('errortype', $httpCode);

@@ -266,6 +266,19 @@ translation-standards:
   script:
     - php doc/devtools/check_template_translation_standards.php --all
 
+phpstan:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php bin/phpstan --configuration=phpstan-tikiCi.neon
+  cache:
+    key: "phpstan"
+    paths:
+      - temp/dev/phpstan_cache
+    policy: pull-push
+
 rector:
   stage: code-quality
   needs:
@@ -313,6 +326,13 @@ schema-naming-convention:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
+
+check-external-links:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php -d display_errors=On doc/devtools/check_external_links.php
 
 translation:
   stage: tiki-check

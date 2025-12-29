@@ -52,8 +52,12 @@ function tiki_setup_events()
         }
 
         if ($prefs['xmpp_feature'] === 'y') {
-// not working due to removal of montefuscolo/xmpp following php8.1 upgrade
-// FIXME            $events->bind('tiki.wiki.save', $defer('xmpp', 'create_room_from_wikipage'));
+            // Bridge Tiki event -> OO subscriber
+            $subscriber = new \Tiki\Event\Subscriber\XmppRegistrationSubscriber();
+            $events->bind('tiki.user.register.local', [$subscriber, 'onUserRegistered']);
+
+            // Optional: auto-create XMPP room on wiki save (requires montefuscolo/xmpp >= 0.8, PHP 8.1+)
+            // $events->bind('tiki.wiki.save', $defer('xmpp', 'create_room_from_wikipage'));
         }
     }
 

@@ -1,0 +1,62 @@
+# Tiki Help: 
+# The config in this file is for tiki CI to run.  Most instructions and comments are in the main phpstan.neon file:
+#
+# bin/phpstan --configuration=phpstan-tikiCi.neon
+
+includes:
+  - phpstan-tikiPaths.neon
+
+parameters:
+  #customRulesetUsed: true
+  level: 0
+  ignoreErrors:
+  # This is what I want to fix right now, but let's get the CI plumbing in place first.
+    -
+      identifier: function.notFound
+    -
+      identifier: constant.notFound
+    -
+      identifier: class.notFound
+    -
+      identifier: new.noConstructor
+    -
+      identifier: new.interface
+    -
+      identifier: method.notFound   
+    -
+      identifier: staticMethod.notFound   
+    -
+      identifier: staticProperty.notFound 
+    -
+      identifier: property.notFound
+    -
+      identifier: classConstant.notFound
+  # Real bugs or phpstan misconfiguration for sure, but we have to start somewhere
+    -
+      identifier: requireOnce.fileNotFound
+    -
+      identifier: require.fileNotFound
+    -
+      identifier: regexp.pattern
+    -
+      identifier: arguments.count
+    -
+      identifier: unset.offset 
+  # Likely bugs...
+    -
+      identifier: unset.variable
+    -
+      identifier: array.duplicateKey
+    -
+      identifier: function.void
+    -
+      identifier: return.missing
+    -
+      identifier: method.void
+    -
+      identifier: variable.undefined
+    -
+      identifier: class.nameCase
+  # Maybe that still works, but in this day and age...
+    -
+      identifier: method.staticCall                                 

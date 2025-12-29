@@ -7,6 +7,8 @@
 class Search_Action_UnknownStep implements Search_Action_Step
 {
     private $actionName;
+    private $action;
+    private $definition;
 
     public function __construct($action = null)
     {
@@ -45,5 +47,14 @@ class Search_Action_UnknownStep implements Search_Action_Step
     public function getName()
     {
         return $this->actionName;
+    }
+    public function getAction(): Search_Action_Action
+    {
+        return $this->action;
+    }
+
+    public function getDefinition(): array
+    {
+        return $this->definition;
     }
 }

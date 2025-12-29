@@ -1403,3 +1403,27 @@ p + ul, p + ol {
     margin-top: var(--tiki-list-top-margin);  
     margin-bottom: var(--tiki-list-bottom-margin);
 }
+
+li.highlight {
+    background-color: var(--bs-secondary-bg-subtle);
+    transition: all 0.3s ease;
+}
+
+.password-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    input {
+        padding-right: 30px;
+    }
+
+    i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        visibility: hidden; /* Hidden by default */
+    }
+}
