@@ -49,7 +49,7 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH'])) {
 
                         if ($filename) {
                             $_POST[$name] = base64_encode($value);
-                            $_POST['name'] = $filename;
+                            $_POST['name'] = $_POST['filename'] = $filename;
                             $_POST['size'] = strlen($value);
                             $_POST['type'] = 'application/octet-stream';
                         } else {
