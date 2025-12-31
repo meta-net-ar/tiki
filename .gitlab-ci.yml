@@ -338,6 +338,22 @@ schema-naming-convention:
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
 
+# Warn if schema patches with structural changes (CREATE/ALTER/DROP TABLE) lack tiki.sql update
+check-tiki-sql-sync:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - |
+      CHANGED_FILES=$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD 2>/dev/null || echo "")
+      php -d display_errors=On doc/devtools/check_tiki_sql_sync.php --changed-files="$CHANGED_FILES"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - "installer/schema/*_tiki.sql"
+        - "installer/schema/*_tiki.php"
+      when: always
+
 check-external-links:
   stage: tiki-check
   needs: []
