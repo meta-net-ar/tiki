@@ -99,6 +99,11 @@ class ImportRegistry
         }
     }
 
+    /**
+     * Mark a registry entry as orphaned.
+     * Called by garbage collector (TikiMarkdownImporter::runGarbageCollect)
+     * when a file is missing from the current import.
+     */
     public function markOrphan(string $sourceKey, string $relpath, int $timestamp): void
     {
         $q = "UPDATE " . self::TABLE . "
@@ -116,6 +121,12 @@ class ImportRegistry
         $this->tikilib->query($q, [$status, $note, $sourceKey, $relpath]);
     }
 
+    /**
+     * Delete a registry entry.
+     * Called by garbage collector (TikiMarkdownImporter::runGarbageCollect)
+     * in 'delete' mode after the corresponding Tiki page has been deleted.
+     * This removes the orphaned entry from tracking.
+     */
     public function deleteEntry(string $sourceKey, string $relpath): void
     {
         $this->tikilib->query(

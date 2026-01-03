@@ -51,7 +51,7 @@ class SourceManager
      * @param ?string $uploadTmp
      * @param ?string $uploadName
      */
-    public function fetchToTempZip(array $cfg, ?string $uploadTmp = null, ?string $uploadName = null): ?string
+    public function fetchToTempDir(array $cfg, ?string $uploadTmp = null, ?string $uploadName = null): ?string
     {
         $this->error = '';
         try {
@@ -64,10 +64,10 @@ class SourceManager
                         'uploadedPath' => $uploadTmp,
                         'uploadedName' => $uploadName,
                     ]);
-                    return $prov->fetchToTempZip();
+                    return $prov->fetchToTempDir();
                 }
                 $prov = new FilesystemProvider('path', $cfg, []);
-                return $prov->fetchToTempZip();
+                return $prov->fetchToTempDir();
             }
 
             if ($type === 'git') {
@@ -79,7 +79,7 @@ class SourceManager
                 ], [
                     'timeout'       => (int)($cfg['git_timeout'] ?? 45),
                 ]);
-                return $prov->fetchToTempZip();
+                return $prov->fetchToTempDir();
             }
 
             throw new \RuntimeException(tra('Unsupported source type:') . ' ' . $type);

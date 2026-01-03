@@ -8,13 +8,13 @@ use Tiki\Lib\Importer\Markdown\Parser\GfmPurifier;
 use Tiki\Lib\Importer\Markdown\Parser\LogseqPurifier;
 use Tiki\Lib\Importer\Markdown\Parser\MarkdownPipeline;
 use Tiki\Lib\Importer\Markdown\Registry\ImportRegistry;
-use Tiki\Lib\Importer\Markdown\Scanner\ZipScanner;
+use Tiki\Lib\Importer\Markdown\Scanner\DirectoryScanner;
 use Tiki\Lib\Importer\Markdown\Source\SourceManager;
 use TikiLib;
 
 /**
  * End-to-end orchestrator:
- * SourceManager (-> temp zip) -> ZipScanner (-> files) -> MarkdownPipeline (purify) -> write pages (with history if enabled) -> Garbage Collect delete/mark
+ * SourceManager (-> temp dir) -> DirectoryScanner (-> files) -> MarkdownPipeline (purify) -> write pages (with history if enabled) -> Garbage Collect delete/mark
  */
 class TikiMarkdownImporter
 {
@@ -53,18 +53,27 @@ class TikiMarkdownImporter
         ?string $uploadName = null
     ): array {
         $mgr = new SourceManager();
-        $zip = $mgr->fetchToTempZip($sourceCfg, $uploadTmp, $uploadName);
+        $dirPath = $mgr->fetchToTempDir($sourceCfg, $uploadTmp, $uploadName);
         $seenRelpaths = [];
+        $isUploadedTemp = false;
 
-        if (! $zip) {
+        if (! $dirPath) {
             $this->errors[] = $mgr->getError();
             return ['written' => 0, 'skipped' => 0, 'counts' => ['total' => 0], 'errors' => $this->errors, 'notes' => []];
         }
 
+        // Detect if temp directory should be cleaned up
+        if ($uploadTmp || (isset($sourceCfg['type']) && $sourceCfg['type'] === 'local' && isset($sourceCfg['local_path']))) {
+            $localPath = $sourceCfg['local_path'] ?? null;
+            if ($uploadTmp || ($localPath && ! is_dir($localPath))) {
+                $isUploadedTemp = true; // Extracted ZIP or copied single file
+            }
+        }
+
         try {
             // 1) Scan
-            $scanner = new ZipScanner();
-            $preview = $scanner->scan($zip, $wikiOpts); // ['files'=>[], 'counts'=>...]
+            $scanner = new DirectoryScanner();
+            $preview = $scanner->scan($dirPath, $wikiOpts); // ['files'=>[], 'counts'=>...]
 
             // 2) Load registry
             $registry  = new ImportRegistry();
@@ -72,8 +81,9 @@ class TikiMarkdownImporter
             $existingMap = $registry->getAllBySourceKey($sourceKey); // relpath => row
             $isFirstRun  = empty($existingMap);
         } finally {
-            if (file_exists($zip)) {
-                unlink($zip);
+            // Cleanup temp directory if it was created for uploads/extracted ZIPs
+            if ($isUploadedTemp && is_dir($dirPath)) {
+                $this->rrmdir($dirPath);
             }
         }
 
@@ -81,6 +91,7 @@ class TikiMarkdownImporter
         $counts  = $preview['counts'] ?? ['total' => count($files)];
         $written = 0;
         $skipped = 0;
+        $errors  = 0;
 
         // 3) Pipeline
         $flavor = strtolower($pipelineCfg['flavor'] ?? 'gfm');
@@ -124,17 +135,23 @@ class TikiMarkdownImporter
                 continue;
             }
 
-            // Write / Update page
-            $ok = $this->writeMarkdownPage($page, $md, tra('Imported from Markdown source'));
-            if ($ok) {
-                $written++;
-            } else {
-                $skipped++;
-                $this->notesByPage[$page][] = tra('Skipped (no content changes).');
-            }
+            // Write / Update page (with error handling)
+            try {
+                $ok = $this->writeMarkdownPage($page, $md, tra('Imported from Markdown source'));
+                if ($ok) {
+                    $written++;
+                } else {
+                    $skipped++;
+                    $this->notesByPage[$page][] = tra('Skipped (no content changes).');
+                }
 
-            // Upsert registry (clear orphan status)
-            $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, $ok ? 'ok' : 'skipped');
+                // Upsert registry (clear orphan status)
+                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, $ok ? 'ok' : 'skipped');
+            } catch (\Exception $e) {
+                $errors++;
+                $this->notesByPage[$page][] = tra('Error: %0', $e->getMessage());
+                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'error');
+            }
         }
 
         // 4) Garbage collect
@@ -164,12 +181,13 @@ class TikiMarkdownImporter
         }
 
         return [
-            'written'   => $written,
-            'skipped'   => $skipped,
-            'counts'    => $counts,
-            'errors'    => $this->errors,
-            'notes'     => $this->notesByPage,
-            'gc_report' => $gcReport,
+            'written'      => $written,
+            'skipped'      => $skipped,
+            'failed'       => $errors,
+            'counts'       => $counts,
+            'errors'       => $this->errors,
+            'notes'        => $this->notesByPage,
+            'gc_report'    => $gcReport,
         ];
     }
 
@@ -184,15 +202,23 @@ class TikiMarkdownImporter
         array $pipelineCtx = []
     ): array {
         $mgr = new SourceManager();
-        $zip = $mgr->fetchToTempZip($sourceCfg, $uploadTmp, $uploadName);
-        if (! $zip) {
+        $dirPath = $mgr->fetchToTempDir($sourceCfg, $uploadTmp, $uploadName);
+        if (! $dirPath) {
             $this->lastError = $mgr->getError() ?: tra('Unknown error fetching source.');
             return ['ok' => false, 'error' => $this->lastError];
         }
 
+        $isUploadedTemp = false;
+        if ($uploadTmp || (isset($sourceCfg['type']) && $sourceCfg['type'] === 'local' && isset($sourceCfg['local_path']))) {
+            $localPath = $sourceCfg['local_path'] ?? null;
+            if ($uploadTmp || ($localPath && ! is_dir($localPath))) {
+                $isUploadedTemp = true;
+            }
+        }
+
         try {
-            $scanner = new ZipScanner();
-            $scan = $scanner->scan($zip, [
+            $scanner = new DirectoryScanner();
+            $scan = $scanner->scan($dirPath, [
                 'roots'          => $wikiOpts['roots'] ?? '.',
                 'recursive'      => $wikiOpts['recursive'] ?? true,
                 'max_depth'      => (int)($wikiOpts['max_depth'] ?? 0),
@@ -207,8 +233,8 @@ class TikiMarkdownImporter
                 'journal_ns'     => $wikiOpts['journal_ns'] ?? 'Journal',
             ]);
         } finally {
-            if (file_exists($zip)) {
-                unlink($zip);
+            if ($isUploadedTemp && is_dir($dirPath)) {
+                $this->rrmdir($dirPath);
             }
         }
 
@@ -272,6 +298,11 @@ class TikiMarkdownImporter
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         $wikilib = TikiLib::lib('wiki');
+
+        // Validate UTF-8 encoding before writing to database
+        if (! mb_check_encoding($markdown, 'UTF-8') || str_contains($markdown, "\0")) {
+            throw new \RuntimeException(tra('Invalid content encoding for page: %0', $name));
+        }
 
         $user = $GLOBALS['user'] ?? 'import';
         $ip   = method_exists($tikilib, 'get_ip_address') ? $tikilib->get_ip_address() : ($_SERVER['REMOTE_ADDR'] ?? '');
@@ -380,11 +411,38 @@ class TikiMarkdownImporter
     }
 
     /**
-     * Garbage collect orphaned pages per registry (minimal options).
+     * Garbage collect orphaned pages from registry.
+     *
+     * GARBAGE COLLECTION WORKFLOW:
+     * Runs automatically after each import to detect and handle files that were
+     * present in previous imports but are missing from the current import.
+     *
+     * Detection:
+     * - Compares files seen in current import ($seenRelpaths) against all registry
+     *   entries for this source ($registry->getAllBySourceKey($sourceKey))
+     * - Files in registry but not in current import = orphans
+     *
+     * Handling Modes:
+     * - 'mark' (default): Sets last_status='orphan' and records orphaned_at timestamp
+     *   via markOrphan(). Pages remain in Tiki, registry entry preserved for audit.
+     * - 'delete': Deletes the actual Tiki page AND removes registry entry via deleteEntry().
+     *   This is the only place deleteEntry() is called - it's part of GC cleanup.
+     * - 'off': No garbage collection performed.
+     *
+     * Safety Mechanisms:
+     * - First run protection: Always uses 'mark' mode on first import (even if 'delete'
+     *   is configured) to prevent accidental deletion of existing pages.
+     * - safe_namespace: Restricts deletion to specific page namespace prefix (e.g., 'Journal-').
+     *   Pages outside this namespace are marked as orphans but never deleted, even in 'delete' mode.
+     *
+     * Registry Cleanup:
+     * - When page is deleted (delete mode), registry entry is removed via deleteEntry().
+     * - Marked entries (mark mode) remain in registry for audit/recovery purposes.
+     *
      * @param ImportRegistry $registry
      * @param string         $sourceKey
-     * @param array          $seenRelpaths
-     * @param array          $opts ['mode'=>'off|mark|delete', 'safe_namespace'=>'Journal']
+     * @param array          $seenRelpaths  Relpaths of files found in current import
+     * @param array          $opts          ['mode'=>'off|mark|delete', 'safe_namespace'=>'Journal']
      * @return array ['orphans'=>int, 'deleted'=>int, 'marked'=>int, 'errors'=>[]]
      */
     private function runGarbageCollect(ImportRegistry $registry, string $sourceKey, array $seenRelpaths, array $opts): array
@@ -460,5 +518,23 @@ class TikiMarkdownImporter
             'marked'  => $marked,
             'errors'  => $errors,
         ];
+    }
+
+    /**
+     * Recursively remove directory.
+     */
+    private function rrmdir(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $file) {
+            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
+        }
+        @rmdir($dir);
     }
 }

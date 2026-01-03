@@ -104,7 +104,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
         $count = 0;
         $journalLinks = 0;
 
-        return preg_replace_callback('~\[\[([^\]]+)\]\]~u', function ($m) use ($journalNs, &$count, &$journalLinks) {
+        $result = preg_replace_callback('~\[\[([^\]]+)\]\]~u', function ($m) use ($journalNs, &$count, &$journalLinks) {
             $count++;
             $label = trim($m[1]);
 
@@ -118,6 +118,8 @@ class LogseqPurifier implements MarkdownPurifierInterface
             // Fallback: keep as text link with no explicit URL
             return '[' . $label . ']';
         }, $md);
+
+        return $result ?? $md;
     }
 
     /**
