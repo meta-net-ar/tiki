@@ -22,7 +22,7 @@ class FilesystemProvider implements SourceProviderInterface
     ) {
     }
 
-    public function fetchToTempZip(): string
+    public function fetchToTempDir(): string
     {
         return $this->mode === 'upload' ? $this->fromUpload() : $this->fromPath();
     }
@@ -38,117 +38,127 @@ class FilesystemProvider implements SourceProviderInterface
 
         $ext = strtolower(pathinfo($uploadedName ?: $uploadedPath, PATHINFO_EXTENSION));
 
+        // If ZIP, extract to temp directory
         if ($ext === 'zip') {
-            $dst = $this->tmpZip();
-            if (! copy($uploadedPath, $dst)) {
-                throw new \RuntimeException(tra('Cannot copy uploaded ZIP to temp.'));
+            if (! class_exists(ZipArchive::class)) {
+                throw new \RuntimeException(tra('ZipArchive extension required to extract ZIP files.'));
             }
-            return $dst;
+
+            $tempDir = sys_get_temp_dir() . '/mdimp_upload_' . uniqid();
+            @mkdir($tempDir, 0755, true);
+
+            $zip = new ZipArchive();
+            if ($zip->open($uploadedPath) !== true) {
+                throw new \RuntimeException(tra('Failed to open uploaded ZIP file.'));
+            }
+
+            if (! $zip->extractTo($tempDir)) {
+                $zip->close();
+                throw new \RuntimeException(tra('Failed to extract ZIP file.'));
+            }
+            $zip->close();
+
+            // Auto-detect and unwrap single top-level folder
+            return $this->detectAndUnwrapTopFolder($tempDir);
         }
 
-        if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException(tra('ZipArchive extension is required.'));
+        // Single .md file: create temp dir with single file
+        if (! preg_match('~\.(md|markdown)$~i', $uploadedName ?: $uploadedPath)) {
+            throw new \RuntimeException(tra('Uploaded file must be .md, .markdown, or .zip'));
         }
-        $zipPath = $this->tmpZip();
-        $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
+
+        $tempDir = sys_get_temp_dir() . '/mdimp_upload_' . uniqid();
+        @mkdir($tempDir, 0755, true);
+
+        $targetFile = $tempDir . '/' . ($uploadedName ?: 'note.md');
+        if (! copy($uploadedPath, $targetFile)) {
+            throw new \RuntimeException(tra('Failed to copy uploaded file.'));
         }
-        $name = $uploadedName ?: 'note.md';
-        if (! preg_match('~\.(md|markdown)$~i', $name)) {
-            $name .= '.md';
-        }
-        $data = file_get_contents($uploadedPath);
-        if ($data === false) {
-            $zip->close();
-            if (file_exists($zipPath)) {
-                @unlink($zipPath);
-            }
-            throw new \RuntimeException(tra('Cannot read uploaded file.'));
-        }
-        $zip->addFromString($name, $data);
-        $zip->close();
-        return $zipPath;
+
+        return $tempDir;
     }
 
     private function fromPath(): string
     {
         $path = (string)($this->cfg['local_path'] ?? '');
         if ($path === '') {
-            throw new \RuntimeException(tra('Missing local_path.'));
+            throw new \RuntimeException(tra('Local path is not specified.'));
         }
         if (! file_exists($path)) {
-            throw new \RuntimeException(tra('Path does not exist:') . ' ' . $path);
+            throw new \RuntimeException(tra('Local path does not exist:') . ' ' . $path);
         }
 
-        // If it's already a ZIP file, just copy it to temp
+        // If it's a directory, return it directly
+        if (is_dir($path)) {
+            return realpath($path);
+        }
+
+        // If it's a ZIP file, extract to temp directory
         if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
-            $dst = $this->tmpZip();
-            if (! copy($path, $dst)) {
-                throw new \RuntimeException(tra('Cannot copy ZIP to temp.'));
+            if (! class_exists(ZipArchive::class)) {
+                throw new \RuntimeException(tra('ZipArchive extension required to extract ZIP files.'));
             }
-            return $dst;
+
+            $tempDir = sys_get_temp_dir() . '/mdimp_local_' . uniqid();
+            @mkdir($tempDir, 0755, true);
+
+            $zip = new ZipArchive();
+            if ($zip->open($path) !== true) {
+                throw new \RuntimeException(tra('Failed to open ZIP file.'));
+            }
+
+            if (! $zip->extractTo($tempDir)) {
+                $zip->close();
+                throw new \RuntimeException(tra('Failed to extract ZIP file.'));
+            }
+            $zip->close();
+
+            // Auto-detect and unwrap single top-level folder
+            return $this->detectAndUnwrapTopFolder($tempDir);
         }
 
-        if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException(tra('ZipArchive extension is required.'));
-        }
-
-        $zipPath = $this->tmpZip();
-        $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
-        }
-
-        if (is_file($path)) {
-            $this->addOneFile($zip, $path, basename($path));
-        } else {
-            $this->addDir($zip, rtrim($path, '/'));
-        }
-
-        $zip->close();
-        return $zipPath;
-    }
-
-    private function addOneFile(ZipArchive $zip, string $full, string $rel): void
-    {
-        $lower = strtolower($full);
+        // Single .md file: create temp dir with single file
+        $lower = strtolower($path);
         if (! str_ends_with($lower, '.md') && ! str_ends_with($lower, '.markdown')) {
-            return;
+            throw new \RuntimeException(tra('Local file must be .md, .markdown, .zip, or a directory'));
         }
-        $data = @file_get_contents($full);
-        if ($data !== false) {
-            $zip->addFromString($rel, $data);
+
+        $tempDir = sys_get_temp_dir() . '/mdimp_local_' . uniqid();
+        @mkdir($tempDir, 0755, true);
+
+        $targetFile = $tempDir . '/' . basename($path);
+        if (! copy($path, $targetFile)) {
+            throw new \RuntimeException(tra('Failed to copy file.'));
         }
+
+        return $tempDir;
     }
 
-    private function addDir(ZipArchive $zip, string $root, string $rel = ''): void
+    /**
+     * Detect if extracted ZIP has a single top-level folder and return its path.
+     * Many ZIP files wrap content in a folder named after the ZIP.
+     * E.g., Archive.zip contains Archive/file1.md instead of file1.md directly.
+     */
+    private function detectAndUnwrapTopFolder(string $dir): string
     {
-        $dir = $rel ? ($root . '/' . $rel) : $root;
-        $it = @scandir($dir);
-        if ($it === false) {
-            // Permission denied → ignore
-            return;
+        $items = @scandir($dir);
+        if ($items === false) {
+            return $dir;
         }
-        foreach ($it as $n) {
-            if ($n === '.' || $n === '..') {
-                continue;
-            }
-            $full = $dir . '/' . $n;
-            $relPath = ltrim($rel . '/' . $n, '/');
-            if (is_dir($full)) {
-                if ($n === '.git') {
-                    continue;
-                }
-                $this->addDir($zip, $root, $relPath);
-            } else {
-                $this->addOneFile($zip, $full, $relPath);
-            }
-        }
-    }
 
-    private function tmpZip(): string
-    {
-        return tempnam(sys_get_temp_dir(), 'mdimp_') . '.zip';
+        // Filter out . and ..
+        $realItems = array_filter($items, fn($i) => $i !== '.' && $i !== '..');
+
+        // If there's exactly one item and it's a directory, use it as the base
+        if (count($realItems) === 1) {
+            $single = reset($realItems);
+            $singlePath = $dir . '/' . $single;
+            if (is_dir($singlePath)) {
+                return $singlePath;
+            }
+        }
+
+        // Otherwise, use the original directory
+        return $dir;
     }
 }

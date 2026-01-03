@@ -7,16 +7,19 @@
 namespace Tiki\Lib\Importer\Markdown\Source;
 
 /**
- * Contract for any source provider that can materialize a temp ZIP file
- * containing markdown files ready to be scanned/imported.
+ * Contract for any source provider that can materialize files
+ * in a local directory ready to be scanned/imported.
  */
 interface SourceProviderInterface
 {
     /**
-     * Download / collect files and produce a temporary ZIP file path.
+     * Download / collect files and produce a local directory path.
+     * For uploaded ZIPs, extract to temp directory.
+     * For Git repos, clone/pull to working directory.
+     * For filesystem paths, return the path directly.
      * MUST throw \RuntimeException on error.
      *
-     * @return string Absolute path to the temporary .zip
+     * @return string Absolute path to the directory containing markdown files
      */
-    public function fetchToTempZip(): string;
+    public function fetchToTempDir(): string;
 }

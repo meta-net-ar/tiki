@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Importer\Markdown\Source;
 
-use ZipArchive;
-
 class GitWorkingCopyProvider implements SourceProviderInterface
 {
     public function __construct(
@@ -16,7 +14,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     ) {
     }
 
-    public function fetchToTempZip(): string
+    public function fetchToTempDir(): string
     {
         $repoUrl   = trim((string)($this->cfg['repo_url'] ?? ''));
         $branch    = trim((string)($this->cfg['repo_branch'] ?? 'main'));
@@ -58,19 +56,8 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             $this->gitPull($git, $wcPath, $token, $timeout);
         }
 
-        if (! class_exists(ZipArchive::class)) {
-            throw new \RuntimeException(tra('ZipArchive extension is required.'));
-        }
-
-        $zipPath = $this->tmpZip();
-        $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException(tra('Cannot create temporary ZIP.'));
-        }
-        $this->addDirMarkdown($zip, $wcPath, '');
-        $zip->close();
-
-        return $zipPath;
+        // Return working copy directory directly
+        return $wcPath;
     }
 
     /* ---------- Git helpers ---------- */
@@ -209,47 +196,6 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
     /* ---------- Files helpers ---------- */
 
-    private function addDirMarkdown(ZipArchive $zip, string $root, string $rel): void
-    {
-        $dir = $rel ? ($root . '/' . $rel) : $root;
-        $list = @scandir($dir);
-        if ($list === false) {
-            return; // permission denied → on ignore
-        }
-        foreach ($list as $name) {
-            if ($name === '.' || $name === '..' || $name === '.git') {
-                continue;
-            }
-
-            $full = $dir . '/' . $name;
-            $relPath = ltrim($rel . '/' . $name, '/');
-
-            if (is_dir($full)) {
-                $this->addDirMarkdown($zip, $root, $relPath);
-                continue;
-            }
-
-            $lower = strtolower($name);
-            if (! str_ends_with($lower, '.md') && ! str_ends_with($lower, '.markdown') && ! str_ends_with($lower, '.zip')) {
-                continue;
-            }
-
-            $data = @file_get_contents($full);
-            if ($data !== false) {
-                $zip->addFromString($relPath, $data);
-
-                // set mtime in zip if possible
-                if (method_exists($zip, 'setMtimeName')) {
-                    $mt = @filemtime($full);
-                    if ($mt !== false) {
-                        // aide le scanner à remplir 'mtime_utc'
-                        $zip->setMtimeName($relPath, (int) $mt);
-                    }
-                }
-            }
-        }
-    }
-
     private function ensureDir(string $dir): void
     {
         if (! is_dir($dir)) {
@@ -318,11 +264,6 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $dir = rtrim($rootDir, '/') . '/' . $host . '/' . $safe;
         $this->ensureDir(\dirname($dir));
         return $dir;
-    }
-
-    private function tmpZip(): string
-    {
-        return tempnam(sys_get_temp_dir(), 'mdimp_') . '.zip';
     }
 
     private function resolveRoots(): array
