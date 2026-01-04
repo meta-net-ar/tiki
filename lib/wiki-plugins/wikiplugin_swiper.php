@@ -354,6 +354,50 @@ function wikiplugin_swiper_info()
                 'since' => '19.0',
                 'options' => BooleanEnglishLetter::options(),
             ],
+            'teleprompter' => [
+                'required' => false,
+                'name' => tr('Teleprompter mode'),
+                'description' => tr('Scroll slides vertically as a teleprompter instead of swapping slides.'),
+                'filter' => 'alpha',
+                'default' => 'n',
+                'advanced' => true,
+                'options' => [
+                    ['text' => 'No', 'value' => 'n'],
+                    ['text' => 'Yes', 'value' => 'y'],
+                ],
+            ],
+            'teleprompterSpeed' => [
+                'required' => false,
+                'name' => tr('Teleprompter speed'),
+                'description' => tr('Scroll speed in pixels per second when teleprompter is enabled.'),
+                'filter' => 'digits',
+                'default' => 60,
+                'advanced' => true,
+            ],
+            'teleprompterMirror' => [
+                'required' => false,
+                'name' => tr('Mirror teleprompter'),
+                'description' => tr('Flip text horizontally for physical teleprompter use.'),
+                'filter' => 'alpha',
+                'default' => 'n',
+                'advanced' => true,
+                'options' => [
+                    ['text' => 'No', 'value' => 'n'],
+                    ['text' => 'Yes', 'value' => 'y'],
+                ],
+            ],
+            'teleprompterPauseOnHover' => [
+                'required' => false,
+                'name' => tr('Pause teleprompter on hover'),
+                'description' => tr('Stop automatic scrolling while the teleprompter is hovered.'),
+                'filter' => 'alpha',
+                'default' => 'y',
+                'advanced' => true,
+                'options' => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No', 'value' => 'n'],
+                ],
+            ],
         ]
     ];
 }
@@ -367,7 +411,30 @@ function wikiplugin_swiper($data, $params)
     static $uid = 0;
     $uid++;
 
+    $params += [
+        'teleprompter' => 'n',
+        'teleprompterSpeed' => 60,
+        'teleprompterMirror' => 'n',
+        'teleprompterPauseOnHover' => 'y',
+    ];
+    $isTeleprompter = $params['teleprompter'] === 'y';
+    if ($isTeleprompter) {
+        $params['navigation'] = 'n';
+        $params['pagination'] = 'n';
+        $params['displayThumbnails'] = 'n';
+        $params['slidesPerView'] = 1;
+        $params['slidesPerColumn'] = 1;
+        $params['slidesPerColumnFill'] = 'column';
+        $params['centeredSlides'] = 'n';
+        $params['freeMode'] = 'n';
+        $params['slideToClickedSlide'] = 'n';
+        $params['effect'] = 'slide';
+        $params['autoPlay'] = 'y';
+        $params['autoPlayDelay'] = 0;
+    }
+
     $plugininfo = wikiplugin_swiper_info();
+    $swiperDigitsParams = [];
     foreach ($plugininfo['params'] as $key => $param) {
         //separating digits filter parameters
         if (! empty($param['filter']) && $param['filter'] == "digits") {
@@ -385,12 +452,17 @@ function wikiplugin_swiper($data, $params)
     } elseif (! empty($params['height']) && preg_match('/^\d+(px|%)$/', $params['height'])) {
         $heightMode = 'custom';
         $heightCSS = 'height: ' . $params['height'] . ';';
+    } elseif ($isTeleprompter) {
+        $heightMode = 'custom';
+        $heightCSS = 'height: 60vh;';
     }
 
     if ($params['autoPlay'] != 'n') {
-        $autoplayDelay = $params['autoPlayDelay'] * 1000;
+        $autoplayDelay = max(0, (int) $params['autoPlayDelay']) * 1000;
+        $autoplayExtras = $isTeleprompter ? 'disableOnInteraction: false,' : '';
         $autoPlay = 'autoplay: {
             delay: ' . $autoplayDelay . ',
+            ' . $autoplayExtras . '
         },';
     } else {
         $autoPlay = '';
@@ -437,6 +509,11 @@ function wikiplugin_swiper($data, $params)
     ->add_jsfile($swiper_js_path);
     $slides = explode("|", ($data ? $data : ""));
     $slidesHtml = '';
+    $slideClass = 'swiper-slide' . ($isTeleprompter ? ' teleprompter-slide' : '');
+    $parallaxAttr = $isTeleprompter ? '' : 'data-swiper-parallax="-300"';
+    $teleprompterContainerClass = $isTeleprompter ? ' teleprompter-container' : '';
+    $teleprompterSettings = '';
+    $teleprompterJs = '';
     //checking if there is a gallery chosen
     $filegallib = TikiLib::lib('filegal');
     if ($params['fgalId']) {
@@ -454,7 +531,7 @@ function wikiplugin_swiper($data, $params)
     }
     if (! empty($files['data'])) {
         foreach ($files['data'] as $file) {
-            $slidesHtml .= '<div class="swiper-slide"><img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display';
+            $slidesHtml .= '<div class="' . $slideClass . '"><img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display';
             if (! empty($params['displaySize'])) {
                 if ($params['displaySize'] > 10) {
                     $slidesHtml .= '&amp;max=' . $params['displaySize'];
@@ -487,7 +564,33 @@ function wikiplugin_swiper($data, $params)
             if (empty($slideArr['title'])) {
                 $slideArr['title'] = '';
             }
-            $slidesHtml .= '<div data-swiper-parallax="-300" class="swiper-slide" style="color:' . $slideArr['color'] . ';background-color:' . $slideArr['bgcolor'] . ';background-image:url(' . $slideArr['image'] . ')"><div class="slide-content' . $uid . '"><h1>' . $slideArr['title'] . '</h1>' . $slideArr['text'] . '</div></div>';
+            $slidesHtml .= '<div ' . $parallaxAttr . ' class="' . $slideClass . '" style="color:' . $slideArr['color'] . ';background-color:' . $slideArr['bgcolor'] . ';background-image:url(' . $slideArr['image'] . ')"><div class="slide-content' . $uid . '"><h1>' . $slideArr['title'] . '</h1>' . $slideArr['text'] . '</div></div>';
+        }
+    }
+
+    if ($isTeleprompter) {
+        $teleprompterSpeed = (int) $params['teleprompterSpeed'] ?: 60;
+        $teleprompterSettings = "direction:'vertical',allowTouchMove:false,";
+        $headerlib->add_css('#swiper-container' . $uid . '.teleprompter-container{align-items: stretch;} #swiper-container' . $uid . '.teleprompter-container .teleprompter-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align: left;background:' . $params['slideContentBg'] . ';line-height:1.6;padding: 1.5rem 2rem;} #swiper-container' . $uid . '.teleprompter-container .teleprompter-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . ';margin:0 0 0.5em;} #swiper-container' . $uid . '.teleprompter-container .slide-content' . $uid . '{min-width: auto;position: static;background: transparent;padding: 0;}');
+        if ($params['teleprompterMirror'] === 'y') {
+            $headerlib->add_css('#swiper-container' . $uid . '.teleprompter-mirror{transform: scaleX(-1);}');
+        }
+        $teleprompterJs = 'var $tpContainer' . $uid . ' = $("#swiper-container' . $uid . '");'
+            . 'var updateTeleprompterSpeed' . $uid . ' = function(){'
+            . 'var h = $tpContainer' . $uid . '.innerHeight() || 600;'
+            . 'var ms = Math.max(250, Math.round((h / ' . $teleprompterSpeed . ') * 1000));'
+            . 'swiper' . $uid . '.params.speed = ms;'
+            . 'swiper' . $uid . '.update();'
+            . '};'
+            . 'updateTeleprompterSpeed' . $uid . '();'
+            . '$(window).on("resize", updateTeleprompterSpeed' . $uid . ');'
+            . 'swiper' . $uid . '.autoplay.start();';
+        if ($params['teleprompterPauseOnHover'] === 'y') {
+            $teleprompterJs .= '$tpContainer' . $uid . '.on("mouseenter", function(){ swiper' . $uid . '.autoplay.stop(); });'
+                . '$tpContainer' . $uid . '.on("mouseleave", function(){ swiper' . $uid . '.autoplay.start(); });';
+        }
+        if ($params['teleprompterMirror'] === 'y') {
+            $teleprompterJs .= '$tpContainer' . $uid . '.addClass("teleprompter-mirror");';
         }
     }
     $swiperSettings = '';
@@ -510,6 +613,7 @@ function wikiplugin_swiper($data, $params)
         $slidesPerViewMobile = $params['slidesPerViewMobile'] == '' ? $slidesPerViewTab : $params['slidesPerViewMobile']; //if not defined use tablets slides per view
         $breakpoints = 'breakpointsInverse: true, breakpoints: { 320: { slidesPerView: ' . $slidesPerViewMobile . '},768: {slidesPerView: ' . $slidesPerViewTab . '},1024: {slidesPerView: ' . $slidesPerView . '}},';
     }
+    $swiperSettings .= $teleprompterSettings;
     $swiperSettings = str_replace(["'y'","'n'"], ["'true'","'false'"], $swiperSettings);
     $headerlib->add_css('#swiper-container' . $uid . ' {position: relative; display: flex; align-items: center; overflow: hidden; ' . $heightCSS . 'width: ' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;} #swiper-container' . $uid . ' .swiper-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align: center;width:100%;overflow:hidden;} .gallery-top {height: 80%;width: 100%;}.gallery-thumbs {height: 20%;box-sizing: border-box;padding: 10px 0;overflow: hidden;}.gallery-thumbs img {max-height:120px;height:120px;width:auto;  margin-bottom:2%;cursor:pointer}.gallery-thumbs .swiper-slide {width: 25%; height: 100%;opacity: 0.4;}.gallery-thumbs .swiper-slide-active {opacity: 1;} #swiper-container' . $uid . ' .swiper-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . '} .slide-content' . $uid . '{min-width:60%;position:absolute;' . $params['slideContentPostion'] . ';background:' . $params['slideContentBg'] . ';padding:1%;text-align:left}  .parallax-bg { position: absolute;left: 0;top: 0;width: 130%;height: 100%;-webkit-background-size: cover;background-size: cover;background-position: center;} .swiper-slide img{max-width:100%}' . $fadeEffectCSS);
     $thumbnails = '';
@@ -571,7 +675,7 @@ function wikiplugin_swiper($data, $params)
             ' . $autoPlay . '
             ' . $navigation . '
      
-            });' . $creativeRandomEffect . $thumbAfter;
+            });' . $creativeRandomEffect . $thumbAfter . $teleprompterJs;
 
     // Add JavaScript for tallest height mode
     if ($heightMode === 'tallest') {
@@ -622,6 +726,6 @@ function wikiplugin_swiper($data, $params)
     $headerlib->add_js(
         '$( document ).ready(function() {' . $swiperOpts . ';$("#swiper-container' . $uid . '").css("max-width",$("#swiper-container' . $uid . '").parent().width());})'
     );
-        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
+        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . $teleprompterContainerClass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
         return $swiperCode;
 }
