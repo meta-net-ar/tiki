@@ -3,38 +3,44 @@
 import ReplyForm from "./ReplyForm.vue";
 import {inject, onMounted} from "vue";
 
-import useMessageStore from "../store";
-const store = useMessageStore();
-
 const tr = inject('tr')
-const props = defineProps({
-    item: {
-        type: Object,
-        required: true,
-    },
-});
-
-onMounted(() => {
-    store.drawMessagesTree();
-});
-
-function update(messageId) {
-    $("#message-" + props.item.messageId + " input[name='updatemessage']").val(messageId);
-    $("#message-" + props.item.messageId + " input[name='title']").val(props.item.title);
-    $("#message-" + props.item.messageId + " textarea[name='message']").val(props.item.message);
-    $("#message-" + props.item.messageId + " .submit-btn").text("Edit message");
-}
-
-function create() {
-    $("#message-" + props.item.messageId + " input[name='updatemessage']").val(0);
-    $("#message-" + props.item.messageId + " input[name='title']").val("");
-    $("#message-" + props.item.messageId + " textarea[name='message']").val("");
-    $("#message-" + props.item.messageId + " .submit-btn").text("Preview/Publish");
-}
 </script>
 <script>
+import useMessageStore from "../store";
+
 export default {
     name: 'Message',
+    props: {
+        item: {
+            type: Object,
+            required: true,
+        },
+    },
+    mounted() {
+        useMessageStore().drawMessagesTree();
+    },
+    methods: {
+        create: function() {
+            $("#message-" + this.item.messageId + " input[name='updatemessage']").val(0);
+            $("#message-" + this.item.messageId + " input[name='title']").val("");
+            $("#message-" + this.item.messageId + " el-input[name='title']").attr("value", "");
+            $("#message-" + this.item.messageId + " textarea[name='message']").val("");
+            $("#message-" + this.item.messageId + " .submit-btn").text("Preview/Publish");
+            setTimeout(() => {
+                useMessageStore().drawMessagesTree();
+            }, 20);//TODO: find a better way to do this
+        },
+        update: function(messageId) {
+            $("#message-" + this.item.messageId + " input[name='updatemessage']").val(messageId);
+            $("#message-" + this.item.messageId + " input[name='title']").val(this.item.title);
+            $("#message-" + this.item.messageId + " el-input[name='title']").attr("value", this.item.title);
+            $("#message-" + this.item.messageId + " textarea[name='message']").val(this.item.message);
+            $("#message-" + this.item.messageId + " .submit-btn").text("Edit message");
+            setTimeout(() => {
+                useMessageStore().drawMessagesTree();
+            }, 20);//TODO: find a better way to do this
+        }
+    }
 }
 </script>
 

@@ -200,7 +200,6 @@ export default defineStore("messageStore", {
             this.threads[index].dislike += 1;
         },
         drawMessagesTree() {
-            //TODO: Manage the reply box height, change the height when the menu is collapse or not
             var arr = this.threads;
             arr.forEach((item) => {
                 let margins = 8;

@@ -1,39 +1,46 @@
-<script setup>
+<script>
 import useMessageStore from "../store";
-const store = useMessageStore();
 
-const props = defineProps({
-    parentId: {
-        type: Number,
-        required: true,
+export default {
+    name: 'ReplyForm',
+    props: {
+        parentId: {
+            type: Number,
+            required: true,
+        },
+        author: {
+            type: String,
+            required: true,
+        },
     },
-    author: {
-        type: String,
-        required: true,
+    mounted() {
+        useMessageStore().drawMessagesTree();
     },
-});
-
-function updateMsg() {
-    if ($("#message-" + props.parentId + " input[name='updatemessage']").val() == "0") {
-        store.addMessage(
-            $("#message-" + props.parentId + " input[name='title']").val(),
-            parseInt($("#message-" + props.parentId + " input[name='parentid']").val()),
-            $("#message-" + props.parentId + " input[name='author']").val(),
-            $("#message-" + props.parentId + " textarea[name='message']").val(),
-            new Date().toLocaleString()
-        );
-    } else {
-        store.updateMessage(
-            parseInt($("#message-" + props.parentId + " input[name='parentid']").val()),
-            $("#message-" + props.parentId + " input[name='title']").val(),
-            $("#message-" + props.parentId + " textarea[name='message']").val()
-        );
+    methods: {
+        updateMsg: function() {
+            if ($("#message-" + this.parentId + " input[name='updatemessage']").val() == "0") {
+                useMessageStore().addMessage(
+                        $("#message-" + this.parentId + " input[name='title']").val(),
+                        parseInt($("#message-" + this.parentId + " input[name='parentid']").val()),
+                        $("#message-" + this.parentId + " input[name='author']").val(),
+                        $("#message-" + this.parentId + " textarea[name='message']").val(),
+                        new Date().toLocaleString()
+                );
+            } else {
+                useMessageStore().updateMessage(
+                        parseInt($("#message-" + this.parentId + " input[name='parentid']").val()),
+                        $("#message-" + this.parentId + " input[name='title']").val(),
+                        $("#message-" + this.parentId + " textarea[name='message']").val()
+                );
+            }
+            $("#message-" + this.parentId + " textarea[name='message']").val("");
+            $("#message-" + this.parentId + " input[name='title']").val("");
+            setTimeout(() => {
+                useMessageStore().drawMessagesTree();
+            }, 20);//TODO: find a better way to do this
+        }
     }
-    $("#message-" + props.parentId + " textarea[name='message']").val("");
-    $("#message-" + props.parentId + " input[name='title']").val("");
 }
-
-
 </script>
 
 <template>
