@@ -492,4 +492,30 @@ class TWVersion
         $this->pollVersion();
         return $this->latestMinorRelease == $this->version || version_compare($this->version, $this->latestRelease) == 1;
     }
+
+    /**
+    * Returns an array of End-of-Life data for Tiki versions.
+    * This data is based on the official Tiki Lifecycle page (https://tiki.org/Lifecycle)
+    * and should be updated with new LTS releases.
+    * @return array
+    */
+    public function getLtsEolDates(): array
+    {
+        return [
+            '24' => '2027-03-31',
+            '27' => '2029-02-28',
+        ];
+    }
+
+    /**
+    * Returns an array of approved extended support providers.
+    * @return array
+    */
+    public function getExtendedSupportProviders(): array
+    {
+        return [
+            ['name' => tra('Official Service Providers'), 'url' => 'https://tiki.org/Extended-Security-Maintenance'],
+            // Future providers can be added here
+        ];
+    }
 }

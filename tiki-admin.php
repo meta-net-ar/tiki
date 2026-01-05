@@ -363,6 +363,9 @@ $smarty->assign('ProblemsLoadingCacheSubSystem', TikiLib::lib('cache')->reportOp
 // VERSION TRACKING
 $forcecheck = ! empty($_GET['forcecheck']);
 
+$upgrade_errors = [];
+$upgrade_warnings = [];
+$upgrade_notes = [];
 $versionObj = Tiki_Version_Version::get($TWV->version);
 $is_stable = $versionObj->isStable();
 
@@ -378,11 +381,28 @@ if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $smarty->assign('upgrade_messages', $upgrades);
     $smarty->assign('git_details', $gitDetails);
     $smarty->assign('is_stable', $is_stable);
+
+    // Pre-sort the messages into separate arrays based on urgency
+
+    foreach ($upgrades as $upgrade_object) {
+        $type = $upgrade_object->getType();
+        $message = $upgrade_object->getMessage();
+        if ($type === 'error') {
+            $upgrade_errors[] = $message;
+        } elseif ($type === 'warning') {
+            $upgrade_warnings[] = $message;
+        } else {
+            $upgrade_notes[] = $message;
+        }
+    }
 } else {
     $smarty->assign('upgrade_messages', []);
     $smarty->assign('git_details', []);
     $smarty->assign('is_stable', $is_stable);
 }
+$smarty->assign('upgrade_errors', $upgrade_errors);
+$smarty->assign('upgrade_warnings', $upgrade_warnings);
+$smarty->assign('upgrade_notes', $upgrade_notes);
 
 // SSL setup
 $haveMySQLSSL = $tikilib->haveMySQLSSL();

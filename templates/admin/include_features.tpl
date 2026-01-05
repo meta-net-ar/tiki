@@ -59,6 +59,8 @@
                 <div class="admin clearfix mb-3 featurelist">
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
+                    {preference name=feature_version_checks}
+                    {preference name=feature_eol_date_notifier}
                     {preference name=feature_scheduler}
                     {preference name=feature_queued_tasks}
                     {preference name=feature_banners}

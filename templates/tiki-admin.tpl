@@ -208,18 +208,37 @@
             {/if}
         </div>
 
-        {if $upgrade_messages|count}
+        {* Error box box for critical "unsupported" messages. *}
+        {if $upgrade_errors|count}
+            {remarksbox type="error" title="{tr}Upgrade Required{/tr}" icon="announce"}
+                {foreach from=$upgrade_errors item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Warning box for "approaching EoL" messages. *}
+        {if $upgrade_warnings|count}
+            {remarksbox type="warning" title="{tr}Upgrade Recommended{/tr}" icon="announce"}
+                {foreach from=$upgrade_warnings item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Note box for informational "upgrade available" messages. *}
+        {if $upgrade_notes|count}
             {if not $is_stable}
                 {$title="{tr}Stable version available{/tr}"}
-            {elseif $upgrade_messages|count eq 1}
+            {elseif $upgrade_notes|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}
             {/if}
             {remarksbox type="note" title=$title icon="announce"}
-                {foreach from=$upgrade_messages item=um}
-                    <p>{$um|escape}</p>
-                {/foreach}
+            {foreach from=$upgrade_notes item=um}
+                <p>{$um|safe_html}</p>
+            {/foreach}
             {/remarksbox}
         {/if}
 

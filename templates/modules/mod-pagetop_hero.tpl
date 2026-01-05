@@ -5,15 +5,21 @@
         <div class="content">
             <h1 class="pagetop-hero-title">{tr}{$pagetitle|escape}{/tr}</h1>
             {if count($breadcrumbs) gt 0}
-                <div class="breadcrumbs">
+                <ol class="breadcrumb">
                     {foreach from=$breadcrumbs item=item name=object }
                         {if $smarty.foreach.object.last}
-                            <span>{tr}{$item}{/tr}</span>
+                            <li class="breadcrumb-item active" aria-current="page">{tr}{$item.text}{/tr}</li>
                         {else}
-                            <b>{tr}{$item}{/tr}</b> /
+                            <li class="breadcrumb-item">
+                                {if $item.url neq null && $item.url neq ''}
+                                    <a href="{$item.url|escape}"><b>{tr}{$item.text|escape}{/tr}</b></a>
+                                {else}
+                                    {tr}{$item.text}{/tr}
+                                {/if}
+                            </li>
                         {/if}
                     {/foreach}
-                </div>
+                </ol>
             {else}
                 {if $description neq ''}
                     <p class="pagetop-hero-description">{tr}{$description|escape}{/tr}</p>
@@ -37,7 +43,7 @@
     }
 
     .pagetop-hero-title,
-    .breadcrumbs,
+    .breadcrumb,
     .pagetop-hero-description {
         text-align: center
     }
@@ -75,9 +81,24 @@
         -moz-filter: brightness(65%);
     }
 
-    .breadcrumbs,
-    .breadcrumbs a,
-    .breadcrumbs span {
+    .breadcrumb,
+    .breadcrumb a,
+    .breadcrumb .breadcrumb-item,
+    .breadcrumb .breadcrumb-item.active {
+        color: #fff !important;
+        background-color: transparent !important;
+    }
+
+    .breadcrumb a:hover {
+        color: #ddd !important;
+        text-decoration: underline;
+    }
+
+    .pagetop-hero .breadcrumb::before {
+        color: #fff !important;
+    }
+
+    .pagetop-hero .breadcrumb-item + .breadcrumb-item::before {
         color: #fff !important;
     }
 </style>
@@ -85,7 +106,7 @@
 {if $content_position eq 'topleft'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: left
         }
@@ -99,7 +120,7 @@
 {if $content_position eq 'leftcenter'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: left
         }
@@ -113,7 +134,7 @@
 {if $content_position eq 'topcenter'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: center
         }
@@ -127,7 +148,7 @@
 {if $content_position eq 'topright'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: right
         }
@@ -141,7 +162,7 @@
 {if $content_position eq 'bottomleft'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: left
         }
@@ -155,7 +176,7 @@
 {if $content_position eq 'bottomcenter'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: center
         }
@@ -169,7 +190,7 @@
 {if $content_position eq 'bottomright'}
     <style>
         .pagetop-hero-title,
-        .breadcrumbs,
+        .breadcrumb,
         .pagetop-hero-description {
             text-align: right
         }

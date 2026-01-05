@@ -16,7 +16,6 @@
 
 $dieInsteadOfForwardingWithHeader = false;
 global $prefs;
-require_once('lib/debug/Tracer.php');
 
 $inputConfiguration = [
     [ 'staticKeyFilters' => [
@@ -30,6 +29,7 @@ $inputConfiguration = [
 $section = "wiki page";
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+require_once('lib/debug/Tracer.php');
 $wikilib = TikiLib::lib('wiki');
 $structlib = TikiLib::lib('struct');
 $notificationlib = TikiLib::lib('notification');
