@@ -13,36 +13,15 @@ use Tiki\Installer\Installer;
  */
 function upgrade_20190123_h5p_move_storage_assets_to_new_dir_tiki($installer)
 {
-    $routeLib = TikiLib::lib('custom_route');
-    $tikipath = rtrim($routeLib->getTikiPath(''), '/');
+    $newH5Pdir = 'storage/public/h5p';
 
-    // construct new path with possible domain subdir
-    global $tikidomainslash;
-    $base = 'storage';
-    if (! empty($tikidomainslash)) {
-        $base .= '/' . rtrim($tikidomainslash, '/');
-    }
-    $absNew = $tikipath . '/' . $base . '/public/h5p';
-
-    // create new dirs if not present
-    if (! is_dir($absNew)) {
-        @mkdir($absNew, 0775, true);
-    }
-    foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
-        $sub = $absNew . '/' . $dir;
-        if (! is_dir($sub)) {
-            @mkdir($sub, 0775, true);
-        }
-    }
-
-    $absOldBase = $tikipath . '/' . 'storage/public';
-
-    // move old dirs to new location
-    foreach (['cachedassets','content','exports','libraries','temp'] as $dir) {
-        $old = $absOldBase . '/' . $dir;
-        $new = $absNew . '/' . $dir;
-        if (is_dir($old) && ! is_dir($new)) {
-            @rename($old, $new);
+    if (! is_dir($newH5Pdir)) {
+        if (mkdir($newH5Pdir)) {
+            foreach (['cachedassets', 'content', 'exports','libraries','temp'] as $dir) {
+                if (is_dir('storage/public/' . $dir)) {
+                    rename('storage/public/' . $dir, $newH5Pdir . '/' . $dir);
+                }
+            }
         }
     }
 }

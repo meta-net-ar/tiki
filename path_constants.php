@@ -77,8 +77,9 @@ const STORAGE_PUBLIC_PATH = 'storage/public';
 const STORAGE_PREFSDOC_PATH = 'storage/prefsdoc';
 /** File gallery default storage path. This is only the default value of the preference, so will not change with this constant */
 const FILE_GALLERY_DEFAULT_STORAGE_PATH = 'storage/fgal';
-// H5P storage lives under STORAGE_PUBLIC_PATH
-const STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
+const DEPRECATED_H5P_STORAGE_SUFFIX = 'public/h5p';
+/** DEPRECATED: Not compatible with MultiTiki. Use H5P_H5PTiki::resolveRelH5PPath() instead */
+const DEPRECATED_STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
 
 const SMARTY_COMPILED_TEMPLATES_PATH = 'temp/templates_c';
 /** Currently this is both the top level template path and the relative template path in themes and packages. Needs to be separated if moved */

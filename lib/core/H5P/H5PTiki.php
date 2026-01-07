@@ -91,27 +91,43 @@ class H5P_H5PTiki implements H5PFrameworkInterface
 
     /**
      * Ensure that the H5P storage directory exists and is writable.
-     * Returns [ok(bool), path(string), msg(string|null)]
+     * @param bool $createSubdirs Whether to create required subdirectories
+     * @return array [ok(bool), path(string), msg(string|null)]
      */
     public static function ensureStorageReady(bool $createSubdirs = true): array
     {
         global $tikipath;
-        $abs = rtrim($tikipath, '/') . '/' . STORAGE_PUBLIC_H5P_PATH;
+        $abs = rtrim($tikipath, '/') . '/' . self::resolveRelH5PPath();
+        $msg = null;
 
+        // Create main H5P directory if needed
         if (! is_dir($abs)) {
-            @mkdir($abs, 0775, true);
+            $created = mkdir($abs, 0775, true);
+            if (! $created) {
+                return [false, $abs, 'failed_to_create_directory'];
+            }
         }
+        // Verify main directory is writable
+        if (! is_writable($abs)) {
+            return [false, $abs, 'directory_not_writable'];
+        }
+        // Create required subdirectories
         if ($createSubdirs) {
             foreach (self::H5P_REQUIRED_SUBDIRS as $d) {
                 $sub = $abs . '/' . $d;
                 if (! is_dir($sub)) {
-                    @mkdir($sub, 0775, true);
+                    $created = mkdir($sub, 0775, true);
+                    if (! $created) {
+                        return [false, $abs, 'failed_to_create_subdir_' . $d];
+                    }
+                }
+                // Verify each subdirectory is writable
+                if (! is_writable($sub)) {
+                    return [false, $abs, 'subdir_not_writable_' . $d];
                 }
             }
         }
-        $ok  = is_dir($abs) && is_writable($abs);
-        $msg = $ok ? null : 'not_writable';
-        return [$ok, $abs, $msg];
+        return [true, $abs, null];
     }
 
     /**
@@ -125,7 +141,11 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             return true;
         }
 
-        $hint = 'Run: <code>sh setup.sh -n fix </code> or <code>chown -R www-data:www-data storage && find storage -type d -exec chmod 775 {} \;</code>.';
+        $hint = tr(
+            'Run: %0 or manually fix permissions for %1',
+            '<code>sh setup.sh -n fix</code>',
+            '<code>' . htmlspecialchars($path) . '</code>'
+        );
         $msg = tr('H5P directory is not writable: %0. %1', $path, $hint);
 
         TikiLib::lib('tiki')->add_feedback('error', $msg);
@@ -1791,12 +1811,11 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
     private static function resolveRelH5PPath(): string
     {
         global $tikidomainslash;
-        // For multi-domain setups, adjust the path
         if (! empty($tikidomainslash)) {
             $site = trim($tikidomainslash, '/');
-            return "storage/{$site}/public/h5p";
+            return 'storage/' . $site . '/' . DEPRECATED_H5P_STORAGE_SUFFIX;
         }
-        return STORAGE_PUBLIC_H5P_PATH;
+        return DEPRECATED_STORAGE_PUBLIC_H5P_PATH;
     }
 
     private static function resolveAbsH5PPath(): string
