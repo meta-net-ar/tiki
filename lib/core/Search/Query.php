@@ -14,6 +14,7 @@ class Search_Query implements Search_Query_Interface
     private $weightCalculator = null;
     private $identifierFields = null;
     private $selectionFields = null;
+    private $countOnly = false;
 
     private $postFilter;
     private $processDidYouMean = false;
@@ -69,6 +70,16 @@ class Search_Query implements Search_Query_Interface
     public function getCyphtSearch()
     {
         return $this->cyphtSearch;
+    }
+
+    public function setCountOnly($countOnly = true)
+    {
+        $this->countOnly = (bool) $countOnly;
+    }
+
+    public function isCountOnly()
+    {
+        return $this->countOnly;
     }
 
     public function addObject($type, $objectId)

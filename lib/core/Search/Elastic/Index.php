@@ -502,6 +502,10 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $hits->total = $hits->total->value;
         }
 
+        if ($query->isCountOnly()) {
+            return new Search_Elastic_ResultSet([], $hits->total, $resultStart, $resultCount);
+        }
+
         /**
          * Sorted Search size adjustment (part 2) - Checks to see if the number of results returned
          * are more than 500. If they are, set an approximate period filter to get to 500 results next

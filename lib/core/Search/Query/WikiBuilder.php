@@ -129,6 +129,11 @@ class Search_Query_WikiBuilder
         $query->setSelectionFields(preg_split('/[, ]+/', $value));
     }
 
+    public function wpquery_select_count($query, $value)
+    {
+        $query->setCountOnly(true);
+    }
+
     public function wpquery_filter_editable($query, $editableType, array $arguments)
     {
         $fields = $this->get_fields_from_arguments($arguments);

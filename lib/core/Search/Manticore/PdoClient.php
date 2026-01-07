@@ -384,6 +384,26 @@ class PdoClient
         return $stmt->fetchAll();
     }
 
+    public function count($table, $condition, $retry = true)
+    {
+        $stmt = null;
+        try {
+            $stmt = $this->query("SELECT COUNT(*) FROM $table WHERE $condition option not_terms_only_allowed=1,cutoff=0,expand_keywords=1");
+            return intval($stmt->fetchColumn());
+        } catch (PDOException $e) {
+            if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+                if ($stmt) {
+                    $stmt->closeCursor();
+                }
+                // federated index tables might have been rebuilt and distributed one not updated properly -> refresh and retry
+                \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
+                return $this->count($table, $condition, false);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
     /**
      * Fetches results from the index along with any facets data that come as subsequent row sets.
      * Builds the query and fetches the results in 2 parts to reduce memory footprint and performance impact for big indices (say 1000+ fields):

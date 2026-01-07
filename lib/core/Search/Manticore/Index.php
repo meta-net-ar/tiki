@@ -435,6 +435,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $table = $this->index;
         }
 
+        if ($query->isCountOnly()) {
+            $totalCount = $this->pdo_client->count($table, $condition);
+            return new ResultSet([], $totalCount, $resultStart, $resultCount);
+        }
+
         $builder = new OrderBuilder($this);
         $order = $builder->build($query->getSortOrder());
 
