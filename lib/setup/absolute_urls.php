@@ -101,15 +101,22 @@ if (! $reverse_proxy) {
     }
 }
 
-// reset prefs if they are on the defaults (or an incorrect 80 for HTTPS)
-if ($prefs['https_port'] == 443 || (int) $prefs['https_port'] == 80) {
+// reset prefs if they are on the defaults
+if ($prefs['https_port'] == 443) {
     $prefs['https_port'] = '';
 }
 if ($prefs['http_port'] == 80) {
     $prefs['http_port'] = '';
 }
 
-
+// Detect misconfigured HTTPS port (e.g., behind reverse proxy with TLS offload)
+if ($prefs['https_port'] == 80) {
+    error_log(
+        '[Tiki Warning] HTTPS port configured as 80. This typically indicates a reverse proxy ' .
+        'or TLS offload configuration issue. Please verify your reverse proxy X-Forwarded-Proto headers ' .
+        'and feature_port_rewriting setting.'
+    );
+}
 
 // create $base_url_http and $base_url_https etc.
 // Note: $url_scheme becomes a globally used var - even headerlib provides a method for it - so do not rename!
@@ -119,7 +126,7 @@ $url_scheme = $https_mode ? 'https' : 'http';
 $url_host = (! empty($prefs['server_domain'])) ? $prefs['server_domain'] : ((isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
 list($url_host,) = preg_split('/:/', $url_host);    // Strip url port
 $url_port = $https_mode ? $prefs['https_port'] : $prefs['http_port'];
-if ($https_mode && (int) $url_port === 80) {
+if (($https_mode && ($url_port == 443 || $url_port == 80)) || (! $https_mode && ($url_port == 80 || $url_port == 443))) {
     $url_port = '';
 }
 $url_path = $tikiroot;

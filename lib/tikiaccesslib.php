@@ -1155,6 +1155,7 @@ class TikiAccessLib extends TikiLib
 
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $url = 'https://' . $url;
+            // Remove default port 443 and incorrect port 80 from TLS offload
             if ($port == ':443' || $port == ':80') {
                 $port = '';
             }
@@ -1163,9 +1164,7 @@ class TikiAccessLib extends TikiLib
             if ($port == ':80' || $port == ':443') {
                 $port = '';
             }
-        }
-
-        $url .= $port;
+        }        $url .= $port;
         if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
             $url .= $_SERVER['HTTP_X_REWRITE_URL'];
         } elseif (isset($_SERVER['REQUEST_URI'])) {
