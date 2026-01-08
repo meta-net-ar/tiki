@@ -150,6 +150,8 @@ export default defineConfig(({ command, mode }) => {
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
             emptyOutDir: true,
+            // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
+            chunkSizeWarningLimit: 2500,
             minify: mode === "production",
             sourcemap: mode === "production",
             cssCodeSplit: true,
