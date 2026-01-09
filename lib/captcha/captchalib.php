@@ -106,7 +106,7 @@ class Captcha
                     'wordLen' => $prefs['captcha_wordLen'],
                     'timeout' => 600,
                     'font' => __DIR__ . '/DejaVuSansMono.ttf',
-                    'imgdir' => 'temp/public/',
+                    'imgdir' => rtrim(tiki_temp_dir(true), '/') . '/',
                     'suffix' => '.captcha.png',
                     'width' => $prefs['captcha_width'],
                     'dotNoiseLevel' => $prefs['captcha_noise'],

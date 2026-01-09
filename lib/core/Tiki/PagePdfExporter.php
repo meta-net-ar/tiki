@@ -97,8 +97,6 @@ class PagePdfExporter
     public function exportToFile($pageIdentifier, ?string $outputPath = null, array $input = []): string
     {
         $tikilib = \TikiLib::lib('tiki');
-        global $tikipath;
-
         // Compute filename when none supplied
         if (empty($outputPath)) {
             // Resolve title for sanitising
@@ -108,7 +106,7 @@ class PagePdfExporter
             $filename = $tikilib->remove_non_word_characters_and_accents($file) . '.pdf';
 
             // Use temp/public directory for generated PDFs
-            $outputPath = $tikipath . TEMP_PUBLIC_PATH . '/' . $filename;
+            $outputPath = rtrim(tiki_temp_dir(true), '/') . '/' . $filename;
         }
 
         // Ensure the directory exists

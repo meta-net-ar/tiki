@@ -34,7 +34,7 @@ $authBackend = new BasicAuth();
 $authPlugin = new DAV\Auth\Plugin($authBackend);
 $server->addPlugin($authPlugin);
 
-$locksBackend = new LocksBackend($tikipath . 'temp/davlocks');
+$locksBackend = new LocksBackend(rtrim($prefs['tmpDir'], '/') . '/davlocks');
 $locksPlugin = new DAV\Locks\Plugin($locksBackend);
 $server->addPlugin($locksPlugin);
 

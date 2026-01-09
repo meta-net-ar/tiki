@@ -340,8 +340,9 @@ class DiagramHelper
         $casperBin = TIKI_PATH . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'casperjs';
         $scriptPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/jquery_tiki/tiki-diagram.js';
         $htmlFile = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/core/File/DiagramHelperExportCasperJS.html';
-        $jsfile = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp/do_' . $fileIdentifier . '.js';
-        $imgFile = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp/diagram_' . $fileIdentifier . '.png';
+        $tmpBase = rtrim(tiki_temp_dir(), '/');
+        $jsfile = $tmpBase . DIRECTORY_SEPARATOR . 'do_' . $fileIdentifier . '.js';
+        $imgFile = $tmpBase . DIRECTORY_SEPARATOR . 'diagram_' . $fileIdentifier . '.png';
 
         if (! empty($vendorPath) && file_exists($casperBin) && file_exists($scriptPath) && file_exists($htmlFile)) {
             $jsContent = <<<EOF
@@ -368,7 +369,7 @@ EOF;
         }
 
         if (file_exists($jsfile)) {
-            $command = [$casperBin, $scriptPath, '--htmlfile=' . $htmlFile, '--filename=' . $fileIdentifier];
+            $command = [$casperBin, $scriptPath, '--htmlfile=' . $htmlFile, '--filename=' . $fileIdentifier, '--tmpdir=' . $tmpBase];
 
             $process = new Process($command);
             if (! empty($params['timeout'])) {

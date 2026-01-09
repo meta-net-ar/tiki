@@ -182,7 +182,7 @@ class PdfGenerator
         // There seemed to be encoding issues when using stdout (on Windows 7 64 bit).
 
         // Use temp/public. It is cleaned up during a cache clean, in case some files are left
-        $filename = 'temp/public/out' . mt_rand() . '.pdf';
+        $filename = rtrim(tiki_temp_dir(true), '/') . '/out' . mt_rand() . '.pdf';
 
         // Run shell_exec command to generate out file
         // NOTE: this requires write permissions
@@ -220,7 +220,7 @@ class PdfGenerator
         // There seemed to be encoding issues when using stdout (on Windows 7 64 bit).
 
         // Use temp/public. It is cleaned up during a cache clean, in case some files are left
-        $filename = 'temp/public/out' . mt_rand() . '.pdf';
+        $filename = rtrim(tiki_temp_dir(true), '/') . '/out' . mt_rand() . '.pdf';
 
         // Run shell_exec command to generate out file
         // NOTE: this requires write permissions
@@ -314,7 +314,7 @@ class PdfGenerator
             'orientation' => $pdfSettings['orientation'],
             'setAutoTopMargin' => 'stretch',
             'setAutoBottomMargin' => 'stretch',
-            'tempDir' => TIKI_PATH . '/temp/mpdf'
+            'tempDir' => rtrim($prefs['tmpDir'], '/') . '/mpdf'
         ];
 
         if (! file_exists($mpdfConfig['tempDir'])) {
@@ -671,7 +671,7 @@ class PdfGenerator
                         }
                     }
 
-                    $tmpExtPDF = "temp/tmp_" . rand(0, 999999999) . ".pdf";
+                    $tmpExtPDF = rtrim(tiki_temp_dir(), '/') . "/tmp_" . rand(0, 999999999) . ".pdf";
                     file_put_contents($tmpExtPDF, fopen($breakPageContent, 'r'));
                     chmod($tmpExtPDF, 0755);
                     $finfo = finfo_open(FILEINFO_MIME_TYPE); //recheck if its valid pdf file
@@ -786,11 +786,11 @@ class PdfGenerator
         }
 
         $this->clearTempImg($tempImgArr);
-        $tempFile = fopen("temp/public/pdffile_" . session_id() . ".txt", "w");
+        $tempFile = fopen(rtrim(tiki_temp_dir(true), '/') . "/pdffile_" . session_id() . ".txt", "w");
         fwrite($tempFile, ($pagesTotal * 30));
 
         if ($prefs['print_pdf_mpdf_debug'] === 'y') {
-            file_put_contents('temp/mpdf_debug_output.html', $debugOutput);
+            file_put_contents(rtrim(tiki_temp_dir(), '/') . '/mpdf_debug_output.html', $debugOutput);
         }
 
         return $mpdf->Output('', 'S');                  // Return as a string
@@ -1162,9 +1162,10 @@ class PdfGenerator
         if (! $internalImg) {
             $url = $base_url . $url;
         }
-        if (! file_exists('temp/pdfimg')) {
-            mkdir('temp/pdfimg');
-            chmod('temp/pdfimg', 0755);
+        $pdfImgDir = rtrim(tiki_temp_dir(), '/') . '/pdfimg';
+        if (! file_exists($pdfImgDir)) {
+            mkdir($pdfImgDir);
+            chmod($pdfImgDir, 0755);
         }
         $cookie = $_SERVER['HTTP_COOKIE'] ?? '';
         $opts = [];
@@ -1180,7 +1181,7 @@ class PdfGenerator
         if (gettype($data) == 'boolean' && ! $data) {
             return '';
         }
-        $newFile = 'temp/pdfimg/pdfimg' . mt_rand(9999, 999999) . '.png';
+        $newFile = $pdfImgDir . '/pdfimg' . mt_rand(9999, 999999) . '.png';
         file_put_contents($newFile, $data);
         chmod($newFile, 0755);
         return $newFile;
@@ -1464,8 +1465,9 @@ TEXT;
         $tid = $table->getAttribute("id");
 
 
-        if (file_exists("temp/#" . $tid . "_" . session_id() . ".txt")) {
-            $content = mb_convert_encoding(file_get_contents("temp/#" . $tid . "_" . session_id() . ".txt"), 'HTML-ENTITIES', 'UTF-8');
+        $tempTableFile = rtrim(tiki_temp_dir(), '/') . "/#" . $tid . "_" . session_id() . ".txt";
+        if (file_exists($tempTableFile)) {
+            $content = mb_convert_encoding(file_get_contents($tempTableFile), 'HTML-ENTITIES', 'UTF-8');
          //formating content
             $tableTag = "<" . $tag;
             if ($table->hasAttributes()) {
@@ -1480,9 +1482,9 @@ TEXT;
             $sortedContent[] = preg_replace('/<sc(<x>)?ript[^>]*>.*?<\/script>/s', '', $content);
             $tempValue[] = $tableTag;
             $table->nodeValue = "";
-            chmod("temp/#" . $tid . "_" . session_id() . ".txt", 0755);
+            chmod($tempTableFile, 0755);
             //unlink tmp table file
-            unlink("temp/#" . $tid . "_" . session_id() . ".txt");
+            unlink($tempTableFile);
         }
     }
 

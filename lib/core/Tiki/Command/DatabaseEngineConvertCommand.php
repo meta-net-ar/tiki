@@ -67,7 +67,7 @@ class DatabaseEngineConvertCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $local_php = TikiInit::getCredentialsFile();
-        global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki;
+        global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $prefs;
 
         if (file_exists($local_php)) {
             include($local_php);
@@ -78,7 +78,7 @@ class DatabaseEngineConvertCommand extends Command
         $password = $input->getOption('password') ? $input->getOption('password') : $pass_tiki;
         $database = $input->getOption('database') ? $input->getOption('database') : $dbs_tiki;
         $host = $input->getOption('host') ? $input->getOption('host') : $host_tiki;
-        $backup_path = $input->hasOption('path') ? $input->getOption('path') : TIKI_PATH . '/temp/db_backups';
+        $backup_path = $input->hasOption('path') ? $input->getOption('path') : rtrim($prefs['tmpDir'], '/') . '/db_backups';
 
         if (! $this->databaseConnect($username, $password, $database, $host)) {
             $msg = tr('Failed to connect to database `%0` . Please check your credentials.', $database);

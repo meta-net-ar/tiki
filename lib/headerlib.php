@@ -738,14 +738,16 @@ class HeaderLib
             $hash = $this->getFilesContentsHash($jsfiles);
             $cachelib->cacheItem($cacheName, $hash, $cacheType);
         }
-        $tempDir = 'temp/public/' . $tikidomainslash;
-        $file = $tempDir . "min_main_" . $hash . ".js";
-        $cdnFile = $this->convert_cdn($file);
+        $tempDirFs = tiki_temp_dir(true) . '/' . $tikidomainslash;
+        $tempDirWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+        $fileFs = $tempDirFs . "min_main_" . $hash . ".js";
+        $fileWeb = $tempDirWeb . "min_main_" . $hash . ".js";
+        $cdnFile = $this->convert_cdn($fileWeb);
 
         // Check if we are on a user defined CDN and the file exists (if tiki_cdn_check is enabled).
         // Note: cdn will only be used if the local minified file exists, this ensures that we run the minification at
         // least once locally (covers the case where this instance is also cdn)
-        if (file_exists($file) && ($file != $cdnFile)) {
+        if (file_exists($fileFs) && ($fileWeb != $cdnFile)) {
             $cacheType = 'cdn_minify_check';
             if ($prefs['tiki_cdn_check'] === 'y' && ! $cachelib->isCached($cdnFile, $cacheType)) {
                 $cdnHeaders = get_headers($cdnFile);
@@ -757,8 +759,8 @@ class HeaderLib
             }
         }
 
-        if (file_exists($file)) {
-            return $file;
+        if (file_exists($fileFs)) {
+            return $fileWeb;
         }
 
          // file does not exist - create it
@@ -790,7 +792,7 @@ class HeaderLib
                             $hash = md5($f);
                             // filename without extension - makes it easier to identify the compressed files if needed.
                             $prefix = basename($f, '.js');
-                            $minifyFile = $tempDir . "min_s_" . $prefix . "_" . $hash . ".js";
+                            $minifyFile = $tempDirFs . "min_s_" . $prefix . "_" . $hash . ".js";
                             if (file_exists($minifyFile)) {
                                 $temp = file_get_contents($minifyFile);
                             } else {
@@ -1139,18 +1141,20 @@ class HeaderLib
     {
         global $tikidomainslash;
         $out = [];
-        $publicDirectory = 'temp/public/' . $tikidomainslash;
+        $publicDirectoryFs = tiki_temp_dir(true) . '/' . $tikidomainslash;
+        $publicDirectoryWeb = tiki_temp_dir_web(true) . $tikidomainslash;
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
             I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
             $fileContentsHash = md5_file($originalFile);
-            $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
-            if (! file_exists($minimalFilePath)) {
-                (new MatthiasMullie\Minify\CSS($originalFile))->minify($minimalFilePath);
-                chmod($minimalFilePath, 0644);
+            $minimalFilePathFs = $publicDirectoryFs . "minified_$fileContentsHash.css";
+            $minimalFilePathWeb = $publicDirectoryWeb . "minified_$fileContentsHash.css";
+            if (! file_exists($minimalFilePathFs)) {
+                (new MatthiasMullie\Minify\CSS($originalFile))->minify($minimalFilePathFs);
+                chmod($minimalFilePathFs, 0644);
             }
 
-            $out[] = $minimalFilePath;
+            $out[] = $minimalFilePathWeb;
         }
 
         return $out;
@@ -1170,9 +1174,10 @@ class HeaderLib
             $fileSetContentsHash = $this->getFilesContentsHash($files);
             $cachelib->cacheItem($fileSetHash, $fileSetContentsHash, 'minify_css_contents_by_paths');
         }
-        $minimalFilePath = 'temp/public/' . $tikidomainslash . "minified_$fileSetContentsHash.css";
+        $minimalFilePathFs = tiki_temp_dir(true) . '/' . $tikidomainslash . "minified_$fileSetContentsHash.css";
+        $minimalFilePathWeb = tiki_temp_dir_web(true) . $tikidomainslash . "minified_$fileSetContentsHash.css";
 
-        if (! file_exists($minimalFilePath)) {
+        if (! file_exists($minimalFilePathFs)) {
             $minifier = new MatthiasMullie\Minify\CSS();
 
             foreach ($files as $originalFile) {
@@ -1184,11 +1189,11 @@ class HeaderLib
                 $minifier->add($originalFile);
             }
 
-            $minifier->minify($minimalFilePath);
-            chmod($minimalFilePath, 0644);
+            $minifier->minify($minimalFilePathFs);
+            chmod($minimalFilePathFs, 0644);
         }
 
-        return [ $minimalFilePath ];
+        return [ $minimalFilePathWeb ];
     }
 
     public function minify_css($file)

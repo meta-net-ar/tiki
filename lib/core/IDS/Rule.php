@@ -25,7 +25,7 @@ class IDS_Rule
         $path = $prefs['ids_custom_rules_file'];
 
         if (empty($path)) {
-            $path = 'temp/ids_custom_rules.json';
+            $path = rtrim(tiki_temp_dir(), '/') . '/ids_custom_rules.json';
         }
 
         return $path;

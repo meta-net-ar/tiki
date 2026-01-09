@@ -30,7 +30,7 @@ class UserPrefsLib extends TikiLib
             $userlib->interSendUserInfo($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $user);
         }
 
-        $image = 'temp/public/' . $tikidomainslash . 'avatar_' . md5($user) . '.*';
+        $image = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash . 'avatar_' . md5($user) . '.*';
         foreach (glob($image) as $file) {
             unlink($file);
         }
@@ -58,14 +58,18 @@ class UserPrefsLib extends TikiLib
         if ($user) {
             if ($prefs['users_serve_avatar_static'] == 'y') {
                 $hash = md5($user);
-                $files = glob("temp/public/{$tikidomainslash}avatar_$hash.{jpg,jpeg,gif,png}", GLOB_BRACE);
+                $publicDirFs = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash;
+                $publicDirWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+                $files = glob($publicDirFs . "avatar_$hash.{jpg,jpeg,gif,png}", GLOB_BRACE);
 
                 if (! empty($files[0])) {
-                    $file = $files[0];
+                    $fileFs = $files[0];
+                    $file = $publicDirWeb . basename($fileFs);
                 } else {
                     $file = $this->generate_avatar_file($user);
+                    $fileFs = $publicDirFs . basename($file);
                 }
-                if ($lastmod = filemtime($file)) {
+                if (! empty($fileFs) && ($lastmod = filemtime($fileFs))) {
                     $file .= '?v=' . $lastmod;
                 }
             } else {
@@ -119,12 +123,13 @@ class UserPrefsLib extends TikiLib
         }
 
         $hash = md5($user);
-        $image = "temp/public/{$tikidomainslash}avatar_{$hash}.$ext";
+        $imageFs = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash . "avatar_{$hash}.$ext";
+        $imageWeb = tiki_temp_dir_web(true) . $tikidomainslash . "avatar_{$hash}.$ext";
 
-        file_put_contents($image, $info['avatarData']);
-        chmod($image, 0644);
+        file_put_contents($imageFs, $info['avatarData']);
+        chmod($imageFs, 0644);
 
-        return $image;
+        return $imageWeb;
     }
 
     /**

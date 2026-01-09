@@ -349,7 +349,7 @@ HTML;
 
             $filename = sprintf('index-compare-engines_results_%s.html', date('YmdHi'));
 
-            $finalPath = 'temp/' . $tikidomainslash . $filename;
+            $finalPath = rtrim(tiki_temp_dir(), '/') . '/' . $tikidomainslash . $filename;
 
             if (file_exists($finalPath)) {
                 unlink($finalPath);

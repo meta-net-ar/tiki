@@ -7497,6 +7497,36 @@ function makeBool($val, $default)
     }
     return ($val ? 'true' : 'false');
 }
+
+function tiki_temp_dir(bool $public = false): string
+{
+    global $prefs;
+
+    $tmpDir = $prefs['tmpDir'] ?? 'temp';
+    $tmpDir = rtrim($tmpDir, '/');
+    if ($public) {
+        $tmpDir .= '/public';
+    }
+
+    return $tmpDir;
+}
+
+function tiki_temp_dir_web(bool $public = false): string
+{
+    $tmpDir = tiki_temp_dir($public);
+    if (! str_starts_with($tmpDir, '/')) {
+        return rtrim($tmpDir, '/') . '/';
+    }
+
+    if (defined('TIKI_PATH')) {
+        $root = rtrim(TIKI_PATH, '/');
+        if (str_starts_with($tmpDir, $root . '/')) {
+            return substr($tmpDir, strlen($root) + 1) . '/';
+        }
+    }
+
+    return $public ? 'temp/public/' : 'temp/';
+}
 /* Editor configuration
      Local Variables:
      tab-width: 4
