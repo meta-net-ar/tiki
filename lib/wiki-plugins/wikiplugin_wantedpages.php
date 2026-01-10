@@ -240,31 +240,37 @@ class WikiPluginWantedPages extends PluginsLib
 
         // Currently we only look in wiki pages.
         // Wiki links in articles, blogs, etc are ignored.
-        $query = 'select distinct tl.`toPage`, tl.`fromPage`, tpf.`data` as fromPageContent from `tiki_links` tl';
-        $query .= ' left join `tiki_pages` tp on (tl.`toPage` = tp.`pageName`)';
-        $query .= ' left join `tiki_pages` tpf on (tl.`fromPage` = tpf.`pageName`)';
+        $query = 'SELECT DISTINCT tl.`toPage`, tl.`fromPage`, ' .
+            'CASE ' .
+                'WHEN tl.`fromPage` LIKE \'objectlink:trackeritemfield:%\' THEN ttif.`value` ' .
+                'ELSE tpf.`data` ' .
+            'END AS fromPageContent ' .
+            'FROM `tiki_links` tl ' .
+            'LEFT JOIN `tiki_pages` tp ON (tl.`toPage` = tp.`pageName`) ' .
+            'LEFT JOIN `tiki_pages` tpf ON (tl.`fromPage` = tpf.`pageName`) ' .
+            'LEFT JOIN `tiki_tracker_item_fields` ttif ON (' .
+                'SUBSTRING_INDEX(SUBSTRING_INDEX(tl.`fromPage`, \':\', 3), \':\', -1) = ttif.`itemId` ' .
+                'AND SUBSTRING_INDEX(tl.`fromPage`, \':\', -1) = ttif.`fieldId` ' .
+                'AND tl.`fromPage` LIKE \'objectlink:trackeritemfield:%\' ' .
+            ')';
         if ($skipalias) {
-            $query .= ' left join `tiki_object_relations` tor on (tl.`toPage` = tor.`target_itemId`)';
+            $query .= ' LEFT JOIN `tiki_object_relations` tor ON (tl.`toPage` = tor.`target_itemId`)';
         }
 
         $categories = $this->get_jail();
         if ($categories) {
-            $query .= ' inner join `tiki_objects` as tob on (tob.`itemId`= tl.`fromPage` and tob.`type`= ?) inner join `tiki_category_objects` as tc on (tc.`catObjectId`=tob.`objectId` and tc.`categId` IN(' . implode(', ', array_fill(0, count($categories), '?')) . '))';
+            $query .= ' INNER JOIN `tiki_objects` AS tob ON (tob.`itemId` = tl.`fromPage` AND tob.`type` = ?) INNER JOIN `tiki_category_objects` AS tc ON (tc.`catObjectId` = tob.`objectId` AND tc.`categId` IN (' . implode(', ', array_fill(0, count($categories), '?')) . '))';
         }
-        $query .= ' where tp.`pageName` is null';
+        $query .= ' WHERE tp.`pageName` IS NULL';
         if ($skipalias) {
-            $query .= ' and (tor.`relation` is null or tor.`relation` != \'tiki.link.alias\')';
+            $query .= ' AND (tor.`relation` IS NULL OR tor.`relation` != \'tiki.link.alias\')';
         }
         $result = $this->query($query, $categories ? array_merge(['wiki page'], $categories) : []);
         $tmp = [];
 
         while ($row = $result->fetchRow()) {
-            // Skip links that were escaped with ~np~ tags
-            // For object links, we don't have page content to check, so skip the escape check
-            if (
-                ! str_starts_with($row['fromPage'], 'objectlink:') &&
-                $this->isEscapedLink($row['fromPageContent'] ?? '', $row['toPage'])
-            ) {
+            // For object links, we now fetch the content to check for escape tags.
+            if ($this->isEscapedLink($row['fromPageContent'] ?? '', $row['toPage'])) {
                 if ($debug == 2) {
                     echo tr('%0 [from: %1]: escaped with ~np~ tags', $row['toPage'], $row['fromPage']) . '<br />';
                 } elseif ($debug) {
