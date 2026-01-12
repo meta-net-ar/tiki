@@ -188,7 +188,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-width: 1px;
-                        border-left-style: solid; // #0075ff;
+                        border-left-style: solid;
                     }');
 
                 return "<div id='autotoc'></div>";
@@ -211,7 +211,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-style: solid;
-                        bordr-left-width: 1px; // #0075ff;
+                        border-left-width: 1px;
                     }
 
                     #autotoc .nav-link.active,
@@ -221,11 +221,10 @@ function wikiplugin_autotoc($data, $params)
                         font-weight: bold;
                         background-color: transparent;
                         border-left-style: solid;
-                        border-left-width: 2px;// solid #0075ff;
+                        border-left-width: 2px;
                     }
 
                     #autotoc .nav-link + ul {
-                        display: none;
                         padding-bottom: 10px;
                     }
 
