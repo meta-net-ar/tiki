@@ -570,7 +570,7 @@ class Services_Tracker_TabularController
                             $entry = new TrackerSourceEntry($itemId);
                             $row = ['itemId' => $itemId];
                             foreach ($columns as $column) {
-                                $row[$column->getField()] = $entry->render($column, false);
+                                $row[$column->getLabel()] = $row[$column->getField()] = $entry->render($column, false);
                             }
                             $data[] = $row;
                         }
