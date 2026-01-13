@@ -347,6 +347,8 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             $this->deleteEmail($existing, $value['delete'], $value['skip_trash'] ?? false);
         } elseif (isset($value['archive'])) {
             $this->archiveEmail($existing, $value['archive']);
+        } elseif (isset($value['restore'])) {
+            $this->restoreEmail($existing, $value['restore']);
         } elseif (isset($value['replace'])) {
             $this->updateDraftEmail($value['replace']);
         } elseif (isset($value['newFolder'])) {
@@ -632,6 +634,23 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 unset($existing[$folder][$key]);
                 $existing[$folder] = array_values($existing[$folder]);
                 $existing['archive'][] = $fileId;
+                break;
+            }
+        }
+    }
+
+    protected function restoreEmail(&$existing, $fileId)
+    {
+
+        if (! $this->getOption('useFolders')) {
+            Feedback::error(tr('%0 field: not configured to use folders but message was tried to be archived.', $this->getConfiguration('name')));
+            return;
+        }
+        foreach ($existing as $folder => $_) {
+            if (($key = array_search($fileId, $existing[$folder])) !== false) {
+                unset($existing[$folder][$key]);
+                $existing[$folder] = array_values($existing[$folder]);
+                $existing['inbox'][] = $fileId;
                 break;
             }
         }
