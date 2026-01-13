@@ -165,13 +165,7 @@ $current_url = $base_uri;
 $smarty->assign('returnURL', $current_url);
 $smarty->assign('currentcalitemId', $calitemId);
 
-$displayedcals = $_SESSION['CalendarViewGroups'] ?? [];
-
-if (! is_array($displayedcals)) {
-    $displayedcals = [];
-}
-
-$smarty->assign('displayedcals', $displayedcals);
+$smarty->assign('displayedcals', $_SESSION['CalendarViewGroups']);
 $thiscal = [];
 $checkedCalIds = [];
 

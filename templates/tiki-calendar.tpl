@@ -1,6 +1,6 @@
 {include file='token_view_actions.tpl'}
 {title admpage="calendar"}
-    {if $displayedcals|@count eq 1}
+    {if $displayedcals|@count eq 1 and isset($displayedcals[0]) and isset($calendars[$displayedcals[0]])}
     {tr}Calendar:{/tr} {$calendars[$displayedcals[0]].displayName|escape}
     {else}
         {tr}Calendar{/tr}
@@ -35,9 +35,9 @@
                         {/if}
                     </li>
                 {/if}
-                {if $displayedcals|@count eq 1 and $prefs.feature_group_watches eq 'y' and ( $tiki_p_admin_users eq 'y' or $tiki_p_admin eq 'y' )}
+                {if isset($displayedcals[0], $calendars[$displayedcals[0]])}
                     <li class="dropdown-item">
-                        <a href="tiki-object_watches.php?objectId={$displayedcals[0]|escape:"url"}&amp;watch_event=calendar_changed&amp;objectType=calendar&amp;objectName={$calendars[$x].name|escape:"url"}&amp;objectHref={'tiki-calendar.php?calIds[]='|cat:$displayedcals[0]|escape:"url"}">
+                         <a href="tiki-object_watches.php?objectId={$displayedcals[0]|escape:'url'}&amp;watch_event=calendar_changed&amp;objectType=calendar&amp;objectName={$calendars[$displayedcals[0]].name|escape:'url'}&amp;objectHref={'tiki-calendar.php?calIds[]='|cat:$displayedcals[0]|escape:'url'}">
                             {icon name="watch-group"} {tr}Group Monitor{/tr}
                         </a>
                     </li>
