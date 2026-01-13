@@ -199,7 +199,7 @@ class H5PLib
         $file = TikiFile::id($fileId);
 
         // make a copy of the h5p file for the validator to unpack (and eventually delete)
-        $dest = rtrim(tiki_temp_dir(), '/') . '/' . $file->filename;
+        $dest = tiki_temp_dir() . $file->filename;
         file_put_contents($dest, $file->getContents());
 
         /** @var ZipArchive $zip */

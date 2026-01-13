@@ -11,7 +11,7 @@ class Tiki_Connect_Server extends Tiki_Connect_Abstract
     public function __construct()
     {
         parent::__construct();
-        $this->indexFile = rtrim(tiki_temp_dir(), '/') . '/connect_server-index';
+        $this->indexFile = tiki_temp_dir() . 'connect_server-index';
     }
 
     public function getMatchingConnections($criteria, $maxRecords = 25, $sort = '')

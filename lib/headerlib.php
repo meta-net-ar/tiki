@@ -738,8 +738,8 @@ class HeaderLib
             $hash = $this->getFilesContentsHash($jsfiles);
             $cachelib->cacheItem($cacheName, $hash, $cacheType);
         }
-        $tempDirFs = tiki_temp_dir(true) . '/' . $tikidomainslash;
-        $tempDirWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+        $tempDirFs = tiki_temp_dir(true) . $tikidomainslash;
+        $tempDirWeb = tiki_temp_dir_web() . $tikidomainslash;
         $fileFs = $tempDirFs . "min_main_" . $hash . ".js";
         $fileWeb = $tempDirWeb . "min_main_" . $hash . ".js";
         $cdnFile = $this->convert_cdn($fileWeb);
@@ -1141,8 +1141,8 @@ class HeaderLib
     {
         global $tikidomainslash;
         $out = [];
-        $publicDirectoryFs = tiki_temp_dir(true) . '/' . $tikidomainslash;
-        $publicDirectoryWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+        $publicDirectoryFs = tiki_temp_dir(true) . $tikidomainslash;
+        $publicDirectoryWeb = tiki_temp_dir_web() . $tikidomainslash;
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
             I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
@@ -1174,8 +1174,8 @@ class HeaderLib
             $fileSetContentsHash = $this->getFilesContentsHash($files);
             $cachelib->cacheItem($fileSetHash, $fileSetContentsHash, 'minify_css_contents_by_paths');
         }
-        $minimalFilePathFs = tiki_temp_dir(true) . '/' . $tikidomainslash . "minified_$fileSetContentsHash.css";
-        $minimalFilePathWeb = tiki_temp_dir_web(true) . $tikidomainslash . "minified_$fileSetContentsHash.css";
+        $minimalFilePathFs = tiki_temp_dir(true) . $tikidomainslash . "minified_$fileSetContentsHash.css";
+        $minimalFilePathWeb = tiki_temp_dir_web() . $tikidomainslash . "minified_$fileSetContentsHash.css";
 
         if (! file_exists($minimalFilePathFs)) {
             $minifier = new MatthiasMullie\Minify\CSS();

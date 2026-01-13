@@ -106,7 +106,7 @@ class PagePdfExporter
             $filename = $tikilib->remove_non_word_characters_and_accents($file) . '.pdf';
 
             // Use temp/public directory for generated PDFs
-            $outputPath = rtrim(tiki_temp_dir(true), '/') . '/' . $filename;
+            $outputPath = tiki_temp_dir(true) . $filename;
         }
 
         // Ensure the directory exists

@@ -64,7 +64,7 @@ class Services_PDF_Controller
     {
         //write content to file
         $tableName = $input->tableName->text();
-        $fname = rtrim(tiki_temp_dir(), '/') . '/' . $tableName . '_' . session_id() . ".txt";
+        $fname = tiki_temp_dir() . $tableName . '_' . session_id() . ".txt";
         $tableFile = fopen($fname, "w");
         $table = $input->tableHTML->none();
         $table = $this->cleanPivotTableSvgs($table);
@@ -77,7 +77,7 @@ class Services_PDF_Controller
     public function action_checkPDFFile()
     {
 
-        $pdfFile = rtrim(tiki_temp_dir(true), '/') . '/pdffile_' . session_id() . '.txt';
+        $pdfFile = tiki_temp_dir(true) . 'pdffile_' . session_id() . '.txt';
         if (file_exists($pdfFile)) {
             $pdfLenght = file_get_contents($pdfFile);
             unlink($pdfFile);

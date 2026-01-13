@@ -14,8 +14,8 @@ function createCodemirrorModes()
     $js = '';
     $css = '';
 
-    $targetFs = tiki_temp_dir(true) . '/' . $tikidomainslash;
-    $targetWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+    $targetFs = tiki_temp_dir(true) . $tikidomainslash;
+    $targetWeb = tiki_temp_dir_web() . $tikidomainslash;
     $jsModesFs = $targetFs . 'codemirror_modes.js';
     $cssModesFs = $targetFs . 'codemirror_modes.css';
     $jsModesWeb = $targetWeb . 'codemirror_modes.js';

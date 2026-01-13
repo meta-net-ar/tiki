@@ -62,8 +62,8 @@ class VueJsLib
         // check if the string contains vuejs script or template tags
         if ($dom->getElementsByTagName('script')->length || $dom->getElementsByTagName('template')->length) {
             global $tikidomainslash;
-            $tempDirFs = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash;
-            $tempDirWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+            $tempDirFs = tiki_temp_dir(true) . $tikidomainslash;
+            $tempDirWeb = tiki_temp_dir_web() . $tikidomainslash;
             $hash = $name ? $name : md5(serialize($str));
 
             $fileFs = $tempDirFs . "vue_" . $hash . ".vue";

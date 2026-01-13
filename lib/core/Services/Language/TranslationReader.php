@@ -61,7 +61,7 @@ class TranslationReader
 
     private function jsonRead()
     {
-        $content = file_get_contents(rtrim(tiki_temp_dir(), '/') . '/' . $_FILES['language_file']['name']);
+        $content = file_get_contents(tiki_temp_dir() . $_FILES['language_file']['name']);
         return json_decode($content, true);
     }
 }

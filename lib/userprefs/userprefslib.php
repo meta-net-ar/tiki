@@ -30,7 +30,7 @@ class UserPrefsLib extends TikiLib
             $userlib->interSendUserInfo($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $user);
         }
 
-        $image = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash . 'avatar_' . md5($user) . '.*';
+        $image = tiki_temp_dir(true) . $tikidomainslash . 'avatar_' . md5($user) . '.*';
         foreach (glob($image) as $file) {
             unlink($file);
         }
@@ -58,8 +58,8 @@ class UserPrefsLib extends TikiLib
         if ($user) {
             if ($prefs['users_serve_avatar_static'] == 'y') {
                 $hash = md5($user);
-                $publicDirFs = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash;
-                $publicDirWeb = tiki_temp_dir_web(true) . $tikidomainslash;
+                $publicDirFs = tiki_temp_dir(true) . $tikidomainslash;
+                $publicDirWeb = tiki_temp_dir_web() . $tikidomainslash;
                 $files = glob($publicDirFs . "avatar_$hash.{jpg,jpeg,gif,png}", GLOB_BRACE);
 
                 if (! empty($files[0])) {
@@ -123,8 +123,8 @@ class UserPrefsLib extends TikiLib
         }
 
         $hash = md5($user);
-        $imageFs = rtrim(tiki_temp_dir(true), '/') . '/' . $tikidomainslash . "avatar_{$hash}.$ext";
-        $imageWeb = tiki_temp_dir_web(true) . $tikidomainslash . "avatar_{$hash}.$ext";
+        $imageFs = tiki_temp_dir(true) . $tikidomainslash . "avatar_{$hash}.$ext";
+        $imageWeb = tiki_temp_dir_web() . $tikidomainslash . "avatar_{$hash}.$ext";
 
         file_put_contents($imageFs, $info['avatarData']);
         chmod($imageFs, 0644);

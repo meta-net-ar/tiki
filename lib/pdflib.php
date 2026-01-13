@@ -182,7 +182,7 @@ class PdfGenerator
         // There seemed to be encoding issues when using stdout (on Windows 7 64 bit).
 
         // Use temp/public. It is cleaned up during a cache clean, in case some files are left
-        $filename = rtrim(tiki_temp_dir(true), '/') . '/out' . mt_rand() . '.pdf';
+        $filename = tiki_temp_dir(true) . 'out' . mt_rand() . '.pdf';
 
         // Run shell_exec command to generate out file
         // NOTE: this requires write permissions
@@ -220,7 +220,7 @@ class PdfGenerator
         // There seemed to be encoding issues when using stdout (on Windows 7 64 bit).
 
         // Use temp/public. It is cleaned up during a cache clean, in case some files are left
-        $filename = rtrim(tiki_temp_dir(true), '/') . '/out' . mt_rand() . '.pdf';
+        $filename = tiki_temp_dir(true) . 'out' . mt_rand() . '.pdf';
 
         // Run shell_exec command to generate out file
         // NOTE: this requires write permissions
@@ -671,7 +671,7 @@ class PdfGenerator
                         }
                     }
 
-                    $tmpExtPDF = rtrim(tiki_temp_dir(), '/') . "/tmp_" . rand(0, 999999999) . ".pdf";
+                    $tmpExtPDF = tiki_temp_dir() . "tmp_" . rand(0, 999999999) . ".pdf";
                     file_put_contents($tmpExtPDF, fopen($breakPageContent, 'r'));
                     chmod($tmpExtPDF, 0755);
                     $finfo = finfo_open(FILEINFO_MIME_TYPE); //recheck if its valid pdf file
@@ -786,11 +786,11 @@ class PdfGenerator
         }
 
         $this->clearTempImg($tempImgArr);
-        $tempFile = fopen(rtrim(tiki_temp_dir(true), '/') . "/pdffile_" . session_id() . ".txt", "w");
+        $tempFile = fopen(tiki_temp_dir(true) . "pdffile_" . session_id() . ".txt", "w");
         fwrite($tempFile, ($pagesTotal * 30));
 
         if ($prefs['print_pdf_mpdf_debug'] === 'y') {
-            file_put_contents(rtrim(tiki_temp_dir(), '/') . '/mpdf_debug_output.html', $debugOutput);
+            file_put_contents(tiki_temp_dir() . 'mpdf_debug_output.html', $debugOutput);
         }
 
         return $mpdf->Output('', 'S');                  // Return as a string
@@ -1162,7 +1162,7 @@ class PdfGenerator
         if (! $internalImg) {
             $url = $base_url . $url;
         }
-        $pdfImgDir = rtrim(tiki_temp_dir(), '/') . '/pdfimg';
+        $pdfImgDir = tiki_temp_dir() . 'pdfimg';
         if (! file_exists($pdfImgDir)) {
             mkdir($pdfImgDir);
             chmod($pdfImgDir, 0755);
@@ -1465,7 +1465,7 @@ TEXT;
         $tid = $table->getAttribute("id");
 
 
-        $tempTableFile = rtrim(tiki_temp_dir(), '/') . "/#" . $tid . "_" . session_id() . ".txt";
+        $tempTableFile = tiki_temp_dir() . "#" . $tid . "_" . session_id() . ".txt";
         if (file_exists($tempTableFile)) {
             $content = mb_convert_encoding(file_get_contents($tempTableFile), 'HTML-ENTITIES', 'UTF-8');
          //formating content

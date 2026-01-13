@@ -44,7 +44,7 @@ function wikiplugin_archivebuilder($data, $params)
         ];
 
         $archive = new ZipArchive();
-        $archive->open($file = tempnam(rtrim(tiki_temp_dir(), '/') . '/', 'archive') . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $archive->open($file = tempnam(tiki_temp_dir(), 'archive') . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         foreach (array_filter(explode("\n", trim($data))) as $line) {
             $parts = explode(":", trim($line));

@@ -735,7 +735,7 @@ class FileGalLib extends TikiLib
 
     public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors)
     {
-        $extract_dir = rtrim(tiki_temp_dir(), '/') . '/' . basename($file) . '/';
+        $extract_dir = tiki_temp_dir() . basename($file) . '/';
         mkdir($extract_dir);
         $archive = new PclZip($file);
         $archive->extract(PCLZIP_OPT_PATH, $extract_dir, PCLZIP_OPT_REMOVE_ALL_PATH);

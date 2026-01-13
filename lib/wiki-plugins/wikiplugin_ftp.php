@@ -90,7 +90,7 @@ function wikiplugin_ftp($data, $params)
             Feedback::errorAndDie(tra("The file you are trying to download was not found on the server or you may not have permissions to access it!"), \Laminas\Http\Response::STATUS_CODE_404);
         }
 
-        $local = rtrim(tiki_temp_dir(), '/') . '/' . $data;
+        $local = tiki_temp_dir() . $data;
         if (! ftp_get($conn_id, $local, $data, FTP_BINARY)) {
             ftp_close($conn_id);
             return tra('failed');

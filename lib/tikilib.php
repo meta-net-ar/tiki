@@ -1770,7 +1770,7 @@ class TikiLib extends TikiDb_Bridge
 
         // Combined query using subqueries
         $query = "
-            SELECT 
+            SELECT
                 ? as lastVisit,
                 (SELECT COUNT(*) FROM `tiki_pages` WHERE `lastModif` > ?) as pages,
                 (SELECT COUNT(*) FROM `tiki_files` WHERE `created` > ?) as files,
@@ -7498,6 +7498,14 @@ function makeBool($val, $default)
     return ($val ? 'true' : 'false');
 }
 
+/**
+ * Returns a filesystem path to the temp directory.
+ *
+ * Uses $prefs['tmpDir'] when set and appends /public for web-accessible storage.
+ *
+ * @param bool $public True to return the public temp directory.
+ * @return string
+ */
 function tiki_temp_dir(bool $public = false): string
 {
     global $prefs;
@@ -7508,14 +7516,22 @@ function tiki_temp_dir(bool $public = false): string
         $tmpDir .= '/public';
     }
 
-    return $tmpDir;
+    return $tmpDir . '/';
 }
 
-function tiki_temp_dir_web(bool $public = false): string
+/**
+ * Returns a web-relative temp path suitable for URLs.
+ *
+ * If tmpDir is outside TIKI_PATH,
+ * falls back to temp/public/
+ *
+ * @return string
+ */
+function tiki_temp_dir_web(): string
 {
-    $tmpDir = tiki_temp_dir($public);
+    $tmpDir = rtrim(tiki_temp_dir(true), '/');
     if (! str_starts_with($tmpDir, '/')) {
-        return rtrim($tmpDir, '/') . '/';
+        return $tmpDir . '/';
     }
 
     if (defined('TIKI_PATH')) {
@@ -7525,8 +7541,9 @@ function tiki_temp_dir_web(bool $public = false): string
         }
     }
 
-    return $public ? 'temp/public/' : 'temp/';
+    return 'temp/public/';
 }
+
 /* Editor configuration
      Local Variables:
      tab-width: 4

@@ -3718,10 +3718,10 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         // set a proper home folder
-                        $tmpBase = rtrim(tiki_temp_dir(), '/');
-                        $_ENV['HOME'] = $tmpBase . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . $tikidomain;
+                        $tmpBase = tiki_temp_dir();
+                        $_ENV['HOME'] = $tmpBase . 'cache/' . $tikidomain;
 
-                        $targetFile = $tmpBase . '/target_' . $fileId . '.png';
+                        $targetFile = $tmpBase . 'target_' . $fileId . '.png';
 
                         Tiki\Lib\Alchemy\AlchemyLib::hintMimeTypeByFilePath($filePath, $file->filetype);
 

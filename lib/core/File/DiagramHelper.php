@@ -340,9 +340,9 @@ class DiagramHelper
         $casperBin = TIKI_PATH . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'casperjs';
         $scriptPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/jquery_tiki/tiki-diagram.js';
         $htmlFile = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/core/File/DiagramHelperExportCasperJS.html';
-        $tmpBase = rtrim(tiki_temp_dir(), '/');
-        $jsfile = $tmpBase . DIRECTORY_SEPARATOR . 'do_' . $fileIdentifier . '.js';
-        $imgFile = $tmpBase . DIRECTORY_SEPARATOR . 'diagram_' . $fileIdentifier . '.png';
+        $tmpBase = tiki_temp_dir();
+        $jsfile = $tmpBase . 'do_' . $fileIdentifier . '.js';
+        $imgFile = $tmpBase . 'diagram_' . $fileIdentifier . '.png';
 
         if (! empty($vendorPath) && file_exists($casperBin) && file_exists($scriptPath) && file_exists($htmlFile)) {
             $jsContent = <<<EOF
