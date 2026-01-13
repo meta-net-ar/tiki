@@ -7502,6 +7502,7 @@ function makeBool($val, $default)
  * Returns a filesystem path to the temp directory.
  *
  * Uses $prefs['tmpDir'] when set and appends /public for web-accessible storage.
+ * The returned value always has a `/` at the end.
  *
  * @param bool $public True to return the public temp directory.
  * @return string
@@ -7524,6 +7525,7 @@ function tiki_temp_dir(bool $public = false): string
  *
  * If tmpDir is outside TIKI_PATH,
  * falls back to temp/public/
+ * The returned value always has a `/` at the end, so you can safely concatenate it for building a web path.
  *
  * @return string
  */
