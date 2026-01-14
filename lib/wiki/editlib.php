@@ -1680,6 +1680,12 @@ class EditLib
             }
         }
 
+        // check if the wiki page is used as a wiki template the data cannot be converted.
+        $perms = $tikilib->get_perm_Object_Case($page, 'wiki page', 'tiki_p_use_as_template' );
+        if (! empty($perms)) {
+            return $data;
+        }
+
         if ($target_syntax == 'markdown') {
             // convert to markdown
             if ($source_syntax == 'markdown') {
