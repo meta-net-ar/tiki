@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 /****
  * Initially just a collection of the functions dotted around tiki-editpage.php for v4.0
  * Started in the edit_fixup experimental branch - jonnybradley Aug 2009
@@ -49,7 +50,7 @@ class EditLib
         if (! $page_info && count($aliases) > 0) {
             $error_title = tra("Cannot create aliased page");
             $error_msg = tra("You attempted to create the following page:") . " " .
-                         "<b>$page</b>.\n<p>\n";
+                "<b>$page</b>.\n<p>\n";
             $error_msg .= tra("That page is an alias for the following pages") . ": ";
             foreach ($aliases as $an_alias) {
                 $error_msg .= '<a href="' . $wikilib->editpage_url($an_alias['fromPage'], false) . '">' . $an_alias['fromPage'] . '</a>, ';
@@ -222,8 +223,8 @@ class EditLib
 
         if (preg_match("/^rgb\( *(\d+) *, *(\d+) *, *(\d+) *\)$/", $col, $parts)) {
             $hex = str_pad(dechex($parts[1]), 2, '0', STR_PAD_LEFT)
-                 . str_pad(dechex($parts[2]), 2, '0', STR_PAD_LEFT)
-                 . str_pad(dechex($parts[3]), 2, '0', STR_PAD_LEFT);
+                . str_pad(dechex($parts[2]), 2, '0', STR_PAD_LEFT)
+                . str_pad(dechex($parts[3]), 2, '0', STR_PAD_LEFT);
             $hex = '#' . TikiLib::strtoupper($hex);
         } else {
             $hex = $col;
@@ -399,9 +400,9 @@ class EditLib
             /*
              * anchor
              */
-             $link_open = '{ANAME()}';
-             $link_close = '{ANAME}';
-             $link = $args['id']['value'];
+            $link_open = '{ANAME()}';
+            $link_close = '{ANAME}';
+            $link = $args['id']['value'];
         } else {
             /*
              * other links []
@@ -683,8 +684,8 @@ class EditLib
 
         // append=false, create new entries on the stack
         if (! $append) {
-            $p['stack'][] = ['tag' => $tag, 'string' => '', 'wikitags' => 0 ];
-            $p['wikistack'][] = [ 'begin' => [], 'end' => [] ];
+            $p['stack'][] = ['tag' => $tag, 'string' => '', 'wikitags' => 0];
+            $p['wikistack'][] = ['begin' => [], 'end' => []];
         };
 
         // get the entry points on the stacks
@@ -958,7 +959,7 @@ class EditLib
                     $add = $node['data'];
                     $noparsed = [];
                     $parserlib->plugins_remove($add, $noparsed);
-                    $add = str_replace(["\r","\n"], '', $add);
+                    $add = str_replace(["\r", "\n"], '', $add);
                     $add = str_replace('&nbsp;', ' ', $add);
                     $add = str_replace('[', '[[', $add);            // escape square brackets to prevent accidental wiki links
                     $parserlib->plugins_replace($add, $noparsed, true);
@@ -985,8 +986,13 @@ class EditLib
                             return trim(explode(':', $attr)[0]);
                         }, $styleAttrs);
                         $tikiStyleAttrs = [
-                            'text-align', 'font-weight', 'font-style', 'text-decoration',
-                            'color', 'background-color', 'background'
+                            'text-align',
+                            'font-weight',
+                            'font-style',
+                            'text-decoration',
+                            'color',
+                            'background-color',
+                            'background'
                         ];
 
                         $givenCssAttrsHandled = array_intersect($tikiStyleAttrs, $cssAttrs);
@@ -1392,8 +1398,14 @@ class EditLib
          *
          * wiki_lbr  = true if we must use '%%%' for linebreaks instead of '\n'
          */
-        $p = ['stack' => [], 'listack' => [], 'wikistack' => [],
-            'wiki_lbr' => 0, 'first_td' => false, 'first_tr' => false];
+        $p = [
+            'stack' => [],
+            'listack' => [],
+            'wikistack' => [],
+            'wiki_lbr' => 0,
+            'first_td' => false,
+            'first_tr' => false
+        ];
         $this->walk_and_parse($htmlparser->content, $out_data, $p, '');
         // Is some tags still opened? (It can be if HTML not valid, but this is not reason
         // to produce invalid wiki :)
@@ -1596,7 +1608,7 @@ class EditLib
         $old_pref = $prefs['wiki_heading_links'];
         $prefs['wiki_heading_links'] = 'n';
         $hashed = [];
-
+        $raw_data = $data;
         if ($target_syntax == 'markdown') {
             // handle some Tiki syntax to Wiki plugins that are not supported in Markdown
             $data = preg_replace('/-=(.+?)=-/', "{DIV(class=titlebar)}$1{DIV}", $data);
@@ -1646,7 +1658,6 @@ class EditLib
             }
         }
         $data = $this->convertSmileysToUnicode($data);
-
         $wikiParserParsable = new WikiParser_Parsable($data);
         if (! $wikiParserParsable->convertable($data)) {
             throw new Exception(tr("Content has plugins that cannot be automatically converted. You should proceed with manual content conversion."));
@@ -1658,6 +1669,7 @@ class EditLib
         $wikiParserParsable->stripPlugins('maketoc');
         $wikiParserParsable->stripPlugins('wantedpages');
         $wikiParserParsable->stripPlugins('markdown');
+        $wikiParserParsable->stripPlugins('js');
         $wikiParserParsable->stripNP();
         $html = $wikiParserParsable->parse([
             'noparseplugins' => true,
@@ -1666,7 +1678,6 @@ class EditLib
             'suppress_icons' => true,
             'markdown_conversion' => true,
         ]);
-
         $prefs['wiki_heading_links'] = $old_pref;
 
         if ($page_name) {
@@ -1680,17 +1691,20 @@ class EditLib
             }
         }
 
-        // check if the wiki page is used as a wiki template the data cannot be converted.
-        $perms = $tikilib->get_perm_Object_Case($page, 'wiki page', 'tiki_p_use_as_template' );
-        if (! empty($perms)) {
-            return $data;
-        }
-
         if ($target_syntax == 'markdown') {
-            // convert to markdown
+            // convert to Markdown
             if ($source_syntax == 'markdown') {
                 throw new Exception(tr("Content already in markdown syntax."));
             }
+            /*
+           * Check if content is HTML, wiki page can be used as template and have HTML content that can not be converted
+           * to preserve content formating and looks.
+           *
+           */
+            if ($this->isHtmlContent($raw_data)) {
+                return $this->removeSyntaxPlugin($raw_data);
+            }
+
             static $converter = null;
             if (! $converter) {
                 $converter = new League\HTMLToMarkdown\HtmlConverter([
@@ -1703,7 +1717,7 @@ class EditLib
                 $converter->getEnvironment()->addConverter(new StrikeConverter());
             }
 
-            // GithubFlovoredMarkdown uses ~text~ for striking through.
+            // GitHub Flavored Markdown uses ~text~ for striking through.
             // This escapes ~ as in tiki syntax it is printed as it is
             $html = preg_replace('/~/', 'preserveTildeChar', $html);
 
@@ -1842,17 +1856,122 @@ class EditLib
     private function preserveInvalidTags(&$data)
     {
         $validTags = [
-            '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
-            'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
-            'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
-            'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
-            'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
-            'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
-            'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
-            'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
-            'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
-            'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
-            'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
+            '!DOCTYPE',
+            'a',
+            'abbr',
+            'address',
+            'area',
+            'article',
+            'aside',
+            'audio',
+            'base',
+            'bdo',
+            'bgsound',
+            'blink',
+            'blockquote',
+            'body',
+            'br',
+            'button',
+            'canvas',
+            'caption',
+            'col',
+            'colgroup',
+            'command',
+            'comme;nt',
+            'datalist',
+            'dd',
+            'del',
+            'details',
+            'div',
+            'dl',
+            'dt',
+            'embed',
+            'fieldset',
+            'figure',
+            'b',
+            'i',
+            'small',
+            'tt',
+            'footer',
+            'form',
+            'head',
+            'header',
+            'hgroup',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'hr',
+            'html',
+            'isindex',
+            'iframe',
+            'ilayer',
+            'img',
+            'input',
+            'ins',
+            'keygen',
+            'label',
+            'layer',
+            'legend',
+            'li',
+            'link',
+            'map',
+            'mark',
+            'marquee',
+            'menu',
+            'meta',
+            'meter',
+            'multicol',
+            'nav',
+            'nobr',
+            'noembed',
+            'noscript',
+            'object',
+            'ol',
+            'optgroup',
+            'option',
+            'output',
+            'p',
+            'param',
+            'cite',
+            'code',
+            'dfn',
+            'em',
+            'kbd',
+            'samp',
+            'strong',
+            'var',
+            'plaintext',
+            'pre',
+            'progress',
+            'q',
+            'ruby',
+            'script',
+            'section',
+            'select',
+            'spacer',
+            'span',
+            's',
+            'style',
+            'sub',
+            'sup',
+            'table',
+            'tbody',
+            'td',
+            'textarea',
+            'tfoot',
+            'thead',
+            'time',
+            'title',
+            'tr',
+            'u',
+            'ul',
+            'video',
+            'wbr',
+            'xmp',
+            'strike'
         ];
 
         $invalidTags = [];
@@ -2157,5 +2276,58 @@ class EditLib
         }
 
         return $style;
+    }
+
+    /**
+     * Detect if a given content string is HTML code.
+     *
+     * This function uses regex patterns to identify common HTML structures.
+     * It is designed to catch both readable and nested HTML, especially when
+     * there are multiple <div> or other block-level elements.
+     *
+     * Detection logic includes:
+     *  - Generic opening/closing tags: <tag> ... </tag>
+     *  - Common HTML elements: div, span, p, a, ul, li, table, h1-h6, img, form, input, etc.
+     *  - Attributes inside tags: <div class="...">, <a href="...">
+     *
+     * @param string $data The input string to analyze.
+     * @return bool True if the content is likely HTML code, false otherwise.
+     */
+    private function isHtmlContent(string $data): bool
+    {
+        // Remove HTML comments
+        $withoutComments = preg_replace('/<!--[\s\S]*?-->/', '', $data);
+        // Remove JS comments
+        $withoutComments = preg_replace([
+            '/\/\/.*$/m',       // single-line comments
+            '/\/\*[\s\S]*?\*\//' // multi-line comments
+        ], '', $withoutComments);
+        $withoutComments = $this->stripPluginSyntax($withoutComments);
+        // Remove Smarty template tags (optional but reduces noise)
+        $withoutComments = preg_replace('/\{[^{}]*\}/', '', $withoutComments);
+
+        if ($withoutComments) {
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+
+            $dom->loadHTML($withoutComments, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+            foreach ($dom->childNodes as $node) {
+                if ($node->nodeType === XML_ELEMENT_NODE) {
+                    $tag = "<{$node->nodeName}";
+                    if (strpos($withoutComments, $tag) !== false) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private function stripPluginSyntax(string $data): string
+    {
+        $pattern = '/\{([A-Za-z][A-Za-z0-9_]*)\([^)]*\)\}([\s\S]*?)\{\1\}/';
+        // Remove the whole block (tags + content)
+        return preg_replace($pattern, '', $data);
     }
 }
