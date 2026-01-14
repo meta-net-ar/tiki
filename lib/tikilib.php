@@ -4298,6 +4298,36 @@ class TikiLib extends TikiDb_Bridge
         return $ret;
     }
 
+
+    /**
+     *
+     * @param string $objectId object id (e.g. 'HomePage' or '42' depending on object type)
+     * @param string $objectType object type (e.g. 'wiki page')
+     * @param string $permName permittion for filtering in case it's exist
+     *
+     * @return array
+     */
+    public function get_perm_Object_Case(string $objectId,string $objectType, string $permName = ''): array {
+        $data = TikiLib::lib('user')->get_object_case_permissions(strtolower($objectId), $objectType);
+        $grouped_perms = array_reduce($data, function ($carry, $item) {
+            $carry[$item['groupName']][] = $item['permName'];
+            return $carry;
+        }) ?? [];
+
+        $perms = $grouped_perms ?? [];
+
+        if (strlen(trim($permName)) > 0 && count($grouped_perms) > 0) {
+            $perms = array_filter($grouped_perms, function ($group) use ($permName) {
+                if (is_array($group)) {
+                    return array_filter($group, function ($perm) use ($permName) {
+                       return $perm == $permName;
+                   });
+                }
+            });
+        }
+        return $perms;
+    }
+
     /**
      * @param $objectType
      * @return string
