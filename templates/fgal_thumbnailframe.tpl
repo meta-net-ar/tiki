@@ -45,7 +45,7 @@
                     {if $key_type neq 'image/svg' and $key_type neq 'image/svg+xml'}
                         {if $imagetypes eq 'y' or $prefs.theme_iconset eq 'legacy'}
                             {if $view eq 'page'}
-                                <img src="tiki-download_file.php?fileId={$file.id}&preview" style="width:{$maxWidth};max-width: 100%;">
+                                <img src="tiki-download_file.php?fileId={$file.id}&preview" style="width:{$maxWidth}px;max-width: 100%;">
                             {else}
                                 <img src="{$file.id|sefurl:thumbnail}" style="max-height:{$thumbnailcontener_size}px">
                             {/if}
