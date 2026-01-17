@@ -98,7 +98,7 @@ function wikiplugin_chartjs_info()
 
 function wikiplugin_chartjs($data, $params)
 {
-    global $base_url, $jitRequest;
+    global $base_url, $jitRequest, $prefs;
 
     static $instance = 0;
     $instance++;
@@ -181,14 +181,15 @@ function wikiplugin_chartjs($data, $params)
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
+    $html_content = '<script src="' . $prefs['headlessbrowser_chartjs_path'] . '"></script>';
+
     // PDF export related logic
     if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
         // casperJS uses PhantomJS that does not support ES6, so no support for modules.
         // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
         // the PDF export of the chart without using JS modules.
         // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
-        $html_content = <<<HTML
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
+        $html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -197,17 +198,10 @@ function wikiplugin_chartjs($data, $params)
 </script>
 HTML;
     } else {
-        $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
         $html_content .= <<<HTML
 <div>
     $canvas
 </div>
-
-<script type="module">
-    import { Chart, registerables } from "chartjs";
-    Chart.register(...registerables);
-    $script
-</script>
 HTML;
     }
     $scriptHash = md5($script);

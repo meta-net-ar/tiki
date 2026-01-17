@@ -188,6 +188,8 @@
                 {preference name=headlessbrowser_integration_type}
                 <div class="adminoptionbox headlessbrowser_integration_type_childcontainer chrome">
                     {preference name=headlessbrowser_chrome_path}
+                    {preference name=headlessbrowser_chrome_ignore_certificate_errors}
+                    {preference name=headlessbrowser_chartjs_path}
                 </div>
             </fieldset>
             <fieldset id="QueuedTasks">
