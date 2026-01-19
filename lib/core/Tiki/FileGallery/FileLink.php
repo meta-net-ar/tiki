@@ -13,7 +13,7 @@ class FileLink extends File
     public function __construct()
     {
         $this->param = array_merge(
-            parent::$param,
+            parent::getParams(),
             [
                 'objectId' => 0,
                 'objectType' => '',

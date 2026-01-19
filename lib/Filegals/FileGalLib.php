@@ -4439,7 +4439,7 @@ class FileGalLib extends TikiLib
             }
         }
     }
-    
+
     public function deleteObjectFiles($args)
     {
         $objectId = $args['object'] ?? null;
