@@ -446,6 +446,7 @@ class PdfGenerator
             if (empty($isPermissionToViewPage)) {
                 $title = tr('PDF Cover Page Error');
                 $mes = tr('PDF generation failed because you do not have permission to view the specified cover page: %0', $coverWikiPage);
+                $this->clearTempImg($tempImgArr);
                 Feedback::error(['mes' => $mes, 'title' => $title]);
                 TikiLib::lib('access')->redirect($params['page'] ?? '');
                 die();
@@ -1136,9 +1137,9 @@ class PdfGenerator
         if (! $internalImg) {
             $url = $base_url . $url;
         }
-        if (! file_exists('temp/pdfimg')) {
-            mkdir('temp/pdfimg');
-            chmod('temp/pdfimg', 0755);
+        if (! file_exists(TEMP_PDFIMG_PATH)) {
+            mkdir(TEMP_PDFIMG_PATH);
+            chmod(TEMP_PDFIMG_PATH, 0755);
         }
         $cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
         $opts = [];
@@ -1154,7 +1155,7 @@ class PdfGenerator
         if (gettype($data) == 'boolean' && ! $data) {
             return '';
         }
-        $newFile = 'temp/pdfimg/pdfimg' . mt_rand(9999, 999999) . '.png';
+        $newFile = TEMP_PDFIMG_PATH . '/pdfimg' . mt_rand(9999, 999999) . '.png';
         file_put_contents($newFile, $data);
         chmod($newFile, 0755);
         return $newFile;
