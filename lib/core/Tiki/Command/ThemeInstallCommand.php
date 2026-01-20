@@ -49,7 +49,7 @@ class ThemeInstallCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        global $tikipath;
+        global $tikipath, $prefs;
         $tikiRootFolder = ! empty($tikipath) ? $tikipath : dirname(dirname(dirname(dirname(__DIR__))));
 
         $logslib = TikiLib::lib('logs');
@@ -68,7 +68,7 @@ class ThemeInstallCommand extends Command
             return Command::INVALID;
         }
         $uniqueHash = 'ThemeZipTmp_' . uniqid('', true) . rand(0, PHP_INT_MAX);
-        $sourceFolder = $tikiRootFolder . '/temp/' . $uniqueHash ;
+        $sourceFolder = rtrim($prefs['tmpDir'], '/') . '/' . $uniqueHash;
         try {
             $zip = new ZipArchive();
             $zip->open($file);

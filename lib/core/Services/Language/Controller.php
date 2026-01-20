@@ -323,11 +323,12 @@ class Services_Language_Controller
             }
 
             //check if a custom.json already exist in temp/ directory and delete it
-            if (file_exists('temp/custom.json')) {
-                unlink('temp/custom.json');
+            $tmpBase = tiki_temp_dir();
+            if (file_exists($tmpBase . 'custom.json')) {
+                unlink($tmpBase . 'custom.json');
             }
             //move the uploaded file to /temp directory
-            $tempFilePath = 'temp/' . $_FILES['language_file']['name'];
+            $tempFilePath = $tmpBase . $_FILES['language_file']['name'];
             move_uploaded_file($_FILES['language_file']['tmp_name'], $tempFilePath);
 
             //read the uploaded file

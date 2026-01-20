@@ -1770,7 +1770,7 @@ class TikiLib extends TikiDb_Bridge
 
         // Combined query using subqueries
         $query = "
-            SELECT 
+            SELECT
                 ? as lastVisit,
                 (SELECT COUNT(*) FROM `tiki_pages` WHERE `lastModif` > ?) as pages,
                 (SELECT COUNT(*) FROM `tiki_files` WHERE `created` > ?) as files,
@@ -7497,6 +7497,55 @@ function makeBool($val, $default)
     }
     return ($val ? 'true' : 'false');
 }
+
+/**
+ * Returns a filesystem path to the temp directory.
+ *
+ * Uses $prefs['tmpDir'] when set and appends /public for web-accessible storage.
+ * The returned value always has a `/` at the end.
+ *
+ * @param bool $public True to return the public temp directory.
+ * @return string
+ */
+function tiki_temp_dir(bool $public = false): string
+{
+    global $prefs;
+
+    $tmpDir = $prefs['tmpDir'] ?? 'temp';
+    $tmpDir = rtrim($tmpDir, '/');
+    if ($public) {
+        $tmpDir .= '/public';
+    }
+
+    return $tmpDir . '/';
+}
+
+/**
+ * Returns a web-relative temp path suitable for URLs.
+ *
+ * If tmpDir is outside TIKI_PATH,
+ * falls back to temp/public/
+ * The returned value always has a `/` at the end, so you can safely concatenate it for building a web path.
+ *
+ * @return string
+ */
+function tiki_temp_dir_web(): string
+{
+    $tmpDir = rtrim(tiki_temp_dir(true), '/');
+    if (! str_starts_with($tmpDir, '/')) {
+        return $tmpDir . '/';
+    }
+
+    if (defined('TIKI_PATH')) {
+        $root = rtrim(TIKI_PATH, '/');
+        if (str_starts_with($tmpDir, $root . '/')) {
+            return substr($tmpDir, strlen($root) + 1) . '/';
+        }
+    }
+
+    return 'temp/public/';
+}
+
 /* Editor configuration
      Local Variables:
      tab-width: 4

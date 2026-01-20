@@ -62,17 +62,19 @@ class VueJsLib
         // check if the string contains vuejs script or template tags
         if ($dom->getElementsByTagName('script')->length || $dom->getElementsByTagName('template')->length) {
             global $tikidomainslash;
-            $tempDir = './temp/public/' . $tikidomainslash;
+            $tempDirFs = tiki_temp_dir(true) . $tikidomainslash;
+            $tempDirWeb = tiki_temp_dir_web() . $tikidomainslash;
             $hash = $name ? $name : md5(serialize($str));
 
-            $file = $tempDir . "vue_" . $hash . ".vue";
+            $fileFs = $tempDirFs . "vue_" . $hash . ".vue";
+            $fileWeb = $tempDirWeb . "vue_" . $hash . ".vue";
             if ($minify) {
                 $minifier = new MatthiasMullie\Minify\JS($str);
-                $minifier->minify($file);
+                $minifier->minify($fileFs);
             } else {
-                file_put_contents($file, $str);
+                file_put_contents($fileFs, $str);
             }
-            chmod($file, 0644);
+            chmod($fileFs, 0644);
 
             if ($app) {
                 $data = json_encode($data);
@@ -86,7 +88,7 @@ class VueJsLib
 
                 $headerlib->add_js_module(<<<JS
                     import { mountApp as $importAlias } from '@tiki-vue-sfc-loader';
-                    $importAlias('$name', '$file', $data);
+                    $importAlias('$name', '$fileWeb', $data);
                 JS
                 );
 

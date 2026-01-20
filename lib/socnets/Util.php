@@ -31,7 +31,7 @@ class Util
       //return pathinfo(ini_get('error_log'),PATHINFO_DIRNAME) . self::$logfile;
       //return dirname(ini_get('error_log')) . self::$logfile;
       //return $custom_error_log_location . self::$logfile;
-        return TIKI_PATH . '/temp/' . self::$logfile;
+        return tiki_temp_dir() . self::$logfile;
     }
 
   //TODO would this work with all things static?

@@ -735,7 +735,7 @@ class FileGalLib extends TikiLib
 
     public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors)
     {
-        $extract_dir = 'temp/' . basename($file) . '/';
+        $extract_dir = tiki_temp_dir() . basename($file) . '/';
         mkdir($extract_dir);
         $archive = new PclZip($file);
         $archive->extract(PCLZIP_OPT_PATH, $extract_dir, PCLZIP_OPT_REMOVE_ALL_PATH);
@@ -772,7 +772,7 @@ class FileGalLib extends TikiLib
         while (($file = readdir($h)) !== false) {
             if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
                 if (false === $data = @file_get_contents($extract_dir . $file)) {
-                    $errors[] = tra('Cannot open this file:') . "temp/$file";
+                    $errors[] = tra('Cannot open this file:') . $extract_dir . $file;
                     return false;
                 }
                 $tikiFile = new TikiFile([

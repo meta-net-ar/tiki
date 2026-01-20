@@ -172,8 +172,9 @@ class Casperjs implements HeadlessBrowserInterface
         $casperBin = TIKI_PATH . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'casperjs';
         $scriptPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/jquery_tiki/tiki-diagram.js';
         $htmlFile = TIKI_PATH . DIRECTORY_SEPARATOR . 'lib/core/File/DiagramHelperExportCasperJS.html';
-        $jsfile = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp/do_' . $fileIdentifier . '.js';
-        $imgFile = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp/diagram_' . $fileIdentifier . '.png';
+        $tmpBase = tiki_temp_dir();
+        $jsfile = $tmpBase . 'do_' . $fileIdentifier . '.js';
+        $imgFile = $tmpBase . 'diagram_' . $fileIdentifier . '.png';
 
         if (! empty($vendorPath) && file_exists($casperBin) && file_exists($scriptPath) && file_exists($htmlFile)) {
             $jsContent = <<<EOF
@@ -205,7 +206,7 @@ class Casperjs implements HeadlessBrowserInterface
         }
 
         try {
-            $command = [$casperBin, $scriptPath, '--htmlfile=' . $htmlFile, '--filename=' . $fileIdentifier];
+            $command = [$casperBin, $scriptPath, '--htmlfile=' . $htmlFile, '--filename=' . $fileIdentifier, '--tmpdir=' . $tmpBase];
             $process = new Process($command);
             $process->run();
             if (! $process->isSuccessful() || ! file_exists($imgFile)) {

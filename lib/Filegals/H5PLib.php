@@ -190,7 +190,7 @@ class H5PLib
 
     private function getZipFile($fileId)
     {
-        global $prefs, $tikipath;
+        global $prefs;
 
         if (! class_exists('ZipArchive')) {
             Feedback::error(tra('PHP Class "ZipArchive" not found'));
@@ -199,7 +199,7 @@ class H5PLib
         $file = TikiFile::id($fileId);
 
         // make a copy of the h5p file for the validator to unpack (and eventually delete)
-        $dest = $tikipath . 'temp/' . $file->filename;
+        $dest = tiki_temp_dir() . $file->filename;
         file_put_contents($dest, $file->getContents());
 
         /** @var ZipArchive $zip */

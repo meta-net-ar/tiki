@@ -14,11 +14,14 @@ function createCodemirrorModes()
     $js = '';
     $css = '';
 
-    $target = 'temp/public/' . $tikidomainslash;
-    $jsModes = $target . 'codemirror_modes.js';
-    $cssModes = $target . 'codemirror_modes.css';
+    $targetFs = tiki_temp_dir(true) . $tikidomainslash;
+    $targetWeb = tiki_temp_dir_web() . $tikidomainslash;
+    $jsModesFs = $targetFs . 'codemirror_modes.js';
+    $cssModesFs = $targetFs . 'codemirror_modes.css';
+    $jsModesWeb = $targetWeb . 'codemirror_modes.js';
+    $cssModesWeb = $targetWeb . 'codemirror_modes.css';
 
-    if (! file_exists($jsModes) || ! file_exists($cssModes)) {
+    if (! file_exists($jsModesFs) || ! file_exists($cssModesFs)) {
         //codemirror theme
         $js .= 'window.codeMirrorTheme = "' . $prefs['feature_syntax_highlighter_theme'] . '";
 test = { mode: function () {}, indentation: function() {} }
@@ -58,17 +61,17 @@ test = { mode: function () {}, indentation: function() {} }
             $css .= @file_get_contents($cssFile);
         }
 
-        file_put_contents($jsModes, $js);
-        chmod($jsModes, 0644);
+        file_put_contents($jsModesFs, $js);
+        chmod($jsModesFs, 0644);
 
-        file_put_contents($cssModes, $css);
-        chmod($cssModes, 0644);
+        file_put_contents($cssModesFs, $css);
+        chmod($cssModesFs, 0644);
     }
 
     // creation upfront is ok, but only include them if the feature is enabled. Otherwise we would get js errors bc codemirror itself would be missing
     if (isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') {
         TikiLib::lib("header")
-            ->add_jsfile($jsModes)
-            ->add_cssfile($cssModes);
+            ->add_jsfile($jsModesWeb)
+            ->add_cssfile($cssModesWeb);
     }
 }
