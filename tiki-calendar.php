@@ -137,9 +137,11 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
 if ($use_default_calendars) {
     if ($prefs['feature_default_calendars'] == 'y') {
         $defaultCalendars = $prefs['default_calendars'];
+
+        // default_calendars is defined as a multicheckbox preference and is expected
+        // to be stored as a serialized array (or already an array when loaded).
         if (is_string($defaultCalendars)) {
-            $tmp = unserialize($defaultCalendars);
-            $defaultCalendars = is_array($tmp) ? $tmp : [];
+            $defaultCalendars = unserialize($defaultCalendars);
         }
         if (! is_array($defaultCalendars)) {
             $defaultCalendars = [];
