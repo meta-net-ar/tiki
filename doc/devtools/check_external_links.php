@@ -620,14 +620,22 @@ class ExternalLinksChecker
 
 /**
  * URL Availability Checker using curl_multi for parallel requests.
- * Designed for performance: checks 50 URLs concurrently.
+ * Designed for performance: checks URLs concurrently with configurable batch size.
  */
 class UrlAvailabilityChecker
 {
+    /** @var int Total request timeout in seconds (balance between detection and CI speed) */
     private $timeout = 5;
+
+    /** @var int Connection timeout in seconds (detect unreachable hosts quickly) */
     private $connectTimeout = 3;
+
+    /** @var int URLs to check concurrently (too high may trigger rate limiting) */
     private $batchSize = 50;
+
+    /** @var string Browser-like User-Agent to reduce bot detection false positives */
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
     private $brokenUrls = [];
     private $activeUrls = [];
     private $uncertainUrls = [];
