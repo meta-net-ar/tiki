@@ -462,8 +462,32 @@ class ExternalLinksChecker
     }
 
     /**
+     * Directories to skip when checking URL availability (test fixtures, 3rd party libs)
+     */
+    private const EXCLUDED_DIRECTORIES = [
+        'test', 'tests', 'fixtures', 'tikihelp', 'xmpp',
+        'nusoap', 'openlayers', 'metadata', 'dracula'
+    ];
+
+    /**
+     * Directory paths with subdirectory structure to exclude
+     */
+    private const EXCLUDED_DIRECTORY_PATHS = [
+        'Sheet' . DIRECTORY_SEPARATOR . 'include'
+    ];
+
+    /**
+     * Placeholder/package registry domain patterns that cannot or should not be checked
+     */
+    private const PLACEHOLDER_DOMAINS = '#(anothersite|testuri|dummydsn|yourdomain|tiki-site)#i';
+
+    /**
+     * XML namespace URI patterns (identifiers, not fetchable URLs)
+     */
+    private const NAMESPACE_PATTERNS = '#/200[0-9]/|/ns/|/protocol/|/schema/|\\}#';
+
+    /**
      * Get unique URLs for availability checking, with smart filtering.
-     * Excludes: lang/ directory, example.* domains (RFC 2606 reserved)
      *
      * @param array|null $severityFilter Array of severities to include (e.g., ['critical', 'high'])
      * @return array Array of URL data for checking
@@ -479,77 +503,13 @@ class ExternalLinksChecker
             }
 
             foreach ($findings as $finding) {
-                $url = $finding['url'];
-                if (isset($seenUrls[$url])) {
-                    continue;
-                }
-                // Skip RFC 2606 reserved domains
-                $parsed = parse_url($url);
-                if (isset($parsed['host'])) {
-                    $host = strtolower($parsed['host']);
-                    if (
-                        $host === 'example.com' || $host === 'example.org' || $host === 'example.net' ||
-                        str_ends_with($host, '.example.com') || str_ends_with($host, '.example.org') || str_ends_with($host, '.example.net')
-                    ) {
-                        continue;
-                    }
-                }
-                // Skip lang/ directory (translation examples)
-                if (str_contains($finding['file'], 'lang' . DIRECTORY_SEPARATOR)) {
-                    continue;
-                }
-                // Skip test fixtures and 3rd party libraries
-                $normalizedFile = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $finding['file']);
-                if (
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'Sheet' . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'tikihelp' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'xmpp' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'nusoap' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'openlayers' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'metadata' . DIRECTORY_SEPARATOR) ||
-                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'dracula' . DIRECTORY_SEPARATOR)
-                ) {
-                    continue;
-                }
-                // Skip XML namespace URIs (identifiers, not fetchable)
-                if (preg_match('#/200[0-9]/|/ns/|/protocol/|/schema/|\\}#', $url)) {
-                    continue;
-                }
-                // Skip placeholder and malformed URLs
-                if (preg_match('#^https?://%|^https?://path_to_#', $url)) {
-                    continue;
-                }
-                if (preg_match('#\\\\|^https?://[^/]+,$|^https?://[a-z]+$#', $url)) {
-                    continue;
-                }
-                // Skip placeholder and development domains
-                if (isset($parsed['host']) && preg_match('#(anothersite|testuri|dummydsn|yourdomain|tiki-site)#i', $parsed['host'])) {
-                    continue;
-                }
-                if (isset($parsed['host']) && (
-                    $parsed['host'] === 'localhost' ||
-                    str_starts_with($parsed['host'], '127.') ||
-                    $parsed['host'] === 'foo' || $parsed['host'] === 'foo.bar'
-                )) {
-                    continue;
-                }
-                // Skip dynamic/incomplete URLs
-                if (preg_match('/\$[a-zA-Z_]|\{\$|%[sd]/', $url)) {
-                    continue;
-                }
-                if (str_contains($url, '...') || str_contains($url, '{') || str_contains($url, '[')) {
-                    continue;
-                }
-                if (! isset($parsed['host']) || empty($parsed['host'])) {
+                if ($this->shouldSkipUrl($finding, $seenUrls)) {
                     continue;
                 }
 
-                $seenUrls[$url] = true;
+                $seenUrls[$finding['url']] = true;
                 $urls[] = [
-                    'url' => $url,
+                    'url' => $finding['url'],
                     'file' => $finding['file'],
                     'line' => $finding['line'],
                     'severity' => $level,
@@ -558,6 +518,103 @@ class ExternalLinksChecker
         }
 
         return $urls;
+    }
+
+    /**
+     * Determine if a URL should be skipped from availability checking.
+     */
+    private function shouldSkipUrl(array $finding, array $seenUrls): bool
+    {
+        $url = $finding['url'];
+        $parsed = parse_url($url);
+        $host = strtolower($parsed['host'] ?? '');
+
+        // Check in order of least to most expensive
+        return isset($seenUrls[$url])
+            || ! $this->hasValidHost($parsed)
+            || $this->isReservedDomain($host)
+            || $this->isExcludedDirectory($finding['file'])
+            || $this->isNamespaceUri($url)
+            || $this->isPlaceholderUrl($url, $host)
+            || $this->isDevelopmentUrl($host)
+            || $this->isIncompleteUrl($url);
+    }
+
+    private function hasValidHost(array|false|null $parsed): bool
+    {
+        return is_array($parsed) && isset($parsed['host']) && ! empty($parsed['host']);
+    }
+
+    private function isReservedDomain(string $host): bool
+    {
+        return $host === 'example.com' || $host === 'example.org' || $host === 'example.net'
+            || str_ends_with($host, '.example.com')
+            || str_ends_with($host, '.example.org')
+            || str_ends_with($host, '.example.net');
+    }
+
+    private function isExcludedDirectory(string $filePath): bool
+    {
+        // Skip lang/ directory (translation examples)
+        if (str_contains($filePath, 'lang' . DIRECTORY_SEPARATOR)) {
+            return true;
+        }
+
+        $normalizedFile = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $filePath);
+
+        foreach (self::EXCLUDED_DIRECTORIES as $dir) {
+            if (str_contains($normalizedFile, DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        foreach (self::EXCLUDED_DIRECTORY_PATHS as $path) {
+            if (str_contains($normalizedFile, DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isNamespaceUri(string $url): bool
+    {
+        return (bool) preg_match(self::NAMESPACE_PATTERNS, $url);
+    }
+
+    private function isPlaceholderUrl(string $url, string $host): bool
+    {
+        // Template/placeholder URL patterns
+        if (preg_match('#^https?://%|^https?://path_to_#', $url)) {
+            return true;
+        }
+        // Malformed URLs (regex patterns, escape sequences, no TLD)
+        if (preg_match('#\\\\|^https?://[^/]+,$|^https?://[a-z]+$#', $url)) {
+            return true;
+        }
+        // Placeholder domains
+        if (! empty($host) && preg_match(self::PLACEHOLDER_DOMAINS, $host)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isDevelopmentUrl(string $host): bool
+    {
+        return $host === 'localhost'
+            || str_starts_with($host, '127.')
+            || $host === 'foo'
+            || $host === 'foo.bar';
+    }
+
+    private function isIncompleteUrl(string $url): bool
+    {
+        // URLs with PHP variables
+        if (preg_match('/\$[a-zA-Z_]|\{\$|%[sd]/', $url)) {
+            return true;
+        }
+        // Templated/incomplete URLs
+        return str_contains($url, '...') || str_contains($url, '{') || str_contains($url, '[');
     }
 }
 
@@ -657,23 +714,26 @@ class UrlAvailabilityChecker
             $error = curl_error($ch);
 
             if ($httpCode === 405) {
-                // Method Not Allowed - try GET instead
+                // Method Not Allowed - remove from multi and retry with GET
+                curl_multi_remove_handle($multiHandle, $ch);
                 curl_setopt($ch, CURLOPT_NOBODY, false);
                 curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
                 curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $error = curl_error($ch);
+                curl_multi_add_handle($multiHandle, $ch);
             }
 
             if ($httpCode >= 200 && $httpCode < 400) {
                 $this->activeUrls[] = $data;
-            } elseif ($httpCode === 103 || $httpCode === 400 || $httpCode === 401 || $httpCode === 403 || $httpCode === 429) {
-                // Uncertain: bot protection, auth required, rate limited
+            } elseif (in_array($httpCode, [103, 400, 401, 403, 405, 429])) {
+                // Uncertain: bot protection, auth required, method not allowed, rate limited
                 $reasons = [
                     103 => 'HTTP 103 (Early Hints - provisional)',
                     400 => 'HTTP 400 (Possible bot protection)',
                     401 => 'HTTP 401 (Requires authentication)',
                     403 => 'HTTP 403 (Possible bot protection)',
+                    405 => 'HTTP 405 (Method not allowed)',
                     429 => 'HTTP 429 (Rate limited)',
                 ];
                 $reason = $reasons[$httpCode] ?? "HTTP $httpCode";
