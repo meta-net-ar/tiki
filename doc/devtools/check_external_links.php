@@ -542,11 +542,17 @@ class ExternalLinksChecker
 
     private function hasValidHost(array|false|null $parsed): bool
     {
-        return is_array($parsed) && isset($parsed['host']) && ! empty($parsed['host']);
+        if (!is_array($parsed) || !isset($parsed['host']) || empty($parsed['host'])) {
+            return false;
+        }
+        // Reject hosts that are only punctuation (malformed like "http://,")
+        return (bool) preg_match('/[a-z0-9]/i', $parsed['host']);
     }
 
     private function isReservedDomain(string $host): bool
     {
+        // Strip trailing dot (DNS root) for matching
+        $host = rtrim($host, '.');
         return $host === 'example.com' || $host === 'example.org' || $host === 'example.net'
             || str_ends_with($host, '.example.com')
             || str_ends_with($host, '.example.org')
@@ -592,6 +598,10 @@ class ExternalLinksChecker
         if (preg_match('#\\\\|^https?://[^/]+,$|^https?://[a-z]+$#', $url)) {
             return true;
         }
+        // Incomplete API base URLs (ending with / followed by concatenation)
+        if (preg_match('#(repo\.packagist\.org|api\.github\.com|registry\.npmjs\.org)/[^/]*/?$#', $url)) {
+            return true;
+        }
         // Placeholder domains
         if (! empty($host) && preg_match(self::PLACEHOLDER_DOMAINS, $host)) {
             return true;
@@ -611,6 +621,10 @@ class ExternalLinksChecker
     {
         // URLs with PHP variables
         if (preg_match('/\$[a-zA-Z_]|\{\$|%[sd]/', $url)) {
+            return true;
+        }
+        // Search engine base URLs (query parameter will be appended at runtime)
+        if (preg_match('/[?&](q|query|p|search|eq|url)=$/i', $url)) {
             return true;
         }
         // Templated/incomplete URLs
