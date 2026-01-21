@@ -136,7 +136,15 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
 
 if ($use_default_calendars) {
     if ($prefs['feature_default_calendars'] == 'y') {
-        $_SESSION['CalendarViewGroups'] = array_intersect(is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']), array_keys($calendars));
+        $defaultCalendars = $prefs['default_calendars'];
+        if (is_string($defaultCalendars)) {
+            $tmp = unserialize($defaultCalendars);
+            $defaultCalendars = is_array($tmp) ? $tmp : [];
+        }
+        if (! is_array($defaultCalendars)) {
+            $defaultCalendars = [];
+        }
+        $_SESSION['CalendarViewGroups'] = array_intersect($defaultCalendars, array_keys($calendars));
     } elseif (! empty($user)) {
         $user_default_calendars = $tikilib->get_user_preference($user, 'default_calendars', array_keys($calendars));
         if (is_string($user_default_calendars)) {
