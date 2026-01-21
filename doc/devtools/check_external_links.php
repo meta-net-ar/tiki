@@ -460,16 +460,259 @@ class ExternalLinksChecker
     {
         return ! empty($this->severity['critical']) || ! empty($this->severity['high']) || ! empty($this->severity['low']);
     }
+
+    /**
+     * Get unique URLs for availability checking, with smart filtering.
+     * Excludes: lang/ directory, example.* domains (RFC 2606 reserved)
+     *
+     * @param array|null $severityFilter Array of severities to include (e.g., ['critical', 'high'])
+     * @return array Array of URL data for checking
+     */
+    public function getUrlsForAvailabilityCheck($severityFilter = null)
+    {
+        $urls = [];
+        $seenUrls = [];
+
+        foreach ($this->severity as $level => $findings) {
+            if ($severityFilter !== null && ! in_array($level, $severityFilter)) {
+                continue;
+            }
+
+            foreach ($findings as $finding) {
+                $url = $finding['url'];
+                if (isset($seenUrls[$url])) {
+                    continue;
+                }
+                // Skip RFC 2606 reserved domains
+                $parsed = parse_url($url);
+                if (isset($parsed['host'])) {
+                    $host = strtolower($parsed['host']);
+                    if (
+                        $host === 'example.com' || $host === 'example.org' || $host === 'example.net' ||
+                        str_ends_with($host, '.example.com') || str_ends_with($host, '.example.org') || str_ends_with($host, '.example.net')
+                    ) {
+                        continue;
+                    }
+                }
+                // Skip lang/ directory (translation examples)
+                if (str_contains($finding['file'], 'lang' . DIRECTORY_SEPARATOR)) {
+                    continue;
+                }
+                // Skip test fixtures and 3rd party libraries
+                $normalizedFile = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $finding['file']);
+                if (
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'Sheet' . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'tikihelp' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'xmpp' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'nusoap' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'openlayers' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'metadata' . DIRECTORY_SEPARATOR) ||
+                    str_contains($normalizedFile, DIRECTORY_SEPARATOR . 'dracula' . DIRECTORY_SEPARATOR)
+                ) {
+                    continue;
+                }
+                // Skip XML namespace URIs (identifiers, not fetchable)
+                if (preg_match('#/200[0-9]/|/ns/|/protocol/|/schema/|\\}#', $url)) {
+                    continue;
+                }
+                // Skip placeholder and malformed URLs
+                if (preg_match('#^https?://%|^https?://path_to_#', $url)) {
+                    continue;
+                }
+                if (preg_match('#\\\\|^https?://[^/]+,$|^https?://[a-z]+$#', $url)) {
+                    continue;
+                }
+                // Skip placeholder and development domains
+                if (isset($parsed['host']) && preg_match('#(anothersite|testuri|dummydsn|yourdomain|tiki-site)#i', $parsed['host'])) {
+                    continue;
+                }
+                if (isset($parsed['host']) && (
+                    $parsed['host'] === 'localhost' ||
+                    str_starts_with($parsed['host'], '127.') ||
+                    $parsed['host'] === 'foo' || $parsed['host'] === 'foo.bar'
+                )) {
+                    continue;
+                }
+                // Skip dynamic/incomplete URLs
+                if (preg_match('/\$[a-zA-Z_]|\{\$|%[sd]/', $url)) {
+                    continue;
+                }
+                if (str_contains($url, '...') || str_contains($url, '{') || str_contains($url, '[')) {
+                    continue;
+                }
+                if (! isset($parsed['host']) || empty($parsed['host'])) {
+                    continue;
+                }
+
+                $seenUrls[$url] = true;
+                $urls[] = [
+                    'url' => $url,
+                    'file' => $finding['file'],
+                    'line' => $finding['line'],
+                    'severity' => $level,
+                ];
+            }
+        }
+
+        return $urls;
+    }
+}
+
+/**
+ * URL Availability Checker using curl_multi for parallel requests.
+ * Designed for performance: checks 50 URLs concurrently.
+ */
+class UrlAvailabilityChecker
+{
+    private $timeout = 5;
+    private $connectTimeout = 3;
+    private $batchSize = 50;
+    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+    private $brokenUrls = [];
+    private $activeUrls = [];
+    private $uncertainUrls = [];
+
+    /**
+     * Check multiple URLs for availability using parallel requests
+     * @param array $urlData Array of ['url' => ..., 'file' => ..., 'line' => ..., 'severity' => ...]
+     * @return array Results with 'broken', 'active', and 'uncertain' arrays
+     */
+    public function checkUrls($urlData)
+    {
+        $this->brokenUrls = [];
+        $this->activeUrls = [];
+        $this->uncertainUrls = [];
+
+        $totalUrls = count($urlData);
+        $processed = 0;
+
+        $batches = array_chunk($urlData, $this->batchSize);
+
+        foreach ($batches as $batch) {
+            $this->processBatch($batch);
+            $processed += count($batch);
+            echo "\rChecking URL availability... " . $processed . "/" . $totalUrls . " URLs checked";
+        }
+
+        echo "\r" . str_repeat(' ', 60) . "\r";
+
+        return [
+            'broken' => $this->brokenUrls,
+            'active' => $this->activeUrls,
+            'uncertain' => $this->uncertainUrls,
+        ];
+    }
+
+    private function processBatch($batch)
+    {
+        $multiHandle = curl_multi_init();
+        $handles = [];
+
+        foreach ($batch as $index => $data) {
+            // Clean URL: remove trailing punctuation and Tiki wiki syntax (|text)
+            $cleanUrl = rtrim($data['url'], '.,;:!?)');
+            // Strip Tiki wiki syntax: [http://example.com|display text] - remove everything after pipe
+            if (str_contains($cleanUrl, '|')) {
+                $cleanUrl = explode('|', $cleanUrl)[0];
+            }
+            
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $cleanUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => $this->timeout,
+                CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS => 5,
+                CURLOPT_NOBODY => true,
+                CURLOPT_USERAGENT => $this->userAgent,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_HTTPHEADER => [
+                    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    'Accept-Language: en-US,en;q=0.5',
+                ],
+            ]);
+
+            curl_multi_add_handle($multiHandle, $ch);
+            $handles[$index] = ['handle' => $ch, 'data' => $data];
+        }
+
+        $running = null;
+        do {
+            curl_multi_exec($multiHandle, $running);
+            if ($running) {
+                curl_multi_select($multiHandle);
+            }
+        } while ($running > 0);
+
+        foreach ($handles as $index => $item) {
+            $ch = $item['handle'];
+            $data = $item['data'];
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+
+            if ($httpCode === 405) {
+                // Method Not Allowed - try GET instead
+                curl_setopt($ch, CURLOPT_NOBODY, false);
+                curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $error = curl_error($ch);
+            }
+
+            if ($httpCode >= 200 && $httpCode < 400) {
+                $this->activeUrls[] = $data;
+            } elseif ($httpCode === 103 || $httpCode === 400 || $httpCode === 401 || $httpCode === 403 || $httpCode === 429) {
+                // Uncertain: bot protection, auth required, rate limited
+                $reasons = [
+                    103 => 'HTTP 103 (Early Hints - provisional)',
+                    400 => 'HTTP 400 (Possible bot protection)',
+                    401 => 'HTTP 401 (Requires authentication)',
+                    403 => 'HTTP 403 (Possible bot protection)',
+                    429 => 'HTTP 429 (Rate limited)',
+                ];
+                $reason = $reasons[$httpCode] ?? "HTTP $httpCode";
+                $this->uncertainUrls[] = array_merge($data, ['reason' => $reason, 'http_code' => $httpCode]);
+            } else {
+                $reason = $error ?: "HTTP $httpCode";
+                if ($httpCode === 0) {
+                    $reason = $error ?: 'Connection failed';
+                } elseif ($httpCode === 404) {
+                    $reason = 'HTTP 404 (Not Found)';
+                } elseif ($httpCode >= 500) {
+                    $reason = "HTTP $httpCode (Server Error)";
+                }
+                $this->brokenUrls[] = array_merge($data, ['reason' => $reason, 'http_code' => $httpCode]);
+            }
+
+            curl_multi_remove_handle($multiHandle, $ch);
+            curl_close($ch);
+        }
+
+        curl_multi_close($multiHandle);
+    }
 }
 
 $dir = realpath(__DIR__ . '/../../');
 $paramList = $_SERVER['argv'] ?? [];
 $listFiles = [];
 $ciMode = false;
+$checkActive = false;
+$severityFilter = null;
 
 foreach ($paramList as $param) {
     if ($param === '--ci') {
         $ciMode = true;
+    } elseif ($param === '--check-active') {
+        $checkActive = true;
+    } elseif (str_starts_with($param, '--severity=')) {
+        $severityValue = substr($param, strlen('--severity='));
+        $severityFilter = array_map('strtolower', array_map('trim', explode(',', $severityValue)));
     } elseif (basename(__FILE__) != basename($param)) {
         $file = $dir . $param;
         if (file_exists($file)) {
@@ -485,11 +728,41 @@ $summary = $checker->getSummary();
 $findings = $checker->getFindings();
 $suppressed = $checker->getSuppressed();
 
+// URL Availability Check (opt-in via --check-active)
+$brokenUrls = [];
+$uncertainUrls = [];
+if ($checkActive) {
+    $urlsToCheck = $checker->getUrlsForAvailabilityCheck($severityFilter);
+    if (empty($urlsToCheck)) {
+        echo "No URLs to check for availability (all filtered out)." . PHP_EOL;
+    } else {
+        $availabilityChecker = new UrlAvailabilityChecker();
+        $results = $availabilityChecker->checkUrls($urlsToCheck);
+        $brokenUrls = $results['broken'];
+        $uncertainUrls = $results['uncertain'];
+        echo count($results['active']) . " active, " . count($brokenUrls) . " broken, " . count($uncertainUrls) . " uncertain" . PHP_EOL;
+    }
+}
+
 echo PHP_EOL;
 info('Scanning for external links...');
 info($summary['files_scanned'] . ' files scanned' . PHP_EOL);
 
-if ($checker->hasIssues()) {
+if ($checker->hasIssues() || ! empty($brokenUrls)) {
+    // Show broken URLs first if --check-active was used
+    if (! empty($brokenUrls)) {
+        echo PHP_EOL;
+        echo color('BROKEN URLs: ' . count($brokenUrls) . ' found', 'red') . PHP_EOL;
+        echo str_repeat('=', 80) . PHP_EOL;
+        foreach ($brokenUrls as $broken) {
+            echo color($broken['file'] . ':' . $broken['line'], 'yellow') . PHP_EOL;
+            echo '  URL: ' . color($broken['url'], 'red') . PHP_EOL;
+            echo '  Reason: ' . $broken['reason'] . PHP_EOL;
+            echo '  Original Severity: ' . strtoupper($broken['severity']) . PHP_EOL;
+            echo PHP_EOL;
+        }
+    }
+
     if (! empty($findings['critical'])) {
         echo PHP_EOL;
         echo color('CRITICAL (External Code): ' . count($findings['critical']) . ' found', 'red') . PHP_EOL;
@@ -541,10 +814,17 @@ if ($checker->hasIssues()) {
     if ($summary['suppressed_count'] > 0) {
         echo '  SUPPRESSED (with @tiki-external-link-ok): ' . color($summary['suppressed_count'], 'green') . PHP_EOL;
     }
+    if (! empty($brokenUrls)) {
+        echo '  BROKEN URLs: ' . color(count($brokenUrls), 'red') . PHP_EOL;
+    }
+    if (! empty($uncertainUrls)) {
+        echo '  UNCERTAIN URLs (bot protection/rate limit): ' . color(count($uncertainUrls), 'yellow') . PHP_EOL;
+    }
     echo '  Total flagged: ' . $summary['total'] . ' external links found' . PHP_EOL;
     echo PHP_EOL;
 
-    if (! empty($findings['critical'])) {
+    // Exit with error if CRITICAL issues or broken URLs found
+    if (! empty($findings['critical']) || ! empty($brokenUrls)) {
         echo color('ERROR: CRITICAL external links detected. These must be fixed before merging.', 'red') . PHP_EOL;
         echo PHP_EOL;
         exit(1);
