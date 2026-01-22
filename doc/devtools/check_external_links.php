@@ -553,10 +553,8 @@ class ExternalLinksChecker
     {
         // Strip trailing dot (DNS root) for matching
         $host = rtrim($host, '.');
-        return $host === 'example.com' || $host === 'example.org' || $host === 'example.net'
-            || str_ends_with($host, '.example.com')
-            || str_ends_with($host, '.example.org')
-            || str_ends_with($host, '.example.net');
+        // Only reserve example.org as per Tiki standard (see RFC 2606)
+        return $host === 'example.org' || str_ends_with($host, '.example.org');
     }
 
     private function isExcludedDirectory(string $filePath): bool
@@ -650,7 +648,7 @@ foreach ($paramList as $param) {
         $severityValue = substr($param, strlen('--severity='));
         $severityFilter = array_map('strtolower', array_map('trim', explode(',', $severityValue)));
     } elseif (basename(__FILE__) != basename($param)) {
-        $file = $dir . $param;
+        $file = $dir . DIRECTORY_SEPARATOR . $param;
         if (file_exists($file)) {
             $listFiles[] = $param;
         }
