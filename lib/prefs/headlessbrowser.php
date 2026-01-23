@@ -39,7 +39,7 @@ function prefs_headlessbrowser_list()
         ],
         'headlessbrowser_chrome_ignore_certificate_errors' => [
             'name' => tra('Headless chrome ignore certificate errors'),
-            'description' => tra('Ignore certificate errors.'),
+            'description' => tra('Ignore SSL certificate errors when requesting external URLs while generating the pdf content.'),
             'type' => 'flag',
             'tags' => ['experimental'],
             'default' => 'n',
@@ -47,7 +47,7 @@ function prefs_headlessbrowser_list()
         'headlessbrowser_chartjs_path' => [
             'name' => tra('ChartJS path'),
             'description' => tra('Url or local path of chartJS file.'),
-            'type' => 'flag',
+            'type' => 'text',
             'tags' => ['experimental'],
             'default' => 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js',
         ],
