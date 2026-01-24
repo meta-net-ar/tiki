@@ -205,7 +205,6 @@
                 {jq}
                     function updateIpFields(typeSelect) {
                         var type = typeSelect.val();
-                        console.log("Type is " + type);
                         var td = typeSelect.closest('td');
                         var wrapv4 = td.next().find('.ipv4-wrapper');
                         var wrapv6 = td.next().next().find('.ipv6-wrapper');
