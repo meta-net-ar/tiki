@@ -54,10 +54,16 @@ if (! empty($_POST['known_hosts']) && $access->checkCsrf()) {
             empty($_POST['known_hosts'][$k]['name'])
             && empty($_POST['known_hosts'][$k]['key'])
             && empty($_POST['known_hosts'][$k]['ip'])
-            && empty($_POST['known_hosts'][$k]['ip6'])
             && empty($_POST['known_hosts'][$k]['contact'])
         ) {
             unset($_POST['known_hosts'][$k]);
+        }
+        // Resets values of hidden entries.
+        if ($_POST['known_hosts'][$k]['iptype'] == 'ipv4') {
+            $_POST['known_hosts'][$k]['ip6'] = "";
+        }
+        if ($_POST['known_hosts'][$k]['iptype'] == 'ipv6') {
+            $_POST['known_hosts'][$k]['ip'] = "";
         }
     }
     simple_set_value('known_hosts');
