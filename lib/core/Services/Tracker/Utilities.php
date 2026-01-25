@@ -108,9 +108,10 @@ class Services_Tracker_Utilities
                 unset($fields[$fieldId]);
             }
         }
-
+        $options['notify_watchers'] = $options['notify_watchers'] ?? null;
+        $options['deleted_files'] = $options['deleted_files'] ?? [];
         if (! $options['validate'] || count($errors) == 0) {
-            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? [], $options['notify_watchers'] ?? null);
+            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'], $options['notify_watchers']);
             return $newItem;
         }
 
