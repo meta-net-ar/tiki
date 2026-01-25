@@ -439,36 +439,21 @@ class TextArea extends Base implements TikiSmartyExtensionInterface
         }
 
         if ($prefs['markdown_enabled'] === 'y' && ($params['_syntax'] === 'tiki' || $params['_syntax'] === 'markdown')) {
-            $headerlib->add_js(/** @lang JavaScript */ '
-    function addSyntaxPlugin(domId, $form) {
-        const $textarea = $("#" + domId),
-            syntax = $("input[name=syntax]", $form).val(),
-            editor = $("input[name=wysiwyg]", $form).val() === "y" ? "wysiwyg" : "plain";
-        let val = $textarea.val();
-
-        if (syntax === "markdown") {
-            // remove plugin markers
-            val = val.replace(/(^|\n)\$\$tiki\n/g, "$1");
-            val = val.replace(/(^|\n)\$\$\n/g, "$1");
-            
-            // wiki link widgets markers
-            val = val.replace(/\$\$widget0 (.*?)\$\$/mg, "$1");
-        }
-        // remove previously added {syntax} plugins
-        val = val.replace(/^\{syntax [^}]+\}\r?\n/gm, "");
-        // add the new one
-        $textarea.val("{syntax type=\"" + syntax + "\" editor=\"" + editor + "\"}\r\n" + val);
-    }
-            ');
-
-
             $headerlib->add_js(
                 /** @lang JavaScript */
                 '
-    $("#' . $as_id . '").closest("form").on("submit", function () {
-        addSyntaxPlugin("' . $as_id . '", $(this));
-        return true;
-    });'
+    (function () {
+        const $textarea = $("#' . $as_id . '");
+        let textareaValue = $textarea.val();
+        if (typeof textareaValue === "string") {
+            textareaValue = textareaValue.replace(/^\{syntax\s+[^}]+\}\r?\n/, "");
+            $textarea.val(textareaValue);
+        }
+        $textarea.closest("form").on("submit", function () {
+            addSyntaxPlugin("' . $as_id . '", $(this), "' . $params['_syntax'] . '", "' . ($params['_wysiwyg'] === 'y' ? 'wysiwyg' : 'plain') . '");
+            return true;
+        });
+    }());'
             );
         }
         return $html;

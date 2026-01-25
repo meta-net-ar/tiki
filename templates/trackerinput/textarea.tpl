@@ -34,12 +34,12 @@
             <input type="text" id="{$data.element_id|escape}" name="{$field.ins_id}"{if $field.options_map.width > 0} size="{$field.options_map.width}"{/if}{if $field.options_map.max gt 0} maxlength="{$field.options_map.max}"{/if} value="{$field.value|escape}"{if $field.options_map.labelasplaceholder} placeholder="{$field.name|escape}"{/if}{if !empty($context.disabled)} disabled{/if} onkeyup={$data.keyup} />
         {else}
             {if $field.options_map.wysiwyg == 'y'}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$tracker_previews}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$tracker_previews _syntax=$prefs.markdown_default}
                     {$field.value}
                 {/textarea}
             {else}
                 {assign var='textarea_placeholder' value=($field.options_map.labelasplaceholder ? $field.name : '')}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$tracker_previews placeholder=$textarea_placeholder disabled=$context.disabled}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows _syntax=$prefs.markdown_default onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$tracker_previews placeholder=$textarea_placeholder disabled=$context.disabled}
                     {$field.value}
                 {/textarea}
             {/if}
