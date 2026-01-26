@@ -14,24 +14,7 @@
     <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
     {if !isset($smarty.session.fullscreen) || isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}
-
-            {******************************************************************
-             * SITE HEADER STRUCTURE
-             *
-             * <header class="site-header">     ← Overall header container
-             *     <nav class="navbar ...">      ← Main navigation
-             *         {block name=navClasses}   ← Themes can customize classes
-             *         {modulelist zone=top}     ← Logo, menu, search modules
-             *
-             * To customize navbar in your theme:
-             *   {extends 'layouts/social/layout_view.tpl'}
-             *   {block name=navClasses}navbar navbar-expand-md sticky-top{/block}
-             *
-             * No JavaScript needed - Bootstrap handles positioning!
-             ******************************************************************}
-
             <header class="site-header" id="site-header" role="banner">
-
                 {* Main navigation - uses block for theme customization *}
                 <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar sticky-top{/block}"
                      id="main-navbar"

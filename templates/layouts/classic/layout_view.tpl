@@ -17,7 +17,8 @@
 
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         {if $prefs.feature_layoutshadows eq 'y'}
-            <div id="header-shadow">{eval var=$prefs.header_shadow_start}{/if}
+            <div id="header-shadow">{eval var=$prefs.header_shadow_start}
+        {/if}
 
         {******************************************************************
          * SITE HEADER STRUCTURE
