@@ -213,7 +213,7 @@ class ComposerCli
         $canExecute = false;
 
         if ($this->composerPharExists()) {
-            list($output) = $this->execComposer(['--no-ansi', '--version']);
+            list($output) = $this->execComposer(['--no-ansi', '--version'], 5);
             if (strncmp($output, 'Composer', 8) == 0) {
                 $canExecute = true;
             }
@@ -236,9 +236,10 @@ class ComposerCli
      * Execute Composer
      *
      * @param $args
+     * @param int|null $timeout
      * @return array
      */
-    protected function execComposer($args)
+    protected function execComposer($args, $timeout = null)
     {
         global $prefs;
 
@@ -271,7 +272,7 @@ class ComposerCli
 
             $process = new Process($args, null, $env);
             $command = $process->getCommandLine();
-            $process->setTimeout($this->timeout);
+            $process->setTimeout($timeout ?? $this->timeout);
             $process->run();
 
             $code = $process->getExitCode();
