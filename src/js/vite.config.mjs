@@ -134,6 +134,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(__dirname, "tiki-sentry-browser/sentry-browser.js"),
         "tiki-figlet": resolve(__dirname, "tiki-figlet/figlet.js"),
+        "single-spa-register": resolve(__dirname, "tiki-single-spa-register/register.js"),
         styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),

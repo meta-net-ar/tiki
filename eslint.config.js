@@ -21,6 +21,9 @@ export default [
             "lib/openlayers/**",
             "src/js/vue-mf/tracker-rules/src/lib/**",
 
+            // Ignore single-spa-register
+            "src/js/tiki-single-spa-register/register.js",
+
             // Ignore Generated Files
             "public/generated/**",
             "temp/**",
