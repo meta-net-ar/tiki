@@ -398,16 +398,16 @@
                         <tr>
                             <td>{$schedulerruns[run].id}</td>
                             <td>
-                                {$schedulerruns[run].start_time|tiki_short_datetime} ({$display_timezone})
+                                {$schedulerruns[run].start_time|tiki_short_datetime:'':'n'} ({$display_timezone})
                                 {if $display_timezone ne 'UTC'}
-                                    <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
                                 {/if}
                             </td>
                             <td>
                                 {if $schedulerruns[run].end_time ne null}
-                                    {$schedulerruns[run].end_time|tiki_short_datetime} ({$display_timezone})
+                                    {$schedulerruns[run].end_time|tiki_short_datetime:'':'n'} ({$display_timezone})
                                     {if $display_timezone ne 'UTC'}
-                                        <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                        <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
                                     {/if}
                                 {/if}
                             </td>
