@@ -144,7 +144,7 @@ class VueJsLib
         ');
             // language=JavaScript
             TikiLib::lib('header')->add_jq_onready('
-            window.registerApplication({
+            window.registerSingleSpaApp({
                 name: "' . $singleSpaAppName . '",
                 app: () => importShim("@vue-mf/tracker-rules"),
                 activeWhen: (location) => {
@@ -153,9 +153,6 @@ class VueJsLib
                 customProps: {
                     trackerRulesObject: ' . json_encode($params) . ',
                 },
-            });
-            onDOMElementRemoved("' . $singleSpaDomId . '", function () {
-                window.unregisterApplication("' . $singleSpaAppName . '");
             });
         ');
 

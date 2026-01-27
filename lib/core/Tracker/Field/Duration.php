@@ -165,8 +165,7 @@ class Tracker_Field_Duration extends \Tracker\Field\AbstractItemField implements
 
         // language=JavaScript
         $headerlib->add_jq_onready('
-        console.log("registerApplication");
-window.registerApplication({
+window.registerSingleSpaApp({
     name: "@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ',
     app: () => importShim("@vue-mf/duration-picker"),
     activeWhen: (location) => {
@@ -183,9 +182,6 @@ window.registerApplication({
             chronometer: ' . $this->getOption("chronometer") . '
         },
     },
-});
-onDOMElementRemoved("single-spa-application:@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ', function () {
-    window.unregisterApplication("@vue-mf/duration-picker-" + ' . json_encode($applicationId) . ');
 });
 ');
         $appHtml = '<div id="single-spa-application:@vue-mf/duration-picker-' . $applicationId . '" class="wp-duration-picker"></div>';

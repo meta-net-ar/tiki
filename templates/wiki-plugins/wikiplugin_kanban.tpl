@@ -1,7 +1,7 @@
 <div id="single-spa-application:@vue-mf/kanban-{$kanbanData.id|escape}" class="wp-kanban"></div>
 
 {jq}
-    window.registerApplication({
+    window.registerSingleSpaApp({
         name: "@vue-mf/kanban-{{$kanbanData.id|escape}}",
         app: () => importShim("@vue-mf/kanban"),
         activeWhen: (location) => {

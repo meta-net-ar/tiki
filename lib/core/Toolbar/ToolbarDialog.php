@@ -133,7 +133,7 @@ class ToolbarDialog extends ToolbarItem
 
             // language=JavaScript
             TikiLib::lib('header')->add_jq_onready('
-    window.registerApplication({
+    window.registerSingleSpaApp({
         name: "' . $this->singleSpaAppName . '",
         app: () => importShim("@vue-mf/toolbar-dialogs"),
         activeWhen: (location) => {
@@ -144,9 +144,6 @@ class ToolbarDialog extends ToolbarItem
             toolbarObject: ' . json_encode($data) . ',
             syntax: ""
         },
-    })
-    onDOMElementRemoved("' . $this->singleSpaDomId . '", function () {
-        window.unregisterApplication("' . $this->singleSpaAppName . '");
     });
     ');
         }
