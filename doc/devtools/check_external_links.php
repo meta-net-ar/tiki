@@ -564,6 +564,10 @@ class ExternalLinksChecker
             return true;
         }
 
+        if (str_ends_with($filePath, 'package-lock.json')) {
+            return true;
+        }
+
         $normalizedFile = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $filePath);
 
         foreach (self::EXCLUDED_DIRECTORIES as $dir) {

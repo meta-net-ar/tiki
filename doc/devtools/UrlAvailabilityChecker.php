@@ -110,14 +110,18 @@ class UrlAvailabilityChecker
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
 
-            if ($httpCode === 405) {
-                // Method Not Allowed - remove from multi and retry with GET
+            // Some sites don't support HEAD requests properly and return 404 or 405
+            // Retry with GET to confirm if the resource actually exists
+            if ($httpCode === 404 || $httpCode === 405) {
                 curl_multi_remove_handle($multiHandle, $ch);
                 curl_setopt($ch, CURLOPT_NOBODY, false);
                 curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
                 curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $newHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $error = curl_error($ch);
+                if ($newHttpCode >= 200 && $newHttpCode < 400) {
+                    $httpCode = $newHttpCode;
+                }
                 curl_multi_add_handle($multiHandle, $ch);
             }
 
