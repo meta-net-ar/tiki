@@ -92,19 +92,6 @@ header.container,
             opacity: 0.8;
         }
     }
-
-    // Module layout within navbar
-    .navbar-modules {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; // Logo left, login right (matches old .top_modules behavior)
-        gap: 1rem;
-        flex-wrap: wrap;
-
-        .module {
-            margin: 0;
-        }
-    }
 }
 
 // Sticky navbar specific styles
