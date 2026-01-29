@@ -12,6 +12,10 @@ try {
     return;
 }
 
+if ($prefs['feature_scheduler'] != 'y') {
+    return;
+}
+
 // Check if Feature Scheduler is enabled
 $feature_enabled = $tikilib->get_preference('feature_scheduler');
 

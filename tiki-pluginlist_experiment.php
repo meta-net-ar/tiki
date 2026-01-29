@@ -20,6 +20,8 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+$access = TikiLib::lib('access');
+$access->check_permission('tiki_p_edit');
 
 if ($tiki_p_edit !== 'y') {
     $smarty->assign('errortype', 401);

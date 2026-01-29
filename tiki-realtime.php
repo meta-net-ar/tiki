@@ -10,9 +10,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
 
-if (php_sapi_name() != 'cli') {
-    die("This server can only be started from the command line.");
-}
+$access = TikiLib::lib('access');
+$access->check_feature('feature_realtime');
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;

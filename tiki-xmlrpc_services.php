@@ -22,6 +22,8 @@ use PhpXmlRpc\Value as XML_RPC_Value;
 use PhpXmlRpc\Response as XML_RPC_Response;
 use PhpXmlRpc\Server as XML_RPC_Server;
 $bloglib = TikiLib::lib('blog');
+$access = TikiLib::lib('access');
+$access->check_feature('feature_xmlrpc');
 
 if ($prefs['feature_xmlrpc'] != 'y') {
     die;

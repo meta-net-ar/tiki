@@ -20,6 +20,8 @@ $inputConfiguration = [[
 ];
 $section = 'trackers';
 require_once('tiki-setup.php');
+$access->check_feature('feature_trackers');
+
 if (empty($_REQUEST["itemId"])) {
     Feedback::errorAndDie(tra("No tracker item indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }

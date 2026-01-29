@@ -203,7 +203,7 @@ function wikiplugin_div_info()
 function wikiplugin_div($content, $params)
 {
     $style = '';
-    extract($params);
+    extract($params, EXTR_SKIP);
 
     $possibletypes = ['div','span','section','aside','header','footer','pre','strong','em','tt','p','blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
     $t    = (isset($type) and in_array($type, $possibletypes)) ? "$type" : "div";

@@ -18,6 +18,10 @@ Important conventions:
 - Directories path must NOT end with a /
 */
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    return;
+}
+
 const ADMIN_PATH = 'admin';
 const BIN_PATH = 'bin';
 
