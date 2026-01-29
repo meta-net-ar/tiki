@@ -818,9 +818,9 @@ class HeaderLib
     /**
      * Build SEO meta tags using Melbahja/SEO library
      *
-     * @return HeaderLib
+     * @return string
      */
-    public function build_metatags($mid)
+    public function build_metatags($mid): string
     {
         // page context variables
         global $prefs;
