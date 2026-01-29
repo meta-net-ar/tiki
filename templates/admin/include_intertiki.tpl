@@ -193,8 +193,12 @@
                                                 <option value="both" selected>Both</option>
                                             </select>
                                         </td>
-                                        <td><label class="sr-only" for="new_host_ip">{tr}IPv4{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""/></td>
-                                        <td><label class="sr-only" for="new_host_ip6">{tr}IPv6{/tr}</label><input type="text" class="form-control" id="new_host_ip6" name="newhost[ip6]" value=""/></td>
+                                        <td>
+                                            <div class="ipv4-wrapper"><label class="sr-only" for="new_host_ip">{tr}IPv4{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""/></div>
+                                        </td>
+                                        <td>
+                                            <div class="ipv6-wrapper"><label class="sr-only" for="new_host_ip6">{tr}IPv6{/tr}</label><input type="text" class="form-control" id="new_host_ip6" name="newhost[ip6]" value=""/></div>
+                                        </td>
                                         <td><label class="sr-only" for="new_host_contact">{tr}Contact{/tr}</label><input type="text" class="form-control" id="new_host_contact" name="newhost[contact]" value=""/></td>
                                         <td><label class="sr-only" for="new_host_can_register">{tr}Can register{/tr}</label><input type="checkbox" id="new_host_can_register" name="newhost[allowusersregister]"/></td>
                                     </tr>
