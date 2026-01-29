@@ -815,6 +815,515 @@ class HeaderLib
         return $back;
     }
 
+    /**
+     * Build SEO meta tags using Melbahja/SEO library
+     *
+     * @return HeaderLib
+     */
+    public function build_metatags($mid)
+    {
+        // page context variables
+        global $prefs;
+        global $section, $post_info, $blog_data, $heading, $parsed_heading, $body, $parsed_body;
+        global $gal_info, $description, $sswindowtitle, $title, $trail, $structure_path, $page;
+        global $header_featured_images, $base_url_canonical, $hasImage, $topicId, $topics;
+        global $publishDate, $edit_data, $author, $metatag_robotscustom, $metatag_robots;
+        global $rsslist_trackers, $tiki_p_view, $tiki_p_read_blog, $tiki_p_read_article;
+        global $tiki_p_view_file_gallery, $tiki_p_forum_read, $tiki_p_view_directory, $tiki_p_view_calendar;
+        global $tracker_item_main_value, $tagTitle, $arttitle, $thread_info, $forum_info;
+        global $categ_info, $userinfo, $tracker_info, $headtitle, $aliasname;
+        global $canonical_ending, $itemId, $forumId, $comments_parentId, $blogId, $postId, $articleId, $parentId, $galleryId;
+
+        $meta = new \Melbahja\Seo\MetaTags();
+
+
+        $metaDescription = '';
+        if (isset($section) && $section === 'blogs') {
+            if (!empty($post_info['parsed_excerpt'])) {
+                $metaDescription = strip_tags($post_info['parsed_excerpt']);
+            } elseif (!empty($post_info['parsed_data'])) {
+                $metaDescription = strip_tags($post_info['parsed_data']);
+            } else {
+                $postTitle = !empty($post_info['title']) ? $post_info['title'] : '';
+                $blogTitle = (!empty($blog_data) && !empty($blog_data['title'])) ? $blog_data['title'] : '';
+                $metaDescription = $postTitle . ($postTitle && $blogTitle ? ' - ' : '') . $blogTitle;
+            }
+        } elseif (isset($section) && $section === 'cms') {
+            if (!empty($parsed_heading)) {
+                $metaDescription = strip_tags($parsed_heading);
+            } elseif (!empty($parsed_body)) {
+                $metaDescription = strip_tags($parsed_body);
+            }
+        } elseif (isset($section) && $section === 'file_galleries') {
+            if (!empty($gal_info['description'])) {
+                $metaDescription = strip_tags($gal_info['description']);
+            }
+        } elseif (!empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && !empty($description)) {
+            $metaDescription = strip_tags($description);
+        } elseif (!empty($prefs['metatag_description_translated'])) {
+            $metaDescription = $prefs['metatag_description_translated'];
+        } elseif (!empty($prefs['metatag_description'])) {
+            $metaDescription = $prefs['metatag_description'];
+        }
+
+        // fallback description if empty
+        if (empty($metaDescription)) {
+            $browserTitle = !empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? '');
+            $sep = !empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+            $pageTitle = !empty($title) && !is_array($title) ? $title : '';
+            $metaDescription = $browserTitle . ($browserTitle && $pageTitle ? " $sep " : '') . $pageTitle;
+        }
+
+        // truncate to 150 chars
+        if (strlen($metaDescription) > 150) {
+            $metaDescription = substr($metaDescription, 0, 147) . '...';
+        }
+
+        $meta->description(trim($metaDescription));
+
+       // compute title
+        $pageTitle = '';
+
+        if (!empty($sswindowtitle)) {
+            if ($sswindowtitle === 'none') {
+                $pageTitle = '&nbsp;';
+            } else {
+                $pageTitle = $sswindowtitle;
+            }
+        } else {
+            // Get structure alias if in structure
+            if (!empty($structure) && $structure === 'y' && !empty($structure_path) && is_array($structure_path)) {
+                $lastItem = end($structure_path);
+                $aliasname = $lastItem['page_alias'] ?? null;
+            }
+
+            // Breadcrumbs logic (replicates {breadcrumbs type=$prefs.site_title_breadcrumb loc="head" crumbs=$trail})
+            $page_description_title = '';
+            if (
+                (($prefs['feature_breadcrumbs'] ?? '') === 'y' || ($prefs['site_title_breadcrumb'] ?? '') === 'desc')
+                && !empty($trail) && is_array($trail)
+            ) {
+                $crumbTitles = [];
+                foreach ($trail as $crumb) {
+                    if (!empty($crumb['title'])) {
+                        $crumbTitles[] = $crumb['title'];
+                    }
+                }
+
+                if (!empty($crumbTitles)) {
+                    if (($prefs['site_title_breadcrumb'] ?? '') === 'desc') {
+                        $page_description_title = implode(' > ', array_reverse($crumbTitles));
+                    } else {
+                        $page_description_title = implode(' > ', $crumbTitles);
+                    }
+                }
+            }
+
+            // Determine middle title
+            if (!empty($page_description_title)) {
+                // Breadcrumbs take priority if generated
+                $middleTitle = $page_description_title;
+            } else {
+                // page specific title fallback chain
+                if (!empty($tracker_item_main_value)) {
+                    $middleTitle = $tracker_item_main_value;
+                } elseif (!empty($tagTitle)) {
+                    $middleTitle = $tagTitle;
+                } elseif (!empty($title) && !is_array($title)) {
+                    $middleTitle = $title;
+                } elseif (!empty($aliasname)) {
+                    $middleTitle = $aliasname;
+                } elseif (!empty($arttitle)) {
+                    $middleTitle = $arttitle;
+                } elseif (!empty($thread_info['title'])) {
+                    $middleTitle = $thread_info['title'];
+                } elseif (!empty($forum_info['name'])) {
+                    $middleTitle = $forum_info['name'];
+                } elseif (!empty($categ_info['name'])) {
+                    $middleTitle = $categ_info['name'];
+                } elseif (!empty($userinfo['login'])) {
+                    $middleTitle = $userinfo['login'];
+                } elseif (!empty($tracker_info['pagetitle'])) {
+                    $middleTitle = $tracker_info['pagetitle'];
+                } elseif (!empty($tracker_info['name'])) {
+                    $middleTitle = $tracker_info['name'];
+                } elseif (!empty($page) && !empty($prefs['site_title_breadcrumb']) && $prefs['site_title_breadcrumb'] === 'pagetitle') {
+                    $middleTitle = $page;
+                } elseif (!empty($description)) {
+                    $middleTitle = $description;
+                } elseif (!empty($page)) {
+                    $middleTitle = $page;
+                } elseif (!empty($headtitle)) {
+                    $middleTitle = str_replace('&nbsp;', ' ', $headtitle);
+                } else {
+                    $middleTitle = '';
+                }
+            }
+
+            // truncate middle title if too long
+            if (strlen($middleTitle) > 255) {
+                $middleTitle = substr($middleTitle, 0, 252) . '...';
+            }
+
+            // assemble based on site_title_location
+            $browserTitle = !empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? '');
+            $sep = !empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+            $location = !empty($prefs['site_title_location']) ? $prefs['site_title_location'] : '';
+
+            if ($location === 'only') {
+                $pageTitle = $browserTitle;
+            } elseif ($location === 'before') {
+                $pageTitle = $browserTitle . ($browserTitle && $middleTitle ? " $sep " : '') . $middleTitle;
+            } elseif ($location === 'after') {
+                $pageTitle = $middleTitle . ($middleTitle && $browserTitle ? " $sep " : '') . $browserTitle;
+            } else {
+                $pageTitle = $middleTitle ?: $browserTitle;
+            }
+        }
+
+        if (!empty($pageTitle)) {
+            $meta->title($pageTitle);
+        }
+
+        // twitter domain
+        if (!empty($base_url_canonical)) {
+            $meta->twitter('domain', $base_url_canonical);
+        }
+
+
+        // resolve canonical url
+        if (($prefs['feature_canonical_url'] ?? '') === 'y' && !empty($mid) && !empty($base_url_canonical)) {
+            $canonicalUrl = '';
+            switch ($mid) {
+                case 'tiki-show_page.tpl':
+                case 'tiki-index_p.tpl':
+                case 'tiki-show_page_raw.tpl':
+                case 'tiki-all_languages.tpl':
+                case 'tiki-show_content.tpl':
+                case 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl':
+                    if (!empty($page)) {
+                        $canonicalUrl =  smarty_modifier_sefurl($page) . (!empty($canonical_ending) ? $canonical_ending : '');
+                    }
+                    break;
+
+                case 'tiki-view_tracker_item.tpl':
+                    if (!empty($itemId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($itemId, 'trackeritem', null, null, false);
+                    }
+                    break;
+
+                case 'tiki-view_forum.tpl':
+                    if (!empty($forumId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($forumId, 'forum');
+                    }
+                    break;
+
+                case 'tiki-view_forum_thread.tpl':
+                case 'tiki-print_forum_thread.tpl':
+                    if (!empty($comments_parentId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($comments_parentId, 'forumthread');
+                    }
+                    break;
+
+                case 'tiki-view_blog.tpl':
+                    if (!empty($blogId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($blogId, 'blog', null, null, false);
+                    }
+                    break;
+
+                case 'tiki-view_blog_post.tpl':
+                    if (!empty($postId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($postId, 'blogpost', null, null, false);
+                    }
+                    break;
+
+                case 'tiki-read_article.tpl':
+                    if (!empty($articleId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($articleId, 'article', null, null, false);
+                    }
+                    break;
+
+                case 'tiki-browse_categories.tpl':
+                    if (!empty($parentId)) {
+                        $canonicalUrl = smarty_modifier_sefurl($parentId, 'category');
+                    }
+                    break;
+
+                case 'tiki-list_file_gallery.tpl':
+                    if (isset($galleryId)) {
+                        $canonicalUrl = 'file' . $galleryId;
+                    }
+                    break;
+            }
+
+            if (!empty($canonicalUrl)) {
+                $meta->canonical($base_url_canonical . $canonicalUrl);
+                $meta->url($base_url_canonical . $canonicalUrl);
+            }
+        }
+
+        // opengraph type
+        $ogType = 'website';
+        if (!empty($prefs['feature_canonical_url']) && $prefs['feature_canonical_url'] === 'y' && !empty($mid)) {
+            if (
+                strpos($mid, 'tiki-view_blog.tpl') !== false ||
+                strpos($mid, 'tiki-view_blog_post.tpl') !== false ||
+                strpos($mid, 'tiki-read_article.tpl') !== false
+            ) {
+                $ogType = 'article';
+            }
+        }
+        $meta->og('type', $ogType);
+
+        // images (multiple support)
+        $imagesAdded = false;
+        if (!empty($header_featured_images) && is_array($header_featured_images)) {
+            foreach ($header_featured_images as $img) {
+                $meta->image($img, 'summary');
+                $imagesAdded = true;
+            }
+        } elseif (!empty($prefs['feature_canonical_url']) && $prefs['feature_canonical_url'] === 'y' && !empty($mid)) {
+            if (strpos($mid, 'tiki-read_article.tpl') !== false) {
+                $imgUrl = '';
+                if (!empty($hasImage) && $hasImage === 'y' && !empty($articleId)) {
+                    $imgUrl = $base_url_canonical . 'article_image.php?image_type=article&id=' . $articleId;
+                } elseif (!empty($topics['image_name']) && !empty($topicId)) {
+                    $imgUrl = $base_url_canonical . 'article_image.php?image_type=topic&id=' . $topicId;
+                }
+                if (!empty($imgUrl)) {
+                    $meta->image($imgUrl, 'summary');
+                    $imagesAdded = true;
+                }
+            }
+        }
+
+        // fallback images
+        if (!$imagesAdded) {
+            if (!empty($prefs['socialnetworks_facebook_site_image'])) {
+                $meta->image($prefs['socialnetworks_facebook_site_image'], 'summary');
+                $imagesAdded = true;
+            }
+            if (!empty($prefs['socialnetworks_twitter_site_image'])) {
+                if (!$imagesAdded) {
+                    $meta->image($prefs['socialnetworks_twitter_site_image'], 'summary');
+                }
+            }
+        }
+
+        // site names and social
+        $siteName = !empty($prefs['socialnetworks_facebook_site_name'])
+            ? $prefs['socialnetworks_facebook_site_name']
+            : (!empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? ''));
+
+        if (!empty($siteName)) {
+            $meta->og('site_name', $siteName);
+        }
+
+        $twitterSite = !empty($prefs['socialnetworks_twitter_site'])
+            ? $prefs['socialnetworks_twitter_site']
+            : $siteName;
+
+        if (!empty($twitterSite)) {
+            $meta->twitter('site', $twitterSite);
+        }
+
+        // facebook app id
+        if (!empty($prefs['socialnetworks_facebook_application_id'])) {
+            $meta->og('app_id', $prefs['socialnetworks_facebook_application_id']);
+        }
+
+        // twitter card
+        $meta->twitter('card', 'summary');
+
+        // article meta
+        if (!empty($mid) && strpos($mid, 'tiki-read_article.tpl') !== false) {
+            $pubDate = !empty($publishDate) ? $publishDate : null;
+            $modDate = !empty($edit_data) ? $edit_data : null;
+            $auth = !empty($author) ? $author : null;
+
+            if (!empty($pubDate)) {
+                $meta->articleMeta($pubDate, $modDate, $auth);
+            }
+        }
+
+        // robots control
+        $robotsContent = '';
+
+        if (!empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && !empty($metatag_robotscustom)) {
+            $robotsContent = $metatag_robotscustom;
+        } else {
+            $hasGlobal = !empty($prefs['metatag_robots']);
+            $hasScript = !empty($metatag_robots);
+
+            if ($hasGlobal && !$hasScript) {
+                $robotsContent = $prefs['metatag_robots'];
+            } elseif (!$hasGlobal && $hasScript) {
+                $robotsContent = $metatag_robots;
+            } elseif ($hasGlobal && $hasScript) {
+                // conflict resolution
+                $scriptLower = strtolower($metatag_robots);
+                $prefsLower = strtolower($prefs['metatag_robots']);
+                $scriptRestrictive = (strpos($scriptLower, 'noindex') !== false || strpos($scriptLower, 'nofollow') !== false);
+                $prefsRestrictive = (strpos($prefsLower, 'noindex') !== false || strpos($prefsLower, 'nofollow') !== false);
+
+                if ($scriptRestrictive) {
+                    $robotsContent = $metatag_robots;
+                } elseif ($prefsRestrictive) {
+                    $robotsContent = $prefs['metatag_robots'];
+                } else {
+                    $robotsContent = $prefs['metatag_robots'] . ', ' . $metatag_robots;
+                }
+            }
+        }
+
+        if (!empty($robotsContent)) {
+            $meta->robots($robotsContent);
+            $meta->robots($robotsContent, 'googlebot');
+        }
+
+        // verification tags
+        if (!empty($prefs['site_google_analytics_site_ownership'])) {
+            $meta->verification('google', $prefs['site_google_analytics_site_ownership']);
+        }
+
+        // geo metas
+        if (!empty($prefs['metatag_geoposition'])) {
+            $meta->meta('geo.position', $prefs['metatag_geoposition']);
+            $meta->meta('ICBM', str_replace(';', ',', $prefs['metatag_geoposition']));
+        }
+        if (!empty($prefs['metatag_georegion'])) {
+            $meta->meta('geo.region', $prefs['metatag_georegion']);
+        }
+        if (!empty($prefs['metatag_geoplacename'])) {
+            $meta->meta('geo.placename', $prefs['metatag_geoplacename']);
+        }
+
+        // google specific
+        if (!empty($prefs['metatag_google_notranslate']) && $prefs['metatag_google_notranslate'] === 'y') {
+            $meta->meta('google', 'notranslate');
+        }
+        if (!empty($prefs['metatag_nositelinkssearchbox']) && $prefs['metatag_nositelinkssearchbox'] === 'y') {
+            $meta->meta('google', 'nositelinkssearchbox');
+        }
+
+        // Wiki feed
+        if (
+            !empty($prefs['feature_wiki']) && $prefs['feature_wiki'] === 'y' &&
+            !empty($prefs['feed_wiki']) && $prefs['feed_wiki'] === 'y' &&
+            (empty($tiki_p_view) || $tiki_p_view === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_wiki_title']) ? $prefs['feed_wiki_title'] : tra('RSS Wiki');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-wiki_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Blogs Feed
+        if (
+            !empty($prefs['feature_blogs']) && $prefs['feature_blogs'] === 'y' &&
+            !empty($prefs['feed_blogs']) && $prefs['feed_blogs'] === 'y' &&
+            (empty($tiki_p_read_blog) || $tiki_p_read_blog === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_blogs_title']) ? $prefs['feed_blogs_title'] : tra('RSS Blogs');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-blogs_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Articles feed
+        if (
+            !empty($prefs['feature_articles']) && $prefs['feature_articles'] === 'y' &&
+            !empty($prefs['feed_articles']) && $prefs['feed_articles'] === 'y' &&
+            (empty($tiki_p_read_article) || $tiki_p_read_article === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_articles_title']) ? $prefs['feed_articles_title'] : tra('RSS Articles');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-articles_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // File Galleries Feed
+        if (
+            !empty($prefs['feature_file_galleries']) && $prefs['feature_file_galleries'] === 'y' &&
+            !empty($prefs['feed_file_galleries']) && $prefs['feed_file_galleries'] === 'y' &&
+            (empty($tiki_p_view_file_gallery) || $tiki_p_view_file_gallery === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_file_galleries_title']) ? $prefs['feed_file_galleries_title'] : tra('RSS File Galleries');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-file_galleries_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Forums feed
+        if (
+            !empty($prefs['feature_forums']) && $prefs['feature_forums'] === 'y' &&
+            !empty($prefs['feed_forums']) && $prefs['feed_forums'] === 'y' &&
+            (empty($tiki_p_forum_read) || $tiki_p_forum_read === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_forums_title']) ? $prefs['feed_forums_title'] : tra('RSS Forums');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-forums_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Directories Feed
+        if (
+            !empty($prefs['feature_directory']) && $prefs['feature_directory'] === 'y' &&
+            !empty($prefs['feed_directories']) && $prefs['feed_directories'] === 'y' &&
+            (empty($tiki_p_view_directory) || $tiki_p_view_directory === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_directories_title']) ? $prefs['feed_directories_title'] : tra('RSS Directories');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-directories_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Calendars Feed
+        if (
+            !empty($prefs['feature_calendar']) && $prefs['feature_calendar'] === 'y' &&
+            !empty($prefs['feed_calendar']) && $prefs['feed_calendar'] === 'y' &&
+            (empty($tiki_p_view_calendar) || $tiki_p_view_calendar === 'y')
+        ) {
+            $feedTitle = !empty($prefs['feed_calendar_title']) ? $prefs['feed_calendar_title'] : tra('RSS Calendars');
+            $ver = urlencode($prefs['feed_default_version'] ?? '2');
+            $meta->feed("tiki-calendars_rss.php?ver=" . $ver, 'application/rss+xml', $feedTitle);
+        }
+
+        // Trackers feeds (Multiple)
+        if (
+            !empty($prefs['feature_trackers']) && $prefs['feature_trackers'] === 'y' &&
+            !empty($prefs['feed_tracker']) && $prefs['feed_tracker'] === 'y' &&
+            !empty($rsslist_trackers) && is_array($rsslist_trackers)
+        ) {
+            foreach ($rsslist_trackers as $tracker) {
+                if (!empty($tracker['trackerId'])) {
+                    $baseTitle = !empty($prefs['feed_tracker_title']) ? $prefs['feed_tracker_title'] : tra('RSS Tracker');
+                    $feedTitle = $baseTitle . ' - ' . ($tracker['name'] ?? '');
+                    $ver = urlencode($prefs['feed_default_version'] ?? '2');
+                    $url = "tiki-tracker_rss.php?ver=" . $ver . "&trackerId=" . $tracker['trackerId'];
+                    $meta->feed($url, 'application/rss+xml', $feedTitle);
+                }
+            }
+        }
+
+        // Universal edit button (universaleditbutton.org)
+        global $editable, $tiki_p_edit, $tiki_p_admin_wiki;
+        if (!empty($editable) && $editable && !empty($page)) {
+            $canEdit = (!empty($tiki_p_edit) && $tiki_p_edit === 'y') ||
+                       (strtolower($page) === 'sandbox') ||
+                       (!empty($tiki_p_admin_wiki) && $tiki_p_admin_wiki === 'y');
+
+            if ($canEdit) {
+                $editUrl = 'tiki-editpage.php?page=' . urlencode($page);
+                $editTitle = tra('Edit this page!');
+
+                // Use push() to add custom link tag with title attribute
+                $meta->push('link', [
+                    'rel' => 'alternate',
+                    'type' => 'application/x-wiki',
+                    'title' => $editTitle,
+                    'href' => $editUrl
+                ]);
+            }
+        }
+
+        return (string) $meta;
+    }
+
 
     /**
      * Force JS Files being added after tiki-setup.php is done to the rank/loadorder 'late' if rank is not 'external'.
