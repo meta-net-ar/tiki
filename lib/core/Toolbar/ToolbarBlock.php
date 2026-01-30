@@ -24,6 +24,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
                 } else {
                     $syntax = "::text::";
                 }
+                $markdown = "{CENTER()}text{CENTER}";
                 break;
             case 'rule':
                 $label = tra('Horizontal Bar');
@@ -44,11 +45,13 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
                 $iconname = 'box';
                 $wysiwyg = '';
                 $syntax = '^text^';
+                $markdown = '{BOX()}text{BOX}';
                 break;
             case 'email':
                 $label = tra('Email');
                 $iconname = 'envelope';
                 $syntax = '[mailto:email@example.com|text]';
+                $markdown = '[text](mailto:email@example.com)';
                 break;
             case 'blockquote':
                 $label = tra('Block quote');
