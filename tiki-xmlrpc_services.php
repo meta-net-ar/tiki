@@ -21,6 +21,8 @@
 
 include_once('tiki-setup.php');
 $bloglib = TikiLib::lib('blog');
+$access = TikiLib::lib('access');
+$access->check_feature('feature_xmlrpc');
 
 if ($prefs['feature_xmlrpc'] != 'y') {
     die;

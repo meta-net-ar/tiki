@@ -12,6 +12,8 @@
 $section = 'mytiki';
 require_once('tiki-setup.php');
 //require_once('lib/prefs/socnets.php');
+$access = TikiLib::lib('access');
+$access->check_feature('feature_socialnetworks');
 
 require_once('lib/socnets/Util.php');
 use TikiLib\Socnets\Util\Util;

@@ -15,6 +15,8 @@ global $prefs;
 $section = "wiki page";
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+$access = TikiLib::lib('access');
+$access->check_permission('tiki_p_edit');
 
 if ($tiki_p_edit !== 'y') {
     $smarty->assign('errortype', 401);

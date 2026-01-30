@@ -13,6 +13,8 @@
 require_once 'tiki-setup.php';
 $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
+$accesslib = TikiLib::lib('access');
+$accesslib->check_permission('tiki_p_admin');
 
 if ($tiki_p_admin_users != 'y') {
     $smarty->assign('msg', tra('You do not have the permission that is needed to use this feature'));

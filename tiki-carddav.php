@@ -19,6 +19,7 @@ use Tiki\SabreDav\PrincipalBackend;
 use Tiki\SabreDav\AclPlugin;
 
 require_once 'tiki-setup.php';
+$access->check_feature('feature_contacts');
 TikiLib::setExternalContext(true);
 
 // Backends

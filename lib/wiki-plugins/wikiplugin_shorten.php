@@ -88,7 +88,7 @@ function wikiplugin_shorten($data, $params)
         'lessText' => '[-]',
         'show_speed' => 0,
         'hide_speed' => 0,
-    ]);
+    ], EXTR_SKIP);
 
     if (isset($params['length'])) {
         $length = (int) sprintf('%d', $params['length']);
