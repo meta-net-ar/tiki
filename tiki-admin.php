@@ -231,8 +231,8 @@ if (isset($_POST['lm_preference']) && $access->checkCsrf()) {
 }
 
 if (isset($_REQUEST['lm_criteria'])) {
-    if (empty($_REQUEST['lm_criteria'])) {
-        Feedback::errorAndDie(tra('Your search request is empty'), \Laminas\Http\Response::STATUS_CODE_400);
+    if ($_REQUEST['lm_criteria'] == '') {
+        Feedback::error(tra('Your search request is empty'), \Laminas\Http\Response::STATUS_CODE_400);
     }
     set_time_limit(0);
     try {
@@ -297,14 +297,14 @@ if (isset($_REQUEST['page'])) {
             $current_admin_icon = $admin_icons[$adminPage];
 
             $admintitle = $current_admin_icon['title'];
-            $description = isset($current_admin_icon['description']) ? $current_admin_icon['description'] : '';
-            $helpUrl = isset($current_admin_icon['help']) ? $current_admin_icon['help'] : '';
+            $description = $current_admin_icon['description'] ?? '';
+            $helpUrl = $current_admin_icon['help'] ?? '';
         }
     }
     $helpDescription = tr("Help on %0 Config", $admintitle);
 
     $smarty->assign('include', $adminPage);
-    if (substr($adminPage, 0, 3) == 'tp_' && ! file_exists("admin/include_$adminPage.tpl")) {
+    if (str_starts_with($adminPage, 'tp_') && ! file_exists("admin/include_$adminPage.tpl")) {
         $packageAdminTplFile = $utilities->getExtensionFilePath("templates/admin/include_$adminPage.tpl");
         if (! file_exists($packageAdminTplFile)) {
             $smarty->assign('include', 'extension_package_missing_page');
@@ -363,16 +363,46 @@ $smarty->assign('ProblemsLoadingCacheSubSystem', TikiLib::lib('cache')->reportOp
 // VERSION TRACKING
 $forcecheck = ! empty($_GET['forcecheck']);
 
+$upgrade_errors = [];
+$upgrade_warnings = [];
+$upgrade_notes = [];
+$versionObj = Tiki_Version_Version::get($TWV->version);
+$is_stable = $versionObj->isStable();
+
 // Versioning feature has been enabled, so if the time is right, do a live
 // check, otherwise display the stored data.
 if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $versionUtils = new Tiki_Version_Utils();
     $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
 
+    $gitlib = TikiLib::lib('git');
+    $gitDetails = $gitlib->isGitInstall() ? $gitlib->getGitDetails()['content'] : [];
+
     $smarty->assign('upgrade_messages', $upgrades);
+    $smarty->assign('git_details', $gitDetails);
+    $smarty->assign('is_stable', $is_stable);
+
+    // Pre-sort the messages into separate arrays based on urgency
+
+    foreach ($upgrades as $upgrade_object) {
+        $type = $upgrade_object->getType();
+        $message = $upgrade_object->getMessage();
+        if ($type === 'error') {
+            $upgrade_errors[] = $message;
+        } elseif ($type === 'warning') {
+            $upgrade_warnings[] = $message;
+        } else {
+            $upgrade_notes[] = $message;
+        }
+    }
 } else {
     $smarty->assign('upgrade_messages', []);
+    $smarty->assign('git_details', []);
+    $smarty->assign('is_stable', $is_stable);
 }
+$smarty->assign('upgrade_errors', $upgrade_errors);
+$smarty->assign('upgrade_warnings', $upgrade_warnings);
+$smarty->assign('upgrade_notes', $upgrade_notes);
 
 // SSL setup
 $haveMySQLSSL = $tikilib->haveMySQLSSL();
@@ -440,6 +470,16 @@ $smarty->assign('missing_patches', $installer->missingPatches());
 $smarty->assign('installer_not_locked', $installer->checkInstallerLocked());
 $smarty->assign('db_engine_type', getCurrentEngine());
 
+if (empty($_GET)) {
+    $where = ! empty($prefs['mailer_queue_max_retries']) ? 'where attempts > ' . $prefs['mailer_queue_max_retries'] : '';
+    if (! empty($where)) {
+        $maxRetries = count(\TikiDb::get()->fetchAll('SELECT messageId, message FROM tiki_mail_queue ' . $where));
+        if ($maxRetries) {
+            $smarty->assign('mailer_queue_requires_update', $maxRetries);
+        }
+    }
+}
+
 $composerWrapper = new ComposerCli($tikipath);
 $smarty->assign('composer_options_diff', $composerWrapper->compareDistRequiredOptions());
 
@@ -460,6 +500,8 @@ if (! empty($prefs['unified_check_unused_indexes']) && $prefs['unified_check_unu
 if ($prefs['feature_scheduler'] === 'y') {
     $schedulerUtils = new \Scheduler_Utils();
     $smarty->assign('isSchedulerRunConfigured', $schedulerUtils->isSchedulerRunConfigured());
+} else {
+    $smarty->assign('isSchedulerRunConfigured', true);
 }
 
 if (! $unifiedsearch->rebuildInProgress()) {

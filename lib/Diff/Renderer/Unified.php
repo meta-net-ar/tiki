@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Diff\Renderer;
 
-require_once('lib/Diff/difflib.php');
+use Tiki\Lib\Diff\DiffUtils;
 
 /**
  * "Unified" diff renderer.
@@ -66,7 +66,7 @@ class Unified extends TikiRenderer
 
     protected function _changed($orig, $final)
     {
-        $lines = diffChar($orig, $final, 0);
+        $lines = DiffUtils::diffChar($orig, $final, 0);
         $this->_deleted([$lines[0]]);
         $this->_added([$lines[1]]);
     }

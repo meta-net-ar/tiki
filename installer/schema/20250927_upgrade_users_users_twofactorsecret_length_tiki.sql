@@ -1,0 +1,1 @@
+ALTER TABLE `users_users` MODIFY `twoFactorSecret` VARCHAR(32) DEFAULT NULL

@@ -1,3 +1,6 @@
+{$TWO_FA_INCORRECT = TWO_FA_INCORRECT}
+{$USER_NOT_FOUND = USER_NOT_FOUND}
+{$PASSWORD_INCORRECT = PASSWORD_INCORRECT}
 {jq notonready=true}
 function capLock(e, el){
     kc = e.keyCode ? e.keyCode : e.which;
@@ -17,7 +20,7 @@ $(document).ready(function () {
     var moduleLogoInstance = "{{$module_logo_instance}}";
     var login_error = "{{$error_login}}";
 
-    if (login_error == {{TWO_FA_INCORRECT}}) {
+    if (login_error == {{$TWO_FA_INCORRECT}}) {
         displayFeedback("error", "{tr}Invalid two-factor authenticator code{/tr}");
     }
 
@@ -39,7 +42,7 @@ $(document).ready(function () {
                 if (!res) {
                     $(event.currentTarget).off('submit').submit();
                 } else {
-                    if (twoFAType === 'google2FA') {
+                    if (twoFAType === '{{$TOTP_2FA}}') {
                         show2FactorInputElement(btn, event);
                     } else {
                         generate2FACode(username, btn, event);
@@ -181,7 +184,7 @@ $(document).ready(function () {
                     }
 
                     // If step > 1, or no user screen, or 2FA is effectively "n", just submit
-                    if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === 'google2FA')) {
+                    if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === '{{$TOTP_2FA}}')) {
                         $(this).off('submit').submit();
                         return false;
                     }
@@ -390,9 +393,8 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         {if !empty($error_login)}
             {remarksbox type='errors' title="{tr}Error{/tr}"}
-                {if $error_login == -5}{tr}Invalid username or password{/tr}
-                {elseif $error_login == -3}{tr}Invalid username or password{/tr}
-                {elseif $error_login == -13}{tr}Invalid two-factor authenticator code{/tr}
+                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND }{tr}Invalid username or password{/tr}
+                {elseif $error_login == $TWO_FA_INCORRECT}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
         {/if}
@@ -445,7 +447,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
-            {if $prefs.twoFactorAuthType eq 'email2FA'}
+            {if $prefs.twoFactorAuthType eq $EMAIL_2FA}
                 <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
                 <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
             {else}
@@ -507,9 +509,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                                 &nbsp;|&nbsp;
                             {/if}
                             <li class="pass{if $mode eq 'popup'} dropdown-item{/if} list-item">
-                                <a href="tiki-login_scr.php?twoFactorForm" title="{if $prefs.twoFactorAuthType eq 'email2FA'}{tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}">
+                                <a href="tiki-login_scr.php?showTwoFactorForm" title="{if $prefs.twoFactorAuthType eq $EMAIL_2FA}{tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}">
                                     {if $mode eq 'popup'}
-                                        {if $prefs.twoFactorAuthType eq 'email2FA'}{tr}Login with 2FA{/tr}{elseif $prefs.twoFactorAuthType eq 'google2FA'}{tr}Login with two-factor authenticator{/tr}{/if}
+                                        {if $prefs.twoFactorAuthType eq $EMAIL_2FA}{tr}Login with 2FA{/tr}{elseif $prefs.twoFactorAuthType eq $TOTP_2FA}{tr}Login with two-factor authenticator{/tr}{/if}
                                     {/if}
                                 </a>
                             </li>

@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Theme\ThemeLib;
 
 /**
@@ -113,8 +114,7 @@ class PdfGenerator
                 if ($prefs['auth_token_access'] == 'y') {
                     $perms = Perms::get();
 
-                    require_once 'lib/auth/tokens.php';
-                    $tokenlib = AuthTokens::build($prefs);
+                    $tokenlib = Tokens::build($prefs);
                     $params['TOKEN'] = $tokenlib->createToken(
                         $tikiroot . $file,
                         $params,
@@ -189,7 +189,7 @@ class PdfGenerator
         $quotedFilename = '"' . $filename . '"';
         $quotedCommand = '"' . $this->location . '"';
 
-        `$quotedCommand -q $arg $quotedFilename`;
+        shell_exec("$quotedCommand -q $arg $quotedFilename");
 
         // Read the out file
         $pdf = file_get_contents($filename);
@@ -228,7 +228,7 @@ class PdfGenerator
         $quotedCommand = '"' . $this->location . '"';
 
         // redirect STDERR to null with 2>/dev/null becasue it outputs plenty of irrelevant warnings (hopefully nothing critical)
-        `$quotedCommand $arg $quotedFilename 2>/dev/null`;
+        shell_exec("$quotedCommand $arg $quotedFilename 2>/dev/null");
 
         // Read the out file
         $pdf = file_get_contents($filename);
@@ -299,7 +299,7 @@ class PdfGenerator
         }
         $this->_parseHTML($html);
         $this->_getImages($html, $tempImgArr);
-        $defaults = new \Mpdf\Config\ConfigVariables();
+        $defaults = new \Mpdf\Config\ConfigVariables(); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $defaultVariables = $defaults->getDefaults();
         $mpdfConfig = [
             'fontDir' => array_merge([TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
@@ -321,8 +321,11 @@ class PdfGenerator
             mkdir($mpdfConfig['tempDir'], 0770, true);
         }
 
-        $mpdf = new \Mpdf\Mpdf($mpdfConfig);
+        $mpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $mpdf->curlAllowUnsafeSslRequests = ($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] ?? 'y') === 'y';
+
+        $basePath = $params['base_path'] ?? TIKI_PATH ;
+        $mpdf->SetBasePath($basePath);
 
         //custom fonts add, currently fontawesome support is added, more fonts can be added in future
         $custom_fontdata = [
@@ -364,7 +367,6 @@ class PdfGenerator
         } else {
             $extcss = '';
         }
-
         // checking if print friendly preference is enabled if so then attach print css
         // otherwise theme styles will be retained by theme css
         $themecss = '';
@@ -409,6 +411,26 @@ class PdfGenerator
                 $themecss .= file_get_contents($themePath);
             }
 
+            // and a theme pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                '',
+                'css/pdf.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            // and an option pdf.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'css/pdf.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
             $themecss .= "\nb,strong{font-weight:bold !important;}";
             // preserving theme styles by removing media print styles to print what is shown on screen
             $themecss = str_replace(["media print", "color : fff"], ["media p","color : #fff"], $themecss);
@@ -424,6 +446,7 @@ class PdfGenerator
             if (empty($isPermissionToViewPage)) {
                 $title = tr('PDF Cover Page Error');
                 $mes = tr('PDF generation failed because you do not have permission to view the specified cover page: %0', $coverWikiPage);
+                $this->clearTempImg($tempImgArr);
                 Feedback::error(['mes' => $mes, 'title' => $title]);
                 TikiLib::lib('access')->redirect($params['page'] ?? '');
                 die();
@@ -459,7 +482,7 @@ class PdfGenerator
 
                 $coverHtml = '<div style="' . $coverStyle . '">' . $coverHtml . '</div>';
 
-                $coverMpdf = new \Mpdf\Mpdf($mpdfConfig);
+                $coverMpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
                 $coverMpdf->SetHTMLHeader();
                 $coverMpdf->SetHTMLFooter();
                 $coverMpdf->AddPage(
@@ -479,7 +502,7 @@ class PdfGenerator
                 // write HTML
                 $coverMpdf->WriteHTML($coverHtml);
 
-                $coverPdfString = $coverMpdf->Output('', \Mpdf\Output\Destination::STRING_RETURN);
+                $coverPdfString = $coverMpdf->Output('', \Mpdf\Output\Destination::STRING_RETURN); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
                 $coverTempFile = writeTempFile($coverPdfString, 'pdfcover/', false, 'coverpage_', '.pdf');
 
                 $mpdf->setSourceFile($coverTempFile);
@@ -495,6 +518,9 @@ class PdfGenerator
             }
         }
 
+        // Insert <a name="id"></a> immediately before each element with an id
+        $html = $this->addNamedAnchorsBeforeIdTags($html);
+
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
         //adding css styles with first page content
         $allCss = '<style>' .
@@ -505,12 +531,16 @@ class PdfGenerator
 
         $cssStyles = str_replace(
             [".tiki","opacity: 0;","page-break-inside: avoid;"],
-            ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"],
+            ["","fill: #fff;opacity:0.3;stroke:black;","page-break-inside: auto;"],
             $allCss
         );
         //PDF import templates will not work if background color is set, need to replace in css
         $cssStyles = $this->replaceCssVariables($cssStyles);
         $cssStyles = $this->evaluateCalcExpressions($cssStyles);
+
+        if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+            $debugOutput = '';
+        }
 
         if (
             array_filter(array_column($pdfPages, 'pageContent'), function ($var) {
@@ -554,14 +584,28 @@ class PdfGenerator
                     return date($matches[1]);
                 }, $coverPage[$i]);
             }
-            $htm = '<body style="' . $coverPageBgColor . 'margin:0px;padding:0px"><div style="height:100%;background-image:url(' . $coverImage . ');background-size:cover;background-repeat: no-repeat;background-position: center;padding:20px;">';
-            if (! empty($coverPage[0]) || ! empty($coverPage[1])) {
-                $htm .= '<div style="' . $coverPageBorder . 'height:95%;">
-                <div style="text-align:' . $textAlign . ';margin-top:30%;' . $textColor . '">
-                <div style="' . $textBgColor . $coverPageTextBorder . 'margin-bottom:10px;font-size:50px;">' . $coverPage[0] . '</div>' . $coverPage[1] . '</div></div>';
+            $bodyStyle = "{$coverPageBgColor}margin:0px;padding:0px";
+            $containerStyle = "height:100%;background-image:url({$coverImage});padding:20px;background-repeat:no-repeat;background-position:center;";
+            $borderStyle = "{$coverPageBorder}height:95%;";
+            $contentStyle = "text-align:{$textAlign};margin-top:30%;{$textColor}";
+            $titleStyle = "{$textBgColor}{$coverPageTextBorder}margin-bottom:10px;font-size:50px;";
+
+            $htmlChunk = <<<HTML
+ <body style="$bodyStyle">
+     <div style="$containerStyle">
+         <div style="$borderStyle">
+             <div style="$contentStyle">
+                 <div style="$titleStyle">{$coverPage[0]}</div>
+                 {$coverPage[1]}
+             </div>
+         </div>
+     </div>
+ </body>
+ HTML;
+            if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+                $debugOutput .= $htmlChunk;
             }
-            $htm .= '</div></body>';
-            $mpdf->WriteHTML($htm);
+            $mpdf->WriteHTML($htmlChunk);
         }
         //Checking bookmark
         if (is_array($pdfSettings['autobookmarks'])) {
@@ -585,7 +629,7 @@ class PdfGenerator
             }
 
             if (strip_tags(trim($pdfPage['pageContent']), "img,pdfinclude") != '') { //including external pdf
-                if (strpos($pdfPage['pageContent'], "<pdfinclude")) {
+                if (str_contains($pdfPage['pageContent'], "<pdfinclude")) {
                     //getting src
                     $breakPageContent = str_replace(["<pdfpage>.","</pdfpage>","<pdfinclude src=","/>","\""], "", $pdfPage['pageContent']);
                     $breakPageContent = trim($breakPageContent);
@@ -599,25 +643,24 @@ class PdfGenerator
                             $tokenParam = '?TOKEN';
                         }
                         if (preg_match('/display(\d+)/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId, 'display' => ''];
                             $tokenParam = '?TOKEN';
                         }
                         if (preg_match('/fileId=(\d+)/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId];
                             $tokenParam = '&TOKEN';
                         }
                         if (preg_match('/fileId=(\d+)(.*)display/', $breakPageContent, $parts)) {
-                            $fileId = isset($parts[1]) ? $parts[1] : 0;
+                            $fileId = $parts[1] ?? 0;
                             $params = ['fileId' => $fileId, 'display' => ''];
                             $tokenParam = '&TOKEN';
                         }
 
                         if ($fileId > 0) {
                             $perms = Perms::get();
-                            require_once 'lib/auth/tokens.php';
-                            $tokenlib = AuthTokens::build($prefs);
+                            $tokenlib = Tokens::build($prefs);
                             $token = $tokenlib->createToken(
                                 $tikiroot . 'tiki-download_file.php',
                                 $params,
@@ -641,7 +684,7 @@ class PdfGenerator
                             for ($i = 1; $i <= $pagecount; $i++) {
                                 $tplId = $mpdf->importPage($i);
                                 $size = $mpdf->getTemplateSize($tplId);
-                                $orientation = isset($size['orientation']) ? $size['orientation'] : '';
+                                $orientation = $size['orientation'] ?? '';
 
                                 $mpdf->SetHTMLHeader();
                                 $mpdf->AddPage($orientation);
@@ -653,7 +696,11 @@ class PdfGenerator
                                 }
                             }
                         } catch (Exception $e) {
-                            $mpdf->WriteHTML("PDF not supported");
+                            $htmlChunk = "PDF not supported";
+                            if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+                                $debugOutput .= $htmlChunk;
+                            }
+                            $mpdf->WriteHTML($htmlChunk);
                         }
                     }
                     unlink($tmpExtPDF);
@@ -703,16 +750,27 @@ class PdfGenerator
                     $pdfPage['pageContent'] = $this->getHtmlLayout($pdfPage['pageContent']);
                     $this->_getImages($pdfPage['pageContent'], $tempImgArr);
 
-                    $mpdf->WriteHTML('<html><body class="' . $bodycss . '" style="margin:0px;padding:0px;">' . $cssStyles);
+                    $htmlChunk = '<html><body class="' . $bodycss . '" style="margin:0px;padding:0px;">' . $cssStyles;
+                    if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+                        $debugOutput .= $htmlChunk;
+                    }
+                    $mpdf->WriteHTML($htmlChunk);
                     $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
                     for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pdfLimit) {
                         $content_slice = substr($pdfPage['pageContent'], $charLimit, $pdfLimit);
                         if ($content_slice) {
+                            if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+                                $debugOutput .= $content_slice;
+                            }
                             $mpdf->WriteHTML($content_slice);
                         }
                     }
-                    $mpdf->WriteHTML('</body></html>');
+                    $htmlChunk = '</body></html>';
+                    if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+                        $debugOutput .= $htmlChunk;
+                    }
+                    $mpdf->WriteHTML($htmlChunk);
                     $pageNo++;
                     $cssStyles = ''; //set to blank after added with first page
                 }
@@ -731,7 +789,35 @@ class PdfGenerator
         $this->clearTempImg($tempImgArr);
         $tempFile = fopen("temp/public/pdffile_" . session_id() . ".txt", "w");
         fwrite($tempFile, ($pagesTotal * 30));
+
+        if ($prefs['print_pdf_mpdf_debug'] === 'y') {
+            file_put_contents('temp/public/mpdf_debug_output.html', $debugOutput);
+        }
+
         return $mpdf->Output('', 'S');                  // Return as a string
+    }
+
+    public function addNamedAnchorsBeforeIdTags(string $html): string
+    {
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $xpath = new DOMXPath($dom);
+        $nodes = $xpath->query('//*[@id]'); // all elements with an id
+
+        foreach ($nodes as $node) {
+            $id = $node->getAttribute('id');
+
+            // Create <a name="id"></a>
+            $a = $dom->createElement("a");
+            $a->setAttribute("name", $id);
+
+            // Insert it just before the node with the id
+            $node->parentNode->insertBefore($a, $node);
+        }
+
+        return $dom->saveHTML();
     }
 
     public function getHtmlLayout($pageContent)
@@ -783,7 +869,7 @@ class PdfGenerator
                                 '',
                                 array_map(
                                     function ($module) {
-                                        return (isset($module['data']) ? $module['data'] : '');
+                                        return ($module['data'] ?? '');
                                     },
                                     $modules[$module_key]
                                 )
@@ -817,45 +903,50 @@ class PdfGenerator
             $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="col-xs-12">' . $modules_to_print_contents['topbar_modules'] . '</div>';
         }
 
-        $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="row">';
+        if (array_filter($modules_to_print_contents)) {
+            $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="row">';
 
-        if ($modules_to_print_contents['left_modules'] || $modules_to_print_contents['right_modules']) {
-            $sideColumn = 'col-xs-4';
+            if ($modules_to_print_contents['left_modules'] || $modules_to_print_contents['right_modules']) {
+                $sideColumn = 'col-xs-4';
 
-            if ($modules_to_print_contents['left_modules'] && $modules_to_print_contents['right_modules']) {
-                $sideColumn = 'col-xs-2';
-            }
+                if ($modules_to_print_contents['left_modules'] && $modules_to_print_contents['right_modules']) {
+                    $sideColumn = 'col-xs-2';
+                }
 
-            if ($modules_to_print_contents['left_modules']) {
-                $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="' . $sideColumn . '">' . $modules_to_print_contents['left_modules'] . '</div>';
-            }
+                if ($modules_to_print_contents['left_modules']) {
+                    $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="' . $sideColumn . '">'
+                        . $modules_to_print_contents['left_modules'] . '</div>';
+                }
 
-            $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="col-xs-8">';
+                $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="col-xs-8">';
 
-            if ($modules_to_print_contents['pagetop_modules']) {
-                $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div>' . $modules_to_print_contents['pagetop_modules'] . '</div>';
-            }
+                if ($modules_to_print_contents['pagetop_modules']) {
+                    $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div>' . $modules_to_print_contents['pagetop_modules'] . '</div>';
+                }
 
-            if ($modules_to_print_contents['pagebottom_modules']) {
-                $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div>' . $modules_to_print_contents['pagebottom_modules'] . '</div>';
+                if ($modules_to_print_contents['pagebottom_modules']) {
+                    $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div>' . $modules_to_print_contents['pagebottom_modules'] . '</div>';
+                }
+
+                $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '</div>';
+
+                if ($modules_to_print_contents['right_modules']) {
+                    $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div class="' . $sideColumn . '">'
+                        . $modules_to_print_contents['right_modules'] . '</div>';
+                }
+            } else {
+                if ($modules_to_print_contents['pagetop_modules']) {
+                    $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="col-xs-12">'
+                        . $modules_to_print_contents['pagetop_modules'] . '</div>';
+                }
+                if ($modules_to_print_contents['pagebottom_modules']) {
+                    $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div class="col-xs-12">'
+                        . $modules_to_print_contents['pagebottom_modules'] . '</div>';
+                }
             }
 
             $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '</div>';
-
-            if ($modules_to_print_contents['right_modules']) {
-                $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div class="' . $sideColumn . '">' . $modules_to_print_contents['right_modules'] . '</div>';
-            }
-        } else {
-            if ($modules_to_print_contents['pagetop_modules']) {
-                $htmlLayout["staringPart"] = $htmlLayout["staringPart"] . '<div class="col-xs-12">' . $modules_to_print_contents['pagetop_modules'] . '</div>';
-            }
-            if ($modules_to_print_contents['pagebottom_modules']) {
-                $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '<div class="col-xs-12">' . $modules_to_print_contents['pagebottom_modules'] . '</div>';
-            }
         }
-
-        $htmlLayout["endingPart"] = $htmlLayout["endingPart"] . '</div>';
-
 
         //check if Module contains navbar and force display (when printing nav is by default display none)
         if (str_contains($htmlLayout["staringPart"], '<nav') || str_contains($htmlLayout["endingPart"], '<nav')) {
@@ -1035,7 +1126,7 @@ class PdfGenerator
         foreach ($tags as $tag) {
             $imgSrc = $tag->getAttribute('src');
             //bypassing base64 encoded images
-            if (! str_contains($imgSrc, ';base64')) {
+            if (! empty($imgSrc) && ! str_contains($imgSrc, ';base64')) {
                 //replacing image with new temp image, all these images will be unlinked after pdf creation
                 $newFile = $this->file_get_contents_by_fget($imgSrc);
                 //replacing old protected image path with temp image
@@ -1060,7 +1151,7 @@ class PdfGenerator
         global $base_url, $prefs;
         //check if image is internal with full path
         $internalImg = 0;
-        if (substr($url, 0, strlen($base_url)) == $base_url) {
+        if (str_starts_with($url, $base_url)) {
             $internalImg = 1;
         }
         //checking for external images
@@ -1072,11 +1163,11 @@ class PdfGenerator
         if (! $internalImg) {
             $url = $base_url . $url;
         }
-        if (! file_exists('temp/pdfimg')) {
-            mkdir('temp/pdfimg');
-            chmod('temp/pdfimg', 0755);
+        if (! file_exists(TEMP_PDFIMG_PATH)) {
+            mkdir(TEMP_PDFIMG_PATH);
+            chmod(TEMP_PDFIMG_PATH, 0755);
         }
-        $cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
+        $cookie = $_SERVER['HTTP_COOKIE'] ?? '';
         $opts = [];
         if (! empty($cookie)) {
             $opts['http'] = ['header' => 'Cookie: ' . $cookie . "\r\n"];
@@ -1090,7 +1181,7 @@ class PdfGenerator
         if (gettype($data) == 'boolean' && ! $data) {
             return '';
         }
-        $newFile = 'temp/pdfimg/pdfimg' . mt_rand(9999, 999999) . '.png';
+        $newFile = TEMP_PDFIMG_PATH . '/pdfimg' . mt_rand(9999, 999999) . '.png';
         file_put_contents($newFile, $data);
         chmod($newFile, 0755);
         return $newFile;
@@ -1171,6 +1262,8 @@ class PdfGenerator
 
     private function checkLargeTables(&$doc)
     {
+        $xpath = new DOMXPath($doc);
+
         //new code to split table large cells
         foreach ($doc->getElementsByTagName('table') as $table) {
             // iterate over each row in the table
@@ -1178,18 +1271,16 @@ class PdfGenerator
             $cloneArr = [];
             foreach ($trs as $tr) {
                 $cloned = 0;
-                foreach ($tr->getElementsByTagName('td') as $td) { // get the columns in this row
-                    if (strlen($td->textContent) > 2000) {
-                        $longValue = $td->nodeValue;
-                        $breaktill = strpos($td->nodeValue, '.', 1000);
+                $directTds = $xpath->query('./td', $tr);
+                foreach ($directTds as $td) { // get the columns in this row
+                    $clones = $this->checkLongTd($td);
+                    if (count($clones)) {
                         if ($cloned == 0) {
-                            $cloneNode = $tr->cloneNode(true);
                             $cloned = 1;
-                            $cloneArr[] = ["node" => $cloneNode,'row' => $tr,'breaktill' => $breaktill];
+                            foreach ($clones as $clone) {
+                                $cloneArr[] = $clone;
+                            }
                         }
-                        $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
-                        $td->setAttribute("style:", "white-space: nowrap");
-                        $td->setAttribute("width", "20%");
                     }
                 }
             }
@@ -1200,6 +1291,33 @@ class PdfGenerator
             }
         }
         $html = @$doc->saveHTML();
+    }
+
+    private function checkLongTd(&$td)
+    {
+        $cloneArr = [];
+        $xpath = new DOMXPath($td->ownerDocument);
+        $directTds = $xpath->query('./td', $td);
+        if (count($directTds)) {
+            array_walk(iterator_to_array($directTds), function ($childTd) use (&$cloneArr) {
+                $cloneArr = array_merge($cloneArr, $this->checkLongTd($childTd));
+            });
+        }
+
+        if ($td->nodeType === XML_TEXT_NODE) {
+            if (strlen($td->textContent) > 2000) {
+                $longValue = $td->nodeValue;
+                $breaktill = strpos($td->nodeValue, '.', 1000);
+                $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
+                $td->setAttribute("style:", "white-space: nowrap");
+                $td->setAttribute("width", "20%");
+                $parentTr = $td->parentNode;
+                $cloneNode = $parentTr->cloneNode(true);
+                $cloneArr[] = ['breaktill' => $breaktill, 'node' => $cloneNode, 'row' => $parentTr];
+            }
+        }
+
+        return $cloneArr;
     }
 
     private function insertNewNodes(&$cloneData, &$table, $start = 1000)
@@ -1607,16 +1725,19 @@ TEXT;
 
     private function runReplaceVars($css, $variables)
     {
+        // FIXME this pattern doesn't match multi-argument var calls
+        // e.g. "var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color)))"
+        // from vendor_bundled/vendor/twbs/bootstrap/dist/css/bootstrap.css:1884
+
         return preg_replace_callback('/var\(--([a-zA-Z0-9-]+)(?:,\s*(.+?))?\)/', function ($matches) use ($variables) {
             $var_name = $matches[1];
-            $fallback = isset($matches[2]) ? $matches[2] : null;  // Optional fallback value
+            $fallback = $matches[2] ?? null;  // Optional fallback value
 
             // Check if the variable exists
-            if (isset($variables[$var_name])) {
-                $value = $variables[$var_name];
-
+            $value = trim($variables[$var_name]);
+            if ($value) {
                 // If the variable contains another `var()`, recursively resolve it
-                if (preg_match('/var\(--([a-zA-Z0-9-]+)\)/', $value)) {
+                if (preg_match('/var\(--([a-zA-Z0-9-]+)\)/U', $value)) {
                     $value = $this->runReplaceVars($value, $variables);
                 }
                 return $value;  // Return resolved value
@@ -1647,6 +1768,15 @@ TEXT;
         // Create an associative array of variable names to their values
         $variables = array_combine($matches[1], $matches[2]);
 
+        // match again to find inline url data: values
+        preg_match_all('/--([a-zA-Z0-9-]+)\s*:\s*(url\(data:[^)]+\));/', $css, $matches);
+        // Reverse so the light variables are processed first?
+        $matches[1] = array_reverse($matches[1]);
+        $matches[2] = array_reverse($matches[2]);
+
+        // Create an associative array of variable names to their values
+        $variables = array_merge($variables, array_combine($matches[1], $matches[2]));
+
         // Replace all `var(--variable)` occurrences in the CSS
         $css = $this->runReplaceVars($css, $variables);
 
@@ -1675,7 +1805,7 @@ function cleanHtml($html, $config = null, $encoding = 'utf8')
             'clean' => true,
             'output-xhtml' => false,
             'merge-divs' => false,
-            'show-body-only' => false,
+            'show-body-only' => 'auto',
             'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
             'new-empty-tags' => 'embed keygen source track wbr',
             'new-inline-tags' => 'svg audio command datalist embed mark menuitem meter output progress source time video wbr',

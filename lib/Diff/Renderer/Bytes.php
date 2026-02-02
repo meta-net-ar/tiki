@@ -6,7 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Diff\Renderer;
 
-require_once('lib/Diff/difflib.php');
+use Tiki\Lib\Diff\DiffUtils;
+
 /**
  * Give back the kb change
  *
@@ -51,7 +52,7 @@ class Bytes extends Base
             $this->delBytes += count($orig);
             return;
         }
-        $change = diffChar($orig, $final, 0, 'bytes');
+        $change = DiffUtils::diffChar($orig, $final, 0, 'bytes');
         preg_match("/add=([0-9]*)&amp;del=([0-9]*)/", $change, $matches);
         $this->addBytes += $matches[1];
         $this->delBytes += $matches[2];

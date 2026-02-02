@@ -70,7 +70,7 @@
             {/if}
         </label>
         <div class="col-sm-1">
-            <input type="radio" name="mode" value="user" {if $info.mode eq 'user'}checked="checked"{/if}>
+            <input type="radio" class="form-check-input" name="mode" value="user" {if $info.mode eq 'user'}checked="checked"{/if}>
         </div>
         <div class="col-sm-7">
             <input type="text" name="userreg" id="banning-userregex" value="{$info.user|escape}" onfocus="$('input[name=mode]').val(['user']);" class="form-control">
@@ -80,7 +80,7 @@
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label" for="banning-ipregex">{tr}Multiple IP regex matching{/tr}</label>
             <div class="col-sm-8 alert-warning">
-                <input type="radio" name="mode" value="mass_ban_ip" {if $info.mode eq 'mass_ban_ip'}checked="checked"{/if}>
+                <input type="radio" class="form-check-input" name="mode" value="mass_ban_ip" {if $info.mode eq 'mass_ban_ip'}checked="checked"{/if}>
                 <br>
                 <input type="checkbox" name="checkmultiip" checked="checked" onclick="CheckMultiIP();">
                 <label for="sectionswitch">{tr}Check / Uncheck All{/tr}</label><br>
@@ -97,7 +97,7 @@
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label" for="banning-ipregex">{tr}IP regex matching{/tr}</label>
             <div class="col-sm-1">
-                <input type="radio" name="mode" value="ip" {if $info.mode eq 'ip'}checked="checked"{/if}>
+                <input type="radio" class="form-check-input" name="mode" value="ip" {if $info.mode eq 'ip'}checked="checked"{/if}>
             </div>
             <div class="col-sm-5">
                 <div class="d-flex flex-row">

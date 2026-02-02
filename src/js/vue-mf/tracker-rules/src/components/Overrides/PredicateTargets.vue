@@ -1,13 +1,23 @@
 <template>
-    <select class="form-select" :value="predicate.target.target_id" @change="handleChange">
+    <el-select
+        v-if="isElementPlusActive"
+        v-model="modelValue"
+        placeholder="Select"
+        @change="() => emit('change', modelValue)"
+    >
+        <el-option v-for="target in columns.targets" :key="target.label" :label="target.label" :value="target.target_id" />
+    </el-select>
+    <select class="form-select" :value="predicate.target.target_id" @change="handleChange" v-else>
         <option v-for="target in columns.targets" :key="target.label" :value="target.target_id">{{ target.label }}
         </option>
     </select>
 </template>
 <script setup>
+import { ref } from "vue";
+
 defineOptions({ name: "PredicateTargets" });
 
-defineProps({
+const props = defineProps({
     columns: {
         type: Object,
         required: true,
@@ -17,6 +27,11 @@ defineProps({
         required: true,
     },
 })
+
+const modelValue = ref(props.predicate.target.target_id);
+
+const isElementPlusActive = ref(!!window.elementPlus);
+
 const emit = defineEmits(["change"]);
 
 const handleChange = (event) => {

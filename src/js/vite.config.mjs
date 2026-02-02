@@ -118,10 +118,17 @@ export default defineConfig(({ command, mode }) => {
         "element-plus-ui/slider": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/slider.js"),
         "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
         "element-plus-ui/backtop": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/backtop.js"),
+        "element-plus-ui/datepicker-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/DatePicker/datePicker.scss"),
+        "element-plus-ui/autocomplete-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Autocomplete/autocomplete.scss"),
+        "element-plus-ui/input-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Input/input.scss"),
+        "element-plus-ui/select-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Select/select.scss"),
+        "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-3d-model-viewer": resolve(__dirname, "tiki-model3dviewer/model3dviewer.js"),
         "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(__dirname, "tiki-sentry-browser/sentry-browser.js"),
+        "tiki-figlet": resolve(__dirname, "tiki-figlet/figlet.js"),
         styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
@@ -129,6 +136,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
+        "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
@@ -145,6 +153,8 @@ export default defineConfig(({ command, mode }) => {
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
             emptyOutDir: true,
+            // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
+            chunkSizeWarningLimit: 2500,
             minify: mode === "production",
             sourcemap: mode === "production",
             cssCodeSplit: true,
@@ -215,33 +225,6 @@ export default defineConfig(({ command, mode }) => {
             postcss: {
                 plugins: [postcssRootToHost()],
             },
-            /**
-             * This workaround suppresses warnings from Sass about mixed declarations
-             * after nested rules. The issue originates from Bootstrap (twbs) and is
-             * tracked here: https://github.com/twbs/bootstrap/issues/40621.
-             *
-             * The fix involves configuring the `scss` preprocessor to silence the specific
-             * deprecation warnings (`mixed-decls`). This is implemented using the `silenceDeprecations`
-             * option with the value `['mixed-decls']`.
-             *
-             * IMPORTANT: This workaround can be removed once Bootstrap is updated to
-             * version 5.3.4 (or later), which includes the resolution to this issue
-             * (see: https://github.com/twbs/bootstrap/pull/40623).
-             *
-             * Original suppressed warning:
-             * DEPRECATION WARNING: Sass's behavior for declarations that appear after nested rules
-             * will change in future versions.
-             *
-             * Future developers should verify whether the workaround is still required
-             * by consulting the linked issue and confirming that the fix is included in the
-             * version of Bootstrap used by the project.
-             */
-            preprocessorOptions: {
-                scss: {
-                    api: "modern-compiler", // or "modern", "legacy"
-                    silenceDeprecations: ["mixed-decls"],
-                },
-            },
         },
         plugins: [
             vue({
@@ -283,6 +266,14 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/@event-calendar/core/dist/index.css",
                         dest: "vendor_dist/@event-calendar/core/dist",
+                    },
+                    {
+                        src: "node_modules/boomerangjs/boomerang.js",
+                        dest: "vendor_dist/boomerangjs/",
+                    },
+                    {
+                        src: "node_modules/boomerangjs/plugins/rt.js",
+                        dest: "vendor_dist/boomerangjs/plugins",
                     },
                     {
                         src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
@@ -400,7 +391,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/converse.js/dist/locales",
                     },
                     {
-                        src: "node_modules/converse.js/dist/emojis.js",
+                        src: "node_modules/converse.js/dist/emoji.json",
                         dest: "vendor_dist/converse.js/dist",
                     },
                     {
@@ -410,6 +401,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/interactjs/dist/*",
                         dest: "vendor_dist/interactjs/dist",
+                    },
+                    {
+                        src: ["node_modules/d3-milestones/build/d3-milestones.css", "node_modules/d3-milestones/build/d3-milestones.min.js"],
+                        dest: "vendor_dist/d3-milestones/build",
                     },
                     {
                         src: "node_modules/dompurify/dist/purify.(es|min)*",
@@ -430,6 +425,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/fitvids/dist/fitvids.js",
                         dest: "vendor_dist/fitvids/dist",
+                    },
+                    {
+                        src: ["node_modules/fieldslinker/fieldsLinker.css", "node_modules/fieldslinker/fieldsLinker.js"],
+                        dest: "vendor_dist/fieldslinker",
                     },
                     {
                         src: ["node_modules/glightbox/dist/css/glightbox.min.css"],
@@ -496,10 +495,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-validation/dist",
                     },
                     {
-                        src: "node_modules/minicart/dist/*.js",
-                        dest: "vendor_dist/minicart/dist",
-                    },
-                    {
                         src: "node_modules/moment/dist/*",
                         dest: "vendor_dist/moment/dist",
                     },
@@ -514,10 +509,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js", "node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
                         dest: "vendor_dist/ol-layerswitcher/dist",
-                    },
-                    {
-                        src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/*.min.js"],
-                        dest: "vendor_dist/pivottable/dist",
                     },
                     {
                         src: "node_modules/plotly.js/dist/topojson*",
@@ -634,9 +625,11 @@ export default defineConfig(({ command, mode }) => {
                 ],
             }),
             AutoImport({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             Components({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */

@@ -1,65 +1,32 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
-//body.layout_basic {
-//    background-image: linear-gradient(to right top, #a52873, #9e2e70, #96326d, #8f3669, #883966, #8f4770, #955579, #9c6383, #b1819d, #c79fb8, #ddbed2, #f4dded);
-//}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
-.text-danger {
-    color: $danger !important; // #B85B19 !important; // $danger !important;
-}
-.text-dark {
-    color: $dark !important;
+// Progress bars
+.progress-bar {
+    --bs-progress-bar-bg: #{$info};
 }
 
-.bg-dark {
-    background-color: $dark !important;
+// Dark color mode
+
+[data-bs-theme=dark] {
+    .blockquote-footer { color: #848C94; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #F65151 !important; }
+
+    .btn.btn-outline-primary { color: #D963AA; border-color: #D963AA; }
+    .btn.btn-outline-secondary { color: #A47DB5; border-color: #A47DB5; }
+    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #F65151; border-color: #F65151; }
+    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
+    .btn.btn-outline-info { color: #CB6CA2; border-color: #CB6CA2; }
+    .btn.btn-outline-dark { color: #D364AC; border-color: #D364AC; }
+
+    .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
 }
 
-.btn-dark {
-    color: #fff;
-    background-color: $dark; // This isn't working.
-    border-color: $dark;
-}
-.breadcrumb-item.active {
-    color: $text-muted !important;
-}
-
-.valid-feedback,
-.valid-tooltip { color: #288040 !important; }
-
-.was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label,
-.invalid-feedback,
-.invalid-tooltip { color: $danger !important; }
-
-.bg-danger,
-.bg-warning {
-    .card-title {
-        color: #fff;
-    }
-}
-
-//.badge.bg-danger,
-.badge.bg-warning,
-.badge.bg-success {
-    color: #000;
-}
-.page-item.disabled, .list-group-item.disabled {
-    color: $text-muted !important;
-}
-
-.btn.btn-outline-success {
-    color: #3A833A;
-    border-color: #3A833A;
-}
-.btn.btn-outline-warning {
-    color: #A4660E;
-    border-color: #A4660E;
-}
-
-.progress-bar.bg-success,
-.progress-bar.bg-warning {
-    color: #000;
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: #{$component-active-bg};
 }

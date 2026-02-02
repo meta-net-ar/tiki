@@ -6,7 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Diff\Renderer;
 
-// require_once('lib/Diff/difflib.php');
+use Tiki\Lib\Diff\DiffUtils;
+
 /**
  * "Inline" diff renderer.
  *
@@ -38,7 +39,7 @@ class Inline extends SideBySide
                 $final = array_merge($final, $edit->final);
             }
         }
-        $lines = diffChar($orig, $final, $this->words, "character_inline");
+        $lines = DiffUtils::diffChar($orig, $final, $this->words, "character_inline");
         echo "<tr class='diffbody'><td colspan='3'>$lines[0]</td></tr>\n";
         $this->_endBlock();
     }

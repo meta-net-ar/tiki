@@ -312,7 +312,6 @@ function wikiplugin_tabs_info()
 
 function wikiplugin_tabs($data, $params)
 {
-    $tikilib = TikiLib::lib('tiki');
     if (! empty($params['name'])) {
         $tabsetname = $params['name'];
     } else {

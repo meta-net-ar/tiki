@@ -72,7 +72,7 @@ class Tiki_PageCache
         if (is_array($this->cacheDataKeys)) {
             foreach ($keys as $k) {
                 if (! isset($this->cacheDataKeys[$k])) {
-                    $this->cacheDataKeys[$k] = isset($array[$k]) ? $array[$k] : null;
+                    $this->cacheDataKeys[$k] = $array[$k] ?? null;
                 }
             }
         }
@@ -139,7 +139,7 @@ class Tiki_PageCache
                     if (is_array($cachedOutput['jsfiles'])) {
                         foreach ($cachedOutput['jsfiles'] as $rank => $files) {
                             foreach ($files as $file) {
-                                $skip_minify = isset($cachedOutput['skip_minify']) ? true : false;
+                                $skip_minify = isset($cachedOutput['skip_minify']);
                                 $headerlib->add_jsfile_by_rank($file, $rank, $skip_minify);
                             }
                         }

@@ -12,8 +12,6 @@
 {/if}
 {$showFacets = not empty($facets) and isset($tableparams.facets) and $tableparams.facets eq 'y'}
 {if $showFacets}
-{*    <pre>{$facets|var_dump}</pre>*}
-{*    <pre>{$results|var_dump}</pre>*}
     <div class="row">
         <div class="col-sm-2">
             <div class="facets filters" id="filters">

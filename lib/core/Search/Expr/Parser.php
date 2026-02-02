@@ -16,7 +16,7 @@ class Search_Expr_Parser
         foreach ($tokenizer->tokenize($string) as $part) {
             if (in_array(strtoupper($part), $this->special)) {
                 $tokens[] = strtoupper($part);
-            } elseif (strpos($part, ' ') === false) {
+            } elseif (! str_contains($part, ' ')) {
                 if (! $this->isAStopWord($part)) {
                     $tokens[] = new Search_Expr_Token($part);
                 }

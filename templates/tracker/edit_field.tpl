@@ -105,7 +105,12 @@
                     <div class="form-text">{$def.description}</div>
                     {if ! $def.selector_type}
                         {if $def.count eq '*'}
-                            <div class="form-text">{tr}Separate multiple with commas.{/tr}</div>
+                            {if $field.type|in_array:["d", "D", "M", "R"]}
+                                <div class="form-text">{tr}Separate multiple options with commas. Repeat an option in the list to set it as the default.{/tr}</div>
+                            {else}
+                                <div class="form-text">{tr}Separate multiple with commas.{/tr}</div>
+                            {/if}
+
                         {elseif $def.separator}
                             <div class="form-text">{tr}Separate multiple with &quot;{$def.separator}&quot;{/tr}</div>
                         {/if}
@@ -321,3 +326,16 @@
     </div>
 </form>
 {/block}
+
+{jq}
+    const validationTypeDropdown = $('select[name="validation_type"]');
+    const isPasswordDropdown = $('select[name="option~is_password"]');
+
+    // Automatically set "Display as password" to "Yes" when the user 
+    // selects "Password" as the validation type.
+    validationTypeDropdown.on('change', function() {
+        if ($(this).val() === 'password') {
+            isPasswordDropdown.val('1');
+        }
+    });
+{/jq}

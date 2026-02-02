@@ -55,13 +55,6 @@ function wikiplugin_skype($data, $params)
         "~np~{SKYPE()}username{SKYPE}~/np~");
     }
 
-    if (! isset($action)) {
-        $action = "chat";
-    }
-    if (! isset($showstatus)) {
-        $showstatus = "n";
-    }
-
     $ret = "<script type=\"text/javascript\" src=\"http://download.skype.com/share/skypebuttons/js/skypeCheck.js\"></script>";
     $ret .= "<a href='skype:$data?$action' onclick='return skypeCheck();'>";
     if ($showstatus == "y") {

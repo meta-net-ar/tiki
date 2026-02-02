@@ -24,7 +24,7 @@ function validator_smarty($input, $parameter = '', $message = '')
         }
     });
 
-    /** @var Smarty_Tiki $smarty */
+    /** @var \Tiki\Smarty\SmartyTiki $smarty */
     $smarty = \TikiLib::lib('smarty');
 
     try {

@@ -1,5 +1,6 @@
+@charset "UTF-8";
 /*!
- * Bootswatch cyborg theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Bootswatch Cyborg theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
 */
@@ -36,12 +37,6 @@
 
 
 // ----------------------------- Overrides and adjustments ----------------------------- //
-
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
 
 // Added for Tiki (not sure why the variable isn't working)
 .accordion-button:not(.collapsed) { background: #222; }

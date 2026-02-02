@@ -135,7 +135,7 @@ if (isset($_REQUEST['galleryId'][1])) {
             continue;
         }
         // TODO get the good gal_info
-        $perms = $tikilib->get_perm_object($_REQUEST['galleryId'][$i], 'file gallery', isset($gal_info) ? $gal_info : '', false);
+        $perms = $tikilib->get_perm_object($_REQUEST['galleryId'][$i], 'file gallery', $gal_info ?? '', false);
         $access->check_permission('tiki_p_upload_files');
     }
 }
@@ -175,7 +175,7 @@ if (! empty($_REQUEST['galleryId'][0]) && $prefs['feature_groupalert'] == 'y') {
 }
 
 if (empty($_REQUEST['returnUrl'])) {
-    include('lib/filegals/max_upload_size.php');
+    include('lib/Filegals/max_upload_size.php');
 }
 
 // Process an upload here
@@ -252,7 +252,7 @@ if ($isUpload) {
 }
 
 $fileparts = (! empty($fileInfo['filename'])) ? pathinfo($fileInfo['filename']) : [];
-$fileInfo['extension'] = isset($fileparts['extension']) ? $fileparts['extension'] : '';
+$fileInfo['extension'] = $fileparts['extension'] ?? '';
 $smarty->assign_by_ref('fileInfo', $fileInfo);
 $smarty->assign('editFileId', (int) $fileId);
 

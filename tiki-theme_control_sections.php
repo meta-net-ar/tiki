@@ -29,7 +29,7 @@ $access->check_feature('feature_theme_control', '', 'look');
 $access->check_permission('tiki_p_admin');
 
 $auto_query_args = ['find', 'sort_mode', 'offset', 'theme', 'theme_option', 'section'];
-$smarty->assign('a_section', isset($_REQUEST['section']) ? $_REQUEST['section'] : '');
+$smarty->assign('a_section', $_REQUEST['section'] ?? '');
 
 $themes = $themelib->list_themes_and_options();
 $smarty->assign('themes', $themes);
@@ -39,7 +39,7 @@ if (isset($_REQUEST['assign'])) {
     $section = $_REQUEST['section'];
     $themeKey = $_REQUEST['theme'];
     $themecontrollib->tc_assign_section($section, $themeKey);
-     $themeName = isset($themes[$themeKey]['name']) ? $themes[$themeKey]['name'] : $themeKey;
+     $themeName = $themes[$themeKey]['name'] ?? $themeKey;
      Feedback::success(tr("Theme '%0' was successfully assigned to section '%1'.", $themeName, $section));
 }
 if (isset($_REQUEST['delete'])) {

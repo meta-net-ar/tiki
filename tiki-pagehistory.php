@@ -17,7 +17,7 @@ $inputConfiguration = [
         'preview'                  => 'digits',            //get
         'flaggedrev'               => 'bool',              //post
         'approve'                  => 'digits',            //post
-        'unapprove'                => 'digits`',           //post
+        'unapprove'                => 'digits',            //post
         'paginate'                 => 'bool',              //post
         'diff_style'               => 'string',            //post
         'history_offset'           => 'digits',            //post
@@ -168,7 +168,7 @@ if ($prefs['flaggedrev_approval'] == 'y') {
 }
 
 if (! isset($_REQUEST['show_all_versions'])) {
-    $_SESSION['show_all_versions'] = isset($_SESSION['show_all_versions']) ? $_SESSION['show_all_versions'] : 'y';
+    $_SESSION['show_all_versions'] = $_SESSION['show_all_versions'] ?? 'y';
 } else {
     $_SESSION['show_all_versions'] = $_REQUEST['show_all_versions'] === 'n' ? 'n' : 'y';
 }
@@ -230,7 +230,7 @@ $history_sessions = [];
 reset($history);
 foreach ($history as &$h) { // as $h has been used by reference before it needs to be so again (it seems)
     $history_versions[] = (int)$h['version'];
-    $history_sessions[] = isset($h['session']) ? (int)$h['session'] : 0;
+    $history_sessions[] = (int)($h['session'] ?? 0);
 }
 $history_versions = array_reverse($history_versions);
 $history_sessions = array_reverse($history_sessions);
@@ -430,7 +430,9 @@ if ($prefs['feature_multilingual'] == 'y') {
             }
         }
         // Build URI / Redirect
-        $diff_style = isset($_REQUEST['diff_style']) ? rawurlencode($_REQUEST['diff_style']) : rawurlencode($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style']);
+        $diff_style = rawurlencode(
+            $_REQUEST['diff_style'] ?? ($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style'])
+        );
         $comment = rawurlencode("Updating from $page at version {$info['version']}");
         if ($newver == 0) {
             $newver = $info['version'];

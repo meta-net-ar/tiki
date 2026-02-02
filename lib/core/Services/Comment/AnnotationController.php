@@ -198,7 +198,7 @@ class Services_Comment_AnnotationController
         $comments = [];
 
         foreach ($list['comments'] as $comment) {
-            if (strpos($comment['data'], ';note:') === 0) {         // only the "inline" ones starting ;note: so far
+            if (str_starts_with($comment['data'], ';note:')) {         // only the "inline" ones starting ;note: so far
                 $data = explode("\n", $comment['data'], 2);
                 $quote = trim(substr($data[0], 6));
                 $text = trim($data[1]);

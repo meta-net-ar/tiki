@@ -15,7 +15,7 @@ class Autoload
         $composer = $event->getComposer();
         $vendors = $composer->getConfig()->get('vendor-dir');
 
-        if (substr($vendors, -1, 1) !== DIRECTORY_SEPARATOR) {
+        if (! str_ends_with($vendors, DIRECTORY_SEPARATOR)) {
             $vendors .= DIRECTORY_SEPARATOR;
         }
 

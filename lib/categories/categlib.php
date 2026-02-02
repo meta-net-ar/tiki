@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -786,16 +786,34 @@ class CategLib extends ObjectLib
         foreach ($result as $res) {
             if (! in_array($res['objectId'] . '-' . $res['category_ids'], $objs)) { // same object and same categories
                 if (preg_match('/trackeritem/', $res['type']) && $res['description'] == '') {
-                    $trklib = TikiLib::lib('trk');
-                    //This is a performance optimisation, but we can't rely on trackerId being present - benoitg - 2024-03-18
-                    $count = 0;
-                    $trackerIdRes = preg_replace('/^.*trackerId=([0-9]+).*$/', '$1', $res['href'], -1, $count);
-                    $trackerId = $count ? $trackerIdRes : null;
-                    $res['name'] = $trklib->get_isMain_value($trackerId, $res['itemId']);
-                    $filed = $trklib->get_field_id($trackerId, "description");
-                    $res['description'] = $trklib->get_item_value($trackerId, $res['itemId'], $filed);
-                    if (empty($res['description'])) {
-                        $res['description'] = $this->getOne("select `name` from `tiki_trackers` where `trackerId`=?", [(int)$trackerId]);
+                    // Use the Tracker_Item API to get item information
+                    $itemObject = Tracker_Item::fromId($res['itemId']);
+
+                    if ($itemObject) {
+                        $definition = $itemObject->getDefinition();
+                        $trklib = TikiLib::lib('trk');
+                        $res['name'] = $trklib->get_isMain_value(null, $res['itemId']);
+                        if (empty($res['name'])) {
+                            $res['name'] = $definition->getConfiguration('name') . ' #' . $res['itemId'];
+                        }
+
+                        // Try to get a description field
+                        $trackerId = $definition->getConfiguration('trackerId');
+                        $field = $trklib->get_field_id($trackerId, "description");
+                        if (! empty($field)) {
+                            $itemInfo = $itemObject->getInfo();
+                            $res['description'] = $itemInfo[$field] ?? '';
+                        }
+                        if (empty($res['description'])) {
+                            $res['description'] = $definition->getConfiguration('description');
+                        }
+                    } else {
+                        // Item doesn't exist, show a message
+                        Feedback::error(tr('Tracker item #%0 could not be found', $res['itemId']));
+
+                        // We still showing something in the list
+                        $res['name'] = tr('Missing Tracker Item #%0', $res['itemId']);
+                        $res['description'] = tr('This tracker item could not be found');
                     }
                 }
                 if ($prefs['feature_sefurl'] == 'y') {
@@ -1142,22 +1160,38 @@ class CategLib extends ObjectLib
 
             $categories = [];
             $roots = [];
-            $query = "select *, (select count(*) from tiki_categories_roles_available cr where tc.categId = cr.categId ) as num_roles from `tiki_categories` tc;";
+            $query = "SELECT tc.*, (select count(*) from tiki_categories_roles_available cr where tc.categId = cr.categId ) as num_roles FROM tiki_categories tc";
+
+            if ($prefs['category_browse_count_objects'] === 'y') {
+                $query = "
+                    SELECT 
+                        tc.*,
+                        COUNT(DISTINCT cr.categRoleId) AS num_roles,
+                        COUNT(DISTINCT tco.catObjectId) AS objects
+                    FROM
+                        `tiki_categories` tc
+                    LEFT JOIN
+                        `tiki_category_objects` tco ON tc.categId = tco.categId
+                     LEFT JOIN `tiki_categories_roles_available` cr
+                              ON tc.categId = cr.categId
+                    GROUP BY
+                        tc.categId
+                ";
+            }
+
             $result = $this->query($query, []);
             while ($res = $result->fetchRow()) {
                 $id = $res["categId"];
-                if ($prefs['category_browse_count_objects'] === 'y') {
-                    $query = "select count(*) from `tiki_category_objects` where `categId`=?";
-                    $res['objects'] = $this->getOne($query, [$id]);
-                } else {
+
+                if ($prefs['category_browse_count_objects'] !== 'y') {
                     $res['objects'] = null;
                 }
+
                 $res['children'] = [];
                 $res['descendants'] = [];
                 if ($localized) {
                     $res['name'] = tr($res['name']);
                 }
-
                 $categories[$id] = $res;
             }
 
@@ -1214,7 +1248,7 @@ class CategLib extends ObjectLib
             $cachelib->cacheItem('roots', serialize($roots), 'allcategs'); // Used in get_category_descendants()
         }
 
-        $type = is_null($filter) ? 'all' : (isset($filter['type']) ? $filter['type'] : 'self');
+        $type = is_null($filter) ? 'all' : ($filter['type'] ?? 'self');
         if ($type != 'all') {
             $kept = [];
             if ($type != 'roots') {
@@ -1533,7 +1567,7 @@ class CategLib extends ObjectLib
         }
         if ($types == '*') {
             $typesallowed = array_keys($typetitles);
-        } elseif (strpos($types, '+')) {
+        } elseif (str_contains($types, '+')) {
             $alltypes = preg_split('/\+/', $types);
             foreach ($alltypes as $t) {
                 if (isset($typetokens["$t"])) {
@@ -1547,7 +1581,6 @@ class CategLib extends ObjectLib
         } elseif (isset($typetitles["$types"])) {
             $typesallowed = [$types];
         }
-        $out = $smarty->fetch("categobjects_title.tpl");
         foreach ($catids as $id) {
             if (! $this->user_has_perm_on_object($user, $id, 'category', 'tiki_p_view_category')) {
                 continue;
@@ -1559,7 +1592,7 @@ class CategLib extends ObjectLib
             $acats = $andcat = [];
             foreach ($objectcat["data"] as $obj) {
                 $type = $obj["type"];
-                if (substr($type, 0, 7) == 'tracker') {
+                if (str_starts_with($type, 'tracker')) {
                     $type = 'tracker';
                 }
                 if (($types == '*') || in_array($type, $typesallowed)) {

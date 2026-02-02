@@ -1,13 +1,13 @@
-// Superhero 5.3.3 -- This file contains overrides of and additions to variables in node_modules/bootswatch/dist/superhero/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-@import "../../../node_modules/bootswatch/dist/superhero/_variables.scss";
+// Superhero 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-//
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/superhero/_variables.scss"; // Bootswatch theme variables file
+
 // Color system
-//
-
-$red-300: tint-color($red, 40%); // !default;
-$green-300: tint-color($green, 40%); // !default;
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:       #BC5815; // $orange;
 $secondary:     #607285; //$gray-200; // !default;
@@ -18,18 +18,55 @@ $danger:        #D33B36; // $red !default;
 //$light:         #F6F6F6FF; // lighten($gray-200, 35%) !default;
 $dark:          #20374c; // !default;
 
-$min-contrast-ratio:   1.6 !default;
+$min-contrast-ratio:   1.6; // !default;
+
+// scss-docs-start theme-text-variables
+$primary-text-emphasis:   shade-color($primary, 60%); // !default;
+$secondary-text-emphasis: shade-color($secondary, 60%); // !default;
+$success-text-emphasis:   shade-color($success, 60%); // !default;
+$info-text-emphasis:      shade-color($info, 60%); // !default;
+$warning-text-emphasis:   shade-color($warning, 60%); // !default;
+$danger-text-emphasis:    shade-color($danger, 60%); // !default;
+$light-text-emphasis:     $gray-700; // !default;
+$dark-text-emphasis:      $gray-700; // !default;
+// scss-docs-end theme-text-variables
+
+// scss-docs-start theme-bg-subtle-variables
+$primary-bg-subtle:       tint-color($primary, 80%); // !default;
+$secondary-bg-subtle:     tint-color($secondary, 80%); // !default;
+$success-bg-subtle:       tint-color($success, 80%); // !default;
+$info-bg-subtle:          tint-color($info, 80%); // !default;
+$warning-bg-subtle:       tint-color($warning, 80%); // !default;
+$danger-bg-subtle:        tint-color($danger, 80%); // !default;
+$light-bg-subtle:         mix($gray-100, $white); // !default;
+$dark-bg-subtle:          $gray-400; // !default;
+// scss-docs-end theme-bg-subtle-variables
+
+// scss-docs-start theme-border-subtle-variables
+$primary-border-subtle:   tint-color($primary, 60%); // !default;
+$secondary-border-subtle: tint-color($secondary, 60%); // !default;
+$success-border-subtle:   tint-color($success, 60%); // !default;
+$info-border-subtle:      tint-color($info, 60%); // !default;
+$warning-border-subtle:   tint-color($warning, 60%); // !default;
+$danger-border-subtle:    tint-color($danger, 60%); // !default;
+$light-border-subtle:     $gray-200; // !default;
+$dark-border-subtle:      $gray-500; // !default;
+// scss-docs-end theme-border-subtle-variables
 
 // Options
-// Prefix for :root CSS variables
-$variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix; // !default;
-$enable-dark-mode:            false;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
+$enable-dark-mode:            false; // IMO dark mode is pointless in this dark theme. g_c-l
 
 // Body
 $body-bg:                   #0f2537; // !default;
 $body-color:                $gray-100; // !default;
 // $body-secondary-color: #FFFFFFBF;
+$body-secondary-color:      rgba($body-color, .99);  // default
+$body-secondary-bg: #152f44;
+$body-tertiary-color:       rgba($body-color, .65);  // default
+$body-tertiary-bg: #132d42;
+$body-emphasis-color:       #c5c5c5;
 
 // Links
 $link-color: #df6919; // #6FADEC; // Lightened for Tiki to comply with WCAG standards
@@ -38,14 +75,14 @@ $link-shade-percentage:                   20%; // !default;
 // Components
 // Typography
 // stylelint-disable-next-line value-keyword-case
-$font-family-sans-serif:      Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-sans-serif:      Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; // !default;
 //$font-size-base:              1.1rem;
 //$text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- rgba(255, 255, 255, .4) !default;
 $mark-bg: #806200;
 
 // Tables
-//$table-dark-border-color:     $gray-200 !default;
-//$table-bg-scale:              0% !default;
+//$table-dark-border-color:     $gray-200; // !default;
+//$table-bg-scale:              0%; // !default;
 
 // Forms
 $input-bg:                          $white; // !default;
@@ -67,45 +104,45 @@ $form-invalid-color:                #E27D79; //$form-feedback-invalid-color; // 
 $form-invalid-border-color:         $form-invalid-color; // !default;
 
 // Dropdowns
-//$dropdown-bg:                       $gray-200 !default;
+//$dropdown-bg:                       $gray-200; // !default;
 
 // Navs
 $nav-link-color:                      #000; //  rgba(0, 0, 0, 0.65); //var(--#{$prefix}link-color) !default;
 //$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // rgba(255, 255, 255, .4) !default;
-//$nav-tabs-border-color:             $gray-200 !default;
-//$nav-tabs-link-active-border-color: $gray-200 !default;
+//$nav-tabs-border-color:             $gray-200; // !default;
+//$nav-tabs-link-active-border-color: $gray-200; // !default;
 
 // Navbar
 $navbar-light-color:  black; // rgba(0, 0, 0, 0.65);
 
 // Pagination
-//$pagination-bg:                     $gray-200 !default;
+//$pagination-bg:                     $gray-200; // !default;
 
 // Cards
 $card-color: #FFFFFFBF;
-//$card-bg:                           $gray-200 !default;
+//$card-bg:                           $gray-200; // !default;
 
 // Popovers
-//$popover-bg:                        $gray-200 !default;
+//$popover-bg:                        $gray-200; // !default;
 
 // Toasts
-//$toast-background-color:            $gray-200 !default;
+//$toast-background-color:            $gray-200; // !default;
 
 // Modals
-//$modal-content-bg:                  $gray-200 !default;
-//$modal-header-border-color:         rgba(0, 0, 0, .2) !default;
+//$modal-content-bg:                  $gray-200; // !default;
+//$modal-header-border-color:         rgba(0, 0, 0, .2); // !default;
 
 // List group
-//$list-group-bg:                     $gray-200 !default;
+//$list-group-bg:                     $gray-200; // !default;
 
 // Breadcrumbs
-//$breadcrumb-bg:                     $gray-200 !default;
+//$breadcrumb-bg:                     $gray-200; // !default;
 
 // Close
 // Code
 $code-color:                        $body-color;
 
-//$pre-color:                         inherit !default;
+//$pre-color:                         inherit; // !default;
 
 //--------------------------- Tiki SCSS variables
 

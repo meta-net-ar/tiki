@@ -13,7 +13,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'trackerId'                => 'int',                //get
-        'sort_mode'                => 'word',               //post
+        'sort_mode'                => 'alnumdash',          //post
         'offset'                   => 'int',                //get
         'find'                     => 'string',             //post
         ],
@@ -36,23 +36,14 @@ if (! empty($_REQUEST['trackerId'])) {
 $smarty->assign('trackerId', $_REQUEST["trackerId"]);
 
 if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = isset($prefs['tracker_list_order']) ? $prefs['tracker_list_order'] : 'created_desc';
+    $sort_mode = $prefs['tracker_list_order'] ?? 'created_desc';
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
-
+$find = $_REQUEST["find"] ?? '';
 if ($prefs['tracker_display_categories'] == 'y') {
     // Get all categories
     $categories = $categlib->getCategories(['type' => 'all']);
@@ -101,13 +92,16 @@ foreach ($trackers_data as &$tracker) {
     }
 
     // Get categories for valid trackers
-    $tracker['categories'] = $categlib->get_object_categories('tracker', $tracker['trackerId']);
-    if (! empty($tracker['categories'])) {
-        $tracker['category_names'] = [];
-        foreach ($tracker['categories'] as $categoryId) {
+    $tracker['categorie_ids'] = $categlib->get_object_categories('tracker', $tracker['trackerId']);
+    if (! empty($tracker['categorie_ids'])) {
+        $tracker['category_details'] = [];
+        foreach ($tracker['categorie_ids'] as $categoryId) {
             $category_info = $categlib->get_category($categoryId);
             if ($category_info) {
-                $tracker['category_names'][] = $category_info['name'];
+                $tracker['category_details'][] = [
+                    "id" => $category_info['categId'],
+                    "name" => $category_info["name"]
+                ];
             }
         }
     }

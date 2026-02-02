@@ -60,4 +60,28 @@ class WikiPlugin_Helper
 
         return $result;
     }
+
+    /**
+     * Apply default parameters from plugin info
+     *
+     * @param array $params Parameter values
+     * @param array $info Plugin info
+     * @return array Updated parameters with defaults
+     */
+    public static function applyParamsDefaults($params, $info)
+    {
+        if (isset($info['params'])) {
+            foreach ($info['params'] as $key => $param) {
+                if (! isset($params[$key])) {
+                    if (isset($param['default'])) {
+                        $params[$key] = $param['default'];
+                    } else {
+                        $params[$key] = null;
+                    }
+                }
+            }
+        }
+
+        return $params;
+    }
 }

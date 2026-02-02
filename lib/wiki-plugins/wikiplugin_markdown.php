@@ -40,8 +40,6 @@ use League\CommonMark\Block\Renderer\FencedCodeRenderer;
 
 function wikiplugin_markdown($data, $params)
 {
-
-    global $prefs;
     extract($params, EXTR_SKIP);
 
     $md = trim($data);

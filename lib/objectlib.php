@@ -30,6 +30,8 @@ class ObjectLib extends TikiLib
     'comments_locked'//?
     ];
 
+    public static $titleCache = [];
+
     /**
      *  Create an object record for the given Tiki object if one doesn't already exist.
      * Returns the object record OID. If the designated object does not exist, may return NULL.
@@ -226,6 +228,8 @@ class ObjectLib extends TikiLib
     {
         return [
             'article',
+            'article_topic',
+            'article_type',
             'blog',
             'calendar',
             'directory',
@@ -251,6 +255,9 @@ class ObjectLib extends TikiLib
     public function getSelectorType($type)
     {
         $supported = [
+            'article' => 'article',
+            'article_topic' => 'article_topic',
+            'article_type' => 'article_type',
             'blog' => 'blog',
             'calendar' => 'calendar',
             'category' => 'category',
@@ -513,7 +520,7 @@ class ObjectLib extends TikiLib
             case 'wiki page':
                 $tikilib = TikiLib::lib('tiki');
                 $info = $tikilib->get_page_info($object);
-                return ['title' => $object ?? "", 'data' => isset($info['data']) ? $info['data'] : "", 'is_html' => isset($info['is_html']) ? $info['is_html'] : ""];
+                return ['title' => $object ?? "", 'data' => $info['data'] ?? "", 'is_html' => $info['is_html'] ?? ""];
 
             case 'article':
                 $artlib = TikiLib::lib('art');
@@ -579,6 +586,11 @@ class ObjectLib extends TikiLib
             if ($post_info) {
                 return true;
             }
+        } elseif ($type === 'blog') {
+            $blog = TikiLib::lib('blog')->get_blog($objectId);
+            if ($blog) {
+                return true;
+            }
         } elseif ($type === 'article') {
             $article_info = TikiLib::lib('art')->get_article($objectId, false);
             if ($article_info !== '') {
@@ -602,6 +614,12 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'file gallery') {
             $file = TikiLib::lib('filegal')->get_file_gallery_info($objectId);
             if ($file != false) {
+                return true;
+            }
+        } elseif ($type === 'file') {
+            $filegallib = TikiLib::lib('filegal');
+            $info = $filegallib->get_file_info($objectId, false, false, false);
+            if ($info != false) {
                 return true;
             }
         } elseif ($type === 'forum') {
@@ -886,7 +904,7 @@ class ObjectLib extends TikiLib
                 return TikiLib::lib('user')->clean_user($id);
             case 'calendar':
                 $info = TikiLib::lib('calendar')->get_calendar($id);
-                return isset($info['name']) ? $info['name'] : "";
+                return $info['name'] ?? "";
             case 'calendar event':
             case 'calendaritem':
                 $info = TikiLib::lib('calendar')->get_item($id);
@@ -931,6 +949,26 @@ class ObjectLib extends TikiLib
         if (empty($objects)) {
             return [];
         }
+        $itemsValues = [];
+        if (ObjectLib::$titleCache) {
+            foreach ($objects as $key => $object) {
+                $cacheKey = $object['type'] . ':' . $object['id'] . ':' . $format;
+                if (isset(ObjectLib::$titleCache[$cacheKey])) {
+                    $itemsValues[] = [
+                        'object_type' => $object['type'],
+                        'object_id' => $object['id'],
+                        'title' => ObjectLib::$titleCache[$cacheKey],
+                    ];
+                    unset($objects[$key]);
+                }
+            }
+        }
+        if (empty($objects)) {
+            return $itemsValues;
+        }
+        if (TikiLib::lib('tiki')->isMemoryLow()) {
+            ObjectLib::$titleCache = [];
+        }
         $lib = TikiLib::lib('unifiedsearch');
         $metaItemIds = [];
         $query = $lib->buildQuery([]);
@@ -959,7 +997,6 @@ class ObjectLib extends TikiLib
                 }
             }
         }
-        $itemsValues = [];
         foreach ($result as $item) {
             $values = [
                 'object_type' => $item['object_type'],
@@ -971,7 +1008,7 @@ class ObjectLib extends TikiLib
                 if (isset($item[$key])) {
                     $values[$value_key] = $item[$key];
                     return $item[$key];
-                } elseif (substr($key, 0, 5) == 'meta.') {
+                } elseif (str_starts_with($key, 'meta.')) {
                     $values[$value_key] = $metadata[$item['object_type'] . ':' . $item['object_id']][substr($key, 5)] ?? '';
                 } elseif (! $format || $format == '{title}') {
                     $values[$value_key] = '';
@@ -981,6 +1018,8 @@ class ObjectLib extends TikiLib
                     return '';
                 }
             }, $format);
+            $cacheKey = $item['object_type'] . ':' . $item['object_id'] . ':' . $format;
+            ObjectLib::$titleCache[$cacheKey] = $values['title'];
             $itemsValues[] = $values;
         }
         return $itemsValues;
@@ -1016,6 +1055,13 @@ class ObjectLib extends TikiLib
     public function getFormattedTitle(string $type, string $id, ?string $defaultTitle, ?string $format = '', ?string $extra = '', ?string $metaItemId = null): string
     {
         if ($format) {
+            $cacheKey = $type . ':' . $id . ':' . $format;
+            if (isset(ObjectLib::$titleCache[$cacheKey])) {
+                return ObjectLib::$titleCache[$cacheKey];
+            }
+            if (TikiLib::lib('tiki')->isMemoryLow()) {
+                ObjectLib::$titleCache = [];
+            }
             $lib = TikiLib::lib('unifiedsearch');
             if ($metaItemId) {
                 $query = $lib->buildQuery([
@@ -1041,7 +1087,7 @@ class ObjectLib extends TikiLib
                     $key = $matches[1];
                     if (isset($item[$key])) {
                         return $item[$key];
-                    } elseif (substr($key, 0, 5) == 'meta.') {
+                    } elseif (str_starts_with($key, 'meta.')) {
                         return $metadata[substr($key, 5)] ?? '';
                     } elseif (! $format || $format == '{title}') {
                         return tr('empty');
@@ -1052,6 +1098,7 @@ class ObjectLib extends TikiLib
             });
             $titles = $result->getArrayCopy();
             $title = array_shift($titles);
+            ObjectLib::$titleCache[$cacheKey] = $title;
         } else {
             $title = $defaultTitle;
         }
@@ -1077,7 +1124,7 @@ class ObjectLib extends TikiLib
      */
     public function get_wiki_content($type, $objectId)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $comment_info = TikiLib::lib('comments')->get_comment((int)$objectId);
             return $comment_info['data'];
         }
@@ -1117,7 +1164,7 @@ class ObjectLib extends TikiLib
      */
     public function get_verbose_type($type)
     {
-        if (substr($type, -7) == 'comment') {
+        if (str_ends_with($type, 'comment')) {
             $isComment = true;
             $type = substr($type, 0, strlen($type) - 8);
         } else {

@@ -32,8 +32,6 @@ get:
                 type: integer
               filetype:
                 type: string
-              data:
-                type: object
               user:
                 type: string
               author:

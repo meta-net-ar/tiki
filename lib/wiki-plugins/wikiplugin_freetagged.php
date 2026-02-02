@@ -180,23 +180,6 @@ function wikiplugin_freetagged($data, $params)
     $headerlib = TikiLib::lib('header');
     $freetaglib = TikiLib::lib('freetag');
 
-    $defaults = [
-        'tags' => '',
-        'type' => null,
-        'offset' => 0,
-        'maxRecords' => -1,
-        'sort_mode' => 'created_desc',
-        'find' => '',
-        'broaden' => 'n',
-        'h_level' => '3',
-        'titles_only' => 'n',
-        'max_image_size' => 0,
-        'more' => 'n',
-        'moreurl' => 'tiki-browse_freetags.php',
-        'moretext' => 'more',
-    ];
-
-    $params = array_merge($defaults, $params);
     extract($params, EXTR_SKIP);
 
     if ($type == tra('all')) {
@@ -240,14 +223,14 @@ function wikiplugin_freetagged($data, $params)
 
     $moreurlparams = 'tag=' . $tags . '&old_type=' . urlencode($type ?? '') . '&sort_mode=' . urlencode($params['sort_mode'] ?? '') . '&find=' . urlencode($find ?? '') . '&broaden=' . urlencode($broaden ?? '');
 
-    if (strpos($moreurl, '?') === false) {
+    if (! str_contains($moreurl, '?')) {
         $moreurl = $moreurl . '?' . $moreurlparams;
     } else {
         $moreurl = $moreurl . '&' . $moreurlparams;
     }
     $smarty->assign_by_ref('moreurl', $moreurl);
 
-    if (isset($moretext)) {
+    if ($moretext != 'more') {
         $smarty->assign_by_ref('moretext', $moretext);
     } else {
         $smarty->assign('moretext', 'more');
@@ -300,7 +283,7 @@ function wikiplugin_freetagged($data, $params)
                         $imgparams['max'] = $max_image_size;
                     }
 
-                    $obj['img'] = wikiplugin_img('', $imgparams, 0);
+                    $obj['img'] = TikiLib::lib('parser')->invokePlugin('img', '', $imgparams);
                     $obj['img'] = WikiPlugin_Helper::resultString($obj['img']);
                     $obj['img'] = str_replace('~np~', '', $obj['img']); // don't nest ~np~
                     $obj['img'] = str_replace('~/np~', '', $obj['img']);

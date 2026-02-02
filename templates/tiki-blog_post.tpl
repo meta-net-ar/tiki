@@ -23,12 +23,13 @@
 {/if}
 
 {if $preview eq 'y'}
-    <div align="center" class="attention" style="font-weight:bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
-    <article class="blogpost post post_single">
+    <div class="alert alert-warning fw-bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
+    <article class="blogpost post post_single border-0 pb-5 bg-transparent">
         {include file='blog_wrapper.tpl' blog_post_context='preview'}
     </article>
 {/if}
 
+<div class="styling-element">
 {capture name=actionUrlParam}{strip}
     {if $postId > 0 && $blogId > 0}
         ?blogId={$blogId}&postId={$postId}
@@ -149,3 +150,4 @@
         <input type="submit" class="btn btn-link" name="cancel" onclick='document.location="{$referer|escape:'html'}";needToConfirm=false;return false;' value="{tr}Cancel{/tr}">
     </div>
 </form>
+</div>

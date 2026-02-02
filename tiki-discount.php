@@ -69,7 +69,7 @@ if (! empty($_REQUEST['id'])) {
     }
 }
 
-$offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+$offset = $_REQUEST['offset'] ?? 0;
 $max = $prefs['maxRecords'];
 $discounts = $discountlib->list_discounts($offset, $max);
 $discounts['offset'] = $offset;

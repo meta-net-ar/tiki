@@ -40,7 +40,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
     }
     public function getDescription()
     {
-        return wikiplugin_tikidocfromcode_info();
+        return wikiplugin_tikidocfromcode_info()['description'];
     }
     public function run($data, $params)
     {
@@ -84,7 +84,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
             $sOutput = $this->generateFieldsExport($selectedFields);
         } elseif (
             // One of the variables below, not two or more, plus $info set
-            $this->exactlyOneSet([[$module, $plugin, $preference, $trackerfield]]) && isset($info)
+            $this->exactlyOneSet([[$module, $plugin, $preference, $trackerfield]]) && $info
         ) {
             $aPrincipalField = ['field' => 'plugin', 'name' => 'Plugin'];
             $helppath = $helpurl . $aPrincipalField['name'];
@@ -99,7 +99,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
         //$aPlugins and $all now has the complete list of plugin or module file names - the code below modifies $aPlugins
         //if necessary based on user settings
         if (! empty($plugin)) {
-            if (strpos($plugin, '|') !== false) {
+            if (str_contains($plugin, '|')) {
                 $aPlugins = [];
                 $userlist = explode('|', $plugin);
                 foreach ($userlist as $useritem) {
@@ -111,7 +111,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
                         $aPlugins[] = $file;
                     }
                 }
-            } elseif (strpos($plugin, '-') !== false) {
+            } elseif (str_contains($plugin, '-')) {
                 $userrange = explode('-', $plugin);
                 $begin = array_search($filepath . $userrange[0] . '.php', $aPlugins);
                 $end = array_search($filepath . $userrange[1] . '.php', $aPlugins);
@@ -157,11 +157,11 @@ class WikiPluginTikiDocFromCode extends PluginsLib
         } elseif (! empty($preference) || ! empty($trackerfield)) {
             $object = ! empty($preference) ? $preference : $trackerfield;
             // Generate a list of elements based on separators
-            if (strpos($object, '|') !== false || strpos($object, '-') !== false) {
+            if (str_contains($object, '|') || str_contains($object, '-')) {
                 $separator = '|'; // Default separator
-                if (strpos($object, '|') === false) {
+                if (! str_contains($object, '|')) {
                     $separator = '-';
-                } elseif (strpos($object, '-') !== false && strpos($object, '-') < strpos($object, '|')) {
+                } elseif (str_contains($object, '-') && strpos($object, '-') < strpos($object, '|')) {
                     $separator = '-';
                 }
                 $objectsArr = explode($separator, $object);
@@ -309,10 +309,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
                             } else {
                                 $rows .= '<code>' . $paramname . '</code>' ;
                             }
-                            if (
-                                isset($params['showparamtype']) && $params['showparamtype'] === 'y'
-                                && ! empty($paraminfo['doctype'])
-                            ) {
+                            if ($params['showparamtype'] === 'y' && ! empty($paraminfo['doctype'])) {
                                 $rows .= '<br /><small>(' . $paraminfo['doctype'] . ')</small>';
                             }
                             $rows .= '</td>';
@@ -622,27 +619,27 @@ class WikiPluginTikiDocFromCode extends PluginsLib
                 $entry = $fields;
 
                 $entry['preference'] = $name;
-                $entry['name'] = isset($raw['name']) ? $raw['name'] : '';
-                $entry['description'] = isset($raw['description']) ? $raw['description'] : '';
-                $entry['filter'] = isset($raw['filter']) ? $raw['filter'] : '';
-                $entry['help'] = isset($raw['help']) ? $raw['help'] : '';
-                $entry['dependencies'] = ! empty($raw['dependencies']) ? implode(',', (array) $raw['dependencies']) : '';
-                $entry['type'] = isset($raw['type']) ? $raw['type'] : '';
-                $entry['options'] = isset($raw['options']) ? implode(',', $raw['options']) : '';
-                $entry['admin'] = isset($raw['admin']) ? $raw['admin'] : '';
-                $entry['module'] = isset($raw['module']) ? $raw['module'] : '';
-                $entry['view'] = isset($raw['view']) ? $raw['view'] : '';
-                $entry['permission'] = isset($raw['permission']) ? implode(',', $raw['permission']) : '';
-                $entry['plugin'] = isset($raw['plugin']) ? $raw['plugin'] : '';
-                $entry['extensions'] = isset($raw['extensions']) ? implode(',', $raw['extensions']) : '';
-                $entry['tags'] = isset($raw['tags']) ? implode(',', $raw['tags']) : '';
-                $entry['parameters'] = isset($raw['parameters']) ? implode(',', $raw['parameters']) : '';
-                $entry['detail'] = isset($raw['detail']) ? $raw['detail'] : '';
-                $entry['warning'] = isset($raw['warning']) ? $raw['warning'] : '';
-                $entry['hint'] = isset($raw['hint']) ? $raw['hint'] : '';
-                $entry['shorthint'] = isset($raw['shorthint']) ? $raw['shorthint'] : '';
+                $entry['name'] = $raw['name'] ?? '';
+                $entry['description'] = $raw['description'] ?? '';
+                $entry['filter'] = $raw['filter'] ?? '';
+                $entry['help'] = $raw['help'] ?? '';
+                $entry['dependencies'] = implode(',', (array) ($raw['dependencies'] ?? []));
+                $entry['type'] = $raw['type'] ?? '';
+                $entry['options'] = implode(',', $raw['options'] ?? []);
+                $entry['admin'] = $raw['admin'] ?? '';
+                $entry['module'] = $raw['module'] ?? '';
+                $entry['view'] = $raw['view'] ?? '';
+                $entry['permission'] = implode(',', $raw['permission'] ?? []);
+                $entry['plugin'] = $raw['plugin'] ?? '';
+                $entry['extensions'] = implode(',', $raw['extensions'] ?? []);
+                $entry['tags'] = implode(',', $raw['tags'] ?? []);
+                $entry['parameters'] = implode(',', $raw['parameters'] ?? []);
+                $entry['detail'] = $raw['detail'] ?? '';
+                $entry['warning'] = $raw['warning'] ?? '';
+                $entry['hint'] = $raw['hint'] ?? '';
+                $entry['shorthint'] = $raw['shorthint'] ?? '';
                 $entry['perspective'] = isset($raw['perspective']) ? $raw['perspective'] ? 'true' : 'false' : '';
-                $entry['separator'] = isset($raw['separator']) ? $raw['separator'] : '';
+                $entry['separator'] = $raw['separator'] ?? '';
                 $data[] = $entry;
             }
         }
@@ -668,7 +665,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
     public function setDefaultValues(&$data, $prefs)
     {
         foreach ($data as & $row) {
-            $row['default'] = isset($prefs[$row['preference']]) ? $prefs[$row['preference']] : '';
+            $row['default'] = $prefs[$row['preference']] ?? '';
 
             if (is_array($row['default'])) {
                 $row['default'] = implode($row['separator'], $row['default']);
@@ -758,7 +755,7 @@ function wikiplugin_tikidocfromcode_info()
                     Ignored when %0singletitle%1 is set to %0top%1 or %0none%1.', '<code>', '</code>'),
                    'filter' => 'text',
                 'accepted' => tra('One or more of: description | parameters | paraminfo'),
-                'default' => 'description | parameters | paraminfo ',
+                'default' => 'description|parameters|paraminfo',
                 'since' => '27',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -811,7 +808,7 @@ function wikiplugin_tikidocfromcode_info()
                 'name' => tra('Preferences export'),
                 'description' => tr('Default preferences export with columns name, description, location or list more separated by %0|%1.', '<code>', '</code>'),
                 'filter' => 'text',
-                'default' => 'name | description | locations',
+                'default' => '',
                 'since' => '27',
             ],
             'type' => [
@@ -910,11 +907,10 @@ function get_plugin_informations($sPluginFile)
     global $sPlugin, $numparams;
     $sPlugin = $match[1];
     include_once($sPluginFile);
-    global $tikilib;
     $parserlib = TikiLib::lib('parser');
 
     $infoPlugin = $parserlib->plugin_info($sPlugin);
-    $numparams = isset($infoPlugin['params']) ? count($infoPlugin['params']) : 0;
+    $numparams = count($infoPlugin['params'] ?? []);
     return $infoPlugin;
 }
 
@@ -930,7 +926,7 @@ function get_module_parameters($sPluginFile)
     foreach ($infoPluginParams as &$param) {
         $param['required'] = ! empty($param['required']);
     }
-    $numparams = isset($infoPluginParams) ? count($infoPluginParams) : 0;
+    $numparams = count($infoPluginParams ?? []);
     $infoPlugin['params'] = $infoPluginParams;
     return $infoPlugin;
 }

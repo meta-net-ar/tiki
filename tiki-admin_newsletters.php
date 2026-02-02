@@ -13,25 +13,26 @@ $inputConfiguration = [
         'staticKeyFilters'            => [
              'nlId'                   => 'int',            //post
              'remove'                 => 'int',            //get
-             'save'                   => 'bool',           //post
-             'allowUserSub'           => 'bool',           //get
+             'save'                   => 'alpha',          //post
+             'allowUserSub'           => 'bool',           //post
              'allowAnySub'            => 'bool',           //post
              'unsubMsg'               => 'bool',           //post
              'validateAddr'           => 'bool',           //post
              'allowTxt'               => 'bool',           //post
-             'allowArticle'           => 'bool',           //post
              'autoArticleClip'        => 'bool',           //post
              'emptyClipBlocksSend'    => 'bool',           //post
              'articleClipRangeDays'   => 'int',            //post
-             'articleClipTypes'       => 'string',         //post
              'frequency'              => 'int',            //post
-             'author'                 => 'string',         //post
+             'author'                 => 'username',       //post
              'allowArticleClip'       => 'bool',           //post
-             'sort_mode_g'            => 'string',         //get
-             'offset'                 => 'string',         //get
-             'find'                   => 'string',         //get
-             'name'                   => 'string',         //post
+             'sort_mode'              => 'alnumdash',      //get
+             'offset'                 => 'int',            //get
+             'find'                   => 'text',           //get
+             'name'                   => 'text',           //post
              'description'            => 'xss',            //post
+        ],
+        'staticKeyFiltersForArrays'  => [
+             'articleClipTypes'       => 'text',           //post
         ],
     ],
 ];
@@ -54,8 +55,7 @@ $smarty->assign('nlId', $_REQUEST["nlId"]);
 $perms = Perms::get(['type' => 'newsletter', 'object' => $_REQUEST['nlId']]);
 
 if ($perms->admin_newsletters != 'y') {
-    Feedback::errorPage(['mes' => tr('You do not have the permission that is needed to use this feature'),
-                         'errortype' => 401]);
+    Feedback::errorPage(['mes' => tr('You do not have the permission that is needed to use this feature'), 'errortype' => 401]);
 }
 $defaultArticleClipRange = 3600 * 24; // one day
 if ($_REQUEST["nlId"]) {
@@ -151,7 +151,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         if (! isset($_REQUEST['frequency'])) {
             $_REQUEST['frequency'] = 0;
         }
-        $sid = $nllib->replace_newsletter(
+        $result = $nllib->replace_newsletter(
             $_REQUEST["nlId"],
             $_REQUEST["name"],
             $_REQUEST["description"],
@@ -168,11 +168,18 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $articleClipTypes,
             $_REQUEST["emptyClipBlocksSend"]
         );
-
-        if ($sid) {
-            Feedback::success(tr('Newsletter created or modified'));
-        } else {
-            Feedback::error(tr('Newsletter not created or modified'));
+        // Handle the result of the operation
+        // -1 indicates that the newsletter already exists
+        // If the result is an integer > 0, it indicates the ID of the updated newsletter
+        // If the result is an array, it indicates a new newsletter was created
+        if ($result === false) {
+            Feedback::error(tr('A newsletter error occurred during the information-writing process.'));
+        } elseif ($result === -1) {
+            Feedback::error(tr('Newsletter already exists. with the same name'));
+        } elseif (is_int($result) && $result > 0) {
+            Feedback::success(tr('Newsletter updated successfully'));
+        } elseif (is_array($result)) {
+            Feedback::success(tr('Newsletter created successfully'));
         }
     }
 
@@ -195,17 +202,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $nllib->list_newsletters(

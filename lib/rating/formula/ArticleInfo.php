@@ -35,7 +35,7 @@ class Tiki_Formula_Function_ArticleInfo extends Math_Formula_Function
                 return $article['rating'];
             } elseif ($property == 'view-count') {
                 return $article[ 'nbreads' ];
-            } elseif (substr($property, 0, 4) == 'age-') {
+            } elseif (str_starts_with($property, 'age-')) {
                 $age = time() - $article['publishDate'];
 
                 switch ($property) {

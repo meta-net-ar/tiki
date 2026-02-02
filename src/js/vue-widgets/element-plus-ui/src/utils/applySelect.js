@@ -1,4 +1,4 @@
-import { attachChangeEventHandler, observeSelectElementMutations, syncSelectOptions, hasVueScopedAttribute } from "../helpers/select/applySelect";
+import { attachChangeEventHandler, observeSelectElementMutations, syncSelectOptions } from "../helpers/select/applySelect";
 
 export default function applySelect() {
     transformContainerSelects(document.body);
@@ -10,11 +10,7 @@ export default function applySelect() {
 }
 
 function transformContainerSelects(containerElement) {
-    const selects = $(containerElement)
-        .find("select:not([element-plus-ref])")
-        .filter(function () {
-            return !hasVueScopedAttribute(this);
-        });
+    const selects = $(containerElement).find("select:not([element-plus-ref])");
     if (selects.length) {
         selects.each(function () {
             const elementUniqueId = "el-" + Math.random().toString(36).substring(7);

@@ -6,7 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Diff\Renderer;
 
-// require_once('lib/Diff/difflib.php');
+use Tiki\Lib\Diff\DiffUtils;
+
 /**
  * "Side-by-Side" diff renderer.
  *
@@ -120,7 +121,7 @@ class SideBySide extends TikiRenderer
 
     protected function _changed($orig, $final)
     {
-        $lines = diffChar($orig, $final, $this->words);
+        $lines = DiffUtils::diffChar($orig, $final, $this->words);
         $this->_deleted(preg_split('/<br[ \/]*>/', $lines[0]), true);
         $this->_added(preg_split('/<br[ \/]*>/', $lines[1]), true);
         // switch with these lines for no character diff

@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -74,7 +74,7 @@ function module_map_edit_features($mod_reference, $module_params)
         }
     }
 
-    $hiddeninput = isset($module_params['hiddeninput']) ? $module_params['hiddeninput'] : '';
+    $hiddeninput = $module_params['hiddeninput'] ?? '';
     preg_match_all('/(\w+)\(([^\)]*)\)/', $hiddeninput, $parts, PREG_SET_ORDER);
     $hidden = [];
     foreach ($parts as $p) {
@@ -88,9 +88,9 @@ function module_map_edit_features($mod_reference, $module_params)
             'definition' => $definition,
             'field' => $targetField,
             'hiddenInput' => $hidden,
-            'standardControls' => isset($module_params['standard']) ? (int)$module_params['standard'] : 1,
-            'editDetails' => isset($module_params['editdetail']) ? (int)$module_params['editdetail'] : 0,
-            'insertMode' => isset($module_params['insertmode']) ? $module_params['insertmode'] : '',
+            'standardControls' => (int)($module_params['standard'] ?? 1),
+            'editDetails' => (int)($module_params['editdetail'] ?? 0),
+            'insertMode' => $module_params['insertmode'] ?? '',
         ]
     );
 }

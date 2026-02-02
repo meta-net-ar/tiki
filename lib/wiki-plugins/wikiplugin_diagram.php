@@ -68,6 +68,7 @@ function wikiplugin_diagram_info()
                 'name' => tr('template'),
                 'description' => tr('Diagram\'s file id to use as a template to new the diagram. This parameter will be skipped if the fileId parameter is present.'),
                 'since' => '23.0',
+                'default' => 0,
                 'filter' => 'int',
             ],
             'galleryId' => [
@@ -99,15 +100,15 @@ function wikiplugin_diagram_info()
  */
 function wikiplugin_diagram($data, $params)
 {
-    global $tikilib, $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_edit, $tiki_p_view;
-    $template = $params['template'] ?? 0;
-    $galleryId = $params['galleryId'] ?? (isset($params['fileName']) ? 1 : '');
+    global $user, $page, $wikiplugin_included_page, $prefs;
+    $template = $params['template'];
+    $galleryId = $params['galleryId'] ?? (! is_null($params['fileName']) ? 1 : '');
     $fileName = $params['fileName'] ?? 'Diagram %page% %date%.drawio' ;
     $escapedPage = htmlentities($page, ENT_COMPAT);
     $fileName = preg_replace('/\%page\%/', $page, $fileName);
     $fileName = preg_replace('/\%date\%/', date('Y-m-d'), $fileName);
 
-    $compressXml = ($prefs['fgal_use_diagram_compression_by_default'] !== 'y') ? false : true;
+    $compressXml = ! (($prefs['fgal_use_diagram_compression_by_default'] !== 'y'));
     $compressXmlParam = false;
 
     if (empty($params['fileId']) && empty(trim($data)) && ! empty($params['template'])) {
@@ -116,7 +117,7 @@ function wikiplugin_diagram($data, $params)
 
     if (
         empty($params['fileId'])
-        && isset($params['compressXml'])
+        && ! is_null($params['compressXml'])
         && in_array($params['compressXml'], ['false', '0'])
     ) {
             $compressXml = false;
@@ -125,7 +126,7 @@ function wikiplugin_diagram($data, $params)
 
     $diagramIdentifier = ! empty($params['fileId']) ? $params['fileId'] : $data;
     $info = wikiplugin_diagram_info();
-    $pageName = isset($params['page']) ? $params['page'] : '';
+    $pageName = $params['page'] ?? '';
     $diagrams = DiagramHelper::getDiagramsFromIdentifier($diagramIdentifier, $pageName);
 
     if (! empty($params['align']) && in_array($params['align'], ['left', 'center', 'right'])) {
@@ -179,8 +180,8 @@ function wikiplugin_diagram($data, $params)
 
     $headerlib->add_css('.diagram hr {margin-top:0.5em;margin-bottom:0.5em}');
 
-    $fileId = isset($params['fileId']) ? intval($params['fileId']) : 0;
-    $annotate = isset($params['annotate']) ? intval($params['annotate']) : 0;
+    $fileId = intval($params['fileId'] ?? 0);
+    $annotate = intval($params['annotate'] ?? 0);
 
     if ($fileId) {
         $file = \Tiki\FileGallery\File::id($fileId);
@@ -257,14 +258,14 @@ function wikiplugin_diagram($data, $params)
 
             $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
             $galHtml = "";
-            if (! isset($params['fileName']) && ! isset($params['galleryId'])) {
+            if (is_null($params['fileName']) && is_null($params['galleryId'])) {
                 $galHtml = "<option value='0'>" . tr('Page (inline)') . "</option>";
             }
             usort($gals['data'], function ($a, $b) {
                 return strcmp(strtolower($a['name']), strtolower($b['name']));
             });
 
-            if (! isset($params['galleryId'])) {
+            if (is_null($params['galleryId'])) {
                 foreach ($gals['data'] as $gal) {
                     if ($gal['name'] != "Wiki Attachments" && $gal['name'] != "Users File Galleries") {
                         if ($gal['parentId'] == -1) {
@@ -329,7 +330,7 @@ EOF;
 
     $base_64_diagram = base64_encode($diagramXmlString);
 
-    if (isset($params['wikiparse']) && $params['wikiparse'] == 1) {
+    if ($params['wikiparse'] == 1) {
         $parsedDiagrams = [];
         $XMLDiagrams = simplexml_load_string($diagramXmlString);
 
@@ -387,7 +388,6 @@ function loadImageAnnotate($annotate)
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($annotate);
 
-    $smarty = TikiLib::lib('smarty');
     $url = smarty_modifier_sefurl($annotate, 'display');
 
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {

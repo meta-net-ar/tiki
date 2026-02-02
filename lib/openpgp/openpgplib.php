@@ -39,7 +39,7 @@
 
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -114,7 +114,7 @@ class OpenPGPLib
     */
     public function __construct()
     {
-        global $prefs,$tiki_p_admin;
+        global $prefs;
 
         $this->gpg_path = $prefs['openpgp_gpg_path'];
         $this->gpg_home = $prefs['openpgp_gpg_home'];
@@ -567,7 +567,7 @@ class OpenPGPLib
     {
         global $user, $prefs, $tikilib;
         $empty = '';
-        return isset($prefs['sender_email']) ? $prefs['sender_email'] : $empty;
+        return $prefs['sender_email'] ?? $empty;
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -1212,31 +1212,16 @@ class OpenPGPLib
      */
     protected function encryptSignGnuPG($unencrypted_message, $recipients)
     {
-
-            $encrypted_message = '';
-
-            // encrypt $message to recipients
-            // sign wth signer
         $gpg = $this->gpg_encrypt("$unencrypted_message", $recipients);
 
-            // $gpg is an array containing
-            // $gpg[0] encrypted output (STDOUT)
-        // $gpg[1] warnings and notices (STDERR)
-            // $gpg[2] exit status from gpg
-
-            // test gpg's exit status
         if ("$gpg[2]" == '0') {
-            // if the gpg command returned zero
             $encrypted_message = $gpg[0];
         } else {
-            // if the gpg command returned non-zero
             $error_msg = 'OpenPGPLib: _encryptSignGnuPG() returned error code: ' . $gpg[2];
             throw new Exception($error_msg);
-            // if an error message directs you to the line above please
-            // double check that your gnupg-configuration, process-call commandline input, and other parameters are correct
         }
-
-            return $encrypted_message;
+        return $encrypted_message;
     }
 }
+
 $openpgplib = new OpenPGPLib();

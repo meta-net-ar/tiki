@@ -11,7 +11,7 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'topicid'                     => 'int',              //post
             'edittopic'                   => 'bool',             //post
-            'name'                        => 'string',           //post
+            'name'                        => 'text',           //post
             'email'                       => 'email',            //post
         ],
     ],

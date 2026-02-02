@@ -8,7 +8,7 @@
  * @group integration
  */
 
-require_once __DIR__ . '/../../auth/tokens.php';
+use Tiki\Lib\Auth\Tokens;
 
 class AuthTokensTest extends TikiDatabaseTestCase
 {
@@ -36,7 +36,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
         $this->table = $this->db->table('tiki_auth_tokens');
 
-        $this->obj = new AuthTokens($this->db, [], $this->dt);
+        $this->obj = new Tokens($this->db, [], $this->dt);
 
         global $prefs;
         $prefs['feature_sefurl'] = 'n'; // default
@@ -136,7 +136,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testMaximumTimeout(): void
     {
-        $lib = new AuthTokens(
+        $lib = new Tokens(
             $this->db,
             [
                 'maxTimeout' => 10,
@@ -157,7 +157,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testAllowMultipleHits(): void
     {
-        $lib = new AuthTokens($this->db, ['maxHits' => 100]);
+        $lib = new Tokens($this->db, ['maxHits' => 100]);
         $token = $lib->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered'], ['hits' => 3]);
         $lib->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']);
         $lib->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']);
@@ -168,7 +168,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testLimitOnAccessCount(): void
     {
-        $lib = new AuthTokens(
+        $lib = new Tokens(
             $this->db,
             [
                 'maxHits' => 10,

@@ -13,13 +13,18 @@ $inputConfiguration = [
         'staticKeyFilters'          => [
             'surveyId'              => 'int',              //get
             'questionId'            => 'int',              //post
-            'mandatory'             => 'bool',             //post
+            'mandatory'             => 'alpha',            //post
             'remove'                => 'int',              //post
             'position'              => 'int',              //post
             'type'                  => 'word',             //post
             'options'               => 'string',           //post
-            'sort_mode'             => 'word',             //get
+            'sort_mode'             => 'alnumdash',             //get
             'offset'                => 'int',              //get
+            'save'                  => 'alpha',            //post
+            'question'              => 'text',             //post
+            'min_answers'           => 'int',              //post
+            'max_answers'           => 'int',              //post
+            'find'                  => 'string',           //get
         ],
         'staticKeyFiltersForArrays' => [
             'questionIds'           => 'string',              //get
@@ -91,17 +96,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $srvlib->list_survey_questions($_REQUEST["surveyId"], $offset, $maxRecords, $sort_mode, $find);

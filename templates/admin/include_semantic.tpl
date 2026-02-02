@@ -5,13 +5,13 @@
             {include file='admin/include_apply_top.tpl'}
         </div>
     </div>
-    <fieldset>
+    <fieldset class="styling-element">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_semantic visible="always"}
         {preference name=feature_backlinks}
     </fieldset>
 </form>
-<div class="row">
+<div class="row styling-element">
     <div class="col-sm-6">
         <h3>{tr}Known types{/tr}</h3>
         <form method="post" action="{$smarty.server.REQUEST_URI|escape}">

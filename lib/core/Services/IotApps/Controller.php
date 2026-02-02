@@ -18,7 +18,7 @@ class Services_IotApps_Controller
         $this->tracker_utilities = new Services_Tracker_Utilities();
         if ($prefs['feature_trackers'] !== 'y' || $prefs['feature_internet_of_things'] !== 'y') {
             Feedback::error(tr("Additional features should be enabled for IoT APIs to work, please check the following:") . "feature_trackers,feature_internet_of_things.");
-            exit(false);
+            exit(1);
         }
         $this->table = new TikiDb_Table(TikiDb::get(), 'tiki_iot_apps');
     }
@@ -28,8 +28,7 @@ class Services_IotApps_Controller
         global $access;
         $access->check_permission('tiki_p_manage_iot_apps');
         $payload = $input->payload->json();
-        $uuid = Uuid::uuid4();
-        $app_uuid  = $uuid->toString();
+        $app_uuid  = \Tiki\Utilities\Identifiers::generateUUID();
         $trackerId = intval($payload['tracker-id']);
         $name = $payload['app-name'];
         try {

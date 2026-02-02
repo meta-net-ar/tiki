@@ -1,5 +1,12 @@
 <?php
 
+// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+//
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -103,8 +110,7 @@ if ($user == $prefs['login_autologin_user']) {
         }
     }
     // Generate token url to log the user in for real
-    require_once 'lib/auth/tokens.php';
-    $tokenlib = AuthTokens::build($prefs);
+    $tokenlib = Tokens::build($prefs);
     $params['uname'] = $uname;
     $params['page'] = $page;
     $params['base_url'] = $autologin_base_url;

@@ -396,7 +396,7 @@
                             <td>
                             {$data.dataLengthMb} Mb
                             </td>
-                            <td>
+                            <td style="text-align:right;">
                             {$data.rowCount}
                             </td>
                         </tr>

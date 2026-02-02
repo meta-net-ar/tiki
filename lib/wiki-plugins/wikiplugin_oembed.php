@@ -1,5 +1,7 @@
 <?php
 
+require_once 'lib/wiki-plugins/shared/embed_helpers.php';
+
 function wikiplugin_oembed_info()
 {
     return [
@@ -16,21 +18,18 @@ function wikiplugin_oembed_info()
           'name' => tra('URL'),
           'description' => tra('Complete URL to the oEmbed video or media'),
           'filter' => 'url',
-          'default' => '',
         ],
         'width' => [
           'required' => false,
           'name' => tra('Width'),
           'description' => tra('Width in pixels (e.g., 560). Leave empty to use provider dimensions.'),
           'filter' => 'digits',
-          'default' => '',
         ],
         'height' => [
           'required' => false,
           'name' => tra('Height'),
           'description' => tra('Height in pixels (e.g., 315). Leave empty to use provider dimensions.'),
           'filter' => 'digits',
-          'default' => '',
         ],
         'privacyEnhanced' => [
           'required' => false,
@@ -50,7 +49,6 @@ function wikiplugin_oembed_info()
           'description' => tra('Object background color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
           'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
           'filter' => 'text',
-          'default' => '',
           'advanced' => true
         ],
         'border' => [
@@ -59,7 +57,6 @@ function wikiplugin_oembed_info()
           'description' => tra('Object border color. Example:') . ' <code>#ffffff</code>, <code>rgb(255, 255, 255)</code>, <code>white</code>',
           'accepted' => tra('Any valid CSS color value, e.g., hex, rgb(a), or color names'),
           'filter' => 'text',
-          'default' => '',
           'advanced' => true
         ],
         'borderRadius' => [
@@ -99,22 +96,6 @@ function wikiplugin_oembed_info()
 
 function wikiplugin_oembed($data, $params)
 {
-    if (! is_array($params)) {
-        $params = [];
-    }
-
-    $plugininfo = wikiplugin_oembed_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
-    if (empty($params['url'])) {
-        Feedback::error(tra('Plugin oEmbed error: the URL parameter is empty.'));
-        return '';
-    }
-
     $oEmbedData = getOEmbedData($params['url']);
     if (! $oEmbedData) {
         Feedback::error(tra('Invalid URL or no oEmbed data found.'));
@@ -123,9 +104,7 @@ function wikiplugin_oembed($data, $params)
 
     $embedHtml = $oEmbedData['html'];
     $dom = new DOMDocument();
-
     libxml_use_internal_errors(true);
-
     $dom->loadHTML('<?xml encoding="UTF-8">' . $embedHtml);
     libxml_clear_errors();
 
@@ -135,95 +114,9 @@ function wikiplugin_oembed($data, $params)
         return '';
     }
 
-    $newIframe = $dom->createElement('iframe');
-    $newIframe->setAttribute('src', $iframe->getAttribute('src'));
-    $newIframe->setAttribute('frameborder', '0');
-    $newIframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-    $newIframe->setAttribute('sandbox', 'allow-scripts allow-same-origin');
-    $newIframe->setAttribute('title', tra('Embedded media content'));
+    $iframeSrc = $iframe->getAttribute('src');
 
-    if (isset($params['start']) && is_numeric($params['start']) && $params['start'] > 0) {
-        $src = $newIframe->getAttribute('src');
-        $newIframe->setAttribute('src', $src . (strpos($src, '?') === false ? '?' : '&') . 'start=' . $params['start']);
-    }
-
-    if ($params['allowFullScreen'] === 'y') {
-        $newIframe->setAttribute('allowfullscreen', '');
-    }
-
-    $containerStyles = [
-        'position' => 'relative',
-        'overflow' => 'hidden',
-        'max-width' => '100%',
-        'max-height' => '75vh',
-    ];
-
-    $iframeStyles = [];
-    $useResponsive = true;
-    $aspectRatio = null;
-
-    // Check for oEmbed-provided dimensions and compute aspect ratio if available
-    if (
-        isset($oEmbedData['width']) && is_numeric($oEmbedData['width']) && $oEmbedData['width'] > 0 &&
-        isset($oEmbedData['height']) && is_numeric($oEmbedData['height']) && $oEmbedData['height'] > 0
-    ) {
-        $aspectRatio = $oEmbedData['width'] / $oEmbedData['height'];
-    }
-
-    if (! empty($params['width']) && is_numeric($params['width']) && $params['width'] > 0) {
-        $containerStyles['width'] = $params['width'] . 'px';
-        $containerStyles['margin'] = '0 auto';
-        $useResponsive = false;
-        if (! empty($params['height']) && is_numeric($params['height']) && $params['height'] > 0) {
-            $containerStyles['height'] = $params['height'] . 'px';
-        } elseif ($aspectRatio) {
-            $containerStyles['aspect-ratio'] = $aspectRatio;
-        }
-    } elseif (! empty($params['height']) && is_numeric($params['height']) && $params['height'] > 0) {
-        $containerStyles['height'] = $params['height'] . 'px';
-        $useResponsive = false;
-        if ($aspectRatio) {
-            $containerStyles['width'] = (int)($params['height'] * $aspectRatio) . 'px';
-            $containerStyles['margin'] = '0 auto';
-        }
-    }
-
-    if ($useResponsive) {
-        $containerStyles['width'] = '100%';
-        if ($aspectRatio) {
-            $containerStyles['aspect-ratio'] = $aspectRatio;
-        } elseif (isset($oEmbedData['type']) && $oEmbedData['type'] === 'video') {
-            $containerStyles['aspect-ratio'] = '16/9'; // Fall back
-        }
-    }
-
-    if ($params['borderRadius'] === 'y') {
-        $containerStyles['border-radius'] = '8px';
-    }
-
-    if (! empty($params['bg'])) {
-        $containerStyles['background-color'] = $params['bg'];
-    }
-
-    if (! empty($params['border'])) {
-        $containerStyles['border'] = '1px solid ' . $params['border'];
-    }
-
-    $iframeStyles = $useResponsive
-        ? ['position' => 'absolute', 'top' => '0', 'left' => '0', 'width' => '100%', 'height' => '100%']
-        : ['width' => '100%', 'height' => '100%'];
-
-    $containerStyle = implode(';', array_map(function ($key, $value) {
-        return "$key:$value";
-    }, array_keys($containerStyles), $containerStyles));
-
-    $iframeStyle = implode(';', array_map(function ($key, $value) {
-        return "$key:$value";
-    }, array_keys($iframeStyles), $iframeStyles));
-
-    $newIframe->setAttribute('style', $iframeStyle);
-
-    $embedHtml = '<div style="' . $containerStyle . '">' . $dom->saveHTML($newIframe) . '</div>';
+    $embedHtml = buildEmbedContainerAndIframe($iframeSrc, $params, $oEmbedData);
 
     return '~np~' . $embedHtml . '~/np~';
 }

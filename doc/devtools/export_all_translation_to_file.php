@@ -39,6 +39,38 @@ foreach ($user_translations as $all_translations) {
     $final_phrase .= "[TRA] Automatic commit of $all_translations[lang] translation contributed By $all_translations[user] to http://i18n.tiki.org \n";
 }
 
+/**
+ * @param $path
+ * @return object
+ */
+function get_info($path)
+{
+    $esc = escapeshellarg($path);
+    $info = @simplexml_load_string(shell_exec("svn info --xml $esc 2> /dev/null"));
+    return $info;
+}
+
+/**
+ * This is taken from the former svntools.php.  It hasn't been functional since before then, but is added back here to the intent is known if someone wants to restore this - benoitg - 2026-01-22
+ * Commit lang files
+ * @param $msg
+ * @param bool $displaySuccess
+ * @param bool $dieOnRemainingChanges
+ * @return int
+ */
+function commit_lang($msg, $displaySuccess = true, $dieOnRemainingChanges = true)
+{
+    $msg = escapeshellarg($msg);
+    shell_exec('svn ci ./lang -m $msg');
+
+    if ($dieOnRemainingChanges && has_uncommited_changes('./lang')) {
+        error("Commit seems to have failed. Uncommited changes exist in the working folder.\n");
+    }
+
+    return (int)get_info('./lang')->entry->commit['revision'];
+}
+
+
 if (has_uncommited_changes(".")) {
     $langlib = new LanguageTranslations();
     echo "there is uncommitted changes \n";

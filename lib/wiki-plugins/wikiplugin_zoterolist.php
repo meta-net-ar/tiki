@@ -26,10 +26,6 @@ function wikiplugin_zoterolist_info()
 
 function wikiplugin_zoterolist($data, $params)
 {
-    if (! isset($params['tag'])) {
-        return WikiParser_PluginOutput::argumentError(['tag']);
-    }
-
     $cachelib = TikiLib::lib('cache');
     $tikilib = TikiLib::lib('tiki');
 

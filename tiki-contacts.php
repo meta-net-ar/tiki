@@ -95,7 +95,7 @@ if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
     $ext_result = [];
     foreach ($exts as $ext) {
-        $ext_result[$ext['fieldId']] = isset($_REQUEST['ext_' . $ext['fieldId']]) ? $_REQUEST['ext_' . $ext['fieldId']] : '';
+        $ext_result[$ext['fieldId']] = $_REQUEST['ext_' . $ext['fieldId']] ?? '';
     }
     if (empty($_REQUEST["firstName"])) {
         $feedback = tra('You must specify the contact name.');

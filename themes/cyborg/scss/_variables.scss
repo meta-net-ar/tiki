@@ -1,9 +1,11 @@
- // Cyborg 5.3.3 -- This overrides and supplements node_modules/bootswatch/dist/cyborg/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
- // In lines with a changed value, a commented-out value and "default", "default" refers to the commented-out value.
- // Color value changes were made to comply with WCAG standards.
+// Cyborg 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/cyborg/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/cyborg/_variables.scss"; // Bootswatch theme variables file
+
+//
 // Color system
 
 $red:     #EB0000; // #F00000; //#c00;  default
@@ -17,14 +19,15 @@ $danger:        $red;  // default
 $light: #737373; //  $gray-800 !default; Darkened for increased contrast with link color
 $dark: #000000;  // default
 
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
+
 //$min-contrast-ratio:   2.25;  // default
+
 // Options
 $enable-dark-mode:            false;
-
-// Prefix for :root CSS variables
-
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-bg:       #060606;  // default

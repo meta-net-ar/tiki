@@ -320,16 +320,21 @@
                         <input class="form-control" type="text" name="profile_tester_name" id="profile_tester_name" value="{if isset($profile_tester_name)}{$profile_tester_name}{else}Test{/if}" />
                         </div>
                         <div class="col-sm-4">
-                            <select class="form-select" name="empty_cache" class="form-control">
-                            <option value=""{if isset($empty_cache) and $empty_cache eq ''} checked="checked"{/if}>{tr}None{/tr}</option>
-                            <option value="all"{if isset($empty_cache) and $empty_cache eq 'all'} checked="checked"{/if}>{tr}All{/tr}</option>
-                            <option value="templates_c"{if isset($empty_cache) and $empty_cache eq 'templates_c'} checked="checked"{/if}>templates_c</option>
-                            <option value="temp_cache"{if isset($empty_cache) and $empty_cache eq 'temp_cache'} checked="checked"{/if}>temp_cache</option>
-                            <option value="temp_public"{if isset($empty_cache) and $empty_cache eq 'temp_public'} checked="checked"{/if}>temp_public</option>
-                            <option value="modules_cache"{if isset($empty_cache) and $empty_cache eq 'modules_cache'} checked="checked"{/if}>modules_cache</option>
-                            <option value="prefs"{if isset($empty_cache) and $empty_cache eq 'prefs'} checked="checked"{/if}>prefs</option>
-                        </select>{$empty_cache}
-                            </div>
+                            {html_options
+                                name="empty_cache"
+                                class="form-select"
+                                options=[
+                                    "" => "{tr}None{/tr}",
+                                    "all" => "{tr}All{/tr}",
+                                    "templates_c" => "templates_c",
+                                    "temp_cache" => "temp_cache",
+                                    "temp_public" => "temp_public",
+                                    "modules_cache" => "modules_cache",
+                                    "prefs" => "prefs"
+                                ]
+                                selected=$empty_cache
+                            }
+                        </div>
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-12">
@@ -347,7 +352,7 @@
 {/tabset}
 
 {jq}
-        {{foreach item=k from=$oldSources}
-                $.profilesRefreshCache("{$baseURI}", "{$k}");
+    {{foreach item=k from=$oldSources}
+        $.profilesRefreshCache("{$baseURI}", "{$k}");
     {/foreach}}
 {/jq}

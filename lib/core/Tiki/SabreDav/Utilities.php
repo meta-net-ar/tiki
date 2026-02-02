@@ -11,6 +11,7 @@ use Sabre\CardDAV;
 use Sabre\DAV;
 use Sabre\DAVACL;
 use Sabre\VObject;
+use Tiki\Lib\TikiDate;
 use TikiLib;
 use TikiMail;
 
@@ -103,7 +104,7 @@ class Utilities
         if ($availability) {
             try {
                 $parsed = VObject\Reader::read($availability);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 TikiLib::lib('log')->add_log('error', tr('Failed parsing availability component: %0', $e->getMessage()));
             }
         }
@@ -269,7 +270,7 @@ class Utilities
             }
             if (isset($component->RRULE)) {
                 $rec = self::mapRRuleToRecurrence($component);
-                $rec->setStartPeriod(\TikiDate::getStartDay($firstOccurence, 'UTC'));
+                $rec->setStartPeriod(TikiDate::getStartDay($firstOccurence, 'UTC'));
             }
 
             // Ensure Occurence values are positive
@@ -381,7 +382,7 @@ class Utilities
                 if ($user) {
                     $result['organizers'][] = $user;
                 }
-                $cn = isset($organizer->CN) ? (string)$organizer->CN : '';
+                $cn = (string)($organizer->CN ?? '');
                 if (empty($cn)) {
                     $result['real_organizers'][] = $email;
                 } else {
@@ -415,7 +416,7 @@ class Utilities
             $result['attendees'] = [];
             foreach ($component->ATTENDEE as $attendee) {
                 $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                $cn = isset($attendee->CN) ? (string)$attendee->CN : '';
+                $cn = (string)($organizer->CN ?? '');
                 if (empty($cn)) {
                     $result['attendees'][] = $email;
                 } else {
@@ -517,9 +518,9 @@ class Utilities
         if (isset($parts['COUNT'])) {
             $rec->setNbRecurrences($parts['COUNT']);
         } elseif (isset($parts['UNTIL'])) {
-            $rec->setEndPeriod(\TikiDate::getStartDay(strtotime($parts['UNTIL']), 'UTC'));
+            $rec->setEndPeriod(TikiDate::getStartDay(strtotime($parts['UNTIL']), 'UTC'));
         } else {
-            $rec->setEndPeriod(\TikiDate::getStartDay(strtotime(CalDAVBackend::MAX_DATE), 'UTC'));
+            $rec->setEndPeriod(TikiDate::getStartDay(strtotime(CalDAVBackend::MAX_DATE), 'UTC'));
         }
         return $rec;
     }
@@ -772,7 +773,7 @@ class Utilities
                     $body = "$sender has updated their participation status in the following event:";
                     break;
                 default:
-                    throw new Exception("Unsupported ITip method: " . $message->method);
+                    throw new \Exception("Unsupported ITip method: " . $message->method);
             }
 
             $organizers = [];

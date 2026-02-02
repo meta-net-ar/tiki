@@ -1,4 +1,8 @@
-{if not empty($item.children)}
+{if $item.type eq '-'}
+    <li class="sm-nav-item nav-item">
+        <hr class="menu-separator my-2">
+    </li>
+{elseif not empty($item.children)}
     <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }static{/if}">
         <a href="{$item.sefurl|escape}" class="sm-nav-link nav-link sm-sub-toggler">
             {if $menu_info.use_items_icons eq "y" && $item.icon}

@@ -126,11 +126,14 @@ if (
     || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
 ) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
     $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
-    if (strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
+    if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') && ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
         /* Force the admin layout on admin pages */
         $prefs['site_layout_admin'] = 'admin';
         /* Force the admin layout on setup/management pages too */
         $prefs['site_layout'] = 'admin';
+        /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
+        $section = 'admin';
+
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
             foreach ($admin_icon['children'] as & $child) {
@@ -139,7 +142,7 @@ if (
         }
         $smarty->assign('admin_icons', $admin_icons);
     }
-    if (! strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
+    if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
         $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
     }
 } else {

@@ -35,6 +35,7 @@ function wikiplugin_tikimanagerclone_info()
                 'description' => tra('Source instance(instance to clone) ID or name.'),
                 'since' => '25.0',
                 'filter' => 'string',
+                'default' => '',
                 'advanced' => false
             ],
             'target' => [
@@ -43,6 +44,7 @@ function wikiplugin_tikimanagerclone_info()
                 'description' => tra('Destination instance(s) ID or name, comma separated in case of multiple instances.'),
                 'since' => '25.0',
                 'filter' => 'string',
+                'default' => '',
                 'advanced' => false
             ],
             'branch' => [
@@ -183,7 +185,7 @@ function wikiplugin_tikimanagerclone($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $instances = TikiManager\Application\Instance::getInstances();
+    $instances = TikiManager\Application\Instance::getInstances();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $source = array_map(function ($i) {
         return $i->id;
     }, array_filter($instances, function ($i) use ($source) {
@@ -224,8 +226,8 @@ function wikiplugin_tikimanagerclone($data, $params)
     $consoleCommand = 'manager:instance:clone ' . $mode . ' --source=' . $source . ' --target=' . $target . ' --branch=' . $branch . (($skipReindex) ? ' --skip-reindex' : '') . (($skipCacheWarmup) ? ' --skip-cache-warmup' : '') . (($unifiedIndexRebuild) ? ' --live-reindex' : '') . (($direct) ? ' --direct' : '') . (($stash) ? ' --stash' : '') . ' --timeout=' . $timeout . (($ignoreRequirements) ? ' --ignore-requirements' : '');
 
     if ($mode == 'clone') {
-        $onlyData = ($toClone == 'data') ? true : false;
-        $onlyCode = ($toClone == 'code') ? true : false;
+        $onlyData = $toClone == 'data';
+        $onlyCode = $toClone == 'code';
         $consoleCommand .= (($onlyData) ? ' --only-data' : '') . (($onlyCode) ? ' --only-code' : '');
     }
 

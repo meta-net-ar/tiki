@@ -5,20 +5,20 @@
         {button href="tiki-article_types.php" _type="link" _icon_name="structure" _text="{tr}Article Types{/tr}"}
     {/if}
 </div>
-<form enctype="multipart/form-data" action="tiki-admin_topics.php" method="post">
+<form enctype="multipart/form-data" action="tiki-admin_topics.php" method="post" class="styling-element">
     {ticket}
     <h2>{tr}Add topic{/tr}</h2>
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label" for="name">{tr}Name{/tr}</label>
         <div class="col-sm-10">
-            <input type="text" name="name" id="name" class="form-control">
+            <input type="text" name="name" id="name" class="form-control" required>
         </div>
     </div>
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label" for="image">{tr}Image{/tr}</label>
         <div class="col-sm-10">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input class="form-control" name="userfile1" type="file" accept="image/*">
+            <input class="form-control" name="userfile1" id="image" type="file" accept="image/*" required>
         </div>
     </div>
     <div class="mb-3 row">
@@ -36,7 +36,7 @@
     </div>
 </form>
 <h2>{tr}Topics{/tr}</h2>
-<div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {* table-responsive class cuts off css drop-down menus *}
     <table class="table table-striped table-hover">
         <tr>
             <th>{tr}ID{/tr}</th>

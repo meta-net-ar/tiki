@@ -64,7 +64,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
         return [
             'attachments' => $typeFactory->multivalue($files),
             'attachment_contents' => $typeFactory->plaintext(implode(' ', $textual)),
-            'primary_image' => $typeFactory->identifier(isset($attributes['tiki.object.image']) ? $attributes['tiki.object.image'] : ''),
+            'primary_image' => $typeFactory->identifier($attributes['tiki.object.image'] ?? ''),
         ];
     }
 }

@@ -30,7 +30,7 @@ if (getcwd()) {
 
     // I can't make sense of the above paragraph, but SCRIPT_FILENAME appears to always work, as the alternative case was broken for 2 years. Chealer
 
-    if (substr($_SERVER['SCRIPT_FILENAME'], 0, strlen($tikipath)) != $tikipath) {
+    if (! str_starts_with($_SERVER['SCRIPT_FILENAME'], $tikipath)) {
         // PATH_TRANSLATED is not always set on PHP5, so try to get first value of get_included_files() in this case
         $scriptDirectory = empty($_SERVER['PATH_TRANSLATED']) ? current(get_included_files()) : $_SERVER['PATH_TRANSLATED'];
     } else {
@@ -72,10 +72,10 @@ if ($dir_level > 0) {
     chdir($tikipath);
 }
 
-if (substr($tikiroot, -1, 1) != '/') {
+if (! str_ends_with($tikiroot, '/')) {
     $tikiroot .= '/';
 }
-if (substr($tikipath, -1, 1) != '/') {
+if (! str_ends_with($tikipath, '/')) {
     $tikipath .= '/';
 }
 

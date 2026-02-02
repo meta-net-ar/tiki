@@ -206,7 +206,7 @@ if (isset($_POST['request']) && $globalperms->request_payment) {
             $_POST['description'],
             $_POST['amount'],
             (int)$_POST['payable'],
-            isset($_POST['detail']) ? $_POST['detail'] : ''
+            $_POST['detail'] ?? ''
         );
 
         if ($prefs['feature_categories'] == 'y') {
@@ -243,7 +243,7 @@ function fetch_payment_list($type)
     $paymentlib = TikiLib::lib('payment');
     $offsetKey = 'offset_' . $type;
     $method = 'get_' . $type;
-    $offset = isset($_REQUEST[$offsetKey]) ? (int)$_REQUEST[$offsetKey] : 0;
+    $offset = (int)($_REQUEST[$offsetKey] ?? 0);
     $max = ! empty($_REQUEST['numrows']) ? $_REQUEST['numrows'] : (int)$prefs['maxRecords'];
 
     if (! empty($_REQUEST)) {

@@ -1,27 +1,131 @@
-// This file is for additional SCSS rules beyond what are in _variables.scss.
+// Morph for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
-$imagePath: "../images/";
+//$imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// Improve color contrast for readability
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+// Links
+// Components
+// Typography
+.blockquote-footer,
+.form-text {
+    color: #59636E;
+}
+
+// Tables
+// Buttons
+button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
+    border-radius: 0;
+    background-color: transparent; }
+
+// Forms
+    // Tiki - match to button radius inside the input
+.input-group {
+    border-radius: 50rem;
+    & > .form-control {
+        padding-left: 2rem; // No start padding seems wrong
+    }
+}
+
+// Navs
+// Navbar
+
+.topbar .nav-link {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+}
+
+    // Make links visible in dark mode
+#col2 .navbar {
+    background: transparent;
+    .nav-link {
+        color: var(--tiki-vert-nav-link-color);
+        &:hover {
+            color: var(--tiki-vert-nav-link-hover-color);
+        }
+    }
+}
+
+// Dropdowns
+// Pagination
+// Cards
+.card.module.no-decorations {
+    box-shadow: none;
+}
+
+// Accordion
+// Badges
+// Alerts
+    // Improve color contrast for readability
 .alert-info,
 .alert-success,
-.alert-danger {
+    //.alert-danger
+    {
     color: #fff;
     .alert-link {
         color: #fff;
     }
 }
 
-//
-button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
-    border-radius: 0;
-    background-color: transparent; }
+.alert #btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 
+// Progress bars
+// List group
+.list-group-item {
+    background-color: inherit;
+}
+
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
 .tiki .textarea-toolbar > div,
 .tiki .textarea-toolbar > ul {
     border: none !important;
+}
+
+// Dark mode
+// External libraries
+    // These aren't working
+    //.tiki form.d-flex .el-input,
+.tiki form.d-flex el-input,
+.el-select__wrapper.is-filterable, .el-select-dropdown, .el-select { //, el-select {
+    --el-component-size: 64px !important;
+    height: 64px !important;
+    }
+.tiki .el-input .el-input__wrapper {
+    padding: 1rem !important;
+}
+.tiki .el-input__wrapper .el-input,
+.tiki .el-select__wrapper.is-filterable.el-tooltip__trigger.el-tooltip__trigger {
+    --el-input-height: 64px !important;
+    --el-input-inner-height: 64px !important;
+}
+:host .el-el-input.el-input--suffix {
+    --el-component-size: 64px !important;
+    --el-input-inner-height: 64px !important;
+}
+
+::v-deep(.el-select .el-input__inner),
+::v-deep(.el-autocomplete.el-tooltip__trigger.el-tooltip__trigger),
+::v-deep(el-autocomplete) {
+    height: 64px !important;
 }

@@ -136,7 +136,7 @@ class ModLib extends TikiLib
         }
         if ($type == "D" || $type == "P") {
             $usermoduleslib = TikiLib::lib('usermodules');
-            $usermoduleslib->add_module_users($moduleId, $name, $title, $position, $order, $cache_time, $rows, $groups, $params, $type);
+            $usermoduleslib->add_module_users($moduleId, $name, $position, $order, $type);
         }
         return $moduleId;
     }
@@ -376,7 +376,7 @@ class ModLib extends TikiLib
         $h = opendir($dircache);
         $i = 0;
         while (($file = readdir($h)) !== false) {
-            if (substr($file, 0, 4) == 'mod-') {
+            if (str_starts_with($file, 'mod-')) {
                 $file = "$dircache/$file";
                 $result = unlink($file);
                 if ($result) {
@@ -523,16 +523,19 @@ class ModLib extends TikiLib
         global $section, $page, $prefs, $user;
         $tikilib = TikiLib::lib('tiki');
 
+        if ($prefs['module_' . $module["name"]] != 'y') {
+            return false;
+        }
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
             if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
                 return true;
             }
         }
-        // TODO: Check this if it behaves well on other "Admin" pages when UAB is enabled
+        // Load only the Unified Admin Interface (UAB) specific modules for Admins on admin panels/management pages
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = $section === 'admin' && strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') !== false;
+        $isControlPanel = $section === 'admin';
 
         if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
             return false;
@@ -858,7 +861,7 @@ class ModLib extends TikiLib
         global $prefs;
 
         $cachelib = TikiLib::lib('cache');
-        $cacheKey = 'module.' . $moduleName . $prefs['language'];
+        $cacheKey = 'module.' . $moduleName . Language::getCurrentLanguage();
         $info = $cachelib->getSerialized($cacheKey, 'module');
 
         if ($info) {
@@ -1115,16 +1118,19 @@ class ModLib extends TikiLib
                 'error' => '',
                 'flip' => ( $prefs['user_flip_modules'] == 'module' ) ? 'n' : $prefs['user_flip_modules'],
             ];
-            $module_params = isset($mod_reference['params']) ? (array) $mod_reference['params'] : [];
+            $module_params = (array) ($mod_reference['params'] ?? []);
             $module_params = array_merge($defaults, $module_params); // not sure why style doesn't get set sometime but is used in the tpl
 
-            $mod_reference = array_merge(['moduleId' => null, 'ord' => 0, 'position' => 0, 'rows' => 10], $mod_reference);
+            $mod_reference = array_merge(['moduleId' => null, 'ord' => 0, 'position' => 0, 'rows' => 10, 'cache_time' => 0], $mod_reference);
 
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
 
+            $prefslib = TikiLib::lib('prefs');
+
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
+                    $this->add_pref_error($mod_reference['name'], $preference);
                     return smarty_block_remarksbox(
                         [
                             'type' => 'warning',
@@ -1207,7 +1213,7 @@ class ModLib extends TikiLib
 
                 if ($this->is_admin_mode() && $timer) {
                     $elapsed = round($timer->stop('module'), 3);
-                    $data = isset($data) ? $data : '';
+                    $data = $data ?? '';
                     $data = preg_replace('/<div /', '<div title="Module Execution Time ' . $elapsed . 's" ', $data, 1);
                 }
 
@@ -1272,7 +1278,7 @@ class ModLib extends TikiLib
             $info = $this->parse($info);
 
             // re-assign module_params for the custom module in case a module plugin is used inside it
-            $smarty->assign_by_ref('module_params', $module_params);
+            $smarty->assign_by_ref('user_module_params', $module_params);
             $smarty->assign('user_title', tra($info['title']));
             $smarty->assign_by_ref('user_data', $info['data']);
             $smarty->assign_by_ref('user_module_name', $info['name']);
@@ -1603,7 +1609,7 @@ function zone_is_empty($zoneName)
     }
 
     foreach ($moduleZones[$key] as $module) {
-        $data = (string) (isset($module['data']) ? $module['data'] : '');
+        $data = (string) ($module['data'] ?? '');
         if (! empty($data)) {
             return false;
         }

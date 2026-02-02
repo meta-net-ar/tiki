@@ -370,7 +370,7 @@ class Services_Tracker_Controller
             }
         }
 
-        $name = $input->name->word();
+        $name = $input->name->text();
         if (! empty($name)) {
             $fields = $definition->getFields();
             foreach ($fields as $currentField) {
@@ -538,9 +538,9 @@ class Services_Tracker_Controller
                 } else {
                     $param['parent'] = null;
                 }
-                $param['parentkey'] = isset($param['parentkey']) ? $param['parentkey'] : null;
-                $param['sort_order'] = isset($param['sort_order']) ? $param['sort_order'] : null;
-                $param['format'] = isset($param['format']) ? $param['format'] : null;
+                $param['parentkey'] = $param['parentkey'] ?? null;
+                $param['sort_order'] = $param['sort_order'] ?? null;
+                $param['format'] = $param['format'] ?? null;
                 if ($param['selector_type'] === 'trackerfield' && isset($field['options_map']['mirrorField'])) {
                     $param['searchfilter'] = ['object_id' => 'NOT ' . $fieldId];
                 }
@@ -1071,6 +1071,8 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
+        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+
         $itemId = 0;
         $util = new Services_Utilities();
         if (! empty($fields) && $util->isActionPost()) {
@@ -1088,7 +1090,7 @@ class Services_Tracker_Controller
 
                 if ($perms->admin_trackers) {   // tracker admins can make items for other users
                     $field = $definition->getField($definition->getUserField());
-                    $theUser = isset($fields[$field['permName']]) ? $fields[$field['permName']] : null; // setup error?
+                    $theUser = $fields[$field['permName']] ?? null; // setup error?
                 } else {
                     $theUser = null;
                 }
@@ -1101,13 +1103,20 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $itemId = $this->utilities->insertItem(
                 $definition,
                 [
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
                 ]
             );
 
@@ -1326,9 +1335,12 @@ class Services_Tracker_Controller
         }
 
         if ($prefs['tracker_field_rules'] === 'y') {
-            $js = TikiLib::lib('vuejs')->generateTrackerRulesJS($definition->getFields());
+            $js = TikiLib::lib('vuejs')->generateTrackerRulesJS(fields: $definition->getFields(), isInEditContext: true);
+            //$js = TikiLib::lib('vuejs')->generateTrackerRulesJS($definition->getFields(), '', true);
             TikiLib::lib('header')->add_jq_onready($js);
         }
+
+        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $access->preventRedirect(true);
@@ -1339,9 +1351,10 @@ class Services_Tracker_Controller
                 $permName = $f['permName'];
                 $fieldValue = $f['value'] ?? '';
                 if ($f['type'] === 'a') {
-                    foreach ((array) $fieldValue as & $value) {
-                        $value = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($value);
-                    }
+                    $convert = fn($v) => TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($v);
+                    $fieldValue = is_array($fieldValue)
+                        ? array_map($convert, $fieldValue) // apply conversion to each element
+                        : $convert($fieldValue); // apply conversion to the single value
                 }
                 $fields[$permName] = $fieldValue;
             }
@@ -1369,6 +1382,12 @@ class Services_Tracker_Controller
 
             $deletedFiles = $itemObject->deletedFiles($input);
 
+            if (TIKI_API) {
+                $validate = ! $input->skipValidation->bool();
+            } else {
+                $validate = true;
+            }
+
             $result = $this->utilities->updateItem(
                 $definition,
                 [
@@ -1376,7 +1395,9 @@ class Services_Tracker_Controller
                     'status' => $input->status->word(),
                     'fields' => $fields,
                     'processedFields' => $processedFields,
-                    'deletedFiles' => $deletedFiles
+                    'deletedFiles' => $deletedFiles,
+                    'validate' => $validate,
+                    'notify_watchers' => $input->notify_watchers->word(),
                 ]
             );
 
@@ -1690,7 +1711,7 @@ class Services_Tracker_Controller
         }
 
         foreach ($fields["data"] as &$field) {
-            $permName = isset($field['permName']) ? $field['permName'] : null;
+            $permName = $field['permName'] ?? null;
             if (isset($fieldsProcessed[$permName])) {
                 if (isset($fieldsProcessed[$permName]['pvalue'])) {
                     $field['pvalue'] = $fieldsProcessed[$permName]['pvalue'];
@@ -1741,7 +1762,7 @@ class Services_Tracker_Controller
         ];
         if (! empty($trackerInfo['viewItemPretty'])) {
             // Need to check wether this is a wiki: or tpl: template, bc the smarty template needs to take care of this
-            if (strpos(strtolower($viewItemPretty['value']), 'wiki:') === false) {
+            if (! str_contains(strtolower($viewItemPretty['value']), 'wiki:')) {
                 $viewItemPretty['type'] = 'tpl';
             }
         }
@@ -2154,6 +2175,10 @@ class Services_Tracker_Controller
 
     public function action_replace($input)
     {
+        // This variable indicates which accordion_group to activate in the Smarty .tpl file
+        // when the user uses this method. By default, its value is set to 1.
+        $accordion_pos = $input->accordion_pos->int() ?? 1;
+
         $trackerId = $input->trackerId->int();
         $confirm = $input->confirm->int();
 
@@ -2228,6 +2253,7 @@ class Services_Tracker_Controller
         }
 
         return [
+            'accordion_pos' => $accordion_pos,
             'title' => $trackerId ? tr('Edit') . " " . tr('%0', $definition->getConfiguration('name')) : tr('Create Tracker'),
             'trackerId' => $trackerId,
             'info' => $info,
@@ -2341,7 +2367,7 @@ class Services_Tracker_Controller
         $itemId = $input->itemId->int();
         $fieldId = $input->fieldId->int();
         $filter = [];
-        if ($input->version->text()) {
+        if ($input->version->text() !== '') {
             $filter['version'] = $input->version->text();
         }
         $offset = $input->offset->int();
@@ -2645,7 +2671,7 @@ class Services_Tracker_Controller
         $export_yaml = $profileTrackerInstallHandler->dumpExport($trackerId, $profileObject);
 
         include_once 'lib/wiki-plugins/wikiplugin_code.php';
-        $export_yaml = wikiplugin_code($export_yaml, ['caption' => 'YAML', 'colors' => 'yaml']);
+        $export_yaml = TikiLib::lib('parser')->invokePlugin('code', $export_yaml, ['caption' => 'YAML', 'colors' => 'yaml']);
         $export_yaml = preg_replace('/~[\/]?np~/', '', $export_yaml);
 
         return [
@@ -2975,7 +3001,8 @@ class Services_Tracker_Controller
             // Highlight elements representing the field
             $(`[field-name="${element.getAttribute("name")}"]`).attr("is-invalid", true);
             if ($(element).attr("element-plus-ref")) {
-                $(`#${$(element).attr("element-plus-ref")}`).attr("is-invalid", true);
+                let takeExistingClassNameAndAddInvalid = $(`#${$(element).attr("element-plus-ref")}`)[0]._root.children[1].className + " invalid";
+                $(`#${$(element).attr("element-plus-ref")}`)[0]._root.children[1].className = takeExistingClassNameAndAddInvalid;
             }
         },
         unhighlight: function(element) {
@@ -2987,7 +3014,9 @@ class Services_Tracker_Controller
             // Unhighlight elements representing the field
             $(`[field-name="${element.getAttribute("name")}"]`).attr("is-invalid", false);
             if ($(element).attr("element-plus-ref")) {
-                $(`#${$(element).attr("element-plus-ref")}`).attr("is-invalid", false);
+                let takeExistingClassName = $(`#${$(element).attr("element-plus-ref")}`)[0]._root.children[1].className;
+                let newClassWithoutInvalidClassName = takeExistingClassName.replace(/\binvalid\b/, " ")
+                $(`#${$(element).attr("element-plus-ref")}`)[0]._root.children[1].className = newClassWithoutInvalidClassName;
             }
         },
         ignore: ".ignore"
@@ -3136,7 +3165,7 @@ class Services_Tracker_Controller
         $item = Tracker_Item::fromId($itemId);
 
         if (! $item) {
-            throw new Services_Exception_NotFound();
+            throw new Services_Exception_NotFound(tr('Tracker item not found'));
         }
 
         $definition = $item->getDefinition();
@@ -3168,6 +3197,13 @@ class Services_Tracker_Controller
         $listFields = $input->listFields->text();
         $limit = $input->limit->int();
 
+        $displaySort = null;
+        try {
+            $displaySort = $input->displayFieldsListSort->text();
+        } catch (\Throwable $e) {
+            $displaySort = null;
+        }
+
         if (! $listFields) {
             $listFields = $field;
         }
@@ -3189,6 +3225,14 @@ class Services_Tracker_Controller
             $item['value'] = (string) $item['itemId'];
             unset($item['field_values']);
             $data[] = $item;
+        }
+
+        if ($displaySort === 'formatted' && ! empty($data)) {
+            usort($data, function ($a, $b) {
+                $ta = $a['label'] ?? '';
+                $tb = $b['label'] ?? '';
+                return strnatcasecmp($ta, $tb);
+            });
         }
 
         return $data;
@@ -3239,26 +3283,36 @@ class Services_Tracker_Controller
             throw new Services_Exception_NotFound();
         }
 
+        /** @var Tracker_Field_EmailFolder $fieldHandler */
         $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
 
         if (! method_exists($fieldHandler, 'getFolders')) {
             throw new ServicesExceptionBadRequest(tr('Incorrect field type'));
         }
 
+        $trackerField = $fieldHandler->getTrackerFieldInstance();
         $folders = [];
 
-        foreach ($fieldHandler->getFolders() as $name => $label) {
-            if (empty($name)) {
-                continue;
+        if ($trackerField->getOption('useFolders')) {
+            foreach ($fieldHandler->getFolders() as $name => $label) {
+                if (empty($name)) {
+                    continue;
+                }
+                $folders[] = [
+                    'name' => $name,
+                    'label' => $label,
+                ];
             }
+        } else {
             $folders[] = [
-                'name' => $name,
-                'label' => $label,
+                'name' => 'inbox',
+                'label' => $trackerField->getOption('inboxName'),
             ];
         }
 
         return [
             'folders' => $folders,
+            'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
 }

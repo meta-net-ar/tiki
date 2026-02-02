@@ -23,7 +23,7 @@
             <div class="row align-items-end">
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Version{/tr}
-                        <input type="number" name="version" value="{if !empty($filter.version)}{$filter.version|escape}{/if}" class="form-control">
+                        <input type="number" name="version" value="{if isset($filter.version)}{$filter.version|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">

@@ -37,7 +37,7 @@ class AdminWizardNamespace extends Wizard
         }
 
         // Only show "hide namespace in structures" option, if structures are active
-        $isStructures = isset($prefs['feature_wiki_structure']) && $prefs['feature_wiki_structure'] === 'y' ? true : false;
+        $isStructures = isset($prefs['feature_wiki_structure']) && $prefs['feature_wiki_structure'] === 'y';
         $smarty->assign('isStructures', $isStructures);
 
         return true;

@@ -186,7 +186,7 @@ if (isset($_POST["step4"])) {
     $smarty->assign('fi_prefix', $_POST["prefix"]);
 } else {
     $smarty->assign('step', 'new');
-    $smarty->assign('tmpdir', isset($prefs['tmpDir']) ? $prefs['tmpDir'] : '');
+    $smarty->assign('tmpdir', $prefs['tmpDir'] ?? '');
     $smarty->assign('fi_types', $import->fi_types);
     $smarty->assign('fi_prefixes', $import->fi_prefixes);
 }

@@ -36,6 +36,7 @@
                 {/if}
             </div>
             {preference name=tiki_cachecontrol_session}
+            {preference name=tiki_cachecontrol_maxage}
             {preference name=smarty_compilation}
             {preference name=users_serve_avatar_static}
             {preference name=allowImageLazyLoad }

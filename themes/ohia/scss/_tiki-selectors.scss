@@ -1,10 +1,24 @@
-@use "sass:color";
+// Ohia for Tiki Bootstrap 5.3
 
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+@use "sass:color";
+// Image path example:
 $imagePath: "../images/";
 // body {
 //     background-image: url('#{$imagePath}bg.jpg');
 // }
 
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
 body {
     border-top: 6px solid $sky-light;
     border-bottom: 8px solid $sea;
@@ -14,230 +28,282 @@ body {
     margin-bottom: 20px;
 }
 
-h1,h2,h3,h4,h5,h6 {
+#topbar_modules .box-search {
+    margin-top: 8px;
+}
+
+.middle_outer > .container {
+    border-top: none;
+}
+
+body.fullscreen {
+    background: var(--#{$prefix}body-bg);
+    .container {
+        border: none;
+    }
+}
+
+// Links
+// Components
+// Typography
+h1, h2, h3, h4, h5, h6 {
     font-variant: small-caps;
 }
 
+// Tables
+// Buttons
+// Buttons
+.btn-outline-secondary {
+    --bs-btn-color: #799C11;
+    --bs-btn-border-color: #799C11;
+}
+
+.btn-outline-success {
+    --bs-btn-color: #0088F0;
+    --bs-btn-border-color: #0088F0;
+}
+
+.btn-outline-danger {
+    --bs-btn-color: #EB1E1E;
+    --bs-btn-border-color: #EB1E1E;
+}
+
+.btn-outline-dark {
+    --bs-btn-color: #949494;
+    --bs-btn-border-color: #949494;
+}
+
+//.btn-outline-primary {
+//    color: adjust($primary, $lightness: 50%, $space: hsl);
+//    border-color: adjust($primary, $lightness: 50%, $space: hsl);
+//}
+
+// Forms
+// Navs
+// Navbar
 .navbar-dark {
     background-color: #343a40;
-//    .nav-link {
-//        color: rgba($white, .55);;
-//    }
+    //    .nav-link {
+    //        color: rgba($white, .55);;
+    //    }
 }
 
 .navbar:not(.navbar-light, .navbar-dark) {
     .nav-link {
         color: $link-color;
     }
+
     .nav-link:hover,
     .nav-link.active {
         color: $link-hover-color;
     }
 }
 
-    .navbar-light.navbar-fixed-top > .container {
-        border: none;
-        margin-bottom: 0;
+.navbar-light.navbar-fixed-top > .container {
+    border: none;
+    margin-bottom: 0;
+}
+
+// Dropdowns
+// Pagination
+// Cards
+.card-header {
+    border-bottom: 5px solid $wood;
+}
+
+// Accordion
+// Popovers
+//.popover {
+//    background-color: color.adjust(#030511, $lightness: 10%, $space: hsl);
+//}
+
+.popover-header {
+    background-color: #696969;
+    border-bottom: 1px solid #ebebeb;
+}
+
+// Badges
+.badge {
+    &.bg-primary,
+        //    &.bg-danger,
+        //    &.bg-secondary,
+        //    &.bg-success,
+    &.bg-info,
+    &.bg-warning {
+        color: #000 !important;
     }
+}
 
-    .middle_outer > .container {
-        border-top: none;
-    }
+.badge.bg-primary,
+.badge.bg-danger {
+    color: #fff;
+    --bs-badge-color: #fff;
+}
 
-    #topbar_modules .box-search {
-        margin-top: 8px;
-    }
+// Modals
+.modal-header .btn-close {
+    background-color: #fff;
+}
 
-    .card-header {
-        border-bottom: 5px solid $wood;
-    }
+// Breadcrumbs
+.breadcrumb {
+    display: inline-block;
+}
 
-    //footer.footer .modules {
-    //    background: #030511;
-    //  padding-top: 1rem;
-    //      color: #f4f4f4;
-    //    font-size: 0.9em;
-    //    a, a:visited {
-    //        color: #f4f4f4;
-    //    }
-    //}
+// Alerts
+  :root .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);;
+  }
 
-    .popover {
-        background-color: color.adjust(#030511, $lightness: 10%, $space: hsl);
-    }
+.alert-primary {
+    --bs-alert-color: #6ea8fe;
+    --bs-alert-bg: #031633;
+    --bs-alert-border-color: #6ea8fe; // #084298;
+    --bs-alert-link-color: #6ea8fe;
+}
 
-    .popover-header {
-        background-color: #696969;
-        border-bottom: 1px solid #ebebeb;
-    }
+.alert-secondary {
+    --bs-alert-color: var(--bs-secondary-text-emphasis);
+    --bs-alert-bg: var(--bs-secondary-bg-subtle);
+    --bs-alert-border-color: var(--bs-secondary-text-emphasis); //-border-subtle);
+    --bs-alert-link-color: var(--bs-secondary-text-emphasis);
+}
 
-    body.fullscreen {
-        background: var(--#{$prefix}body-bg);
-        .container {
-            border: none;
+.alert-success {
+    --bs-alert-color: var(--bs-success-text-emphasis);
+    --bs-alert-bg: var(--bs-success-bg-subtle);
+    --bs-alert-border-color: var(--bs-success-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-success-text-emphasis);
+}
+
+.alert-danger {
+    --bs-alert-color: var(--bs-danger-text-emphasis);
+    --bs-alert-bg: var(--bs-danger-bg-subtle);
+    --bs-alert-border-color: var(--bs-danger-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-danger-text-emphasis);
+}
+
+.alert-warning {
+    --bs-alert-color: var(--bs-warning-text-emphasis);
+    --bs-alert-bg: var(--bs-warning-bg-subtle);
+    --bs-alert-border-color: var(--bs-warning-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-warning-text-emphasis);
+}
+
+.alert-info {
+    --bs-alert-color: var(--bs-info-text-emphasis);
+    --bs-alert-bg: var(--bs-info-bg-subtle);
+    --bs-alert-border-color: var(--bs-info-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-info-text-emphasis);
+}
+
+.alert-light {
+    --bs-alert-color: var(--bs-light-text-emphasis);
+    --bs-alert-bg: var(--bs-light-bg-subtle);
+    --bs-alert-border-color: var(--bs-light-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-light-text-emphasis);
+}
+
+.alert-dark {
+    --bs-alert-color: var(--bs-dark-text-emphasis);
+    --bs-alert-bg: var(--bs-dark-bg-subtle);
+    --bs-alert-border-color: var(--bs-dark-text-emphasis); // -border-subtle);
+    --bs-alert-link-color: var(--bs-dark-text-emphasis);
+}
+
+// List group
+.list-group-item-primary {
+    background-color: #384706;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-secondary {
+    background-color: #2F3D06;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-success {
+    background-color: #004070;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-danger {
+    background-color: #800000;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-warning {
+    background-color: #4E3B18;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-info {
+    background-color: #173E63;
+    --bs-list-group-color: #B9BCC0E6;
+}
+
+.list-group-item-light {
+    background-color: $light;
+    --bs-list-group-color: #2B2B2B;
+}
+
+.list-group-item-dark {
+    background-color: $dark;
+    --bs-list-group-color: #111212BF;
+}
+
+.list-group-item-action:not(.list-group-item-light) {
+    --bs-list-group-action-color: #B9BCC0E6;
+}
+
+.list-group-item-action.list-group-item-light {
+    color: #111212BF;
+}
+
+// External libraries
+
+    // override for some cypht background colors
+.tiki {
+    .inline-cypht {
+        .folder_list, .content_cell, .compose_page, .message_list, .msg_text, .selected_part,
+        .server_content, .profile_content, .user_settings,
+        .nux_add_account, .imap_server_setup, .pop3_server_setup {
+            background-color: $card-bg;
+        }
+
+        .src_name, .content_title, .list_controls {
+            background: $card-cap-bg;
         }
     }
+
+    &.mobile.tiki-cypht {
+        .folder_list {
+            background-color: $card-bg;
+
+            .src_name {
+                background: $card-cap-bg;
+            }
+        }
+
+        .content_title {
+            &, .list_controls {
+                background: $card-cap-bg;
+            }
+        }
+    }
+}
 
     // Update for Smartmenus (override tiki_base.css value)
-    .dropdown-menu.mega-menu a //,
-        //.dropdown-item
-    {
-        color: $body-color;
-        &:hover {
-            color: $link-hover-color;
-        }
+.dropdown-menu.mega-menu a //,
+    //.dropdown-item
+{
+    color: $body-color;
+
+    &:hover {
+        color: $link-hover-color;
     }
+}
 
     //.dropdown-item {
     //    color: $link-color !important;
     //}
-
-    // Badges
-    .badge {
-        &.bg-primary,
-            //    &.bg-danger,
-            //    &.bg-secondary,
-            //    &.bg-success,
-        &.bg-info,
-        &.bg-warning { color: #000 !important; }
-    }
-
-    .badge.bg-primary,
-    .badge.bg-danger {
-        color: #fff;
-        --bs-badge-color: #fff;
-    }
-
-    // Modals
-    .modal-header .btn-close {
-        background-color: #fff;
-    }
-
-    // Breadcrumbs
-    .breadcrumb {
-        display: inline-block;
-    }
-
-    .btn.btn-outline-primary {
-        color: color.adjust($primary, $lightness: 50%, $space: hsl);
-        border-color: color.adjust($primary, $lightness: 50%, $space: hsl);
-    }
-
-    //
-    //.btn-outline-secondary {
-    //    --bs-btn-color: #68850F;
-    //    --bs-btn-border-color: #68850F;
-    //}
-    //.btn-outline-success {
-    //    --bs-btn-color: #0079D6;
-    //    --bs-btn-border-color: #0079D6;
-    //}
-    //.btn-outline-danger {
-    //    --bs-btn-color: #DB3939;
-    //    --bs-btn-border-color: #DB3939;
-    //}
-    //.btn-outline-dank {
-    //    --bs-btn-color: #181A1B; // #6E7A81;
-    //    --bs-btn-border-color: #181A1B; // #6E7A81;
-    //}
-
-    // override for some cypht background colors
-    .tiki {
-        .inline-cypht {
-            .folder_list, .content_cell, .compose_page, .message_list, .msg_text, .selected_part,
-            .server_content, .profile_content, .user_settings,
-            .nux_add_account, .imap_server_setup, .pop3_server_setup {
-                background-color: $card-bg;
-            }
-            .src_name, .content_title, .list_controls {
-                background: $card-header-bg;
-            }
-        }
-        &.mobile.tiki-cypht {
-            .folder_list {
-                background-color: $card-bg;
-                .src_name { background: $card-header-bg; }
-            }
-            .content_title {
-                &, .list_controls { background: $card-header-bg; }
-            }
-        }
-    }
-
-    // Buttons
-    .btn-outline-secondary { --bs-btn-color: #799C11; --bs-btn-border-color: #799C11;  }
-    .btn-outline-success { --bs-btn-color: #0088F0; --bs-btn-border-color: #0088F0;  }
-    .btn-outline-danger { --bs-btn-color: #EB1E1E; --bs-btn-border-color: #EB1E1E; }
-    .btn-outline-dark { --bs-btn-color: #949494; --bs-btn-border-color: #949494; }
-
-    // List group
-    .list-group-item-primary { background-color: #384706; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-secondary { background-color: #2F3D06; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-success { background-color: #004070; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-danger { background-color: #800000; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-warning { background-color: #4E3B18; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-info { background-color: #173E63; --bs-list-group-color: #B9BCC0E6; }
-    .list-group-item-light { background-color: $light; --bs-list-group-color: #2B2B2B; }
-    .list-group-item-dark { background-color: $dark; --bs-list-group-color: #111212BF; }
-
-    .list-group-item-action:not(.list-group-item-light) {
-        --bs-list-group-action-color: #B9BCC0E6;
-    }
-
-    .list-group-item-action.list-group-item-light {
-        color: #111212BF;
-    }
-
-    // Alerts
-    :root .btn-close {
-        filter: invert(1) grayscale(100%) brightness(200%);;
-    }
-
-    .alert-primary {
-        --bs-alert-color: #6ea8fe;
-        --bs-alert-bg: #031633;
-        --bs-alert-border-color: #6ea8fe; // #084298;
-        --bs-alert-link-color: #6ea8fe;
-    }
-    .alert-secondary {
-        --bs-alert-color: var(--bs-secondary-text-emphasis);
-        --bs-alert-bg: var(--bs-secondary-bg-subtle);
-        --bs-alert-border-color: var(--bs-secondary-text-emphasis); //-border-subtle);
-        --bs-alert-link-color: var(--bs-secondary-text-emphasis);
-    }
-    .alert-success {
-        --bs-alert-color: var(--bs-success-text-emphasis);
-        --bs-alert-bg: var(--bs-success-bg-subtle);
-        --bs-alert-border-color: var(--bs-success-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-success-text-emphasis);
-    }
-    .alert-danger {
-        --bs-alert-color: var(--bs-danger-text-emphasis);
-        --bs-alert-bg: var(--bs-danger-bg-subtle);
-        --bs-alert-border-color: var(--bs-danger-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-danger-text-emphasis);
-    }
-    .alert-warning {
-        --bs-alert-color: var(--bs-warning-text-emphasis);
-        --bs-alert-bg: var(--bs-warning-bg-subtle);
-        --bs-alert-border-color: var(--bs-warning-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-warning-text-emphasis);
-    }
-    .alert-info {
-        --bs-alert-color: var(--bs-info-text-emphasis);
-        --bs-alert-bg: var(--bs-info-bg-subtle);
-        --bs-alert-border-color: var(--bs-info-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-info-text-emphasis);
-    }
-    .alert-light {
-        --bs-alert-color: var(--bs-light-text-emphasis);
-        --bs-alert-bg: var(--bs-light-bg-subtle);
-        --bs-alert-border-color: var(--bs-light-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-light-text-emphasis);
-    }
-    .alert-dark {
-        --bs-alert-color: var(--bs-dark-text-emphasis);
-        --bs-alert-bg: var(--bs-dark-bg-subtle);
-        --bs-alert-border-color: var(--bs-dark-text-emphasis); // -border-subtle);
-        --bs-alert-link-color: var(--bs-dark-text-emphasis);
-    }

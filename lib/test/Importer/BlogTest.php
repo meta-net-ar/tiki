@@ -4,9 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 namespace Tiki\Lib\Test\Importer;
 
-use TikiImporter_Blog;
+use Tiki\Lib\Importer\Blog;
+use Tiki\Lib\Importer\Wiki;
 
 /**
  * @group importer
@@ -16,14 +18,14 @@ class BlogTest extends AbstractImporterTestCase
     public $obj;
     protected function setUp(): void
     {
-        $this->obj = new TikiImporter_Blog();
+        $this->obj = new Blog();
     }
 
     public function testImportShouldCallMethodsToStartImportProcess(): void
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['parseData', 'insertData', 'setupTiki'])
             ->getMock();
         $obj->expects($this->once())->method('parseData');
@@ -41,7 +43,7 @@ class BlogTest extends AbstractImporterTestCase
         ob_start();
 
         $expectedImportFeedback = ['importedPages' => 10, 'totalPages' => '13'];
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['parseData', 'insertData', 'saveAndDisplayLog', 'setupTiki'])
             ->getMock();
         $obj->expects($this->once())->method('parseData');
@@ -62,7 +64,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertItem', 'createBlog'])
             ->getMock();
         $obj->expects($this->once())->method('createBlog');
@@ -94,7 +96,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertItem'])
             ->getMock();
         $obj->expects($this->never())->method('insertItem');
@@ -113,7 +115,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertItem', 'createBlog'])
             ->getMock();
         $obj->expects($this->once())->method('createBlog');
@@ -148,7 +150,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertItem', 'createTags', 'createCategories', 'createBlog'])
             ->getMock();
         $obj->expects($this->exactly(0))->method('insertItem');
@@ -177,7 +179,7 @@ class BlogTest extends AbstractImporterTestCase
     public function testInsertItemShouldCallInsertCommentsForPage(): void
     {
         $this->markTestSkipped("As of 2013-09-30, this test is broken. Skipping it for now.");
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertComments', 'insertPage'])
             ->getMock();
         $obj->expects($this->once())->method('insertComments')->with('Any name', 'wiki page');
@@ -194,7 +196,7 @@ class BlogTest extends AbstractImporterTestCase
     public function testInsertItemShouldCallInsertCommentsForPost(): void
     {
         $this->markTestSkipped("As of 2013-09-30, this test is broken. Skipping it for now.");
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertComments', 'insertPost'])
             ->getMock();
         $obj->expects($this->once())->method('insertComments')->with('Any name', 'blog post');
@@ -209,7 +211,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertComments', 'insertPost'])
             ->getMock();
         $obj->expects($this->once())->method('insertComments')->with(22, 'blog post', [1, 2]);
@@ -227,7 +229,7 @@ class BlogTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['insertComments', 'insertPost'])
             ->getMock();
         $obj->expects($this->exactly(0))->method('insertComments');
@@ -298,12 +300,12 @@ class BlogTest extends AbstractImporterTestCase
             ->getMock();
         $objectlib->expects($this->once())->method('insert_object');
 
-        $importerWiki = $this->getMockBuilder('TikiImporter_Wiki')
+        $importerWiki = $this->getMockBuilder(Wiki::class)
             ->onlyMethods(['insertPage'])
             ->getMock();
         $importerWiki->expects($this->once())->method('insertPage')->willReturn('HomePage');
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog')
+        $obj = $this->getMockBuilder(Blog::class)
             ->onlyMethods(['instantiateImporterWiki'])
             ->getMock();
         $obj->expects($this->once())->method('instantiateImporterWiki');

@@ -20,10 +20,12 @@ $inputConfiguration = [
         'staticKeyFilters'      => [
             'comments_parentId'       => 'int',     //post
             'threadId'                => 'int',     //get
+            'forumId'                 => 'int',     //get
+            'locale'                  => 'word',    //get
             'topics_offset'           => 'int',     //get
-            'topics_sort_mode'        => 'word',    //get
-            'thread_sort_mode'        => 'word',    //get
-            'topics_find'             => 'word',    //get
+            'topics_sort_mode'        => 'alnumdash',    //get
+            'thread_sort_mode'        => 'alnumdash',    //get
+            'topics_find'             => 'striptags',    //get
             'topics_threshold'        => 'int',     //get
             'quote'                   => 'int',     //get
             'time_control'            => 'int',     //get
@@ -33,13 +35,14 @@ $inputConfiguration = [
             'comments_reply_threadId' => 'int',     //get
             'lock'                    => 'bool',    //get
             'display'                 => 'word',    //get
-            'archive'                 => 'url',     //post
+            'archive'                 => 'bool',     //post
             'report'                  => 'int',     //get
             'post_reported'           => 'word',    //get
             'comments_per_page'       => 'int',     //get
-            'savenotepad'             => 'bool',    //get
-            'watch_event'             => 'word',    //get
-            'watch_object'            => 'word',    //get
+            'savenotepad'             => 'int',    //get
+            'watch_event'             => 'striptags',    //get
+            'watch_action'            => 'alpha',         //get
+            'watch_object'            => 'int',    //get
             'view_atts'               => 'bool',    //get
             'fa_offset'               => 'int',     //get
             'fa_maxRecords'           => 'int',     //get
@@ -398,8 +401,8 @@ if ($prefs['feature_forum_parse'] == 'y') {
     $smarty->assign_by_ref('plugins', $plugins);
 }
 if (! empty($_REQUEST['view_atts']) && $_REQUEST['view_atts'] == 'y') {
-    $fa_offset = isset($_REQUEST['fa_offset']) ? $_REQUEST['fa_offset'] : 0;
-    $fa_maxRecords = isset($_REQUEST['fa_maxRecords']) ? $_REQUEST['fa_maxRecords'] : $prefs['maxRecords'];
+    $fa_offset = $_REQUEST['fa_offset'] ?? 0;
+    $fa_maxRecords = $_REQUEST['fa_maxRecords'] ?? $prefs['maxRecords'];
     $atts = $commentslib->get_all_thread_attachments($comments_parentId, $fa_offset, $fa_maxRecords);
     $atts['offset'] = $fa_offset;
     $atts['maxRecords'] = $fa_maxRecords;
@@ -439,7 +442,6 @@ if (isset($_REQUEST['display'])) {
             header("Content-Type: application/pdf");
             header("Content-Transfer-Encoding: binary");
             header('Content-Length: ' . strlen($pdf));
-            TikiLib::lib('header')->setXRobotsTag($robots);
             echo $pdf;
         }
     } else {

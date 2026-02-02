@@ -1,0 +1,164 @@
+// The Bento theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+$imagePath: "../images/";
+// body {
+//	background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// -------------------- Colors -------------------- //
+// -------------------- Body (large elements) -------------------- //
+html,
+body,
+body.tiki.tiki-webmail {
+    background-color: var(--tiki-html-bg) !important; // #050d34;
+}
+
+.side-col-toggle {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+
+// -------------------- Links -------------------- //
+// -------------------- Paragraphs -------------------- //
+// -------------------- Components -------------------- //
+// -------------------- Typography -------------------- //
+h1 {
+    text-transform: uppercase;
+}
+
+
+// -------------------- Tables -------------------- //
+// -------------------- Buttons -------------------- //
+.btn.btn-primary {
+    color: #fff;
+}
+
+.btn-outline-primary { color: #586C37; }
+.btn-outline-secondary { color: #396F60; }
+.btn-outline-success { color: #03726F; }
+.btn-outline-info { color: #267363; }
+.btn-outline-warning { color: #8A5D33; }
+.btn-outline-danger { color: #BA3912; }
+
+
+// -------------------- Forms -------------------- //
+// -------------------- Form validation -------------------- //
+// -------------------- Navs -------------------- //
+
+.nav.nav-tabs {
+    border-bottom: none;
+    padding-left: 40px;
+    .nav-item:first-of-type,
+    .nav-item:first-of-type .nav-link {
+        border-top-left-radius: 16px;
+    }
+    .nav-item:last-of-type,
+    .nav-item:last-of-type .nav-link {
+        border-top-right-radius: 16px;
+    }
+}
+
+.nav-tabs .nav-item {
+    color: var(--#{$prefix}emphasis-color); // var(--bs-secondary-color); //$body-secondary-color;
+    background: shift-color($body-bg, 20%); // var(--bs-secondary-bg); // $body-secondary-bg;
+    &:hover {
+        .nav-link {
+            background: $nav-tabs-link-active-bg;
+            bprder-top-left-radius: 16px;
+            bprder-top-right-radius: 16px;
+        }
+    }
+}
+
+.tab-pane.active.show {
+    border-top-left-radius: 0;
+}
+
+// -------------------- Navbar -------------------- //
+
+.topbar-wrapper {
+    padding: var(--tikiben-spacer);
+    border-radius: var(--tikiben-border-radius);
+    margin: calc(2 * var(--tikiben-spacer));
+}
+
+.layout_basic .topbar_modules {
+    padding: var(--tikiben-spacer);
+    border-radius: var(--tikiben-border-radius);
+    margin: calc(2 * var(--tikiben-spacer)) 0;
+}
+
+.navbar.navbar-expand-lg {
+    border-radius: var(--tikiben-border-radius);
+}
+
+[data-bs-theme=dark] {
+    .nav-link {
+        color: var(--bs-body-color);
+    }
+}
+
+// -------------------- Dropdowns -------------------- //
+// -------------------- Pagination -------------------- //
+// -------------------- Jumbotron -------------------- //
+// -------------------- Cards -------------------- //
+// -------------------- Accordion -------------------- //
+// -------------------- Tooltips -------------------- //
+// -------------------- Popovers -------------------- //
+// -------------------- Toasts -------------------- //
+// -------------------- Badges -------------------- //
+// -------------------- Modals -------------------- //
+// -------------------- Alerts -------------------- //
+
+.alert-info { --bs-alert-bg: #D4EAE7; --bs-alert-color: #055160; }
+.alert-primary { --bs-alert-bg: #ddeaca; --bs-alert-border-color: #92ab6c; }
+.alert-warning { --bs-alert-bg: #efdecd; --bs-alert-border-color: #c29971; --bs-alert-color: #664d03; }
+.alert-danger { --bs-alert-bg: #edd2ca; --bs-alert-border-color: #f18d70; }
+
+// -------------------- Progress bars -------------------- //
+// -------------------- List group -------------------- //
+// -------------------- Image thumbnails -------------------- //
+// -------------------- Figures -------------------- //
+// -------------------- Breadcrumbs -------------------- //
+// -------------------- Carousel -------------------- //
+// -------------------- Close -------------------- //
+// -------------------- Code -------------------- //
+// -------------------- Etc -------------------- //
+
+// -------------------- Tiki-specific -------------------- //
+// File galleries
+#thumbnails .thumbnailframe.styling-element {
+    padding: 0;
+}
+
+.thumbnailcontener {
+    margin-right: 12px;
+}
+
+.bottom_modules {
+    border: 2px solid var( --tiki-nonmode-color);
+    border-radius: var(--tikiben-border-radius);
+    padding: var(--tikiben-spacer);
+    margin-bottom: var(--tikiben-spacer);
+}
+
+// -------------------- External libraries -------------------- //
+
+.inline-cypht {
+    background-color: transparent;
+    .app-container {
+        padding: 0;
+    }
+}

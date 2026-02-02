@@ -7,7 +7,7 @@ export function parseData(textarea, onSuccess = null, toWiki = true) {
     editor.layoutInfo.editor.tikiModal(tr("Please wait..."));
 
     const payload = {
-        data: value,
+        data: value.trim(),
     };
 
     if (!toWiki) {

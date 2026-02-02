@@ -21,14 +21,14 @@
                     <input type="hidden" name="apass" value="{$password|escape}">
                     <input type="hidden" name="timestamp" value="{$timestamp|escape}">
                 {/if}
-                {if !empty($hash)}
-                    <input type="hidden" name="hash" value="{$hash|escape}">
+                {if !empty($secure_token)}
+                    <input type="hidden" name="token" value="{$secure_token|escape}">
                 {/if}
                 <div class="card-header text-center">
                     {if $new_user_validation neq 'y'}
-                        <h3 class="card-title">{tr}Change password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Change password{/tr}</h3>
                     {else}
-                        <h3 class="card-title">{tr}Set password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Set password{/tr}</h3>
                     {/if}
                 </div>
                 <div class="card-body">

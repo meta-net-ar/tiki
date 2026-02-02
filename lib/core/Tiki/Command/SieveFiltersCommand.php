@@ -69,12 +69,12 @@ class SieveFiltersCommand extends Command
 
                 $output->writeln(tr('Checking account %0', $mailbox['name']));
 
-                Hm_IMAP_List::add($mailbox, $idx);
+                Hm_IMAP_List::add($mailbox, false);
 
                 $smtp_servers = $config['smtp_servers'] ?? [];
                 $smtp_index = 0;
                 foreach ($smtp_servers as $server) {
-                    Hm_SMTP_List::add($server, $smtp_index);
+                    Hm_SMTP_List::add($server, false);
                     $smtp_index++;
                 }
 
@@ -352,14 +352,18 @@ class SieveFiltersCommand extends Command
                     'type' => 'message/rfc822',
                     'content' => $msg_content
                 ],
-                'folder' => isset($res['folder']) ? $res['folder'] : 'inbox',
+                'folder' => $res['folder'] ?? 'inbox',
             ];
 
             $trk->replace_item($item['trackerId'], $item['itemId'], [
                 'data' => [$field]
             ]);
 
-            if ($action == 'move') {
+            // Check system preference for email-to-tracker mode
+            global $prefs;
+            $email_mode = $prefs['email_to_tracker_mode'] ?? 'move';
+
+            if ($action == 'move' && $email_mode == 'move') {
                 $output->writeln(tr("Moved msg uid %0 to tracker %1, field %2, item %3", $msg['uid'], $item['trackerId'], $field['fieldId'], $item['itemId']));
                 $this->action_discard($imap, $msg, $output);
             } else {

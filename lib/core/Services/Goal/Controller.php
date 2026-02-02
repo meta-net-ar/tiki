@@ -290,7 +290,7 @@ class Services_Goal_Controller
         }
 
         $condition['label'] = $input->label->text() ?: $condition['label'];
-        $condition['count'] = isset($input['count']) ? $input->count->int() : $condition['count'];
+        $condition['count'] = $input->count?->int() ?? $condition['count'];
         $condition['operator'] = $operator ?: $condition['operator'];
         $condition['metric'] = $metric ?: $condition['metric'];
         $condition['hidden'] = $input->hidden->int();
@@ -355,7 +355,7 @@ class Services_Goal_Controller
         $reward['hidden'] = $input->hidden->int();
 
         $reward['creditType'] = $input->creditType->text();
-        $reward['creditQuantity'] = isset($input['creditQuantity']) ? $input->creditQuantity->int() : $reward['creditQuantity'];
+        $reward['creditQuantity'] = $input->creditQuantity?->int() ?? $reward['creditQuantity'];
 
         $reward['trackerItemBadge'] = $this->getTrackerItemBadge($input);
 

@@ -1252,23 +1252,17 @@ class BlogLib extends TikiDb_Bridge
     {
         $query = 'SELECT `blogId` FROM `tiki_blogs` WHERE `blogId`=?';
 
-        if (is_null($this->getOne($query, [$blogId]))) {
-            return false;
-        } else {
-            return true;
-        }
+        return $this->getOne($query, [$blogId]) !== false;
     }
 
     /**
      * Check if a blog exists
      *
      * @param int $blogId
-     * @return bool true or false if blog exists or not
+     * @return void
      */
     public function check_blog_exists($blogId)
     {
-        $smarty = TikiLib::lib('smarty');
-
         if (! $this->blog_exists($blogId)) {
             Feedback::errorAndDie(tra('Blog cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
         }
@@ -1313,7 +1307,7 @@ class BlogLib extends TikiDb_Bridge
            word boundary. The truncate function asks if words can be broken.
            The same question is asked inversely so the supplied parameter needs
            to be reversed to remain accurate. */
-        $breakword = ($wordBoundary == 'y') ? false : true;
+        $breakword = ! ($wordBoundary == 'y');
 
         $etc = ($ellipsis == 'y') ? ' ... ' : ' ';
         $numBlogs = count($blogItems["data"]);

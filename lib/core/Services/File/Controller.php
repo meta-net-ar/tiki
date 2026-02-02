@@ -49,13 +49,19 @@ class Services_File_Controller
 
         $util = new Services_Utilities();
         if ($util->isActionPost()) {
-            if ($input->offsetExists('description')) {
+            if ($input->offsetExists('description') || $input->offsetExists('newfilename')) {
                 $files = $input->asArray('file');
                 $descriptions = $input->asArray('description');
-
+                $newfilenames = $input->asArray('newfilename');
                 foreach ($files as $c => $file) {
                     $fileInfo = $filegallib->get_file_info($file);
-
+                    if (isset($newfilenames[$c])) {
+                        $filegallib->update_file($fileInfo['fileId'], [
+                            'newfilename' => $newfilenames[$c],
+                            'filename' => $fileInfo['filename'],
+                            'lastModifUser' => $fileInfo['asuser'],
+                        ]);
+                    }
                     if (isset($descriptions[$c])) {
                         $filegallib->update_file($fileInfo['fileId'], [
                             'name' => $fileInfo['filename'],
@@ -78,6 +84,7 @@ class Services_File_Controller
             'addDecriptionOnUpload' => $input->addDecriptionOnUpload->int(),
             'admin_trackers'        => $perms->admin_trackers,
             'requireTitle'          => $input->requireTitle->text(),
+            'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
         ];
 
@@ -95,7 +102,13 @@ class Services_File_Controller
         }
 
         $gal_info = $this->checkTargetGallery($input);
-        $fileId = $input->update->int() ? $input->fileId->int() : false;
+
+        if (($input->update->int() || $input->upload->int()) && $input->fileId->int()) {
+            $fileId = $input->fileId->int();
+        } else {
+            $fileId = false;
+        }
+
         if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
             $asuser = $input->asArray('user')[0];
         }
@@ -397,7 +410,7 @@ class Services_File_Controller
         ]);
 
         if ($search = $input->search->text()) {
-            $query->filterContent($search);
+            $query->filterContent($search, 'title,filename');
         }
 
         if ($typeFilter = $input->type->text()) {
@@ -670,7 +683,7 @@ class Services_File_Controller
         $offset = $input->offset->int();
         $maxRecords = $input->maxRecords->int();
         $sort_mode = $input->sort_mode->text() ?: 'created_desc';
-        $find = isset($input->find) ? $input->find->text() : null;
+        $find = $input->find?->text() ?? null;
 
         $perms = Perms::get('file gallery', $galleryId);
 
@@ -701,7 +714,7 @@ class Services_File_Controller
         $maxRecords = $input->maxRecords->int();
         $sort_mode = $input->sort_mode->text() ?: 'created_desc';
         $user = $input->user->text() ?: '';
-        $find = isset($input->find) ? $input->find->text() : null;
+        $find = $find = $input->find?->text() ?? null;
 
         $perms = Perms::get('file gallery', $galleryId);
 
@@ -733,10 +746,17 @@ class Services_File_Controller
             throw new Services_Exception_Denied();
         }
 
+        $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId);
+        if (! $fileInfo) {
+            throw new Services_Exception_NotFound(tr('Requested file does not exist'));
+        }
+        // when stored in the database the file contents is here and should not be sent back to the client
+        $fileInfo['data'] = null;
+
         return [
             'title' => tr('File Info'),
             'fileId' => $fileId,
-            'info' => TikiLib::lib('filegal')->get_file_info($fileId)
+            'info' => $fileInfo
         ];
     }
 
@@ -923,11 +943,22 @@ class Services_File_Controller
 
     private function checkTargetGallery($input)
     {
-        if ($input->fileId->int()) {
+        // The file uploader sends galleryId as an array, while elFinder and older methods send it as an integer. This logic handles all cases.
+
+        // First, check for the array format used by the file uploader.
+        $galleryIdFromInput = $input->galleryId->asArray();
+        if (! empty($galleryIdFromInput) && is_array($galleryIdFromInput) && isset($galleryIdFromInput[0])) {
+            $galleryId = (int) $galleryIdFromInput[0];
+        } elseif ($input->galleryId->int()) {
+            // Second, check for an integer format, used by elFinder and other parts of Tiki.
+            $galleryId = $input->galleryId->int();
+        } elseif ($input->fileId->int()) {
+            // Third, fall back to the context of an existing file (for editing).
             $fileInfo = TikiLib::lib('filegal')->get_file_info($input->fileId->int());
             $galleryId = $fileInfo ? $fileInfo['galleryId'] : $this->defaultGalleryId;
         } else {
-            $galleryId = $input->galleryId->int() ?: $this->defaultGalleryId;
+            // Finally, if no gallery is specified in any of the above contexts, use the system default.
+            $galleryId = $this->defaultGalleryId;
         }
 
         // Patch for uninitialized utilities.

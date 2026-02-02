@@ -84,15 +84,15 @@ class TikiDb_Initializer_Pdo
         $keyFiles = glob($fileroot . "*.pem");
         if (! empty($keyFiles)) {
             foreach ($keyFiles as $filename) {
-                if (strpos($filename, '-key.pem') !== false) {
+                if (str_contains($filename, '-key.pem')) {
                     $clientKey = basename($filename);
                     continue;
                 }
-                if (strpos($filename, '-cert.pem') !== false) {
+                if (str_contains($filename, '-cert.pem')) {
                     $clientCert = basename($filename);
                     continue;
                 }
-                if (strpos($filename, '-ca.pem') !== false) {
+                if (str_contains($filename, '-ca.pem')) {
                     $caCert = basename($filename);
                     continue;
                 }

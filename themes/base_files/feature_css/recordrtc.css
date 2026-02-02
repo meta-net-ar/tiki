@@ -1,0 +1,132 @@
+.video-preview-container {
+    margin: 10px 0;
+    border-radius: 8px;
+    overflow: auto;
+    max-width: 100%;
+    background: #000;
+}
+
+.video-preview-container video {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+}
+
+.audio-icon {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border-radius: 12px;
+}
+
+.video-icon {
+    background: linear-gradient(135deg, #6610f2 0%, #520dc2 100%);
+    border-radius: 12px;
+}
+
+/* Modal overlay */
+#record-preview {
+    position: fixed;
+    width: 100vw !important;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.preview-card {
+    animation: slideUp 0.3s ease-out;
+    max-width: 500px;
+    width: 100%;
+}
+
+.preview-card.video-mode {
+    max-width: 700px;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+    .bg-light.rounded-3 {
+        padding: 1rem !important;
+        margin: 1rem -1.25rem !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+    }
+
+    .bg-white.rounded-3 {
+        padding: 1.25rem 1rem !important;
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .d-flex.gap-3:has(button) {
+        flex-direction: column;
+        gap: 0.625rem !important;
+    }
+
+    button[id^="btn-"] {
+        width: 100% !important;
+        min-height: 48px !important;
+        font-size: 16px !important;
+    }
+
+    .audio-icon,
+    .video-icon {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    h4.fs-5 {
+        font-size: 17px !important;
+    }
+
+    p.small {
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #record-preview {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .preview-card {
+        padding: 1.5rem 1.25rem !important;
+        max-width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0 !important;
+        margin: 0;
+    }
+}
+

@@ -100,13 +100,13 @@ function module_change_category($mod_reference, $module_params)
             $shy = false;
         }
 
-        $detailed = isset($module_params['detail']) ? $module_params['detail'] : "n";
+        $detailed = $module_params['detail'] ?? "n";
         $smarty->assign('detailed', $detailed);
 
-        $add = isset($module_params['add']) ? $module_params['add'] : "y";
+        $add = $module_params['add'] ?? "y";
         $smarty->assign('add', $add);
 
-        $multiple = isset($module_params['multiple']) ? $module_params['multiple'] : "y";
+        $multiple = $module_params['multiple'] ?? "y";
         $smarty->assign('multiple', $multiple);
 
 

@@ -80,7 +80,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Votes older than x days are not considered{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="voteConsiderationSpan">{tr}Votes older than x days are not considered{/tr}</label>
                 <div class="col-sm-7">
                     <input type="number" id="voteConsiderationSpan" name="voteConsiderationSpan" size="5" value="{$info.voteConsiderationSpan|escape}" class="form-control">
                     <div class="small-hint">
@@ -191,9 +191,9 @@
         <form action="tiki-admin_polls.php" method="post">
             {ticket}
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Poll{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_template">{tr}Poll{/tr}</label>
                 <div class="col-sm-7 mb-2">
-                    <select name="poll_template" class="form-control">
+                    <select name="poll_template" id="poll_template" class="form-control">
                         {section name=ix loop=$channels}
                             {if $channels[ix].active eq 't'}
                                 <option value="{$channels[ix].pollId|escape}"{if !empty($smarty.section.ix.first)} selected="selected"{/if}>{tr}{$channels[ix].title}{/tr}</option>
@@ -204,15 +204,15 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Title{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_title">{tr}Title{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="title" class="form-control">
+                    <input type="text" name="title" id="poll_title" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Wiki pages{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="poll_pages">{tr}Wiki pages{/tr}</label>
                 <div class="col-sm-7">
-                    <select name="pages[]" multiple="multiple" class="form-control">
+                    <select name="pages[]" id="poll_pages" multiple="multiple" class="form-control">
                         {section name=ix loop=$listPages}
                             <option value="{$listPages[ix].pageName|escape}">{tr}{$listPages[ix].pageName|escape}{/tr}</option>
                         {/section}
@@ -222,9 +222,9 @@
             </div>
             {if $prefs.feature_wiki_usrlock eq 'y'}
                 <div class="mb-3 row">
-                    <label class="col-sm-3 col-form-label">{tr}Lock the pages{/tr}</label>
+                    <label class="col-sm-3 col-form-label" for="lock_pages">{tr}Lock the pages{/tr}</label>
                     <div class="col-sm-7">
-                        <input type="checkbox" class="form-control" name="locked">
+                        <input type="checkbox" class="form-control" name="locked" id="lock_pages">
                     </div>
                 </div>
             {/if}

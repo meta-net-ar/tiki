@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_scheduler` ADD `stalled_notification_sent_at` TIMESTAMP NULL DEFAULT NULL;

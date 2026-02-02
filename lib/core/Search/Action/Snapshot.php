@@ -7,6 +7,7 @@
 
 use Tiki\HeadlessBrowser\Exception\HeadlessException;
 use Tiki\HeadlessBrowser\HeadlessBrowserFactory;
+use Tiki\Lib\Auth\Tokens;
 
 class Search_Action_Snapshot implements Search_Action_Action
 {
@@ -207,8 +208,7 @@ class Search_Action_Snapshot implements Search_Action_Action
         }
 
         if ($tikiToken && isset($user) && str_contains($url, $baseUrl)) {
-            require_once 'lib/auth/tokens.php';
-            $tokenlib = AuthTokens::build($prefs);
+            $tokenlib = Tokens::build($prefs);
 
             $groups = $userlib->get_user_groups($user);
             //Add the token to the URL with the same permission that the user. This token will be valid for just one hit.

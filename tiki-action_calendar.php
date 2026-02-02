@@ -11,7 +11,7 @@
 /***
  * @var \TikiAccessLib  $access
  * @var \HeaderLib  $headerlib
- * @var \Smarty_Tiki    $smarty
+ * @var \Tiki\Smarty\SmartyTiki  $smarty
  * @var \TikiCalendarLib    $tikicalendarlib
  * @var \TikiLib    $tikilib
  * @var array   $tc_infos

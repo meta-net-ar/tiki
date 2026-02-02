@@ -21,6 +21,8 @@ class Search_MySql_QueryBuilder
     private $fieldBuilder;
     private $tfTranslator;
     private $indexes = [];
+    private $stopwords = null;
+    private $minTokenSize = null;
 
     public function __construct($db, Search_MySql_Table|null $table = null)
     {
@@ -29,6 +31,23 @@ class Search_MySql_QueryBuilder
         $this->factory = new Search_MySql_TypeFactory();
         $this->fieldBuilder = new Search_MySql_FieldQueryBuilder();
         $this->tfTranslator = new Search_MySql_TrackerFieldTranslator();
+    }
+
+    /**
+    * Gets the list of stopwords from Tiki preferences.
+    * It caches the result locally to avoid repeated lookups.
+    *
+    * @return array The list of stopwords.
+    */
+    private function getStopwords()
+    {
+        if ($this->stopwords === null) {
+            global $prefs;
+            $this->stopwords = ! empty($prefs['unified_stopwords']) && is_array($prefs['unified_stopwords'])
+                ? $prefs['unified_stopwords']
+                : [];
+        }
+        return $this->stopwords;
     }
 
     public function build(Search_Expr_Interface $expr)
@@ -42,6 +61,20 @@ class Search_MySql_QueryBuilder
     public function getRequiredIndexes()
     {
         return array_values($this->indexes);
+    }
+
+    /**
+    * Gets the minimum word length for InnoDB Full-Text Search.
+    * This value is fetched directly from the database and cached locally.
+    *
+    * @return int The value of @@innodb_ft_min_token_size.
+    */
+    private function getMinTokenSize()
+    {
+        if ($this->minTokenSize === null) {
+            $this->minTokenSize = (int) $this->db->getOne("SELECT @@innodb_ft_min_token_size");
+        }
+        return $this->minTokenSize;
     }
 
     public function __invoke($node, $childNodes)
@@ -71,11 +104,20 @@ class Search_MySql_QueryBuilder
             if (! $node instanceof NotX && count($fields) == 1 && $this->isFullText($node)) {
                 // $query contains the token string to compare against $fields[0] in the unified search table
                 // $fields[0] can be i.e  'allowed_users', 'allowed_groups'
+                $this->fieldBuilder->setStopwords($this->getStopwords());
+                $this->fieldBuilder->setMinTokenSize($this->getMinTokenSize());
                 $query = $this->fieldBuilder->build($node, $this->factory);
+
+                // If the query is empty, it only contained stopwords.
+                if (empty($query) && ! $node instanceof MoreLikeThis) {
+                    return '';
+                }
+
                 if ($node instanceof MoreLikeThis) {
                     $type = $node->getObjectType();
                     $object = $node->getObjectId();
-                    $str = $node->getContent() ?: $this->getDocumentContent($type, $object);
+                    $field = $node->getField();
+                    $str = $node->getContent() ?: $this->getDocumentContent($type, $object, $field);
                 } else {
                     $str = $this->db->qstr($query);
                 }
@@ -180,12 +222,12 @@ class Search_MySql_QueryBuilder
         return $node->getValue($this->factory)->getValue();
     }
 
-    private function getDocumentContent($type, $object)
+    private function getDocumentContent($type, $object, $field)
     {
-        $results = $this->table->fetchAllIndex(['contents'], ['object_type' => $type, 'object_id' => $object]);
+        $results = $this->table->fetchAllIndex([$field], ['object_type' => $type, 'object_id' => $object]);
 
-        if (! empty($results[0]['contents'])) {
-            return $this->db->qstr($results[0]['contents']);
+        if (! empty($results[0][$field])) {
+            return $this->db->qstr($results[0][$field]);
         }
 
         return '';

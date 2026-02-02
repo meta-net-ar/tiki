@@ -369,6 +369,14 @@ function prefs_user_list($partial = false)
             'default' => 'n',
             'dependencies' => ['feature_userPreferences'],
         ],
+        'user_localtimezonesync' => [
+            'name' => tra('Local Timezone Synchronization'),
+            'description' => tr('Allow user to manage timezone incoherence.'),
+            'help' => 'User-Preferences',
+            'type' => 'flag',
+            'default' => 'y',
+            'tags' => ['basic'],
+        ],
         'user_default_avatar_style' => [
             'name' => tr('Default avatar style'),
             'description' => tr('Default avatar style for users when registering.'),

@@ -12,7 +12,7 @@ use Tiki\Installer\Patch;
 use Tiki\Installer\ProgressBar;
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -125,15 +125,14 @@ $prefs = [
     'feature_scheduler' => 'y',
     'feature_wiki_sharethis' => 'n',
     // lib/prefs/metatag.php
-    'metatag_keywords' => '',
-    'metatag_author' => '',
     'metatag_threadtitle' => 'n',
     'metatag_pagedesc' => 'n',
     'metatag_geoposition' => '',
     'metatag_georegion' => '',
     'metatag_geoplacename' => '',
     'metatag_robotscustom' => 'n',
-    'metatag_revisitafter' => '',
+    'metatag_nositelinkssearchbox' => 'n',
+    'metatag_google_notranslate' => 'n',
     // lib/prefs/site.php
     'site_nav_seper' => '|',
     'site_title_location' => 'after',
@@ -157,7 +156,6 @@ $prefs = [
 require_once 'lib/init/initlib.php';
 require_once 'lib/tikilib.php';
 require_once('lib/setup/error_reporting.php');
-require_once('lib/init/smarty.php');
 require_once('installer/installlib.php');
 include_once('lib/setup/twversion.class.php');
 
@@ -266,8 +264,8 @@ try {
 }
 
 $smarty->assign('mid', 'tiki-install.tpl');
-$smarty->assign('virt', isset($virt) ? $virt : null);
-$smarty->assign('multi', isset($multi) ? $multi : null);
+$smarty->assign('virt', $virt ?? null);
+$smarty->assign('multi', $multi ?? null);
 $smarty->assign('lang', $language);
 if (isset($multi)) {
     $smarty->assign('default_server_domain_name', $multi);
@@ -463,7 +461,7 @@ if (isset($_POST['useInnoDB'])) {
 
 if ($dbconn) {
     $smarty->assign('dbcon', 'y');
-    $smarty->assign('dbname', isset($dbs_tiki) ? $dbs_tiki : null);
+    $smarty->assign('dbname', $dbs_tiki ?? null);
 } else {
     $smarty->assign('dbcon', 'n');
 }
@@ -516,6 +514,12 @@ if (
         $installer->attach(new ProgressBar());
 
         $installer->cleanInstall();
+        // Set Administrator password
+        $randompass = TikiLib::lib('user')->genPass();
+        set_system_administrator_password($randompass);
+        $smarty->assign('defaultpass', $randompass);
+        $default_password_field = '<input type="hidden" name="defaultpass" value="' . $randompass . '">';
+        $smarty->assign('default_password_field', $default_password_field);
         if ($has_tiki_db) {
             $logmsg = 'database "' . $dbs_tiki . '" destroyed and reinstalled';
         } else {
@@ -545,7 +549,7 @@ if (
 
 
     if ($install_step == '6' || $install_step == '7') {
-        if (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+        if (str_contains($_SERVER['SERVER_SOFTWARE'], 'Apache')) {
             if (! file_exists('.htaccess')) {
                 if (! isset($_REQUEST['htaccess_process'])) {
                     $htaccess_options = ['auto' => tra('Automatic')];
@@ -590,6 +594,12 @@ if (
 if (! isset($install_type)) {
     if (isset($_POST['install_type'])) {
         $install_type = $_POST['install_type'];
+        if ($install_type == 'scratch' && isset($_POST['defaultpass'])) {
+            $defaultpass = $_POST['defaultpass'];
+            $smarty->assign('defaultpass', $defaultpass);
+            $default_password_field = '<input type="hidden" name="defaultpass" value="' . $defaultpass . '">';
+            $smarty->assign('default_password_field', $default_password_field);
+        }
     } else {
         $install_type = '';
     }
@@ -610,7 +620,7 @@ if ($install_step == '9') {
     if ($install_type == 'scratch') {
         initialize_prefs(true);
         TikiLib::lib('unifiedsearch')->rebuild();
-        $u = 'tiki-change_password.php?user=admin&oldpass=admin&newuser=y';
+        $u = isset($defaultpass) ? 'tiki-change_password.php?user=admin&oldpass=' . $defaultpass . '&newuser=y' : 'tiki-change_password.php?user=admin&newuser=y';
         $tikilib = TikiLib::lib('tiki');
         $tikilib->set_preference('tiki_install_version', $TWV->version);
     } else {
@@ -709,7 +719,6 @@ if ($install_step == '2') {
         $im = @imagecreate(110, 20);
         if ($im) {
                 $smarty->assign('sample_image', 'y');
-                imagedestroy($im);
         } else {
                 $smarty->assign('sample_image', 'n');
         }
@@ -788,6 +797,8 @@ $headerlib->add_cssfile('public/generated/js/vendor_dist/bootstrap/dist/css/boot
 $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 $headerlib->add_cssfile('themes/base_files/css/tiki_base.css');
 $headerlib->add_jsfile('lib/tiki-js.js');
+$headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
+$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.min.js");
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-ui/dist/jquery-ui.js");
@@ -798,7 +809,6 @@ var jqueryTiki = new Object();
 jqueryTiki.ui = false;
 jqueryTiki.ui_theme = "";
 jqueryTiki.tooltips = false;
-jqueryTiki.reflection = false;
 jqueryTiki.tablesorter = false;
 jqueryTiki.colorbox = false;
 jqueryTiki.carousel = false;

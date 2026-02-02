@@ -132,7 +132,7 @@ function wikiplugin_proposal_get_weight($user, array $params)
 {
     $weights = [];
 
-    if (isset($params['weights'])) {
+    if ($params['weights']) {
         $parts = explode(',', $params['weights']);
         foreach ($parts as $part) {
             if (preg_match('/^(.+)\((\d+(\.\d+)?)\)$/', $part, $segments)) {

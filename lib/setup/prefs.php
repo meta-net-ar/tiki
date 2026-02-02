@@ -176,7 +176,7 @@ function get_default_prefs()
             'toolbar_global_comments' => '
                 bold, italic, underline, strike , - , link, smiley | help
             ',
-            'toolbar_trackeritem_comments' => '
+            'toolbar_trackers_comments' => '
                 bold, italic, underline, strike , - , link, smiley, linkfile | help
             ',
             'toolbar_sheet' => 'addrow, addrowbefore, addrowmulti, deleterow,-, addcolumn, addcolumnbefore, addcolumnmulti, deletecolumn,-,
@@ -235,7 +235,7 @@ function get_default_prefs()
 
     // Be sure we have a default value for user prefs
     foreach ($prefs as $p => $v) {
-        if (substr($p, 0, 12) == 'users_prefs_') {
+        if (str_starts_with($p, 'users_prefs_')) {
             $prefs[substr($p, 12)] = $v;
         }
     }

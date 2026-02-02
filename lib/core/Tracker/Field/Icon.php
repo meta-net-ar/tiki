@@ -147,7 +147,7 @@ class Tracker_Field_Icon extends \Tracker\Field\AbstractItemField
         $definition = Tracker_Definition::get($args['trackerId']);
 
         if ($definition && $fieldId = $definition->getIconField()) {
-            $value = isset($args['values'][$fieldId]) ? $args['values'][$fieldId] : null;
+            $value = $args['values'][$fieldId] ?? null;
 
             if (! empty($value) && isset($_SERVER['REQUEST_METHOD'])) { // leave URLs alone when run from a shell command
                 $value = TikiLib::lib('tiki')->tikiUrl($value);

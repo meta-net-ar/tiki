@@ -13,12 +13,14 @@ $inputConfiguration = [
         'staticKeyFilters'   => [
         'categId'            => 'int',               //post
         'categoryId'         => 'int',               //post
-        'theme'              => 'word',              //post
-        'delete'             => 'int',               //get
-        'categoryIds'        => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'theme'              => 'alnumdash',         //post
+        'delete'             => 'alpha',             //post
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'word',              //post
+        'find'               => 'text',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+        'categoryIds'        => 'int',               //post
         ],
     ],
 ];
@@ -46,7 +48,7 @@ if ($prefs['feature_theme_control_parentcategory'] != "n" && $prefs['feature_the
 $categories = $categlib->getCategories($categoryFilter, true, true, false);
 $smarty->assign('categories', $categories);
 
-$smarty->assign('categId', isset($_REQUEST['categId']) ? $_REQUEST['categId'] : 0);
+$smarty->assign('categId', $_REQUEST['categId'] ?? 0);
 
 $themes = $themelib->list_themes_and_options();
 $smarty->assign('themes', $themes);
@@ -61,7 +63,7 @@ if (isset($_REQUEST['assign'])) {
         $category = $categlib->get_category($categoryId);
         $categoryName = $category['name'] ?? ("ID " . $categoryId);
         $themes = $themelib->list_themes_and_options();
-        $themeName = isset($themes[$themeKey]['name']) ? $themes[$themeKey]['name'] : $themeKey;
+        $themeName = $themes[$themeKey]['name'] ?? $themeKey;
         Feedback::success(tr("Theme '%0' was successfully assigned to the category '%1'.", $themeName, $categoryName));
     } else {
         Feedback::errorAndDie(tra("Please create a category first"), \Laminas\Http\Response::STATUS_CODE_409);
@@ -89,17 +91,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $themecontrollib->tc_list_categories($offset, $maxRecords, $sort_mode, $find);

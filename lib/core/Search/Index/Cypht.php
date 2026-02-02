@@ -229,7 +229,7 @@ class Cypht
             $child = reset($childNodes);
             if ($child && $child[0] == 'FLAGS') {
                 foreach ($child[1] as &$flag) {
-                    if (substr($flag, 0, 2) == 'UN') {
+                    if (str_starts_with($flag, 'UN')) {
                         $flag = substr($flag, 2);
                     } else {
                         $flag = 'UN' . $flag;
@@ -248,7 +248,7 @@ class Cypht
         } elseif ($node instanceof Token || $node instanceof Initial) {
             $raw = $node->getValue(new Search_Type_Factory_Direct())->getValue();
             $field = $node->getField();
-            if (substr($field, 0, 6) === 'email_') {
+            if (str_starts_with($field, 'email_')) {
                 switch (substr($field, 6)) {
                     case 'subject':
                         return ['SUBJECT', $raw];

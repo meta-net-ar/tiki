@@ -47,7 +47,7 @@
         <div class="mb-3 row">
             <label for="add_tran_sw" class="col-md-4 col-form-label">{tr}Add a translation{/tr}</label>
             <div class="col-md-8">
-                <input id="add_tran_sw" class="translation_action" type="radio" name="action" value="add_tran_sw"{if $action eq 'add_tran_sw'} checked{/if}>
+                <input id="add_tran_sw" class="translation_action form-check-input" type="radio" name="action" value="add_tran_sw"{if $action eq 'add_tran_sw'} checked{/if}>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
         <div class="mb-3 row">
             <label for="edit_rec_sw" class="col-md-4 col-form-label">{tr}Untranslated strings{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_rec_sw" class="translation_action" type="radio" name="action" value="edit_rec_sw"{if $action eq 'edit_rec_sw'} checked{/if}>
+                <input id="edit_rec_sw" class="translation_action form-check-input" type="radio" name="action" value="edit_rec_sw"{if $action eq 'edit_rec_sw'} checked{/if}>
                 {if $prefs.record_untranslated eq 'y'}
                 <div class="adminoptionboxchild form-check">
                     <label class="form-check-label"><input id="only_db_untranslated" class="form-check-input translation_action" type="checkbox" name="only_db_untranslated"{if $only_db_untranslated eq 'y'} checked{/if}>{tr}Show only database stored untranslated strings{/tr}</label>
@@ -68,7 +68,7 @@
         <div class="mb-3 row">
             <label for="edit_tran_sw" class="col-md-4 col-form-label">{tr}Edit translations{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_tran_sw" class="translation_action" type="radio" name="action" value="edit_tran_sw"{if $action eq 'edit_tran_sw'} checked{/if}>
+                <input id="edit_tran_sw" class="translation_action form-check-input" type="radio" name="action" value="edit_tran_sw"{if $action eq 'edit_tran_sw'} checked{/if}>
                 <div class="adminoptionboxchild form-check">
                     <label class="form-check-label"><input id="only_db_translations" class="translation_action form-check-input" type="checkbox" name="only_db_translations"{if $only_db_translations eq 'y'} checked{/if}>{tr}Show only database stored translations{/tr}</label>
                 </div>

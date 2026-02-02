@@ -101,6 +101,13 @@ function prefs_tiki_list()
             'dependencies' => [ 'session_silent' ],
             'default' => '',
         ],
+        'tiki_cachecontrol_maxage' => [
+            'name' => tra('Cache-Control Max Age'),
+            'description' => tra('Defines the maximum age (in seconds) for caching assets via the Cache-Control HTTP header.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'default' => '86400',
+        ],
         'tiki_cdn' => [
             'name' => tra('Content delivery networks'),
             'description' => tra('Use alternate domains to serve static files from this Tiki site to avoid sending cookies, improve local caching and generally improve user-experience performance.'),

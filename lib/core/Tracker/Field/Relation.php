@@ -40,6 +40,7 @@ Part of the documentation is at https://dev.tiki.org/Object+Attributes+and+Relat
 class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
     public static $refreshedTargets = [];
+    public static $relationFieldCache = [];
 
     public static function getManagedTypesInfo(): array
     {
@@ -223,6 +224,11 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
 
         $data = $this->getFieldData();
 
+        if (! empty($data['relations']) && count($data['relations']) > 1) {
+            // cache the titles with just 1 query for all related objects
+            $this->getItemValues();
+        }
+
         $filter = $this->trackerField->getParsedFilter();
 
         if (
@@ -291,25 +297,20 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                 return ! empty($returnValue) ? $returnValue : $itemData;
             }
             return $this->getConfiguration('value');
-        } elseif ($context['list_mode'] === 'text') {
-            return implode(
-                "\n",
-                array_map(
-                    function ($rel) {
-                        return $rel->target->getTitle($this->trackerField->getOption('format'));
-                    },
-                    $this->getObjectRelationInstances()
-                )
-            );
         } else {
+            $relations = $this->getObjectRelationInstances();
+            if (! empty($relations) && count($relations) > 1) {
+                // cache the titles with just 1 query for all related objects
+                $this->getItemValues();
+            }
             // TODO: render metadata as well
             return implode(
-                "<br/>",
+                $context['list_mode'] === 'text' ? "\n" : '<br/>',
                 array_map(
                     function ($rel) {
                         return $rel->target->getTitle($this->trackerField->getOption('format'));
                     },
-                    $this->getObjectRelationInstances()
+                    $relations
                 )
             );
         }
@@ -317,6 +318,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
 
     public function renderOutput($context = [])
     {
+        $this->getItemValues(); // this caches the titles and is faster as it does 1 query for all related objects
         $list_mode = $context['list_mode'] ?? '';
         if ($list_mode === 'csv' || $list_mode === 'text') {
             return $this->renderInnerOutput($context);
@@ -336,6 +338,10 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                 }
             }
             $relations = array_values($relations);
+            if (! empty($relations) && count($relations) > 1) {
+                // cache the titles with just 1 query for all related objects
+                $this->getItemValues();
+            }
 
             return $this->renderTemplate(
                 'trackeroutput/relation.tpl',
@@ -517,7 +523,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
             $field = $trklib->get_field_info($args['sourcefield']);
             $handler = $trklib->get_field_handler($field);
             $relation = $handler->getOption(TrackerFieldRelation::OPT_RELATION);
-            if (substr($relation, -7) === '.invert') {
+            if (str_ends_with($relation, '.invert')) {
                 $straight = false;
             } else {
                 $straight = true;
@@ -591,14 +597,14 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory, $mode = '')
     {
-        $baseKey = $this->getBaseKey();
+        global $prefs;
 
+        $baseKey = $this->getBaseKey();
         $data = $this->getFieldData();
         $value = $this->getValue();
+        $format = $this->trackerField->getOption('format');
 
         // we don't have all the data in the field definition at this point, so just render the labels here
-        $objectLib = TikiLib::lib('object');
-        $format = $this->trackerField->getOption('format');
         $labels = [];
         if ($mode !== 'formatting') {
             $objects = [];
@@ -609,8 +615,28 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                     'metaItemId' => $rel->getMetadataItemId(),
                 ];
             }
-            $labels = $objectLib->get_titles($objects, $format);
-            $labels = array_values($labels);
+            if (! empty(self::$relationFieldCache)) {
+                foreach ($objects as $object) {
+                    if (isset(self::$relationFieldCache[$object['id']])) {
+                        $item = self::$relationFieldCache[$object['id']];
+                        $labels[] = preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format) {
+                            $key = $matches[1];
+                            if (isset($item[$key])) {
+                                return $item[$key];
+                            } elseif (! $format || $format == '{title}') {
+                                return tr('empty');
+                            } else {
+                                return '';
+                            }
+                        }, $format);
+                    } else {
+                        $labels[] = TikiLib::lib('trk')->get_isMain_value(null, $object['id']);
+                    }
+                }
+            } else {
+                $labels = TikiLib::lib('object')->get_titles($objects, $format);
+                $labels = array_values($labels);
+            }
         }
 
         $plain = implode(', ', $labels);

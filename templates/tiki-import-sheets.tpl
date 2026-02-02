@@ -80,7 +80,7 @@
         <div class="mb-3 row">
             <div class="col-sm-6">
                 <input id="querypage" type="text" name="page" class="form-control">
-                <input type="hidden" name="handler" value="TikiSheetWikiTableHandler">
+                <input type="hidden" name="handler" value="WikiTableHandler">
             </div>
             <div class="col-sm-6">
                 <input type="submit" class="btn btn-primary" value="Import">

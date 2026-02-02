@@ -47,6 +47,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getModifierCallback(string $modifierName)
     {
+        if ($tikilib = TikiLib::lib('tiki')) {
+            $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+            if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
+                return function (...$args) use ($modifierName) {
+                    return call_user_func_array($modifierName, $args);
+                };
+            }
+        }
+
         switch ($modifierName) {
             case 'a_or_an':
                 return [new \SmartyTiki\Modifier\AorAn(), 'handle'];
@@ -88,6 +97,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\FileCanConvertToPdf(), 'handle'];
             case 'file_diagram':
                 return [new \SmartyTiki\Modifier\FileDiagram(), 'handle'];
+            case 'forummaskemail':
+                return [new \SmartyTiki\Modifier\ForumMaskEmail(), 'handle'];
             case 'forumname':
                 return [new \SmartyTiki\Modifier\ForumName(), 'handle'];
             case 'forumtopiccount':
@@ -421,6 +432,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'queued_tasks_banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\QueuedTasksBanner();
+                break;
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;
@@ -453,6 +467,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
+                break;
+            case 'inline_audio_player':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InlineAudioPlayer();
                 break;
             case 'initials_filter_links':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
@@ -842,12 +859,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatch($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -859,12 +878,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatchAll($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -1081,7 +1102,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         // Use a static instance to ensure the expensive purifier setup runs only once per request.
         static $purifier = null;
         if ($purifier === null) {
-            $config = \HTMLPurifier_Config::createDefault();
+            $config = \HTMLPurifier_HTML5Config::createDefault();
 
             // Define a strict security policy based on a whitelist of allowed elements and attributes.
             $config->set('HTML.Allowed', 'a[href|title],b,strong,i,em,br,p,u');

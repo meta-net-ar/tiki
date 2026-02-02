@@ -6,10 +6,10 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\MailIn\Source;
 
+use TikiLib;
+
 class Message
 {
-    public const EXTRACT_EMAIL_REGEX = '/<?([-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+@[-!#$%&\'*+\/0-9=?A-Z^_`a-z{|}~]+\.[-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+)>?/';
-
     private $id;
     private $deleteCallback;
 
@@ -40,21 +40,15 @@ class Message
         $this->messageId = $messageId;
     }
 
-    public function setRawFrom($from)
+    public function setRawFrom($from_email)
     {
-        $this->from = $from;
-
-        if ($email = $this->getFromAddress()) {
-            $userlib = \TikiLib::lib('user');
-            $this->associatedUser = $userlib->get_user_by_email($email);
-        }
+        $this->from = $from_email;
+        $this->associatedUser = TikiLib::lib('user')->get_user_by_email($from_email);
     }
 
     public function getFromAddress()
     {
-        preg_match(self::EXTRACT_EMAIL_REGEX, $this->from, $mail);
-
-        return $mail[1];
+        return $this->from;
     }
 
     public function setAssociatedUser($user)
@@ -156,15 +150,13 @@ class Message
         return $this->recipient;
     }
 
-    public function setRecipient($recipient)
+    public function setRecipient($recipient_address)
     {
-        $this->recipient = $recipient;
+        $this->recipient = $recipient_address;
     }
 
     public function getRecipientAddress()
     {
-        preg_match(self::EXTRACT_EMAIL_REGEX, $this->recipient, $mail);
-
-        return $mail[1];
+        return $this->recipient;
     }
 }

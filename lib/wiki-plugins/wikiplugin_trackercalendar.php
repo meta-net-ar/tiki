@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
 use Tiki\Package\VendorHelper;
 
 function wikiplugin_trackercalendar_info()
@@ -420,14 +422,6 @@ function wikiplugin_trackercalendar($data, $params)
     if (! $beginField || ! $endField) {
         return WikiParser_PluginOutput::userError(tr('Fields not found.'));
     }
-
-    //set defaults
-    $plugininfo = wikiplugin_trackercalendar_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
 
     $views = [];
     if ($params['amonth'] === 'y') {

@@ -169,7 +169,7 @@ class UnifiedSearchLib
      * @return array|bool
      * @throws Exception
      */
-    public function rebuild($loggit = 0, $fallback = false, $progress = null)
+    public function rebuild($loggit = 0, $fallback = false, $progress = null, $skipErrorTracking = false)
     {
         global $prefs;
         $engineResults = null;
@@ -263,6 +263,7 @@ class UnifiedSearchLib
         try {
             $indexDecorator = new Search_Index_TypeAnalysisDecorator($index);
             $indexer = $this->buildIndexer($indexDecorator, $loggit);
+            $indexer->setErrorTrackingEnabled(! $skipErrorTracking);
             $lastStats = $tikilib->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
 
             $stat = $tikilib->allocate_extra(
@@ -749,11 +750,11 @@ class UnifiedSearchLib
         // trackeritem object type needs to further split fields by tracker ID, so we know which are relevant to each tracker item object
         if (isset($fields['object_types']['trackeritem'])) {
             $types_by_tracker_id = [];
-            $all_fields = TikiLib::lib('trk')->table('tiki_tracker_fields')->fetchMap('permName', 'trackerId', []);
-            foreach ($all_fields as $permName => $trackerId) {
+            $all_fields = TikiLib::lib('trk')->table('tiki_tracker_fields')->fetchAll(['permName', 'trackerId']);
+            foreach ($all_fields as $row) {
                 foreach ($fields['object_types']['trackeritem'] as $field) {
-                    if (str_starts_with($field, 'tracker_field_' . $permName)) {
-                        $types_by_tracker_id['trackeritem' . $trackerId][] = $field;
+                    if (str_starts_with($field, 'tracker_field_' . $row['permName'])) {
+                        $types_by_tracker_id['trackeritem' . $row['trackerId']][] = $field;
                     }
                 }
             }
@@ -812,6 +813,15 @@ class UnifiedSearchLib
             $articleSource = new Search_ContentSource_ArticleSource();
             $aggregator->addContentSource('article', $articleSource);
             $aggregator->addGlobalSource(new Search_GlobalSource_ArticleAttachmentSource($articleSource));
+        }
+
+        // Article topics and types are handled through the ArticleSource's getReferenceMap()
+        if (isset($types['article_topic']) || isset($types['article_type'])) {
+            if (! isset($articleSource)) {
+                $articleSource = new Search_ContentSource_ArticleSource();
+                $aggregator->addContentSource('article', $articleSource);
+                $aggregator->addGlobalSource(new Search_GlobalSource_ArticleAttachmentSource($articleSource));
+            }
         }
 
         if (isset($types['file'])) {
@@ -1045,7 +1055,7 @@ class UnifiedSearchLib
                     if (version_compare($root->version->number, '1.0.0') === -1) {
                         $status = $connection->rawApi('/_status');
                         foreach ($status->indices as $indexName => $data) {
-                            if (strpos($indexName, $prefs['unified_elastic_index_prefix']) === 0) {
+                            if (str_starts_with($indexName, $prefs['unified_elastic_index_prefix'])) {
                                 $info[tr('Index %0', $indexName)] = tr(
                                     '%0 documents, totaling %1',
                                     $data->docs->num_docs,
@@ -1062,7 +1072,7 @@ class UnifiedSearchLib
                         $status = $connection->getIndexStatus();
 
                         foreach ($status->indices as $indexName => $data) {
-                            if (strpos($indexName, $prefs['unified_elastic_index_prefix']) === 0) {
+                            if (str_starts_with($indexName, $prefs['unified_elastic_index_prefix'])) {
                                 if (isset($data->primaries)) {  // v2
                                     $info[tr('Index %0', $indexName)] = tr(
                                         '%0 documents, totaling %1 bytes',
@@ -1406,6 +1416,14 @@ class UnifiedSearchLib
             unset($filter['not_prefix']);
         }
 
+        if (isset($filter['exact']) && is_array($filter['exact'])) {
+            foreach ($filter['exact'] as $field => $value) {
+                $query->filterIdentifier($value, $field);
+            }
+
+            unset($filter['exact']);
+        }
+
         if (
             isset($filter['distance']) && is_array($filter['distance']) &&
                     isset($filter['distance']['distance'], $filter['distance']['lat'], $filter['distance']['lon'])
@@ -1416,7 +1434,7 @@ class UnifiedSearchLib
         }
 
         if (isset($filter['range']) && is_array($filter['range']) && isset($filter['range']['from'], $filter['range']['to'])) {
-            $field = isset($filter['range']['field']) ? $filter['range']['field'] : 'date';
+            $field = $filter['range']['field'] ?? 'date';
             $query->filterRange($filter['range']['from'], $filter['range']['to'], $field);
 
             unset($filter['range']);
@@ -1524,7 +1542,7 @@ class UnifiedSearchLib
                         $out = $indexMap[$index];
                     } else {
                         foreach ($indexMap as $candidate => $name) {
-                            if (0 === strpos($index, $candidate . '_')) {
+                            if (str_starts_with($index, $candidate . '_')) {
                                 $indexMap[$index] = $name;
                                 $out = $name;
                                 break;

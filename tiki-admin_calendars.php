@@ -12,46 +12,45 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'calendarId'                  => 'int',               //post
-            'offset'                      => 'striptags',         //get
-            'sort_mode'                   => 'striptags',         //get
+            'offset'                      => 'digits',            //get
+            'sort_mode'                   => 'alnumdash',         //get
             'description'                 => 'xss',               //post
             'drop'                        => 'int',               //get
             'remove_subscription'         => 'int',               //get
-            'save'                        => 'bool',              //post
-            'customlanguages'             => 'lang',              //post
-            'customlocations'             => 'striptags',         //post
-            'customparticipants'          => 'striptags',         //post
-            'customcategories'            => 'striptags',         //post
-            'custompriorities'            => 'striptags',         //post
-            'customsubscription'          => 'striptags',         //post
-            'personal'                    => 'striptags',         //post
-            'private'                     => 'striptags',         //post
-            'customstatus'                => 'striptags',         //post
+            'save'                        => 'alpha',             //post
+            'customlanguages'             => 'alpha',             //post
+            'customlocations'             => 'alpha',             //post
+            'customparticipants'          => 'alpha',             //post
+            'customcategories'            => 'alpha',             //post
+            'custompriorities'            => 'alpha',             //post
+            'customsubscription'          => 'alpha',             //post
+            'personal'                    => 'alpha',             //post
+            'private'                     => 'alpha',             //post
+            'customstatus'                => 'alpha',             //post
             'startday_Meridian'           => 'digits',            //post
             'startday_Hour'               => 'digits',            //post
             'endday_Meridian'             => 'digits',            //post
             'endday_Hour'                 => 'digits',            //post
-            'allday'                      => 'striptags',         //post
-            'nameoneachday'               => 'striptags',         //post
-            'copybuttononeachevent'       => 'bool',              //post
+            'allday'                      => 'alpha',             //post
+            'nameoneachday'               => 'alpha',             //post
+            'copybuttononeachevent'       => 'alpha',             //post
             'name'                        => 'text',              //post
             'groupforAlert'               => 'groupname',         //post
-            'showeachuser'                => 'bool',              //post
-            'clean'                       => 'bool',              //post
+            'showeachuser'                => 'alpha',             //post
+            'clean'                       => 'alpha',             //post
             'days'                        => 'int',               //post
             'find'                        => 'text',              //post
-            'savesub'                     => 'bool',              //post
-            'subscriptionId'              => 'int',               //post
+            'savesub'                     => 'alpha',             //post
+            'subscriptionId'              => 'int',               //post/get
             'sync_subscription'           => 'int',               //get
             'newstatus'                   => 'text',              //post
+            'cookietab'                   => 'digits',            //get
         ],
         'staticKeyFiltersForArrays' => [
-            'options'               => 'text',    //post
             'viewdays'              => 'int',     //post
-            'show'                  => 'bool',    //post
-            'subscription'          => 'none',    //post
+            'show'                  => 'alpha',   //post
+            'subscription'          => 'text',    //post
         ],
-        'save' => 'text',
     ],
 ];
 $section = 'admin';
@@ -127,7 +126,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $customflags["customparticipants"] = $_REQUEST["customparticipants"];
     $customflags["customcategories"] = $_REQUEST["customcategories"];
     $customflags["custompriorities"] = $_REQUEST["custompriorities"];
-    $customflags["customsubscription"] = isset($_REQUEST["customsubscription"]) ? $_REQUEST["customsubscription"] : 'n';
+    $customflags["customsubscription"] = $_REQUEST["customsubscription"] ?? 'n';
     if (isset($info)) {
         $objectperms = Perms::get('calendar', $info['calendarId']);
 
@@ -413,7 +412,7 @@ $info["eventstatusoutput"] = array_map(
     function ($status) {
         return tra($status);
     },
-    $info["eventstatus"]
+    $info["eventstatus"] ?? []
 );
 $smarty->assign("eventstatusoutput", $info["eventstatusoutput"]);
 $smarty->assign_by_ref('info', $info);
@@ -423,17 +422,9 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $calendars = $calendarlib->list_calendars($offset, $maxRecords, $sort_mode, $find, '', true);
 foreach (array_keys($calendars["data"]) as $i) {

@@ -84,8 +84,13 @@ class TikiHybrid extends LogsLib
                 'id' => $prefs[$this->namedprefix . '_app_id'],
                 'secret' => $prefs[$this->namedprefix . '_app_secret'],
             ],
-            //'scope' => $value['scope'],  //TODO TEST hybridauth reaction to : 'scope' => null or empty?
             ];
+
+            // Add scope for Facebook to request permissions
+            if ($providerName === 'Facebook') {
+                // Request user_posts to access the feed
+                $this->config['scope'] = 'public_profile,user_posts';
+            }
 
 
     //  LLOG('tikiHybrid  constructor config:', $this -> config );
@@ -96,7 +101,7 @@ class TikiHybrid extends LogsLib
 
         //$this->hybridauth = new Hybridauth($confhybrid, $guzzle, null, $this->logger );
         //  LLOG('tikiHybrid  constructed :)' );
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             error_log($e->getMessage());
             //echo TikiHybrid construct error:' . $e->getMessage();
             Feedback::error('TikiHybrid construct error: ' . $e->getMessage());
@@ -182,7 +187,7 @@ class TikiHybrid extends LogsLib
                 $this->set_user_preference($user, $this->namedprefix . '_id', $userId);
                 $this->set_user_preference($user, $this->namedprefix . '_token', $accessToken);
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             Feedback::error('TikiHybrid login error: ' . $e->getMessage());
         }
     }

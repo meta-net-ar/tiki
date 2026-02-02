@@ -34,11 +34,7 @@ $file = $info["filename"];
 $content = $info["data"];
 
 session_write_close();
-//print("File:$file<br />");
-//die;
 header("Content-type: $type");
-
-TikiLib::lib('header')->setXRobotsTag($robots);
 
 // This used to say "header("Content-Disposition: attachment; filename=\"$file\"");"
 // which made everything try to download instead of the browser picking what to do.

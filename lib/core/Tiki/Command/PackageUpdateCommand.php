@@ -39,7 +39,7 @@ class PackageUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setHelp('This command allows you to update packages.')
+            ->setHelp(tra('This command allows you to update packages.'))
             ->addArgument(
                 'package',
                 InputArgument::OPTIONAL,

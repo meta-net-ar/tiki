@@ -173,7 +173,7 @@ class Services_Language_TranslationController
         if (! empty($input->lang->text())) {
             $lang = $input->lang->text();
         } else {
-            $lang = $prefs['language'];
+            $lang = Language::getCurrentLanguage();
         }
 
         $factory = new Multilingual_MachineTranslation();

@@ -1,6 +1,6 @@
 {if $prefs.jquery_smartmenus_enable eq 'y'}
     {* Smartmenu megamenu navigation *}
-    <ul class="sm-nav {if $bs_menu_class}{$bs_menu_class}{else}navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}{*sm-navbar--vertical*} flex-column{else}sm-navbar--horizontal{/if}">
+    <ul class="{if $bs_menu_class}{$bs_menu_class}{else}sm-nav navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}{*sm-navbar--vertical*} flex-column{else}sm-navbar--horizontal{/if}">
         {foreach from=$list item=item}
             {include file='bootstrap_smartmenu.tpl' item=$item}
         {/foreach}
@@ -55,13 +55,19 @@
                     </li>
                 {/if}
             {else}
-                <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">
-                    <a class="nav-link" href="{$item.sefurl|escape}">
-                        {if $menu_info.use_items_icons eq "y" && $item.icon}
-                            {icon name=$item.icon}
-                        {/if}{tr}{$item.name}{/tr}
-                    </a>
-                </li>
+                {if $item.type eq '-'}
+                    <li class="nav-item">
+                        <hr class="menu-separator my-2">
+                    </li>
+                {else}
+                    <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">
+                        <a class="nav-link" href="{$item.sefurl|escape}">
+                            {if $menu_info.use_items_icons eq "y" && $item.icon}
+                                {icon name=$item.icon}
+                            {/if}{tr}{$item.name}{/tr}
+                        </a>
+                    </li>
+                {/if}
             {/if}
         {/foreach}
     </ul>

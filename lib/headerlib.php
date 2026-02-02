@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\RobotsTxt\Matcher;
+
 require_once("path_js_importmap_generator.php");
 /**
  * Add Javascript and CSS to output
@@ -192,7 +194,7 @@ class HeaderLib
 
         // using this method, also reverse proxy / ssl offloading will continue to work
         $httpScheme = TikiLib::httpScheme();
-        $https_mode = ($httpScheme == 'https') ? true : false;
+        $https_mode = $httpScheme == 'https';
 
         $cdn_ssl_uri = array_filter(preg_split('/\s+/', $prefs['tiki_cdn_ssl']));
         $cdn_uri = array_filter(preg_split('/\s+/', $prefs['tiki_cdn']));
@@ -664,7 +666,7 @@ class HeaderLib
         // all other ranks could be minified - minification only happens if activated and if the file was not blocked by $skip_minify
 
         // check whether we need to minify. minify also includes to put the minified files into one single file
-        $minifyActive = isset($prefs['tiki_minify_javascript']) && $prefs['tiki_minify_javascript'] == 'y' ? true : false;
+        $minifyActive = isset($prefs['tiki_minify_javascript']) && $prefs['tiki_minify_javascript'] == 'y';
 
         if (! $minifyActive) {
             $ranks = ['30dependency', '40external', '50standard', '60late'];
@@ -685,20 +687,20 @@ class HeaderLib
 
             $ranks = ['30dependency', '40external', '50standard'];
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
-            $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+            $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
 
-            $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y' ? true : false;
+            $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y';
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
                     if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
-                        $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
                 }
                 // handling of user defined cdn servers is done inside minifyJSFiles()
                 $entry = $this->minifyJSFiles($jsfiles, [$rank]);
-                $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
             } else {
                 foreach ($jsfiles[$rank] as $entry) {
                     $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
@@ -870,10 +872,37 @@ class HeaderLib
             foreach ($this->js_modules as $x => $js) {
                 $b .= "// js_modules $x \n";
                 foreach ($js as $j) {
-                    $b .= "$j\n";
+                    //Modules cannot be fused together in a single script tag, it was a bug.
+                    //By now (2026-01-19 the following slightly adapted message has been pinned at the top of the tiki community chat channel for well over a year,
+                    //and developpers have been warned in MR reviews dozens of times, so there is no excuse for not knowing about this anymore)
+
+
+                    /* Important note for all developers regarding javascript modules.
+                    * I've been baffled by some of the code submitted when migrating dependencies from composer
+                    * (and no doubt some of you were baffled by my reviews).
+                    *
+                    * The cliffnotes:   Code like
+                    *
+                    * $headerlib->add_js_module("import { mountApp } from '@vue-sfc-loader';");
+                    * $headerlib->add_js_module("mountApp('$name', '$file', $data);//rest of code");
+                    * is not supposed to work.  At all.
+                    *
+                    * You are supposed to do:
+                    *
+                    * $headerlib->add_js_module("import { mountApp } from '@vue-sfc-loader';mountApp('$name', '$file', $data);//rest of code");
+                    *
+                    * (off course you'd normally do it with heredoc or nowdoc syntax, the above is just to illustrate)
+                    *
+                    * ...
+                    *
+                    * I discovered we have a important bug in headerlib, which fuses the modules together.
+                    * Part of the point of native js modules is to have isolated namespaces.  So this is a bug, not just an implementation detail.
+                    * As such, it will be fixed in ... and any code like the above that I missed at review will stop working whenever it lands...
+                    */
+                    $b .= $this->wrap_js("$j\n", true);
                 }
             }
-            $output .= $this->wrap_js($b, true);
+            $output .= $b;
         }
 
         // we get one sorted array with script tags
@@ -1140,7 +1169,7 @@ class HeaderLib
         $publicDirectory = 'temp/public/' . $tikidomainslash;
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
-            I tested on Windows 8 with an HDD and a filesystem-based CacheLib. CacheLibFileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using CacheLibMemcache. Chealer 2018-08-31 */
+            I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
             $fileContentsHash = md5_file($originalFile);
             $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
             if (! file_exists($minimalFilePath)) {
@@ -1301,21 +1330,25 @@ window.onload = loadScript;');
     }
 
     /**
-     * Get robots tag based on robots.txt file
+     * Get robots tag based on robots.txt file.
      *
-     * @return string|null
+     * Uses the Matcher class to parse robots.txt and evaluate Allow/Disallow rules
+     * for the current request URL. All parsing and caching logic is handled by Matcher.
+     *
+     * Note: This feature translates "Disallow" into "NOINDEX, NOFOLLOW" as an extra
+     * protection layer for pages that should not appear in search results.
+     *
+     * @return string|null Returns 'NOINDEX, NOFOLLOW' if current URL is disallowed, null otherwise
      */
     public function getRobots()
     {
-        $robotsContent = file_get_contents('robots.txt');
-        $scriptUri = preg_quote(basename($_SERVER['SCRIPT_NAME']));
-        $requestUri = preg_quote(basename($_SERVER['REQUEST_URI']));
+        $robotsFile = defined('TIKI_PATH') ? rtrim(TIKI_PATH, '/') . '/robots.txt' : 'robots.txt';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-        if (preg_match('/^Disallow: \/(' . $scriptUri . '|' . $requestUri . ')/m', $robotsContent)) {
-            return 'NOINDEX, NOFOLLOW';
-        }
+        $matcher = Matcher::fromFile($robotsFile);
 
-        return null;
+        return $matcher->isDisallowed($requestUri, $userAgent) ? 'NOINDEX, NOFOLLOW' : null;
     }
 
     /**
@@ -1331,8 +1364,41 @@ window.onload = loadScript;');
     public function setXRobotsTag(?string $robots = null): ?string
     {
         if (! empty($robots)) {
-            header('X-Robots-Tag: noindex');
+            // Convert to lowercase and remove spaces for proper HTTP header format
+            // e.g., "NOINDEX, NOFOLLOW" becomes "noindex,nofollow"
+            $headerValue = str_replace(' ', '', strtolower($robots));
+            header('X-Robots-Tag: ' . $headerValue);
             return $robots;
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets X-Robots-Tag header for non-HTML responses based on robots.txt rules.
+     *
+     * This is a convenience method for use in scripts that output non-HTML content
+     * (RSS feeds, file downloads, exports, PDFs, etc.) where the normal HTML meta tag
+     * cannot be rendered. It checks the robots.txt rules and sets the X-Robots-Tag
+     * HTTP header if the current URL is disallowed.
+     *
+     * The method respects the 'metatag_robots_txt_apply_directives' preference - if disabled,
+     * no header will be set.
+     *
+     * @return string|null The robots directive set, or null if no header was set.
+     */
+    public function setXRobotsTagFromRobotsTxt(): ?string
+    {
+        global $prefs;
+
+        // Check if the feature is enabled (default is 'y')
+        if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') !== 'y') {
+            return null;
+        }
+
+        $robots = $this->getRobots();
+        if (! empty($robots)) {
+            return $this->setXRobotsTag($robots);
         }
 
         return null;

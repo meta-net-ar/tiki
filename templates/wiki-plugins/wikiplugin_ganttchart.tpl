@@ -251,7 +251,7 @@
                             </td>
                             <td nowrap="" >
                                 <label for="duration" class="form-label">{/literal}{tr}Days{/tr}{literal}</label><br>
-                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays form-control" title="Duration is in working days." autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
+                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays form-control" title="{tr}Duration is in working days.{/tr}" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
                             </td>
                         </tr>
                         <tr>

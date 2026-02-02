@@ -7,9 +7,14 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'galleryId'                   => 'int',          //post
             'newDiagram'                  => 'bool',         //post
-            'fileName'                    => 'int',          //post
+            'fileName'                    => 'text',          //post
             'fileId'                      => 'int',          //post
             'template'                    => 'int',          //post
+            'page'                        => 'pagename',     //post
+            'xml'                         => 'none',         //post (base64/XML)
+            'index'                       => 'int',          //post
+            'compressXmlParam'            => 'bool',         //post
+            'compressXml'                 => 'alpha',        //post ("true"/"false")
         ],
     ],
 ];
@@ -19,10 +24,10 @@ $filegallib = TikiLib::lib('filegal');
 
 $exportImageCache = (int)($prefs['fgal_export_diagram_on_image_save'] == 'y');
 
-$xmlContent = isset($_POST['xml']) ? $_POST['xml'] : false;
-$page = isset($_POST['page']) ? $_POST['page'] : false;
-$index = isset($_POST['index']) ? $_POST['index'] : null;
-$compressXml = ($prefs['fgal_use_diagram_compression_by_default'] !== 'y') ? false : true;
+$xmlContent = $_POST['xml'] ?? false;
+$page = $_POST['page'] ?? false;
+$index = $_POST['index'] ?? null;
+$compressXml = ! (($prefs['fgal_use_diagram_compression_by_default'] !== 'y'));
 
 if (! empty($_POST['compressXmlParam']) && ! empty($_POST['compressXml']) && $_POST['compressXml'] === 'false') {
     $compressXml = false;
@@ -39,7 +44,7 @@ if (! empty($galleryId)) {
         $type = 'file gallery';
         $objectId = $_REQUEST['fileId'] ?? null;
     } else {
-        if (strpos($referer, $baseUrl) === 0) {
+        if (str_starts_with($referer, $baseUrl)) {
             header('Location: ' . $referer);
         } else {
             header("Location: " . $baseUrl . "tiki-list_file_gallery.php");
@@ -51,7 +56,7 @@ if (! empty($galleryId)) {
     $type = 'wiki page';
     $objectId = $page;
 } else {
-    if (strpos($referer, $baseUrl) === 0) {
+    if (str_starts_with($referer, $baseUrl)) {
         header('Location: ' . $referer);
     } else {
         header("Location: " . $baseUrl . "tiki-list_file_gallery.php");
@@ -77,7 +82,7 @@ if ($objectperms->getContext()['type'] == 'file gallery' && $galleryId != 0) {
     });
     $current_galInfos = array_values($current_galInfos);
     if (isset($current_galInfos) && ($current_galInfos[0]['perms']['tiki_p_upload_files'] !== 'y')) {
-        if (strpos($referer, $baseUrl) === 0) {
+        if (str_starts_with($referer, $baseUrl)) {
             header('Location: ' . $referer);
         } else {
             header("Location: " . $baseUrl . "tiki-list_file_gallery.php");

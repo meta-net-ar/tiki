@@ -13,7 +13,27 @@
 }
 
 .el-transfer-panel {
-    width: calc(45% - 25px * 2); // Make it take up all the space
+    min-width: calc(45% - 50px * 2); // Make it take up all the space
+}
+
+// prevent visibility of horizontal scrollbar when moving items via drag-and-drop
+.el-transfer-panel__list {
+    overflow-x: hidden;
+}
+
+// forcefully display the list even when empty to allow dropping items into it
+.el-transfer-panel__list {
+    display: block !important;
+}
+
+// On mobile, hide the buttons, and prefer only to use drag-and-drop
+@media (max-width: 768px) {
+    .el-transfer__buttons {
+        display: none;
+    }
+    .el-transfer {
+        gap: 1rem;
+    }
 }
 
 .transfer-container {

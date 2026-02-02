@@ -4,6 +4,9 @@ import FileGalUploader, { DATA_TEST_ID, DEFAULT_ACTION_URL } from "../../compone
 import { h } from "vue";
 import { ElMessage, ElUpload } from "element-plus";
 import ConfigWrapper from "../../components/ConfigWrapper.vue";
+import * as AjaxUploadHelpers from "element-plus/es/components/upload/src/ajax.mjs";
+import getUploadAjaxError from "../../helpers/fileGalUploader/getUploadAjaxError";
+import handleTikiFeedback from "../../helpers/fileGalUploader/handleTikiFeedback";
 
 vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
@@ -16,6 +19,26 @@ vi.mock("element-plus", async (importOriginal) => {
 vi.mock("../../components/ConfigWrapper.vue", () => {
     return {
         default: vi.fn((props, { slots }) => h("div", { ...props, "data-testid": "config-wrapper" }, slots.default ? slots.default() : null)),
+    };
+});
+
+vi.mock("element-plus/es/components/upload/src/ajax.mjs", async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        ajaxUpload: vi.fn(),
+    };
+});
+
+vi.mock("../../helpers/fileGalUploader/getUploadAjaxError", () => {
+    return {
+        default: vi.fn(),
+    };
+});
+
+vi.mock("../../helpers/fileGalUploader/handleTikiFeedback", () => {
+    return {
+        default: vi.fn(),
     };
 });
 
@@ -46,6 +69,7 @@ describe("FileGalUploader", () => {
                     "auto-upload": false,
                     method: "POST",
                     headers: { accept: "application/json" },
+                    "http-request": expect.any(Function),
                 }),
                 expect.any(Object)
             );
@@ -128,6 +152,49 @@ describe("FileGalUploader", () => {
             });
 
             expect(uploadValidation).toBe(false);
+        });
+
+        test("correctly executes the http request function", async () => {
+            const givenFile = new File(["foo"], "foo.txt", { type: "text/plain" });
+
+            const givenProps = {
+                maxSize: "100",
+                maxFiles: "10",
+            };
+
+            render(FileGalUploader, { props: givenProps });
+
+            const httpRequestFunction = ElUpload.mock.calls[0][0]["http-request"];
+
+            const mockOption = {
+                action: DEFAULT_ACTION_URL,
+                method: "POST",
+                data: {},
+                filename: "file",
+                file: givenFile,
+                onProgress: vi.fn(),
+                onError: vi.fn(),
+                onSuccess: vi.fn(),
+            };
+
+            const mockXMLHttpRequestInstance = new XMLHttpRequest();
+            vi.spyOn(AjaxUploadHelpers, "ajaxUpload").mockReturnValueOnce(mockXMLHttpRequestInstance);
+
+            const alteredOnErrorSpy = vi.spyOn(mockOption, "onError");
+
+            const mockUploadAjaxErrorInstance = { error: "mock error" };
+            getUploadAjaxError.mockReturnValueOnce(mockUploadAjaxErrorInstance);
+
+            httpRequestFunction(mockOption);
+
+            expect(AjaxUploadHelpers.ajaxUpload).toHaveBeenCalledWith(mockOption);
+
+            mockOption.onError();
+            await waitFor(() => {
+                expect(alteredOnErrorSpy).toHaveBeenCalledWith(mockUploadAjaxErrorInstance);
+            });
+            expect(getUploadAjaxError).toHaveBeenCalledWith(mockOption, mockXMLHttpRequestInstance);
+            expect(handleTikiFeedback).toHaveBeenCalledWith(mockXMLHttpRequestInstance);
         });
 
         test("show an error message when the upload fails", async () => {

@@ -8,7 +8,7 @@
 namespace SmartyTiki\Modifier;
 
 use Kint\Kint;
-use Kint\Parser\Parser;
+use SmartyTiki\Utils\SmartyKint;
 
 /**
  * If installed, this modifier will use Kint (from https://github.com/kint-php/kint/)
@@ -54,40 +54,6 @@ class D
             }
         } else {
             var_dump($var);
-        }
-    }
-}
-
-if (class_exists('Kint')) {
-    class SmartyKint implements \Kint\Parser\PluginInterface
-    {
-        protected $parser;
-
-        public function setParser(Parser $p): void
-        {
-            $this->parser = $p;
-        }
-
-        public function getTypes(): array
-        {
-            return ['integer', 'string', 'array', 'object'];
-        }
-
-        public function getTriggers(): int
-        {
-            return Parser::TRIGGER_BEGIN;
-        }
-
-        public function parse(&$var, \Kint\Zval\Value &$o, $trigger): void
-        {
-            if ($trigger === Parser::TRIGGER_BEGIN) {
-                // we begin the Kint dump
-                $replace = preg_replace('/.*\[\'(.*)\']->value/', '$$1', $o->access_path);
-                // if the path of the var is $_smarty_tpl->tpl_vars[...]->value then just use the smarty var name for the title
-                if ($o->access_path !== $replace) {
-                    $o->name = $replace;
-                }
-            }
         }
     }
 }

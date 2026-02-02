@@ -34,13 +34,13 @@ class Iconset
             $this->description = '';
         }
         $this->tag = $data['tag'];
-        $this->prepend = isset($data['prepend']) ? $data['prepend'] : null;
-        $this->append = isset($data['append']) ? $data['append'] : null;
-        $this->rotate = isset($data['rotate']) ? $data['rotate'] : [];
-        $this->class = isset($data['class']) ? $data['class'] : null;
-        $this->styles = isset($data['styles']) ? $data['styles'] : null;
-        $this->icons = isset($data['icons']) ? $data['icons'] : [];
-        $this->defaults = isset($data['defaults']) ? $data['defaults'] : [];
+        $this->prepend = $data['prepend'] ?? null;
+        $this->append = $data['append'] ?? null;
+        $this->rotate = $data['rotate'] ?? [];
+        $this->class = $data['class'] ?? null;
+        $this->styles = $data['styles'] ?? null;
+        $this->icons = $data['icons'] ?? [];
+        $this->defaults = $data['defaults'] ?? [];
 
         if (! empty($data['source'])) {
             $source = new Iconset(TikiLib::lib('iconset')->loadFile($data['source']));
@@ -164,10 +164,10 @@ class Iconset
         $style = empty($style) ? 'default' : $style;
 
         if ($icon = $this->getIcon($name)) {
-            $tag = isset($icon['tag']) ? $icon['tag'] : $this->tag;
-            $prepend = isset($icon['prepend']) ? $icon['prepend'] : (isset($this->styles[$style]['prepend']) ? $this->styles[$style]['prepend'] : $this->prepend);
-            $append  = isset($icon['append']) ? $icon['append'] : (isset($this->styles[$style]['append']) ? $this->styles[$style]['append'] : $this->append);
-            $icon_class = isset($icon['class']) ? $icon['class'] : '';
+            $tag = $icon['tag'] ?? $this->tag;
+            $prepend = $icon['prepend'] ?? ($this->styles[$style]['prepend'] ?? $this->prepend);
+            $append  = $icon['append'] ?? ($this->styles[$style]['append'] ?? $this->append);
+            $icon_class = $icon['class'] ?? '';
             $icon_class .= $params->_menu_icon->alpha() ? ' fa-fw' : '';
             $custom_class = $params->offsetExists('iclass') ? $params->iclass->striptags() : '';
             $title = $params->offsetExists('ititle') ? 'title="' . $params->ititle->striptags() . '"' : '';
@@ -182,7 +182,7 @@ class Iconset
             }
             $size = ! empty($params->size->int()) && $params->size->int() < 10 ? abs($params->size->int()) : 1;
             //only used in legacy icon definition
-            $sizedef = isset($icon['size']) ? $icon['size'] : 1;
+            $sizedef = $icon['size'] ?? 1;
             $rotate = '';
             if (! empty($params->rotate->word())) {
                 if (isset($this->rotate[$params->rotate->word()])) {

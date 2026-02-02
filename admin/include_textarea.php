@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         && (getCookie('admin_textarea', 'tabs') == '#contentadmin_textarea-plugin_alias')
     ) {
         // tab=3 is plugins alias tab (TODO improve)
-        $isUpdate = isset($pluginsAlias[$_POST['plugin_alias']]) ? true : false;
+        $isUpdate = isset($pluginsAlias[$_POST['plugin_alias']]);
         $info = [
             'implementation' => $_POST['implementation'],
             'description' => [

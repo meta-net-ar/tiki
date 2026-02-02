@@ -146,7 +146,7 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
         // Replace #1, #2, etc., with corresponding values from the $values array
         $formula = preg_replace_callback('/#([0-9]+)/', function ($matches) use ($values) {
             $fieldId = $matches[1];
-            return isset($values[$fieldId]) ? $values[$fieldId] : 0;
+            return $values[$fieldId] ?? 0;
         }, $formula);
 
         // Check if the formula contains only allowed characters

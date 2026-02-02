@@ -6,7 +6,7 @@
         </span>
     </div>
     <div class="flex-grow-1 ms-3">
-        {icon name="admin_wysiwyg" size=3 iclass="adminWizardIconright"}
+        {icon name="admin_wysiwyg" size=3 iclass="adminWizardIconright float-end ms-2"}
         <h4 class="mt-0 mb-4">{tr}You can choose to use by default the 'Compatible' Wiki mode (content is saved in wiki syntax), or the HTML mode{/tr}.</h4>
         <fieldset>
             <legend>{tr}Wysiwyg editor{/tr}</legend>

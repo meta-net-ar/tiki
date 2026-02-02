@@ -717,21 +717,21 @@ CREATE TABLE `tiki_comments` (
   `user_ip` varchar(39) default NULL,
   `summary` varchar(240) default NULL,
   `smiley` varchar(80) default NULL,
-  `message_id` varchar(128) default NULL,
-  `in_reply_to` varchar(128) default NULL,
+  `message_id` TEXT,
+  `in_reply_to` varchar(255) default NULL,
   `comment_rating` tinyint(2) default NULL,
   `archived` char(1) default NULL,
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
-  UNIQUE KEY `no_repeats` (`parentId`, `userName`(40), `title`(43), `commentDate`, `message_id`(40), `in_reply_to`(40)),
+  UNIQUE KEY `no_repeats` (`parentId`, `userName`(20), `title`(30), `commentDate`, `message_id`(30), `in_reply_to`(30)),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
   KEY `hits` (hits),
   KEY `tc_pi` (`parentId`),
   KEY `objectType` (object(160), `objectType`),
   KEY `commentDate` (`commentDate`),
-  KEY `threaded` (message_id(89), in_reply_to(88), `parentId`),
+  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`),
   KEY `idx_slvn_commentDate` (`commentDate`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -918,6 +918,7 @@ CREATE TABLE `tiki_file_galleries` (
   `direct` text,
   `template` int(10) default NULL,
   `description` text,
+  `display_name_generation` VARCHAR(20) DEFAULT NULL,
   `created` int(14) default NULL,
   `visible` char(1) default NULL,
   `lastModif` int(14) default NULL,
@@ -1772,10 +1773,15 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Webservices','tiki-admin_webservices.php',1280,'feature_webservices','tiki_p_admin_webservices','', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','References','tiki-references.php',255,'feature_wiki,feature_references','tiki_p_edit_references','', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'Custom Routes', 'tiki-admin_routes.php', 1290, 'feature_sefurl_routes', 'tiki_p_admin', '', 0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'Queued Tasks', 'tiki-admin_queued_tasks.php', 1271, 'feature_queued_tasks', 'tiki_p_admin', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Webauthn', 'tiki-webauthn.php', 1300, 'auth_webauthn_enabled', '', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Tiki Share','tiki-ajax_services.php?controller=share&action=index', 47, 'feature_share', '', 'Registered', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'List Shared URLs','tiki-ajax_services.php?controller=share&action=index', 49, 'feature_share', '', 'Registered', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 'o', 'Admin Icons Dashboard', 'tiki-admin.php?admin_dashboard_icons=y', 1053, 'theme_unified_admin_backend', 'tiki_p_admin', '', 0);
+INSERT INTO `tiki_menu_options` (`menuId`,`type`,`name`,`url`,`position`,`section`,`perm`,`groupname`,`userlevel`,`icon`) VALUES
+(42,'s','PeerTube Video','tiki-list_peertube_entries.php',960,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,'video'),
+(42,'o','List PeerTube Media','tiki-list_peertube_entries.php',962,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,NULL),
+(42,'o','Upload PeerTube Video','tiki-peertube_upload.php',964,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_upload_videos','',0,NULL);
 
 DROP TABLE IF EXISTS `tiki_menus`;
 CREATE TABLE `tiki_menus` (
@@ -1904,6 +1910,7 @@ CREATE TABLE `tiki_newsletters` (
   `emptyClipBlocksSend` char(1) default 'n',
   PRIMARY KEY (`nlId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
+ALTER TABLE `tiki_newsletters` ADD CONSTRAINT `uniq_author_name` UNIQUE (author(100), name(100));
 
 DROP TABLE IF EXISTS `tiki_page_footnotes`;
 CREATE TABLE `tiki_page_footnotes` (
@@ -2938,6 +2945,7 @@ CREATE TABLE `users_groups` (
   `prorateInterval` varchar(255) default '',
   `isRole` char(1) DEFAULT 'n',
   `isTplGroup` char(1) DEFAULT 'n',
+  `twoFactorAuthGracePeriod` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `groupName` (`groupName` (191)),
   KEY `expireAfter` (`expireAfter`)
@@ -2958,6 +2966,10 @@ CREATE TABLE `users_permissions` (
   `level` varchar(80) default NULL,
   PRIMARY KEY  (`permName`)
 ) ENGINE=MyISAM;
+
+-- PeerTube permissions
+INSERT INTO `users_permissions` (`permName`, `level`) VALUES
+('tiki_p_admin_peertube','admin');
 
 DROP TABLE IF EXISTS `users_usergroups`;
 CREATE TABLE `users_usergroups` (
@@ -2995,7 +3007,9 @@ CREATE TABLE `users_users` (
   `valid` varchar(32) default NULL,
   `unsuccessful_logins` int(14) default 0,
   `waiting` char(1) default NULL,
-  `twoFactorSecret` varchar(16) default NULL,
+  `twoFactorSecret` varchar(32) default NULL,
+  `twoFactorAuthGracePeriod` int(11) DEFAULT NULL,
+  `twoFactorGracePeriodStart` int(14) DEFAULT NULL,
   `last_mfa_date` bigint DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
@@ -3003,7 +3017,7 @@ CREATE TABLE `users_users` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 -- Administrator account
-INSERT INTO users_users(email,login,hash,created,registrationDate,avatarName,avatarType,avatarLibName) VALUES ('','admin','$2y$10$nzMJ64PLyjKqgKvqSvO/S.n8jtgAiRzmNMYPLq/TQVLfYIFa0xqkG',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),'admin','l','dicebear/initials');
+INSERT INTO users_users(email,login,created,registrationDate,avatarName,avatarType,avatarLibName) VALUES ('','admin',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),'admin','l','dicebear/initials');
 INSERT INTO tiki_user_preferences (user,`prefName`,value) VALUES ('admin','realName','System Administrator');
 INSERT INTO users_usergroups (`userId`, `groupName`) VALUES(1,'Admins');
 INSERT INTO users_grouppermissions (`groupName`, `permName`) VALUES ('Admins','tiki_p_admin');
@@ -3442,9 +3456,9 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES(
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-directory_browse.php\\?parent=(\\d+)', 'directory$1', 'directory', 'feature_directory');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_faq.php\\?faqId=(\\d+)', 'faq$1', 'faq', 'feature_faqs');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'display$1', 'file', 'feature_file_galleries', 10);
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;thumbnail', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;display', 'display$1', 'display', 'feature_file_galleries');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;preview', 'preview$1', 'preview', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)thumbnail', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)display', 'display$1', 'display', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)preview', 'preview$1', 'preview', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_forum.php\\?forumId=(\\d+)', 'forum$1', 'forum', 'feature_forums');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-newsletters.php\\?nlId=(\\d+)', 'newsletter$1', 'newsletter', 'feature_newsletters');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-take_quiz.php\\?quizId=(\\d+)', 'quiz$1', 'quiz', 'feature_quizzes');
@@ -3511,12 +3525,131 @@ UPDATE tiki_menu_options SET icon = 'survey' WHERE name = 'Surveys';
 UPDATE tiki_menu_options SET icon = 'spreadsheet' WHERE name = 'Spreadsheets';
 UPDATE tiki_menu_options SET icon = 'file-spreadsheet' WHERE name = 'Timesheet';
 UPDATE tiki_menu_options SET icon = 'globe' WHERE name = 'Users Map';
-UPDATE tiki_menu_options SET icon = 'telephone' WHERE name = 'Contact Us';
+UPDATE tiki_menu_options SET icon = 'headset' WHERE name = 'Contact Us';
 UPDATE tiki_menu_options SET icon = 'bug' WHERE name = '(debug)';
 UPDATE tiki_menu_options SET icon = 'kaltura' WHERE name = 'Kaltura Video';
 UPDATE tiki_menu_options SET icon = 'calendar' WHERE name = 'Tiki Calendar';
 UPDATE tiki_menu_options SET icon = 'wizard' WHERE name = 'User Wizard';
-UPDATE tiki_menus SET use_items_icons='y' WHERE `menuId`=42;
+UPDATE tiki_menu_options SET icon = 'key' WHERE name = 'Webauthn';
+UPDATE tiki_menu_options SET icon = 'envelope' WHERE name = 'Messages';
+UPDATE tiki_menu_options SET icon = 'check-square' WHERE name = 'Tasks';
+UPDATE tiki_menu_options SET icon = 'bookmark' WHERE name = 'Bookmarks';
+UPDATE tiki_menu_options SET icon = 'admin_module' WHERE name = 'Modules';
+UPDATE tiki_menu_options SET icon = 'at' WHERE name = 'Webmail';
+UPDATE tiki_menu_options SET icon = 'address-book' WHERE name = 'Contacts';
+UPDATE tiki_menu_options SET icon = 'inbox' WHERE name = 'Mail-in';
+UPDATE tiki_menu_options SET icon = 'sticky-note' WHERE name = 'Notepad';
+UPDATE tiki_menu_options SET icon = 'file' WHERE name = 'My Files';
+UPDATE tiki_menu_options SET icon = 'calendar' WHERE name = 'Mini Calendar';
+UPDATE tiki_menu_options SET icon = 'bell' WHERE name = 'My Watches';
+UPDATE tiki_menu_options SET icon = 'share-nodes' WHERE name = 'Friendship Network';
+UPDATE tiki_menu_options SET icon = 'file' WHERE name = 'Wiki Home';
+UPDATE tiki_menu_options SET icon = 'flask' WHERE name = 'Sandbox';
+UPDATE tiki_menu_options SET icon = 'copy' WHERE name = 'Multiple Print';
+UPDATE tiki_menu_options SET icon = 'share' WHERE name = 'Send Pages';
+UPDATE tiki_menu_options SET icon = 'sitemap' WHERE name = 'Structures';
+UPDATE tiki_menu_options SET icon = 'newspaper' WHERE name = 'Articles Home';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List Articles';
+UPDATE tiki_menu_options SET icon = 'pen' WHERE name = 'Submit Article';
+UPDATE tiki_menu_options SET icon = 'sliders' WHERE name = 'Admin Types';
+UPDATE tiki_menu_options SET icon = 'folder' WHERE name = 'Admin Topics';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List Blogs';
+UPDATE tiki_menu_options SET icon = 'bar-chart' WHERE name = 'Rankings';
+UPDATE tiki_menu_options SET icon = 'edit' WHERE name = 'Create Blog';
+UPDATE tiki_menu_options SET icon = 'edit' WHERE name = 'New Blog Post';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List Blog Posts';
+UPDATE tiki_menu_options SET icon = 'comments' WHERE name = 'List Forums';
+UPDATE tiki_menu_options SET icon = 'cog' WHERE name = 'Admin Forums';
+UPDATE tiki_menu_options SET icon = 'link' WHERE name = 'Submit a new link';
+UPDATE tiki_menu_options SET icon = 'globe' WHERE name = 'Browse Directory';
+UPDATE tiki_menu_options SET icon = 'tools' WHERE name = 'Admin Directory';
+UPDATE tiki_menu_options SET icon = 'images' WHERE name = 'List Galleries';
+UPDATE tiki_menu_options SET icon = 'upload' WHERE name = 'Upload File';
+UPDATE tiki_menu_options SET icon = 'clipboard' WHERE name = 'List Quizzes';
+UPDATE tiki_menu_options SET icon = 'bar-chart' WHERE name = 'Quiz Stats';
+UPDATE tiki_menu_options SET icon = 'bar-chart' WHERE name = 'List Surveys';
+UPDATE tiki_menu_options SET icon = 'video' WHERE name = 'List Media';
+UPDATE tiki_menu_options SET icon = 'cogs' WHERE name = 'Live Support';
+UPDATE tiki_menu_options SET icon = 'admin_security' WHERE name = 'Security Admin';
+UPDATE tiki_menu_options SET icon = 'file-code' WHERE name = 'HTML Pages';
+UPDATE tiki_menu_options SET icon = 'tachometer-alt' WHERE name = 'Performance';
+UPDATE tiki_menu_options SET icon = 'share' WHERE name = 'Social networks';
+UPDATE tiki_menu_options SET icon = 'share' WHERE name = 'Tiki Share';
+UPDATE tiki_menu_options SET icon = 'link' WHERE name = 'List Shared URLs';
+UPDATE tiki_menu_options SET icon = 'desktop' WHERE name = 'Admin Icons Dashboard';
+UPDATE tiki_menu_options SET icon = 'credit-card' WHERE name = 'Payments';
+UPDATE tiki_menu_options SET icon = 'person' WHERE name = 'My Account Home';
+UPDATE tiki_menu_options SET icon = 'gear' WHERE name = 'Preferences';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'User Menu';
+UPDATE tiki_menu_options SET icon = 'users' WHERE name = 'User List';
+UPDATE tiki_menu_options SET icon = 'history' WHERE name = 'Last Changes';
+UPDATE tiki_menu_options SET icon = 'file-text' WHERE name = 'List Pages';
+UPDATE tiki_menu_options SET icon = 'plus' WHERE name = 'Create a Wiki Page';
+UPDATE tiki_menu_options SET icon = 'question-circle' WHERE name = 'Orphan Pages';
+UPDATE tiki_menu_options SET icon = 'inbox' WHERE name = 'Received Pages';
+UPDATE tiki_menu_options SET icon = 'clipboard-list' WHERE name = 'View submissions';
+UPDATE tiki_menu_options SET icon = 'clipboard-list' WHERE name = 'View Submissions';
+UPDATE tiki_menu_options SET icon = 'plus' WHERE name = 'New Article';
+UPDATE tiki_menu_options SET icon = 'send' WHERE name = 'Send Articles';
+UPDATE tiki_menu_options SET icon = 'inbox' WHERE name = 'Received Articles';
+UPDATE tiki_menu_options SET icon = 'cloud' WHERE name = 'Directory batch';
+UPDATE tiki_menu_options SET icon = 'list-ol' WHERE name = 'List FAQs';
+UPDATE tiki_menu_options SET icon = 'tools' WHERE name = 'Admin FAQs';
+UPDATE tiki_menu_options SET icon = 'puzzle-piece' WHERE name = 'Admin Quizzes';
+UPDATE tiki_menu_options SET icon = 'table' WHERE name = 'List Sheets';
+UPDATE tiki_menu_options SET icon = 'tasks' WHERE name = 'List Trackers';
+UPDATE tiki_menu_options SET icon = 'toggle-on' WHERE name = 'Offline mode';
+UPDATE tiki_menu_options SET icon = 'table' WHERE name = 'Manage Tabular Formats';
+UPDATE tiki_menu_options SET icon = 'robot' WHERE name = 'Machine Learning';
+UPDATE tiki_menu_options SET icon = 'layer-group' WHERE name = 'List Models';
+UPDATE tiki_menu_options SET icon = 'book' WHERE name = 'Accounting books';
+UPDATE tiki_menu_options SET icon = 'check-square' WHERE name = 'Admin Surveys';
+UPDATE tiki_menu_options SET icon = 'envelope' WHERE name = 'Send Newsletters';
+UPDATE tiki_menu_options SET icon = 'file-alt' WHERE name = 'Admin Newsletters';
+UPDATE tiki_menu_options SET icon = 'columns' WHERE name = ' Control Panels';
+UPDATE tiki_menu_options SET icon = 'ban' WHERE name = 'Banning';
+UPDATE tiki_menu_options SET icon = 'coins' WHERE name = 'Admin credits';
+UPDATE tiki_menu_options SET icon = 'user' WHERE name = 'Users';
+UPDATE tiki_menu_options SET icon = 'users' WHERE name = 'Groups';
+UPDATE tiki_menu_options SET icon = 'cloud' WHERE name = 'External Pages Cache';
+UPDATE tiki_menu_options SET icon = 'tag' WHERE name = 'Hotwords';
+UPDATE tiki_menu_options SET icon = 'translate' WHERE name = 'Edit languages';
+UPDATE tiki_menu_options SET icon = 'rss' WHERE name = 'External Feeds';
+UPDATE tiki_menu_options SET icon = 'globe' WHERE name = 'External Wikis';
+UPDATE tiki_menu_options SET icon = 'bars' WHERE name = 'Menus';
+UPDATE tiki_menu_options SET icon = 'check-square' WHERE name = 'Polls';
+UPDATE tiki_menu_options SET icon = 'bell' WHERE name = 'Mail Notifications';
+UPDATE tiki_menu_options SET icon = 'bar-chart' WHERE name = 'Search Stats';
+UPDATE tiki_menu_options SET icon = 'palette' WHERE name = 'Theme Control';
+UPDATE tiki_menu_options SET icon = 'key' WHERE name = 'Tokens';
+UPDATE tiki_menu_options SET icon = 'wrench' WHERE name = 'Toolbars';
+UPDATE tiki_menu_options SET icon = 'project-diagram' WHERE name = 'Transitions';
+UPDATE tiki_menu_options SET icon = 'image' WHERE name = 'Banners';
+UPDATE tiki_menu_options SET icon = 'cubes' WHERE name = 'Dynamic content';
+UPDATE tiki_menu_options SET icon = 'message' WHERE name = 'Shoutbox';
+UPDATE tiki_menu_options SET icon = 'message' WHERE name = 'Shoutbox Words';
+UPDATE tiki_menu_options SET icon = 'bar-chart' WHERE name = 'Referer Stats';
+UPDATE tiki_menu_options SET icon = 'puzzle-piece' WHERE name = 'Integrator';
+UPDATE tiki_menu_options SET icon = 'info-circle' WHERE name = 'phpinfo';
+UPDATE tiki_menu_options SET icon = 'server' WHERE name = 'Tiki Cache/Sys Admin';
+UPDATE tiki_menu_options SET icon = 'file-import' WHERE name = 'Tiki Importer';
+UPDATE tiki_menu_options SET icon = 'th-list' WHERE name = 'Tiki Logs';
+UPDATE tiki_menu_options SET icon = 'briefcase' WHERE name = 'Tiki Manager';
+UPDATE tiki_menu_options SET icon = 'clipboard-list' WHERE name = 'Action Log';
+UPDATE tiki_menu_options SET icon = 'file' WHERE name = 'Content Templates';
+UPDATE tiki_menu_options SET icon = 'admin_comments' WHERE name = 'Comments';
+UPDATE tiki_menu_options SET icon = 'award' WHERE name = 'Contribution';
+UPDATE tiki_menu_options SET icon = 'key' WHERE name = 'Permissions';
+UPDATE tiki_menu_options SET icon = 'eye' WHERE name = 'Perspectives';
+UPDATE tiki_menu_options SET icon = 'calendar-check' WHERE name = 'Scheduler';
+UPDATE tiki_menu_options SET icon = 'cloud' WHERE name = 'Webservices';
+UPDATE tiki_menu_options SET icon = 'bookmarks' WHERE name = 'References';
+UPDATE tiki_menu_options SET icon = 'route' WHERE name = 'Custom Routes';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List PeerTube Media';
+UPDATE tiki_menu_options SET icon = 'upload' WHERE name = 'Upload PeerTube Video';
+UPDATE tiki_menu_options SET icon = 'tasks' WHERE name = 'Queued Tasks';
+
+UPDATE tiki_menus SET use_items_icons = 'y' WHERE menuId = 42; 
 
 DROP TABLE IF EXISTS `tiki_plugin_security`;
 CREATE TABLE `tiki_plugin_security` (
@@ -3684,6 +3817,7 @@ CREATE TABLE `tiki_object_attributes` (
     `itemId` varchar(160) NOT NULL,
     `attribute` varchar(70) NOT NULL,
     `value` varchar(255),
+    `fieldId` INT DEFAULT NULL,
     `comment` varchar(255),
     UNIQUE `item_attribute_uq` ( `type`, `itemId`(91), `attribute`(50) ),
     KEY `attribute_lookup_ix` (`attribute`, `value`(121))
@@ -3824,11 +3958,12 @@ CREATE TABLE `tiki_credits_types` (
 
 DROP TABLE IF EXISTS `tiki_queue`;
 CREATE TABLE `tiki_queue` (
-    `entryId` INT PRIMARY KEY AUTO_INCREMENT,
+    `entryId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `queue` VARCHAR(25) NOT NULL,
     `timestamp` INT NOT NULL,
     `handler` VARCHAR(64) NULL,
     `message` TEXT NOT NULL,
+    PRIMARY KEY (`entryId`),
     KEY `queue_name_ix` (`queue`),
     KEY `queue_handler_ix` (`handler`)
 ) ENGINE=MyISAM;
@@ -4020,7 +4155,9 @@ CREATE TABLE `tiki_scheduler` (
   `re_run` TINYINT,
   `run_only_once` TINYINT,
   `creation_date` INT(14),
-  `user_run_now` VARCHAR(255) NULL DEFAULT NULL
+  `user_run_now` VARCHAR(255) NULL DEFAULT NULL,
+  `enable_send_notification_override` TINYINT DEFAULT 0,
+  `stalled_notification_sent_at` TIMESTAMP NULL DEFAULT NULL
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_scheduler_run`;
@@ -4049,7 +4186,7 @@ CREATE TABLE `tiki_oauthserver_clients` (
 DROP TABLE IF EXISTS `tiki_performance`;
 CREATE TABLE `tiki_performance` (
     `id` int(12) NOT NULL AUTO_INCREMENT,
-    `url` varchar (255) NOT NULL,
+    `url` TEXT NOT NULL,
     `time_taken` int(12) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
@@ -4074,6 +4211,34 @@ CREATE TABLE `tiki_custom_color_modes` (
 ) ENGINE=MyISAM;
 
 INSERT INTO `tiki_custom_color_modes` (`name`, `icon`) VALUES ('light', 'sun'), ('dark','moon'), ('auto', 'circle-half');
+
+DROP TABLE IF EXISTS `tiki_bruteforce_attempts`;
+CREATE TABLE `tiki_bruteforce_attempts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `operation` VARCHAR(50) NOT NULL,
+  `properties` TEXT NOT NULL,
+  `properties_hash` CHAR(64) NOT NULL,
+  `attempt_time` bigint NOT NULL,
+  `attempt_count` INT NOT NULL,
+  INDEX `idx_operation_hash` (`operation`, `properties_hash`),
+  INDEX `idx_attempt_time` (`attempt_time`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `tiki_queued_tasks`;
+CREATE TABLE `tiki_queued_tasks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `owner` INT(11) NOT NULL,
+  `type` VARCHAR(20) NOT NULL,
+  `params` LONGTEXT NULL DEFAULT NULL,
+  `status` ENUM('Pending','InProgress','Completed','Failed') NOT NULL DEFAULT 'Pending',
+  `result` LONGTEXT NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `started_at` TIMESTAMP NULL DEFAULT NULL,
+  `ended_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_status` (`status`),
+  INDEX `idx_owner` (`owner`)
+) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_webauthn_credentials`;
 CREATE TABLE `tiki_webauthn_credentials` (
@@ -4142,4 +4307,18 @@ CREATE TABLE `tiki_user_passwords_history` (
   `hash` varchar(60) default NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(`passId`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `tiki_password_reset_tokens`;
+CREATE TABLE `tiki_password_reset_tokens` (
+  `tokenId` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(200) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `created` int NOT NULL,
+  `expires` int NOT NULL,
+  `used` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`tokenId`),
+  UNIQUE KEY `token` (`token`),
+  KEY `user` (`user`),
+  KEY `expires` (`expires`)
 ) ENGINE=MyISAM;

@@ -6,10 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Tests\diff;
 
+use Tiki\Lib\Diff\DiffUtils;
 use TikiLib;
 use TikiTestCase;
-
-require_once __DIR__ . '/../../Diff/difflib.php';
 
 class DiffTest extends TikiTestCase
 {
@@ -23,7 +22,7 @@ class DiffTest extends TikiTestCase
      */
     public function testDiffByType($type, $page1, $page2, $expected): void
     {
-        $result = diff2($page1, $page2, $type);
+        $result = DiffUtils::diff2($page1, $page2, $type);
 
         $this->assertEquals($expected, $result);
     }

@@ -9,6 +9,7 @@ include_once dirname(__DIR__) . '/entities/AuthCodeEntity.php';
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
+use Tiki\Lib\Auth\ApiTokenException;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
 {

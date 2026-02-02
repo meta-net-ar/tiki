@@ -14,9 +14,9 @@ $inputConfiguration = [
              'pollId'                    => 'int',            //post
              'optionId'                  => 'int',            //post
              'remove'                    => 'int',            //post
-             'save'                      => 'bool',           //post
-             'title'                     => 'words',          //post
-             'position'                  => 'words',          //post
+             'save'                      => 'alpha',          //post
+             'title'                     => 'text',           //post
+             'position'                  => 'int',            //post
         ],
     ],
 ];

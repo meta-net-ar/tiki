@@ -358,11 +358,9 @@ properties:
     type: string
     description: Sets classes for form to be used in Tracker Plugin (e.g., col-md-9).
   tabularSync:
-    type: integer
+    type: string
     description: |
-      Whether to synchronize tabular data. Possible values are:
-      - `0`: Do not synchronize tabular data.
-      - `1`: Synchronize tabular data.
+      Comma-separated list of import-export formats to synchronize the tracker data with.
   tabularSyncModifiedField:
     type: integer
     description: |

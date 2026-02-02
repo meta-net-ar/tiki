@@ -5,9 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\OIntegrate\OIntegrate as OIntegrate;
+use Tiki\Lib\OIntegrate\Response;
 use Tiki\Lib\TikiWebServiceTemplate;
 
-require_once 'lib/ointegratelib.php';
 require_once 'soap/soaplib.php';
 require_once 'soap/wsdllib.php';
 
@@ -190,7 +191,7 @@ class Tiki_Webservice
     /**
      * @param $params
      * @param bool $fullReponse
-     * @return bool|OIntegrate_Response
+     * @return bool|Tiki\Lib\OIntegrate\Response
      */
     public function performRequest($params, $fullReponse = false, $clearCache = false)
     {
@@ -212,7 +213,7 @@ class Tiki_Webservice
                             $options['proxy_port'] = $prefs['proxy_port'];
                         }
 
-                        $response = new OIntegrate_Response();
+                        $response = new Response();
                         $soaplib->allowCookies = $this->allowCookies;
                         try {
                             $response->data = $soaplib->performRequest($built, $this->operation, $map, $options, $fullReponse);

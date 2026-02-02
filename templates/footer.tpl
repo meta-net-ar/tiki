@@ -19,12 +19,16 @@
         </div>
     </div>
 {/foreach}
-   
+
 {if $prefs.feature_inline_comments eq 'y' && $tiki_p_post_comments eq 'y'}
     <a id="note-editor-comment" class="alert alert-info" style="display:none;" href="#" role="button">{tr}Add Comment{/tr}</a>
 {/if}
 {if isset($force_fill_action)}
     {include file="tiki-tracker_force_fill.tpl"}
+{/if}
+
+{if Perms::get()->admin and isset($modlib)}
+    {assign var=module_pref_errors value=$modlib->pref_errors}
 {/if}
 {if $module_pref_errors|default:null}
     <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} modules">

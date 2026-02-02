@@ -16,9 +16,13 @@ function prefs_ocr_list()
 
     try {
         $tesseractPath = $ocr->whereIsExecutable('tesseract') ?: 'tesseract';
-        $pdfimagesPath = $ocr->whereIsExecutable('pdfimages') ?: 'pdfimages';
     } catch (Exception $e) {
         $tesseractPath = 'tesseract';
+    }
+
+    try {
+        $pdfimagesPath = $ocr->whereIsExecutable('pdfimages') ?: 'pdfimages';
+    } catch (Exception $e) {
         $pdfimagesPath = 'pdfimages';
     }
 

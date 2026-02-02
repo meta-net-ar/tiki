@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\Diff\DiffUtils;
 use Tiki\Lib\Wiki\ConvertToTiki9;
 
 class HistLib extends TikiLib
@@ -536,7 +537,6 @@ function histlib_helper_setup_diff($page, $oldver, $newver, $diff_style = '', $c
         $old["data"] = $parserlib->parse_data($old["data"], ['preview_mode' => true]);
         $new["data"] = $parserlib->parse_data($new["data"], ['preview_mode' => true]);
     } else {
-        require_once('lib/Diff/difflib.php');
         if ($info['is_html'] == 1 and $diff_style != "htmldiff") {
             $search[] = "~</(table|td|th|div|p)>~";
             $replace[] = "\n";
@@ -561,7 +561,7 @@ function histlib_helper_setup_diff($page, $oldver, $newver, $diff_style = '', $c
             $new["data"] = preg_replace(';~tc~(.*?)~/tc~;s', '', $new["data"]);
         }
 
-        $html = diff2($old["data"], $new["data"], $diff_style);
+        $html = DiffUtils::diff2($old["data"], $new["data"], $diff_style);
         $smarty->assign_by_ref('diffdata', $html);
     }
 }

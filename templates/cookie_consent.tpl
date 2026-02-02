@@ -26,14 +26,14 @@
           </div>
         </div>
         
-        <div class="row mb-4">
+        <div id="customConsentSectionBanner" class="row mb-4">
           <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
             {foreach from=$cookie_categories key=category item=data}
               <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
-                <input class="form-check-input me-2" type="checkbox" id="cookie_{$category}"
+                <input class="form-check-input me-2" type="checkbox" id="toggle{$category|capitalize}"
                   name="cookie_consent_{$category}"
                   {if $category == 'essential'}checked disabled aria-disabled="true"{/if}>
-                <label class="form-check-label me-2 fw-semibold" for="cookie_{$category}">
+                <label class="form-check-label me-2 fw-semibold" for="toggle{$category|capitalize}">
                   {tr}{$data.name}{/tr}
                 </label>
                 <button type="button" class="btn btn-link p-0 text-decoration-none text-dark"
@@ -49,12 +49,12 @@
         <div class="row">
           <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
             {if $prefs.cookie_consent_disable eq 'n'}
-                <button type="button" class="btn btn-outline-danger"
+                <button type="submit" class="btn btn-outline-danger"
                 id="cookie_decline_unnecessary_button">
                 {tr}Refuse unnecessary{/tr}
               </button>
             {/if}
-            <button type="button" class="btn btn-secondary"
+            <button type="submit" class="btn btn-secondary"
               id="cookie_save_button">
               {tr}Save preferences{/tr}
             </button>

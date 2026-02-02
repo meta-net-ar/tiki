@@ -44,7 +44,7 @@ function module_most_commented($mod_reference, $module_params)
         }
     }
 
-    $result = TikiLib::lib('comments')->order_comments_by_count($type, isset($module_params['objectLanguageFilter']) ? $module_params['objectLanguageFilter'] : '', $mod_reference['rows']);
+    $result = TikiLib::lib('comments')->order_comments_by_count($type, $module_params['objectLanguageFilter'] ?? '', $mod_reference['rows']);
     if ($result === false) {
         $smarty->assign('module_error', tra('Feature disabled'));
         return;

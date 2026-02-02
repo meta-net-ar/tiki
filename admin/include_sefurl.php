@@ -7,7 +7,7 @@
 use Tiki\TikiInit;
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
-    die('This script may only be included.');
+    die(tra('This script may only be included.'));
 }
 require_once('tiki-setup.php');
 
@@ -47,7 +47,7 @@ if (isset($enabledFileName)) {
             }
             $referenceIdLine = fgets($referenceFile);
             $enabledIdLine = fgets($enabledFile);
-            if (! str_contains($enabledIdLine, 'This line is used to check that this configuration file is up to date.')) {
+            if (! str_contains($enabledIdLine, tra('This line is used to check that this configuration file is up to date.'))) {
                 $configurationFile = 'unexpected';
             } elseif ($referenceIdLine == $enabledIdLine) { // Do not warn if the Id line of each file is identical. Id lines contain configuration file revision.
                 $configurationFile = 'current';

@@ -54,6 +54,7 @@ class Services_Broker
                 // Special handling for modal dialog requests
                 // Do not send an error code as bootstrap will just blank out
                 // Render the error as a modal
+                $this->prepareModalHeaderLib();
                 $smarty = TikiLib::lib('smarty');
                 $smarty->assign('title', tr('Oops'));
                 $smarty->assign('detail', ['message' => $e->getMessage()]);
@@ -70,6 +71,7 @@ class Services_Broker
                 // Special handling for modal dialog requests
                 // Do not send an error code as bootstrap will just blank out
                 // Render the error as a modal
+                $this->prepareModalHeaderLib();
                 $smarty = TikiLib::lib('smarty');
                 $smarty->assign('title', tr('Oops'));
                 $smarty->assign('detail', ['message' => $e->getMessage()]);
@@ -203,5 +205,13 @@ class Services_Broker
         } else {
             return $smarty->fetch($template);
         }
+    }
+
+    private function prepareModalHeaderLib()
+    {
+        $headerlib = TikiLib::lib('header');
+        $headerlib->output_js_config();
+        $headerlib->output_js_files();
+        $headerlib->output_js();
     }
 }

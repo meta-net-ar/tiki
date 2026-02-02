@@ -14,7 +14,7 @@ class Tiki_Profile_Object
 
     public static function serializeNamedObject($object)
     {
-        if (strpos($object['domain'], '://') === false) {
+        if (! str_contains($object['domain'], '://')) {
             if (is_dir($object['domain'])) {
                 $object['domain'] = "file://" . $object['domain'];
             } else {
@@ -49,7 +49,7 @@ class Tiki_Profile_Object
         $str = '';
         if ($this->isWellStructured()) {
             $str .= $this->getType() . ' ';
-            $name = isset($this->data['data']['name']) ? $this->data['data']['name'] : tra('No name');
+            $name = $this->data['data']['name'] ?? tra('No name');
             $str .= '"' . $name . '"';
         } else {
             $str .= tra('Bad object');

@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\PDFHelper;
+use Tiki\Lib\Auth\Tokens;
 use Tiki\Package\ComposerManager;
 
 class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface
@@ -243,6 +244,16 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             'cameraandaudio' => tr('Camera and audio'),
                         ],
                     ],
+                    'changeFileNameOnUpload' => [
+                        'name' => tr('Change file name'),
+                        'description' => tr('Change file name on uploaded files. Upload In Modal required.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -432,6 +443,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         return $this->renderTemplate('trackerinput/files.tpl', $context, [
             'replaceFile' => 'y' == $this->getOption('replace', 'n'),
             'addDecriptionOnUpload' => $this->getOption('addDecriptionOnUpload') === 'y' ? 1 : 0,
+            'changeFileNameOnUpload' => $this->trackerField->getOption('changeFileNameOnUpload') === 'y' ? 1 : 0,
         ]);
     }
 
@@ -509,16 +521,16 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         $params['rel'] = 'box[' . $this->getInsertId() . ']';
                     }
                     include_once('lib/wiki-plugins/wikiplugin_img.php');
-                    $ret = wikiplugin_img('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('img', '', $params);
                     $ret = WikiPlugin_Helper::resultString($ret);
                 } elseif ($this->getOption('displayMode') == 'vimeo') { // Vimeo videos stored as filegal REMOTEs
                     include_once('lib/wiki-plugins/wikiplugin_vimeo.php');
-                    $ret = wikiplugin_vimeo('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('vimeo', '', $params);
                 } elseif ($this->getOption('displayMode') == 'moodlescorm') {
                     include_once('lib/wiki-plugins/wikiplugin_playscorm.php');
                     foreach ($this->getConfiguration('files') as $fileId => $file) {
                         $params['fileId'] = $fileId;
-                        $ret .= wikiplugin_playscorm('', $params);
+                        $ret .= TikiLib::lib('parser')->invokePlugin('playscorm', '', $params);
                     }
                 } elseif ($this->getOption('displayMode') == 'googleviewer') {
                     if ($prefs['auth_token_access'] != 'y') {
@@ -538,8 +550,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             } else {
                                 $fileurl = urlencode($base_url . "tiki-download_file.php?fileId=" . $fileId);
                             }
-                            require_once 'lib/auth/tokens.php';
-                            $tokenlib = AuthTokens::build($prefs);
+                            $tokenlib = Tokens::build($prefs);
                             if ($prefs['feature_sefurl'] === 'y') {
                                 $token = $tokenlib->createToken(
                                     $tikiroot . "dl" . $fileId,
@@ -587,11 +598,13 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                     $ret .= '<li>';
                     if ($prefs['vimeo_upload'] == 'y' && $this->getOption('displayMode') == 'vimeo') {
                         $ret .= smarty_function_icon(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
+                    } elseif (str_starts_with($file['filetype'], 'audio/')) {
+                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId], $smarty->getEmptyInternalTemplate());
                     } else {
                         $ret .= smarty_modifier_iconify('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
                     }
 
-                    $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name']], $smarty->getEmptyInternalTemplate());
+                    $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
 
                     $globalperms = Perms::get([ 'type' => 'file gallery', 'object' => $galleryId ]);
 
@@ -639,7 +652,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             'trigger' => 'click'
                         ], $smarty->getEmptyInternalTemplate());
                         $icon = smarty_function_icon(['name' => 'wrench'], $smarty->getEmptyInternalTemplate());
-                        $ret .= " <a class='fgalname tips' title='" . tr('Actions') . "'href='#' $popup>$icon</a>";
+                        $ret .= " <a class='fgalname tips label' title='" . tr('Actions') . "'href='#' $popup>$icon</a>";
                     }
 
                     $ret .= '</li>';
@@ -1185,7 +1198,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 $fileIds = [];
                 $urls = explode("\n", $value);
                 foreach ($urls as $url) {
-                    if (substr($url, 0, strlen($base_url)) === $base_url && preg_match('/(\d+)$/', $url, $m)) {
+                    if (str_starts_with($url, $base_url) && preg_match('/(\d+)$/', $url, $m)) {
                         $fileIds[] = $m[1];
                     } else {
                         $file_info = $filegallib->get_info_from_url($url);

@@ -12,7 +12,7 @@ $form-text: $text-muted !default;
 $padding-y: .5rem !default; // node_modules/bootstrap/scss/bootstrap-grid
 $padding-x: .75rem !default;
 
-$tiki-module-h3-card-title-font-size: $h4-font-size !default;
+//$tiki-module-h3-card-title-font-size: $h4-font-size !default; --- card-title is incorrect class for card-header heading but this rule doesn't seem to be in use anyway -g_c-l
 // Older
 $tiki-topmodules-row-sidemargins: 0 !default;
 $tiki-topbar-row-sidemargins: 0 !default;

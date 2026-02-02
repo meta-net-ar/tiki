@@ -10,11 +10,16 @@
 .el-select__wrapper.is-filterable,
 .el-select-dropdown,
 .el-select {
-    font-size: 16px !important;
-    color: var(--bs-body-color) !important;
-    background-color: var(--bs-body-bg) !important;
-    border-color: var(--bs-body-color) !important;
-    border-radius: var(--bs-border-radius) !important;
+    font-size: 16px;
+    border-color: var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+}
+
+.el-select-dropdown,
+.el-select-dropdown__wrap {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
 }
 
 .el-tag.el-tag--info {

@@ -14,21 +14,23 @@ use Tiki\Lib\GraphEngine\GDGRenderer;
 $inputConfiguration = [
     [
         'staticKeyFilters'                   => [
-            'save'                           => 'bool',        //post
-            'saveAction'                     => 'bool',        //post
+            'save'                           => 'alpha',       //post
+            'saveAction'                     => 'alpha',       //post
+            'unset'                          => 'alpha',       //post
             'action_log_type'                => 'striptags',   //post
             'action_log_ip'                  => 'striptags',   //post
             'action_log_action'              => 'striptags',   //post
             'find'                           => 'striptags',   //post
             'offset'                         => 'digits',      //post
-            'export'                         => 'bool',        //post
+            'export'                         => 'alpha',       //post
             'max'                            => 'digits',      //post
             'actionId'                       => 'digits',      //post
             'contributions'                  => 'striptags',   //post
             'startDate'                      => 'digits',      //post
+            'startDate_Year'                 => 'digits',      //post
             'endDate'                        => 'digits',      //post
-            'list'                           => 'bool',        //post
-            'graph'                          => 'bool',        //post
+            'list'                           => 'alpha',       //post
+            'graph'                          => 'alpha',       //post
             'categId'                        => 'int',         //post
             'startDate_Month'                => 'digits',      //post
             'Time_Hour'                      => 'digits',      //post
@@ -41,22 +43,23 @@ $inputConfiguration = [
             'end_Second'                     => 'digits',      //post
             'endDate_Day'                    => 'digits',      //post
             'endDate_Year'                   => 'digits',      //post
-            'export_bbb'                     => 'bool',        //post
-            'unit'                           => 'striptags',   //post
-            'sort_mode'                      => 'striptags',   //get
-            'contribTime'                    => 'striptags',   //post
-            'barPlot'                        => 'striptags',   //post
-            'bgcolor'                        => 'striptags',   //post
-            'legendBgcolor'                  => 'striptags',   //post
+            'export_bbb'                     => 'alpha',       //post
+            'unit'                           => 'alpha',       //post
+            'sort_mode'                      => 'alnumdash',   //get
+            'contribTime'                    => 'alpha',       //post
+            'barPlot'                        => 'alpha',       //post
+            'bgcolor'                        => 'alpha',       //post
+            'legendBgcolor'                  => 'alpha',       //post
             'galleryId'                      => 'int',         //post
             'time'                           => 'digits',      //post
             'action'                         => 'striptags'    //post
         ],
         'staticKeyFiltersForArrays' => [
-            'cat_categories'        => 'striptags',           //post
+            'cat_categories'        => 'digits',              //post
             'selectedUsers'         => 'username',            //post
             'selectedGroups'        => 'groupname',           //post
             'contributors'          => 'striptags',          //post
+            'checked'               => 'digits',              //post
         ],
     ],
 ];
@@ -145,25 +148,49 @@ $confs = $logslib->get_all_actionlog_conf();
 $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type, $action_log_action);
 $nbViewedConfs = 0;
 
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST['offset']) || ! empty($_REQUEST['export'])) {
     $offset = 0;
 } else {
     $offset = $_REQUEST["offset"];
 }
-if (isset($_REQUEST['max'])) {
-    $maxRecords = $_REQUEST['max'];
-} else {
-    $maxRecords = $prefs['maxRecords'];
-}
+$maxRecords = $_REQUEST['max'] ?? $prefs['maxRecords'];
 
 if ($tiki_p_view_actionlog == 'y') {
+    if (isset($_POST['unset']) && $access->checkCsrf()) {
+        foreach ($action_log_conf_selected as $conf) {
+            $logslib->set_actionlog_conf($conf['action'], $conf['objectType'], 'n');
+        }
+
+        $confs = $logslib->get_all_actionlog_conf();
+        $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type);
+        $cookietab = 1;
+        Feedback::success(tr('All actions logs unset'));
+    }
     if (isset($_POST['save']) && $access->checkCsrf()) {
+        $itemsSelected = false;
+        $recordedWithoutReported = [];
+
+        foreach ($action_log_conf_selected as $index => $conf) {
+            $recorded = isset($_REQUEST[$conf['code']]) && $_REQUEST[$conf['code']] == 'on';
+            $reported = isset($_REQUEST['v_' . $conf['code']]) && $_REQUEST['v_' . $conf['code']] == 'on';
+
+            if ($recorded || $reported) {
+                $itemsSelected = true;
+            }
+
+            if ($recorded && ! $reported) {
+                $recordedWithoutReported[] = $conf['action'] . ' - ' . $conf['objectType'];
+            }
+        }
+
+        if (! $itemsSelected) {
+            Feedback::warning(tra('Action logs have been configured successfully. No item checked to be recorded or reported.'));
+        } elseif (! empty($recordedWithoutReported)) {
+            Feedback::success(tra('Action logs have been configured successfully. Some selected items have been recorded but not reported'));
+        }
+
         foreach ($action_log_conf_selected as $index => $conf) {
             if (isset($_REQUEST['v_' . $conf['code']]) && $_REQUEST['v_' . $conf['code']] == 'on') { //viewed and reported
                 $logslib->set_actionlog_conf($conf['action'], $conf['objectType'], 'v');
@@ -173,13 +200,26 @@ if ($tiki_p_view_actionlog == 'y') {
                 $logslib->set_actionlog_conf($conf['action'], $conf['objectType'], 'n');
             }
         }
-        global $actionlogConf;
-        unset($actionlogConf);
+
         $confs = $logslib->get_all_actionlog_conf();
         $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type);
         $cookietab = 1;
     }
 } else {
+    if (isset($_POST['unset']) && $access->checkCsrf()) {
+        $_prefs = 'v';
+        foreach ($action_log_conf_selected as $conf) {
+            if ($conf['status'] === 'v' || $conf['status'] === 'y') {
+                $_prefs .= $conf['id'] . 'y';
+            }
+        }
+
+        $tikilib->set_user_preference($user, 'actionlog_conf', $_prefs);
+        $confs = $logslib->get_all_actionlog_conf();
+        $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type);
+        $cookietab = 1;
+        Feedback::success(tr('All actions logs unset'));
+    }
     if (isset($_POST['save']) && $access->checkCsrf()) {
         $_prefs = 'v';
         foreach ($action_log_conf_selected as $index => $conf) {
@@ -191,8 +231,7 @@ if ($tiki_p_view_actionlog == 'y') {
                 }
             }
         }
-        global $actionlogConf;
-        unset($actionlogConf);
+
         $confs = $logslib->get_all_actionlog_conf();
         $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type);
         $tikilib->set_user_preference($user, 'actionlog_conf', $_prefs);
@@ -207,10 +246,10 @@ if ($tiki_p_view_actionlog == 'y') {
                     }
                 }
             }
+            unset($conf);
         }
     }
-    global $actionlogConf;
-    $actionlogConf = $confs;
+    $logslib->set_actionlog_conf($confs);
 }
 
 foreach ($confs as $conf) {
@@ -493,7 +532,7 @@ if (isset($_REQUEST['list']) || isset($_REQUEST['export']) || isset($_REQUEST['g
         list($col, $order) = explode('_', $_REQUEST['sort_mode']);
         $sort = [];
         foreach ($actions as $a) {
-            $sort[] = isset($a[$col]) ? $a[$col] : '';
+            $sort[] = $a[$col] ?? '';
         }
         array_multisort($sort, ($order == 'desc') ? SORT_DESC : SORT_ASC, $actions);
         $smarty->assign('sort_mode', $_REQUEST['sort_mode']);
@@ -548,12 +587,12 @@ if (isset($_REQUEST['graph'])) {
         require_once('lib/jpgraph/src/jpgraph_bar.php');
         require_once('lib/jpgraph/src/jpgraph_mgraph.php');
         $ext = 'jpeg';
-        $background = new MGraph();
+        $background = new MGraph(); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
         $background->SetImgFormat($ext);
         $background->SetFrame(true, 'black');
         $background->SetMargin(10, 10, 10, 10);
     } else {
-        require_once('lib/sheet/grid.php');
+        require_once('lib/Sheet/grid.php');
         $graphType = 'Tiki\\Lib\\GraphEngine\\BarStackGraphic';
         $ext = 'jpg';
         $background = new GDGRenderer(max($widthUser, $widthWeek) + 80, 9 * $height, $ext);
@@ -564,7 +603,7 @@ if (isset($_REQUEST['graph'])) {
             $s = smarty_modifier_tiki_short_date($startDate);
             $e = smarty_modifier_tiki_short_date($endDate);
             $period = ($s != $e) ? " ($s-$e)" : " ($s)";
-            $accumulated = (isset($_REQUEST['barPlot']) && $_REQUEST['barPlot'] == 'acc') ? true : false;
+            $accumulated = isset($_REQUEST['barPlot']) && $_REQUEST['barPlot'] == 'acc';
             $series = $logslib->draw_contribution_user($userContributions, 'add', $contributions);
     if ($series['totalVol']) {
         if ($tiki_p_admin == 'y') {
@@ -573,7 +612,7 @@ if (isset($_REQUEST['graph'])) {
             $title = sprintf(tra('%s Contributions: Addition'), $user);
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthUser, $height + $xUserTickWidth);
+            $graph = new Graph($widthUser, $height + $xUserTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xUserTickWidth);
@@ -611,7 +650,7 @@ if (isset($_REQUEST['graph'])) {
             $title = sprintf(tra('%s Contributions: Suppression'), $user);
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthUser, $height + $xUserTickWidth);
+            $graph = new Graph($widthUser, $height + $xUserTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xUserTickWidth);
@@ -651,7 +690,7 @@ if (isset($_REQUEST['graph'])) {
             $title2 = tra('Weeks');
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthWeek, $height);
+            $graph = new Graph($widthWeek, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -687,7 +726,7 @@ if (isset($_REQUEST['graph'])) {
             $title2 = tra('Weeks');
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthWeek, $height);
+            $graph = new Graph($widthWeek, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -717,7 +756,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Total Contributions: Addition');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthTotal, $height);
+            $graph = new Graph($widthTotal, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -746,7 +785,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Total Contributions: Suppression');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthTotal, $height);
+            $graph = new Graph($widthTotal, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -775,7 +814,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Groups Contributions: Addition');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthGroup, $height + $xGroupTickWidth);
+            $graph = new Graph($widthGroup, $height + $xGroupTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xGroupTickWidth);
@@ -807,7 +846,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Groups Contributions: Suppression');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthGroup, $height + $xGroupTickWidth);
+            $graph = new Graph($widthGroup, $height + $xGroupTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xGroupTickWidth);

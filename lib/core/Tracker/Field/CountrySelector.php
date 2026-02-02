@@ -150,9 +150,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
     {
         $ins_id = $this->getInsertId();
 
-        $value = isset($requestData[$ins_id])
-            ? $requestData[$ins_id]
-            : $this->getValue();
+        $value = $requestData[$ins_id] ?? $this->getValue();
 
         if ($this->canHaveMultipleValues() && ! is_array($value)) {
             $value = explode(',', $value);

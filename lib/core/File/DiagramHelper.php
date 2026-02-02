@@ -144,7 +144,7 @@ class DiagramHelper
 
         if (in_array($type, ['text/plain', 'text/xml'])) {
             $data = trim($file->getContents());
-            if (strpos($data, '<mx') === 0) {
+            if (str_starts_with($data, '<mx')) {
                 return true;
             }
         }
@@ -239,7 +239,7 @@ class DiagramHelper
                             $listPluginArguments['diagram-offset'] = self::WIKI_SYNTAX_DEFAULT_DIAGRAM_MXCELL_OFFSET;
                         }
 
-                        wikiplugin_list($plugin->getBody(), array_merge($listPluginArguments, ['resultCallback' => $callback]));
+                        TikiLib::lib('parser')->invokePlugin('list', $plugin->getBody(), array_merge($listPluginArguments, ['resultCallback' => $callback]));
                         $cellAttributes = current($mxCell->attributes());
                         $geometryAttributes = current($mxCell->mxGeometry->attributes());
                         $offsetAxis = $listPluginArguments['diagram-repeat'] == 'vertical' ? 'y' : 'x';

@@ -105,6 +105,36 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ["# foo1\n## foo11\n##foo12\n# bar1\n", "<ol><li> foo1\n<ol><li> foo11\n</li><li>foo12\n</li></ol></li><li> bar1\n</li></ol><br />"],   // Nested Numbered list
             ["# foo\n+ Continuation1\n+Continuation2\n# bar\n", "<ol><li> foo\n<br /> Continuation1\n<br />Continuation2\n</li><li> bar\n</li></ol><br />"], // Numbered list with continuation
 
+            // --- TESTS FOR COLLAPSIBLE LISTS ---
+
+            // Test 1: Basic collapsible list, shown by default (+)
+            [
+                "*+ Collapsible List Item",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Collapsible List Item<ul id="idHomePage1" style="display:block;"></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 2: Basic collapsible list, hidden by default (-)
+            [
+                "*- Collapsible List Item",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[+]</a> Collapsible List Item<ul id="idHomePage1" style="display:none;"></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 3: Nested collapsible list with children
+            [
+                "*+ Parent\n**- Child\n*** Grandchild",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Parent<ul id="idHomePage1" style="display:block;">' . "\n" . '<li><a id="flipperidHomePage2" class="link" href="javascript:flipWithSign(\'idHomePage2\')">[+]</a> Child<ul id="idHomePage2" style="display:none;">' . "\n" . '<li> Grandchild</li></ul></li></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 4: Ensure blank lines do not break a nested list
+            [
+                "*+ Parent\n\n** Child",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Parent<ul id="idHomePage1" style="display:block;">' . "\n\n" . '<li> Child</li></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
             ["||r1c1|r1c2\nr2c1|r2c2||", '<table class="wikitable table table-striped table-hover"><tr><td class="wikicell" >r1c1</td><td class="wikicell" >r1c2</td></tr><tr><td class="wikicell" >r2c1</td><td class="wikicell" >r2c2</td></tr></table><br />'],
             ["~pp~foo~/pp~", "<pre>foo</pre><br />"],
         ];

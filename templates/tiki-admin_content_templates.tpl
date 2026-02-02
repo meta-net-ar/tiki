@@ -42,7 +42,7 @@
                         {section name=ix loop=$channels[user].sections}
                             {$channels[user].sections[ix]}
                             {if $channels[user].edit}
-                                <a class="tips" title=":{tr}Delete{/tr}" class="link" href="tiki-admin_content_templates.php?removesection={$channels[user].sections[ix]}&amp;rtemplateId={$channels[user].templateId}" onclick="confirmPopup('{tr}Remove section?{/tr}', '{ticket mode=get}')">
+                                <a class="tips link" title=":{tr}Delete{/tr}"  href="tiki-admin_content_templates.php?removesection={$channels[user].sections[ix]}&amp;rtemplateId={$channels[user].templateId}" onclick="confirmPopup('{tr}Remove section?{/tr}', '{ticket mode=get}')">
                                     {icon name='remove' alt="{tr}Remove section{/tr}"}
                                 </a>
                             {/if}
@@ -197,7 +197,7 @@
                 <div class="mb-3 row">
                     <label class="col-sm-3 col-form-label" for="is_html">{tr}HTML{/tr}</label>
                     <div class="col-sm-9">
-                        <input type="checkbox" name="section_wiki_html" id="is_html" class="form=control" {if $info.section_wiki_html eq 'y'}checked="checked"{/if}>
+                        <input type="checkbox" name="section_wiki_html" id="is_html" class="form-control" {if $info.section_wiki_html eq 'y'}checked="checked"{/if}>
                     </div>
                 </div>
                 {if $prefs.lock_content_templates eq 'y'}

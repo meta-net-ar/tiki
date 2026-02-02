@@ -144,8 +144,8 @@ $.fn.setupEventCalendar = function (tcPluginParams) {
 
                         // Store useful data values to the URL for Wiki Argument Variable
                         // use and to javascript session storage for JQuery use
-                        actualURL += "trackerid=" + event.trackerId;
-                        if (event.trkitemid === "y") {
+                        actualURL += "trackerid=" + tcPluginParams.trackerId;
+                        if (tcPluginParams.trkitemid === "y") {
                             actualURL = actualURL + "&itemId=" + event.id;
                         } else {
                             actualURL = actualURL + "&itemid=" + event.id;

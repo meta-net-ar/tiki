@@ -92,7 +92,7 @@ class Tracker_Options
                             // one word quoted. ex: "bananas" or option1="bananas"
                             if (preg_match('/^(").*\1$|^.*=(").*\2$/', trim($item))) {
                                 $optionItems[] = $item;
-                            } elseif (strpos($item, '"') !== false) {
+                            } elseif (str_contains($item, '"')) {
                                 if ($commaItem == '') {
                                     $commaItem = $item;
                                 } else {

@@ -7,6 +7,8 @@ const props = defineProps({
         type: String,
         default: 'en',
     },
+    minuteStep: Number,
+    enforceStep: Number,
 });
 
 const locale = shallowRef(null);

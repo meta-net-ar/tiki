@@ -63,38 +63,11 @@
     }
 }
                    
-.ec-today {
-    .ec-day-head {
-        background-color: #dfdfdf;
-    }
-}
-
-h4.ec-day-head {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-}
-
 .ec-day-head {
-    height: 1.4rem;
-    width: 1.4rem;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin: 5px 5px 0px 0px;
-    border-radius: 50%;
-    transition: background-color 0.3s ease, color 0.3s ease;
-
-    &:hover {
-        background-color: #1977db;
-        color: #fff;           
-        cursor: pointer;
-    }
 }
 
-.ec-semester-view .ec-day-head, .ec-quarter-view .ec-day-head {
+.ec-semester-view , .ec-quarter-view {
     width: fit-content;
     border-radius: 8px;
 }
@@ -108,16 +81,6 @@ h4.ec-day-head {
     overflow-y: hidden;
 }
 
-.ec-active, .ec-prev, .ec-next {
-    background-color: rgb(13, 110, 253) !important;
-    color: #fff !important;
-}
-
-button.ec-today {
-    background-color: #8da0bc !important;
-    color: #fff !important;
-}
-
 h4.ec-event-title {
     font-size: 16px;
     text-overflow: clip !important;
@@ -129,4 +92,66 @@ h4.ec-event-title {
 
 .ec-days > time {
     display: block;
+}
+
+
+.ui-datepicker {
+    z-index:9999 !important;
+}
+.ec .ec-scrollgrid, .ec .ec-scrollgrid table,
+.ec .ec-day-grid {
+    width: 100% !important;
+}
+.ec-day-grid-harness {
+    border-radius: 4px;
+    margin: 0px 3px 0px;
+}
+.ec-event {
+    display: block;
+    white-space: break-spaces;
+    margin-top: 1px;
+}
+.ec-events .ec-event-time {
+    color: #ffffff;
+    font-weight: bold;
+}
+.ec-events .ec-event-title {
+    color: #ffffff;
+    font-weight: normal;
+}
+.ec-time-grid-event .ec-event-time {
+    font-weight: bold;
+}
+.ec-time-grid .ec-event-title {
+    font-weight: normal;
+}
+.ec-dark .ec-active {
+    color: white;
+}
+article.tips {
+    display: flex;
+}
+.ec-event-tag {
+    height: auto;
+}
+
+nav.ec-toolbar {
+    flex-wrap: wrap;
+}
+
+@media only screen and (max-width: 767px) {
+    .ec-toolbar {
+        display: block !important;
+    }
+    .ec-toolbar .ec-button .btn-group .btn {
+        padding: 0.375rem 0.1rem;
+    }
+    h4.ec-event-title {
+        font-size: 0px;
+    }
+}
+@media print {
+    .ec .ec-day-grid-day-top {
+        border-bottom: 1px solid #dee2e6;
+    }
 }

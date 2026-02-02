@@ -24,7 +24,8 @@
                 <div class="col-sm-9">
                     <select class="form-control" id="instances" name="instances[]" multiple required>
                         {foreach item=instance from=$instances}
-                        <option value="{$instance->id|escape}" {if $instance->id eq $selectedInstanceId}selected{/if}>{$instance->name|escape|default:$instance->id|escape}</option>
+                            <option value="{$instance->id|escape}" {if $instance->id eq $selectedInstanceId}selected{/if}>{$instance->name|escape|default:$instance->id|escape}</option>
+                        {/foreach}
                     </select>
                 </div>
             </div>

@@ -100,7 +100,7 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
         $definition = Tracker_Definition::get($info['trackerId']);
         $fieldDefinition = $definition->getFieldFromPermName($field);
 
-        /** @var FileGalLib $fileGal */
+        /** @var Tiki\Lib\Filegals\FileGalLib $fileGal */
         $fileGal = TikiLib::lib('filegal');
 
         $fileList = $info[$fieldDefinition['fieldId']];

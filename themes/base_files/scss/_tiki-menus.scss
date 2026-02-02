@@ -12,6 +12,12 @@
     }
 }
 
+// Align the various width icons and the menu option text labels nicely
+.navbar-nav .nav-item > .nav-link .icon {
+    min-width: var(--bs-gutter-x);
+    text-align: center;
+}
+
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
     transform: rotate(-90deg);
     /* position: absolute;
@@ -21,6 +27,11 @@
     left: auto;
     margin-left: 0;
     right: 10px; */
+}
+
+// Make Smartmenus dropdowns open on top of, not under, other navbars
+.tiki .sm-navbar {
+    --sm-navbar-z-index: inherit !important;
 }
 
 /* Smartmenus navbars (Megamenu static) */
@@ -141,4 +152,42 @@
     font-variant: normal;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
+}
+
+/* --- Force all dropdowns to open upwards ---*/
+.dropdown-menu-bottom {
+    top: auto !important;
+    bottom: 100% !important;
+    margin-bottom: .5rem;
+    margin-top: 0 !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dropdown-menu-top-t,
+.dropdown-menu-end-l,
+.dropdown-menu-start-r {
+  top: 100%;
+  bottom: auto;
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2000 !important;
+}
+
+.dropdown-menu-bottom-b {
+    max-height: 65vh;
+    z-index: 3000;
+}
+
+/* Menu separator styling */
+.menu-separator {
+  border: none;
+  border-top: 1px solid #343a40;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.form-control .menu-separator {
+  margin: 0;
 }

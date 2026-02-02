@@ -12,14 +12,16 @@ $section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'parentId'           => 'int',               //post
+        'parentId'           => 'int',               //get
         'editfolder'         => 'int',               //get
         'editurl'            => 'int',               //get
         'addfolder'          => 'bool',              //post
-        'foldername'         => 'word',              //post
+        'foldername'         => 'text',              //post
         'removefolder'       => 'int',               //get
-        'addurl'             => 'bool',              //post
-        'urlname'            => 'word',              //post
+        'addurl'             => 'alpha',             //post
+        'urlname'            => 'text',              //post
+        'urlurl'             => 'text',              //post
+        'refreshurl'         => 'int',               //get/post
         'removeurl'          => 'int',               //get
         ],
     ],

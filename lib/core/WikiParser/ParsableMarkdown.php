@@ -18,8 +18,8 @@ use League\CommonMark\MarkdownConverter;
 use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
-use League\CommonMark\Block\Element\FencedCode;
-use League\CommonMark\Block\Renderer\FencedCodeRenderer;
+use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
+use League\CommonMark\Extension\CommonMark\Renderer\Block\FencedCodeRenderer;
 use Tiki\WikiParser\Markdown\Extension as TikiExtension;
 
 class WikiParser_ParsableMarkdown extends ParserLib

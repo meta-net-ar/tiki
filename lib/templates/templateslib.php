@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -88,7 +88,7 @@ class TemplatesLib extends TikiLib
         $res = $result->fetchRow();
 
         if ($res['template_type'] == 'page') {
-            if (substr($res['content'], 0, 5) == 'page:') {
+            if (str_starts_with($res['content'], 'page:')) {
                 $res['page_name'] = substr($res['content'], 5);
                 $res['content'] = $this->get_template_from_page($res['page_name'], $lang);
             }

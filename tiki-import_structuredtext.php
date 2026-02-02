@@ -13,8 +13,8 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
         'import'                          => 'bool',              //post
         'path'                            => 'string',            //post
-        'remo'                            => 'bool',              //post
-        'crunch'                          => 'bool',              //post
+        'remo'                            => 'alpha',              //post
+        'crunch'                          => 'alpha',              //post
         ],
     ],
 ];

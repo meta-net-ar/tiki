@@ -70,7 +70,6 @@ function wikiplugin_list_info()
                 'name' => tra('Cache Purge Rules'),
                 'description' => tra('Purge the cache when the type:id objects are updated. Set id=0 for any of that type. Or set type:withparam:x. Examples: trackeritem:20, trackeritem:trackerId:3, file:galleryId:5, forum post:forum_id:7, forum post:parent_id:8. Note that rule changes affect future caching, not past caches.'),
                 'separator' => ',',
-                'default' => '',
                 'filter' => 'text',
                 'since' => '20.0',
             ],
@@ -138,7 +137,7 @@ function wikiplugin_list($data, $params)
         return;
     }
 
-    if (! isset($params['cache'])) {
+    if (is_null($params['cache'])) {
         if ($prefs['unified_list_cache_default_on'] == 'y') {
             $params['cache'] = 'y';
         } else {
@@ -149,7 +148,7 @@ function wikiplugin_list($data, $params)
     if ($params['cache'] == 'y') {
         // Exclude any type of admin from caching
         foreach (TikiLib::lib('user')->get_user_permissions($user) as $permission) {
-            if (substr($permission, 0, 12) == 'tiki_p_admin') {
+            if (str_starts_with($permission, 'tiki_p_admin')) {
                 $params['cache'] = 'n';
                 break;
             }
@@ -161,10 +160,6 @@ function wikiplugin_list($data, $params)
         $params['cache'] = 'y';
     }
 
-    if (! isset($params['gui'])) {
-        $params['gui'] = 1;
-    }
-
     if ($prefs['wikiplugin_list_gui'] === 'y' && $params['gui']) {
         TikiLib::lib('header')
             ->add_jsfile('lib/jquery_tiki/pluginedit_list.js');
@@ -172,7 +167,7 @@ function wikiplugin_list($data, $params)
 
     $tosearch = [];
 
-    if (isset($params['multisearchid']) && $params['multisearchid'] > '') {
+    if (! is_null($params['multisearchid']) && $params['multisearchid'] > '') {
         // If 'multisearchid' is provided as a parameter to the LIST plugin, it means the list plugin
         // is to render the results of that ID specified in the MULTISEARCH block of the "pre-searching" LIST plugin.
         $renderMultisearch = true;
@@ -188,7 +183,11 @@ function wikiplugin_list($data, $params)
     } else {
         $cacheName = md5($data . "loggedout");
     }
-    if (isset($params['cacheexpiry'])) {
+
+    // use a different cache for each language
+    $cacheName = $prefs['feature_multilingual'] === 'y' ? "{$prefs['language']}-{$cacheName}" : $cacheName;
+
+    if (! is_null($params['cacheexpiry'])) {
         $cacheExpiry = $params['cacheexpiry'];
     } else {
         $cacheExpiry = $prefs['unified_list_cache_default_expiry'];
@@ -230,7 +229,7 @@ function wikiplugin_list($data, $params)
     if ($params['cache'] == 'y') {
         // Clean rules setting
         $rules = [];
-        if (isset($params['cachepurgerules'])) {
+        if (! is_null($params['cachepurgerules'])) {
             foreach ($params['cachepurgerules'] as $r) {
                 $parts = explode(':', $r, 2);
                 $cleanrule['type'] = trim($parts[0]);
@@ -283,7 +282,7 @@ function wikiplugin_list($data, $params)
             }
             // Handle each query. If not multisearch will just be one.
             $query = new Search_Query();
-            if (! isset($params['searchable_only']) || $params['searchable_only'] == 1) {
+            if ($params['searchable_only'] == 1) {
                 $query->filterIdentifier('y', 'searchable');
             }
             $unifiedsearchlib->initQuery($query);

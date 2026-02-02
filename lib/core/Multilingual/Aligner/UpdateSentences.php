@@ -8,7 +8,6 @@
 use Tiki\Lib\Diff\TextDiff;
 use Tiki\Lib\Diff\Renderer\Unified;
 
-include_once __DIR__ . '/../../../Diff/difflib.php';
 include_once __DIR__ . '/SentenceAlignments.php';
 include_once __DIR__ . '/SentenceSegmentor.php';
 include_once __DIR__ . '/MockMTWrapper.php';

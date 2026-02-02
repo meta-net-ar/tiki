@@ -46,7 +46,9 @@
         <service id="tiki.controller.file" class="Services_File_Controller"/>
         <service id="tiki.controller.h5p" class="Services_H5P_Controller"/>
         <service id="tiki.controller.kaltura" class="Services_Kaltura_Controller"/>
+        <service id="tiki.controller.peertube" class="Services_PeerTube_Controller"/>
         <service id="tiki.controller.language" class="Services_Language_Controller"/>
+        <service id="tiki.controller.languagecheck" class="Services_LanguageCheck_Controller"/>
         <service id="tiki.controller.manager" class="Services_Manager_Controller"/>
         <service id="tiki.controller.manager_field" class="Services_Manager_FieldController"/>
         <service id="tiki.controller.manager_patch" class="Services_Manager_PatchController"/>
@@ -102,5 +104,6 @@
         <service id="tiki.controller.webauthn" class="Tiki\Services\Webauthn\WebauthnController"/>
         <service id="tiki.controller.two_fa_auth" class="Tiki\Services\TwoFactorAuth\TwoFactorAuthController"/>
         <service id="tiki.controller.iotapps" class="Services_IotApps_Controller"/>
+        <service id="tiki.controller.queued_tasks" class="Tiki\Services\QueueManager\QueueManagerController"/>
     </services>
 </container>

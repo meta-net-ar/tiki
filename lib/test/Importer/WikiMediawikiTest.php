@@ -4,13 +4,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 namespace Tiki\Lib\Test\Importer;
 
 use DOMDocument;
-use ImporterParserException;
 use PEAR_Error;
 use Text_Wiki_Mediawiki;
-use TikiImporter_Wiki_Mediawiki;
+use Tiki\Lib\Importer\ParserException;
+use Tiki\Lib\Importer\WikiMediawiki;
+use TikiLib;
 
 /**
  * @group importer
@@ -20,7 +22,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     public $obj;
     protected function setUp(): void
     {
-        $this->obj = new TikiImporter_Wiki_Mediawiki();
+        $this->obj = new WikiMediawiki();
     }
 
     public function testImport(): void
@@ -29,7 +31,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $parsedData = 'Some text';
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['validateInput', 'parseData', 'insertData', 'configureParser'])
             ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -53,11 +55,10 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         $this->markTestSkipped('2016-09-26 Skipped as the underlying PEAR is out of date.');
 
-        global $tikilib;
-        $tikilib = $this->getMockBuilder('TikiLib')
+        $tikilib = $this->getMockBuilder(TikiLib::class)
             ->onlyMethods(['create_page', 'update_page', 'page_exists', 'remove_all_versions'])
             ->getMock();
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')->onlyMethods(['saveAndDisplayLog'])->getMock();
+        $obj = $this->getMockBuilder(WikiMediawiki::class)->onlyMethods(['saveAndDisplayLog'])->getMock();
         $obj->expects($this->exactly(12))->method('saveAndDisplayLog');
 
         $expectedImportFeedback = ['totalPages' => 4, 'importedPages' => 4];
@@ -75,7 +76,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $parsedData = 'Some text';
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['validateInput', 'parseData', 'insertData', 'checkRequirementsForAttachments', 'downloadAttachments', 'configureParser'])
             ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -153,7 +154,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->addMethods(['downloadAttachment'])
             ->onlyMethods(['extractInfo'])
             ->getMock();
@@ -169,11 +170,11 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
     public function testParseDataShouldPrintMessageIfErrorToParseAPageWhenExtractInfoReturnException(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->addMethods(['downloadAttachment'])
             ->onlyMethods(['extractInfo', 'saveAndDisplayLog'])
             ->getMock();
-        $obj->expects($this->exactly(4))->method('extractInfo')->willthrowException(new ImporterParserException(''));
+        $obj->expects($this->exactly(4))->method('extractInfo')->willthrowException(new ParserException(''));
         $obj->expects($this->exactly(5))->method('saveAndDisplayLog')->willReturn('');
 
         $obj->dom = new DOMDocument();
@@ -184,7 +185,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
     public function testParseDataHandleDifferentlyPagesAndFilePages(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['extractInfo', 'saveAndDisplayLog'])
             ->getMock();
         $obj->expects($this->exactly(4))->method('extractInfo')->willReturn([]);
@@ -291,7 +292,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $i = 0;
         foreach ($pages as $page) {
-            $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+            $obj = $this->getMockBuilder(WikiMediawiki::class)
                 ->onlyMethods(['extractRevision'])
                 ->getMock();
             $obj->revisionsNumber = 0;
@@ -319,7 +320,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $i = 0;
         foreach ($pages as $page) {
-            $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+            $obj = $this->getMockBuilder(WikiMediawiki::class)
                 ->onlyMethods(['extractRevision'])
                 ->getMock();
             $obj->revisionsNumber = 5;
@@ -348,7 +349,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $i = 0;
         foreach ($pages as $page) {
-            $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+            $obj = $this->getMockBuilder(WikiMediawiki::class)
                 ->onlyMethods(['extractRevision'])
                 ->getMock();
             $obj->revisionsNumber = 0;
@@ -377,7 +378,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $i = 0;
         foreach ($pages as $page) {
-            $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+            $obj = $this->getMockBuilder(WikiMediawiki::class)
                 ->onlyMethods(['extractRevision'])
                 ->getMock();
             $obj->revisionsNumber = 15;
@@ -397,11 +398,11 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['extractRevision'])
             ->getMock();
         $obj->revisionsNumber = 0;
-        $obj->expects($this->exactly(10))->method('extractRevision')->willReturnOnConsecutiveCalls([], [], $this->throwException(new ImporterParserException()), [], [], [], [], [], [], []);
+        $obj->expects($this->exactly(10))->method('extractRevision')->willReturnOnConsecutiveCalls([], [], $this->throwException(new ParserException()), [], [], [], [], [], [], []);
 
         $dom = new DOMDocument();
         $dom->load(__DIR__ . '/fixtures/mediawiki_page.xml');
@@ -417,11 +418,11 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
     public function testExtractInfoShouldThrowExceptionIfUnableToParseAllRevisionsOfPage(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['extractRevision', 'saveAndDisplayLog'])
             ->getMock();
         $obj->revisionsNumber = 0;
-        $obj->expects($this->exactly(8))->method('extractRevision')->willThrowException(new ImporterParserException());
+        $obj->expects($this->exactly(8))->method('extractRevision')->willThrowException(new ParserException());
         $obj->expects($this->exactly(8))->method('saveAndDisplayLog')->willReturn('');
 
         $dom = new DOMDocument();
@@ -449,7 +450,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
         $i = 0;
         foreach ($revisions as $revision) {
-            $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+            $obj = $this->getMockBuilder(WikiMediawiki::class)
                 ->onlyMethods(['convertMarkup', 'extractContributor'])
                 ->getMock();
             $obj->expects($this->once())->method('convertMarkup')->willReturn('Some text');
@@ -461,7 +462,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
 
     public function testExtractRevisionShouldRaiseExceptionForInvalidSyntax(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Wiki_Mediawiki')
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
             ->onlyMethods(['convertMarkup', 'extractContributor'])
             ->getMock();
         $obj->expects($this->once())->method('convertMarkup')->willReturn(new PEAR_Error('some message'));
@@ -471,7 +472,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
         $dom->load(__DIR__ . '/fixtures/mediawiki_revision_invalid_syntax.xml');
         $revisions = $dom->getElementsByTagName('revision');
 
-        $this->expectException('ImporterParserException');
+        $this->expectException(ParserException::class);
         foreach ($revisions as $revision) {
             $this->assertNull($obj->extractRevision($revision));
         }

@@ -18,6 +18,10 @@ Important conventions:
 - Directories path must NOT end with a /
 */
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    return;
+}
+
 const ADMIN_PATH = 'admin';
 const BIN_PATH = 'bin';
 
@@ -55,7 +59,9 @@ const LANG_CUSTOM_PHP_BASENAME = 'custom.php';
 /** This is actually a route, will disapear in path_rework */
 const LISTS_PATH = 'lists';
 const LIB_PATH = 'lib';
-/** The path for php source code, mostly fro rector and phpstan */
+/** Path to test library files */
+const LIB_TEST_PATH = 'lib/test';
+/** The path for php source code, mostly for rector and phpstan */
 const PHP_SOURCES_PATH = 'src/php';
 
 /** This was for the Mods feature, replaced by packages.  Do not confuse with MODULES_PATH */
@@ -91,7 +97,9 @@ const TEMP_PATH = 'temp';
 const TEMP_HTTP_PUBLIC_PATH = 'temp/public';
 const TEMP_CACHE_PATH = 'temp/cache';
 const TEMP_PUBLIC_PATH = 'temp/public';
+const TEMP_MAIL_DEBUG = 'temp/mail_debug';
 const HTMLPURIFIERCACHE_CACHE_PATH = 'temp/cache/HTMLPurifierCache';
+const TEMP_PDFIMG_PATH = 'temp/pdfimg';
 
 const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
 //Question: where is the string or constant that generates these files?
@@ -158,9 +166,15 @@ const PRIMARY_AUTOLOAD_FILE_PATH = 'vendor_bundled/vendor/autoload.php';
 const PRIMARY_COMPOSERJSON_FILE_PATH = 'vendor_bundled/composer.json';
 const COMPOSERLOCK_FILE_PATH = 'vendor_bundled/composer.lock';
 
+const PRIMARY_PACKAGEJSON_FILE_PATH = 'package.json';
+const PRIMARY_PACKAGERLOCK_FILE_PATH = 'package-lock.json';
+const PRIMARY_JQUERYTIKI_PACKAGEJSON_FILE_PATH = 'src/js/jquery-tiki/package.json';
+const PRIMARY_EXTERNAL_PACKAGEJSON_FILE_PATH = 'src/js/common-externals/package.json';
 
 /* BEGIN - HTTP PATHS */
 const HTTP_PUBLIC_PATH = 'public';
+/** Path to generated files that are servable over HTTP */
+const PUBLIC_GENERATED_PATH = 'public/generated';
 /* Javascript assets servable over http, including css generated from js files. */
 const JS_ASSETS_PATH = 'public/generated/js';
 /** This is the path for JS vendor files that would normally be served by a content delivery network.  We both bundle these files in the tarball, and (usually) serve them locally. */
@@ -179,10 +193,10 @@ const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
 const FONTAWESOME_CSS_SRC_PATH = 'node_modules/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/webfonts';
-const MINICART_DIST_PATH = 'public/generated/js/vendor_dist/minicart/dist';
+
 const OL_PATH = 'public/generated/js/vendor_dist/ol'; // 'ol' was formerly called 'openlayers'
 const OL_LAYERSWITCHER_DIST_PATH = 'public/generated/js/vendor_dist/ol-layerswitcher/dist';
-const PIVOTTABLE_DIST_PATH = 'public/generated/js/vendor_dist/pivottable/dist';
+const PIVOTTABLE_DIST_PATH = 'vendor_bundled/vendor/nicolaskruchten/pivottable/dist';
 const PLOTLYJS_DIST_PATH = 'public/generated/js/vendor_dist/plotly.js/dist';
 const REVEALJS_DIST_PATH = 'public/generated/js/vendor_dist/reveal.js/dist';
 const SUBTOTAL_DIST_PATH = 'public/generated/js/vendor_dist/subtotal/dist';

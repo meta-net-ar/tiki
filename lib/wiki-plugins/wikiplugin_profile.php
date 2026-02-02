@@ -31,7 +31,6 @@ function wikiplugin_profile_info()
                 'description' => tra('Name of the profile to be applied.'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
             ]
         ]
     ];
@@ -43,12 +42,6 @@ function wikiplugin_profile($data, $params)
 
     if ($tiki_p_admin != 'y') {
         return '__' . tra('Profile plugin only available to administrators') . '__';
-    }
-
-    $params = array_merge(['domain' => 'profiles.tiki.org'], $params);
-
-    if (! isset($params['name'])) {
-        return 'Missing parameter __name__';
     }
 
     $profile = Tiki_Profile::fromNames($params['domain'], $params['name']);

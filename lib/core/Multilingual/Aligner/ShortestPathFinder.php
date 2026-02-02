@@ -71,9 +71,7 @@ class Multilingual_Aligner_ShortestPathFinder
                 $this -> distance[$currNode] = 0;
             } else {
                 $this -> visited[$currNode] = false;
-                $this -> distance[$currNode] = isset($this -> map[$this -> startnode][$currNode])
-                    ? $this -> map[$this -> startnode][$currNode]
-                    : $this -> infiniteDistance;
+                $this -> distance[$currNode] = $this->map[$this->startnode][$currNode] ?? $this->infiniteDistance;
             }
             $this -> previousNode[$currNode] = $this -> startnode;
         }
@@ -149,7 +147,7 @@ class Multilingual_Aligner_ShortestPathFinder
         $foo = '';
         for ($i = 0, $im = count($map); $i < $im; $i++) {
             for ($k = 0, $m = $im; $k < $m; $k++) {
-                $foo .= sprintf($placeholder, isset($map[$i][$k]) ? $map[$i][$k] : $this -> infiniteDistance);
+                $foo .= sprintf($placeholder, $map[$i][$k] ?? $this->infiniteDistance);
             }
             $foo .= "\n";
         }

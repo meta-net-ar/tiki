@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 function wikiplugin_now_info()
 {
     $timezone_options = [ ['text' => '', 'value' => ''] ];
@@ -105,7 +108,7 @@ function wikiplugin_now($data, $params)
             //see if the user format setting results in a valid date, return default format if not
             try {
                 new DateTime($ret);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $ret = $default;
             }
         }

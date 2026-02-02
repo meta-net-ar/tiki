@@ -146,9 +146,9 @@ class Services_Edit_ListConverter
                     $this->columnOptions['sort'] = $value === 'y';
                     break;
                 case 'sort_mode':
-                    if (strpos($value, 'lastModif_') === 0) {
+                    if (str_starts_with($value, 'lastModif_')) {
                         $sortMode = ['mode' => 'modification_date_' . str_replace('lastModif_', '', 'n' . $value)];
-                    } elseif (strpos($value, 'created_') === 0) {
+                    } elseif (str_starts_with($value, 'created_')) {
                         $sortMode = ['mode' => 'creation_date_' . str_replace('created_', '', 'n' . $value)];
                     } else {
                         $sortMode = ['mode' => $value];    // e.g. f_xxx_desc

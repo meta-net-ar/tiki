@@ -248,7 +248,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         $out = [];
         foreach ($this as $entry) {
             $values = array_map(function ($field) use ($entry) {
-                return isset($entry[$field]) ? $entry[$field] : '';
+                return $entry[$field] ?? '';
             }, $fields);
             $key = implode('', $values);
             if (! isset($out[$key])) {

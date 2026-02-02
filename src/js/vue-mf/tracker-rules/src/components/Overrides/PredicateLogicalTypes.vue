@@ -1,5 +1,13 @@
 <template>
-    <select class="form-select" :value="predicate.logic.logicalType_id" @change="handleChange">
+    <el-select
+        v-if="isElementPlusActive"
+        v-model="modelValue"
+        placeholder="Select"
+        @change="() => emit('change', modelValue)"
+    >
+        <el-option v-for="logicalType in columns.logicalTypes" :key="logicalType.label" :label="logicalType.label" :value="logicalType.logicalType_id" />
+    </el-select>
+    <select class="form-select" :value="predicate.logic.logicalType_id" @change="handleChange" v-else>
         <option v-for="logicalType in columns.logicalTypes" :key="logicalType.label"
             :value="logicalType.logicalType_id">
             {{ logicalType.label }}
@@ -8,9 +16,11 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
+
 defineOptions({ name: "PredicateLogicalTypes" });
 
-defineProps({
+const props = defineProps({
     predicate: {
         type: Object,
         required: true,
@@ -20,6 +30,10 @@ defineProps({
         required: true,
     },
 });
+
+const modelValue = ref(props.predicate.logic.logicalType_id);
+
+const isElementPlusActive = ref(!!window.elementPlus);
 
 const emit = defineEmits(["change"]);
 

@@ -59,7 +59,10 @@
                 <div class="admin clearfix mb-3 featurelist">
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
+                    {preference name=feature_version_checks}
+                    {preference name=feature_eol_date_notifier}
                     {preference name=feature_scheduler}
+                    {preference name=feature_queued_tasks}
                     {preference name=feature_banners}
                     {preference name=feature_contribution}
                     {preference name=feature_copyright}
@@ -192,7 +195,6 @@
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="jQuery_plugins_and_add-ons"> {tr}jQuery plugins and add-ons{/tr}  <a href="#jQuery_plugins_and_add" class="heading-link" aria-label="{tr}jQuery {/tr}">{icon name="link"}</a></h4></legend>
-                {preference name=feature_jquery_reflection}
                 <div class="adminoptionbox">
                     {preference name=jquery_smartmenus_enable}
                     <div class="adminoptionboxchild" id="jquery_smartmenus_enable_childcontainer">

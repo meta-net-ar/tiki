@@ -198,7 +198,7 @@ class Services_File_FinderController
         } elseif ($input->cmd->text() === 'file') {
             // intercept download command and use tiki-download_file so the mime type and extension is correct
             $fileId = $elFinder->realpath($input->target->text());
-            if (strpos($fileId, 'f_') !== false) {
+            if (str_contains($fileId, 'f_')) {
                 global $base_url;
 
                 $fileId = str_replace('f_', '', $fileId);
@@ -210,7 +210,7 @@ class Services_File_FinderController
                     $info = $filegallib->get_file($fileId);
 
                     if (
-                        strpos($info['filetype'], 'image/') !== false ||
+                        str_contains($info['filetype'], 'image/') ||
                         ($prefs['fgal_pdfjs_feature'] === 'y' && $info['filetype'] === 'application/pdf')
                     ) {
                         $url .= '&display';
@@ -236,23 +236,22 @@ class Services_File_FinderController
         return [];
     }
 
-    private function getHashInfo($elFinder, $hashes, $params)
+    private function getHashInfo($elFinder, string $hash, array $params)
     {
         $filegallib = TikiLib::lib('filegal');
-        $ret = [];
-        foreach ($hashes as $hash) {
-            $fileId = $elFinder->realpath($hash);
-            if (strpos($fileId, 'f_') !== false) {
-                $info = $filegallib->get_file(str_replace('f_', '', $fileId));
-            } else {
-                $info = $filegallib->get_file_gallery(str_replace('d_', '', $fileId));
-            }
-            $info['wiki_syntax'] = $filegallib->getWikiSyntax($info['galleryId'], empty($info['fileId']) ? [] : $info, $params);
-            $info['data'] = ''; // binary data makes JSON fall over
-            $ret[] = $info;
+
+        $fileId = $elFinder->realpath($hash);
+
+        if (str_contains($fileId, 'f_')) {
+            $info = $filegallib->get_file(str_replace('f_', '', $fileId));
+        } else {
+            $info = $filegallib->get_file_gallery(str_replace('d_', '', $fileId));
         }
 
-        return $ret;
+        $info['wiki_syntax'] = $filegallib->getWikiSyntax($info['galleryId'], empty($info['fileId']) ? [] : $info, $params);
+        $info['data'] = '';
+
+        return $info;
     }
 
     /**

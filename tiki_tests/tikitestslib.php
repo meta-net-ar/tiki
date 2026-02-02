@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -44,13 +44,13 @@ if (isset($_COOKIE['tikitest_record'])) {
  */
 function test_callback($buffer)
 {
-    global $test_cookie, $test_post, $test_get, $test_url;
+    global $test_post, $test_get;
 
     if (! isset($_COOKIE['tikitest_record']) or $_COOKIE['tikitest_record'] >= 2) {
         return $buffer;
     }
 
-    if (strpos(basename($_SERVER['PHP_SELF']), "tiki-download_file") !== false) {
+    if (str_contains(basename($_SERVER['PHP_SELF']), "tiki-download_file")) {
         return $buffer;
     }
 

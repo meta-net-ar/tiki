@@ -21,7 +21,6 @@ function wikiplugin_colorbox_info()
                 'description' => tra('ID number of the file gallery that contains the images to be displayed'),
                 'filter' => 'digits',
                 'accepted' => 'ID',
-                'default' => '',
                 'since' => '5.0',
                 'profile_reference' => 'file_gallery',
                 ],
@@ -32,7 +31,6 @@ function wikiplugin_colorbox_info()
                 'filter' => 'digits',
                 'separator' => ':',
                 'accepted' => 'ID separated with :',
-                'default' => '',
                 'since' => '6.0'
                 ],
             'thumb' => [
@@ -121,25 +119,15 @@ function wikiplugin_colorbox_info()
 }
 function wikiplugin_colorbox($data, $params)
 {
-    global $user, $prefs, $base_url;
+    global $prefs, $base_url;
     static $iColorbox = 0;
-    $pluginInfo = wikiplugin_colorbox_info();
-    foreach ($pluginInfo['params'] as $key => $param) {
-        if (isset($param['default']) && ! isset($params[$key])) {
-            $params[$key] = $param['default'];
-        }
-    }
     $smarty = TikiLib::lib('smarty');
-    $tikilib = TikiLib::lib('tiki');
 
-    if (! empty($params['fgalId'])) {
+    if (! is_null($params['fgalId'])) {
         if ($prefs['feature_file_galleries'] != 'y') {
             return tra('This feature is disabled') . ': feature_file_galleries';
         }
-        if (empty($params['sort_mode'])) {
-            $params['sort_mode'] = 'created_desc';
-        }
-        $filter = empty($params['fileId']) ? ['fileId' => []] : ['fileId' => $params['fileId']];
+        $filter = is_null($params['fileId']) ? ['fileId' => []] : ['fileId' => $params['fileId']];
         if (! is_array($filter['fileId'])) {
             $filter['fileId'] = explode(':', $filter['fileId']);
         }

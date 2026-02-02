@@ -1,8 +1,5 @@
 <?php
 
-include_once('lib/core/Tiki/TikiInit.php');
-use Tiki\TikiInit;
-
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -15,6 +12,11 @@ use Tiki\TikiInit;
 // You can also get a detailed help on this script with:
 //    php doc/devtools/release.php --help
 //
+
+use Tiki\Smarty\SmartyTiki;
+use Tiki\TikiInit;
+
+include_once('lib/core/Tiki/TikiInit.php');
 
 define('TOOLS', __DIR__);
 define('ROOT', realpath(TOOLS . '/../..'));
@@ -44,7 +46,7 @@ require_once ROOT . '/lib/setup/third_party.php';
 require_once ROOT . '/path_constants.php';
 require_once ROOT . '/' . DEPRECATED_DEVTOOLS_PATH . '/vcscommons.php';
 
-$phpCommand = isset($_SERVER['_']) ? $_SERVER['_'] : 'php';
+$phpCommand = $_SERVER['_'] ?? 'php';
 $phpCommandArguments = implode(' ', $_SERVER['argv']);
 
 if (! ($options = get_options()) || $options['help']) {
@@ -88,8 +90,8 @@ if ($options['only-secdb']) {
 }
 
 $script = $_SERVER['argv'][0];
-$version = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '';
-$subrelease = isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : '';
+$version = $_SERVER['argv'][1] ?? '';
+$subrelease = $_SERVER['argv'][2] ?? '';
 
 if (! preg_match("/^\d+\.\d+$/", $version)) {
     error("Version number should be in X.X format.\n");
@@ -366,7 +368,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
         }
         if (is_dir($entry)) {
             // do not descend and no git files
-            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
+            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $e != 'node_modules' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
                 build_secdb_queries($entry, $version, $queries, $excludes);
             }
         } else {
@@ -801,13 +803,11 @@ function check_smarty_syntax(&$error_msg)
     $prefs['feature_sefurl_filter'] = 'y';
     $prefs['site_layout'] = 'basic';
     require_once 'lib/init/initlib.php';
-    require_once 'lib/init/smarty.php';
-    // needed in Smarty_Tiki
     define('TIKI_PATH', getcwd());
     require_once 'lib/smarty_tiki/prefilter.tr.php';
     require_once 'lib/smarty_tiki/prefilter.jq.php';
     require_once 'lib/smarty_tiki/prefilter.log_tpl.php';
-    $smarty = new Smarty_Tiki();
+    $smarty = new SmartyTiki();
     set_error_handler('check_smarty_syntax_error_handler');
 
     $templates_dir = TIKI_PATH . '/' . SMARTY_TEMPLATES_PATH;
@@ -1111,7 +1111,7 @@ function get_options()
     }
 
     foreach ($_SERVER['argv'] as $arg) {
-        if (substr($arg, 0, 2) == '--') {
+        if (str_starts_with($arg, '--')) {
             if (($opt = substr($arg, 2)) != '' && isset($options[$opt])) {
                 $options[$opt] = true;
             } elseif (substr($arg, 2, 11) == 'http-proxy=') {

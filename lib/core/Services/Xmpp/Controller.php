@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/auth/tokens.php';
+
+use Tiki\Lib\Auth\Tokens;
 
 class Services_Xmpp_Controller
 {
@@ -74,7 +75,7 @@ class Services_Xmpp_Controller
 
         // TODO: Check with jonnybradley if this is a good idea (jonnyb thinks it's fine but is no expert ;)
         global $prefs;
-        $tokenlib = AuthTokens::build($prefs);
+        $tokenlib = Tokens::build($prefs);
         $tokens = $tokenlib->getTokens(['entry' => 'openfireaccesskey']);
         $key = ! empty($tokens) ? md5("{$user}{$tokens[0]['token']}") : null;
 
@@ -85,7 +86,7 @@ class Services_Xmpp_Controller
         // final check, if givenKey is really valid
         if ($validity) {
             $details = $userlib->get_user_details($user);
-            return isset($details['info']) ? $details['info'] : null;
+            return $details['info'] ?? null;
         }
 
         header("HTTP/1.0 403 Forbidden", true, 403);

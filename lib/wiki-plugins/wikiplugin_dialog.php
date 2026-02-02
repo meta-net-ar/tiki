@@ -38,6 +38,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('Use comma-separated values for multiple buttons'),
                 'since' => '8.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'buttonsClassNames' => [
                 'required' => false,
@@ -45,6 +46,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('Css class names to apply to the buttons. Use comma-separated values for multiple buttons.'),
                 'since' => '28.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'buttonsActions' => [
                 'required' => false,
@@ -52,6 +54,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('JavaScript to perform on button click. Use comma-separated values for multiple buttons'),
                 'since' => '28.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'actions' => [
                 'required' => false,
@@ -59,6 +62,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('JavaScript to perform on button click. Use comma-separated values for multiple buttons'),
                 'since' => '8.0',
                 'filter' => 'text',
+                'default' => '',
                 'tag' => PluginParameterTags::Deprecated->value,
                 'tagMessage' => tra('Do not use this parameter and the buttonsActions similtaneously. It is no longer recommended to use this parameter as it will be removed in future versions.'),
             ],
@@ -181,15 +185,6 @@ function wikiplugin_dialog_info()
 
 function wikiplugin_dialog($data, $params)
 {
-
-    $defaults = [];
-    $plugininfo = wikiplugin_dialog_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-
-    $params = array_merge($defaults, $params);
-
     // to avoid invisible stray spaces in class and action names.
     $buttonsLabel = array_map('trim', explode(',', $params['buttons']));
     $buttonsClasses = array_map('trim', explode(',', $params['buttonsClassNames']));

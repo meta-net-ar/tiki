@@ -34,10 +34,10 @@ function prefs_ajax_list()
             'dependencies' => ['ajax_inline_edit'],
         ],
         'ajax_edit_previews' => [
-            'name' => tr('Preview Edits'),
+            'name' => tr('Preview Edits in Text Areas'),
             'description' => tr('Add a preview tab to text areas.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
         ],
     ];
 }

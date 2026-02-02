@@ -39,10 +39,10 @@ if (! $rep) {
 
 
 // Check if given file present at configured location
-$file = $integrator->get_rep_file($rep, isset($_REQUEST["file"]) ? $_REQUEST["file"] : '');
+$file = $integrator->get_rep_file($rep, $_REQUEST["file"] ?? '');
 if (
-    (substr($file, 0, 7) != 'http://')
-    && (substr($file, 0, 8) != 'https://')
+    (! str_starts_with($file, 'http://'))
+    && (! str_starts_with($file, 'https://'))
     && ! file_exists($file)
 ) {
     if ($tiki_p_admin == 'y') {
@@ -54,7 +54,7 @@ if (
 }
 // Needs to clear cached version of this file...
 if (isset($_REQUEST["clear_cache"]) && $rep["cacheable"]) {
-    $integrator->clear_cached_file($repID, (isset($_REQUEST["file"]) ? $_REQUEST["file"] : ''));
+    $integrator->clear_cached_file($repID, ($_REQUEST["file"] ?? ''));
 }
 //
 $url2cache = $tikilib->httpPrefix() . $_SERVER["SCRIPT_NAME"] . "?repID=" . $repID . (isset($_REQUEST["file"]) ? "&file=" . $_REQUEST["file"] : '');

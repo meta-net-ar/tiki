@@ -35,27 +35,27 @@ class DevConfigureCommand extends Command
     {
         $this
             ->setHelp(
-                'Install or update and configure composer development vendor files and unit test config & database.'
+                tra('Install or update and configure composer development vendor files and unit test config & database.')
             )
             ->addArgument(
                 'db_user',
                 InputArgument::OPTIONAL,
-                'User for the PHPUnit database'
+                tra('User for the PHPUnit database')
             )
             ->addArgument(
                 'db_pass',
                 InputArgument::OPTIONAL,
-                'Password for the PHPUnit database'
+                tra('Password for the PHPUnit database')
             )
             ->addArgument(
                 'db_name',
                 InputArgument::OPTIONAL,
-                'Name of the PHPUnit database'
+                tra('Name of the PHPUnit database')
             )
             ->addArgument(
                 'db_host',
                 InputArgument::OPTIONAL,
-                'Host of the PHPUnit database'
+                tra('Host of the PHPUnit database')
             );
     }
 
@@ -97,7 +97,7 @@ class DevConfigureCommand extends Command
 
         // Lets first check that some requirements are met.
         if (! is_callable('exec')) {
-            $output->writeln('<error>Must enable exec() for this command</error>');
+            $output->writeln('<error>' . tra('Must enable exec() for this command') . '</error>');
             exit(1);
         }
 
@@ -110,35 +110,35 @@ class DevConfigureCommand extends Command
             );
             if ($error) {
                 $output->writeln(
-                    '<error>Error: composer files not installed. Check temp/composer.phar</error>'
+                    '<error>' . tra('Error: composer files not installed. Check temp/composer.phar') . '</error>'
                 );
             } else {
                 $output->writeln($raw, OutputInterface::VERBOSITY_VERY_VERBOSE);
                 $output->writeln(
-                    '<info>Done: Composer dev files installed</info>'
+                    '<info>' . tra('Done: Composer dev files installed') . '</info>'
                 );
             }
         } else {
             $output->writeln(
-                '<info>Done: Composer dev files already installed</info>'
+                '<info>' . tra('Done: Composer dev files already installed') . '</info>'
             );
         }
 
-        $output->writeln('Checking phplint');
+        $output->writeln(tra('Checking phplint'));
         if (file_exists('phplint')) {
             $output->writeln(
-                '<info>Done: phplint was already callable via "php phplint" in the project root</info>'
+                '<info>' . tra('Done: phplint was already callable via "php phplint" in the project root') . '</info>'
             );
         } elseif (
             symlink('vendor_bundled/vendor/overtrue/phplint/bin/phplint', 'phplint')
         ) {
             $output->writeln(
-                '<info>Done: phplint is now callable via "php phplint" in the project root</info>'
+                '<info>' . tra('Done: phplint is now callable via "php phplint" in the project root') . '</info>'
             );
         } else {
-            $output->writeln('<error>Could not create symlink</error>');
+            $output->writeln('<error>' . tra('Could not create symlink') . '</error>');
             $output->writeln(
-                'Try using the following command: ln -s vendor_bundled/vendor/overtrue/phplint/bin/phplint phplint'
+                tra('Try using the following command:') . ' ln -s vendor_bundled/vendor/overtrue/phplint/bin/phplint phplint'
             );
         }
 
@@ -155,29 +155,29 @@ exclude:
 EOT;
 
         if (file_exists('.phplint.yml')) {
-            $output->writeln('<info>Done: .phplint.yml was already present in the project root</info>', OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln('<info>' . tra('Done: .phplint.yml was already present in the project root') . '</info>', OutputInterface::VERBOSITY_VERBOSE);
         } elseif (file_put_contents('.phplint.yml', $config)) {
-            $output->writeln('<info>Done: phplint config written</info>');
+            $output->writeln('<info>' . tra('Done: phplint config written') . '</info>');
         } else {
-            $output->writeln('<error>Could not create .phplint.yml</error>');
+            $output->writeln('<error>' . tra('Could not create') . ' .phplint.yml</error>');
         }
 
         $output->writeln('Checking phpunit');
         if (file_exists('phpunit')) {
-            $output->writeln('<info>Done: phpunit was already callable via "php phpunit" in the project root</info>');
+            $output->writeln('<info>' . tra('Done: phpunit was already callable via "php phpunit" in the project root') . '</info>');
         } elseif (symlink('vendor_bundled/vendor/phpunit/phpunit/phpunit', 'phpunit')) {
-            $output->writeln('<info>Done: phpunit is now callable via "php phpunit" in the project root</info>');
+            $output->writeln('<info>' . tra('Done: phpunit is now callable via "php phpunit" in the project root') . '</info>');
         } else {
-            $output->writeln('<error>Could not create symlink</error>');
-            $output->writeln('Try using the following command: ln -s vendor_bundled/vendor/phpunit/phpunit/phpunit phpunit');
+            $output->writeln('<error>' . tra('Could not create symlink') . '</error>');
+            $output->writeln(tra('Try using the following command:') . ' ln -s vendor_bundled/vendor/phpunit/phpunit/phpunit phpunit');
         }
 
-        $output->writeln('Checking PHPUnit local.php file');
+        $output->writeln(tra('Checking PHPUnit local.php file'));
         if (file_exists('lib/test/local.php')) {
-            $output->writeln('<info>Done: PHPUnit database credentials file already present</info>');
-            $output->writeln('* You many configure lib/test/local.php manually if needed</error>', OutputInterface::VERBOSITY_VERBOSE);
+            $output->writeln('<info>' . tra('Done: PHPUnit database credentials file already present') . '</info>');
+            $output->writeln('* ' . tra('You many configure lib/test/local.php manually if needed') . '</error>', OutputInterface::VERBOSITY_VERBOSE);
         } else {
-            $output->writeln('No unit test config file found', OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $output->writeln(tra('No unit test config file found'), OutputInterface::VERBOSITY_VERY_VERBOSE);
             $config = <<<EOT
 <?php
 /*
@@ -192,25 +192,25 @@ File written by php console.php dev:configure
 
 EOT;
             if (file_put_contents('lib/test/local.php', $config)) {
-                $output->writeln('<info>Done: lib/test/local.php written</info>');
+                $output->writeln('<info>' . tra('Done:') . ' lib/test/local.php written</info>');
             } else {
-                $output->writeln('<error>Error: Could not write lib/test/local.php</error>');
+                $output->writeln('<error>' . tra('Error: Could not write') . ' lib/test/local.php</error>');
             }
         }
 
         $output->writeln('Checking PHPUnit database status');
         if ($this->databaseConnect()) {
-            $output->writeln('<info>Done: Database already connecting</info>');
+            $output->writeln('<info>' . tra('Done: Database already connecting') . '</info>');
         } elseif ($this->user_tiki && $this->pass_tiki && $this->dbs_tiki && $this->host_tiki) {
             if (DB_STATUS) {
                 $tikilib = TikiLib::lib('tiki');
                 $error = '';
 
-                $output->writeln('* Creating Database User', OutputInterface::VERBOSITY_VERBOSE);
+                $output->writeln('* ' . tra('Creating Database User'), OutputInterface::VERBOSITY_VERBOSE);
                 $query = "CREATE USER IF NOT EXISTS `$this->user_tiki`@`$this->host_tiki` IDENTIFIED BY '$this->pass_tiki';";
                 $tikilib->queryError($query, $error);
                 if (! empty($error)) {
-                    $output->writeln('<comment>* Could not create user</comment>', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<comment>* ' . tra('Could not create user') . '</comment>', OutputInterface::VERBOSITY_VERBOSE);
                     $output->writeln($error, OutputInterface::VERBOSITY_DEBUG);
                 }
 
@@ -218,35 +218,35 @@ EOT;
                 $query = "CREATE DATABASE IF NOT EXISTS `$this->dbs_tiki` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
                 $tikilib->queryError($query, $error);
                 if (! empty($error)) {
-                    $output->writeln('<comment>* Could not create database</comment>', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<comment>* ' . tra('Could not create database') . '</comment>', OutputInterface::VERBOSITY_VERBOSE);
                     $output->writeln($error, OutputInterface::VERBOSITY_DEBUG);
                 }
 
-                $output->writeln('* Assigning user rights on database', OutputInterface::VERBOSITY_VERBOSE);
+                $output->writeln('* ' . tra('Assigning user rights on database'), OutputInterface::VERBOSITY_VERBOSE);
                 $query = "GRANT ALL ON $this->dbs_tiki.* TO `$this->user_tiki`@`$this->host_tiki`;";
                 $tikilib->queryError($query, $error);
                 if (! empty($error)) {
-                    $output->writeln('<comment>* Could not assign user rights</comment>', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<comment>* ' . tra('Could not assign user rights') . '</comment>', OutputInterface::VERBOSITY_VERBOSE);
                     $output->writeln($error, OutputInterface::VERBOSITY_DEBUG);
                 }
             }
             if ($this->databaseConnect()) {
-                $output->writeln('<info>Done: PHPUnit database configured</info>');
+                $output->writeln('<info>' . tra('Done: PHPUnit database configured') . '</info>');
             } else {
                 if (DB_STATUS) {
-                    $output->writeln('<error>Error: PHPUnit database setup error</error>');
+                    $output->writeln('<error>' . tra('Error: PHPUnit database setup error') . '</error>');
                 } else {
-                    $output->writeln('<comment>Could not detect that PHPUnit database has been setup</comment>');
-                    $output->writeln('Tiki database is not connecting, are you sure that mysql is running?');
+                    $output->writeln('<comment>' . tra('Could not detect that PHPUnit database has been setup') . '</comment>');
+                    $output->writeln(tra('Tiki database is not connecting, are you sure that mysql is running?'));
                 }
-                $output->writeln('You may try the following:');
-                $output->writeln('1. Ensure Tiki database connection root credentials and run this command again.');
-                $output->writeln('2. Open PHPMyAdmin and run the following commands:');
+                $output->writeln(tra('You may try the following:'));
+                $output->writeln(tra('1. Ensure Tiki database connection root credentials and run this command again.'));
+                $output->writeln(tra('2. Open PHPMyAdmin and run the following commands:'));
                 $output->writeln("  CREATE USER IF NOT EXISTS `$this->user_tiki`@`$this->host_tiki` IDENTIFIED BY '$this->pass_tiki';");
                 $output->writeln("  CREATE DATABASE IF NOT EXISTS `$this->dbs_tiki` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
                 $output->writeln("  GRANT ALL ON $this->dbs_tiki.* TO `$this->user_tiki`@`$this->host_tiki`;");
-                $output->writeln('3. Install via the terminal:');
-                $output->writeln('Hints: The default mysql password is "root". Your mysql $PATH must be configured for the below to work.');
+                $output->writeln(tra('3. Install via the terminal:'));
+                $output->writeln(tra('Hints: The default mysql password is "root". Your mysql $PATH must be configured for the below to work.'));
                 $output->writeln('  mysql -u root -p');
                 $output->writeln("  create database $this->dbs_tiki;");
                 $output->writeln("  grant all privileges on $this->dbs_tiki.* TO '$this->user_tiki'@'$this->host_tiki' identified by '$this->pass_tiki';");

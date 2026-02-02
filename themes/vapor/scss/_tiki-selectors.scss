@@ -1,60 +1,78 @@
-// This file is for additional SCSS rules beyond what are in _variables.scss.
+// Vapor for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
-$imagePath: "../images/";
+//$imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-//.jumbotron,
-//.breadcrumb {
-//    color: $modal-content-color;
-//    background:$modal-content-bg;
-//}
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-//blockquote,
-//.blockquote {
-//    color: var(--#{$prefix}body-color); // For better color contrast.
-//    border-left-color: $table-border-color;
-//}
-
-.alert-success a {
-    color: #fff !important;
-    opacity: 1;
-}
-
+// Color system
+// Body
+// Links
+// Components
+// Typography
 .blockquote-footer {
     color: #029C8A;
 }
-.page-item.disabled {
-    --bs-pagination-disabled-color: #029C8A; // Lightened for WCAG2
+
+// Tables
+// Buttons
+// Forms
+.valid-feedback {
+    --bs-form-valid-color: #079D40;
 }
 
+.invalid-feedback {
+    --bs-form-invalid-color: #E44E58;
+}
+
+// Navs
 .nav-pills .nav-link.active,
 .page-link.active, .active > .page-link {
     background: #D4169E;
 }
 
-//.dropdown-menu a {
-//    display: block;
-//    width: 100%;
-//    padding: 0.25rem 1rem;
-//    clear: both;
-//    font-weight: 400;
-//    color: #170229;
-//    text-align: inherit;
-//    text-decoration: none;
-//    white-space: nowrap;
-//    background-color: transparent;
-//    border: 0;
-//    text-shadow: 0 0 1px rgba(50, 251, 226, 0.3), 0 0 2px rgba(50, 251, 226, 0.3), 0 0 5px rgba(50, 251, 226, 0.2);
-//}
+// Navbar
+// Dropdowns
+// Pagination
+.page-item.disabled {
+    --bs-pagination-disabled-color: #029C8A; // Lightened for WCAG2
+}
 
-//.dropdown menu a {
-//    color: #150225;
-//    background-color: #e9ecef;
-//}
+// Cards
+// Accordion
+// Badges
+// Alerts
+.alert-success a {
+    color: #fff !important;
+    opacity: 1;
+}
+// Progress bars
+// List group
+.list-group-item-primary { --bs-list-group-bg: #6034B2; }
+.list-group-item-secondary { --bs-list-group-bg: #B1258C; }
+.list-group-item-success { --bs-list-group-bg: #376D4C; }
+.list-group-item-danger { --bs-list-group-bg: #A61C28; }
+.list-group-item-warning { --bs-list-group-bg: #67562D; }
+.list-group-item-info { --bs-list-group-bg: #24668F; }
+.list-group-item-light { --bs-list-group-color: #616161; }
+.list-group-item-light.list-group-item-action { --bs-list-group-action-color: #616161;}
+.list-group-item-dark { --bs-list-group-bg: $gray-900; }
 
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
 .ec-header,
 .textarea-toolbar > div,
 .textarea-toolbar > ul {
@@ -65,20 +83,5 @@ $imagePath: "../images/";
     background-color: $info !important;
 }
 
-.valid-feedback {
-    --bs-form-valid-color: #079D40;
-}
-
-.invalid-feedback {
-    --bs-form-invalid-color: #E44E58;
-}
-
-.list-group-item-primary { --bs-list-group-bg: #6034B2; }
-.list-group-item-secondary { --bs-list-group-bg: #B1258C; }
-.list-group-item-success { --bs-list-group-bg: #376D4C; }
-.list-group-item-danger { --bs-list-group-bg: #A61C28; }
-.list-group-item-warning { --bs-list-group-bg: #67562D; }
-.list-group-item-info { --bs-list-group-bg: #24668F; }
-.list-group-item-light { --bs-list-group-color: #616161; }
-.list-group-item-light.list-group-item-action { --bs-list-group-action-color: #616161;}
-.list-group-item-dark { --bs-list-group-bg: $gray-900; }
+// Dark mode
+// External libraries

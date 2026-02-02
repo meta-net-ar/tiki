@@ -113,7 +113,7 @@ class UserSelector extends Base
             $userCount = $userlib->count_users('');
         }
 
-        if ($lazyload || ($prefs['elementplus_select'] == 'y' && ($userCount > $prefs['user_selector_threshold'] || $userCount > $params['user_selector_threshold']))) {
+        if ($lazyload || ($prefs['feature_elementplus'] == 'y' && $prefs['elementplus_select'] == 'y' && ($userCount > $prefs['user_selector_threshold'] || $userCount > $params['user_selector_threshold']))) {
             $urlParams = [
                 'listonly' => $params['realnames'] === 'y' ? 'userrealnames' : 'users',
             ];
@@ -126,12 +126,13 @@ class UserSelector extends Base
             $remoteUrl = TikiLib::lib('service')->getUrl($urlParams);
 
             $options = "";
-            foreach ($params['select'] as $selected) {
+            $selectedValues = $params['select'] ?? [];
+            foreach ($selectedValues as $selected) {
                 $options .= "<option value=\"$selected\" selected>$selected</option>";
             }
             return <<<HTML
                 <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}" $mt>{$options}</select>
-HTML;
+            HTML;
         }
 
         // get the user list

@@ -11,12 +11,49 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save'         => 'bool',                //post
+            'save'              => 'alpha',          //post
+            'import'            => 'alpha',          //post
             'parentId'     => 'int',                 //get
+            'categId'           => 'int',            //get/post
             'cookietab'    => 'int',                 //get
-            'sort_mode'    => 'striptags',           //get
+            'sort_mode'         => 'alnumdash',      //get
             'name'         => 'striptags',           //post
             'description'  => 'xss',                 //post
+            'pollId'            => 'int',            //post
+            'faqId'             => 'int',            //post
+            'trackerId'         => 'int',            //post
+            'quizId'            => 'int',            //post
+            'forumId'           => 'int',            //post
+            'galleryId'         => 'int',            //post
+            'file_galleryId'    => 'int',            //post
+            'articleId'         => 'int',            //post
+            'blogId'            => 'int',            //post
+            'directoryId'       => 'int',            //post
+            'removeObject'      => 'int',            //get
+            'removeCat'         => 'int',            //get
+            'tplGroupContainer' => 'int',            //post
+            'tplGroupPattern'   => 'text',           //post
+            'parentPerms'       => 'alpha',          //post
+            'applyRoles'        => 'alpha',          //post
+            'find'              => 'text',           //get
+            'find_objects'      => 'text',           //get
+            'offset'            => 'int',            //get
+            'addpage'           => 'alpha',          //post
+            'addpoll'           => 'alpha',          //post
+            'addfaq'            => 'alpha',          //post
+            'addtracker'        => 'alpha',          //post
+            'addquiz'           => 'alpha',          //post
+            'addforum'          => 'alpha',          //post
+            'addgallery'        => 'alpha',          //post
+            'addfilegallery'    => 'alpha',          //post
+            'addarticle'        => 'alpha',          //post
+            'addblog'           => 'alpha',          //post
+            'adddirectory'      => 'alpha',          //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'pageName'          => 'text',           //post
+            'categoryRole'      => 'int',            //post
+            'rolesToApply'      => 'int',            //post
         ],
     ],
 ];
@@ -281,7 +318,7 @@ if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["na
         }
     }
 
-    $cRolesInput = isset($_REQUEST["categoryRole"]) ? $_REQUEST["categoryRole"] : [];
+    $cRolesInput = $_REQUEST["categoryRole"] ?? [];
     $rolesToSave = [];
     if (isset($cRolesInput) && ! empty($cRolesInput)) {
         $rolesRepo->deleteSelectedCategoryRoleNotUsed($_REQUEST["categId"]);
@@ -566,24 +603,11 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-$smarty->assign('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-if (isset($_REQUEST["find_objects"])) {
-    $find_objects = $_REQUEST["find_objects"];
-} else {
-    $find_objects = '';
-}
+$find_objects = $_REQUEST["find_objects"] ?? '';
 
 // ---------------------------------------------------
 if ($prefs['feature_search'] !== 'y' || $prefs['unified_add_to_categ_search'] !== 'y') {    // no unified search

@@ -163,7 +163,7 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractItemField
         $infooutput = $conn->exec($infostring);
         $ret['debugoutput'] = $infostring . " " . $infooutput;
 
-        if (strpos($infooutput, 'MAINTENANCE: ') !== false) {
+        if (str_contains($infooutput, 'MAINTENANCE: ')) {
             $maintpos = strpos($infooutput, 'MAINTENANCE: ');
             $maintreason = substr($infooutput, $maintpos + 13);
             $maintreason = substr($maintreason, 0, strpos($maintreason, '"'));

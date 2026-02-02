@@ -49,9 +49,9 @@ require_once('lib/wizard/pages/admin_wizard.php');
 $pages[] = new AdminWizard();
 
 // If $useDefaultPrefs is set, the "profiles wizard" should be run. Otherwise the "admin wizard".
-$useDefaultPrefs = isset($_REQUEST['use-default-prefs']) ? true : false;
+$useDefaultPrefs = isset($_REQUEST['use-default-prefs']);
 // If $useChangesWizard is set, the "Changes Wizard" should be run. Otherwise the "admin wizard".
-$useChangesWizard = isset($_REQUEST['use-changes-wizard']) ? true : false;
+$useChangesWizard = isset($_REQUEST['use-changes-wizard']);
 if ($useDefaultPrefs) {
     // Store the default prefs selection in the wizard bar
     $smarty->assign('useDefaultPrefs', $useDefaultPrefs);
@@ -59,38 +59,46 @@ if ($useDefaultPrefs) {
     require_once('lib/wizard/pages/profiles_featured_site_confs.php');
     $pages[] = new ProfilesWizardFeaturedSiteConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
-    $pages[] = new ProfilesWizardUsefulMicroConfs();
+    /*
+        ====== TEMPORARILY DISABLED ======
+        Initially, I had the option to remove, comment out, or hide the code, based on Benoit Roy’s instructions.
+        I decided to comment it out instead of deleting it because, before those instructions, Marc mentioned that some profiles might be fixed in the future.
+        So, as I understood it, the goal was not to permanently delete them, but to temporarily disable the broken ones since most of them are currently malfunctioning and causing issues for users.
+        ====== Author: Landry Bitege (@land-bit) — 2025-11-12 ======
+    */
 
-    require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
-    $pages[] = new ProfilesWizardUsefulChangesInDisplay();
+    // require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
+    // $pages[] = new ProfilesWizardUsefulMicroConfs();
 
-    require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
-    $pages[] = new ProfilesWizardUsefulNewTechConfs();
+    // require_once('lib/wizard/pages/profiles_useful_changes_in_display.php');
+    // $pages[] = new ProfilesWizardUsefulChangesInDisplay();
 
-    require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
-    $pages[] = new ProfilesWizardUsefulAdminConfs();
+    // require_once('lib/wizard/pages/profiles_useful_new_tech_confs.php');
+    // $pages[] = new ProfilesWizardUsefulNewTechConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_common_confs.php');
-    $pages[] = new ProfilesWizardDemoCommonConfs();
+    // require_once('lib/wizard/pages/profiles_useful_admin_confs.php');
+    // $pages[] = new ProfilesWizardUsefulAdminConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_common_confs.php');
+    // $pages[] = new ProfilesWizardDemoCommonConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
-    $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
+    // require_once('lib/wizard/pages/profiles_demo_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
-    $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_other_interesting_use_cases.php');
+    // $pages[] = new ProfilesWizardDemoOtherInterestingUseCases();
 
-    require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
-    $pages[] = new ProfilesWizardDemoProjectManagement();
+    // require_once('lib/wizard/pages/profiles_demo_more_advanced_confs.php');
+    // $pages[] = new ProfilesWizardDemoMoreAdvancedConfs();
 
-    require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
-    $pages[] = new ProfilesWizardHighlySpecializedConfs();
+    // require_once('lib/wizard/pages/profiles_demo_cases_in_project_management.php');
+    // $pages[] = new ProfilesWizardDemoProjectManagement();
 
-    require_once('lib/wizard/pages/profiles_completed.php');
-    $pages[] = new AdminWizardProfilesCompleted();
+    // require_once('lib/wizard/pages/profiles_demo_highly_specialized_confs.php');
+    // $pages[] = new ProfilesWizardHighlySpecializedConfs();
+
+    // require_once('lib/wizard/pages/profiles_completed.php');
+    // $pages[] = new AdminWizardProfilesCompleted();
 } elseif ($useChangesWizard) {
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);

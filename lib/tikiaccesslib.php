@@ -600,12 +600,12 @@ class TikiAccessLib extends TikiLib
         }
         //identify server host + port
         $base = parse_url($base_url);
-        $baseHost = isset($base['host']) ? $base['host'] : '';
+        $baseHost = $base['host'] ?? '';
         $basePort = isset($base['port']) ? ':' . $base['port'] : '';
         $this->base = $baseHost . $basePort;
         //identify requesting host + port
         $origin = parse_url($this->origin);
-        $originHost = isset($origin['host']) ? $origin['host'] : '';
+        $originHost = $origin['host'] ?? '';
         $originPort = isset($origin['port']) ? ':' . $origin['port'] : '';
         $this->origin = $originHost . $originPort;
         //perform compare
@@ -676,7 +676,11 @@ class TikiAccessLib extends TikiLib
 
         global $prefs;
 
-        if ($this->ticket && ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' && ($this->ticket === (isset($_SESSION['CSRF_TOKEN']) ? $_SESSION['CSRF_TOKEN'] : $this->retrieveTicketFromCookie()))) {
+        if (
+            $this->ticket &&
+            ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' &&
+            ($this->ticket === ($_SESSION['CSRF_TOKEN'] ?? $this->retrieveTicketFromCookie()))
+        ) {
             $this->ticketMatch = true;
         } elseif ($this->ticket && ! empty($_SESSION['tickets'][$this->ticket])) {
             //check that request ticket matches server ticket
@@ -891,10 +895,12 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log(PHP_EOL
+        error_log(
+            PHP_EOL
             . '  $_GET: ' . $get . PHP_EOL
             . '  $_POST: ' . $post . PHP_EOL
-            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****');
+            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****'
+        );
     }
 
 
@@ -1035,26 +1041,11 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
             $smarty->display('error-ajax.tpl');
         } else {
-            if (
-                ($errortype == 401 || $errortype == 403) &&
-                        empty($user) &&
-                        ($prefs['permission_denied_login_box'] == 'y' || ! empty($prefs['permission_denied_url']))
-            ) {
-                if (empty($_SESSION['loginfrom'])) {
-                    $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
-                }
-                if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-                    $this->redirect($prefs['login_autologin_redirectlogin_url']);
-                }
-            }
-
             $smarty->assign('errortitle', $detail['errortitle']);
-            $smarty->assign('msg', $detail['message']);
-            $smarty->assign('errortype', $detail['code']);
             if (isset($detail['page'])) {
                 $smarty->assign('page', $page);
             }
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie($detail['message'], $errortype);
         }
         die;
     }
@@ -1574,6 +1565,7 @@ class TikiAccessLib extends TikiLib
                 $title = $prefs['site_busy_title'];
                 $error = $prefs['site_busy_msg'];
                 $prefs['site_closed'] = 'y';    // tell the rest of tiki we're closed
+                header('Retry-After: ' . $prefs['load_retry_after']);
 
                 break;
             case 'maintenance':
@@ -1682,7 +1674,7 @@ class TikiAccessLib extends TikiLib
             'siteSecurityTimeout' => tr('preference:') . ' ' . $prefs['site_security_timeout'] . tr('seconds') . ' (' . $prefs['site_security_timeout'] / 60 . ' minutes)',
             'scriptName' => $_SERVER['SCRIPT_NAME'],
             'requestURI' => $_SERVER['REQUEST_URI'],
-            'httpOrigin' => isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null,
+            'httpOrigin' => $_SERVER['HTTP_ORIGIN'] ?? null,
             'httpReferer' => $_SERVER['HTTP_REFERER'],
             'requestMethod' => $_SERVER['REQUEST_METHOD'],
             'queryString' => $_SERVER['QUERY_STRING'] ?? tr('empty'),

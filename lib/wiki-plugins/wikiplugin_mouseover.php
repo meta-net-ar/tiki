@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_mouseover_info()
 {
-    global $prefs;
     include_once('lib/prefs/jquery.php');
     $jqprefs = prefs_jquery_list();
     $jqfx = [];
@@ -122,7 +121,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('CSS class to apply'),
                 'since' => '4.0',
                 'filter' => 'text',
-                'default' => 'plugin-mouseover',
                 'advanced' => true,
             ],
             'bgcolor' => [
@@ -131,7 +129,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Background color to apply to the popup'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
                 'advanced' => true,
             ],
             'textcolor' => [
@@ -140,7 +137,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Color to apply to the text in the popup'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
                 'advanced' => true,
             ],
             'sticky' => [
@@ -163,7 +159,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Padding size in pixels'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'advanced' => true,
             ],
             'effect' => [
@@ -213,19 +208,16 @@ function wikiplugin_mouseover_info()
 
 function wikiplugin_mouseover($data, $params)
 {
-    $default = ['parse' => 'y', 'parselabel' => 'y'];
-    $params = array_merge($default, $params);
-
-    $width = isset($params['width']) ? (int) $params['width'] : 400;
-    $height = isset($params['height']) ? (int) $params['height'] : 200;
-    $offsetx = isset($params['offsetx']) ? (int) $params['offsetx'] : 5;
-    $offsety = isset($params['offsety']) ? (int) $params['offsety'] : 24;
-    $parse = ! isset($params['parse']) || (strcasecmp($params['parse'], 'n') != 0);
-    $sticky = isset($params['sticky']) && $params['sticky'] == 'y';
-    $padding = isset($params['padding']) ? 'padding: ' . $params['padding'] . 'px;' : '';
-    $effect = ! isset($params['effect']) || $params['effect'] == 'Default' ? '' : strtolower($params['effect']);
-    $speed = ! isset($params['speed']) ? 'normal' : strtolower($params['speed']);
-    $closeDelay = isset($params['closeDelay']) ? (int) $params['closeDelay'] : 0;
+    $width = (int) ($params['width']);
+    $height = (int) ($params['height']);
+    $offsetx = (int) ($params['offsetx']);
+    $offsety = (int) ($params['offsety']);
+    $parse = (strcasecmp($params['parse'], 'n') != 0);
+    $sticky = $params['sticky'] == 'y';
+    $padding = ! is_null($params['padding']) ? 'padding: ' . $params['padding'] . 'px;' : '';
+    $effect = is_null($params['effect']) || $params['effect'] == 'Default' ? '' : strtolower($params['effect']);
+    $speed = strtolower($params['speed'] ?? 'normal');
+    $closeDelay = (int) ($params['closeDelay'] ?? 0);
     $tag = ! empty($params['tag']) ? $params['tag'] : 'a';
 
     if (empty($params['label']) && empty($params['text'])) {
@@ -237,7 +229,7 @@ function wikiplugin_mouseover($data, $params)
     }
 
     $url = '';
-    if (isset($params['url'])) {
+    if ($params['url']) {
         $url = $params['url'];
         $url = htmlentities($url, ENT_QUOTES, 'UTF-8');
     }
@@ -292,13 +284,13 @@ function wikiplugin_mouseover($data, $params)
     }
     $headerlib->add_jq_onready($js);
 
-    $bgcolor   = isset($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
-    $textcolor = isset($params['textcolor']) ? ("color:" . $params['textcolor'] . ';') : '';
-    $class     = ! isset($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
+    $bgcolor   = ! is_null($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
+    $textcolor = ! is_null($params['textcolor']) ? ("color:" . $params['textcolor'] . ';') : '';
+    $class     = is_null($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
     $href      = $url ? 'href="' . $url . '"' : '';
 
     $html = "~np~<$tag id=\"$id-link\" $href class=\"plugin-mouseover-anchor\">$label</$tag>" .
-        "<span id=\"$id\" $class style=\"width: {$width}px; " . (isset($params['height']) ? "height: {$height}px; " : "") . "{$bgcolor} {$textcolor} {$padding} \">$text</span>~/np~";
+        "<span id=\"$id\" $class style=\"width: {$width}px; " . (! empty($params['height']) ? "height: {$height}px; " : "") . "{$bgcolor} {$textcolor} {$padding} \">$text</span>~/np~";
 
     return $html;
 }

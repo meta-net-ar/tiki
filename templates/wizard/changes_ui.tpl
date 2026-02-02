@@ -45,7 +45,6 @@
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend> {tr}jQuery plugins and add-ons{/tr} </legend>
-            {preference name=feature_jquery_reflection}
             {preference name=feature_jquery_zoom}
             {preference name=feature_jquery_carousel} {icon name='warning' alt="{tr}Experimental{/tr}" ititle="{tr}Experimental{/tr}"}
             {preference name=feature_jquery_tablesorter} {icon name='warning' alt="{tr}Experimental{/tr}" ititle="{tr}Experimental{/tr}"}

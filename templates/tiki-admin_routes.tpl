@@ -41,7 +41,7 @@
                             <td class="route_from">
                                 <a class="link tips"
                                    href="tiki-admin_routes.php?route={$routes[route].id}{if $prefs.feature_tabs ne 'y'}#2{/if}"
-                                   {tr}Edit route settings{/tr}"
+                                   title="{tr}Edit route settings{/tr}"
                                 >
                                 {$routes[route].from|escape}
                                 </a>

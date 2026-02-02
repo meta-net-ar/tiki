@@ -46,7 +46,7 @@ if (count($filter) || count($postfilter)) {
     if (isset($_REQUEST['save_query'])) {
         $_SESSION['quick_search'][(int) $_REQUEST['save_query']] = $_REQUEST;
     }
-    $offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+    $offset = $_REQUEST['offset'] ?? 0;
     $maxRecords = empty($_REQUEST['maxRecords']) ? $prefs['maxRecords'] : $_REQUEST['maxRecords'];
 
     if ($access->is_serializable_request(true)) {
@@ -90,7 +90,7 @@ if (count($filter) || count($postfilter)) {
         $access->output_serialized(
             $results,
             [
-                'feedTitle' => tr('%0: Results for "%1"', $prefs['sitetitle'], isset($filter['content']) ? $filter['content'] : ''),
+                'feedTitle' => tr('%0: Results for "%1"', $prefs['sitetitle'], $filter['content'] ?? ''),
                 'feedDescription' => tr('Search Results'),
                 'entryTitleKey' => 'title',
                 'entryUrlKey' => 'url',

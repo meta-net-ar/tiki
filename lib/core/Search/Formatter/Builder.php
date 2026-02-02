@@ -287,7 +287,7 @@ class Search_Formatter_Builder
             }
 
             if (str_contains($arguments['template'], 'table')) {
-                $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y' ? true : false;
+                $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y';
                 if (isset($arguments['downloadable'])) {
                     $outputData['downloadable'] = true;
                     $this->downloadName = $arguments['downloadable'];
@@ -368,23 +368,23 @@ class Search_Formatter_Builder
             $ts = new Table_Plugin();
             $ts->setSettings(
                 $this->id,
-                isset($args['server']) ? $args['server'] : 'n',
-                isset($args['sortable']) ? $args['sortable'] : 'y',
-                isset($args['sortList']) ? $args['sortList'] : null,
-                isset($args['tsortcolumns']) ? $args['tsortcolumns'] : null,
-                isset($args['tsfilters']) ? $args['tsfilters'] : null,
-                isset($args['tsfilteroptions']) ? $args['tsfilteroptions'] : null,
-                isset($args['tspaginate']) ? $args['tspaginate'] : null,
-                isset($args['tscolselect']) ? $args['tscolselect'] : null,
+                $args['server'] ?? 'n',
+                $args['sortable'] ?? 'y',
+                $args['sortList'] ?? null,
+                $args['tsortcolumns'] ?? null,
+                $args['tsfilters'] ?? null,
+                $args['tsfilteroptions'] ?? null,
+                $args['tspaginate'] ?? null,
+                $args['tscolselect'] ?? null,
                 $GLOBALS['requestUri'],
                 $this->count,
-                isset($args['tstotals']) ? $args['tstotals'] : null,
-                isset($args['tstotalformat']) ? $args['tstotalformat'] : null,
-                isset($args['tstotaloptions']) ? $args['tstotaloptions'] : null,
-                isset($args['showProcessing']) ? $args['showProcessing'] : null,
-                isset($args['ignoreCase']) ? $args['ignoreCase'] : null,
-                isset($args['sortLocaleCompare']) ? $args['sortLocaleCompare'] : null,
-                isset($args['tsoutput']) ? $args['tsoutput'] : null
+                $args['tstotals'] ?? null,
+                $args['tstotalformat'] ?? null,
+                $args['tstotaloptions'] ?? null,
+                $args['showProcessing'] ?? null,
+                $args['ignoreCase'] ?? null,
+                $args['sortLocaleCompare'] ?? null,
+                $args['tsoutput'] ?? null
             );
             if (is_array($ts->settings)) {
                 $ts->settings['ajax']['offset'] = 'offset';

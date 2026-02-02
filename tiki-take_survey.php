@@ -12,9 +12,9 @@ $section = 'surveys';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'surveyId'             => 'digits',       //get
-        'ans'                  => 'striptags',    //post
-        'vote'                 => 'striptags',    //post
+        'surveyId'             => 'int',          //get
+        'ans'                  => 'alpha',        //post
+        'vote'                 => 'alpha',        //post
         ],
     ],
 ];

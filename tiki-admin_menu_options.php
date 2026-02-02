@@ -11,9 +11,13 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'    => [
-            'menuId'          => 'int',        //get
-            'preview_css'     => 'bool',       //post
-            'preview_type'    => 'striptags',  //post
+            'menuId'             => 'int',        //get
+            'deletemenu'         => 'int',        //post
+            'preview_type'       => 'striptags',  //post
+            'preview_bootstrap'  => 'alpha',      //post
+            'find'               => 'striptags',  //get
+            'sort_mode'          => 'alnumdash', //get
+            'offset'             => 'int',        //get
         ],
     ],
 ];
@@ -30,10 +34,15 @@ $auto_query_args = [
     'preview_bootstrap',
 ];
 
-if (! empty($_REQUEST["deletemenu"])) {
-    $content = $_REQUEST["deletemenu"];
-    $content = explode("=", $content)[1];
-    $menulib->remove_menu_option($content);
+if (! empty($_REQUEST["deletemenu"]) && $access->checkCsrf()) {
+    $optionId = (int) $_REQUEST["deletemenu"];
+    if ($optionId > 0) {
+        // Verify the option exists and belongs to the current menu
+        $option = $menulib->get_menu_option($optionId);
+        if ($option && $option['menuId'] == $_REQUEST["menuId"]) {
+            $menulib->remove_menu_option($optionId);
+        }
+    }
 }
 
 $smarty->assign('menuId', $_REQUEST["menuId"]);

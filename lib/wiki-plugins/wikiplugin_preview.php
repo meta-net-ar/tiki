@@ -78,21 +78,20 @@ function wikiplugin_preview_info()
  */
 function wikiplugin_preview($data, $params)
 {
-    global $user, $prefs, $tikipath, $tikidomain;
+    global $user, $tikipath, $tikidomain;
 
     if (! AlchemyLib::isLibraryAvailable()) {
         return;
     }
 
-    $fileId = isset($params['fileId']) ? (int)$params['fileId'] : 0;
-    $animation = isset($params['animation']) ? (int)$params['animation'] : 0;
+    $fileId = (int)($params['fileId'] ?? 0);
+    $animation = (int)($params['animation'] ?? 0);
     $width = isset($params['width']) ? (int)$params['width'] : null;
     $height = isset($params['height']) ? (int)$params['height'] : null;
-    $range = isset($params['range']) ? $params['range'] : null;
+    $range = $params['range'] ?? null;
 
     $smartyLib = TikiLib::lib('smarty');
 
-    $fileGalleryLib = TikiLib::lib('filegal');
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($fileId);
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {
@@ -104,7 +103,7 @@ function wikiplugin_preview($data, $params)
     if (! isset($_REQUEST[$requestUniqueIdentifier])) {
         // generate the html output
         $urlParts = parse_url($_SERVER['REQUEST_URI']);
-        $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+        $path = $urlParts['path'] ?? '/';
         if (isset($urlParts['query'])) {
             parse_str($urlParts['query'], $pageParams);
         } else {
@@ -156,11 +155,11 @@ function wikiplugin_preview($data, $params)
         ob_end_clean();
     } // Be sure output buffering is turned off
 
-    /** @var Cachelib $cacheLib */
+    /** @var \Tiki\Cache\CacheLib $cacheLib */
     $cacheLib = TikiLib::lib('cache');
 
     $cacheName = $fileMd5 . $requestUniqueIdentifier;
-    $previewPage = isset($_GET['previewPage']) ? $_GET['previewPage'] : null;
+    $previewPage = $_GET['previewPage'] ?? null;
 
     if ($previewPage) {
         $cacheName .= "_" . $previewPage;

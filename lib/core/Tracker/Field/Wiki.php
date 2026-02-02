@@ -41,6 +41,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                         'profile_reference' => 'tracker_field',
                         'parent' => 'input[name=trackerId]',
                         'parentkey' => 'tracker_id',
+                        'required' => true,
                     ],
                     'namespace' => [
                         'name' => tr('Namespace for Wiki Page'),
@@ -212,10 +213,10 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         $page_name = $this->getValue();
         $insForPagenameField = 'ins_' . $this->getOption('fieldIdForPagename');
 
-        if (! $page_name) {
+        if (! $page_name || (isset($requestData['action']) && $requestData['action'] === 'clone_item')) {
             if (! empty($requestData[$insForPagenameField])) {
                 $page_name = $requestData[$insForPagenameField];    // from tabular import replace
-                $itemId = isset($requestData['itemId']) ? $requestData['itemId'] : 0;
+                $itemId = $requestData['itemId'] ?? 0;
             } elseif (! empty($requestData['itemId'])) {
                 $itemData = $this->getItemData();                   // calculated field types like auto-increment need rendering
                 $definition = $this->getTrackerDefinition();
@@ -235,7 +236,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         }
 
         $tikilib = TikiLib::lib('tiki');
-        $newPageData = $requestData[$ins_id];
+        $newPageData = $requestData[$ins_id] ?? null;
         if ($page_name) {
             // There is already a wiki pagename set (the value of the field is the wiki page name)
             if ($tikilib->page_exists($page_name)) {

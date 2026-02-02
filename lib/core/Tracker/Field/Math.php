@@ -373,7 +373,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                 } elseif ($item) {
                     $item[$mirrorFieldId] = $this->getData($this->getConfiguration('permName'));
                 }
-                //var_dump($mirrorFieldInfo, $item);
                 $handler = TikiLib::lib('trk')->get_field_handler($mirrorFieldInfo, $item);
                 $this->mirrorFieldBaseKey = $handler->getBaseKey();
             }

@@ -46,14 +46,12 @@ function wikiplugin_translated($data, $params)
 
     $h = opendir("img/flags/");
     while ($file = readdir($h)) {
-        if (substr($file, 0, 1) != '.' and substr($file, -4, 4) == '.png') {
+        if (! str_starts_with($file, '.') and str_ends_with($file, '.png')) {
             $avflags[] = substr($file, 0, strlen($file) - 4);
         }
     }
-    if (isset($flag)) {
-        if (in_array($flag, $avflags)) {
-            $img = "<img src='img/flags/$flag.png' width='18' height='13' vspace='0' hspace='3' alt='$lang' align='baseline' /> ";
-        }
+    if (in_array($flag, $avflags)) {
+        $img = "<img src='img/flags/{$escapedFlag}.png' alt='{$escapedLang}' style='width:18px; height:13px; margin:0 3px 0 0; vertical-align:baseline;' />";
     }
 
     if (! $img) {

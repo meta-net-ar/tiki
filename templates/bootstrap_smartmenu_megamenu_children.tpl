@@ -1,4 +1,6 @@
-{if not empty($item.children)}
+{if $item.type eq '-'}
+    <li class="dropdown-divider"></li>
+{elseif not empty($item.children)}
     <li class="mega-menu--item mega-menu--item-level-{$item.sectionLevel}">
         <a href="{$item.sefurl|escape}" class="" data-bs-toggle="dropdown">
             {if $menu_info.use_items_icons eq "y" && $item.icon}

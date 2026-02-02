@@ -113,6 +113,8 @@ class Services_OAuthServer_Controller
 
         if (empty($user)) {
             unset($_SESSION['loginfrom']);
+            $params['controller'] = 'oauthserver';
+            $params['action'] = 'consent';
             $_SESSION['loginfrom'] = $servicelib->getUrl($params);
             $accesslib->redirect('tiki-login_scr.php');
             exit;

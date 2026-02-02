@@ -135,11 +135,11 @@ function prefs_wikiplugin_list($partial = false)
         if (isset($info['name'])) {
             $prefs['wikiplugin_' . $plugin] = [
                 'name' => tr('Plugin %0', $info['name']),
-                'description' => isset($info['description']) ? $info['description'] : '',
+                'description' => $info['description'] ?? '',
                 'type' => 'flag',
                 'help' => 'Plugin' . $plugin,
                 'dependencies' => $dependencies,
-                'packages_required' => (isset($info['packages_required']) && ! empty($info['packages_required'])) ? $info['packages_required'] : [],
+                'packages_required' => (! empty($info['packages_required'])) ? $info['packages_required'] : [],
                 'default' => in_array($plugin, $defaultPlugins) ? 'y' : 'n',
             ];
         }

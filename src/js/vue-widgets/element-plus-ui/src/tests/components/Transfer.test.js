@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import Transfer, { DATA_TEST_ID, DRAG_HANDLER_CLASS } from "../../components/Transfer/Transfer.vue";
 import { ElAlert, ElTransfer } from "element-plus";
 import { h } from "vue";
@@ -46,6 +46,10 @@ describe("Transfer", () => {
     afterEach(() => {
         vi.clearAllMocks();
         vi.resetModules();
+    });
+
+    beforeAll(() => {
+        window.tr = (str) => "translated: " + str;
     });
 
     test("renders correctly with given props", async () => {
@@ -176,7 +180,19 @@ describe("Transfer", () => {
         expect(Sortable).toHaveBeenCalledWith(
             screen.getByText("list 2"),
             expect.objectContaining({
-                handle: "." + DRAG_HANDLER_CLASS,
+                sorting: true,
+                group: props.fieldName,
+                onAdd: expect.any(Function),
+                onUpdate: expect.any(Function),
+            })
+        );
+
+        expect(Sortable).toHaveBeenCalledWith(
+            screen.getByText("list"),
+            expect.objectContaining({
+                sorting: false,
+                group: props.fieldName,
+                onAdd: expect.any(Function),
             })
         );
 
@@ -215,9 +231,109 @@ describe("Transfer", () => {
         const orderedChildren = Array.from(sortableList.children).reverse();
         sortableList.replaceChildren(...orderedChildren);
 
-        Sortable.mock.calls[0][1].onSort();
+        Sortable.mock.calls[0][1].onUpdate();
 
         expect(emitValueChange).toHaveBeenCalledWith({ value: ["b", "a"] });
+    });
+
+    test("should not reorder items with SortableJS when ordering prop is false", async () => {
+        ElTransfer = {
+            setup() {
+                return () =>
+                    h("div", {}, [
+                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                        h("div", { class: "el-transfer-panel__list" }, [
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                            ),
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                            ),
+                        ]),
+                    ]);
+            },
+        };
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props: { ...props, ordering: false } });
+
+        const sortableList = screen.getByText("list 1").nextElementSibling;
+        const orderedChildren = Array.from(sortableList.children).reverse();
+        sortableList.replaceChildren(...orderedChildren);
+
+        Sortable.mock.calls[0][1].onUpdate();
+
+        expect(emitValueChange).not.toHaveBeenCalled();
+    });
+
+    test("should correctly transfer items  via SortableJS from source to target list", async () => {
+        ElTransfer = {
+            setup() {
+                return () =>
+                    h("div", {}, [
+                        h("div", { class: "el-transfer-panel__list" }, [
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item", "data-testid": "item-c" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "c" }, "Item C"))
+                            ),
+                        ]),
+                        h("div", { class: "el-transfer-panel__list" }, "list 2"),
+                    ]);
+            },
+        };
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props });
+
+        const item = screen.getByTestId("item-c");
+        const itemRemoveMock = vi.fn();
+        item.remove = itemRemoveMock;
+
+        Sortable.mock.calls[0][1].onAdd({ item });
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["a", "b", "c"] });
+        expect(itemRemoveMock).toHaveBeenCalled();
+    });
+
+    test("should correctly transfer items via SortableJS from target to source list", async () => {
+        ElTransfer = {
+            setup() {
+                return () =>
+                    h("div", {}, [
+                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                        h("div", { class: "el-transfer-panel__list" }, [
+                            h(
+                                "div",
+                                { class: "el-transfer-panel__item", "data-testid": "item-b" },
+                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                            ),
+                        ]),
+                    ]);
+            },
+        };
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props });
+
+        const item = screen.getByTestId("item-b");
+        const itemRemoveMock = vi.fn();
+        item.remove = itemRemoveMock;
+
+        Sortable.mock.calls[1][1].onAdd({ item });
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["a"] });
+        expect(itemRemoveMock).toHaveBeenCalled();
     });
 
     test("should keep hidden select in sync with el-transfer and call the given emitValueChange prop when the value changes", async () => {

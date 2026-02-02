@@ -11,6 +11,7 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
 use Feedback;
+use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Registration\Error as RegistrationError;
 
 class UserRegistration extends Base
@@ -23,6 +24,7 @@ class UserRegistration extends Base
         $smarty = TikiLib::lib('smarty');
         $captchalib = TikiLib::lib('captcha');
         $access = TikiLib::lib('access');
+        $tikilib = TikiLib::lib('tiki');
 
         // Only generate captcha if this is not a form submission
         if (! isset($_REQUEST['register'])) {
@@ -33,14 +35,18 @@ class UserRegistration extends Base
             return;
         }
 
+        // Check if merged_prefs is an error object before using it as an array
+        if (is_a($registrationlib->merged_prefs, RegistrationError::class)) {
+            Feedback::error(['mes' => $registrationlib->merged_prefs->msg]);
+            return;
+        }
+
         $_VALID = tra("Please enter a valid %s.  No spaces, more than %d characters and contain %s");
         $smarty->assign('_PROMPT_UNAME', sprintf($_VALID, tra("username"), $registrationlib->merged_prefs['min_username_length'], "0-9,a-z,A-Z"));
         $smarty->assign('_PROMPT_PASS', sprintf($_VALID, tra("password"), $registrationlib->merged_prefs['min_pass_length'], "0-9,a-z,A-Z"));
         $smarty->assign('min_username_length', $registrationlib->merged_prefs['min_username_length']);
         $smarty->assign('min_pass_length', $registrationlib->merged_prefs['min_pass_length']);
-        if (is_a($registrationlib->merged_prefs, RegistrationError::class)) {
-            Feedback::error(['mes' => $registrationlib->merged_prefs->msg]);
-        }
+
         $smarty->assign_by_ref('merged_prefs', $registrationlib->merged_prefs);
         $smarty->assign('allowRegister', 'y');
 
@@ -84,6 +90,21 @@ class UserRegistration extends Base
                 global $base_host;
                 if (! isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], $base_host) === false) {
                     Feedback::error(tra('Request not from this host.'));
+                    return '';
+                }
+            }
+
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $bruteForce = new BruteForce();
+                if (! $bruteForce->isOperationAllowed('register', ['ip' => $tikilib->get_ip_address()])) {
+                    $nextAllowedTime = $bruteForce->getNextAllowedTime('register', ['ip' => $tikilib->get_ip_address()]);
+                    $waitTime = $nextAllowedTime - time();
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many registration attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many registration attempts. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::error($waitMessage);
                     return '';
                 }
             }
@@ -141,8 +162,9 @@ class UserRegistration extends Base
                     $re['registrationUsersFieldIds'] = explode(':', $re['registrationUsersFieldIds']);
                 }
                 if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
-                    if (substr($registrationlib->merged_prefs["user_register_prettytracker_tpl"], -4) == ".tpl") {
-                        $userTrackerData = wikiplugin_tracker(
+                    if (str_ends_with($registrationlib->merged_prefs["user_register_prettytracker_tpl"], ".tpl")) {
+                        $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                            'tracker',
                             '',
                             [
                                 'trackerId' => $re['usersTrackerId'],
@@ -161,7 +183,8 @@ class UserRegistration extends Base
                             ]
                         );
                     } else {
-                        $userTrackerData = wikiplugin_tracker(
+                        $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                            'tracker',
                             '',
                             [
                                 'trackerId' => $re['usersTrackerId'],
@@ -181,7 +204,8 @@ class UserRegistration extends Base
                         );
                     }
                 } else {
-                    $userTrackerData = wikiplugin_tracker(
+                    $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                        'tracker',
                         '',
                         [
                             'trackerId' => $re['usersTrackerId'],

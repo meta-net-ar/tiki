@@ -28,7 +28,7 @@ function wikiplugin_userlist_info()
                 'name' => tra('Maximum'),
                 'description' => tra('Result limit'),
                 'since' => '3.0',
-                'default' => '',
+                'default' => -1,
                 'filter' => 'digits',
                 'advanced' => true,
             ],
@@ -82,7 +82,7 @@ function wikiplugin_userlist_info()
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
                 ],
             ],
             'group' => [
@@ -100,19 +100,10 @@ function wikiplugin_userlist_info()
 function wikiplugin_userlist($data, $params)
 {
     global $prefs, $tiki_p_admin, $tiki_p_admin_users, $user;
-    $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
 
     extract($params, EXTR_SKIP);
-
-    if (! isset($sep)) {
-        $sep = ', ';
-    }
-    if (! isset($max)) {
-        $numRows = -1;
-    } else {
-        $numRows = (int) $max;
-    }
+    $numRows = (int) $max;
 
     $from = '';
     if ($data) {
@@ -125,23 +116,20 @@ function wikiplugin_userlist($data, $params)
     }
     $pre = '';
     $post = '';
-    if (isset($layout)) {
-        if ($layout == 'table') {
-            $pre = '<table class=\'sortable\' id=\'' . $tikilib->now . '\'><tr><th>' . tra('users') . '</th></tr><tr><td>';
-            $sep = '</td></tr><tr><td>';
-            $post = '</td></tr></table>';
-        }
+    if ($layout == 'table') {
+        $pre = '<table class=\'sortable\' id=\'' . $tikilib->now . '\'><tr><th>' . tra('users') . '</th></tr><tr><td>';
+        $sep = '</td></tr><tr><td>';
+        $post = '</td></tr></table>';
     }
-    if (isset($group)) {
+    if (! empty($group)) {
         $from .= ", users_usergroups uug";
         $mid .= ' and uug.`groupName` = ? and uu.`userId` = uug.`userId`';
         $bindvars[] = $group;
     }
-    if (isset($sort)) {
-        $sort = strtolower($sort);
-        if (($sort == 'asc') || ($sort == 'desc')) {
-            $mid .= ' ORDER BY `login` ' . $sort;
-        }
+
+    $sort = strtolower($sort);
+    if (($sort == 'asc') || ($sort == 'desc')) {
+        $mid .= ' ORDER BY `login` ' . $sort;
     }
 
         $query = "select `login`, uu.`userId` from `users_users` uu $from where $mid";
@@ -150,32 +138,31 @@ function wikiplugin_userlist($data, $params)
 
     while ($row = $result->fetchRow()) {
         $res = '';
-        if (isset($link)) {
-            if ($link == 'userpage') {
-                if ($prefs['feature_wiki_userpage'] == 'y') {
-                    $wikilib = TikiLib::lib('wiki');
-                    $page = $prefs['feature_wiki_userpage_prefix'] . $row['login'];
-                    if ($tikilib->page_exists($page)) {
-                        $res = '<a href="' . $wikilib->sefurl($page) . '" title="' . tra('Page') . '">';
-                    }
+        if ($link == 'userpage') {
+            if ($prefs['feature_wiki_userpage'] == 'y') {
+                $wikilib = TikiLib::lib('wiki');
+                $page = $prefs['feature_wiki_userpage_prefix'] . $row['login'];
+                if ($tikilib->page_exists($page)) {
+                    $res = '<a href="' . $wikilib->sefurl($page) . '" title="' . tra('Page') . '">';
                 }
-            } elseif (isset($link) && $link == 'userpref') {
-                if ($prefs['feature_userPreferences'] == 'y' && ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y')) {
-                    $res = '<a href="tiki-user_preferences.php?userId=' . $row['userId'] . '" title="' . tra('Preferences') . '">';
-                }
-            } elseif (isset($link) && $link == 'userinfo') {
-                if ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y') {
+            }
+        } elseif ($link == 'userpref') {
+            if ($prefs['feature_userPreferences'] == 'y' && ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y')) {
+                $res = '<a href="tiki-user_preferences.php?userId=' . $row['userId'] . '" title="' . tra('Preferences') . '">';
+            }
+        } elseif ($link == 'userinfo') {
+            if ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y') {
+                $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
+            } else {
+                $user_information = $tikilib->get_user_preference($row['login'], 'user_information', 'public');
+                if ($user_information != 'private' && $row['login'] != $user) {
                     $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
-                } else {
-                    $user_information = $tikilib->get_user_preference($row['login'], 'user_information', 'public');
-                    if ($user_information != 'private' && $row['login'] != $user) {
-                        $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
-                    }
                 }
             }
         }
+
         $displayName = $row['login'];
-        if (! empty($params['realname'])) {
+        if ($realName == 'y') {
             $realName = $tikilib->get_user_preference($row['login'], 'realName');
 
             if ($realName) {

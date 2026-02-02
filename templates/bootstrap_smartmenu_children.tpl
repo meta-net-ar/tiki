@@ -1,4 +1,6 @@
-{if not empty($item.children)}
+{if $item.type eq '-'}
+    <li class="dropdown-divider"></li>
+{elseif not empty($item.children)}
     <li class="sm-sub-item {if $item.selected|default:null} active{/if} {$item.class|escape}">
         <a href="{$item.sefurl|escape}" class="sm-sub-link dropdown-item sm-sub-toggler" data-bs-toggle="dropdown">
             {if $menu_info.use_items_icons eq "y" && $item.icon}

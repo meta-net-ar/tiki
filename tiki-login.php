@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\BruteForce\BruteForce;
 use Tiki\TwoFactorAuth\TwoFactorAuth;
 use Tiki\TwoFactorAuth\Exception\TwoFactorAuthException;
 
@@ -22,12 +23,14 @@ $inputConfiguration = [
         'username'             => 'username',       //post
         'su'                   => 'word',           //post
         'intertiki'            => 'string',         //post
-        'twoFactorForm'        => 'string',         //post
+        'showTwoFactorForm'        => 'string',         //post
         'twoFactorAuthCode'    => 'string',         //post
         'page'                 => 'pagename',       //post
         'url'                  => 'url',            //post
         'rme'                  => 'bool',           //post
         'ticket'               => 'string',         //post
+        'login_mode'           => 'alpha',          //post
+        'keep_login_box_visible' => 'alpha',        //post
         ],
     ],
 ];
@@ -40,6 +43,7 @@ if (empty($_POST['user'])) {
 require_once('tiki-setup.php');
 global $prefs;
 
+$bruteForce = new BruteForce();
 // Refresh not logged in since 30 days user's accounts list
 $userlib = TikiLib::lib('user');
 $userlib->refresh_locked_users_list();
@@ -63,7 +67,7 @@ if (! empty($_REQUEST['code']) && $prefs['auth_method'] == 'openid_connect' && T
 $smarty->assign('errortype', 'login'); // to avoid any redirection to the login box if error
 // Alert user if cookies are switched off
 if (ini_get('session.use_cookies') == 1 && ! isset($_COOKIE[ session_name() ]) && $prefs['session_silent'] != 'y') {
-    Feedback::errorAndDie(tra('Cookies must be enabled to log in to this site'), \Laminas\Http\Response::STATUS_CODE_401);
+    Feedback::errorAndDie(tra('Cookies must be enabled to log in to this site'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 // Redirect to HTTPS if we are not in HTTPS but we require HTTPS login
@@ -129,8 +133,8 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
     }
     $access->redirect($_SESSION['loginfrom']);
 }
-$requestedUser = isset($_REQUEST['user']) ? trim($_REQUEST['user']) : false;
-$pass = isset($_REQUEST['pass']) ? trim($_REQUEST['pass']) : false;
+$requestedUser = trim($_REQUEST['user'] ?? '') ?: false;
+$pass = trim($_REQUEST['pass'] ?? '') ?: false;
 $isvalid = false;
 $isdue = false;
 
@@ -142,7 +146,7 @@ if ($requestedUser == 'admin') {
 if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] != 'y') {
     if (! empty($prefs['feature_intertiki_mymaster'])) {
         $_REQUEST['intertiki'] = $prefs['feature_intertiki_mymaster'];
-    } elseif (strstr($requestedUser, '@')) {
+    } elseif (str_contains($requestedUser, '@')) {
         list($requestedUser, $intertiki_domain) = explode('@', $requestedUser);
         $_REQUEST['intertiki'] = $intertiki_domain;
     }
@@ -150,12 +154,12 @@ if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] != 
     unset($_REQUEST['intertiki']);
 }
 
-//Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["$twoFactorForm"])) {
-    $twoFactorForm = 'y';
+// Setup Two-Factor Auth form state
+$showTwoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["showTwoFactorForm"])) {
+    $showTwoFactorForm = 'y';
 }
-$smarty->assign('twoFactorForm', $twoFactorForm);
+$smarty->assign('showTwoFactorForm', $showTwoFactorForm);
 
 // Go through the intertiki process
 if (
@@ -261,7 +265,7 @@ if (
 
         if (! $username && $email && $oicLib->canCreateUserTiki()) {
             // Remove invalid characters, based on username_pattern pref
-            $username = preg_replace('/[^ \'\-_a-zA-Z0-9@\.]/', '_', $name);
+            $username = preg_replace('/[^\'\-_a-zA-Z0-9@\.]/', '_', $name);
             $user = $userlib->add_user($username, '', $email);
 
             if (! $user) {
@@ -318,12 +322,16 @@ if (
         }
     } elseif ($isvalid) {
         try {
-            $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
-            $requireMfa = TwoFactorAuth::isMFARequired($requestedUser);
-            $twoFactorSecret = TwoFactorAuth::get2FactorSecret($requestedUser);
+            $requireMfa = false;
+            $twoFactorSecret = null;
+
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y') {
+                $requireMfa = TwoFactorAuth::isMFARequired($requestedUser);
+                $twoFactorSecret = TwoFactorAuth::get2FactorSecret($requestedUser);
+            }
 
             if (
-                $prefs['twoFactorAuth'] == 'y'
+                ($prefs['twoFactorAuth'] ?? 'n') === 'y'
                 && isset($_REQUEST['login_mode'])
                 && $_REQUEST['login_mode'] == 'popup'
                 && $requireMfa
@@ -332,15 +340,16 @@ if (
                 $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
                 $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
                 $params = '&create2FaCodeNormalLogin&tiki_username=' . urlencode($_REQUEST['user']);
-                header('Location: ' . $base_url . 'tiki-login_scr.php?twoFactorForm' . $params);
+                header('Location: ' . $base_url . 'tiki-login_scr.php?showTwoFactorForm' . $params);
                 exit;
             }
 
-            if ($prefs['twoFactorAuth'] == 'y' && $requireMfa && ! empty($twoFactorSecret)) {
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y' && $requireMfa && ! empty($twoFactorSecret)) {
+                $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
                 $is2FaPass = $twoFactorAuth->validateCode($requestedUser, $_REQUEST['twoFactorAuthCode']);
                 if (! $is2FaPass) {
                     $error = TWO_FA_INCORRECT;
-                    $smarty->assign('twoFactorForm', 'y');
+                    $smarty->assign('showTwoFactorForm', 'y');
                     $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
                     $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
                     $smarty->assign('create2FaCodeNormalLogin', "y");
@@ -352,7 +361,7 @@ if (
             }
 
             if ($isvalid) {
-                if ($requireMfa && $prefs['twoFactorAuth'] === 'y') {
+                if ($requireMfa && ($prefs['twoFactorAuth'] ?? 'n') === 'y') {
                     $userlib->updateLastMFADate($requestedUser);
                 }
                 $isdue = $userlib->is_due($requestedUser, $method);
@@ -365,6 +374,9 @@ if (
 }
 
 if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, null, 'page'))) {
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $bruteForce->success('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+    }
     $userlib->set_unsuccessful_logins($requestedUser, 0);
     if ($prefs['feature_invite'] == 'y') {
         // tiki-invite, this part is just here to add groups to users which just registered after received an
@@ -407,9 +419,9 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         if (($prefs['feature_best_language'] == 'y') && ($prefs['feature_sefurl'] == 'y')) {
             // If the URL contains the 'main' home page, remove the page name and let Tiki choose the correct home page upon reload
             $homePageUrl = urlencode($prefs['wikiHomePage']);
-            if (strpos($url, 'page=' . $homePageUrl) !== false) {
+            if (str_contains($url, 'page=' . $homePageUrl)) {
                 $url = str_replace('page=' . $homePageUrl, '', $url);
-            } elseif (strpos($url, $homePageUrl) !== false) {
+            } elseif (str_contains($url, $homePageUrl)) {
                 // Strip away the page name from the URL
                 $parts = parse_url($url);
                 $url = '';
@@ -460,7 +472,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
                     //  - pageName => tiki-index.php?page=pageName
                     $anonymous_homepage = $userlib->get_group_home('Anonymous');
                     if (! preg_match('#^https?://#', $anonymous_homepage)) {
-                        if (substr($anonymous_homepage, 0, 5) == 'http:') {
+                        if (str_starts_with($anonymous_homepage, 'http:')) {
                             $anonymous_homepage = substr($anonymous_homepage, 5);
                         } else {
                             $anonymous_homepage = 'tiki-index.php?page=' . urlencode($anonymous_homepage);
@@ -518,7 +530,23 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             }
         }
     }
-} else {    // if ($isvalid) = false
+} else {
+    // if ($isvalid) = false - check and record bruteforce attempts
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $isOperationAllowed = $bruteForce->isOperationAllowed('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+        if ($requestedUser && ! $isOperationAllowed) {
+            $nextAllowedTime = $bruteForce->getNextAllowedTime('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+            $waitTime = $nextAllowedTime - time();
+            if ($waitTime > 60) {
+                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+            } else {
+                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d seconds.'), $waitTime);
+            }
+            $smarty->assign('msg', $waitMessage);
+            $smarty->display('error.tpl');
+            die;
+        }
+    }
     // check if site is closed
     if ($prefs['site_closed'] === 'y') {
         unset($bypass_siteclose_check);
@@ -606,7 +634,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             http_response_code(401);
             $smarty->assign('error_login', $error);
             $smarty->assign('mid', 'tiki-login.tpl');
-            $smarty->assign('error_user', $_REQUEST["user"]);
+            $smarty->assign('error_user', $requestedUser);
             $smarty->display('tiki.tpl');
             exit;
 
@@ -689,7 +717,7 @@ if ($stay_in_ssl_mode == 'y' && $https_mode) {
 }
 
 if (defined('SID') && SID != '') {
-    $url .= ((strpos($url, '?') === false) ? '?' : '&') . SID;
+    $url .= ((! str_contains($url, '?')) ? '?' : '&') . SID;
 }
 
 // Check if a wizard should be run.

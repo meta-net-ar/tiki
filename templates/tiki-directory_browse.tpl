@@ -14,6 +14,7 @@
     </div>
 {/if}
 
+<div class="styling-element">
 {* The navigation bar *}
 {include file='tiki-directory_bar.tpl'}
 
@@ -158,3 +159,5 @@
 {/if}
 
 {include file='tiki-directory_footer.tpl'}
+
+</div>

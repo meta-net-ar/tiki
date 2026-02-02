@@ -268,7 +268,7 @@ class ThemeControlLib extends ThemeLib
 
         //Autocategory -> leave it as it was, but unsure about the sense of this
         if ($prefs['feature_theme_control_autocategorize'] == 'y') {
-            $tc_themeoption = isset($_SESSION['tc_theme_cattheme']) ? $_SESSION['tc_theme_cattheme'] : "";
+            $tc_themeoption = $_SESSION['tc_theme_cattheme'] ?? "";
         }
 
         //create the array with tc_theme and tc_theme_option

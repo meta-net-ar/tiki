@@ -133,17 +133,23 @@
             </div>
         {/if}
     </div>
-    <div class="breadcrumb">
-        <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
-        {$prefs.site_crumb_seper}
-        {foreach from=$parents item=parent}
-            {if isset($parent.name)}
-                <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
-                {$prefs.site_crumb_seper}
-            {/if}
-        {/foreach}
-        <a class="link" href="{$forumId|sefurl:'forum'}">{$forum_info.name|escape}</a>
-    </div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
+            <li class="breadcrumb-item">
+                <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
+            </li>
+            {foreach from=$parents item=parent}
+                {if isset($parent.name)}
+                    <li class="breadcrumb-item">
+                        <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
+                    </li>
+                {/if}
+            {/foreach}
+            <li class="breadcrumb-item active" aria-current="page">
+                {$forum_info.name|escape}
+            </li>
+        </ol>
+    </nav>
 
     {if $tiki_p_forum_post_topic eq 'y'}
         {if $comment_preview eq 'y'}
@@ -368,10 +374,10 @@
                         <div class="mb-3 row">
                             <div class="col-sm-2 col-form-label">{tr}Watch for replies{/tr}</div>
                             <div class="col-sm-10">
-                                <input type="radio" name="set_thread_watch" value="y" id="thread_watch_yes" checked="checked">
+                                <input type="radio" class="form-check-input" name="set_thread_watch" value="y" id="thread_watch_yes" checked="checked">
                                 <label for="thread_watch_yes">{tr}Send me an email when someone replies to my topic{/tr}</label>
                                 <br>
-                                <input type="radio" name="set_thread_watch" value="n" id="thread_watch_no">
+                                <input type="radio" class="form-check-input" name="set_thread_watch" value="n" id="thread_watch_no">
                                 <label for="thread_watch_no">{tr}Don't send me any emails{/tr}</label>
                             </div>
                         </div>
@@ -526,8 +532,8 @@
                         <td class="text">
                             {if isset($channels[user].lastPost)}
                                 {$channels[user].lastPost|tiki_short_datetime}<br>
-                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|escape}</i>{/if}
-                                {tr}by{/tr} {$channels[user].lastPostData.userName|username}</small>
+                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|forummaskemail|escape}</i>{/if}
+                                {tr}by{/tr} {$channels[user].lastPostData.userName|forummaskemail|username}</small>
                             {/if}
                         </td>
                     {/if}
@@ -781,14 +787,14 @@
                         <td class="text">
                             {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
                             <a {if $comments_coms[ix].is_marked}class="forumnameread"{else}class="forumname"{/if} href="{$comments_coms[ix].threadId|sefurl:'forumthread'}{$sep}topics_offset={math equation="x + y" x=$comments_offset y=$smarty.section.ix.index}{if $comments_threshold}&amp;topics_threshold={$comments_threshold}{/if}{if $thread_sort_mode ne $forum_info.topicOrdering}&amp;topics_sort_mode={$thread_sort_mode}{/if}{if isset($topics_find) and $topics_find}&amp;topics_find={$comments_find}{/if}">
-                                {$comments_coms[ix].title|escape}
+                                {$comments_coms[ix].title|forummaskemail|escape}
                             </a>
                             {if $forum_info.topic_summary eq 'y'}
                                 <div class="subcomment">
                                     {if $comments_coms[ix].summary|count_characters > 0}
-                                        {$comments_coms[ix].summary|truncate:240:"...":true|escape}
+                                        {$comments_coms[ix].summary|forummaskemail|truncate:240:"...":true|escape}
                                     {else}
-                                        {$comments_coms[ix].data|truncate:100:"...":true|escape}
+                                        {$comments_coms[ix].data|forummaskemail|truncate:100:"...":true|escape}
                                     {/if}
                                 </div>
                             {/if}
@@ -811,34 +817,34 @@
                         {if $forum_info.topics_list_lastpost eq 'y'}
                             <td class="text">
                                 {if $forum_info.topics_list_lastpost_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
-                                    <div style="float:left;padding-right:2px">{$comments_coms[ix].lastPostData.userName|avatarize}</div>
+                                    <div style="float:left;padding-right:2px">{$comments_coms[ix].lastPostData.userName|forummaskemail|avatarize}</div>
                                 {/if}
                                 <div style="float:left;">
                                     {$comments_coms[ix].lastPost|tiki_short_datetime} {* date_format:"%b %d [%H:%M]" *}
                                     {if $comments_coms[ix].replies}
                                         <br>
-                                        <small>{if $forum_info.topics_list_lastpost_title eq 'y'}<i>{$comments_coms[ix].lastPostData.title|escape}</i> {/if}{tr}by{/tr} {$comments_coms[ix].lastPostData.userName|userlink}</small>
+                                        <small>{if $forum_info.topics_list_lastpost_title eq 'y'}<i>{$comments_coms[ix].lastPostData.title|forummaskemail|escape}</i> {/if}{tr}by{/tr} {$comments_coms[ix].lastPostData.userName|forummaskemail|userlink}</small>
                                     {/if}
                                 </div>
                             </td>
                         {elseif $forum_info.topics_list_lastpost_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                             <td class="text">
-                                {$comments_coms[ix].lastPostData.userName|avatarize}
+                                {$comments_coms[ix].lastPostData.userName|forummaskemail|avatarize}
                             </td>
                         {/if}
                         {if $forum_info.topics_list_author eq 'y'}
                             <td class="text">
                                 {if $forum_info.topics_list_author_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                                     <div style="float:left;padding-right:2px">
-                                        {$comments_coms[ix].userName|avatarize}
+                                        {$comments_coms[ix].userName|forummaskemail|avatarize}
                                     </div>
                                 {/if}
                                 <div style="float:left">
-                                    {$comments_coms[ix].userName|userlink}</td>
+                                    {$comments_coms[ix].userName|forummaskemail|userlink}</td>
                                 </div>
                         {elseif $forum_info.topics_list_author_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                             <td class="text">
-                                {$comments_coms[ix].userName|avatarize}
+                                {$comments_coms[ix].userName|forummaskemail|avatarize}
                             </td>
                         {/if}
 
@@ -941,7 +947,7 @@
         <div class="col-md-8" styles="padding-top:15px">
             <div class="card" id="filter-panel">
                 <div class="card-header filter-card-header">
-                    <h4 class="card-title">
+                    <h4 class="tiki-card-header-title">
                         <a data-bs-toggle="collapse" href="#filterCollapse" class="collapsed">
                             {tr}Filter Posts{/tr} {icon name="angle-down"}
                         </a>

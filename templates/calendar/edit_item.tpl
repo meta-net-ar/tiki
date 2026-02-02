@@ -5,6 +5,7 @@
 {/block}
 
 {block name="content"}
+
     <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form" data-should-parse-editor-data="false">
         <div class="form-contents">
             <div class="preview d-none">
@@ -19,7 +20,7 @@
                 {/if}
             </div>
             <input type="hidden" name="calitem[user]" value="{$calitem.user|escape}">
-            <input type="hidden" name="return_url" value="tiki-calendar.php">
+            <input type="hidden" id="return_url" name="return_url" value="{$calitem.returnURL}">
             {if $calitemId}
                 <input type="hidden" name="calitemId" value="{$calitemId|escape}">
             {/if}
@@ -38,8 +39,7 @@
                 <label for="calid" class="col-form-label col-sm-3">{tr}Calendar{/tr}</label>
                 <div class="col-sm-9">
                     <input name="calendarchanged" type="hidden">
-                    <select name="calitem[calendarId]" id="calid" class="form-control" required
-                            onchange="$(this).parents('.edit-event-form').tikiModal(tr('Loading...')); needToConfirm=false; $('input[name=calendarchanged]').val(1); $('input[name=saveitem]').trigger('click');">
+                    <select name="calitem[calendarId]" id="calid" class="form-control" required>
                         {foreach $calendars as $aCalendar}
                             {$calstyle = ''}
                             {if not empty($aCalendar.custombgcolor)}
@@ -81,10 +81,22 @@
                     <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
                 </div>
             </div>
+            {if !empty($trackerItems)}
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr}</label>
+                    <div class="col-sm-9 mb-0 pt-2">
+                        <ul>
+                            {foreach from=$trackerItems item=trackerItem}
+                                <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Created by{/tr}</label>
                 <div class="col-sm-9">
-                    <div class="summary" style="margin-bottom: 0; padding-top: 7px;">
+                    <div class="summary mb-0 pt-2">
                         {$calitem.user|escape}
                     </div>
 

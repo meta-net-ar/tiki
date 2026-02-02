@@ -33,13 +33,13 @@ class ElasticSearchIndexManager
 
             // Return all indexes
             if (! $onlyUnused) {
-                return array_filter($indexes, fn($indexName) => strpos($indexName, '.') !== 0);
+                return array_filter($indexes, fn($indexName) => ! str_starts_with($indexName, '.'));
             }
 
             // Otherwise, return only unused indexes
             return array_filter($indexes, function ($indexName) use ($tikiLanguages) {
                 // Skip reserved indexes
-                if (strpos($indexName, '.') === 0) {
+                if (str_starts_with($indexName, '.')) {
                     return false;
                 }
 

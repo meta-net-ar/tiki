@@ -15,16 +15,16 @@ define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] 
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'days'                 => 'digits',       //get
+        'days'                 => 'int',          //get
         'pv_chart'             => 'striptags',    //get
-        'chart'                => 'striptags',    //get
-        'startDate_Year'       => 'digits',       //get
-        'startDate_Month'      => 'digits',       //get
-        'startDate_Day'        => 'digits',       //get
-        'endDate_Year'         => 'digits',       //get
-        'endDate_Month'        => 'digits',       //get
-        'endDate_Day'          => 'digits',       //get
-        'display'              => 'striptags'
+        'chart'                => 'alnumdash',    //get
+        'startDate_Year'       => 'digits',       //post
+        'startDate_Month'      => 'digits',       //post
+        'startDate_Day'        => 'digits',       //post
+        'endDate_Year'         => 'digits',       //post
+        'endDate_Month'        => 'digits',       //post
+        'endDate_Day'          => 'digits',       //post
+        'display'              => 'striptags',    //get
         ],
         'catchAllUnset' => null
     ],
@@ -99,18 +99,6 @@ $smarty->assign_by_ref('quiz_stats', $quiz_stats);
 if ($prefs['feature_trackers'] == 'y') {
     // Retrieve trackers statistics and prepare extracted data for display.
     $tracker_stats = $statslib->trackerStats();
-    $tracker_stat_data = [];
-    foreach ($tracker_stats as $key => $stat) {
-        if (isset($stat->result[0])) {
-            $tracker_stat_data = $stat->result[0];
-            $extractedTrackerStatsData[$key] = [
-                'dataLengthMb' => $tracker_stat_data['Data_length'] / 1024 / 1024, // Get data lenght in Mb.
-                'rowCount' => $tracker_stat_data['Rows'] + 1 // Number of records + 1, because it starts with 0 index when counting.
-            ];
-        }
-    }
-
-    $tracker_stats = $extractedTrackerStatsData;
 } else {
     $tracker_stats = false;
 }

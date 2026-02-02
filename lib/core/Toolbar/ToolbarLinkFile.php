@@ -11,7 +11,7 @@ class ToolbarLinkFile extends ToolbarUtilityItem
     public function __construct($trackerItemId)
     {
         $this->trackerItemId = $trackerItemId;
-        $this->setLabel(tra('Link File'))
+        $this->setLabel(tra('Link file from tracker item'))
             ->setIcon('img/icons/file-manager.png')
             ->setIconName('file')
             ->setType('LinkFile')

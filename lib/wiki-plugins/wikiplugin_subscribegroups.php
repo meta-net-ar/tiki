@@ -83,21 +83,18 @@ function wikiplugin_subscribegroups_info()
                 'name' => tra('Groups'),
                 'description' => tra('Colon-separated list of groups. By default the list of groups available to the user.'),
                 'since' => '2.0',
-                'default' => '',
             ],
             'including' => [
                 'required' => false,
                 'name' => tra('Including Group'),
                 'description' => tra('Only list groups that include the group being specified here'),
                 'since' => '4.0',
-                'default' => '',
             ],
             'defaulturl' => [
                 'required' => false,
                 'name' => tra('Default URL'),
                 'description' => tra('Page user will be directed to after clicking on icon to change default group'),
                 'since' => '4.0',
-                'default' => '',
             ],
             'leadergroupname' => [
                 'required' => false,
@@ -105,7 +102,6 @@ function wikiplugin_subscribegroups_info()
                 'description' => tr('Name of group for leaders of the group, where %0 will be substituted by
                     the group name', '<code>groupName</code>'),
                 'since' => '8.0',
-                'default' => '',
             ],
             'pendinggroupname' => [
                 'required' => false,
@@ -113,7 +109,6 @@ function wikiplugin_subscribegroups_info()
                 'description' => tr('Name of group for users that are waiting for approval to enter the group, where
                     %0 will be substituted by the group name', '<code>groupName</code>'),
                 'since' => '8.0',
-                'default' => '',
             ],
             'managementpagename' => [
                 'required' => false,
@@ -121,7 +116,6 @@ function wikiplugin_subscribegroups_info()
                 'description' => tr('Name of wiki page for group management by leaders, where %0 will be
                     substituted by the group name', '<code>groupName</code>'),
                 'since' => '8.0',
-                'default' => '',
             ],
             'hidelink_including' => [
                 'required' => false,
@@ -165,10 +159,10 @@ function wikiplugin_subscribegroups($data, $params)
         $group = '';
     }
 
-    if (! empty($groups)) {
+    if (! is_null($groups)) {
         $groups = explode(':', $groups);
     }
-    if (! empty($including)) {
+    if (! is_null($including)) {
         $groups = $userlib->get_including_groups($including);
     }
     if (! empty($hidelink_including)) {
@@ -186,7 +180,7 @@ function wikiplugin_subscribegroups($data, $params)
             if (! ($info = $userlib->get_group_info($g))) {
                 return tra('Incorrect parameter');
             }
-            if (isset($alwaysallowleave) && $alwaysallowleave == 'y') {
+            if ($alwaysallowleave == 'y') {
                 if ($info['userChoice'] != 'y' && ! empty($_REQUEST['assign'])) {
                     return tra('You do not have permission to subscribe to groups');
                 }
@@ -197,7 +191,7 @@ function wikiplugin_subscribegroups($data, $params)
                 }
                 $smarty->assign('alwaysallowleave', 'n');
             }
-            if (! empty($groups) && ! in_array($g, $groups)) {// limit the group to the groups params
+            if (! is_null($groups) && ! in_array($g, $groups)) {// limit the group to the groups params
                 $g = '';
             }
         }
@@ -220,7 +214,7 @@ function wikiplugin_subscribegroups($data, $params)
     }
     if (! empty($_REQUEST['default']) && isset($userGroups[$_REQUEST['default']])) {
         $userlib->set_default_group($user, $_REQUEST['default']);
-        if (isset($defaulturl)) {
+        if (! is_null($defaulturl)) {
             header("Location: $defaulturl");
             die;
         }
@@ -234,21 +228,21 @@ function wikiplugin_subscribegroups($data, $params)
 
     $leadergroups = [];
     $managementpages = [];
-    if (! empty($leadergroupname)) {
+    if (! is_null($leadergroupname)) {
         $pattern = '/' . str_replace('groupName', '(.+)', preg_quote($leadergroupname)) . '/';
         foreach ($userGroups as $g => $type) {
             if (preg_match($pattern, $g, $matches)) {
                 // these are the groups where the user is a leader
                 $leadergroups[] = $matches[1];
             }
-            if (! empty($managementpagename)) {
+            if (! is_null($managementpagename)) {
                 $managementpages[$g] = str_replace('groupName', $g, $managementpagename);
             }
         }
     }
     $smarty->assign('managementpages', $managementpages);
 
-    if (isset($groups)) {
+    if (! is_null($groups)) {
         foreach ($userGroups as $g => $type) {
             if (! in_array($g, $groups)) {
                 unset($userGroups[$g]);
@@ -266,7 +260,7 @@ function wikiplugin_subscribegroups($data, $params)
     $basegroupnames = [];
     foreach ($allGroups['data'] as $gr) {
         // hide pending (needing approval) group of user if he is already in base group
-        if (! empty($pendinggroupname)) {
+        if (! is_null($pendinggroupname)) {
             $pattern = '/' . str_replace('groupName', '(.+)', preg_quote($pendinggroupname)) . '/';
             if (preg_match($pattern, $gr['groupName'], $matches)) {
                 $basegroupnames[$gr['groupName']] = $matches[1];
@@ -275,39 +269,35 @@ function wikiplugin_subscribegroups($data, $params)
                 }
             }
         }
-        if ($gr['userChoice'] == 'y' && (empty($groups) || in_array($gr['groupName'], $groups)) && ! isset($userGroups[$gr['groupName']]) && $gr['groupName'] != 'Registered' && $gr['groupName'] != 'Anonymous') {
+        if ($gr['userChoice'] == 'y' && (is_null($groups) || in_array($gr['groupName'], $groups)) && ! isset($userGroups[$gr['groupName']]) && $gr['groupName'] != 'Registered' && $gr['groupName'] != 'Anonymous') {
             $possibleGroups[] = $gr['groupName'];
         }
     }
     $smarty->assign('basegroupnames', $basegroupnames);
 
-    if (isset($subscribe)) {
+    if ($subscribe != '') {
         $smarty->assign_by_ref('subscribe', $subscribe);
     } else {
         $smarty->assign('subscribe', '');
     }
-    if (isset($showsubscribe) && $showsubscribe == 'n') {
+    if ($showsubscribe == 'n') {
         $smarty->assign('showsubscribe', 'n');
     } else {
         $smarty->assign('showsubscribe', 'y');
     }
-    if (isset($subscribestyle)) {
-        $smarty->assign('subscribestyle', $subscribestyle);
-    } else {
-        $smarty->assign('subscribestyle', 'dropdown');
-    }
-    if (isset($showdefault) && $showdefault == 'y') {
+    $smarty->assign('subscribestyle', $subscribestyle);
+    if ($showdefault == 'y') {
         $smarty->assign('showdefault', 'y');
     } else {
         $smarty->assign('showdefault', 'n');
     }
-    if (isset($showgroupdescription) && $showgroupdescription == 'y') {
+    if ($showgroupdescription == 'y') {
         $smarty->assign_by_ref('groupDescs', $groupDescs);
         $smarty->assign('showgroupdescription', 'y');
     } else {
         $smarty->assign('showgroupdescription', 'n');
     }
-    if (! empty($defaulturl)) {
+    if (! is_null($defaulturl)) {
         $smarty->assign('defaulturl', $defaulturl);
     }
     $all = [];

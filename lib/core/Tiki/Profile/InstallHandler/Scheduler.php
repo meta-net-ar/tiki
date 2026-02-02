@@ -78,7 +78,7 @@ class Tiki_Profile_InstallHandler_Scheduler extends Tiki_Profile_InstallHandler
                                 $taskParamsError = true;
                                 break;
                             }
-                            $params[$key] = isset($data['params'][$key]) ? $data['params'][$key] : '';
+                            $params[$key] = $data['params'][$key] ?? '';
                         }
                     }
 

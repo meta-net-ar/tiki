@@ -100,9 +100,14 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             ? $requestData[$ins_id]
             : $this->getValue();
 
-        if (! empty($value) && ! is_int((int) $value)) {    // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
-            $value = '';
-            Feedback::error(tr('Date Picker Field: "%0" is not a valid internal date value', $value));
+        if (! empty($value)) {
+            try {
+                // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
+                $this->validateTimestamp($value);
+            } catch (Services_Exception $e) {
+                $value = '';
+                Feedback::error(tr('Date Picker Field: %0', $e->getMessage()));
+            }
         }
 
         return [
@@ -124,6 +129,8 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         $params['notBefore'] = $this->getOption('notBefore') ? '#trackerinput_' . $this->getOption('notBefore') : '';
         $params['notAfter']  = $this->getOption('notAfter') ? '#trackerinput_' . $this->getOption('notAfter') : '';
         $params['timezone'] = TikiLib::lib('tiki')->get_display_timezone();
+        $params['minutestep'] = $this->getValidatedMinuteStep();
+        $params['enforcestep'] = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
 
         return smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate());
     }

@@ -43,7 +43,11 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractItemField i
 
     public function renderInput($context = [])
     {
-        return tr('Feature cannot be set or modified through this interface.');
+        $ins_id = $this->getInsertId();
+        //This input is useful for facilitating the execution of rules
+        $hiddenInput = "<input type='hidden' name='$ins_id'>";
+        $translatedText = tr("Feature cannot be set or modified through this interface.");
+        return $hiddenInput . $translatedText;
     }
 
     public function renderOutput($context = [])

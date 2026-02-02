@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+use Tiki\Exceptions\BigBlueButton\SharedSecretKeyException;
 
 function wikiplugin_bigbluebutton_info()
 {
@@ -103,7 +103,7 @@ function wikiplugin_bigbluebutton_info()
 function wikiplugin_bigbluebutton($data, $params)
 {
     try {
-        global $prefs, $user;
+        global $prefs;
 
         if (empty($prefs['bigbluebutton_server_location'])) {
             return WikiParser_PluginOutput::error(tr('Warning'), tr('BigBlueButton server location is not defined'));
@@ -124,19 +124,12 @@ function wikiplugin_bigbluebutton($data, $params)
             ],
         ];
 
-        $pluginInfo = wikiplugin_bigbluebutton_info();
-        foreach ($pluginInfo['params'] as $key => $param) {
-            if (isset($param['default']) && ! isset($params[$key])) {
-                $params[$key] = $param['default'];
-            }
-        }
         $smarty->assign('bbb_params', Tiki_Security::get()->encode($params));
 
         if (! $bigbluebuttonlib->roomExists($meeting)) {
             if (! isset($_POST['bbb']) || $_POST['bbb'] != $meeting || ! $perms->bigbluebutton_create) {
                 if (
                     $perms->bigbluebutton_view_rec
-                        && isset($params['showrecording'])
                         && $params['showrecording'] != 'n'
                 ) {
                     $smarty->assign('bbb_recordings', $bigbluebuttonlib->getRecordings($meeting));
@@ -166,9 +159,9 @@ function wikiplugin_bigbluebutton($data, $params)
 
         // Won't display anything if recordings were not loaded
         return $smarty->fetch('wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl');
-    } catch (ServerSaltKeyException $e) {
+    } catch (SharedSecretKeyException $e) {
         return WikiParser_PluginOutput::internalError($e->getMessage());
-    } catch (Exception $e) {
+    } catch (Exception) {
         return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
     }
 }

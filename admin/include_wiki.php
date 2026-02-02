@@ -14,7 +14,7 @@ $path = $tikidomain ? EXPORT_DUMP_PATH . "/$tikidomain/dump_wiki.tar" : EXPORT_D
 
 //*** begin state-changing actions
 if (! empty($_POST['w_use_dir']) && $access->checkCsrf()) {
-    if (substr($_POST['w_use_dir'], -1) != '\\' && substr($_POST['w_use_dir'], -1) != '/') {
+    if (! str_ends_with($_POST['w_use_dir'], '\\') && ! str_ends_with($_POST['w_use_dir'], '/')) {
         //TODO don't change $_POST values directly
         $_POST['w_use_dir'] .= '/';
     }

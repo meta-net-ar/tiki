@@ -354,10 +354,11 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         $selected_groups = array_unique(array_merge($selected_groups, $userlib->get_user_groups($v)));
                     }
                     TikiLib::setExternalContext(true);
-                    $templateData['remote_url'] = TikiLib::lib('service')->getUrl([
+                    $params = [
                         'groups' => implode(',', $selected_groups),
                         'listonly' => $this->trackerField->getOption('showRealname') ? 'userrealnames' : 'users',
-                    ]);
+                    ];
+                    $templateData['remote_url'] = TikiLib::lib('service')->getUrl('tiki-ajax_services.php?' . http_build_query($params));
                 } else {
                     $users = $userlib->get_members($groups);
                     foreach ($users as $group => &$usrs) {

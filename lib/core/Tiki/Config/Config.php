@@ -7,158 +7,112 @@
 
 namespace Tiki\Config;
 
-use ArrayAccess;
-use Countable;
-use Iterator;
-
-class Config implements Countable, Iterator, ArrayAccess
+class Config implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    protected array $data = [];
-    protected bool $readOnly;
-    protected bool $skipNextIteration = false;
+    private array $data;
+    private bool $allowModifications;
+    private bool $readOnly = false;
 
-    public function __construct(array $data = [], bool $readOnly = false)
+    public function __construct(array $data = [], bool $allowModifications = false)
     {
-        $this->readOnly = $readOnly;
-
-        // Wrap sub-arrays into Config objects for recursive structure
-        foreach ($data as $key => $value) {
-            $this->data[$key] = is_array($value)
-                ? new self($value, $readOnly)
-                : $value;
-        }
-    }
-
-    public function get(string $key, $default = null)
-    {
-        return $this->data[$key] ?? $default;
-    }
-
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
-    public function __set($name, $value)
-    {
-        if ($this->readOnly) {
-            throw new \RuntimeException('Config is read only');
-        }
-
-        $this->data[$name] = is_array($value)
-            ? new self($value, false)
-            : $value;
-    }
-
-    public function __unset($name)
-    {
-        if ($this->readOnly) {
-            throw new \RuntimeException('Config is read only');
-        }
-
-        unset($this->data[$name]);
-        $this->skipNextIteration = true;
-    }
-
-    public function __isset($name): bool
-    {
-        return isset($this->data[$name]);
-    }
-
-    public function merge(array|self $other): self
-    {
-        $otherData = $other instanceof self ? $other->toArray() : $other;
-        $merged = array_replace_recursive($this->toArray(), $otherData);
-        return new self($merged, $this->readOnly);
+        $this->data = $data;
+        $this->allowModifications = $allowModifications;
     }
 
     public function toArray(): array
     {
-        $array = [];
-        foreach ($this->data as $key => $value) {
-            $array[$key] = $value instanceof self ? $value->toArray() : $value;
-        }
-        return $array;
+        return $this->data;
     }
 
     public function setReadOnly(): void
     {
         $this->readOnly = true;
-        foreach ($this->data as $value) {
-            if ($value instanceof self) {
-                $value->setReadOnly();
+    }
+
+    public function merge(self|array $with): void
+    {
+        $this->assertWritable();
+        $array = $with instanceof self ? $with->toArray() : $with;
+        $this->data = self::deepMerge($this->data, $array, true);
+    }
+
+    public function mergeAddOnly(self|array $with): void
+    {
+        $this->assertWritable();
+        $array = $with instanceof self ? $with->toArray() : $with;
+        $this->data = self::deepMerge($this->data, $array, false);
+    }
+
+    public function get(string $path, mixed $default = null): mixed
+    {
+        $ref = $this->data;
+        foreach (explode('.', $path) as $seg) {
+            if (! is_array($ref) || ! array_key_exists($seg, $ref)) {
+                return $default;
             }
+            $ref = $ref[$seg];
         }
+        return $ref;
     }
 
-    public function isReadOnly(): bool
+    public function __get(string $name): self
     {
-        return $this->readOnly;
+        $val = $this->data[$name] ?? [];
+        return new self(is_array($val) ? $val : [], false);
     }
 
-    public function __clone(): void
+    public function __isset(string $name): bool
     {
-        foreach ($this->data as $key => $value) {
-            $this->data[$key] = $value instanceof self ? clone $value : $value;
-        }
+        return isset($this->data[$name]);
     }
 
-    // === Countable ===
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->data[$offset]);
+    }
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->data[$offset] ?? null;
+    }
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->assertWritable();
+        $this->data[$offset] = $value;
+    }
+    public function offsetUnset(mixed $offset): void
+    {
+        $this->assertWritable();
+        unset($this->data[$offset]);
+    }
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->data);
+    }
     public function count(): int
     {
         return count($this->data);
     }
 
-    // === Iterator ===
-    public function rewind(): void
+    private function assertWritable(): void
     {
-        $this->skipNextIteration = false;
-        reset($this->data);
-    }
-
-    public function current(): mixed
-    {
-        $this->skipNextIteration = false;
-        return current($this->data);
-    }
-
-    public function key(): mixed
-    {
-        return key($this->data);
-    }
-
-    public function next(): void
-    {
-        if ($this->skipNextIteration) {
-            $this->skipNextIteration = false;
-            return;
+        if ($this->readOnly || ! $this->allowModifications) {
+            throw new \RuntimeException('Config is read-only');
         }
-        next($this->data);
     }
 
-    public function valid(): bool
+    private static function deepMerge(array $base, array $extra, bool $overwrite): array
     {
-        return key($this->data) !== null;
-    }
-
-    // === ArrayAccess ===
-    public function offsetExists(mixed $offset): bool
-    {
-        return $this->__isset($offset);
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        return $this->__get($offset);
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        $this->__set($offset, $value);
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-        $this->__unset($offset);
+        foreach ($extra as $k => $v) {
+            if (array_key_exists($k, $base)) {
+                if (is_array($base[$k]) && is_array($v)) {
+                    $base[$k] = self::deepMerge($base[$k], $v, $overwrite);
+                } elseif ($overwrite) {
+                    $base[$k] = $v;
+                }
+            } else {
+                $base[$k] = $v;
+            }
+        }
+        return $base;
     }
 }

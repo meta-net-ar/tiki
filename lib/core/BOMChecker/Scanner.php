@@ -86,6 +86,11 @@ class BOMChecker_Scanner
             return;
         }
 
+        // Skip node_modules at any level (can appear in multiple nested locations)
+        if (basename($sourceDir) === 'node_modules') {
+            return;
+        }
+
         $sourceDir = $this->fixDirSlash($sourceDir);
 
         // Copy files and directories.
@@ -152,7 +157,7 @@ class BOMChecker_Scanner
     {
         $dirPath = str_replace('\\', '/', $dirPath);
 
-        if (substr($dirPath, -1, 1) != '/') {
+        if (! str_ends_with($dirPath, '/')) {
             $dirPath .= '/';
         }
 
@@ -168,7 +173,7 @@ class BOMChecker_Scanner
     protected function getFileExtension($filePath)
     {
         $info = pathinfo($filePath);
-        return isset($info['extension']) ? $info['extension'] : '';
+        return $info['extension'] ?? '';
     }
 
     /**
@@ -180,18 +185,20 @@ class BOMChecker_Scanner
     protected function checkUtfBom($filePath)
     {
         $file = fopen($filePath, 'r');
-        $data = fgets($file, 3);
+        // Note: fgets($file, n) reads up to (n-1) bytes, so we use 4 to read 3 bytes
+        // UTF-8 BOM is 3 bytes (\xEF\xBB\xBF), UTF-16 BOMs are 2 bytes
+        $data = fgets($file, 4);
         fclose($file);
 
         $this->scannedFiles++;
 
-        if (substr($data, 0, 3) == "\xEF\xBB\xBF") {
+        if (str_starts_with($data, "\xEF\xBB\xBF")) {
             return self::BOM_UTF8;
         }
 
         if (
-            (substr($data, 0, 2) == "\xFE\xFF") // UTF-16 big-endian BOM
-            || (substr($data, 0, 2) == "\xFF\xFE") // UTF-16 little-endian BOM
+            (str_starts_with($data, "\xFE\xFF")) // UTF-16 big-endian BOM
+            || (str_starts_with($data, "\xFF\xFE")) // UTF-16 little-endian BOM
         ) {
             return self::BOM_UTF16;
         }
@@ -262,5 +269,112 @@ class BOMChecker_Scanner
         }
 
         return false;
+    }
+
+    /**
+     * Fix BOM in files or report files with BOM
+     *
+     * @param array $files Array of file paths to check
+     * @param bool $reportOnly If true, only detect BOM without removing it
+     * @return array Array of files that had BOM (fixed or detected)
+     */
+    public function fix(array $files, bool $reportOnly = false): array
+    {
+        $affected = [];
+
+        foreach ($files as $file) {
+            // Skip if not a file or not readable
+            if (! is_file($file) || ! is_readable($file)) {
+                continue;
+            }
+
+            // Reuse existing checkUtfBom() method for detection
+            if ($bomType = $this->checkUtfBom($file)) {
+                if (! $reportOnly) {
+                    // Remove BOM using stream-based approach for efficiency
+                    $this->removeBOMFromFile($file, $bomType);
+                }
+                $affected[] = $file;
+            }
+        }
+
+        return $affected;
+    }
+
+    /**
+     * Remove BOM from file using in-place modification
+     * This approach preserves ALL file metadata (permissions, ownership, timestamps, ACLs, extended attributes)
+     * by modifying the file directly without creating a new inode
+     *
+     * @param string $filePath Path to the file
+     * @param string $bomType Type of BOM (BOM_UTF8 or BOM_UTF16)
+     * @return bool True on success, false on failure
+     */
+    protected function removeBOMFromFile(string $filePath, string $bomType): bool
+    {
+        // Determine how many bytes to skip based on BOM type
+        $bytesToSkip = ($bomType === self::BOM_UTF8) ? 3 : 2;
+
+        // Open file for reading and writing (r+b = read/write binary, doesn't truncate)
+        $file = fopen($filePath, 'r+b');
+        if ($file === false) {
+            return false;
+        }
+
+        try {
+            // Get original file size
+            $stats = fstat($file);
+            if ($stats === false) {
+                fclose($file);
+                return false;
+            }
+            $originalSize = $stats['size'];
+
+            // Calculate new size after BOM removal
+            $newSize = $originalSize - $bytesToSkip;
+
+            // Read and write content in chunks to shift it to the beginning
+            // This is memory-efficient even for large files
+            $chunkSize = 8192; // 8KB chunks
+            $readPos = $bytesToSkip;
+            $writePos = 0;
+            $bytesRemaining = $newSize;
+
+            while ($bytesRemaining > 0) {
+                // Calculate how much to read (don't exceed remaining bytes)
+                $toRead = min($chunkSize, $bytesRemaining);
+
+                // Seek to read position and read chunk
+                fseek($file, $readPos, SEEK_SET);
+                $chunk = fread($file, $toRead);
+
+                if ($chunk === false || $chunk === '') {
+                    break;
+                }
+
+                // Seek to write position and write the chunk
+                fseek($file, $writePos, SEEK_SET);
+                $written = fwrite($file, $chunk);
+
+                if ($written === false) {
+                    break;
+                }
+
+                // Update positions
+                $chunkLen = strlen($chunk);
+                $readPos += $chunkLen;
+                $writePos += $chunkLen;
+                $bytesRemaining -= $chunkLen;
+            }
+
+            // Truncate file to new size (removing the BOM bytes from the end)
+            ftruncate($file, $newSize);
+
+            fclose($file);
+            return true;
+        } catch (\Exception) {
+            fclose($file);
+            return false;
+        }
     }
 }

@@ -7,9 +7,9 @@
             {ticket}
             <input name="page" value="{$edit_keywords_page|escape}" type="hidden">
             <div class="tiki-form-group row">
-                <label class="col-sm-3 col-form-label">{tr}Keywords{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="new_keywords">{tr}Keywords{/tr}</label>
                 <div class="input-group col-sm-7 offset-sm-1 mb-3">
-                    <input name="new_keywords" size="65" value="{$edit_keywords|escape}" class="form-control">
+                    <input name="new_keywords" id="new_keywords" size="65" value="{$edit_keywords|escape}" class="form-control">
                     <input type="submit" class="btn btn-primary" name="save_keywords" value="{tr}Save{/tr}">
                 </div>
             </div>
@@ -20,9 +20,9 @@
 <h2>{tr}Current Page Keywords{/tr}</h2>
 <form method="get" action="tiki-admin_keywords.php">
     <div class="tiki-form-group row">
-        <label class="col-sm-3 col-form-label">{tr}Search by page:{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="search_by_page">{tr}Search by page:{/tr}</label>
         <div class="input-group col-sm-7 offset-sm-1 mb-3">
-            <input type="text" name="q" value="{if !empty($smarty.request.q)}{$smarty.request.q|escape}{/if}" class="form-control">
+            <input type="text" name="q" id="search_by_page" value="{if !empty($smarty.request.q)}{$smarty.request.q|escape}{/if}" class="form-control">
             <input type="submit" class="btn btn-primary" name="search" value="{tr}Go{/tr}">
         </div>
     </div>

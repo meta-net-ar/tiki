@@ -4,6 +4,7 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
 
+<div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}General Preferences{/tr}</legend>
         <div class="adminoptionboxchild">
@@ -72,6 +73,7 @@
             {preference name=print_pdf_mpdf_coverpage_settings}
             {preference name=print_pdf_mpdf_coverpage_image_settings}
             {preference name=print_pdf_mpdf_allow_unsafe_ssl_requests}
+            {preference name=print_pdf_mpdf_debug}
         </div>
     </fieldset>
 
@@ -82,5 +84,6 @@
             {preference name=print_original_url_forum}
         </div>
     </fieldset>
+</div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

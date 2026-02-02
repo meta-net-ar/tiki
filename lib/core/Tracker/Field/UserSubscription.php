@@ -52,7 +52,7 @@ class Tracker_Field_UserSubscription extends \Tracker\Field\AbstractItemField
             if ($current_field_ins['maxsubscriptions']) {
                 $nb = min($current_field_ins['maxsubscriptions'], (int)$requestData['user_friends']);
             } else {
-                $nb = isset($requestData['user_friends']) ? (int)$requestData['user_friends'] : $jitPost->user_friends->int();
+                $nb = (int)($requestData['user_friends'] ?? $jitPost->user_friends->int());
             }
             foreach ($current_field_ins['users_array'] as $i => $U) {
                 if ($U['login'] == $user) {

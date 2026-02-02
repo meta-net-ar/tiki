@@ -16,7 +16,6 @@
 
 $dieInsteadOfForwardingWithHeader = false;
 global $prefs;
-require_once('lib/debug/Tracer.php');
 
 $inputConfiguration = [
     [ 'staticKeyFilters' => [
@@ -30,6 +29,7 @@ $inputConfiguration = [
 $section = "wiki page";
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+require_once('lib/debug/Tracer.php');
 $wikilib = TikiLib::lib('wiki');
 $structlib = TikiLib::lib('struct');
 $notificationlib = TikiLib::lib('notification');
@@ -78,7 +78,7 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
                     $need_lang = false;
                 } else {
                     $smarty->assign('languages', $languages);
-                    $smarty->assign('default_lang', $prefs['language']);
+                    $smarty->assign('default_lang', Language::getCurrentLanguage());
                     $need_lang = true;
                     $smarty->assign('_REQUEST', $_REQUEST);
                 }
@@ -160,6 +160,18 @@ if (strtolower($_REQUEST["page"]) == 'sandbox' && $prefs['feature_sandbox'] !== 
 }
 
 $page = $_REQUEST["page"];
+if (isset($_GET['quickedit'])) {
+    // Normalize before checking input by replacing prefs[wiki_url_scheme] symbols ("-", "_", and "+") with space.
+    // This ensures page names like "Marc Andre" and "Marc-Andre" are treated as the same,
+    // preventing slug duplication when regenerating.
+    $normalized = preg_replace('/[\s+_-]/', ' ', $page);
+    if ($page_by_slug = $tikilib->getPageBySlug($normalized)) {
+        Feedback::errorAndDie(
+            tr('Cannot create page "%0", A page "%1" with the same slug variation already exists.', $page, '<strong>' . $page_by_slug . '</strong>'),
+            \Laminas\Http\Response::STATUS_CODE_409
+        );
+    }
+}
 
 if (isset($_REQUEST["description"])) {
     $max_pagedescription_length = 201;
@@ -454,7 +466,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             } else {
                 $description = '';
             }
-            $pageLang = isset($part["lang"]) ? $part["lang"] : "";
+            $pageLang = $part["lang"] ?? "";
             $authorid = urldecode($part["author_id"]);
             if (isset($part["hits"])) {
                 $hits = urldecode($part["hits"]);
@@ -632,7 +644,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
 
 
 // Suck another page and append to the end of current
-$suck_url = isset($_REQUEST["suck_url"]) ? $_REQUEST["suck_url"] : '';
+$suck_url = $_REQUEST["suck_url"] ?? '';
 
 if (isset($_REQUEST["parsehtml"])) {
     $parsehtml = $_REQUEST["parsehtml"] === 'on' ? 'y' : 'n';
@@ -717,19 +729,14 @@ if ($prefs['feature_wiki_footnotes'] === 'y') {
         }
     }
 }
-if (isset($_REQUEST["customTip"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $smarty->assign('customTip', $_REQUEST['customTip']);
-    if (isset($_REQUEST["customTipTitle"])) {
-        $smarty->assign('customTipTitle', tra($_REQUEST["customTipTitle"]));
-    } else {
-        $smarty->assign('customTipTitle', tra('Tip'));
-    }
+if (! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
+    $editlib->assignCustomTipToSmarty($_REQUEST["customTip"] ?? '', $_REQUEST["customTipTitle"] ?? '');
 }
 if (isset($_REQUEST["wikiHeaderTpl"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
     $smarty->assign('wikiHeaderTpl', $smarty->fetch("wiki:{$_REQUEST['wikiHeaderTpl']}"));
 }
 if ((isset($_REQUEST["template_name"]) || isset($_REQUEST["templateId"])) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $templateLang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : null;
+    $templateLang = $_REQUEST['lang'] ?? null;
 
     if (isset($_REQUEST["templateId"])) {
         $templateId = $_REQUEST["templateId"];
@@ -1108,7 +1115,7 @@ if ($prefs['site_layout_per_object'] == 'y') {
     $attributes = $attributelib->get_attributes('wiki page', $page);
     $smarty->assign('object_layout', [
         'available' => TikiLib::lib('theme')::listUserSelectableLayouts(),
-        'current' => isset($attributes['tiki.object.layout']) ? $attributes['tiki.object.layout'] : null,
+        'current' => $attributes['tiki.object.layout'] ?? null,
     ]);
 }
 
@@ -1279,7 +1286,7 @@ if (
                 $description,
                 $minor,
                 $pageLang,
-                isset($_REQUEST['allowhtml']) ? $_REQUEST['allowhtml'] : $is_html,
+                $_REQUEST['allowhtml'] ?? $is_html,
                 $hash,
                 null,
                 $_REQUEST['wysiwyg'],

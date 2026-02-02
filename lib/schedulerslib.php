@@ -54,9 +54,10 @@ class SchedulersLib extends TikiLib
      * @param int|null $scheduler_id The scheduler id (optional)
      * @param int|null $creation_date schedule created date
      * @param string $user_run_now user that request a run now in background
+     * @param int $enable_send_notification_override 0 or 1 to enable notification override for this job
      * @return int    The scheduler id
      */
-    public function set_scheduler($name, $description, $task, $params, $run_time, $status, $re_run, $run_only_once, $scheduler_id = null, $creation_date = null, $user_run_now = null)
+    public function set_scheduler($name, $description, $task, $params, $run_time, $status, $re_run, $run_only_once, $scheduler_id = null, $creation_date = null, $user_run_now = null, $enable_send_notification_override = 0)
     {
 
         $values = [
@@ -69,12 +70,13 @@ class SchedulersLib extends TikiLib
             're_run' => $re_run ? 1 : 0,
             'run_only_once' => $run_only_once ? 1 : 0,
             'user_run_now' => $user_run_now,
+            'enable_send_notification_override' => $enable_send_notification_override ? 1 : 0,
         ];
 
         $schedulersTable = $this->table('tiki_scheduler');
 
         if (! $scheduler_id) {
-            $values["creation_date"] = isset($creation_date) ? $creation_date : time();
+            $values["creation_date"] = $creation_date ?? time();
             return $schedulersTable->insert($values);
         } else {
             $schedulersTable->update($values, ['id' => $scheduler_id]);
@@ -102,6 +104,7 @@ class SchedulersLib extends TikiLib
         if (! empty($runs) && $runs[0]['status'] == 'running') {
             $runs[0]['output'] = SchedulerRunOutput::getTempLog($runs[0]['id']);
         }
+
         return $runs;
     }
 
@@ -128,10 +131,48 @@ class SchedulersLib extends TikiLib
      *
      * @return int
      */
-    public function countRuns($schedulerId)
+    public function countRuns($schedulerId = null)
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
+        if ($schedulerId === null) {
+            return $schedulersRunTable->fetchCount([]);
+        }
         return $schedulersRunTable->fetchCount(['scheduler_id' => $schedulerId]);
+    }
+
+    /**
+     * Get consolidated logs from all schedulers with scheduler names
+     *
+     * @param int $limit  The number of runs to return
+     * @param int $offset The offset for pagination
+     *
+     * @return array An array with the consolidated scheduler runs found
+     */
+    public function getConsolidatedLogs($limit = 100, $offset = 0)
+    {
+        if (! is_numeric($limit)) {
+            $limit = 100;
+        }
+        if (! is_numeric($offset)) {
+            $offset = 0;
+        }
+
+        $query = "SELECT sr.*, sr.output as scheduler_output, s.name as scheduler_name
+            FROM `tiki_scheduler_run` sr
+            LEFT JOIN `tiki_scheduler` s ON sr.scheduler_id = s.id
+            ORDER BY sr.id DESC
+            LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $runs = $this->fetchAll($query);
+
+        // Handle running tasks with temp log output
+        foreach ($runs as $key => $run) {
+            if ($run['status'] !== 'running') {
+                $runs[$key]['output'] = SchedulerRunOutput::getTempLog($run['id']);
+            }
+        }
+
+        return $runs;
     }
 
     /**
@@ -145,6 +186,39 @@ class SchedulersLib extends TikiLib
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
         return $schedulersRunTable->fetchOne('status', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
+    }
+
+    /**
+     * Get scheduler last run stalled status from database
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getStalled($scheduler_id)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+        return $schedulersRunTable->fetchOne('stalled', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
+    }
+
+    /**
+     * Get failed runs
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getFailedRuns($timeBack)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+
+        return $schedulersRunTable->fetchAll(
+            ['start_time', 'end_time', 'output', 'scheduler_id'],
+            [
+                'start_time' => $schedulersRunTable->greaterThan($timeBack),
+                'status' => 'failed'
+            ]
+        );
     }
 
     /**
@@ -190,6 +264,15 @@ class SchedulersLib extends TikiLib
     {
         if (empty($end_time)) {
             $end_time = time();
+        }
+
+        // TEXT column has a 65,535 byte limit. Truncate if output exceeds this size.
+        $maxOutputBytes = 65535;
+        $truncationMsg = "\n\n[Output truncated - exceeded TEXT column limit]";
+        $maxContentBytes = $maxOutputBytes - strlen($truncationMsg);
+
+        if (strlen($errorMessage) > $maxOutputBytes) {
+            $errorMessage = substr($errorMessage, 0, $maxContentBytes) . $truncationMsg;
         }
 
         $schedulersRunTable = $this->table('tiki_scheduler_run');
@@ -291,5 +374,17 @@ class SchedulersLib extends TikiLib
     {
         $schedulerTable = $this->table('tiki_scheduler');
         $schedulerTable->update(['status' => Scheduler_Item::STATUS_ACTIVE], ['id' => $scheduler_id]);
+    }
+
+    /**
+     * Update a field in the schedular table
+     * @param $scheduler_id
+     * @param $field
+     * @param $value
+     */
+    public function updateSchedulerField($scheduler_id, $field, $value)
+    {
+        $schedulerTable = $this->table('tiki_scheduler');
+        return $schedulerTable->update([$field => $value], ['id' => $scheduler_id]);
     }
 }

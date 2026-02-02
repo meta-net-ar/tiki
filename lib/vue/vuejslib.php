@@ -162,7 +162,7 @@ class VueJsLib
         return  '<div id="' . $singleSpaDomId . '" class="tracker-rules"></div>';
     }
 
-    public function generateTrackerRulesJS($fields, $parentSelector = '.tracker-field-group:first')
+    public function generateTrackerRulesJS($fields, $parentSelector = '.tracker-field-group:first', $isInEditContext = false)
     {
 
         $js = '';
@@ -172,7 +172,7 @@ class VueJsLib
         foreach (array_filter($fields) as $field) {
             if (! empty($field['rules']) && $field['rules'] !== '{"conditions":null,"actions":null,"else":null}') {
                 $rules = Tiki\Lib\core\Tracker\Rule\Rules::fromData($field['fieldId'], $field['rules']);
-                $js .= $rules->getJavaScript($parentSelector, $field);
+                $js .= $rules->getJavaScript($parentSelector, $field, $isInEditContext);
             }
         }
 

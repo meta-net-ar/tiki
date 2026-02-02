@@ -106,11 +106,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('articleId', $articleId);
 $smarty->assign('previewId', $previewId);
@@ -121,7 +117,7 @@ $smarty->assign(
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
     $templateslib = TikiLib::lib('template');
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
     if ($templateslib->template_is_in_section($_REQUEST['templateId'], 'wiki_html')) {
@@ -142,7 +138,7 @@ $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
 $smarty->assign('image_alt', '');
-$smarty->assign('lang', $prefs['language']);
+$smarty->assign('lang', Language::getCurrentLanguage());
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
 $smarty->assign('topicId', $topicId);
@@ -284,20 +280,12 @@ $topics = $artlib->list_topics();
  */
 $topics = array_values($topics);
 $smarty->assign_by_ref('topics', $topics);
+$smarty->assign('preview', isset($_REQUEST['preview']) ? 1 : 0);
 
-if (isset($_REQUEST['preview'])) {
-    $smarty->assign('preview', 1);
-} else {
-    $smarty->assign('preview', 0);
-}
 
 // If we are in preview mode then preview it!
 if (isset($_REQUEST['preview']) or ! empty($errors)) {
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     $smarty->assign('reads', '0');
     $smarty->assign('edit_data', 'y');
@@ -482,11 +470,7 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
 if (isset($_REQUEST['save']) && empty($errors)) {
     $access->checkCsrf();
 
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     if (isset($_REQUEST['allowhtml']) && $_REQUEST['allowhtml'] == 'on' || $_SESSION['wysiwyg'] == 'y') {
         $body = $_REQUEST['body'];
@@ -812,6 +796,9 @@ $smarty->assign_by_ref('plugins', $plugins);
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 $smarty->assign('displayTimezone', TikiLib::lib('tiki')->get_display_timezone());
+
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_article.tpl');

@@ -105,18 +105,6 @@ function wikiplugin_animateonscroll($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    // Set defaults if not provided
-    $animation        = isset($animation) ? $animation : 'fade-up';
-    $duration         = isset($duration) ? (int) $duration : 800;
-    $delay            = isset($delay) ? (int) $delay : 0;
-    $easing           = isset($easing) ? $easing : 'easeOutQuad';
-    $once             = isset($once) ? $once : 'y';
-    $threshold        = isset($threshold) ? floatval($threshold) : 0.2;
-    $offset           = isset($offset) ? (int) $offset : 0;
-    $anchorPlacement  = isset($anchorPlacement) ? $anchorPlacement : 'top-bottom';
-    $mirror           = isset($mirror) ? $mirror : 'n';
-
-
     // Preset animations
     $presets = [
         // Basic fade directions
@@ -233,7 +221,7 @@ function wikiplugin_animateonscroll($data, $params)
     ];
 
 
-    $animationPreset = isset($presets[$animation]) ? $presets[$animation] : $presets['fade-up'];
+    $animationPreset = $presets[$animation];
     $animeProps = array_merge($animationPreset, [
         'duration' => $duration,
         'delay' => $delay,
@@ -249,37 +237,13 @@ function wikiplugin_animateonscroll($data, $params)
     //    Examples:
     //    - top-bottom => rootMargin: "0px 0px -offset px 0px"
     //    - center-center => rootMargin: "-50% 0px -50% 0px" (plus offset)
-    $rootMargin = '';
-    switch ($anchorPlacement) {
-        case 'top-bottom':
-            $rootMargin = "0px 0px -{$offset}px 0px";
-            break;
-
-        case 'top-center':
-            $rootMargin = "0px 0px calc(-50% - {$offset}px) 0px";
-            break;
-
-        case 'center-center':
-            $rootMargin = "calc(-50% - {$offset}px) 0px calc(-50% - {$offset}px) 0px";
-            break;
-
-        case 'center-bottom':
-            $rootMargin = "calc(-50%) 0px -{$offset}px 0px";
-            break;
-
-        case 'bottom-bottom':
-            $rootMargin = "0px 0px -{$offset}px 0px";
-            break;
-
-        case 'bottom-center':
-            $rootMargin = "calc(-50%) 0px 0px 0px";
-            break;
-
-        default:
-            // Fallback to "top-bottom"
-            $rootMargin = "0px 0px -{$offset}px 0px";
-            break;
-    }
+    $rootMargin = match ($anchorPlacement) {
+        'top-center' => "0px 0px calc(-50% - {$offset}px) 0px",
+        'center-center' => "calc(-50% - {$offset}px) 0px calc(-50% - {$offset}px) 0px",
+        'center-bottom' => "calc(-50%) 0px -{$offset}px 0px",
+        'bottom-center' =>  "calc(-50%) 0px 0px 0px",
+        default => "0px 0px -{$offset}px 0px",
+    };
 
 
     // 2) Unique ID for the container

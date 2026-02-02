@@ -148,7 +148,7 @@ class Chrome implements HeadlessBrowserInterface
             </script>
         </head>
         <body>
-            <div id='graph' page="" style='height: 100%; width: 100%;'></div>
+            <div id='graph' page="" style='height: auto; width: 100%;'></div>
         </body>
         </html>
         HTML;

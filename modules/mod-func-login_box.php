@@ -5,13 +5,15 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
 
 //aris002 CHECK if we really can't avoid this?
 require_once('lib/socnets/PrefsGen.php');
+
+use Tiki\TwoFactorAuth\TwoFactorAuth;
 use TikiLib\Socnets\PrefsGen\PrefsGen;
 
 /**
@@ -115,8 +117,10 @@ function module_login_box($mod_reference, &$module_params)
     }
 
     $smarty->assign('module_logo_instance', $module_logo_instance);
-    $smarty->assign('mode', isset($module_params['mode']) ? $module_params['mode'] : 'module');
+    $smarty->assign('mode', $module_params['mode'] ?? 'module');
     $smarty->assign('login_text_explanation', $tikilib->get_preference('login_text_explanation'));
+    $smarty->assign('EMAIL_2FA', TwoFactorAuth::EMAIL_2FA);
+    $smarty->assign('TOTP_2FA', TwoFactorAuth::TOTP_2FA);
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
     $smarty->assign('registration', 'n');   // stops the openid form appearing in the module, only on tiki-login_scr.php
@@ -130,6 +134,8 @@ function module_login_box($mod_reference, &$module_params)
             if (! $permsPrevious->admin) {
                 $can_switch_user = 'n';
             }
+            // restore the current "switched to" user's permissions
+            unset($permsContext);
         } else {
             $can_switch_user = 'n';
         }

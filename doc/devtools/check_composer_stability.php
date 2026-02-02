@@ -185,7 +185,7 @@ function extractStabilityFromVersion($version)
         return getVersionParser()->parseStability($version);
     } catch (\UnexpectedValueException $e) {
         // Fallback for very unusual cases
-        if (strpos($version, 'dev-') === 0 || $version === 'dev-master') {
+        if (str_starts_with($version, 'dev-') || $version === 'dev-master') {
             return 'dev';
         }
         // For constraints with explicit stability flags (e.g. ^1.0@beta)

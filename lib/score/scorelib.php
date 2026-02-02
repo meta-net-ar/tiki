@@ -472,7 +472,7 @@ class ScoreLib extends TikiLib
      */
     public function evaluateExpression($expr, $args, $default = "str")
     {
-        if (0 !== strpos($expr, "(")) {
+        if (! str_starts_with($expr, "(")) {
             $expr = "($default $expr)";
         }
         $runner = new Math_Formula_Runner(

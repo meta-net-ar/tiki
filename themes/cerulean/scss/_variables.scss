@@ -1,30 +1,30 @@
+// Cerulean 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
+
 @use "sass:color";
-
-// Cerulean 5.2.0 -- This is a copy of node_modules/bootswatch/dist/cerulean/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-
-@import "../../../node_modules/bootswatch/dist/cerulean/_variables.scss";
+@import "../../../node_modules/bootswatch/dist/cerulean/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
 //
 $cyan:    #157BB7; //#2fa4e7; Updated for Tiki
 
-$primary:       $cyan;
+$primary:       $cyan; // default
 $secondary:     #A0A5AC; // $gray-200;
 $success:       #58812C; // $green;
 $info:          #077F97; // $blue;
 $warning:       #946F00; // $yellow;
-$danger:        $red;
-$light:         $gray-100;
-$dark:          $gray-800;
+$danger:        $red; // default;
+$light:         $gray-100; // default;
+$dark:          $gray-800; // default;
 
-$green-300: tint-color($green, 40%);  // default // Bootstrap 53
-$red-300: tint-color($red, 40%);  // default // Bootstrap 53
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 // Options
-$prefix:                      bs-;  // default
-$prefixTiki:                  tiki-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 // Links
@@ -42,6 +42,9 @@ $blockquote-footer-color: #6D767E; // Darkened for WCAG 2
 // Components
 $border-color:                $gray-400;
 
+// Forms
+$form-text-color: #444A50BF;
+
 // Form validation
 $form-valid-color: #58812C;
 
@@ -51,23 +54,21 @@ $nav-link-color:                    var(--#{$prefix}link-color) !important; // !
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !important;
 
 // Navbar
+$navbar-light-color: #000; // Updated for Tiki
+$navbar-light-hover-color: lighten(#000,10%);
 $navbar-dark-color:       #fff; // Updated for Tiki
+$navbar-dark-hover-color:       $white;
 
 // Accordion (added for Tiki)
 $accordion-button-active-bg: #2fa4e7;
 $accordion-button-active-color: #fff;
 
+// Figures
+$figure-caption-color: #444A50BF;
+
 // Code
 $code-color:                        $body-color; // $pink;  // default // Bootstrap 5.3
 
 //--------------------------- Tiki SCSS variables
-$navbar-dark-bg: #343a40;
-$navbar-dark-link-color: $navbar-dark-color;
-$navbar-dark-link-hover-color:       $white;
-
-$navbar-bg-light: #2fa4e7;
-$navbar-light-color: #000;
-$navbar-light-link-color: #000;
-$navbar-light-link-hover-color: color.adjust(#000,$lightness: 10%, $space: hsl);
-
-
+$tiki-navbar-dark-bg: #343a40;
+$tiki-navbar-light-bg: #2fa4e7;

@@ -13,10 +13,10 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'blogId'                      => 'int',          //post
-            'heading'                     => 'int',           //post
-            'post_heading'                => 'bool',          //post
+            'heading'                     => 'xss',           //post
+            'post_heading'                => 'xss',           //post
             'save'                        => 'bool',          //post
-            'preview'                     => 'int',           //post
+            'preview'                     => 'bool',          //post
             'public'                      => 'bool',          //post
             'allow_comments'              => 'bool',          //post
             'show_avatar'                 => 'bool',          //post
@@ -48,11 +48,7 @@ $bloglib = TikiLib::lib('blog');
 $access->check_feature('feature_blogs');
 $access->check_permission('tiki_p_create_blogs');
 
-if (isset($_REQUEST["blogId"])) {
-    $blogId = $_REQUEST["blogId"];
-} else {
-    $blogId = 0;
-}
+$blogId = $_REQUEST["blogId"] ?? 0;
 
 $smarty->assign('individual', 'n');
 
@@ -165,7 +161,7 @@ if (isset($_REQUEST["save"]) && $prefs['feature_categories'] == 'y' && $prefs['f
     $allow_post_categorization = isset($_REQUEST["allow_post_categorization"]) ? 'y' : 'n';
     $show_avatar = isset($_REQUEST['show_avatar']) ? 'y' : 'n';
     $show_related = isset($_REQUEST['show_related']) ? 'y' : 'n';
-    $related_max = isset($_REQUEST['related_max']) ? $_REQUEST['related_max'] : 5;
+    $related_max = $_REQUEST['related_max'] ?? 5;
     $use_excerpt = isset($_REQUEST['use_excerpt']) ? 'y' : 'n';
     $use_find = isset($_REQUEST['use_find']) ? 'y' : 'n';
     $use_title = isset($_REQUEST['use_title']) ? 'y' : 'n';
@@ -227,7 +223,7 @@ if (isset($_REQUEST['preview']) || $category_needed) {
     $smarty->assign('use_author', isset($_REQUEST["use_author"]) ? 'y' : 'n');
     $smarty->assign('show_avatar', isset($_REQUEST["show_avatar"]) ? 'y' : 'n');
     $smarty->assign('show_related', isset($_REQUEST["show_related"]) ? 'y' : 'n');
-    $smarty->assign('related_max', isset($_REQUEST['related_max']) ? $_REQUEST['related_max'] : 5);
+    $smarty->assign('related_max', $_REQUEST['related_max'] ?? 5);
     $smarty->assign('use_excerpt', isset($_REQUEST['use_excerpt']) ? 'y' : 'n');
     $smarty->assign('add_date', isset($_REQUEST["add_date"]) ? 'y' : 'n');
     $smarty->assign('allow_comments', isset($_REQUEST["allow_comments"]) ? 'y' : 'n');

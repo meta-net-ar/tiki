@@ -359,9 +359,10 @@ class Tiki_Profile_Writer
     {
         if (
             strtolower($data) == 'yes' || strtolower($data) == 'no'
-            || strpos($data, '{') !== false || strpos($data, '[') !== false
+            || str_contains($data, '{')
+            || str_contains($data, '[')
         ) {
-            if (strpos($data, '"') === false) {
+            if (! str_contains($data, '"')) {
                 $data = '"' . $data . '"';
             }
         }

@@ -256,18 +256,4 @@ class MailinLib extends TikiDb_Bridge
         $plaintext = base64_decode($encoded);
         return $plaintext;
     }
-
-    /**
-     * checkPackage
-     *
-     * @return string
-     */
-    public function checkPackage()
-    {
-        $status = "n";
-        if (file_exists('vendor_bundled/vendor/philippemarcmeyer/fieldslinker/')) {
-            $status = "y";
-        }
-        return $status;
-    }
 }

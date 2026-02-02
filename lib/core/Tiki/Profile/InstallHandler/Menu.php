@@ -103,7 +103,7 @@ class Tiki_Profile_InstallHandler_Menu extends Tiki_Profile_InstallHandler
         }
 
         foreach ($item['permissions'] as &$perm) {
-            if (strpos($perm, 'tiki_p_') !== 0) {
+            if (! str_starts_with($perm, 'tiki_p_')) {
                 $perm = 'tiki_p_' . $perm;
             }
         }

@@ -1,0 +1,88 @@
+.fancylink-card {
+    max-height: 300px;
+}
+
+.fancylink-thumb {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.fancylink-card .col-auto {
+    width: 120px;     /* lock the column */
+    height: 120px;    /* same height as the thumb */
+    flex: 0 0 120px;  /* prevents column from stretching */
+}
+
+.fancylink-img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.fancylink-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.fancylink-desc {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.fancylink-popover-wrapper {
+    max-width: 300px !important;
+    max-height: 400px !important;
+}
+
+.fancylink-popover-wrapper .popover-body {
+    max-height: 400px;
+    overflow: hidden;
+    padding: 0.5rem 0.75rem;
+}
+
+.fancylink-popover {
+    max-width: 300px;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.fancylink-popover-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.fancylink-popover-img {
+    max-height: 150px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.fancylink-popover-image {
+    max-height: 150px;
+    width: auto;
+    object-fit: cover;
+}
+
+.fancylink-popover-content {
+    padding: 0 0.25rem;
+}
+
+.fancylink-popover-content h6 {
+    margin-bottom: 0.5rem;
+}
+
+.fancylink-popover-content p {
+    margin-bottom: 0.5rem;
+}
+
+.fancylink-popover-content p:last-child {
+    margin-bottom: 0;
+}

@@ -18,19 +18,19 @@ class Search_Query_FacetWikiBuilder
                 if (isset($arguments['name'])) {
                     $facet = [
                         'name'     => $arguments['name'],
-                        'type'     => isset($arguments['type']) ? $arguments['type'] : 'terms',
+                        'type'     => $arguments['type'] ?? 'terms',
                     ];
 
                     if ($facet['type'] === 'terms') {
-                        $facet['operator'] = isset($arguments['operator']) ? $arguments['operator'] : 'or';
-                        $facet['count'] = isset($arguments['count']) ? $arguments['count'] : null;
-                        $facet['order'] = isset($arguments['order']) ? $arguments['order'] : null;
-                        $facet['min'] = isset($arguments['min']) ? $arguments['min'] : null;
+                        $facet['operator'] = $arguments['operator'] ?? 'or';
+                        $facet['count'] = $arguments['count'] ?? null;
+                        $facet['order'] = $arguments['order'] ?? null;
+                        $facet['min'] = $arguments['min'] ?? null;
                     } elseif ($facet['type'] === 'date_range') {
-                        $facet['ranges'] = isset($arguments['ranges']) ? $arguments['ranges'] : null;
+                        $facet['ranges'] = $arguments['ranges'] ?? null;
                     } elseif ($facet['type'] === 'date_histogram') {
-                        $facet['interval'] = isset($arguments['interval']) ? $arguments['interval'] : null;
-                        $facet['format'] = isset($arguments['format']) ? $arguments['format'] : null;
+                        $facet['interval'] = $arguments['interval'] ?? null;
+                        $facet['format'] = $arguments['format'] ?? null;
                     }
 
                     if (isset($arguments['id'])) {

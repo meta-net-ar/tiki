@@ -37,11 +37,22 @@ class TikiDb_Initializer
         }
     }
 
-    private function getInitializer()
+    private function getInitializer(): TikiDb_Initializer_Pdo
     {
         $connector = new TikiDb_Initializer_Pdo();
         if ($connector->isSupported()) {
             return $connector;
+        } else {
+            header('HTTP/1.0 503 Service Unavailable', true, 503);
+            echo tr("PDO connector isn't available, and is the only one supported by Tiki.  Check if the PDO php module and PHP mysql driver is available");
+            /*
+            Dying here isn't great, but previously no error was seen because
+            tiki-db.php has a catch all error handler, and does not pass errors to the "Lost database connection" template.
+            Nor do we get the actual error from lower in the code.
+            And you cannot use tiki-check.php either if the mysql driver isn't available to php, so...
+            TODO:  Refactor db error handling so the connection error is actually seen from tiki-install, tiki-check, and tiki in general.  - benoitg - 2026-01-20
+            */
+            die(1);
         }
     }
 }

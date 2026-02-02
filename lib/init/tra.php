@@ -35,19 +35,7 @@ function tr(?string $content): string
  */
 function tra(?string $content, ?string $lg = null, $unused = false, array $args = []): string
 {
-    global $prefs;
-
-    if (empty($lg)) {
-        if (! empty($prefs['language'])) {
-            $lang = $prefs['language'];
-        } elseif (! empty($prefs['site_language'])) {
-            $lang = $prefs['site_language'];
-        } else {
-            $lang = 'en';
-        }
-    } else {
-        $lang = $lg;
-    }
+    $lang = $lg ?: Language::getCurrentLanguage();
 
     if ($content) {
         $translator = \I18n\LanguageTranslator::getInstance($lang);

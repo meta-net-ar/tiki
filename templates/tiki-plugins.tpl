@@ -4,6 +4,7 @@
     {tr}For security, grant the <strong>tiki_p_plugin_approve</strong> permission only to trusted user groups.{/tr} {tr}Use the <a href="tiki-admin.php?page=textarea" class="alert-link">Admin: Text Area page</a> to deactivate potentially risky plugins.{/tr}
 {/remarksbox}
 
+<div class="styling-element">
 <p>
 {tr}This page lists the plugins that require validation, the first time they are encountered.{/tr} {tr}Each plugin contains a unique <em>signature</em> that is preserved.{/tr}</p>
 <p>{tr}When you upgrade from an old version, you may need to reparse all the pages.{/tr} {button href="tiki-plugins.php?refresh=y" _text="{tr}Refresh{/tr}"}</p>
@@ -90,3 +91,4 @@
 {else}
     <p>{tr}No plugins pending approval.{/tr}</p>
 {/if}
+</div>

@@ -50,7 +50,7 @@ class Tiki_Profile_InstallHandler_Webmail extends Tiki_Profile_InstallHandler
 
         $this->replaceReferences($data);
 
-        if (strpos($data['body'], 'wikidirect:') === 0) {
+        if (str_starts_with($data['body'], 'wikidirect:')) {
             $pageName = substr($this->content, strlen('wikidirect:'));
             $data['body'] = $this->obj->getProfile()->getPageContent($pageName);
         }

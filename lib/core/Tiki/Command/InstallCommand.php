@@ -42,7 +42,7 @@ class InstallCommand extends Command
 
         $optionUseInnoDB = $input->getOption('useInnoDB');
         if ($optionUseInnoDB !== null) {
-            $installer->useInnoDB = ($optionUseInnoDB == 1) ? true : false;
+            $installer->useInnoDB = $optionUseInnoDB == 1;
         }
 
         if (! $installed || $force) {

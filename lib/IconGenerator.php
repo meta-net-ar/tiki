@@ -37,7 +37,6 @@ class IconGenerator
 
     public function generateIconArraysFromCss($bootstrapIcons, $fontAwesomeIcons): array
     {
-        //var_dump($fontAwesomeIcons);
         $bootstrapPattern = '/\.bi-([a-zA-Z0-9-]+)::before/';
         /**
          * faClassPattern matches a selector starting with .fa- and faUnicodePattern

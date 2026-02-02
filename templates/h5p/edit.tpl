@@ -14,7 +14,7 @@
         <div>
             <div class="form-item form-type-textfield form-item-title">
                 <label for="edit-title">Title
-                    <span class="form-required" title="This field is required.">*</span></label>
+                    <span class="form-required" title="{tr}This field is required.{/tr}">*</span></label>
                 <input type="text" id="edit-title" name="title" value="{$h5p_title|escape}" size="60" maxlength="128" class="form-control required">
             </div>
             <br>
@@ -24,9 +24,9 @@
             <br>
             <div class="form-actions form-wrapper submit" id="edit-actions">
                 {if $fileId}
-                    <input type="submit" id="edit-delete" name="op" value="Delete" class="btn btn-outline-danger confirm">
+                    <input type="submit" id="edit-delete" name="op" value="{tr}Delete{/tr}" class="btn btn-outline-danger confirm">
                 {/if}
-                <input type="submit" id="edit-submit" name="op" value="Save" class="btn btn-primary">
+                <input type="submit" id="edit-submit" name="op" value="{tr}Save{/tr}" class="btn btn-primary">
             </div>
             <br>
         </div>

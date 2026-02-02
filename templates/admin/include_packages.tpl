@@ -348,7 +348,7 @@
                         <th>{tr}Version Required{/tr}</th>
                         <th>{tr}Status{/tr}
                         <th>{tr}Version Installed{/tr}</th>
-                        <th>Actions</th>
+                        <th>{tr}Actions{/tr}</th>
                     </tr>
                     {foreach item=packages key=folderName from=$composer_custom_packages_installed}
                         <tr><td colspan="5" style="font-weight: bold;">{$folderName}</td></tr>
@@ -459,10 +459,10 @@
             <br />
             <h4>{tr}Results{/tr}</h4>
             {if isset($diagnostic_composer_location) }
-                <p><strong>Composer:</strong> {if $diagnostic_composer_location}{tr}{$diagnostic_composer_location}{/tr}{else}{tr}Composer not found{/tr}{/if}</p>
+                <p><strong>{if $diagnostic_composer_location}{tr _0=$diagnostic_composer_location}Composer: %0{/tr}{else}{tr}Composer not found{/tr}{/if}</strong></p>
             {/if}
             {if $diagnostic_composer_output}
-                <p><strong>Composer diagnose output</strong></p>
+                <p><strong>{tr}Composer diagnose output{/tr}</strong></p>
                 <pre>{$diagnostic_composer_output}</pre>
             {/if}
 

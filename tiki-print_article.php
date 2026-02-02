@@ -16,7 +16,7 @@
  */
 define('TIKI_PRINTING', true);
 define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
-define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && strpos($_GET['display'], 'pdf') !== false);
+define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && str_contains($_GET['display'], 'pdf'));
 
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
@@ -281,7 +281,6 @@ if (TIKI_PRINTING_PDF) {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
     }
 } else {

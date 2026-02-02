@@ -1,6 +1,9 @@
 <script setup>
+import { getAutocompleteResources } from "../../../../@tiki/ui-utils/autocomplete";
+import { fetchSuggestions } from "../../../../vue-widgets/element-plus-ui/src/helpers/autocomplete/remote";
 import DialogInput from "./DialogInput.vue";
-import { ref, useTemplateRef, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { ElAutocomplete } from "element-plus";
 
 const props = defineProps({
     toolbarObject: {
@@ -13,9 +16,12 @@ const labelInput = ref("");
 const pageInput = ref("");
 const relationInput = ref("");
 
-const pageInputRef = useTemplateRef('pageInputElement');
-
 const toolbarObject = computed(() => props.toolbarObject);
+
+const isElementPlusAutocompleteActive = ref(!!window.elementPlus?.autocomplete)
+const autoCompleteResources = getAutocompleteResources('pagename');
+
+const translate = window.tr;
 
 onMounted(() => {
     _shown();
@@ -28,10 +34,6 @@ function _shown() {
 
     const textArea = document.getElementById(toolbarObject.value.domElementId);
     const selection = getTASelection(textArea);
-
-    if (window.elementPlus?.autocomplete) {
-        autocomplete(pageInputRef.value.$el, 'pagename');
-    }
 
     let parts = selection.match(/\((.*?)\((.*?)\|(.*?)\)\)/);
     if (! parts) {
@@ -51,13 +53,12 @@ function _shown() {
 
 function _insert() {
     let output = "";
-    // pageInput.value doesn't get updated by tiki=>autocomplete yet
-    if (pageInputRef.value.$el.value) {
+    if (pageInput.value) {
         output += "(";
         if (relationInput.value) {
             output += relationInput.value;
         }
-        output += `(${pageInputRef.value.$el.value}`;
+        output += `(${pageInput.value}`;
         if (labelInput.value) {
             output += `|${labelInput.value}`;
         }
@@ -74,7 +75,19 @@ defineExpose({ execute: _insert, shown: _shown });
 
 <template>
     <DialogInput v-model="labelInput" label="Label" class="mb-2" />
-    <DialogInput ref="pageInputElement" v-model="pageInput" label="Page" class="mb-2" />
+    <el-autocomplete
+        v-model="pageInput"
+        :fetch-suggestions="(query, callback) => fetchSuggestions(query, callback, autoCompleteResources.url)"
+        :placeholder="translate('Search for a wiki page...')"
+        :value-key="autoCompleteResources.valueKey"
+        clearable
+        :debounce="500"
+        :trigger-on-focus="false"
+        :highlight-first-item="true"
+        class="mb-2"
+        v-if="isElementPlusAutocompleteActive"
+    />
+    <DialogInput v-model="pageInput" label="Page" class="mb-2" v-else />
     <div class="input-group input-group-sm">
         <DialogInput v-model="relationInput" label="Semantic Relation" />
         <span class="input-group-text" data-bs-toggle="tooltip" title="Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.">

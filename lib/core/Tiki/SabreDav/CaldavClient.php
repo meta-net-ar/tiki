@@ -39,6 +39,11 @@ class CaldavClient
             $uri = Utilities::getCalendarObjectUri($calitem);
             $existing = TikiLib::lib('calendar')->get_item($calitem['calitemId']);
             $calitem['created'] = $existing['created'];
+            // Preserve UID to ensure event updates are recognized correctly by email clients
+            // RFC 5545 requires UID to remain constant throughout event lifecycle
+            if (! empty($existing['uid'])) {
+                $calitem['uid'] = $existing['uid'];
+            }
         }
         $calitem['lastModif'] = time();
         if (! empty($calitem['user'])) {
@@ -198,7 +203,7 @@ class CaldavClient
                 'userName' => $result['arguments']['username'],
                 'password' => $result['arguments']['password'],
             ]);
-            if ($prefs['zend_http_sslverifypeer'] !== 'y') {
+            if ($prefs['http_sslverifypeer'] !== 'y') {
                 $client->addCurlSetting(CURLOPT_SSL_VERIFYPEER, 0);
             }
             $response = $client->request('REPORT', '', '
@@ -296,7 +301,7 @@ class CaldavClient
         }
 
         $organizer = (string)$vcalendar->VEVENT->ORGANIZER;
-        if (substr($organizer, 0, strlen('mailto:')) === 'mailto:') {
+        if (str_starts_with($organizer, 'mailto:')) {
             $organizer = TikiLib::lib('user')->get_user_by_email(substr($organizer, strlen('mailto:')));
         }
 
@@ -331,7 +336,7 @@ class CaldavClient
                 if (! empty($recipient[0]['value'])) {
                     $recipient = $recipient[0]['value'];
                 }
-                if (substr($recipient, 0, strlen('mailto:')) === 'mailto:') {
+                if (str_starts_with($recipient, 'mailto:')) {
                     $recipient = substr($recipient, strlen('mailto:'));
                 }
                 if (empty($slots[$recipient])) {

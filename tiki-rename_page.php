@@ -13,7 +13,7 @@ $section_class = "tiki_wiki_page manage";   // This will be body class instead o
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-        'page'                     => 'username',         //get
+        'page'                     => 'pagename',         //get
         'rename'                   => 'bool',             //post
         'confirm'                  => 'bool',             //post
         'badname'                  => 'pagename',             //post
@@ -82,6 +82,9 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
                     break;
                 case 2:
                     Feedback::error(tr('Page already exists'));
+                    break;
+                case 3:
+                    Feedback::error(tr('Cannot rename page to the same name'));
                     break;
                 default:
                     throw $e;

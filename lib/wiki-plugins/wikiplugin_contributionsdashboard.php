@@ -4,7 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 use Tiki\Lib\Logs\LogsQueryLib;
+use Tiki\Lib\TikiDate;
 
 function wikiplugin_contributionsdashboard_info()
 {
@@ -53,8 +55,6 @@ function wikiplugin_contributionsdashboard($data, $params)
     global $user;
     $headerlib = TikiLib::lib('header');
     $tikilib = TikiLib::lib('tiki');
-    $trklib = TikiLib::lib("trk");
-    $logsqrylib = TikiLib::lib("logsqry");
     $smarty = TikiLib::lib("smarty");
 
     static $iContributionsDashboard = 0;

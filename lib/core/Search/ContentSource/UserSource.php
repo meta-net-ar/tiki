@@ -77,7 +77,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         if (isset($detail['preferences']['user_style'])) {
             $user_style = $detail['preferences']['user_style'];
         } else {
-            $user_style = isset($prefs['site_style']) ? $prefs['site_style'] : "" ;
+            $user_style = $prefs['site_style'] ?? "";
         }
 
         $user_language = $this->tiki->get_language($objectId);

@@ -17,9 +17,10 @@ include_once('lib/wiki-plugins/wikiplugin_tracker.php');
 $headerlib->clear_js();                             // so store existing js for later and clear
 
 $json_data = [];
-$re = $userlib->get_group_info(isset($_REQUEST['chosenGroup']) ? $_REQUEST['chosenGroup'] : 'Registered');
+$re = $userlib->get_group_info($_REQUEST['chosenGroup'] ?? 'Registered');
 if (! empty($re['usersTrackerId']) && ! empty($re['registrationUsersFieldIds'])) {
-    $json_data['res'] = wikiplugin_tracker(
+    $json_data['res'] = TikiLib::lib('parser')->invokePlugin(
+        'tracker',
         '',
         [
             'trackerId' => $re['usersTrackerId'],

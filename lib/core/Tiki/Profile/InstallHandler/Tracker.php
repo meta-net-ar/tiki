@@ -331,7 +331,7 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
             $trackerOptions = $trklib->get_trackers_options($trackerId);
             $currentOptions = [];
             if (! empty($trackerOptions)) {
-                foreach ($trackerOptions as $key => $value) {
+                foreach ($trackerOptions as $value) {
                     if (! empty($value['name']) && ! empty($value['value'])) {
                         $currentOptions[$value['name']] = $value['value'];
                     }

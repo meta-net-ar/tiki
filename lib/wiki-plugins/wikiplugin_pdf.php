@@ -309,6 +309,10 @@ function wikiplugin_pdf($data, $params)
     $paramList = '';
     //creating string of data paramaters set by user
     foreach ($params as $paramName => $param) {
+        if (str_contains($param, '\'')) {
+            // encode single quotes as html
+            $param = str_replace('\'', '&#039;', $param);
+        }
         $paramList .= $paramName . "='" . $param . "' ";
     }
     return "<pdfsettings " . $paramList . "></pdfsettings>";

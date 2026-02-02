@@ -10,6 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // To include a link in your tpl do
 //<a href="tiki-share.php?url={$smarty.server.REQUEST_URI|escape:'url'}">{tr}Share this page{/tr}</a>
+use Tiki\Lib\Auth\Tokens;
 
 $section = 'share';
 $inputConfiguration = [
@@ -19,21 +20,22 @@ $inputConfiguration = [
             'do_email'                             => 'bool',                //post
             'do_tweet'                             => 'bool',                //post
             'do_fb'                                => 'bool',                //post
-            'fblike'                               => 'digits',              //post
-            'priority'                             => 'digits',              //post
+            'fblike'                               => 'int',                 //post
+            'priority'                             => 'int',                 //post
             'do_message'                           => 'bool',                //post
-            'forumId'                              => 'digits',              //post
+            'forumId'                              => 'int',                 //post
             'url'                                  => 'url',                 //post
-            'shorturl'                             => 'bool',                //post
+            'shorturl'                             => 'url',                 //post
             'subject'                              => 'string',              //post
             'send'                                 => 'bool',                //post
             'comment'                              => 'text',                //post
-            'share_token_notification'             => 'string',              //post
-            'msg_share_token_notification'         => 'string',              //post
+            'share_token_notification'             => 'alpha',               //post
+            'msg_share_token_notification'         => 'alpha',               //post
             'share_access_rights'                  => 'bool',                //post
             'share_access'                         => 'bool',                //post
             'msg_share_access'                     => 'bool',                //post
             'how_much_time_access'                 => 'int',                 //post
+            'msg_how_much_time_access'             => 'int',                 //post
             'addresses'                            => 'email',               //post
             'name'                                 => 'string',              //post
             'email'                                => 'email',               //post
@@ -43,6 +45,8 @@ $inputConfiguration = [
             'replyto_hash'                         => 'string',              //post
             'body'                                 => 'xss',                 //post
             'forum_password'                       => 'password',            //post
+            'tweet'                                => 'text',                //post
+            'back_url'                             => 'url',                 //post
         ],
     ],
 ];
@@ -59,7 +63,7 @@ if (empty($_REQUEST['report'])) {
 
 // email related:
 
-$smarty->assign('do_email', (isset($_REQUEST['do_email']) ? $_REQUEST['do_email'] : true));
+$smarty->assign('do_email', ($_REQUEST['do_email'] ?? true));
 if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
     // twitter/facebook related
     if (isset($prefs['feature_socialnetworks']) and $prefs['feature_socialnetworks'] == 'y') {
@@ -72,9 +76,9 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
         $smarty->assign('twitter', ($twitter_token != ''));
         $facebook_token = $tikilib->get_user_preference($user, 'facebook_token', '');
         $smarty->assign('facebook', ($facebook_token != ''));
-        $smarty->assign('do_tweet', (isset($_REQUEST['do_tweet']) ? $_REQUEST['do_tweet'] : true));
-        $smarty->assign('do_fb', (isset($_REQUEST['do_fb']) ? $_REQUEST['do_fb'] : true));
-        $smarty->assign('fblike', (isset($_REQUEST['fblike']) ? $_REQUEST['fblike'] : 1));
+        $smarty->assign('do_tweet', ($_REQUEST['do_tweet'] ?? true));
+        $smarty->assign('do_fb', ($_REQUEST['do_fb'] ?? true));
+        $smarty->assign('fblike', ($_REQUEST['fblike'] ?? 1));
     } else {
         $smarty->assign('twitterRegistered', false);
         $smarty->assign('twitter', false);
@@ -86,8 +90,8 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
     if (isset($prefs['feature_messages']) and $prefs['feature_messages'] == 'y') {
         $logslib = TikiLib::lib('logs');
 
-        $smarty->assign('priority', (isset($_REQUEST['priority']) ? $_REQUEST['priority'] : 3));
-        $smarty->assign('do_message', (isset($_REQUEST['do_message']) ? $_REQUEST['do_message'] : true));
+        $smarty->assign('priority', ($_REQUEST['priority'] ?? 3));
+        $smarty->assign('do_message', ($_REQUEST['do_message'] ?? true));
         $send_msg = ($tiki_p_messages == 'y');
 
         if ($prefs['allowmsg_is_optional'] == 'y') {
@@ -113,7 +117,7 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
                 $forums[] = $channels['data'][$i];
             }
         }
-        $smarty->assign('forumId', (isset($_REQUEST['forumId']) ? $_REQUEST['forumId'] : 0));
+        $smarty->assign('forumId', ($_REQUEST['forumId'] ?? 0));
     } else {
         $forums = [];
     }
@@ -122,7 +126,7 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
 } else {
     $report = 'y';
 }
-$smarty->assign('report', isset($_REQUEST['report']) ? $_REQUEST['report'] : '');
+$smarty->assign('report', $_REQUEST['report'] ?? '');
 
 $errors = [];
 $ok = true;
@@ -174,7 +178,7 @@ if ($report != 'y') {
 $smarty->assign('url', $_REQUEST['url']);
 $smarty->assign('prefix', $tikilib->httpPrefix(true));
 $smarty->assign_by_ref('url_for_friend', $url_for_friend);
-$smarty->assign('back_url', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
+$smarty->assign('back_url', $_SERVER['HTTP_REFERER'] ?? '');
 
 if (! empty($_REQUEST['subject'])) {
     $subject = $_REQUEST['subject'];
@@ -230,7 +234,7 @@ if (isset($_REQUEST['send'])) {
 
         if (isset($_REQUEST['do_email']) and $_REQUEST['do_email'] == 1) {
             // Fix for multi adresses with autocomplete funtionnality
-            if (substr($_REQUEST['addresses'], -2) == ', ') {
+            if (str_ends_with($_REQUEST['addresses'], ', ')) {
                 $_REQUEST['addresses'] = substr($_REQUEST['addresses'], 0, -2);
             }
             // Call checkAddresses with error = false to avoid double error reporting
@@ -350,7 +354,7 @@ if (isset($_REQUEST['send'])) {
                     $prefs['auth_token_access_maxhits'] = $_REQUEST['msg_how_much_time_access'];
 
                     /* To upload, you need 2 tokens: one to see the page and another */
-                    if (strpos($_REQUEST['url'], 'tiki-upload_file')) {
+                    if (str_contains($_REQUEST['url'], 'tiki-upload_file')) {
                         $prefs['auth_token_access_maxhits'] = $prefs['auth_token_access_maxhits'] * 2 + 1;
                     }
                 }
@@ -634,7 +638,7 @@ function sendMessage($recipients, $subject, $tokenlist = [])
             $subject,
             $txt,
             $_REQUEST['priority'],
-            isset($_REQUEST['replyto_hash']) ? $_REQUEST['replyto_hash'] : ''
+            $_REQUEST['replyto_hash'] ?? ''
         );
 
         TikiLib::events()->trigger(
@@ -656,7 +660,7 @@ function sendMessage($recipients, $subject, $tokenlist = [])
         $subject,
         $txt,
         $_REQUEST['priority'],
-        isset($_REQUEST['replyto_hash']) ? $_REQUEST['replyto_hash'] : ''
+        $_REQUEST['replyto_hash'] ?? ''
     );
 
     // Assign users e-mail was sent to a SMARTY variable to be displayed:

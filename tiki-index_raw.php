@@ -112,11 +112,7 @@ $wikilib->processPageDisplayOptions(TikiLib::lib('header'));
 
 // If the url has the param "download", ask the browser to download it (instead of displaying it)
 if (isset($_REQUEST['download']) && $_REQUEST['download'] !== 'n') {
-    if (isset($_REQUEST["filename"])) {
-        $filename = $_REQUEST['filename'];
-    } else {
-        $filename = $page;
-    }
+    $filename = $_REQUEST['filename'] ?? $page;
     $filename = str_replace(['?',"'",'"',':','/','\\'], '_', $filename);    // clean some bad chars
     // add &css to the URL to transfer it as text/css mime type
     if (isset($_REQUEST['css']) && $_REQUEST['css'] !== 'n') {

@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Diff\DiffUtils;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
@@ -36,8 +38,7 @@ if (! empty($_REQUEST['submit'])) {
         $export_controller = new Services_Export_Controller();
         $local_content = $export_controller->dumpContent();
 
-        require_once('lib/Diff/difflib.php');
-        $diff = diff2($local_content, $remote_content, 'sidediff-full');
+        $diff = DiffUtils::diff2($local_content, $remote_content, 'sidediff-full');
         if (empty($diff)) {
             $diff = '<tr><td colspan="4">The diff is empty.</td></tr>';
         }

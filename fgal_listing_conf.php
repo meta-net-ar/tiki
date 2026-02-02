@@ -93,11 +93,7 @@ $fgal_options = [
 ];
 
 if (! array_key_exists('view', get_defined_vars())) {
-    if (isset($_REQUEST['view'])) {
-        $view = $_REQUEST['view'];
-    } else {
-        $view = null;
-    }
+    $view = $_REQUEST['view'] ?? null;
 }
 if ($view == 'admin') {
     $fgal_options['show_explorer']['value'] = 'n';

@@ -11,15 +11,17 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'objdata'            => 'word',              //post
-        'type'               => 'word',              //post
-        'assign'             => 'bool',              //post
-        'theme'              => 'word',              //post
+        'objdata'            => 'text',              //post
+        'type'               => 'text',              //post
+        'assign'             => 'alpha',             //post
+        'theme'              => 'alnumdash',         //post
         'delete'             => 'int',               //get
-        'obj'                => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+        'obj'                => 'int',               //post
         ],
     ],
 ];
@@ -46,7 +48,7 @@ $access->check_feature('feature_theme_control');
 $access->check_permission('tiki_p_admin');
 
 $auto_query_args = ['find', 'sort_mode', 'offset', 'theme', 'theme_option', 'type', 'objdata'];
-$smarty->assign('a_object', isset($_REQUEST['objdata']) ? $_REQUEST['objdata'] : '');
+$smarty->assign('a_object', $_REQUEST['objdata'] ?? '');
 
 $themes = $themelib->list_themes_and_options();
 $smarty->assign('themes', $themes);
@@ -131,7 +133,7 @@ if (isset($_REQUEST['assign'])) {
 
     if (isset($name) && $name !== '') {
         $themecontrollib->tc_assign_object($id, $themeKey, $type, $name);
-        $themeName = isset($themes[$themeKey]['name']) ? $themes[$themeKey]['name'] : $themeKey;
+        $themeName = $themes[$themeKey]['name'] ?? $themeKey;
         Feedback::success(tr("Theme '%0' was successfully assigned to the %1 '%2'.", $themeName, $type, $name));
     } else {
         Feedback::error(tr('The object name cannot be empty.'));
@@ -153,17 +155,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $themecontrollib->tc_list_objects(null, $offset, $maxRecords, $sort_mode, $find);

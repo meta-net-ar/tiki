@@ -45,7 +45,7 @@ if ($prefs['user_assigned_modules'] != 'y' && $check_req) {
 if (! $user && $check_req) {
     Feedback::errorPage(tr('You must log in to use this feature'));
 }
-$request_uri = $url = isset($_SERVER["REQUEST_URI"]) ? $_SERVER['REQUEST_URI'] : '';
+$request_uri = $url = $_SERVER['REQUEST_URI'] ?? '';
 $access = TikiLib::lib('access');
 foreach ($actions as $action => $settings) {
     if (isset($_REQUEST[$action]) && $access->checkCsrf()) {

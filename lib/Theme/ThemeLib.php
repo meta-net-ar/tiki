@@ -83,7 +83,7 @@ class ThemeLib extends TikiLib
         //consider Admin Theme
         if (! empty($prefs['theme_admin']) && ($section === 'admin' || empty($section))) {        // use admin theme if set
             $theme_active = $prefs['theme_admin'];
-            $theme_option_active = isset($prefs['theme_option_admin']) ? $prefs['theme_option_admin'] : '';                                // and its option
+            $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
 
 
@@ -94,7 +94,7 @@ class ThemeLib extends TikiLib
         return [$theme_active, $theme_option_active];
     }
     /**
-     * A utility method for Smarty_Tiki to convert paths like
+     * A utility method for \Tiki\Smarty\SmartyTiki to convert paths like
      * public/generated/_custom/sites/default_site/themes/customizationstest/ back into
      * _custom/sites/default_site/themes/customizationstest/
      *
@@ -139,7 +139,6 @@ class ThemeLib extends TikiLib
 
         //Base tiki themes
         $paths[] = BASE_THEMES_SRC_PATH;
-        //var_dump($paths);
         return $paths;
     }
 
@@ -159,8 +158,6 @@ class ThemeLib extends TikiLib
             $themes = array_merge($themes, self::getThemes($lookupPath));
         }
         $themes = array_unique($themes);
-        //var_dump($themes);
-        //die;
         return $themes;
     }
 
@@ -380,20 +377,17 @@ class ThemeLib extends TikiLib
             if ($option) {
                 $path = $realLookupPath .
                 $themePathFragment . $themeOptionPathFragment . $suffixFragment;
-                //var_dump("Looking for: $path");
                 if (file_exists($path)) {
                     break;
                 }
             }
             // try "parent" theme dir if no option one
             $path = $realLookupPath . $themePathFragment . $suffixFragment;
-            //var_dump("Looking for (fallback): $path");
             if (file_exists($path)) {
                 break;
             }
             $path = null;
         }
-        //var_dump("getThemePath($theme, $option, $pathFragment, $returnPrivatePath)", $path);
         return $path;
     }
 

@@ -66,8 +66,8 @@
         </div>
     {/if}
 {/if}
-<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
-    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$count|escape}">
+<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv styling-element" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
+    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal m-auto" data-count="{$count|escape}">
         {block name=forumheader}
         <thead>
             <tr>
@@ -152,8 +152,8 @@
                         <td class="text">
                             {if isset($channels[user].lastPost)}
                                 {$channels[user].lastPost|tiki_short_datetime}<br>
-                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|escape}</i>{/if}
-                                {tr}by{/tr} {$channels[user].lastPostData.userName|username}</small>
+                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|forummaskemail|escape}</i>{/if}
+                                {tr}by{/tr} {$channels[user].lastPostData.userName|forummaskemail|username}</small>
                             {/if}
                         </td>
                     {/if}

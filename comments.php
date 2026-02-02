@@ -355,8 +355,7 @@ if ($forum_check[0] == 'forum') {
 
 $smarty->assign(
     'comments_grandParentId',
-    isset($_REQUEST['comments_grandParentId'])
-    ? $_REQUEST['comments_grandParentId'] : ''
+    $_REQUEST['comments_grandParentId'] ?? ''
 );
 
 if (isset($_REQUEST["post_reply"]) && isset($_REQUEST["comments_reply_threadId"])) {

@@ -256,4 +256,15 @@ class UserPrefsLib extends TikiLib
         }
         return $use_24hr_clock;
     }
+
+    /**
+     * @param $user
+     * @return string
+     */
+    public function get_user_tracker_items_col_pref($user): string
+    {
+        $tikilib = TikiLib::lib('tiki');
+        $trk_items_col_pref = $tikilib->get_user_preference($user, 'trk_items_column_pref') ?? "{}";
+        return $trk_items_col_pref;
+    }
 }

@@ -16,21 +16,23 @@ $section_class = 'tiki_login';  // This will be body class instead of $section
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'twoFactorForm'        => 'string',         //post
+        'showTwoFactorForm'        => 'string',         //post
         'clearmenucache'       => 'bool',           //post
         'user'                 => 'username',       //post
+        'create2FaCodeNormalLogin' => 'alpha',      //get
+        'tiki_username'        => 'username',       //get
         ],
     ],
 ];
 include_once("tiki-setup.php");
 
 
-//Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["twoFactorForm"])) {
-    $twoFactorForm = 'y';
+// Setup Two-Factor Auth form state
+$showTwoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["showTwoFactorForm"])) {
+    $showTwoFactorForm = 'y';
 }
-$smarty->assign('twoFactorForm', $twoFactorForm);
+$smarty->assign('showTwoFactorForm', $showTwoFactorForm);
 
 $create2FaCodeNormalLogin = isset($_REQUEST["create2FaCodeNormalLogin"]) ? 'y' : 'n';
 try {

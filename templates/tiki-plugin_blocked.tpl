@@ -1,6 +1,6 @@
 <div class="card text-bg-warning plugin-approval-form" id="{$plugin_fingerprint|escape}">
     <div class="card-header">
-        <h1 class="h4 card-title">
+        <h1 class="h4 tiki-card-header-title">
         {icon name='error' style="vertical-align:middle"}
         {if $plugin_status eq 'rejected'}
             {tr}Plugin execution was denied{/tr}
@@ -42,7 +42,7 @@
                     {if $plugin_body}
                         <div class="card border-info mb-3">
                             <div class="card-header text-bg-info">
-                                <h3 class="card-title h5" id="body">{tr}Body{/tr}</h3>
+                                <h3 class="tiki-card-header-title h5" id="body">{tr}Body{/tr}</h3>
                             </div>
                             <div class="card-body mb-3">
                                 <textarea class="form-control w-100" rows="10" aria-labelledby="body">{$plugin_body}</textarea>

@@ -72,7 +72,7 @@ function module_article_archives($mod_reference, $module_params)
         if (isset($$p)) {
             continue;
         }
-        $$p = isset($module_params[$p]) ? $module_params[$p] : '';
+        $$p = $module_params[$p] ?? '';
     }
 
     foreach ($urlParams as $p => $v) {
@@ -95,7 +95,7 @@ function module_article_archives($mod_reference, $module_params)
         }
     }
 
-    $smarty->assign('more', isset($module_params['more']) ? $module_params['more'] : 'n');
+    $smarty->assign('more', $module_params['more'] ?? 'n');
     $smarty->assign('modArticleArchives', $artc_archive);
     $smarty->assign('arch_count', 'y');
 }

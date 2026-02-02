@@ -10,7 +10,7 @@
             <div class="offcanvas offcanvas-start tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style="top: var(--tiki-admin-top-modules-height); height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title nav-link" id="offcanvasNavbarLabel">{tr}Admin menu{/tr}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: lightgray;"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{tr}Close{/tr}" style="background-color: lightgray;"></button>
                 </div>
                 <div class="offcanvas-body p-0 w-100">
                     <div class="tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" style="height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">
@@ -288,7 +288,7 @@
                                             {/if}
                                             {if $prefs.feature_shoutbox eq "y" and $tiki_p_admin_shoutbox eq "y"}
                                                 <a class="dropdown-item" href="tiki-shoutbox.php">
-                                                    {icon name="bullhorn"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
+                                                    {icon name="message"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.payment_feature eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_credits.php">
@@ -393,6 +393,10 @@
                                             {if $prefs.feature_scheduler eq "y" and $tiki_p_admin}
                                                 <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                                     {icon name="calendar-check"} <span class="ms-1">{tr}Scheduler{/tr}</span> </a>
+                                            {/if}
+                                            {if $prefs.feature_queued_tasks eq "y"}
+                                                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                                    {icon name="calendar-check"} <span class="ms-1">{tr}Queued Tasks{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.tiki_monitor_performance eq 'y'}
                                                 <a class="dropdown-item" href="tiki-performance_stats.php">

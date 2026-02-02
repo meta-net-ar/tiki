@@ -358,7 +358,7 @@ class RSSLib extends TikiDb_Bridge
 
         $ret = $this->modules->fetchAll($this->modules->all(), $conditions, $maxRecords, $offset, $this->modules->sortMode($sort_mode));
 
-        foreach ($ret as & $res) {
+        foreach ($ret as &$res) {
             $res["minutes"] = $res["refresh"] / 60;
         }
 
@@ -418,7 +418,7 @@ class RSSLib extends TikiDb_Bridge
      */
     public function refresh_rss_module($rssId)
     {
-        return $this->update_feeds([ $rssId ], true);
+        return $this->update_feeds([$rssId], true);
     }
 
     /**
@@ -749,7 +749,7 @@ class RSSLib extends TikiDb_Bridge
                         // need to match 0
                         $configuration['rating'] = $settings['rating'];
                     }
-                    $current_priority = isset($settings['priority']) ? $settings['priority'] : 0;
+                    $current_priority = $settings['priority'] ?? 0;
                 }
             }
         }
@@ -758,7 +758,7 @@ class RSSLib extends TikiDb_Bridge
             $publication = $tikilib->now + $configuration['future_publish'] * 60;
         }
 
-        if (strpos($data['content'], trim($data['description'])) === 0 && strlen($data['description']) < 1024) {
+        if (str_starts_with($data['content'], trim($data['description'])) && strlen($data['description']) < 1024) {
             $data['content'] = substr($data['content'], strlen(trim($data['description'])));
         }
         $data['content'] = trim($data['content']) == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
@@ -1070,9 +1070,14 @@ class RSSLib extends TikiDb_Bridge
     {
         global $tikilib;
 
+        $url = $params['url'] ?? '';
+        if (! $url) {
+            return ['params' => $params, 'items' => [], 'meta' => null];
+        }
+
+        $cache_feed_key = self::$cache_feed_key . md5($url);
+        $cache_meta_key = self::$cache_meta_Key . md5($url);
         $refresh_time = $tikilib->now - $params['refresh'] * 60;
-        $cache_feed_key = self::$cache_feed_key . md5($params['url']);
-        $cache_meta_key = self::$cache_meta_Key . md5($params['url']);
         $cache_feed_items = self::$cachelib->getSerialized($cache_feed_key, '', $refresh_time);
         $cache_meta = self::$cachelib->getSerialized($cache_meta_key, '', $refresh_time);
 
@@ -1080,7 +1085,7 @@ class RSSLib extends TikiDb_Bridge
             $items = $cache_feed_items;
             $title = $cache_meta;
         } else {
-            $result = $this->update_feed($params['url']);
+            $result = $this->update_feed($url);
             $items = $result['feedData'];
             $title = $result['siteMeta'];
             self::$cachelib->cacheItem($cache_feed_key, serialize($items));
@@ -1092,6 +1097,27 @@ class RSSLib extends TikiDb_Bridge
             'author' => 1,
             'ticker' => 1,
         ]);
+
+        if (! empty($params['sortBy'])) {
+            $sortBy = $params['sortBy'];
+            $sortOrder = ! empty($params['sortOrder']) ? strtoupper($params['sortOrder']) : 'DESC';
+            if (in_array($sortBy, ['title', 'publication_date', 'author'], true)) {
+                usort($items, function ($a, $b) use ($sortBy, $sortOrder) {
+                    $va = $a[$sortBy] ?? null;
+                    $vb = $b[$sortBy] ?? null;
+                    $cmp = $sortBy === 'publication_date' ? ($va <=> $vb) : strcasecmp((string)$va, (string)$vb);
+                    return $sortOrder === 'ASC' ? $cmp : -$cmp;
+                });
+            }
+        }
+
+        if (! empty($params['max'])) {
+            $m = (int)$params['max'];
+            if ($m > 0 && count($items) > $m) {
+                $items = array_slice($items, 0, $m);
+            }
+        }
+
         return ['params' => $params, 'items' => $items, 'meta' => $title];
     }
 }

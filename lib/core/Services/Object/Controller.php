@@ -36,6 +36,7 @@ class Services_Object_Controller
             'content' => $this->{'infobox_' . $type}($input),
             'plain' => $input->plain->int(),
             'format' => $input->format->word(),
+            'show_title' => $input->popupTpl->text() ? false : true,
         ];
     }
 
@@ -85,6 +86,12 @@ class Services_Object_Controller
         $smarty->assign('can_remove', $itemObject->canRemove());
         $smarty->assign('mode', $input->mode->text() ? $input->mode->text() : '');  // default divs mode
         if ($tpl = $input->popupTpl->text()) {
+            foreach ($fields as $field) {
+                $value = $trklib->field_render_value(['field' => $field, 'item' => $item, 'process' => 'y', 'showlinks' => 'n']);
+                $smarty->assign($field['permName'], $value);
+                $smarty->assign('tracker_field_' . $field['permName'], $value);
+                $smarty->assign('f_' . $field['fieldId'], $value);
+            }
             try {
                 return $smarty->fetch($tpl);
             } catch (Exception $e) {

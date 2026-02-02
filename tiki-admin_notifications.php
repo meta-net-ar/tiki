@@ -11,21 +11,20 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'offset'       => 'digits',             //get
+            'offset'       => 'int',                //get
             'login'        => 'username',           //post
-            'add'          => 'bool',               //post
-            'maxRecords'   => 'digits',             //post
+            'add'          => 'alpha',              //post
+            'maxRecords'   => 'int',                //get
             'removeevent'  => 'digits',             //get
             'removetype'   => 'word',               //get
-            'sort_mode'    => 'word',               //get
-            'find'         => 'striptags',          //get
-            'email'        => 'email',              //get
-            'event'        => 'text',               //get
-            'delsel_x'     => 'alpha',              //get
-            'action'       => 'alpha',              //get
+            'sort_mode'    => 'alnumdash',          //get
+            'find'         => 'text',               //get
+            'email'        => 'email',              //post
+            'event'        => 'text',               //post
+            'action'       => 'alpha',              //post
         ] ,
         'staticKeyFiltersForArrays' => [
-            'checked'               => 'alnum',     //get
+            'checked'      => 'text',               //post
         ] ,
     ]
 ];
@@ -65,7 +64,15 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
         $save = false;
     }
     if ($save and isset($_REQUEST['event']) and isset($watches[$_REQUEST['event']])) {
-        $result = $tikilib->add_user_watch($login, $_REQUEST["event"], $watches[$_REQUEST['event']]['object'], $watches[$_REQUEST['event']]['type'], $watches[$_REQUEST['event']]['label'], $watches[$_REQUEST['event']]['url'], isset($email) ? $email : null);
+        $result = $tikilib->add_user_watch(
+            $login,
+            $_REQUEST["event"],
+            $watches[$_REQUEST['event']]['object'],
+            $watches[$_REQUEST['event']]['type'],
+            $watches[$_REQUEST['event']]['label'],
+            $watches[$_REQUEST['event']]['url'],
+            $email ?? null
+        );
         if (! $result) {
             Feedback::error(tra('The user has no email set. No notifications will be sent.'));
         } else {
@@ -116,17 +123,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('find', $find);
 if (! empty($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];

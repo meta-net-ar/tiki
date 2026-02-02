@@ -1,5 +1,10 @@
-// This file is for additional SCSS rules beyond what are in variables.scss.
-// Amelia for Tiki Bootstrap 5
+// Amelia for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
 //$imagePath: "../images/";
@@ -7,12 +12,16 @@
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// Color system
-//.bg-dark { background: #ad1d28 !important; }
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
+// Color system
 // Body
 body.fullscreen { background: $body-bg; }
 
+// Links
+// Components
 // Typography
 .text-primary { color: #F9CFC8 !important; }
 .text-secondary { color: #E7D58D !important; }
@@ -22,12 +31,34 @@ body.fullscreen { background: $body-bg; }
 .text-danger, .invalid-feedback, .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label { color: #F3D7C4  !important; }
 .text-muted { color: #FFFFFFCC; }
 
+// Tables
+// Buttons
+.btn.btn-outline-dark {
+    color: #de3b48;
+    background: #000;
+    &:hover {
+        background: $gray-800;
+    }
+}
+
+.btn-outline-secondary { --bs-btn-color: #EDDEDE; }
+.btn-outline-danger { --bs-btn-color: #FDC79B; }
+.btn-outline-warning { --bs-btn-color: #FFD966; --bs-btn-border-color: #F5B800; }
+
 // Forms
 legend {
     font-family: 'Lobster', cursive;
     color: #ffffff;
 }
 
+// Navs
+// Navbar
+.nav-tabs .nav-link {
+    color: $link-color;
+}
+
+// Dropdowns
+// Pagination
 // Cards
 .card,
 .autotoc > .nav {
@@ -55,52 +86,12 @@ legend {
   color: inherit;
 }
 
-// Navs
-.nav-tabs .nav-link {
-    color: $link-color;
-}
-
-// Navs
-//.bg-light-parent {
-//    a,
-//    .btn-link {
-//        color: $navbar-light-color;
-//        &:hover {
-//            color: $navbar-light-hover-color;
-//        }
-//    }
-//}
-
-// Dropdowns
-//.dropdown-menu.dropdown-menu-dark .dropdown-item {
-//    color: $gray-300 !important;
-//}
-
-// Buttons
-.btn.btn-outline-dark {
-    color: #de3b48;
-    background: #000;
-    &:hover {
-        background: $gray-800;
-    }
-}
-
-.btn-outline-secondary { --bs-btn-color: #EDDEDE; }
-.btn-outline-danger { --bs-btn-color: #FDC79B; }
-.btn-outline-warning { --bs-btn-color: #FFD966; --bs-btn-border-color: #F5B800; }
-
+// Accordion
 // Badges
 .badge.bg-dark { color: #fff; }
 
-// Tiki-specific
-.tiki_trackers {
-    .icon-status-open, .icon-status-pending, .icon-status-closed {
-        filter: drop-shadow(0 0 1px black);
-    }
-}
-
-//.textarea-toolbar a.toolbar { color: #222; }
-
+// Alerts
+// Progress bars
 // List group
 .list-group-item {color: #FFFFFFE6; }
 .list-group-item-primary { background-color: #384706; --bs-list-group-color: #B9BCC0E6; }
@@ -119,3 +110,15 @@ legend {
 .list-group-item-action.list-group-item-light {
     color: #111212BF;
 }
+// Figures
+// Breadcrumbs
+// Code
+
+// Tiki-specific
+.tiki_trackers {
+    .icon-status-open, .icon-status-pending, .icon-status-closed {
+        filter: drop-shadow(0 0 1px black);
+    }
+}
+
+// External libraries

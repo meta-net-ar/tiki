@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Diff\DiffUtils;
+
 require_once('tiki-setup.php');
 $tikilib = TikiLib::lib('tiki');
 $histlib = TikiLib::lib('hist');
@@ -76,8 +78,7 @@ if ($output["data"] == "EMPTY") {
         $prev_page_p = TikiLib::lib('parser')->parse_data($prev_page[$descId], ['print' => true, 'is_html' => $curr_page['is_html']]);
 
         // do a diff between both pages
-        require_once('lib/Diff/difflib.php');
-        $diff = diff2($prev_page_p, $curr_page_p, $curr_page['is_html'] ? 'htmldiff' : 'unidiff');
+        $diff = DiffUtils::diff2($prev_page_p, $curr_page_p, $curr_page['is_html'] ? 'htmldiff' : 'unidiff');
 
 
         if (is_array($diff)) {
@@ -109,5 +110,4 @@ if ($output["data"] == "EMPTY") {
     $output = $rsslib->generate_feed($feed, $uniqueid, '', $changes, $readrepl, $param, $id, $title, $titleId, $desc, $descId, $dateId, $authorId);
 }
 header("Content-type: " . $output["content-type"]);
-TikiLib::lib('header')->setXRobotsTag($robots);
 print $output["data"];

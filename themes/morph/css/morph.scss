@@ -1,17 +1,25 @@
-/* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
-/* Original Bootswatch information:
- * bootswatch v5.3.3
- * Homepage: http://bootswatch.com
- * Copyright 2012-2022 Thomas Park
+@charset "UTF-8";
+/*!
+ * Bootswatch Morph theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Bootswatch v5.3.7 (https://bootswatch.com)
+ * Theme: morph
+ * Copyright 2012-2025 Thomas Park
  * Licensed under MIT
  * Based on Bootstrap
- *
- * Adapted by the Tiki Community for Tiki Wiki CMS Groupware
 */
+/*!
+ * Bootstrap  v5.3.7 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
 
+@import "../scss/variables"; // 2. (This is moved above the functions file to have effect, maybe a quirk of the Bootswatch file arrangement.) The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
-@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/morph/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
@@ -24,34 +32,6 @@
 @import "../../base_files/scss/_tiki-selectors.scss"; // 10. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 11. Optionally imported to group (separately) the top and topbar zone components for styling.
 @import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+@import '../../../node_modules/element-plus/dist/index.css';
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
-
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
-.topbar .nav-link {
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
-}
-
-// Make links visible in dark mode
-#col2 .navbar {
-    background: transparent;
-    .nav-link {
-        color: var(--tiki-vert-nav-link-color);
-        &:hover {
-            color: var(--tiki-vert-nav-link-hover-color);
-        }
-    }
-}
-// Tiki - match to button radius inside the input
-.input-group {
-    border-radius: 50rem;
-    & > .form-control {
-        padding-left: 2rem; // No start padding seems wrong
-    }
-}

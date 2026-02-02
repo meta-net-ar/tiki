@@ -1,11 +1,13 @@
-// Slate 5.3.3 -- This is a copy of node_modules/bootswatch/dist/slate/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Slate 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/slate/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/slate/_variables.scss"; // Bootswatch theme variables file
 
-//
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $gray-800;  // default
 $secondary:     #6E757C; // $gray-600;  // default
@@ -17,9 +19,8 @@ $light:         rgb(233, 236, 239); // #757575; // $gray-500; // $gray-200;  // 
 //$dark:          $gray-900;  // default
 
 // Options
-// Prefix for :root CSS variables
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 $enable-dark-mode:            false;
 
 // Body
@@ -50,10 +51,6 @@ $input-group-addon-color: #CCCCCC;
 $form-valid-color: #3FA63F;
 $form-invalid-color: #EE6863;
 
-// Dropdowns
-$dropdown-link-color:               var(--#{$prefix}body-color);
-$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
-
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color);  // default
 
@@ -66,11 +63,16 @@ $navbar-light-active-color:         $gray-800;  // default
 $navbar-dark-hover-color:           $white;  // default
 $navbar-brand-padding-y:            0; // not being respected
 
+// Dropdowns
+$dropdown-link-color:               var(--#{$prefix}body-color);
+$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
+
 // Pagination
 // Cards
 $card-cap-bg: #3B3F45;
 
 // Popovers
+// Badges
 // Toasts
 // Modals
 // Progress bars
@@ -79,6 +81,7 @@ $card-cap-bg: #3B3F45;
 $figure-caption-color: #AAAAAAD4;
 
 // Breadcrumbs
+// Close
 // Code
 
 //--------------------------- Tiki SCSS variables

@@ -24,7 +24,6 @@ function wikiplugin_js_info()
                 'description' => tra('JavaScript filename'),
                 'since' => '3.0',
                 'filter' => 'url',
-                'default' => '',
             ],
             'lateload' => [
                 'required' => false,
@@ -48,8 +47,8 @@ function wikiplugin_js($data, $params)
     $headerlib = TikiLib::lib('header');
     extract($params, EXTR_SKIP);
 
-    if (isset($lateload) && $lateload == 'y') {
-        if (isset($file)) {
+    if ($lateload == 'y') {
+        if (! is_null($file)) {
             $headerlib->add_jsfile($file);
         } elseif ($data) {
             $headerlib->add_js($data);
@@ -57,7 +56,7 @@ function wikiplugin_js($data, $params)
         return '';
     }
 
-    if (isset($file)) {
+    if (! is_null($file)) {
         $ret = "~np~<script type=\"text/javascript\" src=\"$file\"></script> ~/np~";
     } else {
         $ret = '';

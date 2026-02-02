@@ -10,7 +10,8 @@
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use OAuth2ServerExamples\Entities\ScopeEntity;
+
+require dirname(__DIR__) . '../entities/ScopeEntity.php';
 
 class ScopeRepository implements ScopeRepositoryInterface
 {

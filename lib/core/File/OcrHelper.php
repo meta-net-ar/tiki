@@ -29,7 +29,7 @@ class OcrHelper
             return false;
         }
 
-        if (substr(PHP_OS, 0, 3) == 'WIN') {
+        if (str_starts_with(PHP_OS, 'WIN')) {
             return false;
         }
 
@@ -46,7 +46,7 @@ class OcrHelper
             try {
                 $unoconv = new UnoconvLib();
                 $unoconv->convertFile($tempReadableFilePath, $tempFileName, 'txt');
-            } catch (RuntimeException $e) {
+            } catch (\RuntimeException $e) {
                 // Unoconv was unable to extract text without converting to PDF first
                 $pdfTempFile = PDFHelper::convertToPDF($fileId);
             }

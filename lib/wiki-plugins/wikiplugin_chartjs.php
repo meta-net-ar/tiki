@@ -111,14 +111,6 @@ function wikiplugin_chartjs($data, $params)
         $params['id'] = "tikiChart$instance";
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_chartjs_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if (empty($params['data_highlights'])) {
         $params['data_highlights'] = $params['data_colors'];
     }
@@ -194,6 +186,7 @@ function wikiplugin_chartjs($data, $params)
         // casperJS uses PhantomJS that does not support ES6, so no support for modules.
         // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
         // the PDF export of the chart without using JS modules.
+        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
         $html_content = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
 <div>
@@ -227,7 +220,6 @@ HTML;
         if (! $cacheLib->isCached($scriptHash, $cacheKey)) {
             $headlessBrowser = HeadlessBrowserFactory::getHeadlessBrowser();
             $htmlFile = writeTempFile($html_content, '', true, 'wikiplugin_chart_', '.html');
-            $htmlFileUrl = rtrim($base_url, '/') . '/temp/' . basename($htmlFile);
             $hash = str_replace('wikiplugin_chart_', '', str_replace('.html', '', basename($htmlFile)));
             $outputPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'wikiplugin_chart_' . $hash . '.png';
             $htmlFile = realpath($htmlFile);

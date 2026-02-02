@@ -7,7 +7,7 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'type'     => 'word',              //post
+            'type'     => 'text',              //post
             'objId'    => 'word',              //post
             'save'     => 'bool',              //post
             'newtag'   => 'string',            //post
@@ -142,7 +142,7 @@ $allLanguages = $langLib->list_languages();
 $t_used_languages = [];
 foreach ($allLanguages as $al) {
     foreach ($used_languages as $ul) {
-        if (substr($al["value"], 0, 2) == substr($ul, 0, 2)) {
+        if (str_starts_with($al["value"], substr($ul, 0, 2))) {
             $t_used_languages[] = $al["value"];
             break;
         }

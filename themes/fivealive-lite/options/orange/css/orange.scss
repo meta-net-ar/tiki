@@ -1,4 +1,3 @@
-// - orange/tiki.less; compile to make
 /*  The Orange theme option file for the FiveAlive-lite theme of Tiki Wiki CMS Groupware. */
 
 // Required
@@ -18,9 +17,11 @@
 @import "../../../../../node_modules/bootstrap/scss/buttons";
 @import "../../../../../node_modules/bootstrap/scss/nav";
 @import "../../../../../node_modules/bootstrap/scss/navbar";
+@import "../../../../../node_modules/bootstrap/scss/card";
 @import "../../../../../node_modules/bootstrap/scss/alert";
 
 @import "../../../scss/selectors-for-options";
 @import "../../../../base_files/scss/tiki-pagetop_colors";
+
 
 @import "../scss/tiki-selectors";

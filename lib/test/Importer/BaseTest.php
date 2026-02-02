@@ -4,11 +4,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 namespace Tiki\Lib\Test\Importer;
 
 use Tiki\Lib\Test\Importer\Helper\FirstChild;
 use Tiki\Lib\Test\Importer\Helper\GranSon;
-use TikiImporter;
+use Tiki\Lib\Importer\Base as BaseImporter;
 
 /**
  * @group importer
@@ -31,7 +32,7 @@ class BaseTest extends AbstractImporterTestCase
 
     public function testChangePhpSettings(): void
     {
-        TikiImporter::changePhpSettings();
+        BaseImporter::changePhpSettings();
         $this->assertEquals(E_ALL & ~E_DEPRECATED, ini_get('error_reporting'), 'Should change the value of the error reporting');
         $this->assertEquals('on', ini_get('display_errors'), 'Should change the value of display_errors');
         $this->assertEquals(0, ini_get('max_execution_time'), 'Should change the value of max_execution_time');
@@ -39,7 +40,7 @@ class BaseTest extends AbstractImporterTestCase
 
     public function testDisplayPhpUploadError(): void
     {
-        $this->assertNull(TikiImporter::displayPhpUploadError(-1), 'Should return null if invalid code passed as param');
-        $this->assertEquals('No file was uploaded.', TikiImporter::displayPhpUploadError(4));
+        $this->assertNull(BaseImporter::displayPhpUploadError(-1), 'Should return null if invalid code passed as param');
+        $this->assertEquals('No file was uploaded.', BaseImporter::displayPhpUploadError(4));
     }
 }

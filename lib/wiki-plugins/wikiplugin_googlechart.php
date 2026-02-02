@@ -170,19 +170,8 @@ function wikiplugin_googlechart($data, $params)
     $unique = 'wpdialog_' . ++$id;
     $headerlib = TikiLib::lib('header');
 
-    $defaults = [];
-    $plugininfo = wikiplugin_googlechart_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     if ($id === 1 && (empty($params['credentials']) || ! is_readable($params['credentials']))) {
-        return tra('googlechart: No credentials file.');
-    }
-
-    if (empty($params['query_ids'])) {
-        return tra('googlechart: No query_ids supplied.');
+        return WikiParser_PluginOutput::error(tr('Error'), tra('googlechart: No credentials file.'));
     }
 
     if (empty($params['chart_container'])) {
@@ -238,7 +227,7 @@ function wikiplugin_googlechart($data, $params)
     }
     $queryp = [];
     foreach ($params as $key => $param) {
-        if (strpos($key, 'query_') === 0) {
+        if (str_starts_with($key, 'query_')) {
             $queryp[substr($key, strlen('query_'))] = $param;
         }
     }
@@ -248,7 +237,7 @@ function wikiplugin_googlechart($data, $params)
     $chart = ['options' => ['width' => '100%']];
 
     foreach ($params as $key => $param) {
-        if (strpos($key, 'chart_') === 0) {
+        if (str_starts_with($key, 'chart_')) {
             $chart[substr($key, strlen('query_'))] = $param;
         }
     }
@@ -302,15 +291,15 @@ gapi.analytics.ready(function () {
 function wikiplugin_googlechart_authenticate($credentials_file)
 {
 
-    $client = new Google_Client();
+    $client = new Google_Client(); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
     $token = isset($_SESSION['ga_access_token']) && $_SESSION['ga_access_token'] ? $_SESSION['ga_access_token'] : false;
 
     if (empty($token) || $token['created'] + 3600 < time()) {   // in v2 it will be $token['expires_in'] but hard coded to 3600 for v1 api
         $data = json_decode(file_get_contents($credentials_file));
 
-        $cred = new Google_Auth_AssertionCredentials(
+        $cred = new Google_Auth_AssertionCredentials( // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $data->client_email,
-            [Google_Service_Analytics::ANALYTICS_READONLY],
+            [Google_Service_Analytics::ANALYTICS_READONLY], // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $data->private_key
         );
 
@@ -323,7 +312,7 @@ function wikiplugin_googlechart_authenticate($credentials_file)
         $client->setApplicationName("The Networked Planet Test App");
         $client->setAccessType('offline');
 
-        $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY);
+        $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
 
         $token = $client->getAccessToken();
         $token = json_decode($token, true);

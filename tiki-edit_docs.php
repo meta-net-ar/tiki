@@ -17,7 +17,7 @@ $inputConfiguration = [
             'fileId'                      => 'int',           //post
             'galleryId'                   => 'int',           //post
             'name'                        => 'string',        //post
-            'data'                        => 'none',          //post
+            'data'                        => 'string',        //post
             'description'                 => 'xss',           //post
             'edit'                        => 'bool',          //post
         ],
@@ -96,7 +96,7 @@ $_REQUEST['name'] = htmlspecialchars(str_replace('.odt', '', $_REQUEST['name']))
 //Upload to file gallery
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['data'])) {
     $_REQUEST['galleryId'] = (int)$_REQUEST['galleryId'];
-    $_REQUEST['description'] = htmlspecialchars(isset($_REQUEST['description']) ? $_REQUEST['description'] : $_REQUEST['name']);
+    $_REQUEST['description'] = htmlspecialchars($_REQUEST['description'] ?? $_REQUEST['name']);
 
     //webodf has to send an encoded string so that all browsers can handle the post-back
     $_REQUEST['data'] = base64_decode($_REQUEST['data']);

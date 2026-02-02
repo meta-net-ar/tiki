@@ -25,31 +25,31 @@ class NotificationDigestCommand extends Command
             ->addArgument(
                 'domain',
                 InputArgument::OPTIONAL,
-                'Domain name to use (cannot be obtained from the URL)'
+                tra('Domain name to use (cannot be obtained from the URL)')
             )
             ->addArgument(
                 'days',
                 InputArgument::OPTIONAL,
-                'Number of days to include in the digest',
+                tra('Number of days to include in the digest'),
                 7
             )
             ->addOption(
                 'ssl',
                 null,
                 InputOption::VALUE_NONE,
-                'Use HTTPS for generated links'
+                tra('Use HTTPS for generated links')
             )
             ->addOption(
                 'path',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to Tiki, if not in the domain root'
+                tra('Path to Tiki, if not in the domain root')
             )
             ->addOption(
                 'port',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Port to include in the URL'
+                tra('Port to include in the URL')
             )
             ;
     }
@@ -79,7 +79,7 @@ class NotificationDigestCommand extends Command
         }
 
         if (empty($url_host)) {
-            $output->writeln('<error>Error: Please define domain name as argument or set "Fallback for tiki base URL" preference.</error>');
+            $output->writeln('<error>' . tra('Error: Please define domain name as argument or set "Fallback for tiki base URL" preference.') . '</error>');
             return Command::FAILURE;
         }
 

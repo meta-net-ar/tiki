@@ -4,11 +4,22 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Lib\Unoconv\UnoconvLib;
+use Tiki\Lib\Unoconv\UnoconvStrategy;
+use Tiki\Lib\Unoconv\UnoserverStrategy;
 
 function prefs_alchemy_list()
 {
     $prefs = [
+        'alchemy_converter_type' => [
+            'name' => tra('Document Converter'),
+            'description' => tra('Select the converter to use for office documents.'),
+            'type' => 'list',
+            'options' => [
+                UnoconvStrategy::NAME => tra('Unoconv'),
+                UnoserverStrategy::NAME => tra('Unoserver')
+            ],
+            'default' => UnoconvStrategy::NAME,
+        ],
         'alchemy_ffmpeg_path' => [
             'name' => tra('ffmpeg path'),
             'description' => tra('Path to the location of the ffmpeg binary'),
@@ -63,7 +74,15 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '5',
             'filter' => 'digits',
-            'default' => UnoconvLib::DEFAULT_PORT,
+            'default' => UnoconvStrategy::DEFAULT_PORT,
+        ],
+        'alchemy_unoserver_port' => [
+            'name' => tra('unoserver port'),
+            'description' => tra('unoserver daemon port.'),
+            'type' => 'text',
+            'size' => '5',
+            'filter' => 'digits',
+            'default' => UnoserverStrategy::DEFAULT_PORT,
         ],
     ];
 

@@ -2,3 +2,4 @@ svn+ssh test by luci
 git test by Jyhem
 automerge test by drsassafras
 subgit (svn to git) test by rjsmelo
+jb new computer test

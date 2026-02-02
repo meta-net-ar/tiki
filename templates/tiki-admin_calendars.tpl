@@ -291,7 +291,7 @@
                 </div>
                 <div class="checkbox col-sm-3">
                     <input type="checkbox" name="show[location]" id="showCustomLocationsPopup" class="form-check-input" value="on"{if $show_location eq 'y'} checked="checked"{/if}>
-                    <label>
+                    <label for="showCustomLocationsPopup">
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
@@ -307,8 +307,8 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
-                    <input type="checkbox" class="form-check-input" name="show[participants]" value="on"{if $show_participants eq 'y'} checked="checked"{/if}>
-                    <label>
+                    <input type="checkbox" class="form-check-input" name="show[participants]" id="show_participants_popup" value="on"{if $show_participants eq 'y'} checked="checked"{/if}>
+                    <label for="show_participants_popup">
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
@@ -324,8 +324,8 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
-                    <input type="checkbox" class="form-check-input" name="show[category]" value="on"{if $show_category eq 'y'} checked="checked"{/if}>
-                    <label>
+                    <input type="checkbox" class="form-check-input" name="show[category]" id="show_category_popup" value="on"{if $show_category eq 'y'} checked="checked"{/if}>
+                    <label for="show_category_popup">
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
@@ -415,7 +415,7 @@
                 </div>
             {/if}
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="customcategories">
+                <label class="col-sm-4 col-form-label">
                     {tr}Start of day{/tr}
                 </label>
                 <div class="col-sm-2">
@@ -423,7 +423,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="customcategories">
+                <label class="col-sm-4 col-form-label">
                     {tr}End of day{/tr}
                 </label>
                 <div class="col-sm-2">
@@ -431,7 +431,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-            <label class="col-sm-4 col-form-label" for="customcategories">
+            <label class="col-sm-4 col-form-label">
                 {tr}Days to display{/tr}
             </label>
             <div class="col-sm-8">
@@ -456,11 +456,11 @@
             </div>
         </div>
         <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="customcategories">
+                <label class="col-sm-4 col-form-label" for="standard_color">
                     {tr}Standard color{/tr}
                 </label>
                 <div class="col-sm-3">
-                    <select class="form-select" id="customcategories" name="options[customcolors]" onChange="javascript:document.getElementById('fgColorField').disabled=(this.options[this.selectedIndex].value != 0);document.getElementById('bgColorField').disabled=(this.options[this.selectedIndex].value != 0);">
+                    <select class="form-select" id="standard_color" name="options[customcolors]" onChange="javascript:document.getElementById('fgColorField').disabled=(this.options[this.selectedIndex].value != 0);document.getElementById('bgColorField').disabled=(this.options[this.selectedIndex].value != 0);">
                         <option value="" />
                         <option value="008400-99fa99" style="background-color:#99fa99;color:#008400" {if ($customColors) eq '008400-99fa99'}selected{/if}>{tr}Green{/tr}</option>
                         <option value="3333ff-aaccff" style="background-color:#aaccff;color:#3333ff" {if ($customColors) eq '3333ff-aaccff'}selected{/if}>{tr}Blue{/tr}</option>
@@ -512,16 +512,16 @@
             </div>
             <div class="mb-3 row">
                 <div class="checkbox col-sm-4 offset-sm-4">
-                    <input type="checkbox" class="form-check-input" name="show[status]" value="on"{if $info.show_status eq 'y'} checked="checked"{/if}>
-                    <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="show[status]" id="show_status_popup" value="on"{if $info.show_status eq 'y'} checked="checked"{/if}>
+                    <label class="form-check-label" for="show_status_popup">
                         {tr}Show in popup view{/tr}
                     </label>
                 </div>
             </div>
             <div class="mb-3 row">
                 <div class="checkbox col-sm-4 offset-sm-4">
-                    <input type="checkbox" class="form-check-input" name="show[status_calview]" value="on"{if $info.show_status_calview ne 'n'} checked="checked"{/if}>
-                    <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="show[status_calview]" id="show_status_calview" value="on"{if $info.show_status_calview ne 'n'} checked="checked"{/if}>
+                    <label class="form-check-label" for="show_status_calview">
                         {tr}Show in calendar view{/tr}
                     </label>
                 </div>
@@ -562,7 +562,7 @@
                     {tr}Event name on each day in calendar view{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" class="form-check-input" name="nameoneachday"{if $info.nameoneachday eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="nameoneachday"{if $info.nameoneachday eq 'y'} checked="checked"{/if} id="nameoneachday">
                 </div>
             </div>
             <div class="mb-3 row">
@@ -570,7 +570,7 @@
                     {tr}Show copy button of event link in each event in calendar view{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" class="form-check-input" name="copybuttononeachevent"{if $info.copybuttononeachevent eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="copybuttononeachevent"{if $info.copybuttononeachevent eq 'y'} checked="checked"{/if} id="copybuttononeachevent">
                 </div>
             </div>
             <div class="mb-3 text-center">

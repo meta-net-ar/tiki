@@ -9,11 +9,11 @@ class Services_Tracker_Utilities
     public function insertItem($definition, $item)
     {
         $newItem = $this->replaceItem($definition, 0, $item['status'], $item['fields'], $item['processedFields'] ?? [], [
-            'validate' => isset($item['validate']) ? $item['validate'] : true,
+            'validate' => $item['validate'] ?? true,
             'skip_categories' => false,
-            'bulk_import' => isset($item['bulk_import']) ? $item['bulk_import'] : false,
+            'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
-            'deleted_files' => isset($item['deletedFiles']) ? $item['deletedFiles'] : []
+            'deleted_files' => $item['deletedFiles'] ?? []
         ]);
 
         return $newItem;
@@ -22,11 +22,12 @@ class Services_Tracker_Utilities
     public function updateItem($definition, $item)
     {
         return $this->replaceItem($definition, $item['itemId'], $item['status'], $item['fields'], $item['processedFields'] ?? [], [
-            'validate' => isset($item['validate']) ? $item['validate'] : true,
+            'validate' => $item['validate'] ?? true,
             'skip_categories' => false,
-            'bulk_import' => isset($item['bulk_import']) ? $item['bulk_import'] : false,
+            'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
-            'deleted_files' => isset($item['deletedFiles']) ? $item['deletedFiles'] : []
+            'deleted_files' => $item['deletedFiles'] ?? [],
+            'notify_watchers' => $item['notify_watchers']
         ]);
     }
 
@@ -109,7 +110,7 @@ class Services_Tracker_Utilities
         }
 
         if (! $options['validate'] || count($errors) == 0) {
-            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? []);
+            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? [], $options['notify_watchers']);
             return $newItem;
         }
 
@@ -175,10 +176,10 @@ class Services_Tracker_Utilities
             'n',
             ($isFirst ? 'y' : 'n'),
             'y',
-            isset($data['isHidden']) ? $data['isHidden'] : 'n',
+            $data['isHidden'] ?? 'n',
             isset($data['isMandatory']) ? ($data['isMandatory'] ? 'y' : 'n') : ($isFirst ? 'y' : 'n'),
             $trklib->get_last_position($data['trackerId']) + 10,
-            isset($data['options']) ? $data['options'] : '',
+            $data['options'] ?? '',
             $data['description'],
             '',
             null,
@@ -193,8 +194,8 @@ class Services_Tracker_Utilities
             null,
             null,
             false,
-            isset($data['visibleInViewMode']) ? $data['visibleInViewMode'] : 'y',
-            isset($data['visibleInEditMode']) ? $data['visibleInEditMode'] : 'y',
+            $data['visibleInViewMode'] ?? 'y',
+            $data['visibleInEditMode'] ?? 'y',
         );
     }
 
@@ -203,7 +204,16 @@ class Services_Tracker_Utilities
         $definition = Tracker_Definition::get($trackerId);
 
         //$fieldId = 0 when is a new field, e.g. when importing tracker structure
-        $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        try {
+            $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        } catch (RuntimeException $e) {
+            if ($fieldId > 0) {
+                // importing tracker field keeping the fieldId
+                $field = [];
+            } else {
+                throw $e;
+            }
+        }
         $trklib = TikiLib::lib('trk');
         $trklib->replace_tracker_field(
             $trackerId,
@@ -730,8 +740,8 @@ EXPORT;
                 continue;
             }
             // since field may have comma or quotes or tab in it
-            $fields = str_getcsv($row, "\t");
-            if (substr($row, -1) === "\t") {
+            $fields = str_getcsv($row, "\t", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
+            if (str_ends_with($row, "\t")) {
                 $fields[] = '';
             }
             $pFields = []; // escape processed fields

@@ -2,7 +2,7 @@
 
 <div class="t_navbar mb-4">
     {button href="tiki-browse_categories.php?parentId=$parentId" _type="link" _icon_name="view" _text="{tr}Browse Categories{/tr}" _title="{tr}Browse the category system{/tr}"}
-    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Organize Objects{/tr}" _icon_name="structure" _title="{tr}Organize Objects{/tr}"}
+    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Categorize Objects{/tr}" _icon_name="structure" _title="{tr}Categorize Objects{/tr}"}
 </div>
 
 <div class="tree breadcrumb" id="top">
@@ -232,7 +232,7 @@
                     {if not empty($objects)}
                         <div class="submit text-center p-1">
                             {ticket}
-                            <input type="hidden" name="categId" value="{$parentId|escape}"}>
+                            <input type="hidden" name="categId" value="{$parentId|escape}">
                             <input type="submit" name="uncategorize" value="{tr}Remove checked{/tr}" class="btn btn-danger" onclick="return confirm('{tr}Remove objects from category?{/tr}');">
                         </div>
                     {/if}

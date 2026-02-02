@@ -24,6 +24,7 @@ global $prefs, $user;
 
 clearstatcache();
 $modules = $modlib->get_modules_for_user($user);
+$smarty->assign('modlib', $modlib);
 
 if (Perms::get()->admin) {
     $smarty->assign('module_pref_errors', $modlib->pref_errors);
@@ -70,3 +71,4 @@ $module_nodecorations = ['decorations' => 'n'];
 $module_isflippable = ['flip' => 'y'];
 $smarty->assign('module_nodecorations', $module_nodecorations);
 $smarty->assign('module_isflippable', $module_isflippable);
+$smarty->assign('all_modules', $modlib->get_all_modules());

@@ -32,7 +32,7 @@
     {if in_array('manager_update', $available_actions)}
     <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=manager_update}">{icon name=import} {tr}Setup Update{/tr}</a>
     {/if}
-    <h2>Instances</h2>
+    <h2>{tr}Instances{/tr}</h2>
     <div class="table-responsive">
         <table class="table">
             <tr>

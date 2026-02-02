@@ -14,7 +14,7 @@
         </div>
         <div class="col-auto">
             <select class="form-control" :id="`${props.field.ins_id}Minute`" :name="`${props.field.ins_id}Minute`" :value="model.minute" @change="$emit('update:modelValue', { ...model, ['minute']: $event.target.value })">
-                <option v-for="minute in 60" :value="zeroPad(minute-1)">{{zeroPad(minute-1)}}</option>
+                <option v-for="minute in minutes" :value="zeroPad(minute)">{{zeroPad(minute)}}</option>
             </select>
         </div>
         <div class="col-auto" v-if="!use24hrClock">
@@ -37,6 +37,10 @@
     const props = defineProps({
         field: {
             type: Object
+        },
+        minuteStep: {
+            type: Number,
+            default: 1
         }
     })
     const emit = defineEmits(['input'])
@@ -54,6 +58,14 @@
     }))
 
     const use24hrClock = computed(() => store.getters.getPref('use_24hr_clock'))
+    const minuteStep = computed(() => Math.max(1, Number(props.minuteStep) || 1));
+    const minutes = computed(() => {
+        const vals = [];
+        for (let m = 0; m < 60; m += minuteStep.value) {
+            vals.push(m);
+        }
+        return vals;
+    });
 
     const zeroPad = (num) => {
         if (parseInt(num) < 10) {

@@ -32,6 +32,11 @@ interface Perms_Resolver
      */
     public function applicableGroups();
 
+    /**
+     * Merge another set of resolver permissions into the current one.
+     */
+    public function merge(?Perms_Resolver $another = null);
+
     /*
      * Dump useful resolve information for debugging purposes.
      * @return array of resolved permissions

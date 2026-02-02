@@ -7,6 +7,7 @@
 
 namespace SmartyTiki\FunctionHandler;
 
+use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 
@@ -17,7 +18,7 @@ class InteractiveTranslation extends Base
         $headerlib = \TikiLib::lib('header');
         $smarty = \TikiLib::lib('smarty');
 
-        $translator = \I18N\LanguageTranslator::getInstance(\I18N\LanguageTranslator::getLanguageFromPrefs());
+        $translator = \I18N\LanguageTranslator::getInstance(Language::getCurrentLanguage());
         $strings = $translator->getInteractiveCollectedStrings();
         if (count($strings) == 0) {
             return;

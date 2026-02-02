@@ -41,12 +41,12 @@ function module_since_last_visit($mod_reference, $params = null)
     // Calculate totals for simple view
     $nvi_info = [
         'lastVisit' => $slvn_info['lastLogin'],
-        'pages' => isset($slvn_info['items']['pages']) ? $slvn_info['items']['pages']['count'] : 0,
-        'files' => isset($slvn_info['items']['files']) ? $slvn_info['items']['files']['count'] : 0,
-        'comments' => isset($slvn_info['items']['comments']) ? $slvn_info['items']['comments']['count'] : 0,
-        'users' => isset($slvn_info['items']['users']) ? $slvn_info['items']['users']['count'] : 0,
-        'trackers' => isset($slvn_info['items']['trackers']) ? $slvn_info['items']['trackers']['count'] : 0,
-        'calendar' => isset($slvn_info['items']['calendar']) ? $slvn_info['items']['calendar']['count'] : 0,
+        'pages'    => $slvn_info['items']['pages']['count'] ?? 0,
+        'files'    => $slvn_info['items']['files']['count'] ?? 0,
+        'comments' => $slvn_info['items']['comments']['count'] ?? 0,
+        'users'    => $slvn_info['items']['users']['count'] ?? 0,
+        'trackers' => $slvn_info['items']['trackers']['count'] ?? 0,
+        'calendar' => $slvn_info['items']['calendar']['count'] ?? 0,
     ];
 
     $smarty->assign('nvi_info', $nvi_info);

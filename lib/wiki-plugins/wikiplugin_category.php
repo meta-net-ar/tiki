@@ -22,7 +22,6 @@ function wikiplugin_category_info()
                 'since' => '1',
                 'filter' => 'digits',
                 'separator' => '+',
-                'default' => '',
                 'profile_reference' => 'category',
             ],
             'types' => [
@@ -238,51 +237,27 @@ function wikiplugin_category($data, $params)
 
     $categlib = TikiLib::lib('categ');
 
-    $default = ['maxRecords' => 50];
-    $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
 
-    // TODO: use categ name instead of id (alternative)
-    if (isset($split) and substr(strtolower($split), 0, 1) == 'n') {
-        $split = false;
-    } else {
-        $split = true;
-    }
-    if (isset($sub) and substr(strtolower($sub), 0, 1) == 'n') {
-        $sub = false;
-    } else {
-        $sub = true;
-    }
-    if (! empty($lang)) {
-        $filter['language'] = $lang;
-    } elseif (isset($params['lang'])) {
-        $filter['language'] = $prefs['language'];
-    } else {
-        $filter = null;
-    }
-    if (isset($and) and substr(strtolower($and), 0, 1) == 'y') {
-        $and = true;
-    } else {
-        $and = false;
-    }
-    if (isset($sort)) {
+    $split = strtolower($split) == 'y';
+    $sub = strtolower($sub) == 'y';
+    $and = strtolower($and) == 'y';
+    $filter['language'] = $lang ?: Language::getCurrentLanguage();
+
+    if (! empty($sort)) {
         $list = explode(',', $sort);
         foreach ($list as $l) {
             if (! in_array($l, ['name_asc', 'name_desc', 'hits_asc', 'hits_desc', 'type_asc', 'type_desc', 'created_asc', 'created_desc', 'itemId_asc', 'itemId_desc', 'random'])) {
                 return tra('Incorrect parameter:') . ' sort';
             }
         }
-    } else {
-        $sort = '';
     }
 
-    if (isset($types) && is_array($types)) {
+    if (is_array($types)) {
         $types = strtolower(implode("+", $types));
-    } else {
-        $types = "*";
     }
 
-    $id = (! empty($id)) ? $id : 'current'; // use current category if none is given
+    $id = $id ?: 'current'; // use current category if none is given
 
     if ($id == 'current') {
         if (isset($_REQUEST['page'])) {

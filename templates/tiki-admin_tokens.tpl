@@ -89,25 +89,25 @@
         <form action="tiki-admin_tokens.php" method="post">
             <input type="hidden" name="action" value="add">
             <div class="tiki-form-group row">
-                <label class="col-sm-4 col-form-label">{tr}Full URL{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="entry">{tr}Full URL{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="text" id='entry' name='entry' class="form-control" required>
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-4 col-form-label">{tr}Timeout in seconds (-1 for unlimited){/tr}</label>
+                <label class="col-sm-4 col-form-label" for="timeout">{tr}Timeout in seconds (-1 for unlimited){/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="number" id='timeout' name='timeout' class="form-control">
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-4 col-form-label">{tr}Maximum number of hits (-1 for unlimited){/tr}</label>
+                <label class="col-sm-4 col-form-label" for="maxhits">{tr}Maximum number of hits (-1 for unlimited){/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="number" id='maxhits' name='maxhits' class="form-control">
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-4 col-form-label">{tr}Groups{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="groups">{tr}Groups{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <select name="groups[]" id="groups" class="form-control" multiple="multiple" required>
                         {foreach item=groupName from=$groups}

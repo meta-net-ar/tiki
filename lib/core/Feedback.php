@@ -7,7 +7,7 @@
 //this script may only be included - so its better to die if called directly.
 declare(strict_types=1);
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -79,11 +79,28 @@ class Feedback
 
     public static function errorAndDie(string $message, int $httpCode, ?string $errorPage = null): never
     {
+        global $access, $user, $prefs;
+        if (($httpCode == 401 || $httpCode == 403) && ! $user && $prefs['permission_denied_login_box'] == 'y') {
+            if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
+                $url = $prefs['login_autologin_redirectlogin_url'];
+            } else {
+                $url = $prefs['permission_denied_url'] ?: 'tiki-login.php';
+            }
+
+            $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
+
+            $access->redirect($url, $message, msgtype: 'error');
+            die;
+        }
+
         $errorPage = $errorPage ?? "error.tpl";
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('errortype', $httpCode);
         $smarty->assign('msg', $message);
-        http_response_code($httpCode);
+        //This errorAndDie is meant for fatal errors.  Http headers may have already been sent, which would crash the following line.  We want this function to terminate properly even then - benoitg - 2026-01-27
+        if (! headers_sent()) {
+            http_response_code($httpCode);
+        }
         $smarty->display($errorPage);
         die;
     }
@@ -302,7 +319,7 @@ class Feedback
                         $message = $type . ': ' . str_replace('<br />', "\n", $message['mes']);
                     }
 
-                    if ($type === 'success' || $type === 'note') {
+                    if ($type === 'success' || $type === 'note' || $type === 'feedback') {
                         if (! $output->isVeryVerbose()) {
                             continue;
                         }
@@ -444,12 +461,15 @@ class Feedback
                 foreach ($watches as $watch) {
                     $usersList[] = "<a href='tiki-user_information.php?user=" . $watch['user'] . "' class='fw-bold'>" . $watch['user'] . "</a>";
                 }
-                $message = implode(", ", $usersList);
-                self::note([
-                    'title' => tr('Notification sent to:'),
-                    'mes' => $message,
-                    'icon' => 'bell'
-                ]);
+
+                if (! empty($usersList)) {
+                    $message = implode(", ", $usersList);
+                    self::note([
+                        'title' => tr('Notification sent to:'),
+                        'mes' => $message,
+                        'icon' => 'bell'
+                    ]);
+                }
             }
         }
     }

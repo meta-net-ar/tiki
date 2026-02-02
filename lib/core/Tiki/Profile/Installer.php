@@ -634,7 +634,8 @@ class Tiki_Profile_Installer
                             $info['emailPattern'],
                             $info['anniversary'],
                             $info['prorateInterval'],
-                            $info['groupColor']
+                            $info['groupColor'],
+                            twaFAGracePeriod: $info['twoFactorAuthGracePeriod']
                         );
                         $this->setFeedback(tra('Group modified') . ': ' . $info['groupName']);
                     }
@@ -703,7 +704,7 @@ class Tiki_Profile_Installer
                 if (! isset($prefs[$pref]) || $prefs[$pref] != $value) {
                     $this->setFeedback(tra('Preference set') . ': ' . $pref . '=' . (is_array($value) ? implode(', ', $value) : $value));
 
-                    $oldValue = isset($prefs[$pref]) ? $prefs[$pref] : 'n';
+                    $oldValue = $prefs[$pref] ?? 'n';
                     $this->setTrackProfileChanges('preference', $value, $oldValue, $pref);
                 }
 
@@ -808,7 +809,8 @@ class Tiki_Profile_Installer
                     $info['email_pattern'],
                     $info['anniversary'],
                     $info['prorate_interval'],
-                    $info['color']
+                    $info['color'],
+                    twaFAGracePeriod: $info['twoFactorAuthGracePeriod']
                 );
             }
         }

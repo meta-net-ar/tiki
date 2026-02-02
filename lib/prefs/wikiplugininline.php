@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_wikiplugininline_list($partial = false)
 {
-    global $tikilib;
     $parserlib = TikiLib::lib('parser');
 
     $defaultInline = [

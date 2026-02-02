@@ -178,13 +178,6 @@ function wikiplugin_matomo($data, $params)
         return;
     }
 
-    $plugininfo = wikiplugin_matomo_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
-
     if (empty($params['matomoserverurl'])) {
         $params['matomoserverurl'] = $prefs['site_matomo_analytics_server_url'];
     }
@@ -223,7 +216,7 @@ function wikiplugin_matomo($data, $params)
     $attributes = '';
 
     foreach ($params as $key => $value) {
-        if (strpos($key, '_') === 0) {
+        if (str_starts_with($key, '_')) {
             if ($value) {
                 $attributes .= ' ' . substr($key, 1) . '="' . $value . '"';
             }

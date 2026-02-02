@@ -41,7 +41,7 @@ function md5_check_dir($dir, &$result) // save all files in $result
                 md5_check_dir($entry, $result);
             }
         } else {
-            if (substr($e, -4, 4) == ".php" && $entry != './tiki-create_md5.php' && $entry != './db/local.php') {
+            if (str_ends_with($e, ".php") && $entry != './tiki-create_md5.php' && $entry != './db/local.php') {
                 // echo "creating sum of $entry <br />\n";
                 $result[$entry] = md5_file($entry);
             }
@@ -52,7 +52,7 @@ function md5_check_dir($dir, &$result) // save all files in $result
 
 
 $tikimd5 = [];
-$chkdir = isset($_REQUEST['chkdir']) ? $_REQUEST['chkdir'] : '.';
+$chkdir = $_REQUEST['chkdir'] ?? '.';
 echo "creating md5 sums for dir $chkdir <br>";
 flush();
 md5_check_dir($chkdir, $tikimd5);

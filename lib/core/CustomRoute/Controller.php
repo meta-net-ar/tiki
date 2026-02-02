@@ -23,9 +23,9 @@ class Controller
     public function populateFromRequest($request)
     {
         $id = ! empty($request['route']) ? $request['route'] : '';
-        $type = isset($request['router_type']) ? $request['router_type'] : '';
-        $from = isset($request['router_from']) ? $request['router_from'] : '';
-        $description = isset($request['router_description']) ? $request['router_description'] : '';
+        $type = $request['router_type'] ?? '';
+        $from = $request['router_from'] ?? '';
+        $description = $request['router_description'] ?? '';
         $active = empty($request['router_active']) ? 0 : 1;
         $shortUrl = empty($request['router_short_url']) ? 0 : 1;
         $params = [];

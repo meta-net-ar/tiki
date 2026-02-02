@@ -65,7 +65,8 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
             'tracker_item_modify' => 'Search_Action_TrackerItemModify',
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
-            'categorize_object' => 'Search_Action_CategorizeObjectAction'
+            'categorize_object' => 'Search_Action_CategorizeObjectAction',
+            'export_pdf' => 'SearchActionExportPDF',
         ]
     );
 
@@ -139,7 +140,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
     $result->setId('wplistexecute-' . $iListExecute);
 
     $resultBuilder = new Search_ResultSet_WikiBuilder($result);
-    $resultBuilder->apply($matches, $params);
+    $resultBuilder->apply($matches);
 
     $dataSource = $unifiedsearchlib->getDataSource();
     $builder = new Search_Formatter_Builder();
@@ -305,14 +306,17 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
         }
     }
 
-    $formatted = $formatter->format($result);
-
-    if (! str_contains($formatted, "listexecute-$iListExecute")) {
-        $formatted = '~np~
+    $alternateOutput = $formatter->getAlternateOutput();
+    if (! strstr($alternateOutput, "listexecute-$iListExecute")) {
+        // no results found or custom alternatate code supplied, thus missing list execute main form, add it artificially as JS code bind to it
+        $alternateOutput = '~np~
 <form method="post" class="list-executable" id="listexecute-' . $iListExecute . '" data-id="wplistexecute-' . $iListExecute . '">
-    <input type="hidden" name="plugin" value="' . $fingerprint . '">~/np~' . $formatted . '~np~
+    <input type="hidden" name="plugin" value="' . $fingerprint . '">~/np~' . $alternateOutput . '~np~
 </form>~/np~';
+        $formatter->setAlternateOutput($alternateOutput);
     }
+
+    $formatted = $formatter->format($result);
 
     $mark_plugins = $parser->option['mark_plugins'];
     if (empty($mark_plugins && ! empty(TikiLib::lib('parser')->core_options['mark_plugins']))) {

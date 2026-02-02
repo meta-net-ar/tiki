@@ -56,8 +56,6 @@ export const DATA_TEST_ID = {
                 :show-password="showPassword"
                 :autocomplete="autocomplete ?? 'on'"
                 :name="name"
-                :style="style"
-                :role="role"
                 :disabled="disabled"
                 :type="type"
                 @change="(value) => _emit('change', value)"
@@ -68,6 +66,8 @@ export const DATA_TEST_ID = {
                 @keyup="() => _emit('keyup')"
                 @keydown="() => _emit('keydown')"
                 :data-testid="DATA_TEST_ID.INPUT"
+                v-bind="$attrs"
+            >
             >
                 <template #prepend v-if="prependText">{{ prependText }}</template>
                 <template #append v-if="appendText">{{ appendText }}</template>

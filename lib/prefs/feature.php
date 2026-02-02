@@ -695,13 +695,14 @@ function prefs_feature_list($partial = false)
             'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://summernote.org">Summernote</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'feature_ajax',
                 'ajax_autosave',
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
+            'tags' => ['experimental'],
         ],
 
         'feature_kaltura' => [
@@ -712,6 +713,15 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'admin' => 'video',
             'view' => 'tiki-list_kaltura_entries.php?list=media',
+        ],
+        'feature_peertube' => [
+            'name' => tra('PeerTube video management'),
+            'description' => tra('Integration with the PeerTube video platform'),
+            'help' => 'PeerTube',
+            'type' => 'flag',
+            'default' => 'n',
+            'admin' => 'video',
+            'view' => 'tiki-list_peertube_entries.php?list=videos',
         ],
         'feature_friends' => [
             'name' => tra('Friendship Network'),
@@ -977,6 +987,15 @@ function prefs_feature_list($partial = false)
             'default' => 'y',
             'tags' => ['basic'],
         ],
+        'feature_eol_date_notifier' => [
+            'name' => tra('End-of-Life Date Notifier'),
+            'description' => tra('Enable notifications for approaching End-of-Life (EoL) dates for supported versions.'),
+            'type' => 'flag',
+            'package' => 'features',
+            'since' => '30.0',
+            'default' => 'y',
+            'tags' => ['basic', 'interface', 'admin', 'security'],
+        ],
         'feature_ticketlib' => [
             'name' => tra('Require confirmation of an action if a possible CSRF is detected'),
             'type' => 'flag',
@@ -1084,7 +1103,7 @@ function prefs_feature_list($partial = false)
         'feature_tag_users' => [
             'name' => tra('Tagging users'),
             'description' => tra('Add support for @username mentions'),
-            'help' => 'Add support for @username mentions',
+            'help' => 'User Mentions',
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
@@ -1092,7 +1111,7 @@ function prefs_feature_list($partial = false)
         'feature_notify_users_mention' => [
             'name' => tra('User mention notifications'),
             'description' => tra('Add support for @username mentions notifications'),
-            'help' => 'Add support for @username mentions notifications by email',
+            'help' => 'Activate User Mention Notification',
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
@@ -1873,13 +1892,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-        'feature_jquery_reflection' => [
-            'name' => tra('Reflection'),
-            'description' => tra('Creates a reflection under an image. Used in Plugin Img with the parameter "class=reflect"'),
-            'type' => 'flag',
-            'help' => 'JQuery#Reflection',
-            'default' => 'n',       // reflection effects on images
-        ],
         'feature_jquery_ui' => [
             'name' => tra('JQuery UI'),
             'description' => tra('Include jQuery UI library. Enables a number of interface features.'),
@@ -1944,6 +1956,7 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'help' => 'JQuery#TableSorter',
             'default' => 'n',   // sortable tables ([will] override existing)
+            'tags' => ['experimental'],
         ],
         'feature_jquery_tagcanvas' => [
             'name' => tra('TagCanvas'),
@@ -2874,6 +2887,15 @@ function prefs_feature_list($partial = false)
             'default' => 'y',
             'tags' => ['advanced'],
         ],
+        'feature_queued_tasks' => [
+            'name' => tra('Queued Tasks'),
+            'description' => tra('Enables the execution of tasks in the background.'),
+            'help' => 'Queued Tasks',
+            'type' => 'flag',
+            'view' => 'tiki-admin_queued_tasks.php',
+            'default' => 'n',
+            'tags' => ['advanced'],
+        ],
         'feature_absolute_to_relative_links' => [
             'name' => tra('Convert from absolute to relative link'),
             'description' => tra('Process wiki text and convert internal links from absolute to relative links'),
@@ -2958,6 +2980,14 @@ function prefs_feature_list($partial = false)
             'description' => tra('Modal popups can be resized.'),
             'type' => 'flag',
             'default' => 'y',
+        ],
+        'feature_language_check' => [
+            'name' => tra('Language checking in editors'),
+            'description' => tra('Enable real-time grammar and spelling checking in editors using LanguageTool.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
         ],
     ];
 }

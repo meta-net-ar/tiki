@@ -44,6 +44,11 @@ use ElliotJReed\DisposableEmail\Exceptions\InvalidEmailException;
 use PhpXmlRpc\Value as XML_RPC_Value;
 use PhpXmlRpc\Request as XML_RPC_Message;
 use PhpXmlRpc\Client as XML_RPC_Client;
+use Tiki\Lib\Auth\Tokens;
+use Tiki\Lib\Auth\LdapLib;
+use Tiki\Lib\Auth\PhpBBLib;
+use Tiki\Lib\TikiDate;
+use Tiki\Lib\Auth\PhpCAS;
 
 class UsersLib extends TikiLib
 {
@@ -59,6 +64,7 @@ class UsersLib extends TikiLib
     public $get_object_permissions_for_user_cache;
     public static $cas_initialized = false;
     public static $userexists_cache = [];
+    public const USERNAME_MANDATORY_VALIDATION_PATTERN = '/^\S*$/';
 
     public function __construct()
     {
@@ -345,13 +351,18 @@ class UsersLib extends TikiLib
             $url .= '?' . SID;
         }
 
-        if ($prefs['auth_method'] === 'cas' && $user !== 'admin' && $user !== '' && $prefs['cas_force_logout'] === 'y') {
-            phpCAS::logoutWithRedirectService($url);
+        unset($_SESSION['cas_validation_time'], $_SESSION[$user_cookie_site], $_SESSION['phpCAS']);
+        if (session_status() !== PHP_SESSION_NONE) {
+            if (ini_get('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+            }
+            session_unset();
+            session_destroy();
         }
-        unset($_SESSION['cas_validation_time']);
-        unset($_SESSION[$user_cookie_site]);
-        session_unset();
-        session_destroy();
+        if ($prefs['auth_method'] === 'cas' && $user !== 'admin' && $user !== '' && $prefs['cas_force_logout'] === 'y') {
+            PhpCAS::logoutWithRedirectService($url);
+        }
 
         if ($remote_logout) {
             return;
@@ -424,6 +435,8 @@ class UsersLib extends TikiLib
 
         $user = str_replace(chr(0), '', $user);
         $pass = str_replace(chr(0), '', $pass);
+        $userlib = TikiLib::lib('user');
+        $isAdminGroupMember = in_array($user, $userlib->get_members('Admins'), true);
 
         if ($user != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
             // slave intertiki sites should never check passwords locally, just for admin
@@ -471,7 +484,7 @@ class UsersLib extends TikiLib
 
         // first attempt a login via the standard Tiki system
         //
-        if (! ($auth_shib || $auth_cas || $auth_saml) || $user == 'admin') { //redflo: does this mean, that users in cas and shib are not replicated to tiki tables? Does this work well?
+        if (! ($auth_shib || $auth_cas || $auth_saml) || $isAdminGroupMember) { //redflo: does this mean, that users in cas and shib are not replicated to tiki tables? Does this work well?
             list($result, $user) = $this->validate_user_tiki($user, $pass, $validate_phase);
         } else {
             $result = null;
@@ -516,19 +529,19 @@ class UsersLib extends TikiLib
         // if we are using tiki auth or if we're using an alternative auth except for admin
 
         // todo: bad hack. better search for a more general solution here
-        if (
-            (! $auth_ldap && ! $auth_pam && ! $auth_cas && ! $auth_shib && ! $auth_saml && ! $auth_phpbb)
-                || (
-                        ( ($auth_ldap && $skip_admin)
-                            || ($auth_shib && $shib_skip_admin)
-                            || ($auth_saml && $saml_skip_admin)
-                            || ($auth_pam && $pam_skip_admin)
-                            || ($auth_cas && $cas_skip_admin)
-                            || ($auth_phpbb && $phpbb_skip_admin)
-                        )
-                        && $user == 'admin')
-                || ($auth_ldap && ($prefs['auth_ldap_permit_tiki_users'] == 'y' && $userTiki))
-        ) {
+        // Check if no special authentication method is enabled
+        $noSpecialAuthEnabled = ! $auth_ldap && ! $auth_pam && ! $auth_cas && ! $auth_shib && ! $auth_saml && ! $auth_phpbb;
+
+        // Check if admin can skip special auth and use Tiki auth instead
+        $adminHasSkipPrivilege = ($auth_ldap && $skip_admin) || ($auth_pam && $pam_skip_admin) || ($auth_cas && $cas_skip_admin)
+        || ($auth_shib && $shib_skip_admin) || ($auth_saml && $saml_skip_admin) || ($auth_phpbb && $phpbb_skip_admin);
+
+        $adminCanSkip = $isAdminGroupMember && $adminHasSkipPrivilege;
+
+        // Check if the user created using Tiki can use Tiki to login, when LDAP is enabled
+        $ldapUserHasTikiLoginAccess = $auth_ldap && ($prefs['auth_ldap_permit_tiki_users'] == 'y' && $userTiki);
+
+        if ($noSpecialAuthEnabled || $adminCanSkip || $ldapUserHasTikiLoginAccess) {
             // if the user verified ok, log them in
             if ($userTiki) {//user validated in tiki, update lastlogin and be done
                 if ($auth_ldap) {
@@ -594,8 +607,9 @@ class UsersLib extends TikiLib
                 return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result];
             }
         } elseif ($auth_cas) {
-        // next see if we need to check CAS
-            $result = $this->validate_user_cas($user);
+        // next see if we need to check CAS (via wrapper)
+            $hasTicket = isset($_GET['ticket']) || isset($_REQUEST['ticket']);
+            $result = $this->validate_user_cas($user, $hasTicket);
 
             switch ($result) {
                 case USER_VALID:
@@ -648,9 +662,6 @@ class UsersLib extends TikiLib
                     // just say no!
                     return [false, $user, $result];
                 }
-            } elseif ($userCAS && $userTikiPresent) {
-                // if the user was authenticated by CAS and found in Tiki (no password in Tiki user table necessary)
-                return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result];
             }
         } elseif ($auth_shib) {
             // next see if we need to check Shibboleth
@@ -1095,11 +1106,28 @@ class UsersLib extends TikiLib
             $_SESSION[$user_cookie_site] = strtolower($_SESSION['phpCAS']['user']);
         }
 
-        if (isset($_REQUEST['ticket']) && empty($_SESSION[$user_cookie_site])) {
+        if (isset($_REQUEST['ticket']) && empty($_SESSION[$user_cookie_site]) && isset($_GET['cas'])) {
             $cas_user = '';
             $_SESSION['cas_is_validating'] = false;
-            $this->validate_user_cas($cas_user, true);
-            die();
+            $res = $this->validate_user_cas($cas_user, true);
+            if ($res === USER_VALID && is_string($cas_user) && $cas_user !== '') {
+                $_SESSION['phpCAS']['user'] = strtolower($cas_user);
+                $_SESSION['cas_validation_time'] = $tikilib->now;
+            }
+            // Redirect to the same URL without the CAS parameters to avoid re-processing
+            $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $uri    = $_SERVER['REQUEST_URI'] ?? '/';
+            $parts  = parse_url($uri);
+            $path   = $parts['path'] ?? '/';
+            $qsArr  = [];
+            if (! empty($parts['query'])) {
+                parse_str($parts['query'], $qsArr);
+                unset($qsArr['ticket'], $qsArr['cas'], $qsArr['gateway'], $qsArr['renew']);
+            }
+            $newQs = http_build_query($qsArr, '', '&', PHP_QUERY_RFC3986);
+            header('Location: ' . $scheme . '://' . $host . $path . ($newQs ? ('?' . $newQs) : ''), true, 303);
+            exit;
         }
 
         // Check for CAS (re-)validation
@@ -1117,7 +1145,7 @@ class UsersLib extends TikiLib
             && basename($_SERVER['SCRIPT_NAME']) != 'tiki-logout.php'
             && (! isset($_SESSION[$user_cookie_site]) || $_SESSION[$user_cookie_site] != 'admin' )
             && empty($_POST)
-            && ( ( $prefs['cas_authentication_timeout'] && $tikilib->now - $_SESSION['cas_validation_time'] > $prefs['cas_authentication_timeout'] )
+            && ( ( $prefs['cas_authentication_timeout'] && isset($_SESSION['cas_validation_time']) && $tikilib->now - $_SESSION['cas_validation_time'] > $prefs['cas_authentication_timeout'] )
                 || ( isset($_SESSION['cas_is_validating']) && $_SESSION['cas_is_validating'] === true && $tikilib->now - $_SESSION['cas_validation_time'] > 5 ) )
         ) {
             unset($_SESSION["$user_cookie_site"]);
@@ -1127,24 +1155,30 @@ class UsersLib extends TikiLib
             $_SESSION['cas_is_validating'] = true;
             $cas_user = '';
 
-            // phpCAS will always redirect to CAS validate URL
+            // PhpCAS will always redirect to CAS validate URL
             $this->validate_user_cas($cas_user, true);
 
-            die();
+            return true;
         }
     }
 
     public function _init_cas_client()
     {
-        global $prefs;
+        global $prefs, $base_url;
 
         // just make sure we're supposed to be here
         if ($prefs['auth_method'] != 'cas') {
             return false;
         }
         if (self::$cas_initialized === false) {
-            // initialize phpCAS
-            phpCAS::client($prefs['cas_version'], '' . $prefs['cas_hostname'], (int) $prefs['cas_port'], '' . $prefs['cas_path'], false);
+            // initialize PhpCAS
+            PhpCAS::client(
+                (string) $prefs['cas_version'],
+                (string) $prefs['cas_hostname'],
+                (int)    $prefs['cas_port'],
+                (string) $prefs['cas_path'],
+                false
+            );
             self::$cas_initialized = true;
         }
 
@@ -1162,24 +1196,27 @@ class UsersLib extends TikiLib
             return false;
         }
 
-        // Redirect to this URL after authentication
-        if (! empty($prefs['cas_extra_param']) && basename($_SERVER['SCRIPT_NAME']) == 'tiki-login.php') {
-            phpCAS::setFixedServiceURL($base_url . 'tiki-login.php?cas=y&' . $prefs['cas_extra_param']);
+        if ($checkOnly && ! empty($_SESSION['phpCAS']['user'])) {
+            $user = strtolower($_SESSION['phpCAS']['user']);
+            return USER_VALID;
+        }
+        // If no ticket and no user in session, and we are only checking, return now
+        if ($checkOnly && empty($_GET['ticket']) && empty($_SESSION['phpCAS']['user'])) {
+            $user = null;
+            return PASSWORD_INCORRECT;
         }
 
-        // check CAS authentication
-        phpCAS::setNoCasServerValidation();
         if ($checkOnly) {
-            unset($_SESSION['phpCAS']['auth_checked']);
-            $auth = phpCAS::checkAuthentication();
+            $auth = PhpCAS::checkAuthentication();
         } else {
-            $auth = phpCAS::forceAuthentication();
+            PhpCAS::forceAuthentication();
+            $auth = PhpCAS::checkAuthentication();
         }
         $_SESSION['cas_validation_time'] = $tikilib->now;
 
         // at this step, the user has been authenticated by the CAS server
-        // and the user's login name can be read with phpCAS::getUser().
-        if ($auth && ($user = strtolower(phpCAS::getUser()))) {
+        // and the user's login name can be read with PhpCAS::getUser().
+        if ($auth && ($user = strtolower(PhpCAS::getUser()))) {
             return USER_VALID;
         } else {
             $user = null;
@@ -1355,7 +1392,6 @@ class UsersLib extends TikiLib
     {
         global $prefs;
         if (! isset($this->ldap)) {
-            require_once('auth/ldap.php');
             $ldap_options = [
                     'host' => $prefs['auth_ldap_host'],
                     'port' => $prefs['auth_ldap_port'],
@@ -1384,7 +1420,7 @@ class UsersLib extends TikiLib
                     'debug' => $prefs['auth_ldap_debug']
             ];
             // print_r($ldap_options);
-            $this->ldap = new TikiLdapLib($ldap_options);
+            $this->ldap = new LdapLib($ldap_options);
         }
     }
 
@@ -1446,20 +1482,19 @@ class UsersLib extends TikiLib
     // validate the user from a phpBB database
     public function validate_user_phpbb($user, $pass)
     {
-        require_once('auth/phpbb.php');
-        $this->phpbbauth = new TikiPhpBBLib();
+        $this->phpbbauth = new PhpBBLib();
 
         switch ($this->phpbbauth->check($user, $pass)) {
-            case PHPBB_INVALID_CREDENTIALS:
+            case PhpBBLib::PHPBB_INVALID_CREDENTIALS:
                 return PASSWORD_INCORRECT;
                 break;
 
-            case PHPBB_INVALID_SYNTAX:
-            case PHPBB_NO_SUCH_USER:
+            case PhpBBLib::PHPBB_INVALID_SYNTAX:
+            case PhpBBLib::PHPBB_NO_SUCH_USER:
                 return USER_NOT_FOUND;
                 break;
 
-            case PHPBB_SUCCESS:
+            case PhpBBLib::PHPBB_SUCCESS:
                 //$logslib->add_log('phpbb','PhpBB user validation successful.');
                 return USER_VALID;
                 break;
@@ -1503,7 +1538,6 @@ class UsersLib extends TikiLib
             return false;
         }
 
-        require_once('auth/ldap.php');
         if ($prefs['auth_ldap_debug'] == 'y') {
             $logslib->add_log('ldap', 'UsersLib::ldap_sync_all_users(): Syncing all Tiki users to LDAP');
         }
@@ -1552,7 +1586,7 @@ class UsersLib extends TikiLib
                     'debug' => $prefs['auth_ldap_debug']
         ];
 
-        $user_ldap = new TikiLdapLib($ldap_options);
+        $user_ldap = new LdapLib($ldap_options);
 
         // Retrieve all users from LDAP:
         if (! ($users_attributes = $user_ldap->get_all_users_attributes())) {
@@ -1758,7 +1792,7 @@ class UsersLib extends TikiLib
                         $ldap_group_options['bindpw'] = $prefs['auth_ldap_group_adminpass'];
                     }
 
-                    $ext_dir = new TikiLdapLib($ldap_group_options);
+                    $ext_dir = new LdapLib($ldap_group_options);
                 }
 
                 $ext_dir->setOption('username', $userattributes[$prefs['auth_ldap_group_corr_userattr']]);
@@ -2159,7 +2193,10 @@ class UsersLib extends TikiLib
      */
     public function create_user_ldap($user, $pass)
     {
-        // todo: no more pear::auth! all in pear::ldap2
+        //This calls new Auth('LDAP', $options); below, I can't identify what API that was from, but LdapLib has no method to add a new LDAP user.
+        throw new Error("Adding a LDAP user is not currently supported");
+    /*
+    // todo: no more pear::auth! all in pear::ldap2
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
 
@@ -2199,6 +2236,7 @@ class UsersLib extends TikiLib
         }
 
         return $status;
+        */
     }
 
 
@@ -2614,6 +2652,10 @@ class UsersLib extends TikiLib
         $query = 'update `users_users` set `default_group`=? where `login`=? and `default_group`=?';
         $this->query($query, ['Registered', $user, $group]);
 
+        if (! empty($_SESSION['u_info']['login']) && $_SESSION['u_info']['login'] == $user) {
+            $_SESSION['u_info']['group'] = 'Registered';
+        }
+
         TikiLib::events()->trigger('tiki.user.groupleave', [
             'type' => 'user',
             'object' => $user,
@@ -2621,7 +2663,14 @@ class UsersLib extends TikiLib
             'bulk_import' => $bulk,
         ]);
 
-        $_SESSION['u_info']['group'] = 'Registered';
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] Cache invalidation error: ' . $e->getMessage());
+        }
 
         return $result;
     }
@@ -3393,7 +3442,7 @@ class UsersLib extends TikiLib
             $idStr = '';
         }
 
-        $isSelf = ($auser === $user) ? true : false;
+        $isSelf = $auser === $user;
         // Only process if feature_friends enabled, user_information public or we query ourselfs
         if (($this->get_user_preference($auser, 'user_information', 'public') != 'public') && ($prefs['feature_friends'] != 'y') && ! $isSelf) {
             return "<span{$idStr}>$body</span>";
@@ -4993,7 +5042,7 @@ class UsersLib extends TikiLib
                 'level' => 'registered',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5002,7 +5051,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5011,7 +5060,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5020,7 +5069,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5029,7 +5078,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -5038,7 +5087,16 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura'],
+                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'scope' => 'global',
+            ],
+            [
+                'name' => 'tiki_p_admin_peertube',
+                'description' => tra('Can admin PeerTube video feature'),
+                'level' => 'admin',
+                'type' => 'media',
+                'admin' => true,
+                'prefs' => ['feature_peertube'],
                 'scope' => 'global',
             ],
             [
@@ -6914,6 +6972,18 @@ class UsersLib extends TikiLib
         foreach ($groups as $k => $grp) {
             $this->assign_user_to_group($user, $grp, $k != $lastkey);
         }
+
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+            if (method_exists($xmpplib, 'syncUserGroupsToXmpp')) {
+                $xmpplib->syncUserGroupsToXmpp($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] sync error: ' . $e->getMessage());
+        }
     }
 
     public function ban_user_from_group($user, $group)
@@ -6989,6 +7059,7 @@ class UsersLib extends TikiLib
         global $prefs;
         $cachelib = TikiLib::lib('cache');
         $tikilib = TikiLib::lib('tiki');
+        $userlib = TikiLib::lib('user');
 
         $autogenerate_uname = false;
         if ($prefs['login_autogenerate'] == 'y' && $user == '') {
@@ -6999,11 +7070,11 @@ class UsersLib extends TikiLib
         }
 
         $user = trim($user);
-
         if (
             $this->user_exists($user)
                 || empty($user)
                 || (! empty($prefs['username_pattern']) && ! preg_match($prefs['username_pattern'], $user))
+                || (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $user))
                 || strtolower($user) == 'anonymous'
                 || strtolower($user) == 'registered'
         ) {
@@ -7072,7 +7143,7 @@ class UsersLib extends TikiLib
                 }
                 $this->assign_user_to_group($user, 'Registered');
             } else {
-                $this->assign_user_to_groups($user, array_merge('Registered', $groups));
+                $this->assign_user_to_groups($user, array_merge(['Registered'], [$groups]));
             }
         }
 
@@ -7083,6 +7154,13 @@ class UsersLib extends TikiLib
 
             $this->assign_user_to_group($user, $user);
         }
+
+        // Notify listeners that a local user has been created (e.g. XMPP auto-join)
+        $userGroups = $this->get_user_groups($user);
+        TikiLib::events()->trigger('tiki.user.register.local', [
+            'username' => $user,
+            'groups' => $userGroups,
+        ]);
 
         $this->set_user_default_preferences($user, false); // do not force
 
@@ -7209,7 +7287,7 @@ class UsersLib extends TikiLib
             ( ! isset($user) && isset($prefs['contact_anon']) && $prefs['contact_anon'] == 'y' ) ||
                 ( isset($user) && $user != '' && isset($prefs['feature_contact']) && $prefs['feature_contact'] == 'y' )
         ) {
-            return isset($prefs['sender_email']) ? $prefs['sender_email'] : $this->get_user_email($prefs['contact_user']);
+            return $prefs['sender_email'] ?? $this->get_user_email($prefs['contact_user']);
         }
     }
 
@@ -7470,6 +7548,51 @@ class UsersLib extends TikiLib
         return $this->getOne($query, [$user]);
     }
 
+    public function get2FAGracePeriod($user)
+    {
+        global $prefs;
+
+        $userInfo = $this->get_user_info($user);
+        if ($userInfo['twoFactorAuthGracePeriod'] !== null) {
+            return (int)$userInfo['twoFactorAuthGracePeriod'];
+        }
+
+        $userGroups = $this->get_user_groups($user);
+        $groupsGracePeriods = array_filter(array_map(function ($group) {
+            return $this->get_group_info($group)['twoFactorAuthGracePeriod'];
+        }, $userGroups), function ($value) {
+            return $value !== null;
+        });
+        $maxGroupGracePeriod = ! empty($groupsGracePeriods) ? max($groupsGracePeriods) : null;
+
+        return (int)($maxGroupGracePeriod !== null ? $maxGroupGracePeriod : $prefs['twoFactorAuthGracePeriod']);
+    }
+
+    public function get2FAGracePeriodStart($user)
+    {
+        $query = 'select `twoFactorGracePeriodStart` from `users_users` where `login`=?';
+        return $this->getOne($query, [$user]);
+    }
+
+    public function reset2FAGracePeriodStart($user)
+    {
+        $query = 'update `users_users` set `twoFactorGracePeriodStart`=? where binary `login`=?';
+        $now = time();
+        $this->query($query, [$now, $user]);
+        return $now;
+    }
+
+    public function setTwoFactorAuthGracePeriod($user, $gracePeriod)
+    {
+        if ($gracePeriod === '') {
+            $gracePeriod = null;
+        }
+
+        $query = 'update `users_users` set `twoFactorAuthGracePeriod`=? where binary `login`=?';
+        $this->query($query, [$gracePeriod, $user]);
+        return $gracePeriod;
+    }
+
     public function validate_two_factor($twoFactorSecret, $pin, $user)
     {
         $google2fa = new Google2FA();
@@ -7540,20 +7663,22 @@ class UsersLib extends TikiLib
     {
 
         $hash = password_hash($pass, PASSWORD_DEFAULT);
-        $new_pass_confirm = $this->now;
 
-        if ($pass_first_login) {                    // if true, set pass_confirm to force passord change upon next login
-            if (! empty($pass)) {
-                $query = 'update `users_users` set `hash`=? , `provpass`=?, `pass_confirm`=? where binary `login`=?';
-                $result = $this->query($query, [$hash, $pass, 0, $user]);
+        if (! empty($pass)) {
+            $query = 'update `users_users` set `hash`=?, `provpass`=?, `pass_confirm`=? where binary `login`=?';
+            // if true, set pass_confirm to force passord change upon next login
+            if ($pass_first_login) {
+                $params = [$hash, $pass, 0, $user];
             } else {
-                $query = 'update `users_users` set `pass_confirm`=? where binary `login`=?';
-                $result = $this->query($query, [0, $user]);
+                $params = [$hash, '', $this->now, $user];
             }
         } else {
-            $query = 'update `users_users` set `hash`=? ,`pass_confirm`=?, `provpass`=? where binary `login`=?';
-            $result = $this->query($query, [$hash, $new_pass_confirm, '', $user]);
+            // No password change, only update confirmation flag
+            $query = 'update `users_users` set `pass_confirm`=? where binary `login`=?';
+            $params = [$pass_first_login ? 0 : $this->now, $user];
         }
+
+        $result = $this->query($query, $params);
 
         if ($result && $result->numRows() === 1) {
             // invalidate the cache so that after a fresh install, the admin (who has no user details at the install) can log in
@@ -7595,7 +7720,8 @@ class UsersLib extends TikiLib
         $color = '',
         $isRole = '',
         $isTplGroup = '',
-        $include_groups = []
+        $include_groups = [],
+        $twaFAGracePeriod = null
     ) {
 
         $tikilib = TikiLib::lib('tiki');
@@ -7625,6 +7751,7 @@ class UsersLib extends TikiLib
             'prorateInterval' => $prorateInterval,
             'isRole' => $isRole,
             'isTplGroup' => empty($isTplGroup) ? 'n' : $isTplGroup,
+            'twoFactorAuthGracePeriod' => $twaFAGracePeriod === '' ? null : $twaFAGracePeriod,
         ];
 
         $id = $this->table('users_groups')->insert($data);
@@ -7665,7 +7792,8 @@ class UsersLib extends TikiLib
         $color = '',
         $isRole = '',
         $isTplGroup = '',
-        $include_groups = []
+        $include_groups = [],
+        $twaFAGracePeriod = null
     ) {
         $isTplGroup = empty($isTplGroup) ? 'n' : $isTplGroup;
         $users = $this->get_group_users($group);
@@ -7698,7 +7826,9 @@ class UsersLib extends TikiLib
                 $prorateInterval,
                 $color,
                 $isRole,
-                $isTplGroup
+                $isTplGroup,
+                [],
+                $twaFAGracePeriod
             );
         }
 
@@ -7726,6 +7856,7 @@ class UsersLib extends TikiLib
             'prorateInterval' => $prorateInterval,
             'isRole' => $isRole,
             'isTplGroup' => $isTplGroup,
+            'twoFactorAuthGracePeriod' => $twaFAGracePeriod === '' ? null : $twaFAGracePeriod,
         ];
 
         $this->table('users_groups')->update($data, ['groupName' => $olgroup]);
@@ -7839,7 +7970,8 @@ class UsersLib extends TikiLib
             $groupInfo["groupColor"],
             $groupInfo["isRole"],
             $groupInfo["isTplGroup"],
-            $includeGroups
+            $includeGroups,
+            $groupInfo["twoFactorAuthGracePeriod"]
         );
         return true;
     }
@@ -8051,7 +8183,7 @@ class UsersLib extends TikiLib
                 $smarty->assign_by_ref('chosenGroup', $chosenGroup);
                 if ($prefs['userTracker'] == 'y') {
                     $trklib = TikiLib::lib('trk');
-                    $re = $this->get_group_info(isset($chosenGroup) ? $chosenGroup : 'Registered');
+                    $re = $this->get_group_info($chosenGroup ?? 'Registered');
                     $fields = $trklib->list_tracker_fields(
                         $re['usersTrackerId'],
                         0,
@@ -8881,12 +9013,11 @@ class UsersLib extends TikiLib
         $smarty->assign('expiry', $user);
         $mail->setBcc($this->get_user_email($user));
         $smarty->assign('token_expiry', $this->get_long_datetime($this->now + $timeout));
-        require_once 'lib/auth/tokens.php';
 
         $emailTokenURLs = [];
 
         foreach ($emails as $email) {
-            $tokenlib = AuthTokens::build($prefs);
+            $tokenlib = Tokens::build($prefs);
             $token_url = $tokenlib->includeToken(TikiLib::lib('tiki')->tikiUrl($path), $groups, $email, $timeout, -1, true, $prefix);
             include_once('tiki-sefurl.php');
             $token_url = filter_out_sefurl($token_url);

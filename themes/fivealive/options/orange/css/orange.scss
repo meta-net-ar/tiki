@@ -1,7 +1,7 @@
 /*  The Orange theme option file for the FiveAlive theme of Tiki Wiki CMS Groupware. */
 
 // Required
-@import "../../../../../node_modules/bootstrap/scss/functions";
+@import "../../../../base_files/scss/_tiki-bootstrap_functions";
 
 @import "../../../../default/scss/variables"; // Bootstrap default variables, with a few Tiki overrides
 @import "../../../../default/scss/variables-dark"; // Bootstrap dark mode default variables
@@ -16,9 +16,12 @@
 @import "../../../../../node_modules/bootstrap/scss/reboot";
 @import "../../../../../node_modules/bootstrap/scss/buttons";
 @import "../../../../../node_modules/bootstrap/scss/nav";
+@import "../../../../../node_modules/bootstrap/scss/navbar";
+@import "../../../../../node_modules/bootstrap/scss/card";
 @import "../../../../../node_modules/bootstrap/scss/alert";
 
 @import "../../../scss/selectors-for-options";
 @import "../../../../base_files/scss/tiki-pagetop_colors";
+
 
 @import "../scss/tiki-selectors";

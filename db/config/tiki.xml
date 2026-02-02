@@ -27,15 +27,9 @@
         <service id="tiki.lib.admin" class="AdminLib">
             <file>%kernel.root_dir%/lib/admin/adminlib.php</file>
         </service>
-        <service id="tiki.lib.api_token" class="ApiToken">
-            <file>%kernel.root_dir%/lib/auth/api_token.php</file>
-        </service>
-        <service id="tiki.lib.webhook" class="Webhook">
-            <file>%kernel.root_dir%/lib/auth/webhook.php</file>
-        </service>
-        <service id="tiki.lib.authtokens" class="AuthTokens">
-            <file>%kernel.root_dir%/lib/auth/tokens.php</file>
-        </service>
+        <service id="tiki.lib.api_token" class="Tiki\Lib\Auth\ApiToken"/>
+        <service id="tiki.lib.webhook" class="Tiki\Lib\Auth\Webhook"/>
+        <service id="tiki.lib.authtokens" class="Tiki\Lib\Auth\Tokens"/>
         <service id="tiki.lib.autosave" class="AutoSaveLib">
             <file>%kernel.root_dir%/lib/ajax/autosave.php</file>
         </service>
@@ -60,9 +54,7 @@
         <service id="tiki.lib.blog" class="BlogLib">
             <file>%kernel.root_dir%/lib/blogs/bloglib.php</file>
         </service>
-        <service id="tiki.lib.cache" class="CacheLib">
-            <file>%kernel.root_dir%/lib/cache/cachelib.php</file>
-        </service>
+        <service id="tiki.lib.cache" class="Tiki\Cache\CacheLib"/>
         <service id="tiki.lib.calendar" class="CalendarLib">
             <file>%kernel.root_dir%/lib/calendar/calendarlib.php</file>
         </service>
@@ -119,15 +111,9 @@
         <service id="tiki.lib.flaggedrevision" class="FlaggedRevisionLib">
             <file>%kernel.root_dir%/lib/wiki/flaggedrevisionlib.php</file>
         </service>
-        <service id="tiki.lib.filegal" class="FileGalLib">
-            <file>%kernel.root_dir%/lib/filegals/filegallib.php</file>
-        </service>
-        <service id="tiki.lib.filegalbatch" class="FileGalBatchLib">
-            <file>%kernel.root_dir%/lib/filegals/filegalbatchlib.php</file>
-        </service>
-        <service id="tiki.lib.filegalcopy" class="FileGalCopyLib">
-            <file>%kernel.root_dir%/lib/filegals/filegalcopylib.php</file>
-        </service>
+        <service id="tiki.lib.filegal" class="Tiki\Lib\Filegals\FileGalLib"/>
+        <service id="tiki.lib.filegalbatch" class="Tiki\Lib\Filegals\BatchLib"/>
+        <service id="tiki.lib.filegalcopy" class="Tiki\Lib\Filegals\CopyLib"/>
         <service id="tiki.lib.freetag" class="FreetagLib">
             <file>%kernel.root_dir%/lib/freetag/freetaglib.php</file>
         </service>
@@ -149,9 +135,7 @@
         <service id="tiki.lib.groupalert" class="GroupAlertLib">
             <file>%kernel.root_dir%/lib/groupalert/groupalertlib.php</file>
         </service>
-        <service id="tiki.lib.h5p" class="H5PLib">
-            <file>%kernel.root_dir%/lib/filegals/h5plib.php</file>
-        </service>
+        <service id="tiki.lib.h5p" class="Tiki\Lib\Filegals\H5PLib"/>
         <service id="tiki.lib.header" class="HeaderLib">
             <file>%kernel.root_dir%/lib/headerlib.php</file>
         </service>
@@ -169,6 +153,10 @@
         <service id="tiki.lib.kalturauser" class="KalturaLib">
             <file>%kernel.root_dir%/lib/videogals/kalturalib.php</file>
             <argument type="string">0</argument> <!-- KalturaLib::SESSION_USER -->
+        </service>
+        <service id="tiki.lib.peertubeuser" class="Tiki\Videogals\PeerTubeLib">
+            <file>%kernel.root_dir%/lib/videogals/peertubelib.php</file>
+            <argument type="string">0</argument> <!-- PeerTubeLib::SESSION_USER -->
         </service>
         <service id="tiki.lib.language" class="Language">
             <file>%kernel.root_dir%/lib/language/Language.php</file>
@@ -194,9 +182,7 @@
         <service id="tiki.lib.mailin" class="MailinLib">
             <file>%kernel.root_dir%/lib/mailin/mailinlib.php</file>
         </service>
-        <service id="tiki.lib.memcache" class="Memcachelib">
-            <file>%kernel.root_dir%/lib/cache/memcachelib.php</file>
-        </service>
+        <service id="tiki.lib.memcache" class="Tiki\Cache\MemcacheLib"/>
         <service id="tiki.lib.message" class="Messu">
             <file>%kernel.root_dir%/lib/messu/messulib.php</file>
         </service>
@@ -263,9 +249,7 @@
         <service id="tiki.lib.queue" class="QueueLib">
             <file>%kernel.root_dir%/lib/queuelib.php</file>
         </service>
-        <service id="tiki.lib.quiz" class="QuizLib">
-            <file>%kernel.root_dir%/lib/quizzes/quizlib.php</file>
-        </service>
+        <service id="tiki.lib.quiz" class="Tiki\Lib\Quizzes\QuizLib"/>
         <service id="tiki.lib.rating" class="RatingLib">
             <file>%kernel.root_dir%/lib/rating/ratinglib.php</file>
         </service>
@@ -292,9 +276,7 @@
         <service id="tiki.lib.score" class="ScoreLib">
             <file>%kernel.root_dir%/lib/score/scorelib.php</file>
         </service>
-        <service id="tiki.lib.scorm" class="ScormLib">
-            <file>%kernel.root_dir%/lib/filegals/scormlib.php</file>
-        </service>
+        <service id="tiki.lib.scorm" class="Tiki\Lib\Filegals\ScormLib"/>
         <service id="tiki.lib.searchstats" class="SearchStatsLib">
             <file>%kernel.root_dir%/lib/search/searchstatslib.php</file>
         </service>
@@ -305,14 +287,12 @@
             <file>%kernel.root_dir%/lib/servicelib.php</file>
         </service>
         <service id="tiki.lib.slugmanager" class="Tiki\Wiki\SlugManager"/>
-        <service id="tiki.lib.smarty" class="Smarty_Tiki">
-            <file>%kernel.root_dir%/lib/init/smarty.php</file>
-        </service>
+        <service id="tiki.lib.smarty" class="Tiki\Smarty\SmartyTiki"/>
         <service id="tiki.lib.social" class="SocialLib">
             <file>%kernel.root_dir%/lib/user/sociallib.php</file>
         </service>
         <service id="tiki.lib.sheet" class="SheetLib">
-            <file>%kernel.root_dir%/lib/sheet/sheetlib.php</file>
+            <file>%kernel.root_dir%/lib/Sheet/sheetlib.php</file>
         </service>
         <service id="tiki.lib.stats" class="StatsLib">
             <file>%kernel.root_dir%/lib/stats/statslib.php</file>
@@ -323,7 +303,7 @@
         <service id="tiki.lib.struct" class="StructLib">
             <file>%kernel.root_dir%/lib/structures/structlib.php</file>
         </service>
-        <service id="tiki.lib.symbols" class="Tiki_Profile_SymbolLoader" />
+        <service id="tiki.lib.symbols" class="Tiki\Profile\SymbolLoader" />
         <service id="tiki.lib.tabular" class="Tracker\Tabular\Manager">
             <argument type="service" id="tiki.lib.db"/>
         </service>
@@ -364,8 +344,7 @@
         <service id="tiki.lib.vuejs" class="VueJsLib">
             <file>%kernel.root_dir%/lib/vue/vuejslib.php</file>
         </service>
-        <service id="tiki.lib.vimeo" class="VimeoLib">
-            <file>%kernel.root_dir%/lib/filegals/vimeolib.php</file>
+        <service id="tiki.lib.vimeo" class="Tiki\Lib\Filegals\VimeoLib">
             <argument type="service" id="tiki.lib.oauth"/>
         </service>
         <service id="tiki.lib.xmpp" class="XMPPLib">

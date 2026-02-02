@@ -12,14 +12,13 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
             'surveyId'              => 'int',                //get
-            'questionId'            => 'int',                //post
-            'restriction'           => 'bool',               //post
+            'restriction'           => 'alpha',              //post
             'name'                  => 'string',             //post
-            'sort_mode'             => 'word',               //get
+            'sort_mode'             => 'alnumdash',          //get
             'offset'                => 'int',                //get
             'description'           => 'xss',                //post
-            'save'                  => 'bool',               //post
-            'status'                => 'striptags',          //post
+            'save'                  => 'alpha',              //post
+            'status'                => 'alpha',              //post
             'remove'                => 'int',                //post
             'find'                  => 'string',             //post
         ],
@@ -53,8 +52,16 @@ if (isset($_REQUEST["save"])) {
         } else {
             $restriction = 'n';
         }
+
+        $isUpdating = ! empty($_REQUEST["surveyId"]);
+
         $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $restriction, $_REQUEST["status"]);
         if ($sid) {
+            if ($isUpdating) {
+                Feedback::success(tr('Survey updated successfully.'));
+            } else {
+                Feedback::success(tr('Survey created successfully.'));
+            }
             $cat_type = 'survey';
             $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
             $cat_desc = substr($_REQUEST["description"], 0, 200);
@@ -81,23 +88,16 @@ if (! empty($_REQUEST["surveyId"])) {
 $smarty->assign('info', $info);
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $srvlib->remove_survey($_REQUEST["remove"]);
+    Feedback::success(tr('The survey has been deleted successfully.'));
 }
 if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = 'created_desc';
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $srvlib->list_surveys($offset, $maxRecords, $sort_mode, $find);

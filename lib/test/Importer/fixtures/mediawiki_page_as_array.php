@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-// the expected output of TikiImporter_Wiki_Mediawiki::parseData(), used to test
-// the behavior of the TikiImporter_Wiki::insertPage()
+// the expected output of Tiki\Lib\Importer\WikiMediawiki::parseData(), used to test
+// the behavior of the Tiki\Lib\Importer\Wiki::insertPage()
 global $page;
 $page = ['revisions' => [
                   0 => [

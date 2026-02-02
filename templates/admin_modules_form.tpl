@@ -46,7 +46,7 @@
                     </div>
                 {/if}
                 <div class="admin2cols adminoptionbox clearfix">
-                    <label for="groups">{tr}Groups{/tr}</label>
+                    <label class="d-block min-w-25" for="groups">{tr}Groups{/tr}</label>
                     <select multiple="multiple" id="groups" name="groups[]" class="form-control mb-4 resize-vertical" style="width:100%;">
                         {section name=ix loop=$groups}
                             <option value="{$groups[ix].groupName|escape}" {if $groups[ix].selected eq 'y'}selected="selected"{/if}>{$groups[ix].groupName|escape}</option>
@@ -92,7 +92,7 @@
                         <fieldset id="param_section_{$sect}">
                             {foreach from=$params key=name item=param}
                                 <div class="admin2cols adminoptionbox clearfix">
-                                    <label for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)} <span class="attention">({tr}required{/tr})</span>{/if}</label>
+                                    <label class="d-block min-w-25" for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)} <span class="attention">({tr}required{/tr})</span>{/if}</label>
                                     {if isset($name) and $name eq 'id' and $assign_info.name eq 'Menu'}
                                         <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control" aria-label="{tr}Select Menu{/tr}">
                                             <option value="" disabled {if !isset($param.value)}selected{/if}>{tr}Select Menu{/tr}</option>

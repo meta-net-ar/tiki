@@ -22,7 +22,6 @@ if ($tiki_p_admin != 'y') {
 // 3. Print first the name of the page P, then one after the other,
 //    all pages that it points to.
 
-TikiLib::lib('header')->setXRobotsTag($robots);
 header("Content-Type: text/plain; charset=utf-8");
 $query = "select `pageName` from `tiki_pages`";
 $result = $tikilib->query($query, []);

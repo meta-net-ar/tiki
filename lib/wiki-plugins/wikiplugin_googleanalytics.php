@@ -61,7 +61,7 @@ function wikiplugin_googleanalytics($data, $params)
     $account = htmlspecialchars($params['account'], ENT_QUOTES);
 
     // Maintain retro-compatibility with old preference
-    if (substr($account, 0, 3) !== "UA-" && substr($account, 0, 2) !== "G-") {
+    if (! str_starts_with($account, "UA-") && ! str_starts_with($account, "G-")) {
         $account = "UA-" . $account;
     }
 
@@ -79,6 +79,7 @@ ga('send', 'pageview');
 </script>
 HTML;
     } else {
+        // @tiki-external-link-ok: Google Analytics plugin - loading external tracking script is the core feature (user explicitly enables this)
         $ret = <<<HTML
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=$account"></script>

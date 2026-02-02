@@ -5,14 +5,14 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
 global $tikiroot;
 
-define('VENDOR_PATH', $tikipath . '/vendor_bundled/vendor/');
+define('VENDOR_PATH', __DIR__ . '/../../../' . TIKI_VENDOR_BUNDLED_PATH . '/'); //I presume VENDOR_PATH is a constant used by the cypht codebase - benoitg - 2026-01-25
 define('APP_PATH', VENDOR_PATH . 'jason-munro/cypht/');
 define('CONFIG_PATH', VENDOR_PATH . 'jason-munro/cypht/config/');
 define('WEB_ROOT', 'vendor_bundled/vendor/jason-munro/cypht/');
@@ -33,8 +33,9 @@ require_once __DIR__ . '/Tiki_Hm_User_Config.php';
 require_once __DIR__ . '/Tiki_Hm_Sieve_Custom_Client.php';
 require_once __DIR__ . '/Tiki_Hm_Sieve_Client_Factory.php';
 require_once __DIR__ . '/Tiki_Hm_Functions.php';
+require_once __DIR__ . '/Tiki_Hm_Dispatch.php';
 
-putenv('WORKER_CUSTOM_IMPORTS=' . __DIR__ . '/Tiki_Hm_User_Config.php,' . realpath(__DIR__ . '/../../cache/cachelib.php') . ',' . __DIR__ . '/Tiki_Hm_Tiki_Cache.php,' . __DIR__ . '/Tiki_Hm_Custom_Cache.php');
+putenv('WORKER_CUSTOM_IMPORTS=' . __DIR__ . '/Tiki_Hm_User_Config.php,' . realpath(__DIR__ . '/../../core/Cache/CacheLib.php') . ',' . __DIR__ . '/Tiki_Hm_Tiki_Cache.php,' . __DIR__ . '/Tiki_Hm_Custom_Cache.php');
 
 $environment = Hm_Environment::getInstance();
 $environment->load();

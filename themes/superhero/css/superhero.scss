@@ -1,5 +1,6 @@
+@charset "UTF-8";
 /*!
- * Bootswatch superhero theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Bootswatch Superhero theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
 */
@@ -33,4 +34,3 @@
 @import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
-

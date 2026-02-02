@@ -2,59 +2,12 @@
 // and CSS selectors remaining.
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
-// CSS is used because Bootstrap partials aren't available for theme variables, etc.
-//body.layout_basic {
-//    background-image: linear-gradient(to right bottom, #c8aab4, #d7aeac, #deb4a2, #dbbe99, #cdcb98, #c7c58e, #c0c085, #baba7b, #c39f66, #c5825f, #bf6765, #ac5271);
-//}
 
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
 .text-dark {
     color: #6D5509 !important;
-}
-
-.btn.btn-primary {
-    color: #ffffff;
-}
-
-.bg-dark {
-    background-color: $dark !important;
-}
-
-.btn-dark {
-    color: #fff;
-    background-color: $dark; // This isn't working.
-    border-color: $dark;
-}
-
-// Button colors copied from Kiwi, then some updated
-.btn.btn-outline-primary {
-    color: #80780A;
-    border-color: #80780A;
-}
-
-.btn.btn-outline-secondary {
-    color: #B35123;
-    border-color: #B35123;
-}
-
-.btn.btn-outline-success {
-    color: #3A833A;
-    border-color: #3A833A;
-}
-.btn.btn-outline-warning {
-    color: #A2630B;
-    border-color: #A2630B;
-}
-.btn.btn-outline-info {
-    color: #6E7425;
-    border-color: #6E7425;
-}
-
-.btn.btn-outline-dark {
-    color: #6D5509;
-    border-color: #6D5509;
 }
 
 .breadcrumb-item.active {
@@ -67,13 +20,6 @@
 .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label,
 .invalid-feedback,
 .invalid-tooltip { color: #85072E !important; }
-
-.bg-danger,
-.bg-warning {
-    .card-title {
-        color: #fff;
-    }
-}
 
 .badge.bg-secondary {
     background-color: #BB5525 !important;
@@ -95,4 +41,26 @@
 
 .page-item.disabled, .list-group-item.disabled {
     color: $text-muted !important;
+}
+
+// Dropdown partial isn't available to these theme options.
+:root .tiki-admin .dropdown-item.active {
+    background-color: $primary;
+}
+
+// Dark color mode
+[data-bs-theme=dark] {
+    .blockquote-footer, .figure-caption { color: #808D93; }
+    .valid-feedback { color: #329F4F !important; }
+    .invalid-feedback { color: #F74B81 !important; }
+
+    .btn.btn-outline-primary { color: #F740A2; border-color: #F740A2; }
+    .btn.btn-outline-secondary { color: #E45E8D; border-color: #E45E8D; }
+//    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
+    .btn.btn-outline-danger { color: #EF5757; border-color: #EF5757; }
+//    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
+    .btn.btn-outline-info { color: #E35F91; border-color: #E35F91; }
+    .btn.btn-outline-dark { color: #F641A2; border-color: #F641A2; }
+
+    .page-item.disabled .page-link { background: #3d3d3d; border-color: #252729; } // var(--bs-secondary-bg); }
 }

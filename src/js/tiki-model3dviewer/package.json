@@ -1,0 +1,14 @@
+{
+  "name": "tiki-model3dviewer",
+  "version": "1.0.0",
+  "main": "model3dviewer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "three": "^0.179.1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

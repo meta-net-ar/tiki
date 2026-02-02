@@ -23,8 +23,16 @@ export function observeSelectElementMutations(select, elementPlusUi) {
                     $(elementPlusUi).removeAttr("is-invalid");
                 }
             } else if (mutation.attributeName) {
+                let attributeValue = mutation.target.getAttribute(mutation.attributeName);
                 const attributeName = mutation.attributeName.replace("data-", "");
-                $(elementPlusUi).attr(attributeName, mutation.target.getAttribute(mutation.attributeName));
+                // skip "display: none;" value in the style attribute change
+                if (mutation.attributeName === "style") {
+                    attributeValue = mutation.target
+                        .getAttribute(mutation.attributeName)
+                        .replace(/display:\s*none;?/g, "")
+                        .trim();
+                }
+                $(elementPlusUi).attr(attributeName, attributeValue);
             }
         });
     }).observe(select, { childList: true, attributes: true });
@@ -43,7 +51,8 @@ export function syncSelectOptions(elementPlusSelect, select) {
         })
         .get();
     $(elementPlusSelect).attr("options", JSON.stringify(options));
-    $(elementPlusSelect).attr("value", JSON.stringify($(select).val()));
+    const value = [...select.selectedOptions].map((option) => option.value);
+    $(elementPlusSelect).attr("value", $(select).prop("multiple") ? JSON.stringify(value) : value[0]);
     if (options.find((option) => option.group)) {
         $(elementPlusSelect).attr("group", true);
     }
@@ -68,25 +77,4 @@ export function attachChangeEventHandler(elementPlusSelect, select) {
         $(select).val(selectedValues);
         $(select).trigger("change");
     });
-}
-
-/**
- * Determines whether a given element or any of its ancestors
- * has an attribute that starts with "data-v-".
- *
- * This is useful for identifying elements that are part of
- * rendered Vue app, where Vue uses dynamic scoped attributes
- * such as "data-v-xxxx" for encapsulation.
- *
- * @param {HTMLElement} el - The element to check.
- * @returns {boolean} True if the element or any parent element has a "data-v-" attribute, false otherwise.
- */
-export function hasVueScopedAttribute(el) {
-    while (el) {
-        if (el.attributes && Array.from(el.attributes).some((attr) => attr.name.startsWith("data-v-"))) {
-            return true;
-        }
-        el = el.parentElement;
-    }
-    return false;
 }

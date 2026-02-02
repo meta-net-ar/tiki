@@ -52,6 +52,26 @@
                 {breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs}
             {/if}
             *}
+            {if ! empty($tiki_version)}
+                {remarksbox type="info" title="{tr}Tiki version{/tr}"}
+                    <div class="adminoptionbox">
+                        <strong>{tr}Tiki version: {/tr}</strong> {$tiki_version}{if !empty($db_engine_type)} ({$db_engine_type}){/if}
+                    </div>
+                    {if ! empty($git_details)}
+                        <div class="adminoptionbox">
+                            <strong>{tr}Git Information:{/tr}</strong> {$git_details.branch}: <a target="_blank" class="wiki external" href="https://gitlab.com/tikiwiki/tiki/-/commit/{$git_details.commit.hash}"><cite>{$git_details.commit.hash|substring:0:8}</cite></a>{icon name='link-external'} {tr}from{/tr} {$git_details.committer.date|tiki_short_datetime}
+                        </div>
+                    {/if}
+                {/remarksbox}
+            {/if}
+            {if $mailer_queue_requires_update}
+                {remarksbox type="error" title="{tr}Email Queue Problem{/tr}"}
+                    <p>{tr}There are messages in the email queue that exceeded the number of retries and will not be retried anymore.{/tr}</p>
+                    <p>{tr}You can manage the queue.{/tr}
+                        {tr _0='<a class="alert-link" href="tiki-admin_email_queue.php">' _1="</a>"}%0Manage the queue.%1{/tr}
+                    </p>
+                {/remarksbox}
+            {/if}
             {if $ProblemsLoadingCacheSubSystem}
                 {remarksbox type="warning" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
                 {tr _0=$ProblemsLoadingCacheSubSystem}Tiki is configured to use <strong>%0 cache system</strong>, however, it was not loaded properly. Check if the extension has been properly loaded.{/tr}<br />
@@ -147,7 +167,7 @@
                         {tr}Please proceed to <a class="alert-link" href="{bootstrap_modal controller=search action=rebuild}">{tr}rebuild Index{/tr}</a>.{/tr}
                         {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
                         <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} index:rebuild</kbd>
-                    {else if $prefs.unified_elastic_mysql_search_fallback eq 'n'}
+                    {elseif $prefs.unified_elastic_mysql_search_fallback eq 'n'}
                         {tr}The main search engine is not working properly and the fallback is also not set.</br>
                             Search engine results might not be properly displayed.{/tr}
                     {/if}
@@ -188,16 +208,37 @@
             {/if}
         </div>
 
-        {if $upgrade_messages|count}
-            {if $upgrade_messages|count eq 1}
+        {* Error box box for critical "unsupported" messages. *}
+        {if $upgrade_errors|count}
+            {remarksbox type="error" title="{tr}Upgrade Required{/tr}" icon="announce"}
+                {foreach from=$upgrade_errors item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Warning box for "approaching EoL" messages. *}
+        {if $upgrade_warnings|count}
+            {remarksbox type="warning" title="{tr}Upgrade Recommended{/tr}" icon="announce"}
+                {foreach from=$upgrade_warnings item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Note box for informational "upgrade available" messages. *}
+        {if $upgrade_notes|count}
+            {if not $is_stable}
+                {$title="{tr}Stable version available{/tr}"}
+            {elseif $upgrade_notes|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}
             {/if}
             {remarksbox type="note" title=$title icon="announce"}
-                {foreach from=$upgrade_messages item=um}
-                    <p>{$um|escape}</p>
-                {/foreach}
+            {foreach from=$upgrade_notes item=um}
+                <p>{$um|safe_html}</p>
+            {/foreach}
             {/remarksbox}
         {/if}
 

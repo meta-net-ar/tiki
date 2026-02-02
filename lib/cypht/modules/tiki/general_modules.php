@@ -81,7 +81,7 @@ class Hm_Handler_add_file_attachment extends Hm_Handler_Module
                 'size' => $tikifile->filesize
             ];
             if (! attach_file($tikifile->getContents(), $file, $this->config->get('attachment_dir'), $draft_id, $this)) {
-                Hm_Msgs::add('ERRAn error occurred attaching the file gallery file.');
+                Hm_Msgs::add(tr('An error occurred attaching the file gallery file.'), 'danger');
             }
         }
     }
@@ -377,7 +377,7 @@ class Hm_Output_filter_message_headers_mpdf extends Hm_Output_Module
     {
         $headers = $this->get('msg_headers');
         if (is_string($headers) && TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
-            $pdf_link = ' <a class="hlink" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
+            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary me-2" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
             $headers = append_to_msg_headers($headers, $pdf_link);
             $this->out('msg_headers', $headers, false);
         }
@@ -451,9 +451,6 @@ class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
         }
 
         $subject = $this->request->post['compose_subject'];
-        $body = $this->request->post['compose_body'];
-        $body = strip_tags($body);
-        $body = str_replace(['@', '<', '>', '+', '-'], '', $body);
 
         $keywords = [];
 
@@ -461,9 +458,6 @@ class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
             $keywords[] = $word;
         }
 
-        foreach (explode(' ', $body) as $word) {
-            $keywords[] = $word;
-        }
         $keywords = array_map('trim', $keywords);
         $keywords = array_filter($keywords);
         $keywords = array_unique($keywords);
@@ -486,6 +480,17 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         $this->session->set('msg_uid', '');
         $this->session->set('imap_server_id', '');
 
+        $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+        $fields = array_map(function ($field) {
+            $tracker = TikiLib::lib('trk')->get_tracker($field['trackerId']);
+            return [
+                'tracker_id' => $field['trackerId'],
+                'field_id' => $field['fieldId'],
+                'title' => "{$tracker['name']} - {$field['name']}",
+            ];
+        }, $fields);
+        $this->out('tracker_fields', $fields);
+
         if (isset($this->request->post['lookup'])) {
             $searchArgs = [];
             if (isset($this->request->post['sort_mode'])) {
@@ -494,12 +499,18 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
             if (isset($this->request->post['limit'])) {
                 $searchArgs['maxRecords'] = $this->request->post['limit'];
             }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['tracker_id'] = $this->request->post['tracker_id'];
+            }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['field_id'] = $this->request->post['field_id'];
+            }
             $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs));
             return;
         }
 
         if (! $keywords || ! $msgUid || ! $imapServerId) {
-            $this->out('error', 'No sent message found');
+            $this->out('no_message', true);
             return;
         }
 

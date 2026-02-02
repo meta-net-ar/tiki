@@ -26,7 +26,7 @@ $tikilib = new TikiLib();
 
 $structId = '160';
 
-$pages = explode("\n", `grep -r '{\$helpurl}' templates | sed -e "s/^.*helpurl}\([^\"']*\)[\"'].*$/\\1/" | sort | uniq`);
+$pages = explode("\n", shell_exec("grep -r '{\$helpurl}' templates | sed -e \"s/^.*helpurl}\([^\"']*\)[\"'].*$/\\1/\" | sort | uniq"));
 $afterid = null;
 foreach ($pages as $p) {
     if ($p) {

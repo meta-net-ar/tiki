@@ -60,6 +60,7 @@
     {title}{tr}Activity Rules{/tr}{/title}
 {/block}
 {block name="content"}
+    <div class="styling-element">
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
         <table class="table table-hover">
             <tr>
@@ -130,5 +131,6 @@
                 </tr>
             {/foreach}
         </table>
+    </div>
     </div>
 {/block}

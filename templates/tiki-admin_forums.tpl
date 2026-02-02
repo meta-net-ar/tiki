@@ -79,16 +79,16 @@
                         <td>
                             <a class="link" href="{$channels[user].forumId|sefurl:'forum'}" title="{tr}View{/tr}">{$channels[user].name|escape}</a>
                         </td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].threads}<span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].threads}</span></td>
                         <td class="integer">
                             <input type="number" name="order[]" value="{$channels[user].forumOrder|escape}" aria-label="{tr}Order{/tr}">
                             <input type="hidden" name="forumsId[]" value="{$channels[user].forumId|escape}">
                         </td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].comments}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].users}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].age}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].posts_per_day|string_format:"%.2f"}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].hits}<span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].comments}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].users}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].age}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].posts_per_day|string_format:"%.2f"}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].hits}</span></td>
                         <td class="action">
                             {actions}
                             {strip}
@@ -203,7 +203,7 @@
                     </div>
                 </div>
                 <div class="tiki-form-group row">
-                    <label class="col-sm-4 col-form-label" for="new_section">{tr}Section{/tr}</label>
+                    <label class="col-sm-4 col-form-label" for="section">{tr}Section{/tr}</label>
                     <div class="col-sm-4">
                         <select name="section" id="section" aria-label="{tr}New section{/tr}" class="form-control">
                             <option value="" {if $forumSection eq ""}selected="selected"{/if}>{tr}None{/tr}</option>
@@ -269,7 +269,7 @@
                 <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="moderator_group">{tr}Moderator group{/tr}</label>
                     <div class="col-sm-8">
-                        <input id="moderator_group" type="text" class="form-control" name="moderator_group" id="moderator_group" value="{$moderator_group|escape}">
+                        <input id="moderator_group" type="text" class="form-control" name="moderator_group" value="{$moderator_group|escape}">
                         {autocomplete element='#moderator_group' type='groupname'}
                     </div>
                 </div>
@@ -641,7 +641,7 @@
                     <label class="col-sm-4 form-check-label" for="att_list_nb">{tr}Shows number of attachments of the all thread in forum list{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="att_list_nb" name="att_list_nb"{if $att_list_nb eq 'y'} checked="checked"{/if} id="att_list_nb">
+                            <input class="form-check-input" type="checkbox" id="att_list_nb" name="att_list_nb"{if $att_list_nb eq 'y'} checked="checked"{/if}>
                         </div>
                     </div>
                 </div>

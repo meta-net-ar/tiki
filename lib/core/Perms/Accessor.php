@@ -120,7 +120,7 @@ class Perms_Accessor implements ArrayAccess
 
     private function sanitize($name)
     {
-        if ($this->prefix && $name[0] == $this->prefix[0] && strpos($name, $this->prefix) === 0) {
+        if ($this->prefix && $name[0] == $this->prefix[0] && str_starts_with($name, $this->prefix)) {
             return substr($name, strlen($this->prefix));
         } else {
             return $name;

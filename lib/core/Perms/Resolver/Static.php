@@ -65,6 +65,29 @@ class Perms_Resolver_Static implements Perms_Resolver
         return array_keys($this->known);
     }
 
+    /**
+     * Return the known groups with their permissions, used for merging.
+     */
+    public function known()
+    {
+        return $this->known;
+    }
+
+    /**
+     * The result is a union of both sets of permissions - thus additive merge.
+     */
+    public function merge(?Perms_Resolver $another = null)
+    {
+        if (empty($another) || ! method_exists($another, 'known')) {
+            return;
+        }
+        foreach ($another->known() as $group => $perms) {
+            foreach ($perms as $perm => $_) {
+                $this->known[$group][$perm] = true;
+            }
+        }
+    }
+
     public function dump()
     {
         $result = [

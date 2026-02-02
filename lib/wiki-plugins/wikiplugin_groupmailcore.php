@@ -101,7 +101,6 @@ function wikiplugin_groupmailcore_info()
 
 function wikiplugin_groupmailcore($data, $params)
 {
-    global $tikilib;
     require_once('lib/wiki-plugins/wikiplugin_trackerlist.php');
 
     $trackerparams = [];
@@ -109,7 +108,7 @@ function wikiplugin_groupmailcore($data, $params)
     $trackerparams['fields'] = ($params['fromFId'] ?? 0) . ':' . ($params['operatorFId'] ?? 0) . ':' . ($params['subjectFId'] ?? 0) . ':' . ($params['datetimeFId'] ?? 0);
     $trackerparams['popup'] = ($params['fromFId'] ?? 0) . ':' . ($params['contentFId'] ?? 0);
     $trackerparams['filterfield'] = ($params['fromFId'] ?? 0) . ':' . ($params['accountFId'] ?? 0);
-    $trackerparams['filtervalue'] = (isset($params['fromEmail']) ? $params['fromEmail'] : '') . ':' . (isset($params['accountName']) ? $params['accountName'] : '');
+    $trackerparams['filtervalue'] = ($params['fromEmail'] ?? '') . ':' . ($params['accountName'] ?? '');
     $trackerparams['stickypopup'] = 'n';
     $trackerparams['showlinks'] = 'y';
     $trackerparams['shownbitems'] = 'n';
@@ -118,7 +117,7 @@ function wikiplugin_groupmailcore($data, $params)
     $trackerparams['showcreated'] = 'n';
     $trackerparams['showlastmodif'] = 'n';
 
-    $data = wikiplugin_trackerlist('', $trackerparams);
+    $data = TikiLib::lib('parser')->invokePlugin('trackerlist', '', $trackerparams);
 
     return $data;
 }

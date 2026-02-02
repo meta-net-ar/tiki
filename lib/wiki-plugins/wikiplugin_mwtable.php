@@ -53,16 +53,14 @@ function wikiplugin_mwtable_info()
 
 function wikiplugin_mwtable($data, $params)
 {
-    global $tikilib;
-
     // Parse the parameters
     extract($params, EXTR_SKIP);
-    if (isset($fancy) and $fancy == "true") {
+    if ($fancy == "true") {
         $fancy = true;
     } else {
         $fancy = false;
     }
-    if (isset($wiki_classes) and $wiki_classes == "false") {
+    if ($wiki_classes == "false") {
         $wiki_classes = false;
     } else {
         $wiki_classes = true;
@@ -70,12 +68,11 @@ function wikiplugin_mwtable($data, $params)
 
     // set class constants
     $default_class_table = "normal";
-    $default_class_heading = "";
-    $default_class_td_odd = "";
+    $default_class_headings = "";
     $default_class_td_odd = "";
     if ($fancy) {
         $default_class_table = "normal";
-        $default_class_heading = "heading";
+        $default_class_headings = "heading";
         $default_class_td_odd = "odd";
         $default_class_td_even = "even";
     } elseif ($wiki_classes) {
@@ -110,7 +107,7 @@ function wikiplugin_mwtable($data, $params)
     if (substr($data, $soe, strlen($prefix)) == $prefix) {
         $eoe = strpos($data, $suffix, $soe);
         $element = substr($data, $soe + strlen($prefix), $eoe - $soe - strlen($prefix) - strlen($suffix));
-        if (strpos($element, "|")) {
+        if (str_contains($element, "|")) {
             // attributes present
             list($attribs, $text) = explode("|", $element, 2);
             $attributes = _get_attributes($attribs);
@@ -173,7 +170,7 @@ function wikiplugin_mwtable($data, $params)
         $wret .= "<tr>\n";
         foreach ($columns as $column) {
             // each column can have attributes and/or text
-            if (strpos($column, "|")) {
+            if (str_contains($column, "|")) {
                 list($attribs, $text) = explode("|", $column, 2);
                 $attributes = _get_attributes($attribs);
                 _check_class_attribute($attributes, $default_class_headings);
@@ -227,7 +224,7 @@ function wikiplugin_mwtable($data, $params)
             // get cells - skip over prefix of first cell
             $cells = explode($prefix, $row_cells);
         foreach ($cells as $cell) {
-            if (strpos($cell, "|")) {
+            if (str_contains($cell, "|")) {
                 list($attribs, $text) = explode("|", $cell, 2);
                 $attributes = _get_attributes($attribs);
             } else {

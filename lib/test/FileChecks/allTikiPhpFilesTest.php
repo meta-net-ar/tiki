@@ -22,7 +22,7 @@ class allTikiPhpFilesTest extends TestCase
     public function testOutputBeforePhpTags(): void
     {
         foreach ($this->phpFiles as $fileName) {
-            if (strpos($fileName, TIKI_CUSTOMIZATIONS_SRC_PATH) === 0) {
+            if (str_starts_with($fileName, TIKI_CUSTOMIZATIONS_SRC_PATH)) {
                 // not a tiki file
                 continue;
             }
@@ -31,7 +31,7 @@ class allTikiPhpFilesTest extends TestCase
             $count = 0;
             do {
                 $buffer = fgets($handle);
-                if (! $count && strpos($buffer, '#!') !== 0) {
+                if (! $count && ! str_starts_with($buffer, '#!')) {
                     $fileContent .= $buffer;
                     if (stripos($buffer, '<?php') !== false) { // match several different comment styles
                         $this->assertDoesNotMatchRegularExpression('/([\S\s]+)<\?php/iU', $fileContent, $fileName . ' does not start with <?php');

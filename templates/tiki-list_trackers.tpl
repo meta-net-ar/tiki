@@ -63,7 +63,7 @@
         {/if}
     {/if}
 
-    <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
+    <div class="{if $js}table-responsive{/if} styling-element"> {*the table-responsive class cuts off dropdown menus *}
         <table class="table table-condensed table-hover table-striped">
             <tr>
                 <th class="id text-center">{self_link _sort_arg='sort_mode' _sort_field='trackerId'}{tr}Id{/tr}{/self_link}
@@ -71,7 +71,9 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}</th>
-                <th>{self_link _sort_arg='sort_mode' _sort_field='fieldsCount'}{tr}Fields{/tr}{/self_link}</th>
+                {if $tiki_p_admin eq 'y' or $tiki_p_admin_trackers eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='fieldsCount'}{tr}Fields{/tr}{/self_link}</th>
+                {/if}
                 <th class="text-end">{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Items{/tr}{/self_link}</th>
                 {if $prefs.tracker_display_categories eq 'y'}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Categories{/tr}{/self_link}</th>
@@ -108,12 +110,14 @@
                     </td>
                     <td class="date">{$tracker.created|tiki_short_date}</td>
                     <td class="date">{$tracker.lastModif|tiki_short_datetime}</td>
-                    <td class="date">
-                        <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
-                            href="tiki-view_tracker.php?trackerId={$tracker.trackerId}">
-                            {$tracker.fieldsCount|escape}
-                        </a>
-                    </td>
+                    {if $tiki_p_admin eq 'y' or $tiki_p_admin_trackers eq 'y'}
+                        <td class="integer">
+                            <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View fields{/tr}"
+                                href="tiki-admin_tracker_fields.php?trackerId={$tracker.trackerId}">
+                                {$tracker.fieldsCount|escape}
+                            </a>
+                        </td>
+                    {/if}
                     <td class="integer">
                         <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
                             href="tiki-view_tracker.php?trackerId={$tracker.trackerId}">
@@ -122,10 +126,14 @@
                     </td>
                     {if $prefs.tracker_display_categories eq 'y'}
                         <td class="categories">
-                            {if !empty($tracker.category_names)}
+                            {if !empty($tracker.category_details)}
                                 <ul class="tracker-category-list list-unstyled mb-0">
-                                    {foreach from=$tracker.category_names item=catname}
-                                        <li><span class="badge bg-info">{$catname|escape}</span></li>
+                                    {foreach from=$tracker.category_details item=category}
+                                        <li>
+                                            <a class="tips" href="tiki-browse_categories.php?parentId={$category.id}&deep=off&type=#contentbrowse-categories-2" title="{$category.name|escape}:{tr}View category{/tr}">
+                                                <span class="badge bg-info">{$category.name|escape}</span>
+                                            </a>
+                                        </li>
                                     {/foreach}
                                 </ul>
                             {else}

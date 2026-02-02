@@ -475,7 +475,7 @@ class Document
                 }
                 foreach ($this->document as $word) {
                     $skip = false;
-                    $d = isset($word['deleted_by']) ? $word['deleted_by'] : '';
+                    $d = $word['deleted_by'] ?? '';
                     $w = $word['word'];
                     if ($author != $word['author'] or $deleted != $word['deleted'] or $deleted_by != $d) {
                         if ($text != '') {
@@ -498,10 +498,10 @@ class Document
                     }
                     if (! $options['escape']) {
                         if ($this->parsed and ! $this->nohtml) { // skipping popups for links
-                            if (substr($w, 0, 3) == '<a ') {
+                            if (str_starts_with($w, '<a ')) {
                                 $text .= '{AUTHOR}';
                             }
-                            if (substr($w, -4) == '</a>') {
+                            if (str_ends_with($w, '</a>')) {
                                 $text .= $w . "{AUTHOR(author=\"$author\"" .
                                        ($deleted ? ",deleted_by=\"$deleted_by\"" : '') .
                                        ',visible="1", ' .

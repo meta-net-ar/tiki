@@ -159,6 +159,19 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                             'value' => 'transfer'
                         ],
                     ],
+                    'displayFieldsListSort' => [
+                        'name' => tr('Default Sort Order'),
+                        'description' => tr('Sort the items in the dropdown list.'),
+                        'filter' => 'alpha',
+                        'options' => [
+                            'itemId' => tr('Item ID'),
+                            'formatted' => tr('Formatted Value'),
+                        ],
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown'
+                        ],
+                    ],
                     'trackerListOptions' => [
                         'name' => tr('Plugin TrackerList options'),
                         'description' => tr('Override one or more options of Plugin TrackerList to customize displayed table at item edit time (e.g. editable, tsfilters, etc.)'),
@@ -305,7 +318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                             0 => tr('No'),
                             1 => tr('Yes'),
                         ],
-                        'default' => '1',
+                        'default' => '0',
                         'depends' => [
                             'pref' => 'tracker_clone_item',
                         ],
@@ -733,7 +746,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($value)) {
+        if (count($indexRemote) && is_numeric($value) && $value > 0) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
             $item = $trklib->get_tracker_item($value);
@@ -756,7 +769,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $handler = $factory->getHandler($field, $item);
 
                 foreach ($handler->getDocumentPart($typeFactory) as $key => $field) {
-                    if (strpos($key, 'tracker_field') === 0) {
+                    if (str_starts_with($key, 'tracker_field')) {
                         $key = $baseKey . substr($key, strlen('tracker_field'));
                         $out[$key] = $field;
                     }
@@ -946,6 +959,9 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                     $this->trackerField->getOption('displayFieldsListFormat')
                 );
                 $list = $this->handleDuplicates($list);
+                if ($this->getOption('displayFieldsListSort') == 'formatted') {
+                    natsort($list);
+                }
             }
         } else {
             $list = TikiLib::lib('trk')->get_all_items(
@@ -1302,7 +1318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $getParseIntoTransformFunction = function ($separator) use ($permName, $invertField) {
                     return function (&$info, $value) use ($separator, $permName, $invertField) {
                         $itemIds = [];
-                        foreach (explode($separator, $value) as $val) {
+                        foreach (explode($separator, (string) $value) as $val) {
                             if ($id = $invertField->get($val)) {
                                 $itemIds[] = $id;
                             }
@@ -1391,13 +1407,13 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $remoteSchema = null;
             $definition = Tracker_Definition::get($this->trackerField->getOption('trackerId'));
             if ($definition) {
-                $tabular = null;
-                $tabularId = $definition->getConfiguration('tabularSync');
-                if ($tabularId) {
-                    $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
-                }
-                if ($tabular) {
-                    $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                try {
+                    $tabulars = $definition->getSynchronizedTabulars();
+                    if ($tabulars) {
+                        $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabulars[0]);
+                    }
+                } catch (Exception $e) {
+                    Feedback::error($e->getMessage());
                 }
             }
 
@@ -1474,6 +1490,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $value = $control->getValue();
 
                 if ($value) {
+                    $value = str_replace('trackeritem:', '', $value);
                     if ($multivalue) {
                         $query->filterMultivalue((string) $value, $baseKey);
                     } else {

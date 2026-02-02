@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -87,17 +87,17 @@ class Table_Code_WidgetOptionsFilter extends Table_Code_WidgetOptions
                                 }
                                 break;
                             case 'range':
-                                $min = isset($info['from']) ? $info['from'] : 0;
-                                $max = isset($info['to']) ? $info['to'] : 100;
+                                $min = $info['from'] ?? 0;
+                                $max = $info['to'] ?? 100;
                                 $valtohead = isset($info['style']) && $info['style'] == 'popup' ? 'false' : 'true';
                                 $fform[] = $colpointer . ' : function($cell, indx){return $.tablesorter.filterFormatter.uiRange('
                                         . '$cell, indx, {values: [' . $min . ', ' . $max . '], min: ' . $min . ', max: ' . $max
                                         . ', delayed: false, valueToHeader: ' . $valtohead . ', exactMatch: true});}';
                                 break;
                             case 'date':
-                                $fm = isset($info['from']) ? $info['from'] : '';
-                                $to = isset($info['to']) ? $info['to'] : '';
-                                $format = isset($info['format']) ? $info['format'] : 'yy-mm-dd';
+                                $fm = $info['from'] ?? '';
+                                $to = $info['to'] ?? '';
+                                $format = $info['format'] ?? 'yy-mm-dd';
                                 $fform[] = $colpointer . ' : function($cell, indx){return $.tablesorter.filterFormatter.uiDatepicker('
                                         . '$cell, indx, {from: \'' . $fm . '\', to: \'' . $to . '\', dateFormat: \'' . $format
                                         . '\', changeMonth: true, changeYear: true});}';

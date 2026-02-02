@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 namespace Tiki\Lib\Test\Importer;
 
 use DOMDocument;
@@ -11,7 +12,7 @@ use Laminas\Http\Client as HttpClient;
 use Laminas\Http\Client\Adapter\Test as HttpClientAdapterTest;
 use Tiki\FileGallery\File;
 use TikiDb;
-use TikiImporter_Blog_Wordpress;
+use Tiki\Lib\Importer\BlogWordpress;
 
 /**
  * @group importer
@@ -23,7 +24,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     protected function setUp(): void
     {
         date_default_timezone_set('UTC');
-        $this->obj = new TikiImporter_Blog_Wordpress();
+        $this->obj = new BlogWordpress();
         $this->ensureDefaultGalleryExists();
     }
 
@@ -39,7 +40,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['validateInput', 'extractBlogInfo', 'parseData', 'insertData', 'setupTiki', 'extractPermalinks'])
             ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -64,7 +65,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['validateInput', 'extractBlogInfo', 'parseData', 'insertData', 'downloadAttachments', 'setupTiki', 'extractPermalinks'])
             ->getMock();
         $obj->expects($this->once())->method('validateInput');
@@ -109,7 +110,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['extractItems', 'extractTags', 'extractCategories'])
             ->getMock();
         $obj->expects($this->once())->method('extractItems')->willReturn(['posts' => [], 'pages' => []]);
@@ -190,7 +191,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
 
     public function testExtractItems(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['extractInfo'])
             ->getMock();
         $obj->dom = new DOMDocument();
@@ -252,7 +253,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['extractComment', 'parseContent', 'identifyInternalLinks'])
             ->getMock();
         $obj->expects($this->exactly(3))->method('extractComment')->willReturn(true);
@@ -300,7 +301,7 @@ class BlogWordpressTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['extractComment', 'parseContent', 'identifyInternalLinks'])
             ->getMock();
         $obj->expects($this->exactly(0))->method('extractComment')->willReturn(true);
@@ -497,7 +498,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         $client = new HttpClient();
         $client->setAdapter($adapter);
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['getHttpClient', 'createFileGallery'])
             ->getMock();
         $obj->expects($this->once())->method('getHttpClient')->willReturn($client);
@@ -546,7 +547,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         $client = new HttpClient();
         $client->setAdapter($adapter);
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['getHttpClient', 'createFileGallery'])
             ->getMock();
         $obj->expects($this->once())->method('createFileGallery')->willReturn(1);
@@ -582,7 +583,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         $client = new HttpClient();
         $client->setAdapter($adapter);
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['getHttpClient', 'createFileGallery'])
             ->getMock();
         $obj->expects($this->once())->method('createFileGallery')->willReturn(1);
@@ -704,7 +705,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
 
     public function testInsertItemShouldCallStoreNewLink(): void
     {
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['storeNewLink', 'insertPost'])
             ->getMock();
         $obj->expects($this->once())->method('storeNewLink');
@@ -782,7 +783,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         ob_start();
         $_POST['replaceInternalLinks'] = 'on';
 
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['insertItem', 'createBlog', 'replaceInternalLinks'])
             ->getMock();
         $obj->expects($this->once())->method('createBlog');
@@ -818,7 +819,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
     public function testInsertDataShouldNotCallReplaceInternalLinks(): void
     {
         ob_start();
-        $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
+        $obj = $this->getMockBuilder(BlogWordpress::class)
             ->onlyMethods(['insertItem', 'createBlog', 'replaceInternalLinks'])
             ->getMock();
         $obj->expects($this->once())->method('createBlog');
