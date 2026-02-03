@@ -27,6 +27,13 @@ This configuration must be kept synchronized with the configuration for other We
             <denyUrlSequences>
                 <add sequence="changelog.txt" />
                 <add sequence="_htaccess" />
+                <add sequence="README" />
+                <add sequence="INSTALL" />
+                <add sequence="web_config" />
+                <add sequence="composer." />
+                <add sequence="copyright.txt" />
+                <add sequence=".git" />
+                <add sequence="node_modules" />
             </denyUrlSequences>
             <fileExtensions>
                 <add fileExtension=".bak" allowed="false" />
@@ -35,6 +42,9 @@ This configuration must be kept synchronized with the configuration for other We
                 <add fileExtension=".sh" allowed="false" />
                 <add fileExtension=".tpl" allowed="false" />
                 <add fileExtension=".sql" allowed="false" />
+                <add fileExtension=".shtml" allowed="false" />
+                <add fileExtension=".asp" allowed="false" />
+                <add fileExtension=".xml.dist" allowed="false" />
             </fileExtensions>
         </requestFiltering>
     </security>
