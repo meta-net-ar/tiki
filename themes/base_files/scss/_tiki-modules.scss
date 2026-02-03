@@ -43,7 +43,7 @@ header.container,
 //***** Site Header & Identity *****/
 
 //==================================================
-// NAVBAR - SEMANTIC STRUCTURE (Task 148971)
+// NAVBAR - SEMANTIC STRUCTURE
 // Clean navbar using Bootstrap 5 utilities
 // No JavaScript needed!
 //==================================================
@@ -51,17 +51,13 @@ header.container,
 // Site header container
 .site-header {
     display: block;
-
-    // Translation bar (if added in future)
-    .interactive-translation-bar {
-        font-size: 0.875rem;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
 }
 
 // Main navbar
 #main-navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+
     // Logo sizing
     .sitelogo-img {
         max-height: 65px; // Default fallback if not set in module

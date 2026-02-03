@@ -549,6 +549,7 @@ class ModLib extends TikiLib
         }
         // Load only Unified Admin Interface specific modules for admins on admin panels.
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
+        $topLogo = $module['name'] === 'logo' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
         $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
@@ -559,6 +560,7 @@ class ModLib extends TikiLib
             && ! $this->isModuleAssignmentMode()
             && $module['position'] !== 'admin'
             && ! $topLogin
+            && ! $topLogo
             && ! $footer
             && ! $topQA
         ) {

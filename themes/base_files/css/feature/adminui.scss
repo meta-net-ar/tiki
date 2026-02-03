@@ -138,11 +138,20 @@ body.tiki-admin {
     }
 }
 
-.tiki-admin aside.admin-nav>nav,
+.tiki-admin aside.admin-nav > nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+/* Admin navbar must be fixed to span full width over the sidebar */
 .tiki-admin .top_modules {
     position: fixed;
     left: 0;
     top: 0;
+    right: 0;
+    justify-content: flex-end !important;
+    z-index: 1050;
 }
 
 .tiki-admin aside.admin-nav .navbar-light,

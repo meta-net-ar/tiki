@@ -131,7 +131,6 @@
             </div>
             {preference name=site_layout}
             {preference name=site_layout_per_object}
-            {preference name=theme_navbar_fixed_topbar_offset}
             {preference name=theme_header_and_address_bar_color}
             {preference name=theme_default_color_mode}
 
