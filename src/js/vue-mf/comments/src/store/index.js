@@ -202,11 +202,11 @@ export default defineStore("messageStore", {
         drawMessagesTree() {
             var arr = this.threads;
             arr.forEach((item) => {
-                let margins = 8;
+                let margins = 6;
                 let totalHeight = 0;
                 let lastChildHeight = 0;
                 if (item.parentId === 0) {
-                    margins = 18;
+                    margins = 16;
                 }
                 let parentBody = $("#body-" + item.messageId).parent(".thread-block");
                 totalHeight = parentBody.outerHeight();

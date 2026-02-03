@@ -64,6 +64,14 @@
     z-index: 9999;
 }
 
+.message-body:hover .thread-border {
+    border-left: 0.15rem solid rgba(13,110,254,0.5) !important;
+}
+
+.message-body:hover + .row > .thread-replies > .message-body > .t-left-border {
+    border: 0.15rem solid rgba(13,110,254,0.5) !important;
+}
+
 .bottom-line {
     border-top: 2px dashed black;
 }
@@ -92,7 +100,7 @@
     height: 48px;
     width: 64px;
     background-color: #fff;
-    border-radius: 10.5px;
+    border-radius: 14.5px;
     left: 12px;
     top: -42px;
     z-index: 2;
