@@ -349,6 +349,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             $userlib->assign_openid($user, $_SESSION['openid_url']);
         }
         $url = $_SESSION['loginfrom'];
+        $_SESSION['login_time'] = time();
 
         // When logging into a multi-lingual Tiki, $_SESSION['loginfrom'] contains the main-language page, and not the translated one
         //  This only applies if feature_best_language and only seems to affect SEFURL

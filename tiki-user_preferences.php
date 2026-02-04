@@ -379,6 +379,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             die;
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
+        $userlib->update_lastlogin($userwatch);
         if ($prefs['feature_user_encryption'] === 'y') {
             // Notify CryptLib about the login
             $cryptlib = TikiLib::lib('crypt');

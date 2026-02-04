@@ -66,7 +66,28 @@ require_once('lib/setup/tikisetup.class.php');
 require_once('lib/setup/timer.class.php');
 $tiki_timer = new timer();
 $tiki_timer->start();
-require_once('tiki-setup_base.php');
+require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
+
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['lastLogin']) && $_SESSION['login_time'] < $userInfo['lastLogin']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
+
+if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
+    if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
+        header('location: tiki-install.php');
+        exit;
+    }
+    // This is command-line. No 'location' command make sense here. Let admins access what works and deal with the rest.
+    echo 'Warning: Tiki expects PHP ' . TIKI_MIN_PHP_VERSION . ' and above. You are running ' . PHP_VERSION . ". Use at your own risk\n";
+}
 
 // Attempt setting locales. This code is just a start, locales should be set per-user.
 // Also, different operating systems use different locale strings. en_US.utf8 is valid on POSIX systems, maybe not on Windows, feel free to add alternative locale strings.
