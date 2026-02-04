@@ -1,5 +1,5 @@
 Tiki Wiki CMS Groupware
-Version 28.4
+Version 28.5
 
 Started in 2002, Tiki Wiki CMS Groupware is a web application combining
 the features of a wiki, a content management system (CMS) and groupware.
@@ -18,7 +18,7 @@ DOCUMENTATION
 
 * You have access to a diverse source of support through documentation, forum, events, etc.
 
-* The documentation for 28.4 version is ever evolving at http://doc.tiki.org.
+* The documentation for 28.5 version is ever evolving at http://doc.tiki.org.
   You're encouraged to contribute.
 
 * It is highly recommended that you refer to the online documentation:
@@ -38,7 +38,7 @@ UPGRADES
 
 COPYRIGHT
 
-Copyright (c) 2002-2025, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
+Copyright (c) 2002-2026, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
 Tiki was started under the name tikiwiki by Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
 All Rights Reserved. See copyright.txt for details and a complete list of authors.
 Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
