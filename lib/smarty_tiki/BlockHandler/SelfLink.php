@@ -138,7 +138,8 @@ class SelfLink extends Base
                         );
                         unset($params['_onclick']); // Prevent addition to $link later
                     } else {
-                        $ret = 'href="' . $ret . '"';
+                        // Escape href value to prevent XSS injection
+                        $ret = 'href="' . htmlspecialchars($ret, ENT_QUOTES, 'UTF-8') . '"';
                     }
                 }
 
