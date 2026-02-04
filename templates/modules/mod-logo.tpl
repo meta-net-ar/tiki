@@ -3,12 +3,7 @@
         <div class="sitelogo" class="d-flex align-items-center">
         <a class="navbar-brand d-flex flex-row w-100 align-self-center align-items-center p-0 {$module_params.class_image|escape}" href="{$module_params.link}" title="{$module_params.title_attr|escape}">
             {if !empty($module_params.src)}
-                <img class="{$module_params.class_image|escape} sitelogo-img img-fluid align-self-center me-3"
-                     src="{$module_params.src}"
-                     alt="{$module_params.alt_attr|escape}"
-                     {if !empty($module_params.max_height)}
-                         style="max-height: {$module_params.max_height}px; width: auto; object-fit: contain;"
-                     {/if}>
+                <img class="{$module_params.class_image|escape} sitelogo-img img-fluid align-self-center me-3" src="{$module_params.src}" alt="{$module_params.alt_attr|escape}" {if !empty($module_params.max_height)} style="max-height: {$module_params.max_height}px; width: auto; object-fit: contain;"{/if}>
             {/if}
             {if !empty($module_params.sitetitle) or !empty($module_params.sitesubtitle)}
                 {if $prefs.site_layout neq 'social'}
