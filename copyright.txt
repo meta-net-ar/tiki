@@ -12,7 +12,7 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2025-11-28, the community has:
+As of 2026-02-04, the community has:
   * 751 members on SourceForge.net,
   * Array of those people who made at least one code commit
 
@@ -59,8 +59,8 @@ Number of Commits: 1
 
 Nickname: Alvin Bauma
 First Commit: Fri Oct 8 14:05:39 2021 +0100
-Last Commit: Fri Mar 31 17:57:01 2023 +0200
-Number of Commits: 21
+Last Commit: Mon Jan 5 13:24:40 2026 +0100
+Number of Commits: 22
 
 Nickname: Andon Andonov
 First Commit: Thu Apr 30 13:08:48 2020 +0300
@@ -79,8 +79,8 @@ Number of Commits: 1
 
 Nickname: Baraka Kinywa
 First Commit: Thu Aug 15 19:09:17 2024 +0000
-Last Commit: Wed Nov 12 15:40:08 2025 +0200
-Number of Commits: 4
+Last Commit: Sat Jan 10 20:09:08 2026 +0200
+Number of Commits: 5
 
 Nickname: Benoit Grégoire
 First Commit: Tue Sep 18 18:46:52 2018 -0400
@@ -144,8 +144,8 @@ Number of Commits: 1
 
 Nickname: Elifeleti Mukisa Dan
 First Commit: Mon Aug 19 15:05:26 2024 +0000
-Last Commit: Fri Nov 28 16:12:34 2025 +0000
-Number of Commits: 17
+Last Commit: Wed Feb 4 18:04:42 2026 +0000
+Number of Commits: 22
 
 Nickname: Elvis Ansima
 First Commit: Wed Aug 17 16:41:06 2022 +0000
@@ -404,8 +404,8 @@ Number of Commits: 5
 
 Nickname: Merci Jacob
 First Commit: Wed Nov 1 21:03:09 2023 +0000
-Last Commit: Tue Jul 29 14:20:39 2025 +0000
-Number of Commits: 5
+Last Commit: Fri Dec 19 09:25:05 2025 +0000
+Number of Commits: 7
 
 Nickname: Micael José de Sousa Farinha
 First Commit: Mon May 13 19:06:57 2024 +0000
@@ -1050,7 +1050,7 @@ Nickname: chibaguy
 Name: Gary Cunningham-Lee
 First Commit: 2006-02-04
 Last Commit: Mon Mar 2 09:16:38 2020 +0000
-Number of Commits: 1736
+Number of Commits: 1729
 SF Role: Admin
 
 Nickname: chris_holman
@@ -1517,7 +1517,7 @@ Nickname: gezzzan
 Name: gezza
 First Commit: 2009-05-02
 Last Commit: Sun Apr 2 07:55:23 2017 +0000
-Number of Commits: 390
+Number of Commits: 388
 SF Role: Developer
 
 Nickname: ggd
@@ -2257,7 +2257,7 @@ SF Role: Developer
 Nickname: manivannans
 First Commit: 2013-10-24
 Last Commit: Tue May 19 13:21:35 2015 +0000
-Number of Commits: 42
+Number of Commits: 39
 SF Role: Developer
 
 Nickname: marc-etienne
@@ -2273,7 +2273,7 @@ Nickname: marclaporte
 Name: Marc Laporte
 First Commit: 2003-11-28
 Last Commit: Thu Nov 14 04:34:48 2019 +0000
-Number of Commits: 65
+Number of Commits: 64
 SF Role: Admin
 
 Nickname: marcmont
@@ -3396,14 +3396,14 @@ SF Role: Developer
 Nickname: usbbush
 Name: ushindi bienvenu
 First Commit: Fri Nov 28 19:35:38 2025 +0200
-Last Commit: Fri Nov 28 19:42:10 2025 +0200
-Number of Commits: 4
+Last Commit: Wed Feb 4 22:27:40 2026 +0200
+Number of Commits: 11
 SF Role: Admin
 
 Nickname: ushindi bienvenu
 First Commit: Tue Jul 1 22:42:12 2025 +0000
-Last Commit: Fri Aug 22 01:30:13 2025 +0000
-Number of Commits: 2
+Last Commit: Tue Feb 3 21:31:51 2026 +0000
+Number of Commits: 4
 
 Nickname: uxeric
 First Commit: 2015-08-17
