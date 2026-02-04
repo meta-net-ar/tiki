@@ -553,6 +553,7 @@ class TikiLib extends TikiDb_Bridge
 
     /*shared*/
     // Returns IP address or IP address forwarded by the proxy if feature load balancer is set
+    // Security: Only trusts proxy headers from trusted reverse proxy IPs
     /**
      * @param $firewall true to detect ip behind a firewall
      * @return null|string
@@ -560,35 +561,21 @@ class TikiLib extends TikiDb_Bridge
     public function get_ip_address($firewall = 0)
     {
         global $prefs;
-        if ($firewall || (isset($prefs['feature_loadbalancer']) && $prefs['feature_loadbalancer'] === "y")) {
-            $header_checks = [
-                'HTTP_CF_CONNECTING_IP',
-                'HTTP_CLIENT_IP',
-                'HTTP_PRAGMA',
-                'HTTP_XONNECTION',
-                'HTTP_CACHE_INFO',
-                'HTTP_XPROXY',
-                'HTTP_PROXY',
-                'HTTP_PROXY_RENAMED',
-                'HTTP_PROXY_CONNECTION',
-                'HTTP_VIA',
-                'HTTP_X_COMING_FROM',
-                'HTTP_COMING_FROM',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'HTTP_CACHE_CONTROL',
-                'HTTP_X_REAL_IP',
-                'REMOTE_ADDR'];
 
-            foreach ($header_checks as $key) {
-                if (array_key_exists($key, $_SERVER) === true) {
-                    foreach (explode(',', $_SERVER[$key]) as $ip) {
+        // Check if we should trust proxy headers
+        $should_check_proxy_headers = $firewall || (isset($prefs['feature_loadbalancer']) && $prefs['feature_loadbalancer'] === "y");
+
+        if ($should_check_proxy_headers) {
+            // Security: Verify that the request comes from a trusted proxy
+            $isFromTrustedProxy = $this->isFromTrustedProxy();
+
+            if ($isFromTrustedProxy) {
+                // Determine which header to check
+                $header_to_check = $this->getProxyHeaderName();
+
+                if (! empty($header_to_check) && array_key_exists($header_to_check, $_SERVER)) {
+                    foreach (explode(',', $_SERVER[$header_to_check]) as $ip) {
                         $ip = trim($ip);
-
-                        //filter the ip with filter functions
                         if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
                             return $ip;
                         }
@@ -596,11 +583,64 @@ class TikiLib extends TikiDb_Bridge
                 }
             }
         }
+
+        // Fall back to REMOTE_ADDR if proxy headers are not available or not trusted
         if (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
             return $_SERVER['REMOTE_ADDR'];
         } else {
             return '0.0.0.0';
         }
+    }
+
+    /*shared*/
+    /**
+     * Check if the current request comes from a trusted reverse proxy
+     * @return bool
+     */
+    public function isFromTrustedProxy()
+    {
+        global $prefs;
+
+        // If feature_loadbalancer is not enabled, don't trust proxy headers
+        if (! isset($prefs['feature_loadbalancer']) || $prefs['feature_loadbalancer'] !== "y") {
+            return false;
+        }
+
+        $trusted_proxies = isset($prefs['feature_loadbalancer_trusted_proxies']) ? $prefs['feature_loadbalancer_trusted_proxies'] : '';
+        $remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+
+        // If no trusted proxies are configured, don't trust any proxy headers (most secure)
+        if (empty($trusted_proxies)) {
+            return false;
+        }
+
+        // Parse the trusted proxies list
+        $trusted_ips = array_map('trim', explode(',', $trusted_proxies));
+
+        // Check if the request comes from a trusted proxy IP
+        return in_array($remote_addr, $trusted_ips, true);
+    }
+
+    /*shared*/
+    /**
+     * Get the name of the HTTP header to use for getting the client IP from a reverse proxy
+     * @return string|null
+     */
+    public function getProxyHeaderName()
+    {
+        global $prefs;
+
+        // If a specific header is configured, use it
+        if (isset($prefs['feature_loadbalancer_header']) && ! empty($prefs['feature_loadbalancer_header'])) {
+            $header = strtoupper(str_replace('-', '_', $prefs['feature_loadbalancer_header']));
+            // Add HTTP_ prefix if not already present
+            if (strpos($header, 'HTTP_') !== 0 && $header !== 'REMOTE_ADDR') {
+                $header = 'HTTP_' . $header;
+            }
+            return $header;
+        }
+
+        return null;
     }
 
     /*shared*/
