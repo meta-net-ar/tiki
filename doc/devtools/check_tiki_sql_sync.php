@@ -36,6 +36,32 @@ class CheckTikiSqlSync
         '/\bTRUNCATE\s+TABLE\b/i',
     ];
 
+    /** Data SQL patterns that require tiki.sql update for specific tables */
+    protected const DATA_PATTERNS = [
+        '/\bINSERT\s+INTO\s+[`]?%s[`]?\b/i',
+        '/\bUPDATE\s+[`]?%s[`]?\b/i',
+        '/\bDELETE\s+FROM\s+[`]?%s[`]?\b/i',
+    ];
+
+    /** Tables that are seeded in tiki.sql and must be kept in sync */
+    protected const SEEDED_TABLES = [
+        'tiki_menu_options',
+        'tiki_menus',
+        'tiki_modules',
+        'tiki_actionlog_conf',
+        'tiki_score',
+        'tiki_sefurl_regex_out',
+        'tiki_live_support_modules',
+        'tiki_file_galleries',
+        'tiki_custom_color_modes',
+        'tiki_integrator_reps',
+        'tiki_integrator_rules',
+        'tiki_semantic_tokens',
+        'users_groups',
+        'users_permissions',
+        'users_grouppermissions',
+    ];
+
     protected $verbose = false;
     protected $schemaPath;
     protected $tikiSqlPath;
@@ -77,21 +103,21 @@ class CheckTikiSqlSync
         }
 
         if (empty($filesWithStructuralChanges)) {
-            $this->printMessage('No structural changes detected. db/tiki.sql update not required.');
+            $this->printMessage('No structural or seeded data changes detected. db/tiki.sql update not required.');
             return 0;
         }
 
         $tikiSqlChanged = $this->isTikiSqlChanged($options);
 
         if ($tikiSqlChanged) {
-            $this->printMessage('Structural changes detected and db/tiki.sql is modified. OK');
+            $this->printMessage('Structural/Data changes detected and db/tiki.sql is modified. OK');
             return 0;
         }
 
         $this->printError('');
         $this->printError('ERROR: db/tiki.sql may need to be updated');
         $this->printError('');
-        $this->printError('Schema patches with structural changes:');
+        $this->printError('Schema patches with structural or seeded data changes:');
         foreach ($filesWithStructuralChanges as $file => $statements) {
             $this->printError('  ' . basename($file) . ': ' . implode(', ', $statements));
         }
@@ -118,7 +144,7 @@ class CheckTikiSqlSync
     protected function getChangedSchemaFiles($options)
     {
         if (! empty($options['changed-files'])) {
-            $files = explode(',', $options['changed-files']);
+            $files = preg_split('/[,\s]+/', $options['changed-files'], -1, PREG_SPLIT_NO_EMPTY);
             return array_filter($files, function ($file) {
                 return $this->isSchemaFile($file);
             });
@@ -210,9 +236,19 @@ class CheckTikiSqlSync
         $content = preg_replace('/\/\*.*?\*\//s', '', $content);
 
         $found = [];
+
         foreach (self::STRUCTURAL_PATTERNS as $pattern) {
             if (preg_match($pattern, $content, $matches)) {
-                $found[] = trim($matches[0]);
+                $found[] = 'Structure: ' . trim($matches[0]);
+            }
+        }
+
+        foreach (self::SEEDED_TABLES as $table) {
+            foreach (self::DATA_PATTERNS as $patternTemplate) {
+                $pattern = sprintf($patternTemplate, preg_quote($table, '/'));
+                if (preg_match($pattern, $content, $matches)) {
+                    $found[] = 'Data (' . $table . '): ' . trim($matches[0]);
+                }
             }
         }
 
