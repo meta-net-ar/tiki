@@ -103,4 +103,37 @@ class Scheduler_Task_HTTPGetCommandTask extends Scheduler_Task_CommandTask
             ],
         ];
     }
+    public function validateOutputFile($value): string | bool
+    {
+        // First validate the path
+        $publicPathes = [TEMP_PATH, HTTP_PUBLIC_PATH];
+
+        $pathDir = dirname($value);
+
+        foreach ($publicPathes as $dir) {
+            $realDir = realpath($dir);
+
+            if (strpos($pathDir, $realDir) === 0) {
+                return tra('You cannot write to this path.');
+            }
+        }
+
+        // After validate the file extension
+        $badExts = [
+            'php', 'phtml', 'phar',
+            'asp', 'aspx', 'jsp', 'cgi',
+            'pl', 'py', 'rb', 'sh',
+            'exe', 'dll', 'so', 'bin', 'msi',
+            'js', 'html', 'htm', 'svg', 'swf',
+            'cmd', 'bat', 'vbs', 'jar'
+        ];
+
+        $parts = explode('.', $value, 2);
+
+        if (count($parts) == 2 && in_array($parts[1], $badExts, true)) {
+            return tra('This extension is not allowed.');
+        }
+
+        return true;
+    }
 }
