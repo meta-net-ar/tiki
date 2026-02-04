@@ -153,6 +153,15 @@ body.tiki-admin {
     z-index: 1050;
 }
 
+/* Admin layout uses #page-header */
+.tiki-admin.layout_admin #page-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+}
+
 .tiki-admin .top_modules {
     justify-content: flex-end !important;
 }
