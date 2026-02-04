@@ -2648,6 +2648,23 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['experimental'],
         ],
+        'feature_loadbalancer_trusted_proxies' => [
+            'name' => tra('Trusted reverse proxy IPs'),
+            'description' => tra('List of IP addresses of trusted reverse proxies. Only requests coming from these IPs will have their X-Forwarded-For headers trusted. Leave empty to trust all IPs (less secure).'),
+            'type' => 'textarea',
+            'size' => 3,
+            'default' => '',
+            'tags' => ['experimental'],
+            'dependencies' => ['feature_loadbalancer'],
+        ],
+        'feature_loadbalancer_header' => [
+            'name' => tra('Reverse proxy header'),
+            'description' => tra('Name of the HTTP header used by your reverse proxy to pass the client IP. Common values: X-Forwarded-For, CF-Connecting-IP, X-Real-IP, X-Client-IP. There is no auto-detection.'),
+            'type' => 'text',
+            'default' => '',
+            'tags' => ['experimental'],
+            'dependencies' => ['feature_loadbalancer'],
+        ],
         'feature_port_rewriting' => [
             'name' => tra('Tiki is behind a frontend-proxy/load-balancer that rewrites ports'),
                 'description' => tra('Activate this only if the server is behind a frontend-proxy/load-balancer (or reverse proxy) that rewrites ports. This enables Tiki to use the HTTP_X_FORWARDED_PROTO parameter set by the proxy, to provide correct links.'),

@@ -78,12 +78,14 @@ echo $display;
 
 /**
  * Check monitor is restricted by IP
+ * Security: Uses get_ip_address() which properly validates reverse proxy headers
  *
  * @return null
  */
 function isMonitorRestrited()
 {
     global $prefs;
+    $tikilib = TikiLib::lib('tiki');
 
     $tikiMonitorRestriction = ! empty($prefs['monitor_restricted_ips']) ? explode(',', preg_replace('/\s+/', '', $prefs['monitor_restricted_ips'])) : [];
     $sIpToCheck = null;
