@@ -11,6 +11,11 @@ header.container,
     margin-bottom: 0;
 }
 
+.tiki.layout_classic .header_container .container.container-std {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
 // Vertically center visible content in fixed-top navbar
 @media(min-width: 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
 
