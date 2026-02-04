@@ -52,6 +52,7 @@ if (isset($_REQUEST["rollback"], $_REQUEST["comment"]) && $access->checkCsrf()) 
     $histlib->use_version($page, $version, $comment);
     $tikilib->invalidate_cache($page);
 
+    Feedback::success(tr('Page %0 has been reverted to version %1', $page, $version));
     header("location: tiki-index.php?page=" . urlencode($page));
     die;
 }
