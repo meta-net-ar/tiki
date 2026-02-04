@@ -54,6 +54,16 @@ function saveScheduler()
                 $errors[] = sprintf(tra('%s is required'), $param['name']);
                 $addTask = false;
             }
+
+            $validateMethod = 'validate' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+
+            if (method_exists($class, $validateMethod)) {
+                $validationResult = $class->$validateMethod($_POST[$httpParamName]);
+                if (is_string($validationResult)) {
+                    $errors[] = $validationResult;
+                    $addTask = false;
+                }
+            }
         }
 
         $params = $class->parseParams();
