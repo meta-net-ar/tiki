@@ -145,13 +145,16 @@ body.tiki-admin {
 }
 
 /* Admin navbar must be fixed to span full width over the sidebar */
-.tiki-admin .top_modules {
+.tiki-admin #main-navbar {
     position: fixed;
-    left: 0;
     top: 0;
+    left: 0;
     right: 0;
-    justify-content: flex-end !important;
     z-index: 1050;
+}
+
+.tiki-admin .top_modules {
+    justify-content: flex-end !important;
 }
 
 .tiki-admin aside.admin-nav .navbar-light,
