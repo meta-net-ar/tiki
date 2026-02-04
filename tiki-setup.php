@@ -65,6 +65,18 @@ $tiki_timer->start();
 
 require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
 
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['lastLogin']) && $_SESSION['login_time'] < $userInfo['lastLogin']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
+
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
         header('location: tiki-install.php');
