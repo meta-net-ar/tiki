@@ -161,6 +161,7 @@
         ""
     ],
     "require": {
+        "altcha-org/altcha": "~1.1",
         "bacon/bacon-qr-code": "~3.0",
         "bertoost/elasticemail-mailer": "~1.1",
         "bigbluebutton/bigbluebutton-api-php": "~2.3",
@@ -279,8 +280,7 @@
         "tikiwiki/text-wiki-mediawiki": "~0.2",
         "web-auth/webauthn-lib": "~4.9",
         "xemlock/htmlpurifier-html5": "~0.1.11",
-        "zbateson/mail-mime-parser": "~3.0",
-        "altcha-org/altcha": "~1.1"
+        "zbateson/mail-mime-parser": "~3.0"
     },
     "require-dev": {
         "kint-php/kint": "~6.1",
@@ -408,6 +408,7 @@
             "ext-ftp": "0"
         },
         "secure-http": false,
+        "auditComment": "PKSA-5rb8-j658-qvzz: altcha requires PHP 8.2+ but Tiki still supports PHP 8.1. The code has been adapted to work with PHP 8.1. This security advisory ignore should be removed after Tiki drops PHP 8.1 support and requires PHP 8.2+.",
         "audit": {
             "ignore": ["PKSA-5rb8-j658-qvzz"]
         },

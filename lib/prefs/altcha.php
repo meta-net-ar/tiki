@@ -19,7 +19,7 @@ function prefs_altcha_list()
         'altcha_hmac_key' => [
             'name' => tra('Altcha Hmac Key'),
             'type' => 'text',
-            'description' => tra('Your Altcha Developper Secret Key'),
+            'description' => tra('Your Altcha developer Secret Key'),
             'size' => 60,
             'default' => '',
             'keywords' => 'captcha altcha',
