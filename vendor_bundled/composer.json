@@ -161,7 +161,6 @@
         ""
     ],
     "require": {
-        "altcha-org/altcha": "~1.1",
         "bacon/bacon-qr-code": "~3.0",
         "bertoost/elasticemail-mailer": "~1.1",
         "bigbluebutton/bigbluebutton-api-php": "~2.3",
@@ -281,9 +280,7 @@
         "web-auth/webauthn-lib": "~4.9",
         "xemlock/htmlpurifier-html5": "~0.1.11",
         "zbateson/mail-mime-parser": "~3.0",
-        "zf1s/zend-service-akismet": "~1.15",
-        "altcha-org/altcha": "*",
-        "antchain/antchain-util": "*"
+        "altcha-org/altcha": "~1.1"
     },
     "require-dev": {
         "kint-php/kint": "~6.1",
@@ -411,6 +408,9 @@
             "ext-ftp": "0"
         },
         "secure-http": false,
+        "audit": {
+            "ignore": ["PKSA-5rb8-j658-qvzz"]
+        },
         "allow-plugins": {
             "composer/installers": true,
             "oomphinc/composer-installers-extender": true,

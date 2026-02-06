@@ -137,7 +137,7 @@ class Captcha
         } elseif ($type === 'altcha') {
             $hmacKey = $prefs['altcha_hmac_key'];
             $this->captcha = new AltchaLib($hmacKey);
-            $this->type = 'altcha';
+            $this->type = $type;
         } else {        // implied $type==='dumb'
             $this->captcha = new Laminas\Captcha\Dumb();
             $this->captcha->setWordlen($prefs['captcha_wordLen']);
