@@ -161,14 +161,27 @@
         {/if}
     </div>
     {jq}
+        /**
+         * Multi-select status toggle handler.
+         *
+         * Normal click: Simple filter by one status (handled by default form submit)
+         * Ctrl/Cmd/Shift+click: Toggle status to combine filters (e.g., show "Open + Pending")
+         */
         (function(){
             var order = ['o','p','c'];
+
             $('.js-status-toggle').on('click', function(e){
+                // Only intercept modifier-key clicks; normal clicks use default submit behavior
                 if (!(e.ctrlKey || e.metaKey || e.shiftKey)) return;
                 e.preventDefault();
+
                 var form = this.form;
                 if (!form) return;
+
+                // Each button has data-letter="o|p|c" indicating which status it controls
                 var letter = this.getAttribute('data-letter') || '';
+
+                // Find or create the hidden input that holds the combined status string
                 var hidden = form.querySelector('input[type="hidden"][name="status"]');
                 if (!hidden) {
                     hidden = document.createElement('input');
@@ -176,9 +189,13 @@
                     hidden.name = 'status';
                     form.appendChild(hidden);
                 }
+
+                // Toggle: add letter if absent, remove if present
                 var current = hidden.value || '';
                 var set = new Set(current.split('').filter(Boolean));
                 if (set.has(letter)) { set.delete(letter); } else { set.add(letter); }
+
+                // Rebuild value in canonical order (o before p before c)
                 hidden.value = order.filter(function(ch){ return set.has(ch); }).join('');
                 form.submit();
             });
