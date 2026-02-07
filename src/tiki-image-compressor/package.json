@@ -1,0 +1,15 @@
+{
+  "name": "@tiki/image-compressor",
+  "version": "1.0.0",
+  "description": "Media compression module for images and videos",
+  "main": "imageCompressor.js",
+  "type": "module",
+  "dependencies": {
+    "browser-image-compression": "^2.0.2",
+    "@ffmpeg/ffmpeg": "^0.12.6",
+    "@ffmpeg/util": "^0.12.1"
+  },
+  "exports": {
+    ".": "./imageCompressor.js"
+  }
+}
