@@ -361,8 +361,7 @@ class Services_File_Controller
         return [
             'canUpload' => (bool) $gal_info,
             'type' => $gal_info['type'],
-            'image_max_size_x' => (int) $gal_info['image_max_size_x'],
-            'image_max_size_y' => (int) $gal_info['image_max_size_y'],
+            'image_max_dimension' => (int) $gal_info['image_max_dimension'],
         ];
     }
 
