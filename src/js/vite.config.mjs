@@ -134,6 +134,8 @@ export default defineConfig(({ command, mode }) => {
         "tiki-glightbox": resolve(import.meta.dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(import.meta.dirname, "tiki-sentry-browser/sentry-browser.js"),
         "tiki-figlet": resolve(import.meta.dirname, "tiki-figlet/figlet.js"),
+        "tiki-image-compressor": resolve(__dirname, "tiki-image-compressor/imageCompressor.js"),
+        "tiki-image-compressor-controls": resolve(__dirname, "tiki-image-compressor/compressionControls.js"),
         styleguide: resolve(import.meta.dirname, "vue-mf/styleguide/src/styleguide.js"),
         "tiki-offline": resolve(import.meta.dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(import.meta.dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),

@@ -8,7 +8,8 @@
  */
 
 import imageCompression from "browser-image-compression";
-import { FFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 
 // Supported MIME types
 const SUPPORTED_TYPES = {

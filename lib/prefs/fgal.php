@@ -970,7 +970,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'help' => 'Image-Compression',
             'dependencies' => ['fgal_image_compression_enabled'],
         ],
-        'fgal_image_compression_max_size' => [
+        'fgal_image_compression_max_size_mb' => [
             'name' => tra('Minimum file size for compression'),
             'description' => tra('Only compress images larger than this size (in MB). Set to 0 to compress all images.'),
             'type' => 'text',

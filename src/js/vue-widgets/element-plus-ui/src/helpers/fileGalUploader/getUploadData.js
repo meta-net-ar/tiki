@@ -1,8 +1,7 @@
 import { ElMessage } from "element-plus";
-import adjustImageSize from "./adjustImageSize";
 import fileToBase64 from "./fileToBase64";
 
-export default async function (file, maxWidth, maxHeight) {
+export default async function (file) {
     const result = {
         name: file.name,
         type: file.type,
@@ -11,12 +10,7 @@ export default async function (file, maxWidth, maxHeight) {
 
     try {
         const base64 = await fileToBase64(file);
-        if (maxWidth && maxHeight && file.type.includes("image")) {
-            const resized = await adjustImageSize(base64, maxWidth, maxHeight, file.type);
-            result.data = resized.replace(/^data:image\/\w+;base64,/, "");
-        } else {
-            result.data = base64.replace(/^data:.*?;base64,/, "");
-        }
+        result.data = base64.replace(/^data:.*?;base64,/, "");
     } catch (error) {
         ElMessage.error("Failed to get file data");
     }

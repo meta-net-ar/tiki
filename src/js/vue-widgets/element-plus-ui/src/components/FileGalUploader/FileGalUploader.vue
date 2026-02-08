@@ -3,13 +3,12 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { ajaxUpload as defaultHttpRequest } from 'element-plus/es/components/upload/src/ajax';
 import { ref, onMounted } from 'vue'
-import imageCompressionModule from '../../../tiki-imagecompressor/imageCompressionModule.js'
 import getUploadData from '../../helpers/fileGalUploader/getUploadData';
 import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
 
-const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language', 'compressionSettings']);
+const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language']);
 const maxSize = JSON.parse(props.maxSize);
 const maxFiles = JSON.parse(props.maxFiles);
 
@@ -20,15 +19,10 @@ const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
 
-onMounted(async () => {
+onMounted(() => {
     const searcParams = new URLSearchParams(location.search);
     if (searcParams.get('filegals_manager')) {
         insertIntoEditor.value = true;
-    }
-    
-    // Initialize compression module with server settings
-    if (props.compressionSettings) {
-        await imageCompressionModule.init(JSON.parse(props.compressionSettings));
     }
 })
 
@@ -44,28 +38,12 @@ const submitUpload = () => {
     uploadRef.value.submit();
 }
 
-const beforeUpload = async (rawFile) => {
+const beforeUpload = (rawFile) => {
     if (rawFile.size > maxSize) {
         const maxSizeKB = props.maxSize / 1000;
         ElMessage.error(`File size cannot exceed ${maxSizeKB}KB`);
         return false;
     }
-    
-    // Compress image if enabled
-    if (imageCompressionModule.shouldCompress(rawFile)) {
-        try {
-            const compressed = await imageCompressionModule.compress(rawFile);
-            Object.defineProperty(rawFile, 'size', { value: compressed.size });
-            Object.defineProperty(rawFile, 'slice', {
-                value: (start, end) => compressed.slice(start, end)
-            });
-            ElMessage.success(`Compressed: ${(rawFile.size / 1024).toFixed(1)} KB`);
-        } catch (error) {
-            ElMessage.warning(`Compression failed, uploading original: ${error.message}`);
-        }
-    }
-    
-    return true;
 }
 
 /**
