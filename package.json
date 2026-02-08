@@ -165,6 +165,7 @@
     "src/js/jquery-tiki",
     "src/js/tiki-figlet",
     "src/tiki-image-compressor",
+    "src/js/tiki-image-compressor",
     "src/js/tiki-iot",
     "src/js/tiki-glightbox",
     "src/js/tiki-html5-qrcode",

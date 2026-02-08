@@ -297,6 +297,23 @@ if ($prefs['elementplus_upload'] === 'y') {
     $headerlib->add_js_module("import '@vue-widgets/el-file-gal-uploader';");
 }
 
+if ($prefs['fgal_image_compression_enabled'] === 'y') {
+    $quality = (int)$prefs['fgal_image_compression_quality'];
+    $maxDimension = (int)$prefs['fgal_image_compression_max_dimension'];
+    $saveOriginal = json_encode($prefs['fgal_image_compression_save_original']);
+    $preset = json_encode($prefs['fgal_image_compression_preset_type']);
+    
+    $headerlib->add_js_module("
+        import initCompression from '@tiki/image-compressor-controls';
+        initCompression({
+            quality: " . $quality . ",
+            maxDimension: " . $maxDimension . ",
+            saveOriginal: " . $saveOriginal . ",
+            preset: " . $preset . "
+        });
+    ");
+}
+
 // Display the template
 if (! $isUpload || ! empty($_REQUEST['fileId'])) {
     if ($prefs['elementplus_upload'] !== 'y') {

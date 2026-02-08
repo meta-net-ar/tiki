@@ -208,59 +208,131 @@
                     {/if}
                 {/if}
             </div>
-            <div class="col-sm-12">
-                <div class="form-check">
-                    <label for="imagesize" class="form-check-label">
-                        <input class="form-check-input" type="checkbox" id="imagesize" name="imagesize" checked="checked" value="yes" />
-                        {tr}Use the gallery's default resize settings for images{/tr}
-                        <span id="imageResizeInfo">
-    {if isset($gal_info.image_max_size_x) && isset($gal_info.image_max_size_y)}
-        {tr _0=$gal_info.image_max_size_x _1=$gal_info.image_max_size_y}(%0px x %1px){/tr}
-    {else}
-        {tr}(No resize){/tr}
-    {/if}
-</span>
-                    </label>
-                </div>
-            </div>
-
-            <div id="customsize" style="display:none">
+            {* Image Compression Controls *}
+            {if $prefs.fgal_image_compression_enabled eq 'y'}
                 <div class="mb-3 row">
-                    <label for="image_max_size_x" class="col-sm-4 text-end">{tr}Maximum width of images{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="input-group col-sm-4">
-                            <input type="number" name="image_max_size_x" id="image_max_size_x"
-                                   value="{if isset($gal_info["image_max_size_x"])}{$gal_info["image_max_size_x"]}{else}0{/if}"
-                                   class="form-control text-end">
-                            <span class="input-group-text"> {tr}pixel{/tr}</span>
-                        </div>
-                        <span class="form-text">{tr}If an image is wider than this, it will be resized. Attention: In this case, the original image will be lost. (0=unlimited){/tr}</span>
-                    </div>
+                    <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
+                    <div class="col-md-8">
 
-                </div>
-                <div class="mb-3 row">
-                    <label for="image_max_size_y" class="col-sm-4 text-end">{tr}Maximum height of images in gallery{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="input-group col-sm-4">
-                            <input type="number" name="image_max_size_y" id="image_max_size_y"  value="{if isset($gal_info["image_max_size_y"])}{$gal_info["image_max_size_y"]}{else}0{/if}"  class="form-control text-end">
-                            <span class="input-group-text"> {tr}pixel{/tr}</span>
-                        </div>
-                        <span class="form-text">{tr}If an image is higher than this, it will be resized. Attention: In this case, the original image will be lost. (0=unlimited){/tr}</span>
-                    </div>
-                </div>
-            </div>
-            {if $simpleMode neq 'y'}
-                <div class="fgal_file_c2">
-                    {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
-                        <div class="col-sm-12">
-                            <div class="form-check mb-3">
-                                <label for="isbatch" class="form-check-label">
-                                    <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
-                                    {tr}Unzip zip files{/tr}
-                                </label>
+                        {* Default Preset Summary *}
+                        <div id="compression_default_summary">
+                            <div class="border rounded p-3 bg-light mb-3">
+                                <strong>{tr}Current Settings{/tr}:</strong>
+                                <ul class="mb-2">
+                                    <li>{tr}Max dimension{/tr}: <span id="default_max_size"
+                                            data-default="{$prefs.fgal_image_compression_max_dimension}">
+                                            {$prefs.fgal_image_compression_max_dimension} px
+                                            </span>
+                                    </li>
+                                    <li>{tr}Compress files larger than{/tr}: <span
+                                            data-default="{$prefs.fgal_image_compression_max_size_mb|default:1}"
+                                            id="default_min_file">{$prefs.fgal_image_compression_max_size_mb|default:1} MB
+                                            </span>
+                                    </li>
+                                    <li>{tr}Save original{/tr}:
+                                       {if $prefs.fgal_image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
+                                    </li>
+                                    <li>{tr}Unzip zip files{/tr}:
+                                        {if isset($isbatch) and $isbatch|@count gt 0}
+                                             {tr}Yes{/tr}
+                                        {else}
+                                             {tr}No{/tr}
+                                        {/if}
+                                    </li>
+                                </ul>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="customize-compression-toggle">
+                                    <i class="fas fa-cog"></i> {tr}Customize{/tr}
+                                </button>
                             </div>
                         </div>
-                    {/if}
+    
+                       {* Custom Controls (hidden by default) *}
+                        <div id="compression_custom_controls" class="d-none">
+      
+                            {* Compression type: preset levels or slider *}
+                            {if $prefs.fgal_image_compression_preset_type eq 'levels'}
+                                <div class="compression-preset-controls mb-3">
+                                    <label class="form-label">{tr}Compression Level{/tr}</label>
+                                    <div class="btn-group w-100" role="group">
+                                       <input type="radio" class="btn-check" name="compression_preset_main"
+                                            id="compression_high_main" value="high" checked>
+                                        <label class="btn btn-outline-success" for="compression_high_main">
+                                            <i class="fas fa-star"></i> {tr}High Quality{/tr}
+                                            <small class="d-block text-muted">90% - Large file</small>
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="compression_preset_main"
+                                            id="compression_balanced_main" value="balanced">
+                                        <label class="btn btn-outline-primary" for="compression_balanced_main">
+                                            <i class="fas fa-balance-scale"></i> {tr}Balanced{/tr}
+                                            <small class="d-block text-muted">75% - Medium file</small>
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="compression_preset_main"
+                                           id="compression_compressed_main" value="compressed">
+                                        <label class="btn btn-outline-warning" for="compression_compressed_main">
+                                           <i class="fas fa-compress"></i> {tr}Compressed{/tr}
+                                           <small class="d-block text-muted">60% - Small file</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="compression-quality-controls mb-3">
+                                    <label for="compression_quality_main" class="form-label">{tr}Compression Quality{/tr}</label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="range" class="form-range me-3" id="compression_quality_main"
+                                            name="compression_quality" min="10" max="100"
+                                            value="{$prefs.fgal_image_compression_quality|default:85}">
+                                        <span class="quality-display badge bg-primary"
+                                            id="quality_display_main">{$prefs.fgal_image_compression_quality|default:85}%</span>
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <div class="mb-3">
+                                <label for="compression_max_dimension_main" class="form-label">{tr}Max Image Dimension{/tr}</label>
+                                <input type="number" id="compression_max_dimension_main" name="compression_max_dimension" class="form-control"
+                                    value="{$prefs.fgal_image_compression_max_dimension|default:1600}" min="100" step="100">
+                                <small class="form-text text-muted">{tr}Maximum width or height in pixels. Images larger than this will be resized.{/tr}</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">{tr}Min File Size to Compress{/tr}</label>
+                                <input type="number" name="compression_max_size" class="form-control"
+                                    value="{$prefs.fgal_image_compression_max_size_mb|default:1}" min="1" step="0.5">
+                                <small class="form-text text-muted">{tr}Only compress images larger than this size (MB).{/tr}</small>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="compression_save_original_main"
+                                    name="compression_save_original" value="y"
+                                    {if $prefs.fgal_image_compression_save_original eq 'y'}checked{/if}>
+                                <label for="compression_save_original_main" class="form-check-label">{tr}Save original
+                                    file{/tr}</label>
+                            </div>
+
+                            {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
+                                <div class="col-sm-12">
+                                    <div class="form-check mb-3">
+                                        <label for="isbatch" class="form-check-label">
+                                            <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
+                                            {tr}Unzip zip files{/tr}
+                                        </label>
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="compression-back-to-default">
+                                <i class="fas fa-arrow-left"></i> {tr}Back to default{/tr}
+                            </button>
+                       </div>
+                   </div>
+               </div>
+            {/if}
+
+            {if $simpleMode neq 'y'}
+                <div class="fgal_file_c2">                
                     {if $prefs.fgal_delete_after eq 'y'}
                         <div class="mb-3 row">
                             <label for="deleteAfter" class="col-md-4 col-form-label">{tr}File can be deleted after{/tr}</label>
@@ -419,7 +491,7 @@
             {/if}
             {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
-                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
+                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" />
                 </div>
             {/if}
             {if !$editFileId}
@@ -581,23 +653,19 @@
     {/if}
 {/if}
 {jq}
-var defaultx= $("#image_max_size_x").attr('value');
-var defaulty= $("#image_max_size_y").attr('value');
+var defaultDim= $("#image_max_dimension").attr('value');
 
 $("#imagesize").on("click", function () {
     if ($(this).prop("checked")) {
         $("#customsize").css("display", "none");
         //resetting size to default
-        $("#image_max_size_x").attr('value',defaultx);
-        $("#image_max_size_y").attr('value',defaulty);
-        $("element-plus-ui#uploader").attr('max-width', defaultx);
-        $("element-plus-ui#uploader").attr('max-height', defaulty);
+        $("#image_max_dimension").attr('value',defaultDim);
+        $("element-plus-ui#uploader").attr('max-width', defaultDim);
+        $("element-plus-ui#uploader").attr('max-height', defaultDim);
     } else {
         $("#customsize").css("display", "");
-        $("#image_max_size_x").on("change", function () {
+        $("#image_max_dimension").on("change", function () {
             $("element-plus-ui#uploader").attr('max-width', $(this).val());
-        });
-        $("#image_max_size_y").on("change", function () {
             $("element-plus-ui#uploader").attr('max-height', $(this).val());
         });
     }
@@ -650,20 +718,17 @@ $("#galleryId").on("change", function(){
             if (data.canUpload) {
                 $("#gallery_type").attr('value', data.type);
 
-                $("#image_max_size_x").attr('value', data.image_max_size_x);
-                $("#image_max_size_y").attr('value', data.image_max_size_y);
-                if (data.image_max_size_x) {
-                    $("#imageResizeInfo").html(data.image_max_size_x + 'px X ' + data.image_max_size_y + 'px');
+                $("#image_max_dimension").attr('value', data.image_max_dimension);
+                if (data.image_max_dimension) {
+                    $("#imageResizeInfo").html(data.image_max_dimension + 'px');
                 } else {
                     $("#imageResizeInfo").html('(No resize)');
                 }
             } else {
                 $("#gallery_type").attr('value', '');
-                $("#image_max_size_x").attr('value','');
-                $("#image_max_size_y").attr('value',"");
+                $("#image_max_dimension").attr('value','');
                 $("#imageResizeInfo").html('');
-                defaultx='';
-                efaulty='';
+                defaultDim='';
             }
         },
         error: function (e) {

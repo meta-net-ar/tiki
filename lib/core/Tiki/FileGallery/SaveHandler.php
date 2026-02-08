@@ -8,7 +8,6 @@ namespace Tiki\FileGallery;
 
 use TikiLib;
 use Tiki\FileGallery\File as TikiFile;
-use Tiki\FileGallery\ImageCompressionModule;
 
 class SaveHandler
 {
@@ -133,19 +132,6 @@ class SaveHandler
         global $prefs, $user;
 
         $file = $this->file;
-
-        // Apply server-side image compression if enabled
-        if ($file->filetype && ImageCompressionModule::shouldCompress($file->filetype, $prefs)) {
-            $tempFile = tempnam(sys_get_temp_dir(), 'tiki_image_');
-            file_put_contents($tempFile, $file->getWrapper()->getContents());
-            
-            if (ImageCompressionModule::compress($tempFile, $file->filetype, $prefs)) {
-                $compressedContent = file_get_contents($tempFile);
-                $file->replaceContents($compressedContent);
-            }
-            
-            @unlink($tempFile);
-        }
 
         $initialFileId = (int)$file->param['fileId'];
         $sendWatches = true;
