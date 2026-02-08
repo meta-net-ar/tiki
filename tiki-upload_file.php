@@ -302,15 +302,53 @@ if ($prefs['fgal_image_compression_enabled'] === 'y') {
     $maxDimension = (int)$prefs['fgal_image_compression_max_dimension'];
     $saveOriginal = json_encode($prefs['fgal_image_compression_save_original']);
     $preset = json_encode($prefs['fgal_image_compression_preset_type']);
+    $maxSize = (float)$prefs['fgal_image_compression_max_size_mb'] ?? 1;
     
     $headerlib->add_js_module("
         import initCompression from '@tiki/image-compressor-controls';
+        import { compressFileList } from '@tiki/image-compressor';
+        import { compressBeforeAjaxSubmit } from '@tiki/image-compressor-controls';
+        
         initCompression({
             quality: " . $quality . ",
             maxDimension: " . $maxDimension . ",
             saveOriginal: " . $saveOriginal . ",
             preset: " . $preset . "
         });
+        
+        // Expose compression functions globally
+        window.tikiCompressBeforeAjaxSubmit = compressBeforeAjaxSubmit;
+        
+        // For Element Plus uploader
+        window.tikiCompressFiles = async (fileList) => {
+            let quality = " . $quality . ";
+            let maxDimension = " . $maxDimension . ";
+            let saveOriginal = " . $saveOriginal . ";
+            
+            const qualityInput = document.getElementById('compression_quality_main');
+            if (qualityInput && qualityInput.value) {
+                quality = parseInt(qualityInput.value, 10);
+            }
+            
+            const maxDimInput = document.querySelector('[name=\"compression_max_dimension\"]');
+            if (maxDimInput && maxDimInput.value) {
+                maxDimension = parseInt(maxDimInput.value, 10);
+            }
+            
+            const saveOrigChk = document.getElementById('compression_save_original_main');
+            if (saveOrigChk) {
+                saveOriginal = saveOrigChk.checked ? 'y' : 'n';
+            }
+            
+            const settings = {
+                maxDimension: maxDimension,
+                qualityPercent: quality,
+                saveOriginal: saveOriginal
+            };
+            
+            const dataTransfer = await compressFileList(fileList, settings);
+            return { files: Array.from(dataTransfer.files) };
+        };
     ");
 }
 

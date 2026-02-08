@@ -230,5 +230,112 @@ async function compressMultiple(files, prefs = {}, options = {}) {
     return results;
 }
 
-export { compress, compressMultiple, isSupported, isImage, isVideo };
+/**
+ * Compress FileList from form input in-place
+ * Updates file input with compressed files using DataTransfer
+ * 
+ * @param {FileList} fileList - FileList from input[type="file"]
+ * @param {Object} prefs - Compression settings (quality, maxDimension, maxSize)
+ * @returns {Promise<DataTransfer>} - DataTransfer with compressed files
+ */
+async function compressFileList(fileList, prefs = {}) {
+    if (!fileList || fileList.length === 0) {
+        console.log('[MediaCompressor] No files to compress');
+        return new DataTransfer();
+    }
+
+    const dataTransfer = new DataTransfer();
+    const results = [];
+
+    for (const file of fileList) {
+        // Check if file is supported
+        if (!isSupported(file)) {
+            console.log('[MediaCompressor] File not supported, keeping original:', file.name);
+            dataTransfer.items.add(file);
+            results.push({
+                name: file.name,
+                original: file.size,
+                compressed: file.size,
+                success: false,
+                skipped: true,
+                reason: 'unsupported',
+            });
+            continue;
+        }
+
+        // Check minimum file size threshold
+        const minSizeMB = prefs.maxSize || 1;
+        const fileSizeMB = file.size / (1024 * 1024);
+        if (fileSizeMB < minSizeMB) {
+            console.log('[MediaCompressor] File too small, keeping original:', file.name);
+            dataTransfer.items.add(file);
+            results.push({
+                name: file.name,
+                original: file.size,
+                compressed: file.size,
+                success: false,
+                skipped: true,
+                reason: 'too_small',
+            });
+            continue;
+        }
+
+        try {
+            const result = await compress(file, prefs);
+
+            if (result.success) {
+                const compressedFile = new File(
+                    [result.blob],
+                    file.name,
+                    { type: result.blob.type }
+                );
+                dataTransfer.items.add(compressedFile);
+                
+                results.push({
+                    name: file.name,
+                    original: file.size,
+                    compressed: result.blob.size,
+                    success: true,
+                    savings: (100 - (result.blob.size / file.size * 100)).toFixed(1),
+                });
+            } else if (result.skipped) {
+                dataTransfer.items.add(file);
+                results.push({
+                    name: file.name,
+                    original: file.size,
+                    compressed: file.size,
+                    success: false,
+                    skipped: true,
+                    reason: result.formatted,
+                });
+            } else {
+                // Compression failed, keep original
+                dataTransfer.items.add(file);
+                results.push({
+                    name: file.name,
+                    original: file.size,
+                    compressed: file.size,
+                    success: false,
+                    error: result.error,
+                });
+            }
+        } catch (err) {
+            // Error during compression, keep original
+            console.error('[MediaCompressor] Error compressing file:', file.name, err);
+            dataTransfer.items.add(file);
+            results.push({
+                name: file.name,
+                original: file.size,
+                compressed: file.size,
+                success: false,
+                error: err.message,
+            });
+        }
+    }
+
+    console.log('[MediaCompressor] Compression results:', results);
+    return dataTransfer;
+}
+
+export { compress, compressMultiple, compressFileList, isSupported, isImage, isVideo };
 export default compress;

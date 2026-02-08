@@ -491,7 +491,7 @@
             {/if}
             {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
-                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" />
+                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"{if $prefs.fgal_image_compression_enabled eq 'y'} :compress-handler="() => window.tikiCompressFiles"{/if} />
                 </div>
             {/if}
             {if !$editFileId}
@@ -553,13 +553,22 @@
 {if ! $editFileId and $prefs.elementplus_upload neq 'y'}
     {jq notonready=true}
     {literal}
-        $('#file_0').ajaxForm({target: '#progress_0', forceSync: true});
+        function initAjaxForm(formId, progressId) {
+            var ajaxConfig = {target: '#' + progressId, forceSync: true};
+            if (typeof window.tikiCompressBeforeAjaxSubmit === 'function') {
+                ajaxConfig.beforeSubmit = window.tikiCompressBeforeAjaxSubmit;
+            }
+            $('#' + formId).ajaxForm(ajaxConfig);
+        }
+        
+        initAjaxForm('file_0', 'progress_0');
         var nb_upload = 1;
         function add_upload_file() {
-            var clone = $('#form form').eq(0).clone().resetForm().attr('id', 'file_' + nb_upload).ajaxForm({target: '#progress_' + nb_upload, forceSync: true});
+            var clone = $('#form form').eq(0).clone().resetForm().attr('id', 'file_' + nb_upload);
             $(clone[0].submission).val(parseInt($(clone[0].submission).val(), 10) + parseInt(nb_upload, 10));
             clone.insertAfter($('#form form').eq(-1));
             document.getElementById('progress').innerHTML += "<div id='progress_"+nb_upload+"'></div>";
+            initAjaxForm('file_' + nb_upload, 'progress_' + nb_upload);
             nb_upload += 1;
         }
         function upload_files(){

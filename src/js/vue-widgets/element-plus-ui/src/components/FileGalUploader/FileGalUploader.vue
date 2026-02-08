@@ -8,13 +8,14 @@ import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
 
-const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language']);
+const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language', 'compressHandler']);
 const maxSize = JSON.parse(props.maxSize);
 const maxFiles = JSON.parse(props.maxFiles);
 
 const uploadRef = ref(null);
 const insertIntoEditor = ref(false);
 const uploadedFiles = ref([]);
+const isCompressing = ref(false);
 const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
@@ -26,7 +27,53 @@ onMounted(() => {
     }
 })
 
-const submitUpload = () => {
+const compressFiles = async () => {
+    if (!props.compressHandler || !uploadRef.value?.uploadFiles || uploadRef.value.uploadFiles.length === 0) {
+        console.log('[FileGalUploader] Compression not available or no files');
+        return true;
+    }
+    
+    try {
+        isCompressing.value = true;
+        console.log('[FileGalUploader] Starting compression for', uploadRef.value.uploadFiles.length, 'files');
+        
+        // Create a FileList-like array of files
+        const files = uploadRef.value.uploadFiles.map(f => f.raw);
+        
+        // Call the compress handler
+        const compressed = await props.compressHandler(files);
+        console.log('[FileGalUploader] Compression complete');
+        
+        // Replace the upload files with compressed versions
+        if (compressed?.files?.length > 0) {
+            uploadRef.value.uploadFiles = Array.from(compressed.files).map((file, index) => ({
+                uid: -1 - index,
+                name: file.name,
+                raw: file,
+                size: file.size,
+                percentage: 0,
+                status: 'ready'
+            }));
+            console.log('[FileGalUploader] Files replaced with compressed versions');
+        }
+        
+        return true;
+    } catch (err) {
+        console.error('[FileGalUploader] Compression failed:', err);
+        ElMessage.error('File compression failed: ' + err.message);
+        return false;
+    } finally {
+        isCompressing.value = false;
+    }
+}
+
+const submitUpload = async () => {
+    // Compress files first if handler available
+    const canProceed = await compressFiles();
+    if (!canProceed) {
+        return;
+    }
+
     submitCalled.value = true;
     if (uploadRef.value && uploadRef.value.uploadFiles) {
         totalFilesToUpload.value = uploadRef.value.uploadFiles.length;
@@ -35,6 +82,7 @@ const submitUpload = () => {
         totalFilesToUpload.value = 0;
         completedUploads.value = 0;
     }
+
     uploadRef.value.submit();
 }
 
@@ -176,8 +224,9 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             </div>
         </div>
 
-        <el-button type="primary" @click="submitUpload" :data-testid="DATA_TEST_ID.SUBMIT_BUTTON">
-        <span v-if="!insertIntoEditor">Upload</span>
+        <el-button type="primary" @click="submitUpload" :data-testid="DATA_TEST_ID.SUBMIT_BUTTON" :disabled="isCompressing">
+        <span v-if="isCompressing">Compressing...</span>
+        <span v-else-if="!insertIntoEditor">Upload</span>
         <span v-else>Insert</span>
         </el-button>
     </ConfigWrapper>
