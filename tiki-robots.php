@@ -1,5 +1,7 @@
 <?php
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
+
 header('content-type: text/plain');
 
 require_once 'tiki-setup.php';
@@ -9,6 +11,30 @@ $dynamicOptions = "";
 if ($prefs['sitemap_enable'] == 'y') {
     $dynamicOptions .= "# Be sure to re-generate sitemaps with scheduler (https://doc.tiki.org/Sitemap)" . PHP_EOL;
     $dynamicOptions .= "Sitemap: {$base_url}storage/public/sitemap-index.xml";
+}
+
+if ($prefs['seo_prevent_crawling'] == 'y') {
+    $disallowRule = "# Prevent crawling of the entire site, you can change this via preferences" . PHP_EOL;
+    $disallowRule .= "Disallow: /" . PHP_EOL;
+    echo <<<EOF
+    # This is a robots.txt file to instruct all search bots that we don't want them to crawl in the paths beginning with the strings below.
+    # If you are viewing this via example.org/robots.txt, it is an alias of tiki-robots.php (likely via an instruction in .htaccess)
+    # tiki-robots.php permits to dynamically generate a robots.txt file according to preferences set in the admin panel
+    # 
+    # For an installation in a subdirectory, you have to copy this file in root of your domain and add /yoursubdirname on each line.
+    #
+    # (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+    #
+    # All Rights Reserved. See copyright.txt for details and a complete list of authors.
+    # Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+    User-agent: *
+    {$disallowRule}
+    EOF;
+    exit;
+} else {
+    $disallowRule = "# Allow site crawling" . PHP_EOL;
+    $disallowRule .= "Allow: /" . PHP_EOL;
 }
 
 echo <<<EOF
@@ -24,8 +50,7 @@ echo <<<EOF
 # Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 User-agent: *
-# Uncomment the following line to indicate to robots __not__ to crawl your site.
-# Disallow: /
+{$disallowRule}
 
 {$dynamicOptions}
 
