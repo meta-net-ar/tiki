@@ -12,7 +12,7 @@ function prefs_seo_list()
             'name' => tr('Prevent entire site from being crawled'),
             'description' => tr('Blocks all search engine crawlers from indexing the site. Useful for development, staging, or private sites.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'keywords' => 'seo robots crawl search engine noindex block',
         ],
     ];
