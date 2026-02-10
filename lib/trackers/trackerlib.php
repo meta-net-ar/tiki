@@ -528,22 +528,45 @@ class TrackerLib extends TikiLib
         return $status;
     }
 
+    /**
+     * List tracker items with optional field filtering and sorting
+     *
+     * @param int $trackerId The tracker ID (-1 for all trackers)
+     * @param int $offset Offset for pagination
+     * @param int $maxRecords Maximum number of records to return (-1 for all)
+     * @param string $sort_mode Sort mode (e.g., 'itemId_asc', 'lastModif_desc', or 'f_fieldname_asc')
+     * @param array|null $fields Array with 'data' key containing field definitions from list_tracker_fields(), or null
+     * @param string $status Filter by item status (empty string for all)
+     * @param string $initial Filter items starting with this initial character
+     * @return array Array with 'data' key containing items and 'count' key with total count
+     */
     /*shared*/
     public function list_tracker_items($trackerId, $offset, $maxRecords, $sort_mode, $fields, $status = '', $initial = '')
     {
-
         $filters = [];
-        if ($fields) {
+        $csort_mode = '';
+
+        if ($fields && is_array($fields) && isset($fields["data"])) {
             $temp_max = count($fields["data"]);
             for ($i = 0; $i < $temp_max; $i++) {
                 $fieldId = $fields["data"][$i]["fieldId"];
                 $filters[$fieldId] = $fields["data"][$i];
             }
+
+            if (! $sort_mode) {
+                for ($i = 0; $i < $temp_max; $i++) {
+                    if ($fields['data'][$i]['isMain'] == 'y') {
+                        $csort_mode = $fields['data'][$i]['name'];
+                        break;
+                    }
+                }
+            }
         }
-        $csort_mode = '';
+
         if (str_starts_with($sort_mode, "f_")) {
             list($a,$csort_mode,$corder) = explode('_', $sort_mode, 3);
         }
+
         $trackerId = (int) $trackerId;
         if ($trackerId == -1) {
             $mid = " where 1=1 ";
@@ -559,15 +582,6 @@ class TrackerLib extends TikiLib
         if ($initial) {
             $mid .= "and ttif.`value` like ?";
             $bindvars[] = $initial . '%';
-        }
-        if (! $sort_mode) {
-            $temp_max = count($fields["data"]);
-            for ($i = 0; $i < $temp_max; $i++) {
-                if ($fields['data'][$i]['isMain'] == 'y') {
-                    $csort_mode = $fields['data'][$i]['name'];
-                    break;
-                }
-            }
         }
         if ($csort_mode) {
             $bindvars[] = $csort_mode;

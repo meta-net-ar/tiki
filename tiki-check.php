@@ -3900,17 +3900,17 @@ function check_db_mismatches()
 function getDbKeyDefinitions($tableName)
 {
     $query = <<<SQL
-    SELECT 
-        INDEX_NAME, 
+    SELECT
+        INDEX_NAME,
         TABLE_NAME,
         GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS INDEX_COLUMNS,
-    CASE 
+    CASE
         WHEN NON_UNIQUE = 0 AND INDEX_NAME = 'PRIMARY'
-            THEN 'PRIMARY' 
+            THEN 'PRIMARY'
         WHEN NON_UNIQUE = 0
             THEN 'UNIQUE'
-        ELSE 'INDEX' 
-    END AS INDEX_TYPE 
+        ELSE 'INDEX'
+    END AS INDEX_TYPE
     FROM information_schema.statistics
     WHERE TABLE_SCHEMA = database() AND TABLE_NAME = "$tableName"
     GROUP BY INDEX_NAME, NON_UNIQUE;
@@ -4846,26 +4846,30 @@ if ($standalone && ! $nagios) {
 
     $output = array();
     $locales = null;
-    exec("locale -a 2>&1", $output, $returnCode);
-    // Verification of the return code.
-    if ($returnCode === 0) {
-        // The command was successfully executed, we filter it from the array.
-        if (is_array($output)) {
-            $locales = array_filter($output);
-            sort($locales, SORT_STRING | SORT_FLAG_CASE);
-        } else {
-            if ($locales = preg_split("/\r ?\n/", $output)) {
-                $locales = array_filter($locales);
+    if (function_exists('exec')) {
+        exec("locale -a 2>&1", $output, $returnCode);
+        // Verification of the return code.
+        if ($returnCode === 0) {
+            // The command was successfully executed, we filter it from the array.
+            if (is_array($output)) {
+                $locales = array_filter($output);
                 sort($locales, SORT_STRING | SORT_FLAG_CASE);
             } else {
-                $locales = "Unexpected result";
+                if ($locales = preg_split("/\r ?\n/", $output)) {
+                    $locales = array_filter($locales);
+                    sort($locales, SORT_STRING | SORT_FLAG_CASE);
+                } else {
+                    $locales = tra("Unexpected result");
+                }
+            }
+        } else {
+            // The command failed, we take the error array, and convert it to a string to display to the user
+            foreach ($output as $errorLine) {
+                $locales .= "$errorLine\n";
             }
         }
     } else {
-        // The command failed, we take the error array, and convert it to a string to display to the user
-        foreach ($output as $errorLine) {
-            $locales .= "$errorLine\n";
-        }
+        $locales = tra("exec() function is disabled in PHP configuration");
     }
 
     $smarty->assign('locales', $locales);
