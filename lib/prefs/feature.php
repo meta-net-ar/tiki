@@ -987,6 +987,15 @@ function prefs_feature_list($partial = false)
             'default' => 'y',
             'tags' => ['basic'],
         ],
+        'feature_eol_date_notifier' => [
+            'name' => tra('End-of-Life Date Notifier'),
+            'description' => tra('Enable notifications for approaching End-of-Life (EoL) dates for supported versions.'),
+            'type' => 'flag',
+            'package' => 'features',
+            'since' => '30.0',
+            'default' => 'y',
+            'tags' => ['basic', 'interface', 'admin', 'security'],
+        ],
         'feature_ticketlib' => [
             'name' => tra('Require confirmation of an action if a possible CSRF is detected'),
             'type' => 'flag',
@@ -1094,7 +1103,7 @@ function prefs_feature_list($partial = false)
         'feature_tag_users' => [
             'name' => tra('Tagging users'),
             'description' => tra('Add support for @username mentions'),
-            'help' => 'Add support for @username mentions',
+            'help' => 'User Mentions',
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
@@ -1102,7 +1111,7 @@ function prefs_feature_list($partial = false)
         'feature_notify_users_mention' => [
             'name' => tra('User mention notifications'),
             'description' => tra('Add support for @username mentions notifications'),
-            'help' => 'Add support for @username mentions notifications by email',
+            'help' => 'Activate User Mention Notification',
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
@@ -2606,6 +2615,23 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['experimental'],
         ],
+        'feature_loadbalancer_trusted_proxies' => [
+            'name' => tra('Trusted reverse proxy IPs'),
+            'description' => tra('List of IP addresses of trusted reverse proxies. Only requests coming from these IPs will have their X-Forwarded-For headers trusted. Leave empty to trust all IPs (less secure).'),
+            'type' => 'textarea',
+            'size' => 3,
+            'default' => '',
+            'tags' => ['experimental'],
+            'dependencies' => ['feature_loadbalancer'],
+        ],
+        'feature_loadbalancer_header' => [
+            'name' => tra('Reverse proxy header'),
+            'description' => tra('Name of the HTTP header used by your reverse proxy to pass the client IP. Common values: X-Forwarded-For, CF-Connecting-IP, X-Real-IP, X-Client-IP. There is no auto-detection.'),
+            'type' => 'text',
+            'default' => '',
+            'tags' => ['experimental'],
+            'dependencies' => ['feature_loadbalancer'],
+        ],
         'feature_port_rewriting' => [
             'name' => tra('Tiki is behind a frontend-proxy/load-balancer that rewrites ports'),
                 'description' => tra('Activate this only if the server is behind a frontend-proxy/load-balancer (or reverse proxy) that rewrites ports. This enables Tiki to use the HTTP_X_FORWARDED_PROTO parameter set by the proxy, to provide correct links.'),
@@ -2971,6 +2997,14 @@ function prefs_feature_list($partial = false)
             'description' => tra('Modal popups can be resized.'),
             'type' => 'flag',
             'default' => 'y',
+        ],
+        'feature_language_check' => [
+            'name' => tra('Language checking in editors'),
+            'description' => tra('Enable real-time grammar and spelling checking in editors using LanguageTool.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
         ],
     ];
 }

@@ -29,7 +29,7 @@ class FacetReader
             }
         }
 
-        $entries = $this->getFromBucket($entry);
+        $entries = $this->getFromBucket($entry, $facet);
         if ($entries) {
             return new \Search_ResultSet_FacetFilter($facet, $entries);
         } else {
@@ -37,12 +37,16 @@ class FacetReader
         }
     }
 
-    private function getFromBucket($entry)
+    private function getFromBucket($entry, $facet)
     {
         $out = [];
         foreach ($entry as $row) {
             $value = array_shift($row);
             $count = array_pop($row);
+            if ($facet->getType() === 'date_histogram') {
+                // ES histogram is in milliseconds, Manticore is in seconds
+                $value = intval($value) * 1000;
+            }
             if ($value != '') {
                 $out[] = ['value' => $value, 'count' => $count];
             }

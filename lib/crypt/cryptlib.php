@@ -129,7 +129,7 @@ class CryptLib extends TikiLib
             set_error_handler([$this, 'handleDeprecatedError'], E_DEPRECATED);
 
             // Using Rijndael 256 in CBC mode.
-            $this->mcrypt = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', 'cbc', '');
+            $this->mcrypt = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', 'cbc', ''); // @phpstan-ignore function.notFound (part of mcrypt extension)
 
             restore_error_handler();
         }
@@ -150,7 +150,7 @@ class CryptLib extends TikiLib
             set_error_handler([$this, 'handleDeprecatedError'], E_DEPRECATED);
 
             // Call mcrypt_module_close that might trigger E_DEPRECATED
-            mcrypt_module_close($this->mcrypt);
+            mcrypt_module_close($this->mcrypt); // @phpstan-ignore function.notFound (part of mcrypt extension)
             $this->mcrypt_key = null;
             $this->mcrypt = null;
 
@@ -645,11 +645,11 @@ class CryptLib extends TikiLib
             set_error_handler([$this, 'handleDeprecatedError'], E_DEPRECATED);
 
             $cryptData = base64_decode($cryptData64);
-            $ivSize = mcrypt_enc_get_iv_size($this->mcrypt);
+            $ivSize = mcrypt_enc_get_iv_size($this->mcrypt); // @phpstan-ignore function.notFound (part of mcrypt extension)
             $iv = substr($cryptData, 0, $ivSize);
             $crypttext = substr($cryptData, $ivSize);
 
-            $rawcleartext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $this->mcrypt_key, $crypttext, MCRYPT_MODE_CBC, $iv);
+            $rawcleartext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $this->mcrypt_key, $crypttext, MCRYPT_MODE_CBC, $iv); // @phpstan-ignore function.notFound (part of mcrypt extension)
 
             // Clear trailing null-characters
             $cleartext = rtrim($rawcleartext);

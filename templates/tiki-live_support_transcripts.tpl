@@ -1,5 +1,5 @@
 {title}{tr}Support chat transcripts{/tr}{/title}
-
+<div class="styling-element">
 <a class="link" href="tiki-live_support_admin.php">{tr}Back to admin{/tr}</a>
 
 <h2>{tr}Support requests{/tr}</h2>
@@ -80,3 +80,4 @@
         </table>
     </div>
 {/if}
+</div>

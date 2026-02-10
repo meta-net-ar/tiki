@@ -18,12 +18,12 @@
             </div>
         {/if}
         {if !empty($p.fgal_picker)}
-            {$fileId = {ldelim}|cat:'fileId'|cat:{rdelim}}
+            {$fileId = "%fileId%"}
                     <a
                         class="btn btn-primary"
                         title="{tr}Upload image{/tr}"
                         href="#"
-                        onclick="$('#{$p.id|escape}').trigger('select'); openFgalsWindow('tiki-upload_file.php?filegals_manager={$p.id|escape}&insertion_syntax={$fileId|sefurl:display}', true);return false;"
+                        onclick="$('#{$p.id|escape}').trigger('select'); openFgalsWindow('tiki-upload_file.php?filegals_manager={$p.id|escape}&insertion_syntax={$fileId|sefurl:display}&galleryId=1', true);return false;"
                         role="button"
                     >
                     {icon name='image'}&nbsp;{tr}Upload image{/tr}

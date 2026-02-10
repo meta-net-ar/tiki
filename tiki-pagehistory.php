@@ -7,7 +7,6 @@
 
 use Tiki\Lib\Wiki\WikiLibOutput;
 
-$section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -43,6 +42,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $histlib = TikiLib::lib('hist');
 require_once('lib/wiki/renderlib.php');
 

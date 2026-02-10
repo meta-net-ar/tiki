@@ -13,7 +13,7 @@
     {title help="Articles" admpage="articles"}{tr}Submit article{/tr}{/title}
 {/if}
 
-<div class="t_navbar">
+<div class="t_navbar mb-3">
     {button href="tiki-list_submissions.php" _icon_name="list" _class="btn-info" _text="{tr}List submissions{/tr}"}
 </div>
 
@@ -21,7 +21,7 @@
     {tr}Use {$wikiPageSeparator} to separate pages in a multi-page post{/tr}
 {/remarksbox}
 
-<form enctype="multipart/form-data" method="post" action=" " id="editpageform" novalidate>
+<form class="styling-element" enctype="multipart/form-data" method="post" action=" " id="editpageform" novalidate>
     {ticket}
     <input type="hidden" name="subId" value="{$subId|escape}">
     <input type="hidden" name="previewId" value="{$previewId|escape}">

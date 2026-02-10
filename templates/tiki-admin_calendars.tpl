@@ -256,7 +256,7 @@
                     {tr}Name{/tr}
                 </label>
                 <div class="col-sm-5">
-                    <input type="text" class="form-control" name="name" id="calendarName" value="{$name|escape}">
+                    <input type="text" class="form-control" name="name" id="calendarName" value="{$name|escape}" maxlength="{$MAX_CALENDAR_NAME_LENGTH}">
                 </div>
                 <div class="checkbox col-sm-3">
                     <input type="checkbox" name="show[calname]" id="showCalnamePopup" class="form-check-input" value="on"{if $show_calname eq 'y'} checked="checked"{/if}>
@@ -270,7 +270,7 @@
                     {tr}Description{/tr}
                 </label>
                 <div class="col-sm-5">
-                    <textarea name="description" rows="5" wrap="virtual" class="form-control" id="calendarDescription">{$description|escape}</textarea>
+                    {textarea name="description" rows="5" wrap="virtual" class="form-control" id="calendarDescription" maxlength="{$MAX_CALENDAR_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
                 <div class="checkbox col-sm-3">
                     <input type="checkbox" id="showCalDescriptionPopup" class="form-check-input" name="show[description]" value="on"{if $show_description eq 'y'} checked="checked"{/if}>

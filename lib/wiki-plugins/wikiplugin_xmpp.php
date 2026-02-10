@@ -15,7 +15,7 @@ function wikiplugin_xmpp_info()
         'introduced' => 19,
         'params' => [
             'room' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Room Name'),
                 'description' => tr('Room to auto-join'),
                 'since' => 19,
@@ -24,15 +24,15 @@ function wikiplugin_xmpp_info()
             'view_mode' => [
                 'required' => false,
                 'name' => tra('View Mode'),
-                'description' => tra(''),
+                'description' => tra('Choose how the chat room is displayed: overlayed as a popup, embedded in the page, or fullscreen.'),
                 'since' => 19,
-                'default' => 'embedded',
+                'default' => 'overlayed',
                 'filter' => 'word',
                 'options' => [
                     ['text' => '', 'value' => ''],
+                    ['text' => tra('Overlayed'), 'value' => 'overlayed'],
                     ['text' => tra('Embedded'), 'value' => 'embedded'],
                     ['text' => tra('Fullscreen'), 'value' => 'fullscreen'],
-                    ['text' => tra('Overlayed'), 'value' => 'overlayed'],
                 ],
             ],
             'width' => [
@@ -115,7 +115,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Is secret?'),
                 'description' => tra('If the room will be listed on public chat room list'),
                 'default' => 'n',
-                'filter' => 'y|n',
+                'filter' => 'alpha',
                 'required' => false,
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -127,7 +127,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Archiving'),
                 'description' => tra('If room messages will be stored'),
                 'default' => 'y',
-                'filter' => 'y|n',
+                'filter' => 'alpha',
                 'required' => false,
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -139,7 +139,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Persistent'),
                 'description' => tra('If room will continue to exist after last user leaves'),
                 'default' => 'y',
-                'filter' => 'y|n',
+                'filter' => 'alpha',
                 'required' => false,
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -151,7 +151,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Moderated'),
                 'description' => tra('If room is moderated'),
                 'default' => 'y',
-                'filter' => 'y|n',
+                'filter' => 'alpha',
                 'required' => false,
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -165,11 +165,71 @@ function wikiplugin_xmpp_info()
 
 function wikiplugin_xmpp($data, $params)
 {
-    global $prefs, $tiki_p_list_users, $tiki_p_admin;
+    global $user, $prefs, $tiki_p_list_users, $tiki_p_admin;
 
     $headerlib = TikiLib::lib('header');
     $servicelib = TikiLib::lib('service');
     $smarty = TikiLib::lib('smarty');
+
+    $anonMode = trim($prefs['xmpp_anonymous_mode'] ?? '');
+    $isAnonymous = ($params['visibility'] ?? '') === 'anonymous';
+    $dmMode = $isAnonymous && $anonMode === 'support';
+    $params['view_mode'] = $params['view_mode'] ?? 'overlayed';
+    $params['width'] = $params['width'] ?? '100%';
+    $params['height'] = $params['height'] ?? '400px';
+
+    // Require room only when not in anonymous support (DM) mode
+    if (! $dmMode && empty($params['room'])) {
+        Feedback::error(tr('PluginXMPP Error: No room specified'));
+        return '';
+    }
+
+    $visibility = $params['visibility'] ?? 'anonymous';
+    $params['anonymous'] = $visibility === 'anonymous' ? 'y' : 'n';
+
+    // If anonymous → force the room defined in prefs
+    if (empty($user) && isset($params['anonymous']) && $params['anonymous'] === 'y') {
+        $anonMode      = $prefs['xmpp_anonymous_mode'] ?? 'community';
+        $communityRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
+        $supportRoom   = trim($prefs['xmpp_anonymous_support_room'] ?? '');
+        $targetRoom    = '';
+        $xmpplib = TikiLib::lib('xmpp');
+
+        if ($dmMode) {
+            // Personalized support: direct message target, no MUC
+            $params['dm_target'] = trim($prefs['xmpp_admin_jid'] ?? '');
+            unset($params['room']);
+        } elseif ($anonMode === 'community' && $communityRoom !== '') {
+            $targetRoom = $communityRoom;
+        }
+
+        // Never override anonymous room with plugin value
+        if (! empty($user) && $targetRoom === '' && ! empty($params['room'])) {
+            $targetRoom = $params['room'];
+        }
+
+        if ($targetRoom !== '') {
+            $params['room'] = $targetRoom;
+        }
+    }
+
+    if (! empty($user) && ($params['anonymous'] ?? 'n') !== 'y') {
+        $xmpplib = TikiLib::lib('xmpp');
+
+        $requestedFull = $xmpplib->buildRoomJid($params['room']);
+
+        $authorizedRooms = $xmpplib->getXmppRoomsForUser($user);
+        $authorizedFull = array_map(fn($r) => $xmpplib->buildRoomJid($r), $authorizedRooms);
+
+        if (! in_array($requestedFull, $authorizedFull, true)) {
+            if (! empty($prefs['xmpp_conversejs_debug']) && $prefs['xmpp_conversejs_debug'] === 'y') {
+                error_log("[XMPP Plugin] User '{$user}' blocked from {$requestedFull}. Allowed: " . implode(',', $authorizedFull));
+            }
+            return '<div class="alert alert-warning">'
+                . tra('This chat room is restricted.')
+                . '</div>';
+        }
+    }
 
     $result = '<style type="text/css">#page-bar .dropdown-menu { z-index: 1031; }</style>'
         . '<div id="conversejs"'
@@ -207,7 +267,6 @@ function wikiplugin_xmpp($data, $params)
         // supress to avoid conflict
         $headerlib->unsafeClearAllCss();
     }
-    $params['anonymous'] = $params['visibility'] === 'anonymous' ? 'y' : 'n';
 
     $javascript = 'lib/jquery_tiki/wikiplugin-xmpp.js';
     $headerlib->add_jsfile_late($javascript . '?_=' . filemtime(TIKI_PATH . "/$javascript"), false);

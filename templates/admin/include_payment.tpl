@@ -1,4 +1,4 @@
-<form action="tiki-admin.php?page=payment" method="post">
+<form action="tiki-admin.php?page=payment" method="post" class="theme-has_tabs">
     {ticket}
     <div class="row">
         <div class="mb-3 col-lg-12 clearfix">
@@ -10,7 +10,7 @@
     </div>
 
     {if $prefs.payment_feature neq "y"}
-        <fieldset class="mb-3 w-100">
+        <fieldset class="mb-3 w-100 styling-element">
             <legend class="h3">{tr}Activate the feature{/tr}</legend>
             {preference name=payment_feature visible="always"}
         </fieldset>

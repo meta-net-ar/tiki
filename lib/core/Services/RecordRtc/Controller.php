@@ -13,6 +13,48 @@ class Services_RecordRtc_Controller
         Services_Exception_Disabled::check('fgal_use_record_rtc_screen');
     }
 
+    public function action_render_audio_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $src = $input->src->url();
+
+        $smarty->assign('media_src', $src);
+        $smarty->assign('show_audio_preview', true);
+
+        return [
+            'html' => $smarty->fetch('modules/mod-recordrtc.tpl')
+        ];
+    }
+
+    public function action_render_video_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $src = $input->src->url();
+
+        $smarty->assign('media_src', $src);
+        $smarty->assign('show_video_preview', true);
+
+        return [
+            'html' => $smarty->fetch('modules/mod-recordrtc.tpl')
+        ];
+    }
+
+    public function action_render_modal_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $fileType = $input->filetype->word();
+        $mediaUrl = $input->mediaurl->url();
+
+        $smarty->assign('file_type', $fileType);
+        $smarty->assign('media_url', $mediaUrl);
+        $smarty->assign('isAudio', $fileType === 'audio');
+        $smarty->assign('show_modal_preview', true);
+
+        return [
+            'html' => $smarty->fetch('trackerinput/files.tpl')
+        ];
+    }
+
     public function action_upload($input)
     {
         require_once('tiki-setup.php');

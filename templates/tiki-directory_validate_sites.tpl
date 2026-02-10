@@ -1,5 +1,5 @@
 {title help="Directory"}{tr}Validate sites{/tr}{/title}
-
+<div class="styling-element">
 {* Display the title using parent *}
 {include file='tiki-directory_admin_bar.tpl'} <br>
 <h2>{tr}Sites{/tr}</h2>
@@ -105,3 +105,4 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
     });
 {/jq}
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

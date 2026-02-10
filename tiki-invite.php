@@ -41,9 +41,21 @@ $prefs['feature_wiki_protect_email'] = 'n'; //not to alter the email
 function parsemails_csv($bloc)
 {
     $results = [];
+    $ignored = [];
     $lines = preg_split('/[\n\r]+/', $bloc);
     foreach ($lines as $line) {
-        $l = explode(',', $line);
+        $line = trim($line);
+        if ($line === '') {
+            continue;
+        }
+        $l = array_map('trim', explode(',', $line));
+
+        // Require lastname, firstname and email to safely access indexes 0–2
+        if (count($l) < 3) {
+            $ignored[] = $line;
+            continue;
+        }
+
         $r = [];
         $r['lastname'] = trim($l[0]);
         $r['firstname'] = trim($l[1]);
@@ -52,7 +64,7 @@ function parsemails_csv($bloc)
             $results[] = $r;
         }
     }
-    return $results;
+    return [$results, $ignored];
 }
 
 /* everything format */
@@ -127,16 +139,30 @@ if (isset($_REQUEST['send'])) {
     $_text = str_replace("\n\r", "\n", $_text);
     $_text = str_replace("\r", "\n", $_text);
 
+    if (strpos($_REQUEST['emailcontent'], '{link}') === false) {
+        Feedback::error(tra("The email content must include the {link} placeholder for the invitation link."));
+        $_REQUEST['send'] = false;
+    }
+
     $mails = $_REQUEST["emailslist"];
+    $ignoredLines = [];
     switch ($_REQUEST['emailslist_format']) {
         case 'all':
             $emails = parsemails_all($mails);
             break;
         case 'csv':
-            $emails = parsemails_csv($mails);
+            $parsed = parsemails_csv($mails);
+            $emails = $parsed[0];
+            $ignoredLines = $parsed[1];
             break;
         default:
             $emails = [];
+    }
+    if (! empty($ignoredLines) && empty($_REQUEST['confirm'])) {
+        Feedback::warning(
+            tra('Some CSV lines were ignored because they are not in the expected format (lastname, firstname, email):')
+            . '<br><pre>' . htmlspecialchars(implode("\n", $ignoredLines)) . '</pre>'
+        );
     }
 
     $igroups = $_REQUEST['invitegroups'] ?? [];

@@ -853,6 +853,10 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         }
         $this->out('show_archive', $email['show_archive']);
 
+        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m) && $email['is_tiki_tracker_trash_folder']) {
+            $this->out('show_restore', true);
+        }
+
         clear_existing_reply_details($this->session);
         if ($part_num == 0) {
             $msg_struct_current['type'] = 'text';
@@ -1039,6 +1043,54 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
     }
 }
 
+
+class Hm_Handler_tiki_restore_message extends Hm_Handler_Module
+{
+    /**
+     * Restore message from archive or trash to inbox folder
+     */
+    public function process()
+    {
+        list($success, $form) = $this->process_form(['imap_msg_uid', 'list_path']);
+        if ($success) {
+            // Remove archive and deleted flags to restore to inbox
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'archive');
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'deleted');
+
+            $path = str_replace('tracker_folder_', '', $form['list_path']);
+            list ($itemId, $fieldId) = explode('_', $path);
+
+            $trk = TikiLib::lib('trk');
+            $item = $trk->get_item_info($itemId);
+            if (! $item) {
+                Hm_Msgs::add('Tracker item not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            $field = $trk->get_field_info($fieldId);
+            if (! $field) {
+                Hm_Msgs::add('Tracker field not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            // Move message back to inbox by updating the field value
+            $field['value'] = [
+                'restore' => $form['imap_msg_uid']
+            ];
+
+            $trk->replace_item($item['trackerId'], $item['itemId'], [
+                'data' => [$field]
+            ]);
+
+            Hm_Msgs::add('Message restored to inbox');
+            $this->out('restore_error', false);
+        }
+    }
+}
+
+
 /**
  * Add Move to trackers button
  * @subpackage tiki/output
@@ -1058,6 +1110,20 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     public function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers', true);
+        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
+        $this->out('msg_headers', $headers, false);
+    }
+}
+
+/**
+ * Add Restore Message button in tracker folders
+ * @subpackage tiki/output
+ */
+class Hm_Output_add_restore_message extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = tiki_restore_message($this);
         $headers = append_to_msg_headers($this->get('msg_headers'), $res);
         $this->out('msg_headers', $headers, false);
     }

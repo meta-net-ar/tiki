@@ -84,7 +84,7 @@ class Sefurl
                 $attributes = $attributelib->get_attributes('file', $source);
 
                 if ($type == 'file') {
-                    $prefix = 'display';
+                    $prefix = 'dl';
                     $suffix = null;
                 } else {
                     $prefix = $type;

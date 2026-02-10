@@ -25,10 +25,7 @@ include_once('lib/live_support/lsadminlib.php');
 include_once('lib/live_support/lslib.php');
 $access->check_feature('feature_live_support');
 if ($tiki_p_live_support_admin != 'y' && ! $lsadminlib->is_operator($user)) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tr("You do not have the permission that is needed to use this feature"), 401);
 }
 $smarty->assign('html', false);
 if (isset($_REQUEST['show_html'])) {

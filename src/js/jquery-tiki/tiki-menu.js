@@ -27,23 +27,18 @@ $(function () {
         }
     });
 
-    $(".sm-nav-item").on("click", function () {
-        const $menu = $(this).find(".dropdown-menu, ul").first();
-        if ($menu.length === 0) return;
+    // Position submenu dropdowns appropriately when expanded
+    $(document).on("shown.bs.collapse", ".sm-sub", function () {
+        const $menu = $(this);
+        const $toggler = $menu.prev(".sm-sub-toggler");
+        if ($toggler.length === 0) return;
 
-        const rect = this.getBoundingClientRect();
-
-        // Determine vertical and horizontal position
+        const rect = $toggler[0].getBoundingClientRect();
         const vertical = rect.top < window.innerHeight / 2 ? "top-t" : "bottom-b";
         const horizontal = rect.left < window.innerWidth / 2 ? "end-l" : "start-r";
 
-        // Remove existing position classes
         $menu.removeClass("dropdown-menu-top-t dropdown-menu-bottom-b dropdown-menu-end-l dropdown-menu-start-r");
-
-        if (vertical && horizontal) {
-            // Add new position classes
-            $menu.addClass(`dropdown-menu-${vertical} dropdown-menu-${horizontal}`);
-        }
+        $menu.addClass(`dropdown-menu-${vertical} dropdown-menu-${horizontal}`);
     });
 });
 

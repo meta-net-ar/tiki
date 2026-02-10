@@ -859,12 +859,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatch($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -876,12 +878,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatchAll($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**

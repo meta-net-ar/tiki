@@ -16,7 +16,7 @@ $inputConfiguration = [
         'findfilter_approved'      => 'word',            //post
         'sort_mode'                => 'word',            //get
         'offset'                   => 'int',             //get
-        'find'                     => 'word',            //post
+        'find'                     => 'string',            //post
         ],
         'staticKeyFiltersForArrays' => [
             'types'                    => 'string',      //post
@@ -237,7 +237,7 @@ if (isset($_REQUEST['checked'])) {
 
 if (isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
-     $column_validity = TikiDb::get()->validateSortColumn('tiki_comments', $sort_mode);
+    $column_validity = TikiDb::get()->validateSortColumn('tiki_comments', $sort_mode);
     if (! $column_validity) {
         $sort_mode = 'commentDate_desc';
         Feedback::error(tr('Invalid sort mode'));

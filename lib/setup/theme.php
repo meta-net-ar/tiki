@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\Theme\ThemeLib;
+use Tiki\Sections;
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
@@ -132,7 +133,7 @@ if (
         /* Force the admin layout on setup/management pages too */
         $prefs['site_layout'] = 'admin';
         /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
-        $section = 'admin';
+        Sections::setCurrentSection(Sections::SECTION_ADMIN);
 
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
@@ -222,7 +223,7 @@ if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetiza
 
 // set the color of header bar and address bar
 if ($prefs['theme_header_and_address_bar_color'] === 'y') {
-    if ($section === 'admin' || empty($section)) {
+    if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || empty(Sections::getCurrentSection())) {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
     } else {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";

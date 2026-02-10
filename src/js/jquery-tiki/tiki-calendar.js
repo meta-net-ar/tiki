@@ -181,7 +181,8 @@ $.fn.setupEventCalendar = function (
                     }
                 }
                 const eventTitle = tooltipEscape(event.title);
-                element.attr("title", eventTitle + "|" + event.extendedProps.description);
+                const eventDescription = event.extendedProps.viewable === true ? event.extendedProps.description : "";
+                element.attr("title", eventTitle + "|" + eventDescription);
                 element.addClass("tips");
                 // surely there's a better way?
                 $(element).parent().tiki_popover();

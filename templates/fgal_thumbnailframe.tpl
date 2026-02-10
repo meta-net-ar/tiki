@@ -1,5 +1,5 @@
 {* Id *}
-<div class="thumbnailframe" style="width:100%;height:{if $view != 'page'}{$thumbnailcontener_size}px{else}100%{/if}{if $show_infos neq 'y'};margin-bottom:4px{/if}">
+<div class="thumbnailframe styling-element" style="width:100%;height:{if $view != 'page'}{$thumbnailcontener_size}px{else}100%{/if}{if $show_infos neq 'y'};margin-bottom:4px{/if}">
     <div class="thumbimage">
         <div class="thumbimagesub">{$key_type=$file.type}
             {$imagetypes = 'n'}

@@ -30,6 +30,9 @@ $inputConfiguration = [
 ];
 // Initialization
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_permission(['tiki_p_admin_notifications']);
 
 $notificationlib = TikiLib::lib('notification');

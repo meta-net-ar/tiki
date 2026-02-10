@@ -1,6 +1,6 @@
 {title help="Toolbars"}{tr}Admin Toolbars{/tr}{/title}
 
-<div class="toolbars-admin clearfix">
+<div class="toolbars-admin clearfix styling-element">
     <form name="toolbars" method="post" class="pb-4" action="tiki-admin_toolbars.php" onsubmit="return saveRows()">
         <div class="adminoptionbox mb-3 row">
             <label for="section" class="col-form-label col-sm-4">

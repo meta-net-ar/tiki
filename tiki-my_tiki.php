@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $wikilib = TikiLib::lib('wiki');
 include_once('lib/tasks/tasklib.php');
 //get_strings tra('My Account Home');

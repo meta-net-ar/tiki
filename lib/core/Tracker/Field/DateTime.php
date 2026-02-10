@@ -9,6 +9,7 @@ use Tiki\Lib\TikiDate;
 
 /**
  * Handler class for DateTime
+ * Adds optional/enforced minute stepping via minuteStep + enforceStep.
  *
  * Letter key: ~f~
  *
@@ -79,6 +80,25 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                             1 => tr('Yes'),
                         ],
                     ],
+                    'minuteStep' => [
+                        'name' => tr('Minute step'),
+                        'description' => tr('Step interval for the minutes dropdown (e.g. 5, 10, 15). Must be between 1 and 59. Default is 1.'),
+                        'example' => '15',
+                        'filter' => 'digits',
+                        'default' => 1,
+                        'legacy_index' => 4,
+                    ],
+                    'enforceStep' => [
+                        'name' => tr('Enforce minute step'),
+                        'description' => tr('If enabled, users can only select minutes aligned to the configured step; other values will be rejected.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'legacy_index' => 5,
+                    ],
                 ],
             ],
         ];
@@ -93,6 +113,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
             'value' => empty($value) ? ($this->getOption('blankdate') == 'blank' ? '' : TikiLib::lib('tiki')->now) : $value,
         ];
 
+
         // Vue component stores as JSON array
         foreach (['Month', 'Day', 'Year', 'Hour', 'Minute'] as $field) {
             if (isset($requestData[$ins_id][strtolower($field)])) {
@@ -101,11 +122,24 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
             }
         }
 
+        // Normalize step + enforce flags early for validation.
+        $step = $this->getValidatedMinuteStep();
+        $enforce = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
+
         if (isset($requestData[$ins_id . 'Month']) || isset($requestData[$ins_id . 'Day']) || isset($requestData[$ins_id . 'Year']) || isset($requestData[$ins_id . 'Hour']) || isset($requestData[$ins_id . 'Minute'])) {
             $data['value'] = TikiLib::lib('trk')->build_date($requestData, $this->getOption('datetime'), $ins_id);
             if (empty($data['value']) && (! empty($requestData[$ins_id . 'Month']) || ! empty($requestData[$ins_id . 'Day']) || ! empty($requestData[$ins_id . 'Year']) || ! empty($requestData[$ins_id . 'Hour']) || ! empty($requestData[$ins_id . 'Minute']))) {
                 $data['error'] = 'y';
             }
+
+            // When enforcing step and time component is present (not date-only), validate the minute input.
+            if ($enforce && $this->getOption('datetime') !== 'd' && isset($requestData[$ins_id . 'Minute']) && $requestData[$ins_id . 'Minute'] !== '') {
+                $min = (int) $requestData[$ins_id . 'Minute'];
+                if ($min % $step !== 0) {
+                    $data['error'] = 'y';
+                }
+            }
+
             if ($data['value'] && $this->getOption('datetime') == 'd') {
                 // dates convert to 12am UTC
                 $server_offset = TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $data['value']);
@@ -120,6 +154,12 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
             // Validate timestamp format - exception will bubble up to stop form submission
             $this->validateTimestamp($value);
 
+            if ($enforce && $data['value'] && $this->getOption('datetime') !== 'd') {
+                $minute = (int) date('i', (int) $data['value']);
+                if ($minute % $step !== 0) {
+                    $data['error'] = 'y';
+                }
+            }
             $data['value'] = $value;
         }
 
@@ -135,6 +175,10 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
         TikiLib::lib('header')->add_jq_onready('$.validator.classRuleSettings.date = false;
 ');
         TikiLib::lib('smarty')->assign('use_24hr_clock', TikiLib::lib('userprefs')->get_user_clock_pref($user));
+        $step = $this->getValidatedMinuteStep();
+        TikiLib::lib('smarty')->assign('minute_step', $step);
+        $enforce = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
+        TikiLib::lib('smarty')->assign('enforce_step', $enforce);
 
         $value = $this->getValue();
         if ($this->getOption('datetime') === 'd' && is_numeric($value)) {
@@ -344,6 +388,30 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                     return TikiLib::lib('tiki')->get_short_date($date);
                 })
         ];
+    }
+
+    /**
+     * Validates and returns the minute step value.
+     * Logs a warning if an invalid step is detected.
+     *
+     * @return int Valid minute step (1-59), defaults to 1 if invalid
+     */
+    protected function getValidatedMinuteStep(): int
+    {
+        $step = (int) ($this->trackerField->getOption('minuteStep') ?: 1);
+        if ($step < 1 || $step > 59) {
+            trigger_error(
+                sprintf(
+                    tr('Invalid minuteStep value "%d" for tracker field "%s" (fieldId: %d). Must be between 1 and 59. Falling back to default value of 1.'),
+                    $step,
+                    $this->getConfiguration('name') ?: tr('unknown'),
+                    $this->getConfiguration('fieldId') ?: 0
+                ),
+                E_USER_WARNING
+            );
+            return 1;
+        }
+        return $step;
     }
 
     /**

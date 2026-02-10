@@ -537,7 +537,7 @@ function wikiplugin_files($data, $params)
         }
         $gal_info = $filegallib->get_file_gallery($galId);
         if (empty($gal_info)) {
-            $gal_info = [];
+            return '~np~' . tr('File gallery "%0" not found', $galId) . '~/np~';
         }
         $gal_info['name'] = $filegallib->get_user_gallery_name($gal_info, $user);
 
@@ -610,6 +610,9 @@ function wikiplugin_files($data, $params)
         // get the files of the gallery
         foreach ($objects['data'] as $og) {
             $gal_info = $filegallib->get_file_gallery($og['itemId']);
+            if (empty($gal_info)) {
+                continue; // Skip this gallery if it doesn't exist
+            }
             $fs = $filegallib->get_files(0, $max, $sort, '', $og['itemId'], false, $withsubgals == 'y', false, true, false, $show_parentName == 'y', true, $recursive, '', false, false, false, $filter);
             if ($fs['count']) {
                 for ($i = 0, $count_fs_data = count($fs['data']); $i < $count_fs_data; ++$i) {
@@ -729,7 +732,7 @@ function wikiplugin_files_check_perm_file($fileId)
         Feedback::error(tr('File %0 does not exist', $fileId));
         return $info;
     }
-        $gal_info = $filegallib->get_file_gallery($info['galleryId']);
+    $gal_info = $filegallib->get_file_gallery($info['galleryId']);
     if ($tiki_p_admin != 'y' && $tiki_p_admin_files_galleries != 'y' && $gal_info['user'] != $user) {
         $info['p_view_file_gallery'] = $tikilib->user_has_perm_on_object($user, $info['fileId'], 'file', 'tiki_p_view_file_gallery') ? 'y' : 'n';
         if ($info['p_view_file_gallery'] != 'y') {

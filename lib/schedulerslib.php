@@ -15,6 +15,14 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 class SchedulersLib extends TikiLib
 {
     /**
+     * Limit of the name field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_DESCRIPTION_LENGTH = 255;
+    /**
      * Let a list of schedulers
      *
      * @param int       $schedulerId    The Scheduler Id
@@ -264,6 +272,15 @@ class SchedulersLib extends TikiLib
     {
         if (empty($end_time)) {
             $end_time = time();
+        }
+
+        // TEXT column has a 65,535 byte limit. Truncate if output exceeds this size.
+        $maxOutputBytes = 65535;
+        $truncationMsg = "\n\n[Output truncated - exceeded TEXT column limit]";
+        $maxContentBytes = $maxOutputBytes - strlen($truncationMsg);
+
+        if (strlen($errorMessage) > $maxOutputBytes) {
+            $errorMessage = substr($errorMessage, 0, $maxContentBytes) . $truncationMsg;
         }
 
         $schedulersRunTable = $this->table('tiki_scheduler_run');

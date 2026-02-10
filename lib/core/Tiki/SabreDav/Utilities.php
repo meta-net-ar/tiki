@@ -104,7 +104,7 @@ class Utilities
         if ($availability) {
             try {
                 $parsed = VObject\Reader::read($availability);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 TikiLib::lib('log')->add_log('error', tr('Failed parsing availability component: %0', $e->getMessage()));
             }
         }
@@ -518,9 +518,9 @@ class Utilities
         if (isset($parts['COUNT'])) {
             $rec->setNbRecurrences($parts['COUNT']);
         } elseif (isset($parts['UNTIL'])) {
-            $rec->setEndPeriod(\TikiDate::getStartDay(strtotime($parts['UNTIL']), 'UTC'));
+            $rec->setEndPeriod(TikiDate::getStartDay(strtotime($parts['UNTIL']), 'UTC'));
         } else {
-            $rec->setEndPeriod(\TikiDate::getStartDay(strtotime(CalDAVBackend::MAX_DATE), 'UTC'));
+            $rec->setEndPeriod(TikiDate::getStartDay(strtotime(CalDAVBackend::MAX_DATE), 'UTC'));
         }
         return $rec;
     }
@@ -773,7 +773,7 @@ class Utilities
                     $body = "$sender has updated their participation status in the following event:";
                     break;
                 default:
-                    throw new Exception("Unsupported ITip method: " . $message->method);
+                    throw new \Exception("Unsupported ITip method: " . $message->method);
             }
 
             $organizers = [];

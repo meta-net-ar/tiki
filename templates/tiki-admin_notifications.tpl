@@ -5,7 +5,7 @@
         {tr}You need to set <a class="alert-link" href="tiki-admin.php?page=general">Sender Email</a> before creating email notifications{/tr}.
     {/remarksbox}
 {/if}
-
+<div class="styling-element">
 <h2>{tr}Add notification{/tr}</h2>
 <form action="tiki-admin_notifications.php" method="post">
     {ticket}
@@ -189,3 +189,4 @@
         </table>
     </div>
 {/if}
+</div>

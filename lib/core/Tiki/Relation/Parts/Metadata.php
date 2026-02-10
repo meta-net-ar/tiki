@@ -31,6 +31,8 @@ class Metadata implements \ArrayAccess
             case 'trackerId':
                 $item = TikiLib::lib('trk')->get_tracker_item($this->itemId);
                 return $item['trackerId'] ?? null;
+            default:
+                return null;
         }
     }
 

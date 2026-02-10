@@ -185,6 +185,9 @@
             <fieldset id="QueuedTasks">
                 <legend>{tr}Queued Tasks{/tr}</legend>
                 {preference name=feature_queued_tasks}
+                <div class="adminoptionboxchild" id="feature_queued_tasks_childcontainer">
+                    {preference name=queued_tasks_js_processing_disabled}
+                </div>
             </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>
@@ -374,6 +377,7 @@
                 {preference name=use_load_threshold}
                 <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                     {preference name=load_threshold}
+                    {preference name=load_retry_after}
                     {preference name=site_busy_title}
                     {preference name=site_busy_msg}
                 </div>

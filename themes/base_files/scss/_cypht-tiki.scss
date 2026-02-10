@@ -666,5 +666,22 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
             padding-left: 0px;
         }
         .submit_section { padding-left: 15px; }
+        .terms_section {
+            .d-flex { display: inline-block; }
+            .adv_terms { display: inline-block; }
+            .adv_term_nots input { margin-top: 12px; }
+        }
+        .source_section {
+            .adv_folder_link {
+                .folders > li > .d-flex { display: inline-block; }
+            }
+        }
+        .targets_section {
+            .adv_targets .form-check-label { display: inline; }
+        }
+        .time_section {
+            .adv_times { display: inline-block; }
+            .new_time { display: block; }
+        }
     }
 }

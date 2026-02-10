@@ -48,8 +48,10 @@ $inputConfiguration = [
     ],
 ];
 
-$section = 'admin';
-require_once 'tiki-setup.php';
+require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
 $dcslib = TikiLib::lib('dcs');
 $bannerlib = TikiLib::lib('banner');

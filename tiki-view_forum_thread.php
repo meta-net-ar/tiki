@@ -14,7 +14,6 @@ define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] 
 // TIKI_PRINTING_ALL is true when displaying all content for printing (?display=print_all).
 define('TIKI_PRINTING_ALL', isset($_REQUEST['display']) && $_REQUEST['display'] === 'print_all');
 
-$section = 'forums';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
@@ -50,6 +49,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FORUMS;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_forums');
 

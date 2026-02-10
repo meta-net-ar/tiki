@@ -11,9 +11,11 @@ use Tiki\Lib\Sheet\DatabaseHandler;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'sheet';
 require_once('tiki-setup.php');
 require_once('lib/Sheet/grid.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SHEET;
+Sections::setCurrentSection($section);
 $sheetlib = TikiLib::lib('sheet');
 $auto_query_args = [
     'sheetId',

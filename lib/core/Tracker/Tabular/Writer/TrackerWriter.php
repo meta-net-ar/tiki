@@ -18,12 +18,21 @@ class TrackerWriter
         $schema = $source->getSchema();
         $bulkImport = $schema->useBulkImport();
 
+        $appliedFields = [];
+        if ($schema->getFilterCollection()) {
+            foreach ($schema->getFilterCollection()->getFilters() as $filter) {
+                if ($filter->getControl() && $filter->getControl()->hasValue() && method_exists($filter->getControl(), 'getValue')) {
+                    $appliedFields[$filter->getField()] = $filter->getControl()->getValue();
+                }
+            }
+        }
+
         if ($bulkImport) {
             global $prefs;
             $prefs['categories_cache_refresh_on_object_cat'] = 'n';
         }
 
-        $iterate = function ($callback) use ($source, $schema, $bulkImport) {
+        $iterate = function ($callback) use ($source, $schema, $bulkImport, $appliedFields) {
             $columns = $schema->getColumns();
 
             $tx = \TikiDb::get()->begin();
@@ -36,7 +45,7 @@ class TrackerWriter
             foreach ($source->getEntries() as $line => $entry) {
                 $info = [
                     'itemId' => false,
-                    'fields' => [],
+                    'fields' => $appliedFields,
                     'skip_sync' => $source instanceof \Tracker\Tabular\Source\ODBCSource,
                     'validate' => ($source instanceof \Tracker\Tabular\Source\ODBCSource || $schema->isSkipValidation()) ? false : true, // ODBC sync needs saving no matter of validation errors
                 ];

@@ -473,8 +473,11 @@ body.fullscreen.tiki.navbar-padding {
     .tiki.tiki_wiki_page .popover { max-width: 75%; }
 }
 
-// Override the default Bootstrap separator.
-.breadcrumb-item + .breadcrumb-item::before { content: none !important; }
+// Use Bootstrap's default separator mechanism driven by the CSS variable.
+// Individual templates can set --bs-breadcrumb-divider (e.g., via user pref site_crumb_seper).
+.breadcrumb-item + .breadcrumb-item::before {
+  content: var(--bs-breadcrumb-divider, "/");
+}
 
 // Restore pre-Bootstrap 5 top and bottom padding on vertical menu items
 .navbar-nav.me-auto.bs-vertical .nav-link,

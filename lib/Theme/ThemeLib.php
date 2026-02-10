@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Tiki\Package\ExtensionManager;
 use Tiki\Paths\Customization;
 use TikiLib;
+use Tiki\Sections;
 
 /*
 ThemeLib
@@ -56,7 +57,8 @@ class ThemeLib extends TikiLib
      */
     public static function getActiveThemeAndOption(): array
     {
-        global $prefs, $smarty, $section;
+        global $prefs, $smarty;
+        $section = Sections::getCurrentSection();
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';
         $theme_option_active = $prefs['theme_option'] ?? '';
@@ -81,7 +83,7 @@ class ThemeLib extends TikiLib
         }
 
         //consider Admin Theme
-        if (! empty($prefs['theme_admin']) && ($section === 'admin' || empty($section))) {        // use admin theme if set
+        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || empty($section))) {        // use admin theme if set
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }

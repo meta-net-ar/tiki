@@ -15,6 +15,10 @@ class RSSLib extends TikiDb_Bridge
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
     private static string $cache_meta_Key = 'rss_feed_meta';
+    /**
+     * Limit of the name field of the tiki_rss_modules table
+     */
+    public const MAX_EXTERNAL_FEED_NAME_LENGTH = 200;
 
     public function __construct()
     {

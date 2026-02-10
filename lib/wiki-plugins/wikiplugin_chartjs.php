@@ -186,6 +186,7 @@ function wikiplugin_chartjs($data, $params)
         // casperJS uses PhantomJS that does not support ES6, so no support for modules.
         // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
         // the PDF export of the chart without using JS modules.
+        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
         $html_content = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
 <div>

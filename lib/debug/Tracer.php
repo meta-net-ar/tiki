@@ -136,8 +136,8 @@ class Tracer
     }
 }
 
-if (file_exists('db/local.php') && ! defined('TIKI_IN_TEST')) {
-    include 'db/local.php';
+if (file_exists(TIKI_CONFIG_FILE_PATH) && ! defined('TIKI_IN_TEST')) {
+    include TIKI_CONFIG_FILE_PATH;
 }
 global $tiki_traces_fpath, $tiki_traces_are_on, $tiki_traces_active_ids, $tracer;
 $tracer = new Tracer($tiki_traces_fpath, $tiki_traces_are_on, $tiki_traces_active_ids);

@@ -23,6 +23,7 @@ use Tiki\FileGallery\File as TikiFile;
 use Tiki\FileGallery\FileDraft as TikiFileDraft;
 use Tiki\FileGallery\ImageTransformer;
 use Tiki\Lib\Filegals\FileIsNotSafeException;
+use Symfony\Component\Filesystem\Filesystem;
 use TikiDb;
 use TikiLib;
 use TikiMail;
@@ -808,7 +809,7 @@ class FileGalLib extends TikiLib
         }
 
         $file = $return[0];
-
+        $this->verifyFileGalleryIntegrity($file);
         if ($use_draft && $prefs['feature_file_galleries_save_draft'] == 'y') {
             $draft = $this->table('tiki_file_drafts')->fetchRow(
                 ['filename', 'filesize', 'filetype', 'data', 'user', 'path', 'hash', 'lastModif', 'lockedby'],
@@ -1266,11 +1267,22 @@ class FileGalLib extends TikiLib
         $this->table('tiki_files')->update(['maxhits' => (int) $limit], ['fileId' => (int) $fileId]);
     }
     // not the best optimisation as using a library using files and not content
-    public function zip($fileIds, &$error, $zipName = '')
+    /**
+     * Create a zip file from file gallery files
+     *
+     * @param array $fileEntries Array of file entries with structure:
+     *                           ['fileId' => int, 'path' => string]
+     *                           The 'path' key specifies the relative folder path within the zip
+     *                           to preserve folder hierarchy when downloading galleries.
+     * @param string &$error Error message on failure
+     * @param string $zipName Optional custom zip name
+     * @return array|false|null File info array on success, false on error, null on no permission
+     */
+    public function zip($fileEntries, &$error, $zipName = '')
     {
         global $tiki_p_admin_file_galleries, $prefs, $user;
         $userlib = TikiLib::lib('user');
-        $list = [];
+        $tempFiles = [];
         $temp = '/' . md5(random_bytes(10)) . '/';
         if (! mkdir(sys_get_temp_dir() . $temp)) {
             $temp = sys_get_temp_dir() . $temp;
@@ -1280,44 +1292,81 @@ class FileGalLib extends TikiLib
             $error = "Can not create directory $temp";
             return false;
         }
-        $fileIds = array_unique($fileIds);
-        Perms::bulk(['type' => 'file'], 'object', $fileIds);
+        // Check permissions
+        $checkIds = array_unique(array_column($fileEntries, 'fileId'));
+        Perms::bulk(['type' => 'file'], 'object', $checkIds);
+
         $filenames = [];
-        $padding = strlen(count($fileIds)) - 1;
-        foreach ($fileIds as $fileId) {
+        $padding = strlen(count($fileEntries)) - 1;
+        foreach ($fileEntries as $fileEntry) {
+            $fileId = $fileEntry['fileId'];
+            $relativePath = $fileEntry['path'];
+
             $file = TikiFile::id($fileId);
             if ($tiki_p_admin_file_galleries == 'y' || $userlib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {
                 if (empty($zipName)) {
                     $zipName = $file->galleryId;
                 }
+
+                $relativePath = str_replace('..', '', $relativePath);
+                $relativePath = trim($relativePath, '/\\');
+                $destDir = $temp;
+                if ($relativePath !== '') {
+                    $destDir .= $relativePath . '/';
+                    if (! is_dir($destDir)) {
+                        if (! mkdir($destDir, 0777, true)) {
+                            $error = "Cannot create directory: $destDir";
+                            return false;
+                        }
+                    }
+                }
+
                 $filename = $file->filename;
+                $pathKey = $relativePath;
+                if (! isset($filenames[$pathKey])) {
+                    $filenames[$pathKey] = [];
+                }
+
                 $counter = 1;
-                while (in_array($filename, $filenames)) {
+                while (in_array($filename, $filenames[$pathKey])) {
                     $filename = $file->filename . '_' . str_pad($counter, $padding, '0', STR_PAD_LEFT);
                     $counter++;
                 }
-                $filenames[] = $filename;
-                $tmp = $temp . $filename;
+                $filenames[$pathKey][] = $filename;
+                $tmp = $destDir . $filename;
                 if (! copy($file->getWrapper()->getReadableFile(), $tmp)) {
-                    $error = "Can not copy to $tmp";
+                    $error = tr('Can not copy to %0', $tmp);
                     return false;
                 }
-                $list[] = $tmp;
+                $tempFiles[] = [
+                    'path' => $tmp,
+                    'filename' => $filename,
+                    'lastModif' => $file->lastModif,
+                ];
                 $info = $file->getParams();
             }
         }
-        if (empty($list)) {
-            $error = "No permission";
+        if (empty($tempFiles)) {
+            $error = tra('You do not have permission to download any of the selected files.');
             return null;
         }
         $info['filename'] = "$zipName.zip";
         $zip = $temp . $info['filename'];
-        define('PCZLIB_SEPARATOR', '\001');
+        define('PCZLIB_SEPARATOR', '\\001');
         if (! $archive = new PclZip($zip)) {
             $error = $archive->errorInfo(true);
             return false;
         }
-        if (! ($v_list = $archive->create($list, PCLZIP_OPT_REMOVE_PATH, $temp))) {
+        // Use file descriptors with PCLZIP_ATT_FILE_MTIME to preserve original file timestamps
+        $list = [];
+        foreach ($tempFiles as $fileData) {
+            $list[] = [
+                PCLZIP_ATT_FILE_NAME => $fileData['path'],
+                PCLZIP_ATT_FILE_NEW_FULL_NAME => $fileData['filename'],
+                PCLZIP_ATT_FILE_MTIME => $fileData['lastModif'],
+            ];
+        }
+        if (! ($v_list = $archive->create($list))) {
             $error = $archive->errorInfo(true);
             return false;
         }
@@ -1325,11 +1374,13 @@ class FileGalLib extends TikiLib
         $info['path'] = '';
         $info['filetype'] = 'application/x-zip-compressed';
         $info['filesize'] = strlen($info['data']);
-        foreach ($list as $tmp) {
-            unlink($tmp);
+        foreach ($tempFiles as $fileData) {
+            unlink($fileData['path']);
         }
         unlink($zip);
-        rmdir($temp);
+        $fs = new Filesystem();
+        $fs->remove($temp);
+
         return $info;
     }
 
@@ -2420,9 +2471,15 @@ class FileGalLib extends TikiLib
             $where = 'tf.`galleryId`=? order by ' . $this->convertSortMode('random') . ' limit 1 ';
             $bindvars[] = (int)$randomGalleryId;
         }
-        $query = "select tf.*, tfg.`backlinkPerms` from `tiki_files` tf left join `tiki_file_galleries` tfg on (tfg.`galleryId`=tf.`galleryId`) where $where";
+        $query = "select tf.*, tfg.`backlinkPerms`, tfg.galleryId as validGalleryId
+                from `tiki_files` tf
+                left join `tiki_file_galleries` tfg on (tfg.`galleryId`=tf.`galleryId`)
+                where $where";
+
         $result = $this->query($query, $bindvars);
-        return $result ? $result->fetchRow() : [];
+        $file = $result ? $result->fetchRow() : [];
+        $this->verifyFileGalleryIntegrity($file);
+        return $file;
     }
 
     /**
@@ -2460,10 +2517,13 @@ class FileGalLib extends TikiLib
         } else {
             $name = substr($name, 0, $max);
         }
-        $query = "select `fileId`,`path`,`galleryId`,`filename`,`filetype`,`data`,`filesize`,`name`,`description`,
-                `created`, `lastModif` from `tiki_files` where `galleryId`=? AND `$column`=? ORDER BY created DESC LIMIT 1";
+        $query = "select tf.*, tfg.galleryId as validGalleryId
+                from `tiki_files` tf
+                left join `tiki_file_galleries` tfg on (tf.`galleryId`=tfg.`galleryId`)
+                where tf.`galleryId`=? AND tf.`$column`=? ORDER BY tf.created DESC LIMIT 1";
         $result = $this->query($query, [(int) $galleryId, $name]);
         $res = $result->fetchRow();
+        $this->verifyFileGalleryIntegrity($res);
         return $res;
     }
 
@@ -2474,10 +2534,14 @@ class FileGalLib extends TikiLib
         } else {
             $filename = substr($filename, 0, 80);
         }
-        $query = "select `fileId`,`path`,`galleryId`,`filename`,`filetype`,`data`,`filesize`,`name`,`description`,
-                `created` from `tiki_files` where `filename`=? ORDER BY created DESC LIMIT 1";
+        $query = "select tf.*, tfg.galleryId as validGalleryId
+                from `tiki_files` tf
+                left join `tiki_file_galleries` tfg on (tf.`galleryId`=tfg.`galleryId`)
+                where tf.`filename`=? ORDER BY tf.created DESC LIMIT 1";
         $result = $this->query($query, [$filename]);
-        return $result->fetchRow();
+        $file = $result->fetchRow();
+        $this->verifyFileGalleryIntegrity($file);
+        return $file;
     }
 
     public function get_file_gallery_by_name($parentId, $name)
@@ -4334,5 +4398,30 @@ class FileGalLib extends TikiLib
         }
 
         return $listfgals;
+    }
+
+    /**
+     * Checks if the gallery referenced by a file exists.
+     * Throws an exception if the record is orphaned to prevent silent failures.
+     *
+     * @param array|bool|null $file The file row from the database
+     * @return void
+     * @throws Exception
+    */
+    private function verifyFileGalleryIntegrity(&$file): void
+    {
+        // Guard clause: If file wasn't found we can't check it.
+        if (! is_array($file) || empty($file['galleryId'])) {
+            return;
+        }
+
+        if (array_key_exists('validGalleryId', $file)) {
+            $invalid = $file['validGalleryId'] === null;
+            unset($file['validGalleryId']);
+
+            if ($invalid) {
+                throw new Exception(tr('Orphaned file record detected: File %0 points to non-existent gallery %1', $file['fileId'] ?? 'unknown', $file['galleryId']));
+            }
+        }
     }
 }

@@ -208,10 +208,10 @@ function prefs_global_list($partial = false)
             'description' => tra('Type of 2FA to be used.'),
             'type' => 'list',
             'options' => [
-                \Tiki\TwoFactorAuth\TwoFactorAuth::GOOGLE_2FA => tra('Google 2FA'),
+                \Tiki\TwoFactorAuth\TwoFactorAuth::TOTP_2FA => tra('Authenticator App (TOTP)'),
                 \Tiki\TwoFactorAuth\TwoFactorAuth::EMAIL_2FA => tra('Email 2FA'),
             ],
-            'default' => \Tiki\TwoFactorAuth\TwoFactorAuth::GOOGLE_2FA,
+            'default' => \Tiki\TwoFactorAuth\TwoFactorAuth::TOTP_2FA,
         ],
         'twoFactorAuthEmailTokenLength' => [
             'name' => tra('Email 2FA Token Length'),

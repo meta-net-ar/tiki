@@ -12,8 +12,7 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 
 require_once('tiki-setup.php');
 
-require_once('lib/socnets/PrefsGen.php');
-use TikiLib\Socnets\PrefsGen\PrefsGen;
+use Tiki\Lib\Socnets\PrefsGen;
 
 
 $url = PrefsGen::getSocBaseUrl();

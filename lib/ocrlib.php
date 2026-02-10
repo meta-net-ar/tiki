@@ -162,7 +162,7 @@ class ocrLib extends TikiLib
 
         try {
             $tesseract = $this->newTesseract();
-            $errors = new FriendlyErrors();
+            $errors = new FriendlyErrors(); // @phpstan-ignore class.notFound (depends on TesseractOCR, installed through packages)
             $errors::checkTesseractPresence($tesseract->command->executable);
         } catch (Exception $e) {
             return false;
@@ -292,7 +292,7 @@ class ocrLib extends TikiLib
     {
         global $prefs;
 
-        $tesseract = new TesseractOCR($fileName);
+        $tesseract = new TesseractOCR($fileName); // @phpstan-ignore class.notFound (depends on TesseractOCR, installed through packages)
         if (! empty($prefs['ocr_tesseract_path']) && file_exists($prefs['ocr_tesseract_path'])) {
             $tesseract->executable($prefs['ocr_tesseract_path']);
         } else {

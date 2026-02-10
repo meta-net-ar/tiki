@@ -1,0 +1,12 @@
+path: ./
+jobs: 8
+cache-dir: temp/phplint.cache #Can't store it any deeper, phplint will not create subdirectories, and will silently use the default path if it cannot store the cache.
+extensions:
+  - php
+exclude:
+  - temp/
+  - vendor/
+  - vendor_bundled/vendor
+  - src/php/external_lib_sources
+warning: true
+memory_limit: -1

@@ -70,7 +70,7 @@
                 <br>
                 <div class="form-check">
                     <input class="form-check-input" type='radio' name='emailslist_format' value='all' {if $smarty.request.emailslist_format == 'all'}checked{/if}>
-                    <label class="form-check-label">{tr}Everything that appear as an email in the text will be detected and used (in that case, \{literal}{firstname} and {lastname}{/literal} will be ignored in the email content){/tr}</label>
+                    <label class="form-check-label">{tr}Everything that appear as an email in the text will be detected and used (in that case, {literal}{firstname} and {lastname}{/literal} will be ignored in the email content){/tr}</label>
                 </div>
             </div>
         </div>
@@ -83,9 +83,9 @@
         </div>
 
         <div class="mb-3 row">
-            <label class="col-form-label col-sm-5" for="emailcontent">{tr}Type here the email content you'll want to be sent to them (and let the \{literal}{link}{/literal} word, it will be replaced with the good link for registering){/tr}</label>
+            <label class="col-form-label col-sm-5" for="emailcontent">{tr}Type here the email content you'll want to be sent to them (and let the {literal}{link}{/literal} word, it will be replaced with the good link for registering){/tr}</label>
             <div class="col-sm-7">
-                <textarea name='emailcontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.emailcontent|escape}{else}Hi \{literal}{firstname} {lastname}{/literal},
+                <textarea name='emailcontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.emailcontent|escape}{else}Hi {literal}{firstname} {lastname}{/literal},
 
 We would like to invite you to register on our web site
 To register, just follow this link:
@@ -100,7 +100,7 @@ Kind regards
         <div class="mb-3 row">
             <label class="col-form-label col-sm-5" for="wikicontent">{tr}Type here the content that the user will see when he'll click on the link from the mail{/tr}</label>
             <div class="col-sm-7">
-                <textarea name='wikicontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.wikicontent|escape}{else}Hi \{literal}{firstname} {lastname}{/literal},
+                <textarea name='wikicontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.wikicontent|escape}{else}Hi {literal}{firstname} {lastname}{/literal},
 
 You are here because you have just clicked on the link from my invitation email.
 

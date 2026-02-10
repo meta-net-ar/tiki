@@ -485,15 +485,15 @@
                             <hr>
                         {/if}
 
-                        {assign var="tagTitle" value=($prefs.wiki_customize_title_tag eq 'y')} {* for Content of the tag title *}
-                        {assign var="description" value=(($prefs.feature_wiki_description eq 'y' || $prefs.metatag_pagedesc eq 'y') && $prefs.wiki_description_edit_tab_input neq 'y')} {* for Description *}
+                        {assign var="prefTagTitle" value=($prefs.wiki_customize_title_tag eq 'y')} {* for Content of the tag title *}
+                        {assign var="prefDescription" value=(($prefs.feature_wiki_description eq 'y' || $prefs.metatag_pagedesc eq 'y') && $prefs.wiki_description_edit_tab_input neq 'y')} {* for Description *}
                         {assign var="freetags" value=$page|lower neq 'sandbox' && ($prefs.wiki_freetags_edit_position eq 'properties' || $prefs.wiki_freetags_edit_position eq '') && $prefs.feature_freetags eq 'y' && $tiki_p_freetags_tag eq 'y'} {* for Tags *}
                         {assign var="metaRobots" value=$prefs.metatag_robotscustom eq 'y'} {* for Meta robots *}
                         {assign var="forSitemap" value=$prefs.sitemap_enable eq 'y'} {* for For sitemap *}
 
-                        {if $tagTitle || $description || $freetags || $metaRobots || $forSitemap}
+                        {if $prefTagTitle || $prefDescription || $freetags || $metaRobots || $forSitemap}
                             <h3>{tr}SEO :{/tr}</h3>
-                            {if $tagTitle}
+                            {if $prefTagTitle}
                                 <div class="mb-3 row clearfix">
                                     <label for="content_title" class="col-md-4 col-form-label">{tr}Content of the tag title{/tr}</label>
                                     <div class="col-md-8">
@@ -504,7 +504,7 @@
                                     </div>
                                 </div>
                             {/if}
-                            {if $description}
+                            {if $prefDescription}
                                 <div class="mb-3 row">
                                     {if $prefs.metatag_pagedesc eq 'y'}
                                         <label for="" class="col-md-4 col-form-label">{tr}Description (used for metatags){/tr}</label>
@@ -555,7 +555,7 @@
                         {/if}
 
                         {assign var="comments_enabled_section" value=($prefs.wiki_comments_allow_per_page neq 'n')} {* for Allow comments on this page *}
-                        {assign var="rating" value=($prefs.feature_wiki_ratings eq 'y' && $tiki_p_wiki_admin_ratings eq 'y')} {* for Rating *}
+                        {assign var="prefRating" value=($prefs.feature_wiki_ratings eq 'y' && $tiki_p_wiki_admin_ratings eq 'y')} {* for Rating *}
                         {assign var="show_page_title" value=($prefs.wiki_page_hide_title eq 'y' && ($prefs.wiki_page_name_above eq 'y' || $prefs.feature_page_title eq 'y' || $prefs.wiki_page_name_inside eq 'y'))} {* for Show page title *}
                         {assign var="auto_toc" value=($prefs.wiki_auto_toc eq 'y' && $prefs.wiki_page_hide_title eq 'y')} {* for Show automatic table of contents *}
                         {assign var="cache" value=($page|lower neq 'sandbox' && $prefs.feature_wiki_icache eq 'y')} {* for Cache*}
@@ -565,9 +565,9 @@
                         {assign var="page_layout" value=($prefs.site_layout_per_object eq 'y')} {* for Page layout *}
                         {assign var="object_maintainers" value=($prefs.object_maintainers_enable eq 'y')} {* for Object maintainers *}
 
-                        {if $comments_enabled_section || $rating || $show_page_title || $auto_toc || $cache || $multilingual || $lock_page || $namespace || $page_layout || $object_maintainers}
+                        {if $comments_enabled_section || $prefRating || $show_page_title || $auto_toc || $cache || $multilingual || $lock_page || $namespace || $page_layout || $object_maintainers}
                             <h3>{tr}Management : {/tr}</h3>
-                            {if $comments_enabled_section || $rating || $show_page_title || $auto_toc}
+                            {if $comments_enabled_section || $prefRating || $show_page_title || $auto_toc}
                                 <h4>{tr}Additional content options{/tr}</h4>
                                 {if $prefs.wiki_comments_allow_per_page neq 'n'}
                                     <div class="mb-3 row">

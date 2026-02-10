@@ -100,6 +100,7 @@ class Services_Comment_Controller
     public function action_post($input)
     {
         global $prefs, $user;
+        $smarty = TikiLib::lib('smarty');
 
         $type = $input->type->text();
         $objectId = $input->objectId->pagename();
@@ -124,6 +125,8 @@ class Services_Comment_Controller
         }
 
         $commentslib = TikiLib::lib('comments');
+        $smarty->assign('MAX_COMMENT_TITLE_LENGTH', Comments::MAX_COMMENT_TITLE_LENGTH);
+        $smarty->assign('MAX_COMMENT_DATA_LENGTH', Comments::MAX_COMMENT_DATA_LENGTH);
         if ($parentId && $prefs['feature_comments_locking'] == 'y') {
             $parent = $commentslib->get_comment($parentId);
 
@@ -133,12 +136,19 @@ class Services_Comment_Controller
         }
 
         $errors = [];
-
-        $title = trim($input->title->xss());
+        $titleRaw = $input->title->xss();
         $data = trim($input->data->wikicontent());
+
+        if ($prefs['comments_notitle'] == 'y') {
+            $title = 'Untitled';
+        } else {
+            // If title is not set, use an empty string
+            $title = $titleRaw !== null ? $titleRaw : "";
+        }
 
         $tikilib = TikiLib::lib('tiki');
         $data = $tikilib->convertAbsoluteLinksToRelative($data);
+        $title = trim($title);
 
         $watch = $input->watch->text();
         $contributions = [];
@@ -169,15 +179,15 @@ class Services_Comment_Controller
             if ($prefs['comments_notitle'] != 'y' && empty($title)) {
                 $errors['title'] = tr('Title is empty');
             }
-            if (mb_strlen($title) > Comments::MAX_COMMENT_TITLE_LENGTH) {
-                $errors['title'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment title field"), Comments::MAX_COMMENT_TITLE_LENGTH);
+            if (! Feedback::validateFieldLength("Title", $title, Comments::MAX_COMMENT_TITLE_LENGTH)) {
+                $errors['title'] = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", Comments::MAX_COMMENT_TITLE_LENGTH, "Title");
             }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
-            } elseif (mb_strlen($data) > Comments::MAX_COMMENT_DATA_LENGTH) {
-                $errors['data'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment data field"), Comments::MAX_COMMENT_DATA_LENGTH);
             }
-
+            if (! Feedback::validateFieldLength("Data", $data, Comments::MAX_COMMENT_DATA_LENGTH)) {
+                $errors['data'] = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", Comments::MAX_COMMENT_DATA_LENGTH, "Data");
+            }
             if (empty($user) && $prefs['feature_antibot'] == 'y') {
                 $captchalib = TikiLib::lib('captcha');
 
@@ -185,11 +195,6 @@ class Services_Comment_Controller
                     $errors[] = $captchalib->getErrors();
                 }
             }
-
-            if ($prefs['comments_notitle'] == 'y') {
-                $title = 'Untitled';
-            }
-
 
             if (count($errors) === 0) {
                 $message_id = ''; // By ref
@@ -213,6 +218,8 @@ class Services_Comment_Controller
                     $version
                 );
                 if ($threadId) {
+                    $watch_event = null;
+
                     switch ($type) {
                         case 'wiki page':
                             $watch_event = 'wiki_comment_changes';
@@ -252,8 +259,10 @@ class Services_Comment_Controller
                             $notification_url = '';
                             break;
                     }
-                    Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
-                    Feedback::sendHeaders();
+                    if ($watch_event) {
+                        Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
+                        Feedback::sendHeaders();
+                    }
 
                     // Set watch if requested
                     if ($prefs['feature_user_watches'] == 'y' && $watch == 'y') {
@@ -333,8 +342,6 @@ class Services_Comment_Controller
             'type' => $type,
             'objectId' => $objectId,
             'title' => $title,
-            'max_comment_title_length' => Comments::MAX_COMMENT_TITLE_LENGTH,
-            'max_comment_data_length' => Comments::MAX_COMMENT_DATA_LENGTH,
             'data' => $data,
             'contributions' => $contributions,
             'anonymous_name' => $anonymous_name,
@@ -350,6 +357,10 @@ class Services_Comment_Controller
     public function action_edit($input)
     {
         $threadId = $input->threadId->int();
+        $smarty = TikiLib::lib('smarty');
+        $commentslib = TikiLib::lib('comments');
+        $smarty->assign('MAX_COMMENT_TITLE_LENGTH', Comments::MAX_COMMENT_TITLE_LENGTH);
+        $smarty->assign('MAX_COMMENT_DATA_LENGTH', Comments::MAX_COMMENT_DATA_LENGTH);
 
         if (! $comment = $this->getCommentInfo($threadId)) {
             throw new Services_Exception_NotFound();
@@ -368,17 +379,17 @@ class Services_Comment_Controller
 
             $tikilib = TikiLib::lib('tiki');
             $data = $tikilib->convertAbsoluteLinksToRelative($data);
-            if (mb_strlen($title) > Comments::MAX_COMMENT_TITLE_LENGTH) {
-                $errors['title'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment title field"), Comments::MAX_COMMENT_TITLE_LENGTH);
+            if (! Feedback::validateFieldLength("Title", $title, Comments::MAX_COMMENT_TITLE_LENGTH)) {
+                $errors['title'] = tr("Number of characters allowed exceeded");
             }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
-            } elseif (mb_strlen($data) > Comments::MAX_COMMENT_DATA_LENGTH) {
-                $errors['data'] = sprintf(tr("You have exceeded the number of characters allowed (%s max) for the comment data field"), Comments::MAX_COMMENT_DATA_LENGTH);
+            }
+            if (! Feedback::validateFieldLength("Data", $data, Comments::MAX_COMMENT_DATA_LENGTH)) {
+                $errors['data'] = tr("Number of characters allowed exceeded");
             }
 
             if (count($errors) === 0) {
-                $commentslib = TikiLib::lib('comments');
                 $commentslib->update_comment($threadId, $title, $comment['comment_rating'], $data);
 
                 return [
@@ -392,8 +403,6 @@ class Services_Comment_Controller
 
         return [
             'comment' => $comment,
-            'max_comment_title_length' => Comments::MAX_COMMENT_TITLE_LENGTH,
-            'max_comment_data_length' => Comments::MAX_COMMENT_DATA_LENGTH,
             'diffInfo' => $diffInfo,
             'errors' => $errors,
             'type' => $comment['objectType'],

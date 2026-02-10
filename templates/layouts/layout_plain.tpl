@@ -40,6 +40,7 @@
                     {block name=title}{/block}
                     {block name=navigation}{/block}
                     {feedback}
+                    {queued_tasks_banner}
                     {block name=content}{/block}
                 </div>
             </div>

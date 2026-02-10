@@ -11,9 +11,10 @@
 
 use Tiki\Package\VendorHelper;
 
-$section = 'trackers';
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_TRACKERS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_trackers');
 
 if ($prefs['pwa_feature'] !== 'y') {

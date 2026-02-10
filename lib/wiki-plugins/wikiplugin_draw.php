@@ -86,13 +86,11 @@ function wikiplugin_draw($data, $params)
         $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
 
         $galHtml = "";
-        if (! function_exists('wp_draw_cmp')) {
-            function wp_draw_cmp($a, $b)
-            {
-                return strcmp(strtolower($a["name"]), strtolower($b["name"]));
-            }
-        }
-        usort($gals['data'], 'wp_draw_cmp');
+        $wp_draw_cmp = function ($a, $b) {
+            return strcmp(strtolower($a["name"]), strtolower($b["name"]));
+        };
+
+        usort($gals['data'], $wp_draw_cmp);
         foreach ($gals['data'] as $gal) {
             if ($gal['name'] != "Wiki Attachments" && $gal['name'] != "Users File Galleries") {
                 // While smarty_function_bootstrap_modal is available for such use cases, it doesn't fit in cases where the final html is generated as strings because there happens to be quotes not properly escaped.

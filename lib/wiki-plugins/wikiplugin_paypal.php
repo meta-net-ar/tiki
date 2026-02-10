@@ -157,20 +157,7 @@ function wikiplugin_paypal_info()
                 'default' => $prefs['payment_paypal_business'],
                 'advanced' => ! empty($prefs['payment_paypal_business']),   // if set in prefs shouldn't need to change it here
             ],
-            'minicart' => [
-                'required' => false,
-                'name' => tra('Use MiniCart'),
-                'description' => tra('See https://github.com/jeffharrell/MiniCart'),
-                'since' => '11.0',
-                'filter' => 'alpha',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n'],
-                ],
-                'default' => 'y',
-                'advanced' => true,
-            ],
+
             'no_shipping' => [
                 'required' => false,
                 'name' => tra('Shipping Address Prompt'),
@@ -220,51 +207,6 @@ function wikiplugin_paypal_info()
                 'since' => '11.0',
                 'filter' => 'text',
                 'default' => tra('PayPal — The safer, easier way to pay online.'),
-                'advanced' => true,
-            ],
-            'stringButton' => [
-                'required' => false,
-                'name' => tra('Button text'),
-                'description' => tra('The checkout button text'),
-                'since' => '11.0',
-                'filter' => 'text',
-                'default' => 'Checkout',
-                'advanced' => true,
-            ],
-            'stringSubtotal' => [
-                'required' => false,
-                'name' => tra('Subtotal text'),
-                'description' => tra('The subtotal text'),
-                'since' => '11.0',
-                'filter' => 'text',
-                'default' => 'Subtotal: ',
-                'advanced' => true,
-            ],
-            'stringDiscount' => [
-                'required' => false,
-                'name' => tra('Discount text'),
-                'description' => tra('The discount text'),
-                'since' => '11.0',
-                'filter' => 'text',
-                'default' => 'Discount: ',
-                'advanced' => true,
-            ],
-            'stringShipping' => [
-                'required' => false,
-                'name' => tra('Shipping text'),
-                'description' => tra('The shipping text'),
-                'since' => '11.0',
-                'filter' => 'text',
-                'default' => 'does not include shipping &amp; tax',
-                'advanced' => true,
-            ],
-            'stringProcessing' => [
-                'required' => false,
-                'name' => tra('Processing text'),
-                'description' => tra('The processing text'),
-                'since' => '11.0',
-                'filter' => 'text',
-                'default' => 'Processing...',
                 'advanced' => true,
             ],
         ],
@@ -361,10 +303,8 @@ function wikiplugin_paypal($data, $params)
         if (! empty($_SERVER['HTTP_REFERER'])) {
             $returnUrl = $_SERVER['HTTP_REFERER'];
         }
-        $csearchInit = 'paypal = {}; $("#PPMiniCart").fadeOut().remove();';
     } else {
         $csearchEvent = 'ready';
-        $csearchInit = '';
     }
     foreach (['return', 'shopping_url', 'cancel_return'] as $ret) {
         if (empty($params[$ret])) {
@@ -374,34 +314,13 @@ function wikiplugin_paypal($data, $params)
         }
     }
 
-    // just add javascript?
-    $jsfile = MINICART_DIST_PATH . '/minicart' . ($prefs['tiki_minify_javascript'] === 'y' ? '.min' : '') . '.js';
-    if ($params['minicart'] === 'y' && file_exists($jsfile)) {
-        // it appears currently if you set any of these all must be set
-        $miniParams = ['strings' => []];
-        $miniParams['strings']['button']     = tra($params['stringButton']);
-        $miniParams['strings']['subtotal']   = tra($params['stringSubtotal']);
-        $miniParams['strings']['discount']   = tra($params['stringDiscount']);
-        $miniParams['strings']['shipping']   = tra($params['stringShipping']);
-        $miniParams['strings']['processing'] = tra($params['stringProcessing']);
-        // this seems to be the only secure URL for these assets, minicart.com uses github's SSL certificate
-        $miniParams['assetURL'] = 'https://github.com/jeffharrell/minicart/raw/3.0.6/';
-        $miniParamStr = json_encode($miniParams);
-
-        $js = '';
-        if ($csearchEvent === 'ready') {
-            $js .= '$(function() {';
-        } else {
-            $js .= '$(document).on("' . $csearchEvent . '", function () {';
-        }
-        $js .= $csearchInit . ' $.getScript("' . $jsfile . '", function() {
-            paypal.minicart.render(' . $miniParamStr . ');
-        });';
-        $js .= '});';
-
-        TikiLib::lib('header')->add_js($js)->add_css('#PPMiniCart {z-index: 1040;}'); // make sure it clears the fixed page-header
-    }
+    // Remove any minicart param if present
     unset($params['minicart']);
+    unset($params['stringButton']);
+    unset($params['stringSubtotal']);
+    unset($params['stringDiscount']);
+    unset($params['stringShipping']);
+    unset($params['stringProcessing']);
 
 
     //$params['item_name'] = htmlentities($params['item_name']);    // FIXME encoding problems!

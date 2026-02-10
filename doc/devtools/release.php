@@ -368,7 +368,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
         }
         if (is_dir($entry)) {
             // do not descend and no git files
-            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
+            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $e != 'node_modules' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
                 build_secdb_queries($entry, $version, $queries, $excludes);
             }
         } else {

@@ -3,6 +3,7 @@
 namespace Tiki\Lib\core\Toolbar;
 
 use TikiLib;
+use Tiki\Sections;
 
 abstract class ToolbarItem
 {
@@ -60,10 +61,10 @@ abstract class ToolbarItem
 
     public static function getTag(string $tagName, bool $wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = '', string|null $objectId = ''): ?ToolbarItem
     {
-        global $section;
+        $section = Sections::getCurrentSection();
 
         //we detect sheet first because it has unique buttons
-        if ($section == 'sheet' && $tag = ToolbarSheet::fromName($tagName)) {
+        if (Sections::isCurrentSection(Sections::SECTION_SHEET) && $tag = ToolbarSheet::fromName($tagName)) {
             return $tag;
         } elseif ($wysiwyg && $tag = ToolbarSummernoteOnly::fromName($tagName, $is_html, $is_markdown)) {
             return $tag;
@@ -103,6 +104,8 @@ abstract class ToolbarItem
             return new ToolbarLinkFile($objectId);
         } elseif ($tagName == 'launchplugins') {
             return new ToolbarLaunchPlugins();
+        } elseif ($tagName == 'languagecheck') {
+            return new ToolbarLanguageCheck();
         }
         return null;
     }
@@ -213,7 +216,8 @@ abstract class ToolbarItem
                     'tikitable',
                     'task',
                     'codeblock',
-                    'linkfile'
+                    'linkfile',
+                    'languagecheck'
                 ],
                 $plugins
             )

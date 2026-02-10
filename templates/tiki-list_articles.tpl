@@ -34,7 +34,7 @@
     {wikiplugin _name="map" scope=".listarticlesmap .geolocated" width="400" height="400"}{/wikiplugin}
 {/if}
 
-<form name="checkform" method="get">
+<form name="checkform" method="get" class="styling-element">
     {ticket}
     <input type="hidden" name="maxRecords" value="{$maxRecords|escape}">
     {$numbercol=1}

@@ -10,11 +10,11 @@
         {accordion_group title="{tr}General{/tr}"}
         <div class="mb-3 mx-0">
             <label for="name" class="col-form-label">{tr}Name{/tr}</label>
-            <input type="text" name="name" value="{$field.name|escape}" required="required" class="form-control">
+            <input type="text" name="name" value="{$field.name|escape}" required="required" class="form-control" maxlength="{$MAX_TRACKER_FIELD_NAME_LENGTH}">
         </div>
         <div class="mb-3 mx-0">
             <label name="description" class="col-form-label">{tr}Description{/tr}</label>
-            <textarea name="description" class="form-control">{$field.description|escape}</textarea>
+            {textarea name="description" class="form-control"}{$field.description|escape}{/textarea}
         </div>
         <div class="form-check">
             <input type="checkbox" class="form-check-input" name="description_parse" id="description_parse" value="1"

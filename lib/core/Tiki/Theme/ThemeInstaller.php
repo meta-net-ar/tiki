@@ -8,6 +8,9 @@ namespace Tiki\Theme;
 
 use Exception;
 use Tiki\Installer\Installer;
+use Tiki\Theme\Handler as ThemeHandler;
+use Tiki\Theme\Menu as ThemeMenu;
+use Tiki\Theme\Module as ThemeModule;
 use Symfony\Component\Filesystem\Filesystem as Filesystem;
 use Symfony\Component\Yaml\Yaml;
 use Tiki\Process\PhpExecutableFinder;

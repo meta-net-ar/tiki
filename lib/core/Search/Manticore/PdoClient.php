@@ -195,6 +195,10 @@ class PdoClient
 
     public function possibleFacetFields($table)
     {
+        static $cache = [];
+        if (isset($cache[$table])) {
+            return $cache[$table];
+        }
         if ($table == self::distributedIndexName()) {
             $stmt = $this->query("DESC $table");
             $result = $stmt->fetchAll();
@@ -220,7 +224,8 @@ class PdoClient
             }
         }
         if (count($fields) == 1) {
-            return array_keys(array_shift($fields));
+            $cache[$table] = array_keys(array_shift($fields));
+            return $cache[$table];
         }
         $common = [];
         $result = array_shift($fields);
@@ -241,7 +246,8 @@ class PdoClient
             }
             $common[] = $field;
         }
-        return $common;
+        $cache[$table] = $common;
+        return $cache[$table];
     }
 
     public function deleteIndex($index)
@@ -378,6 +384,26 @@ class PdoClient
         return $stmt->fetchAll();
     }
 
+    public function count($table, $condition, $retry = true)
+    {
+        $stmt = null;
+        try {
+            $stmt = $this->query("SELECT COUNT(*) FROM $table WHERE $condition option not_terms_only_allowed=1,cutoff=0,expand_keywords=1");
+            return intval($stmt->fetchColumn());
+        } catch (PDOException $e) {
+            if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+                if ($stmt) {
+                    $stmt->closeCursor();
+                }
+                // federated index tables might have been rebuilt and distributed one not updated properly -> refresh and retry
+                \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
+                return $this->count($table, $condition, false);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
     /**
      * Fetches results from the index along with any facets data that come as subsequent row sets.
      * Builds the query and fetches the results in 2 parts to reduce memory footprint and performance impact for big indices (say 1000+ fields):
@@ -404,20 +430,30 @@ class PdoClient
             'total' => 0,
         ];
         if ($selectFields) {
-            $sql = 'SELECT ' . implode(', ', array_filter($selectFields, function ($field) use ($indexFields) {
-                return in_array($field, $indexFields);
-            }));
+            $fields = array_map(function ($field) use ($indexFields) {
+                if (in_array($field, $indexFields)) {
+                    return $field;
+                } elseif (str_starts_with($field, 'tracker_field_')) {
+                    return 'tracker_fields_json.' . preg_replace('/^tracker_field_/', '', $field) . ' as ' . $field;
+                } else {
+                    return null;
+                }
+            }, $selectFields);
+            $fields = array_unique(array_filter($fields));
+            $sql = 'SELECT ' . implode(', ', $fields);
         } else {
-            $sql = 'SELECT object_type, object_id' . (in_array('tracker_id', $indexFields) ? ', tracker_id' : '');
+            $sql = 'SELECT *';
         }
         foreach ($selectExpressions as $key => $expr) {
             $sql .= ", $expr as $key";
         }
         $sql .= " FROM $table WHERE $condition";
         if ($order) {
-            $sql .= " ORDER BY $order";
+            $sql .= " ORDER BY $order, id asc";
+        } else {
+            $sql .= " ORDER BY weight() desc, id asc";
         }
-        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0";
+        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {
             $sql .= ',max_matches=' . ($resultStart + $resultCount);
         }
@@ -426,23 +462,8 @@ class PdoClient
         }
         $stmt = null;
         try {
-            $subselects = [];
-            $original_order = [];
-            $i = 0;
             $stmt = $this->query($sql);
-            if ($selectFields) {
-                $result['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    if ($row['object_type'] == 'trackeritem') {
-                        $type = 'trackeritem' . $row['tracker_id'];
-                    } else {
-                        $type = $row['object_type'];
-                    }
-                    $subselects[$type][] = $row['object_id'];
-                    $original_order[$row['object_type'] . $row['object_id']] = $i++;
-                }
-            }
+            $result['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {
                 $result['facets'][] = $stmt->fetchAll();
             }
@@ -462,26 +483,32 @@ class PdoClient
                     $result['total'] = intval($row['Value']);
                 }
             }
-            if (! $selectFields) {
-                $available_fields = \TikiLib::lib('unifiedsearch')->getAvailableFields();
-                foreach ($subselects as $type => $object_ids) {
-                    $fields = $available_fields['object_types'][$type] ?? [];
-                    $fields = array_map(function ($f) {
-                        return strtolower($f);
-                    }, $fields);
-                    if (str_starts_with($type, 'trackeritem')) {
-                        $type = 'trackeritem';
+            foreach ($result['rows'] as &$row) {
+                if (isset($row['tracker_fields_json']) && ! empty($row['tracker_fields_json'])) {
+                    $jsonFields = json_decode($row['tracker_fields_json'], true);
+                    if (is_array($jsonFields)) {
+                        foreach ($jsonFields as $jsonFieldName => $jsonValue) {
+                            $row['tracker_field_' . $jsonFieldName] = $jsonValue;
+                        }
                     }
-                    $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
-                    //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
-                    $sql .= " LIMIT 0, $resultCount ";
-                    $stmt = $this->prepareAndExecute($sql, $object_ids);
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;
+                    unset($row['tracker_fields_json']);
+                } elseif ($selectFields) {
+                    foreach ($row as $rowField => $rowValue) {
+                        foreach ($selectFields as $selectField) {
+                            if ($rowField == $selectField) {
+                                break;
+                            }
+                            if ($rowField != $selectField && $rowField == strtolower($selectField)) {
+                                unset($row[$rowField]);
+                                $row[$selectField] = $rowValue;
+                                break;
+                            }
+                        }
                     }
                 }
-                ksort($result['rows']);
             }
+            unset($row);
+
             return $result;
         } catch (PDOException $e) {
             if ($retry && str_contains($e->getMessage(), 'unknown local table')) {

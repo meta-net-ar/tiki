@@ -835,6 +835,9 @@ function wikiplugin_pivottable($data, $params)
     //translating permName to field name for columns and rows
     $cols = [];
     if (! empty($params['cols'])) {
+        $params['cols'] = array_filter($params['cols']);
+    }
+    if (! empty($params['cols'])) {
         foreach ($params['cols'] as $colName) {
             if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($colName), $definitions)) {
                 $cols[] = $field['name'];
@@ -848,6 +851,7 @@ function wikiplugin_pivottable($data, $params)
 
     $rows = [];
     if (! empty($params['rows'])) {
+        $params['rows'] = array_filter($params['rows']);
         foreach ($params['rows'] as $rowName) {
             if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($rowName), $definitions)) {
                 $rows[] = $field['name'];
@@ -859,6 +863,7 @@ function wikiplugin_pivottable($data, $params)
 
     $vals = [];
     if (! empty($params['vals'])) {
+        $params['vals'] = array_filter($params['vals']);
         foreach ($params['vals'] as $valName) {
             if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($valName), $definitions)) {
                 $vals[] = $field['name'];

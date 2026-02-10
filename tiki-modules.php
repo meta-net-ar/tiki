@@ -71,3 +71,4 @@ $module_nodecorations = ['decorations' => 'n'];
 $module_isflippable = ['flip' => 'y'];
 $smarty->assign('module_nodecorations', $module_nodecorations);
 $smarty->assign('module_isflippable', $module_isflippable);
+$smarty->assign('all_modules', $modlib->get_all_modules());

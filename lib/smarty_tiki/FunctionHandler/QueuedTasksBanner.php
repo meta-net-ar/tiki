@@ -16,12 +16,18 @@ class QueuedTasksBanner extends Base
 {
     public function handle($params, Template $template)
     {
-        $smarty = TikiLib::lib('smarty');
-        $result = QueuedTaskBanner::get();
-        if (empty($result)) {
+        global $prefs;
+
+        if ($prefs['feature_queued_tasks'] === 'y') {
+            $smarty = TikiLib::lib('smarty');
+            $result = QueuedTaskBanner::get();
+            if (empty($result)) {
+                return '';
+            }
+            $smarty->assign('queuedInfo', $result);
+            return $smarty->fetch('queuedtasks/alert.tpl');
+        } else {
             return '';
         }
-        $smarty->assign('queuedInfo', $result);
-        return $smarty->fetch('queuedtasks/alert.tpl');
     }
 }

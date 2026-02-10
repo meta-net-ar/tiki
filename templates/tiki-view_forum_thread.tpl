@@ -20,22 +20,28 @@
     {remarksbox type=warning title="{tr}The post has been reported and will be reviewed by a moderator.{/tr}"}{/remarksbox}
 {/if}
 <br>
-<div id="thread-breadcrumb" class="breadcrumb d-flex justify-content-between mb-4">
-    <div>
-    <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">
-        {tr}Forums{/tr}
-    </a>
-    {$prefs.site_crumb_seper}
-    <a class="link" href="{$forumId|sefurl:'forum'}">
-        {$forum_info.name|escape}
-    </a>{if isset($thread_info.topic.threadId) and $thread_info.topic.threadId}
-        {$prefs.site_crumb_seper}
-        <a class="link" href="{$thread_info.topic.threadId|sefurl:'forumthread'}{if !empty($smarty.request.topics_offset)}&amp;topics_offset={$smarty.request.topics_offset}{/if}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}">
-            {$thread_info.topic.title|forummaskemail|escape}
-        </a>
-    {/if}
-    {$prefs.site_crumb_seper}
-    {$thread_info.title|forummaskemail|escape}
+<div id="thread-breadcrumb" class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
+            <li class="breadcrumb-item">
+                <a href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{$forumId|sefurl:'forum'}">{$forum_info.name|escape}</a>
+            </li>
+            {if isset($thread_info.topic.threadId) and $thread_info.topic.threadId}
+                <li class="breadcrumb-item">
+                    <a href="{$thread_info.topic.threadId|sefurl:'forumthread'}{if !empty($smarty.request.topics_offset)}&amp;topics_offset={$smarty.request.topics_offset}{/if}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}">
+                        {$thread_info.topic.title|forummaskemail|escape}
+                    </a>
+                </li>
+            {/if}
+            <li class="breadcrumb-item active" aria-current="page">
+                {$thread_info.title|forummaskemail|escape}
+            </li>
+        </ol>
+    </nav>
+</div>
     <div>
         {if empty($thread_info.topic.threadId)}
             <span>

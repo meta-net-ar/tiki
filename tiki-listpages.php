@@ -10,7 +10,6 @@ use Tiki\Lib\OIntegrate\Response;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 $section_class = 'tiki_wiki_page manage';   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -41,7 +40,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $auto_query_args = [
                 'initial',
                 'maxRecords',

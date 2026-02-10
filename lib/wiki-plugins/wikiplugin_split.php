@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 function wikiplugin_split_info()
 {
     return [
@@ -111,7 +114,8 @@ function wikiplugin_split_rollback($data, $hashes)
  */
 function wikiplugin_split($data, $params, $pos)
 {
-    global $tikilib, $tiki_p_admin_wiki, $tiki_p_admin, $section;
+    global $tikilib, $tiki_p_admin_wiki, $tiki_p_admin;
+    $section = Sections::getCurrentSection();
     preg_match_all('/{(SPLIT|CODE|HTML|FADE|JQ|JS|MOUSEOVER|VERSIONS).+{\1}/ismU', $data, $matches);
     $hashes = [];
     foreach ($matches[0] as $match) {
@@ -232,7 +236,7 @@ function wikiplugin_split($data, $params, $pos)
                     $i = substr($i, 2);
                     $ind += 2;
                 }
-                if ($edit == 'y' && $perm && $section == 'wiki page') {
+                if ($edit == 'y' && $perm && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                     $result .= '<div class="split"><div style="float:right">';
                     $result .= "$pos-$icell-" . htmlspecialchars(substr($data, $pos, 10));
                     $result .= '<a href="tiki-editpage.php?page=' . $object . '&amp;pos=' . $pos . '&amp;cell=' . $icell . '">'

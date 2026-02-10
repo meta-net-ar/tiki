@@ -6,7 +6,10 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_module_list()
 {
-    return [
+    $modlib = TikiLib::lib('mod');
+    $all_modules = $modlib->get_all_modules();
+    sort($all_modules);
+    $pref_modules = [
         'module_zones_top' => [
             'name' => tra('Top module zone'),
             'description' => tra('Activate zone for modules such as site logo, log-in form, etc. (page header)'),
@@ -99,4 +102,14 @@ function prefs_module_list()
             'default' => 'n',
         ],
     ];
+    foreach ($all_modules as $name) {
+        $modinfo = $modlib->get_module_info($name);
+        $pref_modules['module_' . $name] = [
+            'name' => $modinfo['name'],
+            'type' => 'flag',
+            'description' => $modinfo['description'],
+            'default' => 'y',
+        ];
+    }
+    return $pref_modules;
 }

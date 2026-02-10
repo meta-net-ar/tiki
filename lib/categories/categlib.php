@@ -27,6 +27,14 @@ class CategLib extends ObjectLib
 {
     private $parentCategories = [];
     private $currentObjectCategories = [];
+    /**
+     * Limit of the name field of the tiki_categories table
+     */
+    public const MAX_CATEGORY_NAME_LENGTH = 200;
+    /**
+     * Limit of the description field of the tiki_categories table
+     */
+    public const MAX_CATEGORY_DESCRIPTION_LENGTH = 500;
 
     // Returns a string representing the specified category's path.
     // The path includes all parent categories ordered from the root to the category's parent, and the category itself.
@@ -1511,7 +1519,7 @@ class CategLib extends ObjectLib
             "calendar" => "calendar",
             "img" => "image",
             "template" => "template",
-        ];    //get_strings tra("article");tra("blog");tra("directory");tra("faq");tra("FAQ");tra("file gallery");tra("forum");tra("image gallery");tra("newsletter");
+        ];    //get_strings tra("article");tra("blog");tra("directory");tra("faq");tra("FAQ");tra("file gallery");tra("forum");tra("newsletter");
         //get_strings tra("poll");tra("quiz");tra("survey");tra("tracker");tra("wiki page");tra("image");tra("calendar");tra("template");
 
         $typetitles = [

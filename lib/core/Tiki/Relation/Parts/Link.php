@@ -34,6 +34,8 @@ abstract class Link implements \ArrayAccess
                 return $this->itemId;
             case 'title':
                 return $this->getTitle();
+            default:
+                return null;
         }
     }
 

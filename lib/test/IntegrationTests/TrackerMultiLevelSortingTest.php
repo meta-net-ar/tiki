@@ -21,144 +21,205 @@ class TrackerMultiLevelSortingTest extends TikiTestCase
     protected static $categoryIds = [];
     protected static $itemIds = [];
     protected static $linkedItemIds = [];
+    protected static $setUpException = null;
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
-        self::$old_prefs = $prefs;
-        $prefs['feature_trackers'] = 'y';
-        $prefs['feature_categories'] = 'y';
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
-        self::$categlib = TikiLib::lib('categ');
-    // Create categories for testing category field sorting
-        self::$categoryIds['alpha'] = self::$categlib->add_category(0, 'Alpha Category', '');
-        self::$categoryIds['beta'] = self::$categlib->add_category(0, 'Beta Category', '');
-        self::$categoryIds['gamma'] = self::$categlib->add_category(0, 'Gamma Category', '');
-    // Create linked tracker for ItemLink field testing
-        self::$linkedTrackerId = self::$trklib->replace_tracker(null, 'Linked Tracker for Sorting Test', '', [], 'n');
-        $linkedFieldId = self::$trklib->replace_tracker_field(self::$linkedTrackerId, 0, 'Linked Name', 't', 'y', 'y', 'y', 'y', 'n', 'y', 10, '', '', '', null, '', null, null, 'n', '', '', '', 'linked_name');
-    // Create linked items with different names for sorting
-        $linkedNames = ['Zebra', 'Apple', 'Mango'];
-        foreach ($linkedNames as $name) {
-            $definition = Tracker_Definition::get(self::$linkedTrackerId);
-            $fields = $definition->getFields();
-            $fields[0]['value'] = $name;
-            self::$linkedItemIds[$name] = self::$trklib->replace_item(self::$linkedTrackerId, 0, ['data' => $fields], 'o');
+        try {
+            global $prefs;
+            self::$old_prefs = $prefs;
+            $prefs['feature_trackers'] = 'y';
+            $prefs['feature_categories'] = 'y';
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$categlib = TikiLib::lib('categ');
+            // Create categories for testing category field sorting
+            self::$categoryIds['alpha'] = self::$categlib->add_category(0, 'Alpha Category ' . uniqid(), '');
+            self::$categoryIds['beta'] = self::$categlib->add_category(0, 'Beta Category ' . uniqid(), '');
+            self::$categoryIds['gamma'] = self::$categlib->add_category(0, 'Gamma Category ' . uniqid(), '');
+            // Create linked tracker for ItemLink field testing
+            self::$linkedTrackerId = self::$trklib->replace_tracker(null, 'Linked Tracker for Sorting Test ' . uniqid(), '', [], 'n');
+            $linkedFieldId = self::$trklib->replace_tracker_field(self::$linkedTrackerId, 0, 'Linked Name', 't', 'y', 'y', 'y', 'y', 'n', 'y', 10, '', '', '', null, '', null, null, 'n', '', '', '', 'linked_name');
+            // Create linked items with different names for sorting
+            $linkedNames = ['Zebra', 'Apple', 'Mango'];
+            foreach ($linkedNames as $name) {
+                $definition = Tracker_Definition::get(self::$linkedTrackerId);
+                $fields = $definition->getFields();
+                if (! isset($fields[0])) {
+                    throw new \Exception('Linked tracker field definition missing');
+                }
+                $fields[0]['value'] = $name;
+                self::$linkedItemIds[$name] = self::$trklib->replace_item(self::$linkedTrackerId, 0, ['data' => $fields], 'o');
+            }
+            // Create main tracker with various field types
+            self::$trackerId = self::$trklib->replace_tracker(null, 'Multi-Level Sort Test Tracker ' . uniqid(), '', [], 'n');
+            // Get linked tracker field for ItemLink options
+            $linkedDefinition = Tracker_Definition::get(self::$linkedTrackerId);
+            $linkedFields = $linkedDefinition->getFields();
+            // Define fields for testing
+            $fieldsConfig = [
+                [
+                    'name' => 'Text Field',
+                    'type' => 't',
+                    'permName' => 'test_text',
+                ],
+                [
+                    'name' => 'Numeric Field',
+                    'type' => 'n',
+                    'permName' => 'test_numeric',
+                ],
+                [
+                    'name' => 'ItemLink Field',
+                    'type' => 'r',
+                    'permName' => 'test_itemlink',
+                    'options' => json_encode([
+                        'trackerId' => self::$linkedTrackerId,
+                        'fieldId' => $linkedFields[0]['fieldId'] ?? null
+                    ]),
+                ],
+                [
+                    'name' => 'Category Field',
+                    'type' => 'e',
+                    'permName' => 'test_category',
+                ],
+                [
+                    'name' => 'Rating Field',
+                    'type' => 's',
+                    'permName' => 'test_rating',
+                    'options' => json_encode(['mode' => 's', 'options' => '5']),
+                ],
+            ];
+            foreach ($fieldsConfig as $i => $field) {
+                $fieldId = self::$trklib->replace_tracker_field(
+                    self::$trackerId,
+                    0,
+                    $field['name'],
+                    $field['type'],
+                    'y',
+                    'y',
+                    'y',
+                    'y',
+                    'n',
+                    'n',
+                    ($i + 1) * 10,
+                    $field['options'] ?? '',
+                    '',
+                    '',
+                    null,
+                    '',
+                    null,
+                    null,
+                    'n',
+                    '',
+                    '',
+                    '',
+                    $field['permName']
+                );
+                self::$fieldIds[$field['permName']] = $fieldId;
+            }
+            // Create test items with different values for sorting
+            self::createTestItems();
+        } catch (\Throwable $e) {
+            self::$setUpException = $e;
         }
-
-        // Create main tracker with various field types
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Multi-Level Sort Test Tracker', '', [], 'n');
-    // Get linked tracker field for ItemLink options
-        $linkedDefinition = Tracker_Definition::get(self::$linkedTrackerId);
-        $linkedFields = $linkedDefinition->getFields();
-    // Define fields for testing
-        $fieldsConfig = [
-            [
-                'name' => 'Text Field',
-                'type' => 't',
-                'permName' => 'test_text',
-            ],
-            [
-                'name' => 'Numeric Field',
-                'type' => 'n',
-                'permName' => 'test_numeric',
-            ],
-            [
-                'name' => 'ItemLink Field',
-                'type' => 'r',
-                'permName' => 'test_itemlink',
-                'options' => json_encode([
-                    'trackerId' => self::$linkedTrackerId,
-                    'fieldId' => $linkedFields[0]['fieldId']
-                ]),
-            ],
-            [
-                'name' => 'Category Field',
-                'type' => 'e',
-                'permName' => 'test_category',
-            ],
-            [
-                'name' => 'Rating Field',
-                'type' => 's',
-                'permName' => 'test_rating',
-                'options' => json_encode(['mode' => 's', 'options' => '5']),
-            ],
-        ];
-        foreach ($fieldsConfig as $i => $field) {
-            $fieldId = self::$trklib->replace_tracker_field(self::$trackerId, 0, $field['name'], $field['type'], 'y', 'y', 'y', 'y', 'n', 'n', ($i + 1) * 10, $field['options'] ?? '', '', '', null, '', null, null, 'n', '', '', '', $field['permName']);
-            self::$fieldIds[$field['permName']] = $fieldId;
-        }
-
-        // Create test items with different values for sorting
-        self::createTestItems();
     }
 
     protected static function createTestItems()
     {
-        $definition = Tracker_Definition::get(self::$trackerId);
-        $testData = [
-            [
-                'text' => 'Banana',
-                'numeric' => 50,
-                'itemlink' => self::$linkedItemIds['Apple'],
-                'category' => self::$categoryIds['beta'],
-                'rating' => 3,
-            ],
-            [
-                'text' => 'Apple',
-                'numeric' => 100,
-                'itemlink' => self::$linkedItemIds['Zebra'],
-                'category' => self::$categoryIds['alpha'],
-                'rating' => 5,
-            ],
-            [
-                'text' => 'Cherry',
-                'numeric' => 25,
-                'itemlink' => self::$linkedItemIds['Mango'],
-                'category' => self::$categoryIds['gamma'],
-                'rating' => 2,
-            ],
-            [
-                'text' => 'Apple',
-                'numeric' => 75,
-                'itemlink' => self::$linkedItemIds['Apple'],
-                'category' => self::$categoryIds['alpha'],
-                'rating' => 4,
-            ],
-            [
-                'text' => 'Banana',
-                'numeric' => 30,
-                'itemlink' => self::$linkedItemIds['Mango'],
-                'category' => self::$categoryIds['beta'],
-                'rating' => 1,
-            ],
-        ];
-        foreach ($testData as $data) {
-            $fields = $definition->getFields();
-            $fields[0]['value'] = $data['text'];
-            $fields[1]['value'] = $data['numeric'];
-            $fields[2]['value'] = $data['itemlink'];
-            $fields[3]['value'] = $data['category'];
-            $fields[4]['value'] = $data['rating'];
-            $itemId = self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
-            self::$itemIds[] = $itemId;
+        try {
+            $definition = Tracker_Definition::get(self::$trackerId);
+            if (! $definition) {
+                throw new \Exception('Main tracker definition missing');
+            }
+            $testData = [
+                [
+                    'text' => 'Banana',
+                    'numeric' => 50,
+                    'itemlink' => self::$linkedItemIds['Apple'] ?? null,
+                    'category' => self::$categoryIds['beta'] ?? null,
+                    'rating' => 3,
+                ],
+                [
+                    'text' => 'Apple',
+                    'numeric' => 100,
+                    'itemlink' => self::$linkedItemIds['Zebra'] ?? null,
+                    'category' => self::$categoryIds['alpha'] ?? null,
+                    'rating' => 5,
+                ],
+                [
+                    'text' => 'Cherry',
+                    'numeric' => 25,
+                    'itemlink' => self::$linkedItemIds['Mango'] ?? null,
+                    'category' => self::$categoryIds['gamma'] ?? null,
+                    'rating' => 2,
+                ],
+                [
+                    'text' => 'Apple',
+                    'numeric' => 75,
+                    'itemlink' => self::$linkedItemIds['Apple'] ?? null,
+                    'category' => self::$categoryIds['alpha'] ?? null,
+                    'rating' => 4,
+                ],
+                [
+                    'text' => 'Banana',
+                    'numeric' => 30,
+                    'itemlink' => self::$linkedItemIds['Mango'] ?? null,
+                    'category' => self::$categoryIds['beta'] ?? null,
+                    'rating' => 1,
+                ],
+            ];
+            foreach ($testData as $data) {
+                $fields = $definition->getFields();
+                if (! isset($fields[0], $fields[1], $fields[2], $fields[3], $fields[4])) {
+                    throw new \Exception('Main tracker field definition incomplete');
+                }
+                $fields[0]['value'] = $data['text'];
+                $fields[1]['value'] = $data['numeric'];
+                $fields[2]['value'] = $data['itemlink'];
+                $fields[3]['value'] = $data['category'];
+                $fields[4]['value'] = $data['rating'];
+                try {
+                    $itemId = self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
+                    self::$itemIds[] = $itemId;
+                } catch (\Throwable $e) {
+                    throw $e;
+                }
+            }
+        } catch (\Throwable $e) {
+            self::$setUpException = $e;
+        }
+    }
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (self::$setUpException) {
+            $this->fail('Exception during static setup: ' . self::$setUpException->getMessage() . "\n" . self::$setUpException->getTraceAsString());
         }
     }
 
     public static function tearDownAfterClass(): void
     {
-        global $prefs;
-        $prefs = self::$old_prefs;
-        parent::tearDownAfterClass();
-// Clean up
-        if (self::$trackerId) {
-            self::$trklib->remove_tracker(self::$trackerId);
-        }
-        if (self::$linkedTrackerId) {
-            self::$trklib->remove_tracker(self::$linkedTrackerId);
-        }
-        foreach (self::$categoryIds as $categId) {
-            self::$categlib->remove_category($categId);
+        try {
+            global $prefs;
+            $prefs = self::$old_prefs;
+            parent::tearDownAfterClass();
+            // Clean up
+            if (self::$trackerId) {
+                self::$trklib->remove_tracker(self::$trackerId);
+            }
+            if (self::$linkedTrackerId) {
+                self::$trklib->remove_tracker(self::$linkedTrackerId);
+            }
+            foreach (self::$categoryIds as $categId) {
+                if ($categId) {
+                    self::$categlib->remove_category($categId);
+                }
+            }
+            self::$fieldIds = [];
+            self::$categoryIds = [];
+            self::$itemIds = [];
+            self::$linkedItemIds = [];
+        } catch (\Throwable $e) {
+            // Log but do not throw
         }
     }
 
@@ -212,7 +273,11 @@ class TrackerMultiLevelSortingTest extends TikiTestCase
         $result = self::$trklib->list_items(self::$trackerId, 0, -1, ['f_' . $fieldId . '_asc'], '', '', '', '', '', '', '', null, true, true);
         $this->assertEquals(5, $result['count']);
         $firstItemCateg = self::getItemFieldValue($result['data'][0]['itemId'], $fieldId);
-        $this->assertEquals(self::$categoryIds['alpha'], $firstItemCateg);
+        if (is_array($firstItemCateg)) {
+            $this->assertContains(self::$categoryIds['alpha'], $firstItemCateg);
+        } else {
+            $this->assertEquals(self::$categoryIds['alpha'], $firstItemCateg);
+        }
     }
 
     /**
@@ -345,6 +410,13 @@ class TrackerMultiLevelSortingTest extends TikiTestCase
      */
     protected static function getItemFieldValue($itemId, $fieldId)
     {
-        return self::$trklib->get_item_value(self::$trackerId, $itemId, $fieldId);
+        if (! self::$trackerId || ! $itemId || ! $fieldId) {
+            return null;
+        }
+        try {
+            return self::$trklib->get_item_value(self::$trackerId, $itemId, $fieldId);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

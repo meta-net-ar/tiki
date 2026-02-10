@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\FileGallery;
 
+use League\Flysystem\FilesystemException;
 use Feedback;
 use TikiLib;
 

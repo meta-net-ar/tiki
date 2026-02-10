@@ -90,7 +90,7 @@ class FileHelper
                     $accesslib->check_feature('fgal_convert_documents_pdf');
 
                     if (! UnoconvLib::isLibraryAvailable()) {
-                        $accesslib->display_error('tiki-display.php', tr('To view office document files Tiki needs the media-alchemyst/media-alchemyst package. If you do not have permission to install this package, ask the site administrator.'));
+                        $accesslib->display_error('tiki-display.php', tr('To view office document files Tiki needs the tikiwiki/media-alchemyst package installed with either unoconv or unoserver configured. If you do not have permission to install this package, ask the site administrator.'));
                     }
 
                     $exportLink = sprintf('tiki-download_file.php?fileId=%s&pdf', $_REQUEST['fileId']);

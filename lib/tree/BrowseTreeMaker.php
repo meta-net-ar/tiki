@@ -22,7 +22,7 @@ class BrowseTreeMaker extends TreeMaker
     /// Generate HTML code for tree. Need to redefine to add javascript cookies block
     public function make_tree($rootid, $ar)
     {
-        $r = '<ul class="tree root">' . "\n";
+        $r = '<ul class="tree root bg-theme">' . "\n";
 
         $r .= $this->make_tree_r($rootid, $ar) . "</ul>\n";
 

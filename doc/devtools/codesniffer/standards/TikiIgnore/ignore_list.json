@@ -3033,6 +3033,9 @@
         "lib\/core\/Services\/Access\/Controller.php": {
             "class:Services_Access_Controller": true
         },
+        "lib\/core\/Services\/LanguageCheck\/Controller.php": {
+            "class:Services_LanguageCheck_Controller": true
+        },
         "lib\/core\/Services\/OAuthServer\/JsonResponse.php": {
             "class:Services_OAuthServer_JsonResponse": true
         },
@@ -4078,6 +4081,7 @@
             "RelationLib::get_relation_id": true,
             "RelationLib::get_relations_by_prefix": true,
             "RelationLib::get_relation_count": true,
+            "RelationLib::get_transitive_relations": true,
             "RelationLib::relation_exists": true,
             "RelationLib::get_relation": true,
             "RelationLib::remove_relation": true,
@@ -5346,6 +5350,7 @@
         "lib\/core\/Search\/Query\/WikiBuilder.php": {
             "Search_Query_WikiBuilder::wpquery_list_max": true,
             "Search_Query_WikiBuilder::wpquery_select_fields": true,
+            "Search_Query_WikiBuilder::wpquery_select_count": true,
             "Search_Query_WikiBuilder::wpquery_filter_editable": true,
             "Search_Query_WikiBuilder::wpquery_sort_return_only": true,
             "Search_Query_WikiBuilder::wpquery_filter_type": true,
@@ -5605,6 +5610,10 @@
             "Services_H5P_Controller::action_list_results": true,
             "Services_H5P_Controller::action_cron": true,
             "Services_H5P_Controller::action_content_type_cache": true
+        },
+        "lib\/core\/Services\/LanguageCheck\/Controller.php": {
+            "Services_LanguageCheck_Controller::action_check_text": true,
+            "Services_LanguageCheck_Controller::action_get_languages": true
         },
         "lib\/core\/Services\/Relation\/Controller.php": {
             "Services_Relation_Controller::action_toggle": true,
@@ -9471,6 +9480,9 @@
         },
         "lib\/core\/Services\/OAuthServer\/Controller.php": {
             "Services_OAuthServer_Controller": true
+        },
+        "lib\/core\/Services\/LanguageCheck\/Controller.php": {
+            "Services_LanguageCheck_Controller": true
         },
         "lib\/core\/Services\/OAuthServer\/Utilities.php": {
             "Services_OAuthServer_Utilities": true

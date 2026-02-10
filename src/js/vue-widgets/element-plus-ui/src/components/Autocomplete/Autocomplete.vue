@@ -1,9 +1,9 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language']);
+const props = defineProps(['_expose', 'value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language']);
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
@@ -11,6 +11,8 @@ const shouldRefocusOnBlur = ref(false);
 
 const modelValue = ref(props.value);
 const autocompleteRef = ref(null);
+
+props._expose({ value: modelValue });
 
 const handleFetchSuggestions = (query, callback) => {
     const wrappedCallback = (results) => {
@@ -49,6 +51,10 @@ onMounted(() => {
         console.error(TEXT.ERROR_NO_REQUIRED_PROPS);
     }
 })
+
+watchEffect(() => {
+    modelValue.value = props.value;
+});
 </script>
 
 <script>

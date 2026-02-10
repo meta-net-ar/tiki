@@ -19,6 +19,7 @@
     <exclude-pattern>*/gitlab-ci-local/*</exclude-pattern>
 
     <!-- libraries bundled with tiki -->
+    <exclude-pattern>*src/php/external_lib_sources/*</exclude-pattern>
     <exclude-pattern>*/lib/dracula/*</exclude-pattern>
     <exclude-pattern>*/lib/equation/*</exclude-pattern>
     <exclude-pattern>*/lib/ical/*</exclude-pattern>
@@ -156,6 +157,9 @@
     </rule>
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern>lib/cypht/integration/*</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/lib/core/Services/*/Controller.php</exclude-pattern>
     </rule>
 
     <!-- ## Mark some rules as warnings until tiki gets in a better shape -->

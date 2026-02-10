@@ -40,6 +40,10 @@ class ConverseJS
         if (! empty($prefs['xmpp_muc_component_domain'])) {
             $this->set_option('muc_domain', $prefs['xmpp_muc_component_domain']);
         }
+
+        if (! empty($prefs['xmpp_ws_url'])) {
+            $this->set_option('websocket_url', $prefs['xmpp_ws_url']);
+        }
     }
 
     public function get_oauth_parameters()
@@ -71,13 +75,43 @@ class ConverseJS
     public function set_auth($params)
     {
         global $user;
+        global $prefs;
         $authMethod = TikiLib::lib('tiki')->get_preference('xmpp_auth_method');
 
+        // Anonymous login
         if (empty($user) && isset($params['anonymous']) && $params['anonymous'] === 'y') {
+            $anonMode      = $prefs['xmpp_anonymous_mode'] ?? 'community';
+            $communityRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
+            $dmTarget      = trim($params['dm_target'] ?? ($prefs['xmpp_admin_jid'] ?? ''));
+            $anonRoom      = '';
+
+            if ($anonMode === 'support') {
+                // DM with admin; no MUC auto-join
+                $anonRoom = '';
+            } elseif ($anonMode === 'community' && $communityRoom !== '') {
+                $anonRoom = $communityRoom;
+            }
+
+            // Never override anonymous room with plugin room
+            if (! empty($user) && $anonRoom === '' && ! empty($params['room'])) {
+                $anonRoom = $params['room'];
+            }
+
             $this->set_options([
                 'authentication'   => 'anonymous',
                 'auto_login'       => true,
+                'jid'              => $prefs['xmpp_domain_guest'] ?? null,
+                'bosh_service_url' => $prefs['xmpp_server_http_bind'] ?? null,
+                'websocket_url'    => $prefs['xmpp_ws_url'] ?? null,
+                'dm_target'        => $dmTarget,
             ]);
+
+            // Auto-join anonymous room if configured (community only)
+            if (! empty($anonRoom)) {
+                $this->set_auto_join_rooms($anonRoom);
+            }
+
+        // Prebind (tikitoken)
         } elseif ($authMethod === 'tikitoken') {
             $this->set_options([
                 'auto_login' => true,
@@ -93,10 +127,37 @@ class ConverseJS
                 'oauth_providers' => [
                     'tiki' => $this->get_oauth_parameters(),
                 ]]);
-        } else {
+        } elseif ($authMethod === 'http') {
             $this->set_options([
-                'authentication' => 'login'
+                'authentication'   => 'login',
+                'auto_login'       => true,
+                'jid'              => $user . '@' . $prefs['xmpp_domain_users'],
+                'password' => TikiLib::lib('xmpp')->getXmppSessionToken($user),
+                'bosh_service_url' => $prefs['xmpp_server_http_bind'],
+                'websocket_url'    => $prefs['xmpp_ws_url'],
             ]);
+        } else {
+            global $user, $prefs;
+            if (! empty($user)) {
+                $xmpplib = TikiLib::lib('xmpp');
+
+                $jid = $xmpplib->getUserJidForLogin($user);
+
+                $transport_opts = [];
+                if (! empty($prefs['xmpp_ws_url'])) {
+                    $transport_opts['websocket_url'] = $prefs['xmpp_ws_url'];
+                }
+                if (! empty($prefs['xmpp_server_http_bind'])) {
+                    $transport_opts['bosh_service_url'] = $prefs['xmpp_server_http_bind'];
+                }
+
+                $this->set_options(array_merge([
+                    'authentication' => 'login',
+                    'auto_login'     => true,
+                    'jid'            => $jid,
+                    'password'       => $xmpplib->getXmppSessionToken($user),
+                ], $transport_opts));
+            }
         }
     }
 

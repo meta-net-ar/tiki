@@ -1,6 +1,7 @@
 {include file='token_view_actions.tpl'}
 {title help="Spreadsheet"}{$title}{/title}
 
+<div class="styling-element">
 <div class="description form-text">
     {$description|escape}
 </div>
@@ -22,8 +23,9 @@
 
 
 <div id="feedback" style="height: 1.5em; margin-left: .2em"><span></span></div>
+</div> {* styling-element *}
 
-<div class="t_navbar btn-group mb-3">
+<div class="t_navbar btn-group my-3">
     <div>
         {if $page}
             {button href="tiki-index.php" page="$page" _class="btn btn-primary me-1" _text="{tr}Back to Page{/tr}"}

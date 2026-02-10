@@ -276,10 +276,6 @@ class MenuLib extends TikiLib
             return $option;
         }, $options);
 
-        $treeOut = array_filter($treeOut, function ($option) {
-            return $option['type'] !== '-';
-        });
-
         if (isset($count)) {
             $options = [
                 'data' => $treeOut,

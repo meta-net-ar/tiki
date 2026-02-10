@@ -2193,7 +2193,10 @@ class UsersLib extends TikiLib
      */
     public function create_user_ldap($user, $pass)
     {
-        // todo: no more pear::auth! all in pear::ldap2
+        //This calls new Auth('LDAP', $options); below, I can't identify what API that was from, but LdapLib has no method to add a new LDAP user.
+        throw new Error("Adding a LDAP user is not currently supported");
+    /*
+    // todo: no more pear::auth! all in pear::ldap2
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
 
@@ -2233,6 +2236,7 @@ class UsersLib extends TikiLib
         }
 
         return $status;
+        */
     }
 
 
@@ -2658,6 +2662,15 @@ class UsersLib extends TikiLib
             'group' => $group,
             'bulk_import' => $bulk,
         ]);
+
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] Cache invalidation error: ' . $e->getMessage());
+        }
 
         return $result;
     }
@@ -6959,6 +6972,18 @@ class UsersLib extends TikiLib
         foreach ($groups as $k => $grp) {
             $this->assign_user_to_group($user, $grp, $k != $lastkey);
         }
+
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+            if (method_exists($xmpplib, 'syncUserGroupsToXmpp')) {
+                $xmpplib->syncUserGroupsToXmpp($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] sync error: ' . $e->getMessage());
+        }
     }
 
     public function ban_user_from_group($user, $group)
@@ -7129,6 +7154,13 @@ class UsersLib extends TikiLib
 
             $this->assign_user_to_group($user, $user);
         }
+
+        // Notify listeners that a local user has been created (e.g. XMPP auto-join)
+        $userGroups = $this->get_user_groups($user);
+        TikiLib::events()->trigger('tiki.user.register.local', [
+            'username' => $user,
+            'groups' => $userGroups,
+        ]);
 
         $this->set_user_default_preferences($user, false); // do not force
 

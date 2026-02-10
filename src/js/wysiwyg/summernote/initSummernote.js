@@ -2,6 +2,10 @@ import "summernote";
 import formatTikiToolbars from "./formatTikiToolbars";
 import * as Handlers from "./handlers/index";
 import { parseData } from "./handlers/formSubmission.helpers";
+import { setupLanguageCheckTrigger, initializeLanguageCheck } from "./languageCheck";
+
+// Set up global trigger function for toolbar callbacks
+setupLanguageCheckTrigger();
 
 export default function (areaId, toolbar, options) {
     const target = $(`#${areaId}`);
@@ -59,7 +63,37 @@ export default function (areaId, toolbar, options) {
         icons,
         buttons: customButtons,
         height: options.height,
-        callbacks,
+        callbacks: {
+            onInit: function () {
+                const toolbar = $(this).data("summernote").layoutInfo.toolbar;
+                toolbar.find(".custom-btn-wrapper").each(function () {
+                    $(this).children().unwrap();
+                });
+                if (!options.inline) {
+                    parseData(target, Handlers.dirtyCheck.bind(null, target), false);
+                } else {
+                    Handlers.dirtyCheck(target);
+                }
+
+                // Initialize language checker if enabled via options
+                initializeLanguageCheck(target, options);
+            },
+            onKeydown: function (event) {
+                if (event.key === "@") {
+                    event.preventDefault();
+                    renderUserMentionModal(areaId);
+                }
+            },
+            onCodeviewToggled: function () {
+                Handlers.customCodeview(target);
+            },
+            onDestroy: function () {
+                const languageChecker = target.data("languageChecker");
+                if (languageChecker) {
+                    languageChecker.destroy();
+                }
+            },
+        },
     });
 
     Handlers.formSubmission(target);

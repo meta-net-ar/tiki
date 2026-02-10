@@ -205,6 +205,7 @@ function wikiplugin_sharethis($data, $params)
         $headerlib->add_css('a.stbar.chicklet {height:16px;line-height:16px;}');
         $icons = is_array($multiple) ? $multiple : explode('|', $multiple);
         foreach ($icons as $icon) {
+            // @tiki-external-link-ok: ShareThis plugin - external icon/button service is the core feature (user explicitly enables this)
             $iconcode .= '<a id="ck_' . $icon . '" class="stbar chicklet" href="javascript:void(0);">'
                             . '<img src="https://ws.sharethis.com/chicklets/' . $icon . '.gif" style="margin-right:3px;" />';
             if ($icon == 'sharethis') {
@@ -261,6 +262,7 @@ function wikiplugin_sharethis($data, $params)
     if (TikiLib::lib('parser')->option['is_markdown']) {
         $sharethiscode .= '~np~';
     }
+    // @tiki-external-link-ok: ShareThis plugin - external sharing script is the core feature (user explicitly enables this)
     $sharethiscode .= '<script type="text/javascript" src="https://ws.sharethis.com/button/sharethis.js#';
     $sharethiscode .= "type=" . $sharethis_options['type'];
 

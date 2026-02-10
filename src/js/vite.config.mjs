@@ -136,6 +136,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
+        "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
@@ -152,6 +153,8 @@ export default defineConfig(({ command, mode }) => {
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
             emptyOutDir: true,
+            // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
+            chunkSizeWarningLimit: 2500,
             minify: mode === "production",
             sourcemap: mode === "production",
             cssCodeSplit: true,
@@ -267,7 +270,8 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/boomerangjs/boomerang.js",
                         dest: "vendor_dist/boomerangjs/",
-                    },{
+                    },
+                    {
                         src: "node_modules/boomerangjs/plugins/rt.js",
                         dest: "vendor_dist/boomerangjs/plugins",
                     },
@@ -491,10 +495,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-validation/dist",
                     },
                     {
-                        src: "node_modules/minicart/dist/*.js",
-                        dest: "vendor_dist/minicart/dist",
-                    },
-                    {
                         src: "node_modules/moment/dist/*",
                         dest: "vendor_dist/moment/dist",
                     },
@@ -625,9 +625,11 @@ export default defineConfig(({ command, mode }) => {
                 ],
             }),
             AutoImport({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             Components({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */

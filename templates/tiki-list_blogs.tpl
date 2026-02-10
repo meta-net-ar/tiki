@@ -13,7 +13,7 @@
     {include file='find.tpl'}
 {/if}
 
-<div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {*the table-responsive class cuts off dropdown menus *}
     <table class="table table-striped normal">
         {$numbercol=0}
         <tr>

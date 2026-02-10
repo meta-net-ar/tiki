@@ -148,7 +148,7 @@
                                 {icon name="heading"} <span>{tr}Expand all collapsible headings{/tr}</span>
                             </a>
                         {/if}
-                        {if $pdf_export eq 'y' and $pdf_warning eq 'n' and $prefs["feature_wiki_print"] eq 'y'}
+                        {if $pdf_export eq 'y' && $pdf_warning eq 'n' && $prefs["feature_wiki_print"] eq 'y' && $tiki_p_export_pdf eq 'y'}
                             <a class="dropdown-item generate-pdf" href="tiki-print.php?{query _keepall='y' display="pdf" page=$page}">
                                 {icon name="pdf"} {tr} PDF{/tr}
                                 {$hasPageAction="1"}

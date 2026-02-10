@@ -102,7 +102,7 @@ if ($isvalid) {
     }
 
     if ($language = $tikilib->get_user_preference($user, 'language')) {
-        setLanguage($language);
+        Language::setCurrentLanguage($language);
     }
 
     if (! empty($prefs['url_after_validation']) && ! $wasAdminValidation) {

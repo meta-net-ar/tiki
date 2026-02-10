@@ -60,7 +60,10 @@ if (! hm_exists('tiki_parse_message')) {
                 }
             }
             if ($email) {
-                $email['show_archive'] = $handler->getOption('useFolders') && $folder != 'archive';
+                if ($handler->getOption('useFolders')) {
+                    $email['show_archive'] = $folder != 'archive';
+                    $email['is_tiki_tracker_trash_folder'] = $folder == 'trash';
+                }
                 break;
             }
         }
@@ -394,6 +397,18 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
         }
         $res .= "</div>";
 
+        return $res;
+    }
+}
+
+/**
+ * @subpackage tiki/functions
+ * @return string Restore message button
+ */
+if (! hm_exists('tiki_restore_message')) {
+    function tiki_restore_message($mod)
+    {
+        $res = "<div class='d-inline-block' id='restore_message' style='display: none'><a href='#' title='" . $mod->trans("Restore message to inbox") . "' class='restore_message hlink text-decoration-none btn btn-sm btn-outline-secondary' >" . $mod->trans("Restore") . "</a></div>";
         return $res;
     }
 }

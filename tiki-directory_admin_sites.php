@@ -27,6 +27,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 
 // If no parent category then the parent category is 0
@@ -145,7 +148,6 @@ $countries = $tikilib->get_flags();
 sort($countries);
 $smarty->assign_by_ref('countries', $countries);
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

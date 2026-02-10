@@ -36,10 +36,10 @@ class CreateInstanceTask extends QueuedAbstractTask
     {
         try {
             $this->loadEnv();
-            $cmd = new CreateInstanceCommand();
+            $cmd = new CreateInstanceCommand();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             $params = $this->getParams();
             $inputCommand = new ArrayInput($params['params']);
-            $lastInstanceId = Instance::getLastInstance()->id;
+            $lastInstanceId = Instance::getLastInstance()->id;   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             $this->runCommand($cmd, $inputCommand);
             $output1 = '';
             $output2 = '';
@@ -48,9 +48,9 @@ class CreateInstanceTask extends QueuedAbstractTask
                 $instanceURL = $params['params']['--url'];
                 $info = "[OK] Please test your site at " . $instanceURL;
                 if (str_contains($output1, $info)) {
-                    $instance = Instance::getLastInstance();
+                    $instance = Instance::getLastInstance();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
                     $command = "users:password admin " . $params['tikipassword'];
-                    $cmd = new ConsoleInstanceCommand();
+                    $cmd = new ConsoleInstanceCommand();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
                     $inputCmd = new ArrayInput([
                         'command' => $cmd->getName(),
                         '-i' => $instance->getId(),
@@ -61,7 +61,7 @@ class CreateInstanceTask extends QueuedAbstractTask
                 }
             }
             $this->manager_output->write($output1 . "\n" . $output2);
-            $newInstanceId = Instance::getLastInstance()->id;
+            $newInstanceId = Instance::getLastInstance()->id;   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             if (! empty($params['profile']) && $lastInstanceId != $newInstanceId) {
                 $this->applyProfile($newInstanceId, $params['profile'], $params['repository']);
             }
@@ -82,7 +82,7 @@ class CreateInstanceTask extends QueuedAbstractTask
      */
     private function applyProfile($instanceId, $profile, $repository)
     {
-        $cmd = new ApplyProfileCommand();
+        $cmd = new ApplyProfileCommand();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         $inputCmd = new ArrayInput([
             'command' => $cmd->getName(),
             '-i' => $instanceId,

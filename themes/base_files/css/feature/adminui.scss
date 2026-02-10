@@ -143,12 +143,12 @@ body.tiki-admin {
 
 .tiki-admin aside.admin-nav .navbar-light,
 .tiki-admin aside.admin-nav .navbar-dark {
-    z-index: 9998;
+    z-index: 1049;
 }
 
 .tiki-admin .top_modules.navbar-dark-parent,
 .tiki-admin .top_modules.navbar-light-parent {
-    z-index: 9999;
+    z-index: 1050;
 }
 
 .tiki-admin .admin-navbar .form-check-label {
@@ -244,10 +244,6 @@ body.tiki-admin {
     font-size: 1rem;
     padding: 0.375rem 0.75rem;
     border: none;
-}
-
-.tiki-admin aside el-input + .btn {
-    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
 }
 
 .tiki-admin aside nav {
@@ -690,7 +686,7 @@ body.tiki-admin {
     position: fixed;
     left: 0;
 //    padding-left: 7rem;
-    z-index: 9999 !important;
+    z-index: 1050 !important;
 }
 
 .tiki-admin #col1 {
@@ -700,7 +696,7 @@ body.tiki-admin {
 
 // Popovers
 .tiki-admin .popover {
-    z-index: 9999;
+    z-index: 1070;
     max-width: 50vw;
 }
 

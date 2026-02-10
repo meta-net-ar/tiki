@@ -53,8 +53,11 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'admin';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
+
 $categlib = TikiLib::lib('categ');
 $calendarlib = TikiLib::lib('calendar');
 if ($prefs['feature_groupalert'] == 'y') {
@@ -121,6 +124,15 @@ if (isset($_REQUEST["remove_subscription"]) && $access->checkCsrf(true)) {
     }
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
+    if (isset($_REQUEST["name"], $_REQUEST["description"])) {
+        $validateNameFieldLength = Feedback::validateFieldLength("Name", $_REQUEST["name"], CalendarLib::MAX_CALENDAR_NAME_LENGTH);
+        $validateDescriptionFieldLength = Feedback::validateFieldLength("Description", $_REQUEST["description"], CalendarLib::MAX_CALENDAR_DESCRIPTION_LENGTH);
+        if (! $validateNameFieldLength || ! $validateDescriptionFieldLength) {
+            $smarty->assign('mid', 'tiki-admin_calendars.tpl');
+            $smarty->display("tiki.tpl");
+            die;
+        }
+    }
     $customflags["customlanguages"] = $_REQUEST["customlanguages"];
     $customflags["customlocations"] = $_REQUEST["customlocations"];
     $customflags["customparticipants"] = $_REQUEST["customparticipants"];
@@ -375,6 +387,8 @@ if ($userlib->user_has_permission($user, 'tiki_p_add_events')) {
 
 $smarty->assign('name', $info["name"]);
 $smarty->assign('description', $info["description"]);
+$smarty->assign('MAX_CALENDAR_NAME_LENGTH', CalendarLib::MAX_CALENDAR_NAME_LENGTH);
+$smarty->assign('MAX_CALENDAR_DESCRIPTION_LENGTH', CalendarLib::MAX_CALENDAR_DESCRIPTION_LENGTH);
 $smarty->assign('owner', $info["user"]);
 $smarty->assign('customlanguages', $info["customlanguages"]);
 $smarty->assign('customlocations', $info["customlocations"]);

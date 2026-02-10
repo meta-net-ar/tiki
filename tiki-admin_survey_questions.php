@@ -33,6 +33,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $auto_query_args = [
     'surveyId',
     'questionId',

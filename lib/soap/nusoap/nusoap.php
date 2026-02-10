@@ -2738,7 +2738,7 @@ class soap_transport_http extends nusoap_base {
         } else {
             $this->debug('remove proxy');
             $proxy = null;
-            unsetHeader('Proxy-Authorization');
+            $this->unsetHeader('Proxy-Authorization');
         }
     }
 

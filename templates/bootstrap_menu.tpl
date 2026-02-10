@@ -55,13 +55,19 @@
                     </li>
                 {/if}
             {else}
-                <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">
-                    <a class="nav-link" href="{$item.sefurl|escape}">
-                        {if $menu_info.use_items_icons eq "y" && $item.icon}
-                            {icon name=$item.icon}
-                        {/if}{tr}{$item.name}{/tr}
-                    </a>
-                </li>
+                {if $item.type eq '-'}
+                    <li class="nav-item">
+                        <hr class="menu-separator my-2">
+                    </li>
+                {else}
+                    <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">
+                        <a class="nav-link" href="{$item.sefurl|escape}">
+                            {if $menu_info.use_items_icons eq "y" && $item.icon}
+                                {icon name=$item.icon}
+                            {/if}{tr}{$item.name}{/tr}
+                        </a>
+                    </li>
+                {/if}
             {/if}
         {/foreach}
     </ul>

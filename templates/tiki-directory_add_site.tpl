@@ -1,5 +1,6 @@
 {title url="tiki-directory_add_site.php?parent=$parent"}{tr}Add a new site{/tr}{/title}
 
+<div class="styling-element">
 {include file='tiki-directory_bar.tpl'}
 
 {if $categs[0] eq ''}
@@ -116,3 +117,4 @@
         </form>
     {/if}
 {/if}
+</div>

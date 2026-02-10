@@ -502,6 +502,10 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $hits->total = $hits->total->value;
         }
 
+        if ($query->isCountOnly()) {
+            return new Search_Elastic_ResultSet([], $hits->total, $resultStart, $resultCount);
+        }
+
         if ($query->processDidYouMean() && $hits->total === 0) {
             list($result, $correctKeywords, $didYouMean) = $this->callSuggestions([
                 'fullQuery' => $fullQuery,

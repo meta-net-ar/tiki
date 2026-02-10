@@ -70,7 +70,7 @@ function wikiplugin_addtogooglecal($data, $params)
     $gcal_action = 'TEMPLATE';
     $gcal_text = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['parsedName'])));
     $gcal_details = urlencode(str_replace(["\n","\r"], ['',''], $calitem['parsed']));
-    $gcal_location = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['locationName'])));
+    $gcal_location = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['locationName'] ?? '')));
     // Google requires date to be formatted in UTC
     $old_tz = date_default_timezone_get();
     date_default_timezone_set('UTC');

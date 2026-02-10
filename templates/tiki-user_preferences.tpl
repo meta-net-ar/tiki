@@ -842,7 +842,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-7 p-4">
                         <div class="d-flex mt-4">
                             <div class="well">
                                 {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>

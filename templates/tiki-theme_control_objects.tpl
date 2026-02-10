@@ -1,9 +1,10 @@
 {title help="Theme Control"}{tr}Theme Control:{/tr} {tr}Objects{/tr}{/title}
-<div class="t_navbar btn-group">
-    {button href="tiki-theme_control.php" class="btn btn-primary" _text="{tr}Control by Categories{/tr}"}
-    {button href="tiki-theme_control_sections.php" class="btn btn-primary" _text="{tr}Control by Sections{/tr}"}
+<div class="t_navbar btn-group mb-3">
+    {button href="tiki-theme_control.php" _class="btn btn-link" _text="{tr}Control by Categories{/tr}"}
+    {button href="tiki-theme_control_sections.php" _class="btn btn-link" _text="{tr}Control by Sections{/tr}"}
 </div>
 
+<div class="styling-element">
 <h2>{tr}Assign themes to objects{/tr}</h2>
 <form id='objform' action="tiki-theme_control_objects.php" method="post" {*class="d-flex flex-row flex-wrap align-items-center"*}>
     {ticket}
@@ -83,3 +84,4 @@
 </form>
 
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

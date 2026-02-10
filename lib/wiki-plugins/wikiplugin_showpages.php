@@ -9,7 +9,7 @@ function wikiplugin_showpages_info()
     return [
         'name' => tra('Show Pages'),
         'documentation' => 'PluginShowPages',
-        'description' => tra('Find pages by searching within page names'),
+        'description' => tra('Deprecated: Use PluginListPages instead. Find pages by searching within page names.'),
         'prefs' => [ 'wikiplugin_showpages' ],
         'iconname' => 'search',
         'introduced' => 1,
@@ -47,34 +47,28 @@ function wikiplugin_showpages_info()
 
 function wikiplugin_showpages($data, $params)
 {
-    global $tikilib, $prefs;
+    include_once('lib/wiki-plugins/wikiplugin_listpages.php');
 
-    extract($params, EXTR_SKIP);
+    // Default parameters required by wikiplugin_listpages
+    $listpagesParams = [];
+    $info = wikiplugin_listpages_info();
+    $listpagesParams = WikiPlugin_Helper::applyParamsDefaults($listpagesParams, $info);
 
-    if (is_null($max)) {
-        $max = -1;
+    if (isset($params['find'])) {
+        $listpagesParams['find'] = $params['find'];
     }
 
-    if ((strpos($display, 'name') === false && strpos($display, 'desc') === false)) {
-        $display = 'name|desc';
+    if (isset($params['max'])) {
+        $listpagesParams['max'] = $params['max'];
     }
 
-    $data = $tikilib->list_pages(0, $max, 'pageName_asc', $find, null, false);
-
-    $text = '';
-
-    foreach ($data["data"] as $page) {
-        if (isset($prefs['feature_wiki_description']) && $prefs['feature_wiki_description'] == 'y' && strpos($display, 'desc') !== false) {
-            $desc = $tikilib->page_exists_desc($page["pageName"]);
-        } else {
-            $desc = '';
-        }
-        $text .= "<a href=\"tiki-index.php?page=" . $page["pageName"] . "\" title=\"" . tra("Last modified by") . " " . $page["user"] . "\" class=\"wiki\">";
-        $text .= (strpos($display, 'name') !== false || strlen($desc) == 0 ? $page["pageName"] : $desc);
-        $text .= "</a>";
-        $text .= (strpos($display, 'name') !== false && $desc !== $page["pageName"] && strlen($desc) > 0 ? " - $desc" : "");
-        $text .= "<br />";
+    // Map display parameter to showNameOnly or showNameAndDescriptionOnly
+    $display = $params['display'] ?? 'name|desc';
+    if ($display === 'name') {
+        $listpagesParams['showNameOnly'] = 'y';
+    } else {
+        $listpagesParams['showNameAndDescriptionOnly'] = 'y';
     }
 
-    return $text;
+    return wikiplugin_listpages($data, $listpagesParams);
 }

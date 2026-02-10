@@ -237,6 +237,9 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
     {
         if (isset($context['search_render']) && $context['search_render'] == 'y') {
             $itemIds = $this->getData($this->getConfiguration('fieldId'));
+            if (empty($itemIds) && ! is_array($itemIds)) {
+                $itemIds = [];
+            }
         } else {
             $itemIds = $this->getItemIds();
         }
@@ -777,8 +780,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                 isset($filterFieldHere['options_array'][0]) &&  // trackerId
                 isset($filterFieldHere['options_array'][1]) &&  // fieldId
                 // check for filterFieldThere not being another ItemLink because then we need the itemId
-                $filterFieldThere['type'] !== 'r' &&
-                $filterFieldThere['type'] !== 'w'
+                (empty($filterFieldThere) || ($filterFieldThere['type'] !== 'r' && $filterFieldThere['type'] !== 'w'))
             ) {
                 $localValue = $trklib->get_item_value(
                     $filterFieldHere['options_array'][0],

@@ -17,8 +17,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'quizzes';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_QUIZZES;
+Sections::setCurrentSection($section);
 $quizlib = TikiLib::lib('quiz');
 $auto_query_args = ['sort_mode', 'offset', 'find'];
 $access->check_feature('feature_quizzes');

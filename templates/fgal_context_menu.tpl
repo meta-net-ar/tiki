@@ -96,6 +96,23 @@
                     {icon name='edit' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Edit{/tr}"}
                 </a>
             {/if}
+        {elseif $prefs.cryptpad_feature eq 'y' and (
+            preg_match('/\.(docx|xlsx|pptx|odt|ods|odp)$/i', $file.filename)
+            or $file.type|strpos:'application/vnd.openxmlformats' === 0
+            or $file.type|strpos:'application/vnd.oasis.opendocument' === 0
+            or ($file.type eq 'application/vnd.ms-excel' and preg_match('/\.xlsx$/i', $file.filename))
+            or ($file.type eq 'application/vnd.ms-powerpoint' and preg_match('/\.pptx$/i', $file.filename))
+            or ($file.type eq 'application/msword' and preg_match('/\.docx$/i', $file.filename))
+        )}
+            {if $file.perms.tiki_p_upload_files eq 'y'}
+                <a href="tiki-edit_cryptpad.php?fileId={$file.id}&edit&galleryId={$file.galleryId}">
+                    {icon name='edit' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Edit in CryptPad{/tr}"}
+                </a>
+            {elseif $file.perms.tiki_p_download_files eq 'y'}
+                <a href="tiki-edit_cryptpad.php?fileId={$file.id}&edit&galleryId={$file.galleryId}">
+                    {icon name='view' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Open in CryptPad{/tr}"}
+                </a>
+            {/if}
         {elseif $prefs.h5p_enabled eq 'y' and $file.type eq 'application/zip' and preg_match('/\.h5p$/i', $file.filename)}
             <a href="{service controller='h5p' action='embed' fileId=$file.id}">
                 {icon name='view' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Display{/tr}"}

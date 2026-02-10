@@ -44,7 +44,7 @@
                     {tr}Each{/tr} {$recurrence.dayOfMonth|join:', '} {tr}of the month{/tr}
                 {elseif $recurrence.monthlyType eq 'firstlastweekday'}
                     {tr}Every{/tr}
-                    {if $recurrence.monthlyFirstlastWeekdayValue[0] eq '1'}
+                    {if $recurrence.monthlyFirstlastWeekdayValue == 1}
                         {tr}First Weekday{/tr}
                     {else}
                         {tr}Last Weekday{/tr}

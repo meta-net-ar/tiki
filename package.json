@@ -48,8 +48,8 @@
         "prepare" : "husky"
     },
     "engines" : {
-        "npm" : ">=9.0.0 <11",
-        "node" : ">=20.0.0 <23"
+        "npm" : ">=9.0.0 <12",
+        "node" : ">=20.0.0 <25"
     },
     "enginesComment" : {
         "npm" : "Npm arrived at version 9 in the middle of node 18 lifecycle, but version 9 is required to keep the version of package-lock.json at v3",
@@ -64,34 +64,35 @@
         "single-spa-vue" : "https://github.com/single-spa/single-spa-vue/releases"
     },
     "devDependencies" : {
-        "@commitlint/cli" : "^19.8.1",
-        "@commitlint/config-conventional" : "^19.8.1",
-        "@stylistic/eslint-plugin" : "^5.0.0",
+        "@commitlint/cli" : "^20.2.0",
+        "@commitlint/config-conventional" : "^20.2.0",
+        "@stylistic/eslint-plugin" : "^5.6.1",
         "@testing-library/vue" : "^8.1.0",
-        "@vitejs/plugin-vue" : "^6.0.0",
-        "@vitest/coverage-istanbul" : "^3.2.4",
+        "@vitejs/plugin-vue" : "^6.0.3",
+        "@vitest/coverage-istanbul" : "^4.0.16",
         "check-engine" : "^1.14.0",
-        "concurrently" : "^9.2.0",
+        "concurrently" : "^9.2.1",
         "copy-and-watch" : "^0.1.8",
-        "es-module-shims" : "^2.6.1",
-        "eslint" : "^9.29.0",
-        "eslint-config-prettier" : "^10.1.5",
-        "eslint-plugin-prettier" : "^5.5.1",
-        "eslint-plugin-vue" : "^10.2.0",
-        "happy-dom" : "^20.0.0",
+        "es-module-shims" : "^2.7.0",
+        "eslint" : "^9.39.2",
+        "eslint-config-prettier" : "^10.1.8",
+        "eslint-plugin-prettier" : "^5.5.4",
+        "eslint-plugin-vue" : "^10.6.2",
+        "happy-dom" : "^20.0.11",
         "husky" : "^9.1.7",
         "npm-run-all2" : "^8.0.4",
-        "patch-package" : "^8.0.0",
-        "prettier" : "^3.6.1",
-        "rollup-plugin-visualizer" : "^6.0.3",
-        "tinyglobby" : "^0.2.14",
-        "unplugin-auto-import" : "^19.3.0",
-        "unplugin-vue-components" : "^28.7.0",
-        "vite" : "^7.0.0",
-        "vite-plugin-static-copy" : "^3.1.0",
-        "vitest" : "^3.2.4"
+        "patch-package" : "^8.0.1",
+        "prettier" : "^3.7.4",
+        "rollup-plugin-visualizer" : "^6.0.5",
+        "tinyglobby" : "^0.2.15",
+        "unplugin-auto-import" : "^20.3.0",
+        "unplugin-vue-components" : "^30.0.0",
+        "vite" : "^7.3.0",
+        "vite-plugin-static-copy" : "^3.1.4",
+        "vitest" : "^4.0.16"
     },
     "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace" : {
+        "@commitlint/*": "https://github.com/conventional-changelog/commitlint/blob/master/CHANGELOG.md",
         "@stylistic/eslint-plugin" : "https://github.com/eslint-stylistic/eslint-stylistic/blob/main/CHANGELOG.md",
         "@vitejs/plugin-vue" : "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
         "es-module-shims" : "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
@@ -105,17 +106,17 @@
         "sass" : "https://github.com/sass/dart-sass/blob/main/CHANGELOG.md",
         "tinyglobby" : "Only used directly in vite.config.mjs.  Migrated from glob to align with vite and avoid problem with bad engine specifier in glob that skipped node 21.  https://github.com/SuperchupuDev/tinyglobby/blob/main/CHANGELOG.md",
         "unplugin-auto-import" : "https://github.com/unplugin/unplugin-auto-import/releases",
-        "unplugin-vue-components" : "https://github.com/unplugin/unplugin-vue-components/releases/tag/v28.7.0",
+        "unplugin-vue-components" : "https://github.com/unplugin/unplugin-vue-components/releases",
         "vite" : "https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md",
         "vite-plugin-static-copy" : "https://github.com/sapphi-red/vite-plugin-static-copy/blob/main/CHANGELOG.md",
         "vitest" : "https://github.com/vitest-dev/vitest/releases"
     },
     "overrides" : {
-        "dompurify" : "3.2.7"
+        "dompurify" : "3.3.1"
     },
     "overridesComment" : {
         "dompurify": [
-            "This override forces all packages to use DOMPurify v3.2.7 to fix a security vulnerability present in DOMPurify v2.x.",
+            "This override forces all packages to use DOMPurify v3.3.1 to fix a security vulnerability present in DOMPurify v2.x.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
             "As noted by Victor Buzinaro in https://github.com/cure53/DOMPurify/issues/785, the only breaking change introduced in v3 is the removal of IE-specific support.",
             "After reviewing the changes between versions 2.5.8 and 3.3.0 (https://github.com/cure53/DOMPurify/compare/2.5.8...3.3.0), we confirmed there are no functional breaking changes that affect our usage.",
@@ -130,6 +131,7 @@
     "src/js/jquery-tiki",
     "src/js/tiki-glightbox",
     "src/js/tiki-html5-qrcode",
+    "src/js/tiki-lottie",
     "src/js/tiki-mermaid",
     "src/js/tiki-sentry-browser",
     "src/js/tiki-figlet",

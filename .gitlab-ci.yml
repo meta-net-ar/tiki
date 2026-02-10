@@ -15,17 +15,22 @@ variables:
   MYSQL_USER: tikiuser
   MYSQL_PASSWORD: tikipass
   ELASTICSEARCH_HOST: elasticsearch
-  #The source for these images is at https://gitlab.com/tikiwiki/ci-helpers/docker-tikiwiki-ci 
+  #The source for these images is at https://gitlab.com/tikiwiki/ci-helpers/docker-tikiwiki-ci
   BASE_QA_IMAGE: tikiwiki/tikiwiki-ci:8.1-qa
-  #DBDiff is sensitive to mysql version.  
+  #DBDiff is sensitive to mysql version.
   #The schemas dumped for prior tikis on https://gitlab.com/tikiwiki/tikiwiki-ci-databases have explicit COLLATION() statements for each table column.  Later versions of mysql (8.0.11+, but not sure) will not dump the same whits explicit collations.
   #Running php doc/devtools/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into doc/devtool/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
 
-  MARIADB_IMAGE_NEWEST_SUPPORTED: mariadb:10.11.7
+  # Database Version Testing Strategy:
+  # - OLDEST versions: Minimum compatibility baseline, ensures backward compatibility
+  # - COMMON LTS: Widely deployed versions, provides stable testing baseline
+  # - NEWEST LTS: Future-proofing, tests latest LTS features and compatibility
   MARIADB_IMAGE_OLDEST_SUPPORTED: mariadb:10.5.11
-  MYSQL_IMAGE_NEWEST_SUPPORTED: mysql:8.0.36
+  MARIADB_IMAGE_COMMON_LTS: mariadb:10.11.15
+  MARIADB_IMAGE_NEWEST_SUPPORTED: mariadb:11.8.5
   MYSQL_IMAGE_OLDEST_SUPPORTED: mysql:8.0.29
-  MANTICORE_NEWEST_SUPPORTED: 6.3.6
+  MYSQL_IMAGE_NEWEST_SUPPORTED: mysql:8.4.7
+  MANTICORE_NEWEST_SUPPORTED: 15.1.0
   #Only for older version upgrade tests these days
   MYSQL_5_IMAGE: mysql:5.7.44
   NODE_IMAGE: node:20
@@ -49,11 +54,11 @@ workflow:
       when: never
     #CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX was terribly defined by gitlab, because you need to append a / to every image name.
     #So you can't just use CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX prepended to every image name.
-    #The following is a workround: 
+    #The following is a workround:
     #gitlab-ci-local doesn't support rules variables yet, so it skips anyway
     #https://github.com/firecow/gitlab-ci-local/issues/691
     #
-    #But since DEPENDENCY_PROXY_PREFIX is set to the empty string above, 
+    #But since DEPENDENCY_PROXY_PREFIX is set to the empty string above,
     #DEPENDENCY_PROXY_PREFIX will have no effect
     #This will run in gitlab-ci-local
     #
@@ -95,7 +100,7 @@ node_modules:
 #Tests for a successful compile of all generated files
 node_build:
   stage: build
-  needs: 
+  needs:
     - node_modules  #This is only because we still have some scss files installed from composer - 2023-11-17
     - composer
   image:
@@ -209,14 +214,11 @@ phplint:
   needs:
     - composer
   script:
-    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint -n --configuration=doc/devtools/phplint.yml
-  cache:
-    key: phplint${PHP_VERSION}
-    paths:
-      - phplint.cache
+    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
+  # No point in using cache, on fast hardware it's almost as fast to compute as it is to verify the cache - benoitg - 2026-01-26
   parallel:
     matrix:
-      - PHP_VERSION: ['8.1', '8.2', '8.3', '8.4', '8.5']
+      - PHP_VERSION: ['8.1', '8.5'] #Checking more than max and min PHP versions just wastes CI minutes
 
 smarty-lint:
   stage: code-quality
@@ -228,14 +230,14 @@ smarty-lint:
 
 eslint:
   stage: code-quality
-  needs: 
+  needs:
     - node_modules
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
     #entrypoint: ["/bin/sh", "-c"]
   script:
     - npx eslint .
-      
+
 shlint:
   stage: code-quality
   needs: []
@@ -266,6 +268,19 @@ translation-standards:
   script:
     - php doc/devtools/check_template_translation_standards.php --all
 
+phpstan:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php bin/phpstan --configuration=phpstan-tikiCi.neon
+  cache:
+    key: "phpstan"
+    paths:
+      - temp/ci/phpstan_cache
+    policy: pull-push
+
 rector:
   stage: code-quality
   needs:
@@ -280,7 +295,7 @@ rector:
         files:
           - rector.php
       paths:
-        - temp/dev/rector_cache
+        - temp/ci/rector_cache
       policy: pull-push
 #
 # Check Tikiwiki development specific check (related also with release)
@@ -313,6 +328,13 @@ schema-naming-convention:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
+
+check-external-links:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php -d display_errors=On doc/devtools/check_external_links.php
 
 translation:
   stage: tiki-check
@@ -351,7 +373,7 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  
+
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -419,7 +441,7 @@ composer-could-update-lock:
   <<: *template-tiki-schema-upgrade
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      command: [ "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+      command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
       alias: mysql
 
 db-upgrade-28-mysql:
@@ -503,7 +525,7 @@ check-custom-folder:
 # This will mostly catch composer platform-check problems.
 console-php-works:
   stage: tiki-check
-  needs: 
+  needs:
       - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
@@ -521,7 +543,7 @@ console-php-works:
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
       alias: mysql
-      command: ["--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off"]
+      command: ["--explicit-defaults-for-timestamp=off"]
     - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
       alias: elasticsearch
     - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:${MANTICORE_NEWEST_SUPPORTED}
@@ -556,7 +578,7 @@ unit-tests:
       - PHP_VERSION: "8.1"
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.3"
-        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+        DB_IMAGE: ${MARIADB_IMAGE_COMMON_LTS}
       - PHP_VERSION: "8.4"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
       - PHP_VERSION: "8.5"

@@ -746,7 +746,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($value)) {
+        if (count($indexRemote) && is_numeric($value) && $value > 0) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
             $item = $trklib->get_tracker_item($value);
@@ -1318,7 +1318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $getParseIntoTransformFunction = function ($separator) use ($permName, $invertField) {
                     return function (&$info, $value) use ($separator, $permName, $invertField) {
                         $itemIds = [];
-                        foreach (explode($separator, $value) as $val) {
+                        foreach (explode($separator, (string) $value) as $val) {
                             if ($id = $invertField->get($val)) {
                                 $itemIds[] = $id;
                             }
@@ -1490,6 +1490,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $value = $control->getValue();
 
                 if ($value) {
+                    $value = str_replace('trackeritem:', '', $value);
                     if ($multivalue) {
                         $query->filterMultivalue((string) $value, $baseKey);
                     } else {

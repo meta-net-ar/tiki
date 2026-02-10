@@ -51,6 +51,7 @@ lang = {
     "Select an Option" : "Sélectionnez une option",
     "Select Some Options" : "Sélectionnez quelques options",
     "No results match" : "Aucun résultat ne correspond",
+    "Warning: You have exceeded the allowed limit of %0 characters" : "Attention : vous avez dépassé la limite autorisée de %0 caractères.",
     // remember the IE does not support ending comma on last item
     "Bogus entry" : "Entrée erronnée"
 };

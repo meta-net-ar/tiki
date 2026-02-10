@@ -15,6 +15,9 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     exit;
 }
 
+require_once('tiki-setup.php');
+use Tiki\Sections;
+
 // Fill the display configuration array
 $fgal_listing_conf = [
     'id' => ['name' => tra('ID')],
@@ -40,7 +43,9 @@ $fgal_listing_conf = [
     'source' => ['name' => tra('Source')],
 ];
 
-if (isset($section) && $section == 'admin') {
+$section = Sections::getCurrentSection();
+
+if (isset($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
     foreach ($fgal_listing_conf as $k => $v) {
         $fgal_listing_conf_admin[$k . '_admin'] = $v;
     }
@@ -76,7 +81,7 @@ if (isset($gal_info) && isset($gal_info['galleryId']) && isset($gal_info['lockab
 $smarty = TikiLib::lib('smarty');
 $smarty->assign_by_ref('fgal_listing_conf', $fgal_listing_conf);
 
-if (isset($section) && $section == 'admin') {
+if (isset($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
     foreach ($fgal_listing_conf_admin as $k => $v) {
         if (isset($prefs['fgal_list_' . $k])) {
             $fgal_listing_conf_admin[$k]['value'] = $prefs['fgal_list_' . $k];

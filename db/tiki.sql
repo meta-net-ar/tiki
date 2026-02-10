@@ -496,7 +496,7 @@ CREATE TABLE `tiki_calendar_roles` (
 DROP TABLE IF EXISTS `tiki_calendars`;
 CREATE TABLE `tiki_calendars` (
   `calendarId` int(14) NOT NULL auto_increment,
-  `name` varchar(80) NOT NULL default '',
+  `name` varchar(255) NOT NULL default '',
   `description` varchar(255) default NULL,
   `user` varchar(200) NOT NULL default '',
   `customlocations` enum('n','y') NOT NULL default 'n',
@@ -2184,7 +2184,7 @@ CREATE TABLE `tiki_related_categories` (
 DROP TABLE IF EXISTS `tiki_rss_modules`;
 CREATE TABLE `tiki_rss_modules` (
   `rssId` int(8) NOT NULL auto_increment,
-  `name` varchar(30) NOT NULL default '',
+  `name` varchar(200) NOT NULL default '',
   `description` text,
   `url` text NOT NULL,
   `refresh` int(8) default NULL,
@@ -3457,9 +3457,9 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES(
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-directory_browse.php\\?parent=(\\d+)', 'directory$1', 'directory', 'feature_directory');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_faq.php\\?faqId=(\\d+)', 'faq$1', 'faq', 'feature_faqs');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'display$1', 'file', 'feature_file_galleries', 10);
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;thumbnail', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;display', 'display$1', 'display', 'feature_file_galleries');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;preview', 'preview$1', 'preview', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)thumbnail', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)display', 'display$1', 'display', 'feature_file_galleries');
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)preview', 'preview$1', 'preview', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_forum.php\\?forumId=(\\d+)', 'forum$1', 'forum', 'feature_forums');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-newsletters.php\\?nlId=(\\d+)', 'newsletter$1', 'newsletter', 'feature_newsletters');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-take_quiz.php\\?quizId=(\\d+)', 'quiz$1', 'quiz', 'feature_quizzes');

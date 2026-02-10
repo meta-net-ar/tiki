@@ -244,6 +244,12 @@ class WikiLib extends TikiLib
         $tikilib = TikiLib::lib('tiki');
         // if page already exists, stop here
         $newName = trim($newName);
+        $oldName = trim($oldName);
+
+        // Check if trying to rename to the same name
+        if ($oldName === $newName) {
+            throw new Exception("Cannot rename page to the same name", 3);
+        }
         if ($this->get_page_info($newName, false, true)) {
             // if it is a case change of same page: allow it, else stop here
             if (strcasecmp(trim($oldName), $newName) <> 0) {
@@ -1671,6 +1677,10 @@ class WikiLib extends TikiLib
             if ($prefs['feature_sefurl'] === 'y') {
                 $tiki_pages = TikiDb::get()->table('tiki_pages');
                 $href = urlencode($tiki_pages->fetchOne('pageSlug', ['pageName' => $finalPageName]));
+                if (! $href) {
+                    // prevent endless loop if empty slug
+                    $href = $finalPageName;
+                }
             } else {
                 $href = "$view_script?page=" . urlencode($finalPageName);
             }

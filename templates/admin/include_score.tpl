@@ -6,6 +6,8 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
 
+    <div class="styling-element">
+
     <fieldset class="mb-3 w-100">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_score visible="always"}
@@ -119,9 +121,12 @@
                     {/foreach}
                 </select>
             </div>
-            <a id="addEventBtn" href="#" class="btn btn-primary" role="button">{tr}Add a Scoring Event{/tr}</a>
+            <div class="text-center">
+                <a id="addEventBtn" href="#" class="btn btn-primary" role="button">{tr}Add a Scoring Event{/tr}</a>
+            </div>
         </div>
     </fieldset>
+    </div>
 
     {include file='admin/include_apply_bottom.tpl'}
 </form>

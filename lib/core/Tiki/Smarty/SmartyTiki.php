@@ -19,6 +19,7 @@ use Smarty\Variable;
 use Smarty_Resource_Tplwiki;
 use Smarty_Resource_Wiki;
 use SmartyTiki\Extension\SmartyTikiExtension;
+use Tiki\Sections;
 use TikiLib;
 
 /**
@@ -643,8 +644,9 @@ class SmartyTiki extends Smarty
      */
     private function addLayoutTemplatesFromTemplatePath($templatePath): void
     {
-        global $prefs, $section;
-        if ($section != "admin") {
+        global $prefs;
+
+        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
             $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? SMARTY_DEFAULT_LAYOUT;
         } else {
             $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? SMARTY_DEFAULT_LAYOUT;
@@ -679,7 +681,7 @@ class SmartyTiki extends Smarty
     */
     public function initializePaths(): void
     {
-        global $prefs, $tikidomainslash, $section;
+        global $prefs, $tikidomainslash;
 
         if (! $this->main_template_dir) {
             // First run only

@@ -7,6 +7,7 @@
         </div>
     </div>
 
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_messages visible="always"}
@@ -24,5 +25,6 @@
         {preference name=messu_truncate_internal_message}
 
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

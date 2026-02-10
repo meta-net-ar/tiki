@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'surveys';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
@@ -20,6 +19,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SURVEYS;
+Sections::setCurrentSection($section);
 $auto_query_args = ['sort_mode', 'offset', 'find'];
 
 $access->check_feature('feature_surveys');

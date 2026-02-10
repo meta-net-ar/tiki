@@ -19,6 +19,7 @@ use Tiki\TikiDb\PdoDb;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 require_once('tiki-filter-base.php');
+use Tiki\Sections;
 
 if (! isset($_SERVER['QUERY_STRING'])) {
     $_SERVER['QUERY_STRING'] = '';
@@ -74,6 +75,7 @@ $needed_prefs = [
     'site_language' => 'en',
     'lang_use_db' => 'n',
     'feature_fullscreen' => 'n',
+    'feature_language_check' => 'n',
     'error_reporting_level' => 0,
     'error_tracking_dsn' => '',
     'error_tracking_enabled_php' => 'n',
@@ -192,7 +194,7 @@ if (isset($prefs['session_storage']) && $prefs['session_storage'] == 'db') {
         $db->getReal();
     }
 
-    if ($db instanceof TikiDb_Pdo) {
+    if ($db instanceof PdoDb) {
         require_once('lib/tikisession-pdo.php');
     }
 } elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && TikiLib::lib("memcache")->isEnabled()) {
@@ -652,9 +654,10 @@ if ($prefs['feature_perspective'] === 'y') {
         // if the perspective is not set in the session, try to determine the perspective to use, avoiding redirect loops
         (function () {
             // self executing function just to keep the variable scope
-            global $section, $user;
+            global $user;
+            $section = Sections::getCurrentSection();
             $request = array_merge($_GET, $_POST);
-            if (empty($request['page']) && ! empty($section) && $section == 'wiki page') {
+            if (empty($request['page']) && ! empty($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                 $userlib = TikiLib::lib('user');
                 $request['page'] = $userlib->get_user_default_homepage($user);
             }

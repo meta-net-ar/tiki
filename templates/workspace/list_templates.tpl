@@ -10,7 +10,7 @@
 {block name="title"}
     {title help="" admpage="workspace"}{$title|escape}{/title}
 {/block}
-
+<div class="styling-element">
 {block name="navigation"}
     <div class="navbar">
         <a class="btn btn-primary" role="button" href="{bootstrap_modal controller=workspace action=add_template}">
@@ -51,3 +51,4 @@
         </table>
     </div>
 {/block}
+</div>

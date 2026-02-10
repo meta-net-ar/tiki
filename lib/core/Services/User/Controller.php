@@ -1133,6 +1133,7 @@ class Services_User_Controller
         global $user, $tikilib;
         $access = TikiLib::lib('access');
         $clientTz = $input->client_timezone->text();
+        $userPreferenceTz = $tikilib->get_user_preference($user, 'display_timezone', '');
         $action = $input->timezone_action->text();
 
         if ($action === 'never') {
@@ -1143,25 +1144,85 @@ class Services_User_Controller
             return [];
         }
 
-        if (! empty($_SESSION["temp_timezone"])) {
-            $preferedTz = $_SESSION["temp_timezone"];
-        } else {
-            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        if (! $this->isValidTimezone($clientTz)) {
+            Feedback::error(tr("Invalid detected timezone."));
+            $access->redirect($_SERVER['HTTP_REFERER']);
+            return [];
+        }
+
+        // Determine effective timezone deterministically
+        $effectiveTz = '';
+
+        // Temporary session timezone (highest priority)
+        if (! empty($_SESSION['temp_timezone']) && $this->isValidTimezone($_SESSION['temp_timezone'])) {
+            $effectiveTz = $_SESSION['temp_timezone'];
+        } elseif (! empty($userPreferenceTz) && $this->isValidTimezone($userPreferenceTz)) { // User preference
+            $effectiveTz = $userPreferenceTz;
+        } else { // Fallback to detected/system timezone
+            $effectiveTz = $clientTz;
         }
 
         if ($action === 'switch') {
             $tikilib->set_user_preference($user, 'display_timezone', $clientTz);
-            $preferedTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+
+            unset($_SESSION['temp_timezone']);
+
+            $userPreferenceTz = $clientTz;
+            $effectiveTz = $clientTz;
         } elseif ($action === 'temporary') {
             $_SESSION["temp_timezone"] = $clientTz;
-            $preferedTz = $clientTz;
+            $effectiveTz = $clientTz;
         }
 
-        $different = $clientTz && $clientTz !== $preferedTz;
+        // Determine if the client timezone and effective (user/system) timezone are different.
+        // If they differ by name, we check if they are functionally equivalent
+        // meaning their UTC offsets are the same throughout the year.
+        //
+        // This avoids showing misleading "timezone synchronization" notification when the
+        // timezones are actually the same in behavior but have different names (e.g. "America/Toronto" vs "EST").
+        //
+        // This logic improves UX by not bothering users with unnecessary alerts
+        // when the functional result is the same
+        $different = false;
+        // In detect mode, effective timezone always follows client
+        if (empty($userPreferenceTz)) {
+            $effectiveTz = $clientTz;
+        }
+        // $clientTz is already validated above
+        if (! empty($clientTz)) {
+            if ($clientTz !== $effectiveTz) {
+                $different = true;
+                try {
+                    $tzClient = new DateTimeZone($clientTz);
+                    $tzEffective = new DateTimeZone($effectiveTz);
+                    $year = date('Y');
+                    $functionallySame = true;
+
+                    for ($month = 1; $month <= 12; $month++) {
+                        $dateUTC = new DateTime("$year-$month-15 12:00:00", new DateTimeZone('UTC'));
+                        $offsetClient = $tzClient->getOffset($dateUTC);
+                        $offsetEffective = $tzEffective->getOffset($dateUTC);
+
+                        if ($offsetClient !== $offsetEffective) {
+                            $functionallySame = false;
+                            break;
+                        }
+                    }
+                    if ($functionallySame) {
+                        $different = false;
+                    }
+                } catch (Exception $e) {
+                    Feedback::error("TimezoneSync Error: " . $e->getMessage());
+                    $different = false;
+                }
+            }
+        }
+
         $result = [
-            'different'      => $different ? true : false,
-            'preferedTimezone' => $preferedTz,
+            'different'      => $different,
+            'preferedTimezone' => $userPreferenceTz,
             'clientTimezone'   => $clientTz,
+            'effectiveTimezone' => $effectiveTz,
         ];
 
         if ($action === 'switch' || $action === 'temporary') {
@@ -1169,6 +1230,11 @@ class Services_User_Controller
         }
 
         return $result;
+    }
+
+    private function isValidTimezone(string $timezone): bool
+    {
+        return in_array($timezone, DateTimeZone::listIdentifiers(), true);
     }
 
     private function redirectAndReturn($data = []): array

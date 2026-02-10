@@ -59,6 +59,8 @@
                 <div class="admin clearfix mb-3 featurelist">
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
+                    {preference name=feature_version_checks}
+                    {preference name=feature_eol_date_notifier}
                     {preference name=feature_scheduler}
                     {preference name=feature_queued_tasks}
                     {preference name=feature_banners}
@@ -129,6 +131,10 @@
                         </fieldset>
                     </div>
                     {preference name=feature_docs}
+                    {preference name=cryptpad_feature}
+                    <div class="adminoptionboxchild" id="cryptpad_feature_childcontainer">
+                        {preference name=cryptpad_base_url}
+                    </div>
                     {preference name=feature_slideshow}
                     {preference name=feature_slideshow_pdfexport}
                     {preference name=feature_faqs}

@@ -70,6 +70,7 @@ add_output('ajax_imap_message_content', 'add_rsvp_actions', true, 'imap', 'filte
 add_output('ajax_imap_message_content', 'filter_message_headers_mpdf', true, 'imap', 'filter_message_headers', 'after');
 add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
 add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
+add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'after');
 
 /* message page rsvp actions to an event */
 setup_base_ajax_page('ajax_rsvp_action', 'core');
@@ -154,6 +155,7 @@ add_output('ajax_tiki_message_content', 'filter_message_body', true, 'imap');
 add_output('ajax_tiki_message_content', 'filter_message_struct', true, 'imap');
 add_output('ajax_tiki_message_content', 'forward_variables', true);
 add_output('ajax_tiki_message_content', 'add_move_to_trackers', true);
+add_output('ajax_tiki_message_content', 'add_restore_message', true);
 setup_base_ajax_page('ajax_tiki_delete_message', 'core');
 add_handler('ajax_tiki_delete_message', 'message_list_type', true, 'core');
 add_handler('ajax_tiki_delete_message', 'tracker_message_list_type', true);
@@ -176,6 +178,11 @@ add_handler('ajax_tiki_flag_message', 'flag_tiki_message', true);
 add_output('ajax_tiki_flag_message', 'forward_variables', true);
 setup_base_ajax_page('ajax_tiki_message_action', 'core');
 add_handler('ajax_tiki_message_action', 'tiki_message_action', true);
+setup_base_ajax_page('ajax_tiki_restore_message', 'core');
+add_handler('ajax_tiki_restore_message', 'message_list_type', true, 'core');
+add_handler('ajax_tiki_restore_message', 'tracker_message_list_type', true);
+add_handler('ajax_tiki_restore_message', 'close_session_early', true, 'core');
+add_handler('ajax_tiki_restore_message', 'tiki_restore_message', true);
 
 /* get trackers script */
 setup_base_ajax_page('ajax_tiki_get_trackers', 'core');
@@ -253,6 +260,7 @@ return [
     'info',
     'ajax_tiki_msg_tracker_items',
     'ajax_tiki_auto_move_reply_to_tracker',
+    'ajax_tiki_restore_message',
   ],
   'allowed_get' => [
     'tiki_download_message' => FILTER_VALIDATE_BOOLEAN,
@@ -268,7 +276,9 @@ return [
     'msg_next_subject' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'delete_error' => [FILTER_VALIDATE_BOOLEAN, false],
     'archive_error' => [FILTER_VALIDATE_BOOLEAN, false],
+    'restore_error' => [FILTER_VALIDATE_BOOLEAN, false],
     'show_archive' => [FILTER_VALIDATE_BOOLEAN, false],
+    'show_restore' => [FILTER_VALIDATE_BOOLEAN, false],
     'flag_state' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'trackers' => [FILTER_DEFAULT, false],
     'tracker_data' => [FILTER_DEFAULT, false],

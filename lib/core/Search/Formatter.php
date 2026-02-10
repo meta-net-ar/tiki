@@ -30,6 +30,11 @@ class Search_Formatter
         $this->alternateOutput = $output;
     }
 
+    public function getAlternateOutput()
+    {
+        return $this->alternateOutput;
+    }
+
     public function setContext(?string $context)
     {
         $this->context = $context;

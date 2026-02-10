@@ -1,5 +1,6 @@
 {title admpage=freetags}{tr}Browse Tags{/tr}{/title}
 
+<div class="styling-element">
 {autocomplete element="#tagBox" type="tag" options="multiple: true, multipleSeparator: ' ';"}
 <form action="tiki-browse_freetags.php" method="get" name="my_form" class="freetagsearch">
     <div class="mb-3 row">
@@ -246,4 +247,5 @@
         </table>
         {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
     {/if}
+</div>
 </div>

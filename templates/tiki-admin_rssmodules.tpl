@@ -162,7 +162,7 @@
             <div class="mb-3 row">
                 <label for="feed_name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="name" id="feed_name" value="{$name|escape}" class="form-control">
+                    <input type="text" maxlength="{$MAX_EXTERNAL_FEED_NAME_LENGTH}" name="name" id="feed_name" value="{$name|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">

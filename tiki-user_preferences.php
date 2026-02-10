@@ -11,7 +11,6 @@ use Tiki\Lib\Theme\ThemeLib;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -78,6 +77,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $modlib = TikiLib::lib('mod');
 $userprefslib = TikiLib::lib('userprefs');
 $perspectivelib = TikiLib::lib('perspective');
@@ -94,6 +96,7 @@ use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Tiki\Lib\TikiDate;
+use Tiki\TwoFactorAuth\TwoFactorAuth;
 
 // User preferences screen
 if ($prefs['feature_userPreferences'] != 'y' && $prefs['change_password'] != 'y' && $tiki_p_admin_users != 'y') {
@@ -476,6 +479,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
+        $userlib->update_lastlogin($userwatch);
         if ($prefs['feature_user_encryption'] === 'y') {
             // Notify CryptLib about the login
             $cryptlib = TikiLib::lib('crypt');
@@ -507,7 +511,7 @@ if (
     }
 }
 
-if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == 'email2FA') {
+if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == TwoFactorAuth::EMAIL_2FA) {
     $tfaSecret = $userlib->update_2_factor_secret($user, 'y');
 }
 
@@ -527,7 +531,7 @@ $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
 $userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
-if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == 'google2FA') {
+if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == TwoFactorAuth::TOTP_2FA) {
     $google2fa = new Google2FA();
     if (empty($_SESSION['tfaSecret']) || $_SESSION['tfaSecret'] == $tfaSecret) {
         $_SESSION['tfaSecret'] = $google2fa->generateSecretKey();

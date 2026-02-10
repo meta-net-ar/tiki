@@ -185,7 +185,7 @@ function wikiplugin_tikimanagerclone($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $instances = TikiManager\Application\Instance::getInstances();
+    $instances = TikiManager\Application\Instance::getInstances();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $source = array_map(function ($i) {
         return $i->id;
     }, array_filter($instances, function ($i) use ($source) {

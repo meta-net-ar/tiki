@@ -23,9 +23,11 @@ $inputConfiguration = [ [
 ] ];
 
 $auto_query_args = [ 'offset', 'id', 'cookietab' ];
-$section = 'admin';
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $perspectivelib = TikiLib::lib('perspective');
 
 $access->check_feature(['feature_perspective']);

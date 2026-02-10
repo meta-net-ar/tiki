@@ -10,6 +10,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Sections;
+
 /**
  * @package   Tiki
  * @subpackage    Language
@@ -671,6 +673,127 @@ class Language extends TikiDb_Bridge
         // now lets sort the list so it comes back all pretty :)
         asort($LangCodes);
         return $LangCodes;
+    }
+
+    /**
+     * Indicates whether a locale identifier is valid
+     *
+     * @param string $localeIdentifier A locale identifier, such as "en"
+     * @return bool true if and only if the given locale identifier is valid and allowed
+     */
+    public static function isValidLocale(string $localeIdentifier = ''): bool
+    {
+        global $prefs;
+
+        $availableLanguages = $prefs['available_languages'];
+
+        if (is_string($availableLanguages)) {
+            $availableLanguages = json_decode($availableLanguages, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $availableLanguages = [];
+            }
+        }
+
+        return preg_match("/[a-zA-Z-_]+$/", $localeIdentifier)
+            && file_exists('lang/' . $localeIdentifier . '/language.php')
+            && ($prefs['restrict_language'] === 'n' || empty($availableLanguages) || in_array($localeIdentifier, $availableLanguages));
+    }
+
+    /**
+     * Sets the language
+     *
+     * @param string $localeIdentifier the identifier of the locale to set
+     * @param bool $languageAdmin whether to set the admin language
+     * @return bool true on success, false on failure (if $localeIdentifier is not a valid and allowed locale identifier)
+     */
+    public static function setCurrentLanguage(string $localeIdentifier = '', bool $languageAdmin = false): bool
+    {
+        $smarty = TikiLib::lib('smarty');
+        $tikilib = TikiLib::lib('tiki');
+        global $prefs, $user;
+
+        $prefName = $languageAdmin ? 'language_admin' : 'language';
+
+        if (self::isValidLocale($localeIdentifier)) {
+            $prefs[$prefName] = $localeIdentifier;
+            $smarty->refreshLanguage();
+            $tikilib->set_user_preference($user, $prefName, $localeIdentifier);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determine the user's preferred language (switchLang GET param or browser detection)
+     *
+     * @return string|null
+    */
+    protected static function determineUserLanguage(): ?string
+    {
+        global $prefs, $tikilib;
+
+        if ($prefs['feature_multilingual'] != 'y' || $prefs['change_language'] != 'y') {
+            return null;
+        }
+
+        // User manually switched language via GET
+        if (isset($_GET['switchLang'])) {
+            return $_GET['switchLang'];
+        }
+
+        // Detect browser language if enabled and user has no preference
+        if ($prefs['feature_detect_language'] === 'y' && ! $tikilib->userHasPreference('language')) {
+            $browserLanguage = detect_browser_language();
+            if (self::isValidLocale($browserLanguage)) {
+                return $browserLanguage;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determine admin section language override
+     *
+     * @return string|null
+     */
+    protected static function determineAdminLanguage(): ?string
+    {
+        global $prefs;
+        $section = Sections::getCurrentSection();
+        if (! empty($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['language_admin']) && self::isValidLocale($prefs['language_admin'])) {
+            return $prefs['language_admin'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the current language based on section and user preferences
+     * Should be called after the Section is set and autoloader is available
+     *
+     * @return void
+    */
+    public static function setSectionLanguage(): void
+    {
+        global $prefs;
+
+        // Step 1: determine user language or fallback
+        $lang = self::determineUserLanguage() ?? $prefs['site_language'];
+
+        // Step 2: admin override
+        $adminLang = self::determineAdminLanguage();
+        if ($adminLang !== null) {
+            $lang = $adminLang;
+        }
+
+        // Step 3: ensure valid locale
+        if (! self::isValidLocale($lang)) {
+            $lang = $prefs['site_language'];
+        }
+
+        // Step 4: apply language
+        self::setCurrentLanguage($lang);
     }
 
     public static function getCurrentLanguage(): string

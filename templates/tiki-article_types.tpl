@@ -5,7 +5,7 @@
         {button href="tiki-admin_topics.php" _type="link" _icon_name="flag" _text="{tr}Article Topics{/tr}"}
     {/if}
 </div>
-<form enctype="multipart/form-data" action="tiki-article_types.php" method="post" class="form">
+<form enctype="multipart/form-data" action="tiki-article_types.php" method="post" class="form styling-element">
     <h2>{tr}Add Type{/tr}</h2>
         <div class="mb-3 row mx-0">
             <div class="input-group">

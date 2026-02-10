@@ -1196,3 +1196,15 @@ h6:hover .heading-link {
         padding: 20px;
     }
 }
+
+.popover-body .img-popover-image {
+    max-width: 100%;
+    max-height: 80vh;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.popover {
+    max-width: none;
+}

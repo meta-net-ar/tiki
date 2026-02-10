@@ -98,6 +98,32 @@
                 {/remarksbox}
             {/if}
 
+            {if $htaccess_global_warning}
+                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                    <p class="mb-2">
+                        {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">
+                            {tr}How to fix{/tr}
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" href="tiki-admin_security.php#content" rel="noopener">
+                            {tr}See details in Security panel{/tr}
+                        </a>
+                    </div>
+                    <details class="small mt-2">
+                        <summary>{tr}Technical details{/tr}</summary>
+                        <ul class="list-unstyled mb-0">
+                            <li>{tr}Reference hash:{/tr} <code>{$htaccess_global_warning.reference_hash|escape}</code></li>
+                            <li>{tr}Active hash:{/tr} <code>{$htaccess_global_warning.hash|escape}</code></li>
+                            {if !empty($htaccess_global_warning.details.symlink_target)}
+                                <li>{tr}Symlink target:{/tr} <code>{$htaccess_global_warning.details.symlink_target|escape}</code></li>
+                            {/if}
+                        </ul>
+                    </details>
+                {/remarksbox}
+            {/if}
+
             {if $vendor_autoload_ignored or $vendor_autoload_disabled}
                 {remarksbox type="error" title="{tr}Vendor folder issues{/tr}"}
                     {tr}Your vendor folder contains multiple packages that were normally bundled with Tiki. Since version 17 those libraries were migrated from the folder <strong>vendor</strong> to the folder <strong>vendor_bundled</strong>.{/tr}<br />
@@ -208,18 +234,37 @@
             {/if}
         </div>
 
-        {if $upgrade_messages|count}
+        {* Error box box for critical "unsupported" messages. *}
+        {if $upgrade_errors|count}
+            {remarksbox type="error" title="{tr}Upgrade Required{/tr}" icon="announce"}
+                {foreach from=$upgrade_errors item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Warning box for "approaching EoL" messages. *}
+        {if $upgrade_warnings|count}
+            {remarksbox type="warning" title="{tr}Upgrade Recommended{/tr}" icon="announce"}
+                {foreach from=$upgrade_warnings item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Note box for informational "upgrade available" messages. *}
+        {if $upgrade_notes|count}
             {if not $is_stable}
                 {$title="{tr}Stable version available{/tr}"}
-            {elseif $upgrade_messages|count eq 1}
+            {elseif $upgrade_notes|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}
             {/if}
             {remarksbox type="note" title=$title icon="announce"}
-                {foreach from=$upgrade_messages item=um}
-                    <p>{$um|escape}</p>
-                {/foreach}
+            {foreach from=$upgrade_notes item=um}
+                <p>{$um|safe_html}</p>
+            {/foreach}
             {/remarksbox}
         {/if}
 

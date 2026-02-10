@@ -15,7 +15,7 @@ $inputConfiguration = [
         'remove_x'                 => 'int',              //get
         'sort_mode'                => 'word',             //get
         'offset'                   => 'int',              //get
-        'find'                     => 'word',             //post
+        'find'                     => 'string',           //post
         'blogId'                   => 'int',              //get
         ],
         'staticKeyFiltersForArrays' => [

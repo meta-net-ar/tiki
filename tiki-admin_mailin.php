@@ -18,7 +18,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-//check if feature is on
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_mailin');
 $access->check_permission(['tiki_p_admin_mailin']);
 
