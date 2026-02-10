@@ -160,7 +160,7 @@ abstract class AbstractTrackerField
     }
 
     /**
-     * Called after field values are saved to determine if the item's 
+     * Called after field values are saved to determine if the item's
      * lastModif/lastModifBy metadata should be NOT be updated.
      *
      * @return bool true to exclude from lastModif update.
