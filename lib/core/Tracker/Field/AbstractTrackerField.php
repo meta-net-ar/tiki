@@ -46,6 +46,7 @@ abstract class AbstractTrackerField
      * rules
      * encryptionKeyId
      * excludeFromNotification
+     * excludeFromTrackerItemLastModificationDate
      * visibleInViewMode
      * visibleInEditMode
      * visibleInHistoryMode
@@ -156,5 +157,16 @@ abstract class AbstractTrackerField
         } else {
             return $this->options->getParam($key, $default);
         }
+    }
+
+    /**
+     * Called after field values are saved to determine if the item's 
+     * lastModif/lastModifBy metadata should be NOT be updated.
+     *
+     * @return bool true to exclude from lastModif update.
+     */
+    public function handleTrackerItemSave(): bool
+    {
+        return ($this->fieldRow['excludeFromTrackerItemLastModificationDate'] ?? 'n') === 'y';
     }
 }

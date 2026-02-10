@@ -2355,16 +2355,22 @@ class TrackerLib extends TikiLib
         ];
 
         if (! empty($itemId) && ! empty($fieldsModified)) {
-            $updateLastModif = false;
+            $hasNonExcludedField = false;
+            $definition = \Tracker_Definition::get($trackerId);
             foreach ($fieldsModified as $fieldId => $array) {
-                $field = $this->get_tracker_field($fieldId);
-                if (! isset($field['updateLastModif']) || $field['updateLastModif'] !== 'n') {
-                    $updateLastModif = true;
+                try {
+                    $trackerField = $definition->getFieldInstance($fieldId);
+                    if ($trackerField && ! $trackerField->handleTrackerItemSave()) {
+                        $hasNonExcludedField = true;
+                        break;
+                    }
+                } catch (\Throwable $e) {
+                    $hasNonExcludedField = true;
                     break;
                 }
             }
 
-            if ($updateLastModif) {
+            if ($hasNonExcludedField) {
                 $this->update_items(
                     [$itemId],
                     [
@@ -3517,7 +3523,7 @@ class TrackerLib extends TikiLib
      * @param int $fieldId  0 has special meaning:  insert a new field
      * @return int the field id inserted or operated on.
      */
-    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $updateLastModif = 'y', $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y'): int
+    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y', $excludeFromTrackerItemLastModificationDate = 'n'): int
     {
         global $prefs;
         $fieldId = (int) $fieldId;
@@ -3581,7 +3587,7 @@ class TrackerLib extends TikiLib
             'rules' => $rules,
             'encryptionKeyId' => $encryptionKeyId,
             'excludeFromNotification' => $excludeFromNotification,
-            'updateLastModif' => $updateLastModif,
+            'excludeFromTrackerItemLastModificationDate' => $excludeFromTrackerItemLastModificationDate,
             'visibleInViewMode' => $visibleInViewMode ?? 'y',
             'visibleInEditMode' => $visibleInEditMode ?? 'y',
             'visibleInHistoryMode' => $visibleInHistoryMode ?? 'y'
@@ -4495,6 +4501,7 @@ class TrackerLib extends TikiLib
                 $field['rules'],
                 $field['encryptionKeyId'],
                 $field['excludeFromNotification'],
+                $field['excludeFromTrackerItemLastModificationDate'] ?? 'n',
                 $field['visibleInViewMode'],
                 $field['visibleInEditMode'],
                 $field['visibleInHistoryMode']
