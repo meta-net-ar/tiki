@@ -4515,10 +4515,10 @@ class TrackerLib extends TikiLib
                 $field['rules'],
                 $field['encryptionKeyId'],
                 $field['excludeFromNotification'],
-                $field['excludeFromTrackerItemLastModificationDate'] ?? 'n',
                 $field['visibleInViewMode'],
                 $field['visibleInEditMode'],
-                $field['visibleInHistoryMode']
+                $field['visibleInHistoryMode'],
+                $field['excludeFromTrackerItemLastModificationDate'] ?? 'n'
             );
             if ($options['defaultOrderKey'] == $field['fieldId']) {
                 $options['defaultOrderKey'] = $newFieldId;
