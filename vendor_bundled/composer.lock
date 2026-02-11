@@ -8268,7 +8268,6 @@
         },
         {
             "name": "pear/pear",
-<<<<<<< HEAD
             "version": "v1.10.18",
             "source": {
                 "type": "git",
@@ -8279,18 +8278,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/pear/pear-core/zipball/9076191766577a02f75587049d9d316472403aea",
                 "reference": "9076191766577a02f75587049d9d316472403aea",
-=======
-            "version": "v1.10.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pear/pear-core.git",
-                "reference": "b3736aa8384625eb5710db763f8dfe68bc53cd21"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core/zipball/b3736aa8384625eb5710db763f8dfe68bc53cd21",
-                "reference": "b3736aa8384625eb5710db763f8dfe68bc53cd21",
->>>>>>> 4d055d6fc0 (update composer)
                 "shasum": ""
             },
             "require": {
@@ -8378,11 +8365,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=PEAR",
                 "source": "https://github.com/pear/PEAR"
             },
-<<<<<<< HEAD
             "time": "2026-01-25T16:57:52+00:00"
-=======
-            "time": "2025-12-14T20:32:41+00:00"
->>>>>>> 4d055d6fc0 (update composer)
         },
         {
             "name": "pear/structures_graph",
