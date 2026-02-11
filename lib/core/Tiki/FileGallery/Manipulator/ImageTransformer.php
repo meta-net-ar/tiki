@@ -113,15 +113,6 @@ class ImageTransformer extends Manipulator
         }
 
         $data = file_get_contents($work_file);
-        
-        // Apply server-side image compression if enabled
-        global $prefs;
-        if (ImageCompressionModule::shouldCompress($this->file->filetype, $prefs)) {
-            if (ImageCompressionModule::compress($work_file, $this->file->filetype, $prefs)) {
-                $data = file_get_contents($work_file);
-            }
-        }
-        
         unlink($work_file);
 
         $this->file->replaceContents($data);
