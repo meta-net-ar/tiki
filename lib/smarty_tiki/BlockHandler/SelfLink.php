@@ -103,6 +103,9 @@ class SelfLink extends Base
 
                 $params['_type'] = $default_type;
 
+                if (! empty($params['_tag']) && $params['_tag'] === 'y') {
+                    $params['_urlencode'] = 'n';
+                }
                 $ret = smarty_function_query($params, $template);
             }
 
