@@ -491,7 +491,20 @@
             {/if}
             {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
-                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}" max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"{if $prefs.fgal_image_compression_enabled eq 'y'} :compress-handler="() => window.tikiCompressFiles"{/if} />
+                    <tiki-el-file-gal-uploader
+                        id="uploader"
+                        accept="{$allowedMimeTypes}"
+                        max-size="{$max_upload_size}"
+                        max-files="{$max_file_uploads}"
+                        max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"
+                        max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"
+                        compression_enabled="{if $prefs.fgal_image_compression_enabled eq 'y'}true{else}false{/if}"
+                        compression_preset_type="{$prefs.fgal_image_compression_preset_type}"
+                        compression_quality="{$prefs.fgal_image_compression_quality|default:85}"
+                        compression_max_dimension="{$prefs.fgal_image_compression_max_dimension|default:1600}"
+                        compression_max_size_mb="{$prefs.fgal_image_compression_max_size_mb|default:1}"
+                        compression_save_original="{$prefs.fgal_image_compression_save_original}"
+                    />
                 </div>
             {/if}
             {if !$editFileId}

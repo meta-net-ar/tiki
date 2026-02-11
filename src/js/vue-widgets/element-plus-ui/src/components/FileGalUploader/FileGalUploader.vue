@@ -7,8 +7,25 @@ import getUploadData from '../../helpers/fileGalUploader/getUploadData';
 import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
+import { compressFileList } from '../../../../../tiki-image-compressor/imageCompressor.js';
+import initializeCompressionUI, { getCompressionSettings } from '../../../../../tiki-image-compressor/compressionControls.js';
 
-const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language', 'compressHandler']);
+const props = defineProps([
+    'accept',
+    'maxSize',
+    'maxFiles',
+    'maxWidth',
+    'maxHeight',
+    'vimeoUrl',
+    'language',
+    'compression_enabled',
+    'compression_preset_type',
+    'compression_quality',
+    'compression_max_dimension',
+    'compression_max_size_mb',
+    'compression_save_original'
+]);
+
 const maxSize = JSON.parse(props.maxSize);
 const maxFiles = JSON.parse(props.maxFiles);
 
@@ -20,47 +37,56 @@ const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
     const searcParams = new URLSearchParams(location.search);
     if (searcParams.get('filegals_manager')) {
         insertIntoEditor.value = true;
     }
+
+    if (props.compression_enabled === 'true') {
+
+        const prefs = {
+            preset: props.compression_preset_type || 'slider',
+            quality: parseInt(props.compression_quality, 10) || 85,
+            maxDimension: parseInt(props.compression_max_dimension, 10) || 1600,
+            maxSize: parseFloat(props.compression_max_size_mb) || 1,
+            saveOriginal: props.compression_save_original,
+        };
+
+        await initializeCompressionUI(prefs);
+    }
 })
 
-const compressFiles = async () => {
-    if (!props.compressHandler || !uploadRef.value?.uploadFiles || uploadRef.value.uploadFiles.length === 0) {
-        console.log('[FileGalUploader] Compression not available or no files');
-        return true;
+const submitUpload = async () => {
+    uploadRef.value.submit();
+}
+
+const beforeUpload = async (rawFile) => {
+    if (rawFile.size > maxSize) {
+        const maxSizeKB = props.maxSize / 1000;
+        ElMessage.error(`File size cannot exceed ${maxSizeKB}KB`);
+        return false;
     }
-    
+
+    if (props.compression_enabled !== 'true') return true;
+
     try {
         isCompressing.value = true;
-        console.log('[FileGalUploader] Starting compression for', uploadRef.value.uploadFiles.length, 'files');
-        
-        // Create a FileList-like array of files
-        const files = uploadRef.value.uploadFiles.map(f => f.raw);
-        
-        // Call the compress handler
-        const compressed = await props.compressHandler(files);
-        console.log('[FileGalUploader] Compression complete');
-        
-        // Replace the upload files with compressed versions
-        if (compressed?.files?.length > 0) {
-            uploadRef.value.uploadFiles = Array.from(compressed.files).map((file, index) => ({
-                uid: -1 - index,
-                name: file.name,
-                raw: file,
-                size: file.size,
-                percentage: 0,
-                status: 'ready'
-            }));
-            console.log('[FileGalUploader] Files replaced with compressed versions');
+
+        ElMessage.info(`Compressing file ${rawFile.name}...`);
+        const compressedFiles = await compressFileList([rawFile], getCompressionSettings().current);
+
+        if (compressedFiles?.files?.length) {
+            const compressedFile = compressedFiles.files[0];
+            console.log('[FileGalUploader] Replacing upload file', {original: rawFile.size, compressed: compressedFile.size});
+            ElMessage.success(`File ${rawFile.name} compressed successfully (${(rawFile.size / 1000).toFixed(2)}KB → ${(compressedFile.size / 1000).toFixed(2)}KB)`);
+
+            return compressedFile;
         }
-        
+
         return true;
     } catch (err) {
-        console.error('[FileGalUploader] Compression failed:', err);
-        ElMessage.error('File compression failed: ' + err.message);
+        ElMessage.error("Compression failed: " + err.message);
         return false;
     } finally {
         isCompressing.value = false;

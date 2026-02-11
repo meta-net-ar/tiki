@@ -10,15 +10,10 @@ import { compressFileList } from './imageCompressor.js';
 // ============================================================================
 // STATE MANAGEMENT - Single source of truth
 // ============================================================================
-
 const STATE = {
-    // Server defaults - never modified
     serverDefaults: {},
-    // Current settings - mix of server defaults and user customizations
     current: {},
-    // Track if UI is initialized
     isInitialized: false,
-    // Track attached listeners for cleanup
     listeners: [],
 };
 
@@ -204,18 +199,6 @@ function attachListener(element, event, handler, options = false) {
 }
 
 /**
- * Debounced event handler
- */
-function debounce(key, callback, delay = DEBOUNCE_DELAY) {
-    return function (...args) {
-        clearTimeout(DEBOUNCE_TIMERS[key]);
-        DEBOUNCE_TIMERS[key] = setTimeout(() => {
-            callback(...args);
-        }, delay);
-    };
-}
-
-/**
  * Remove all attached event listeners
  */
 function cleanup() {
@@ -223,7 +206,6 @@ function cleanup() {
         element.removeEventListener(event, handler, options);
     });
     STATE.listeners = [];
-    console.log('[CompressionUI] Event listeners cleaned up');
 }
 
 /**
@@ -252,7 +234,7 @@ async function waitForElements(selectors) {
  * Initialize all event listeners
  */
 async function initializeEventListeners() {
-    // Wait for DOM elements to be ready
+
     const elements = await waitForElements({
         qualitySlider: '#compression_quality_main',
         qualityDisplay: '#quality_display_main',
@@ -263,66 +245,52 @@ async function initializeEventListeners() {
         backBtn: '#compression-back-to-default',
     });
 
-    // Quality slider - immediate
     if (elements.qualitySlider) {
         const handler = (e) => {
             const value = parseInt(e.target.value, 10);
             updateState({ quality: value });
         };
         attachListener(elements.qualitySlider, 'input', handler);
-        console.log('[CompressionUI] Quality slider listener attached');
     }
 
-    // Max dimension input - immediate
     if (elements.maxDimInput) {
         const handler = (e) => {
             const value = parseInt(e.target.value, 10) || 0;
             updateState({ maxDimension: value });
         };
         attachListener(elements.maxDimInput, 'input', handler);
-        console.log('[CompressionUI] Max dimension listener attached');
     }
 
-    // Max size input - immediate
     if (elements.maxSizeInput) {
         const handler = (e) => {
             const value = parseFloat(e.target.value) || 0;
             updateState({ maxSize: value });
         };
         attachListener(elements.maxSizeInput, 'input', handler);
-        console.log('[CompressionUI] Max size listener attached');
     }
 
-    // Save original checkbox - immediate
     if (elements.saveOrigChk) {
         const handler = (e) => {
             updateState({ saveOriginal: e.target.checked ? 'y' : 'n' });
         };
         attachListener(elements.saveOrigChk, 'change', handler);
-        console.log('[CompressionUI] Save original listener attached');
     }
 
-    // Toggle button - immediate
     if (elements.toggleBtn) {
         const handler = (e) => {
             e.preventDefault();
             toggleCustomUI(true);
         };
         attachListener(elements.toggleBtn, 'click', handler);
-        console.log('[CompressionUI] Toggle button listener attached');
     }
 
-    // Back button - immediate
     if (elements.backBtn) {
         const handler = (e) => {
             e.preventDefault();
             toggleCustomUI(false);
         };
         attachListener(elements.backBtn, 'click', handler);
-        console.log('[CompressionUI] Back button listener attached');
     }
-
-    console.log('[CompressionUI] ✓ All event listeners attached');
 }
 
 /**
@@ -336,13 +304,11 @@ function toggleCustomUI(showCustom) {
         // Show custom controls
         if (defaultSummary) defaultSummary.classList.add('d-none');
         if (customControls) customControls.classList.remove('d-none');
-        console.log('[CompressionUI] Custom UI shown');
     } else {
         // Show default summary and reset to defaults
         if (defaultSummary) defaultSummary.classList.remove('d-none');
         if (customControls) customControls.classList.add('d-none');
         resetToDefaults();
-        console.log('[CompressionUI] Default UI shown, reset to defaults');
     }
 }
 
@@ -408,12 +374,10 @@ async function compressBeforeAjaxSubmit(formData, jqForm, options) {
  */
 async function initializeCompressionUI(config = {}) {
     if (STATE.isInitialized) {
-        console.log('[CompressionUI] Already initialized, skipping');
         return;
     }
 
     try {
-        // Set server defaults (never modified)
         STATE.serverDefaults = {
             quality: validateSetting('quality', config.quality || 65),
             maxDimension: validateSetting('maxDimension', config.maxDimension || 1600),
@@ -422,34 +386,30 @@ async function initializeCompressionUI(config = {}) {
             preset: validateSetting('preset', config.preset || 'slider'),
         };
 
-        // Initialize current state from defaults
         STATE.current = { ...STATE.serverDefaults };
 
-        console.log('[CompressionUI] Server defaults:', STATE.serverDefaults);
-
-        // Wait for DOM to be ready
         await waitForElements({
             summary: '#compression_default_summary',
             controls: '#compression_custom_controls',
         });
 
-        // Sync UI with state
         updateDOMFromState();
 
-        // Attach all event listeners
         await initializeEventListeners();
 
         STATE.isInitialized = true;
-        console.log('[CompressionUI] ✓ Fully initialized');
     } catch (err) {
         console.error('[CompressionUI] Initialization failed:', err);
         STATE.isInitialized = false;
     }
 }
 
-// ============================================================================
-// EXPORTS
-// ============================================================================
+/**
+ * Return current live compression settings
+ */
+function getCompressionSettings() {
+    return { ...STATE };
+}
 
 export default initializeCompressionUI;
-export { compressBeforeAjaxSubmit, cleanup };
+export { compressBeforeAjaxSubmit, cleanup, getCompressionSettings };

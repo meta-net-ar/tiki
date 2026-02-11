@@ -90,7 +90,7 @@ async function compressImage(fileBlob, prefs) {
         alwaysKeepResolution: false,
     };
 
-    return imageCompression.compress(fileBlob, compressionOptions);
+    return imageCompression(fileBlob, compressionOptions);
 }
 
 /**
@@ -109,9 +109,9 @@ async function compressVideo(fileBlob, prefs) {
 
     try {
         const buffer = await fetchFile(fileBlob);
-        
+
         ffmpeg.writeFile('input.mp4', buffer);
-        
+
         // Use libx265 for better compression
         await ffmpeg.exec([
             '-i', 'input.mp4',
@@ -138,9 +138,9 @@ async function compressVideo(fileBlob, prefs) {
  * 
  * @param {Blob|File} fileBlob - File to compress
  * @param {Object} prefs - Compression preferences
- *   - quality: 0-100 (default: 65)
- *   - maxDimension: pixels for images (default: 1600)
- *   - maxSize: MB (default: 1)
+ *   - quality: 0-100
+ *   - maxDimension: pixels for images
+ *   - maxSize: MB
  * @param {Object} options - Additional options
  *   - mimeType: override file MIME type
  *   - fallbackOnError: return original if compression fails (default: true)
@@ -156,14 +156,11 @@ async function compress(fileBlob, prefs = {}, options = {}) {
     };
 
     try {
-        // Validate input
         if (!fileBlob) {
             throw new Error('File blob is required');
         }
 
         const mimeType = options.mimeType || fileBlob?.type || '';
-
-        // If not supported, return as-is (no error)
         if (!isSupported(fileBlob, mimeType)) {
             result.skipped = true;
             result.formatted = 'unsupported';
@@ -172,7 +169,6 @@ async function compress(fileBlob, prefs = {}, options = {}) {
 
         let compressedBlob;
 
-        // Route to appropriate compressor
         if (isImage(mimeType)) {
             result.formatted = 'image';
             compressedBlob = await compressImage(fileBlob, prefs);
@@ -184,7 +180,6 @@ async function compress(fileBlob, prefs = {}, options = {}) {
             return result;
         }
 
-        // Validate result
         if (!compressedBlob || compressedBlob.size === 0) {
             throw new Error('Compression resulted in empty blob');
         }
@@ -198,12 +193,11 @@ async function compress(fileBlob, prefs = {}, options = {}) {
         result.error = errorMsg;
         result.success = false;
 
-        // Fallback: return original file
         if (options.fallbackOnError !== false) {
             result.blob = fileBlob;
         }
 
-        console.warn('[MediaCompressor]', errorMsg);
+        console.log('[MediaCompressor]', error);
         return result;
     }
 }
@@ -240,7 +234,6 @@ async function compressMultiple(files, prefs = {}, options = {}) {
  */
 async function compressFileList(fileList, prefs = {}) {
     if (!fileList || fileList.length === 0) {
-        console.log('[MediaCompressor] No files to compress');
         return new DataTransfer();
     }
 
@@ -248,9 +241,7 @@ async function compressFileList(fileList, prefs = {}) {
     const results = [];
 
     for (const file of fileList) {
-        // Check if file is supported
         if (!isSupported(file)) {
-            console.log('[MediaCompressor] File not supported, keeping original:', file.name);
             dataTransfer.items.add(file);
             results.push({
                 name: file.name,
@@ -263,11 +254,9 @@ async function compressFileList(fileList, prefs = {}) {
             continue;
         }
 
-        // Check minimum file size threshold
         const minSizeMB = prefs.maxSize || 1;
         const fileSizeMB = file.size / (1024 * 1024);
         if (fileSizeMB < minSizeMB) {
-            console.log('[MediaCompressor] File too small, keeping original:', file.name);
             dataTransfer.items.add(file);
             results.push({
                 name: file.name,
@@ -290,7 +279,7 @@ async function compressFileList(fileList, prefs = {}) {
                     { type: result.blob.type }
                 );
                 dataTransfer.items.add(compressedFile);
-                
+
                 results.push({
                     name: file.name,
                     original: file.size,
@@ -309,7 +298,6 @@ async function compressFileList(fileList, prefs = {}) {
                     reason: result.formatted,
                 });
             } else {
-                // Compression failed, keep original
                 dataTransfer.items.add(file);
                 results.push({
                     name: file.name,
@@ -320,7 +308,6 @@ async function compressFileList(fileList, prefs = {}) {
                 });
             }
         } catch (err) {
-            // Error during compression, keep original
             console.error('[MediaCompressor] Error compressing file:', file.name, err);
             dataTransfer.items.add(file);
             results.push({
