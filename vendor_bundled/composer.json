@@ -234,7 +234,7 @@
         "npm-asset/html2canvas": "~1.4",
         "npm-asset/interactjs": "^1.10",
         "npm-asset/popper.js": "^1.13.4",
-        "npm-asset/prefixfree": ">=1.0.10",
+        "npm-asset/prefixfree": "~1.0",
         "npm-asset/reveal.js": "^3.9.2",
         "npm-asset/sass-svg-uri": "^1.0",
         "npm-asset/select2": "^4.1.0-RC.0",
@@ -280,7 +280,7 @@
         "symfony/dependency-injection": "~6.4.3",
         "symfony/finder": "~6.4",
         "symfony/mime": "~6.4.3",
-        "symfony/polyfill-ctype": "~1.8",
+        "symfony/polyfill-ctype": "~1.33",
         "symfony/polyfill-iconv": "^1.27",
         "symfony/polyfill-intl-icu": "^1.27",
         "symfony/polyfill-mbstring": "^1.27",
@@ -299,14 +299,14 @@
     },
     "require-dev": {
         "kint-php/kint": "^5.1.0",
-        "kornrunner/dbunit": "^7.0.0",
+        "kornrunner/dbunit": "~7.0",
         "mikey179/vfsstream": "^1",
         "overtrue/phplint": "^9.0.4",
         "phpcompatibility/php-compatibility": "^10.0.0-alpha2",
         "phpcsstandards/phpcsutils": "^1.1.0",
         "phpstan/phpstan": "^1.10.57",
         "phpstan/phpstan-deprecation-rules": "^1.1.3",
-        "phpunit/phpunit": "10.5.26",
+        "phpunit/phpunit": "~10.5",
         "php-webdriver/webdriver": "^1.15.1",
         "rector/rector": "~1.0.1",
         "sebastian/diff": "^5.1.1",
@@ -368,14 +368,6 @@
                 "alternatives": "No alternatives for prebinding. Custom implementation would be complex.",
                 "impact": "XMPP chat completely non-functional. Users cannot authenticate or connect."
             },
-            "montefuscolo/xmpp": {
-                "reason": "XMPP library with PHP 8.1 compatibility fixes. Using dev-php8.1 branch for required PHP 8.1 support.",
-                "mitigation": "Specific dev branch targeting PHP 8.1 compatibility. Monitored for upstream changes.",
-                "reviewed": "2025-08-27",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "Wait for stable release with PHP 8.1 support or use alternative XMPP library.",
-                "impact": "XMPP functionality may be affected if PHP 8.1 compatibility issues arise."
-            },
             "rubix/extras": {
                 "reason": "Machine learning extras package providing additional algorithms and transformers. Using beta version 2.0.0-beta for required ML functionality. Package is ABANDONED - no stable release will be available.",
                 "mitigation": "Beta version provides stable API for core ML features. Used extensively in MachineLearningLib for classifiers, regressors, transformers, and neural networks. Package is abandoned but beta version remains functional for current needs.",
@@ -391,14 +383,6 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "Wait for stable release. In Tiki 28.x+, this is handled by the JS build system.",
                 "impact": "Enhanced select input functionality lost. Users lose search, tagging, and advanced selection features in forms."
-            },
-            "symfony/polyfill-ctype": {
-                "reason": "Provides ctype_* functions when ext-ctype extension is not available.",
-                "mitigation": "Version ~1.8 required by Symfony 6.4 components. Provides fallback functionality.",
-                "reviewed": "2025-08-27",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "No alternatives for ctype function polyfills.",
-                "impact": "Symfony components fail. System likely unusable due to cascading failures."
             }
         }
     },

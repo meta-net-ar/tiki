@@ -28,4 +28,4 @@ if (isset($options['prepend'])) {
 unset($options);
 
 require PHPUNIT_COMPOSER_INSTALL;
-PHPUnit\TextUI\Command::main();
+exit((new PHPUnit\TextUI\Application())->run($_SERVER['argv']));

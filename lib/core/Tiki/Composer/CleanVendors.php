@@ -430,6 +430,7 @@ class CleanVendors
     {
         $excludeDirs = [
             'rector/rector',  //It breaks rector, and it's a devtool, so won't be bundled anyway.
+            'phpunit/phpunit/schema',
             'phpseclib/phpseclib/phpseclib/Crypt', //it breaks phpseclib as it thinks there are classes called index due to the index files
         ];
         // add index file if needed
