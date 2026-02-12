@@ -15,11 +15,11 @@ const STATE = {
 
 // Validation rules for settings
 const VALIDATION = {
-    quality: { min: 10, max: 100, type: 'number' },
-    maxDimension: { min: 100, max: 10000, type: 'number' },
-    maxSize: { min: 0.1, max: 1000, type: 'number' },
-    saveOriginal: { type: 'enum', values: ['y', 'n'] },
-    preset: { type: 'enum', values: ['slider', 'levels'] },
+    quality: { min: 10, max: 100, type: "number" },
+    maxDimension: { min: 100, max: 10000, type: "number" },
+    maxSize: { min: 0.1, max: 1000, type: "number" },
+    saveOriginal: { type: "enum", values: ["y", "n"] },
+    preset: { type: "enum", values: ["slider", "levels"] },
 };
 
 /**
@@ -32,7 +32,7 @@ function validateSetting(key, value) {
     const rule = VALIDATION[key];
     if (!rule) return value;
 
-    if (rule.type === 'number') {
+    if (rule.type === "number") {
         const num = parseFloat(value);
         if (isNaN(num)) return STATE.serverDefaults[key];
         if (num < rule.min || num > rule.max) {
@@ -42,7 +42,7 @@ function validateSetting(key, value) {
         return num;
     }
 
-    if (rule.type === 'enum') {
+    if (rule.type === "enum") {
         if (!rule.values.includes(value)) {
             console.warn(`[CompressionUI] Invalid ${key} value: ${value}`);
             return STATE.serverDefaults[key];
@@ -93,33 +93,33 @@ function updateDOMFromState() {
     const state = STATE.current;
 
     // Quality display
-    const qualityDisplay = document.getElementById('quality_display_main');
+    const qualityDisplay = document.getElementById("quality_display_main");
     if (qualityDisplay) {
-        qualityDisplay.textContent = state.quality + '%';
+        qualityDisplay.textContent = state.quality + "%";
     }
 
     // Quality slider
-    const qualitySlider = document.getElementById('compression_quality_main');
+    const qualitySlider = document.getElementById("compression_quality_main");
     if (qualitySlider && qualitySlider.value != state.quality) {
         qualitySlider.value = state.quality;
     }
 
     // Max dimension input
-    const maxDimInput = document.querySelector('[name="compression_max_dimension"]');
+    const maxDimInput = document.querySelector("[name='compression_max_dimension']");
     if (maxDimInput && maxDimInput.value != state.maxDimension) {
         maxDimInput.value = state.maxDimension;
     }
 
     // Max size input
-    const maxSizeInput = document.querySelector('[name="compression_max_size"]');
+    const maxSizeInput = document.querySelector("[name='compression_max_size']");
     if (maxSizeInput && maxSizeInput.value != state.maxSize) {
         maxSizeInput.value = state.maxSize;
     }
 
     // Save original checkbox
-    const saveOrigChk = document.getElementById('compression_save_original_main');
-    if (saveOrigChk && saveOrigChk.checked != (state.saveOriginal === 'y')) {
-        saveOrigChk.checked = state.saveOriginal === 'y';
+    const saveOrigChk = document.getElementById("compression_save_original_main");
+    if (saveOrigChk && saveOrigChk.checked != (state.saveOriginal === "y")) {
+        saveOrigChk.checked = state.saveOriginal === "y";
     }
 
     // Default summary display
@@ -131,10 +131,10 @@ function updateDOMFromState() {
  */
 function updateDefaultSummary(settings) {
     const updates = [
-        ['default_max_size', settings.maxDimension + ' px'],
-        ['default_min_file', settings.maxSize + ' MB'],
-        ['default_save_original', settings.saveOriginal === 'y' ? 'Yes' : 'No'],
-        ['default_unzip', 'No'],
+        ["default_max_size", settings.maxDimension + " px"],
+        ["default_min_file", settings.maxSize + " MB"],
+        ["default_save_original", settings.saveOriginal === "y" ? "Yes" : "No"],
+        ["default_unzip", "No"],
     ];
 
     updates.forEach(([id, value]) => {
@@ -188,14 +188,14 @@ async function waitForElements(selectors) {
 async function initializeEventListeners() {
 
     const elements = await waitForElements({
-        qualitySlider: '#compression_quality_main',
-        qualityDisplay: '#quality_display_main',
-        maxDimInput: '[name="compression_max_dimension"]',
-        maxSizeInput: '[name="compression_max_size"]',
-        saveOrigChk: '#compression_save_original_main',
-        toggleBtn: '#customize-compression-toggle',
-        backBtn: '#compression-back-to-default',
-        maxSizeMsgEl: '#compression_max_dimension_msg',
+        qualitySlider: "#compression_quality_main",
+        qualityDisplay: "#quality_display_main",
+        maxDimInput: "[name='compression_max_dimension']",
+        maxSizeInput: "[name='compression_max_size']",
+        saveOrigChk: "#compression_save_original_main",
+        toggleBtn: "#customize-compression-toggle",
+        backBtn: "#compression-back-to-default",
+        maxSizeMsgEl: "#compression_max_dimension_msg",
     });
 
     if (elements.qualitySlider) {
@@ -203,7 +203,7 @@ async function initializeEventListeners() {
             const value = parseInt(e.target.value, 10);
             updateState({ quality: value });
         };
-        attachListener(elements.qualitySlider, 'input', handler);
+        attachListener(elements.qualitySlider, "input", handler);
     }
 
     if (elements.maxDimInput) {
@@ -214,7 +214,7 @@ async function initializeEventListeners() {
             const max = VALIDATION.maxDimension.max;
 
             if (isNaN(value)) {
-                msgEl.textContent = '';
+                msgEl.textContent = "";
                 return;
             }
 
@@ -222,18 +222,18 @@ async function initializeEventListeners() {
             if (value < min) {
                 clamped = min;
                 msgEl.textContent = `Too low, will use ${min} px internally.`;
-                msgEl.className = 'text-success small mt-1';
+                msgEl.className = "text-success small mt-1";
             } else if (value > max) {
                 clamped = max;
                 msgEl.textContent = `Too high, will use ${max} px internally.`;
-                msgEl.className = 'text-success small mt-1';
+                msgEl.className = "text-success small mt-1";
             } else {
-                msgEl.textContent = '';
+                msgEl.textContent = "";
             }
 
             STATE.current.maxDimension = clamped;
         };
-        attachListener(elements.maxDimInput, 'input', handler);
+        attachListener(elements.maxDimInput, "input", handler);
     }
 
     if (elements.maxSizeInput) {
@@ -241,14 +241,14 @@ async function initializeEventListeners() {
             const value = parseFloat(e.target.value) || 0;
             updateState({ maxSize: value });
         };
-        attachListener(elements.maxSizeInput, 'input', handler);
+        attachListener(elements.maxSizeInput, "input", handler);
     }
 
     if (elements.saveOrigChk) {
         const handler = (e) => {
-            updateState({ saveOriginal: e.target.checked ? 'y' : 'n' });
+            updateState({ saveOriginal: e.target.checked ? "y" : "n" });
         };
-        attachListener(elements.saveOrigChk, 'change', handler);
+        attachListener(elements.saveOrigChk, "change", handler);
     }
 
     if (elements.toggleBtn) {
@@ -256,7 +256,7 @@ async function initializeEventListeners() {
             e.preventDefault();
             toggleCustomUI(true);
         };
-        attachListener(elements.toggleBtn, 'click', handler);
+        attachListener(elements.toggleBtn, "click", handler);
     }
 
     if (elements.backBtn) {
@@ -264,7 +264,7 @@ async function initializeEventListeners() {
             e.preventDefault();
             toggleCustomUI(false);
         };
-        attachListener(elements.backBtn, 'click', handler);
+        attachListener(elements.backBtn, "click", handler);
     }
 }
 
@@ -272,17 +272,17 @@ async function initializeEventListeners() {
  * Toggle between default summary and custom controls
  */
 function toggleCustomUI(showCustom) {
-    const defaultSummary = document.getElementById('compression_default_summary');
-    const customControls = document.getElementById('compression_custom_controls');
+    const defaultSummary = document.getElementById("compression_default_summary");
+    const customControls = document.getElementById("compression_custom_controls");
 
     if (showCustom) {
         // Show custom controls
-        if (defaultSummary) defaultSummary.classList.add('d-none');
-        if (customControls) customControls.classList.remove('d-none');
+        if (defaultSummary) defaultSummary.classList.add("d-none");
+        if (customControls) customControls.classList.remove("d-none");
     } else {
         // Show default summary and reset to defaults
-        if (defaultSummary) defaultSummary.classList.remove('d-none');
-        if (customControls) customControls.classList.add('d-none');
+        if (defaultSummary) defaultSummary.classList.remove("d-none");
+        if (customControls) customControls.classList.add("d-none");
         resetToDefaults();
     }
 }
@@ -298,18 +298,18 @@ async function initializeCompressionUI(config = {}) {
 
     try {
         STATE.serverDefaults = {
-            quality: validateSetting('quality', config.quality || 65),
-            maxDimension: validateSetting('maxDimension', config.maxDimension || 1600),
-            maxSize: validateSetting('maxSize', config.maxSize || 1),
-            saveOriginal: validateSetting('saveOriginal', config.saveOriginal || 'n'),
-            preset: validateSetting('preset', config.preset || 'slider'),
+            quality: validateSetting("quality", config.quality || 65),
+            maxDimension: validateSetting("maxDimension", config.maxDimension || 1600),
+            maxSize: validateSetting("maxSize", config.maxSize || 1),
+            saveOriginal: validateSetting("saveOriginal", config.saveOriginal || "n"),
+            preset: validateSetting("preset", config.preset || "slider"),
         };
 
         STATE.current = { ...STATE.serverDefaults };
 
         await waitForElements({
-            summary: '#compression_default_summary',
-            controls: '#compression_custom_controls',
+            summary: "#compression_default_summary",
+            controls: "#compression_custom_controls",
         });
 
         updateDOMFromState();
@@ -318,7 +318,7 @@ async function initializeCompressionUI(config = {}) {
 
         STATE.isInitialized = true;
     } catch (err) {
-        console.error('[CompressionUI] Initialization failed:', err);
+        console.error("[CompressionUI] Initialization failed:", err);
         STATE.isInitialized = false;
     }
 }

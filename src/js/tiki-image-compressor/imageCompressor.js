@@ -1,6 +1,6 @@
 /**
  * Media Compressor Module
- * 
+ *
  * Centralized compression for images and videos.
  * - Images: browser-image-compression
  * - Videos: ffmpeg.wasm
@@ -13,8 +13,8 @@ import { fetchFile } from "@ffmpeg/util";
 
 // Supported MIME types
 const SUPPORTED_TYPES = {
-    images: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/bmp'],
-    videos: ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/mpeg'],
+    images: ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/bmp"],
+    videos: ["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo", "video/mpeg"],
 };
 
 const ALL_SUPPORTED = [...SUPPORTED_TYPES.images, ...SUPPORTED_TYPES.videos];
@@ -35,7 +35,7 @@ async function initFFmpeg() {
         ffmpegInstance = ffmpeg;
         return ffmpegInstance;
     } catch (error) {
-        console.warn('[MediaCompressor] FFmpeg initialization failed:', error.message);
+        console.warn("[MediaCompressor] FFmpeg initialization failed:", error.message);
         return null;
     }
 }
@@ -48,7 +48,7 @@ async function initFFmpeg() {
  * @returns {Boolean} - true if supported
  */
 function isSupported(file, mimeType) {
-    const mime = mimeType || file?.type || '';
+    const mime = mimeType || file?.type || "";
     return ALL_SUPPORTED.includes(mime);
 }
 
@@ -85,7 +85,7 @@ async function compressImage(fileBlob, prefs) {
     const compressionOptions = {
         maxSizeMB: maxSize,
         maxWidthOrHeight: maxDimension,
-        useWebWorker: typeof Worker !== 'undefined',
+        useWebWorker: typeof Worker !== "undefined",
         quality: quality / 100, // Convert 0-100 to 0-1
         alwaysKeepResolution: false,
     };
@@ -101,7 +101,7 @@ async function compressImage(fileBlob, prefs) {
 async function compressVideo(fileBlob, prefs) {
     const ffmpeg = await initFFmpeg();
     if (!ffmpeg) {
-        throw new Error('FFmpeg not available for video compression');
+        throw new Error("FFmpeg not available for video compression");
     }
 
     const quality = prefs.quality || 65;
@@ -110,23 +110,23 @@ async function compressVideo(fileBlob, prefs) {
     try {
         const buffer = await fetchFile(fileBlob);
 
-        ffmpeg.writeFile('input.mp4', buffer);
+        ffmpeg.writeFile("input.mp4", buffer);
 
         // Use libx265 for better compression
         await ffmpeg.exec([
-            '-i', 'input.mp4',
-            '-c:v', 'libx265',
-            '-crf', crf.toString(),
-            '-c:a', 'aac',
-            '-b:a', '128k',
-            'output.mp4'
+            "-i", "input.mp4",
+            "-c:v", "libx265",
+            "-crf", crf.toString(),
+            "-c:a", "aac",
+            "-b:a", "128k",
+            "output.mp4"
         ]);
 
-        const data = ffmpeg.readFile('output.mp4');
-        ffmpeg.deleteFile('input.mp4');
-        ffmpeg.deleteFile('output.mp4');
+        const data = ffmpeg.readFile("output.mp4");
+        ffmpeg.deleteFile("input.mp4");
+        ffmpeg.deleteFile("output.mp4");
 
-        return new Blob([data.buffer], { type: 'video/mp4' });
+        return new Blob([data.buffer], { type: "video/mp4" });
     } catch (error) {
         throw new Error(`Video compression failed: ${error.message}`);
     }
@@ -152,28 +152,28 @@ async function compress(fileBlob, prefs = {}, options = {}) {
         success: false,
         error: null,
         skipped: false,
-        formatted: 'unknown',
+        formatted: "unknown",
     };
 
     try {
         if (!fileBlob) {
-            throw new Error('File blob is required');
+            throw new Error("File blob is required");
         }
 
-        const mimeType = options.mimeType || fileBlob?.type || '';
+        const mimeType = options.mimeType || fileBlob?.type || "";
         if (!isSupported(fileBlob, mimeType)) {
             result.skipped = true;
-            result.formatted = 'unsupported';
+            result.formatted = "unsupported";
             return result;
         }
 
         let compressedBlob;
 
         if (isImage(mimeType)) {
-            result.formatted = 'image';
+            result.formatted = "image";
             compressedBlob = await compressImage(fileBlob, prefs);
         } else if (isVideo(mimeType)) {
-            result.formatted = 'video';
+            result.formatted = "video";
             compressedBlob = await compressVideo(fileBlob, prefs);
         } else {
             result.skipped = true;
@@ -181,7 +181,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
         }
 
         if (!compressedBlob || compressedBlob.size === 0) {
-            throw new Error('Compression resulted in empty blob');
+            throw new Error("Compression resulted in empty blob");
         }
 
         result.blob = compressedBlob;
@@ -189,7 +189,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
 
         return result;
     } catch (error) {
-        const errorMsg = error.message || 'Unknown compression error';
+        const errorMsg = error.message || "Unknown compression error";
         result.error = errorMsg;
         result.success = false;
 
@@ -197,7 +197,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
             result.blob = fileBlob;
         }
 
-        console.log('[MediaCompressor]', error);
+        console.log("[MediaCompressor]", error);
         return result;
     }
 }
@@ -212,7 +212,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
  */
 async function compressMultiple(files, prefs = {}, options = {}) {
     if (!Array.isArray(files)) {
-        throw new Error('Files must be an array');
+        throw new Error("Files must be an array");
     }
 
     const results = [];
@@ -249,7 +249,7 @@ async function compressFileList(fileList, prefs = {}) {
                 compressed: file.size,
                 success: false,
                 skipped: true,
-                reason: 'unsupported',
+                reason: "unsupported",
             });
             continue;
         }
@@ -264,7 +264,7 @@ async function compressFileList(fileList, prefs = {}) {
                 compressed: file.size,
                 success: false,
                 skipped: true,
-                reason: 'too_small',
+                reason: "too_small",
             });
             continue;
         }
@@ -308,7 +308,7 @@ async function compressFileList(fileList, prefs = {}) {
                 });
             }
         } catch (err) {
-            console.error('[MediaCompressor] Error compressing file:', file.name, err);
+            console.error("[MediaCompressor] Error compressing file:", file.name, err);
             dataTransfer.items.add(file);
             results.push({
                 name: file.name,
@@ -320,7 +320,7 @@ async function compressFileList(fileList, prefs = {}) {
         }
     }
 
-    console.log('[MediaCompressor] Compression results:', results);
+    console.log("[MediaCompressor] Compression results:", results);
     return dataTransfer;
 }
 
