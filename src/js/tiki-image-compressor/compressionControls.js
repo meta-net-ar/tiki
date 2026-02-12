@@ -5,11 +5,7 @@
  * Centralized state management with proper validation, error handling, and performance optimization
  */
 
-import { compressFileList } from './imageCompressor.js';
-
-// ============================================================================
 // STATE MANAGEMENT - Single source of truth
-// ============================================================================
 const STATE = {
     serverDefaults: {},
     current: {},
@@ -66,7 +62,6 @@ function validateSetting(key, value) {
 function updateState(updates, skipDOMUpdate = false) {
     const changes = {};
 
-    // Validate and apply updates
     for (const [key, value] of Object.entries(updates)) {
         const validated = validateSetting(key, value);
         if (STATE.current[key] !== validated) {
@@ -77,9 +72,6 @@ function updateState(updates, skipDOMUpdate = false) {
 
     if (Object.keys(changes).length === 0) return;
 
-    console.log('[CompressionUI] State updated:', changes);
-
-    // Batch update DOM
     if (!skipDOMUpdate) {
         updateDOMFromState();
     }
@@ -90,7 +82,6 @@ function updateState(updates, skipDOMUpdate = false) {
  */
 function resetToDefaults() {
     STATE.current = { ...STATE.serverDefaults };
-    console.log('[CompressionUI] Reset to defaults:', STATE.current);
     updateDOMFromState();
 }
 
@@ -136,37 +127,6 @@ function updateDOMFromState() {
 }
 
 /**
- * Read current DOM state ONLY for display purposes (not as truth)
- * Used when toggling UI to restore displayed values
- * @returns {Object} - Current displayed values
- */
-function readDisplayedState() {
-    const displayed = {};
-
-    const qualitySlider = document.getElementById('compression_quality_main');
-    if (qualitySlider?.value) {
-        displayed.quality = parseInt(qualitySlider.value, 10);
-    }
-
-    const maxDimInput = document.querySelector('[name="compression_max_dimension"]');
-    if (maxDimInput?.value) {
-        displayed.maxDimension = parseInt(maxDimInput.value, 10);
-    }
-
-    const maxSizeInput = document.querySelector('[name="compression_max_size"]');
-    if (maxSizeInput?.value) {
-        displayed.maxSize = parseFloat(maxSizeInput.value);
-    }
-
-    const saveOrigChk = document.getElementById('compression_save_original_main');
-    if (saveOrigChk) {
-        displayed.saveOriginal = saveOrigChk.checked ? 'y' : 'n';
-    }
-
-    return displayed;
-}
-
-/**
  * Update default summary display with current settings
  */
 function updateDefaultSummary(settings) {
@@ -184,10 +144,6 @@ function updateDefaultSummary(settings) {
         }
     });
 }
-
-// ============================================================================
-// EVENT MANAGEMENT - Proper cleanup and debouncing
-// ============================================================================
 
 /**
  * Attach event listener with tracking for cleanup
@@ -226,10 +182,6 @@ async function waitForElements(selectors) {
     return elements;
 }
 
-// ============================================================================
-// UI CONTROLS INITIALIZATION
-// ============================================================================
-
 /**
  * Initialize all event listeners
  */
@@ -243,6 +195,7 @@ async function initializeEventListeners() {
         saveOrigChk: '#compression_save_original_main',
         toggleBtn: '#customize-compression-toggle',
         backBtn: '#compression-back-to-default',
+        maxSizeMsgEl: '#compression_max_dimension_msg',
     });
 
     if (elements.qualitySlider) {
@@ -255,8 +208,30 @@ async function initializeEventListeners() {
 
     if (elements.maxDimInput) {
         const handler = (e) => {
-            const value = parseInt(e.target.value, 10) || 0;
-            updateState({ maxDimension: value });
+            const msgEl = elements.maxSizeMsgEl;
+            let value = parseInt(e.target.value, 10);
+            const min = VALIDATION.maxDimension.min;
+            const max = VALIDATION.maxDimension.max;
+
+            if (isNaN(value)) {
+                msgEl.textContent = '';
+                return;
+            }
+
+            let clamped = value;
+            if (value < min) {
+                clamped = min;
+                msgEl.textContent = `Too low, will use ${min} px internally.`;
+                msgEl.className = 'text-success small mt-1';
+            } else if (value > max) {
+                clamped = max;
+                msgEl.textContent = `Too high, will use ${max} px internally.`;
+                msgEl.className = 'text-success small mt-1';
+            } else {
+                msgEl.textContent = '';
+            }
+
+            STATE.current.maxDimension = clamped;
         };
         attachListener(elements.maxDimInput, 'input', handler);
     }
@@ -312,62 +287,6 @@ function toggleCustomUI(showCustom) {
     }
 }
 
-// ============================================================================
-// COMPRESSION EXECUTION
-// ============================================================================
-
-/**
- * Compress files before AJAX form submission
- * Used as beforeSubmit callback in jQuery ajaxForm
- * Must return true/false for ajaxForm to proceed
- */
-async function compressBeforeAjaxSubmit(formData, jqForm, options) {
-    console.log('[CompressionUI] beforeSubmit: Starting compression');
-
-    try {
-        const form = jqForm[0];
-        const fileInputs = form.querySelectorAll('input[type="file"][name="userfile[]"]');
-
-        if (fileInputs.length === 0) {
-            console.log('[CompressionUI] No file inputs found, proceeding without compression');
-            return true;
-        }
-
-        console.log('[CompressionUI] Compressing', fileInputs.length, 'file input(s)');
-
-        let filesCompressed = 0;
-        for (const fileInput of fileInputs) {
-            if (!fileInput.files || fileInput.files.length === 0) {
-                console.log('[CompressionUI] File input empty, skipping');
-                continue;
-            }
-
-            try {
-                console.log('[CompressionUI] Processing', fileInput.files.length, 'files from input');
-                const dataTransfer = await compressFileList(fileInput.files, STATE.current);
-                fileInput.files = dataTransfer.files;
-                filesCompressed++;
-                console.log('[CompressionUI] ✓ Files compressed for input');
-            } catch (err) {
-                console.error('[CompressionUI] Compression failed for this input:', err);
-                // Don't fail the whole submission, just log and continue
-                // This handles graceful degradation
-            }
-        }
-
-        console.log('[CompressionUI] ✓ Compression complete, proceeding with upload');
-        return true;
-    } catch (err) {
-        console.error('[CompressionUI] Unexpected error in compression:', err);
-        // Don't block submission on unexpected errors
-        return true;
-    }
-}
-
-// ============================================================================
-// INITIALIZATION
-// ============================================================================
-
 /**
  * Initialize compression controls with server settings
  * @param {Object} config - Server preferences
@@ -412,4 +331,4 @@ function getCompressionSettings() {
 }
 
 export default initializeCompressionUI;
-export { compressBeforeAjaxSubmit, cleanup, getCompressionSettings };
+export { cleanup, getCompressionSettings };

@@ -68,22 +68,24 @@ const beforeUpload = async (rawFile) => {
         return false;
     }
 
-    if (props.compression_enabled !== 'true') return true;
+    if (props.compression_enabled !== 'true' && props.saveOriginal) return true;
 
     try {
         isCompressing.value = true;
+        const pressets =  getCompressionSettings();
 
-        ElMessage.info(`Compressing file ${rawFile.name}...`);
-        const compressedFiles = await compressFileList([rawFile], getCompressionSettings().current);
+        if(pressets.current.saveOriginal !== "y"){
+            ElMessage.info(`Compressing file ${rawFile.name}...`);
+            const compressedFiles = await compressFileList([rawFile], pressets.current);
 
-        if (compressedFiles?.files?.length) {
-            const compressedFile = compressedFiles.files[0];
-            console.log('[FileGalUploader] Replacing upload file', {original: rawFile.size, compressed: compressedFile.size});
-            ElMessage.success(`File ${rawFile.name} compressed successfully (${(rawFile.size / 1000).toFixed(2)}KB → ${(compressedFile.size / 1000).toFixed(2)}KB)`);
+            if (compressedFiles?.files?.length) {
+                const compressedFile = compressedFiles.files[0];
+                console.log('[FileGalUploader] Replacing upload file', {original: rawFile.size, compressed: compressedFile.size});
+                ElMessage.success(`File ${rawFile.name} compressed successfully (${(rawFile.size / 1000).toFixed(2)}KB → ${(compressedFile.size / 1000).toFixed(2)}KB)`);
 
-            return compressedFile;
+                return compressedFile;
+            }
         }
-
         return true;
     } catch (err) {
         ElMessage.error("Compression failed: " + err.message);
