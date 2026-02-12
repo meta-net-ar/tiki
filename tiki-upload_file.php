@@ -305,9 +305,8 @@ if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_uplo
     $maxSize = (float)$prefs['fgal_image_compression_max_size_mb'] ?? 1;
 
     $headerlib->add_js_module("
-        import initCompression from '@tiki/image-compressor-controls';
+        import initCompression, {getCompressionSettings} from '@tiki/image-compressor-controls';
         import { compressFileList } from '@tiki/image-compressor';
-        import { compressBeforeAjaxSubmit } from '@tiki/image-compressor-controls';
 
         initCompression({
             quality: " . $quality . ",
@@ -318,7 +317,7 @@ if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_uplo
         });
 
         window.tikiCompressFileList = compressFileList;
-        window.tikiCompressBeforeAjaxSubmit = compressBeforeAjaxSubmit;
+        window.tikiGetCompressionSettings = getCompressionSettings;
     ");
 }
 

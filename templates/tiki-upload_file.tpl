@@ -292,7 +292,8 @@
                             <div class="mb-3">
                                 <label for="compression_max_dimension_main" class="form-label">{tr}Max Image Dimension{/tr}</label>
                                 <input type="number" id="compression_max_dimension_main" name="compression_max_dimension" class="form-control"
-                                    value="{$prefs.fgal_image_compression_max_dimension|default:1600}" min="100" step="100">
+                                    value="{$prefs.fgal_image_compression_max_dimension|default:1600}">
+                                    <small id="compression_max_dimension_msg" class="text-success small mt-1"></small>
                                 <small class="form-text text-muted">{tr}Maximum width or height in pixels. Images larger than this will be resized.{/tr}</small>
                             </div>
 
@@ -587,14 +588,34 @@
         function upload_files(){
             var totalSubmissions = $("#form form").length;
             $("#form form").append($('<input />', {type: 'hidden', name: 'totalSubmissions', value: totalSubmissions}));
-            $("#form form").each(function(n) {
+            $("#form form").each(async function(n) {
                 if ($(this).find('input[name="userfile\\[\\]"]').val() != '') {
-        var $progress = $('#progress_'+n).html(`{/literal}{icon name='spinner' iclass='fa-spin' _menu_text='y' _menu_icon='y' ititle="{tr}Uploading file...{/tr}"}{literal}`);
+                    const $form = $(this);
+                    const $fileInput = $form.find('input[name="userfile\\[\\]"]');
+                    const originalFiles = $fileInput[0].files;
+
+                    if(typeof window.tikiGetCompressionSettings === "function"){
+                        const pressets = window.tikiGetCompressionSettings();
+                        if(pressets?.isInitialized && pressets?.current?.saveOriginal !== "y") {
+                            try {
+                                const dataTransfer = await window.tikiCompressFileList($fileInput[0].files, pressets.current);
+                                $fileInput[0].files = dataTransfer.files;
+                            } catch (err) {
+                                console.error('[Upload] Compression failed:', err);
+                                show('form');
+                                $("#form").showError(tr("File compression error:") + " " + err.message);
+                                return;
+                            }
+                        }
+                    }
+
+                    var $progress = $('#progress_'+n).html(`{/literal}{icon name='spinner' iclass='fa-spin' _menu_text='y' _menu_icon='y' ititle="{tr}Uploading file...{/tr}"}{literal}`);
                     $( document ).on('ajaxError', function(event, jqxhr, ajaxSettings, thrownError ) {
                         $progress.hide();
                         show('form');
                         $("#form").showError(tr("File upload error:") + " " + thrownError)
                     });
+
                     $(this).trigger("submit");
                     this.reset();
                 } else {
