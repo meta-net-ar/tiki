@@ -160,7 +160,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            const uploadValidation = elUploadSpy.mock.calls[0][0]["before-upload"](givenFile);
+            const uploadValidation = await ElUpload.mock.calls[0][0]["before-upload"](givenFile);
 
             await waitFor(() => {
                 expect(elMessage).toHaveBeenCalledWith(`File size cannot exceed ${Number(givenProps.maxSize) / 1000}KB`);
