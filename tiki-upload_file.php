@@ -223,8 +223,7 @@ if ($isUpload) {
             'insertion_syntax',
             'filetype',
             'imagesize',
-            'image_max_size_x',
-            'image_max_size_y',
+            'image_max_dimension',
             'ocr_state',
             'ocr_lang'
         ];

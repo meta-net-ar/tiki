@@ -217,22 +217,22 @@
                         {* Default Preset Summary *}
                         <div id="compression_default_summary">
                             <div class="border rounded p-3 bg-light mb-3">
-                                <strong>{tr}Current Settings{/tr}:</strong>
+                                <strong>{tr}Current Settings:{/tr}</strong>
                                 <ul class="mb-2">
-                                    <li>{tr}Max dimension{/tr}: <span id="default_max_size"
+                                    <li>{tr}Max dimension:{/tr} <span id="default_max_size"
                                             data-default="{$prefs.fgal_image_compression_max_dimension}">
                                             {$prefs.fgal_image_compression_max_dimension} px
                                             </span>
                                     </li>
-                                    <li>{tr}Compress files larger than{/tr}: <span
+                                    <li>{tr}Compress files larger than:{/tr} <span
                                             data-default="{$prefs.fgal_image_compression_max_size_mb|default:1}"
                                             id="default_min_file">{$prefs.fgal_image_compression_max_size_mb|default:1} MB
                                             </span>
                                     </li>
-                                    <li>{tr}Save original{/tr}:
+                                    <li>{tr}Save original:{/tr}
                                        {if $prefs.fgal_image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
                                     </li>
-                                    <li>{tr}Unzip zip files{/tr}:
+                                    <li>{tr}Unzip zip files:{/tr}
                                         {if isset($isbatch) and $isbatch|@count gt 0}
                                              {tr}Yes{/tr}
                                         {else}

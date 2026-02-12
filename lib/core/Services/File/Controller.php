@@ -79,8 +79,7 @@ class Services_File_Controller
             'typeFilter'            => $input->type->text(),
             'uploadInModal'         => $input->uploadInModal->int(),
             'files'                 => $this->getFilesInfo((array)$input->file->int()),
-            'image_max_size_x'      => $input->image_max_size_x->text(),
-            'image_max_size_y'      => $input->image_max_size_y->text(),
+            'image_max_dimension'   => $input->image_max_dimension->text(),
             'addDecriptionOnUpload' => $input->addDecriptionOnUpload->int(),
             'admin_trackers'        => $perms->admin_trackers,
             'requireTitle'          => $input->requireTitle->text(),
@@ -133,11 +132,11 @@ class Services_File_Controller
         }
 
         if (! $input->imagesize->word()) {
-            $image_x = $input->image_max_size_x->text();
-            $image_y = $input->image_max_size_y->text();
+            $image_x = $input->image_max_dimension->text();
+            $image_y = $input->image_max_dimension->text();
         } else {
-            $image_x = $gal_info["image_max_size_x"];
-            $image_y = $gal_info["image_max_size_y"];
+            $image_x = $gal_info["image_max_dimension"];
+            $image_y = $gal_info["image_max_dimension"];
         }
         if (isset($_FILES['data'])) {
             // used by $this->action_upload_multiple and file gallery Files fields (possibly others)

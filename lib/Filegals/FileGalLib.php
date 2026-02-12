@@ -3738,11 +3738,11 @@ class FileGalLib extends TikiLib
                     } else {
                         $title = $params["name"][$key];
                         if (! $params['imagesize'][$key]) {
-                            $image_x = $params["image_max_size_x"];
-                            $image_y = $params["image_max_size_y"];
+                            $image_x = $params["image_max_dimension"];
+                            $image_y = $params["image_max_dimension"];
                         } else {
-                            $image_x = $gal_info["image_max_size_x"];
-                            $image_y = $gal_info["image_max_size_y"];
+                            $image_x = $gal_info["image_max_dimension"];
+                            $image_y = $gal_info["image_max_dimension"];
                         }
                         $fileId = $file->replace($data, $type, $title, $name, $image_x, $image_y);
                     }

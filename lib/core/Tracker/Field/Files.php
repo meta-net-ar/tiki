@@ -358,11 +358,11 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
         //checking if image_x and image_y are set
         if (! $image_x) {
-            $image_x = $galinfo['image_max_size_x'];
+            $image_x = $galinfo['image_max_dimension'];
         }
 
         if (! $image_y) {
-            $image_y = $galinfo['image_max_size_y'];
+            $image_y = $galinfo['image_max_dimension'];
         }
 
         if ($this->getOption('directoryPattern')) {
