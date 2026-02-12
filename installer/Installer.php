@@ -130,18 +130,14 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 // The batch loader failed
                 if (file_exists($secdb)) {
                     // Mirror runDataFile behavior to avoid duplicate PK rows on re-runs.
-                    if ($this->tableExists('tiki_secdb')) {
-                        $this->query('TRUNCATE TABLE `tiki_secdb`');
-                    }
+                    $this->truncateSecdbIfExists();
                     // Run single inserts
                     $this->runFile($secdb, false);
                 }
             }
         } elseif (file_exists($secdb)) {
             // Keep fallback SQL path idempotent, as with .data loading.
-            if ($this->tableExists('tiki_secdb')) {
-                $this->query('TRUNCATE TABLE `tiki_secdb`');
-            }
+            $this->truncateSecdbIfExists();
             // Run single inserts
             $this->runFile($secdb, false);
         }
@@ -247,6 +243,13 @@ class Installer extends TikiDb_Bridge implements SplSubject
         }
 
         $this->executed[] = $script;
+    }
+
+    private function truncateSecdbIfExists()
+    {
+        if ($this->tableExists('tiki_secdb')) {
+            $this->query('TRUNCATE TABLE `tiki_secdb`');
+        }
     }
 
 
