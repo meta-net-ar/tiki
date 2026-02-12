@@ -129,11 +129,19 @@ class Installer extends TikiDb_Bridge implements SplSubject
             if ($rc == false) {
                 // The batch loader failed
                 if (file_exists($secdb)) {
+                    // Mirror runDataFile behavior to avoid duplicate PK rows on re-runs.
+                    if ($this->tableExists('tiki_secdb')) {
+                        $this->query('TRUNCATE TABLE `tiki_secdb`');
+                    }
                     // Run single inserts
                     $this->runFile($secdb, false);
                 }
             }
         } elseif (file_exists($secdb)) {
+            // Keep fallback SQL path idempotent, as with .data loading.
+            if ($this->tableExists('tiki_secdb')) {
+                $this->query('TRUNCATE TABLE `tiki_secdb`');
+            }
             // Run single inserts
             $this->runFile($secdb, false);
         }
