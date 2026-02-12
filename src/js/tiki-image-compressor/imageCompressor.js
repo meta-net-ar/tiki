@@ -28,7 +28,7 @@ let ffmpegInstance = null;
  */
 async function initFFmpeg() {
     if (ffmpegInstance) return ffmpegInstance;
-    
+
     try {
         const ffmpeg = new FFmpeg();
         await ffmpeg.load();
@@ -42,7 +42,7 @@ async function initFFmpeg() {
 
 /**
  * Check if file type is supported
- * 
+ *
  * @param {Blob|File} file - File to check
  * @param {String} mimeType - Optional MIME type override
  * @returns {Boolean} - true if supported
@@ -54,7 +54,7 @@ function isSupported(file, mimeType) {
 
 /**
  * Check if file is an image
- * 
+ *
  * @param {String} mimeType - MIME type
  * @returns {Boolean}
  */
@@ -64,7 +64,7 @@ function isImage(mimeType) {
 
 /**
  * Check if file is a video
- * 
+ *
  * @param {String} mimeType - MIME type
  * @returns {Boolean}
  */
@@ -74,7 +74,7 @@ function isVideo(mimeType) {
 
 /**
  * Compress image using browser-image-compression
- * 
+ *
  * @private
  */
 async function compressImage(fileBlob, prefs) {
@@ -95,7 +95,7 @@ async function compressImage(fileBlob, prefs) {
 
 /**
  * Compress video using FFmpeg
- * 
+ *
  * @private
  */
 async function compressVideo(fileBlob, prefs) {
@@ -113,14 +113,7 @@ async function compressVideo(fileBlob, prefs) {
         ffmpeg.writeFile("input.mp4", buffer);
 
         // Use libx265 for better compression
-        await ffmpeg.exec([
-            "-i", "input.mp4",
-            "-c:v", "libx265",
-            "-crf", crf.toString(),
-            "-c:a", "aac",
-            "-b:a", "128k",
-            "output.mp4"
-        ]);
+        await ffmpeg.exec(["-i", "input.mp4", "-c:v", "libx265", "-crf", crf.toString(), "-c:a", "aac", "-b:a", "128k", "output.mp4"]);
 
         const data = ffmpeg.readFile("output.mp4");
         ffmpeg.deleteFile("input.mp4");
@@ -135,7 +128,7 @@ async function compressVideo(fileBlob, prefs) {
 /**
  * Compress media file (image or video)
  * Returns file as-is if type not supported (no error).
- * 
+ *
  * @param {Blob|File} fileBlob - File to compress
  * @param {Object} prefs - Compression preferences
  *   - quality: 0-100
@@ -204,7 +197,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
 
 /**
  * Compress multiple files
- * 
+ *
  * @param {Blob[]|File[]} files - Array of files
  * @param {Object} prefs - Compression preferences
  * @param {Object} options - Additional options
@@ -227,7 +220,7 @@ async function compressMultiple(files, prefs = {}, options = {}) {
 /**
  * Compress FileList from form input in-place
  * Updates file input with compressed files using DataTransfer
- * 
+ *
  * @param {FileList} fileList - FileList from input[type="file"]
  * @param {Object} prefs - Compression settings (quality, maxDimension, maxSize)
  * @returns {Promise<DataTransfer>} - DataTransfer with compressed files
@@ -273,11 +266,7 @@ async function compressFileList(fileList, prefs = {}) {
             const result = await compress(file, prefs);
 
             if (result.success) {
-                const compressedFile = new File(
-                    [result.blob],
-                    file.name,
-                    { type: result.blob.type }
-                );
+                const compressedFile = new File([result.blob], file.name, { type: result.blob.type });
                 dataTransfer.items.add(compressedFile);
 
                 results.push({
@@ -285,7 +274,7 @@ async function compressFileList(fileList, prefs = {}) {
                     original: file.size,
                     compressed: result.blob.size,
                     success: true,
-                    savings: (100 - (result.blob.size / file.size * 100)).toFixed(1),
+                    savings: (100 - (result.blob.size / file.size) * 100).toFixed(1),
                 });
             } else if (result.skipped) {
                 dataTransfer.items.add(file);

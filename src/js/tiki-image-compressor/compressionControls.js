@@ -1,6 +1,6 @@
 /**
  * Compression Controls Module
- * 
+ *
  * Manages UI controls for image compression settings in tiki-upload.tpl
  * Centralized state management with proper validation, error handling, and performance optimization
  */
@@ -173,7 +173,7 @@ async function waitForElements(selectors) {
         let el = document.querySelector(selector);
         let attempts = 0;
         while (!el && attempts < 10) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
             el = document.querySelector(selector);
             attempts++;
         }
@@ -186,7 +186,6 @@ async function waitForElements(selectors) {
  * Initialize all event listeners
  */
 async function initializeEventListeners() {
-
     const elements = await waitForElements({
         qualitySlider: "#compression_quality_main",
         qualityDisplay: "#quality_display_main",
