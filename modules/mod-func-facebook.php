@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Socnets\SocnetsDataLib;
+
 /**
  * @return array
  */
@@ -50,8 +52,7 @@ function module_facebook($mod_reference, $module_params)
         $pageId = $module_params['pageid'] ?? '';
 
         // Try new HybridAuth system first
-        require_once('lib/socnets/SocnetsDataLib.php');
-        $socnetsDataLib = new \TikiLib\Socnets\SocnetsDataLib\SocnetsDataLib();
+        $socnetsDataLib = new SocnetsDataLib();
         try {
             $timeline = $socnetsDataLib->getFacebookWall($user, 'Facebook', $page, $perPage, $pageId);
         } catch (\TikiLib\Core\Services\Exception\SocnetsTokenNotFoundException $e) {

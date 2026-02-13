@@ -19,6 +19,7 @@ use Tiki\TikiDb\PdoDb;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 require_once('tiki-filter-base.php');
+use Tiki\Sections;
 
 if (! isset($_SERVER['QUERY_STRING'])) {
     $_SERVER['QUERY_STRING'] = '';
@@ -653,9 +654,10 @@ if ($prefs['feature_perspective'] === 'y') {
         // if the perspective is not set in the session, try to determine the perspective to use, avoiding redirect loops
         (function () {
             // self executing function just to keep the variable scope
-            global $section, $user;
+            global $user;
+            $section = Sections::getCurrentSection();
             $request = array_merge($_GET, $_POST);
-            if (empty($request['page']) && ! empty($section) && $section == 'wiki page') {
+            if (empty($request['page']) && ! empty($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                 $userlib = TikiLib::lib('user');
                 $request['page'] = $userlib->get_user_default_homepage($user);
             }

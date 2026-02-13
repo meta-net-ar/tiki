@@ -63,7 +63,12 @@ $inputConfiguration = [
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
 if (empty($prefs['feature_jpgraph'])) {
     $prefs['feature_jpgraph'] = 'n'; //optional package does not go througp prefs

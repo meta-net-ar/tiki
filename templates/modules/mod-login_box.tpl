@@ -557,14 +557,16 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 </a>
             </div>
         {/if}
-        <div class="social-buttons">
-            {foreach from=$prefs.socnets_enabledProviders  key=k  item=pNum}
-                {$providerName = $socnetsAll[$pNum]}
-                {if $prefs["socnets_`$providerName`_loginEnabled"] eq 'y' and $mode neq "header" and empty($user) and $user neq 'anonymous'}
-                {button _icon_name="{$providerName|lower}" _text="{tr}Log in via {/tr}{$providerName}" _class="btn btn-social btn-{$providerName|lower}" _script="tiki-login_hybridauth.php" _auto_args=provider provider="{$providerName}"  _title="{tr}Log in via {/tr}{$providerName}"}
-                {/if}
-            {/foreach}
-        </div>
+        {if $prefs.hybridauth_login_enabled === 'y'}
+            <div class="social-buttons">
+                {foreach from=$prefs.socnets_enabledProviders  key=k  item=pNum}
+                    {$providerName = $socnetsAll[$pNum]}
+                    {if $prefs["socnets_`$providerName`_loginEnabled"] eq 'y' and $mode neq "header" and empty($user) and $user neq 'anonymous'}
+                    {button _icon_name="{$providerName|lower}" _text="{tr}Log in via {/tr}{$providerName}" _class="btn btn-social btn-{$providerName|lower}" _script="tiki-login_hybridauth.php" _auto_args=provider provider="{$providerName}"  _title="{tr}Log in via {/tr}{$providerName}"}
+                    {/if}
+                {/foreach}
+            </div>
+        {/if}
         {$close_tags}
         </div>
     {/if}

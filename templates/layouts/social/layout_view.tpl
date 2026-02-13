@@ -67,7 +67,7 @@
             </header>
         {/if}
     {/if}
-    <div class="middle_outer" id="middle_outer">
+    <div class="middle_outer" id="middle_outer" style="margin-top: 70px;">
         {if !isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}
                 {$modzonetop}

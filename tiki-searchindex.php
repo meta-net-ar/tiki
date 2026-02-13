@@ -23,8 +23,10 @@ $inputConfiguration = [
   ]
 ];
 
-$section = 'search';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SEARCH;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_search');
 $access->check_permission('tiki_p_search');
 $smarty->assign('headtitle', tr('Search'));

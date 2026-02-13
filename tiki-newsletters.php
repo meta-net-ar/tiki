@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'newsletters';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -26,6 +25,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 global $nllib;
 include_once('lib/newsletters/nllib.php');
 $access->check_feature('feature_newsletters');
@@ -148,7 +150,6 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $nllib->list_newsletters($offset, $maxRecords, $sort_mode, $find, '', ["tiki_p_subscribe_newsletters", "tiki_p_admin_newsletters", "tiki_p_send_newsletters"]);
 $smarty->assign_by_ref('count', $channels['count']);
 $smarty->assign_by_ref('channels', $channels["data"]);
-$section = 'newsletters';
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-newsletters.tpl');

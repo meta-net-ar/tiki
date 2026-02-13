@@ -18,7 +18,7 @@ export default function handleMermaid() {
     const renderDiagram = async (element) => {
         try {
             let svgElement = await drawDiagram(element);
-            svgElement.style.height = "60vh";
+            svgElement.style.height = "80vh";
             svgElement.style.maxWidth = "100%";
             const mermaidPanZoom = svgPanZoom(svgElement, {
                 zoomEnabled: true,

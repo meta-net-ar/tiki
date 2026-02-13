@@ -10,6 +10,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Sections;
+
 class AutoSaveLib
 {
     public function __construct()
@@ -94,14 +96,15 @@ class AutoSaveLib
 
         // should be page name, but use URI if not?
         if (empty($referer)) {
-            global $section,  $user, $tikilib;
+            global $user, $tikilib;
+
             $referer .= empty($user) ? $tikilib->get_ip_address() : $user;
             $referer .= ':';
-            if ($section == 'wiki page') {
+            if (Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                 if (isset($_REQUEST['page'])) {
                     $referer .= 'wiki_page:' . rawurlencode($_REQUEST['page']);
                 }
-            } elseif ($section == 'blogs') {
+            } elseif (Sections::isCurrentSection(Sections::SECTION_BLOGS)) {
                 if (isset($_REQUEST['postId'])) {
                     $referer .= 'blog:' . $_REQUEST['postId'];
                 }

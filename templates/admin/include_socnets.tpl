@@ -33,23 +33,25 @@
 
 {tab name ="{tr}Enabled{/tr}"}
 
-<ol>
-{foreach from=$prefs["`$socPrefix`enabledProviders"]  key=k  item=pNum}
-{$providerName = $socnetsAll[$pNum]}
-{$prefname="`$socPrefix``$providerName`_socnetEnabled" }
-{$prefs[$prefname] = 'y'}
-<strong><li>{$providerName}  {* debug pNum={$pNum} k={$k} *}</li></strong>
-{/foreach}
-</ol>
-
-<fieldset>
-    <div class="adminoptionbox">
-        {$prefName = "`$socPrefix`enabledProviders"}
-    {preference name=$prefName visible="always"}
-    </div>
-
-</fieldset>
-{/tab}{************************************}
+<h5 class="h4">{tr}Social network integration using Hybridauth{/tr}</h5>
+{preference name=hybridauth_login_enabled visible="always"}
+<div class="adminoptionboxchild" id="hybridauth_login_enabled_childcontainer">
+    <ol>
+        {foreach from=$prefs["`$socPrefix`enabledProviders"]  key=k  item=pNum}
+            {$providerName = $socnetsAll[$pNum]}
+            {$prefname="`$socPrefix``$providerName`_socnetEnabled" }
+            {$prefs[$prefname] = 'y'}
+            <strong><li>{$providerName}</li></strong>
+        {/foreach}
+    </ol>
+    <fieldset>
+        <div class="adminoptionbox">
+            {$prefName = "`$socPrefix`enabledProviders"}
+            {preference name=$prefName visible="always"}
+        </div>
+    </fieldset>
+</div>
+{/tab}
 {tab name="{tr}Settings{/tr}"}
 
 <ol>
@@ -128,11 +130,20 @@
 
 
 {/tab}
-{************************************}
-{tab name ="{tr}Debug and Logs{/tr}" }
+{tab name ="{tr}OAuth Configuration{/tr}" }
 <div class="adminoptionbox">
-    {$prefname = "`$socPrefix`socLoginBaseUrl"}
-    {$prefs[$prefname]}
+    {remarksbox type="note" title="{tr}OAuth Callback/Redirect URL{/tr}"}
+        <p>
+            {tr}This is the base URL where social network providers will redirect users after authentication. This is a setting for the OAuth2 authentication flow to work correctly.{/tr}
+        </p>
+        <p>
+            <strong>{tr}Current value:{/tr}</strong><br>
+            <code>{$prefname = "`$socPrefix`socLoginBaseUrl"}{$prefs[$prefname]}</code>
+        </p>
+        <p>
+            {tr}Social networks append the provider name to this URL to form the complete OAuth callback endpoint. When configuring your application on social network platforms (Facebook, LinkedIn, etc.), use this URL as the "Redirect URI" or "Callback URL".{/tr}
+        </p>
+    {/remarksbox}
     {preference name=$prefname}
 </div>
 {/tab}

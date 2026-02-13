@@ -71,17 +71,31 @@ class CookieConsentLib
         }
         // If the user is logged in, try to load their stored preference
         if ($user) {
+            $consentPreferences = self::getUserPreference();
+            if (! empty($consentPreferences)) {
+                // Sync the cookie with the user preference
+                self::setConsentPreferences($consentPreferences);
+                return $consentPreferences;
+            }
+        }
+
+        return $consentPreferences;
+    }
+
+    private static function getUserPreference()
+    {
+        global $tikilib, $user;
+
+        if ($user) {
             $userPreferences = $tikilib->get_user_preference($user, 'cookie_consent_user_pref', '');
             if ($userPreferences) {
                 $consentPreferences = json_decode($userPreferences, true);
                 if (is_array($consentPreferences)) {
-                    // Sync the cookie with the user preference
-                    self::setConsentPreferences($consentPreferences);
                     return $consentPreferences;
                 }
             }
         }
-        return $consentPreferences;
+        return [];
     }
 
     /**

@@ -51,7 +51,7 @@
         {if $prefs.feature_layoutshadows eq 'y'}{eval var=$prefs.header_shadow_end}</div>{/if}
 {/if}
 
-    <div class="middle_outer" id="middle_outer" >
+<div class="middle_outer" id="middle_outer" style="margin-top: 70px;">
         <div class="topbar-wrapper navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}">
             <div class="topbar container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
                 {$modzonetopbar}

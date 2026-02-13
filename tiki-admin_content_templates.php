@@ -38,8 +38,10 @@ $inputConfiguration = [
     ],
 ];
 
-$section = 'admin';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature(['feature_wiki_templates','feature_cms_templates','feature_file_galleries_templates'], '', 'features', true);
 
 $templateslib = TikiLib::lib('template');

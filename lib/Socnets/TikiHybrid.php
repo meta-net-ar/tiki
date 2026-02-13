@@ -4,30 +4,21 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
 //author : aris002@yahoo.co.uk
+namespace Tiki\Lib\Socnets;
 
-namespace TikiLib\Socnets\TikiHybrid;
-
-require_once('lib/socnets/Util.php');
-use TikiLib\Socnets\Util\Util;
-require_once('lib/socnets/LLOG.php');
-//use TikiLib\Socnets\LLOG\LLOG;
-require_once('lib/socnets/PrefsGen.php');
-use TikiLib\Socnets\PrefsGen\PrefsGen;
-
+use Tiki\Lib\Socnets\Util;
+use Tiki\Lib\Socnets\PrefsGen;
 use Hybridauth\Logger\LoggerInterface;
 use Hybridauth\Logger;
 use Hybridauth\Exception\Exception;
 use Hybridauth\Hybridauth;
 use Hybridauth\HttpClient;
-
 use TikiLib;
 use Feedback;
 use Tracker_Definition;
 use Services_Tracker_Utilities;
 use Tiki\Lib\Logs\LogsLib;
-
 
 class TikiHybrid extends LogsLib
 {
@@ -92,18 +83,13 @@ class TikiHybrid extends LogsLib
                 $this->config['scope'] = 'public_profile,user_posts';
             }
 
-
-    //  LLOG('tikiHybrid  constructor config:', $this -> config );
-
             $adapterClass = '\\Hybridauth\\Provider\\' . $providerName;
 
             $this -> adapter = new $adapterClass($this -> config, $guzzle);
 
         //$this->hybridauth = new Hybridauth($confhybrid, $guzzle, null, $this->logger );
-        //  LLOG('tikiHybrid  constructed :)' );
         } catch (\Throwable $e) {
             error_log($e->getMessage());
-            //echo TikiHybrid construct error:' . $e->getMessage();
             Feedback::error('TikiHybrid construct error: ' . $e->getMessage());
         }
     }

@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // author : aris002@yahoo.co.uk
 
-namespace TikiLib\Socnets\Util;
+namespace Tiki\Lib\Socnets;
 
 //require_once('lib/prefs/sochybrid.php');
 /*

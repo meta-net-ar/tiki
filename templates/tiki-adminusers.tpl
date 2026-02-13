@@ -247,10 +247,9 @@
                                                                 </a>
                                                             </action>
                                                         {/if}
-                                                        {if $users[user].user eq $user or $users[user].user_information neq 'private' or $tiki_p_admin eq 'y'}
+                                                        {if $users[user].user eq $user or $tiki_p_admin eq 'y'}
                                                             <action>
-                                                                <a href="tiki-user_information.php?userId={$users[user].userId}"{if $users[user].user_information eq 'private'}
-                                                                    style="opacity:0.5;"{/if}
+                                                                <a href="tiki-user_information.php?userId={$users[user].userId}"
                                                                 >
                                                                     {icon name="help" _menu_text='y' _menu_icon='y' alt="{tr}User information{/tr}"}
                                                                 </a>

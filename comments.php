@@ -30,6 +30,7 @@ $tikilib = TikiLib::lib('tiki');
 $headerlib = TikiLib::lib('header');
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
 
 /*
  * Determine the settings used to display the thread
@@ -448,8 +449,7 @@ if ($prefs['feature_contribution'] == 'y') {
     include_once('contribution.php');
 }
 // see if comments are allowed on this specific wiki page
-global $section;
-if ($section == 'wiki page') {
+if (Sections::getCurrentSection() === Sections::SECTION_WIKI_PAGE) {
     if ($prefs['wiki_comments_allow_per_page'] != 'n') {
         global $info;
         if (! empty($info['comments_enabled'])) {

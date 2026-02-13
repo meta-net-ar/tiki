@@ -142,6 +142,13 @@ class Manager
                         throw new Exception($result['errors'][0]);
                     }
                 }
+                if ($tabular['odbc_config'] || $tabular['api_config']) {
+                    // refresh values_by_perm_name as backfilled PK or other changed values (from other ODBC sources, for example) will not be avaialble for subsequent tabular syncs when we use more than 1 tabular format to sync
+                    foreach ($args['values_by_permname'] as $permName => $value) {
+                        $field = $definition->getFieldFromPermName($permName);
+                        $args['values_by_permname'][$permName] = $trklib->get_item_value($args['trackerId'], $args['object'], $field['fieldId'], false);
+                    }
+                }
             } catch (Exception $e) {
                 Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
             }

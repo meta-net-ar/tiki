@@ -18,6 +18,22 @@ if (! defined('ROLE_ORGANIZER')) {
 class CalendarLib extends TikiLib
 {
     /**
+     * Limit of the name field of the tiki_calendars table
+     */
+    public const MAX_CALENDAR_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_calendars table
+     */
+    public const MAX_CALENDAR_DESCRIPTION_LENGTH = 255;
+    /**
+     * Limit of the name field of the tiki_calendar_items table
+     */
+    public const MAX_CALENDAR_EVENT_TITLE_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_calendar_items table
+     */
+    public const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 65535;
+    /**
      * @param $sort_mode
      * @return string
      */

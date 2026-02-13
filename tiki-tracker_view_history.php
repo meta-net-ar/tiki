@@ -18,8 +18,9 @@ $inputConfiguration = [[
         ]],
             ['catchAllUnset' => null],
 ];
-$section = 'trackers';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_TRACKERS;
 $access->check_feature('feature_trackers');
 
 if (empty($_REQUEST["itemId"])) {

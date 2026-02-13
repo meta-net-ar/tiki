@@ -10,8 +10,10 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
+use Tiki\Sections;
 
-$section = 'cms';
+$here = [];
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -21,7 +23,10 @@ $inputConfiguration = [
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_articles');

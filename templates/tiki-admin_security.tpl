@@ -5,6 +5,97 @@
     {tr}For additional security checks, please visit <a href="tiki-check.php" class="alert-link">Tiki Server Compatibility Check</a>.{/tr}
 {/remarksbox}
 
+{if isset($htaccessCheckEnabled)}
+<h2>{tr}.htaccess Integrity{/tr}</h2>
+
+{if $htaccessCheckEnabled == 'n'}
+{remarksbox type="info"}
+    {tr}.htaccess monitoring is disabled. Enable it in Admin -> <a href="tiki-admin.php?page=security">Security</a>.{/tr}
+{/remarksbox}
+
+{elseif $htaccessCheck}
+{assign var=htStatus value=$htaccessCheck.status}
+
+{if $htStatus == 'mismatch'}
+    {remarksbox type="warning"}
+    {tr}.htaccess differs from the bundled _htaccess.{/tr}
+    <div class="mt-2 d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">
+        {tr}How to fix{/tr}
+        </a>
+        {if $htaccessCheck.diff}
+        <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" href="#htacxDiff" role="button" aria-expanded="false" aria-controls="htacxDiff">
+            {tr}View diff{/tr}
+        </a>
+        {/if}
+    </div>
+    <details class="small mt-2">
+        <summary>{tr}Technical details{/tr}</summary>
+        <ul class="list-unstyled mb-0">
+        <li>{tr}Reference hash:{/tr} <code>{$htaccessCheck.reference_hash|escape}</code></li>
+        <li>{tr}Active hash:{/tr} <code>{$htaccessCheck.hash|escape}</code></li>
+        {if !empty($htaccessCheck.details.symlink_target)}
+            <li>{tr}Symlink target:{/tr} <code>{$htaccessCheck.details.symlink_target|escape}</code></li>
+        {/if}
+        </ul>
+    </details>
+    {/remarksbox}
+
+    {if $htaccessCheck.diff}
+    <div id="htacxDiff" class="collapse mt-2">
+        {remarksbox type="info"}
+        {foreach from=$htaccessCheck.diff item=chunk}
+            {if $chunk.type == 'diffdeleted'}
+            <div class="diffdeleted">
+                {foreach from=$chunk.data item=line name=del}
+                {if not $smarty.foreach.del.first}<br>{/if}- {$line|escape}
+                {/foreach}
+            </div>
+            {elseif $chunk.type == 'diffadded'}
+            <div class="diffadded">
+                {foreach from=$chunk.data item=line name=add}
+                {if not $smarty.foreach.add.first}<br>{/if}+ {$line|escape}
+                {/foreach}
+            </div>
+            {elseif $chunk.type == 'diffbody'}
+            <div class="diffbody">
+                {foreach from=$chunk.data item=line name=body}
+                {if not $smarty.foreach.body.first}<br>{/if}{$line|escape}
+                {/foreach}
+            </div>
+            {/if}
+        {/foreach}
+        {/remarksbox}
+    </div>
+    {/if}
+
+{elseif $htStatus == 'ok'}
+    {remarksbox type="success"}{tr}.htaccess matches the reference.{/tr}{/remarksbox}
+
+{elseif $htStatus == 'maintenance'}
+    {remarksbox type="info"}{tr}Maintenance .htaccess is active.{/tr}{/remarksbox}
+
+{elseif $htStatus == 'unreadable'}
+    {remarksbox type="info"}{tr}.htaccess exists but is unreadable by the web server.{/tr}{/remarksbox}
+
+{elseif $htStatus == 'not_applicable' && $htaccessCheck.code == 'server_not_apache'}
+    {remarksbox type="info"}{tr}Not applicable on non-Apache servers.{/tr}{/remarksbox}
+
+{elseif $htStatus == 'not_applicable' && $htaccessCheck.code == 'missing_reference'}
+    {remarksbox type="info"}{tr}Reference _htaccess missing or unreadable.{/tr}{/remarksbox}
+
+{elseif $htStatus == 'not_applicable' && $htaccessCheck.code == 'missing_htaccess'}
+    {remarksbox type="info"}{tr}No active .htaccess detected.{/tr}{/remarksbox}
+
+{else}
+    {remarksbox type="info"}{tr}.htaccess check could not be completed.{/tr}{/remarksbox}
+{/if}
+
+{else}
+{remarksbox type="info"}{tr}.htaccess check could not be completed.{/tr}{/remarksbox}
+{/if}
+{/if}
+
 <h2>{tr}Tiki settings{/tr}</h2>
 <div class="table-responsive secsetting-table">
     <table class="table table-striped table-hover">

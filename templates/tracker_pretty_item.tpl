@@ -5,11 +5,12 @@
     {if $field.type ne 'x'
         and (empty($listfields) or in_array($field.fieldId, $listfields))
         and ($field.type ne 'p' or $field.options_array[0] ne 'password')}
-        {capture name=value|cat:'i':$item.itemId:'f':$field.fieldId}
+        {assign var=varname value='value'|cat:'i':$item.itemId:'f':$field.fieldId}
+        {capture name=$varname}
             {trackeroutput item=$item field=$field list_mode=$list_mode showlinks=$context.showlinks url=$context.url}
         {/capture}
-        {assign var="f_"|cat:$field.fieldId value=$smarty.capture.value}
-        {assign var="f_"|cat:$field.permName value=$smarty.capture.value}
+        {assign var="f_"|cat:$field.fieldId value=$smarty.capture[$varname]}
+        {assign var="f_"|cat:$field.permName value=$smarty.capture[$varname]}
     {else}
         {assign var="f_"|cat:$field.fieldId value=''}
         {assign var="f_"|cat:$field.permName value=''}

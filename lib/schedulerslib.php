@@ -15,6 +15,14 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 class SchedulersLib extends TikiLib
 {
     /**
+     * Limit of the name field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_DESCRIPTION_LENGTH = 255;
+    /**
      * Let a list of schedulers
      *
      * @param int       $schedulerId    The Scheduler Id

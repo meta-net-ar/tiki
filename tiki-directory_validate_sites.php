@@ -25,6 +25,10 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
+
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_validate_links');
 if (isset($_REQUEST["validate"]) && isset($_REQUEST['sites'])) {
@@ -58,7 +62,6 @@ $items = $dirlib->dir_list_invalid_sites($offset, $maxRecords, $sort_mode, $find
 $smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-directory_validate_sites.tpl');

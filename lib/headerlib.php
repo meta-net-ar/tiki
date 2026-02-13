@@ -870,7 +870,7 @@ class HeaderLib
         if (count($this->js_modules)) {
             $b = '';
             foreach ($this->js_modules as $x => $js) {
-                $b .= "// js_modules $x \n";
+                $b .= "\n<!-- js_modules $x -->\n";
                 foreach ($js as $j) {
                     //Modules cannot be fused together in a single script tag, it was a bug.
                     //By now (2026-01-19 the following slightly adapted message has been pinned at the top of the tiki community chat channel for well over a year,

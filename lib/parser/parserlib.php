@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 /**
  * Parser Library
  *
@@ -1208,13 +1211,21 @@ class ParserLib extends TikiDb_Bridge
 
                 // Preserve null values (parameters not provided by user)
                 if ($argValue !== null) {
-                    $argValue = TikiLib::htmldecode($argValue);
+                    if (is_array($argValue)) {
+                        foreach ($argValue as &$value) {
+                            $value = TikiLib::htmldecode($value);
+                        }
+                    } else {
+                        $argValue = TikiLib::htmldecode($argValue);
+                    }
                 }
 
-                if (isset($paramInfo['separator'])) {
+                if (isset($paramInfo['separator']) && ! is_array($argValue)) {
                     if ($argValue !== null) {
-                        $vals = [];
-                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
+                        $vals = $tikilib->array_apply_filter(
+                            $tikilib->multi_explode($paramInfo['separator'], $argValue),
+                            $filter
+                        );
                         $argValue = array_values($vals);
                     }
                     // If $argValue is null, leave it as null (don't process separator)
@@ -1272,11 +1283,12 @@ class ParserLib extends TikiDb_Bridge
     //*
     public function plugin_is_editable($name, $pluginArgs = null)
     {
-        global $tiki_p_edit, $prefs, $section;
+        global $tiki_p_edit, $prefs;
+        $section = Sections::getCurrentSection();
         $info = $this->plugin_info($name);
         $is_allowed = $this->check_permission_from_plugin_params($pluginArgs);
         // note that for 3.0 the plugin editor only works in wiki pages, but could be extended later
-        return $section == 'wiki page' && $info && ($tiki_p_edit == 'y' || $is_allowed == 'y') && $prefs['wiki_edit_plugin'] == 'y'
+        return Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $info && ($tiki_p_edit == 'y' || $is_allowed == 'y') && $prefs['wiki_edit_plugin'] == 'y'
             && ! $this->plugin_is_inline($name);
     }
 
@@ -2885,9 +2897,10 @@ class ParserLib extends TikiDb_Bridge
                                         'title_real_num' => $current_title_real_num
                                         ];
                         //}
-                        global $tiki_p_edit, $section;
+                        global $tiki_p_edit;
+                        $section = Sections::getCurrentSection();
                         if (
-                            $prefs['wiki_edit_section'] === 'y' && $section === 'wiki page' && $tiki_p_edit === 'y' &&
+                            $prefs['wiki_edit_section'] === 'y' && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $tiki_p_edit === 'y' &&
                                 ( $prefs['wiki_edit_section_level'] == 0 || $hdrlevel <= $prefs['wiki_edit_section_level']) &&
                                 (empty($this->option['print']) || ! $this->option['print']) && ! $this->option['suppress_icons']
                         ) {
@@ -3239,7 +3252,7 @@ class ParserLib extends TikiDb_Bridge
         $data = $new_data . $data;
         // Add icon to edit the text before the first section (if there is some)
         if (
-            $prefs['wiki_edit_section'] === 'y' && isset($section) && $section === 'wiki page' && $tiki_p_edit === 'y' && (empty($this->option['print']) ||
+            $prefs['wiki_edit_section'] === 'y' && isset($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $tiki_p_edit === 'y' && (empty($this->option['print']) ||
                 ! $this->option['print'])  && strpos($data, '<div class="icon_edit_section">') != 0 && ! $this->option['suppress_icons']
         ) {
             $smarty = TikiLib::lib('smarty');

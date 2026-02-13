@@ -13,14 +13,22 @@ use Services_User_Controller as ServicesUserController;
 
 class ServicesUserControllerTest extends TestCase
 {
-    protected $controller;
     protected static $originalTimezone;
     protected $originalUserSyncPref;
 
     protected function setUp(): void
     {
-        global $prefs,$user;
+        global $prefs, $user;
 
+        // Ensure session exists (required for temporary timezone)
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // Simulate a logged-in user (required by get_display_timezone)
+        $user = 'testuser';
+
+        // Fake referer used by controller redirects
         $_SERVER['HTTP_REFERER'] = 'http://example.com/some/page';
 
         self::$originalTimezone = $prefs['display_timezone'];
@@ -36,10 +44,12 @@ class ServicesUserControllerTest extends TestCase
 
         unset($_SESSION['temp_timezone']);
         unset($_SERVER['HTTP_REFERER']);
+        unset($GLOBALS['user']);
     }
 
     public function testTimezoneSwitchAction(): void
     {
+        global $prefs;
 
         $input = new JitFilter([
             'client_timezone' => 'Africa/Lubumbashi',
@@ -48,28 +58,64 @@ class ServicesUserControllerTest extends TestCase
 
         $result = (new ServicesUserController())->actionLocalTimezoneSync($input);
 
-        $this->assertEquals([
-            'different' => false,
-            'preferedTimezone' => 'Africa/Lubumbashi',
-            'clientTimezone' => 'Africa/Lubumbashi'
-        ], $result);
+        // Actual behavior: preference must be updated
+        $this->assertEquals('Africa/Lubumbashi', $prefs['display_timezone']);
+
+        // Response consistency
+        $this->assertFalse($result['different']);
+        $this->assertEquals('Africa/Lubumbashi', $result['effectiveTimezone']);
     }
 
     public function testTimezoneTemporaryAction(): void
     {
+        global $prefs;
+
+        $originalTz = $prefs['display_timezone'];
+
         $input = new JitFilter([
             'client_timezone' => 'Africa/Lubumbashi',
             'timezone_action' => 'temporary',
         ]);
 
-        $_SESSION['temp_timezone'] = $input->client_timezone;
+        $result = (new ServicesUserController())->actionLocalTimezoneSync($input);
+
+        // Actual behavior: session timezone only
+        $this->assertEquals('Africa/Lubumbashi', $_SESSION['temp_timezone']);
+
+        // Preference must remain unchanged
+        $this->assertEquals($originalTz, $prefs['display_timezone']);
+
+        // Response consistency
+        $this->assertEquals('Africa/Lubumbashi', $result['effectiveTimezone']);
+    }
+    public function testFunctionallyEquivalentTimezonesAreNotDifferent(): void
+    {
+        global $tikilib, $prefs;
+
+        // Deterministic initial state
+        $prefs['display_timezone'] = 'Etc/UTC';
+        date_default_timezone_set('Etc/UTC');
+
+        // Explicit user preference (not detect mode)
+        $tikilib->set_user_preference('testuser', 'display_timezone', 'Etc/UTC');
+
+        $input = new JitFilter([
+            'client_timezone' => 'UTC',
+            'timezone_action' => 'check',
+        ]);
 
         $result = (new ServicesUserController())->actionLocalTimezoneSync($input);
 
-        $this->assertEquals([
-            'different' => false,
-            'preferedTimezone' => 'Africa/Lubumbashi',
-            'clientTimezone' => 'Africa/Lubumbashi'
-        ], $result);
+        // Functional equivalence must not trigger sync
+        $this->assertFalse(
+            $result['different'],
+            'Equivalent timezones should not trigger sync notification'
+        );
+
+        // Effective timezone may be normalized
+        $this->assertContains(
+            $result['effectiveTimezone'],
+            ['UTC', 'Etc/UTC']
+        );
     }
 }

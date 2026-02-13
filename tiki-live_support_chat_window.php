@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'livesupport';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
@@ -19,6 +18,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/live_support/lslib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_LIVESUPPORT;
+Sections::setCurrentSection($section);
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); // always modified
 header("Cache-Control: no-store, no-cache, must-revalidate"); // HTTP/1.1

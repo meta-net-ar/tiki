@@ -203,6 +203,113 @@ class RelationLib extends TikiDb_Bridge
     }
 
     /**
+     * Get transitive (multi-hop) relations via iterative traversal.
+     *
+     * @param string $type starting object type
+     * @param string $object starting object ID
+     * @param string $relation optional relation filter (wildcard supported)
+     * @param int $maxDepth max hops (1-10)
+     * @param array $excludeLevels levels to exclude (e.g. [1])
+     * @param int $maxPerLevel limit per level
+     *
+     * @return array relations grouped by depth: [depth => [relations]]
+     */
+    public function get_transitive_relations(
+        string $type,
+        string $object,
+        string $relation = '',
+        int $maxDepth = 3,
+        array $excludeLevels = [],
+        int $maxPerLevel = 50
+    ): array {
+        // Validate parameters
+        $maxDepth = max(1, min(10, (int)$maxDepth));
+        $maxPerLevel = max(1, min(500, (int)$maxPerLevel));
+        $excludeLevels = array_flip($excludeLevels);
+
+        // Prepare relation filter
+        $relation = TikiFilter::get('attribute_type')->filter($relation);
+        $relationFilter = $relation;
+        if ($relation && str_ends_with($relation, '.')) {
+            $relationFilter .= '%';
+        } elseif (! $relation) {
+            $relationFilter = '%';
+        }
+
+        // Recursive CTE Query
+        $query = "
+            WITH RECURSIVE transitive_relations (depth, target_type, target_itemId, relation, relationId, path) AS (
+                SELECT
+                    1,
+                    target_type,
+                    target_itemId,
+                    relation,
+                    relationId,
+                    CONCAT('|', source_type, ':', source_itemId, '|', target_type, ':', target_itemId, '|')
+                FROM tiki_object_relations
+                WHERE source_type = ? AND source_itemId = ? AND relation LIKE ?
+
+                UNION DISTINCT
+
+                SELECT
+                    tr.depth + 1,
+                    r.target_type,
+                    r.target_itemId,
+                    r.relation,
+                    r.relationId,
+                    CONCAT(tr.path, r.target_type, ':', r.target_itemId, '|')
+                FROM tiki_object_relations r
+                INNER JOIN transitive_relations tr ON r.source_type = tr.target_type AND r.source_itemId = tr.target_itemId
+                WHERE tr.depth < ? 
+                AND r.relation LIKE ?
+                AND INSTR(tr.path, CONCAT('|', r.target_type, ':', r.target_itemId, '|')) = 0
+            )
+            SELECT * FROM transitive_relations ORDER BY depth ASC, relationId ASC
+        ";
+
+        $bindVars = [
+            $type,
+            $object,
+            $relationFilter,
+            $maxDepth,
+            $relationFilter
+        ];
+
+        $rows = $this->fetchAll($query, $bindVars);
+
+        $results = [];
+        $counts = [];
+
+        foreach ($rows as $row) {
+            $depth = (int)$row['depth'];
+
+            // Skip excluded levels
+            if (isset($excludeLevels[$depth])) {
+                continue;
+            }
+
+            // Enforce maxPerLevel limit in PHP
+            if (! isset($counts[$depth])) {
+                $counts[$depth] = 0;
+            }
+            if ($counts[$depth] >= $maxPerLevel) {
+                continue;
+            }
+
+            // Format result to match previous output structure
+            $results[$depth][] = [
+                'type' => $row['target_type'],
+                'itemId' => $row['target_itemId'],
+                'relation' => $row['relation'],
+                'relationId' => $row['relationId'],
+            ];
+            $counts[$depth]++;
+        }
+
+        return $results;
+    }
+
+    /**
      * The relation must contain at least two dots and only lowercase letters.
      * NAMESPACE management and relation naming.
      * Please see http://dev.tiki.org/Object+Attributes+and+Relations for guidelines on

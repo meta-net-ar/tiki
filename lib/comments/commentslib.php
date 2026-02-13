@@ -10,6 +10,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Component\Mime\Address;
 use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Sections;
 
 /**
  *
@@ -18,8 +19,30 @@ class Comments extends TikiLib
 {
     public $time_control = 0;
     private $extras = true;
+    /**
+     * Limit of the title field of the tiki_comments table
+     */
     public const MAX_COMMENT_TITLE_LENGTH = 255;
+    /**
+     * Limit of the data field of the tiki_comments table
+     */
     public const MAX_COMMENT_DATA_LENGTH = 65535;
+    /**
+     * Limit of the name field of the tiki_forums table
+     */
+    public const MAX_FORUM_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_forums table
+     */
+    public const MAX_FORUM_DESCRIPTION_LENGTH = 65535;
+    /**
+     * Limit of the section field of the tiki_forums table
+     */
+    public const MAX_FORUM_SECTION_LENGTH = 200;
+    /**
+     * Limit of the forum_password field of the tiki_forums table
+     */
+    public const MAX_FORUM_PASSWORD_LENGTH = 32;
 
     /* Functions for the forums */
     public function report_post($forumId, $parentId, $threadId, $user, $reason = '')
@@ -2336,10 +2359,10 @@ class Comments extends TikiLib
      */
     public function parse_comment_data($data, $threadId = null)
     {
-        global $prefs, $section;
+        global $prefs;
         $parserlib = TikiLib::lib('parser');
 
-        if (($prefs['feature_forum_parse'] == 'y' && $section == 'forums') || $prefs['section_comments_parse'] == 'y') {
+        if (($prefs['feature_forum_parse'] == 'y' && Sections::isCurrentSection(Sections::SECTION_FORUMS)) || $prefs['section_comments_parse'] == 'y') {
             $options = [
                 'objectType' => 'comments',
                 'objectId' => $threadId,

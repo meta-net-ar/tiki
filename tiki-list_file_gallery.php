@@ -120,11 +120,10 @@ $inputConfiguration = [
     ],
 ];
 
-
-
-
-$section = 'file_galleries';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FILE_GALLERIES;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_file_galleries');
 $filegallib = TikiLib::lib('filegal');
 $statslib = TikiLib::lib('stats');

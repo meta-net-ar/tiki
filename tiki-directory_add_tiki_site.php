@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'directory';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -23,6 +22,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 // Set parent category to 2 ("tiki sites")
 $_REQUEST["parent"] = 2;

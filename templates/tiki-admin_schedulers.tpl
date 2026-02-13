@@ -288,14 +288,14 @@
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_name">{tr}Name{/tr} *</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_name' class="form-control" name='scheduler_name'
+                <input maxlength="{$MAX_SCHEDULER_NAME_LENGTH}" type="text" id='scheduler_name' class="form-control" name='scheduler_name'
                     value="{$schedulerinfo.name|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_description">{tr}Description{/tr}</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_description' class="form-control" name='scheduler_description'
+                <input maxlength="{$MAX_SCHEDULER_DESCRIPTION_LENGTH}" type="text" id='scheduler_description' class="form-control" name='scheduler_description'
                     value="{$schedulerinfo.description|escape}">
             </div>
         </div>

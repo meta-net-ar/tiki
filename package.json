@@ -29,7 +29,7 @@
         "build:js" : "vite --config=src/js/vite.config.mjs build --mode=production",
         "build:scss" : "npm run build -w src/scss",
         "build:_custom" : "copy-and-watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
-        "build" : "concurrently  --kill-others-on-fail \"npm:build:*\"",
+        "build" : "concurrently --max-processes=1 --kill-others-on-fail \"npm:build:*\"",
         "prewatch" : "npm run checkEnvironment",
         "watch:generateIconList" : "npm run build:generateIconList",
         "watch:js" : "vite --config=src/js/vite.config.mjs build --watch --mode=development",

@@ -8,7 +8,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'forums';
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -20,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FORUMS;
+Sections::setCurrentSection($section);
 //get_strings tra('List Forums')
 $auto_query_args = ['sort_mode', 'offset', 'find', 'mode'];
 

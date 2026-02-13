@@ -137,7 +137,7 @@ class KalturaLib
         }
 
         if ($this->sessionType == self::SESSION_ADMIN) {
-            $session = $client->session->start($prefs['kaltura_adminSecret'], $kuser, self::SESSION_ADMIN, $prefs['kaltura_partnerId'], 86400, 'edit:*');
+            $session = $client->session->start($prefs['kaltura_adminSecret'], $kuser, self::SESSION_ADMIN, $prefs['kaltura_partnerId'], 86400, '*');
         } else {
             $session = $client->session->start($prefs['kaltura_secret'], $kuser, self::SESSION_USER, $prefs['kaltura_partnerId'], 86400, 'edit:*');
         }
@@ -320,5 +320,46 @@ class KalturaLib
         }
 
         return [];
+    }
+
+    /**
+     * Upload video to Kaltura
+     *
+     * @return MediaEntry|null
+     */
+    public function uploadVideo($filePath, $name, $description = '', $tags = '')
+    {
+        if ($client = $this->getClient()) {
+            try {
+                // 1. Create upload token
+                $uploadToken = new \Kaltura\Client\Type\UploadToken();
+                $uploadToken = $client->uploadToken->add($uploadToken);
+
+                // 2. Upload the file to the token
+                $uploadedToken = $client->uploadToken->upload($uploadToken->id, $filePath);
+
+                // 3. Create media entry
+                $mediaEntry = new MediaEntry();
+                $mediaEntry->name = $name;
+                $mediaEntry->description = $description;
+                $mediaEntry->tags = $tags;
+                $mediaEntry->mediaType = \Kaltura\Client\Enum\MediaType::VIDEO;
+
+                $entry = $client->media->add($mediaEntry);
+
+                // 4. Attach the uploaded content to the entry
+                $resource = new \Kaltura\Client\Type\UploadedFileTokenResource();
+                $resource->token = $uploadedToken->id;
+
+                $entry = $client->media->addContent($entry->id, $resource);
+
+                return $entry;
+            } catch (\Exception $e) {
+                Feedback::error(tr('Kaltura upload error: %0', $e->getMessage()));
+                return null;
+            }
+        }
+
+        return null;
     }
 }

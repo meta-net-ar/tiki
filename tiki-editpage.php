@@ -25,10 +25,12 @@ $inputConfiguration = [
         'cancel_edit' => 'url'
     ] ],
 ];
-
-$section = "wiki page";
-$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+
+$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 require_once('lib/debug/Tracer.php');
 $wikilib = TikiLib::lib('wiki');
 $structlib = TikiLib::lib('struct');

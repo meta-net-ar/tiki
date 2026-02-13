@@ -3,6 +3,7 @@
 namespace Tiki\Lib\core\Toolbar;
 
 use TikiLib;
+use Tiki\Sections;
 
 class ToolbarLaunchPlugins extends ToolbarUtilityItem
 {
@@ -64,6 +65,8 @@ class ToolbarLaunchPlugins extends ToolbarUtilityItem
 
     public function getWysiwygJs(): string
     {
+        $section = Sections::getCurrentSection();
+
         $servicelib = TikiLib::lib('service');
 
         $params = ['controller' => 'edit', 'action' => 'help', 'modal' => 1];

@@ -154,8 +154,7 @@ function wikiplugin_userlist($data, $params)
             if ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y') {
                 $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
             } else {
-                $user_information = $tikilib->get_user_preference($row['login'], 'user_information', 'public');
-                if ($user_information != 'private' && $row['login'] != $user) {
+                if ($row['login'] != $user) {
                     $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
                 }
             }

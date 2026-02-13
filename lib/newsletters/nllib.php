@@ -1401,7 +1401,7 @@ class NlLib extends TikiLib
     {
         $emails = false;
         $trklib = TikiLib::lib('trk');
-        $listItems = $trklib->list_tracker_items($trackerId, 0, -1, '', '');
+        $listItems = $trklib->list_tracker_items($trackerId, 0, -1, '', null);
 
         if (empty($listItems['data'])) {
             return false;

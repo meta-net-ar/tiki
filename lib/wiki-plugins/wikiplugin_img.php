@@ -839,7 +839,7 @@ function wikiplugin_img($data, $params)
             }
         }
         $imageObj = '';
-        //Deal with images with info in tiki databases (file and image galleries and attachments)
+        //Deal with images with info in tiki databases (file galleries and attachments)
         if (
             empty($imgdata['randomGalleryId']) && (! empty($imgdata['fileId'])
                 || ! empty($imgdata['attId']))
@@ -884,7 +884,7 @@ function wikiplugin_img($data, $params)
                 }
             }
         }
-        //finished getting info from db for images in image or file galleries or attachments
+        //finished getting info from db for images in file galleries or attachments
         if (! empty($dbinfo['path'])) {
             $basepath = $prefs['w_use_dir'];
         }

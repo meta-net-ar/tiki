@@ -36,8 +36,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'admin';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_newsletters');
 
 global $nllib;

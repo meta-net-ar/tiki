@@ -14,6 +14,7 @@
 use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use Tiki\Sections;
 use TikiLib;
 
 class HtmlBodyAttributes extends Base
@@ -21,7 +22,8 @@ class HtmlBodyAttributes extends Base
     // Used in the template to create the html_body_attributes tag which can take a class as parameter and returns the attributes for a standard tiki page body tag
     public function handle($params, Template $template)
     {
-        global $section, $prefs, $page, $section_class, $user;
+        global $prefs, $page, $section_class, $user;
+        $section = Sections::getCurrentSection();
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';

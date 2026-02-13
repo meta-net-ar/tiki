@@ -36,8 +36,10 @@ $inputConfiguration = [
 
 $auto_query_args = ['section', 'comments', 'autoreload', 'view_mode'];
 
-require_once 'tiki-setup.php';
-
+require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_permission('tiki_p_admin');
 
 $sections = [ 'global' => tra('Global'), 'admin' => tra('Admin')];
@@ -80,9 +82,11 @@ $sections = array_merge($sections, $sections2);
 
 if (isset($_REQUEST['section']) && in_array($_REQUEST['section'], array_keys($sections))) {
     $section = $_REQUEST['section'];
+    Sections::setCurrentSection($section);
 } else {
     $keys = array_keys($sections);
     $section = reset($keys);
+    Sections::setCurrentSection($section);
 }
 if (isset($_REQUEST['comments']) && $_REQUEST['comments'] == 'on') {
     $show_comments = true;
@@ -100,7 +104,7 @@ foreach ($sections as $skey => $sval) {
 }
 
 $view_mode = $_REQUEST['view_mode'] ?? '';
-if ($view_mode === 'sheet' && $section !== 'sheet') {
+if ($view_mode === 'sheet' && ! Sections::isCurrentSection(Sections::SECTION_SHEET)) {
     $view_mode = '';
     $_REQUEST['view_mode'] = '';
 }
@@ -117,7 +121,7 @@ if (isset($_REQUEST['save'], $_REQUEST['pref'])) {
     $tikilib->set_preference($prefName . 'modified', 'y');
 }
 
-if ((isset($_REQUEST['reset']) && $section != 'global') || (isset($_REQUEST['reset_global']) && $section == 'global')) {
+if ((isset($_REQUEST['reset']) && ! Sections::isCurrentSection(Sections::SECTION_GLOBAL)) || (isset($_REQUEST['reset_global']) && Sections::isCurrentSection(Sections::SECTION_GLOBAL))) {
     $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->delete_preference($prefName);
     $tikilib->set_preference($prefName . 'modified', 'n');
@@ -146,7 +150,7 @@ if (empty($current)) {
     $smarty->assign('not_global', true);
 }
 $smarty->assign('not_default', false);
-if ($section == 'global') {
+if (Sections::isCurrentSection(Sections::SECTION_GLOBAL)) {
     $cachelib = TikiLib::lib('cache');
     if ($defprefs = $cachelib->getSerialized("tiki_default_preferences_cache")) {
         if ($defprefs['toolbar_global' . $comments_suffix] != $current) {

@@ -5,15 +5,11 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // author : aris002@yahoo.co.uk
-namespace TikiLib\Socnets\PrefsGen;
+namespace Tiki\Lib\Socnets;
 
-require_once('lib/socnets/Util.php');
-use TikiLib\Socnets\Util\Util;
-
-require_once('lib/socnets/LLOG.php');
-//use TikiLib\Socnets\LLOG\LLOG;
-
+use Tiki\Lib\Socnets\Util;
 use Feedback;
+
 /**
 * TODO speak with tiki developers about excessive preferences naming when in groups.
 * Idea - group name?
@@ -97,7 +93,6 @@ class PrefsGen
                 'type' => 'flag',
                 'tags' => ['experimental'],
                 'dependencies' => [
-                    '_socnetEnabled',
                     '_app_id',
                     '_app_secret',
                 ],
@@ -169,9 +164,6 @@ class PrefsGen
                 'keywords' => 'social networks',
                 'type' => 'flag',
                 'tags' => ['experimental'],
-                'dependencies' => [
-                    '_socnetEnabled',
-                ],
                 'default' => 'n',
             ],
 
@@ -183,7 +175,6 @@ class PrefsGen
                 'tags' => ['experimental'],
                 'size' => 20,
                 'dependencies' => [
-                    '_socnetEnabled',
                     '_autocreateuser',
                 ],
                 'default' => 'soc_',
@@ -195,7 +186,6 @@ class PrefsGen
                 'type' => 'flag',
                 'tags' => ['experimental'],
                 'dependencies' => [
-                    '_socnetEnabled',
                     '_autocreateuser',
                 ],
                 'default' => 'n',
@@ -207,7 +197,6 @@ class PrefsGen
                 'type' => 'flag',
                 'tags' => ['experimental'],
                 'dependencies' => [
-                    '_socnetEnabled',
                     '_autocreateuser',
                 ],
                 'default' => 'n',
@@ -219,9 +208,8 @@ class PrefsGen
                 'type' => 'flag',
                 'tags' => ['experimental'],
                 'dependencies' => [
-                    '_socnetEnabled',
                     '_autocreateuser',
-        //              '_autocreate_user_trackeritem',
+                    '_autocreate_user_trackeritem',
                 ],
                 'default' => 'n',
             ]
@@ -231,43 +219,33 @@ class PrefsGen
 
     public static function getOneSocPref($providerName, $key2, $value2)
     {
-  /*
-      if($key2 === '_authType') {
-        $value2['name'] = 'What ' . ucfirst($key) ." " .$value2['name'];
-        $value2['default'] = $value['authType'];
-        $value2['_authType']['value'] = $value['authType'];
-      }
-      else if($key2 === 'graphVersion') {
-        $value2['name'] = 'What ' . ucfirst($key) ." " .$value2['name'];
-        $value2['default'] = $value['graphVersion'];
-        $value2['_app_api']['value'] = $value['graphVersion'];
-      }
+        if ($key2 === '_socnetEnabled') {
+            $value2['dependencies'] = ['hybridauth_login_enabled'];
+        } else {
+            $coreDependencies = [
+                'hybridauth_login_enabled',
+                self::$socPrefix . $providerName . '_socnetEnabled'
+            ];
+            // Prefix each of the existing dependencies with provider-specific name
+            $existingDeps = $value2['dependencies'] ?? [];
+            foreach ($existingDeps as $i => $dep) {
+                $existingDeps[$i] = self::$socPrefix . $providerName . $dep;
+            }
+            $value2['dependencies'] = array_merge($coreDependencies, $existingDeps);
+        }
 
-    */
         if ($key2 === '_loginEnabled') {
-            $value2['dependencies'][0] = self::$socPrefix . $providerName . $value2['dependencies'][0];
-            $value2['dependencies'][1] = self::$socPrefix . $providerName . $value2['dependencies'][1];
-            $value2['dependencies'][2] = self::$socPrefix . $providerName . $value2['dependencies'][2];
-            $value2['description'] = 'Let ' . $providerName . " " . $value2['description'];
-        } elseif ($key2 === '_autocreateuser') {
-            $value2['dependencies'][0] = self::$socPrefix . $providerName . $value2['dependencies'][0];
             $value2['description'] = 'Let ' . $providerName . " " . $value2['description'];
         } elseif ($key2 === '_autocreate_prefix') {
-            $value2['dependencies'][0] = self::$socPrefix . $providerName . $value2['dependencies'][0];
-            $value2['dependencies'][1] = self::$socPrefix . $providerName . $value2['dependencies'][1];
             $value2['description'] = 'What ' . $providerName . " " . $value2['description'];
-            $value2['default'] = (strlen($providerName) < 5) ? substr($providerName, 0, strlen($providerName)) . "_" : substr($providerName, 0, 4) . "_";
-        } elseif (str_starts_with($key2, '_autocreate_')) {
-            $value2['dependencies'][0] = self::$socPrefix . $providerName . $value2['dependencies'][0];
-            $value2['dependencies'][1] = self::$socPrefix . $providerName . $value2['dependencies'][1];
+            $value2['default'] = (strlen($providerName) < 5) ? $providerName . "_" : substr($providerName, 0, 4) . "_";
+        } elseif (str_starts_with($key2, '_autocreate')) {
             $value2['description'] = 'Let ' . $providerName . " " . $value2['description'];
         } else {
             $value2['description'] = $providerName . " " . $value2['description'];
         }
 
         $value2['name'] = $providerName . " " . $value2['name'];
-    //  $value2['base_name'] = $key2;
-    //  $value2['socnet_name'] = $providerName; //storing this way maybe is excessive... but maybe it is faster than extract it from the pref name?
 
         return $value2;
     }
@@ -297,49 +275,6 @@ class PrefsGen
         return $prefs3;
     }
 
-
-//TODO maybe test if it is faster to load settings for all social networks (socnets)
-// fix errors and add custom scopes
-/*
-    public static function getHybridauthConfig()
-    {
-
-        global $prefs;
-        // Get Enabled providers!!!
-        $providerNames = self::getEnabledProvidersNames();
-        $loginUrl = Util::getSocUrl();
-
-        Util::log2(' getHybridauthConfig providerNames:', $providerNames);
-
-        $ret = [];
-
-        foreach ($providerNames as $key => $name) {
-            $ret[$name] =
-                         [
-                             'callback' => $loginUrl . $name,
-                            'enabled' => $prefs[self::$socPrefix . $name . '_loginEnabled'],
-                            'keys' => [
-                    'id' => $prefs[self::$socPrefix . $name . '_app_id'],
-                    'secret' => $prefs[self::$socPrefix . $name . '_app_secret'],
-                        ],
-    //          'scope' => $value['scope'],  //TODO TEST hybridauth reaction to : 'scope' => null or empty?
-                ];
-        }
-
-
-        'sochybrid_config' = [
-                'name' => tra('Hybridauth config'),
-                'providers' => [], //prefs_sochybrid2_list(),
-                 'debug_mode' => false,
-                        // Path to file writeable by the web server. Required if 'debug_mode' is not false
-                    'debug_file' => '/var/log/httpd/errors/tikihybrid.log',
-        ],
-
-
-        return $ret;
-
-    }
-*/
     //TODO check. I don't know how but it works.
     public static function getEnabledProvidersNames()
     {
@@ -352,11 +287,6 @@ class PrefsGen
                 $ret[] = $name;
             }
         }
-
-        //Util::log2('get socnetsAll prefs:', $prefs[self::$socPrefix . 'socnetsAll'] );
-        //Util::log2('getEnabledProvidersNames ret:', $ret );
-        //Util::log2('getEnabledProviders prefs:', $prefs[self::$socPrefix . 'enabledProviders'] );
-
         return $ret;
     }
 
@@ -368,9 +298,6 @@ class PrefsGen
         Util::logclear();
         Util::log('getSocPrefs start');
         $allProviders = self::getHybridProvidersPHP();
-
-        //Util::log2('socPrefix:', self::$socPrefix);
-        //Util::deletePrefsStarts('sochybrid');
 
         $prefs1 = [
             self::$socPrefix . 'socnetsAll' => [
@@ -406,24 +333,8 @@ class PrefsGen
                 'tags' => ['experimental'],
                 'default' => self::getSocLoginBaseUrl(),
                 ],
-            /*
-            self::$socPrefix . 'hybridauthConfig' => [
-                 'name' => tra('Hybridauth config- DO NOT USE in FORMS:'),
-                 'description' =>  tra('Hybridauth config'),
-                 'type' => 'array',
-                // 'options' => self::getHybridauthConfig(),
-                 'default' => self::getHybridauthConfig(),
-                 ],
-            */
         ];
-
-
         $prefs3 = array_merge($prefs1, self::getPrefsAllProviders());
-
-    //  Util::log2(' getSocPrefs enabledProvidersNames:', $prefs[self::$socPrefix . 'enabledProvidersNames'] );
-    //  Util::log2(' getSocPrefs enabledProviders:', $prefs[self::$socPrefix . 'enabledProviders'] );
-    //  Util::log2(' getSocPrefs prefs1:', $prefs1);
-
         return $prefs3;
     }
 }

@@ -18,6 +18,18 @@ use Tiki\Wiki\WikiPaginationUtils;
 class BlogLib extends TikiDb_Bridge
 {
     /**
+     * Limit of the title field of the tiki_blogs table
+     */
+    public const MAX_BLOG_TITLE_LENGTH = 200;
+    /**
+     * Limit of the description field of the tiki_blogs table
+     */
+    public const MAX_BLOG_DESCRIPTION_LENGTH = 65535;
+    /**
+     * Limit of the title field of the tiki_blog_posts table
+     */
+    public const MAX_BLOG_POST_TITLE_LENGTH = 255;
+    /**
      * List all blogs
      *
      * @param int $offset

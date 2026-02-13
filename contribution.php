@@ -19,8 +19,10 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 }
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
 global $prefs;
 
+$section = Sections::getCurrentSection();
 if ($prefs['feature_contribution'] == 'y') {
     $contributionlib = TikiLib::lib('contribution');
     $contributions = $contributionlib->list_contributions();
@@ -47,13 +49,13 @@ if ($prefs['feature_contribution'] == 'y') {
         }
     }
     if (! empty($oneSelected)) {
-        if ((isset($section) && $section == 'forum' && $prefs['feature_contribution_mandatory_forum'] != 'y') || ((! isset($section) || $section != 'forum') && $prefs['feature_contribution_mandatory_comment'] != 'y')) {
+        if ((isset($section) && Sections::isCurrentSection(Sections::SECTION_FORUM) && $prefs['feature_contribution_mandatory_forum'] != 'y') || ((! isset($section) || ! Sections::isCurrentSection(Sections::SECTION_FORUM)) && $prefs['feature_contribution_mandatory_comment'] != 'y')) {
             $contributions['data'][] = ['contributionId' => 0, 'name' => ''];
         }
     }
     $smarty->assign_by_ref('contributions', $contributions['data']);
 
-    if ($prefs['feature_contributor_wiki'] == 'y' && ! empty($section) && $section == 'wiki page') {
+    if ($prefs['feature_contributor_wiki'] == 'y' && ! empty($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
         $users = $userlib->list_all_users();
 
         include_once('lib/smarty_tiki/modifier.username.php');

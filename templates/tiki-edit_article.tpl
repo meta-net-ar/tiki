@@ -33,19 +33,19 @@
             <h2>{tr}Content{/tr}</h2>
             <div class="mb-3 mx-0">
                 <label for="title">{tr}Title{/tr}</label>
-                <input type="text" name="title" id="title" value="{$arttitle|escape}" maxlength="255" class="form-control">
+                <input type="text" name="title" id="title" value="{$arttitle|escape}" maxlength="{$MAX_ARTICLE_TITLE_LENGTH}" class="form-control">
             </div>
             <div class="mb-3 mx-0">
                 <label for="subheading">{tr}Heading{/tr}</label>
                 {if $types.$type.heading_only eq 'y'}
-                    {textarea name="heading" rows="5" class="form-control" id="subheading"}{$heading}{/textarea}
+                    {textarea name="heading" rows="5" class="form-control" id="subheading" maxlength="{$MAX_ARTICLE_HEADING_LENGTH}"}{$heading}{/textarea}
                 {else}
-                    {textarea _simple="y" name="heading" class="form-control" rows="5" id="subheading" comments="y"}{$heading}{/textarea}
+                    {textarea _simple="y" name="heading" class="form-control" rows="5" id="subheading" comments="y" maxlength="{$max_article_heading_length}"}{$heading}{/textarea}
                 {/if}
             </div>
             <div id='heading_only' class="mb-3 mx-0"{if $types.$type.heading_only eq 'y'}style="display: none;"{/if}>
                 <label for="body">{tr}Body{/tr}</label>
-                {textarea name="body" id="body" _preview=$prefs.ajax_edit_previews}{$body}{/textarea}
+                {textarea name="body" id="body" _preview=$prefs.ajax_edit_previews maxlength="{$MAX_ARTICLE_BODY_LENGTH}"}{$body}{/textarea}
             </div>
             {if $tiki_p_use_HTML eq 'y'}
                 {if $smarty.session.wysiwyg neq 'y'}
@@ -293,7 +293,7 @@
             <div class="mb-3{if $types.$type.show_subtitle neq 'y'} hidden{/if}">
                 <label for="subtitle" class="col-form-label col-md-4">{tr}Subtitle{/tr}</label>
                 <div class="col-md-8">
-                    <input type="text" name="subtitle" id="subtitle" value="{$subtitle|escape}" class="form-control">
+                    <input type="text" name="subtitle" id="subtitle" value="{$subtitle|escape}" class="form-control" maxlength="{$MAX_ARTICLE_SUBTITLE_LENGTH}">
                 </div>
             </div>
             <div class="mb-3{if $types.$type.show_linkto neq 'y'} hidden{/if}">

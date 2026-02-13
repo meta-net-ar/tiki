@@ -31,13 +31,13 @@
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="blog-title">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" maxlength="200" name="title" id="blog-title" class="form-control" value="{$title|escape}" required="required">
+                    <input type="text" maxlength="{$MAX_BLOG_TITLE_LENGTH}" name="title" id="blog-title" class="form-control" value="{$title|escape}" required="required">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="blog-desc">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea class="wikiedit form-control" name="description" id="blog-desc" rows="10">{$description|escape}</textarea>
+                    <textarea class="wikiedit form-control" maxlength="{$MAX_BLOG_DESCRIPTION_LENGTH}" name="description" id="blog-desc" rows="10">{$description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">

@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 /*This inputconfiguration array is here to support legacy code and it will never be exhaustive
    it is recommended to add the input when added to te code especially if it is a new $_REQUEST variable
 */
@@ -80,6 +79,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/tasks/tasklib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $messulib = TikiLib::lib('message');
 $accesslib = TikiLib::lib('access');
 

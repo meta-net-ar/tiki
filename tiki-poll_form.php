@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'poll';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -16,8 +15,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_POLL;
+Sections::setCurrentSection($section);
 $polllib = TikiLib::lib('poll');
 $access->check_feature('feature_polls');
 $access->check_permission('tiki_p_vote_poll');

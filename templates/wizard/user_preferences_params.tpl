@@ -118,14 +118,6 @@
                         <input type="checkbox" class="form-check-input" name="display_12hr_clock" {if $display_12hr_clock eq 'y'}checked="checked"{/if}>
                     </td>
                 </tr>
-                {if $prefs.feature_community_mouseover eq 'y'}
-                    <tr>
-                        <td>{tr}Display info tooltip on mouseover for every user who allows his/her information to be public{/tr}</td>
-                        <td>
-                            <input type="checkbox" class="form-check-input" name="show_mouseover_user_info" {if $show_mouseover_user_info eq 'y'}checked="checked"{/if}>
-                        </td>
-                    </tr>
-                {/if}
             </table>
         </fieldset>
 

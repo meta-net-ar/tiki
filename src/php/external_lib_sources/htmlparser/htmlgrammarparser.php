@@ -107,7 +107,7 @@ if (! defined("_ECHOSERVER_HTML_GRAMMARPARSER")) {
 /********************************************************************************************
  *  Get word from data
  ********************************************************************************************/
-        public function GetWord($word)
+        public function GetWord(&$word)
         {
             $word = "";
             $found = 0;
@@ -392,7 +392,7 @@ EOF        -1 -1 -1 -1 -1
                             if ($this->parname == "closeon") {
                                 $notexists = [];
                                 $exists = [];
-                                $this->ParseCloseOn($this->pg[$this->pgpos]["tag"][$this->parname], &$notexists, &$exists);
+                                $this->ParseCloseOn($this->pg[$this->pgpos]["tag"][$this->parname], $notexists, $exists);
                                 $this->pg[$this->pgpos]["tag"][$this->parname] = [];
                                 $this->pg[$this->pgpos]["tag"][$this->parname]["notin"] = $notexists;
                                 $this->pg[$this->pgpos]["tag"][$this->parname]["in"] = $exists;
@@ -418,7 +418,7 @@ EOF        -1 -1 -1 -1 -1
 /********************************************************************************************
  *  Parse closeon structure
  ********************************************************************************************/
-        public function ParseCloseOn($str, $notexists, $exists)
+        public function ParseCloseOn($str, &$notexists, &$exists)
         {
             $arr = explode("|", $str);
             if (! is_array($arr)) {
@@ -447,7 +447,7 @@ EOF        -1 -1 -1 -1 -1
             }
             $this->line = 1;
             while (1) {
-                $isword = $this->GetWord(&$word);
+                $isword = $this->GetWord($word);
                 if (! $isword) {
                     $this->iseof = true;
                 }

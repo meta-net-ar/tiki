@@ -4,13 +4,22 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tracker\Field\AutoSyncableInterface;
+
+const AUTO_ASSIGN_OPTIONS = [
+    'None' => 0,
+    'Creator' => 1,
+    'Modifier' => 2,
+];
+
 /**
  * Handler class for UserSelector
  *
  * Letter key: ~u~
  *
  */
-class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface, \Tracker\Field\EnumerableInterface
+class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface, \Tracker\Field\EnumerableInterface, AutoSyncableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -35,11 +44,11 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'name' => tr('Auto-Assign'),
                         'description' => tr('Assign the value based on the creator or modifier.'),
                         'filter' => 'int',
-                        'default' => 0,
+                        'default' => AUTO_ASSIGN_OPTIONS['None'],
                         'options' => [
-                            0 => tr('None'),
-                            1 => tr('Creator'),
-                            2 => tr('Modifier'),
+                            AUTO_ASSIGN_OPTIONS['None'] => tr('None'),
+                            AUTO_ASSIGN_OPTIONS['Creator'] => tr('Creator'),
+                            AUTO_ASSIGN_OPTIONS['Modifier'] => tr('Modifier'),
                         ],
                         'legacy_index' => 0,
                     ],
@@ -232,7 +241,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
         $autoassign = (int) $this->getOption('autoassign');
 
         if (isset($requestData[$ins_id])) {
-            if ($autoassign == 0 || $this->canChangeValue()) {
+            if ($autoassign == AUTO_ASSIGN_OPTIONS['None'] || $this->canChangeValue()) {
                 $ausers = $requestData[$ins_id];
                 $realnames_check = $prefs['user_selector_realnames_tracker'] == 'y' && $this->getOption('showRealname');
                 $users = TikiLib::lib('user')->extract_users($ausers, $realnames_check);
@@ -244,32 +253,49 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                     $data['value'] = '';
                 }
             } else {
-                if ($autoassign == 2) {
-                    if ($this->getOption('multiple')) {
-                        $data['value'] = TikiLib::lib('trk')->parse_user_field($this->getValue());
-                        if (! in_array($user, $data['value'])) {
-                            $data['value'][] = $user;
-                        }
-                        $data['value'] = TikiLib::lib('tiki')->str_putcsv($data['value']);
-                    } else {
-                        $data['value'] = $user;
-                    }
-                } elseif ($autoassign == 1) {
-                    if (! $this->getItemId() || ($this->getTrackerDefinition()->getConfiguration('userCanTakeOwnership') == 'y' && ! $this->getValue())) {
-                        $data['value'] = $user; // the user appropiate the item
-                    } else {
-                        $data['value'] = $this->getValue();
-                        // unset($data['fieldId']); hmm?
-                    }
-                } else {
-                    $data['value'] = '';
-                }
+                $data['value'] = $this->getAutoAssignValue();
             }
         } else {
             $data['value'] = $this->getValue(false);
         }
 
         return $data;
+    }
+
+    public function getAutoSyncInlineEditFieldData(array $requestData = []): array
+    {
+        if (! isset($requestData['edit']) || $requestData['edit'] != 'inline' || isset($requestData[$this->getInsertId()])) {
+            return [];
+        }
+        return ['value' => $this->getAutoAssignValue()];
+    }
+
+    private function getAutoAssignValue()
+    {
+        global $user;
+        $autoassign = (int) $this->getOption('autoassign');
+
+        $out = '';
+
+        if ($autoassign == AUTO_ASSIGN_OPTIONS['Modifier']) {
+            if ($this->getOption('multiple')) {
+                $out = TikiLib::lib('trk')->parse_user_field($this->getValue());
+                if (! in_array($user, $out)) {
+                    $out[] = $user;
+                }
+                $out = TikiLib::lib('tiki')->str_putcsv($out);
+            } else {
+                $out = $user;
+            }
+        } elseif ($autoassign == AUTO_ASSIGN_OPTIONS['Creator']) {
+            if (! $this->getItemId() || ($this->getTrackerDefinition()->getConfiguration('userCanTakeOwnership') == 'y' && ! $this->getValue())) {
+                $out = $user; // the user appropiate the item
+            } else {
+                $out = $this->getValue();
+            }
+        }
+
+        return $out;
     }
 
     public function addValue($user)

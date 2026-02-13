@@ -20,6 +20,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/newsletters/nllib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_newsletters');
 if (! empty($_REQUEST['nlId'])) {
     $smarty->assign('nlId', $_REQUEST["nlId"]);
@@ -93,7 +96,6 @@ if (isset($_REQUEST['editionId'])) {
         }
     }
 }
-$section = 'newsletters';
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-newsletter_archives.tpl');

@@ -12,7 +12,6 @@
 //<a href="tiki-share.php?url={$smarty.server.REQUEST_URI|escape:'url'}">{tr}Share this page{/tr}</a>
 use Tiki\Lib\Auth\Tokens;
 
-$section = 'share';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -51,6 +50,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SHARE;
+Sections::setCurrentSection($section);
 if (empty($_REQUEST['report'])) {
     $access->check_feature('feature_share');
     $access->check_permission('tiki_p_share');

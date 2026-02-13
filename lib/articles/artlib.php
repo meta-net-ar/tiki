@@ -12,6 +12,22 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 
 class ArtLib extends TikiLib
 {
+    /**
+     * Limit of the title field of the tiki_articles table
+     */
+    public const MAX_ARTICLE_TITLE_LENGTH = 255;
+    /**
+     * Limit of the subtitle field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_SUBTITLE_LENGTH = 255;
+    /**
+     * Limit of the heading field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_HEADING_LENGTH = 65535;
+    /**
+     * Limit of the body field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_BODY_LENGTH = 65535;
     public function approve_submission($subId)
     {
         $data = $this->get_submission($subId);
@@ -296,10 +312,18 @@ class ArtLib extends TikiLib
 
     public function replace_article($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $user, $articleId, $image_x, $image_y, $type, $topline = '', $subtitle = '', $linkto = '', $image_caption = '', $image_alt = '', $lang = '', $rating = 0, $isfloat = 'n', $emails = '', $from = '', $list_image_x = '', $list_image_y = '', $ispublished = 'y', $fromurl = false)
     {
-
         $tikilib = TikiLib::lib('tiki');
         $smarty = TikiLib::lib('smarty');
-
+        if (isset($title, $subtitle, $heading, $body)) {
+            $validateTitleFieldLength = Feedback::validateFieldLength("Name", $title, ArtLib::MAX_ARTICLE_TITLE_LENGTH);
+            $validateSubtitleFieldLength = Feedback::validateFieldLength("Subtitle", $subtitle, ArtLib::MAX_ARTICLE_SUBTITLE_LENGTH);
+            $validateHeadingFieldLength = Feedback::validateFieldLength("Heading", $heading, ArtLib::MAX_ARTICLE_HEADING_LENGTH);
+            $validateBodyFieldLength = Feedback::validateFieldLength("Body", $body, ArtLib::MAX_ARTICLE_BODY_LENGTH);
+            if (! $validateTitleFieldLength || ! $validateSubtitleFieldLength || ! $validateHeadingFieldLength || ! $validateBodyFieldLength) {
+                header('location: ' . $_SERVER['REQUEST_URI']);
+                die;
+            }
+        }
         if (empty($imgdata) || $useImage === 'n') { // remove image data if not using it
             $imgdata = '';
         }

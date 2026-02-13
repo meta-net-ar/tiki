@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'forums';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -18,9 +17,11 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-
 include_once('lib/rankings/ranklib.php');
 
+use Tiki\Sections;
+$section = Sections::SECTION_FORUMS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_forums');
 $access->check_feature('feature_forum_rankings');
 $access->check_permission('tiki_p_forum_read');
