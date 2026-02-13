@@ -272,7 +272,29 @@ class ComposerCli
 
             $process = new Process($args, null, $env);
             $command = $process->getCommandLine();
-            $process->setTimeout($timeout ?? $this->timeout);
+            $timeout = $timeout ?? $this->timeout;
+
+            $maxExecutionTime = (int) ini_get('max_execution_time');
+            if ($maxExecutionTime > 0) {
+                $elapsed = 0;
+                if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
+                    $elapsed = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+                } elseif (isset($_SERVER['REQUEST_TIME'])) {
+                    $elapsed = time() - $_SERVER['REQUEST_TIME'];
+                }
+
+                $remaining = $maxExecutionTime - $elapsed;
+                $safeTimeout = $remaining - 5;
+
+                if ($safeTimeout < 1) {
+                    $safeTimeout = 1;
+                }
+                if ($timeout > $safeTimeout) {
+                    $timeout = (int) $safeTimeout;
+                }
+            }
+
+            $process->setTimeout($timeout);
             $process->run();
 
             $code = $process->getExitCode();
