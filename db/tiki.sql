@@ -496,7 +496,7 @@ CREATE TABLE `tiki_calendar_roles` (
 DROP TABLE IF EXISTS `tiki_calendars`;
 CREATE TABLE `tiki_calendars` (
   `calendarId` int(14) NOT NULL auto_increment,
-  `name` varchar(80) NOT NULL default '',
+  `name` varchar(255) NOT NULL default '',
   `description` varchar(255) default NULL,
   `user` varchar(200) NOT NULL default '',
   `customlocations` enum('n','y') NOT NULL default 'n',
@@ -2184,7 +2184,7 @@ CREATE TABLE `tiki_related_categories` (
 DROP TABLE IF EXISTS `tiki_rss_modules`;
 CREATE TABLE `tiki_rss_modules` (
   `rssId` int(8) NOT NULL auto_increment,
-  `name` varchar(30) NOT NULL default '',
+  `name` varchar(200) NOT NULL default '',
   `description` text,
   `url` text NOT NULL,
   `refresh` int(8) default NULL,

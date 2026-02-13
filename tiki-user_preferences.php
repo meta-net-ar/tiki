@@ -11,7 +11,6 @@ use Tiki\Lib\Theme\ThemeLib;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -25,7 +24,6 @@ $inputConfiguration = [
         'country'                         => 'striptags',    //post
         'location'                        => 'striptags',    //post
         'homePage'                        => 'pagename',     //post
-        'user_information'                => 'striptags',    //post
         'new_prefs'                       => 'bool',         //post
         'mytheme'                         => 'striptags',    //post
         'userbreadCrumb'                  => 'digits',       //post
@@ -35,7 +33,6 @@ $inputConfiguration = [
         'display_timezone'                => 'striptags',    //post
         'display_12hr_clock'              => 'bool',         //post
         'diff_versions'                   => 'bool',         //post
-        'show_mouseover_user_info'        => 'bool',         //post
         'remember_closed_rboxes'          => 'bool',         //post
         'email_isPublic'                  => 'bool',         //post
         'mailCharset'                     => 'striptags',    //post
@@ -78,6 +75,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $modlib = TikiLib::lib('mod');
 $userprefslib = TikiLib::lib('userprefs');
 $perspectivelib = TikiLib::lib('perspective');
@@ -137,7 +137,7 @@ $foo1 = str_replace("tiki-user_preferences", "tiki-editpage", $foo["path"]);
 $foo2 = str_replace("tiki-user_preferences", "tiki-index", $foo["path"]);
 $smarty->assign('url_edit', $tikilib->httpPrefix() . $foo1);
 $smarty->assign('url_visit', $tikilib->httpPrefix() . $foo2);
-$smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
+
 
 if ($prefs['feature_perspective'] === 'y') {
     $smarty->assign('perspectives', $perspectivelib->list_perspectives());
@@ -179,9 +179,6 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     if (isset($_POST["homePage"])) {
         $tikilib->set_user_preference($userwatch, 'homePage', $_POST["homePage"]);
     }
-
-    $tikilib->set_user_preference($userwatch, 'user_information', $_POST['user_information']);
-
     TikiLib::events()->trigger(
         'tiki.user.update',
         [
@@ -291,15 +288,6 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     } else {
         $tikilib->set_user_preference($userwatch, 'diff_versions', 'n');
         $smarty->assign('diff_versions', 'n');
-    }
-    if ($prefs['feature_community_mouseover'] == 'y') {
-        if (isset($_POST['show_mouseover_user_info']) && $_POST['show_mouseover_user_info'] == 'on') {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'y');
-            $smarty->assign('show_mouseover_user_info', 'y');
-        } else {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
-            $smarty->assign('show_mouseover_user_info', 'n');
-        }
     }
 
     $tikilib->set_user_preference($userwatch, 'remember_closed_rboxes', empty($_POST['remember_closed_rboxes']) ? 'n' : 'y');
@@ -477,6 +465,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
+        $userlib->update_lastlogin($userwatch);
         if ($prefs['feature_user_encryption'] === 'y') {
             // Notify CryptLib about the login
             $cryptlib = TikiLib::lib('crypt');
@@ -654,7 +643,6 @@ $smarty->assign_by_ref('avatar', $avatar);
 $mailCharsets = ['utf-8', 'iso-8859-1'];
 $smarty->assign_by_ref('mailCharsets', $mailCharsets);
 $smarty->assign_by_ref('user_prefs', $user_preferences[$userwatch]);
-$tikilib->get_user_preference($userwatch, 'user_information', 'public');
 $tikilib->get_user_preference($userwatch, 'diff_versions', 'n');
 $usertrackerId = false;
 $useritemId = false;

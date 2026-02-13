@@ -12,8 +12,10 @@ use Tiki\File\SlideshowHelper;
 use Tiki\Wiki\WikiPaginationUtils;
 
 global $pdfStyles, $prefs, $tiki_p_view;
-$section = 'wiki page';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI;
+Sections::setCurrentSection($section);
 $tikilib = TikiLib::lib('tiki');
 $structlib = TikiLib::lib('struct');
 $wikilib = TikiLib::lib('wiki');

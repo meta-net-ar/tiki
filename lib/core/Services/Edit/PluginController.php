@@ -377,7 +377,7 @@ class Services_Edit_PluginController
      * @param JitFilter $input
      * @return array
      * @throws Services_Exception
-     * @throws Services_Exception_BadRequest
+     * @throws ServicesExceptionBadRequest
      * @throws Services_Exception_Denied
      */
     public function action_convert_trackerlist($input)
@@ -409,7 +409,7 @@ class Services_Edit_PluginController
 
         $info = $tikilib->get_page_info($page);
         if (! $info) {
-            throw new Services_Exception_BadRequest(tr('Page "%0" not found', $page));
+            throw new ServicesExceptionBadRequest(tr('Page "%0" not found', $page));
         }
 
         $perms = $tikilib->get_perm_object($page, 'wiki page', $info, false);

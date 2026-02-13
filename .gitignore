@@ -12,9 +12,6 @@
 /.gitlab-ci-local/
 /phpunit
 /.phpunit.result.cache
-/.phplint.yml
-/phplint
-/phplint.cache
 /node_modules
 /phpmyadmin
 /nbproject

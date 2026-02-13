@@ -8,15 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
+require_once('tiki-setup.php');
 use Tiki\Installer\Installer;
 use Tiki\Package\ComposerCli;
 use Tiki\Package\ExtensionManager;
 use Tiki\Suggestion\Rules;
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
-$section = 'admin';
-
-require_once('tiki-setup.php');
 $adminlib = TikiLib::lib('admin');
 
 $auto_query_args = ['page'];
@@ -542,4 +542,19 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
+
+$htacxGlobal = null;
+if (TikiLib::lib('tiki')->get_preference('security_warn_htaccess_mismatch', 'y') === 'y') {
+    $htacx = (new \Tiki\Security\HtaccessChecker())->run(
+        TIKI_PATH,
+        TIKI_PATH . '/_htaccess',
+        ['server_software' => $_SERVER['SERVER_SOFTWARE'] ?? '']
+    );
+    if ($htacx && ($htacx['status'] ?? '') === \Tiki\Security\HtaccessChecker::STATUS_MISMATCH) {
+        $htacxGlobal = $htacx;
+    }
+}
+$smarty->assign('htaccess_global_warning', $htacxGlobal);
+$smarty->assign('htaccessDocsUrl', 'https://doc.tiki.org/htaccess');
+
 $smarty->display('tiki.tpl');

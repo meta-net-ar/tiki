@@ -186,6 +186,10 @@
                     {preference name=http_header_public_key_pins_value}
                 </div>
             </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}.htaccess Security{/tr}{help url="Security"}</legend>
+                {preference name=security_warn_htaccess_mismatch}
+            </fieldset>
         {/tab}
 
         {tab name="{tr}Spam Protection{/tr}"}

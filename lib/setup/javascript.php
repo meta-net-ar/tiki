@@ -238,6 +238,7 @@ $jqueryTiki['tiki_same_day_time_only'] = $prefs['tiki_same_day_time_only'];
 $jqueryTiki['jquery_timeago'] = $prefs['jquery_timeago'] === 'y';
 $jqueryTiki['short_date_format'] = $prefs['short_date_format'];
 $jqueryTiki['short_time_format'] = $prefs['short_time_format'];
+$jqueryTiki['cookie_consent_enabled'] = $prefs['cookie_consent_feature'] === 'y' ? true : false;
 $jqueryTiki['cookie_consent_dom_id'] = $prefs['cookie_consent_dom_id'];
 $jqueryTiki['cookie_consent_mode'] = $prefs['cookie_consent_mode'];
 $jqueryTiki['cookie_consent_expires'] = $prefs['cookie_consent_expires'];

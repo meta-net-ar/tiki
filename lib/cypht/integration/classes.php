@@ -12,7 +12,7 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 
 global $tikiroot;
 
-define('VENDOR_PATH', $tikipath . '/vendor_bundled/vendor/');
+define('VENDOR_PATH', __DIR__ . '/../../../' . TIKI_VENDOR_BUNDLED_PATH . '/'); //I presume VENDOR_PATH is a constant used by the cypht codebase - benoitg - 2026-01-25
 define('APP_PATH', VENDOR_PATH . 'jason-munro/cypht/');
 define('CONFIG_PATH', VENDOR_PATH . 'jason-munro/cypht/config/');
 define('WEB_ROOT', 'vendor_bundled/vendor/jason-munro/cypht/');

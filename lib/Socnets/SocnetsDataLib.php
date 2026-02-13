@@ -5,18 +5,14 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // author : aris002@yahoo.co.uk
+namespace Tiki\Lib\Socnets;
 
-namespace TikiLib\Socnets\SocnetsDataLib;
-
-require_once('lib/socnets/Util.php');
-use TikiLib\Socnets\Util\Util;
-require_once('lib/socnets/LLOG.php');
-require_once('lib/socnets/PrefsGen.php');
-use TikiLib\Socnets\PrefsGen\PrefsGen;
 require_once('lib/core/Services/Exception/SocnetsProviderNotConfigured.php');
 require_once('lib/core/Services/Exception/SocnetsTokenNotFound.php');
 require_once('lib/core/Services/Exception/SocnetsApi.php');
 
+use Tiki\Lib\Socnets\Util;
+use Tiki\Lib\Socnets\PrefsGen;
 use Hybridauth\HttpClient;
 use TikiLib;
 use Feedback;

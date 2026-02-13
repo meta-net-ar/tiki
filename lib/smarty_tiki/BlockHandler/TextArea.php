@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use Tiki\Sections;
 use TikiLib;
 use Language;
 use Services_LanguageCheck_Controller;
@@ -74,7 +75,7 @@ class TextArea extends Base
         $params['name'] = $params['name'] ?? 'edit';
         $params['id'] = $params['id'] ?? 'editwiki';
         $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
-        $params['class'] = $params['class'] ?? 'wikiedit form-control check_character_limit';
+        $params['class'] = $params['class'] ?? 'wikiedit form-control';
         $params['comments'] = $params['comments'] ?? 'n';
         $params['autosave'] = $params['autosave'] ?? 'y';
 
@@ -105,8 +106,8 @@ class TextArea extends Base
         $params['_previewConfirmExit'] = $params['_previewConfirmExit'] ?? 'y';
 
         if (empty($params['section'])) {
-            global $section;
-            $params['section'] = $section ?: 'wiki page';
+            $section = Sections::getCurrentSection();
+            $params['section'] = $section ?: Sections::SECTION_WIKI_PAGE;
         } elseif ($params['section'] === 'trackeritem') {
             $params['section'] = 'trackers';
         }

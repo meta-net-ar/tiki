@@ -173,6 +173,7 @@ class BigBlueButtonLib
         $createMeetingParams->setAttendeePassword($params['attendeePW']);
         $createMeetingParams->setModeratorPassword($params['moderatorPW']);
         $createMeetingParams->setLogoutUrl($urlLogout);
+        $createMeetingParams->addMeta('isPublic', $params['isPublic']);
 
         if (! empty($params['recording']) && $params['recording'] == 'true') {
             $createMeetingParams->setRecord(true);
@@ -190,12 +191,16 @@ class BigBlueButtonLib
     }
 
     /**
+     * Get the join URL for a BigBlueButton meeting
+     *
      * @param $room
+     * @param $params
+     * @return string The join URL for the meeting
      */
-    public function joinMeeting($room)
+    public function joinMeeting($room, $params)
     {
         $name = $this->getAttendeeName();
-        $password = $this->getAttendeePassword($room);
+        $password = ! $params['isPublic'] && ! $params['autoJoin'] ? $params['passCode'] : $this->getAttendeePassword($room);
 
         $joinParams = new JoinMeetingParameters(
             $room,
@@ -206,9 +211,7 @@ class BigBlueButtonLib
         $joinParams->setRedirect(true);
         $joinParams->setUserID('user-' . uniqid());
 
-        $joinUrl = $this->bbb->getJoinMeetingURL($joinParams);
-        header("Location: " . $joinUrl);
-        exit;
+        return $this->bbb->getJoinMeetingURL($joinParams);
     }
 
     /**
@@ -253,7 +256,6 @@ class BigBlueButtonLib
     {
         if ($meeting = $this->getMeeting($room)) {
             $perms = Perms::get('bigbluebutton', $room);
-
             if ($perms->bigbluebutton_moderate) {
                 return $meeting['moderatorPW'];
             } else {
@@ -276,6 +278,7 @@ class BigBlueButtonLib
             $reflection = new \ReflectionClass($response);
             $property = $reflection->getProperty('rawXml');
             $rawXml = $property->getValue($response);
+            $metadata = json_decode(json_encode($rawXml->metadata), true);
 
             return [
                 'meetingID' => (string) $rawXml->meetingID,
@@ -289,8 +292,23 @@ class BigBlueButtonLib
                 'duration' => (string) $rawXml->duration,
                 'recording' => (string) $rawXml->recording,
                 'hasBeenForciblyEnded' => (string) $rawXml->hasBeenForciblyEnded,
+                'metadata' => $metadata,
             ];
         }
+    }
+
+    /**
+     * @param $room
+     * @return array|false
+     */
+    public function getMeetingMetadata($room)
+    {
+        $info = $this->getMeeting($room);
+        if (! $info) {
+            return false;
+        }
+
+        return $info['metadata'];
     }
 
     /**
@@ -313,6 +331,10 @@ class BigBlueButtonLib
     {
         if (! $this->isRecordingSupported()) {
             return [];
+        }
+
+        if (empty($room)) {
+            throw new InvalidArgumentException(tr("Cannot fetch recordings: meeting ID is missing."));
         }
 
         $recordingParams = new GetRecordingsParameters();

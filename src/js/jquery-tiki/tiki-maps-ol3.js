@@ -267,6 +267,66 @@ import { defaults as defaultControls } from "ol/control";
                 desiredControls;
             $(container).css("background", "white");
 
+            // Shared style function for all map features (accessible from both clustered and non-clustered layers)
+            container.createMapFeatureStyle = function (feature) {
+                // Check for custom color from container-level storage (set by colorpicker)
+                var geom = feature.getGeometry();
+                if (geom && geom.getCoordinates) {
+                    var coords = geom.getCoordinates();
+                    if (Array.isArray(coords)) {
+                        var key = coords.join(",");
+                        if (container.featureColors && container.featureColors[key]) {
+                            return new ol.style.Style({
+                                geometry: feature.getGeometry(),
+                                image: new ol.style.Circle({
+                                    radius: 10,
+                                    fill: new ol.style.Fill({ color: container.featureColors[key] }),
+                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                                }),
+                            });
+                        }
+                    }
+                }
+
+                // Check for color on feature property
+                var featureColor = feature.get("color");
+                if (featureColor) {
+                    return new ol.style.Style({
+                        geometry: feature.getGeometry(),
+                        image: new ol.style.Circle({
+                            radius: 10,
+                            fill: new ol.style.Fill({ color: featureColor }),
+                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                        }),
+                    });
+                }
+
+                // Check if it's a marker with icon
+                if (feature.get("intent") === "marker") {
+                    return new ol.style.Style({
+                        geometry: feature.getGeometry(),
+                        image: new ol.style.Icon({
+                            anchor: [feature.get("offsetx"), feature.get("offsety")],
+                            anchorXUnits: "pixels",
+                            anchorYUnits: "pixels",
+                            src: feature.get("url"),
+                        }),
+                    });
+                }
+
+                // Default style: red triangle for unmarked features
+                return new ol.style.Style({
+                    geometry: feature.getGeometry(),
+                    image: new ol.style.RegularShape({
+                        points: 3,
+                        radius: 12,
+                        fill: new ol.style.Fill({ color: "#cc3333" }),
+                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
+                        rotation: 0,
+                    }),
+                });
+            };
+
             container.getLayer = function (name) {
                 var vectors;
 
@@ -317,7 +377,44 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.set("radius", radius);
                                     }
                                 },
+                                // Get feature color key from coordinates for stable lookup
+                                getFeatureColorKey = function (feature) {
+                                    var geom = feature.getGeometry();
+                                    if (geom && geom.getCoordinates) {
+                                        var coords = geom.getCoordinates();
+                                        if (Array.isArray(coords)) {
+                                            return coords.join(",");
+                                        }
+                                    }
+                                    return null;
+                                },
+                                getFeatureColor = function (feature) {
+                                    // Try feature property first
+                                    var color = feature.get("color");
+                                    if (color) {
+                                        return color;
+                                    }
+                                    // Try coords lookup from container-level storage (set by colorpicker)
+                                    var key = getFeatureColorKey(feature);
+                                    if (key && container.featureColors && container.featureColors[key]) {
+                                        return container.featureColors[key];
+                                    }
+                                    return null;
+                                },
                                 createMarkerStyle = function (feature) {
+                                    // Check for custom color from multiple sources
+                                    var customColor = getFeatureColor(feature);
+                                    if (customColor) {
+                                        return new ol.style.Style({
+                                            geometry: feature.getGeometry(),
+                                            image: new ol.style.Circle({
+                                                radius: 10,
+                                                fill: new ol.style.Fill({ color: customColor }),
+                                                stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                                            }),
+                                        });
+                                    }
+
                                     if (feature.get("intent") === "marker") {
                                         return new ol.style.Style({
                                             geometry: feature.getGeometry(),
@@ -329,6 +426,18 @@ import { defaults as defaultControls } from "ol/control";
                                             }),
                                         });
                                     }
+
+                                    // Default style for searchlayer features and other points without explicit intent
+                                    return new ol.style.Style({
+                                        geometry: feature.getGeometry(),
+                                        image: new ol.style.RegularShape({
+                                            points: 3,
+                                            radius: 12,
+                                            fill: new ol.style.Fill({ color: "#cc3333" }),
+                                            stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
+                                            rotation: 0,
+                                        }),
+                                    });
                                 },
                                 invisibleFill = new ol.style.Fill({
                                     color: "rgba(255, 255, 255, 0.01)",
@@ -394,12 +503,10 @@ import { defaults as defaultControls } from "ol/control";
                                             });
                                             styleCache[size + " " + maxFeatureCount] = style;
                                         }
-                                    } else if (features) {
+                                    } else if (features && features[0]) {
                                         feature = features[0];
-
-                                        if (feature.get("intent") === "marker") {
-                                            style = createMarkerStyle(feature);
-                                        }
+                                        // Always try to create a style - createMarkerStyle handles custom colors
+                                        style = createMarkerStyle(feature);
                                     }
                                     return style;
                                 },
@@ -432,8 +539,7 @@ import { defaults as defaultControls } from "ol/control";
                             vectors = container.layers[name] = new ol.layer.Vector({
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
-                                //styleMap: container.defaultStyleMap,
-                                //rendererOptions: {zIndexing: true}
+                                style: container.createMapFeatureStyle,
                             });
                         }
 
@@ -1726,6 +1832,258 @@ import { defaults as defaultControls } from "ol/control";
                         }
                     }
                 });
+
+                // Initialize colorpicker functionality
+                function initializeColorpicker() {
+                    var $colorpickerContainer = $(container).find(".map-colorpicker-container");
+                    if (!$colorpickerContainer.length) return;
+
+                    var colors = $colorpickerContainer.data("colorpicker-colors") || [];
+                    var title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
+                    var modalId = "mapColorpickerModal-" + id;
+
+                    // Create Bootstrap 5 Modal for colorpicker
+                    var swatchesHtml = colors
+                        .map(function (c) {
+                            return (
+                                '<button type="button" class="btn color-swatch p-0 m-1" ' +
+                                'style="background-color:' +
+                                c +
+                                '; width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" ' +
+                                'data-color="' +
+                                c +
+                                '" title="' +
+                                c +
+                                '"></button>'
+                            );
+                        })
+                        .join("");
+
+                    var modalHtml =
+                        '<div class="modal fade" id="' +
+                        modalId +
+                        '" tabindex="-1" aria-labelledby="' +
+                        modalId +
+                        'Label" aria-hidden="true">' +
+                        '  <div class="modal-dialog modal-sm">' +
+                        '    <div class="modal-content">' +
+                        '      <div class="modal-header">' +
+                        '        <h5 class="modal-title" id="' +
+                        modalId +
+                        'Label">' +
+                        title +
+                        "</h5>" +
+                        '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                        "      </div>" +
+                        '      <div class="modal-body">' +
+                        '        <div class="mb-3">' +
+                        '          <label for="colorPickerInput-' +
+                        id +
+                        '" class="form-label">' +
+                        tr("Select Color") +
+                        "</label>" +
+                        '          <input type="color" class="form-control form-control-color w-100" ' +
+                        '                 id="colorPickerInput-' +
+                        id +
+                        '" value="#6699cc">' +
+                        "        </div>" +
+                        '        <div class="color-swatches d-flex flex-wrap">' +
+                        swatchesHtml +
+                        "</div>" +
+                        "      </div>" +
+                        '      <div class="modal-footer">' +
+                        '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' +
+                        tr("Close") +
+                        "</button>" +
+                        '        <button type="button" class="btn btn-primary" id="applyColor-' +
+                        id +
+                        '">' +
+                        tr("Apply") +
+                        "</button>" +
+                        "      </div>" +
+                        "    </div>" +
+                        "  </div>" +
+                        "</div>";
+
+                    $(document.body).append(modalHtml);
+
+                    var $modal = $("#" + modalId);
+                    var $colorInput = $("#colorPickerInput-" + id);
+                    var $applyBtn = $("#applyColor-" + id);
+                    var selectedFeature = null;
+
+                    // Store colorpicker config on container
+                    container.colorpicker = {
+                        colors: colors,
+                        modal: $modal,
+                        show: function (feature) {
+                            selectedFeature = feature;
+                            var currentColor = feature.get("color") || "#6699cc";
+                            $colorInput.val(currentColor);
+                            bootstrap.Modal.getOrCreateInstance($modal[0]).show();
+                        },
+                    };
+
+                    // Handle color swatch clicks
+                    $modal.on("click", ".color-swatch", function () {
+                        var color = $(this).data("color");
+                        $colorInput.val(color);
+                        // Highlight selected swatch
+                        $modal.find(".color-swatch").css("border-color", "#ccc");
+                        $(this).css("border-color", "#000");
+                    });
+
+                    // Handle apply button
+                    $applyBtn.on("click", function () {
+                        if (selectedFeature) {
+                            var color = $colorInput.val();
+                            applyColorToFeature(selectedFeature, color);
+                        }
+                        bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
+                    });
+
+                    // Function to apply color to a feature's style
+                    function applyColorToFeature(feature, color) {
+                        // Initialize container-level color storage if not exists
+                        if (!container.featureColors) {
+                            container.featureColors = {};
+                        }
+
+                        // Store color on feature property
+                        feature.set("color", color);
+
+                        // Also store by coordinates for persistence across cluster recalculations
+                        var geom = feature.getGeometry();
+                        var key = null;
+                        if (geom && geom.getCoordinates) {
+                            var coords = geom.getCoordinates();
+                            if (Array.isArray(coords)) {
+                                key = coords.join(",");
+                                container.featureColors[key] = color;
+                            }
+                        }
+
+                        // Create a colored circle style
+                        var coloredStyle = new ol.style.Style({
+                            image: new ol.style.Circle({
+                                radius: 12,
+                                fill: new ol.style.Fill({ color: color }),
+                                stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                            }),
+                        });
+
+                        // DIRECTLY set the style on the feature
+                        feature.setStyle(coloredStyle);
+
+                        // Also try to find this feature in all sources and update it there
+                        var layers = container.overlays.getLayers().getArray();
+
+                        layers.forEach(function (layer) {
+                            if (layer.getSource && layer.getSource()) {
+                                var source = layer.getSource();
+
+                                // Check if this is a cluster source
+                                if (source.getSource) {
+                                    var innerSource = source.getSource();
+                                    // Find features at same coordinates
+                                    if (key) {
+                                        innerSource.getFeatures().forEach(function (f) {
+                                            var fGeom = f.getGeometry();
+                                            if (fGeom && fGeom.getCoordinates) {
+                                                var fCoords = fGeom.getCoordinates();
+                                                if (Array.isArray(fCoords) && fCoords.join(",") === key) {
+                                                    f.set("color", color);
+                                                    f.setStyle(coloredStyle);
+                                                }
+                                            }
+                                        });
+                                    }
+                                    // Refresh the cluster
+                                    source.refresh();
+                                }
+
+                                source.changed();
+                            }
+                            layer.changed();
+                        });
+
+                        // Force a full map render
+                        map.renderSync();
+                    }
+
+                    // Function to re-apply all stored colors to features
+                    function reapplyStoredColors() {
+                        if (!container.featureColors || Object.keys(container.featureColors).length === 0) {
+                            return;
+                        }
+
+                        var layers = container.overlays.getLayers().getArray();
+                        layers.forEach(function (layer) {
+                            if (layer.getSource && layer.getSource()) {
+                                var source = layer.getSource();
+
+                                // For cluster sources, check the inner source
+                                var featureSource = source.getSource ? source.getSource() : source;
+
+                                featureSource.getFeatures().forEach(function (f) {
+                                    var geom = f.getGeometry();
+                                    if (geom && geom.getCoordinates) {
+                                        var coords = geom.getCoordinates();
+                                        if (Array.isArray(coords)) {
+                                            var key = coords.join(",");
+                                            if (container.featureColors[key]) {
+                                                var color = container.featureColors[key];
+                                                var coloredStyle = new ol.style.Style({
+                                                    image: new ol.style.Circle({
+                                                        radius: 12,
+                                                        fill: new ol.style.Fill({ color: color }),
+                                                        stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                                                    }),
+                                                });
+                                                f.setStyle(coloredStyle);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    // Hook into feature selection to show colorpicker
+                    if (selectionInteraction) {
+                        var originalSelectHandler = null;
+
+                        // Add colorpicker trigger on feature selection when Shift is held
+                        map.on("click", function (evt) {
+                            if (evt.originalEvent.shiftKey) {
+                                map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+                                    if (feature && container.colorpicker) {
+                                        // Get the actual feature (not cluster)
+                                        var targetFeature = feature;
+                                        var clusterFeatures = feature.get("features");
+                                        if (clusterFeatures && clusterFeatures.length === 1) {
+                                            targetFeature = clusterFeatures[0];
+                                        }
+                                        container.colorpicker.show(targetFeature);
+                                        return true; // Stop iteration
+                                    }
+                                });
+                            } else {
+                                // On non-shift clicks, re-apply stored colors after a short delay
+                                setTimeout(function () {
+                                    reapplyStoredColors();
+                                }, 50);
+                            }
+                        });
+
+                        // Also re-apply colors when map is moved or rendered
+                        map.on("moveend", function () {
+                            reapplyStoredColors();
+                        });
+                    }
+                }
+
+                initializeColorpicker();
 
                 $(container).trigger("initialized");
             }, 250);

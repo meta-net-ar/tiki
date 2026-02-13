@@ -298,11 +298,17 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
     {
         $selected_categories = $this->getConfiguration('selected_categories');
         $categories = $this->getConfiguration('list');
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
         $ret = [];
         $rendered = empty($context['list_mode']) || $context['list_mode'] !== 'csv';
         foreach ($selected_categories as $categId) {
             foreach ($categories as $category) {
-                if ($category['categId'] == $categId) {
+                if (isset($category['categId']) && $category['categId'] == $categId) {
                     if ($this->getOption('descendants') == 2) {
                         $str = $category['relativePathString'];
                     } else {

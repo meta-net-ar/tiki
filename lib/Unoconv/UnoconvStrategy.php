@@ -38,7 +38,7 @@ class UnoconvStrategy implements ConverterInterface
             'unoconv.port' => $prefs['alchemy_unoconv_port'],
         ];
 
-        $this->unoconv = Unoconv::create($config);
+        $this->unoconv = Unoconv::create($config); // @phpstan-ignore class.notFound (The point of this class is that Unoconv\Unoconv may not be installed)
     }
 
     /**

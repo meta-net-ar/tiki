@@ -40,8 +40,10 @@ $inputConfiguration = [
         ],
     ]
 ];
-$section = 'cms';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 $access->check_feature('feature_articles');
 

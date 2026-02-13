@@ -557,6 +557,22 @@ customsearch$id._load = function (receive, params) {
     if (typeof params !== undefined) {
         $.extend(datamap, params);
     }
+    if (datamap.download) {
+        let form = $('<form method=\"post\" action=\"'+$.service('search_customsearch', 'customsearch')+'\"></form>');
+        $.param(datamap).split('&').forEach(function(pair) {
+            let parts = pair.split('=');
+            let name = decodeURIComponent(parts[0]);
+            let value = decodeURIComponent(parts[1] || '');
+            form.append($('<input>').attr({
+                type: 'hidden',
+                name: name,
+                value: value
+            }));
+        });
+        form.appendTo('body').submit();
+        return;
+    }
+
     $.ajax({
         type: 'POST',
         url: $.service('search_customsearch', 'customsearch'),
@@ -585,6 +601,11 @@ customsearch$id.maxRecords = $maxRecords;
 customsearch$id.store_query ='';
 customsearch$id.init();
 $iconinsert;
+$(document).on('submit', '#listexecute-download-wpcs-$id, #listexecute-download-top-wpcs-$id', function(e) {
+    e.preventDefault();
+    customsearch$id._load(null, {download: true});
+    return false;
+});
 $(document).trigger('formSearchReady');
 ";
 

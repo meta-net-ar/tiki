@@ -10,11 +10,9 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     exit;
 }
 
-//aris002 CHECK if we really can't avoid this?
-require_once('lib/socnets/PrefsGen.php');
 
 use Tiki\TwoFactorAuth\TwoFactorAuth;
-use TikiLib\Socnets\PrefsGen\PrefsGen;
+use Tiki\Lib\Socnets\PrefsGen;
 
 /**
  * @return array

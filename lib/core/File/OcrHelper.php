@@ -46,7 +46,7 @@ class OcrHelper
             try {
                 $unoconv = new UnoconvLib();
                 $unoconv->convertFile($tempReadableFilePath, $tempFileName, 'txt');
-            } catch (RuntimeException $e) {
+            } catch (\RuntimeException $e) {
                 // Unoconv was unable to extract text without converting to PDF first
                 $pdfTempFile = PDFHelper::convertToPDF($fileId);
             }

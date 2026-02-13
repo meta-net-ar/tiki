@@ -71,7 +71,7 @@ function wikiplugin_tikimanager($data, $params)
     $showactions ??= [];
     $hideactions ??= [];
 
-    $instances = TikiManager\Application\Instance::getInstances(true);
+    $instances = TikiManager\Application\Instance::getInstances(true);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $instances = array_filter($instances, function ($i) use ($instanceIds) {
         return empty($instanceIds) || in_array($i->getId(), $instanceIds);
     });

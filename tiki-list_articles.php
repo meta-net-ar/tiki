@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -40,6 +39,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 $access->check_feature('feature_articles');
 $auto_query_args = ['sort_mode', 'category', 'offset', 'maxRecords', 'find', 'find_from_Month', 'find_from_Day', 'find_from_Year', 'find_to_Month', 'find_to_Day', 'find_to_Year', 'type', 'topic', 'cat_categories', 'categId', 'lang', 'mode', 'mapview', 'searchmap', 'searchlist'];

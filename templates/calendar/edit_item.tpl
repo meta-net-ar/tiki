@@ -78,7 +78,7 @@
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
+                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" maxlength="{$MAX_CALENDAR_EVENT_TITLE_LENGTH}" required>
                 </div>
             </div>
             {if !empty($trackerItems)}
@@ -216,7 +216,7 @@
                 <label class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
                         {strip}
-                            {textarea name="calitem[description]" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
+                            {textarea name="calitem[description]" maxlength="{$MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH}" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
                             {$calitem.description}
                             {/textarea}
                         {/strip}

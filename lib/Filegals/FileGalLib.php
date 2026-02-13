@@ -23,6 +23,7 @@ use Tiki\FileGallery\File as TikiFile;
 use Tiki\FileGallery\FileDraft as TikiFileDraft;
 use Tiki\FileGallery\ImageTransformer;
 use Tiki\Lib\Filegals\FileIsNotSafeException;
+use Symfony\Component\Filesystem\Filesystem;
 use TikiDb;
 use TikiLib;
 use TikiMail;
@@ -1266,11 +1267,22 @@ class FileGalLib extends TikiLib
         $this->table('tiki_files')->update(['maxhits' => (int) $limit], ['fileId' => (int) $fileId]);
     }
     // not the best optimisation as using a library using files and not content
-    public function zip($fileIds, &$error, $zipName = '')
+    /**
+     * Create a zip file from file gallery files
+     *
+     * @param array $fileEntries Array of file entries with structure:
+     *                           ['fileId' => int, 'path' => string]
+     *                           The 'path' key specifies the relative folder path within the zip
+     *                           to preserve folder hierarchy when downloading galleries.
+     * @param string &$error Error message on failure
+     * @param string $zipName Optional custom zip name
+     * @return array|false|null File info array on success, false on error, null on no permission
+     */
+    public function zip($fileEntries, &$error, $zipName = '')
     {
         global $tiki_p_admin_file_galleries, $prefs, $user;
         $userlib = TikiLib::lib('user');
-        $list = [];
+        $tempFiles = [];
         $temp = '/' . md5(random_bytes(10)) . '/';
         if (! mkdir(sys_get_temp_dir() . $temp)) {
             $temp = sys_get_temp_dir() . $temp;
@@ -1280,44 +1292,81 @@ class FileGalLib extends TikiLib
             $error = "Can not create directory $temp";
             return false;
         }
-        $fileIds = array_unique($fileIds);
-        Perms::bulk(['type' => 'file'], 'object', $fileIds);
+        // Check permissions
+        $checkIds = array_unique(array_column($fileEntries, 'fileId'));
+        Perms::bulk(['type' => 'file'], 'object', $checkIds);
+
         $filenames = [];
-        $padding = strlen(count($fileIds)) - 1;
-        foreach ($fileIds as $fileId) {
+        $padding = strlen(count($fileEntries)) - 1;
+        foreach ($fileEntries as $fileEntry) {
+            $fileId = $fileEntry['fileId'];
+            $relativePath = $fileEntry['path'];
+
             $file = TikiFile::id($fileId);
             if ($tiki_p_admin_file_galleries == 'y' || $userlib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {
                 if (empty($zipName)) {
                     $zipName = $file->galleryId;
                 }
+
+                $relativePath = str_replace('..', '', $relativePath);
+                $relativePath = trim($relativePath, '/\\');
+                $destDir = $temp;
+                if ($relativePath !== '') {
+                    $destDir .= $relativePath . '/';
+                    if (! is_dir($destDir)) {
+                        if (! mkdir($destDir, 0777, true)) {
+                            $error = "Cannot create directory: $destDir";
+                            return false;
+                        }
+                    }
+                }
+
                 $filename = $file->filename;
+                $pathKey = $relativePath;
+                if (! isset($filenames[$pathKey])) {
+                    $filenames[$pathKey] = [];
+                }
+
                 $counter = 1;
-                while (in_array($filename, $filenames)) {
+                while (in_array($filename, $filenames[$pathKey])) {
                     $filename = $file->filename . '_' . str_pad($counter, $padding, '0', STR_PAD_LEFT);
                     $counter++;
                 }
-                $filenames[] = $filename;
-                $tmp = $temp . $filename;
+                $filenames[$pathKey][] = $filename;
+                $tmp = $destDir . $filename;
                 if (! copy($file->getWrapper()->getReadableFile(), $tmp)) {
-                    $error = "Can not copy to $tmp";
+                    $error = tr('Can not copy to %0', $tmp);
                     return false;
                 }
-                $list[] = $tmp;
+                $tempFiles[] = [
+                    'path' => $tmp,
+                    'filename' => $filename,
+                    'lastModif' => $file->lastModif,
+                ];
                 $info = $file->getParams();
             }
         }
-        if (empty($list)) {
-            $error = "No permission";
+        if (empty($tempFiles)) {
+            $error = tra('You do not have permission to download any of the selected files.');
             return null;
         }
         $info['filename'] = "$zipName.zip";
         $zip = $temp . $info['filename'];
-        define('PCZLIB_SEPARATOR', '\001');
+        define('PCZLIB_SEPARATOR', '\\001');
         if (! $archive = new PclZip($zip)) {
             $error = $archive->errorInfo(true);
             return false;
         }
-        if (! ($v_list = $archive->create($list, PCLZIP_OPT_REMOVE_PATH, $temp))) {
+        // Use file descriptors with PCLZIP_ATT_FILE_MTIME to preserve original file timestamps
+        $list = [];
+        foreach ($tempFiles as $fileData) {
+            $list[] = [
+                PCLZIP_ATT_FILE_NAME => $fileData['path'],
+                PCLZIP_ATT_FILE_NEW_FULL_NAME => $fileData['filename'],
+                PCLZIP_ATT_FILE_MTIME => $fileData['lastModif'],
+            ];
+        }
+        if (! ($v_list = $archive->create($list))) {
             $error = $archive->errorInfo(true);
             return false;
         }
@@ -1325,11 +1374,13 @@ class FileGalLib extends TikiLib
         $info['path'] = '';
         $info['filetype'] = 'application/x-zip-compressed';
         $info['filesize'] = strlen($info['data']);
-        foreach ($list as $tmp) {
-            unlink($tmp);
+        foreach ($tempFiles as $fileData) {
+            unlink($fileData['path']);
         }
         unlink($zip);
-        rmdir($temp);
+        $fs = new Filesystem();
+        $fs->remove($temp);
+
         return $info;
     }
 

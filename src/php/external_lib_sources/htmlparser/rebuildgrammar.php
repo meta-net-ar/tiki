@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //include ("common.inc");
 
-include("htmlgrammarparser.inc");
+include("htmlgrammarparser.php");
 $p = new HtmlGrammarParser("htmlgrammar.dat");
 $p->Parse();
 $p->PrintErrors();

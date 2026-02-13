@@ -29,6 +29,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 include_once('lib/directory/dirlib.php');
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_admin_directory_cats');
@@ -123,7 +126,6 @@ $cat_type = 'directory';
 $cat_objid = $_REQUEST['categId'];
 include_once("categorize_list.php");
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

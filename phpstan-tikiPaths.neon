@@ -24,7 +24,9 @@ parameters:
     # Depends on code decompressed in the source tree, so isn't always there
  
     # Cypth related
+    # There is really no reason to exclude cypht anymore, as jason-munro/cypht is in composer.json by default.  But lib/cypht/integration/classes.php uses nested requires which seem to confuse phpstan. - benoitg - 2026-01-25
     - lib/cypht
+    - lib/core/Services/Cypht/Controller.php
     - lib/core/Search/Index/Cypht.php
     - lib/wiki-plugins/wikiplugin_cypht.php 
     - modules/mod-func-webmail_unread_messages.php
@@ -54,7 +56,7 @@ parameters:
     # lang/ takes too long to process
     - lang
 
-  tmpDir: temp/dev/phpstan_cache
+  tmpDir: temp/ci/phpstan_cache
 
   #Permanent error configuration
   ignoreErrors:

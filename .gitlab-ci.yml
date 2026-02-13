@@ -33,7 +33,7 @@ variables:
   MANTICORE_NEWEST_SUPPORTED: 15.1.0
   #Only for older version upgrade tests these days
   MYSQL_5_IMAGE: mysql:5.7.44
-  NODE_IMAGE: node:20
+  NODE_IMAGE: node:24
   MANTICORE_DSN: http://manticore
   # You can set USE_GITLAB_PROXY to "true" in your project configuration to use the gitlab dependency proxy. (default not using as it may cause issues for some accounts)
   USE_GITLAB_PROXY: ''
@@ -101,12 +101,15 @@ node_modules:
 node_build:
   stage: build
   needs:
-    - node_modules  #This is only because we still have some scss files installed from composer - 2023-11-17
+    - node_modules  
+    #This is only because we still have some scss files installed from composer - 2023-11-17
     - composer
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
   script:
-    - npm run build
+    - free -h
+    - NODE_OPTIONS="--max-old-space-size=4096" npm run build
+    - free -h
   artifacts:
     expire_in: 2 days
     paths:
@@ -214,14 +217,11 @@ phplint:
   needs:
     - composer
   script:
-    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint -n --configuration=doc/devtools/phplint.yml
-  cache:
-    key: phplint${PHP_VERSION}
-    paths:
-      - phplint.cache
+    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
+  # No point in using cache, on fast hardware it's almost as fast to compute as it is to verify the cache - benoitg - 2026-01-26
   parallel:
     matrix:
-      - PHP_VERSION: ['8.1', '8.2', '8.3', '8.4', '8.5']
+      - PHP_VERSION: ['8.5', '8.1'] #Checking more than max and min PHP versions just wastes CI minutes
 
 smarty-lint:
   stage: code-quality
@@ -281,7 +281,7 @@ phpstan:
   cache:
     key: "phpstan"
     paths:
-      - temp/dev/phpstan_cache
+      - temp/ci/phpstan_cache
     policy: pull-push
 
 rector:
@@ -298,7 +298,7 @@ rector:
         files:
           - rector.php
       paths:
-        - temp/dev/rector_cache
+        - temp/ci/rector_cache
       policy: pull-push
 #
 # Check Tikiwiki development specific check (related also with release)
@@ -574,18 +574,16 @@ unit-tests:
   allow_failure: false
   parallel:
     matrix:
-      - PHP_VERSION: "8.1"
-        DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
-      - PHP_VERSION: "8.2"
+      - PHP_VERSION: "8.5"
+        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.4"
         DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-      - PHP_VERSION: "8.1"
-        DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.3"
         DB_IMAGE: ${MARIADB_IMAGE_COMMON_LTS}
-      - PHP_VERSION: "8.4"
-        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
-      - PHP_VERSION: "8.5"
-        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.2"
+        DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
+      - PHP_VERSION: "8.1"
+        DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
 
 unit-tests-node:
   stage: unit-tests

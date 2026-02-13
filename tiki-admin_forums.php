@@ -86,8 +86,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'admin';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 if (! isset($_REQUEST['forumId'])) {
     $_REQUEST['forumId'] = 0;
 }
@@ -110,6 +112,10 @@ $auto_query_args = [
 ];
 
 $commentslib = TikiLib::lib('comments');
+$smarty->assign('MAX_FORUM_NAME_LENGTH', Comments::MAX_FORUM_NAME_LENGTH);
+$smarty->assign('MAX_FORUM_DESCRIPTION_LENGTH', Comments::MAX_FORUM_DESCRIPTION_LENGTH);
+$smarty->assign('MAX_FORUM_SECTION_LENGTH', Comments::MAX_FORUM_SECTION_LENGTH);
+$smarty->assign('MAX_FORUM_PASSWORD_LENGTH', Comments::MAX_FORUM_PASSWORD_LENGTH);
 if (isset($_REQUEST['lock']) && isset($_REQUEST['forumId'])) {
     if ($_REQUEST['lock'] == 'y' && $access->checkCsrf()) {
         $commentslib->lock_object_thread('forum:' . ((int)$_REQUEST['forumId']));
@@ -146,6 +152,17 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $value = trim($value);
         }
         $input[$key] = $value ;
+    }
+    if (isset($input["name"], $input["description"], $input["section"], $input["forum_password"])) {
+        $validateNameFieldLength = Feedback::validateFieldLength("Name", $input["name"], Comments::MAX_FORUM_NAME_LENGTH);
+        $validateDescriptionFieldLength = Feedback::validateFieldLength("Description", $input["description"], Comments::MAX_FORUM_DESCRIPTION_LENGTH);
+        $validateSectionFieldLength = Feedback::validateFieldLength("Section", $input["section"], Comments::MAX_FORUM_SECTION_LENGTH);
+        $validateForumPasswordFieldLength = Feedback::validateFieldLength("Section", $input["forum_password"], Comments::MAX_FORUM_PASSWORD_LENGTH);
+        if (! $validateNameFieldLength || ! $validateDescriptionFieldLength || ! $validateSectionFieldLength) {
+            $smarty->assign('mid', 'tiki-admin_forums.tpl');
+            $smarty->display("tiki.tpl");
+            die;
+        }
     }
     $fid = $commentslib->replace_forum($input);
 

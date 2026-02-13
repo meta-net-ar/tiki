@@ -8,6 +8,7 @@
 use Tiki\Lib\Wiki\ConvertToTiki9;
 use Tiki\Profiling\Timer;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
 
 /**
  *
@@ -520,7 +521,8 @@ class ModLib extends TikiLib
      */
     public function filter_active_module($module)
     {
-        global $section, $page, $prefs, $user;
+        global $page, $prefs, $user;
+        $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
 
         if ($prefs['module_' . $module["name"]] != 'y') {
@@ -535,7 +537,7 @@ class ModLib extends TikiLib
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = $section === 'admin';
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
 
         if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
             return false;
@@ -564,14 +566,14 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['nopage']) && isset($page) && isset($section) && $section == 'wiki page') {
+        if (isset($params['nopage']) && isset($page) && isset($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
             if (in_array($page, (array) $params['nopage'])) {
                 return false;
             }
         }
 
         if (isset($params['page'])) {
-            if (! isset($section) || $section != 'wiki page' || ! isset($page)) { // must be in a page
+            if (! isset($section) || ! Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) || ! isset($page)) { // must be in a page
                 return false;
             } elseif (! in_array($page, (array) $params['page'])) {
                 return false;
@@ -616,7 +618,7 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['creator']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['creator']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } elseif ($params['creator'] == 'y' && $page_info['creator'] != $user) {
@@ -626,7 +628,7 @@ class ModLib extends TikiLib
             }
         }
 
-        if (isset($params['contributor']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['contributor']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } else {

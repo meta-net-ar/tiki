@@ -8,9 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 use Tiki\TikiInit;
 
-$section = 'file_galleries';
 $isUpload = false;
 
 if (isset($_POST['upload'])) {
@@ -23,8 +23,10 @@ if (isset($_POST['upload'])) {
 if (isset($_POST['PHPSESSID']) && $_POST['PHPSESSID'] != '') {
     session_id($_POST['PHPSESSID']);
 }
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FILE_GALLERIES;
+Sections::setCurrentSection($section);
 if ($prefs['feature_categories'] == 'y') {
     $categlib = TikiLib::lib('categ');
 }

@@ -1,0 +1,63 @@
+{
+    "_hash": "6112759526c6c00b6c90c3c8f873596a81a3dd7c24c4d8617dffe8c560a27a65",
+    "patches": {
+        "candy-chat/xmpp-prebind-php": [
+            {
+                "package": "candy-chat/xmpp-prebind-php",
+                "description": "Removed string access with curly braces syntax in PHP8",
+                "url": "../installer/composer-patches/xmpp-prebind-php__php8fixes.patch",
+                "sha256": "897978b92944a9215c5064502538c99044445c49a9f2e8bc0e80583ea712dd01",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
+                }
+            }
+        ],
+        "jquery/jquery-sheet": [
+            {
+                "package": "jquery/jquery-sheet",
+                "description": "Fix visibility issues",
+                "url": "../installer/composer-patches/jquery-sheet_fix-visibility-issues.patch",
+                "sha256": "a0c5316561e8bae7f7664e1cd5f89c701b2e437fc3711ec304e5f47c99031e87",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
+                }
+            }
+        ],
+        "nicolaskruchten/pivottable": [
+            {
+                "package": "nicolaskruchten/pivottable",
+                "description": "Sort rows and columns by key_z_to_a and Drag and drop via touch",
+                "url": "../installer/composer-patches/nicolaskruchten_pivottable__sort_by_key_z_to_a_and_drag_and_drop_via_touch.patch",
+                "sha256": "e3b31a4b1b6efa7412991977286873de4eaf5349d7340e44088db7503442104c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
+                }
+            }
+        ],
+        "umakantp/smartylint": [
+            {
+                "package": "umakantp/smartylint",
+                "description": "Fix smartylint syntax with curly braces",
+                "url": "../installer/composer-patches/smartylint-warning-curly-bracket.patch",
+                "sha256": "50b5f06e2677a89c8911957e6173ff86bd490e9f7b2a732123a077aa80a2e110",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
+                }
+            },
+            {
+                "package": "umakantp/smartylint",
+                "description": "Fix smartylint PHP 8.1 support and other fixes",
+                "url": "../installer/composer-patches/smartylint-php8.1-and-other-fixes.patch",
+                "sha256": "4d6756c3c950e3bfc2e7009be37837c52bb70a2823240a45a0e7eec468745dec",
+                "depth": 1,
+                "extra": {
+                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
+                }
+            }
+        ]
+    }
+}

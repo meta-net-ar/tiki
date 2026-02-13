@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 class WikiPlugin_Negotiator_Wiki
 {
     public $name;
@@ -362,10 +365,11 @@ class WikiPlugin_Negotiator_Wiki
 
     public function isEditable()
     {
-        global $tiki_p_edit, $prefs, $section;
+        global $tiki_p_edit, $prefs;
+        $section = Sections::getCurrentSection();
 
         return (
-            $section == 'wiki page' &&
+            Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) &&
             isset($this->info) &&
             $tiki_p_edit == 'y' &&
             $prefs['wiki_edit_plugin'] == 'y' &&

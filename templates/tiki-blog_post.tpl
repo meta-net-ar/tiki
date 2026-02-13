@@ -61,7 +61,7 @@
         <div class="mb-3 row">
             <div class="col-md-12">
                 <label class="col-form-label" for="blog_title">{tr}Title{/tr}</label>
-                <input type="text" maxlength="255" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
+                <input type="text" maxlength="{$MAX_BLOG_POST_TITLE_LENGTH}" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
             </div>
         </div>
         {if isset($blog_data) and $blog_data.use_excerpt eq 'y'}

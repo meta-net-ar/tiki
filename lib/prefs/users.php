@@ -65,15 +65,6 @@ function prefs_users_list()
             ],
             'default' => 'n',
         ],
-        'users_prefs_show_mouseover_user_info' => [
-            'name' => tra("Pre-set show user's info on mouseover"),
-            'description' => tra("Set new users' info to display in a popup when their name is hovered over."),
-            'type' => 'flag',
-            'dependencies' => [
-                'feature_community_mouseover',
-            ],
-            'default' => 'n',
-        ],
         'users_prefs_tasks_maxRecords' => [
             'name' => tra('Tasks per page'),
             'type' => 'list',

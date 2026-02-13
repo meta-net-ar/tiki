@@ -49,14 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name      = trim($_POST['name'] ?? '');
             $desc      = trim($_POST['description'] ?? '');
             $channelId = (int) ($_POST['channelId'] ?? 0);
+            $privacy   = isset($_POST['privacy']) ? (int) $_POST['privacy'] : 1;
 
-            if (mb_strlen($name) < 3 || mb_strlen($name) > 120) {
-                $errors[] = tra('Title must be between 3 and 120 characters.');
-            }
+            // Assign for repopulation
+            $smarty->assign('name', $name);
+            $smarty->assign('description', $desc);
+            $smarty->assign('channelId', $channelId);
+            $smarty->assign('privacy', $privacy);
 
-            if ($desc !== '' && mb_strlen($desc) < 3) {
-                $errors[] = tra('Description must be at least 3 characters, or leave it empty.');
-            }
+            require_once 'lib/core/Services/Video/Validator.php';
+            $validationErrors = \Services\Video\Validator::validateMetadata($name, $desc);
+            $errors = array_merge($errors, $validationErrors);
 
             if ($channelId <= 0) {
                 $errors[] = tra('Please select a valid channel.');

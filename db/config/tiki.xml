@@ -143,9 +143,6 @@
             <file>%kernel.root_dir%/lib/wiki/histlib.php</file>
         </service>
         <service id="tiki.lib.iconset" class="Tiki\Lib\Theme\IconsetLib"/>
-        <service id="tiki.lib.imagegal" class="ImageGalsLib">
-            <file>%kernel.root_dir%/lib/imagegals/imagegallib.php</file>
-        </service>
         <service id="tiki.lib.kalturaadmin" class="KalturaLib">
             <file>%kernel.root_dir%/lib/videogals/kalturalib.php</file>
             <argument type="string">2</argument> <!-- KalturaLib::SESSION_ADMIN -->

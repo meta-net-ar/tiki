@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 class Services_Menu_Controller
 {
     /** @var  MenuLib */
@@ -267,6 +270,7 @@ class Services_Menu_Controller
 
             $url = $input->url->text();
             $section = $input->section->text();
+            Sections::setCurrentSection($section);
             $perm = $input->perm->text();
             $groupname = $input->asArray('groupname');
             $groupname = implode(',', $groupname);

@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -54,6 +53,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 $artlib = TikiLib::lib('art');
 
@@ -163,6 +165,11 @@ $smarty->assign('edit_data', 'n');
 $smarty->assign('emails', '');
 $smarty->assign('userEmail', $userlib->get_user_email($user));
 $smarty->assign('ispublished', '');
+
+$smarty->assign('MAX_ARTICLE_TITLE_LENGTH', ArtLib::MAX_ARTICLE_TITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_SUBTITLE_LENGTH', ArtLib::MAX_ARTICLE_SUBTITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_HEADING_LENGTH', ArtLib::MAX_ARTICLE_HEADING_LENGTH);
+$smarty->assign('MAX_ARTICLE_BODY_LENGTH', ArtLib::MAX_ARTICLE_BODY_LENGTH);
 
 // If the articleId is passed then get the article data
 // GGG - You have to check for the actual value of the articleId because it
@@ -624,7 +631,6 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $author = $user;
         }
     }
-
     $_REQUEST['title'] = strip_tags($_REQUEST['title'], '<a><pre><p><img><hr><b><i>');
     $artid = $artlib->replace_article(
         $_REQUEST['title'],

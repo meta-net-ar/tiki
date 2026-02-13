@@ -22,7 +22,11 @@ $inputConfiguration = [
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $adminlib = TikiLib::lib('admin');
 
 $access->check_permission('tiki_p_admin');

@@ -59,5 +59,15 @@ function prefs_bigbluebutton_list()
             'default' => 'n',
             'tags' => ['advanced', 'experimental'],
         ],
+        'bigbluebutton_use_iframe' => [
+            'name' => tr('Use iframe to join BigBlueButton meetings'),
+            'description' => tr('If enabled, meetings will be opened inside an iframe instead of a new browser tab. ' .
+                       'Note: The BBB server must allow your Tiki site to embed meetings in an iframe. ' .
+                       'This may require configuring X-Frame-Options or CORS on the BBB server.'),
+            'keywords' => 'big blue button iframe',
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced', 'experimental'],
+        ],
     ];
 }

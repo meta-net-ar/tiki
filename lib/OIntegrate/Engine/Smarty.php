@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\OIntegrate\Engine;
 
-use Smarty_Tiki;
+use Tiki\Smarty\SmartyTiki;
 use Tiki\Lib\OIntegrate\EngineInterface;
 
 /**
@@ -31,8 +31,8 @@ class Smarty implements EngineInterface
      */
     public function process($data, $templateFile)
     {
-        /** @var Smarty_Tiki $smarty */
-        $smarty = new Smarty_Tiki();
+        /** @var SmartyTiki $smarty */
+        $smarty = new SmartyTiki();
         $smarty->setTemplateDir(dirname($templateFile));
 
         if ($this->changeDelimiters) {

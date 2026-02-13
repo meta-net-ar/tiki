@@ -25,7 +25,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-require_once 'tiki-setup.php';
+require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 require_once 'lib/transitionlib.php';
 

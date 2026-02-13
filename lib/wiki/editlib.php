@@ -1357,9 +1357,9 @@ class EditLib
 
     public function parse_html(&$inHtml)
     {
-        include(__DIR__ . '/../htmlparser/htmlparser.inc');
+        require_once(__DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlparser.php');
         // Read compiled (serialized) grammar
-        $grammarfile = TIKI_PATH . '/lib/htmlparser/htmlgrammar.cmp';
+        $grammarfile = __DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlgrammar.cmp';
         if (! $fp = @fopen($grammarfile, 'r')) {
             Feedback::errorAndDie(tra("Can't parse HTML data - no grammar file"), \Laminas\Http\Response::STATUS_CODE_409);
         }

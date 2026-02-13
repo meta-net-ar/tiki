@@ -870,12 +870,39 @@ class HeaderLib
         if (count($this->js_modules)) {
             $b = '';
             foreach ($this->js_modules as $x => $js) {
-                $b .= "// js_modules $x \n";
+                $b .= "\n<!-- js_modules $x -->\n";
                 foreach ($js as $j) {
-                    $b .= "$j\n";
+                    //Modules cannot be fused together in a single script tag, it was a bug.
+                    //By now (2026-01-19 the following slightly adapted message has been pinned at the top of the tiki community chat channel for well over a year,
+                    //and developpers have been warned in MR reviews dozens of times, so there is no excuse for not knowing about this anymore)
+
+
+                    /* Important note for all developers regarding javascript modules.
+                    * I've been baffled by some of the code submitted when migrating dependencies from composer
+                    * (and no doubt some of you were baffled by my reviews).
+                    *
+                    * The cliffnotes:   Code like
+                    *
+                    * $headerlib->add_js_module("import { mountApp } from '@vue-sfc-loader';");
+                    * $headerlib->add_js_module("mountApp('$name', '$file', $data);//rest of code");
+                    * is not supposed to work.  At all.
+                    *
+                    * You are supposed to do:
+                    *
+                    * $headerlib->add_js_module("import { mountApp } from '@vue-sfc-loader';mountApp('$name', '$file', $data);//rest of code");
+                    *
+                    * (off course you'd normally do it with heredoc or nowdoc syntax, the above is just to illustrate)
+                    *
+                    * ...
+                    *
+                    * I discovered we have a important bug in headerlib, which fuses the modules together.
+                    * Part of the point of native js modules is to have isolated namespaces.  So this is a bug, not just an implementation detail.
+                    * As such, it will be fixed in ... and any code like the above that I missed at review will stop working whenever it lands...
+                    */
+                    $b .= $this->wrap_js("$j\n", true);
                 }
             }
-            $output .= $this->wrap_js($b, true);
+            $output .= $b;
         }
 
         // we get one sorted array with script tags

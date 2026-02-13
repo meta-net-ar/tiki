@@ -328,11 +328,6 @@ function tiki_setup_events()
     $events->bind('tiki.image.save', 'tiki.save');
     $events->bind('tiki.image.view', 'tiki.view');
 
-    $events->bind('tiki.imagegallery.create', 'tiki.imagegallery.save');
-    $events->bind('tiki.imagegallery.delete', 'tiki.imagegallery.save');
-    $events->bind('tiki.imagegallery.save', 'tiki.save');
-    $events->bind('tiki.imagegallery.view', 'tiki.view');
-
     $events->bind('tiki.forum.update', 'tiki.forum.save');
     $events->bind('tiki.forum.create', 'tiki.forum.save');
     $events->bind('tiki.forum.delete', 'tiki.forum.save');

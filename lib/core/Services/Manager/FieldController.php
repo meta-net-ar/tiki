@@ -165,7 +165,7 @@ class Services_Manager_FieldController
 
     protected function addInstanceToFieldValue($instanceName, $handler, $item)
     {
-        $instances = TikiManager\Application\Instance::getInstances(false);
+        $instances = TikiManager\Application\Instance::getInstances(false);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         $instances = array_filter($instances, function ($i) use ($instanceName) {
             return $i->name == $instanceName;
         });

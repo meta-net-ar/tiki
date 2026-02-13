@@ -38,6 +38,14 @@ class TrackerLib extends TikiLib
 {
     public $trackerinfo_cache;
     private $sectionFormats = [];
+    /**
+     * Limit of the name field of the tiki_trackers table
+     */
+    public const MAX_TRACKER_NAME_LENGTH = 255;
+    /**
+     * Limit of the field name field of the tiki_tracker_fields table
+     */
+    public const MAX_TRACKER_FIELD_NAME_LENGTH = 255;
 
     public function __construct()
     {
@@ -520,22 +528,45 @@ class TrackerLib extends TikiLib
         return $status;
     }
 
+    /**
+     * List tracker items with optional field filtering and sorting
+     *
+     * @param int $trackerId The tracker ID (-1 for all trackers)
+     * @param int $offset Offset for pagination
+     * @param int $maxRecords Maximum number of records to return (-1 for all)
+     * @param string $sort_mode Sort mode (e.g., 'itemId_asc', 'lastModif_desc', or 'f_fieldname_asc')
+     * @param array|null $fields Array with 'data' key containing field definitions from list_tracker_fields(), or null
+     * @param string $status Filter by item status (empty string for all)
+     * @param string $initial Filter items starting with this initial character
+     * @return array Array with 'data' key containing items and 'count' key with total count
+     */
     /*shared*/
     public function list_tracker_items($trackerId, $offset, $maxRecords, $sort_mode, $fields, $status = '', $initial = '')
     {
-
         $filters = [];
-        if ($fields) {
+        $csort_mode = '';
+
+        if ($fields && is_array($fields) && isset($fields["data"])) {
             $temp_max = count($fields["data"]);
             for ($i = 0; $i < $temp_max; $i++) {
                 $fieldId = $fields["data"][$i]["fieldId"];
                 $filters[$fieldId] = $fields["data"][$i];
             }
+
+            if (! $sort_mode) {
+                for ($i = 0; $i < $temp_max; $i++) {
+                    if ($fields['data'][$i]['isMain'] == 'y') {
+                        $csort_mode = $fields['data'][$i]['name'];
+                        break;
+                    }
+                }
+            }
         }
-        $csort_mode = '';
+
         if (str_starts_with($sort_mode, "f_")) {
             list($a,$csort_mode,$corder) = explode('_', $sort_mode, 3);
         }
+
         $trackerId = (int) $trackerId;
         if ($trackerId == -1) {
             $mid = " where 1=1 ";
@@ -551,15 +582,6 @@ class TrackerLib extends TikiLib
         if ($initial) {
             $mid .= "and ttif.`value` like ?";
             $bindvars[] = $initial . '%';
-        }
-        if (! $sort_mode) {
-            $temp_max = count($fields["data"]);
-            for ($i = 0; $i < $temp_max; $i++) {
-                if ($fields['data'][$i]['isMain'] == 'y') {
-                    $csort_mode = $fields['data'][$i]['name'];
-                    break;
-                }
-            }
         }
         if ($csort_mode) {
             $bindvars[] = $csort_mode;
@@ -1023,7 +1045,7 @@ class TrackerLib extends TikiLib
             $fieldsId = preg_split('/\|/', $fieldsId, -1, PREG_SPLIT_NO_EMPTY);
         }
         $res = [];
-        $itemIds = $this->get_all_tracker_items($trackerId);
+        $itemIds = $this->get_all_tracker_items($trackerId, $status);
         foreach ($itemIds as $itemId) {
             $res[$itemId] = $this->concat_item_from_fieldslist(
                 $trackerId,
@@ -1186,9 +1208,14 @@ class TrackerLib extends TikiLib
         return $needToCheckCategPerms;
     }
 
-    public function get_all_tracker_items($trackerId)
+    public function get_all_tracker_items($trackerId, $status = null)
     {
-        return $this->items()->fetchColumn('itemId', ['trackerId' => (int) $trackerId]);
+        $conditions = ['trackerId' => (int) $trackerId];
+        if ($status) {
+            $sts = preg_split('//', $status, -1, PREG_SPLIT_NO_EMPTY);
+            $conditions['status'] = $this->items()->in($sts);
+        }
+        return $this->items()->fetchColumn('itemId', $conditions);
     }
 
     public function getSqlStatus($status, &$mid, &$bindvars, $trackerId, $skip_status_perm_check = false)
@@ -4089,12 +4116,14 @@ class TrackerLib extends TikiLib
     }
 
     /**
-     * Get's the rendered value of the field that is used as the name of
+     * Compute the rendered value of the field that is used as the name of
      * the tracker item.  Usually used as the item's title in a list,
      * the search index, etc.
      *
-     * @param [type] $trackerId, optionnal (will be retrieved from itemId if missing)
-     * @param [type] $itemId
+     * @param int|null $trackerId Optional tracker ID (will be retrieved from itemId if missing)
+     * @param int $itemId Tracker item ID
+     * @param bool $use_cache Whether to use caching for performance (default: false)
+     * @return string The rendered main title value of the tracker item
      */
     public function get_isMain_value($trackerId, $itemId, $use_cache = false): string
     {
@@ -4105,7 +4134,7 @@ class TrackerLib extends TikiLib
                 return $cache[$cacheKey];
             }
         }
-        $query = "SELECT tif.`value`, tf.`type`
+        $query = "SELECT tif.`value`, tf.`type`, tf.`fieldId`, tf.`options`, i.`trackerId`
                 FROM `tiki_tracker_item_fields` tif
                 JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
                 JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
@@ -4113,11 +4142,23 @@ class TrackerLib extends TikiLib
                 ORDER BY tf.`position`";
         $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
 
-        $titles = [];
+        if (! $trackerId) {
+            $trackerId = $queryResult[0]['trackerId'];
+        }
+
         $item = $this->get_tracker_item($itemId);
+        $titles = [];
+
         foreach ($queryResult as $row) {
             $value = $row['value'];
-            $field = ['type' => $row['type'], 'value' => $value];
+            $field = [
+                'fieldId' => $row['fieldId'],
+                'trackerId' => $trackerId,
+                'type' => $row['type'],
+                'options' => $row['options'],
+                'value' => $value
+            ];
+
             $handler = $this->get_field_handler($field, $item);
 
             if ($handler) {
@@ -4128,6 +4169,7 @@ class TrackerLib extends TikiLib
                 $titles[] = $value;
             }
         }
+
         $result = implode(' ', $titles);
         if ($use_cache) {
             if (TikiLib::lib('tiki')->isMemoryLow()) {
@@ -5530,14 +5572,13 @@ class TrackerLib extends TikiLib
     /**
      * Get a field handler for a specific fieldtype. The handler comes initialized with the field / item data passed.
      * @deprecated  This is just a proxy to  $definition->getFieldFactory()->getHandler() with a different calling convention.
-     * @param array $field.
-     * <pre>
-     * $field = array(
-     *      // required
-     *      'trackerId' => 1 // trackerId
-     * );
-     * </pre
-     * @param array $item - array('itemId1' => value1, 'itemid2' => value2)
+     * @param array $field - $field definition array, must contain at least: [
+     *        'trackerId' => 1,
+     *        'fieldId'   => 42,
+     *        'type'      => 'r',
+     *        'value'     => 'foo'
+     *    ];
+     * @param array|null $item - array('itemId1' => value1, 'itemid2' => value2)
      * @return \Tracker\Field\AbstractItemField $tracker_field_handler - i.e. Tracker_Field_Text
      */
     public function get_field_handler(array $field, $item = null): \Tracker\Field\AbstractItemField|false

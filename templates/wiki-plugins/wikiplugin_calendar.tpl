@@ -15,11 +15,13 @@
             let returnUrlForPlugin = ('{{$returnURL}}');
             returnUrlForPlugin = returnUrlForPlugin.toString();
             $("#plugin-calendar").setupEventCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}', returnUrlForPlugin);
-            elt.addEventListener('change', () => {
-                document.getElementById('plugin-calendar').innerHTML = "";
-                content['initialDate'] = $('#date-plugin-calendar').val();
-                $("#plugin-calendar").setupEventCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}', returnUrlForPlugin);
-            })
+            if (elt) {
+                elt.addEventListener('change', () => {
+                    document.getElementById('plugin-calendar').innerHTML = "";
+                    content['initialDate'] = $('#date-plugin-calendar').val();
+                    $("#plugin-calendar").setupEventCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}', returnUrlForPlugin);
+                });
+            }
             {{if $prefs.print_pdf_from_url neq 'none'}$("#plugin-calendar").addEventCalendarPrint('#calendar-pdf-btn', wikipluginCalendar[0]);{/if}}
         {/jq}
     {/if}

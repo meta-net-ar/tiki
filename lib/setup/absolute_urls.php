@@ -8,6 +8,8 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 
+use Tiki\Sections;
+
 global $https_mode, $url_scheme, $url_host, $url_port, $url_path, $base_host, $base_url, $base_url_http, $base_url_https, $tikiroot;
 
 // $_SERVER['HTTP_HOST'] 172.20.20.20:8080  // reverse proxy
@@ -150,15 +152,16 @@ if (str_contains($base_uri, $tikiroot . 'route.php') && ! empty($inclusion)) {
     if (! empty($_GET)) {
         $base_uri .= '?' . http_build_query($_GET, '', '&');
     }
-    global $section, $sections;
+    global $sections;
+    $section = Sections::getCurrentSection();
     include_once('tiki-sefurl.php');
     if (isset($sections[$section]['objectType'])) {
         $objectType = $sections[$section]['objectType'];
     } else {
         $objectType = $section;
     }
-    if ($objectType === 'wiki page') {
-        $objectType = 'wiki';
+    if ($objectType === Sections::SECTION_WIKI_PAGE) {
+        $objectType = Sections::SECTION_WIKI;
     }
 
     $base_uri = TikiLib::tikiUrlOpt(filter_out_sefurl($base_uri, $objectType));

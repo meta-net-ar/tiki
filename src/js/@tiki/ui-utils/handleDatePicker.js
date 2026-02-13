@@ -19,7 +19,7 @@ export default function handleDatePicker(selector, options) {
         element.after(inputEndDateHolder);
     }
 
-    element[0].addEventListener("change", (e) => {
+    element.on("change", (e) => {
         const value = e.detail[0];
         if (Array.isArray(value)) {
             inputDateHolder.attr("value", moment(value[0]).unix());
@@ -38,7 +38,7 @@ export default function handleDatePicker(selector, options) {
 
     if (element.attr("custom-timezone") === "true") {
         element.after(inputTimezoneHolder);
-        element[0].addEventListener("timezoneChange", (e) => {
+        element.on("timezoneChange", (e) => {
             inputTimezoneHolder.attr("value", e.detail[0]);
         });
     }

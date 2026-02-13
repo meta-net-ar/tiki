@@ -47,13 +47,13 @@
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="name">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" name="name" id="name" value="{$categoryName|escape}">
+                    <input type="text" class="form-control" name="name" id="name" value="{$categoryName|escape}" maxlength="{$MAX_CATEGORY_NAME_LENGTH}">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="description">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea rows="2" class="form-control" name="description" id="description" maxlength=500>{$description|escape}</textarea>
+                    {textarea rows="2" class="form-control" name="description" id="description" maxlength="{$MAX_COMMENT_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
             </div>
             {if isset($role_groups) && count($role_groups) }

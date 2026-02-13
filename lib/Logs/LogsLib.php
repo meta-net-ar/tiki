@@ -15,6 +15,9 @@ use function tr;
 use function tra;
 use function mb_convert_encoding;
 
+/**
+ * This class implements the tiki action log https://doc.tiki.org/Log
+ */
 class LogsLib extends TikiLib
 {
     /**
@@ -1640,15 +1643,15 @@ class LogsLib extends TikiLib
         $plot = [];
 
         for ($i = 0; isset($series["y$i"]); ++$i) {
-            $plot[$i] = new \BarPlot($series["y$i"]);
+            $plot[$i] = new \BarPlot($series["y$i"]); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $plot[$i]->SetFillColor($series['color'][$i]);
             $plot[$i]->SetLegend($series['label'][$i]);
         }
 
         if ($accumulated) {
-            $gbplot = new \AccBarPlot($plot);
+            $gbplot = new \AccBarPlot($plot);// @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
         } else {
-            $gbplot = new \GroupBarPlot($plot);
+            $gbplot = new \GroupBarPlot($plot);// @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
         }
 
         $jpgraph->legend->SetFillColor($colorLegend);

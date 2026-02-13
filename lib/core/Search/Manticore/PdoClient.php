@@ -449,7 +449,9 @@ class PdoClient
         }
         $sql .= " FROM $table WHERE $condition";
         if ($order) {
-            $sql .= " ORDER BY $order";
+            $sql .= " ORDER BY $order, id asc";
+        } else {
+            $sql .= " ORDER BY weight() desc, id asc";
         }
         $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {

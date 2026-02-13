@@ -4081,6 +4081,7 @@
             "RelationLib::get_relation_id": true,
             "RelationLib::get_relations_by_prefix": true,
             "RelationLib::get_relation_count": true,
+            "RelationLib::get_transitive_relations": true,
             "RelationLib::relation_exists": true,
             "RelationLib::get_relation": true,
             "RelationLib::remove_relation": true,

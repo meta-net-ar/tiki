@@ -68,6 +68,18 @@ $tiki_timer->start();
 
 require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
 
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['lastLogin']) && $_SESSION['login_time'] < $userInfo['lastLogin']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
+
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
         header('location: tiki-install.php');
@@ -194,7 +206,18 @@ if ($prefs['login_multiple_forbidden'] == 'y') {
 
 require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
-require_once('lib/setup/language.php');
+require_once('lib/core/Sections.php');
+use Tiki\Sections;
+// Initialize language settings after section is set and autoloader is available
+Language::setSectionLanguage();
+
+// Register callback to update language when section changes
+// This ensures that when admin files call Sections::setCurrentSection(),
+// the language is automatically updated (e.g., admin section gets admin language)
+Sections::onSectionChange(function ($section) {
+    Language::setSectionLanguage();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -681,6 +704,22 @@ if ($prefs['jquery_smartmenus_enable'] == 'y') {
                 nav[indexCurrentNav].classList.add("sm-navbar");
                 nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
                 const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+                
+                // Enable navigation on parent menu items with children
+                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+                // Note: Relies on SmartMenus internal class that may change in future versions
+                nav[indexCurrentNav].addEventListener("click", function(e) {
+                    const link = e.target.closest("a.sm-sub-toggler");
+                    if (link && nav[indexCurrentNav].contains(link)) {
+                        const href = link.getAttribute("href");
+                        if (href && href !== "#" && href !== "") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.location.href = href;
+                        }
+                    }
+                });
             }
         }
     ');
@@ -1104,8 +1143,6 @@ if ($prefs['feature_elementplus'] == 'y') {
 
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
 $headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
-// module allowing you to limit the number of characters allowed in the fields.
-$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 
 $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
 

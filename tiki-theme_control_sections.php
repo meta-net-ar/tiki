@@ -21,6 +21,7 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
 $themecontrollib = TikiLib::lib('themecontrol');
 $categlib = TikiLib::lib('categ');
 $themelib = TikiLib::lib('theme');
@@ -37,6 +38,7 @@ $smarty->assign('themes', $themes);
 if (isset($_REQUEST['assign'])) {
     $access->checkCsrf();
     $section = $_REQUEST['section'];
+    Sections::setCurrentSection($section);
     $themeKey = $_REQUEST['theme'];
     $themecontrollib->tc_assign_section($section, $themeKey);
      $themeName = $themes[$themeKey]['name'] ?? $themeKey;

@@ -28,6 +28,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $menulib = TikiLib::lib('menu');
 $auto_query_args = [
     'offset',

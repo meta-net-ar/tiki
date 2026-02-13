@@ -1,6 +1,13 @@
 <?php
 
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
+    header("location: index.php");
+    exit;
+}
+
 require_once __DIR__ . '/../../lib/core/Cache/NoCache.php';
+
+use Tiki\Cache\NoCache;
 
 function upgrade_20130513_convert_tracker_field_parameters_tiki($installer)
 {

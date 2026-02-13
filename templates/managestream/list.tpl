@@ -22,37 +22,22 @@
                 </div>
             </div>
             {button href="tiki-admin.php?page=community" _icon_name="settings" _text="{tr}Community{/tr}" _class="tips" _title=":{tr}Community Control Panel{/tr}"}
-            {* former add_dracula() *}
-            {$headerlib->add_jsfile('lib/dracula/raphael-min.js', true)}
-            {$headerlib->add_jsfile('lib/dracula/graffle.js')}
-            {$headerlib->add_jsfile('lib/dracula/graph.js')}
-            <button href="#" id="graph-draw" class="btn btn-primary">{icon name="image"} {tr}Event Chain Diagram{/tr}</button>
-            <div id="graph-canvas" class="graph-canvas" data-graph-nodes="{$event_graph.nodes|@json_encode|escape}" data-graph-edges="{$event_graph.edges|@json_encode|escape}"></div>
-    {jq}
-        $('#graph-draw').on("click", function(e) {
-            const width = $window.width() - 50;
-            const height = $window.height() - 130;
             
-            $('#graph-canvas')
-                .css('width', width)
-                .css('height', height)
-                .drawGraph();
-
-            $.openModal({
-                title: "{tr}Events{/tr}",
-                size: 'modal-fullscreen',
-                dialogVariants: ["scrollable", "center"],
-                content: $('#graph-canvas'),
-                open: function() {
-                    $(this).on('hidden.bs.modal', function() {
-                        // Keep the canvas in the DOM so that the graph can be redrawn on next click.
-                        $('body').append($('#graph-canvas').empty());
-                    });
-                }
-            })
-            return false;
-        });
-    {/jq}
+            {$headerlib->add_js_module("import handleMermaid from '@mermaidPack'; handleMermaid();")}
+            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#mermaidOffcanvas" aria-controls="mermaidOffcanvas">{icon name="diagram"} {tr}Event Chain Diagram{/tr}</button>
+            
+            <div class="offcanvas offcanvas-start" style="width: 100vw !important;" tabindex="-1" id="mermaidOffcanvas" aria-labelledby="mermaidOffcanvasLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="mermaidOffcanvasLabel">{tr}Event Chain Diagram{/tr}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div id="mermaid-diagram">
+                        <textarea class="code d-none">{$event_graph|escape}</textarea>
+                        <div class="mermaid w-100"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     {/if}
 {/block}

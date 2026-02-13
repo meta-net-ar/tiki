@@ -10,35 +10,34 @@ $.fn.eachAsync = function (opts) {
     } = opts;
     const array = this.toArray(); // Convert jQuery object to an array of DOM elements
     let i = 0; // Index for tracking current item
+    let batchStart = performance.now();
 
     // Process each batch of elements
     function processBatch() {
-        const batchStart = performance.now();
-
         // Use eachLimit to process a subset of elements with a concurrency of 1
         eachLimit(
             array,
             1,
-            (item, callback) => {
-                if (i < array.length && performance.now() - batchStart < bulk) {
-                    loop(item, i);
-                    i++;
-                    callback();
+            (item, next) => {
+                loop.call(item, i, item);
+                i++;
+
+                if (bulk > 0 && performance.now() - batchStart > bulk) {
+                    setTimeout(() => {
+                        batchStart = performance.now();
+                        next();
+                    }, delay);
                 } else {
-                    callback(new Error("Bulk time exceeded"));
+                    next();
                 }
             },
-            (err) => {
-                // If an error or time exceeded, schedule the next batch after a delay
-                if (i < array.length) {
-                    setTimeout(processBatch, delay);
-                } else {
-                    end();
-                }
-            }
+            () => end()
         );
     }
 
-    processBatch();
+    setTimeout(() => {
+        processBatch();
+    }, 0);
+
     return this;
 };

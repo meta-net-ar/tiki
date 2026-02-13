@@ -40,8 +40,12 @@ $inputConfiguration = [
         ],
     ],
 ];
-require_once 'tiki-setup.php';
+
+require_once('tiki-setup.php');
 require_once('admin/include_credits.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
 $accesslib = TikiLib::lib('access');

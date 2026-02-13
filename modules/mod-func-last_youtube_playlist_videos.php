@@ -139,7 +139,7 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
         }
 
         // Define an object that will be used to make all API requests.
-        $youtube = new Google_Service_YouTube($client);
+        $youtube = new Google_Service_YouTube($client); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
 
         /*
          * TODO: orderby is not supported by V3 API, probably sort locally
@@ -192,7 +192,7 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
                 }
                 $count_videos++;
             }
-        } catch (Google_Service_Exception $e) {
+        } catch (Google_Service_Exception $e) { // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $errorBody = json_decode($e->getMessage(), true);
 
             // Handling specific errors

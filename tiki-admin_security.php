@@ -4,7 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_permission('tiki_p_admin');
 
 // tikiwiki preferences check
@@ -619,6 +623,22 @@ if (isset($_POST['rebuild_secdb_confirmation'])) {
 if (isset($_GET['rebuild_status']) && $_GET['rebuild_status'] === 'success') {
     $smarty->assign('rebuild_success_message', tra('The security database has been successfully rebuilt.'));
 }
+
+$warn_htaccess_mismatch_enabled = TikiLib::lib('tiki')->get_preference('security_warn_htaccess_mismatch', 'y') === 'y';
+
+$htaccessCheck = null;
+if ($warn_htaccess_mismatch_enabled) {
+    $checker = new \Tiki\Security\HtaccessChecker();
+    $htaccessCheck = $checker->run(
+        TIKI_PATH,
+        TIKI_PATH . '/_htaccess',
+        ['server_software' => $_SERVER['SERVER_SOFTWARE'] ?? '']
+    );
+}
+
+$smarty->assign('htaccessCheckEnabled', $warn_htaccess_mismatch_enabled ? 'y' : 'n');
+$smarty->assign('htaccessCheck', $htaccessCheck);
+$smarty->assign('htaccessDocsUrl', 'https://doc.tiki.org/htaccess');
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

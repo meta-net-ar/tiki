@@ -154,12 +154,6 @@ function module_users_list($mod_reference, $module_params)
         if (isset($module_params['avatar']) && $module_params['avatar'] == 'y') {
             $users['data'][$i]['avatar'] = $tikilib->get_user_avatar($my_user);
         }
-        if (
-            (isset($module_params['realName']) && $module_params['realName'] == 'y')
-            || (isset($module_params['login']) && $module_params['login'] == 'y')
-        ) {
-            $users['data'][$i]['info_public'] = $tikilib->get_user_preference($my_user, 'user_information', 'public') != 'private' ? 'y' : 'n';
-        }
         if (isset($module_params['userPage']) && $module_params['userPage'] == 'y') {
             global $feature_wiki_userpage;
             if ($prefs['feature_wiki_userpage'] == 'y' or $feature_wiki_userpage == 'y') {

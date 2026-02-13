@@ -11,7 +11,6 @@
 
 use Tiki\Lib\TikiDate;
 
-$section = 'calendar';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -33,7 +32,9 @@ $inputConfiguration = [
     ]
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_CALENDAR;
+Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');

@@ -48,9 +48,11 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'newsletters';
 require_once('tiki-setup.php');
 include_once('lib/newsletters/nllib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 $auto_query_args = [
     'sort_mode',
     'offset',

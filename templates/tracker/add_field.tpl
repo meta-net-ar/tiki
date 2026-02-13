@@ -8,7 +8,7 @@
 <form method="post" action="{service controller=tracker action=add_field}">
     <div class="mb-3 row mx-0">
         <label for="name" class="col-form-label">{tr}Name{/tr}</label>
-        <input type="text" name="name" id="name" value="{$name|escape}" required="required" class="form-control">
+        <input type="text" name="name" id="name" value="{$name|escape}" required="required" class="form-control" maxlength="{$MAX_TRACKER_FIELD_NAME_LENGTH}">
     </div>
     <div class="mb-3 row mx-0" style="display: none;">
         <label for="permName" class="col-form-label">{tr}Permanent name{/tr}</label>

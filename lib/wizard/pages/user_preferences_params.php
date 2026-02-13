@@ -55,7 +55,6 @@ class UserWizardPreferencesParams extends Wizard
         $userwatch = $user;
 
         $smarty->assign('userwatch', $userwatch);
-        $smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
 
         $mailCharsets = ['utf-8', 'iso-8859-1'];
         $smarty->assign_by_ref('mailCharsets', $mailCharsets);
@@ -232,13 +231,6 @@ class UserWizardPreferencesParams extends Wizard
             $tikilib->set_user_preference($userwatch, 'diff_versions', 'y');
         } else {
             $tikilib->set_user_preference($userwatch, 'diff_versions', 'n');
-        }
-        if ($prefs['feature_community_mouseover'] == 'y') {
-            if (isset($_REQUEST['show_mouseover_user_info']) && $_REQUEST['show_mouseover_user_info'] == 'on') {
-                $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'y');
-            } else {
-                $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
-            }
         }
         $email_isPublic = $_REQUEST['email_isPublic'] ?? 'n';
         $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);

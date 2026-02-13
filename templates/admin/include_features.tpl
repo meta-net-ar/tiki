@@ -131,6 +131,10 @@
                         </fieldset>
                     </div>
                     {preference name=feature_docs}
+                    {preference name=cryptpad_feature}
+                    <div class="adminoptionboxchild" id="cryptpad_feature_childcontainer">
+                        {preference name=cryptpad_base_url}
+                    </div>
                     {preference name=feature_slideshow}
                     {preference name=feature_slideshow_pdfexport}
                     {preference name=feature_faqs}
