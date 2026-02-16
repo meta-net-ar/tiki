@@ -6,28 +6,32 @@
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
-              <button
-                type="submit"
-                name="status"
-                value=""
-                class="btn {if not $status}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
-                aria-pressed="{if not $status}true{else}false{/if}"
-              >
-                {icon name="list"} <span>{tr}All{/tr}</span>
-              </button>
-              {foreach key=st item=stdata from=$status_types}
+                {* "All" button: Clears the filter *}
                 <button
-                  type="submit"
-                  name="status"
-                  value="{$stdata.statuslink}"
-                  class="btn {if $stdata.class eq 'statuson'}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1 js-status-toggle"
-                  data-letter="{$stdata.statuslink}"
-                  aria-pressed="{if $stdata.class eq 'statuson'}true{else}false{/if}"
+                    type="button"
+                    class="btn {if not $status}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
+                    aria-pressed="{if not $status}true{else}false{/if}"
+                    onclick="this.form.status.value=''; this.form.submit();"
                 >
-                  {icon name="{$stdata.iconname}"}
-                  <span>{$stdata.label}</span>
+                    {icon name="list"} <span>{tr}All{/tr}</span>
                 </button>
-              {/foreach}
+
+                {* Status Toggles: Checkboxes that update the hidden 'status' field *}
+                {foreach key=st item=stdata from=$status_types}
+                    <input
+                        type="checkbox"
+                        class="btn-check js-status-checkbox"
+                        id="status-btn-{$stdata.statuslink}"
+                        value="{$st}"
+                        autocomplete="off"
+                        {if $stdata.class eq 'statuson'}checked{/if}
+                        onchange="updateTrackerStatus(this)"
+                    >
+                    <label class="btn btn-outline-primary d-flex align-items-center gap-1" for="status-btn-{$stdata.statuslink}">
+                        {icon name="{$stdata.iconname}"}
+                        <span>{$stdata.label}</span>
+                    </label>
+                {/foreach}
             </div>
         {/if}
 
@@ -161,44 +165,28 @@
         {/if}
     </div>
     {jq}
-        /**
-         * Multi-select status toggle handler.
-         *
-         * Normal click: Simple filter by one status (handled by default form submit)
-         * Ctrl/Cmd/Shift+click: Toggle status to combine filters (e.g., show "Open + Pending")
-         */
-        (function(){
-            var order = ['o','p','c'];
-
-            $('.js-status-toggle').on('click', function(e){
-                // Only intercept modifier-key clicks; normal clicks use default submit behavior
-                if (!(e.ctrlKey || e.metaKey || e.shiftKey)) return;
-                e.preventDefault();
-
-                var form = this.form;
-                if (!form) return;
-
-                // Each button has data-letter="o|p|c" indicating which status it controls
-                var letter = this.getAttribute('data-letter') || '';
-
-                // Find or create the hidden input that holds the combined status string
-                var hidden = form.querySelector('input[type="hidden"][name="status"]');
-                if (!hidden) {
-                    hidden = document.createElement('input');
-                    hidden.type = 'hidden';
-                    hidden.name = 'status';
-                    form.appendChild(hidden);
-                }
-
-                // Toggle: add letter if absent, remove if present
-                var current = hidden.value || '';
-                var set = new Set(current.split('').filter(Boolean));
-                if (set.has(letter)) { set.delete(letter); } else { set.add(letter); }
-
-                // Rebuild value in canonical order (o before p before c)
-                hidden.value = order.filter(function(ch){ return set.has(ch); }).join('');
-                form.submit();
+        /* Global function for tracker status toggle */
+        window.updateTrackerStatus = function(checkbox) {
+            var form = checkbox.form;
+            var checkboxes = $(form).find('.js-status-checkbox:checked');
+            var values = [];
+            checkboxes.each(function() {
+                values.push(this.value);
             });
-        })();
+
+            var outputVal = values.join('');
+
+            // Remove any existing status inputs to avoid duplicates/confusion
+            $(form).find('input[name="status"]').remove();
+
+            // Create a fresh hidden input
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'status',
+                value: outputVal
+            }).appendTo(form);
+
+            $(form).submit();
+        };
     {/jq}
 </form>
