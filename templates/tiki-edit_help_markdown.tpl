@@ -84,7 +84,7 @@
         <td>
             {icon name='list'}
             <strong>{tr}Blockquotes{/tr}</strong><br>
-            <code>> This is a blockquote.<br>> It can span multiple lines.</code
+            <code> This is a blockquote.<br> It can span multiple lines.</code>
         </td>
     </tr>
     <tr>

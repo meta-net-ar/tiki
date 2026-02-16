@@ -1370,13 +1370,7 @@ class UnifiedSearchLib
         }
 
         if (isset($filter['content']) && $filter['content']) {
-            $o = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
-            if (count($o) == 1 && empty($o[0])) {
-                // Use "contents" field by default, if no default is specified
-                $query->filterContent($filter['content'], ['contents']);
-            } else {
-                $query->filterContent($filter['content'], $o);
-            }
+            $query->filterContent($filter['content'], $this->getFilterContentFields());
         }
 
         if (isset($filter['autocomplete']) && $filter['autocomplete']) {
@@ -1424,6 +1418,27 @@ class UnifiedSearchLib
             unset($filter['exact']);
         }
 
+        if (isset($filter['multi'])) {
+            if (
+                isset($filter['multi']['fields']) && is_array($filter['multi']['fields']) &&
+                    isset($filter['multi']['value'])
+            ) {
+                $fields = $filter['multi']['fields'];
+                $value = $filter['multi']['value'];
+
+                foreach ($fields as $k => $v) {
+                    if ($v === 'content') {
+                        unset($fields[$k]);
+                        $fields = array_merge($fields, $this->getFilterContentFields());
+                    }
+                }
+
+                $query->filterContent($value, $fields);
+            }
+
+            unset($filter['multi']);
+        }
+
         if (
             isset($filter['distance']) && is_array($filter['distance']) &&
                     isset($filter['distance']['distance'], $filter['distance']['lat'], $filter['distance']['lon'])
@@ -1463,6 +1478,16 @@ class UnifiedSearchLib
             }
         }
         return $query;
+    }
+
+    private function getFilterContentFields()
+    {
+        $fields = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
+        if (count($fields) == 1 && empty($fields[0])) {
+            $fields = ['contents'];
+        }
+
+        return $fields;
     }
 
     public function getFacetProvider()

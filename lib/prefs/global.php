@@ -687,6 +687,42 @@ function prefs_global_list($partial = false)
             'default' => '60',
             'tags' => ['advanced'],
         ],
+        'scheduledTasksReport' => [
+            'name' => tra('Report when scheduled tasks do not run successfully'),
+            'description' => tr('Scheduler report'),
+            'type' => 'list',
+            'options' => [
+                'do_not_report' => tra('Do not report'),
+                'last_run' => tra('Last Run'),
+                'last_number_of_hours' => tra('Last number of hours')
+            ],
+            'default' => 'last_run',
+            'tags' => ['basic'],
+        ],
+        'scheduledTasksReportHours' => [
+            'name' => tr('Nº of hours'),
+            'description' => tr('Number of hours to show scheduler logs'),
+            'type' => 'text',
+            'size' => 100,
+            'filter' => 'int',
+            'units' => tra('hours'),
+            'default' => 24,
+            'constraints' => [
+                'min' => 1
+            ],
+        ],
+        'scheduledTasksReportMaxDays' => [
+            'name' => tr('Do not report failures older than (days)'),
+            'description' => tr('failure report days'),
+            'type' => 'text',
+            'size' => 5,
+            'filter' => 'int',
+            'units' => tra('Days'),
+            'default' => 30,
+            'constraints' => [
+                'min' => 1
+            ],
+        ],
     ];
 }
 

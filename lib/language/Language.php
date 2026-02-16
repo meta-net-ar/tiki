@@ -779,7 +779,7 @@ class Language extends TikiDb_Bridge
         global $prefs;
 
         // Step 1: determine user language or fallback
-        $lang = self::determineUserLanguage() ?? $prefs['site_language'];
+        $lang = self::determineUserLanguage() ?? self::getCurrentLanguage();
 
         // Step 2: admin override
         $adminLang = self::determineAdminLanguage();

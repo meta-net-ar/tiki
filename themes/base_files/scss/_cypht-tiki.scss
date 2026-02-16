@@ -90,7 +90,18 @@
     }
 }
 
+.tiki-cypht {
+    .sm-sub.collapse.dropdown-menu {
+        padding-left: 0; background: var(--bs-card-bg); border: 1px solid var(--bs-card-border-color);
+    }
+    .sm-sub-link, sm-nav-link.nav-link {
+        color: var(--bs-nav-link-color);
+        &:hover { color: var(--bs-nav-link-hover-color); text-decoration: underline; }
+    }
+}
+
 .inline-cypht {
+    .cypht-layout { grid-template-columns: calc(var(--nav-size) - 55px) 1fr; }
     .item_to_trackers {
         .move_to_title {
             background-color: transparent;
@@ -192,6 +203,7 @@
     .server_section { color: inherit !important; }
 
     .total_unread_count, .unread_count {
+        padding-top: 2.5px; padding-bottom: 2px; line-height: normal;
         background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1));
         color: var(--bs-body-bg);
     }
@@ -210,6 +222,7 @@
     // message list / text
     .refresh_list, .list_settings_link { padding:0; margin: 5px 2px 0; }
     .msg_date { font-weight: bold; }
+    .msg_parts { table-layout: fixed !important; }
     .msg_parts tr:not(:last-child) { border-bottom: 1px solid #444; }
     .part_desc, .part_size, .download_link { margin-left: 25px; }
     .msg_part_icon { padding: 0; margin-left: 5px; }
@@ -243,6 +256,7 @@
     .app-container {
         padding: 20px;
     }
+    .folder_list { width: calc(var(--nav-size) - 75px); }
     .folder_list, .content_cell{
         position: relative;
         border-radius: var(--bs-border-radius);
@@ -281,7 +295,6 @@
 
     /* Bootstrap-based message headers */
     .msg_text * {
-        white-space: normal !important;
         word-break: break-word;
         overflow-wrap: anywhere;
     }
@@ -354,10 +367,11 @@
         display: inherit;
     }
     nav.collapsed .menu-toggle {
-        right: 36%;
+        right: 33%;
     }
     .folder_cell.collapsed .folder_list {
-        padding-right: 20px;
+        padding-right: 14px;
+        width: calc(var(--nav-size) - 68px);
     }
 
     main .container {
@@ -405,8 +419,15 @@
             i.bi { color: var(--bs-btn-hover-color) !important; }
         }
     }
-    #show_message_source { margin-right: 0.5rem; }
-    .msg_actions .d-inline-block > .hlink { margin-bottom: 0.5rem; }
+    .msg_actions {
+        .move_to_location {
+            min-width: max-content;
+            .folders { margin: 10px 6px !important; }
+        }
+        .archive_link + .dropdown { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .block_sender_link { margin-right: 0; }
+        .item_to_trackers { min-width: max-content; }
+    }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {

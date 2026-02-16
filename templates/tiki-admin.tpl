@@ -98,6 +98,37 @@
                 {/remarksbox}
             {/if}
 
+            {if ! empty($scheduler_failure_logs) }
+                {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
+                    <p>
+                    {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
+                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {if ! empty($scheduler_total_count)}
+                            <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
+                        {else}
+                            <strong>{count($scheduler_failure_logs)}</strong>
+                        {/if}
+                    {else}
+                        {tr}Nº of tasks failure during last execution:{/tr}
+                        <strong>{count($scheduler_failure_logs)}</strong>
+                    {/if}
+                    </p>
+
+                    <strong>{tr}Scheduler tasks with errors:{/tr}</strong>
+                    <ul>
+                        {foreach from=$scheduler_failure_logs item=item}
+                            <li>{$item['name']}</li>
+                        {/foreach}
+                    </ul>
+
+                    <p>
+                        <a target="_blank" href="tiki-admin_schedulers.php">
+                            {tr}View Scheduler Details{/tr}
+                        </a>
+                    </p>
+                {/remarksbox}
+            {/if}
+
             {if $htaccess_global_warning}
                 {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
                     <p class="mb-2">

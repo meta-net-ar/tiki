@@ -166,13 +166,14 @@ class CalendarLib extends TikiLib
             $calendars[$calendar['calendarId']] = $calendar;
             // for week and day views
             $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-            $startOfDayHour = $startOfDayUnix / 3600;
-            $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-            $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+
+            $startOfDayHour = intdiv($startOfDayUnix, 3600);
+            $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
+            $minHourOfDay = sprintf('%02d:%02d:00', $startOfDayHour, $startOfDayMinute);
             $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-            $endOfDayHour = $endOfDayUnix / 3600;
-            $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-            $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+            $endOfDayHour = intdiv($endOfDayUnix, 3600);
+            $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
+            $maxHourOfDay = sprintf('%02d:%02d:00', $endOfDayHour, $endOfDayMinute);
             $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
         }
         return  [

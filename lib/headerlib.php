@@ -274,7 +274,7 @@ class HeaderLib
 
     /**
      * Add a js file to load after dependency . That file must not be loaded from an external source.
-     * Theses are usually custom libraries like raphael, gaffle etc.
+     * Theses are usually custom libraries.
      * Depending on prefs, it could be minified and put into a single js file.
      * @param string $filename with path relative to tiki dir
      * @param bool $skip_minify true if the file must not be minified, false if it can

@@ -74,14 +74,27 @@ class ErrorTracking
     /**
      * Capture thrown exception. Exceptions are always added to the exceptions stack.
      *
-     * @param \Exception $exception
+     * @param \Throwable $exception The exception to capture
+     * @param array $tags Optional associative array of tags to attach to this specific event only
      */
-    public function captureException(\Throwable $exception)
+    public function captureException(\Throwable $exception, array $tags = [])
     {
         if ($this->state === self::STATE_DISABLED) {
             return;
         }
-        \Sentry\captureException($exception);
+
+        if (empty($tags)) {
+            // No event-specific tags, capture directly
+            \Sentry\captureException($exception);
+        } else {
+            // Use withScope to set event-specific tags without polluting global scope
+            \Sentry\withScope(function (\Sentry\State\Scope $scope) use ($exception, $tags) {
+                foreach ($tags as $key => $value) {
+                    $scope->setTag($key, (string)$value);
+                }
+                \Sentry\captureException($exception);
+            });
+        }
     }
 
     /**

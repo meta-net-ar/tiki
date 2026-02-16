@@ -511,8 +511,10 @@ class FileGalLib extends TikiLib
             return false;
         }
         if (empty($galleryId)) {
-            $info = $this->get_file_info($id);
-            $galleryId = $info['galleryId'];
+            $info = $this->get_file_gallery_info($id);
+            if ($info) {
+                $galleryId = $info['parentId'] ?? 0;
+            }
         } else {
             $info = null;
         }

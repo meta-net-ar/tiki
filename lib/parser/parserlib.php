@@ -149,22 +149,12 @@ class ParserLib extends TikiDb_Bridge
         $params = WikiPlugin_Helper::applyParamsDefaults($params, $info);
 
         $missingRequired = [];
-        $tikilib = TikiLib::lib('tiki');
-
         if (isset($info['params'])) {
             foreach ($info['params'] as $key => $param) {
                 if (isset($param['required']) && $param['required'] === true) {
                     // Parameter is required and has no default - check if user provided it
                     if (! isset($param['default']) && $params[$key] === null) {
                         $missingRequired[] = $key;
-                    }
-                }
-
-                if (isset($param['separator']) && isset($params[$key])) {
-                    if (is_string($params[$key]) && $params[$key] !== null) {
-                        $params[$key] = $tikilib->multi_explode($param['separator'], $params[$key]);
-                    } elseif (! is_array($params[$key]) && $params[$key] !== null) {
-                        $params[$key] = [$params[$key]];
                     }
                 }
             }
@@ -1211,21 +1201,13 @@ class ParserLib extends TikiDb_Bridge
 
                 // Preserve null values (parameters not provided by user)
                 if ($argValue !== null) {
-                    if (is_array($argValue)) {
-                        foreach ($argValue as &$value) {
-                            $value = TikiLib::htmldecode($value);
-                        }
-                    } else {
-                        $argValue = TikiLib::htmldecode($argValue);
-                    }
+                    $argValue = TikiLib::htmldecode($argValue);
                 }
 
-                if (isset($paramInfo['separator']) && ! is_array($argValue)) {
+                if (isset($paramInfo['separator'])) {
                     if ($argValue !== null) {
-                        $vals = $tikilib->array_apply_filter(
-                            $tikilib->multi_explode($paramInfo['separator'], $argValue),
-                            $filter
-                        );
+                        $vals = [];
+                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
                         $argValue = array_values($vals);
                     }
                     // If $argValue is null, leave it as null (don't process separator)

@@ -504,6 +504,18 @@ if ($prefs['feature_scheduler'] === 'y') {
     $smarty->assign('isSchedulerRunConfigured', true);
 }
 
+if (! empty($prefs['scheduledTasksReport']) && $prefs['scheduledTasksReport'] !== 'do_not_report') {
+    $schedLib = \TikiLib::lib('scheduler');
+    $schedulerFailureLogs = $schedLib->getSchedulerFromLogs('failed');
+    $smarty->assign('scheduler_failure_logs', $schedulerFailureLogs);
+    $smarty->assign('scheduler_failure_count', count($schedulerFailureLogs));
+    // Get total count for ratio display in time_window mode
+    if ($prefs['scheduledTasksReport'] === 'last_number_of_hours') {
+        $allLogs = $schedLib->getSchedulerFromLogs(); // All statuses
+        $smarty->assign('scheduler_total_count', count($allLogs));
+    }
+}
+
 if (! $unifiedsearch->rebuildInProgress()) {
     $searchIndex = [
         'error' => false,

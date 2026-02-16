@@ -1,39 +1,6 @@
 import Editor from "svgedit/dist/editor/Editor.js";
 import "svgedit/dist/editor/svgedit.css";
 
-$.fn.drawFullscreen = function () {
-    var win = $(window);
-    var me = $(this);
-    me.trigger("saveDraw");
-
-    let fullscreen = $("#svg-fullscreen");
-
-    if (fullscreen.length === 0) {
-        me.data("origParent", me.parent());
-
-        var menuHeight = $("#drawMenu").height();
-        $("body").addClass("full_screen_body");
-        $("body,html").scrollTop(0);
-
-        fullscreen = $('<div id="svg-fullscreen" />').html(me).prependTo("body");
-
-        var fullscreenSvgEdit = fullscreen.find("#svgedit");
-
-        win.on("resize", function () {
-            fullscreen.height(win.height()).width(win.width());
-
-            fullscreenSvgEdit.height(fullscreen.height() - menuHeight);
-        }).trigger("resize");
-    } else {
-        me.data("origParent").append(me);
-        win.off("resize");
-        fullscreen.remove();
-        $("body").removeClass("full_screen_body");
-    }
-
-    return this;
-};
-
 $.fn.replaceDraw = function (o) {
     var me = $(this);
     if (o.error) {
@@ -94,14 +61,6 @@ $.fn.saveDraw = function () {
     } catch (e) {}
 
     return this;
-};
-
-$.fn.saveAndBackDraw = function () {
-    $(this)
-        .saveDraw()
-        .one("savedDraw", function () {
-            window.history.back();
-        });
 };
 
 $.fn.renameDraw = function () {
