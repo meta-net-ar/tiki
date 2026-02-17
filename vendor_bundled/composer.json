@@ -81,7 +81,7 @@
         "laminas/laminas-recaptcha": "~3.2",
         "laminas/laminas-text": "^2.8",
         "laminas/laminas-twitter": "~2.1",
-        "league/flysystem": ">=2.0.0-beta.3",
+        "league/flysystem": ">=2.5.0",
         "league/commonmark": "^1.5",
         "matthiasmullie/minify": "^1.3.58",
         "michelf/php-smartypants": "^1.8.1",
@@ -97,10 +97,10 @@
         "npm-asset/dompurify": "^2.3.3",
         "npm-asset/fullcalendar": "^5.3.2",
         "npm-asset/fullcalendar--moment": "^5.5",
-        "npm-asset/html2canvas": "^1.0.0-RC.5",
+        "npm-asset/html2canvas": "^1.4.1",
         "npm-asset/moment-duration-format": "^2.3",
         "npm-asset/popper.js": "^1.13.4",
-        "npm-asset/prefixfree": ">=1.0.10",
+        "npm-asset/prefixfree": "~1.0",
         "npm-asset/sass-svg-uri": "^1.0",
         "npm-asset/sentry--browser": "^6.0",
         "npm-asset/vue": "^2.6",
@@ -136,7 +136,7 @@
         "sentry/sdk": "^3.1",
         "simile_timeline/simile_timeline": "2.3.0",
         "slm/mail": "^4.2",
-        "smarty/smarty": "^3.1.33",
+        "smarty/smarty": "^3.1.48",
         "sorich87/bootstrap-tour": "^0.12.0",
         "studio-42/elfinder": "~2.1",
         "steverhoades/oauth2-openid-connect-client": "^0.3.0",
@@ -162,7 +162,7 @@
         "zbateson/mail-mime-parser": "^2.4",
         "zendframework/zendservice-akismet": "~2.0",
         "gidkom/php-openfire-restapi": "1.0.0",
-        "montefuscolo/xmpp": "dev-master",
+        "montefuscolo/xmpp": "^0.7.1",
         "league/oauth2-server": "^7.3",
         "npm-asset/converse.js": "7.0.4",
         "ext-json": "*",
@@ -195,7 +195,61 @@
         "umakantp/smartylint": "0.1.4"
     },
     "extra": {
-        "patches-file": "../installer/composer-patches/composer-patches.json"
+        "patches-file": "../installer/composer-patches/composer-patches.json",
+        "stability-ignore": {
+            "_comment": [
+                "Packages with non-standard version constraints that require explanation.",
+                "This includes both unstable versions (dev-master, etc.) and stable versions that aren't the latest available.",
+                "This section documents why specific version constraints are acceptable",
+                "NOTE:",
+                "This stability-ignore list will be included in all supported Tiki versions because:",
+                "1. It provides valuable context for dependency decisions across all supported versions",
+                "2. Helps maintain consistency in dependency management practices",
+                "3. Enables the stability checker tool to work properly when analyzing from master",
+                "4. Documents decisions that may affect future dependency updates",
+                "5. Ensures all versions have the same understanding of acceptable version constraints",
+                "",
+                "Each entry should include:",
+                "  - reason: Why this specific version constraint is necessary/acceptable",
+                "  - mitigation: How risk is reduced or managed",
+                "  - reviewed: Date when decision was reviewed",
+                "  - reviewer: Name of person who reviewed this decision",
+                "  - alternatives: What alternatives were considered (if any)",
+                "  - impact: What functionality would be lost without this package"
+            ],
+            "candy-chat/xmpp-prebind-php": {
+                "reason": "Essential XMPP prebinding for chat system authentication and session management.",
+                "mitigation": "PHP 8 compatibility via patches. Extended with custom TIKITOKEN auth.",
+                "reviewed": "2025-08-27",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for prebinding. Custom implementation would be complex.",
+                "impact": "XMPP chat completely non-functional. Users cannot authenticate or connect."
+            },
+            "erusev/parsedown": {
+                "reason": "Required for Markdown parsing and rendering for Cypht v1.4",
+                "mitigation": "Package is abandoned and there is no tagged stable version. Only master branch is available and it remains functional for current needs",
+                "reviewed": "2026-02-10",
+                "reviewer": "Ushindi",
+                "alternatives": "Migrate to alternative library league/commonmark. Switching would require rewriting rendering code.",
+                "impact": "Continued use may pose long-term maintenance risks due to abandonment, but immediate functionality is unaffected"
+            },
+            "ahand/mobileesp": {
+                "reason": "Provides device detection to enable mobile-friendly UI behavior",
+                "mitigation": "Package is abandoned and there is no tagged stable version. Only master branch is available and it remains functional for current needs",
+                "reviewed": "2026-02-10",
+                "reviewer": "Ushindi",
+                "alternatives": "Migrate to alternative to modern approach using css media queries.",
+                "impact": "As new devices emerge continued use may pose long-term maintenance risks due to abandonment, but immediate functionality is unaffected."
+            },
+            "bootstrap-v4-rtl/bootstrap-rtl": {
+                "reason": "Required to provide proper right-to-left (RTL) layout support for Bootstrap 4 in Tiki24. The project does not publish tagged releases or semantic versions; only the master branch is available.",
+                "mitigation": "The CSS file is bundled and loaded explicitly with a high priority to ensure it overrides standard Bootstrap styles. Usage is limited to RTL contexts and is well-isolated.",
+                "reviewed": "2026-02-10",
+                "reviewer": "Ushindi",
+                "alternatives": "Migrate to alternative library MahdiMajidzadeh/bootstrap-v4-rtl. Switching can require refactoring the code",
+                "impact": "Continued use may pose long-term maintenance risks due to abandonment, but immediate functionality is unaffected"
+            }
+        }
     },
     "replace": {
         "npm-asset/tslib": "*"
