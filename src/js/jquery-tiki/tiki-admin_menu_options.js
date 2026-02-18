@@ -232,10 +232,10 @@ $(function () {
             if ($(el).find("input.samepos:checked").first().length === 0) {
                 position++;
             }
-            
+
             // Preserve separator type from data attribute
             var currentType = $(el).data("type") || null;
-            
+
             var obj = {
                 optionId: $(el).data("id"),
                 parentId: $(el).data("parent"),
@@ -246,7 +246,7 @@ $(function () {
                 sectionLevel: null,
                 type: currentType,
             };
-            
+
             // Keep separators even when another item shares the same position
             if (currentType === "-") {
                 obj.type = "-";
@@ -255,7 +255,7 @@ $(function () {
                 dataArr.push(obj);
                 return;
             }
-            
+
             var firstOccurrenceObj = getFirstOccurrenceObjByParentId(obj.parentId, dataArr);
             var lastObj = getLastObj(dataArr);
 
