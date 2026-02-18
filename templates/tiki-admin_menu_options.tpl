@@ -102,7 +102,7 @@
                                         <span class="input-group-text">{icon name='sort'}</span>
                                         {if $option.type eq '-'}
                                             <div class="form-control d-flex align-items-center" style="background-color: #f8f9fa; padding: 0.5rem;">
-                                                <hr class="menu-separator">
+                                                <hr class="dropdown-divider">
                                             </div>
                                         {else}
                                             <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
