@@ -186,18 +186,6 @@
     z-index: 3000;
 }
 
-/* Minimal support for Bootstrap divider outside .dropdown-menu */
-.sm-nav,
-.navbar,
-.form-control {
-    --bs-dropdown-divider-bg: rgba(var(--bs-emphasis-color-rgb), 0.22);
-    --bs-dropdown-divider-margin-y: 0.5rem;
-}
-
-hr.dropdown-divider {
-    opacity: 1;
-}
-
 .sm-sub-toggler[data-bs-toggle="collapse"]::after {
     display: none;
 }

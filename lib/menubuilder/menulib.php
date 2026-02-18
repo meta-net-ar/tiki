@@ -764,10 +764,7 @@ class MenuLib extends TikiLib
                 }
                 if ($display) {
                     $pos = $res['position'];
-                    // Keep separators even when another item shares the same position.
-                    if ($res['type'] === '-') {
-                        $ret[$pos . '-sep-' . $res['optionId']] = $res;
-                    } elseif (empty($ret[$pos]) || empty($ret[$pos]['url'])) {
+                    if (empty($ret[$pos]) || empty($ret[$pos]['url'])) {
                         $ret[$pos] = $res;
                     }
                 }
