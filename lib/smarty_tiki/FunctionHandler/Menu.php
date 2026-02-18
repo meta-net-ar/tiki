@@ -127,15 +127,33 @@ class Menu extends Base
                         $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
                     }
 
-                    // Separators are added at level 0 without hierarchy processing
-                    if ($element['type'] === '-') {
+                    $level = $element['sectionLevel'];
+
+                    $name = trim((string) ($element['name'] ?? ''));
+                    $class = (string) ($element['class'] ?? '');
+                    $hasSeparatorClass = preg_match('/(^|\s)separator(\s|$)/', $class) === 1;
+                    $isSyntheticSeparator = $element['type'] === '-' && strcasecmp($name, 'separator') === 0 && ! $hasSeparatorClass;
+                    $isVisualSeparator = ($element['type'] === '-' && ! $isSyntheticSeparator)
+                        || ($element['type'] === 's' && $name === '')
+                        || $hasSeparatorClass;
+
+                    // Keep historical synthetic separators for hierarchy management only.
+                    if ($isSyntheticSeparator) {
+                        continue;
+                    }
+
+                    // Normalize visual separators for template rendering.
+                    if ($isVisualSeparator) {
+                        $element['type'] = '-';
+                    }
+
+                    // Creates new branch at level 0
+                    if ($level === 0) {
                         $structured[] = $element;
                         continue;
                     }
 
-                    $level = $element['sectionLevel'];
-                    // Creates new branch at level 0
-                    if ($level === 0) {
+                    if (empty($structured)) {
                         $structured[] = $element;
                         continue;
                     }
@@ -260,17 +278,30 @@ class Menu extends Base
         $sectionLevel = 0;
         $prev_type = null;
         $new_data = array_map(function ($menu_item) use (&$sectionLevel, &$prev_type) {
-            if ($menu_item['type'] === 's') {
+            $name = trim((string) ($menu_item['name'] ?? ''));
+            $class = (string) ($menu_item['class'] ?? '');
+            $hasSeparatorClass = preg_match('/(^|\s)separator(\s|$)/', $class) === 1;
+            $isSyntheticSeparator = $menu_item['type'] === '-' && strcasecmp($name, 'separator') === 0 && ! $hasSeparatorClass;
+            $isVisualSeparator = ($menu_item['type'] === '-' && ! $isSyntheticSeparator)
+                || ($menu_item['type'] === 's' && $name === '')
+                || $hasSeparatorClass;
+
+            if ($menu_item['type'] === 's' && ! $isVisualSeparator) {
                 $sectionLevel = 0;
             } elseif (($prev_type === 's' || is_numeric($prev_type)) && $menu_item['type'] === 'o') {
                 $sectionLevel++;
-            } elseif ($menu_item['type'] === '-') {
+            } elseif ($isSyntheticSeparator) {
                 if ($sectionLevel - 1 >= 0) {
                     $sectionLevel--;
                 }
             } elseif (is_numeric($menu_item['type'])) {
                 $sectionLevel = (int)$menu_item['type'];
             }
+
+            if ($isVisualSeparator) {
+                $menu_item['type'] = '-';
+            }
+
             $prev_type = $menu_item['type'];
             $menu_item['sectionLevel'] = $sectionLevel;
 

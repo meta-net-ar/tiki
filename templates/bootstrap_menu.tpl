@@ -21,12 +21,16 @@
                         </a>
                         <div class="dropdown-menu {if !empty($item.selected)}show{/if}" aria-labelledby="menu_option{$item.optionId|escape}">
                             {foreach from=$item.children item=sub}
-                                <a class="dropdown-item {$sub.class|escape} {if $sub.selected|default:null}active{/if}" href="{$sub.sefurl|escape}">
-                                    {if $menu_info.use_items_icons eq "y" && $sub.icon}
-                                        {icon name=$sub.icon}
-                                    {/if}
-                                    {tr}{$sub.name}{/tr}
-                                </a>
+                                {if $sub.type eq '-' or ($sub.type eq 's' and empty($sub.name)) or preg_match('/(^|\\s)separator(\\s|$)/', $sub.class|default:'')}
+                                    <div role="separator" class="dropdown-divider my-2"></div>
+                                {else}
+                                    <a class="dropdown-item {$sub.class|escape} {if $sub.selected|default:null}active{/if}" href="{$sub.sefurl|escape}">
+                                        {if $menu_info.use_items_icons eq "y" && $sub.icon}
+                                            {icon name=$sub.icon}
+                                        {/if}
+                                        {tr}{$sub.name}{/tr}
+                                    </a>
+                                {/if}
                             {/foreach}
                         </div>
                     </li>
@@ -40,22 +44,28 @@
                         </a>
                         <ul id="menu_option{$item.optionId|escape}" class="nav flex-column collapse {if !empty($item.selected)}show{/if}" aria-labelledby="#menu_option{$item.optionId|escape}">
                             {foreach from=$item.children item=sub}
-                                <li class="nav-item {$sub.class|escape|default:null} {if !empty($sub.selected)}active{/if}">
-                                    <a class="nav-link {$sub.class|escape} {if $sub.selected|default:null}active{/if}" href="{$sub.sefurl|escape}">
-                                        <small>
-                                            {if $menu_info.use_items_icons eq "y" && $sub.icon}
-                                                {icon name=$sub.icon}
-                                            {/if}
-                                            {tr}{$sub.name}{/tr}
-                                        </small>
-                                    </a>
-                                </li>
+                                {if $sub.type eq '-' or ($sub.type eq 's' and empty($sub.name)) or preg_match('/(^|\\s)separator(\\s|$)/', $sub.class|default:'')}
+                                    <li class="nav-item" role="separator">
+                                        <hr class="dropdown-divider my-2">
+                                    </li>
+                                {else}
+                                    <li class="nav-item {$sub.class|escape|default:null} {if !empty($sub.selected)}active{/if}">
+                                        <a class="nav-link {$sub.class|escape} {if $sub.selected|default:null}active{/if}" href="{$sub.sefurl|escape}">
+                                            <small>
+                                                {if $menu_info.use_items_icons eq "y" && $sub.icon}
+                                                    {icon name=$sub.icon}
+                                                {/if}
+                                                {tr}{$sub.name}{/tr}
+                                            </small>
+                                        </a>
+                                    </li>
+                                {/if}
                             {/foreach}
                         </ul>
                     </li>
                 {/if}
             {else}
-                {if $item.type eq '-'}
+                {if $item.type eq '-' or ($item.type eq 's' and empty($item.name)) or preg_match('/(^|\\s)separator(\\s|$)/', $item.class|default:'')}
                     <li class="nav-item" role="separator">
                         <hr class="dropdown-divider my-2">
                     </li>

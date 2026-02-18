@@ -1,4 +1,4 @@
-{if $item.type eq '-'}
+{if $item.type eq '-' or ($item.type eq 's' and empty($item.name)) or preg_match('/(^|\\s)separator(\\s|$)/', $item.class|default:'')}
     <li class="sm-nav-item nav-item" role="separator">
         <hr class="dropdown-divider my-2">
     </li>
@@ -35,7 +35,7 @@
         {/if}
     </li>
 {else}
-    <li class="sm-nav-item nav-item{$item.class|escape}{if $item.selected|default:null} active{/if}">
+    <li class="sm-nav-item nav-item {$item.class|escape}{if $item.selected|default:null} active{/if}">
         <a class="sm-nav-link nav-link" href="{$item.sefurl|escape}">
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>
