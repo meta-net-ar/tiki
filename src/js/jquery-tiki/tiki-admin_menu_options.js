@@ -244,12 +244,8 @@ $(function () {
             };
             var firstOccurrenceObj = getFirstOccurrenceObjByParentId(obj.parentId, dataArr);
             var lastObj = getLastObj(dataArr);
-            var originalType = $(el).data("type");
 
-            if (originalType === "-") {
-                obj.type = "-";
-                obj.sectionLevel = lastObj ? lastObj.sectionLevel : 0;
-            } else if (obj.parentId === 0) {
+            if (obj.parentId === 0) {
                 obj.sectionLevel = 0;
                 obj.type = "s";
             } else if (firstOccurrenceObj) {
@@ -260,7 +256,7 @@ $(function () {
                 obj.type = lastObj.sectionLevel + 1;
             }
 
-            if (!isParent(obj.optionId, parentIds) && obj.parentId !== 0 && originalType !== "-") {
+            if (!isParent(obj.optionId, parentIds) && obj.parentId !== 0) {
                 obj.type = "o";
             }
 

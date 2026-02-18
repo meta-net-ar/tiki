@@ -193,13 +193,3 @@
 .sm-sub.collapse.show {
     display: block;
 }
-
-/* Ensure separator visibility in navbars and smartmenus */
-.navbar .dropdown-divider,
-.sm-nav .dropdown-divider,
-.sm-sub .dropdown-divider {
-    width: 100%;
-    margin: 0.5rem 0;
-    border-top: 1px solid rgba(var(--bs-emphasis-color-rgb), 0.35);
-    opacity: 1;
-}
