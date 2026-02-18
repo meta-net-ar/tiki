@@ -56,8 +56,8 @@
                 {/if}
             {else}
                 {if $item.type eq '-'}
-                    <li class="nav-item">
-                        <hr class="menu-separator my-2">
+                    <li class="nav-item" role="separator">
+                        <hr class="dropdown-divider my-2">
                     </li>
                 {else}
                     <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">

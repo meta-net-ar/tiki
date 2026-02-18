@@ -1,6 +1,6 @@
 {if $item.type eq '-'}
-    <li class="sm-nav-item nav-item">
-        <hr class="menu-separator my-2">
+    <li class="sm-nav-item nav-item" role="separator">
+        <hr class="dropdown-divider my-2">
     </li>
 {elseif not empty($item.children)}
     <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }static{/if}">
