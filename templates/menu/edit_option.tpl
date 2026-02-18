@@ -39,6 +39,7 @@
                         <option value="r" {if $info.type eq 'r'}selected="selected"{/if}>{tr}sorted section level 0{/tr}</option>
                         <option value="-" {if $info.type eq '-'}selected="selected"{/if}>{tr}separator{/tr}</option>
                     </select>
+                    <div class="form-text">{tr}Choose{/tr} <strong>{tr}separator{/tr}</strong> {tr}to add a visual divider line in a menu or submenu.{/tr}</div>
                 </div>
             </div>
             <div class="mb-3 row">

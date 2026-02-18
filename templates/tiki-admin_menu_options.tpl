@@ -19,6 +19,9 @@
         </a>
     {/if}
 </div>
+{remarksbox type="tip" title="{tr}Tip{/tr}" close="y"}
+    {tr}To add a visual separator, click{/tr} <strong>{tr}Create menu option{/tr}</strong>, {tr}set{/tr} <strong>{tr}Type{/tr}</strong> {tr}to{/tr} <strong>{tr}separator{/tr}</strong>, {tr}then save your menu.{/tr}
+{/remarksbox}
 
 {tabset name="admin_menu_options"}
 {tab name="{tr}Manage menu{/tr} {$editable_menu_info.name}"}
