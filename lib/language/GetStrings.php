@@ -294,7 +294,7 @@ class Language_GetStrings
         $result = $tikilib->fetchAll($query);
 
         global $prefs;
-        $filesStrings = [];
+        $dbStrings = [];
         foreach ($result as $row) {
             $pageSlug = $row['pageSlug'];
             if (empty($pageSlug)) {
@@ -306,22 +306,24 @@ class Language_GetStrings
                 $file = preg_replace($regex, $replacement, $file);
             }
 
-            $pageStrings = [];
             foreach ($regexes as $regex) {
                 $matches = [];
                 preg_match_all($regex, $file, $matches);
-                if (! empty($matches[1])) {
-                    $pageStrings = array_merge($pageStrings, $matches[1]);
+
+                foreach ($matches[1] ?? [] as $str) {
+                    if (! isset($dbStrings[$str])) {
+                        $dbStrings[$str] = [
+                            'name'   => $str,
+                            'source' => 'database', // to be able to distinguish from file strings
+                            'files'  => [],
+                        ];
+                    }
+
+                    $dbStrings[$str]['files'][$pageSlug] = $pageSlug;
                 }
             }
-
-            if (! empty($pageStrings)) {
-                // Remove duplicates for this page
-                $filesStrings[$pageSlug] = array_values(array_unique($pageStrings));
-            }
         }
-
-        return $filesStrings;
+        return $dbStrings;
     }
 
     /**
@@ -337,42 +339,69 @@ class Language_GetStrings
     {
         $strings = [];
 
-        // strings collected per file
-        $filesStrings = [];
+        foreach ($files as $file) {
+            $fileStrings = $this->collectStrings($file);
+            $writeFile = new Language_WriteFile(new Language_File($file));
+            $source = $writeFile->isCustomDir(dirname($file)) ? 'custom' : 'standard'; // Define the source for file-based strings: 'custom' for user overrides, 'standard' for core.
 
-        if (! empty($files)) {
-            foreach ($files as $file) {
-                $filesStrings[$file] = $this->collectStrings($file);
+            foreach ($fileStrings as $str) {
+                $this->mergeStringEntry($strings, $str, $source, [$file]);
             }
         }
 
         if ($this->includeDatabase) {
-            $dataFromDatabase = $this->collectStringsFromDatabase();
-            $filesStrings = array_merge($filesStrings, $dataFromDatabase);
-        }
-
-        // join strings collected per file into a single array
-        // and remove duplicated strings
-        foreach ($filesStrings as $file => $fileStrings) {
-            foreach ($fileStrings as $str) {
-                if (! isset($strings[$str])) {
-                    $string = ['name' => $str];
-
-                    if ($this->outputFiles) {
-                        // $string['files'] is an array with all the files where the string was found
-                        $string['files'] = [$file];
-                    }
-
-                    $strings[$str] = $string;
-                } else {
-                    if ($this->outputFiles) {
-                        $strings[$str]['files'][] = $file;
-                    }
-                }
+            $databaseStrings = $this->collectStringsFromDatabase();
+            foreach ($databaseStrings as $str => $entry) {
+                $this->mergeStringEntry($strings, $str, $entry['source'], $entry['files'] ?? []);
             }
         }
 
         return $strings;
+    }
+
+    /**
+     * Merges a string entry into the provided strings array.
+     *
+     * If the string entry with the given name does not exist, it initializes it with the provided sources and files.
+     * If it already exists, it merges the new sources and files into the existing entry, avoiding duplicates.
+     *
+     * @param array  &$strings Reference to the array of string entries to be updated.
+     * @param string $name     The name/key of the string entry to merge.
+     * @param mixed  $source   The source(s) of the string entry. Can be a string or an array of strings.
+     * @param array  $files    (Optional) List of files associated with the string entry.
+     *
+     * @return void
+     */
+    private function mergeStringEntry(array &$strings, string $name, $source, array $files = []): void
+    {
+        $sources = ! is_array($source) ? [$source] : $source;
+
+        if (! isset($strings[$name])) {
+            $strings[$name] = [
+                'name'   => $name,
+                'source' => $sources,
+            ];
+            if ($this->outputFiles) {
+                $strings[$name]['files'] = $files;
+            }
+            return;
+        }
+
+        // Merge Sources
+        foreach ($sources as $s) {
+            if (! in_array($s, $strings[$name]['source'], true)) {
+                $strings[$name]['source'][] = $s;
+            }
+        }
+
+        // Merge Files
+        if ($this->outputFiles) {
+            foreach ($files as $file) {
+                if (! in_array($file, $strings[$name]['files'], true)) {
+                    $strings[$name]['files'][] = $file;
+                }
+            }
+        }
     }
 
     public function writeToFiles($strings)
