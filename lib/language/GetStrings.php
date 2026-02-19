@@ -341,8 +341,7 @@ class Language_GetStrings
 
         foreach ($files as $file) {
             $fileStrings = $this->collectStrings($file);
-            $writeFile = new Language_WriteFile(new Language_File($file));
-            $source = $writeFile->isCustomDir(dirname($file)) ? 'custom' : 'standard'; // Define the source for file-based strings: 'custom' for user overrides, 'standard' for core.
+            $source = Language_WriteFile::isCustomDir(dirname($file)) ? 'custom' : 'standard'; // Define the source for file-based strings: 'custom' for user overrides, 'standard' for core.
 
             foreach ($fileStrings as $str) {
                 $this->mergeStringEntry($strings, $str, $source, [$file]);

@@ -120,7 +120,7 @@ class Language_WriteFile
         if ($handle) {
             fwrite($handle, "<?php\n");
 
-            $isCustomDir = $this->isCustomDir($targetDir);
+            $isCustomDir = self::isCustomDir($targetDir);
 
             $this->writeLanguageFile($handle, $entries, $outputFiles, $language, $isCustomDir);
 
@@ -245,7 +245,7 @@ TXT;
      * @param string $dir The directory path to check
      * @return bool Returns true if it's a custom theme directory, false otherwise
      */
-    public function isCustomDir($dir): bool
+    public static function isCustomDir($dir): bool
     {
         global $tikipath;
         $resolvedDir = realpath($dir);
