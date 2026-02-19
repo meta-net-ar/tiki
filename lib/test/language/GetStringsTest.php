@@ -198,10 +198,10 @@ class Language_GetStringsTest extends TikiTestCase
         $files = ['file1', 'file2', 'file3'];
 
         $strings = [
-            'string1' => ['name' => 'string1'],
-            'string2' => ['name' => 'string2'],
-            'string3' => ['name' => 'string3'],
-            'string4' => ['name' => 'string4'],
+            'string1' => ['name' => 'string1', 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'source' => ['standard']],
         ];
 
         $this->collectFiles->expects($this->once())->method('setExtensions');
@@ -338,10 +338,10 @@ class Language_GetStringsTest extends TikiTestCase
         $files = ['file1', 'file2', 'file3'];
 
         $strings = [
-            'string1' => ['name' => 'string1'],
-            'string2' => ['name' => 'string2'],
-            'string3' => ['name' => 'string3'],
-            'string4' => ['name' => 'string4'],
+            'string1' => ['name' => 'string1', 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'source' => ['standard']],
         ];
 
         $obj = $this->getMockBuilder('Language_GetStrings')
@@ -369,10 +369,10 @@ class Language_GetStringsTest extends TikiTestCase
     {
         $files = ['file1', 'file2', 'file3'];
         $strings = [
-            'string1' => ['name' => 'string1', 'files' => ['file1']],
-            'string2' => ['name' => 'string2', 'files' => ['file1', 'file2']],
-            'string3' => ['name' => 'string3', 'files' => ['file2', 'file3']],
-            'string4' => ['name' => 'string4', 'files' => ['file3']],
+            'string1' => ['name' => 'string1', 'files' => ['file1'], 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'files' => ['file1', 'file2'], 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'files' => ['file2', 'file3'], 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'files' => ['file3'], 'source' => ['standard']],
         ];
         $obj = $this->getMockBuilder('Language_GetStrings')
                     ->onlyMethods(['collectStrings', 'setLanguages'])
