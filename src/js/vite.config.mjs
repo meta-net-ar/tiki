@@ -101,7 +101,7 @@ export default defineConfig(({ command, mode }) => {
     Object.assign(
         rollupInput,
         Object.fromEntries(
-            glob.sync("src/js/jquery-tiki/*.js").map((file) => {
+            glob.sync("src/js/jquery-tiki/**/*.js").map((file) => {
                 //console.log(path.relative(__dirname, file));
                 return [
                     // This remove `src/js/jquery-tiki` as well as the file extension from each
