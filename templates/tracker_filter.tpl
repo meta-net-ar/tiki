@@ -6,12 +6,12 @@
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
-                {* "All" button: Clears the filter *}
+                {* "All" button: Active when no specific status is selected (showing default view) *}
                 <button
                     type="button"
                     class="btn {if not $status}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
                     aria-pressed="{if not $status}true{else}false{/if}"
-                    onclick="this.form.status.value=''; this.form.submit();"
+                    onclick="$(this.form).find('input[name=status]').remove(); this.form.submit();"
                 >
                     {icon name="list"} <span>{tr}All{/tr}</span>
                 </button>
@@ -23,9 +23,7 @@
                         class="btn-check js-status-checkbox"
                         id="status-btn-{$stdata.statuslink}"
                         value="{$st}"
-                        autocomplete="off"
                         {if $stdata.class eq 'statuson'}checked{/if}
-                        onchange="updateTrackerStatus(this)"
                     >
                     <label class="btn btn-outline-primary d-flex align-items-center gap-1" for="status-btn-{$stdata.statuslink}">
                         {icon name="{$stdata.iconname}"}
@@ -165,10 +163,17 @@
         {/if}
     </div>
     {jq}
-        /* Global function for tracker status toggle */
-        window.updateTrackerStatus = function(checkbox) {
-            var form = checkbox.form;
+        // Handle status checkbox changes (mandatory: at least one must be selected)
+        $(document).on('change', '.js-status-checkbox', function() {
+            var form = this.form;
             var checkboxes = $(form).find('.js-status-checkbox:checked');
+
+            // Mandatory: if the user unchecked the last one, re-check all instead
+            if (checkboxes.length === 0) {
+                $(form).find('.js-status-checkbox').prop('checked', true);
+                checkboxes = $(form).find('.js-status-checkbox:checked');
+            }
+
             var values = [];
             checkboxes.each(function() {
                 values.push(this.value);
@@ -176,10 +181,10 @@
 
             var outputVal = values.join('');
 
-            // Remove any existing status inputs to avoid duplicates/confusion
+            // Remove any existing status inputs to avoid duplicates
             $(form).find('input[name="status"]').remove();
 
-            // Create a fresh hidden input
+            // Create a fresh hidden input with the combined status string
             $('<input>').attr({
                 type: 'hidden',
                 name: 'status',
@@ -187,6 +192,6 @@
             }).appendTo(form);
 
             $(form).submit();
-        };
+        });
     {/jq}
 </form>
