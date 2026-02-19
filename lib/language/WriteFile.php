@@ -245,13 +245,17 @@ TXT;
      * @param string $dir The directory path to check
      * @return bool Returns true if it's a custom theme directory, false otherwise
      */
-    protected function isCustomDir($dir): bool
+    public function isCustomDir($dir): bool
     {
+        global $tikipath;
         $resolvedDir = realpath($dir);
         if ($resolvedDir === false) {
             $resolvedDir = $dir;
         }
+        // Ensure trailing slash for root
+        $root = rtrim($tikipath, '/') . '/';
 
-        return strpos($resolvedDir, '_custom') !== false;
+        // Match paths where the first directory after $root is "_custom"
+        return preg_match('#^' . preg_quote($root, '#') . '_custom(?:/|$)#', $resolvedDir) === 1;
     }
 }
