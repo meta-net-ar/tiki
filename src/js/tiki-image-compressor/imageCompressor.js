@@ -1,44 +1,14 @@
 /**
- * Media Compressor Module
+ * Image Compressor Module
  *
- * Centralized compression for images and videos.
+ * Centralized compression for images.
  * - Images: browser-image-compression
- * - Videos: ffmpeg.wasm
  * Handles file type validation, graceful fallbacks, returns unsupported as-is.
  */
 
 import imageCompression from "browser-image-compression";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
 
-// Supported MIME types
-const SUPPORTED_TYPES = {
-    images: ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/bmp"],
-    videos: ["video/mp4", "video/webm", "video/quicktime", "video/x-msvideo", "video/mpeg"],
-};
-
-const ALL_SUPPORTED = [...SUPPORTED_TYPES.images, ...SUPPORTED_TYPES.videos];
-
-// FFmpeg instance (lazy loaded)
-let ffmpegInstance = null;
-
-/**
- * Initialize ffmpeg (lazy load)
- * Only loads if needed for video compression
- */
-async function initFFmpeg() {
-    if (ffmpegInstance) return ffmpegInstance;
-
-    try {
-        const ffmpeg = new FFmpeg();
-        await ffmpeg.load();
-        ffmpegInstance = ffmpeg;
-        return ffmpegInstance;
-    } catch (error) {
-        console.warn("[MediaCompressor] FFmpeg initialization failed:", error.message);
-        return null;
-    }
-}
+const ALL_SUPPORTED = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/bmp"];
 
 /**
  * Check if file type is supported
@@ -63,16 +33,6 @@ function isImage(mimeType) {
 }
 
 /**
- * Check if file is a video
- *
- * @param {String} mimeType - MIME type
- * @returns {Boolean}
- */
-function isVideo(mimeType) {
-    return SUPPORTED_TYPES.videos.includes(mimeType);
-}
-
-/**
  * Compress image using browser-image-compression
  *
  * @private
@@ -94,39 +54,7 @@ async function compressImage(fileBlob, prefs) {
 }
 
 /**
- * Compress video using FFmpeg
- *
- * @private
- */
-async function compressVideo(fileBlob, prefs) {
-    const ffmpeg = await initFFmpeg();
-    if (!ffmpeg) {
-        throw new Error("FFmpeg not available for video compression");
-    }
-
-    const quality = prefs.quality || 65;
-    const crf = Math.max(18, Math.min(51, Math.round((100 - quality) * 0.33))); // CRF scale
-
-    try {
-        const buffer = await fetchFile(fileBlob);
-
-        ffmpeg.writeFile("input.mp4", buffer);
-
-        // Use libx265 for better compression
-        await ffmpeg.exec(["-i", "input.mp4", "-c:v", "libx265", "-crf", crf.toString(), "-c:a", "aac", "-b:a", "128k", "output.mp4"]);
-
-        const data = ffmpeg.readFile("output.mp4");
-        ffmpeg.deleteFile("input.mp4");
-        ffmpeg.deleteFile("output.mp4");
-
-        return new Blob([data.buffer], { type: "video/mp4" });
-    } catch (error) {
-        throw new Error(`Video compression failed: ${error.message}`);
-    }
-}
-
-/**
- * Compress media file (image or video)
+ * Compress a single file based on type and preferences
  * Returns file as-is if type not supported (no error).
  *
  * @param {Blob|File} fileBlob - File to compress
@@ -165,9 +93,6 @@ async function compress(fileBlob, prefs = {}, options = {}) {
         if (isImage(mimeType)) {
             result.formatted = "image";
             compressedBlob = await compressImage(fileBlob, prefs);
-        } else if (isVideo(mimeType)) {
-            result.formatted = "video";
-            compressedBlob = await compressVideo(fileBlob, prefs);
         } else {
             result.skipped = true;
             return result;
@@ -190,7 +115,7 @@ async function compress(fileBlob, prefs = {}, options = {}) {
             result.blob = fileBlob;
         }
 
-        console.log("[MediaCompressor]", error);
+        console.log("[ImageCompressor]", error);
         return result;
     }
 }
@@ -297,7 +222,7 @@ async function compressFileList(fileList, prefs = {}) {
                 });
             }
         } catch (err) {
-            console.error("[MediaCompressor] Error compressing file:", file.name, err);
+            console.error("[ImageCompressor] Error compressing file:", file.name, err);
             dataTransfer.items.add(file);
             results.push({
                 name: file.name,
@@ -309,9 +234,9 @@ async function compressFileList(fileList, prefs = {}) {
         }
     }
 
-    console.log("[MediaCompressor] Compression results:", results);
+    console.log("[ImageCompressor] Compression results:", results);
     return dataTransfer;
 }
 
-export { compress, compressMultiple, compressFileList, isSupported, isImage, isVideo };
+export { compress, compressMultiple, compressFileList, isSupported, isImage };
 export default compress;
