@@ -226,7 +226,7 @@ class TaskLib extends TikiLib
         $result = $this->query('SELECT * FROM `tiki_user_tasks` WHERE taskId = ?', [$taskId]);
         $res = $result->fetchRow();
         if ($user == $res['creator'] or  ($user == $res['user'] and $res['rights_by_creator'] == null) or $admin_mode) {
-            $values = ['deleted' => (int) $this->now];
+            $values = ['deleted' => $this->now];
             $this->update_task($taskId, $user, $values, null, $admin_mode);
         }
     }
@@ -255,7 +255,7 @@ class TaskLib extends TikiLib
 
     public function mark_complete_task($taskId, $user)
     {
-        $values = ['percentage' => (int) 100, 'status' => 'c', 'completed' => (int) $this->now];
+        $values = ['percentage' => (int) 100, 'status' => 'c', 'completed' => $this->now];
         $this->update_task($taskId, $user, $values);
     }
 

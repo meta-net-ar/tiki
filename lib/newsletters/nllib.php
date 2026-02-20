@@ -48,7 +48,7 @@ class NlLib extends TikiLib
         $result = $this->query($query, [
             $name,
             $description,
-            (int) $this->now,
+            $this->now,
             0,
             0,
             0,
@@ -67,7 +67,7 @@ class NlLib extends TikiLib
         ]);
 
         if ($result) {
-            return $this->getOne('select max(`nlId`) from `' . self::TABLE_NEWSLETTERS . '` where `created`=?', [(int) $this->now]);
+            return $this->lastInsertId();
         }
 
         return false;
@@ -171,7 +171,7 @@ class NlLib extends TikiLib
                 // save and send a draft
                 $query = "update `" . self::TABLE_SENT_NEWSLETTERS . "` set `subject`=?, `data`=?, `sent`=?, `users`=? , `datatxt`=?, `wysiwyg`=?, `is_html`=? ";
                 $query .= "where editionId=? and nlId=?";
-                $result = $this->query($query, [$subject, $data, (int) $this->now, $users, $datatxt, $wysiwyg, $is_html, (int) $editionId, (int) $nlId]);
+                $result = $this->query($query, [$subject, $data, $this->now, $users, $datatxt, $wysiwyg, $is_html, (int) $editionId, (int) $nlId]);
                 $query = "update `" . self::TABLE_NEWSLETTERS . "` set `editions`= `editions`+ 1 where `nlId`=? ";
                 $result = $this->query($query, [(int) $nlId]);
                 $query = "delete from `" . self::TABLE_SENT_NEWSLETTERS_FILES . "` where `editionId`=?";
@@ -179,10 +179,10 @@ class NlLib extends TikiLib
             } else {
                  // save and send an edition
                 $query = "insert into `" . self::TABLE_SENT_NEWSLETTERS . "`(`nlId`,`subject`,`data`,`sent`,`users` ,`datatxt`, `wysiwyg`, `is_html`) values(?,?,?,?,?,?,?,?)";
-                $result = $this->query($query, [(int) $nlId, $subject, $data, (int) $this->now, $users, $datatxt, $wysiwyg, $is_html]);
+                $result = $this->query($query, [(int) $nlId, $subject, $data, $this->now, $users, $datatxt, $wysiwyg, $is_html]);
                 $query = "update `" . self::TABLE_NEWSLETTERS . "` set `editions`= `editions`+ 1 where `nlId`=?";
                 $result = $this->query($query, [(int) $nlId]);
-                $editionId = $this->getOne('select max(`editionId`) from `' . self::TABLE_SENT_NEWSLETTERS . '`');
+                $editionId = $this->lastInsertId();
             }
         } else {
             if ($editionId > 0 && $this->getOne('select `sent` from `' . self::TABLE_SENT_NEWSLETTERS . '` where `editionId`=?', [(int) $editionId ]) == -1) {
@@ -196,7 +196,7 @@ class NlLib extends TikiLib
                 // save a new draft
                 $query = "insert into `" . self::TABLE_SENT_NEWSLETTERS . "`(`nlId`,`subject`,`data`,`sent`,`users`,`datatxt`, `wysiwyg`, `is_html`) values(?,?,?,?,?,?,?,?)";
                 $result = $this->query($query, [(int) $nlId, $subject, $data, -1, 0, $datatxt, $wysiwyg, $is_html]);
-                $editionId = $this->getOne('select max(`editionId`) from `tiki_sent_newsletters`');
+                $editionId = $this->lastInsertId();
             }
         }
         foreach ($files as $file) {
@@ -574,11 +574,11 @@ class NlLib extends TikiLib
 
             if (empty($res)) {
                 $query = "insert into `" . self::TABLE_NEWSLETTER_SUBSCRIPTIONS . "`(`nlId`,`email`,`code`,`valid`,`subscribed`,`isUser`,`included`) values(?,?,?,?,?,?,?)";
-                $bindvars = [(int) $nlId,$add,$code,'n',(int) $this->now,$isUser,'n'];
+                $bindvars = [(int) $nlId,$add,$code,'n',$this->now,$isUser,'n'];
             } else {
                 // if already sub'ed but not validated then update code and timestamp (a.k.a. `subscribed`) and resend mail
                 $query = "UPDATE `" . self::TABLE_NEWSLETTER_SUBSCRIPTIONS . "` SET `code`=?,`subscribed`=? WHERE `nlId`=? AND `email`=? AND `isUser`=? AND `valid`='n' AND `included`='n'";
-                $bindvars = [$code,(int) $this->now,(int) $nlId,$add,$isUser];
+                $bindvars = [$code,$this->now,(int) $nlId,$add,$isUser];
             }
             $result = $this->query($query, $bindvars);
             // Now email the address with the confirmation instructions;
@@ -609,7 +609,7 @@ class NlLib extends TikiLib
                 return $result && $result->numRows();
             }
             $query = "insert into `" . self::TABLE_NEWSLETTER_SUBSCRIPTIONS . "`(`nlId`,`email`,`code`,`valid`,`subscribed`,`isUser`,`included`) values(?,?,?,?,?,?,?)";
-            $result = $this->query($query, [(int) $nlId, $add, $code, 'y', (int) $this->now, $isUser, 'n']);
+            $result = $this->query($query, [(int) $nlId, $add, $code, 'y', $this->now, $isUser, 'n']);
             return $result && $result->numRows();
         }
     }

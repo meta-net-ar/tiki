@@ -35,7 +35,18 @@ class QuizLib extends TikiLib
 
     public function compute_quiz_stats()
     {
-        $query = "select `quizId`  from `tiki_user_quizzes`";
+        $query = "
+        SELECT 
+            q.quizId, 
+            q.name AS quizName, 
+            COUNT(uq.quizId) AS timesTaken, 
+            AVG(uq.points) AS avgpoints, 
+            MAX(uq.maxPoints) AS maxPoints, 
+            AVG(uq.timeTaken) AS avgtime
+        FROM tiki_quizzes q
+        INNER JOIN tiki_user_quizzes uq ON q.quizId = uq.quizId
+        GROUP BY q.quizId, q.name
+    ";
 
         $result = $this->fetchAll($query, []);
 
@@ -43,22 +54,18 @@ class QuizLib extends TikiLib
 
         foreach ($result as $res) {
             $quizId = $res["quizId"];
-
-            $quizName = $this->getOne("select `name`  from `tiki_quizzes` where `quizId`=?", [(int) $quizId]);
-            $timesTaken = $this->getOne("select count(*) from `tiki_user_quizzes` where `quizId`=?", [(int) $quizId]);
-            $avgpoints = $this->getOne("select avg(`points`) from `tiki_user_quizzes` where `quizId`=?", [(int) $quizId]);
-            $maxPoints = $this->getOne("select max(`maxPoints`) from `tiki_user_quizzes` where `quizId`=?", [(int) $quizId]);
-            $avgavg = ($maxPoints != 0) ? $avgpoints / $maxPoints * 100 : 0.0;
-            $avgtime = $this->getOne("select avg(`timeTaken`) from `tiki_user_quizzes` where `quizId`=?", [(int) $quizId]);
+            $maxPoints = $res['maxPoints'];
+            $avgpoints = $res['avgpoints'];
+            $avgavg = ($maxPoints > 0) ? $avgpoints / $maxPoints * 100 : 0.0;
 
             $quizStatsSum->delete(['quizId' => (int) $quizId,]);
             $quizStatsSum->insert(
                 [
                     'quizId' => (int) $quizId,
-                    'quizName' => $quizName,
-                    'timesTaken' => (int) $timesTaken,
+                    'quizName' => $res['quizName'],
+                    'timesTaken' => (int) $res['timesTaken'],
                     'avgpoints' => (float) $avgpoints,
-                    'avgtime' => (float) $avgtime,
+                    'avgtime' => (float) $res['avgtime'],
                     'avgavg' => (float) $avgavg,
                 ]
             );
@@ -84,7 +91,7 @@ class QuizLib extends TikiLib
         }
 
         $result = $quizzes->fetchColumn('quizId', $conditions);
-        $ret = $retids = [];
+        $res = $ret = $retids = [];
         $n = 0;
 
         //FIXME Perm:filter ?
@@ -721,7 +728,7 @@ class QuizLib extends TikiLib
                                     (int) $questionsPerPage,
                                     $timeLimited,
                                     (int) $timeLimit,
-                                    (int) $this->now,
+                                    $this->now,
                                     0,
                                     (int) $passingperct
             ];
@@ -1088,12 +1095,12 @@ class QuizLib extends TikiLib
                                 (int) $questionsPerPage,
                                 $timeLimited,
                                 (int) $timeLimit,
-                                (int) $this->now,
+                                $this->now,
                                 0
             ];
             $this->query($query, $bindvars);
             $queryid = "select max(`quizId`) from `tiki_quizzes` where `created`=?";
-            $quizId = $this->getOne($queryid, [(int) $this->now]);
+            $quizId = $this->getOne($queryid, [$this->now]);
         }
 
         return $quizId;
