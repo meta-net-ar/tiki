@@ -185,9 +185,13 @@ class Captcha
         }
     }
 
-    /** Return captcha ID
+    /**
+     * Return CAPTCHA ID
      *
-     * @return string captcha ID
+     * Note: Not all CAPTCHA implementations provide an ID.
+     * For CAPTCHAs without an ID (e.g., Altcha), this will return an empty string.
+     *
+     * @return string captcha ID or empty string if not available
      */
     public function getId()
     {
