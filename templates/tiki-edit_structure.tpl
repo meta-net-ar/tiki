@@ -1,7 +1,7 @@
 {title url="tiki-edit_structure.php?page_ref_id=$page_ref_id"}{tr}Structure:{/tr} {$structure_name}{/title}
 
 <div class="t_navbar mb-4">
-    {button href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
+    {button _class="btn btn-link" href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
 </div>
 
 {if $remove eq 'y'}
@@ -72,7 +72,7 @@
         {/foreach}
     {/remarksbox}
 {/if}
-
+<div class="styling-element">
 <div class="admintoclevel" id="topnode_{$page_ref_id}">
     <h2>{tr}Structure Layout{/tr}</h2>
     {if $editable eq 'y'}
@@ -128,9 +128,11 @@
                         {capture assign=title}{tr _0=$page_info.user}locked by %0{/tr}{/capture}
                         {icon name='lock' alt="{tr}Locked{/tr}" title=$title}
                     {else}
-                        {self_link _script='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}'}
-                            {icon name="edit"}
-                        {/self_link}
+                        {if !empty($structure_name)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {elseif !empty($pageName)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$pageName _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {/if}
                     {/if}
                     {if empty($page)}
                         {self_link _class="tips btn btn-link btn-sm add_new_child_page" _title=":{tr}Add new child page{/tr}"}
@@ -184,13 +186,19 @@
                     {/if}
                 </div>
                 <ul id="page_list_container" class="list-group">
-                    {foreach $listpages.data as $aPage}
-                        <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
-                            {$aPage.pageName|escape}
-                        </li>
-                    {/foreach}
+                    {if !empty($listpages.data)}
+                        {foreach $listpages.data as $aPage}
+                            <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
+                                {$aPage.pageName|escape}
+                            </li>
+                        {/foreach}
+                    {else}
+                        <li class="list-group-item">{tr}No pages found{/tr}</li>
+                    {/if}
                 </ul>
-                {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {if !empty($listpages.count) && $listpages.count > 0 && !empty($maxRecords) && $maxRecords > 0 && $listpages.count > $maxRecords}
+                    {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {/if}
             </div>
         </div>
     </form>
@@ -229,9 +237,9 @@
                 </select>
             </div>
             <label class="float-start" for="begin1">{tr}at the beginning{/tr}</label>
-            <div class="float-start"><input type="radio" id="begin1" name="begin" value="1" checked="checked" {if $structures|@count eq '1'} disabled="disabled"{/if}></div>
+            <div class="float-start"><input type="radio" class="form-check-input" id="begin1" name="begin" value="1" checked="checked" {if $structures|@count eq '1'} disabled="disabled"{/if}></div>
             <label class="float-start" for="begin2">{tr}at the end{/tr}</label>
-            <div class="float-start"><input type="radio" id="begin2" name="begin" value="0" {if $structures|@count eq '1'}disabled="disabled"{/if}></div>
+            <div class="float-start"><input type="radio" class="form-check-input" id="begin2" name="begin" value="0" {if $structures|@count eq '1'}disabled="disabled"{/if}></div>
             <hr>
             <div class="float-start input_submit_container submit">
                 <input type="submit" class="btn btn-primary" name="move_to" value="{tr}Move{/tr}" {if $structures|@count eq '1'} disabled="disabled"{/if}>
@@ -258,3 +266,4 @@
         </form>
     </div>
 {/if}{* end of if structure editable *}
+</div>

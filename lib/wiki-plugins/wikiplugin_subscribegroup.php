@@ -17,12 +17,11 @@ function wikiplugin_subscribegroup_info()
         'tags' => [ 'basic' ],
         'params' => [
             'group' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Group Name'),
                 'description' => tra('Group name to subscribe to or unsubscribe from'),
                 'since' => '2.0',
                 'filter' => 'groupname',
-                'default' => ''
             ],
             'subscribe' => [
                 'required' => false,
@@ -52,7 +51,6 @@ function wikiplugin_subscribegroup_info()
                     '<code>%s</code>'
                 ),
                 'since' => '2.0',
-                'default' => tra('OK')
             ],
             'unsubscribe_action' => [
                 'required' => false,
@@ -62,7 +60,6 @@ function wikiplugin_subscribegroup_info()
                     '<code>%s</code>'
                 ),
                 'since' => '2.0',
-                'default' => tra('OK')
             ],
             'postsubscribe_url' => [
                 'required' => false,
@@ -70,7 +67,6 @@ function wikiplugin_subscribegroup_info()
                 'description' => tra('URL to send the user to after subscribing, if required.'),
                 'since' => '8.0',
                 'filter' => 'url',
-                'default' => ''
             ],
             'postunsubscribe_url' => [
                 'required' => false,
@@ -78,7 +74,6 @@ function wikiplugin_subscribegroup_info()
                 'description' => tra('URL to send the user to after unsubscribing, if required.'),
                 'since' => '8.0',
                 'filter' => 'url',
-                'default' => ''
             ],
             'defgroup' => [
                 'required' => false,
@@ -88,7 +83,6 @@ function wikiplugin_subscribegroup_info()
                     '<code>%s</code>'
                 ),
                 'since' => '9.1',
-                'default' => tra('OK')
             ],
             'undefgroup' => [
                 'required' => false,
@@ -98,21 +92,18 @@ function wikiplugin_subscribegroup_info()
                     '<code>%s</code>'
                 ),
                 'since' => '9.1',
-                'default' => tra('OK')
             ],
             'defgroup_action' => [
                 'required' => false,
                 'name' => tra('Default Group Action'),
                 'description' => tra('Default group button label. Will subscribe to the group first if not already a member.'),
                 'since' => '9.1',
-                'default' => tra('OK')
             ],
             'undefgroup_action' => [
                 'required' => false,
                 'name' => tra('Not Default Group Action'),
                 'description' => tra('Stop this being default group button label. Does not unsubscribe from the group.'),
                 'since' => '9.1',
-                'default' => tra('OK')
             ],
             'undefgroup_group' => [
                 'required' => false,
@@ -168,7 +159,7 @@ function wikiplugin_subscribegroup($data, $params)
     }
     extract($params, EXTR_SKIP);
 
-    if (empty($group)) {
+    if (is_null($group)) {
         if (! empty($_REQUEST['group'])) {
             $group = $_REQUEST['group'];
         } else {
@@ -181,7 +172,7 @@ function wikiplugin_subscribegroup($data, $params)
     if (! ($info = $userlib->get_group_info($group)) || $info['groupName'] != $group) { // must have the right case
         return tra('Incorrect param');
     }
-    if (! isset($params['allowLeaveNonUserChoice']) || $params['allowLeaveNonUserChoice'] != 'y') {
+    if ($params['allowLeaveNonUserChoice'] != 'y') {
         if ($info['userChoice'] != 'y') {
             return tra('Permission denied');
         }
@@ -196,7 +187,7 @@ function wikiplugin_subscribegroup($data, $params)
     }
 
     if (! empty($_REQUEST['subscribeGroup']) && ! empty($_REQUEST['iSubscribeGroup']) && $_REQUEST['iSubscribeGroup'] == $iSubscribeGroup && $_REQUEST['group'] == $group) {
-        if (isset($defgroup) || isset($defgroup_action) || isset($undefgroup) || isset($undefgroup_action)) {
+        if (! is_null($defgroup) || ! is_null($defgroup_action) || ! is_null($undefgroup) || ! is_null($undefgroup_action)) {
             if ($current_defgroup == $group) {
                 $new_group = ! empty($undefgroup_group) ? $undefgroup_group : 'Registered';
                 $userlib->set_default_group($user, $new_group);
@@ -216,30 +207,30 @@ function wikiplugin_subscribegroup($data, $params)
         } elseif (isset($groups[$group])) {
             $userlib->remove_user_from_group($user, $group);
             unset($groups[$group]);
-            if (! empty($postunsubscribe_url)) {
+            if (! is_null($postunsubscribe_url)) {
                 header("Location: $postunsubscribe_url");
                 die;
             }
         } else {
             $userlib->assign_user_to_group($user, $group);
             $groups[$group] = 'real';
-            if (! empty($postsubscribe_url)) {
+            if (! is_null($postsubscribe_url)) {
                 header("Location: $postsubscribe_url");
                 die;
             }
         }
     }
 
-    if (isset($undefgroup) || isset($undefgroup_action)) {
+    if (! is_null($undefgroup) || ! is_null($undefgroup_action)) {
         if ($current_defgroup == $group) {
             $text = $undefgroup ?? '';
-            if (! isset($undefgroup_action)) {
+            if (is_null($undefgroup_action)) {
                 $undefgroup_action = tra('OK');
             }
             $smarty->assign('action', $undefgroup_action);
         } else {
             $text = $defgroup ?? '';
-            if (! isset($defgroup_action)) {
+            if (is_null($defgroup_action)) {
                 $defgroup_action = tra('OK');
             }
             $smarty->assign('action', $defgroup_action);
@@ -249,13 +240,13 @@ function wikiplugin_subscribegroup($data, $params)
             return tra('Incorrect param');
         }
         $text = $unsubscribe ?? tra('Unsubscribe') . '%s';
-        if (! isset($unsubscribe_action)) {
+        if (is_null($unsubscribe_action)) {
             $unsubscribe_action = tra('OK');
         }
         $smarty->assign('action', $unsubscribe_action);
     } else {
         $text = $subscribe ?? tra('Subscribe') . '%s';
-        if (! isset($subscribe_action)) {
+        if (is_null($subscribe_action)) {
             $subscribe_action = tra('OK');
         }
         $smarty->assign('action', $subscribe_action);

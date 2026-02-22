@@ -264,6 +264,12 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             ],
         ];
 
+        if (! empty($prefs['unified_elastic_index_max_result_window'])) {
+            $definition['index'] = [
+                'max_result_window' => (int) $prefs['unified_elastic_index_max_result_window'],
+            ];
+        }
+
         // optionally removes 's from the end of words
         if ($this->possessiveStemmer) {
             $definition['analysis']['analyzer']['default']['filter'][] = 'english_possessive_stemmer';
@@ -494,6 +500,10 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         if (isset($hits->total->value)) {
             // TODO: new in 7.0 total might be approximate, so consider using track_total_hits:true
             $hits->total = $hits->total->value;
+        }
+
+        if ($query->isCountOnly()) {
+            return new Search_Elastic_ResultSet([], $hits->total, $resultStart, $resultCount);
         }
 
         if ($query->processDidYouMean() && $hits->total === 0) {

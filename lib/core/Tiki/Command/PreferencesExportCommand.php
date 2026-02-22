@@ -35,19 +35,19 @@ class PreferencesExportCommand extends Command
             ->addArgument(
                 'filename',
                 InputArgument::REQUIRED,
-                'File to export preferences'
+                tra('File to export preferences')
             )
             ->addOption(
                 'fields',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Preferences fields to export'
+                tra('Preferences fields to export')
             )
             ->addOption(
                 'wiki',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Option to specify if export will be in wiki syntax'
+                tra('Option to specify if export will be in wiki syntax')
             );
     }
 
@@ -55,7 +55,7 @@ class PreferencesExportCommand extends Command
     {
         $filename = $input->getArgument('filename');
 
-        $output->writeln("Exporting preferences...");
+        $output->writeln(tra("Exporting preferences..."));
 
         $defaultValues = get_default_prefs();
 

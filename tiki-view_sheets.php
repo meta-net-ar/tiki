@@ -12,27 +12,30 @@ use Tiki\Lib\Sheet\DatabaseHandler;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'sheet';
 $tiki_sheet_div_style = '';
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
             'sheetId'      => 'int',     //get
             'file'         => 'word',    //get
-            'fileId'       => 'word',    //get
+            'fileId'       => 'int',     //get
             'page'         => 'page',    //get
             'height'       => 'int',     //get
-            'parse'        => 'word',    //get
+            'parse'        => 'alpha',    //get
             's'            => 'string',  //get
             'readdate'     => 'int',     //get
-            'relate'       => 'int',     //get
+            'relate'       => 'alpha',   //get
             'trackerId'    => 'int',     //get
             'childSheetId' => 'int',     //get
-            'sheetonly'    => 'bool',    //get
+            'sheetonly'    => 'alpha',   //get
         ]
     ],
 ];
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_SHEET;
+Sections::setCurrentSection($section);
 
 $sheetlib = TikiLib::lib('sheet');
 

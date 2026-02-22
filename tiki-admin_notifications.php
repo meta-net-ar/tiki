@@ -11,26 +11,28 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'offset'       => 'digits',             //get
+            'offset'       => 'int',                //get
             'login'        => 'username',           //post
-            'add'          => 'bool',               //post
-            'maxRecords'   => 'digits',             //post
+            'add'          => 'alpha',              //post
+            'maxRecords'   => 'int',                //get
             'removeevent'  => 'digits',             //get
             'removetype'   => 'word',               //get
-            'sort_mode'    => 'word',               //get
-            'find'         => 'striptags',          //get
-            'email'        => 'email',              //get
-            'event'        => 'text',               //get
-            'delsel_x'     => 'alpha',              //get
-            'action'       => 'alpha',              //get
+            'sort_mode'    => 'alnumdash',          //get
+            'find'         => 'text',               //get
+            'email'        => 'email',              //post
+            'event'        => 'text',               //post
+            'action'       => 'alpha',              //post
         ] ,
         'staticKeyFiltersForArrays' => [
-            'checked'               => 'alnum',     //get
+            'checked'      => 'text',               //post
         ] ,
     ]
 ];
 // Initialization
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_permission(['tiki_p_admin_notifications']);
 
 $notificationlib = TikiLib::lib('notification');
@@ -124,17 +126,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('find', $find);
 if (! empty($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];

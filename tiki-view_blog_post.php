@@ -8,22 +8,29 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'blogs';
+require_once('tiki-setup.php');
+
+use Tiki\Sections;
+
+$section = Sections::SECTION_BLOGS;
+Sections::setCurrentSection($section);
+
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
-            'postId'            => 'int',      //get
-            'watch_event'       => 'word',     //get
-            'watch_action'      => 'word',     //get
-            'offset'            => 'int',      //get
-            'sort_mode'         => 'word',     //get
-            'find'              => 'string',   //get
-            'page'              => 'int',      //get
-            'savenotepad'       => 'none',     //get
+            'postId'            => 'int',           //get
+            'watch_event'       => 'striptags',     //get
+            'watch_action'      => 'alpha',         //get
+            'watch_object'      => 'int',           //get
+            'offset'            => 'int',           //get
+            'sort_mode'         => 'alnumdash',     //get
+            'find'              => 'striptags',     //get
+            'page'              => 'int',           //get
+            'savenotepad'       => 'int',          //get
         ]
     ],
 ];
-require_once('tiki-setup.php');
+
 $bloglib = TikiLib::lib('blog');
 
 use Tiki\Wiki\WikiPaginationUtils;

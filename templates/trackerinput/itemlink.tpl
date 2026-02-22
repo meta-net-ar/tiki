@@ -80,7 +80,23 @@
             {/jq}
         {/if}
     {else}
-        <select name="{$field.html_name}" {if $data.preselection and $data.crossSelect neq 'y'}disabled="disabled"{/if} {if $data.selectMultipleValues}multiple="multiple"{/if} class="form-select" {if $field.isMandatory eq 'y'} required{/if} {if $field.options_map.lazyload}data-remote-source-url="{service external=true controller=tracker action=findItems trackerId=$field.options_map.trackerId field=$field.options_map.fieldId listFields=$data.listFields limit=50}"{/if}>
+        <select name="{$field.html_name}"
+            {if $data.preselection and $data.crossSelect neq 'y'}disabled="disabled"{/if}
+            {if $data.selectMultipleValues}multiple="multiple"{/if}
+            class="form-select"
+            {if $field.isMandatory eq 'y'} required{/if}
+            {if $field.options_map.lazyload}
+                data-remote-source-url="{service external=true
+                    controller=tracker
+                    action=findItems
+                    trackerId=$field.options_map.trackerId
+                    field=$field.options_map.fieldId
+                    listFields=$data.listFields
+                    displayFieldsListSort=$field.options_map.displayFieldsListSort
+                    limit=50
+                }"
+            {/if}
+        >
             {if $field.isMandatory ne 'y' || empty($field.value)}
                 <option value=""></option>
             {/if}

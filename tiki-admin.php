@@ -8,15 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
+require_once('tiki-setup.php');
 use Tiki\Installer\Installer;
 use Tiki\Package\ComposerCli;
 use Tiki\Package\ExtensionManager;
 use Tiki\Suggestion\Rules;
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
-$section = 'admin';
-
-require_once('tiki-setup.php');
 $adminlib = TikiLib::lib('admin');
 
 $auto_query_args = ['page'];
@@ -363,16 +363,46 @@ $smarty->assign('ProblemsLoadingCacheSubSystem', TikiLib::lib('cache')->reportOp
 // VERSION TRACKING
 $forcecheck = ! empty($_GET['forcecheck']);
 
+$upgrade_errors = [];
+$upgrade_warnings = [];
+$upgrade_notes = [];
+$versionObj = Tiki_Version_Version::get($TWV->version);
+$is_stable = $versionObj->isStable();
+
 // Versioning feature has been enabled, so if the time is right, do a live
 // check, otherwise display the stored data.
 if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $versionUtils = new Tiki_Version_Utils();
     $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
 
+    $gitlib = TikiLib::lib('git');
+    $gitDetails = $gitlib->isGitInstall() ? $gitlib->getGitDetails()['content'] : [];
+
     $smarty->assign('upgrade_messages', $upgrades);
+    $smarty->assign('git_details', $gitDetails);
+    $smarty->assign('is_stable', $is_stable);
+
+    // Pre-sort the messages into separate arrays based on urgency
+
+    foreach ($upgrades as $upgrade_object) {
+        $type = $upgrade_object->getType();
+        $message = $upgrade_object->getMessage();
+        if ($type === 'error') {
+            $upgrade_errors[] = $message;
+        } elseif ($type === 'warning') {
+            $upgrade_warnings[] = $message;
+        } else {
+            $upgrade_notes[] = $message;
+        }
+    }
 } else {
     $smarty->assign('upgrade_messages', []);
+    $smarty->assign('git_details', []);
+    $smarty->assign('is_stable', $is_stable);
 }
+$smarty->assign('upgrade_errors', $upgrade_errors);
+$smarty->assign('upgrade_warnings', $upgrade_warnings);
+$smarty->assign('upgrade_notes', $upgrade_notes);
 
 // SSL setup
 $haveMySQLSSL = $tikilib->haveMySQLSSL();
@@ -474,6 +504,18 @@ if ($prefs['feature_scheduler'] === 'y') {
     $smarty->assign('isSchedulerRunConfigured', true);
 }
 
+if (! empty($prefs['scheduledTasksReport']) && $prefs['scheduledTasksReport'] !== 'do_not_report') {
+    $schedLib = \TikiLib::lib('scheduler');
+    $schedulerFailureLogs = $schedLib->getSchedulerFromLogs('failed');
+    $smarty->assign('scheduler_failure_logs', $schedulerFailureLogs);
+    $smarty->assign('scheduler_failure_count', count($schedulerFailureLogs));
+    // Get total count for ratio display in time_window mode
+    if ($prefs['scheduledTasksReport'] === 'last_number_of_hours') {
+        $allLogs = $schedLib->getSchedulerFromLogs(); // All statuses
+        $smarty->assign('scheduler_total_count', count($allLogs));
+    }
+}
+
 if (! $unifiedsearch->rebuildInProgress()) {
     $searchIndex = [
         'error' => false,
@@ -512,4 +554,19 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
+
+$htacxGlobal = null;
+if (TikiLib::lib('tiki')->get_preference('security_warn_htaccess_mismatch', 'y') === 'y') {
+    $htacx = (new \Tiki\Security\HtaccessChecker())->run(
+        TIKI_PATH,
+        TIKI_PATH . '/_htaccess',
+        ['server_software' => $_SERVER['SERVER_SOFTWARE'] ?? '']
+    );
+    if ($htacx && ($htacx['status'] ?? '') === \Tiki\Security\HtaccessChecker::STATUS_MISMATCH) {
+        $htacxGlobal = $htacx;
+    }
+}
+$smarty->assign('htaccess_global_warning', $htacxGlobal);
+$smarty->assign('htaccessDocsUrl', 'https://doc.tiki.org/htaccess');
+
 $smarty->display('tiki.tpl');

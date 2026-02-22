@@ -11,16 +11,58 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save'         => 'bool',                //post
+            'save'              => 'alpha',          //post
+            'import'            => 'alpha',          //post
             'parentId'     => 'int',                 //get
+            'categId'           => 'int',            //get/post
             'cookietab'    => 'int',                 //get
-            'sort_mode'    => 'striptags',           //get
+            'sort_mode'         => 'alnumdash',      //get
             'name'         => 'striptags',           //post
             'description'  => 'xss',                 //post
+            'pollId'            => 'int',            //post
+            'faqId'             => 'int',            //post
+            'trackerId'         => 'int',            //post
+            'quizId'            => 'int',            //post
+            'forumId'           => 'int',            //post
+            'galleryId'         => 'int',            //post
+            'file_galleryId'    => 'int',            //post
+            'articleId'         => 'int',            //post
+            'blogId'            => 'int',            //post
+            'directoryId'       => 'int',            //post
+            'removeObject'      => 'int',            //get
+            'removeCat'         => 'int',            //get
+            'tplGroupContainer' => 'int',            //post
+            'tplGroupPattern'   => 'text',           //post
+            'parentPerms'       => 'alpha',          //post
+            'applyRoles'        => 'alpha',          //post
+            'find'              => 'text',           //get
+            'find_objects'      => 'text',           //get
+            'offset'            => 'int',            //get
+            'addpage'           => 'alpha',          //post
+            'addpoll'           => 'alpha',          //post
+            'addfaq'            => 'alpha',          //post
+            'addtracker'        => 'alpha',          //post
+            'addquiz'           => 'alpha',          //post
+            'addforum'          => 'alpha',          //post
+            'addgallery'        => 'alpha',          //post
+            'addfilegallery'    => 'alpha',          //post
+            'addarticle'        => 'alpha',          //post
+            'addblog'           => 'alpha',          //post
+            'adddirectory'      => 'alpha',          //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'pageName'          => 'text',           //post
+            'categoryRole'      => 'int',            //post
+            'rolesToApply'      => 'int',            //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
+
 $categlib = TikiLib::lib('categ');
 $rolesRepo = TikiLib::lib('roles');
 
@@ -140,11 +182,6 @@ if (isset($_REQUEST["addforum"]) && $_REQUEST["parentId"] != 0 && $access->check
     $categlib->categorize_any('forum', $_REQUEST["forumId"], $_REQUEST["parentId"]);
     $categorizedObject = $categlib->get_categorized_object('forum', $_REQUEST["forumId"]);
 }
-if (isset($_REQUEST["addgallery"]) && $_REQUEST["parentId"] != 0 && $access->checkCsrf()) {
-    // Here we categorize an image gallery
-    $categlib->categorize_any('image gallery', $_REQUEST["galleryId"], $_REQUEST["parentId"]);
-    $categorizedObject = $categlib->get_categorized_object('image gallery', $_REQUEST["galleryId"]);
-}
 if (isset($_REQUEST["addfilegallery"]) && $_REQUEST["parentId"] != 0 && $access->checkCsrf()) {
     // Here we categorize a file gallery
     $categlib->categorize_any('file gallery', $_REQUEST["file_galleryId"], $_REQUEST["parentId"]);
@@ -236,6 +273,15 @@ if (
 }
 if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["name"]) > 0 && $access->checkCsrf()) {
     // Save
+    if (isset($_REQUEST["name"], $_REQUEST["description"])) {
+        $validateNameFieldLength = Feedback::validateFieldLength("Name", $_REQUEST["name"], CategLib::MAX_CATEGORY_NAME_LENGTH);
+        $validateDescriptionFieldLength = Feedback::validateFieldLength("Description", $_REQUEST["description"], CategLib::MAX_CATEGORY_DESCRIPTION_LENGTH);
+        if (! $validateNameFieldLength || ! $validateDescriptionFieldLength) {
+            $smarty->assign('mid', 'tiki-admin_categories.tpl');
+            $smarty->display("tiki.tpl");
+            die;
+        }
+    }
     if (! empty($_REQUEST["tplGroupContainer"]) && ! str_contains($_REQUEST["tplGroupPattern"], '--groupname--')) {
         Feedback::error(tra('A pattern that does not contain "--groupname--" is not allowed'));
     }
@@ -380,6 +426,8 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
 $smarty->assign('categId', $_REQUEST["categId"]);
 $smarty->assign('categoryName', $info["name"]);
 $smarty->assign('description', $info["description"]);
+$smarty->assign('MAX_CATEGORY_NAME_LENGTH', CategLib::MAX_CATEGORY_NAME_LENGTH);
+$smarty->assign('MAX_CATEGORY_DESCRIPTION_LENGTH', CategLib::MAX_CATEGORY_DESCRIPTION_LENGTH);
 if (isset($info["tplGroupContainerId"])) {
     $smarty->assign('tplGroupContainerId', $info["tplGroupContainerId"]);
 }
@@ -566,24 +614,11 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-$smarty->assign('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-if (isset($_REQUEST["find_objects"])) {
-    $find_objects = $_REQUEST["find_objects"];
-} else {
-    $find_objects = '';
-}
+$find_objects = $_REQUEST["find_objects"] ?? '';
 
 // ---------------------------------------------------
 if ($prefs['feature_search'] !== 'y' || $prefs['unified_add_to_categ_search'] !== 'y') {    // no unified search

@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_mail_info()
 {
-    global $prefs;
 
     return [
         'name' => tra('Mail'),
@@ -23,7 +22,6 @@ function wikiplugin_mail_info()
                 'description' => tra('Limit the list of groups to the groups including each group'),
                 'filter' => 'groupname',
                 'since' => '5.0',
-                'default' => '',
                 'separator' => ':',
             ],
             'showgroupdd' => [

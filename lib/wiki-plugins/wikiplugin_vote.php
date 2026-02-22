@@ -25,12 +25,11 @@ function wikiplugin_vote_info()
                 'profile_reference' => 'tracker',
             ],
             'fields' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Fields'),
                 'description' => tra('Colon-separated list of field IDs to be displayed. If not set all the fields that
                     can be used (except IP, user, system, private fields) are used. Example:') . ' <code>2:4:5</code>',
                 'since' => '2.0',
-                'default' => '',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[trackerId]"]',
@@ -172,7 +171,7 @@ function wikiplugin_vote($data, $params)
     $alreadyVoted = $trklib->get_user_item($trackerId, ['oneUserItem' => 'y']);
     $smarty->assign('has_already_voted', $alreadyVoted ? 'y' : 'n');
 
-    if (empty($fields)) {
+    if (is_null($fields)) {
         $fields = $trklib->list_tracker_fields($trackerId);
         $ff = [];
         foreach ($fields['data'] as $field) {

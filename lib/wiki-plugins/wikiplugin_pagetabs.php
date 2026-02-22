@@ -27,7 +27,6 @@ function wikiplugin_pagetabs_info()
                     pipe %0|%1. Or a table with the class of "pagetabs" on the main page. On child pages use as a way
                     to redirect to the parent.', '<code>', '</code>'),
                 'since' => '9.0',
-                'default' => '',
                 'separator' => '|',
                 'filter' => 'pagename',
                 'profile_reference' => 'wiki_page',
@@ -43,11 +42,6 @@ function wikiplugin_pagetabs($data, $params)
     static $pagetabsindex = 0;
     ++$pagetabsindex;
     extract($params, EXTR_SKIP);
-
-    if (empty($params['pages'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'pages'));
-        return;
-    }
 
     $smarty->assign('id', $pagetabsindex);
     $smarty->assign('pages', $pages);

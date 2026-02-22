@@ -5,6 +5,7 @@
 {/block}
 
 {block name="content"}
+
     <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form" data-should-parse-editor-data="false">
         <div class="form-contents">
             <div class="preview d-none">
@@ -19,7 +20,7 @@
                 {/if}
             </div>
             <input type="hidden" name="calitem[user]" value="{$calitem.user|escape}">
-            <input type="hidden" name="return_url" value="tiki-calendar.php">
+            <input type="hidden" id="return_url" name="return_url" value="{$calitem.returnURL}">
             {if $calitemId}
                 <input type="hidden" name="calitemId" value="{$calitemId|escape}">
             {/if}
@@ -38,8 +39,7 @@
                 <label for="calid" class="col-form-label col-sm-3">{tr}Calendar{/tr}</label>
                 <div class="col-sm-9">
                     <input name="calendarchanged" type="hidden">
-                    <select name="calitem[calendarId]" id="calid" class="form-control" required
-                            onchange="$(this).parents('.edit-event-form').tikiModal(tr('Loading...')); needToConfirm=false; $('input[name=calendarchanged]').val(1); $('input[name=saveitem]').trigger('click');">
+                    <select name="calitem[calendarId]" id="calid" class="form-control" required>
                         {foreach $calendars as $aCalendar}
                             {$calstyle = ''}
                             {if not empty($aCalendar.custombgcolor)}
@@ -78,7 +78,7 @@
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
+                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" maxlength="{$MAX_CALENDAR_EVENT_TITLE_LENGTH}" required>
                 </div>
             </div>
             {if !empty($trackerItems)}
@@ -216,7 +216,7 @@
                 <label class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
                         {strip}
-                            {textarea name="calitem[description]" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
+                            {textarea name="calitem[description]" maxlength="{$MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH}" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
                             {$calitem.description}
                             {/textarea}
                         {/strip}

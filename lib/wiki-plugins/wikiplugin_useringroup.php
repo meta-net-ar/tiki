@@ -58,10 +58,6 @@ function wikiplugin_useringroup($data, $params)
 {
     $userlib = TikiLib::lib('user');
 
-    if (! isset($params['testgroup']) && ! isset($params['userId'])) {
-        return WikiParser_PluginOutput::error(tr('Plugin UserInGroup'), tr('Sorry you need to specify the userId and testgroup parameter'));
-    }
-
     $result = $params['falsetext'];
 
     if ($userlib->user_is_in_group($params['userId'], $params['testgroup'])) {

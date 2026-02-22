@@ -293,6 +293,9 @@ class CacheLib
 
             // Folders created by unoconv/libreoffice that should be removed
             $unoconvFolders = ['.cache', '.config'];
+            $deletedOkSoFar = true;
+            $errorMessage = '';
+
             while (false !== ($file = readdir($dir))) {
                 if (
                     ( substr($file, 0, 1) == "." && substr($file, -5) != $extracheck ) or
@@ -310,16 +313,24 @@ class CacheLib
                     $this->erase_dir_content($path . "/" . $file);
                     @rmdir($path . "/" . $file);    // dir won't be empty if there are multitiki dirs inside
                 } else {
-                    try {
-                        $filePath = $path . "/" . $file;
-                        if (file_exists($filePath)) {
-                            unlink($filePath);
+                    $filePath = $path . "/" . $file;
+                    if (file_exists($filePath)) {
+                        if (! unlink($filePath)) {
+                            if ($deletedOkSoFar) {
+                                $errorMessage = tr('Cache file %0 failed to be deleted', $path . "/" . $file);
+                                // don't display the error for each file
+                                $deletedOkSoFar = false;
+                            } else {
+                                $errorMessage .= '<br>' . tr('Other cache files failed to be deleted');
+                            }
                         }
-                    } catch (Error $e) {
-                        Feedback::error(tr('Cache file %0 is not writable (%1)', $path . "/" . $file, $e->getMessage()));
                     }
                 }
             }
+            if ($errorMessage) {
+                Feedback::error($errorMessage);
+            }
+
             closedir($dir);
         }
     }

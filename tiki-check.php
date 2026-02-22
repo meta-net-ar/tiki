@@ -27,8 +27,10 @@ IMPORTANT:
 // phpcs:disable PHPCompatibility.IniDirectives.RemovedIniDirectives.mbstring_func_overloadDeprecated
 
 use Tiki\Lib\Alchemy\AlchemyLib;
-use Tiki\Lib\Unoconv\UnoconvLib;
+use Tiki\Lib\Unoconv\UnoconvStrategy;
+use Tiki\Lib\Unoconv\UnoserverStrategy;
 use Tiki\Package\ComposerManager;
+use Smarty\Smarty;
 
 // Define fitness status constants early
 define('FITNESS_STATUS_GOOD', 'good');
@@ -99,14 +101,14 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
                 'fitness' => tra('info'),
                 'fitness_status' => FITNESS_STATUS_INFO,
                 'setting' => 'Enabled',
-                'message' => tra('Errors will be logged, since log_errors is enabled. Also, display_errors is disabled.')
+                'message' => tr('Errors will be logged, since %0 is enabled. Also, %1 is disabled.', 'log_errors', 'display_errors')
             );
         } else {
             $php_properties['Error logging'] = array(
                 'fitness' => tra('info'),
                 'fitness_status' => FITNESS_STATUS_INFO,
                 'setting' => 'Enabled',
-                'message' => tra('Errors will be logged, since log_errors is enabled, but display_errors is also enabled.')
+                'message' => tr('Errors will be logged, since %0 is enabled, but %1 is also enabled.', 'log_errors', 'display_errors')
             );
         }
     } else {
@@ -114,7 +116,7 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Full',
-            'message' => tra('Errors will not be logged, since log_errors is not enabled.')
+            'message' => tr('Errors will not be logged, since %0 is not enabled.', 'log_errors')
         );
     }
 
@@ -144,14 +146,14 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => 'Enabled',
-            'message' => tra('allow_url_fopen is enabled, which could be a security risk.')
+            'message' => tr('%0 is enabled, which could be a security risk.', 'allow_url_fopen')
         );
     } else {
         $security['allow_url_fopen'] = array(
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => 'Disabled',
-            'message' => tra('allow_url_fopen is disabled, which is good for security.')
+            'message' => tr('%0 is disabled, which is good for security.', 'allow_url_fopen')
         );
     }
 
@@ -163,14 +165,14 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
                 'fitness' => tra('good'),
                 'fitness_status' => FITNESS_STATUS_GOOD,
                 'setting' => 'Loaded',
-                'message' => tra("The $ext extension is loaded.")
+                'message' => tr('The %0 extension is loaded.', $ext)
             );
         } else {
             $php_properties[$ext] = array(
                 'fitness' => tra('bad'),
                 'fitness_status' => FITNESS_STATUS_BAD,
                 'setting' => 'Not loaded',
-                'message' => tra("The $ext extension is not loaded.")
+                'message' => tr('The %0 extension is not loaded.', $ext)
             );
         }
     }
@@ -808,14 +810,14 @@ if ($l) {
         'fitness' => tra('info'),
         'fitness_status' => FITNESS_STATUS_INFO,
         'setting' => 'Enabled',
-        'message' => tra('Errors will be logged, since log_errors is enabled. Also, display_errors is disabled. This is good practice for a production site, to log the errors instead of displaying them.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Errors will be logged, since %0 is enabled. Also, %1 is disabled. This is good practice for a production site, to log the errors instead of displaying them. %2 More info about %0 %3', 'log_errors', 'display_errors', '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['Error logging'] = array(
         'fitness' => tra('info'),
         'fitness_status' => FITNESS_STATUS_INFO,
         'setting' => 'Enabled',
-        'message' => tra('Errors will be logged, since log_errors is enabled, but display_errors is also enabled. Good practice, especially for a production site, is to log all errors instead of displaying them.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Errors will be logged, since %0 is enabled, but %1 is also enabled. Good practice, especially for a production site, is to log all errors instead of displaying them. %2 How to change this value %3', 'log_errors', 'display_errors', '<a href="#php_conf_info">', '</a>')
         );
     }
 } else {
@@ -823,7 +825,7 @@ if ($l) {
     'fitness' => tra('info'),
     'fitness_status' => FITNESS_STATUS_INFO,
     'setting' => 'Full',
-    'message' => tra('Errors will not be logged, since log_errors is not enabled. Good practice, especially for a production site, is to log all errors.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+    'message' => tr('Errors will not be logged, since %0 is not enabled. Good practice, especially for a production site, is to log all errors. %1 How to change this value %2', 'log_errors', '<a href="#php_conf_info">', '</a>')
     );
 }
 if ($e == 0) {
@@ -832,14 +834,14 @@ if ($e == 0) {
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Disabled',
-            'message' => tra('Errors will not be reported, because error_reporting and display_errors are both turned off. This may be appropriate for a production site but, if any problems occur, enable these in php.ini to get more information.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr('Errors will not be reported, because %0 and %1 are both turned off. This may be appropriate for a production site but, if any problems occur, enable these in php.ini to get more information. %2 How to change this value %3', 'error_reporting', 'display_errors', '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['Error reporting'] = array(
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Disabled',
-            'message' => tra('No errors will be reported, although display_errors is On, because the error_reporting level is set to 0. This may be appropriate for a production site but, in if any problems occur, raise the value in php.ini to get more information.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr('No errors will be reported, although %0 is On, because the %1 level is set to 0. This may be appropriate for a production site but, in if any problems occur, raise the value in php.ini to get more information. %2 How to change this value %3', 'display_errors', 'error_reporting', '<a href="#php_conf_info">', '</a>')
         );
     }
 } elseif ($e > 0 && $e < 32767) {
@@ -848,14 +850,14 @@ if ($e == 0) {
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Disabled',
-            'message' => tra('No errors will be reported, because display_errors is turned off. This may be appropriate for a production site but, in any problems occur, enable it in php.ini to get more information. The error_reporting level is reasonable at ' . $e . '.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr('No errors will be reported, because %0 is turned off. This may be appropriate for a production site but, in any problems occur, enable it in php.ini to get more information. The %1 level is reasonable at %2. %3 How to change this value %4', 'display_errors', 'error_reporting', $e, '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['Error reporting'] = array(
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Partly',
-            'message' => tr('Not all errors will be reported as the error_reporting level is at %0. This is not necessarily a bad thing (and it may be appropriate for a production site) as critical errors will be reported, but sometimes it may be useful to get more information. Check the error_reporting level in php.ini if any problems are occurring. <a href="#php_conf_info">How to change this value</a>', $e)
+            'message' => tr('Not all errors will be reported as the %0 level is at %1. This is not necessarily a bad thing (and it may be appropriate for a production site) as critical errors will be reported, but sometimes it may be useful to get more information. Check the %0 level in php.ini if any problems are occurring. %2 How to change this value %3', 'error_reporting', $e, '<a href="#php_conf_info">', '</a>')
         );
     }
 } else {
@@ -864,14 +866,14 @@ if ($e == 0) {
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Disabled',
-            'message' => tra('No errors will be reported although the error_reporting level is all the way up at ' . $e . ', because display_errors is off. This may be appropriate for a production site but, in case of problems, enable it in php.ini to get more information.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr('No errors will be reported although the %0 level is all the way up at %1, because %2 is off. This may be appropriate for a production site but, in case of problems, enable it in php.ini to get more information. %3 How to change this value %4', 'error_reporting', $e, 'display_errors', '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['Error reporting'] = array(
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => 'Full',
-            'message' => tra('All errors will be reported as the error_reporting level is all the way up at ' . $e . ' and display_errors is on. This is good because, in case of problems, the error reports usually contain useful information.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr('All errors will be reported as the %0 level is all the way up at %1 and %2 is on. This is good because, in case of problems, the error reports usually contain useful information. %3 How to change this value %4', 'error_reporting', $e, 'display_errors', '<a href="#php_conf_info">', '</a>')
         );
     }
 }
@@ -886,7 +888,7 @@ if (function_exists('ini_set')) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => 'Enabled',
-        'message' => tra('ini_set is used in some places to accommodate special needs of some Tiki features.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('%0 is used in some places to accommodate special needs of some Tiki features. %1 More info about %0 %2', 'ini_set', '<a href="#php_conf_info">', '</a>')
     );
     // As ini_set is available, use it for PDO error reporting
     ini_set('display_errors', '1');
@@ -895,7 +897,7 @@ if (function_exists('ini_set')) {
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => 'Disabled',
-        'message' => tra('ini_set is used in some places to accommodate special needs of some Tiki features. Check disable_functions in your php.ini.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('%0 is used in some places to accommodate special needs of some Tiki features. Check disable_functions in your php.ini. %1 How to change this value %2', 'ini_set', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1071,21 +1073,21 @@ if (function_exists('disk_free_space')) {
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => $free_space,
-            'message' => tra('Less than 200MB of free disk space is available. Tiki will not fit in this amount of disk space.')
+            'message' => tr('Less than %0 of free disk space is available. Tiki will not fit in this amount of disk space.', '200MB')
         );
     } elseif ($bytes < 250 * 1024 * 1024) {
         $server_properties['Disk Space'] = array(
             'fitness' => tra('unsure'),
             'fitness_status' => FITNESS_STATUS_UNSURE,
             'setting' => $free_space,
-            'message' => tra('Less than 250MB of free disk space is available. This would be quite tight for a Tiki installation. Tiki needs disk space for compiled templates and uploaded files.') . ' ' . tra('When the disk space is filled, users, including administrators, will not be able to log in to Tiki.') . ' ' . tra('This test cannot reliably check for quotas, so be warned that if this server makes use of them, there might be less disk space available than reported.')
+            'message' => tr('Less than %0 of free disk space is available. This would be quite tight for a Tiki installation. Tiki needs disk space for compiled templates and uploaded files. When the disk space is filled, users, including administrators, will not be able to log in to Tiki. This test cannot reliably check for quotas, so be warned that if this server makes use of them, there might be less disk space available than reported.', '250MB')
         );
     } else {
         $server_properties['Disk Space'] = array(
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => $free_space,
-            'message' => tra('More than 251MB of free disk space is available. Tiki will run smoothly, but there may be issues when the site grows (because of file uploads, for example).') . ' ' . tra('When the disk space is filled, users, including administrators, will not be able to log in to Tiki.') . ' ' . tra('This test cannot reliably check for quotas, so be warned that if this server makes use of them, there might be less disk space available than reported.')
+            'message' => tr('More than %0 of free disk space is available. Tiki will run smoothly, but there may be issues when the site grows (because of file uploads, for example). When the disk space is filled, users, including administrators, will not be able to log in to Tiki. This test cannot reliably check for quotas, so be warned that if this server makes use of them, there might be less disk space available than reported.', '251MB')
         );
     }
 } else {
@@ -1093,7 +1095,7 @@ if (function_exists('disk_free_space')) {
             'fitness' => tra('N/A'),
             'fitness_status' => FITNESS_STATUS_NA,
             'setting' => 'N/A',
-            'message' => tra('The PHP function disk_free_space is not available on your server, so the amount of available disk space can\'t be checked for.')
+            'message' => tr('The PHP function %0 is not available on your server, so the amount of available disk space can\'t be checked for.', 'disk_free_space')
         );
 }
 
@@ -1170,14 +1172,14 @@ if (function_exists('exec')) {
                 'fitness' => tra('good'),
                 'fitness_status' => FITNESS_STATUS_GOOD,
                 'setting' => $cliVersion,
-                'message' => 'The version of the command line executable of PHP (' . $cliCommand . ') is the same version as the web server version.',
+                'message' => tr('The version of the command line executable of PHP (%0) is the same version as the web server version.', $cliCommand),
             );
         } else {
             $php_properties['PHP CLI version'] = array(
                 'fitness' => tra('unsure'),
                 'fitness_status' => FITNESS_STATUS_UNSURE,
                 'setting' => $cliVersion,
-                'message' => 'The version of the command line executable of PHP (' . $cliCommand . ') is not the same as the web server version.',
+                'message' => tr('The version of the command line executable of PHP (%0) is not the same as the web server version.', $cliCommand),
             );
         }
     } else {
@@ -1280,14 +1282,14 @@ if (function_exists('opcache_get_configuration') && (ini_get('opcache.enable') =
                     'fitness' => tra('info'),
                     'fitness_status' => FITNESS_STATUS_INFO,
                     'setting' => 'WinCache',
-                    'message' => tra('WinCache version 2 or higher is being used as the FileCache. It does not support a ByteCode Cache.') . ' ' . tra('It is recommended to use Zend opcode cache as the ByteCode Cache.')
+                    'message' => tr('WinCache version 2 or higher is being used as the FileCache. It does not support a ByteCode Cache. It is recommended to use Zend opcode cache as the ByteCode Cache.')
                 );
             } else {
                 $php_properties['ByteCode Cache'] = array(
                     'fitness' => tra('unsure'),
                     'fitness_status' => FITNESS_STATUS_UNSURE,
                     'setting' => 'WinCache',
-                    'message' => tra('WinCache version 2 or higher is being used as the FileCache, but the required CGI/FastCGI server API is apparently not being used.') . ' ' . tra('It is recommended to use Zend opcode cache as the ByteCode Cache.')
+                    'message' => tr('WinCache version 2 or higher is being used as the FileCache, but the required CGI/FastCGI server API is apparently not being used. It is recommended to use Zend opcode cache as the ByteCode Cache.')
                 );
             }
         } else {
@@ -1321,28 +1323,28 @@ if ($s >= 160 * 1024 * 1024) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $memory_limit,
-        'message' => tra('The memory_limit is at') . ' ' . $memory_limit . '. ' . tra('This is known to support smooth functioning even for bigger sites.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is known to support smooth functioning even for bigger sites. %2 More info about %0 %3', 'memory_limit', $memory_limit, '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s < 160 * 1024 * 1024 && $s > 127 * 1024 * 1024) {
     $php_properties['memory_limit'] = array(
         'fitness' => tra('unsure') ,
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $memory_limit,
-        'message' => tra('The memory_limit is at') . ' ' . $memory_limit . '. ' . tra('This will normally work, but the site might run into problems when it grows.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This will normally work, but the site might run into problems when it grows. %2 How to change this value %3', 'memory_limit', $memory_limit, '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s == -1) {
     $php_properties['memory_limit'] = array(
         'fitness' => tra('unsure') ,
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $memory_limit,
-        'message' => tra("The memory_limit is unlimited. This is not necessarily bad, but it's a good idea to limit this on productions servers in order to eliminate unexpectedly greedy scripts.") . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr("The %0 is unlimited. This is not necessarily bad, but it's a good idea to limit this on productions servers in order to eliminate unexpectedly greedy scripts. %1 How to change this value %2", 'memory_limit', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['memory_limit'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
         'setting' => $memory_limit,
-        'message' => tra('Your memory_limit is at') . ' ' . $memory_limit . '. ' . tra('This is known to cause issues! The memory_limit should be increased to at least 128M, which is the PHP default.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Your %0 is at %1. This is known to cause issues! The %0 should be increased to at least %2, which is the PHP default. %3 How to change this value %4', 'memory_limit', $memory_limit, '128M', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1353,14 +1355,14 @@ if ($s != 'files') {
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s,
-        'message' => tra('The session.save_handler should be set to \'files\'.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 should be set to \'files\'. %1 How to change this value %2', 'session.save_handler', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['session.save_handler'] = array(
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $s,
-        'message' => tra('Well set! The default setting of \'files\' is recommended for Tiki.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Well set! The default setting of \'files\' is recommended for Tiki. %0 More info about this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1390,14 +1392,16 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => $s,
-            'message' => tra('The session.save_path must be writable.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 must be writable. %1 How to change this value %2", 'session.save_path', '<a href="#php_conf_info">', '</a>') .
+                        '<br><strong>' . tra('Alternative solution:') . '</strong> ' .
+                        tr("Consider using database session storage instead. Navigate to Admin → General Settings, switch to 'Advanced' mode, look for the 'Sessions' group, and set 'Session storage location' to 'Database'. This will store sessions in the database instead of the filesystem. %0 Go to General Settings %1", '<a href="tiki-admin.php?page=general#contentadmin_general-2">', '</a>')
         );
     } else {
         $php_properties['session.save_path'] = array(
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => $s,
-            'message' => tra('The session.save_path is writable.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 is writable. %1 More info about %0 %2", 'session.save_path', '<a href="#php_conf_info">', '</a>')
         );
     }
 } else {
@@ -1407,14 +1411,14 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
             'fitness' => tra('unknown'),
             'fitness_status' => FITNESS_STATUS_UNKNOWN,
             'setting' => $s,
-            'message' => tra('The session.save_path can\'t be checked because open_basedir is defined.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 can't be checked because %1 is defined. %2 More info about %0 %3", "session.save_path", "open_basedir", '<a href="#php_conf_info">', '</a>')
         );
     } else {
         $php_properties['session.save_path'] = array(
             'fitness' => tra('info'),
             'fitness_status' => FITNESS_STATUS_INFO,
             'setting' => $s,
-            'message' => tra('The session.save_path is writable.') . tra('It doesn\'t matter though, since your session.save_handler is not set to \'files\'.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+            'message' => tr("The %0 is writable. It doesn't matter though, since your %1 is not set to 'files'. %2 More info about %0 %3", "session.save_path", "session.save_handler", '<a href="#php_conf_info">', '</a>')
         );
     }
 }
@@ -1424,7 +1428,7 @@ $php_properties['session.gc_probability'] = array(
     'fitness' => tra('info'),
     'fitness_status' => FITNESS_STATUS_INFO,
     'setting' => $s,
-    'message' => tra('In conjunction with gc_divisor is used to manage probability that the gc (garbage collection) routine is started.')
+    'message' => tr('In conjunction with %0 is used to manage probability that the gc (garbage collection) routine is started.', 'gc_divisor')
 );
 
 $s = ini_get('session.gc_divisor');
@@ -1432,7 +1436,7 @@ $php_properties['session.gc_divisor'] = array(
     'fitness' => tra('info'),
     'fitness_status' => FITNESS_STATUS_INFO,
     'setting' => $s,
-    'message' => tra('Coupled with session.gc_probability defines the probability that the gc (garbage collection) process is started on every session initialization. The probability is calculated by using gc_probability/gc_divisor, e.g. 1/100 means there is a 1% chance that the GC process starts on each request.')
+    'message' => tr('Coupled with %0 defines the probability that the gc (garbage collection) process is started on every session initialization. The probability is calculated by using %1/%2, e.g. 1/100 means there is a 1% chance that the GC process starts on each request.', 'session.gc_probability', 'gc_probability', 'gc_divisor')
 );
 
 $s = ini_get('session.gc_maxlifetime');
@@ -1440,7 +1444,7 @@ $php_properties['session.gc_maxlifetime'] = array(
     'fitness' => tra('info'),
     'fitness_status' => FITNESS_STATUS_INFO,
     'setting' => $s . 's',
-    'message' => tra('Specifies the number of seconds after which data will be seen as \'garbage\' and potentially cleaned up. Garbage collection may occur during session start.')
+    'message' => tr('Specifies the number of seconds after which data will be seen as \'garbage\' and potentially cleaned up. Garbage collection may occur during session start.')
 );
 
 // test session work
@@ -1470,14 +1474,14 @@ if ($s) {
         'fitness' => tra('info'),
         'fitness_status' => FITNESS_STATUS_INFO,
         'setting' => 'On',
-        'message' => tra('zlib output compression is turned on. This saves bandwidth. On the other hand, turning it off would reduce CPU usage. The appropriate choice can be made for this Tiki.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('zlib output compression is turned on. This saves bandwidth. On the other hand, turning it off would reduce CPU usage. The appropriate choice can be made for this Tiki. %0 More info about this value %1', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['zlib.output_compression'] = array(
         'fitness' => tra('info'),
         'fitness_status' => FITNESS_STATUS_INFO,
         'setting' => 'Off',
-        'message' => tra('zlib output compression is turned off. This reduces CPU usage. On the other hand, turning it on would save bandwidth. The appropriate choice can be made for this Tiki.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('zlib output compression is turned off. This reduces CPU usage. On the other hand, turning it on would save bandwidth. The appropriate choice can be made for this Tiki. %0 More info about this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1488,14 +1492,14 @@ if (strtolower($s) == 'utf-8') {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $s,
-        'message' => tra('Correctly set! Tiki is fully UTF-8 and so should be this installation.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Correctly set! Tiki is fully UTF-8 and so should be this installation. %0 More info about this value %1', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['default_charset'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s,
-        'message' => tra('default_charset should be UTF-8 as Tiki is fully UTF-8. Please check the php.ini file.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('default_charset should be UTF-8 as Tiki is fully UTF-8. Please check the php.ini file. %0 How to change this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1506,14 +1510,14 @@ if (empty($s)) {
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s,
-        'message' => tra('No time zone is set! While there are a number of fallbacks in PHP to determine the time zone, the only reliable solution is to set it explicitly in php.ini! Please check the value of date.timezone in php.ini.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('No time zone is set! While there are a number of fallbacks in PHP to determine the time zone, the only reliable solution is to set it explicitly in php.ini! Please check the value of %0 in php.ini. %1 How to change this value %2', 'date.timezone', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['date.timezone'] = array(
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $s,
-        'message' => tra('Well done! Having a time zone set protects the site from related errors.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Well done! Having a time zone set protects the site from related errors. %0 More info about this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1561,28 +1565,28 @@ if ($s >= 30 && $s <= 90) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $s . 's',
-        'message' => tra('The max_execution_time is at') . ' ' . $s . '. ' . tra('This is a good value for production sites. If timeouts are experienced (such as when performing admin functions) this may need to be increased nevertheless.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is a good value for production sites. If timeouts are experienced (such as when performing admin functions) this may need to be increased nevertheless. %2 How to change this value %3', 'max_execution_time', $s, '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s == -1 || $s == 0) {
     $php_properties['max_execution_time'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s . 's',
-        'message' => tra('The max_execution_time is unlimited.') . ' ' . tra('This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is unlimited. This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts. %1 How to change this value %2', 'max_execution_time', '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s > 90) {
     $php_properties['max_execution_time'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s . 's',
-        'message' => tra('The max_execution_time is at') . ' ' . $s . '. ' . tra('This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts. %2 How to change this value %3', 'max_execution_time', $s, '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['max_execution_time'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
         'setting' => $s . 's',
-        'message' => tra('The max_execution_time is at') . ' ' . $s . '. ' . tra('It is likely that some scripts, such as admin functions, will not finish in this time! The max_execution_time should be incresed to at least 30s.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. It is likely that some scripts, such as admin functions, will not finish in this time! The %0 should be incresed to at least %2. %3 How to change this value %4', 'max_execution_time', $s, '30s', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1593,28 +1597,28 @@ if ($s >= 30 && $s <= 90) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $s . 's',
-        'message' => tra('The max_input_time is at') . ' ' . $s . '. ' . tra('This is a good value for production sites. If timeouts are experienced (such as when performing admin functions) this may need to be increased nevertheless.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is a good value for production sites. If timeouts are experienced (such as when performing admin functions) this may need to be increased nevertheless. %2 How to change this value %3', 'max_input_time', $s, '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s == -1 || $s == 0) {
     $php_properties['max_input_time'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s . 's',
-        'message' => tra('The max_input_time is unlimited.') . ' ' . tra('This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is unlimited. This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts. %1 How to change this value %2', 'max_input_time', '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s > 90) {
     $php_properties['max_input_time'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $s . 's',
-        'message' => tra('The max_input_time is at') . ' ' . $s . '. ' . tra('This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is not necessarily bad, but it\'s a good idea to limit this time on productions servers in order to eliminate unexpectedly long running scripts. %2 How to change this value %3', 'max_input_time', $s, '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['max_input_time'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
         'setting' => $s . 's',
-        'message' => tra('The max_input_time is at') . ' ' . $s . '. ' . tra('It is likely that some scripts, such as admin functions, will not finish in this time! The max_input_time should be increased to at least 30 seconds.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. It is likely that some scripts, such as admin functions, will not finish in this time! The %0 should be increased to at least %2. %3 How to change this value %4', 'max_input_time', $s, '30 seconds', '<a href="#php_conf_info">', '</a>')
     );
 }
 // max_file_uploads
@@ -1624,7 +1628,7 @@ if ($max_file_uploads) {
         'fitness' => tra('info'),
         'fitness_status' => FITNESS_STATUS_INFO,
         'setting' => $max_file_uploads,
-        'message' => tra('The max_file_uploads is at') . ' ' . $max_file_uploads . '. ' . tra('This is the maximum number of files allowed to be uploaded simultaneously.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is the maximum number of files allowed to be uploaded simultaneously. %2 More info about %0 %3', 'max_file_uploads', $max_file_uploads, '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['max_file_uploads'] = array(
@@ -1654,21 +1658,21 @@ if ($s >= 8 * 1024 * 1024) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $upload_max_filesize,
-        'message' => tra('The upload_max_filesize is at') . ' ' . $upload_max_filesize . '. ' . tra('Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly. %2 More info about %0 %3', 'upload_max_filesize', $upload_max_filesize, '<a href="#php_conf_info">', '</a>')
     );
 } elseif ($s == 0) {
     $php_properties['upload_max_filesize'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $upload_max_filesize,
-        'message' => tra('The upload_max_filesize is at') . ' ' . $upload_max_filesize . '. ' . tra('Upload size is unlimited and this not advised. A user could mistakenly upload a very large file which could fill up the disk. This value should be set to accommodate the realistic needs of the site.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. Upload size is unlimited and this not advised. A user could mistakenly upload a very large file which could fill up the disk. This value should be set to accommodate the realistic needs of the site. %2 How to change this value %3', 'upload_max_filesize', $upload_max_filesize, '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['upload_max_filesize'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $upload_max_filesize,
-        'message' => tra('The upload_max_filesize is at') . ' ' . $upload_max_filesize . '. ' . tra('This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site. %2 How to change this value %3', 'upload_max_filesize', $upload_max_filesize, '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1692,14 +1696,14 @@ if ($s >= 8 * 1024 * 1024) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => $post_max_size,
-        'message' => tra('The post_max_size is at') . ' ' . $post_max_size . '. ' . tra('Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly. %2 More info about %0 %3', 'post_max_size', $post_max_size, '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $php_properties['post_max_size'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => $post_max_size,
-        'message' => tra('The post_max_size is at') . ' ' . $post_max_size . '. ' . tra('This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('The %0 is at %1. This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site. %2 How to change this value %3', 'post_max_size', $post_max_size, '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -1758,7 +1762,6 @@ if ($s && function_exists('gd_info')) {
             'setting' => $gd_info['GD Version'],
             'message' => tra('The GD extension is needed for manipulation of images and for CAPTCHA images.')
         );
-        imagedestroy($im);
     } elseif ($im) {
         $php_properties['gd'] = array(
                 'fitness' => tra('unsure'),
@@ -1766,7 +1769,6 @@ if ($s && function_exists('gd_info')) {
                 'setting' => $gd_info['GD Version'],
                 'message' => tra('The GD extension is loaded, and Tiki can create images, but the FreeType extension is needed for CAPTCHA text generation.')
             );
-            imagedestroy($im);
     } else {
         $php_properties['gd'] = array(
             'fitness' => tra('unsure'),
@@ -1802,7 +1804,7 @@ if ($s) {
             'fitness' => tra('unsure'),
             'fitness_status' => FITNESS_STATUS_UNSURE,
             'setting' => 'Dysfunctional',
-            'message' => tra('ImageMagick is used as a fallback in case GD is not available.') . tra('ImageMagick is available, but unable to create images. Please check your ImageMagick configuration.')
+            'message' => tr('%0 is used as a fallback in case GD is not available. %0 is available, but unable to create images. Please check your %0 configuration.', 'ImageMagick')
             );
     }
 } else {
@@ -1831,7 +1833,7 @@ if ($s) {
             'fitness' => tra('unsure'),
             'fitness_status' => FITNESS_STATUS_UNSURE,
             'setting' => 'Badly configured',
-            'message' => tra('mbstring extension is loaded, but mbstring.func_overload = ' . ' ' . $func_overload . '.' . ' ' . 'Tiki only works with mbstring.func_overload = 0. Please check the php.ini file.')
+            'message' => tr('mbstring extension is loaded, but %0 = %1. Tiki only works with %0 = 0. Please check the php.ini file.', 'mbstring.func_overload', $func_overload)
             );
     } else {
         $php_properties['mbstring'] = array(
@@ -1864,7 +1866,7 @@ if ($s) {
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
         'setting' => 'Not available',
-        'message' => tra('calendar extension is needed by Tiki.') . ' ' . tra('The calendar feature of Tiki will not function without this.')
+        'message' => tr('calendar extension is needed by Tiki. The calendar feature of Tiki will not function without this.')
     );
 }
 
@@ -2042,8 +2044,7 @@ if ($s) {
 }
 
 $s = extension_loaded('sodium');
-$msg = tra('This extension is required to encrypt data such as CSRF ticket cookie and user data.') . PHP_EOL;
-$msg .= tra('Enable safe, encrypted storage of data such as passwords. Since Tiki 22, Sodium lib (included in PHP 7.2 core) is used for the User Encryption feature and improves encryption in other features, when available');
+$msg = tr('This extension is required to encrypt data such as CSRF ticket cookie and user data. %0 Enable safe, encrypted storage of data such as passwords. Since Tiki 22, Sodium lib (included in PHP 7.2 core) is used for the User Encryption feature and improves encryption in other features, when available', PHP_EOL);
 if ($s) {
     $php_properties['sodium'] = array(
         'fitness' => tra('good'),
@@ -2061,9 +2062,10 @@ if ($s) {
 }
 
 $s = extension_loaded('openssl');
-$msg = tra('Enable safe, encrypted storage of data such as passwords. Tiki 21 and earlier versions, require OpenSSL for the User Encryption feature and improves encryption in other features, when available.');
 if (! $standalone) {
-    $msg .= ' ' . tra('Tiki still uses OpenSSL to decrypt user data encrypted with OpenSSL, when converting that data to Sodium (PHP 7.2+).') . ' ' . tra('Please check the \'User Data Encryption\' section to see if there is user data encrypted with OpenSSL.');
+    $msg = tr('Enable safe, encrypted storage of data such as passwords. Tiki 21 and earlier versions, require OpenSSL for the User Encryption feature and improves encryption in other features, when available. Tiki still uses OpenSSL to decrypt user data encrypted with OpenSSL, when converting that data to Sodium (PHP 7.2+). Please check the \'User Data Encryption\' section to see if there is user data encrypted with OpenSSL.');
+} else {
+    $msg = tr('Enable safe, encrypted storage of data such as passwords. Tiki 21 and earlier versions, require OpenSSL for the User Encryption feature and improves encryption in other features, when available.');
 }
 if ($s) {
     $php_properties['openssl'] = array(
@@ -2083,9 +2085,10 @@ if ($s) {
 
 
 $s = extension_loaded('mcrypt');
-$msg = tra('MCrypt is abandonware and is being phased out. Starting in version 18 up to 21, Tiki uses OpenSSL where it previously used MCrypt, except perhaps via third-party libraries.');
 if (! $standalone) {
-    $msg .= ' ' . tra('Tiki still uses MCrypt to decrypt user data encrypted with MCrypt, when converting that data to OpenSSL.') . ' ' . tra('Please check the \'User Data Encryption\' section to see if there is user data encrypted with MCrypt.');
+    $msg = tr('MCrypt is abandonware and is being phased out. Starting in version 18 up to 21, Tiki uses OpenSSL where it previously used MCrypt, except perhaps via third-party libraries. Tiki still uses MCrypt to decrypt user data encrypted with MCrypt, when converting that data to OpenSSL. Please check the \'User Data Encryption\' section to see if there is user data encrypted with MCrypt.');
+} else {
+    $msg = tr('MCrypt is abandonware and is being phased out. Starting in version 18 up to 21, Tiki uses OpenSSL where it previously used MCrypt, except perhaps via third-party libraries.');
 }
 if ($s) {
     $php_properties['mcrypt'] = array(
@@ -2151,14 +2154,14 @@ if ($s == 42) {
         'fitness' => tra('good'),
         'fitness_status' => FITNESS_STATUS_GOOD,
         'setting' => 'Available',
-        'message' => tra('The eval() function is required by the Smarty templating engine.')
+        'message' => tr('The eval() function is required by the Smarty templating engine.')
     );
 } else {
     $php_properties['eval()'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
         'setting' => 'Not available',
-        'message' => tra('The eval() function is required by the Smarty templating engine.') . ' ' . tra('You will get "Please contact support about" messages instead of modules. eval() is most probably disabled via Suhosin.')
+        'message' => tr('The eval() function is required by the Smarty templating engine. You will get \"Please contact support about\" messages instead of modules. eval() is most probably disabled via Suhosin.')
     );
 }
 
@@ -2231,7 +2234,7 @@ if ($connection || ! $standalone) {
         'fitness' => $s ? tra('good') : tra('bad'),
         'fitness_status' => $s ? FITNESS_STATUS_GOOD : FITNESS_STATUS_BAD,
         'setting' => $mysql_version,
-        'message' => tra('Tiki requires MariaDB >= 5.5 or MySQL >= 5.7')
+        'message' => tr('Tiki requires MariaDB >= %0 or MySQL >= %1', '5.5', '5.7')
     );
 
     // max_allowed_packet
@@ -2244,14 +2247,14 @@ if ($connection || ! $standalone) {
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => $max_allowed_packet . 'M',
-            'message' => tra('The max_allowed_packet setting is at') . ' ' . $max_allowed_packet . 'M. ' . tra('Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly.') . ' ' . tra('This limits the size of binary files that can be uploaded to Tiki, when storing files in the database. Please see: <a href="http://doc.tiki.org/File-Storage">file storage</a>.')
+            'message' => tr('The %0 setting is at %1. Quite large files can be uploaded, but keep in mind to set the script timeouts accordingly. This limits the size of binary files that can be uploaded to Tiki, when storing files in the database. Please see: %2', 'max_allowed_packet', $max_allowed_packet . 'M', '<a href="http://doc.tiki.org/File-Storage">file storage</a>')
         );
     } else {
         $mysql_properties['max_allowed_packet'] = array(
             'fitness' => tra('unsure'),
             'fitness_status' => FITNESS_STATUS_UNSURE,
             'setting' => $max_allowed_packet . 'M',
-            'message' => tra('The max_allowed_packet setting is at') . ' ' . $max_allowed_packet . 'M. ' . tra('This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site.') . ' ' . tra('This limits the size of binary files that can be uploaded to Tiki, when storing files in the database. Please see: <a href="http://doc.tiki.org/File-Storage">file storage</a>.')
+            'message' => tr('The %0 setting is at %1. This is not a bad amount, but be sure the level is high enough to accommodate the needs of the site. This limits the size of binary files that can be uploaded to Tiki, when storing files in the database. Please see: %2', 'max_allowed_packet', $max_allowed_packet . 'M', '<a href="http://doc.tiki.org/File-Storage">file storage</a>')
         );
     }
 
@@ -2263,14 +2266,14 @@ if ($connection || ! $standalone) {
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => 'available',
-            'message' => tra('Your database supports the utf8mb4 character set required in Tiki19 and above.')
+            'message' => tr('Your database supports the %0 character set required in %1 and above.', 'utf8mb4', 'Tiki19')
         );
     } else {
         $mysql_properties['utf8mb4'] = array(
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => 'not available',
-            'message' => tra('Your database does not support the utf8mb4 character set required in Tiki19 and above. You need to upgrade your mysql or mariadb installation.')
+            'message' => tr('Your database does not support the %0 character set required in %1 and above. You need to upgrade your mysql or mariadb installation.', 'utf8mb4', 'Tiki19')
         );
     }
 
@@ -2286,14 +2289,14 @@ if ($connection || ! $standalone) {
                     'fitness' => tra('good'),
                     'fitness_status' => FITNESS_STATUS_GOOD,
                     'setting' => $value['Value'],
-                    'message' => tra('Tiki is fully utf8mb4 and so should be every part of the stack.')
+                    'message' => tr('Tiki is fully %0 and so should be every part of the stack.', 'utf8mb4')
                 );
             } else {
                 $mysql_properties[$value['Variable_name']] = array(
                     'fitness' => tra('unsure'),
                     'fitness_status' => FITNESS_STATUS_UNSURE,
                     'setting' => $value['Value'],
-                    'message' => tra('On a fresh install everything should be set to utf8mb4 to avoid unexpected results. For further information please see <a href="http://doc.tiki.org/Understanding-Encoding">Understanding Encoding</a>.')
+                    'message' => tr('On a fresh install everything should be set to %0 to avoid unexpected results. For further information please see %1 Understanding Encoding %2.', 'utf8mb4', '<a href="http://doc.tiki.org/Understanding-Encoding">', '</a>')
                 );
             }
         }
@@ -2308,14 +2311,14 @@ if ($connection || ! $standalone) {
                 'fitness' => tra('good'),
                 'fitness_status' => FITNESS_STATUS_GOOD,
                 'setting' => $value['Value'],
-                'message' => tra('Tiki is fully utf8mb4 but some database underlying variables are set to utf8 by the database engine and cannot be modified.')
+                'message' => tr('Tiki is fully %0 but some database underlying variables are set to %1 by the database engine and cannot be modified.', 'utf8mb4', 'utf8')
             );
         } else {
             $mysql_properties[$value['Variable_name']] = array(
                 'fitness' => tra('unsure'),
                 'fitness_status' => FITNESS_STATUS_UNSURE,
                 'setting' => $value['Value'],
-                'message' => tra('On a fresh install everything should be set to utf8mb4 or utf8 to avoid unexpected results. For further information please see <a href="http://doc.tiki.org/Understanding-Encoding">Understanding Encoding</a>.')
+                'message' => tr('On a fresh install everything should be set to %0 or %1 to avoid unexpected results. For further information please see %2 Understanding Encoding %3.', 'utf8mb4', 'utf8', '<a href="http://doc.tiki.org/Understanding-Encoding">', '</a>')
             );
         }
     }
@@ -2330,14 +2333,14 @@ if ($connection || ! $standalone) {
                     'fitness' => tra('good'),
                     'fitness_status' => FITNESS_STATUS_GOOD,
                     'setting' => $value['Value'],
-                    'message' => tra('Tiki is fully utf8mb4 and so should be every part of the stack. utf8mb4_unicode_ci is the default collation for Tiki.')
+                    'message' => tr('Tiki is fully %0 and so should be every part of the stack. %1 is the default collation for Tiki.', 'utf8mb4', 'utf8mb4_unicode_ci')
                 );
             } else {
                 $mysql_properties[$value['Variable_name']] = array(
                     'fitness' => tra('unsure'),
                     'fitness_status' => FITNESS_STATUS_UNSURE,
                     'setting' => $value['Value'],
-                    'message' => tra('On a fresh install everything should be set to utf8mb4 to avoid unexpected results. utf8mb4_unicode_ci is the default collation for Tiki. For further information please see <a href="http://doc.tiki.org/Understanding-Encoding">Understanding Encoding</a>.')
+                    'message' => tr('On a fresh install everything should be set to %0 to avoid unexpected results. %1 is the default collation for Tiki. For further information please see %2 Understanding Encoding %3.', 'utf8mb4', 'utf8mb4_unicode_ci', '<a href="http://doc.tiki.org/Understanding-Encoding">', '</a>')
                 );
             }
         }
@@ -2509,7 +2512,7 @@ if (function_exists('apache_get_version')) {
                     'setting' => $rewritebase,
                     'fitness' => tra('bad') ,
                     'fitness_status' => FITNESS_STATUS_BAD,
-                    'message' => tra('RewriteBase is not set correctly in .htaccess. Search Engine Friendly URLs are not going to work with this configuration. It should be set to "') . substr($url_path, 0, -1) . '".'
+                    'message' => tr('RewriteBase is not set correctly in .htaccess. Search Engine Friendly URLs are not going to work with this configuration. It should be set to \"%0\".', substr($url_path, 0, -1))
                 );
             }
         } else {
@@ -2569,7 +2572,7 @@ if (function_exists('apache_get_version')) {
                             'setting' => 'Not Working',
                             'fitness' => tra('info') ,
                             'fitness_status' => FITNESS_STATUS_INFO,
-                            'message' => sprintf(tra('An automated test was done and, based on the results, the server does not appear to be configured correctly to handle Search Engine Friendly URLs. The server returned an unexpected HTTP code: "%s". This automated test may fail due to the infrastructure setup, but the Apache configuration should be checked. For further information go to Admin->SefURL in your Tiki.'), $apache_return_code)
+                            'message' => sprintf(tr('An automated test was done and, based on the results, the server does not appear to be configured correctly to handle Search Engine Friendly URLs. The server returned an unexpected HTTP code: "%0". This automated test may fail due to the infrastructure setup, but the Apache configuration should be checked. For further information go to Admin->SefURL in your Tiki.', $apache_return_code))
                         );
                     } else {
                         $apache_properties['SefURL Test'] = array(
@@ -2658,7 +2661,6 @@ if (function_exists('apache_get_version')) {
         } else {
             $apache_server_info = false;
         }
-        curl_close($curl);
     } else {
         $apache_server_info = 'nocurl';
     }
@@ -2709,6 +2711,45 @@ if (! $standalone) {
         ),
         array(
             'name' => 'media-alchemyst/media-alchemyst',
+            'preferences' => array(
+                'alchemy_ffmpeg_path' => array(
+                    'name' => tra('ffmpeg path'),
+                    'type' => 'path'
+                ),
+                'alchemy_ffprobe_path' => array(
+                    'name' => tra('ffprobe path'),
+                    'type' => 'path'
+                ),
+                'alchemy_unoconv_path' => array(
+                    'name' => tra('unoconv path'),
+                    'type' => 'path'
+                ),
+                'alchemy_gs_path' => array(
+                    'name' => tra('ghostscript path'),
+                    'type' => 'path'
+                ),
+                'alchemy_imagine_driver' => array(
+                    'name' => tra('Alchemy Image library'),
+                    'type' => 'classOptions',
+                    'options' => array(
+                        'imagick' => array(
+                            'name' => tra('Imagemagick'),
+                            'classLib' => 'Imagine\Imagick\Imagine',
+                            'className' => 'Imagick',
+                            'extension' => false
+                        ),
+                        'gd' => array(
+                            'name' => tra('GD'),
+                            'classLib' => 'Imagine\Gd\Imagine',
+                            'className' => false,
+                            'extension' => 'gd'
+                        )
+                    ),
+                ),
+            )
+        ),
+        array(
+            'name' => 'tikiwiki/media-alchemyst',
             'preferences' => array(
                 'alchemy_ffmpeg_path' => array(
                     'name' => tra('ffmpeg path'),
@@ -3113,48 +3154,48 @@ if (isset($prefs) && $prefs['feature_blogs'] == 'y') {
 $fcts = array(
          array(
             'function' => 'exec',
-            'risky' => tra('Exec can potentially be used to execute arbitrary code on the server.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled.') . ' ' . tra('However, the Plugins R/RR need it. If you use the Plugins R/RR and the other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tra('Exec can be potentially be used to execute arbitrary code on the server.') . ' ' . tra('Tiki needs it to run the Plugins R/RR.') . tra('If this is needed and the other PHP software on the server can be trusted, this should be enabled.')
+            'risky' => tr('Exec can potentially be used to execute arbitrary code on the server. Tiki does not need it; perhaps it should be disabled. However, the Plugins R/RR need it. If you use the Plugins R/RR and the other PHP software on the server can be trusted, this should be enabled.'),
+            'safe' => tr('Exec can be potentially be used to execute arbitrary code on the server. Tiki needs it to run the Plugins R/RR. If this is needed and the other PHP software on the server can be trusted, this should be enabled.')
          ),
          array(
             'function' => 'passthru',
-            'risky' => tra('Passthru is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts may need it.'),
-            'safe' => tra('Passthru is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts may need it.')
+            'risky' => tr('Passthru is similar to exec. Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts may need it.'),
+            'safe' => tr('Passthru is similar to exec. Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts may need it.')
          ),
          array(
             'function' => 'shell_exec',
-            'risky' => tra('Shell_exec is similar to exec.') . ' ' . tra('Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). ') . $pdf_webkit . tra('If this is needed and the other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tra('Shell_exec is similar to exec.') . ' ' . tra('Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). ') . $pdf_webkit . tra('If this is needed and the other PHP software on the server can be trusted, this should be enabled.')
+            'risky' => tr('Shell_exec is similar to exec. Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). %0 If this is needed and the other PHP software on the server can be trusted, this should be enabled.', $pdf_webkit),
+            'safe' => tr('Shell_exec is similar to exec. Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). %0 If this is needed and the other PHP software on the server can be trusted, this should be enabled.', $pdf_webkit)
          ),
          array(
             'function' => 'system',
-            'risky' => tra('System is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled.'),
-            'safe' => tra('System is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled.')
+            'risky' => tr('System is similar to exec. Tiki does not need it; perhaps it should be disabled.'),
+            'safe' => tr('System is similar to exec. Tiki does not need it; it is good that it is disabled.')
          ),
-         array(
+        array(
             'function' => 'proc_open',
-            'risky' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.'),
-            'safe' => tra('Proc_open is similar to exec.') . ' ' . tra('Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the <a href="https://doc.tiki.org/Packages" target="_blank">admin interface</a> may need it.')
-         ),
+            'risky' => tr('Proc_open is similar to exec. Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the %0admin interface%1 may need it. The Sendmail mailer option also requires it.', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>'),
+            'safe' => tr('Proc_open is similar to exec. Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the %0admin interface%1 may need it. The Sendmail mailer option also requires it.', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>')
+        ),
          array(
             'function' => 'popen',
-            'risky' => tra('popen is similar to exec.') . ' ' . tra('Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tra('popen is similar to exec.') . ' ' . tra('Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.')
+            'risky' => tr('popen is similar to exec. Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.'),
+            'safe' => tr('popen is similar to exec. Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.')
          ),
          array(
             'function' => 'curl_exec',
-            'risky' => tra('Curl_exec can potentially be abused to write malicious code.') . ' ' . tra('Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tra('Curl_exec can potentially be abused to write malicious code.') . ' ' . tra('Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
+            'risky' => tr('Curl_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
+            'safe' => tr('Curl_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
          ),
          array(
             'function' => 'curl_multi_exec',
-            'risky' => tra('Curl_multi_exec can potentially be abused to write malicious code.') . ' ' . tra('Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tra('Curl_multi_exec can potentially be abused to write malicious code.') . ' ' . tra('Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
+            'risky' => tr('Curl_multi_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
+            'safe' => tr('Curl_multi_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
          ),
          array(
             'function' => 'parse_ini_file',
-            'risky' => tra('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned.') . ' ' . tra('It is required for the <a href="http://doc.tiki.org/System-Configuration" target="_blank">System Configuration</a> feature.'),
-            'safe' => tra('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned.') . ' ' . tra('It is required for the <a href="http://doc.tiki.org/System-Configuration" target="_blank">System Configuration</a> feature.'),
+            'risky' => tr('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned. It is required for the %0System Configuration%1 feature.', '<a href="http://doc.tiki.org/System-Configuration" target="_blank">', '</a>'),
+            'safe' => tr('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned. It is required for the %0System Configuration%1 feature.', '<a href="http://doc.tiki.org/System-Configuration" target="_blank">', '</a>'),
          )
     );
 
@@ -3183,14 +3224,14 @@ if ($s) {
         'setting' => 'Enabled',
         'fitness' => tra('unsafe'),
         'fitness_status' => FITNESS_STATUS_UNSAFE,
-        'message' => tra('session.use_trans_sid should be off by default. See the PHP manual for details.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('session.use_trans_sid should be off by default. See the PHP manual for details. %0 How to change this value %1', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $security['session.use_trans_sid'] = array(
         'setting' => 'Disabled',
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('session.use_trans_sid should be off by default. See the PHP manual for details.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('session.use_trans_sid should be off by default. See the PHP manual for details. %0 How to change this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -3200,14 +3241,14 @@ if ($s == 1) {
         'setting' => 'Enabled',
         'fitness' => tra('unsafe'),
         'fitness_status' => FITNESS_STATUS_UNSAFE,
-        'message' => tra('Setting the xbithack option is unsafe. Depending on the file handling of the webserver and the Tiki settings, an attacker may be able to upload scripts to file gallery and execute them.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('Setting the xbithack option is unsafe. Depending on the file handling of the webserver and the Tiki settings, an attacker may be able to upload scripts to file gallery and execute them. %0 How to change this value %1', '<a href="#php_conf_info">', '</a>')
     );
 } else {
     $security['xbithack'] = array(
         'setting' => 'Disabled',
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('setting the xbithack option is unsafe. Depending on the file handling of the webserver and the Tiki settings,  an attacker may be able to upload scripts to file gallery and execute them.') . ' <a href="#php_conf_info">' . tra('How to change this value') . '</a>'
+        'message' => tr('setting the xbithack option is unsafe. Depending on the file handling of the webserver and the Tiki settings,  an attacker may be able to upload scripts to file gallery and execute them. %0 How to change this value %1', '<a href="#php_conf_info">', '</a>')
     );
 }
 
@@ -3217,14 +3258,14 @@ if ($s == 1) {
         'setting' => 'Enabled',
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tra('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. ' . $feature_blogs . 'If this Tiki does not use the Blogs feature, this can be switched off.')
+        'message' => tr('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. %0 If this Tiki does not use the Blogs feature, this can be switched off.', $feature_blogs)
     );
 } else {
     $security['allow_url_fopen'] = array(
         'setting' => 'Disabled',
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. ' . $feature_blogs . 'If this Tiki does not use the Blogs feature, this can be switched off.')
+        'message' => tr('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. %0 If this Tiki does not use the Blogs feature, this can be switched off.', $feature_blogs)
     );
 }
 
@@ -3282,18 +3323,18 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
         if ($standalone && array_key_exists($type, $fh_native)) {
             $file_handler['fitness'] = tra('info');
             $file_handler['fitness_status'] = FITNESS_STATUS_INFO;
-            $file_handler['message'] = tra("will be handled natively by Tiki &gt;= ") . $fh_native["$type"];
+            $file_handler['message'] = tr("will be handled natively by Tiki &gt;= %0", $fh_native["$type"]);
         }
         if ($file_handler['fitness_status'] == '' || $file_handler['fitness_status'] == FITNESS_STATUS_INFO) {
             foreach ($options as $opt) {
                 $optArray = explode(' ', $opt, 2);
                 $exec = reset($optArray);
-                $which_exec = `which $exec`;
+                $which_exec = shell_exec("which $exec");
                 if ($which_exec) {
                     if ($file_handler['fitness_status'] == FITNESS_STATUS_INFO) {
-                        $file_handler['message'] .= tra(", otherwise handled by ") . $which_exec;
+                        $file_handler['message'] .= tr(", otherwise handled by %0", $which_exec);
                     } else {
-                        $file_handler['message'] = tra("will be handled by ") . $which_exec;
+                        $file_handler['message'] = tr("will be handled by %0", $which_exec);
                     }
                     $file_handler['fitness'] = tra('good');
                     $file_handler['fitness_status'] = FITNESS_STATUS_GOOD;
@@ -3306,7 +3347,7 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
                     $fh_commands .= $fh_commands ? ' or ' : '';
                     $fh_commands .= '"' . substr($opt, 0, strpos($opt, ' ')) . '"';
                 }
-                $file_handler['message'] .= tra(', otherwise you need to install ') . $fh_commands . tra(' to index this type of file');
+                $file_handler['message'] .= tr(', otherwise you need to install %0 to index this type of file', $fh_commands);
             }
         }
         if (! $file_handler['fitness']) {
@@ -3317,7 +3358,7 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
                 $fh_commands .= $fh_commands ? ' or ' : '';
                 $fh_commands .= '"' . substr($opt, 0, strpos($opt, ' ')) . '"';
             }
-            $file_handler['message'] = tra('You need to install ') . $fh_commands . tra(' to index this type of file');
+            $file_handler['message'] = tr('You need to install %0 to index this type of file', $fh_commands);
         }
         $file_handlers[$type] = $file_handler;
     }
@@ -3495,7 +3536,7 @@ if (! empty($db_config_issues)) {
     $tiki_security['Database Configuration Permissions'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
-        'message' => tra('Database configuration file has insecure permissions: ') . implode(', ', $db_config_issues)
+        'message' => tr('Database configuration file has insecure permissions: %0', implode(', ', $db_config_issues))
     );
 } else {
     $tiki_security['Database Configuration Permissions'] = array(
@@ -3511,7 +3552,7 @@ if (! empty($phpmyadmin_issues)) {
     $tiki_security['phpMyAdmin Security'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
-        'message' => tra('phpMyAdmin installation detected that may expose database management: ') . implode(', ', $phpmyadmin_issues)
+        'message' => tr('phpMyAdmin installation detected that may expose database management: %0', implode(', ', $phpmyadmin_issues))
     );
 } else {
     $tiki_security['phpMyAdmin Security'] = array(
@@ -3527,7 +3568,7 @@ if (! empty($adminer_issues)) {
     $tiki_security['Adminer Security'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
-        'message' => tra('Adminer installation detected that may expose database management: ') . implode(', ', $adminer_issues)
+        'message' => tr('Adminer installation detected that may expose database management: %0', implode(', ', $adminer_issues))
     );
 } else {
     $tiki_security['Adminer Security'] = array(
@@ -3543,7 +3584,7 @@ if (! empty($backup_file_issues)) {
     $tiki_security['Backup Configuration Files'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tra('Backup configuration files detected that may expose sensitive information: ') . implode(', ', $backup_file_issues)
+        'message' => tr('Backup configuration files detected that may expose sensitive information: %0', implode(', ', $backup_file_issues))
     );
 } else {
     $tiki_security['Backup Configuration Files'] = array(
@@ -3559,7 +3600,7 @@ if (! empty($directory_listing_issues)) {
     $tiki_security['Directory Listing Security'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tra('Directory listing may be enabled in sensitive directories: ') . implode(', ', $directory_listing_issues)
+        'message' => tr('Directory listing may be enabled in sensitive directories: %0', implode(', ', $directory_listing_issues))
     );
 } else {
     $tiki_security['Directory Listing Security'] = array(
@@ -3575,7 +3616,7 @@ if (! empty($ssl_issues)) {
     $tiki_security['SSL/TLS Configuration'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tra('SSL/TLS configuration issues detected: ') . implode(', ', $ssl_issues)
+        'message' => tr('SSL/TLS configuration issues detected: %0', implode(', ', $ssl_issues))
     );
 } else {
     $tiki_security['SSL/TLS Configuration'] = array(
@@ -3590,7 +3631,7 @@ if (! empty($sensitiveDataDetectedFiles)) {
     $tiki_security['Sensitive Data Exposure'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tra('Tiki detected that there are temporary files in the db folder that may expose credentials or other sensitive information.') . $files
+        'message' => tr('Tiki detected that there are temporary files in the db folder that may expose credentials or other sensitive information. %0', $files)
     );
 } else {
     $tiki_security['Sensitive Data Exposure'] = array(
@@ -3662,6 +3703,7 @@ function processKeyFields(&$alterTableFile, $tableName, $keyFields, $isUnique = 
 // Function used to check db mismatches
 function check_db_mismatches()
 {
+    $diffDbColumns = array();
     $tikiSql = file_get_contents('db/tiki.sql');
     preg_match_all('/CREATE TABLE (?:.(?!;[^\S]))+./s', $tikiSql, $tables);
     preg_match_all("/ALTER TABLE (?:.(?!;[^\S]))+./s", $tikiSql, $alterTables);
@@ -3858,18 +3900,18 @@ function check_db_mismatches()
 function getDbKeyDefinitions($tableName)
 {
     $query = <<<SQL
-    SELECT 
-        INDEX_NAME, 
+    SELECT
+        INDEX_NAME,
         TABLE_NAME,
-        GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS INDEX_COLUMNS, 
-    CASE 
-        WHEN NON_UNIQUE = 0 AND INDEX_NAME = 'PRIMARY' 
-            THEN 'PRIMARY' 
+        GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS INDEX_COLUMNS,
+    CASE
+        WHEN NON_UNIQUE = 0 AND INDEX_NAME = 'PRIMARY'
+            THEN 'PRIMARY'
         WHEN NON_UNIQUE = 0
             THEN 'UNIQUE'
-        ELSE 'INDEX' 
-    END AS INDEX_TYPE 
-    FROM information_schema.statistics 
+        ELSE 'INDEX'
+    END AS INDEX_TYPE
+    FROM information_schema.statistics
     WHERE TABLE_SCHEMA = database() AND TABLE_NAME = "$tableName"
     GROUP BY INDEX_NAME, NON_UNIQUE;
     SQL;
@@ -4757,7 +4799,7 @@ if ($standalone && ! $nagios) {
         'MCrypt' => $criptLib->getUserCryptDataStats('mcrypt'),
     ));
     $ws_port = $prefs['realtime_port'] ? $prefs['realtime_port'] : '8080';
-    $websocket_full_base_url = $prefs['realtime_full_base_url'];
+    $websocket_full_base_url = $prefs['realtime_full_base_url'] ?? '';
     if (! empty($websocket_full_base_url)) {
         $parts = parse_url($websocket_full_base_url);
         $ws_port = $parts['port'] ?? null;
@@ -4804,26 +4846,30 @@ if ($standalone && ! $nagios) {
 
     $output = array();
     $locales = null;
-    exec("locale -a 2>&1", $output, $returnCode);
-    // Verification of the return code.
-    if ($returnCode === 0) {
-        // The command was successfully executed, we filter it from the array.
-        if (is_array($output)) {
-            $locales = array_filter($output);
-            sort($locales, SORT_STRING | SORT_FLAG_CASE);
-        } else {
-            if ($locales = preg_split("/\r ?\n/", $output)) {
-                $locales = array_filter($locales);
+    if (function_exists('exec')) {
+        exec("locale -a 2>&1", $output, $returnCode);
+        // Verification of the return code.
+        if ($returnCode === 0) {
+            // The command was successfully executed, we filter it from the array.
+            if (is_array($output)) {
+                $locales = array_filter($output);
                 sort($locales, SORT_STRING | SORT_FLAG_CASE);
             } else {
-                $locales = "Unexpected result";
+                if ($locales = preg_split("/\r ?\n/", $output)) {
+                    $locales = array_filter($locales);
+                    sort($locales, SORT_STRING | SORT_FLAG_CASE);
+                } else {
+                    $locales = tra("Unexpected result");
+                }
+            }
+        } else {
+            // The command failed, we take the error array, and convert it to a string to display to the user
+            foreach ($output as $errorLine) {
+                $locales .= "$errorLine\n";
             }
         }
     } else {
-        // The command failed, we take the error array, and convert it to a string to display to the user
-        foreach ($output as $errorLine) {
-            $locales .= "$errorLine\n";
-        }
+        $locales = tra("exec() function is disabled in PHP configuration");
     }
 
     $smarty->assign('locales', $locales);
@@ -5090,6 +5136,7 @@ function checkPackageMessages($messages, $package)
     global $prefs;
 
     switch ($package['name']) {
+        case 'tikiwiki/media-alchemyst':
         case 'media-alchemyst/media-alchemyst':
             try {
                 if (! AlchemyLib::hasReadWritePolicies()) {
@@ -5105,17 +5152,51 @@ function checkPackageMessages($messages, $package)
                 $messages['warnings'][] = tr('Error when checking Alchemy "Read" and "Write" policy rights: %0', $e->getMessage());
             }
 
-            if (! UnoconvLib::isPortAvailable()) {
-                $messages['warnings'][] = tr(
-                    'The configured port (%0) to execute unoconv is in use by another process. The port can be set in \'unoconv port\' preference.',
-                    $prefs['alchemy_unoconv_port'] ?: UnoconvLib::DEFAULT_PORT
-                );
-            } else {
-                $messages['successes'][] = tr(
-                    'The configured port (%0) is configured to execute unoconv.',
-                    $prefs['alchemy_unoconv_port'] ?: UnoconvLib::DEFAULT_PORT
-                );
+            // Check converter availability
+            $converterType = $prefs['alchemy_converter_type'] ?: UnoconvStrategy::NAME;
+
+            if ($converterType === UnoserverStrategy::NAME) {
+                if (UnoserverStrategy::isLibraryAvailable()) {
+                    $messages['successes'][] = tr('Unoserver (unoconvert) binary is available.');
+
+                    if (UnoserverStrategy::isServerRunning()) {
+                        $messages['successes'][] = tr(
+                            'Unoserver daemon is running on port %0.',
+                            $prefs['alchemy_unoserver_port'] ?: UnoserverStrategy::DEFAULT_PORT
+                        );
+                    } else {
+                        $messages['warnings'][] = tr(
+                            'Unoserver daemon is not running on port %0. Start the daemon with: unoserver --port %0',
+                            $prefs['alchemy_unoserver_port'] ?: UnoserverStrategy::DEFAULT_PORT
+                        );
+                    }
+                } else {
+                    $messages['errors'][] = tr('Unoserver is selected but unoconvert binary is not found.');
+                }
+            } elseif ($converterType === UnoconvStrategy::NAME) {
+                if (UnoconvStrategy::isLibraryAvailable()) {
+                    $messages['successes'][] = tr('Unoconv library is available.');
+
+                    if (! UnoconvStrategy::isPortAvailable()) {
+                        $messages['successes'][] = tr(
+                            'Unoconv listener is running on port %0.',
+                            $prefs['alchemy_unoconv_port'] ?: UnoconvStrategy::DEFAULT_PORT
+                        );
+                    } else {
+                        $messages['warnings'][] = tr(
+                            'Unoconv listener is not running on port %0. Start with: unoconv --listener --port=%0',
+                            $prefs['alchemy_unoconv_port'] ?: UnoconvStrategy::DEFAULT_PORT
+                        );
+                    }
+                } else {
+                    $messages['errors'][] = tr('Unoconv is selected but the library is not available.');
+                }
             }
+
+            if (! UnoserverStrategy::isLibraryAvailable() && ! UnoconvStrategy::isLibraryAvailable()) {
+                $messages['errors'][] = tr('No document converter available. Please install unoserver or unoconv.');
+            }
+
             break;
         default:
             $messages['successes'] = array();
@@ -5436,7 +5517,7 @@ class BenchmarkPhp
  * Identify files, like backup copies made by editors, or manual copies of the local.php files,
  * that may be accessed remotely and, because they are not interpreted as PHP, may expose the source,
  * which might contain credentials or other sensitive information.
- * Ref: http://feross.org/cmsploit/
+ * Ref: https://github.com/feross/CMSploit
  *
  * @param array $files Array of filenames. Suspicious files will be added to this array.
  * @param string $sourceDir Path of the directory to check
@@ -5525,7 +5606,6 @@ function get_content_from_url($url)
         if ($http_code != 200) {
             $content = "fail-http-" . $http_code;
         }
-        curl_close($curl);
     } else {
         $content = "fail-no-request-done";
     }

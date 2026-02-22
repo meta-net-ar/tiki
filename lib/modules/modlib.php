@@ -8,6 +8,7 @@
 use Tiki\Lib\Wiki\ConvertToTiki9;
 use Tiki\Profiling\Timer;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
 
 /**
  *
@@ -520,19 +521,23 @@ class ModLib extends TikiLib
      */
     public function filter_active_module($module)
     {
-        global $section, $page, $prefs, $user;
+        global $page, $prefs, $user;
+        $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
 
+        if ($prefs['module_' . $module["name"]] != 'y') {
+            return false;
+        }
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
             if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
                 return true;
             }
         }
-        // TODO: Check this if it behaves well on other "Admin" pages when UAB is enabled
+        // Load only the Unified Admin Interface (UAB) specific modules for Admins on admin panels/management pages
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = $section === 'admin' && strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') !== false;
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
 
         if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
             return false;
@@ -561,14 +566,14 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['nopage']) && isset($page) && isset($section) && $section == 'wiki page') {
+        if (isset($params['nopage']) && isset($page) && isset($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
             if (in_array($page, (array) $params['nopage'])) {
                 return false;
             }
         }
 
         if (isset($params['page'])) {
-            if (! isset($section) || $section != 'wiki page' || ! isset($page)) { // must be in a page
+            if (! isset($section) || ! Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) || ! isset($page)) { // must be in a page
                 return false;
             } elseif (! in_array($page, (array) $params['page'])) {
                 return false;
@@ -613,7 +618,7 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['creator']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['creator']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } elseif ($params['creator'] == 'y' && $page_info['creator'] != $user) {
@@ -623,7 +628,7 @@ class ModLib extends TikiLib
             }
         }
 
-        if (isset($params['contributor']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['contributor']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } else {
@@ -858,7 +863,7 @@ class ModLib extends TikiLib
         global $prefs;
 
         $cachelib = TikiLib::lib('cache');
-        $cacheKey = 'module.' . $moduleName . $prefs['language'];
+        $cacheKey = 'module.' . $moduleName . Language::getCurrentLanguage();
         $info = $cachelib->getSerialized($cacheKey, 'module');
 
         if ($info) {
@@ -1123,8 +1128,11 @@ class ModLib extends TikiLib
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
 
+            $prefslib = TikiLib::lib('prefs');
+
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
+                    $this->add_pref_error($mod_reference['name'], $preference);
                     return smarty_block_remarksbox(
                         [
                             'type' => 'warning',
@@ -1139,7 +1147,7 @@ class ModLib extends TikiLib
 
             if (! $cachefile || $this->require_cache_build($mod_reference, $cachefile) || $this->is_admin_mode()) {
                 if ($this->is_admin_mode()) {
-                    $timer = new Timer('module');
+                    $timer = new Timer();
                     $timer->start('module');
                 }
                 if ($info['type'] == "function") { // Use the module name as default module title. This can be overriden later. A module can opt-out of this in favor of a dynamic default title set in the TPL using clear_assign in the main module function. It can also be overwritten in the main module function.
@@ -1272,7 +1280,7 @@ class ModLib extends TikiLib
             $info = $this->parse($info);
 
             // re-assign module_params for the custom module in case a module plugin is used inside it
-            $smarty->assign_by_ref('module_params', $module_params);
+            $smarty->assign_by_ref('user_module_params', $module_params);
             $smarty->assign('user_title', tra($info['title']));
             $smarty->assign_by_ref('user_data', $info['data']);
             $smarty->assign_by_ref('user_module_name', $info['name']);

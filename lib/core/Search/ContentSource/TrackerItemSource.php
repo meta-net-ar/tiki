@@ -99,6 +99,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 'modification_date' => $typeFactory->timestamp($item['lastModif']),
                 'creation_date' => $typeFactory->timestamp($item['created']),
                 'contributors' => $typeFactory->multivalue(array_unique([$item['createdBy'], $item['lastModifBy']])),
+                'created_by' => $typeFactory->identifier($item['createdBy']),
                 'date' => $typeFactory->timestamp($item['created']),
 
                 'tracker_status' => $typeFactory->identifier($item['status']),
@@ -143,6 +144,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'creation_date',
             'date',
             'contributors',
+            'created_by',
 
             'tracker_status',
             'tracker_id',
@@ -176,6 +178,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'creation_date' => 'timestamp',
             'date' => 'timestamp',
             'contributors' => 'multivalue',
+            'created_by' => 'identifier',
 
             'tracker_status' => 'identifier',
             'tracker_id' => 'identifier',
@@ -309,5 +312,48 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
     public function setIndexer($indexer)
     {
         $this->indexer = $indexer;
+    }
+
+    public static function cacheRelationFields()
+    {
+        global $prefs;
+        if (empty($prefs['unified_cache_relation']) || $prefs['unified_cache_relation'] !== 'y') {
+            return;
+        }
+        if (! empty(Tracker_Field_Relation::$relationFieldCache)) {
+            return;
+        }
+        $selectionFields = [];
+        foreach (self::getAllIndexableHandlers() as $handler) {
+            if (! $handler instanceof Tracker_Field_Relation) {
+                continue;
+            }
+            $format = $handler->getOption('format');
+            $pattern = '/\{([\w\.]+)\}/';
+            if (preg_match_all($pattern, $format, $matches)) {
+                $selectionFields = array_merge($selectionFields, $matches[1]);
+            }
+        }
+        $selectionFields = array_unique($selectionFields);
+
+        if (empty($selectionFields)) {
+            return;
+        }
+
+        $relationlib = TikiLib::lib('relation');
+        $relatedItems = $relationlib->getAllRelatedTrackerItems();
+
+        $lib = TikiLib::lib('unifiedsearch');
+        foreach (array_chunk($relatedItems, 500) as $chunk) {
+            $query = $lib->buildQuery([]);
+            foreach ($chunk as $object) {
+                $query->addObject('trackeritem', $object);
+            }
+            $query->setSelectionFields($selectionFields);
+            $result = $query->search($lib->getIndex());
+            foreach ($result as $item) {
+                Tracker_Field_Relation::$relationFieldCache[$item['object_id']] = $item;
+            }
+        }
     }
 }

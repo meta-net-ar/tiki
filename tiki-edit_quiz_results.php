@@ -15,12 +15,12 @@ $inputConfiguration = [
             'resultId'                    => 'int',            //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'fromPoints'                  => 'digits',         //post
-            'toPoints'                    => 'digits',         //post
+            'fromPoints'                  => 'float',         //post
+            'toPoints'                    => 'float',         //post
             'answer'                      => 'xss',            //post
-            'sort_mode'                   => 'string',         //get
+            'sort_mode'                   => 'alnumdash',         //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];
@@ -91,20 +91,10 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
-
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 $smarty->assign_by_ref('sort_mode', $sort_mode);

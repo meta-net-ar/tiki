@@ -8,19 +8,20 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'surveys';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'surveyId'             => 'digits',       //get
-        'ans'                  => 'striptags',    //post
-        'vote'                 => 'striptags',    //post
+        'surveyId'             => 'int',          //get
+        'ans'                  => 'alpha',        //post
+        'vote'                 => 'alpha',        //post
         ],
     ],
 ];
-
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SURVEYS;
+Sections::setCurrentSection($section);
 if ($prefs['feature_categories'] == 'y') {
     $categlib = TikiLib::lib('categ');
 }

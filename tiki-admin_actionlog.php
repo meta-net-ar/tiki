@@ -14,21 +14,23 @@ use Tiki\Lib\GraphEngine\GDGRenderer;
 $inputConfiguration = [
     [
         'staticKeyFilters'                   => [
-            'save'                           => 'bool',        //post
-            'saveAction'                     => 'bool',        //post
+            'save'                           => 'alpha',       //post
+            'saveAction'                     => 'alpha',       //post
+            'unset'                          => 'alpha',       //post
             'action_log_type'                => 'striptags',   //post
             'action_log_ip'                  => 'striptags',   //post
             'action_log_action'              => 'striptags',   //post
             'find'                           => 'striptags',   //post
             'offset'                         => 'digits',      //post
-            'export'                         => 'bool',        //post
+            'export'                         => 'alpha',       //post
             'max'                            => 'digits',      //post
             'actionId'                       => 'digits',      //post
             'contributions'                  => 'striptags',   //post
             'startDate'                      => 'digits',      //post
+            'startDate_Year'                 => 'digits',      //post
             'endDate'                        => 'digits',      //post
-            'list'                           => 'bool',        //post
-            'graph'                          => 'bool',        //post
+            'list'                           => 'alpha',       //post
+            'graph'                          => 'alpha',       //post
             'categId'                        => 'int',         //post
             'startDate_Month'                => 'digits',      //post
             'Time_Hour'                      => 'digits',      //post
@@ -41,26 +43,32 @@ $inputConfiguration = [
             'end_Second'                     => 'digits',      //post
             'endDate_Day'                    => 'digits',      //post
             'endDate_Year'                   => 'digits',      //post
-            'export_bbb'                     => 'bool',        //post
-            'unit'                           => 'striptags',   //post
-            'sort_mode'                      => 'striptags',   //get
-            'contribTime'                    => 'striptags',   //post
-            'barPlot'                        => 'striptags',   //post
-            'bgcolor'                        => 'striptags',   //post
-            'legendBgcolor'                  => 'striptags',   //post
+            'export_bbb'                     => 'alpha',       //post
+            'unit'                           => 'alpha',       //post
+            'sort_mode'                      => 'alnumdash',   //get
+            'contribTime'                    => 'alpha',       //post
+            'barPlot'                        => 'alpha',       //post
+            'bgcolor'                        => 'alpha',       //post
+            'legendBgcolor'                  => 'alpha',       //post
             'galleryId'                      => 'int',         //post
             'time'                           => 'digits',      //post
             'action'                         => 'striptags'    //post
         ],
         'staticKeyFiltersForArrays' => [
-            'cat_categories'        => 'striptags',           //post
+            'cat_categories'        => 'digits',              //post
             'selectedUsers'         => 'username',            //post
             'selectedGroups'        => 'groupname',           //post
             'contributors'          => 'striptags',          //post
+            'checked'               => 'digits',              //post
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
 if (empty($prefs['feature_jpgraph'])) {
     $prefs['feature_jpgraph'] = 'n'; //optional package does not go througp prefs
@@ -145,22 +153,14 @@ $confs = $logslib->get_all_actionlog_conf();
 $action_log_conf_selected = $logslib->get_actionlog_conf($action_log_type, $action_log_action);
 $nbViewedConfs = 0;
 
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST['offset']) || ! empty($_REQUEST['export'])) {
     $offset = 0;
 } else {
     $offset = $_REQUEST["offset"];
 }
-if (isset($_REQUEST['max'])) {
-    $maxRecords = $_REQUEST['max'];
-} else {
-    $maxRecords = $prefs['maxRecords'];
-}
+$maxRecords = $_REQUEST['max'] ?? $prefs['maxRecords'];
 
 if ($tiki_p_view_actionlog == 'y') {
     if (isset($_POST['unset']) && $access->checkCsrf()) {
@@ -592,7 +592,7 @@ if (isset($_REQUEST['graph'])) {
         require_once('lib/jpgraph/src/jpgraph_bar.php');
         require_once('lib/jpgraph/src/jpgraph_mgraph.php');
         $ext = 'jpeg';
-        $background = new MGraph();
+        $background = new MGraph(); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
         $background->SetImgFormat($ext);
         $background->SetFrame(true, 'black');
         $background->SetMargin(10, 10, 10, 10);
@@ -617,7 +617,7 @@ if (isset($_REQUEST['graph'])) {
             $title = sprintf(tra('%s Contributions: Addition'), $user);
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthUser, $height + $xUserTickWidth);
+            $graph = new Graph($widthUser, $height + $xUserTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xUserTickWidth);
@@ -655,7 +655,7 @@ if (isset($_REQUEST['graph'])) {
             $title = sprintf(tra('%s Contributions: Suppression'), $user);
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthUser, $height + $xUserTickWidth);
+            $graph = new Graph($widthUser, $height + $xUserTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xUserTickWidth);
@@ -695,7 +695,7 @@ if (isset($_REQUEST['graph'])) {
             $title2 = tra('Weeks');
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthWeek, $height);
+            $graph = new Graph($widthWeek, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -731,7 +731,7 @@ if (isset($_REQUEST['graph'])) {
             $title2 = tra('Weeks');
         }
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthWeek, $height);
+            $graph = new Graph($widthWeek, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -761,7 +761,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Total Contributions: Addition');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthTotal, $height);
+            $graph = new Graph($widthTotal, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -790,7 +790,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Total Contributions: Suppression');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthTotal, $height);
+            $graph = new Graph($widthTotal, $height); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40);
@@ -819,7 +819,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Groups Contributions: Addition');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthGroup, $height + $xGroupTickWidth);
+            $graph = new Graph($widthGroup, $height + $xGroupTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xGroupTickWidth);
@@ -851,7 +851,7 @@ if (isset($_REQUEST['graph'])) {
     if ($series['totalVol']) {
         $title = tra('Groups Contributions: Suppression');
         if ($prefs['feature_jpgraph'] == 'y') {
-            $graph = new Graph($widthGroup, $height + $xGroupTickWidth);
+            $graph = new Graph($widthGroup, $height + $xGroupTickWidth); // @phpstan-ignore class.notFound (depended on https://jpgraph.net/ through https://mods.tiki.org/details.php?type=lib&mod=jpgraph)
             $graph->img->SetImgFormat($ext);
             $logslib->graph_to_jpgraph($graph, $series, $accumulated, $_REQUEST['bgcolor'], $_REQUEST['legendBgcolor']);
             $graph->img->SetMargin(40 + $yTickWidth, 40 + $legendWidth, 50, 40 + $xGroupTickWidth);

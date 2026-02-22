@@ -17,5 +17,15 @@ function prefs_load_list()
             ],
             'default' => 3,
         ],
+        'load_retry_after' => [
+            'name' => tra('Retry-After header value (in seconds) when site is closed due to high load'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'size' => '3',
+            'dependencies' => [
+                'use_load_threshold',
+            ],
+            'default' => 120,
+        ],
     ];
 }

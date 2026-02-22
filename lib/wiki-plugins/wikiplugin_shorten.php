@@ -24,6 +24,7 @@ function wikiplugin_shorten_info()
                 'description' => tra('Char length of always visible portion of text.'),
                 'since' => '17',
                 'filter' => 'digits',
+                'default' => 20,
             ],
             'moreText' => [
                 'required' => false,
@@ -45,7 +46,6 @@ function wikiplugin_shorten_info()
                 'filter' => 'alnum',
                 'description' => tr('Speed of animation in milliseconds when showing content (%0200%1 is fast and
                     %0600%1 is slow. %01000%1 equals 1 second).', '<code>', '</code>'),
-                'default' => 0,
                 'since' => '17',
                 'accepted' => tr(
                     'Integer greater than 0 and less than or equal to 1000, or %0 or %1',
@@ -60,7 +60,6 @@ function wikiplugin_shorten_info()
                 'filter' => 'alnum',
                 'description' => tr('Speed of animation in milliseconds when hiding content (%0200%1 is fast and
                     %0600%1 is slow. %01000%1 equals 1 second).', '<code>', '</code>'),
-                'default' => 0,
                 'since' => '17',
                 'accepted' => tr(
                     'Integer greater than 0 and less than or equal to 1000, or %0 or %1',
@@ -88,17 +87,17 @@ function wikiplugin_shorten($data, $params)
         'hide_speed' => 0,
     ], EXTR_SKIP);
 
-    if (isset($params['length'])) {
+    if (! is_null($params['length'])) {
         $length = (int) sprintf('%d', $params['length']);
         $length = max(1, $length);
     }
 
-    if (isset($params['show_speed'])) {
+    if (! is_null($params['show_speed'])) {
         $show_speed = str_replace(['slow', 'fast'], ['600', '200'], $params['show_speed']);
         $show_speed = sprintf(' data-show-speed="%d"', $show_speed);
     }
 
-    if (isset($params['hide_speed'])) {
+    if (! is_null($params['hide_speed'])) {
         $hide_speed = str_replace(['slow', 'fast'], ['600', '200'], $params['hide_speed']);
         $hide_speed = sprintf(' data-hide-speed="%d"', $hide_speed);
     }
@@ -144,11 +143,11 @@ function wikiplugin_shorten($data, $params)
 
         $shorten_count += 1;
 
-        if (isset($params['moreText'])) {
+        if (! is_null($params['moreText'])) {
             $moreText = strip_tags($params['moreText']);
         }
 
-        if (isset($params['lessText'])) {
+        if (! is_null($params['lessText'])) {
             $lessText = strip_tags($params['lessText']);
         }
 

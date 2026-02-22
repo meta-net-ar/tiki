@@ -272,7 +272,9 @@ describe("Select", () => {
             await ElSelect.mock.calls[0][0]["remote-method"]("query");
 
             expectedData.forEach(async (option) => {
-                expect(ElOption).toHaveBeenCalledWith(expect.objectContaining({ value: option, label: option }), null);
+                await waitFor(() => {
+                    expect(ElOption).toHaveBeenCalledWith(expect.objectContaining({ value: option, label: option }), null);
+                });
             });
         });
 

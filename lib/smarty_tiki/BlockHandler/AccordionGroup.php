@@ -53,7 +53,7 @@ class AccordionGroup extends Base
         }
 
         return <<<CONTENT
-    <div class="card card-accordian">
+    <div class="card card-accordion">
         <div class="card-header">
             <h4 class="card-title">
                 <a class="accordion-toggle" data-bs-toggle="collapse" href="#$id" aria-expanded="$expanded" aria-controls="$id">

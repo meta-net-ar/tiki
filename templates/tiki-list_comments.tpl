@@ -11,7 +11,7 @@
 {/if}
 
 {$numbercol=2}
-
+        <div class="styling-element">
         <div class="{if $js}table-responsive{/if} comment-table"> {*the table-responsive class cuts off dropdown menus *}
 <table class="table table-striped table-hover">
     <tr>
@@ -165,6 +165,7 @@
     {/section}
 </table>
 </div>
+        </div>
 
 {if $comments}
     <div class="input-group col-sm-8">

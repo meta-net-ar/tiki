@@ -176,7 +176,7 @@ function get_default_prefs()
             'toolbar_global_comments' => '
                 bold, italic, underline, strike , - , link, smiley | help
             ',
-            'toolbar_trackeritem_comments' => '
+            'toolbar_trackers_comments' => '
                 bold, italic, underline, strike , - , link, smiley, linkfile | help
             ',
             'toolbar_sheet' => 'addrow, addrowbefore, addrowmulti, deleterow,-, addcolumn, addcolumnbefore, addcolumnmulti, deletecolumn,-,

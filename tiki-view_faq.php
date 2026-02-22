@@ -20,9 +20,11 @@ $inputConfiguration = [
     ],
     [ 'catchAllUnset' => null ],
 ];
-
-$section = 'faqs';
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_FAQS;
+Sections::setCurrentSection($section);
 $faqlib = TikiLib::lib('faq');
 if ($prefs['feature_categories'] == 'y') {
     $categlib = TikiLib::lib('categ');
@@ -47,11 +49,7 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $channels = $faqlib->list_faq_questions($_REQUEST["faqId"], 0, -1, 'position_asc,questionId_asc', $find);
 $smarty->assign_by_ref('channels', $channels["data"]);

@@ -18,7 +18,7 @@ function wikiplugin_param_info()
         'introduced' => 7,
         'params' => [
             'name' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Name'),
                 'description' => tr('Names of parameters required to display text, separated by %0|%1.', '<code>', '</code>'),
                 'since' => '7.0',
@@ -70,6 +70,7 @@ function wikiplugin_param($data, $params)
         $params['source'] = 'request';
     }
 
+    $params['name'] = ! is_null($params['name']) ? $params['name'] : [];
     foreach ($params['name'] as $name) {
         $value = null;
         switch ($params['source']) {

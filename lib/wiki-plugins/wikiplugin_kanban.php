@@ -160,7 +160,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
         }
     }
     if (is_array($fieldValuesParam) && ! empty($fieldValuesParam)) {
-        foreach ($fieldValuesParam as $key => $fieldParams) {
+        foreach ($fieldValuesParam as $fieldParams) {
             $fieldParamsArray = explode(',', $fieldParams);
 
             $fieldValue = trim($fieldParamsArray[0]);
@@ -205,6 +205,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 {
     global $user, $prefs;
     static $id = 0;
+    $plugininfo = wikiplugin_kanban_info();
 
     if ($prefs['auth_api_tokens'] !== 'y') {
         //This is a proof of concept, this should really be handled by a parent class of wikiplugin, using a dependencies definition
@@ -303,7 +304,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         &&
         ! array_key_exists('', $columnsInfo)
     ) {
-        foreach (array_keys($columnsInfo) as $index => $fieldValue) {
+        foreach (array_keys($columnsInfo) as $fieldValue) {
             $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
         }
     }
@@ -311,7 +312,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         $jit->swimlaneValues->text() &&
         ! array_key_exists('', $swimlanesInfo)
     ) {
-        foreach (array_keys($swimlanesInfo) as $index => $fieldValue) {
+        foreach (array_keys($swimlanesInfo) as $fieldValue) {
             $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
         }
     }
@@ -343,7 +344,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $plugin = new Search_Formatter_Plugin_ArrayTemplate($data);
     $usedFields = array_keys($plugin->getFields());
 
-    foreach ($boardFields as $key => $field) {
+    foreach ($boardFields as $field) {
         if (! in_array('tracker_field_' . $field['permName'], $usedFields) && ! in_array($field['permName'], $usedFields)) {
             if ($field['type'] == 'e') {
                 $data .= '{display name="tracker_field_' . $field['permName'] . '" format="categorylist" singleList="y" separator=" "}';

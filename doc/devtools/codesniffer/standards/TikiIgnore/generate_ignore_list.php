@@ -34,11 +34,11 @@ echo "# Running PHPCS ...." . PHP_EOL;
 if ($ignoreExists) {
     if (file_exists($ignoreFileBackup)) {
         if (! unlink($ignoreFileBackup)) {
-            throw new Error(`Unable to delete $ignoreFileBackup`);
+            throw new Error("Unable to delete $ignoreFileBackup");
         };
     }
     if (! rename($ignoreFileOriginal, $ignoreFileBackup)) {
-        throw new Error(`Unable to backup $ignoreFileOriginal to $ignoreFileBackup`);
+        throw new Error("Unable to backup $ignoreFileOriginal to $ignoreFileBackup");
     };
 }
 
@@ -74,7 +74,7 @@ $process = [
 
         return $matches[1] . ':' . $matches[2];
     },
-    'Squiz.Classes.ValidClassName.NotCamelCaps' => function ($file, $message) {
+    'Squiz.Classes.ValidClassName.NotPascalCase' => function ($file, $message) {
         $parts = explode('"', $message['message']);
         return $parts[1];
     },

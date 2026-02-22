@@ -8,7 +8,6 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 function wikiplugin_cookieconsent_info()
 {
-    global $prefs;
     return [
         'name' => tra('Cookie Consent'),
         'documentation' => 'PluginCookieConsent',
@@ -64,7 +63,7 @@ function wikiplugin_cookieconsent($body, $params)
     }
 
     $tag1 = $tag2 = '';
-    if ($params['element'] && $params['element'] !== 'none') {
+    if ($params['element'] !== 'none') {
         if ($class) {
             $class = " class=\"{$class}\"";
         }

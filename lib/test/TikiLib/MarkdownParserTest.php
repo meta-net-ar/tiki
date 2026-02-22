@@ -253,7 +253,7 @@ line 1 of code
 line 2 of code
 line 3 of code
 </code></pre>
-<pre><code>Sample text here...
+<pre class="codelisting"><code>Sample text here...
 </code></pre>
 <table class="wikitable table table-striped table-hover">
 <thead>

@@ -6,7 +6,7 @@
         </span>
     </div>
     <div class="flex-grow-1 ms-3">
-        {icon name="admin_look" size=3 iclass="adminWizardIconright"}
+        {icon name="admin_look" size=3 iclass="adminWizardIconright float-end ms-2"}
         <h4 class="mt-0 mb-4">{tr}Configure the Tiki theme and other look & feel preferences{/tr}</h4>
         <fieldset>
             <legend>{tr}Look & Feel options{/tr}</legend>

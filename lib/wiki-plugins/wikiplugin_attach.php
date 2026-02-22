@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 function wikiplugin_attach_info()
 {
     return [
@@ -165,7 +168,7 @@ function wikiplugin_attach_info()
 function wikiplugin_attach($data, $params)
 {
     global $atts;
-    global $user, $section, $section_class;
+    global $user, $section_class;
 
     $wikilib = TikiLib::lib('wiki');
     $tikilib = TikiLib::lib('tiki');
@@ -180,7 +183,7 @@ function wikiplugin_attach($data, $params)
         // We're being called from a preview or something; try to build the atts ourselves.
 
         // See if we're being called from a tracker page.
-        if ($section == 'trackers') {
+        if (Sections::isCurrentSection(Sections::SECTION_TRACKERS)) {
             $trklib = TikiLib::lib('trk');
             $atts_item_name = $_REQUEST["itemId"];
 
@@ -193,22 +196,11 @@ function wikiplugin_attach($data, $params)
                 throw new Exception(tr('No tracker found matching id %0', $atts_item_name));
             }
 
-            // Merge the two arrays
-            $tracker_info = array_merge($tracker_info, $tracker_options);
-
-            $attextra = 'n';
-
-            if (str_contains($tracker_info["orderAttachments"], '|')) {
-                $attextra = 'y';
-            }
-
-            $attfields = explode(',', strtok($tracker_info["orderAttachments"], '|'));
-
             $atts = $trklib->list_item_attachments($atts_item_name, 0, -1, 'comment_asc', '');
         }
 
         // See if we're being called from a wiki page.
-        if ($section_class && str_contains($section_class, 'wiki_page')) {
+        if ($section_class && str_contains($section_class, Sections::SECTION_WIKI_PAGE)) {
             $atts_item_name = $_REQUEST["page"];
             $atts = $wikilib->list_wiki_attachments($atts_item_name, 0, -1, 'created_desc', '');
         }

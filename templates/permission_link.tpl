@@ -28,6 +28,14 @@
             <span class="badge bg-secondary">{$permission_link.count|escape}</span>
         {/if}
     </a>
+{elseif $permission_link.mode eq 'dropdown_item'}
+    <a class="btn btn-link dropdown-item{if !empty($permission_link.addclass)} {$permission_link.addclass}{/if}" href="{$permission_link.url|escape}">
+        {* {icon name="permission"} *}
+        {$permission_link.label|escape}
+        {if !empty($permission_link.count)}
+            <span class="badge bg-secondary">{$permission_link.count|escape}</span>
+        {/if}
+    </a>
 {elseif $permission_link.mode eq 'icon'}
     {strip}
     <a class="tips btn {if !empty($permission_link.active)}btn-warning {else} btn-link{/if} btn-sm{if !empty($permission_link.addclass)} {$permission_link.addclass}{/if}" href="{$permission_link.url|escape}" title=":{$permission_link.label}">

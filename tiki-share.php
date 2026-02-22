@@ -12,7 +12,6 @@
 //<a href="tiki-share.php?url={$smarty.server.REQUEST_URI|escape:'url'}">{tr}Share this page{/tr}</a>
 use Tiki\Lib\Auth\Tokens;
 
-$section = 'share';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -20,21 +19,22 @@ $inputConfiguration = [
             'do_email'                             => 'bool',                //post
             'do_tweet'                             => 'bool',                //post
             'do_fb'                                => 'bool',                //post
-            'fblike'                               => 'digits',              //post
-            'priority'                             => 'digits',              //post
+            'fblike'                               => 'int',                 //post
+            'priority'                             => 'int',                 //post
             'do_message'                           => 'bool',                //post
-            'forumId'                              => 'digits',              //post
+            'forumId'                              => 'int',                 //post
             'url'                                  => 'url',                 //post
-            'shorturl'                             => 'bool',                //post
+            'shorturl'                             => 'url',                 //post
             'subject'                              => 'string',              //post
             'send'                                 => 'bool',                //post
             'comment'                              => 'text',                //post
-            'share_token_notification'             => 'string',              //post
-            'msg_share_token_notification'         => 'string',              //post
+            'share_token_notification'             => 'alpha',               //post
+            'msg_share_token_notification'         => 'alpha',               //post
             'share_access_rights'                  => 'bool',                //post
             'share_access'                         => 'bool',                //post
             'msg_share_access'                     => 'bool',                //post
             'how_much_time_access'                 => 'int',                 //post
+            'msg_how_much_time_access'             => 'int',                 //post
             'addresses'                            => 'email',               //post
             'name'                                 => 'string',              //post
             'email'                                => 'email',               //post
@@ -44,10 +44,15 @@ $inputConfiguration = [
             'replyto_hash'                         => 'string',              //post
             'body'                                 => 'xss',                 //post
             'forum_password'                       => 'password',            //post
+            'tweet'                                => 'text',                //post
+            'back_url'                             => 'url',                 //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SHARE;
+Sections::setCurrentSection($section);
 if (empty($_REQUEST['report'])) {
     $access->check_feature('feature_share');
     $access->check_permission('tiki_p_share');

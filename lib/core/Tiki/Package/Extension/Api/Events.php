@@ -7,6 +7,7 @@
 namespace Tiki\Package\Extension\Api;
 
 use Tiki\Package\Extension\Api;
+use Tiki\Package\ExtensionManager;
 
 class Events extends Api
 {
@@ -14,7 +15,8 @@ class Events extends Api
 
     public function isInstalled($folder)
     {
-        $installed1 = array_keys(self::$parents);
+        $installed1 = array_keys(ExtensionManager::getInstalled()); //Not sure of this fix, line was $installed1 = array_keys(self::$parents);, but most likely this code isn't run.  There is no way that worked before.  benoitg - 2026-02-16
+
         if (str_contains($folder, '/') && ! str_contains($folder, '_')) {
             $folder = str_replace('/', '_', $folder);
         }

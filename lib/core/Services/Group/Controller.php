@@ -373,7 +373,8 @@ class Services_Group_Controller
                 $params['color'],
                 $params['isRole'],
                 $params['isTplGroup'],
-                $params['include_groups'] ?? []
+                $params['include_groups'] ?? [],
+                $params['twoFactorAuthGracePeriod']
             );
 
 
@@ -723,7 +724,7 @@ class Services_Group_Controller
             'groupfield' => 0,
             'userstracker' => 0,
             'usersfield' => 0,
-            'registrationUsersFieldIds' => ''
+            'registrationUsersFieldIds' => '',
         ];
         global $prefs;
         $prefGroupTracker = isset($prefs['groupTracker']) and $prefs['groupTracker'] == 'y';

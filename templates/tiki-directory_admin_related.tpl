@@ -1,5 +1,5 @@
 {title help="Directory" url="tiki-directory_admin_related.php?parent=$parent"}{tr}Admin related directory categories{/tr}{/title}
-
+<div class="styling-element">
 {* Display the title using parent *}
 {include file='tiki-directory_admin_bar.tpl'}
 
@@ -92,3 +92,4 @@
     </div>
 </form>
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

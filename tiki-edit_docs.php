@@ -8,9 +8,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Package\VendorHelper;
 
-$section = 'docs';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -24,6 +22,10 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Package\VendorHelper;
+use Tiki\Sections;
+$section = Sections::SECTION_DOCS;
+Sections::setCurrentSection($section);
 $filegallib = TikiLib::lib('filegal');
 include_once('lib/mime/mimetypes.php');
 global $mimetypes;

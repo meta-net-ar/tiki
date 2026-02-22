@@ -13,7 +13,7 @@ Syntax:
 php check_tiki-new.php -u <URL> --user <user> --pass <password>]
 
     -u        Full URL of your Tiki installation
-            e.g.: http://www.example.com/subdirectory
+            e.g.: http://www.example.org/subdirectory
     --user        User for HTTP authentication
     --pass        Password for HTTP authentication
 
@@ -42,7 +42,6 @@ function get_data($options)
         curl_setopt($crl, CURLOPT_USERPWD, $options['user'] . ":" . $options['pass']);
     }
     $ret = curl_exec($crl);
-    curl_close($crl);
     $ret = json_decode($ret);
     if ($ret === null) {
         $ret = ['state' => 2,

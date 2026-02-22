@@ -26,13 +26,13 @@ if (! hm_exists('tiki_parse_message')) {
 
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('Tracker field not found', 'danger');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('Tracker item not found', 'danger');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
         $item[$field['fieldId']] = $trk->get_item_value(null, $item['itemId'], $field['fieldId']);
@@ -41,7 +41,7 @@ if (! hm_exists('tiki_parse_message')) {
         $data = $handler->getFieldData();
 
         if (! isset($data['emails']) || ! is_array($data['emails'])) {
-            Hm_Msgs::add('Tracker field storage is broken or you are using the wrong field type', 'danger');
+            Hm_Msgs::add(tr('Tracker field storage is broken or you are using the wrong field type'), 'danger');
             return;
         }
 
@@ -60,18 +60,21 @@ if (! hm_exists('tiki_parse_message')) {
                 }
             }
             if ($email) {
-                $email['show_archive'] = $handler->getOption('useFolders') && $folder != 'archive';
+                if ($handler->getOption('useFolders')) {
+                    $email['show_archive'] = $folder != 'archive';
+                    $email['is_tiki_tracker_trash_folder'] = $folder == 'trash';
+                }
                 break;
             }
         }
 
         if (! $email) {
-            Hm_Msgs::add('Email not found in related tracker item', 'warning');
+            Hm_Msgs::add(tr('Email not found in related tracker item'), 'warning');
             return;
         }
 
         if (empty($email['message_raw'])) {
-            Hm_Msgs::add('Email could not be parsed', 'warning');
+            Hm_Msgs::add(tr('Email could not be parsed'), 'warning');
             return;
         }
 
@@ -312,7 +315,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // smtp server details
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (! $smtp_details) {
-            Hm_Msgs::add('Could not use the configured SMTP server', 'danger');
+            Hm_Msgs::add(tr('Could not use the configured SMTP server'), 'danger');
             return false;
         }
 
@@ -328,7 +331,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // try to connect
         $smtp = Hm_SMTP_List::connect($smtp_id, false);
         if (! $smtp->authed()) {
-            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
+            Hm_Msgs::add(tr("Failed to authenticate to the SMTP server"), "danger");
             return false;
         }
 
@@ -342,14 +345,14 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // get smtp recipients
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
-            Hm_Msgs::add("No valid receipts found", "warning");
+            Hm_Msgs::add(tr("No valid receipts found"), "warning");
             return false;
         }
 
         // send the message
         $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("%s", $err_msg, "danger"));
+            Hm_Msgs::add(sprintf("%s", $err_msg), "danger");
             return false;
         }
 
@@ -371,7 +374,6 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             return;
         }
         $field_list = [];
-        $fields_without_folders = [];
         foreach ($fields as $field) {
             $tracker = $trk->get_tracker($field['trackerId']);
             $handler = $trk->get_field_handler($field);
@@ -385,18 +387,28 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             } else {
                 $field_list[] = "<a href='#' class='object_selector_trigger dropdown-item' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='inbox'>{$tracker['name']} - {$field['name']}</a>";
             }
-            $fields_without_folders[] = ['tracker_id' => $field['trackerId'], 'field_id' => $field['fieldId'], 'title' => "{$tracker['name']} - {$field['name']}"];
         }
         $res = "<div class=\"" . ($class != 'move_to_trackers' ? 'dropdown ' : '') . "d-inline-block\">";
         if ($class != 'move_to_trackers') {
-            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2 dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
             $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div>";
         } else {
-            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
-            $res .= '<script type="text/javascript">var tiki_tracker_fields = ' . json_encode($fields_without_folders) . '</script>';
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
         }
         $res .= "</div>";
 
+        return $res;
+    }
+}
+
+/**
+ * @subpackage tiki/functions
+ * @return string Restore message button
+ */
+if (! hm_exists('tiki_restore_message')) {
+    function tiki_restore_message($mod)
+    {
+        $res = "<div class='d-inline-block' id='restore_message' style='display: none'><a href='#' title='" . $mod->trans("Restore message to inbox") . "' class='restore_message hlink text-decoration-none btn btn-sm btn-outline-secondary' >" . $mod->trans("Restore") . "</a></div>";
         return $res;
     }
 }
@@ -472,7 +484,7 @@ function find_relevant_tracker_items($keywords, $multivalueField = '', $searchAr
     $lib->initQuery($query);
     $query->filterType('trackeritem');
 
-    $query->setOrder($searchArgs['sort_mode'] ?? 'title_asc');
+    $query->setOrder($searchArgs['sort_mode'] ?? 'score_desc');
     $query->setRange(0, $searchArgs['maxRecords'] ?? $prefs['maxRecords']);
 
     if (! empty($searchArgs['tracker_id'])) {

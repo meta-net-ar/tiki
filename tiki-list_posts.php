@@ -15,7 +15,7 @@ $inputConfiguration = [
         'remove_x'                 => 'int',              //get
         'sort_mode'                => 'word',             //get
         'offset'                   => 'int',              //get
-        'find'                     => 'word',             //post
+        'find'                     => 'string',           //post
         'blogId'                   => 'int',              //get
         ],
         'staticKeyFiltersForArrays' => [
@@ -48,18 +48,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (isset($_REQUEST['blogId'])) {
     $blogId = $_REQUEST['blogId'];

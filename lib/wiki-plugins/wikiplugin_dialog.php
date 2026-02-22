@@ -38,6 +38,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('Use comma-separated values for multiple buttons'),
                 'since' => '8.0',
                 'filter' => 'text',
+                'default' => '',
             ],
             'buttonsClassNames' => [
                 'required' => false,
@@ -61,6 +62,7 @@ function wikiplugin_dialog_info()
                 'description' => tra('JavaScript to perform on button click. Use comma-separated values for multiple buttons'),
                 'since' => '8.0',
                 'filter' => 'text',
+                'default' => '',
                 'tag' => PluginParameterTags::Deprecated->value,
                 'tagMessage' => tra('Do not use this parameter and the buttonsActions similtaneously. It is no longer recommended to use this parameter as it will be removed in future versions.'),
             ],

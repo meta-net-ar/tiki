@@ -47,11 +47,6 @@ class LogsQueryLib
         return LogsQueryLib::type("file gallery")->id($id);
     }
 
-    public static function imageGallery($id = "")
-    {
-        return LogsQueryLib::type("image gallery")->id($id);
-    }
-
     public static function category($id = "")
     {
         return LogsQueryLib::type("category")->id($id);

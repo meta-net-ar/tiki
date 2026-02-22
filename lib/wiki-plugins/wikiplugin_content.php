@@ -22,7 +22,6 @@ function wikiplugin_content_info()
                 'description' => tra('Dynamic content ID. The value can be obtained in the listing.'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
             ],
             'label' => [
                 'required' => false,
@@ -30,7 +29,6 @@ function wikiplugin_content_info()
                 'description' => tra('Label of the dynamic content to display.'),
                 'since' => '5.0',
                 'filter' => 'text',
-                'default' => '',
             ],
         ],
     ];
@@ -45,9 +43,9 @@ function wikiplugin_content($data, $params)
         $lang = TikiLib::lib('parser')->option['language'];
     }
 
-    if (isset($params['id']) &&  $params['id']) {
+    if (! is_null($params['id'])) {
         return $dcslib->get_actual_content((int) $params['id'], $lang);
-    } elseif (isset($params['label']) && $params['label']) {
+    } elseif (! is_null($params['label'])) {
         return $dcslib->get_actual_content_by_label($params['label'], $lang);
     }
 }

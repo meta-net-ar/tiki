@@ -371,9 +371,10 @@ class TikiLib extends TikiDb_Bridge
      */
     private function prepare_http_auth_header($client, $arguments)
     {
-        $url = $arguments['url'];
-
-        $client->setUri($this->urlencode_accent($url)); // Laminas\Http\Client seems to fail with accents in urls
+        if (isset($arguments['url'])) {
+            $url = $arguments['url'];
+            $client->setUri($this->urlencode_accent($url)); // Laminas\Http\Client seems to fail with accents in urls
+        }
         $client->setMethod(Laminas\Http\Request::METHOD_GET);
 
         $headers = $client->getRequest()->getHeaders();
@@ -518,7 +519,7 @@ class TikiLib extends TikiDb_Bridge
             }
 
             return $response->getBody();
-        } catch (Laminas\Http\Exception\ExceptionInterface $e) {
+        } catch (Laminas\Http\Exception\ExceptionInterface) {
             return false;
         }
     }
@@ -586,7 +587,7 @@ class TikiLib extends TikiDb_Bridge
 
                 require TIKI_CONFIG_FILE_PATH;
                 $dbsqlplugin = new PDO("$dbdriver:host=$dbhost;dbname=$database", $dbuserid, $dbpassword);
-                $connectionMap[$name] = new TikiDb_Pdo($dbsqlplugin);
+                $connectionMap[$name] = new PdoDb($dbsqlplugin);
             }
             return $connectionMap[$name];
         } catch (Exception $e) {
@@ -596,6 +597,7 @@ class TikiLib extends TikiDb_Bridge
 
     /*shared*/
     // Returns IP address or IP address forwarded by the proxy if feature load balancer is set
+    // Security: Only trusts proxy headers from trusted reverse proxy IPs
     /**
      * @param $firewall true to detect ip behind a firewall
      * @return null|string
@@ -603,35 +605,21 @@ class TikiLib extends TikiDb_Bridge
     public function get_ip_address($firewall = 0)
     {
         global $prefs;
-        if ($firewall || (isset($prefs['feature_loadbalancer']) && $prefs['feature_loadbalancer'] === "y")) {
-            $header_checks = [
-                'HTTP_CF_CONNECTING_IP',
-                'HTTP_CLIENT_IP',
-                'HTTP_PRAGMA',
-                'HTTP_XONNECTION',
-                'HTTP_CACHE_INFO',
-                'HTTP_XPROXY',
-                'HTTP_PROXY',
-                'HTTP_PROXY_RENAMED',
-                'HTTP_PROXY_CONNECTION',
-                'HTTP_VIA',
-                'HTTP_X_COMING_FROM',
-                'HTTP_COMING_FROM',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'HTTP_CACHE_CONTROL',
-                'HTTP_X_REAL_IP',
-                'REMOTE_ADDR'];
 
-            foreach ($header_checks as $key) {
-                if (array_key_exists($key, $_SERVER) === true) {
-                    foreach (explode(',', $_SERVER[$key]) as $ip) {
+        // Check if we should trust proxy headers
+        $should_check_proxy_headers = $firewall || (isset($prefs['feature_loadbalancer']) && $prefs['feature_loadbalancer'] === "y");
+
+        if ($should_check_proxy_headers) {
+            // Security: Verify that the request comes from a trusted proxy
+            $isFromTrustedProxy = $this->isFromTrustedProxy();
+
+            if ($isFromTrustedProxy) {
+                // Determine which header to check
+                $header_to_check = $this->getProxyHeaderName();
+
+                if (! empty($header_to_check) && array_key_exists($header_to_check, $_SERVER)) {
+                    foreach (explode(',', $_SERVER[$header_to_check]) as $ip) {
                         $ip = trim($ip);
-
-                        //filter the ip with filter functions
                         if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
                             return $ip;
                         }
@@ -639,11 +627,64 @@ class TikiLib extends TikiDb_Bridge
                 }
             }
         }
+
+        // Fall back to REMOTE_ADDR if proxy headers are not available or not trusted
         if (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
             return $_SERVER['REMOTE_ADDR'];
         } else {
             return '0.0.0.0';
         }
+    }
+
+    /*shared*/
+    /**
+     * Check if the current request comes from a trusted reverse proxy
+     * @return bool
+     */
+    public function isFromTrustedProxy()
+    {
+        global $prefs;
+
+        // If feature_loadbalancer is not enabled, don't trust proxy headers
+        if (! isset($prefs['feature_loadbalancer']) || $prefs['feature_loadbalancer'] !== "y") {
+            return false;
+        }
+
+        $trusted_proxies = isset($prefs['feature_loadbalancer_trusted_proxies']) ? $prefs['feature_loadbalancer_trusted_proxies'] : '';
+        $remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+
+        // If no trusted proxies are configured, don't trust any proxy headers (most secure)
+        if (empty($trusted_proxies)) {
+            return false;
+        }
+
+        // Parse the trusted proxies list
+        $trusted_ips = array_map('trim', explode(',', $trusted_proxies));
+
+        // Check if the request comes from a trusted proxy IP
+        return in_array($remote_addr, $trusted_ips, true);
+    }
+
+    /*shared*/
+    /**
+     * Get the name of the HTTP header to use for getting the client IP from a reverse proxy
+     * @return string|null
+     */
+    public function getProxyHeaderName()
+    {
+        global $prefs;
+
+        // If a specific header is configured, use it
+        if (isset($prefs['feature_loadbalancer_header']) && ! empty($prefs['feature_loadbalancer_header'])) {
+            $header = strtoupper(str_replace('-', '_', $prefs['feature_loadbalancer_header']));
+            // Add HTTP_ prefix if not already present
+            if (strpos($header, 'HTTP_') !== 0 && $header !== 'REMOTE_ADDR') {
+                $header = 'HTTP_' . $header;
+            }
+            return $header;
+        }
+
+        return null;
     }
 
     /*shared*/
@@ -700,16 +741,22 @@ class TikiLib extends TikiDb_Bridge
         return false;
     }
 
-    // $noteId 0 means create a new note
     /**
-     * @param $user
-     * @param $noteId
-     * @param $name
-     * @param $data
-     * @param null $parse_mode
-     * @return mixed
+     * Create or update a user note in the notepad.
+     *
+     * Inserts a new note when $noteId is null/0, or updates an existing note when $noteId is provided.
+     * Automatically converts absolute links to relative links before storing.
+     * Sets both created and lastModif timestamps to current time.
+     *
+     * @param string      $user       The username of the note owner
+     * @param int|null    $noteId     The note ID to update, or null/0 to create a new note
+     * @param string      $name       The title/name of the note
+     * @param string      $data       The note content
+     * @param string|null $parse_mode The parsing mode ('raw' for plain text, 'wiki' for wiki syntax), or null to use default
+     *
+     * @return int The note ID (newly created ID for inserts, or the provided ID for updates)
      */
-    public function replace_note($user, $noteId, $name, $data, $parse_mode = null)
+    public function replace_note(string $user, ?int $noteId, string $name, string $data, ?string $parse_mode = null): int
     {
         $data = $this->convertAbsoluteLinksToRelative($data);
         $size = strlen($data);
@@ -718,7 +765,6 @@ class TikiLib extends TikiDb_Bridge
             'user' => $user,
             'name' => $name,
             'data' => $data,
-            'created' => $this->now,
             'lastModif' => $this->now,
             'size' => (int) $size,
             'parse_mode' => $parse_mode,
@@ -726,8 +772,9 @@ class TikiLib extends TikiDb_Bridge
 
         $userNotes = $this->table('tiki_user_notes');
         if ($noteId) {
-            $userNotes->update($queryData, ['noteId' => (int) $noteId,]);
+            $userNotes->update($queryData, ['noteId' => (int) $noteId]);
         } else {
+            $queryData['created'] = $this->now;
             $noteId = $userNotes->insert($queryData);
         }
 
@@ -810,7 +857,7 @@ class TikiLib extends TikiDb_Bridge
                     'url' => $url,
                 ]
             );
-        } catch (\Throwable $th) {
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -1073,7 +1120,7 @@ class TikiLib extends TikiDb_Bridge
      * @param null $info
      * @return array
      */
-    public function get_event_watches($event, $object, $info = null)
+    public function get_event_watches(string $event, $object, $info = null)
     {
         global $prefs;
         $ret = [];
@@ -1409,7 +1456,6 @@ class TikiLib extends TikiDb_Bridge
             $query = "select s.`user`, p.`value` as `realName`, `timestamp`, `tikihost` from `tiki_sessions` s left join `tiki_user_preferences` p on s.`user`<>? and s.`user` = p.`user` and p.`prefName` = 'realName' where s.`user` is not null;";
             $result = $this->fetchAll($query, ['']);
             foreach ($result as $res) {
-                $res['user_information'] = $this->get_user_preference($res['user'], 'user_information', 'public');
                 $res['allowMsgs'] = $this->get_user_preference($res['user'], 'allowMsgs', 'y');
                 $this->online_users_cache[$res['user']] = $res;
             }
@@ -1589,12 +1635,15 @@ class TikiLib extends TikiDb_Bridge
         switch ($type) {
             case 'l':
                 if (str_starts_with($libname, 'dicebear')) {
+                    $seed = $res['avatarName'];
+                    if ($seed === 'admin') {
+                        return '<i class="fa fa-user-tie fa-2xl admin-icon" title="' . tra("Administrator") . '"></i>';
+                    }
                     TikiLib::lib('header')->add_js_module(<<<JS
                         import { renderAvatars } from 'avatar-generator';
                         renderAvatars();
                     JS);
 
-                    $seed = $res['avatarName'];
                     $style = explode('/', $libname)[1];
                     return <<<HTML
                         <div class="dicebear-avatar" data-seed="{$seed}" data-style="{$style}" data-size="{$avatarRenderSize}"></div>
@@ -1637,7 +1686,6 @@ class TikiLib extends TikiDb_Bridge
 
         if (is_array($user)) {
             $res = $user;
-            $user = $user['login'];
         } else {
             $res = $this->table('users_users')->fetchRow(['login', 'avatarType', 'avatarFileType', 'avatarData', 'avatarLibName', 'email'], ['login' => $user]);
         }
@@ -1728,7 +1776,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public function add_wiki_attachment_hit($id)
     {
-        global $prefs, $user;
         if (StatsLib::is_stats_hit()) {
             $wikiAttachments = $this->table('tiki_wiki_attachments');
             $wikiAttachments->update(
@@ -1768,7 +1815,7 @@ class TikiLib extends TikiDb_Bridge
 
         // Combined query using subqueries
         $query = "
-            SELECT 
+            SELECT
                 ? as lastVisit,
                 (SELECT COUNT(*) FROM `tiki_pages` WHERE `lastModif` > ?) as pages,
                 (SELECT COUNT(*) FROM `tiki_files` WHERE `created` > ?) as files,
@@ -2112,7 +2159,7 @@ class TikiLib extends TikiDb_Bridge
         $query = 'select `threadId`, `forumId` from `tiki_comments`,`tiki_forums`'
               . " where `object`=`forumId` and `objectType`=? and `tiki_comments`.`parentId`=? order by " . $this->convertSortMode('commentDate_desc');
         $result = $this->fetchAll($query, $bindvars, $maxRecords * 3, 0); // Load a little more, for permission filters
-        $res = $ret = $retids = [];
+        $ret = $retids = [];
         $n = 0;
 
         foreach ($result as $res) {
@@ -2436,7 +2483,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public function list_users($offset = 0, $maxRecords = -1, $sort_mode = 'pref:realName', $find = '', $include_prefs = false)
     {
-        global $user, $prefs;
         $userprefslib = TikiLib::lib('userprefs');
 
         $bindvars = [];
@@ -2723,7 +2769,7 @@ class TikiLib extends TikiDb_Bridge
             }
 
             // Check if url matches tiki instance links
-            if ($url = $this->getMatchBaseUrlSchema($matches[2][$i]) && $matches[2][$i] == $matches[4][$i]) {
+            if ($this->getMatchBaseUrlSchema($matches[2][$i]) && $matches[2][$i] == $matches[4][$i]) {
                 $newLink = '[' . $matches[2][$i] . ']';
                 $data = str_replace($matches[0][$i], $newLink, $data);
             }
@@ -3768,7 +3814,7 @@ class TikiLib extends TikiDb_Bridge
                 $mid = " where LOWER(`pageName`) NOT IN (" . implode(',', array_fill(0, count($exclude_pages), 'LOWER(?)')) . ")";
             }
 
-            foreach ($exclude_pages as $epKey => $epVal) {
+            foreach ($exclude_pages as $epVal) {
                 $bindvars[] = $epVal;
             }
         }
@@ -3992,6 +4038,8 @@ class TikiLib extends TikiDb_Bridge
             $count++;
         }
         if (! $need_everything) {
+            // Historically, $count was used to compute page count. Even though the final return now relies on $pageCount instead, this adjustment
+            // is kept to preserve context for "this is not exact. Workaround." below  Removing it would make the intent harder to understand.
             $count += $offset;
         }
 
@@ -4170,7 +4218,6 @@ class TikiLib extends TikiDb_Bridge
         switch ($objectType) {
             case 'tracker':
                 return 'tiki_p_admin_trackers';
-            case 'image gallery':
             case 'image':
                 return 'tiki_p_admin_galleries';
             case 'file gallery':
@@ -4569,8 +4616,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public function get_user_preferences($my_user, $names = null)
     {
-        global $user_preferences;
-
         // $my_user must be specified
         if (! is_string($my_user) || $my_user == '') {
             return false;
@@ -4785,7 +4830,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public function add_hit($pageName)
     {
-        global $prefs;
         if (StatsLib::is_stats_hit()) {
             $pages = $this->table('tiki_pages');
             $pages->update(['hits' => $pages->increment(1)], ['pageName' => $pageName]);
@@ -5001,7 +5045,6 @@ class TikiLib extends TikiDb_Bridge
         $id = $this->lastInsertId();
 
         //update status, we don't want the page to be decoded later
-        $wikilib = TikiLib::lib('wiki');
         $converter = new ConvertToTiki9();
         $converter->saveObjectStatus($id, 'tiki_history');
 
@@ -5094,7 +5137,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public function get_page_info($pageName, $retrieve_datas = true, $skipCache = false): array|false
     {
-        global $prefs;
         if ($pageName === null) {
             return false;
         }
@@ -5219,7 +5261,7 @@ class TikiLib extends TikiDb_Bridge
     public static function scrambleEmail($email)
     {
         $ar = explode('@', $email);
-        return self::protect_email($ar[0], $ar[1]);
+        return self::protect_email($ar[0] ?? '', $ar[1] ?? '');
     }
 
     //Updates a dynamic variable found in some object
@@ -5295,7 +5337,7 @@ class TikiLib extends TikiDb_Bridge
         unset($this->cache_page_info[urlencode($page)]);
         $this->table('tiki_pages')->update(['cache_timestamp' => 0], ['pageName' => $page]);
 
-        $pageCache = Tiki_PageCache::create()
+        Tiki_PageCache::create()
             ->checkMeta('wiki-page-output-meta-timestamp', ['page' => $page ])
             ->invalidate();
     }
@@ -5867,7 +5909,6 @@ class TikiLib extends TikiDb_Bridge
      */
     public static function date_format($format, $timestamp = false, $_user = false, $input_format = 5, $is_strftime_format = true, $forceTimezone = false)
     {
-        global $user;
         $tikilib = TikiLib::lib('tiki');
         static $currentUserDateByFormat = [];
         if (! $timestamp) {
@@ -6142,7 +6183,7 @@ class TikiLib extends TikiDb_Bridge
 
         foreach ($args as $arg) {
             if ($arg == 'language') {
-                $language = $prefs['language'] ?? 'en';
+                $language = Language::getCurrentLanguage();
                 $key .= "_{$language}";
             } elseif ($arg == 'external') {
                 $key .= (int) self::$isExternalContext;
@@ -6244,7 +6285,6 @@ class TikiLib extends TikiDb_Bridge
         $fp = fopen($tmp_dest, "rb");
         $data = '';
         $fhash = '';
-        $chunk = '';
         if ($store_type == 'dir') {
             $fhash = $this->get_attach_hash_file_name($file_name);
             $fw = fopen($prefs['w_use_dir'] . $fhash, "wb");
@@ -6413,11 +6453,9 @@ class TikiLib extends TikiDb_Bridge
      */
     public function get_flags($with_names = false, $translate = false, $sort_names = false, $langsort = false)
     {
-        global $prefs;
-
         $cachelib = TikiLib::lib('cache');
         $args = func_get_args();
-        $cacheKey = serialize($args) . $prefs['language'];
+        $cacheKey = serialize($args) . Language::getCurrentLanguage();
 
         if ($data = $cachelib->getSerialized($cacheKey, 'flags')) {
             return $data;
@@ -7027,7 +7065,7 @@ class TikiLib extends TikiDb_Bridge
         }
         //strip the .tpl
         $temp = explode('.', $basetpl);
-        $ext  = array_pop($temp);
+        array_pop($temp);
         $base = implode('.', $temp);
 
         $smarty = TikiLib::lib('smarty');
@@ -7062,7 +7100,7 @@ class TikiLib extends TikiDb_Bridge
         $prefName = 'toolbar_' . $section;
         $toolbars = explode(',', $prefs[$prefName]);
         if ($action == 'add') {
-            foreach ($new_toolbars as $key => $value) {
+            foreach ($new_toolbars as $value) {
                 if (! in_array($value, $toolbars)) {
                     $toolbars[] = $value;
                 }

@@ -125,15 +125,14 @@ $prefs = [
     'feature_scheduler' => 'y',
     'feature_wiki_sharethis' => 'n',
     // lib/prefs/metatag.php
-    'metatag_keywords' => '',
-    'metatag_author' => '',
     'metatag_threadtitle' => 'n',
     'metatag_pagedesc' => 'n',
     'metatag_geoposition' => '',
     'metatag_georegion' => '',
     'metatag_geoplacename' => '',
     'metatag_robotscustom' => 'n',
-    'metatag_revisitafter' => '',
+    'metatag_nositelinkssearchbox' => 'n',
+    'metatag_google_notranslate' => 'n',
     // lib/prefs/site.php
     'site_nav_seper' => '|',
     'site_title_location' => 'after',
@@ -720,7 +719,6 @@ if ($install_step == '2') {
         $im = @imagecreate(110, 20);
         if ($im) {
                 $smarty->assign('sample_image', 'y');
-                imagedestroy($im);
         } else {
                 $smarty->assign('sample_image', 'n');
         }

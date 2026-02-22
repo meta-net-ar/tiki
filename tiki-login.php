@@ -23,12 +23,14 @@ $inputConfiguration = [
         'username'             => 'username',       //post
         'su'                   => 'word',           //post
         'intertiki'            => 'string',         //post
-        'twoFactorForm'        => 'string',         //post
+        'showTwoFactorForm'        => 'string',         //post
         'twoFactorAuthCode'    => 'string',         //post
         'page'                 => 'pagename',       //post
         'url'                  => 'url',            //post
         'rme'                  => 'bool',           //post
         'ticket'               => 'string',         //post
+        'login_mode'           => 'alpha',          //post
+        'keep_login_box_visible' => 'alpha',        //post
         ],
     ],
 ];
@@ -65,7 +67,7 @@ if (! empty($_REQUEST['code']) && $prefs['auth_method'] == 'openid_connect' && T
 $smarty->assign('errortype', 'login'); // to avoid any redirection to the login box if error
 // Alert user if cookies are switched off
 if (ini_get('session.use_cookies') == 1 && ! isset($_COOKIE[ session_name() ]) && $prefs['session_silent'] != 'y') {
-    Feedback::errorAndDie(tra('Cookies must be enabled to log in to this site'), \Laminas\Http\Response::STATUS_CODE_401);
+    Feedback::errorAndDie(tra('Cookies must be enabled to log in to this site'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 // Redirect to HTTPS if we are not in HTTPS but we require HTTPS login
@@ -152,12 +154,12 @@ if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] != 
     unset($_REQUEST['intertiki']);
 }
 
-//Enable Two-Factor Auth Input
-$twoFactorForm = $prefs['twoFactorAuth'];
-if (isset($_REQUEST["$twoFactorForm"])) {
-    $twoFactorForm = $_REQUEST["$twoFactorForm"];
+// Setup Two-Factor Auth form state
+$showTwoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["showTwoFactorForm"])) {
+    $showTwoFactorForm = 'y';
 }
-$smarty->assign('twoFactorForm', $twoFactorForm);
+$smarty->assign('showTwoFactorForm', $showTwoFactorForm);
 
 // Go through the intertiki process
 if (
@@ -263,7 +265,7 @@ if (
 
         if (! $username && $email && $oicLib->canCreateUserTiki()) {
             // Remove invalid characters, based on username_pattern pref
-            $username = preg_replace('/[^ \'\-_a-zA-Z0-9@\.]/', '_', $name);
+            $username = preg_replace('/[^\'\-_a-zA-Z0-9@\.]/', '_', $name);
             $user = $userlib->add_user($username, '', $email);
 
             if (! $user) {
@@ -320,12 +322,16 @@ if (
         }
     } elseif ($isvalid) {
         try {
-            $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
-            $requireMfa = TwoFactorAuth::isMFARequired($requestedUser);
-            $twoFactorSecret = TwoFactorAuth::get2FactorSecret($requestedUser);
+            $requireMfa = false;
+            $twoFactorSecret = null;
+
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y') {
+                $requireMfa = TwoFactorAuth::isMFARequired($requestedUser);
+                $twoFactorSecret = TwoFactorAuth::get2FactorSecret($requestedUser);
+            }
 
             if (
-                $prefs['twoFactorAuth'] == 'y'
+                ($prefs['twoFactorAuth'] ?? 'n') === 'y'
                 && isset($_REQUEST['login_mode'])
                 && $_REQUEST['login_mode'] == 'popup'
                 && $requireMfa
@@ -334,15 +340,16 @@ if (
                 $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
                 $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
                 $params = '&create2FaCodeNormalLogin&tiki_username=' . urlencode($_REQUEST['user']);
-                header('Location: ' . $base_url . 'tiki-login_scr.php?twoFactorForm' . $params);
+                header('Location: ' . $base_url . 'tiki-login_scr.php?showTwoFactorForm' . $params);
                 exit;
             }
 
-            if ($prefs['twoFactorAuth'] == 'y' && $requireMfa && ! empty($twoFactorSecret)) {
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y' && $requireMfa && ! empty($twoFactorSecret)) {
+                $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
                 $is2FaPass = $twoFactorAuth->validateCode($requestedUser, $_REQUEST['twoFactorAuthCode']);
                 if (! $is2FaPass) {
                     $error = TWO_FA_INCORRECT;
-                    $smarty->assign('twoFactorForm', 'y');
+                    $smarty->assign('showTwoFactorForm', 'y');
                     $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
                     $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
                     $smarty->assign('create2FaCodeNormalLogin', "y");
@@ -354,7 +361,7 @@ if (
             }
 
             if ($isvalid) {
-                if ($requireMfa && $prefs['twoFactorAuth'] === 'y') {
+                if ($requireMfa && ($prefs['twoFactorAuth'] ?? 'n') === 'y') {
                     $userlib->updateLastMFADate($requestedUser);
                 }
                 $isdue = $userlib->is_due($requestedUser, $method);
@@ -406,6 +413,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         TikiLib::lib('login')->activateSession($user);
 
         $url = $_SESSION['loginfrom'];
+        $_SESSION['login_time'] = time();
 
         // When logging into a multi-lingual Tiki, $_SESSION['loginfrom'] contains the main-language page, and not the translated one
         //  This only applies if feature_best_language and only seems to affect SEFURL
@@ -482,7 +490,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
                 }
                 // Go to the group page instead of the referer url if we are in one of those cases :
                 //   - pref 'Go to the group homepage only if logging in from the default homepage' (limitedGoGroupHome) is disabled,
-                //   - referer url (e.g. http://example.com/tiki/tiki-index.php?page=Homepage ) is the homepage (tikiIndex),
+                //   - referer url (e.g. http://example.org/tiki/tiki-index.php?page=Homepage ) is the homepage (tikiIndex),
                 //   - referer url complete path ( e.g. /tiki/tiki-index.php?page=Homepage ) is the homepage,
                 //   - referer url relative path ( e.g. tiki-index.php?page=Homepage ) is the homepage
                 //   - referer url SEF page ( e.g. /tiki/Homepage ) is the homepage
@@ -627,7 +635,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             http_response_code(401);
             $smarty->assign('error_login', $error);
             $smarty->assign('mid', 'tiki-login.tpl');
-            $smarty->assign('error_user', $_REQUEST["user"]);
+            $smarty->assign('error_user', $requestedUser);
             $smarty->display('tiki.tpl');
             exit;
 

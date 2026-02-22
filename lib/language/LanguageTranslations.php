@@ -60,7 +60,7 @@ class LanguageTranslations extends TikiDb_Bridge
         if (! is_null($lang)) {
             $this->lang = $lang;
         } else {
-            $this->lang = \I18N\LanguageTranslator::getLanguageFromPrefs();
+            $this->lang = Language::getCurrentLanguage();
         }
 
         $this->filePath = "lang/{$this->lang}/language.php";

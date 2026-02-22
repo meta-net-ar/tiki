@@ -97,7 +97,6 @@ function wikiplugin_layout_info()
                     'Enter page content width in px or %; for example, 1000px, leave blank for same width as page body.)'
                 ),
                 'filter'      => 'text',
-                'default'     => '',
                 'advanced'    => true,
                 'since'       => '19.0',
             ],
@@ -109,7 +108,6 @@ function wikiplugin_layout_info()
                     'Enter image URL, in the case of a single image.'
                 ),
                 'filter'      => 'text',
-                'default'     => '',
                 'since'       => '19.0',
             ],
             'bgrepeat'    => [
@@ -143,7 +141,6 @@ function wikiplugin_layout_info()
                     'List of IDs of images from the file galleries, separated by commas.'
                 ),
                 'filter'      => 'striptags',
-                'default'     => '',
             ],
             'topmargin'  => [
                 'required'    => false,
@@ -152,7 +149,6 @@ function wikiplugin_layout_info()
                     'Enter value in % or px; for example, 30%, 300px. Default is 0.'
                 ),
                 'filter'      => 'text',
-                'default'     => '0',
                 'advanced'    => true,
                 'since'       => '19.0',
             ],
@@ -163,7 +159,6 @@ function wikiplugin_layout_info()
                     'Enter page header width in px or %; leave blank for same width as page body.'
                 ),
                 'filter'      => 'text',
-                'default'     => 0,
                 'advanced'    => true,
                 'since'       => '19.0',
             ],
@@ -174,7 +169,6 @@ function wikiplugin_layout_info()
                     'Enter page footer width in px or %; leave blank for same width as page body.'
                 ),
                 'filter'      => 'text',
-                'default'     => 0,
                 'advanced'    => true,
                 'since'       => '19.0',
             ],
@@ -185,7 +179,6 @@ function wikiplugin_layout_info()
                     'Enter a valid CSS color hex code, or an RGBA value if setting opacity is desired; for example: #000 or rgba(00, 00, 00, 0.5).'
                 ),
                 'filter'      => 'text',
-                'default'     => '',
                 'advanced'    => true,
                 'since'       => '19.0',
             ],
@@ -196,7 +189,6 @@ function wikiplugin_layout_info()
                     'Enter a valid CSS color hex code, or an RGBA value if setting opacity is desired; for example: #000 or rgba(00, 00, 00, 0.5).'
                 ),
                 'filter'      => 'text',
-                'default'     => '',
                 'since'       => '19.0',
             ],
             'contenttextcolor'    => [
@@ -206,7 +198,6 @@ function wikiplugin_layout_info()
                     'Enter a valid CSS color hex code; for example, #000, #fff, #ccc.'
                 ),
                 'filter'      => 'text',
-                'default'     => '',
                 'since'       => '19.0',
             ],
             'contentradius'    => [
@@ -217,7 +208,6 @@ function wikiplugin_layout_info()
                 ),
                 'filter'      => 'text',
                 'advance'     => true,
-                'default'     => '',
                 'since'       => '19.0',
             ],
             'contentboxshadow'    => [
@@ -228,7 +218,6 @@ function wikiplugin_layout_info()
                 ),
                 'filter'      => 'text',
                 'advance'     => true,
-                'default'     => '',
                 'since'       => '19.0',
             ],
 
@@ -344,7 +333,7 @@ function wikiplugin_layout($data, $params)
         $headerlib->add_js("$('.page_actions a').removeClass('btn btn-primary dropdown-toggle');"); //making action toggle smaller
     }
 
-    if (isset($params['bgimage'])) {
+    if (! is_null($params['bgimage'])) {
         $backgroundOption = "background-size:cover";
         if ($params['bgrepeat']) {
             if ($params['bgrepeat'] == "repeat") {
@@ -365,8 +354,8 @@ function wikiplugin_layout($data, $params)
         );
     }
     if (
-        isset($params['contentwidth'])
-        || isset($params['topmargin']) || isset($params['contentradius']) || isset($params['contentboxshadow'])
+        ! is_null($params['contentwidth'])
+        || ! is_null($params['topmargin']) || ! is_null($params['contentradius']) || ! is_null($params['contentboxshadow'])
     ) {
         $headerlib->add_css(
             "#row-middle{width:" . $params["contentwidth"]
@@ -374,22 +363,22 @@ function wikiplugin_layout($data, $params)
             . ";min-width:380px;border-radius:" . $params['contentradius'] . ";box-shadow:" . $params['contentboxshadow'] . "} #col1{min-width:380px;margin:auto}"
         );
     }
-    if (isset($params['headerwidth'])) {
+    if (! is_null($params['headerwidth'])) {
         $headerlib->add_css(
             "#page-header{width:" . $params["headerwidth"] . " !important;margin:auto }"
         );
     }
-    if (isset($params['footerwidth'])) {
+    if (! is_null($params['footerwidth'])) {
         $headerlib->add_css(
             "#footer{width:" . $params["footerwidth"] . " !important;margin:auto}"
         );
     }
-    if (isset($params['nosidemargins'])) {
+    if ($params['nosidemargins']) {
         $headerlib->add_css(
             ".container-std.container-fluid #page-data {margin-left: 0; margin-right: 0} .container-std.container-fluid #page-data > .row {margin-left: 0; margin-right: 0;} .col1 {padding-left: 0; padding-right: 0;} "
         );
     }
-    if (isset($params['fgalId']) || isset($params['fileIds'])) {
+    if (! is_null($params['fgalId']) || ! is_null($params['fileIds'])) {
         //checking if gallery is choosen
         $filegallib = TikiLib::lib('filegal');
         if ($params['fgalId']) {
@@ -415,7 +404,7 @@ function wikiplugin_layout($data, $params)
                 . '&amp;display",';
         }
 
-        $transitionDelay = (isset($params['transitiondelay'])
+        $transitionDelay = (($params['transitiondelay'])
             ? $params['transitiondelay'] * 1000 : 5000);
 
         $headerlib->add_css(
@@ -467,13 +456,13 @@ function wikiplugin_layout($data, $params)
             });'
         );
     }
-    if (isset($params['contentbg']) || isset($params['contenttextcolor'])) {
+    if (! is_null($params['contentbg']) || ! is_null($params['contenttextcolor'])) {
         $headerlib->add_css(
             "#row-middle{background-color:" . $params["contentbg"] . ";color:"
             . $params["contenttextcolor"] . "}"
         );
     }
-    if (isset($params['bgcolor'])) {
+    if (! is_null($params['bgcolor'])) {
         $headerlib->add_css(
             "body{background-color:" . $params["bgcolor"] . "}"
         );

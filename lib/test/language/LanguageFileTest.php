@@ -60,7 +60,6 @@ class LanguageFileTest extends TikiTestCase
     {
         $reflectionClass = new ReflectionClass($this->obj);
         $property = $reflectionClass->getProperty('contentLoaded');
-        $property->setAccessible(true);
 
         $this->obj->parse();
         $this->assertTrue($property->getValue($this->obj));
@@ -119,10 +118,8 @@ class LanguageFileTest extends TikiTestCase
 
         $reflectionClass = new ReflectionClass($obj);
         $contentProperty = $reflectionClass->getProperty('content');
-        $contentProperty->setAccessible(true);
         $contentProperty->setValue($obj, $content);
         $contentLoadedProperty = $reflectionClass->getProperty('contentLoaded');
-        $contentLoadedProperty->setAccessible(true);
         $contentLoadedProperty->setValue($obj, true);
 
         $this->assertEquals($expectedResult, $obj->getStats());

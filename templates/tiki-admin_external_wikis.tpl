@@ -1,7 +1,7 @@
 {title help="External Wikis"}{tr}Admin External Wikis{/tr}{/title}
 
 <h2>{tr}Create/Edit External Wiki{/tr}</h2>
-<form action="tiki-admin_external_wikis.php" method="post">
+<form action="tiki-admin_external_wikis.php" method="post" class="styling-element">
     {ticket}
     <input type="hidden" name="extwikiId" value="{$extwikiId|escape}">
     <div class="mb-3 row">
@@ -37,7 +37,7 @@
 </form>
 
 <h2>{tr}External Wiki{/tr}</h2>
-<div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {* table-responsive class cuts off css drop-down menus *}
     <table class="table table-striped table-hover">
         <tr>
             <th>

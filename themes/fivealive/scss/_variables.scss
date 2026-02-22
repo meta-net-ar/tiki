@@ -54,6 +54,7 @@ $component-active-bg:         #0c628c; // ($primary);  // default
 $font-family-sans-serif: Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // Switch to system font instead of "Open Sans", sans-serif; // Was Lato
 $font-size-base: 1rem;
 $headings-font-weight: 700;
+$headings-color: #333333;
 
 // Tables
 // Buttons
@@ -71,6 +72,7 @@ $form-range-thumb-bg:                      $component-active-bg; // !default; NE
 $nav-tabs-border-color:             $gray-300; // !default;
 
 // Navbar
+$navbar-padding-y: 0em;
 //$nav-link-padding-y:                 0.9rem;
 $navbar-dark-color:                #efefef; // rgba($white, .55) !default;
 $navbar-dark-hover-color:          #fff; // rgba($white, .75) !default;
@@ -81,8 +83,8 @@ $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 // Cards
-//$card-cap-bg: #28AAE1FF; // $tiki-top-bg; // var(--tiki-top-bg);  // --bs-card-cap-bg default. In options, declared as $tiki-top-bg.
-//$card-title-color: $white;
+$card-cap-bg: #2fb0ea; // $tiki-top-bg; // var(--tiki-top-bg);  // --bs-card-cap-bg default. In options, declared as $tiki-top-bg.
+$card-cap-color: $white;
 $card-border-radius: 0;
 $card-text: $body-color !default;
 $card-border-color: transparent;
@@ -99,7 +101,7 @@ $card-border-color: transparent;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                      $body-color; // $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; //!default;
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 

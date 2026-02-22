@@ -78,7 +78,7 @@ class Console extends SessionAwareApp
 
     protected function formatHtml($text)
     {
-        $formatter = \TikiManager\Config\App::get('ConsoleHtmlFormatter');
+        $formatter = \TikiManager\Config\App::get('ConsoleHtmlFormatter'); // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         return $formatter->format($text);
     }
 

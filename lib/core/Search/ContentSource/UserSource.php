@@ -128,8 +128,6 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
     {
         if ($this->visibility == 'all') {
             return true;
-        } elseif (isset($detail['preferences']['user_information'])) {
-            return $detail['preferences']['user_information'] == 'public';
         } else {
             return false;
         }

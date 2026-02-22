@@ -40,12 +40,6 @@
 
 .siteloginbar_poppedup .list-unstyled li { background: none !important; }
 
-// Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
 [data-bs-theme=dark] {
     .btn-outline-primary {
         color: #EB6433;

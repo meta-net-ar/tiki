@@ -129,11 +129,11 @@ if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-r
 }
 
 if (isset($_GET['language'])) {
-    setLanguage($_GET['language']);
+    Language::setCurrentLanguage($_GET['language']);
 }
 
 if (isset($_GET['languageAdmin'])) {
-    setLanguage($_GET['languageAdmin'], true);
+    Language::setCurrentLanguage($_GET['languageAdmin'], true);
 }
 header("location: $orig_url");
 exit;

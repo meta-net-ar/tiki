@@ -26,7 +26,7 @@ class SchedulerHealCommand extends Command
             ->addArgument(
                 'schedulerId',
                 InputArgument::OPTIONAL,
-                'Scheduler Id to be healed'
+                tra('Scheduler Id to be healed')
             );
     }
 

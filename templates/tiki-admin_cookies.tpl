@@ -3,7 +3,7 @@
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
     {tr}To use cookie in a text area (Wiki page, etc), a <a class="alert-link" href="tiki-admin_modules.php">module</a> or a template, use {literal}{cookie}{/literal}.{/tr}
 {/remarksbox}
-
+<div class="styling-element">
 <h2>{tr}Create/edit cookies{/tr}</h2>
 <form action="tiki-admin_cookies.php" method="post">
     {ticket}
@@ -81,6 +81,7 @@
             {norecords _colspan=3}
         {/section}
     </table>
+</div>
 </div>
 
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

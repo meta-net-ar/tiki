@@ -208,8 +208,16 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return [];
         }
-        if (strpbrk($email_or_username, ',; ') !== false) {
-            $list = preg_split('/\s*[,;\s]\s*/', $email_or_username);
+        if (str_contains($email_or_username, ';')) {
+            $list = preg_split('/\s*;\s*/', $email_or_username);
+            $res = [];
+            foreach ($list as $email_or_username) {
+                $res = array_merge($res, $this->dereference($email_or_username));
+            }
+            return array_filter($res);
+        }
+        if (str_contains($email_or_username, ',') && ! str_contains($email_or_username, '<')) {
+            $list = preg_split('/\s*,\s*/', $email_or_username);
             $res = [];
             foreach ($list as $email_or_username) {
                 $res = array_merge($res, $this->dereference($email_or_username));

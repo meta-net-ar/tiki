@@ -667,6 +667,13 @@
                             {icon name=information}
                         </a>
                     </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="config[skip_validation]" value="1" {if $config['skip_validation']} checked {/if}>
+                        <label class="form-check-label">{tr}Skip Validation{/tr}</label>
+                        <a class="tikihelp text-info" title="{tr}Skip Validation:{/tr} {tr}Tracker items that are created during import won't be validated against their rules like mandatory field checks. Use with caution.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </div>
                 </div>
                 <div class="col-sm-5">
                     <div class="form-check">

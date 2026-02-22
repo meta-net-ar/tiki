@@ -8,14 +8,13 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'newsletters';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
             'nlId'                 => 'digits',            //post
             'cancel'               => 'bool',              //post
             'editionId'            => 'digits',            //post
-            'sendingUniqId'        => 'bool',              //post
+            'sendingUniqId'        => 'text',              //post
             'cookietab'            => 'digits',            //post
             'resend'               => 'bool',              //post
             'remove'               => 'int',               //get
@@ -33,7 +32,7 @@ $inputConfiguration = [
             'datatxt'              => 'text',              //post
             'replyto'              => 'email',             //post
             'sendfrom'             => 'email',             //post
-            'usedTpl'              => 'bool',              //post
+            'usedTpl'              => 'text',              //post
             'save'                 => 'bool',              //post
             'resendEditionId'      => 'bool',              //post
             'begin'                => 'bool',              //post
@@ -41,21 +40,28 @@ $inputConfiguration = [
             'ticket'               => 'string',               //post
             'clipArticles'         => 'bool',              //post
             'articleClip'          => 'text',              //post
-            'ed_sort_mode'         => 'word',              //get
-            'dr_sort_mode'         => 'word',              //get
+            'dataparsed'           => 'none',              //post
+            'ed_sort_mode'         => 'alnumdash',         //get
+            'dr_sort_mode'         => 'alnumdash',         //get
             'ed_offset'            => 'int',               //get
             'dr_offset'            => 'int',               //get
             'ed_find'              => 'word',              //post
             'dr_find'              => 'word',              //post
         ],
+        'staticKeyFiltersForArrays' => [
+            'newsletterfile'       => 'text',              //post
+        ],
     ],
 ];
 
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 @ini_set('max_execution_time', 0);
 $prefs['feature_wiki_protect_email'] = 'n'; //not to alter the email
 include_once('lib/newsletters/nllib.php');
+
 $auto_query_args = ['sort_mode', 'offset', 'find', 'nlId', 'cookietab', 'editionId'];
 
 $access->check_feature('feature_newsletters');
@@ -301,16 +307,8 @@ foreach ($info['files'] as $k => $newsletterfile) {
 $smarty->assign('preview', 'n');
 if (isset($_REQUEST["preview"])) {
     $smarty->assign('preview', 'y');
-    if (isset($_REQUEST["subject"])) {
-        $info["subject"] = $_REQUEST["subject"];
-    } else {
-        $info["subject"] = '';
-    }
-    if (isset($_REQUEST["data"])) {
-        $info["data"] = $_REQUEST["data"];
-    } else {
-        $info["data"] = '';
-    }
+    $info["subject"] = $_REQUEST["subject"] ?? '';
+    $info["data"] = $_REQUEST["data"] ?? '';
     if (isset($_REQUEST['wikiparse']) && $_REQUEST['wikiparse'] == 'on') {
         $info['wikiparse'] = 'y';
     } else {

@@ -18,7 +18,6 @@ $inputConfiguration = [
             'sort_mode'               => 'striptags',    //post
             'offset'                  => 'digits',       //post
             'find'                    => 'striptags',    //post
-            'add'                     => 'bool',         //post
             'save'                    => 'bool',         //post
             'upload'                  => 'bool',         //post
         ],
@@ -26,6 +25,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/taglines/taglinelib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
 $access->check_permission('tiki_p_edit_cookies');
 
@@ -106,17 +108,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $taglinelib->list_cookies($offset, $maxRecords, $sort_mode, $find);

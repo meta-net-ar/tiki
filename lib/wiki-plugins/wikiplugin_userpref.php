@@ -31,7 +31,6 @@ function wikiplugin_userpref($data, $params)
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
-    $else = false;
     foreach ($params as $prefName => $prefValue) {
         if ($tikilib->get_user_preference($user, $prefName) != $prefValue) {
             return $dataelse;

@@ -191,6 +191,7 @@ class OAuthLib extends TikiDb_Bridge
 
             switch ($provider_key) {
                 case 'twitter':
+                    // @tiki-external-link-ok: Twitter OAuth2 endpoints
                     $this->providers[$provider_key] = new \League\OAuth2\Client\Provider\GenericProvider([
                         'clientId' => $config['clientId'],
                         'clientSecret' => $config['clientSecret'],

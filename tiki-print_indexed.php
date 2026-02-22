@@ -64,7 +64,7 @@ switch ($_GET['list']) {
         if (isset($_REQUEST['languages'])) {
             $languages = (array)$_REQUEST['languages'];
         } else {
-            $languages = [$prefs['language']];
+            $languages = [Language::getCurrentLanguage()];
         }
 
         $filterLang = reset($languages);

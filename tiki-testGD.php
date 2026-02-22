@@ -19,4 +19,3 @@ $background_color = imagecolorallocate($im, 0, 95, 170);
 $text_color = imagecolorallocate($im, 255, 255, 255);
 imagestring($im, 1, 2, 2, "test GD image", $text_color);
 imagepng($im);
-imagedestroy($im);

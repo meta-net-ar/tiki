@@ -8,50 +8,54 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'allowhtml'                     => 'bool',            //post
             'subId'                         => 'int',             //post
             'topicId'                       => 'int',             //post
-            'type'                          => 'string',          //post
+            'type'                          => 'alnumdash',          //post
             'previewId'                     => 'int',             //post
             'imageIsChanged'                => 'bool',            //post
             'templateId'                    => 'int',             //post
-            'preview'                       => 'int',             //post
+            'preview'                       => 'bool',             //post
             'body'                          => 'xss',             //post
-            'translationOf'                 => 'digits',          //post
+            'translationOf'                 => 'int',          //post
             'save'                          => 'bool',            //post
             'submitarticle'                 => 'bool',            //post
-            'publish_Hour'                  => 'digits',          //post
-            'publish_Minute'                => 'digits',          //post
-            'publish_Month'                 => 'digits',          //post
-            'publish_Day'                   => 'digits',          //post
-            'publish_Year'                  => 'digits',          //post
-            'publish_Meridian'              => 'string',          //post
-            'title'                         => 'string',          //post
-            'authorName'                    => 'string',          //post
+            'publish_Hour'                  => 'int',          //post
+            'publish_Minute'                => 'int',          //post
+            'publish_Month'                 => 'int',          //post
+            'publish_Day'                   => 'int',          //post
+            'publish_Year'                  => 'int',          //post
+            'publish_Meridian'              => 'alpha',          //post
+            'title'                         => 'text',          //post
+            'authorName'                    => 'text',          //post
             'useImage'                      => 'bool',            //post
             'isfloat'                       => 'bool',            //post
-            'image_data'                    => 'striptags',       //post
-            'topline'                       => 'string',          //post
-            'subtitle'                      => 'string',          //post
-            'linkto'                        => 'string',          //post
-            'image_caption'                 => 'string',          //post
-            'image_name'                    => 'string',          //post
-            'image_type'                    => 'string',          //post
-            'image_size'                    => 'digits',          //post
-            'image_x'                       => 'digits',          //post
-            'image_y'                       => 'digits',          //post
-            'rating'                        => 'digits',          //post
+            'image_data'                    => 'none',       //post
+            'topline'                       => 'text',          //post
+            'subtitle'                      => 'text',          //post
+            'linkto'                        => 'text',          //post
+            'image_caption'                 => 'text',          //post
+            'image_name'                    => 'text',          //post
+            'image_type'                    => 'text',          //post
+            'image_size'                    => 'text',          //post
+            'image_x'                       => 'text',          //post
+            'image_y'                       => 'text',          //post
+            'rating'                        => 'text',          //post
             'heading'                       => 'xss',             //post
-            'freetag_string'                => 'string',          //post
+            'freetag_string'                => 'text',          //post
             'recategorize'                  => 'bool',            //post
+            'lang'                          => 'alnumdash',          //post
+            'image_alt'                      => 'text',          //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 
 if ($prefs['feature_freetags'] == 'y') {
@@ -70,11 +74,7 @@ if ($tiki_p_admin != 'y') {
     }
 }
 
-if (isset($_REQUEST['subId'])) {
-    $subId = $_REQUEST['subId'];
-} else {
-    $subId = 0;
-}
+$subId = $_REQUEST['subId'] ?? 0;
 
 if (! empty($_REQUEST['topicId'])) {
     $topicId = $_REQUEST['topicId'];
@@ -89,11 +89,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('subId', $subId);
 $smarty->assign('articleId', $subId);
@@ -106,7 +102,7 @@ $smarty->assign(
 $templateslib = TikiLib::lib('template');
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
     if ($templateslib->template_is_in_section($_REQUEST['templateId'], 'wiki_html')) {
@@ -125,7 +121,7 @@ $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
 $smarty->assign('image_alt', '');
-$smarty->assign('lang', $prefs['language']);
+$smarty->assign('lang', Language::getCurrentLanguage());
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
 $smarty->assign('topicId', $topicId);
@@ -147,7 +143,7 @@ $smarty->assign('rating', 7);
 $smarty->assign('edit_data', 'n');
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
 }
@@ -658,6 +654,9 @@ include_once('tiki-section_options.php');
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_submission.tpl');

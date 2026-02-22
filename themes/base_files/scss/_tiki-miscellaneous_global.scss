@@ -642,9 +642,6 @@ blockquote {
         margin: .8rem 0;
 }
 
-// Improve horizontal spacing of breadcrumb icons and separators
-.breadcrumb-item { padding-right: 0.5rem;}
-.breadcrumb .tips { padding-right: 0.5rem;}
 
 // Enable Smartmenus dropdown-menu to display above fixed-top header
 ul.sm-vertical,
@@ -916,4 +913,10 @@ ul.sm-horizontal {
     max-width: 100%;
     overflow-x: auto;
     display: block;
+}
+
+// Moved from _tiki-blogs.scss because it's also used in wiki and directory, etc.
+.description {
+    font-size: .95em;
+    font-style: italic;
 }

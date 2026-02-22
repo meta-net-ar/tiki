@@ -100,7 +100,13 @@
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">{icon name='sort'}</span>
-                                        <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
+                                        {if $option.type eq '-'}
+                                            <div class="form-control d-flex align-items-center" style="background-color: #f8f9fa; padding: 0.5rem;">
+                                                <hr class="menu-separator">
+                                            </div>
+                                        {else}
+                                            <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
+                                        {/if}
                                         <span class="tips input-group-text option-edit" title="|{tr}Check this if the option is an alternative to the previous one.{/tr}">
                                                 <input type="checkbox" class="samepos"{if $option.position eq $prevpos} checked="checked"{/if}>
                                             {$prevpos = $option.position}

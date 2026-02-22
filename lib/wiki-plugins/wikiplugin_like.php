@@ -38,7 +38,6 @@ function wikiplugin_like_info()
                 'description' => tra('Sets whether to only show the count of likes rather than give the option to vote'),
                 'since' => '15.0',
                 'filter' => 'alpha',
-                'default' => 'false',
             ],
         ]
     ];

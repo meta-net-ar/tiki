@@ -1,0 +1,240 @@
+// CSS variables for the Tikiben theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+// Possible palette:
+:root {
+    --tikiben-red: #e72627;
+    --tikiben-darkblue: #0f2847;
+    --tikiben-grey: #565759;
+    --tikiben-orange: #ee7620;
+    --tikiben-lightbeige: #f2e8cd;
+    --tikiben-lightyellow: #f7de8c;
+    --tikiben-mediumbeige: #e0d6bd;
+    .nav-link {
+        --bs-nav-link-color: #566837; // Unable to override Bootstrap default in variables.scss.
+    }
+}
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "variables";
+
+// Used for L&F nav color choice and color mode override
+@mixin top-nav-dark {
+    --tiki-top-bg: var(--tikiben-darkblue); // #212529; // rgb(85, 85, 85);
+    --tiki-top-color: #fff;
+    --tiki-top-hover-color: #fff;
+    //    --tiki-top-border: solid rgb(85, 85, 85);
+    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
+}
+
+@mixin topbar-nav-dark {
+    --tiki-topbar-bg: #9C693A; // var(--tikiben-grey); //  #212529; // rgb(85, 85, 85);
+    --tiki-topbar-color: #fff;
+    --tiki-topbar-hover-color: #fff;
+    //    --tiki-topbar-border: solid rgb(85, 85, 85);
+}
+
+@mixin top-nav-light {
+    --tiki-top-bg: #BDBE9E; // rgb(255, 255, 255);
+    --tiki-top-color: rgba(0, 0, 0, 0.65);
+    --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
+    //    --tiki-top-border: solid #333;
+    --bs-navbar-brand-color: #{$navbar-light-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+}
+
+@mixin topbar-nav-light {
+    --tiki-topbar-bg: #D4EAE7; // rgb(255, 255, 255);
+    --tiki-topbar-color: rgba(0, 0, 0, 0.65);
+    --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
+    //    --tiki-topbar-border: solid #333;
+}
+
+.tiki-top-nav-light {
+    @include top-nav-light;
+}
+
+.tiki-topbar-nav-light {
+    @include topbar-nav-light;
+}
+
+.tiki-top-nav-dark {
+    @include top-nav-dark;
+}
+
+.tiki-topbar-nav-dark {
+    @include topbar-nav-dark;
+}
+
+// Color mode preference trumps L&F admin light navbar option - THIS ADJUSTMENT ISN'T NEEDED IN THIS THEME.
+//[data-bs-theme=dark] {                              // color mode
+//    .tiki-top-nav-light {                           // light top selector
+//        @include top-nav-dark;                      // dark values
+//    }
+//    .tiki-topbar-nav-light {
+//        @include topbar-nav-dark;
+//    }
+//}
+//
+// Color mode preference trumps L&F admin dark navbar option
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-dark;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-dark;
+//    }
+//}
+
+// Global top and topbar styles that can be set by CSS variables
+:root {
+    --tiki-top-border-width: 0;
+    --tiki-topbar-border-width: 0;
+
+    --tiki-fixed-top-site-title-font-size: 1.8rem;          // Fixed-top position (Basic Bootstrap layout) - Title and subtitle in one line
+    --tiki-fixed-top-site-title-font-weight: 700;
+    --tiki-fixed-top-site-subtitle-font-size: 1.4rem;
+    --tiki-fixed-top-site-subtitle-font-weight: 400;
+
+    --tiki-site-title-font-size: 2rem;                      // Static position (Classic Tiki and Single Container layouts) - Title and subtitle in two lines
+    --tiki-site-title-font-weight: 700;
+    --tiki-site-subtitle-font-size: 1.5rem;
+    --tiki-site-subtitle-font-weight: 400;
+
+    //--tiki-site-title-color: var(--bs-body-color);
+    //--tiki-site-subtitle-color: var(--bs-body-color);
+}
+
+// - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
+
+// Light navbar minus top nav
+@mixin admin-nav-light {
+    --tiki-admin-top-nav-bg: #D4EAE7; // #F0F0F0;
+    --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.55);  // rgba(0, 0, 0, 0.9);
+    --tiki-admin-top-nav-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-aside-nav-bg: #D4EAE7;
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-bg: #{$dropdown-bg}; // #e6e6e6;
+    --tiki-admin-dropdown-link-color: #{$dropdown-link-color}; // #{$navbar-light-color};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color}; // #fff;
+    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg}; // #007BFF;
+}
+
+// Dark navbar minus top nav
+@mixin admin-nav-dark {
+    --tiki-admin-top-nav-bg: #212529; // #2C2C2C;
+    --tiki-admin-top-nav-color: #fff;
+    --tiki-admin-top-nav-hover-color: #fff;
+    --tiki-admin-top-nav-hover-bg: #fff;
+    --tiki-admin-aside-nav-bg: #2C2C2C;
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
+    --tiki-admin-dropdown-bg: #{$dropdown-dark-bg}; // #1C1C1C;
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
+    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg}; // #007BFF;
+    .accordion-item {
+        border-width: 0 !important;
+    }
+    .accordion-item.search-preferences,
+    button.was-nav-link.accordion-button {
+        color: var(--tiki-admin-aside-nav-color) !important;
+        background: var(--tiki-admin-aside-nav-bg) !important;
+    }
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+}
+
+// When color mode switch isn't active
+:root {
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+    .tiki .tiki-admin-aside-nav-light {
+        @include admin-nav-light;
+    }
+    .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+    .tiki .tiki-admin-aside-nav-dark {
+        @include admin-nav-dark;
+    }
+}
+
+// Color mode preference trumps L&F admin light navbar option
+[data-bs-theme=dark] {                              // dark color mode
+    .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+        @include admin-nav-dark;                      // dark values
+    }
+}
+// Color mode preference trumps L&F admin dark navbar option
+[data-bs-theme=light] {                              // light color mode
+    .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
+        @include admin-nav-dark;                      // dark values
+    }
+}
+
+// - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
+
+// Special-case colors, etc., for color-mode-exception areas (not color-mode-switching content areas)
+    // Dark body background with light text, etc.:
+//[data-bs-theme=dark] {
+//    .tiki.cat_no-content-bg .col1,
+//    .tiki.cat_no-content-bg article.wikitext,
+//    .special-case_colors {
+//        --tiki-html-bg: linear-gradient(135deg, #1B0F66, #0F411A); //#040a28; ///*    * Created with https://www.css-gradient.com* Gradient link: https://www.css-gradient.com/?c1=1b0f66&c2=0f411a&gt=l&gd=dtl
+//        --tiki-nonmode-color: #d0d2d2;
+//        --tiki-nonmode-link-color: #d0d2d2;
+//        --tiki-nonmode-nav-link-color: #d0d2d2;
+//    }
+//}
+
+
+    // Light body background with dark text, etc.:
+:root,
+.tiki.cat_no-content-bg .col1,
+.tiki.cat_no-content-bg article.wikitext,
+.special-case_colors,
+.tiki-webmail {
+    --tiki-html-bg: #03AAA4 !important; // var(--tikiben-lightbeige);
+    --tiki-nonmode-color: #0f2847;
+    --tiki-nonmode-link-color: #0f2847;
+    --tiki-nonmode-nav-link-color: #0f2847;
+}
+
+:root {
+ //   --tiki-html-bg: linear-gradient(135deg, #1B0F66, #0F411A); //#040a28; ///*    * Created with https://www.css-gradient.com* Gradient link: https://www.css-gradient.com/?c1=1b0f66&c2=0f411a&gt=l&gd=dtl
+    --tikiben-spacer: 10px;
+    --tikiben-border-radius: 1rem;
+    --tikiben-border-color: var(--bs-body-bg);
+}
+
+
+[data-bs-theme=dark] {
+    .navbar:has(* .sm-vertical,.bs-vertical) {  // Remove background gradient on vertical menus to counteract the theme's variable\ $enable-gradients=y
+        --bs-gradient: none !important;
+        .nav-link {
+            --bs-nav-link-color: var(--bs-link-color) !important;
+        }
+    }
+    .nav-tabs .nav-item {
+        color: var(--bs-emphasis-color);
+        background: rgb(61 66 72);
+    }
+    --bs-card-cap-color: #212529;;
+}

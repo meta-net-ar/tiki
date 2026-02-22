@@ -26,7 +26,6 @@ function wikiplugin_webservice_info()
                 'name' => tra('URL'),
                 'description' => tra('Complete service URL'),
                 'since' => '3.0',
-                'default' => '',
             ],
             'service' => [
                 'required' => false,
@@ -34,7 +33,6 @@ function wikiplugin_webservice_info()
                 'name' => tra('Service Name'),
                 'description' => tra('Registered service name.'),
                 'since' => '3.0',
-                'default' => '',
             ],
             'template' => [
                 'required' => false,
@@ -43,7 +41,6 @@ function wikiplugin_webservice_info()
                 'description' => tra('For use with registered services, name of the template to be used to display the
                     service output. This parameter will be ignored if a body is provided.'),
                 'since' => '3.0',
-                'default' => '',
             ],
             'bodyname' => [
                 'required' => false,
@@ -62,7 +59,6 @@ function wikiplugin_webservice_info()
                 'description' => tra('Parameters formatted like a query')
                     . ': <code>param1=value1&amp;param2=value2</code>',
                 'since' => '7.0',
-                'default' => '',
             ],
         ],
     ];
@@ -70,13 +66,13 @@ function wikiplugin_webservice_info()
 
 function wikiplugin_webservice($data, $params)
 {
-    if (isset($params['bodyname']) && ! empty($params['bodyname'])) {
+    if (! empty($params['bodyname'])) {
         $params[ $params['bodyname'] ] = $data;
         unset($params['bodyname']);
         $data = '';
     }
 
-    if (isset($params['params'])) {
+    if (! is_null($params['params'])) {
         parse_str($params['params'], $request_params);
         $params = array_merge($params, $request_params);
     }
@@ -91,7 +87,7 @@ function wikiplugin_webservice($data, $params)
         $templateFile = '';
     }
 
-    if (isset($params['url'])) {
+    if (! is_null($params['url'])) {
         // When URL is specified, always use the body as template
         $request = new OIntegrate();
         $response = $request->performRequest($params['url']);
@@ -99,7 +95,7 @@ function wikiplugin_webservice($data, $params)
         if (! empty($templateFile)) {
             return $response->render('smarty', 'tikiwiki', 'tikiwiki', $templateFile);
         }
-    } elseif (isset($params['service']) && (isset($params['template']) || ! empty($templateFile) )) {
+    } elseif (! is_null($params['service']) && (! is_null($params['template']) || ! empty($templateFile) )) {
         require_once 'lib/webservicelib.php';
 
         if ($service = Tiki_Webservice::getService($params['service'])) {

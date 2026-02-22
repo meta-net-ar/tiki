@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'trackers';
 $inputConfiguration = [
     [
         'staticKeyFilters'       => [
@@ -17,10 +16,10 @@ $inputConfiguration = [
             'show'               => 'word',          //get
             'cookietab'          => 'word',          //get
             'new'                => 'word',          //get
-            'my'                 => 'word',          //get
+            'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'word',          //get
+            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -38,10 +37,14 @@ $inputConfiguration = [
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
+            'sort_mode'             => 'string',    //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_TRACKERS;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_trackers');
 
@@ -179,19 +182,46 @@ if (isset($_REQUEST['status'])) {
     $sts = preg_split('//', $tracker_info["defaultStatus"], -1, PREG_SPLIT_NO_EMPTY);
     $_REQUEST['status'] = $tracker_info["defaultStatus"];
 } else {
-    $sts = [
-        'o'
-    ];
+    $sts = ['o'];
     $_REQUEST['status'] = 'o';
 }
+
+/**
+ * Keep a consistent order for combined statuses, based on tracker’s declared statuses.
+ * Example typical order: ['o','p','c'].
+ */
+$statusOrder = array_keys($status_raw);
+
 foreach ($status_raw as $let => $sta) {
     if (isset($sta['perm']) || ($my || $ours)) {
-        if (in_array($let, $sts)) {
+        // Visual state
+        if (in_array($let, $sts, true)) {
             $sta['class'] = 'statuson';
         } else {
             $sta['class'] = 'statusoff';
         }
-        $sta['statuslink'] = $let;
+
+        // Build toggled set against current selection
+        $newSet = $sts;
+
+        if (in_array($let, $newSet, true)) {
+            // Remove this status from the set
+            $newSet = array_values(array_diff($newSet, [$let]));
+            // If that would leave empty, show all OTHER statuses instead
+            if (empty($newSet)) {
+                $newSet = array_values(array_diff($statusOrder, [$let]));
+            }
+        } else {
+            // Add clicked status
+            $newSet[] = $let;
+        }
+
+        // Normalize order to tracker's order, and ensure uniqueness
+        $newSet = array_values(array_intersect($statusOrder, $newSet));
+
+        // Link carries the combined status string (e.g. 'op', 'pc', 'opc', etc.)
+        $sta['statuslink'] = implode('', $newSet);
+
         $status_types[$let] = $sta;
     }
 }
@@ -224,10 +254,10 @@ if (! isset($_REQUEST["sort_mode"])) {
         $sort_mode = '';
     }
 } else {
-    $sort_mode = $_REQUEST["sort_mode"];
-    if (preg_match('/f_([0-9]+)_/', $sort_mode, $matches)) {
+    $requestedSort = $_REQUEST["sort_mode"];
+    $sort_mode = is_array($requestedSort) ? reset($requestedSort) : $requestedSort;
+    if (is_string($sort_mode) && preg_match('/f_([0-9]+)_/', $sort_mode, $matches)) {
         $sort_field = $matches[1];
-        $filterFields['fieldId'] = $matches[1];
     }
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
@@ -466,29 +496,17 @@ if (isset($_REQUEST["save"])) {
         }
     }
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! empty($_REQUEST["maxRecords"])) {
     $maxRecords = $_REQUEST['maxRecords'];
 }
-if (isset($_REQUEST["initial"])) {
-    $initial = $_REQUEST["initial"];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
 $writerfield = $trackerDefinition->getWriterField();
 $writergroupfield = $trackerDefinition->getWriterGroupField();
 
-if (isset($_REQUEST["filterfield"])) {
-    $filterfield = $_REQUEST["filterfield"];
-} else {
-    $filterfield = '';
-}
+$filterfield = $_REQUEST["filterfield"] ?? '';
 $smarty->assign('filterfield', $filterfield);
 if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and isset($_REQUEST["filtervalue"]["$filterfield"])) {
     $filtervalue = $_REQUEST["filtervalue"]["$filterfield"];
@@ -507,11 +525,18 @@ if (! empty($filterfield)) {
     $field = '';
 }
 
-if ($field && in_array($field['type'], ['d', 'D', 'R'])) {
+$isExact = isset($_REQUEST['filter_exact']);
+
+if ($isExact) {
     $exactvalue = $filtervalue;
 } else {
-    $exactvalue = '';
+    if ($field && in_array($field['type'], ['d', 'D', 'R'])) {
+        $exactvalue = $filtervalue;
+    } else {
+        $exactvalue = '';
+    }
 }
+
 $smarty->assign('filtervalue', $filtervalue);
 if (is_array($filtervalue)) {
     foreach ($filtervalue as $fil) {
@@ -523,14 +548,52 @@ $smarty->assign('status', $_REQUEST["status"]);
 if (isset($_REQUEST["trackerId"])) {
     $trackerId = $_REQUEST["trackerId"];
 }
+
+// Process request parameters
+// Initialize sort_mode from request parameters (support array-based input)
+$sort_mode_full = [];
+if (isset($_REQUEST["sort_mode"])) {
+    if (is_array($_REQUEST["sort_mode"])) {
+        $sort_mode_full = array_values($_REQUEST["sort_mode"]);
+    } else {
+        $sort_mode_full = [$_REQUEST["sort_mode"]];
+    }
+}
+if (empty($sort_mode_full)) {
+    $sort_mode_full = ['itemId_asc'];
+}
+
+// Expose primary sort to template
+$sort_mode = $sort_mode_full[0] ?? 'itemId_asc';
+
+$smarty->assign('sort_mode', $sort_mode);
+
 if (isset($tracker_info['useRatings']) and $tracker_info['useRatings'] == 'y' and $user and $tiki_p_tracker_vote_ratings == 'y' and ! empty($_REQUEST['trackerId']) and ! empty($ratedItemId) and isset($newItemRate) and ($newItemRate == 'NULL' || in_array($newItemRate, explode(',', $tracker_info['ratingOptions'])))) {
     $trklib->replace_rating($_REQUEST['trackerId'], $ratedItemId, $newItemRateField, $user, $newItemRate);
 }
-$items = $trklib->list_items($_REQUEST["trackerId"], $offset, $maxRecords, $sort_mode, $listfields, $filterfield, $filtervalue, $_REQUEST["status"], $initial, $exactvalue, '', $xfields);
+
+// Call list_items passing array-based sort
+$items = $trklib->list_items(
+    $_REQUEST["trackerId"],
+    $offset,
+    $maxRecords,
+    $sort_mode_full,
+    $listfields,
+    $filterfield,
+    $filtervalue,
+    $_REQUEST["status"],
+    $initial,
+    $exactvalue,
+    '',
+    $xfields
+);
 $urlquery['status'] = $_REQUEST['status'];
 $urlquery['initial'] = $initial;
 $urlquery['trackerId'] = $_REQUEST["trackerId"];
-$urlquery['sort_mode'] = $sort_mode;
+// Handle sort_mode in urlquery - use array-style parameters
+if (! empty($sort_mode_full)) {
+    $urlquery['sort_mode'] = $sort_mode_full; // results in sort_mode[]=...
+}
 $urlquery['exactvalue'] = $exactvalue;
 $urlquery['filterfield'] = $filterfield;
 if (is_array($filtervalue)) {

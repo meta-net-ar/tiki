@@ -25,18 +25,18 @@ class IncludeProfile extends ObjectWriter
             ->addArgument(
                 'repository',
                 InputArgument::REQUIRED,
-                'Profile repository'
+                tra('Profile repository')
             )
             ->addArgument(
                 'profile',
                 InputArgument::REQUIRED,
-                'Profile name'
+                tra('Profile name')
             )
             ->addOption(
                 'full-references',
                 null,
                 InputOption::VALUE_NONE,
-                'Include the repository path in the reference'
+                tra('Include the repository path in the reference')
             );
     }
 

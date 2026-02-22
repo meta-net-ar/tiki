@@ -205,7 +205,7 @@ function wikiplugin_twitter($data, $params)
     $attributes .= " data-theme='$theme' data-height='$height' data-width='$width'";
 
     // Inspiration: http://stackoverflow.com/questions/14303710/how-to-customize-twitter-widget-style
-    // and https://dev.twitter.com/web/embedded-timelines
+    // and https://docs.x.com/x-for-websites/oembed-api#embedded-timelines
     // Note: the $widgetId is more important than the $tweet in defining what is displayed
     $html = "<a class=\"twitter-timeline\"  href=\"https://twitter.com/$tweet\" data-widget-id=\"$widgetId\"
 " . $attributes . "data-show-replies='false' data-aria-polite='polite'>Tweets from @$tweet</a>

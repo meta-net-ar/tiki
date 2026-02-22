@@ -10,7 +10,7 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     die;
 }
 
-require_once 'lib/soap/nusoap/nusoap.php';
+require_once 'src/php/external_lib_sources/nusoap/nusoap.php';
 
 class Tiki_Wsdl
 {

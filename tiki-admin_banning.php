@@ -11,21 +11,48 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'save' => 'bool',           //post
-            'import' => 'bool',         //post
+            'save' => 'alpha',          //post
+            'import' => 'alpha',        //post
+            'del' => 'alpha',           //post
+            'banId' => 'int',           //post
             'title' => 'text',          //post
+            'mode' => 'alpha',          //post
             'userreg' => 'text',        //post
             'ip1' => 'int',             //post
             'ip2' => 'int',             //post
             'ip3' => 'int',             //post
             'ip4' => 'int',             //post
-            'use_dates' => 'bool',      //post
+            'use_dates' => 'alpha',     //post
+            'date_fromMonth' => 'digits',   //post
+            'date_fromDay' => 'digits',     //post
+            'date_fromYear' => 'digits',    //post
+            'date_toMonth' => 'digits',     //post
+            'date_toDay' => 'digits',       //post
+            'date_toYear' => 'digits',      //post
             'message' => 'xss',         //post
+            'import_as_new' => 'alpha', //post
+            'export' => 'alpha',        //post
+            'max' => 'digits',          //post
+            'sort_mode' => 'alnumdash', //post
+            'offset' => 'digits',       //post
+            'find' => 'striptags',      //post
+            'mass_ban_ip' => 'striptags',           //get
+            'mass_ban_ip_actionlog' => 'striptags', //get
+            'mass_ban_ip_users' => 'striptags',     //get
+        ],
+        'staticKeyFiltersForArrays' => [
+            'delsec' => 'int',
+            'section' => 'alpha',
+            'multi_banned_ip' => 'alpha',
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/ban/banlib.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_banning');
 $access->check_permission('tiki_p_admin_banning');
 
@@ -265,17 +292,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $items = $banlib->list_rules($offset, $maxRecords, $sort_mode, $find);
@@ -283,7 +302,7 @@ $items = $banlib->list_rules($offset, $maxRecords, $sort_mode, $find);
 if (isset($_REQUEST['export']) || isset($_REQUEST['csv'])) {
     // export banning rules //
     $csv = $banlib->export_rules($items['data']);
-    TikiLib::lib('header')->setXRobotsTag($robots);
+
     header("Content-type: text/comma-separated-values; charset:UTF-8");
     header('Content-Disposition: attachment; filename="tiki-admin_banning.csv"');
     if (function_exists('mb_strlen')) {

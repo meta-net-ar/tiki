@@ -16,7 +16,7 @@ $success:       #0D873E; // $green;  // default
 $info:          #007CAD; // $cyan;  // default
 $warning:       #A26B0B; // $yellow;  // default
 $danger:        #EC0404; //$red;  // default
-//$light:         $gray-200;  // default
+$light:         #ebe4fe; // $gray-200;  // default
 //$dark:          $gray-900;  // default
 
 // Options
@@ -63,7 +63,11 @@ $navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .1
 $navbar-light-brand-color:          $navbar-light-active-color;  // default
 $navbar-light-brand-hover-color:    $navbar-light-active-color;  // default
 
-$navbar-dark-color: #946DD0;
+//$navbar-dark-color: #946DD0;
+$navbar-dark-color:                 rgba($white, .85);
+$navbar-dark-hover-color:           rgba($white, .95);
+$navbar-dark-active-color:          $white; // !default;
+$navbar-dark-disabled-color:        rgba($white, .55);
 
 // Dropdowns
 $dropdown-color:                    var(--#{$prefix}body-color);  // default

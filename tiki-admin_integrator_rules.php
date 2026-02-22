@@ -12,26 +12,32 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
              'repID'               => 'int',          //post
+             'ruleID'              => 'int',          //post
+             'ord'                 => 'digits',       //post
              'srcrep'              => 'int',          //get
-             'srch'                => 'alpha',        //post
-             'repl'                => 'alpha',        //post
-             'description'         => 'alpha',         //post
-             'type'                => 'bool',         //post
+             'srch'                => 'text',         //post
+             'repl'                => 'text',         //post
+             'description'         => 'text',         //post
+             'rxmod'               => 'alpha',        //post
+             'type'                => 'alpha',        //post
              'file'                => 'text',         //post
-             'casesense'           => 'bool',         //post
-             'html'                => 'bool',         //post
-             'all'                 => 'bool',         //post
-             'enabled'             => 'bool',         //post
-             'copy'                => 'bool',         //post
-             'save'                => 'bool',         //post
-             'preview'             => 'bool',         //post
+             'casesense'           => 'alpha',        //post
+             'html'                => 'alpha',        //post
+             'all'                 => 'alpha',        //post
+             'enabled'             => 'alpha',        //post
+             'copy'                => 'alpha',        //post
+             'save'                => 'alpha',        //post
+             'preview'             => 'alpha',        //post
              'action'              => 'text',         //post
-             'code'                => 'bool',         //post
+             'code'                => 'alpha',        //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 require_once('lib/integrator/integrator.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 // If Integrator is ON, check permissions...
 $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);

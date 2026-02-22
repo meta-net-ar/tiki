@@ -10,6 +10,7 @@ use Error;
 use Exception;
 use Feedback;
 use HTMLPurifier;
+use Language;
 use Perms;
 use Smarty\Extension\CoreExtension;
 use Smarty\Extension\DefaultExtension;
@@ -18,6 +19,7 @@ use Smarty\Variable;
 use Smarty_Resource_Tplwiki;
 use Smarty_Resource_Wiki;
 use SmartyTiki\Extension\SmartyTikiExtension;
+use Tiki\Sections;
 use TikiLib;
 
 /**
@@ -142,18 +144,23 @@ class SmartyTiki extends Smarty
     }
 
     /**
- * Override fetch method to sanitize tpl path before processing
- * @param string $_smarty_tpl_file
- * @param null $_smarty_cache_id
- * @param null $_smarty_compile_id
- * @param null $parent
- * @param bool $_smarty_display
- * @param bool $merge_tpl_vars
- * @param bool $no_output_filter
- * @return string
- */
+     * Override fetch method to sanitize tpl path before processing
+     *
+     * @param string $_smarty_tpl_file
+     * @param mixed  $_smarty_cache_id
+     * @param mixed  $_smarty_compile_id
+     * @param string $parent
+     * @param bool   $_smarty_display
+     * @param bool   $merge_tpl_vars
+     * @param bool   $no_output_filter
+     *
+     * @return string
+     */
+
     public function fetch($_smarty_tpl_file = null, $_smarty_cache_id = null, $_smarty_compile_id = null, $parent = null, $_smarty_display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
+        // save the template in case there's an error
+        $tplFile = $_smarty_tpl_file;
 
         // Sanitize tpl path
         $_smarty_tpl_file = $this->get_filename($_smarty_tpl_file);
@@ -169,10 +176,10 @@ class SmartyTiki extends Smarty
             } else {
                 $html = parent::fetch($_smarty_tpl_file, $_smarty_cache_id, $_smarty_compile_id, $parent);
             }
-        } catch (Error $e) {
+        } catch (Exception | Error $e) {
             TikiLib::lib('errortracking')->captureException($e);
-            $html = '<div class="error">';
-            $html .= "Fatal error rendering template file $_smarty_tpl_file\n<br/>";
+            $html = '<div class="error mb-2">';
+            $html .= tr('Fatal error rendering template file "%0"', $tplFile);
             $html .= '</div><pre>';
             $html .= $e;
             $html .= '</pre>';
@@ -220,14 +227,14 @@ class SmartyTiki extends Smarty
 
         $_smarty_tpl_file = $this->get_filename($_smarty_tpl_file);
 
-        $lgSave = $prefs['language'];
+        $lgSave = Language::getCurrentLanguage();
         $prefs['language'] = $lg;
         $this->refreshLanguage();
         $res = parent::fetch($_smarty_tpl_file, $_smarty_cache_id, $_smarty_compile_id);
         $prefs['language'] = $lgSave; // Restore the language of the user triggering the notification
         $this->refreshLanguage();
 
-        return preg_replace("/^[ \t]*/", '', $res);
+        return ltrim($res, " \t");
     }
 
     /**
@@ -525,6 +532,11 @@ class SmartyTiki extends Smarty
 
         if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST')) {
             require_once 'tiki-modules.php';
+            // Re-assign module_pref_errors after modules are loaded to capture errors from lazy rendering
+            if (Perms::get()->admin) {
+                $modlib = TikiLib::lib('mod');
+                $this->assign('module_pref_errors', $modlib->pref_errors);
+            }
         }
         $this->assign('TIKI_IN_INSTALLER', defined('TIKI_IN_INSTALLER'));
     }
@@ -613,7 +625,7 @@ class SmartyTiki extends Smarty
     {
         global $tikidomain, $prefs;
 
-        $lang = $prefs['language'];
+        $lang = Language::getCurrentLanguage();
         if (empty($lang)) {
             $lang = 'default';
         }
@@ -637,8 +649,9 @@ class SmartyTiki extends Smarty
      */
     private function addLayoutTemplatesFromTemplatePath($templatePath): void
     {
-        global $prefs, $section;
-        if ($section != "admin") {
+        global $prefs;
+
+        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
             $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? SMARTY_DEFAULT_LAYOUT;
         } else {
             $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? SMARTY_DEFAULT_LAYOUT;
@@ -673,7 +686,7 @@ class SmartyTiki extends Smarty
     */
     public function initializePaths(): void
     {
-        global $prefs, $tikidomainslash, $section;
+        global $prefs, $tikidomainslash;
 
         if (! $this->main_template_dir) {
             // First run only
@@ -739,7 +752,7 @@ class SmartyTiki extends Smarty
 
     /**
      * When calling directly smarty functions, from PHP, you need to provide a object of type \Smarty\Template
-     * The method signature for smarty functions is: smarty_function_xxxx($params, \Smarty\Template $template)
+     * The method signature for smarty functions is: smarty_function_xxxx($params, Smarty\Template $template)
      *
      * @return \Smarty\Template
      */

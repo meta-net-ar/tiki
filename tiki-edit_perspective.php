@@ -23,9 +23,11 @@ $inputConfiguration = [ [
 ] ];
 
 $auto_query_args = [ 'offset', 'id', 'cookietab' ];
-$section = 'admin';
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $perspectivelib = TikiLib::lib('perspective');
 
 $access->check_feature(['feature_perspective']);
@@ -52,11 +54,7 @@ if (isset($_REQUEST['name']) && $selectedId && $objectperms->perspective_edit) {
     $prefslib = TikiLib::lib('prefs');
     $perspectivelib->replace_perspective($selectedId, $_REQUEST['name']);
 
-    if (isset($_REQUEST['lm_preference'])) {
-        $preferences = $_REQUEST['lm_preference'];
-    } else {
-        $preferences = [];
-    }
+    $preferences = $_REQUEST['lm_preference'] ?? [];
 
     $input = $prefslib->getInput($jitRequest, $preferences, 'perspective');
 

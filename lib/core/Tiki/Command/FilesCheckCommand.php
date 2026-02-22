@@ -15,7 +15,7 @@ use Tiki\Files\CheckAttachmentGallery;
 use Tiki\Files\CheckFileGallery;
 
 /**
- * Command to check the status of the files in File and Image Gallery
+ * Command to check the status of the files in File Gallery
  */
 #[AsCommand(
     name: 'files:check',

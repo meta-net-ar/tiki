@@ -22,7 +22,6 @@ function wikiplugin_trackerverticaltimeline_info()
                 'description' => tra('Numeric value representing the tracker ID'),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker',
             ],
             'title' => [
@@ -77,7 +76,6 @@ function wikiplugin_trackerverticaltimeline_info()
                     datetime/jscalendar field.'),
                 'since' => '29.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -111,7 +109,7 @@ function wikiplugin_trackerverticaltimeline_info()
                 ),
                 'since' => '29.0',
                 'filter' => 'text',
-                'default' => 'left-right'
+                'default' => 'minute'
             ],
             'orientation' => [
                 'required' => false,
@@ -143,47 +141,35 @@ function wikiplugin_trackerverticaltimeline($data, $params)
 {
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
-    $js = '';
     static $instance = 0;
     $instance++;
 
-    if (! isset($params['tracker'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
-    }
-
-    if (! isset($params['date'])) {
-        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'date') . '{BOX}';
-    }
-
-    $default = ['aggregateBy' => 'minute'];
-    $params = array_merge($default, $params);
-
     $urlTarget = "";
-    if (isset($params['urlTarget'])) {
+    if ($params['urlTarget']) {
         $fieldIds[ $params['urlTarget'] ] = 'urlTarget';
 
         $urlTarget = ".urlTarget('" . $params['urlTarget'] . "')";
     }
 
     $distribution = "";
-    if (isset($params['distribution'])) {
+    if ($params['distribution']) {
         $fieldIds[ $params['distribution'] ] = 'distribution';
         $distribution = ".distribution('" . $params['distribution'] . "')";
     }
 
     $orientation = "";
-    if (isset($params['orientation'])) {
+    if ($params['orientation']) {
         $fieldIds[ $params['orientation'] ] = 'orientation';
         $orientation = ".orientation('" . $params['orientation'] . "')";
     }
 
     $height = 'auto';
-    if (isset($params['height'])) {
+    if ($params['height']) {
         $fieldIds[ $params['height'] ] = 'height';
         $height = $params['height'];
     }
     $aggregateBy = "";
-    if (isset($params['aggregateBy'])) {
+    if ($params['aggregateBy']) {
         $fieldIds[ $params['aggregateBy'] ] = 'aggregateBy';
         $aggregateBy = ".aggregateBy('" . $params['aggregateBy'] . "')";
     }
@@ -216,8 +202,6 @@ function wikiplugin_trackerverticaltimeline($data, $params)
             $detail[ $fieldIds[$field['fieldId']] ] = $field['value'];
         }
 
-        $detailStart = $detail['date'] ?? 0;
-        $detailSummary = $detail['title'] ?? null;
         $detailGroup = $detail['url'] ?? null;
         $detail['encoded'] = json_encode($detail);
 
@@ -232,12 +216,11 @@ function wikiplugin_trackerverticaltimeline($data, $params)
     // prepare the data - to be included in the page for now (ajax feed to come)
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/d3-milestones/build/d3-milestones.css');
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/d3-milestones/build/d3-milestones.min.js');
-    foreach ($data as $group => $list) {
+    foreach ($data as $list) {
         $counter = 0;  // ignoring group for now
         foreach ($list as $item) {
             $counter++;
             $itemDate = $item['date'] ?? null;
-            $itemSummary = $item['url'] ?? null;
             $itemImage = $item['image'] ?? null;
 
             $event = [
@@ -281,7 +264,7 @@ function wikiplugin_trackerverticaltimeline($data, $params)
         })
         .parseTime('%Y-%m-%dT%H:%M:%S.%LZ')
         $orientation
-        $distributation
+        $distribution
         $aggregateBy
         .optimize(true)
         $urlTarget

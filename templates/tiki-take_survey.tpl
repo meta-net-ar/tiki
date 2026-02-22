@@ -26,7 +26,7 @@
                     <div class="quizoptions">
                         {section name=jx loop=$questions[ix].qoptions}
                             <label>
-                                <input type="radio" value="{$questions[ix].qoptions[jx].optionId|escape}" name="{$questionId}"
+                                <input type="radio" class="form-check-input" value="{$questions[ix].qoptions[jx].optionId|escape}" name="{$questionId}"
                                     {if $answer eq $questions[ix].qoptions[jx].optionId} checked="checked"{/if}>
                                 {$questions[ix].qoptions[jx].qoption}
                             </label>

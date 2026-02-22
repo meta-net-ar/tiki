@@ -181,7 +181,7 @@
                                 {if $recurrence.id eq 0}<span class="input-group-text"><input type="radio" {if $recurrence.monthlyType eq 'firstlastweekday'}checked="checked"{/if} name="recurrenceTypeMonthy" value="firstlastweekday"></span>{/if}
                                 <span class="input-group-text">{tr}Every{/tr}</span>
                                 <select name="monthlyFirstLastWeekNumber" class="form-control" {if $recurrence.id neq 0}readonly{/if}>
-                                    <option value="1" {if $recurrence.monthlyFirstlastWeekdayValue[0] eq '1'} selected="selected" {/if}>
+                                    <option value="1" {if $recurrence.monthlyFirstlastWeekdayValue|string_format:"%d"|substr:0:1 eq '1'} selected="selected" {/if}>
                                         {tr}First weekday{/tr}
                                     </option>
                                     <option value="-1" {if strpos($recurrence.monthlyFirstlastWeekdayValue, '-1') === 0} selected="selected" {/if}>
@@ -372,10 +372,10 @@
                                 {if $recurrence.id eq 0}<span class="input-group-text"><input type="radio" {if $recurrence.yearlyType eq 'firstlastweekday'}checked="checked"{/if} name="recurrenceTypeYearly" value="firstlastweekday"></span>{/if}
                                 <span class="input-group-text">{tr}Every{/tr}</span>
                                 <select name="yearlyFirstLastWeekNumber" class="form-control" {if $recurrence.id neq 0}readonly{/if}>
-                                    <option value="1" {if $recurrence.yearlyFirstlastWeekdayValue[0] eq '1'} selected="selected" {/if}>
+                                    <option value="1" {if $recurrence.yearlyFirstlastWeekdayValue == 1} selected="selected" {/if}>
                                         {tr}First weekday{/tr}
                                     </option>
-                                    <option value="-1" {if strpos($recurrence.yearlyFirstlastWeekdayValue, '-1') === 0} selected="selected" {/if}>
+                                    <option value="-1" {if $recurrence.yearlyFirstlastWeekdayValue == -1} selected="selected" {/if}>
                                         {tr}Last weekday{/tr}
                                     </option>
                                 </select>

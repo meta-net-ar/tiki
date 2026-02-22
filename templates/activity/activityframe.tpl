@@ -78,7 +78,7 @@
         </div>
     {/if}
     {if $activityframe.comment && $activity_format eq 'extended'}
-        <div class="comment-container" data-reload="{service controller=comment action=list type=$activityframe.comment.type objectId=$activityframe.comment.id}">
+        <div class="comment-container my-3 mx-0" data-reload="{service controller=comment action=list type=$activityframe.comment.type objectId=$activityframe.comment.id}">
             {service_inline controller=comment action=list type=$activityframe.comment.type objectId=$activityframe.comment.id _silent=true}
         </div>
     {/if}

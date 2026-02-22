@@ -28,9 +28,10 @@ $inputConfiguration = [
     ],
     [ 'catchAllUnset' => null ],
 ];
-
-$section = 'faqs';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FAQS;
+Sections::setCurrentSection($section);
 
 $faqlib = TikiLib::lib('faq');
 
@@ -102,20 +103,10 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
 $smarty->assign_by_ref('offset', $offset);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
-
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 if (isset($_REQUEST["remove_suggested"])) {

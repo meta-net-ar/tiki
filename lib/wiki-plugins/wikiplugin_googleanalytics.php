@@ -79,6 +79,7 @@ ga('send', 'pageview');
 </script>
 HTML;
     } else {
+        // @tiki-external-link-ok: Google Analytics plugin - loading external tracking script is the core feature (user explicitly enables this)
         $ret = <<<HTML
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=$account"></script>

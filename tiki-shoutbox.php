@@ -17,9 +17,9 @@ $inputConfiguration = [
             'shoutbox_autolink'            => 'bool',                //post
             'save'                         => 'bool',                //post
             'message'                      => 'text',                //post
-            'tweet'                        => 'bool',                //post
-            'sort_mode'                    => 'word',                //get
-            'offset'                       => 'digits',              //get
+            'tweet'                        => 'int',                 //post
+            'sort_mode'                    => 'alnumdash',           //get
+            'offset'                       => 'int',                 //get
             'find'                         => 'text',                //post
         ],
     ],

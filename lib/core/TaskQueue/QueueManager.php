@@ -198,7 +198,7 @@ class QueueManager implements QueuedInterface
             $tx = TikiDb::get()->begin();
             $deleted = $this->queuedTaskDb->delete(['id' => $taskId]);
             $tx->commit();
-            return $deleted > 0;
+            return $deleted->numrows > 0;
         } catch (Exception $e) {
             throw new QueueManagerException(
                 sprintf('Failed to delete task %s: %s', $taskId, $e->getMessage())

@@ -26,7 +26,7 @@ class SchedulerMonitorCommand extends Command
                 'minutes-back',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Number of minutes back to check for failed tasks'
+                tra('Number of minutes back to check for failed tasks')
             );
     }
 

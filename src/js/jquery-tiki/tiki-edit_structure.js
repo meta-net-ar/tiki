@@ -8,6 +8,80 @@ import Sortable from "sortablejs";
 $(function () {
     let tocDirty = false;
 
+    // Get page_ref_id from URL parameters
+    const getPageRefId = function () {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("page_ref_id");
+    };
+
+    // Restore collapsed/expanded state from localStorage
+    const restoreStructureState = function () {
+        const pageRefId = getPageRefId();
+        if (pageRefId) {
+            const storageKey = "tiki_structure_state_" + pageRefId;
+            const savedState = localStorage.getItem(storageKey);
+            // First, hide all sub-levels by default (except root level)
+            $(".admintoclevel").each(function () {
+                const $node = $(this);
+                const $children = $node.find("ol.admintoc").first().parent();
+                // Only hide if it's not the root level (check if it has a parent admintoclevel)
+                if ($node.parents(".admintoclevel").length > 0 && $children.length > 0) {
+                    $children.hide();
+                    $node.find(".flip-children .icon").setIcon("caret-right");
+                }
+            });
+
+            // Then restore saved expanded states
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    Object.keys(state).forEach(function (nodeId) {
+                        const $node = $("#" + nodeId);
+                        if ($node.length && state[nodeId] === "expanded") {
+                            const $children = $node.find("ol.admintoc").first().parent();
+                            $children.show();
+                            $node.find(".flip-children .icon").setIcon("caret-down");
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error restoring structure state:", e);
+                }
+            }
+        } else {
+            // If no storage key, hide all sub-levels by default
+            $(".admintoclevel").each(function () {
+                const $node = $(this);
+                const $children = $node.find("ol.admintoc").first().parent();
+                if ($node.parents(".admintoclevel").length > 0 && $children.length > 0) {
+                    $children.hide();
+                    $node.find(".flip-children .icon").setIcon("caret-right");
+                }
+            });
+        }
+    };
+
+    // Save collapsed/expanded state to localStorage
+    const saveStructureState = function () {
+        const pageRefId = getPageRefId();
+        if (pageRefId) {
+            const storageKey = "tiki_structure_state_" + pageRefId;
+            const state = {};
+            $(".admintoclevel").each(function () {
+                const $node = $(this);
+                const nodeId = $node.attr("id");
+                if (nodeId) {
+                    const $children = $node.find("ol.admintoc").first().parent();
+                    state[nodeId] = $children.is(":visible") ? "expanded" : "collapsed";
+                }
+            });
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(state));
+            } catch (e) {
+                console.error("Error saving structure state:", e);
+            }
+        }
+    };
+
     const setupStructure = function () {
         const sortableOptions = {
             group: {
@@ -58,12 +132,14 @@ $(function () {
                     $children.find(".icon-caret-down").setIcon("caret-right");
                 }
                 $children.hide("fast");
+                saveStructureState();
             } else {
                 $this.find(".icon").setIcon("caret-down");
                 if (event.altKey) {
                     $children.find(".icon-caret-right").setIcon("caret-down");
                 }
                 $children.show("fast");
+                saveStructureState();
             }
         });
 
@@ -116,6 +192,7 @@ $(function () {
     });
 
     setupStructure();
+    restoreStructureState();
 
     $(".save_structure").on("click", function () {
         const $sortable = $(this).parent().find(".admintoc").first();
@@ -175,6 +252,7 @@ $(function () {
                 if (data) {
                     $sortable.replaceWith(data.html);
                     setupStructure();
+                    restoreStructureState();
                     $(".save_structure").hide();
                     tocDirty = false;
                 }

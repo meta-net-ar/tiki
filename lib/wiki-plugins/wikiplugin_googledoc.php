@@ -24,7 +24,6 @@ function wikiplugin_googledoc_info()
                 'description' => tra('Type of Google document'),
                 'since' => '3.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Document'), 'value' => 'document'],
@@ -35,14 +34,13 @@ function wikiplugin_googledoc_info()
                 ]
             ],
             'key' => [
-                    'safe' => true,
-                    'required' => true,
-                    'name' => tra('Key'),
-                    'description' => tra('Google doc key - for example:') . ' <code>pXsHENf1bGGY92X1iEeJJI</code>',
-                    'since' => '3.0',
-                    'filter' => 'text',
-                    'default' => ''
-                ],
+                'safe' => true,
+                'required' => true,
+                'name' => tra('Key'),
+                'description' => tra('Google doc key - for example:') . ' <code>pXsHENf1bGGY92X1iEeJJI</code>',
+                'since' => '3.0',
+                'filter' => 'text',
+            ],
             'name' => [
                 'safe' => true,
                 'required' => false,
@@ -68,7 +66,6 @@ function wikiplugin_googledoc_info()
                     presentations sizes exactly.'),
                 'since' => '3.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Small'), 'value' => 'small'],
@@ -100,7 +97,6 @@ function wikiplugin_googledoc_info()
                 'name' => tra('Alignment'),
                 'description' => tra('Position of frame on page'),
                 'since' => '3.0',
-                'default' => '',
                 'filter' => 'word',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -132,7 +128,6 @@ function wikiplugin_googledoc_info()
                 'description' => tra('Margin height in pixels'),
                 'filter' => 'digits',
                 'since' => '3.0',
-                'default' => ''
             ],
             'marginwidth' => [
                 'safe' => true,
@@ -141,7 +136,6 @@ function wikiplugin_googledoc_info()
                 'description' => tra('Margin width in pixels'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => ''
             ],
             'scrolling' => [
                 'safe' => true,
@@ -149,7 +143,6 @@ function wikiplugin_googledoc_info()
                 'name' => tra('Scrolling'),
                 'description' => tra('Choose whether to add a scroll bar'),
                 'since' => '3.0',
-                'default' => '',
                 'filter' => 'word',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -181,18 +174,7 @@ function wikiplugin_googledoc($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    if (empty($type)) {
-        return tra('Required parameter "type" missing');
-    }
-    if (empty($key)) {
-        return tra('Required parameter "key" missing');
-    }
-
-    if (! isset($editLink)) {
-        $editLink = '';
-    }
-
-    if (isset($name)) {
+    if (! is_null($name)) {
         $frameName = $name;
     } else {
         $frameName = "Frame" . $key;
@@ -219,7 +201,7 @@ function wikiplugin_googledoc($data, $params)
         $editHtml = " <p><a href=$editSrcUrl target=\"$frameName\">Edit this Google Document</a></p>";
     }
     if ($type == "drive") {
-        if (! isset($url)) {
+        if (empty($url)) {
             return tra('Required parameter "url" is missing');
         }
         $srcUrl = "https://drive.google.com/file/d/";
@@ -239,7 +221,7 @@ function wikiplugin_googledoc($data, $params)
     }
     $ret .= "~np~<iframe  name=\"$frameName\"";
 
-    if (isset($size)) {
+    if (! is_null($size)) {
         if ($size == 'small') {
             $width = 410;
             $height = 342;
@@ -252,35 +234,23 @@ function wikiplugin_googledoc($data, $params)
         }
     }
 
-    if (isset($width)) {
-        $ret .= " width=\"$width\"";
-    } else {
-        $ret .= " width=\"800\"";
-    }
-    if (isset($height)) {
-        $ret .= " height=\"$height\"";
-    } else {
-        $ret .= " height=\"400\"";
-    }
+    $ret .= " width=\"$width\"";
+    $ret .= " height=\"$height\"";
 
-    if (isset($align)) {
+    if (! is_null($align)) {
         $ret .= " align=\"$align\"";
     }
-    if (isset($frameborder)) {
-        $ret .= " frameborder=\"$frameborder\"";
-    } else {
-        $ret .= " frameborder=0";
-    }
-    if (isset($marginheight)) {
+    $ret .= " frameborder=\"$frameborder\"";
+    if (! is_null($marginheight)) {
         $ret .= " marginheight=\"$marginheight\"";
     }
-    if (isset($marginwidth)) {
+    if (! is_null($marginwidth)) {
         $ret .= " marginwidth=\"$marginwidth\"";
     }
-    if (isset($scrolling)) {
+    if (! is_null($scrolling)) {
         $ret .= " scrolling=\"$scrolling\"";
     }
-    if (isset($key)) {
+    if (! is_null($key)) {
         $ret .= " src=$srcUrl></iframe>~/np~";
     }
     if ($editLink == 'both' or $editLink == 'bottom') {

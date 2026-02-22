@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'freetags';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -29,6 +28,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FREETAGS;
+Sections::setCurrentSection($section);
 $freetaglib = TikiLib::lib('freetag');
 $access->check_feature('feature_freetags');
 $access->check_permission('tiki_p_view_freetags');
@@ -60,18 +62,10 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $query_sort_mode = str_replace('created', 'o.`created`', $sort_mode);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign_by_ref('find', $find);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! isset($_REQUEST["type"])) {
     $type = $_REQUEST['old_type'] ?? '';
@@ -169,7 +163,6 @@ $smarty->assign(
         'directory',
         'faq',
         'file gallery',
-        'image gallery',
         'image',
         'poll',
         'quiz',

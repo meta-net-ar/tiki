@@ -24,7 +24,7 @@ function getMinVersion()
  */
 function check_bin_version()
 {
-    return version_compare(trim(`git --version  2> /dev/null | awk '{print $3}'`), GIT_MIN_VERSION, '>');
+    return version_compare(trim(shell_exec("git --version  2> /dev/null | awk '{print \$3}'")), GIT_MIN_VERSION, '>');
 }
 
 /**
@@ -36,7 +36,7 @@ function check_bin_version()
 function has_uncommited_changes($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $count = trim(`git status -s $localPath | wc -l`);
+    $count = trim(shell_exec("git status -s $localPath | wc -l"));
     return $count > 0;
 }
 
@@ -49,7 +49,7 @@ function has_uncommited_changes($localPath)
 function getUncommittedChangesParentFolder($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $output = trim(`git status -s $localPath | awk '{print $2}' | xargs -I{} dirname {} | sort | uniq`);
+    $output = trim(shell_exec("git status -s $localPath | awk '{print \$2}' | xargs -I{} dirname {} | sort | uniq"));
 
     $parentFolders = array_filter(explode("\n", trim($output)));
     $processedFolders = array_map(function ($folder) {
@@ -72,14 +72,14 @@ function getUncommittedChangesParentFolder($localPath)
 
 function add($file)
 {
-    `git add $file`;
+    shell_exec("git add $file");
 }
 
 function delete_file($file, $message = null)
 {
-    `git rm -f $file`;
+    shell_exec("git rm -f $file");
     if ($message) {
-        `git commit -m $message $file`;
+        shell_exec("git commit -m $message $file");
     }
 }
 
@@ -95,7 +95,7 @@ function delete_file($file, $message = null)
 function files_differ($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $ret = trim(`git -C $localPath status -s | awk '{print $2}'`);
+    $ret = trim(shell_exec("git -C $localPath status -s | awk '{print \$2}'"));
     return explode(PHP_EOL, $ret);
 }
 
@@ -106,7 +106,7 @@ function files_differ($localPath)
 function update_working_copy($localPath, $ignore_externals = false)
 {
     $localPath = escapeshellarg($localPath);
-    `git -C $localPath pull`;
+    shell_exec("git -C $localPath pull");
 }
 
 /**
@@ -117,9 +117,9 @@ function update_working_copy($localPath, $ignore_externals = false)
 function get_revision($path)
 {
     if (str_starts_with($path, "http")) {
-        `git fetch`;
+        shell_exec("git fetch");
     }
-    return trim(`git rev-parse HEAD`);
+    return trim(shell_exec("git rev-parse HEAD"));
 }
 
 /**
@@ -128,7 +128,7 @@ function get_revision($path)
  */
 function getCurrentBranch()
 {
-    return trim(`git rev-parse --abbrev-ref HEAD`);
+    return trim(shell_exec("git rev-parse --abbrev-ref HEAD"));
 }
 
 /**
@@ -142,7 +142,7 @@ function get_tag_revision($releaseNumber)
     $revision = 0;
 
     // --stop-on-copy makes it only return the tag commit, not the whole history since time began
-    $log = `git describe --tags tags/$releaseNumber`;
+    $log = shell_exec("git describe --tags tags/$releaseNumber");
     $log = ! empty($log) ? trim($log) : '';
 
     if (preg_match('/^r(\d+)/ms', $log, $matches)) {
@@ -161,8 +161,8 @@ function get_tag_revision($releaseNumber)
 function commit($msg, $displaySuccess = true, $dieOnRemainingChanges = true)
 {
     $msg = escapeshellarg($msg);
-    `git add .`;
-    `git commit -m $msg`;
+    shell_exec("git add .");
+    shell_exec("git commit -m $msg");
 
     if ($dieOnRemainingChanges && has_uncommited_changes('.')) {
         error("Commit seems to have failed. Uncommitted changes exist in the working folder.\n");
@@ -175,8 +175,8 @@ function commit($msg, $displaySuccess = true, $dieOnRemainingChanges = true)
 function commit_specific_lang($lang, $msg, $displaySuccess = true, $dieOnRemainingChanges = true)
 {
     $msg = escapeshellarg($msg);
-    `git add ./lang/$lang`;
-    `git commit -m $msg ./lang/$lang`;
+    shell_exec("git add ./lang/$lang");
+    shell_exec("git commit -m $msg ./lang/$lang");
 
     if (has_uncommited_changes("./lang/$lang")) {
         error("Commit seems to have failed. Uncommitted changes exist in the working folder.\n");
@@ -196,9 +196,9 @@ function checkoutBranch($branch, $newBranch = false)
 {
     $branch = escapeshellarg($branch);
     if ($newBranch) {
-        $output = `git checkout -b $branch 2>&1`;
+        $output = shell_exec("git checkout -b $branch 2>&1");
     } else {
-        $output = `git checkout $branch 2>&1`;
+        $output = shell_exec("git checkout $branch 2>&1");
     }
 
     if (str_contains($output, 'fatal') || str_contains($output, 'error')) {
@@ -211,7 +211,7 @@ function checkoutBranch($branch, $newBranch = false)
 
 function push()
 {
-    `git push`;
+    shell_exec("git push");
 }
 
 function push_create_merge_request($merge_title, $merge_desciption, $target_branch, $current_branch = "master")
@@ -219,7 +219,7 @@ function push_create_merge_request($merge_title, $merge_desciption, $target_bran
     $merge_title = escapeshellarg($merge_title);
     $merge_desciption = escapeshellarg($merge_desciption);
     $target_branch = escapeshellarg($target_branch);
-    `git push -u origin $current_branch -o merge_request.create -o merge_request.target=$target_branch -o merge_request.title=$merge_title -o merge_request.description=$merge_desciption`;
+    shell_exec("git push -u origin $current_branch -o merge_request.create -o merge_request.target=$target_branch -o merge_request.title=$merge_title -o merge_request.description=$merge_desciption");
 }
 
 /**
@@ -234,7 +234,7 @@ function get_logs_contrib($localPath, $minRevision, $maxRevision = 'HEAD')
     if (empty($maxRevision)) {
         return false;
     }
-    $logs = `git --no-pager log -n $step --pretty=format:"%H;%x09;%an;%x09;%ad;%x09;%s" $maxRevision`;
+    $logs = shell_exec("git --no-pager log -n $step --pretty=format:\"%H;%x09;%an;%x09;%ad;%x09;%s\" $maxRevision");
     return $logs;
 }
 
@@ -243,7 +243,7 @@ function get_logs($localPath, $minRevision, $maxRevision = 'HEAD')
     if (empty($minRevision) || empty($maxRevision)) {
         return false;
     }
-    $logs = `git --no-pager log --pretty=format:"%H | %an | %ad |%n%n%s%n------------------------------------------------------------------------" $minRevision..$maxRevision`;
+    $logs = shell_exec("git --no-pager log --pretty=format:\"%H | %an | %ad |%n%n%s%n------------------------------------------------------------------------\" $minRevision..$maxRevision");
     return $logs;
 }
 
@@ -261,7 +261,7 @@ function get_contributors($path, &$contributors, $minRevision, $maxRevision, $st
 
     do {
         if (! $minRevision || $minRevision == 1) {
-            $minRevision = `git --no-pager log -n $step --pretty=format:"%H" $maxRevision | tail -n 1`;
+            $minRevision = shell_exec("git --no-pager log -n $step --pretty=format:\"%H\" $maxRevision | tail -n 1");
         }
 
         echo "\rRetrieving logs from revision $minRevision to $maxRevision ...\t\t\t";
@@ -300,8 +300,8 @@ function get_contributors($path, &$contributors, $minRevision, $maxRevision, $st
  */
 function tag_exists($tag, $remote = false)
 {
-    `git fetch --all --tags --prune`;
-    $searchedTag = `git tag --list '$tag'`;
+    shell_exec("git fetch --all --tags --prune");
+    $searchedTag = shell_exec("git tag --list '$tag'");
     $searchedTag = ! empty($searchedTag) ? trim($searchedTag) : '';
 
     return ! empty($searchedTag);
@@ -314,8 +314,8 @@ function tag_exists($tag, $remote = false)
  */
 function delete_tag($tag, $commitMsg = "")
 {
-    `git tag -d $tag`; // Delete from local
-    `git push --delete origin $tag`; // Delete from remote
+    shell_exec("git tag -d $tag"); // Delete from local
+    shell_exec("git push --delete origin $tag"); // Delete from remote
 }
 
 /**
@@ -327,8 +327,8 @@ function delete_tag($tag, $commitMsg = "")
  */
 function create_tag($tag, $commitMsg, $branch = "", $revision = "")
 {
-    `git tag -a $tag -m "$commitMsg"`;
-    `git push origin $tag`;
+    shell_exec("git tag -a $tag -m \"$commitMsg\"");
+    shell_exec("git push origin $tag");
 }
 
 /**
@@ -339,7 +339,7 @@ function create_tag($tag, $commitMsg, $branch = "", $revision = "")
  */
 function export($source, $dest)
 {
-    $files = `git -C $source ls-files`;
+    $files = shell_exec("git -C $source ls-files");
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $files) as $file) {
         // do stuff with $line
         if ($file === ".git" || $file === "." || empty($file)) {

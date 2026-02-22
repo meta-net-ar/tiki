@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 class Services_Menu_Controller
 {
     /** @var  MenuLib */
@@ -246,7 +249,9 @@ class Services_Menu_Controller
             }
 
             $name = $input->name->text();
-            if (! $name) {
+            $type = $input->type->text();
+
+            if (! $name && $type !== '-') {
                 throw new Services_Exception_MissingValue('name');
             }
 
@@ -264,8 +269,8 @@ class Services_Menu_Controller
             }
 
             $url = $input->url->text();
-            $type = $input->type->text();
             $section = $input->section->text();
+            Sections::setCurrentSection($section);
             $perm = $input->perm->text();
             $groupname = $input->asArray('groupname');
             $groupname = implode(',', $groupname);

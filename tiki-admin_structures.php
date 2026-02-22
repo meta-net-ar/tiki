@@ -27,6 +27,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $structlib = TikiLib::lib('struct');
 $categlib = TikiLib::lib('categ');
 include_once("lib/ziplib.php");
@@ -75,7 +78,6 @@ if ($tiki_p_edit_structures == 'y') {
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
             Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
         }
-        TikiLib::lib('header')->setXRobotsTag($robots);
         header("content-type: text/plain");
         $structlib->s_export_structure_tree($_REQUEST['export_tree']);
         die;
@@ -230,23 +232,18 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // default $maxRecords defined in tiki-setup.php
 if (isset($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
+} else {
+    $maxRecords = $prefs['maxRecords'];
 }
+$smarty->assign('maxRecords', $maxRecords);
 $filter = '';
 if (! empty($_REQUEST['lang'])) {
     $filter['lang'] = $_REQUEST['lang'];

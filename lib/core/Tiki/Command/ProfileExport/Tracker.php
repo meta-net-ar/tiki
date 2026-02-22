@@ -26,12 +26,12 @@ class Tracker extends ObjectWriter
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Export all trackers'
+                tra('Export all trackers')
             )
             ->addArgument(
                 'tracker',
                 InputArgument::OPTIONAL,
-                'Tracker ID'
+                tra('Tracker ID')
             );
 
         parent::configure();
@@ -60,7 +60,7 @@ class Tracker extends ObjectWriter
         if ($result) {
             $writer->save();
         } else {
-            $output->writeln("Tracker not found: $trackerId");
+            $output->writeln(tra("Tracker not found: %trackerId%", ['%trackerId%' => $trackerId]));
         }
         return Command::SUCCESS;
     }

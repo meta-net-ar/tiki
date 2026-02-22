@@ -83,22 +83,26 @@ $form-text: #547173;
 $form-invalid-color: #D42537;
 $form-valid-color: #177D4D;
 
-// Navs (four below added for Bootstrap 53)
+// Navs
 $nav-link-color:                    var(--#{$prefix}link-color);
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);
 $nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color);
 
-// Navbar (four below added for Bootstrap 53)
+// Navbar
 $navbar-light-color:                $link-color; // #fff; // rgba(var(--#{$prefix}emphasis-color-rgb), .65);
 $navbar-light-hover-color:          $link-hover-color; // rgba(var(--#{$prefix}emphasis-color-rgb), .8);
 $navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);
 $navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 
 $navbar-dark-color:                 $white; // rgba($white, .55);
 $navbar-dark-hover-color:           rgba($white, .95);
 $navbar-dark-active-color:          rgba($white, .95);
 $navbar-dark-disabled-color:        rgba($white, .45);
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns (color specs updated for Bootstrap 53)
 $dropdown-color:                    var(--#{$prefix}body-color);

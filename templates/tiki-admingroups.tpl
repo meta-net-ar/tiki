@@ -98,7 +98,17 @@
 
                         {if $prefs.useGroupHome eq 'y'}
                             <td class="text">
-                                <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {if !empty($users[user].groupHome)}
+                                    <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {else}
+                                    <span class="text-muted">
+                                        {tr}Group homepage is not defined{/tr}.
+                                        <a class="btn btn-link p-0 align-baseline"
+                                            href="tiki-admingroups.php?group={$users[user].groupName|escape:"url"}{if $prefs.feature_tabs ne 'y'}#tab2{/if}">
+                                            {tr}Configure{/tr}
+                                        </a>
+                                    </span>
+                                {/if}
                             </td>
                         {/if}
 
@@ -417,6 +427,17 @@
                         </div>
                     </div>
                 {/if}
+                {if $prefs.twoFactorAuth eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-md-3">{tr}2FA Grace Period{/tr}</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$twoFactorAuthGracePeriod|escape}">
+                            <div class="form-text">
+                                {tr}Number of days to allow users in this group to access the site without 2FA before forcing them to set it up.{/tr}
+                            </div>
+                        </div>
+                    </div>
+                {/if}
                 {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins'}
                     <div class="mb-3 row">
                         <label class="col-form-label col-md-3">{tr}User Choice{/tr}</label>
@@ -435,7 +456,7 @@
                             <label for="anniversaryId">{tr}Anniversary{/tr}</label>
                             <input type="text" name="anniversary" id="anniversaryId" class="form-control" value="{if is_array($group_info)}{$group_info.anniversary|escape}{else}{/if}">
                             <div class="form-text">{tr}Use MMDD to specify an annual date as of which all users will be unassigned from the group, or DD to specify a monthly date.{/tr}</div>
-                            <label>{tr}Or{/tr}</label><br> 
+                            <label>{tr}Or{/tr}</label><br>
                             <label>{tr}Number of Days{/tr}</label>
                             <input type="text" class="form-control" name="expireAfter" value="{if is_array($group_info)}{$group_info.expireAfter|escape}{else}{/if}">
                             <div class="form-text">
@@ -819,7 +840,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">
                             {tr}CSV File{/tr}
-                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a> 
+                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a>
                         </label>
                         <div class="col-sm-7">
                             <input name="csvlist" type="file" accept=".csv" class="form-control">

@@ -19,12 +19,14 @@ function wikiplugin_profilesymbolvalue_info()
                 'description' => tra('Domain'),
                 'since' => '20',
                 'filter' => 'text',
+                'default' => '',
             ],
             'profile' => [
                 'required' => true,
                 'description' => tra('Profile name'),
                 'since' => '20',
                 'filter' => 'text',
+                'default' => '',
             ],
             'reference' => [
                 'name' => tra('Reference key'),
@@ -32,6 +34,7 @@ function wikiplugin_profilesymbolvalue_info()
                 'description' => tra('Reference name'),
                 'since' => '20',
                 'filter' => 'text',
+                'default' => '',
             ],
             'package' => [
                 'name' => tra('Package'),
@@ -39,6 +42,7 @@ function wikiplugin_profilesymbolvalue_info()
                 'required' => false,
                 'since' => '20',
                 'filter' => 'text',
+                'default' => '',
             ],
         ],
     ];
@@ -46,10 +50,10 @@ function wikiplugin_profilesymbolvalue_info()
 
 function wikiplugin_profilesymbolvalue($data, $params)
 {
-    $domain = $params['domain'] ?? '';
-    $profile = $params['profile'] ?? '';
-    $ref = $params['reference'] ?? '';
-    $package = $params['package'] ?? '';
+    $domain = $params['domain'];
+    $profile = $params['profile'];
+    $ref = $params['reference'];
+    $package = $params['package'];
 
     $smarty = TikiLib::lib('smarty');
     return smarty_function_profilesymbolvalue([

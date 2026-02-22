@@ -40,6 +40,7 @@ describe("Autocomplete", () => {
         test("renders correctly with default props value", () => {
             const givenProps = {
                 remoteSourceUrl: "https://foo/bar",
+                _expose: vi.fn(),
             };
 
             render(Autocomplete, { props: givenProps });
@@ -60,10 +61,11 @@ describe("Autocomplete", () => {
 
             expect(consoleErrorSpy).not.toHaveBeenCalled();
             expect(consoleWarnSpy).not.toHaveBeenCalled();
+            expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
         });
 
         test("logs an error to the console when required props are not provided", () => {
-            render(Autocomplete, { props: {} });
+            render(Autocomplete, { props: { _expose: vi.fn() } });
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(TEXT.ERROR_NO_REQUIRED_PROPS);
             expect(consoleWarnSpy).not.toHaveBeenCalled();
@@ -77,6 +79,7 @@ describe("Autocomplete", () => {
                 placeholder: "Search",
                 valueKey: "name",
                 language: "en",
+                _expose: vi.fn(),
             };
 
             render(Autocomplete, { props: givenProps });
@@ -101,6 +104,7 @@ describe("Autocomplete", () => {
 
             expect(consoleErrorSpy).not.toHaveBeenCalled();
             expect(consoleWarnSpy).not.toHaveBeenCalled();
+            expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
         });
     });
 
@@ -109,6 +113,7 @@ describe("Autocomplete", () => {
             const givenProps = {
                 remoteSourceUrl: "https://foo/bar",
                 emitCustomEvent: vi.fn(),
+                _expose: vi.fn(),
             };
 
             ElAutocomplete = {
@@ -145,6 +150,7 @@ describe("Autocomplete", () => {
             const givenProps = {
                 remoteSourceUrl,
                 sourceList,
+                _expose: vi.fn(),
             };
 
             ElAutocomplete = {
@@ -164,12 +170,14 @@ describe("Autocomplete", () => {
             await fireEvent.change(input, { target: { value: "foo" } });
 
             expect(fetchSuggestions).toHaveBeenCalledWith("foo", expect.any(Function), remoteSourceUrl, sourceList ? JSON.parse(sourceList) : []);
+            expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
         });
 
         test("calls props.emitCustomEvent when ElAutocomplete emits a select event", async () => {
             const givenProps = {
                 remoteSourceUrl: "https://foo/bar",
                 emitCustomEvent: vi.fn(),
+                _expose: vi.fn(),
             };
 
             ElAutocomplete = {
@@ -190,12 +198,14 @@ describe("Autocomplete", () => {
             await fireEvent.click(suggestion);
 
             expect(givenProps.emitCustomEvent).toHaveBeenCalledWith("select", "suggestion");
+            expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
         });
 
         test("calls props.emitCustomEvent when ElAutocomplete emits a input event", async () => {
             const givenProps = {
                 remoteSourceUrl: "https://foo/bar",
                 emitCustomEvent: vi.fn(),
+                _expose: vi.fn(),
             };
 
             ElAutocomplete = {
@@ -219,6 +229,7 @@ describe("Autocomplete", () => {
             await fireEvent.change(input, { target: { value: "foo" } });
 
             expect(givenProps.emitCustomEvent).toHaveBeenCalledWith("input", "foo");
+            expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
         });
     });
 });

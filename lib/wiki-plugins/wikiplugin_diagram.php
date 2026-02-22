@@ -68,6 +68,7 @@ function wikiplugin_diagram_info()
                 'name' => tr('template'),
                 'description' => tr('Diagram\'s file id to use as a template to new the diagram. This parameter will be skipped if the fileId parameter is present.'),
                 'since' => '23.0',
+                'default' => 0,
                 'filter' => 'int',
             ],
             'galleryId' => [
@@ -99,12 +100,13 @@ function wikiplugin_diagram_info()
  */
 function wikiplugin_diagram($data, $params)
 {
-    global $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_edit, $tiki_p_view;
-    $template = $params['template'] ?? 0;
-    $galleryId = $params['galleryId'] ?? (isset($params['fileName']) ? 1 : '');
+    global $user, $page, $wikiplugin_included_page, $prefs;
+    $pageName = $params['page'] ?? ''; //Important note:  you cannot rely on page being present (during indexing among other things).  I corrected a few related bugs, but there are most likely remaining incorrect assumptions in the plugin code. - benoitg - 2026-02-18
+
+    $template = $params['template'];
+    $galleryId = $params['galleryId'] ?? (! is_null($params['fileName']) ? 1 : '');
     $fileName = $params['fileName'] ?? 'Diagram %page% %date%.drawio' ;
-    $escapedPage = htmlentities($page, ENT_COMPAT);
-    $fileName = preg_replace('/\%page\%/', $page, $fileName);
+    $fileName = preg_replace('/\%page\%/', $pageName, $fileName);
     $fileName = preg_replace('/\%date\%/', date('Y-m-d'), $fileName);
 
     $compressXml = ! (($prefs['fgal_use_diagram_compression_by_default'] !== 'y'));
@@ -116,7 +118,7 @@ function wikiplugin_diagram($data, $params)
 
     if (
         empty($params['fileId'])
-        && isset($params['compressXml'])
+        && ! is_null($params['compressXml'])
         && in_array($params['compressXml'], ['false', '0'])
     ) {
             $compressXml = false;
@@ -124,9 +126,9 @@ function wikiplugin_diagram($data, $params)
     }
 
     $diagramIdentifier = ! empty($params['fileId']) ? $params['fileId'] : $data;
+    $diagrams = DiagramHelper::getDiagramsFromIdentifier($diagramIdentifier, $pageName);  //This seems incorrect, there is no reason to believe multi-page diagrams would correspond to the current wiki page name. - benoitg - 2026-02-18
+
     $info = wikiplugin_diagram_info();
-    $pageName = $params['page'] ?? '';
-    $diagrams = DiagramHelper::getDiagramsFromIdentifier($diagramIdentifier, $pageName);
 
     if (! empty($params['align']) && in_array($params['align'], ['left', 'center', 'right'])) {
         $alignment = $params['align'];
@@ -182,17 +184,18 @@ function wikiplugin_diagram($data, $params)
     $fileId = intval($params['fileId'] ?? 0);
     $annotate = intval($params['annotate'] ?? 0);
 
+    $diagramString = $data; //There is really no reason this logic cannot be shared with the TIKI_PRINTING_PDF logic above - benoitg - 2026-02-18
     if ($fileId) {
         $file = \Tiki\FileGallery\File::id($fileId);
-        $data = $file->getContents();
+        $diagramString = $file->getContents();
 
-        if ($data === false) {
+        if ($diagramString === false) {
             Feedback::error(tr("Tiki wasn't able to find the file with id %0.", $fileId));
             return '';
         }
     }
 
-    $diagramXmlString = DiagramHelper::parseData($data);
+    $diagramXmlString = DiagramHelper::parseData($diagramString);
     static $diagramIndex = 0;
     ++$diagramIndex;
 
@@ -216,25 +219,30 @@ function wikiplugin_diagram($data, $params)
         $type = 'wiki page';
         $objectId = $page;
     } else {
-        throw new \RuntimeException('Missing parameters: either galleryId or page is required.');
+        //Diagram in the body of the plugin ($data), and we are not in a page global context (ex indexing, template using wikiplugin).  Not an error
+        $type = null;
+        $objectId = null;
     }
 
-    $objectperms = Perms::get([
-        'type' => $type,
-        'object' => $objectId,
-    ]);
+    $objectperms = null;
+    if ($objectId) {
+        $objectperms = Perms::get([
+            'type' => $type,
+            'object' => $objectId,
+        ]);
+    }
 
     if ($type === 'file gallery' && empty($galleryId)) {
         throw new LogicException("Invalid state: type is 'file gallery' but galleryId is empty.");
     }
 
-    if ($objectperms->edit) {
+    if ($objectperms?->edit) {
         $allowEdit = true;
     } else {
         $allowEdit = false;
     }
 
-    if ($objectperms->view) {
+    if ($objectperms?->view) {
         $allowView = true;
     } else {
         $allowView = false;
@@ -242,12 +250,12 @@ function wikiplugin_diagram($data, $params)
 
     //checking if the user has permissions on the wikipage to view the diagram
     if ((! empty($page) && ! $allowView )) {
-        Feedback::error(tr('Tiki wasn\'t able to display the Diagram on page %1%0%3. Please check the %1%2%3 permission on this %4.', $escapedPage, '<code>', 'tiki_p_view', '</code>', '<a href="tiki-objectpermissions.php#contenttabs_objectpermissions-1">permission page</a>'));
+        Feedback::error(tr('Tiki wasn\'t able to display the Diagram on page %1%0%3. Please check the %1%2%3 permission on this %4.', htmlentities($page, ENT_COMPAT), '<code>', 'tiki_p_view', '</code>', '<a href="tiki-objectpermissions.php#contenttabs_objectpermissions-1">permission page</a>'));
         return '';
     }
 
     if (function_exists('simplexml_load_string')) {
-        $doc = simplexml_load_string($diagramXmlString);
+        $doc = DiagramHelper::getDiagramsFromXmlString($diagramXmlString);
         if ($doc !== false && ($doc->getName() != 'mxGraphModel' && $doc->getName() != 'mxfile')) {
             Feedback::error(tr("Tiki wasn't able to parse the Diagram. Please check the diagram XML data and structure."));
             return '';
@@ -257,14 +265,14 @@ function wikiplugin_diagram($data, $params)
 
             $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
             $galHtml = "";
-            if (! isset($params['fileName']) && ! isset($params['galleryId'])) {
+            if (is_null($params['fileName']) && is_null($params['galleryId'])) {
                 $galHtml = "<option value='0'>" . tr('Page (inline)') . "</option>";
             }
             usort($gals['data'], function ($a, $b) {
                 return strcmp(strtolower($a['name']), strtolower($b['name']));
             });
 
-            if (! isset($params['galleryId'])) {
+            if (is_null($params['galleryId'])) {
                 foreach ($gals['data'] as $gal) {
                     if ($gal['name'] != "Wiki Attachments" && $gal['name'] != "Users File Galleries") {
                         if ($gal['parentId'] == -1) {
@@ -279,6 +287,7 @@ function wikiplugin_diagram($data, $params)
                 }
             }
 
+            $diagramXmlStringEncoded = '';
             if ($annotate && $infoImg = loadImageAnnotate($annotate)) {
                 $diagramXmlString = <<<XML
 <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff">
@@ -329,7 +338,7 @@ EOF;
 
     $base_64_diagram = base64_encode($diagramXmlString);
 
-    if (isset($params['wikiparse']) && $params['wikiparse'] == 1) {
+    if ($params['wikiparse'] == 1) {
         $parsedDiagrams = [];
         $XMLDiagrams = simplexml_load_string($diagramXmlString);
 
@@ -387,7 +396,6 @@ function loadImageAnnotate($annotate)
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($annotate);
 
-    $smarty = TikiLib::lib('smarty');
     $url = smarty_modifier_sefurl($annotate, 'display');
 
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {

@@ -34,7 +34,7 @@ $success: #A5E4A0;
 $info: #D5CDEA;
 $warning: #E4D081;
 $danger: #ef98b5;
-$dark: #6e0d0d; // #0F7D85; // #ad1d28;
+$dark: #450c0c; //#6e0d0d; // #0F7D85; // #ad1d28;
 $light: #c8e8eb; // #5AE3ED; // #FDF7F9;
 
 $theme-colors: (
@@ -122,19 +122,22 @@ $nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // darke
 $nav-pills-link-active-bg:          $component-active-bg; // !default;darken($body-bg, 8%);
 
 // Navbar
-$navbar-dark-color:                 $link-color;
-$navbar-dark-hover-color:           rgba($white, .75); // !default; // lighten($navbar-dark-color, 25%);
-$navbar-dark-active-color:          $navbar-dark-color;
-$navbar-dark-disabled-color:        rgba($white, .25); //  !default;lighten($navbar-dark-color, 50%);
-
 $navbar-light-color:                $black; // $link-color; // $black;
 $navbar-light-hover-color:          rgba($black, .7);  // default
 $navbar-light-active-color:         rgba($black, .9);  // default
 $navbar-light-disabled-color:       rgba($black, .3);  // default
+//$navbar-color: $link-color;
+//$navbar-light-hover-color: $link-hover-color;
+//$navbar-link-active-color: $link-hover-color;
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 
-$navbar-color: $link-color;
-$navbar-light-hover-color: $link-hover-color;
-$navbar-link-active-color: $link-hover-color;
+$navbar-dark-color:                 $link-color;
+$navbar-dark-hover-color:           rgba($white, .75); // !default; // lighten($navbar-dark-color, 25%);
+$navbar-dark-active-color:          $navbar-dark-color;
+$navbar-dark-disabled-color:        rgba($white, .25); //  !default;lighten($navbar-dark-color, 50%);
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-color:                   #444;

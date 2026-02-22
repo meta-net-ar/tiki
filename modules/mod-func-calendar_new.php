@@ -73,7 +73,7 @@ function module_calendar_new_info()
  */
 function module_calendar_new($mod_reference, $module_params)
 {
-    global $prefs, $user, $tiki_p_admin_calendars;
+    global $prefs, $user, $tiki_p_admin_calendars, $base_uri;
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
@@ -81,7 +81,7 @@ function module_calendar_new($mod_reference, $module_params)
     global $calendarViewMode, $focusdate;
     $default = ['viewnavbar' => 'y', 'viewmode' => 'month', 'showaction' => 'y'];
     $module_params = array_merge($default, $module_params);
-
+    $defaultCalendarId = 0;
     if (isset($_REQUEST['viewmode'])) {
         $save_viewmode = $_REQUEST['viewmode'];
     }
@@ -132,6 +132,7 @@ function module_calendar_new($mod_reference, $module_params)
     } else {
         $calIds = [];
     }
+    $defaultCalendarId = $calIds[0] ?? 0;
     $moduleCalendarIds = implode(',', $calIds);
 
     $_REQUEST['gbi'] = 'y';
@@ -143,19 +144,40 @@ function module_calendar_new($mod_reference, $module_params)
 
     $rawcals = $calendarlib->list_calendars();
     if (empty($rawcals['data'])) {
-        Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
+        Feedback::error(tra("No calendars found"));
+        return;
     }
 
+    $rawcals['data'] = Perms::filter(
+        ['type' => 'calendar'],
+        'object',
+        $rawcals['data'],
+        [ 'object' => 'calendarId' ],
+        'view_calendar'
+    );
+
+    if (empty($rawcals['data'])) {
+        Feedback::error(tra("You do not have permission to view the calendar"));
+        return;
+    }
+
+    $moduleCalendarFocusdate = date("Y-m-d");
     $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $calIds));
-    $calendars = [];
 
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
+    $calendars = $calendarInitialParams['calendars'];
     $smarty->assign(
         'eventCalendarParams',
         $calendarInitialParams
     );
+
+    $current_url = $base_uri;
+    $smarty->assign('returnURL', $current_url);
+    $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
     $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
+    $smarty->assign('defaultCalendarId', $defaultCalendarId);
+
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
             ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
@@ -182,6 +204,9 @@ function module_calendar_new($mod_reference, $module_params)
         }
 
         $smarty->assign('name', 'calendar_new');
+        $smarty->assign('calendars', $calendars);
+        $smarty->assign_by_ref('checkedCalIds', $calIds);
+
 
         $smarty->assign('show_calendar_module', 'y');
         if (isset($save_todate)) {

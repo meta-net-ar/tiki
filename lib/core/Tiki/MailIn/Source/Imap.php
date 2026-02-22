@@ -123,19 +123,24 @@ class Imap implements SourceInterface
     /**
      * @throws TransportException
      */
-    public function connect(): Hm_IMAP
+    public function connect(): Hm_IMAP // @phpstan-ignore class.notFound (this exists, but cypht defines is conditionally for some reason, which confuses phpstan)
     {
+        global $tikipath;
         try {
             $config = [
                 'server'    => $this->host,
                 'port'      => $this->port,
-                'tls'       => stripos($this->ssl, 'TLS') !== false,
+                'tls'       => $this->port === 993,
                 'type'      => 'imap',
                 'username'  => $this->username ,
                 'password'  => $this->password,
                 'use_cache' => true,
             ];
-            $imap = new Hm_IMAP();
+            require_once $tikipath . '/lib/cypht/integration/classes.php';
+            require_once APP_PATH . 'modules/core/message_functions.php';
+            require_once APP_PATH . 'modules/imap/hm-imap.php';
+
+            $imap = new Hm_IMAP(); // @phpstan-ignore class.notFound (this exists, but cypht defines is conditionally for some reason, which confuses phpstan)
             $authenticate = $imap->connect($config);
             if (! $authenticate) {
                 throw new MailInException();

@@ -108,7 +108,7 @@
     margin-top: -15px;
 }
 
-.card-accordian {
+.card-accordion {
     > .card-header {
         padding: 0;
         h4.card-title {
@@ -197,6 +197,11 @@
     }
 }
 
+.form-switch .form-check-input.tracker-notify-switch {
+  margin-left: 0;
+  margin-right: 0.5em;
+}
+
 // vue.js field conditions defs
 
 .tracker-rules .actions .ui-predicate__row:first-child,
@@ -226,4 +231,86 @@
 
   .truncate-text a {
     display: inline;
+  } 
+
+// BigBlueButton Tracker Field Styles
+.bbb-recordings-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.bbb-recording-item {
+  transition: all 0.2s ease-in-out;
+  
+  &.border-primary {
+    border-color: #007bff !important;
   }
+  
+  .form-check-label {
+    font-weight: 500;
+    cursor: pointer;
+    
+    &:hover {
+      color: #007bff;
+    }
+  }
+  
+  .btn {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+.bbb-recordings-display {
+  margin-top: 0.5rem;
+}
+
+.bbb-recording-display-item {
+  h6 {
+    color: #495057;
+    margin-bottom: 0.75rem;
+    
+    i {
+      color: #007bff;
+    }
+  }
+  
+  .btn {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .bbb-recordings-container {
+    max-height: 300px;
+  }
+  
+  .bbb-recording-item,
+  .bbb-recording-display-item {
+    padding: 0.75rem !important;
+  }
+  
+  .bbb-recording-display-item .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .bbb-recording-display-item h6 {
+    color: #e2e8f0;
+  }
+}

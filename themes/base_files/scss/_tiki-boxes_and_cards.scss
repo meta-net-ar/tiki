@@ -1,12 +1,12 @@
 // Boxes
-.error .rbox-data .adminoption,
-.error .rbox-data .adminoptionlabel {
-    display: inline;
-}
+//.error .rbox-data .adminoption, // Can't find in template files
+//.error .rbox-data .adminoptionlabel {
+//    display: inline;
+//}
 
-.adminoption {
-    align-items: center;
-}
+//.adminoption {
+//    align-items: center;
+//}
 
 .tikihelp-reset-wrapper {
     display: flex;
@@ -20,23 +20,23 @@
 }
 
 // Was h3.card-title
-h3.tiki-card-header-title {
-    display: block;
-    padding-top: 0;
-    margin: 0;
-}
+//h3.tiki-card-header-title {
+//    display: block; // Headings are block level already
+//    padding-top: 0; // Utility classes added to template
+//    margin: 0;
+//}
 
 // Class name updated/corrected; not all instances are in modules and some are other heading sizes, etc. - g_c-l
-.card.module h3.tiki-card-header-title {
-    font-size: 1.25rem;
-}
+//.card.module h3.tiki-card-header-title {
+//    font-size: 1.25rem; // Utility class added to template
+//}
 
 .moduleflip {
     display: none;
     position: absolute;
     right: .2rem;
     top: .2rem;
-//    width: 5rem; This has to be an error - This width overlaps the icon and the module text.
+//    width: 5rem; // This has to be an error - This width overlaps the icon and the module text.
 }
 
 .moduleflip > * {
@@ -62,8 +62,8 @@ a.flipmodtitle .icon {
 
 .card-body {
     table { width: 100%; }
-    a.linkmenu { display: block; }
-    ol { padding-left: 2rem; }
+//    a.linkmenu { display: block; } // Class added to templates
+//    ol { padding-left: 2rem; } // Overridden by global rule
 }
 
 .module .card-body {
@@ -76,40 +76,40 @@ a.flipmodtitle .icon {
     }
 }
 
-.box-months_links ul {
-    list-style-type: none;
-    padding-left: 0;
-}
+//.box-months_links ul { // Utility class added in template
+//    list-style-type: none;
+//    padding-left: 0;
+//}
+//
+//.box-months_links ul li {
+//    list-style-type: none;
+//    padding-left: 0.5em;
+//}
+//
+//.box-months_links ul li li {
+//    list-style-type: none;
+//    padding-left: 1.3em;
+//}
 
-.box-months_links ul li {
-    list-style-type: none;
-    padding-left: 0.5em;
-}
-
-.box-months_links ul li li {
-    list-style-type: none;
-    padding-left: 1.3em;
-}
-
-.modcontrols > div > button.btn-link {
-    padding: 0;
-}
+// .modcontrols > div > button.btn-link { // Utility class added in template
+//    padding: 0;
+// }
 
 // MiniChat
 .box-minichat {
     width: 100%;
 }
 
-.minichat,
-.minichatdiv,
-.minichatchan {
-    overflow: auto;
-}
+//.minichat, Redundant
+//.minichatdiv, // Utility class added in template file
+//.minichatchan { // Selector not found
+//    overflow: auto;
+//}
 
 #autosave_preview {
-    height: 30ex;
-    overflow-y: auto;
-    overflow-x: hidden;
+    height: 30em;
+//    overflow-y: auto; // Replaced with classes in template
+//    overflow-x: hidden;
 }
 
 // Preserve legacy module HTML/appearance (after div.card-footer was added to div.module), but allow overriding by theme CSS for styling purposes, etc.

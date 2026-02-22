@@ -161,7 +161,7 @@
                         <label for="history_pagesize">{tr}rows per page{/tr}</label>
                     {/if}
             </form>
-            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+            <form id="pagehistory-rmv-history" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
                 <input type="hidden" name="page" value="{$page|escape}">
                 <input type="hidden" name="history_offset" value="{$history_offset}">
 
@@ -335,11 +335,11 @@
                             </td>
                             {if $prefs.default_wiki_diff_style ne "old" and $history}
                                 <td class="button_container">
-                                    <input type="radio" name="oldver" value="0" title="{tr}Compare{/tr}" {if isset($old.version)
+                                    <input type="radio" class="form-check-input" name="oldver" value="0" title="{tr}Compare{/tr}" {if isset($old.version)
                                         and $old.version == $info.version}checked="checked"{/if}>
                                 </td>
                                 <td class="button_container">
-                                    <input type="radio" name="newver" value="0" title="{tr}Compare{/tr}" {if (isset($new.version)
+                                    <input type="radio" class="form-check-input" name="newver" value="0" title="{tr}Compare{/tr}" {if (isset($new.version)
                                         and $new.version == $info.version) or (!isset($smarty.request.diff_style)
                                         or !$smarty.request.diff_style)}checked="checked"{/if}>
                                 </td>
@@ -450,12 +450,12 @@
                             {if $prefs.default_wiki_diff_style ne "old"}
                                 <td class="button_container">
                                     {if $show_all_versions eq 'n' and not empty($element.session)}
-                                        <input type="radio" name="oldver" value="{$element.session}"
+                                        <input type="radio" class="form-check-input" name="oldver" value="{$element.session}"
                                             title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.session) and $old.version == $element.session)
                                             or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
                                             and $smarty.foreach.hist.first)}checked="checked"{/if}>
                                     {else}
-                                        <input type="radio" name="oldver" value="{$element.version}"
+                                        <input type="radio" class="form-check-input" name="oldver" value="{$element.version}"
                                             title="{tr}Older Version{/tr}" {if (isset($old.version) and isset($element.version) and $old.version == $element.version)
                                             or ((!isset($smarty.request.diff_style) or !$smarty.request.diff_style)
                                             and $smarty.foreach.hist.first)}checked="checked"{/if}>
@@ -463,7 +463,7 @@
                                 </td>
                                 <td class="button_container">
                                     {* if $smarty.foreach.hist.last &nbsp; *}
-                                    <input type="radio" name="newver" value="{$element.version}" title="Select a newer version for comparison"
+                                    <input type="radio" class="form-check-input" name="newver" value="{$element.version}" title="Select a newer version for comparison"
                                         {if isset($new.version) and $new.version == $element.version}checked="checked"{/if} >
                                 </td>
                             {/if}
@@ -482,7 +482,7 @@
                 </select>
                 <button
                     type="submit"
-                    form="pagehistory"
+                    form="pagehistory-rmv-history"
                     formaction="{bootstrap_modal controller=wiki}"
                     class="btn btn-primary"
                     onclick="confirmPopup()"

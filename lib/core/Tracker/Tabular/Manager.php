@@ -50,6 +50,7 @@ class Manager
                 'import_transaction' => 0,
                 'bulk_import' => 0,
                 'skip_unmodified' => 0,
+                'skip_validation' => 0,
                 'encoding' => '',
                 'format' => '',
                 'mapping' => '',
@@ -74,6 +75,7 @@ class Manager
                 'import_transaction' => (int)! empty($config['import_transaction']),
                 'bulk_import' => (int)! empty($config['bulk_import']),
                 'skip_unmodified' => (int)! empty($config['skip_unmodified']),
+                'skip_validation' => (int)! empty($config['skip_validation']),
                 'encoding' => $config['encoding'] ?? '',
                 'format' => $config['format'] ?? '',
                 'mapping' => $config['mapping'] ?? '',
@@ -138,6 +140,13 @@ class Manager
                     $result = $writer->write($source);
                     if (! empty($result['errors'])) {
                         throw new Exception($result['errors'][0]);
+                    }
+                }
+                if ($tabular['odbc_config'] || $tabular['api_config']) {
+                    // refresh values_by_perm_name as backfilled PK or other changed values (from other ODBC sources, for example) will not be avaialble for subsequent tabular syncs when we use more than 1 tabular format to sync
+                    foreach ($args['values_by_permname'] as $permName => $value) {
+                        $field = $definition->getFieldFromPermName($permName);
+                        $args['values_by_permname'][$permName] = $trklib->get_item_value($args['trackerId'], $args['object'], $field['fieldId'], false);
                     }
                 }
             } catch (Exception $e) {
@@ -328,7 +337,9 @@ class Manager
     {
         try {
             if (! empty($odbc_config['permanent_values'])) {
-                $odbc_config['permanent_values'] = json_decode($odbc_config['permanent_values'], true, 512, JSON_THROW_ON_ERROR);
+                if (is_scalar($odbc_config['permanent_values'])) {
+                    $odbc_config['permanent_values'] = json_decode($odbc_config['permanent_values'], true, 512, JSON_THROW_ON_ERROR);
+                }
                 if (! is_array($odbc_config['permanent_values'])) {
                     throw new Exception('invalid format');
                 }
@@ -345,7 +356,9 @@ class Manager
         }
         try {
             if (! empty($odbc_config['value_mappings'])) {
-                $odbc_config['value_mappings'] = @json_decode($odbc_config['value_mappings'], true, 512, JSON_THROW_ON_ERROR);
+                if (is_string($odbc_config['value_mappings'])) {
+                    $odbc_config['value_mappings'] = json_decode($odbc_config['value_mappings'], true, 512, JSON_THROW_ON_ERROR);
+                }
                 if (! is_array($odbc_config['value_mappings'])) {
                     throw new Exception('invalid format');
                 }

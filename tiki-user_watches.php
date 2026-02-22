@@ -8,23 +8,26 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'categwatch'        => 'int',          //post
             'id'                => 'int',          //post
             'add'               => 'bool',         //post
-            'event'             => 'string',       //post
+            'event'             => 'striptags',    //post
             'delete'            => 'bool',         //post
+            'langwatch'         => 'lang',         //post
         ],'staticKeyFiltersForArrays' => [
-            'cat_categories'          => 'string',    //post
+            'cat_categories'          => 'int',       //post
             'checked'                 => 'int',       //post
         ],
     ],
 ];
-include_once('tiki-setup.php');
 
+include_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $access->check_user($user);
 $access->check_feature('feature_user_watches');
 

@@ -88,7 +88,6 @@ class Gd extends ImageAbstract
                         header('Content-Type: image/png');
                         imagepng($rasterImage);
                         $imageData = ob_get_clean();
-                        imagedestroy($rasterImage);
                         $this->data = imagecreatefromstring($imageData);
                         $this->format = 'png';
                         $this->loaded = true;

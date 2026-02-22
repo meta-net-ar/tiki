@@ -68,6 +68,18 @@ $tiki_timer->start();
 
 require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
 
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['pass_confirm']) && $_SESSION['login_time'] < $userInfo['pass_confirm']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
+
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
         header('location: tiki-install.php');
@@ -128,14 +140,32 @@ $twoFactorSecret = $userlib->get_2_factor_secret($user);
 $force2FA = $userlib->forceTwoFactorAuth($user);
 //Check if 2FA is required for a user and if it not yet enabled
 if ($prefs['twoFactorAuth'] == 'y' && empty($twoFactorSecret) && $force2FA && ! empty($user)) {
-    $accesslib = TikiLib::lib('access');
-    //URL to send user who has not yet enabled 2FA
-    $accessibleUrl = $base_url . 'tiki-user_preferences.php';
-    $pageUrl = $url_scheme . "://" . $host . $requestUri;
-    //Do not redirect the user if it is a logout action
-    if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
-        header('location: tiki-user_preferences.php');
-        exit();
+    $gracePeriod = $userlib->get2FAGracePeriod($user);
+    $userGracePeriodStart = $userlib->get2FAGracePeriodStart($user);
+
+    if (! $userGracePeriodStart) {
+        if ($gracePeriod > 0) {
+            $userGracePeriodStart = $userlib->reset2FAGracePeriodStart($user);
+        } else {
+            $userGracePeriodStart = 0;
+        }
+    }
+
+    $userGracePeriodShouldEnd = $userGracePeriodStart + ($gracePeriod * 24 * 3600);
+
+    if ($userGracePeriodShouldEnd < time()) {
+        $accesslib = TikiLib::lib('access');
+        //URL to send user who has not yet enabled 2FA
+        $accessibleUrl = $base_url . 'tiki-user_preferences.php';
+        $pageUrl = $url_scheme . "://" . $host . $requestUri;
+        //Do not redirect the user if it is a logout action
+        if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
+            header('location: tiki-user_preferences.php');
+            exit();
+        }
+    } else {
+        $daysLeft = ceil(($userGracePeriodShouldEnd - time()) / (24 * 3600));
+        Feedback::warning(tra(strtr('You must enable Two-Factor Authentication within the next %days% day(s) to continue using your account. Please update your <a href="%url%">user preferences</a>.', ['%days%' => $daysLeft, '%url%' => 'tiki-user_preferences.php'])));
     }
 }
 
@@ -176,7 +206,18 @@ if ($prefs['login_multiple_forbidden'] == 'y') {
 
 require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
-require_once('lib/setup/language.php');
+require_once('lib/core/Sections.php');
+use Tiki\Sections;
+// Initialize language settings after section is set and autoloader is available
+Language::setSectionLanguage();
+
+// Register callback to update language when section changes
+// This ensures that when admin files call Sections::setCurrentSection(),
+// the language is automatically updated (e.g., admin section gets admin language)
+Sections::onSectionChange(function ($section) {
+    Language::setSectionLanguage();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -385,13 +426,29 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
     $smarty->assign('pagespwa', json_encode($pages));
 }
 
+$customRobots = null;
 if ($prefs['metatag_robotscustom'] == 'y') {
     if (empty($object)) {
         $object = current_object();
     }
     if ($object && $object['type'] == 'wiki page') {
         $wikilib = TikiLib::lib('wiki');
-        $smarty->assign('metatag_robotscustom', $wikilib->getPageMetatagRobotscustom($object['object']));
+        $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+        if (! empty($customRobots)) {
+            $smarty->assign('metatag_robotscustom', $customRobots);
+            $headerlib->setXRobotsTag($customRobots);
+        }
+    }
+}
+
+// Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
+if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
+    $robotsFromTxt = $headerlib->getRobots();
+    if (! empty($robotsFromTxt)) {
+        $smarty->assign('metatag_robots', $robotsFromTxt);
+        if (empty($customRobots)) {
+            $headerlib->setXRobotsTag($robotsFromTxt);
+        }
     }
 }
 
@@ -512,6 +569,25 @@ if (isset($prefs['fgal_elfinder_feature']) && $prefs['fgal_elfinder_feature'] ==
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
+
+if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking_dsn'])) {
+    // Sentry configuration passed to ES module
+    $sentryConfig = json_encode([
+        'dsn' => $prefs['error_tracking_dsn'],
+        'sampleRate' => isset($prefs['error_tracking_sample_rate']) && is_numeric($prefs['error_tracking_sample_rate'])
+            ? (float) $prefs['error_tracking_sample_rate']
+            : 1,
+        'tracingEnabled' => ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y',
+        'tracesSampleRate' => isset($prefs['error_tracking_traces_sample_rate']) && is_numeric($prefs['error_tracking_traces_sample_rate'])
+            ? (float) $prefs['error_tracking_traces_sample_rate']
+            : 0.1,
+    ]);
+
+    // Sentry initialization via ES module
+    // Loaded with priority -10 to ensure it initializes before other modules
+    $headerlib->add_js_module("import { initSentry } from '@tiki-modules/sentryBrowser'; initSentry($sentryConfig);", -10);
+}
+
 //This is applied globally so all menus can open upward when space is limited.
 //Since menus appear in many places in Tiki, we can’t handle them individually, so we load it once on page load to make it available site-wide.
 //templates/menu/clone.tpl
@@ -521,11 +597,7 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
 
-if (isset($_REQUEST['geo_zoomlevel_to_found_location'])) {
-    $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'];
-} else {
-    $zoomToFoundLocation = $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-}
+$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
 $headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
 
 if ($prefs['geo_enabled'] === 'y') {
@@ -632,6 +704,22 @@ if ($prefs['jquery_smartmenus_enable'] == 'y') {
                 nav[indexCurrentNav].classList.add("sm-navbar");
                 nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
                 const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+                
+                // Enable navigation on parent menu items with children
+                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+                // Note: Relies on SmartMenus internal class that may change in future versions
+                nav[indexCurrentNav].addEventListener("click", function(e) {
+                    const link = e.target.closest("a.sm-sub-toggler");
+                    if (link && nav[indexCurrentNav].contains(link)) {
+                        const href = link.getAttribute("href");
+                        if (href && href !== "#" && href !== "") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.location.href = href;
+                        }
+                    }
+                });
             }
         }
     ');
@@ -689,7 +777,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
 }
 
 if ($prefs['jquery_timeago'] === 'y') {
-    $language = $prefs['language'];
+    $language = Language::getCurrentLanguage();
     $locale_file = '';
 
     $full_locale_path = NODE_PUBLIC_DIST_PATH . "/timeago/dist/locales/jquery.timeago.{$language}.js";
@@ -1010,11 +1098,6 @@ if ($prefs['feature_tiki_manager'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-manager.js');
 }
 
-$robots = $headerlib->getRobots();
-if (! empty($robots)) {
-    $smarty->assign('metatag_robots', $robots);
-}
-
 if ($prefs['feature_realtime'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-websockets.js');
 }
@@ -1022,7 +1105,7 @@ if ($prefs['feature_realtime'] == 'y') {
 if ($prefs['feature_calendar'] === 'y') {
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
     $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
-    $headerlib->add_js_module('import "@jquery-tiki/fullcalendar_to_pdf";');
+    $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');
 }
 
 // Using boomerang for performance monitoring
@@ -1031,19 +1114,6 @@ if ($prefs['tiki_monitor_performance'] == 'y') {
     $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/boomerangjs/plugins/rt.js");
 }
 
-if ($prefs['error_tracking_enabled_js'] == 'y' &&  ! empty($prefs['error_tracking_dsn'])) {
-    //GlitchTip reporting script should be load before any other JS to capture issues/failures on other JS scripts
-
-    $sampleRate = isset($prefs['error_tracking_sample_rate']) && is_numeric($prefs['error_tracking_sample_rate'])
-            ? $prefs['error_tracking_sample_rate']
-            : 1;
-            $dsn = addslashes($prefs['error_tracking_dsn']);
-            $script = <<<JS
-            import {Sentry} from "@tiki-modules/sentryBrowser";
-            Sentry.init({dsn: '$dsn', sampleRate: $sampleRate});
-            JS;
-        $headerlib->add_js_module($script, -10);
-}
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
@@ -1057,8 +1127,9 @@ if ($prefs['feature_elementplus'] == 'y') {
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message-box.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-popper.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/element-plus-ui/input-root-css.css');
     $headerlib->add_js_module("import '@vue-widgets/el-file-input';");
-    $headerlib->add_js_module("import { applyInput } from '@vue-widgets/el-input';  applyInput();");
+    $headerlib->add_js_module("import '@vue-widgets/el-input';");
     $headerlib->add_js_module("import { showMessage } from '@vue-widgets/el-message'; window.showMessage = showMessage;");
     if ($prefs['elementplus_select'] == 'y') {
         $headerlib->add_js_module("import { applySelect } from '@vue-widgets/el-select'; applySelect();");
@@ -1079,6 +1150,7 @@ if ($prefs['fgal_use_record_rtc_screen'] == 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
+    $headerlib->add_cssfile('themes/base_files/feature_css/recordrtc.css');
 }
 // use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not
 define('TIKI_SETUP_FINISHED', true);

@@ -43,7 +43,6 @@ function wikiplugin_autotoc_info()
                 'description' => tr('Specify which levels you want to see in the TOC. Levels are integers (1 to 6) separated with colon. Example : <code>levels="1:2:3"</code> to show only level 1, 2 and 3 headers.'),
                 'since' => '23.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':',
             ],
             'offset' => [
@@ -92,7 +91,6 @@ function wikiplugin_autotoc_info()
                 'since' => '25.0',
                 'filter' => 'text',
                 'separator' => ',',
-                'default' => '',
             ],
             'tabset_panes' => [
                 'required' => false,
@@ -101,7 +99,6 @@ function wikiplugin_autotoc_info()
                 'since' => '25.0',
                 'filter' => 'text',
                 'separator' => ',',
-                'default' => '',
             ],
         ]
     ];
@@ -119,7 +116,7 @@ function wikiplugin_autotoc($data, $params)
         (! str_contains($_SERVER["SCRIPT_NAME"], 'tiki-pagehistory.php'))
     ) {
         if ($params['tabs'] == 'yes') {
-            if (empty($params['tabset_names']) || empty($params['tabset_panes'])) {
+            if (is_null($params['tabset_names']) || is_null($params['tabset_panes'])) {
                 Feedback::error(tra('Missing Tabs names (tabset_names) parameter: it must be filled in when the Tabs (tabs) parameter is set to yes'));
                 return;
             }
@@ -130,14 +127,25 @@ function wikiplugin_autotoc($data, $params)
             $jqueryAutoToc['plugin_autoToc_mode'] = $params['mode'] === 'inline' ?: 'off';
             $autotocPos = $params['align'];
             $jqueryAutoToc['plugin_autoToc_pos'] = $autotocPos;
-            $jqueryAutoToc['plugin_autoToc_offset'] = $params['offset'] ?: 15;
+            $jqueryAutoToc['plugin_autoToc_offset'] = $params['offset'];
             $jqueryAutoToc['plugin_autoToc_title'] = $params['title'];
             $jqueryAutoToc['plugin_autoToc_tabs'] = $params['tabs'];
-            $jqueryAutoToc['plugin_autoToc_tabset_names'] = $params['tabset_names'];
-            $jqueryAutoToc['plugin_autoToc_tabset_panes'] = $params['tabset_panes'];
-            $jqueryAutoToc['plugin_autoToc_levels'] = $params['levels'] ?: null;
-            $jq_autotoc = json_encode($jqueryAutoToc, JSON_UNESCAPED_SLASHES);
-            $headerlib->add_js('var jqueryAutoToc = ' . $jq_autotoc . '"\n";');
+            $jqueryAutoToc['plugin_autoToc_tabset_names'] = $params['tabset_names'] ?? '';
+            $jqueryAutoToc['plugin_autoToc_tabset_panes'] = $params['tabset_panes'] ?? '';
+            $jqueryAutoToc['plugin_autoToc_levels'] = $params['levels'] ?? '';
+
+            if (! empty($params['levels'])) {
+                $autoTocLevels = $params['levels'];
+            } else {
+                $autoTocLevels = null;
+            }
+            $jqueryAutoToc['plugin_autoToc_levels'] = $autoTocLevels;
+
+            $js = '
+            var jqueryAutoToc = ' . json_encode($jqueryAutoToc, JSON_UNESCAPED_SLASHES) . "\n";
+
+            $headerlib->add_js($js);
+
             if ($prefs['wiki_auto_toc'] !== 'y' || $prefs['wiki_toc_default'] !== 'on') {
                 $headerlib->add_jsfile('lib/jquery_tiki/autoToc.js');
             }
@@ -160,7 +168,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-width: 1px;
-                        border-left-style: solid; // #0075ff;
+                        border-left-style: solid;
                     }');
 
                 return "<div id='autotoc'></div>";
@@ -183,7 +191,7 @@ function wikiplugin_autotoc($data, $params)
                         text-decoration: none;
                         background-color: transparent;
                         border-left-style: solid;
-                        bordr-left-width: 1px; // #0075ff;
+                        border-left-width: 1px;
                     }
 
                     #autotoc .nav-link.active,
@@ -193,11 +201,11 @@ function wikiplugin_autotoc($data, $params)
                         font-weight: bold;
                         background-color: transparent;
                         border-left-style: solid;
-                        border-left-width: 2px;// solid #0075ff;
+                        border-left-width: 2px;
+                        border-left-color: var(--bs-primary);
                     }
 
                     #autotoc .nav-link + ul {
-                        display: none;
                         padding-bottom: 10px;
                     }
 

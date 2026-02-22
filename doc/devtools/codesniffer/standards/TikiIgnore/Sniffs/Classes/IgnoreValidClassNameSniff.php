@@ -17,11 +17,11 @@ class IgnoreValidClassNameSniff implements Sniff
 {
     use IgnoreListTrait;
 
-    protected const SNIFF_NOT_CAMEL_CAPS = 'Squiz.Classes.ValidClassName.NotCamelCaps';
+    protected const SNIFF_NOT_PASCAL_CASE = 'Squiz.Classes.ValidClassName.NotPascalCase';
 
     public function __construct()
     {
-        $this->loadIgnoreList([self::SNIFF_NOT_CAMEL_CAPS]);
+        $this->loadIgnoreList([self::SNIFF_NOT_PASCAL_CASE]);
     }
 
     /**
@@ -75,8 +75,8 @@ class IgnoreValidClassNameSniff implements Sniff
         // Check for PascalCase format.
         $valid = Common::isCamelCaps($name, true, true, false);
         if ($valid === false) {
-            if ($this->inIgnoreList(self::SNIFF_NOT_CAMEL_CAPS, $phpcsFile->path, $name)) {
-                $this->ignoreToken(self::SNIFF_NOT_CAMEL_CAPS, $phpcsFile, $tokens, $stackPtr);
+            if ($this->inIgnoreList(self::SNIFF_NOT_PASCAL_CASE, $phpcsFile->path, $name)) {
+                $this->ignoreToken(self::SNIFF_NOT_PASCAL_CASE, $phpcsFile, $tokens, $stackPtr);
             }
         }
     }

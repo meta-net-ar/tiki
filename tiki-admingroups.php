@@ -34,6 +34,14 @@ $inputConfiguration = [
             'initial'                   => 'alpha',
             'find'                      => 'groupname',
             'group'                     => 'groupname',
+            'clean'                     => 'alpha',         //post
+            'add'                       => 'alpha',         //get
+            'export'                    => 'alpha',         //post
+            'username'                  => 'alpha',         //post
+            'email'                     => 'alpha',         //post
+            'lastLogin'                 => 'alpha',         //post
+            'encoding'                  => 'alpha',         //post
+            'import'                    => 'alpha',         //post
         ],
     ]
 ];
@@ -130,23 +138,11 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["initial"])) {
-    $initial = $_REQUEST["initial"];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial);
 
@@ -232,6 +228,10 @@ if (! empty($_REQUEST["group"])) {
                 $smarty->assign('groupitemid', $groupitemid);
             }
         }
+    }
+
+    if ($prefs['twoFactorAuth'] == 'y') {
+        $smarty->assign('twoFactorAuthGracePeriod', $re['twoFactorAuthGracePeriod']);
     }
     $groupperms = $re["perms"];
     //$allgroups = $userlib->list_all_groups();
@@ -372,7 +372,6 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
     header("Expires: 0");
     header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
     header("Pragma: public");
-    TikiLib::lib('header')->setXRobotsTag($robots);
     echo $data;
     die;
 }

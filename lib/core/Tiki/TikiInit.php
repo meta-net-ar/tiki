@@ -19,8 +19,6 @@ use TWVersion;
 use function file_put_contents;
 use function iconv;
 
-use const TIKI_PATH;
-
 /**
  * performs some checks on the underlying system, before initializing Tiki.
  * @package TikiWiki\lib\init

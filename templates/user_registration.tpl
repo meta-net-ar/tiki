@@ -37,6 +37,33 @@
         {jq}
             $('form[name="RegForm"]').on("submit", async function (event) {
                 event.preventDefault();
+                var $form = $(this);
+
+                if ($form.data('submitting') === true) {
+                    return;
+                }
+
+                function setSubmitting(state) {
+                    $form.data('submitting', state === true);
+                    $form.find('button[type="submit"], .registerSubmit').prop('disabled', state === true).toggleClass('disabled', state === true);
+                }
+
+                var isFormValid = true;
+                if (typeof $form.validate === 'function') {
+                    if (!$form.data('validator')) {
+                        $form.validate();
+                    }
+                    if (!$form.valid()) {
+                        isFormValid = false;
+                    }
+                }
+                
+                if (!isFormValid) {
+                    return;
+                }
+
+                setSubmitting(true);
+
                 var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
                 var isWebAuthnIsChoosen = $("#webauthn_checkbox_register").is(':checked') && isWebauthnEnabled === 'y';
                 var regUser = $(this).find('#name').val();
@@ -56,6 +83,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>`
                             );
+                            setSubmitting(false);
                             return;
                         }
                         this.submit();
@@ -66,6 +94,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>`
                         );
+                        setSubmitting(false);
                         return;
                     }
                 } else {

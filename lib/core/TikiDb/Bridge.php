@@ -141,4 +141,19 @@ class TikiDb_Bridge extends TikiDb
     {
         return self::get()->table($tableName, $autoIncrement);
     }
+
+    public function beginTransaction(): bool
+    {
+        return self::get()->beginTransaction();
+    }
+
+    public function commit(): bool|null
+    {
+        return self::get()->commit();
+    }
+
+    public function rollback(): bool|null
+    {
+        return self::get()->rollback();
+    }
 }

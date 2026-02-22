@@ -88,6 +88,27 @@ class EditLib
         return true;
     }
 
+    /**
+     * Assigns custom tip message to Smarty template variables for display in remarksbox alert
+     *
+     * @param string $customTip The tip content to display in the alert box
+     * @param string $customTipTitle Optional title for the alert box (defaults to 'Tip')
+     * @return void
+     */
+    public function assignCustomTipToSmarty(string $customTip, string $customTipTitle = ''): void
+    {
+        if (trim($customTip) !== '') {
+            $smarty = TikiLib::lib('smarty');
+            $smarty->assign('customTip', $customTip);
+
+            if (trim($customTipTitle) !== '') {
+                $smarty->assign('customTipTitle', $customTipTitle);
+            } else {
+                $smarty->assign('customTipTitle', tr('Tip'));
+            }
+        }
+    }
+
     // translation functions
 
     public function isTranslationMode()
@@ -165,20 +186,10 @@ class EditLib
     private function setTranslationSourceAndTargetVersions()
     {
         global $_REQUEST, $tikilib;
-
-        if (isset($_REQUEST['oldver'])) {
-            $this->oldSourceVersion = $_REQUEST['oldver'];
-        } else {
-            // Note: -1 means a "virtual" empty version.
-            $this->oldsourceVersion = -1;
-        }
-
-        if (isset($_REQUEST['newver'])) {
-            $this->newSourceVersion = $_REQUEST['newver'];
-        } else {
-            // Note: version number of 0 means the most recent version.
-            $this->newSourceVersion = 0;
-        }
+        // Note: -1 means a "virtual" empty version.
+        $this->oldSourceVersion = $_REQUEST['oldver'] ?? -1;
+        // Note: version number of 0 means the most recent version.
+        $this->newSourceVersion = $_REQUEST['newver'] ?? 0;
     }
 
     public function aTranslationWasSavedAs($complete_or_partial)
@@ -1346,9 +1357,9 @@ class EditLib
 
     public function parse_html(&$inHtml)
     {
-        include(__DIR__ . '/../htmlparser/htmlparser.inc');
+        require_once(__DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlparser.php');
         // Read compiled (serialized) grammar
-        $grammarfile = TIKI_PATH . '/lib/htmlparser/htmlgrammar.cmp';
+        $grammarfile = __DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlgrammar.cmp';
         if (! $fp = @fopen($grammarfile, 'r')) {
             Feedback::errorAndDie(tra("Can't parse HTML data - no grammar file"), \Laminas\Http\Response::STATUS_CODE_409);
         }

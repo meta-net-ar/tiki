@@ -1,16 +1,16 @@
 /* Look & feel thumbnail */
 
-#style_thumb_div {
+/*#style_thumb_div {
     text-align: center;
 }
 
 .adminoptionpopup a {
     display: block;
-}
+}*/
 
-.multicheckbox label,
-.multicheckbox ul,
-.multicheckbox > div {
+/*.multicheckbox label,
+.multicheckbox > div */
+.multicheckbox ul {
     float: left;
 }
 
@@ -23,7 +23,7 @@
     list-style-type: none;
 }
 
-.admin input.fullwidth {
+/* .admin input.fullwidth {
     width: 100%;
 }
 
@@ -42,15 +42,16 @@
 }
 
 .admin2cols label {
-    display: block;
+   display: block;
     min-width: 20%;
-}
+}*/
 
 .admin legend img, .admin label img {
     margin-left: 1em;
     vertical-align: middle;
 }
 
+/* not found in code
 .admingroup {
     border: #aaa 1px solid;
     margin-bottom: .5em;
@@ -75,22 +76,18 @@
     float: left;
     clear: none;
 }
-
+*/
 
 .toolbars-admin .full {
-    border: solid thin lightgrey;
-    float: left;
-    height: auto;
     max-height: 400px;
     min-height: 16px;
-    overflow: auto;
-    margin: 0;
 }
 
 .toolbars-admin .lists {
     min-height: 10em;
 }
 
+/* can't find in tpl
 .toolbars-admin .selectDiv {
     float: left;
     clear: left;
@@ -106,7 +103,7 @@
     overflow: hidden;
     border-top: 1px #eee solid;
     border-bottom: 1px #ccc solid;
-}
+}*/
 
 .toolbar img.icon {
     vertical-align: middle;
@@ -117,7 +114,7 @@
     cursor: pointer;
 }
 
-.toolbars-admin .rows .row {
+/*.toolbars-admin .rows .row {
     min-height: 20px;
     min-width: 500px;
     overflow: hidden;
@@ -133,13 +130,13 @@
     padding: 0;
     min-width: 16px;
     width: auto;
-}
+} */
 
 .toolbars-admin ul.full {
     list-style-type: none;
-    display: inline;
+ /*   display: inline;
     padding-left: 0pt;
-    width: 100%;
+    width: 100%; */
 }
 
 .toolbars-admin .textarea-toolbar li.toolbar {
@@ -157,10 +154,10 @@
 }
 
 .toolbars-admin .row li.qt-plugin {
-    width: auto;
-    margin: 0 6px 0 0;
-    padding: 2px 0px 2px 3px;
-    color: #030;
+    /*  width: auto;
+    /*   margin: 0 6px 0 0;
+      padding: 2px 0px 2px 3px; */
+    color: var(--bs-success-text-emphasis); /* #030; */
     font-style: normal;
     font-weight: normal;
 }
@@ -169,7 +166,7 @@
     width: 18px;
     height: 18px;
     list-style-type: none;
-    background-color: #ff0;
+    background-color: var(--bs-warning-bg-subtle); /*#ff0;*/
     float: left;
 }
 
@@ -182,25 +179,25 @@
 }
 
 .qt-custom {
-    background-color: #ff9;
+    background-color:  var(--bs-warning-bg-subtle); /*#ff9;*/
 }
 
 .qt-noaccess {
-    opacity: .4;
+    color: var(--bs-danger-text-emphasis) !important; /*opacity: .4;*/
 }
 
-#toolbar_edit_div label,
+/*#toolbar_edit_div label,
 #toolbar_edit_div input,
 #toolbar_edit_div select {
-    display:block;
-}
+    display: block;
+}*/
 
 #toolbar_edit_div input,
 #toolbar_edit_div select {
     clear: right;
 }
 
-#toolbar_edit_div input.text {
+/*#toolbar_edit_div input.text {
     margin-bottom:12px;
     width:95%;
     padding: .4em;
@@ -210,7 +207,7 @@
     padding:0;
     border:0;
     margin-top:25px;
-}
+}*/
 
 #toolbar_edit_div .adminoptionbox {
     text-align: right;
@@ -232,33 +229,30 @@
     border: 1px solid transparent;
 }
 
-#assigned_modules tr.odd:hover {
+/*#assigned_modules tr.odd:hover {
     border-color: #ccc;
 }
 
 #assigned_modules tr.even:hover {
     border-color: #bbb;
-}
+}*/
 
 .module-placeholder {
     width: 160px;
     min-height: 40px;
     list-style-type: none;
-    background-color: #ff8;
+    background-color: var(--bs-warning-bg-subtle); /*#ff8;*/
     border: #884 2px solid;
     margin: 10px;
     padding: 10px;
 }
 
-#module_list {
+/*#module_list {
     padding: 0;
-}
+}*/
 #module_list li {
     list-style: none;
-    -ms-user-select: none;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
 }
 
 #module_list li.disabled {
@@ -267,12 +261,8 @@
 }
 
 #save_modules a {
-    background-color: #faa;
+    background-color: var(--bs-danger-bg-subtle); /*#faa;*/
     background-image: none;
-}
-
-.module_selector {
-    margin: .5em .2em;
 }
 
 /* make empty module zones more "droppable" */
@@ -291,7 +281,7 @@
 
 /* tiki 7 theme generator *
  * deliberately pixel based sizes */
-
+/*
 .tgItems {
     list-style: none;
     line-height: 40px;
@@ -374,7 +364,7 @@
 .tgContexts li {
     font-family: monospace;
     font-size: 1.2em;
-}
+} */
 
 /* end theme generator */
 
@@ -387,11 +377,11 @@
 }
 */
 
-#export_to_yaml .wikitext {
+/* #export_to_yaml .wikitext { Not found
     height: 30em;
     overflow: auto;
     padding: .5em;
-}
+} */
 
 /* end profiles */
 
@@ -400,17 +390,17 @@
 #suggestionsPopup {
     position: fixed;
     z-index: 100;
-    bottom: 0px;
-    right: 0px;
+    bottom: 0;
+    right: 0;
     width: 300px;
-    background-color: #f8f9fa;
     margin-right: 20px;
     margin-bottom: 20px;
+/*    background-color: #f8f9fa;
     border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 0.25rem;
+    border-radius: 0.25rem; */
 }
 
-#suggestionsPopup .sug-header .sug-button-close button {
+/* #suggestionsPopup .sug-header .sug-button-close button {
     margin-left: 20px;
 }
 
@@ -435,7 +425,7 @@
 #suggestionsPopup .sug-body {
     flex: 1 1 auto;
     padding: 0.50rem 1.25rem 0 1.25rem;
-}
+} */
 
 @media (max-width: 767px) {
     .toolbars-admin .rows {
@@ -451,6 +441,7 @@
         padding: 0 0 1em;
     }
 }
-.resize-vertical{
+
+.resize-vertical {
     resize: vertical;
 }

@@ -7,9 +7,14 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'galleryId'                   => 'int',          //post
             'newDiagram'                  => 'bool',         //post
-            'fileName'                    => 'int',          //post
+            'fileName'                    => 'text',          //post
             'fileId'                      => 'int',          //post
             'template'                    => 'int',          //post
+            'page'                        => 'pagename',     //post
+            'xml'                         => 'none',         //post (base64/XML)
+            'index'                       => 'int',          //post
+            'compressXmlParam'            => 'bool',         //post
+            'compressXml'                 => 'alpha',        //post ("true"/"false")
         ],
     ],
 ];

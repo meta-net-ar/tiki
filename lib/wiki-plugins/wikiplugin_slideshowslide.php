@@ -101,8 +101,8 @@ function wikiplugin_slideshowslide_info()
                 'name' => tra('Transition In'),
                 'description' => tra('Select entry transition effect for slide'),
                 'filter' => 'word',
-                'default' => '',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
@@ -117,8 +117,8 @@ function wikiplugin_slideshowslide_info()
                 'name' => tra('Transition Out'),
                 'description' => tra('Select exit transition effect for slide'),
                 'filter' => 'word',
-                'default' => '',
                 'since' => '19.0',
+                'default' => 'none',
                 'options' => [
                     ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
@@ -182,8 +182,8 @@ function wikiplugin_slideshowslide($data, $params)
         }
     }
     $slideSettings = str_replace(["'y'","'n'"], ["'true'","'false'"], $slideSettings);
-    $transitionIn = (isset($params['transitionIn']) ? $params['transitionIn'] . "-in" : '');
-    $transitionOut = (isset($params['transitionOut']) ? $params['transitionOut'] . "-out" : '');
+    $transitionIn = (! is_null($params['transitionIn']) ? $params['transitionIn'] . "-in" : '');
+    $transitionOut = (! is_null($params['transitionOut']) ? $params['transitionOut'] . "-out" : '');
     if ($transitionIn  || $transitionOut) {
         $slideSettings .= "data-transition=\"" . $transitionIn . " " . $transitionOut . "\"";
     }

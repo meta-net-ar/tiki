@@ -167,59 +167,43 @@ function wikiplugin_map_info()
 
 function wikiplugin_map($data, $params)
 {
-    $smarty = TikiLib::lib('smarty');
-
     $width = '100%';
-    if (isset($params['width'])) {
+    if (! is_null($params['width'])) {
         $width = (int)$params['width'] . 'px';
     }
 
     $height = '100%';
-    if (isset($params['height'])) {
+    if (! is_null($params['height'])) {
         $height = (int)$params['height'] . 'px';
-    }
-
-    if (! isset($params['controls'])) {
-        $params['controls'] = wp_map_default_controls();
     }
 
     if (! is_array($params['controls'])) {
         $params['controls'] = explode(',', $params['controls']);
     }
 
-    if (! isset($params['popupstyle'])) {
-        $params['popupstyle'] = 'bubble';
-    }
-
     $popupStyle = smarty_modifier_escape($params['popupstyle']);
 
-    if (! empty($params['tooltips']) && $params['tooltips'] === 'y') {
+    if ($params['tooltips'] === 'y') {
         $tooltips = ' data-tooltips="1"';
     } else {
         $tooltips = '';
     }
 
-    if (isset($params['cluster'])) {
-        $cluster = (int) $params['cluster'];
-    } else {
-        $cluster = 0;
-    }
-    if (isset($params['clusterHover'])) {
+    $cluster = (int) $params['cluster'];
+    if ($params['clusterHover']) {
         $clusterHover = ' data-clusterhover="' . $params['clusterHover'] . '"';
-    } else {
-        $clusterHover = ' data-clusterhover="features"';
     }
-    if (isset($params['clusterFillColor'])) {
+    if ($params['clusterFillColor']) {
         $clusterFillColor = ' data-clusterfillcolor="' . $params['clusterFillColor'] . '"';
     } else {
         $clusterFillColor = '';
     }
-    if (isset($params['clusterTextColor'])) {
+    if ($params['clusterTextColor']) {
         $clusterTextColor = ' data-clustertextcolor="' . $params['clusterTextColor'] . '"';
     } else {
         $clusterTextColor = '';
     }
-    if (isset($params['tilesets'])) {
+    if ($params['tilesets']) {
         $tilesets = ' data-tilesets="' . $params['tilesets'] . '"';
     } else {
         $tilesets = '';
@@ -270,7 +254,7 @@ function wikiplugin_map($data, $params)
 function wp_map_getscope($params)
 {
     $scope = 'center';
-    if (isset($params['scope'])) {
+    if ($params['scope']) {
         $scope = $params['scope'];
     }
 
@@ -378,14 +362,28 @@ OUT;
 
 function wp_map_plugin_colorpicker($body, $args)
 {
-    $headerlib = TikiLib::lib('header');
-    static $counter = 0;
-
     $args->replaceFilter('colors', 'word');
     $colors = array_map('wp_map_color_filter', $args->asArray('colors', ','));
 
-    // Need re-implementing for OpenLayers3+
-    return '';
+    // Filter out empty values
+    $colors = array_filter($colors);
+
+    if (empty($colors)) {
+        // Default color palette if none specified
+        $colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080'];
+    }
+
+    $colorsJson = json_encode(array_values($colors));
+    $title = tra('Color Picker');
+
+    // The colorpicker container stores configuration; JS uses the map container's ID for modal uniqueness
+    return <<<OUT
+<div class="map-colorpicker-container" 
+     data-colorpicker-colors='$colorsJson' 
+     data-colorpicker-title="$title"
+     style="display: none;">
+</div>
+OUT;
 }
 
 function wp_map_color_filter($color)

@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 /*This inputconfiguration array is here to support legacy code and it will never be exhaustive
    it is recommended to add the input when added to te code especially if it is a new $_REQUEST variable
 */
@@ -12,11 +11,11 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
         'taskId'                    => 'int',          //post
-        'move_task_into_trash'      => 'striptags',    //post
+        'move_task_into_trash'      => 'bool',         //post
         'update_tasks'              => 'bool',         //post
-        'remove_task_from_trash'    => 'striptags',    //post
-        'update_percentage'         => 'striptags',    //post
-        'action'                    => 'striptags',    //post
+        'remove_task_from_trash'    => 'bool',         //post
+        'update_percentage'         => 'bool',         //post
+        'action'                    => 'word',         //post
         'reload'                    => 'bool',         //post
         'show_trash'                => 'bool',         //post
         'show_completed'            => 'bool',         //post
@@ -28,17 +27,17 @@ $inputConfiguration = [
         'tasks_maxRecords'          => 'int',          //post
         'admin_mode'                => 'bool',         //get
         'admin_mode_off'            => 'bool',         //get
-        'emty_trash'                => 'striptags',    //get
-        'show_form'                 => 'striptags',    //get
-        'show_history'              => 'striptags',    //get
-        'preview'                   => 'striptags',    //post
-        'tiki_view_mode'            => 'striptags',    //post
+        'emty_trash'                => 'bool',         //get
+        'show_form'                 => 'alpha',        //get
+        'show_history'              => 'alpha',        //get
+        'preview'                   => 'bool',         //post
+        'tiki_view_mode'            => 'alpha',        //post
         'save'                      => 'bool',         //post
         'title'                     => 'striptags',    //post
         'description'               => 'xss',          //post
-        'start_Meridian'            => 'digits',       //post
+        'start_Meridian'            => 'alpha',        //post
         'start_Hour'                => 'digits',       //post
-        'end_Meridian'              => 'digits',       //post
+        'end_Meridian'              => 'alpha',        //post
         'use_start_date'            => 'bool',         //post
         'start_Minute'              => 'digits',       //post
         'start_Month'               => 'digits',       //post
@@ -54,21 +53,21 @@ $inputConfiguration = [
         'task_user'                 => 'striptags',    //post
         'rights_by_creator'         => 'bool',         //post
         'priority'                  => 'int',          //post
-        'status'                    => 'striptags',    //post
-        'percentage'                => 'striptags',    //post
+        'status'                    => 'alpha',        //post
+        'percentage'                => 'alnum',        //post
         'task_accept'               => 'striptags',    //post
-        'task_not_accept'           => 'striptags',    //post
+        'task_not_accept'           => 'bool',         //post
         'remove_from_trash'         => 'bool',         //post
         'move_into_trash'           => 'bool',         //post
         'task_send_changes_message' => 'bool',         //post
         'task_version'              => 'digits',       //post
         'creator'                   => 'striptags',    //post
-        'created'                   => 'striptags',    //post
+        'created'                   => 'digits',       //post
         'task_info_message'         => 'striptags',    //post
         'send_email_newtask'        => 'bool',         //post
         'HTTP_HOST'                 => 'striptags',    //post
         'REQUEST_URI'               => 'striptags',    //post
-        'sort_mode'                 => 'striptags',    //post
+        'sort_mode'                 => 'alnumdash',    //post
         'offset'                    => 'int',          //get
         'find'                      => 'striptags',    //get
         ],
@@ -80,6 +79,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/tasks/tasklib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $messulib = TikiLib::lib('message');
 $accesslib = TikiLib::lib('access');
 
@@ -448,11 +450,7 @@ if ((isset($_REQUEST['save'])) || (isset($_REQUEST['preview']))) {
             $msg_changes .= tra('Rights by creator') . ': ' . $info['rights_by_creator'] . ' --> ' . $save_head['rights_by_creator'] . "\n";
         }
     }
-    if (isset($_REQUEST['public_for_group'])) {
-        $public_for_group = $_REQUEST['public_for_group'];
-    } else {
-        $public_for_group = null;
-    }
+    $public_for_group = $_REQUEST['public_for_group'] ?? null;
     if (isset($_REQUEST['title']) and $info['title'] != $_REQUEST['title']) {
         $save['title'] = $_REQUEST['title'];
         $msg_changes .= tra('Title') . ': ' . $info['title'] . ' --> ' . $save['title'] . "\n";
@@ -729,11 +727,7 @@ if (! isset($_REQUEST['offset'])) {
     $offset = $_REQUEST['offset'];
 }
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = null;
-}
+$find = $_REQUEST['find'] ?? null;
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (! $show_form) {

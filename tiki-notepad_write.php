@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -17,24 +16,31 @@ $inputConfiguration = [
         'save'                 => 'bool',       //post
         'name'                 => 'string',     //post
         'data'                 => 'none',       //post
-        'parse_mode'           => 'string',     //post
+        'parse_mode'           => 'word',       //post
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
 include_once('lib/notepad/notepadlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_notepad');
 $access->check_user($user);
 $access->check_permission('tiki_p_notepad');
+
 if (isset($_REQUEST["remove"])) {
     $access->checkCsrf();
     $notepadlib->remove_note($user, $_REQUEST['remove']);
 }
 include 'lib/setup/editmode.php';
+
 if (isset($_REQUEST["noteId"])) {
-    $note_id = $_REQUEST["noteId"];
-    $smarty->assign('noteId', $note_id);
-    $info = $notepadlib->get_note($user, $note_id);
+    $noteId = $_REQUEST["noteId"];
+    $smarty->assign('noteId', $noteId);
+    $info = $notepadlib->get_note($user, $noteId);
+
     if ($info['parse_mode'] == 'raw') {
         $info['parsed'] = nl2br(htmlspecialchars($info['data']));
         $smarty->assign('wysiwyg', 'n');
@@ -47,10 +53,11 @@ if (isset($_REQUEST["noteId"])) {
     $info['data'] = '';
     $info['parse_mode'] = 'wiki';
 }
+
 if (isset($_REQUEST['save'])) {
     $access->checkCsrf();
     $noteId = $notepadlib->replace_note($user, $noteId ?? null, $_REQUEST["name"], $_REQUEST["data"], $_REQUEST["parse_mode"]);
-    header('location: tiki-notepad_read.php?noteId=' . $noteId);
+    header("location: tiki-notepad_read.php?noteId=$noteId");
     die;
 }
 

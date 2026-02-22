@@ -19,7 +19,7 @@
                     <td>
                         <div class="d-flex">
                             <select class="form-select" id="command_preselect" style="width:140px; border-top-right-radius:0; border-bottom-right-radius:0;">
-                                <option selected value="">Select</option>
+                                <option selected value="">{tr}Select{/tr}</option>
                                 <option value="features [partial-name]">features</option>
                                 <option value="perm [partial-name]">perm</option>
                                 <option value="print $var1 $var2 ...">print</option>

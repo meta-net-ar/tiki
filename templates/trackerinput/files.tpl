@@ -125,15 +125,77 @@
             </fieldset>
         {/if}
     {else}
-        {if empty($field.canUpload)}
-            {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
-            {/remarksbox}
-        {else}
-            {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
-            {/remarksbox}
+        {if !isset($show_modal_preview)}
+            {if empty($field.canUpload)}
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
+                {/remarksbox}
+            {else}
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
+                {/remarksbox}
+            {/if}
         {/if}
     {/if}
 </div>
+
+{* Modal preview for recordings *}
+{if isset($show_modal_preview)}
+    <div id="record-preview" class="record-preview">
+        <div class="bg-white rounded-4 p-4 shadow-lg preview-card{if !$isAudio} video-mode{/if}">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="{if $isAudio}audio-icon{else}video-icon{/if} d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                    {if $isAudio}
+                        {icon name='music'}
+                    {else}
+                        {icon name='video'}
+                    {/if}
+                </div>
+                <div class="flex-grow-1">
+                    <h4 class="mb-1 fs-5 fw-semibold text-dark">{if $isAudio}{tr}Audio Recording{/tr}{else}{tr}Video Recording{/tr}{/if}</h4>
+                    <p class="mb-0 text-muted small">{tr}Review your recording before uploading{/tr}</p>
+                </div>
+            </div>
+            
+            {if $isAudio}
+                <audio 
+                    src="{$media_url|escape}" 
+                    class="w-100 rounded-2 my-4"
+                    controls
+                    autoplay
+                    controlsList="nodownload"
+                    playsinline
+                ></audio>
+            {else}
+                <video 
+                    src="{$media_url|escape}"
+                    class="w-100 rounded-2 bg-dark my-4" 
+                    controls 
+                    autoplay
+                    playsinline
+                    crossorigin="anonymous"
+                ></video>
+            {/if}
+            
+            <div class="d-flex gap-3 mt-4">
+                <button 
+                    id="btn-upload-now" 
+                    class="btn btn-primary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
+                    style="min-height: 48px;"
+                >
+                    {icon name='upload'}
+                    <span>{tr}Upload{/tr}</span>
+                </button>
+                <button 
+                    id="close-preview" 
+                    class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
+                    style="min-height: 48px;"
+                >
+                    {icon name='remove'}
+                    <span>{tr}Cancel{/tr}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
 
 {if !empty($field.canUpload)}
     {jq}

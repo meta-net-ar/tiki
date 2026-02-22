@@ -168,6 +168,12 @@ function prefs_site_list()
                 'wikiplugin_googleanalytics',
             ],
         ],
+        'site_google_analytics_site_ownership' => [
+            'name' => tr('Google Analytics site ownership'),
+            'description' => tra('Verification process of proving that you own the site or app that you claim to own'),
+            'type' => 'text',
+            'default' => '',
+        ],
         'site_google_analytics_gtag' => [
             'name' => tr('Google Global Site Tag Mode'),
             'description' => tra('Use the newer Google Global Site Tag (gtag.js) as opposed to the previous ga.js.'),

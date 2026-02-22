@@ -60,6 +60,11 @@
                     {preference name=mailer_spark_post_key}
                     {preference name=mailer_spark_post_region}
                 </div>
+                <div class="adminoptionboxchild mailer_handler_childcontainer phpini">
+                    {remarksbox type="warning" title="{tr}PHP mail() limitations{/tr}"}
+                        {tr _0='<a href="https://symfony.com/doc/current/mailer.html#using-built-in-transports" target="_blank" rel="noopener">' _1='</a>'}This uses PHP’s mail() settings from php.ini (sendmail_path or SMTP). Because it relies on the host configuration, delivery errors may be hidden and Bcc headers might be exposed. Prefer the Sendmail or SMTP options when possible. See %0Symfony’s mailer documentation%1 for details.{/tr}
+                    {/remarksbox}
+                </div>
                 <div class="adminoptionboxchild mailer_handler_childcontainer smtp">
                     {preference name=mailer_smtp_server}
                     {preference name=mailer_smtp_auth}
@@ -130,6 +135,14 @@
                         {preference name=error_tracking_enabled_js}
                     </div>
                 </div>
+                <div class="adminoptionbox">
+                    <legend class="h4">{tr}Performance Tracing{/tr}</legend>
+                    {preference name=error_tracking_traces_sample_rate}
+                    <div class="adminoptionboxchild">
+                        {preference name=error_tracking_tracing_enabled_php}
+                        {preference name=error_tracking_tracing_enabled_js}
+                    </div>
+                </div>
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Web Cron{/tr}</legend>
@@ -162,6 +175,14 @@
                 {preference name=scheduler_keep_logs}
                 {preference name=scheduler_last_run_warning_minutes}
             </fieldset>
+            <fieldset id="SchedulerLogs">
+                <legend>{tr}Scheduler Logs{/tr}</legend>
+                {preference name=scheduledTasksReport}
+                <div class="adminoptionbox scheduledTasksReport_childcontainer last_number_of_hours">
+                    {preference name=scheduledTasksReportHours}
+                </div>
+                {preference name=scheduledTasksReportMaxDays}
+            </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Headless Browser Integration{/tr}</legend>
                 {preference name=headlessbrowser_integration_type}
@@ -172,6 +193,9 @@
             <fieldset id="QueuedTasks">
                 <legend>{tr}Queued Tasks{/tr}</legend>
                 {preference name=feature_queued_tasks}
+                <div class="adminoptionboxchild" id="feature_queued_tasks_childcontainer">
+                    {preference name=queued_tasks_js_processing_disabled}
+                </div>
             </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>
@@ -361,6 +385,7 @@
                 {preference name=use_load_threshold}
                 <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                     {preference name=load_threshold}
+                    {preference name=load_retry_after}
                     {preference name=site_busy_title}
                     {preference name=site_busy_msg}
                 </div>

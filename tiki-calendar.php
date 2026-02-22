@@ -11,7 +11,6 @@
 
 use Tiki\Lib\TikiDate;
 
-$section = 'calendar';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -33,7 +32,9 @@ $inputConfiguration = [
     ]
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_CALENDAR;
+Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');
@@ -89,6 +90,8 @@ if (empty($rawcals['data'])) {
 
 $minHourOfDay = 12;
 $maxHourOfDay = 12;
+$startOfDayMinute = 0;
+$endOfDayMinute = 0;
 $calendars = [];
 $canEditAnything = false;
 
@@ -99,13 +102,12 @@ foreach ($rawcals['data'] as $calendar) {
 
     // for week and day views
     $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayHour = $startOfDayUnix / 3600;
-    $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-    $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+    $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
+    $minHourOfDay = intdiv($startOfDayUnix, 3600);
+
     $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayHour = $endOfDayUnix / 3600;
-    $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-    $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+    $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
+    $maxHourOfDay = intdiv($endOfDayUnix, 3600);
 
     $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
 }
@@ -171,6 +173,9 @@ if (! empty($_REQUEST["calitemId"])) {
 } else {
     $calitemId = '';
 }
+global $base_uri;
+$current_url = $base_uri;
+$smarty->assign('returnURL', $current_url);
 $smarty->assign('currentcalitemId', $calitemId);
 
 $smarty->assign('displayedcals', $_SESSION['CalendarViewGroups']);
@@ -185,12 +190,7 @@ if (is_array($_SESSION['CalendarViewGroups'])) {
     }
 }
 $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 if (! empty($_REQUEST['mon'])) {
@@ -237,7 +237,7 @@ if (! empty($_REQUEST['generate_availability'])) {
                 continue;
             }
             $ranges[$day] = [
-                [(int)$minHourOfDay, 0], [(int)$maxHourOfDay, 0]
+                [$minHourOfDay, $startOfDayMinute], [$maxHourOfDay, $endOfDayMinute]
             ];
         }
         $busy_list = [];

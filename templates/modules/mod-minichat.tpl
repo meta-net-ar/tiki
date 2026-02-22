@@ -1,18 +1,37 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="minichat" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
     {if $tiki_p_chat eq 'y'}
-    <div id='minichatchans' class='btn-group minichatchans mb-2'{if $module_params.nochannelbar && $module_params.nochannelbar != "n"} style="height: 0; visibility: hidden"{/if}></div>
-
-    <div id='minichat' class='minichat well well-sm' style='overflow-x: hidden; overflow-y: auto; height: {$module_rows}em;'></div>
-
-    <div class="minichatinputs">
-        <form name='minichatinputform' action='javascript:minichatpost();'>
-            <div class="input-group input-group-sm">
-                <input class="form-control" name='minichatinput' id='minichatinput' type='text' autocomplete='off'>
-                <input class="btn btn-primary" type='submit' value="{tr}OK{/tr}">
-            </div>
-        </form>
+    <div
+    id="minichatchans"
+    class="btn-group minichatchans mb-2"
+    {if $module_params.nochannelbar && $module_params.nochannelbar != "n"}
+    style="height:0;visibility:hidden"
+    {/if}>
     </div>
-    {else}
+
+    <div
+    id="minichat"
+    class="mb-2 overflow-auto"
+    style="height: {$module_rows}em;">
+    </div>
+
+    <div class="border-top pt-2 bg-body">
+    <form name="minichatinputform" onsubmit="minichatpost(); return false;">
+    <div class="input-group input-group-sm">
+        <input
+            id="minichatinput"
+            name="minichatinput"
+            type="text"
+            class="form-control rounded-pill"
+            autocomplete="off"
+            placeholder="{tr}Type a message...{/tr}">
+        <button type="submit" class="btn btn-primary rounded-pill">
+            {tr}Send{/tr}
+        </button>
+    </div>
+    </form>
+    </div>
+
+{else}
     {tr}You do not have the permission that is needed to use this feature.{/tr}
     {/if}
 {/tikimodule}
@@ -57,29 +76,37 @@
         function minichat_loadJS(file) {
             var head = document.getElementsByTagName('head').item(0);
             var scriptTag = document.getElementById('minichat_loadJS');
+            const chat = document.getElementById('minichat');
             if (scriptTag) head.removeChild(scriptTag);
             script = document.createElement('script');
             script.src = file;
             script.type = 'text/javascript';
             script.id = 'minichat_loadJS';
             head.appendChild(script);
+           
+            chat.scrollTop = chat.scrollHeight;
         }
 
         function minichat_update() {
             var u=minichat_mkurl();
             minichat_loadJS(u);
+            setTimeout(function() {
+            var chatDiv = document.getElementById('minichat');
+                if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+            }, 500);
         }
 
         function minichatpost() {
-            var obj=document.getElementById('minichatinput');
-            var value=minichat_urlencode(obj.value);
+            var obj = document.getElementById('minichatinput');
+            var value = minichat_urlencode(obj.value);
 
-            var u=minichat_mkurl();
-            if (minichat_selectedchan) u+="&msgon="+minichat_urlencode(minichat_selectedchan.name);
-            u+="&msg="+value;
-
+            var u = minichat_mkurl();
+            if (minichat_selectedchan) u += "&msgon=" + minichat_urlencode(minichat_selectedchan.name);
+            u += "&msg_chat=" + value;
+           
             minichat_loadJS(u);
-            obj.value='';
+            obj.value = '';
+
         }
 
         function minichat_newelem(type, vals) {
@@ -127,7 +154,7 @@
             minichat_lastchan=c;
             if (!minichat_firstchan) minichat_firstchan=c;
 
-            var d=minichat_newelem("div", { 'id' : 'minichatdiv_'+c.id , 'class' : 'minichatdiv' });
+            var d=minichat_newelem("div", { 'id' : 'minichatdiv_'+c.id , 'class' : 'minichatdiv overflow-auto' });
             document.getElementById('minichat').appendChild(d);
 
             d=minichat_newelem("a", { 'id' : 'minichata_'+c.id, 'class' : 'btn btn-primary btn-sm minichata_unselected', 'role' : 'button' , 'href' : "javascript: minichat_selectchannel('"+c.name+"');" });

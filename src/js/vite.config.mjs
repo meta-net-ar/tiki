@@ -125,6 +125,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-3d-model-viewer": resolve(__dirname, "tiki-model3dviewer/model3dviewer.js"),
         "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(__dirname, "tiki-sentry-browser/sentry-browser.js"),
         "tiki-figlet": resolve(__dirname, "tiki-figlet/figlet.js"),
@@ -135,6 +136,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
+        "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
@@ -151,6 +153,8 @@ export default defineConfig(({ command, mode }) => {
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
             emptyOutDir: true,
+            // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
+            chunkSizeWarningLimit: 2500,
             minify: mode === "production",
             sourcemap: mode === "production",
             cssCodeSplit: true,
@@ -221,33 +225,6 @@ export default defineConfig(({ command, mode }) => {
             postcss: {
                 plugins: [postcssRootToHost()],
             },
-            /**
-             * This workaround suppresses warnings from Sass about mixed declarations
-             * after nested rules. The issue originates from Bootstrap (twbs) and is
-             * tracked here: https://github.com/twbs/bootstrap/issues/40621.
-             *
-             * The fix involves configuring the `scss` preprocessor to silence the specific
-             * deprecation warnings (`mixed-decls`). This is implemented using the `silenceDeprecations`
-             * option with the value `['mixed-decls']`.
-             *
-             * IMPORTANT: This workaround can be removed once Bootstrap is updated to
-             * version 5.3.4 (or later), which includes the resolution to this issue
-             * (see: https://github.com/twbs/bootstrap/pull/40623).
-             *
-             * Original suppressed warning:
-             * DEPRECATION WARNING: Sass's behavior for declarations that appear after nested rules
-             * will change in future versions.
-             *
-             * Future developers should verify whether the workaround is still required
-             * by consulting the linked issue and confirming that the fix is included in the
-             * version of Bootstrap used by the project.
-             */
-            preprocessorOptions: {
-                scss: {
-                    api: "modern-compiler", // or "modern", "legacy"
-                    silenceDeprecations: ["mixed-decls"],
-                },
-            },
         },
         plugins: [
             vue({
@@ -293,7 +270,8 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/boomerangjs/boomerang.js",
                         dest: "vendor_dist/boomerangjs/",
-                    },{
+                    },
+                    {
                         src: "node_modules/boomerangjs/plugins/rt.js",
                         dest: "vendor_dist/boomerangjs/plugins",
                     },
@@ -517,10 +495,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-validation/dist",
                     },
                     {
-                        src: "node_modules/minicart/dist/*.js",
-                        dest: "vendor_dist/minicart/dist",
-                    },
-                    {
                         src: "node_modules/moment/dist/*",
                         dest: "vendor_dist/moment/dist",
                     },
@@ -651,9 +625,11 @@ export default defineConfig(({ command, mode }) => {
                 ],
             }),
             AutoImport({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             Components({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */

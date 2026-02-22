@@ -52,7 +52,7 @@ function wikiplugin_activitystream($data, $params)
 
     $servicelib = TikiLib::lib('service');
     return $servicelib->render('activitystream', 'render', [
-        'autoscroll' => isset($params['auto']) && $params['auto'],
+        'autoscroll' => $params['auto'] == 1,
         'stream' => $encoded,
     ]);
 }

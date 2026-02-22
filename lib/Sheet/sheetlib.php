@@ -447,9 +447,7 @@ class SheetLib extends TikiLib
                 ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/globalize.js')
                 ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/globalize.cultures.js')
 
-                ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/jquery.nearest.min.js', true)
-                ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/raphael-min.js', true)
-                ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/g.raphael-min.js', true);
+                ->add_jsfile('vendor_bundled/vendor/jquery/jquery-sheet/plugins/jquery.nearest.min.js', true);
 
             $this->setup_jQuery_sheet_files = true;
         }

@@ -24,7 +24,6 @@ function wikiplugin_rss_info()
                 'filter' => 'int',
                 'description' => tr('List of feed IDs separated by colons (e.g., %0). You can find the IDs in the RSS Administration page:  %1', '<code>feedId:feedId2</code>', '<code>tiki-admin_rssmodules.php</code>.'),
                 'since' => '1',
-                'default' => '',
                 'profile_reference' => 'rss',
             ],
             'url' => [
@@ -183,18 +182,18 @@ function wikiplugin_rss($data, $params)
         $params
     );
 
-    if (empty($params['id']) && empty($params['url'])) {
+    if (is_null($params['id']) && empty($params['url'])) {
         return WikiParser_PluginOutput::argumentError([ 'id or url' ]);
     }
 
-    if (! empty($params['id']) && ! empty($params['url'])) {
+    if (! is_null($params['id']) && ! empty($params['url'])) {
         return WikiParser_PluginOutput::argumentError(['id or url, not both']);
     }
 
     $items = [];
     $title = null;
 
-    if (! empty($params['id'])) {
+    if (! is_null($params['id'])) {
         $params['id'] = (array) $params['id'];
         $items = $rsslib->get_feed_items($params['id'], $params['max'], $params['sortBy'], $params['sortOrder']);
         if (count($params['id']) == 1) {

@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'poll';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -26,18 +25,21 @@ $inputConfiguration = [
         'deletevote'               => 'bool',              //get
         'optionId'                 => 'digits',            //get
         'pollId'                   => 'digits',            //get
-        'user'                     => 'usename',           //get
+        'user'                     => 'username',          //get
         'ip'                       => 'text',              //post
         'scoresort_asc'            => 'text',              //get
         'scoresort_desc'           => 'text',              //get
         'list'                     => 'text',              //get
         'scoresort'                => 'text',              //get
-        'sort_mode'                => 'text',              //get
-        'offset'                   => 'digit',             //get
+        'sort_mode'                => 'alnumdash',        //get - used in SQL ORDER BY
+        'offset'                   => 'digits',           //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_POLL;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_polls');
 $access->check_permission('tiki_p_view_poll_results');
 $polllib = TikiLib::lib('poll');
@@ -128,11 +130,7 @@ foreach ($pollIds as $pK => $pId) { // iterate each poll
  */
 function scoresort($a, $b)
 {
-    if (isset($_REQUEST['scoresort_asc'])) {
-        $i = $_REQUEST['scoresort_asc'];
-    } else {
-        $i = $_REQUEST['scoresort_desc'];
-    }
+    $i = $_REQUEST['scoresort_asc'] ?? $_REQUEST['scoresort_desc'];
     // must first sort based on missing, otherwise missing index will occur when trying to read more info.
     if (count($a['options']) <= $i && count($b['options']) <= $i) {
         return 0;

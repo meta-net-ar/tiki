@@ -19,9 +19,10 @@ $inputConfiguration = [
         'checked'                  => 'bool',              //post
         'prefix'                   => 'word',              //post
         'postfix'                  => 'word',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //get
-        'find'                     => 'alpha',             //post
+        'find'                     => 'text',              //get
+        'sort_modes'               => 'alnumdash',         //get
         ],
     ],
 ];
@@ -104,17 +105,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $tikilib->list_received_pages($offset, $maxRecords, $sort_mode, $find, 'p');

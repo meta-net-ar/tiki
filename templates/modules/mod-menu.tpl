@@ -1,6 +1,6 @@
 {tikimodule error=$module_error title=$tpl_module_title name=$tpl_module_name flip=$module_params.flip|default:null decorations=$module_params.decorations|default:null nobox=$module_params.nobox|default:null notitle=$module_params.notitle|default:null type=$module_type}
     {if $module_params.bootstrap|default:null neq 'n'}
-        <nav class="navbar navbar-expand-lg{if $module_params.type == 'horiz'} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-nav-{$navbar_color_variant}{/if} {if $prefs.jquery_smartmenus_enable eq 'y' and $module_params.type|default:null eq 'vert'}sm-navbar--vertical {/if}{if !empty($module_params.navbar_class)} {$module_params.navbar_class}{/if}" role="navigation"> {* Only horizontal navbars get Bootstrap navbar color and background.  *}
+        <nav class="navbar{if empty($module_params.type) or $module_params.type eq 'vert'} navbar-expand{else} navbar-expand-lg{/if}{if $module_params.type == 'horiz'} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-nav-{$navbar_color_variant}{/if}{if $prefs.jquery_smartmenus_enable eq 'y' and $module_params.type|default:null eq 'vert'} sm-navbar--vertical{/if}{if !empty($module_params.navbar_class)} {$module_params.navbar_class}{/if}" role="navigation"> {* Only horizontal navbars get Bootstrap navbar color and background.  *}
             {if $module_params.navbar_brand neq ''}
                 <a class="navbar-brand" href="index.php">
                     <img id="logo-header" src="{$module_params.navbar_brand}" alt="Logo">

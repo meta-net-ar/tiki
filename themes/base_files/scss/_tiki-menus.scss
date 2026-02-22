@@ -3,13 +3,21 @@
     display: block;
     /* flex-grow: 1; */
 }
+
 // Vertical menus shouldn't have the navbar backgrounds
 .col2,
 .col3 {
+
     .navbar-light.bg-light,
     .navbar-dark.bg-dark {
         background: none !important;
     }
+}
+
+// Align the various width icons and the menu option text labels nicely
+.navbar-nav .nav-item > .nav-link .icon {
+    min-width: var(--bs-gutter-x);
+    text-align: center;
 }
 
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
@@ -43,10 +51,13 @@
 }
 
 // Override inline negative margin-left from Smartmenus JavaScript
-.tiki /*.mega-menu-static .navbar-nav:not(.sm-vertical) */ .navbar-nav .dropdown-menu.mega-menu {
-//    margin-left: 0 !important;
+.tiki
+
+/*.mega-menu-static .navbar-nav:not(.sm-vertical) */
+.navbar-nav .dropdown-menu.mega-menu {
+    //    margin-left: 0 !important;
     position: absolute;
-//    width: 98vw !important;
+    //    width: 98vw !important;
     left: 0 !important;
     margin-left: 0 !important;
 }
@@ -101,8 +112,9 @@
 }
 
 .mega-menu a:hover,
-.mega-menu--item-container .mega-menu--item-level-1 > li > a:hover { // uncommented and scope increased by Gary
-  text-decoration: none;
+.mega-menu--item-container .mega-menu--item-level-1 > li > a:hover {
+    // uncommented and scope increased by Gary
+    text-decoration: none;
 }
 
 .mega-menu ul {
@@ -146,4 +158,51 @@
     font-variant: normal;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
+}
+
+/* --- Force all dropdowns to open upwards ---*/
+.dropdown-menu-bottom {
+    top: auto !important;
+    bottom: 100% !important;
+    margin-bottom: .5rem;
+    margin-top: 0 !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dropdown-menu-top-t,
+.dropdown-menu-end-l,
+.dropdown-menu-start-r {
+    top: 100%;
+    bottom: auto;
+    max-height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 2000 !important;
+}
+
+.dropdown-menu-bottom-b {
+    max-height: 65vh;
+    z-index: 3000;
+}
+
+/* Menu separator styling */
+.menu-separator {
+    height: 0;
+    margin: var(--bs-dropdown-divider-margin-y) 0;
+    overflow: hidden;
+    border-top: 1px solid var(--bs-dropdown-divider-bg);
+    opacity: 1;
+}
+
+.form-control .menu-separator {
+    margin: 0;
+}
+
+.sm-sub-toggler[data-bs-toggle="collapse"]::after {
+    display: none;
+}
+
+.sm-sub.collapse.show {
+    display: block;
 }

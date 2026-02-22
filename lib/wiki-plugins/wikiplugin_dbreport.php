@@ -61,7 +61,6 @@ function wikiplugin_dbreport_parse_error(&$token, $msg)
 
 function wikiplugin_dbreport_next_token(&$code, $len, $pos)
 {
-    global $wikiplugin_dbreport_errors, $wikiplugin_dbreport_fields_allowed;
     $whitespace = " \n\r\t\v\f";
     $tokenstop = " :<>[$\"\n\r\t\v\f";
     // create a token object to return
@@ -422,7 +421,7 @@ function wikiplugin_dbreport_next_token(&$code, $len, $pos)
 
 function wikiplugin_dbreport_parse(&$code)
 {
-    global $debug, $wikiplugin_dbreport_fields_allowed;
+    global $wikiplugin_dbreport_fields_allowed;
     // code properties
     $len = strlen($code);
     $pos = 0;
@@ -584,7 +583,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_object->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -722,7 +721,7 @@ function wikiplugin_dbreport_parse(&$code)
                                     break;
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_line->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -766,7 +765,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_cell->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -833,7 +832,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_text->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -872,7 +871,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_object->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -960,7 +959,6 @@ function wikiplugin_dbreport_info()
                 'description' => tr('A full DSN (Data Source Name) connection string. Example: ')
                     . '<code>mysql://user:pass@server/database</code>',
                 'since' => '3.0',
-                'default' => '',
                 'filter' => 'url',
             ],
             'db' => [
@@ -968,7 +966,6 @@ function wikiplugin_dbreport_info()
                 'name' => tra('Wiki DSN Name'),
                 'description' => tra('The name of a DSN connection defined by the Wiki administrator.'),
                 'since' => '3.0',
-                'default' => '',
                 'filter' => 'text',
             ],
             'wiki' => [
@@ -1010,7 +1007,6 @@ function wikiplugin_dbreport_info()
                 'description' => tr('If set, a CSV file will be created or appended with information about the SQL call performed.'),
                 'since' => '21.2',
                 'filter' => 'text',
-                'default' => '',
             ],
         ],
     ];
@@ -1020,8 +1016,7 @@ function wikiplugin_dbreport_info()
 function wikiplugin_dbreport($data, $params)
 {
     // TikiWiki globals
-    global $tikilib, $user, $group, $page, $prefs;
-    global $wikiplugin_dbreport_errors, $wikiplugin_dbreport_fields;
+    global $tikilib, $user, $group, $prefs;
     // wikiplugin_dbreport globals
     global $wikiplugin_dbreport_errors;
     global $wikiplugin_dbreport_fields;
@@ -1035,8 +1030,8 @@ function wikiplugin_dbreport($data, $params)
     // extract parameters
     extract($params, EXTR_SKIP);
     // we need a dsn or db parameter
-    if (! isset($dsn) && ! isset($db)) {
-        return tra('Missing db or dsn parameter');
+    if (is_null($dsn) && is_null($db)) {
+        return WikiParser_PluginOutput::argumentError(['dsn', 'db']);
     }
     // parse the report definition
     $parse_fix = (! empty($_REQUEST['preview'])) && ($prefs['tiki_release'] == '2.2');
@@ -1063,14 +1058,14 @@ function wikiplugin_dbreport($data, $params)
         }
     }
     // translate db name into dsn
-    if (isset($db)) {
+    if (! is_null($db)) {
         $perms = Perms::get([ 'type' => 'dsn', 'object' => $db ]);
         if (! $perms->dsn_query) {
             return tra('You do not have the permission that is needed to use this feature');
         }
     }
     // Open the database
-    if (isset($dsn)) {
+    if (! is_null($dsn)) {
         $db = $tikilib->get_db_by_name($db);
         $query = $db->query($report->sql, $bindvars);
         // Convert result set to FETCH_BOTH manually
@@ -1240,7 +1235,7 @@ function wikiplugin_dbreport($data, $params)
         TikiLib::lib('logs')->add_log('wikiplugin_dbreport', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true));
     }
 
-    if (! empty($params['audit_csv'])) {
+    if (! is_null($params['audit_csv'])) {
         $headers = ['date', 'user', 'page', 'vars'];
         $contentRow[] = [
             $tikilib->date_format($prefs['short_date_format'] . ' ' . $prefs['long_time_format'], $tikilib->now),

@@ -1,0 +1,8 @@
+{
+    "name": "tiki-lottie",
+    "version": "1.0.0",
+    "main": "lottie.js",
+    "dependencies": {
+        "@lottiefiles/dotlottie-wc": "^0.8.0"
+    }
+}

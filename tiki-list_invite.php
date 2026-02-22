@@ -17,7 +17,6 @@ $inputConfiguration = [
         'only_success'             => 'word',               //post
         'sort_mode'                => 'word',               //get
         'offset'                   => 'int',                //get
-        'find'                     => 'word',               //post
         ],
     ],
 ];

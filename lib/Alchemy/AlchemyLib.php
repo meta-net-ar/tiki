@@ -18,6 +18,10 @@ use TikiLib;
 
 /**
  * Wrapper of the library Media Alchemy, for media processing
+ *
+ * This ultimately depends on media-alchemyst/media-alchemyst,
+ * which is only optionally installed from a tiki Package,
+ * not by composer
  */
 class AlchemyLib
 {
@@ -44,7 +48,7 @@ class AlchemyLib
             \Feedback::error(tr('To use AlchemyLib Tiki needs the tikiwiki/media-alchemyst package. If you do not have permission to install this package, ask the site administrator.'), true);
         }
 
-        $drivers = new DriversContainer();
+        $drivers = new DriversContainer(); // @phpstan-ignore class.notFound (MediaAlchemist is an optional install)
         $drivers['configuration'] = [
             'ffmpeg.threads' => 4,
             'ffmpeg.ffmpeg.timeout' => 3600,
@@ -59,7 +63,7 @@ class AlchemyLib
             'gs.timeout' => 60,
         ];
 
-        $this->alchemyst = new Alchemyst($drivers, FsManager::create());
+        $this->alchemyst = new Alchemyst($drivers, FsManager::create()); // @phpstan-ignore-line
 
         $this->mediavorus = $drivers['mediavorus'];
     }
@@ -122,11 +126,11 @@ class AlchemyLib
 
             $guessedType = $guess->getType();
 
-            if ($guessedType == MediaInterface::TYPE_VIDEO && $animated) {
-                $targetType = new Animation();
+            if ($guessedType == MediaInterface::TYPE_VIDEO && $animated) {// @phpstan-ignore class.notFound (MediaAlchemist is an optional install)
+                $targetType = new Animation();// @phpstan-ignore class.notFound (MediaAlchemist is an optional install)
                 $targetImageType = self::TYPE_IMAGE_ANIMATION;
             } else {
-                $targetType = new Image();
+                $targetType = new Image();// @phpstan-ignore class.notFound (MediaAlchemist is an optional install)
                 $targetImageType = self::TYPE_IMAGE;
             }
 
@@ -134,7 +138,7 @@ class AlchemyLib
                 $targetType->setDimensions($width, $height);
             }
 
-            if ($targetType instanceof Image && $page != 1) {
+            if ($targetType instanceof Image && $page != 1) {// @phpstan-ignore class.notFound (MediaAlchemist is an optional install)
                 $targetType->fromPage($page);
             }
 

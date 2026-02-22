@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, computed } from 'vue';
 import moment, { tz } from 'moment-timezone';
 import ConfigWrapper from '../ConfigWrapper.vue';
 import getShortcuts from '../../helpers/datePicker/getShortcuts';
@@ -39,10 +39,35 @@ const props = defineProps({
         default: '-'
     },
     format: String,
+    minuteStep: {
+        type: Number,
+        default: 1
+    },
+    enforceStep: {
+        type: Number,
+        default: 0
+    }
 });
 
 const customTimezone = props.customTimezone === 'true';
 const rangeMode = props.type.slice(-5) === 'range';
+
+const disabledMinutes = computed(() => {
+    const step = Number(props.minuteStep) || 1;
+    const enforce = Number(props.enforceStep) || 0;
+    
+    if (!enforce || step <= 1) {
+        return () => [];
+    }
+    
+    return () => {
+        const disabled = [];
+        for (let i = 0; i < 60; i++) {
+            if (i % step !== 0) disabled.push(i);
+        }
+        return disabled;
+    };
+});
 
 const dateModelValue = ref(props.value ? (rangeMode ? props.value.split(','): props.value): '');
 const timezoneModelValue = ref(props.timezone ?? '');
@@ -100,6 +125,7 @@ export const DATA_TEST_ID = {
             :end-placeholder="endPlaceholder"
             :shortcuts="shortcuts"
             :format="format"
+            :disabled-minutes="type.includes('time') ? disabledMinutes : undefined"
             @change="handleDateChange"
             :data-testid="DATA_TEST_ID.DATE_PICKER"
         >

@@ -23,15 +23,19 @@ $light: #fff; // $gray-100 !default
 $dark: #474747; // $gray-900 !default
 
 $theme-colors: (
-        "primary": $primary,
-        "secondary": $secondary,
-        "success": $success,
-        "info": $info,
-        "warning": $warning,
-        "danger": $danger,
-        "light": $light,
-        "dark": $dark
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
 );
+
+:root {
+    --tiki-darkroom-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
+}
 
 // Options
 $enable-dark-mode:            false;
@@ -58,7 +62,7 @@ $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 $component-active-color: #ffffff;
 $component-active-bg: #030511;
 
-
+// Typography
 $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #DEDEDE; // #b9b9b9;
 $abbr-border-color: $gray-200;
 $headings-small-color: $gray-200;
@@ -67,8 +71,6 @@ $blockquote-border-color: $gray-400;
 $page-header-border-color: $gray-500;
 $hr-border: $gray-500;
 
-
-// Typography
 $font-family-sans-serif:  system-ui, sans-serif; // "Trebuchet MS", "Bitstream Vera Sans", sans-serif; - From https://modernfontstacks.com/
 $font-family-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif; // Georgia, "Times New Roman", Times, serif;
 $font-family-monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; // Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -118,6 +120,8 @@ $input-group-addon-border-color: $input-border-color;
 
 $form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
 $form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"); //  !default;
+
 $form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Form validation
@@ -129,7 +133,6 @@ $nav-link-color: #BDBDBD;
 $nav-pills-active-link-hover-bg: $component-active-bg;
 $nav-pills-active-link-hover-color: $component-active-color;
 
-// Tabs
 $nav-tabs-border-color: #dddddd;
 $nav-tabs-link-hover-border-color: $gray-700;
 
@@ -148,6 +151,8 @@ $navbar-dark-color:                 $navbar-light-color;
 $navbar-dark-hover-color:           $navbar-light-hover-color;
 $navbar-dark-active-color:          $navbar-light-active-color;
 $navbar-dark-disabled-color:        $navbar-light-disabled-color;
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-bg: #242424;

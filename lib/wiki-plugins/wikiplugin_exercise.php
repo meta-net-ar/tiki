@@ -38,7 +38,6 @@ function wikiplugin_exercise_info()
 function wikiplugin_exercise($data, $params)
 {
     static $nextId = 1;
-    $smarty = TikiLib::lib('smarty');
 
     $params = new JitFilter($params);
     $answer = $params->answer->text();

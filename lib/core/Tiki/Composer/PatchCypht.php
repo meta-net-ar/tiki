@@ -67,7 +67,7 @@ class PatchCypht
         $contents = file_get_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript);
         $contents = preg_replace('/define.*?VENDOR_PATH.*?;/', "define('VENDOR_PATH', '$vendors');", $contents);
         file_put_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript, $contents);
-        $output = `cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}`;
+        $output = shell_exec("cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}");
 
         if (! is_string($output)  || ! str_contains($output, 'dynamic.php file written')) {
             $io->write('Could not build Cypht package configuration. Check the output below and make sure minimum PHP version is available and executable as CLI.');

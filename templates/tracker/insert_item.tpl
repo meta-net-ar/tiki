@@ -43,7 +43,7 @@
                 <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input
                     type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-primary item-submit-btn"
                     onclick="needToConfirm=false;"
                     value="{tr}Create{/tr}"
                 >

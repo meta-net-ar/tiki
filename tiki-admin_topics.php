@@ -11,17 +11,19 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'addtopic'              => 'bool',      //post
+            'addtopic'              => 'alpha',      //post
             'name'                  => 'string',    //post
-            'remove'                => 'int',       //get
+            'remove'                => 'int',       //post
             'removeall'             => 'int',       //post
             'activate'              => 'int',       //post
             'deactivate'            => 'int',       //post
         ],
     ],
 ];
-$section = 'cms';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 $access->check_feature('feature_articles');
 // PERMISSIONS: NEEDS p_admin or tiki_p_articles_admin_topics

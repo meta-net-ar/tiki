@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 class Services_ContentTemplate_Controller
 {
     public function setUp()
@@ -21,7 +24,7 @@ class Services_ContentTemplate_Controller
      */
     public function getSection()
     {
-        return 'wiki page';
+        return Sections::SECTION_WIKI_PAGE;
     }
 
     public function action_list($input)
@@ -33,7 +36,8 @@ class Services_ContentTemplate_Controller
         // Load the templates library
         $templateslib = TikiLib::lib('template');
 
-        $section = 'wiki';
+        $section = Sections::SECTION_WIKI;
+        Sections::setCurrentSection($section);
         $offset = 0;
         $maxRecords = -1;
         $sort_mode = 'name_asc';

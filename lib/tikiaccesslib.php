@@ -1041,26 +1041,11 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
             $smarty->display('error-ajax.tpl');
         } else {
-            if (
-                ($errortype == 401 || $errortype == 403) &&
-                        empty($user) &&
-                        ($prefs['permission_denied_login_box'] == 'y' || ! empty($prefs['permission_denied_url']))
-            ) {
-                if (empty($_SESSION['loginfrom'])) {
-                    $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
-                }
-                if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-                    $this->redirect($prefs['login_autologin_redirectlogin_url']);
-                }
-            }
-
             $smarty->assign('errortitle', $detail['errortitle']);
-            $smarty->assign('msg', $detail['message']);
-            $smarty->assign('errortype', $detail['code']);
             if (isset($detail['page'])) {
                 $smarty->assign('page', $page);
             }
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie($detail['message'], $errortype);
         }
         die;
     }
@@ -1580,6 +1565,7 @@ class TikiAccessLib extends TikiLib
                 $title = $prefs['site_busy_title'];
                 $error = $prefs['site_busy_msg'];
                 $prefs['site_closed'] = 'y';    // tell the rest of tiki we're closed
+                header('Retry-After: ' . $prefs['load_retry_after']);
 
                 break;
             case 'maintenance':

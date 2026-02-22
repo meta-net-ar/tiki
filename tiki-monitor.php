@@ -79,26 +79,29 @@ echo json_encode($result);
 
 /**
  * Check monitor is restricted by IP
+ * Security: Uses get_ip_address() which properly validates reverse proxy headers
  *
  * @return null
  */
 function isMonitorRestrited()
 {
     global $prefs;
+    $tikilib = TikiLib::lib('tiki');
 
     $tikiMonitorRestriction = ! empty($prefs['monitor_restricted_ips']) ? explode(',', preg_replace('/\s+/', '', $prefs['monitor_restricted_ips'])) : [];
-    $sIpToCheck = null;
-    if (! empty($tikiMonitorRestriction)) {
-        if (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $aListIp = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $sIpToCheck = $aListIp[0];
-        } elseif (! empty($_SERVER['REMOTE_ADDR'])) {
-            $sIpToCheck = $_SERVER['REMOTE_ADDR'];
-        }
+
+    if (empty($tikiMonitorRestriction)) {
+        // No IP restrictions configured, allow access
+        return;
     }
 
-    if (in_array($sIpToCheck, $tikiMonitorRestriction) === false) {
-        header('location: index.php');
+    // Use the secure get_ip_address() method
+    $sIpToCheck = $tikilib->get_ip_address();
+
+    if (! in_array($sIpToCheck, $tikiMonitorRestriction, true)) {
+        // Return 403 Forbidden instead of 302 redirect for better security semantics
+        http_response_code(403);
+        echo 'Access Forbidden: Your IP address is not authorized to access this resource.';
         exit();
     }
 }

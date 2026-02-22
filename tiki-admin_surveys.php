@@ -12,22 +12,23 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
             'surveyId'              => 'int',                //get
-            'questionId'            => 'int',                //post
-            'restriction'           => 'bool',               //post
+            'restriction'           => 'alpha',              //post
             'name'                  => 'string',             //post
-            'sort_mode'             => 'word',               //get
+            'sort_mode'             => 'alnumdash',          //get
             'offset'                => 'int',                //get
             'description'           => 'xss',                //post
-            'save'                  => 'bool',               //post
-            'status'                => 'striptags',          //post
+            'save'                  => 'alpha',              //post
+            'status'                => 'alpha',              //post
             'remove'                => 'int',                //post
             'find'                  => 'string',             //post
         ],
     ],
 ];
-$section = 'admin';
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_surveys');
 
 $auto_query_args = [
@@ -96,17 +97,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $srvlib->list_surveys($offset, $maxRecords, $sort_mode, $find);
@@ -168,7 +161,6 @@ $smarty->assign('mins', $mins);
 $cat_type = 'survey';
 $cat_objid = $_REQUEST["surveyId"];
 include_once("categorize_list.php");
-$section = 'surveys';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

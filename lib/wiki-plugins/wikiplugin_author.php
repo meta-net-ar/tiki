@@ -20,7 +20,6 @@ function wikiplugin_author_info()
                 'name' => tra('Username'),
                 'description' => tra('Username of the author of the text.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'username',
             ],
             'deleted_by' => [
@@ -28,7 +27,6 @@ function wikiplugin_author_info()
                 'name' => tra('Deleted by User'),
                 'description' => tra('Username of the person who deleted the text.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'username',
             ],
             'visible'   => [
@@ -62,8 +60,6 @@ function wikiplugin_author_info()
 function wikiplugin_author($data, $params)
 {
     $headerlib = TikiLib::lib('header');
-    $tikilib = TikiLib::lib('tiki');
-    $smarty = TikiLib::lib('smarty');
 
     global $authors;
 
@@ -73,10 +69,6 @@ function wikiplugin_author($data, $params)
     $blocktags = '/(<+\/?address.*?>|<+\/?blockcode.*?>|<+\/?blockquote.*?>|<+\/?div.*?>|<+\/?h1.*?>|<+\/?h2.*?>|<+\/?h3.*?>|<+\/?h4.*?>|<+\/?h5.*?>|<+\/?h6.*?>|<+\/?hr.*?>|<+\/?h.*?>|<+\/?li.*?>|<+\/?ol.*?>|<+\/?pre.*?>|<+\/?p.*?>|<+\/?section.*?>|<+\/?table.*?>|<+\/?td.*?>|<+\/?th.*?>|<+\/?tr.*?>|<+\/?ul.*?>)/';
     if (! is_array($authors)) {
         $authors = [];
-    }
-    if (empty($params['author'])) {
-        Feedback::error(tra('The author parameter is missing'));
-        return;
     }
     if (empty($params['visible'])) {
         $params['visible'] = 0;
@@ -109,7 +101,7 @@ function wikiplugin_author($data, $params)
                 }
                 if ($params['visible'] == 1) {
                     $html .= 'class="' . $authors[$author]['style'];
-                    if (isset($params['deleted_by'])) {
+                    if (! is_null($params['deleted_by'])) {
                         $html .= ' deleted';
                     }
                     $html .= '"';
@@ -133,7 +125,7 @@ function wikiplugin_author($data, $params)
                     $js .= "\$('#author$id-link').on('mouseout', function(event) { setTimeout(function() {hideJQ('#author$id', '', '')}, 1000); });";
                     $headerlib->add_jq_onready($js);
                     $html .= "<span id=\"author$id\" class=\"plugin-mouseover\" style=\"width: 200px; height: 80px; padding: 2px \">" .
-                        tra('Author') . ": $author" . (isset($params['deleted_by']) ? "<br />" . tra('deleted by') . ': ' . $params['deleted_by'] : '') . "</span>";
+                        tra('Author') . ": $author" . (! is_null($params['deleted_by']) ? "<br />" . tra('deleted by') . ': ' . $params['deleted_by'] : '') . "</span>";
                 }
                 $id++;
             } // content is not a block tag

@@ -43,6 +43,12 @@ class IndexRebuildCommand extends Command
                 'p',
                 InputOption::VALUE_NONE,
                 'Show progress bar'
+            )
+            ->addOption(
+                'skip-error-tracking',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip Tiki error tracking and only log errors to log file (if enabled). Useful if you rebuild generates a lot of noise in your external error tracking system.'
             );
     }
 
@@ -130,10 +136,11 @@ class IndexRebuildCommand extends Command
             $progress->setMessage(tr('Rebuilding...'));
             $progress->start();
         }
+        $skipErrorTracking = $input->getOption('skip-error-tracking') ? true : false;
 
         // Use shared service to rebuild index directly (console commands always execute directly)
         $searchIndexRebuilder = new SearchIndexRebuilder();
-        $result = $searchIndexRebuilder->rebuildIndex($log, false, $progress);
+        $result = $searchIndexRebuilder->rebuildIndex($log, false, $progress, $skipErrorTracking);
 
         \Feedback::printToConsole($output, $cron);
 

@@ -6,6 +6,7 @@
         </a>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset id="Calendar">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_calendar visible="always"}
@@ -48,5 +49,6 @@
         {preference name=calendar_watch_editor}
         {preference name=calendar_holidays}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

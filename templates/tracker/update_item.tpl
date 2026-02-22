@@ -28,12 +28,24 @@
                 <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input type="hidden" name="conflictoverride" value="{$conflictoverride|escape}">
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
-                <input type="submit" class="btn btn-primary" value="{$button_label}" onclick="needToConfirm=false;">
+                <input type="submit" class="btn btn-primary item-submit-btn" value="{$button_label}" onclick="needToConfirm=false;">
             </div>
         </form>
     {else}
         <form method="post" action="{service controller=tracker action=update_item format=$format editItemPretty=$editItemPretty suppressFeedback=$suppressFeedback}" id="updateItemForm{$trackerId|escape}">
             {trackerfields trackerId=$trackerId fields=$fields status=$status itemId=$itemId format=$format editItemPretty=$editItemPretty}
+            <hr>
+            <div class="form-check form-switch alert alert-warning">
+                <input type="checkbox"
+                    class="form-check-input tracker-notify-switch"
+                    id="notify_watchers"
+                    name="notify_watchers"
+                    value="1"
+                    checked>
+                <label class="form-check-label" for="notify_watchers">
+                    {tr}Notify users following this item{/tr}
+                </label>
+            </div>
             <div class="submit">
                 {if $skip_preview neq 'y'}
                     <input type="button" class="btn btn-secondary previewItemBtn" title="{tr}Preview your changes.{/tr}" name="preview" value="{tr}Preview{/tr}">
@@ -53,7 +65,7 @@
                 <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input type="hidden" name="conflictoverride" value="{$conflictoverride|escape}">
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
-                <input type="submit" class="btn btn-primary" value="{$button_label}" onclick="needToConfirm=false;">
+                <input type="submit" class="btn btn-primary item-submit-btn" value="{$button_label}" onclick="needToConfirm=false;">
                 {if $can_remove and $prefs.tracker_legacy_insert eq 'y'}
                     <a class="btn btn-danger" href="tiki-view_tracker.php?trackerId={$trackerId|escape}&amp;remove={$itemId|escape}" title="Delete" role="button">
                         {tr}Delete{/tr}

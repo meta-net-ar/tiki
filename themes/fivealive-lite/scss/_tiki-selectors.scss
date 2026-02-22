@@ -37,7 +37,6 @@ $imagePath: "../images/";
 
 body.tiki.navbar-padding,
 .layout_social_modules {
-    padding-top: $tiki-navbar-fixed-height;
     h1.sitetitle {
         line-height: normal;
     }
@@ -113,8 +112,6 @@ header.header {
 .layout_basic .topbar > div {
     margin-bottom: -3px !important;
 }
-
-
 
 .topbar {
     .form-control,
@@ -197,4 +194,33 @@ label a:hover { text-decoration: none; }
 // Breadcrumbs
 // Code
 // Tiki-specific
+
+//.bottom_modules {
+//    .card-body { color: #dee2e6; background: #262626; }
+//}
+
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    color: #dee2e6;
+    .tiki-card-header-title { color: #fff!important; }
+    .card-header { border-bottom: solid 1px  #1174a5; }
+//    .card, .card-header { border-color: transparent; }
+    .card-body { color: #dee2e6; background: #262626; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: #1ea6be; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: #8BB9FE; }
+}
+
+
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    .card {
+        color: #dee2e6;
+        background: #000;
+    }
+}
+
 // External libraries

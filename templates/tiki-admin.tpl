@@ -52,6 +52,18 @@
                 {breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs}
             {/if}
             *}
+            {if ! empty($tiki_version)}
+                {remarksbox type="info" title="{tr}Tiki version{/tr}"}
+                    <div class="adminoptionbox">
+                        <strong>{tr}Tiki version: {/tr}</strong> {$tiki_version}{if !empty($db_engine_type)} ({$db_engine_type}){/if}
+                    </div>
+                    {if ! empty($git_details)}
+                        <div class="adminoptionbox">
+                            <strong>{tr}Git Information:{/tr}</strong> {$git_details.branch}: <a target="_blank" class="wiki external" href="https://gitlab.com/tikiwiki/tiki/-/commit/{$git_details.commit.hash}"><cite>{$git_details.commit.hash|substring:0:8}</cite></a>{icon name='link-external'} {tr}from{/tr} {$git_details.committer.date|tiki_short_datetime}
+                        </div>
+                    {/if}
+                {/remarksbox}
+            {/if}
             {if $mailer_queue_requires_update}
                 {remarksbox type="error" title="{tr}Email Queue Problem{/tr}"}
                     <p>{tr}There are messages in the email queue that exceeded the number of retries and will not be retried anymore.{/tr}</p>
@@ -83,6 +95,63 @@
                             {/foreach}
                         </ul>
                     </div>
+                {/remarksbox}
+            {/if}
+
+            {if ! empty($scheduler_failure_logs) }
+                {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
+                    <p>
+                    {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
+                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {if ! empty($scheduler_total_count)}
+                            <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
+                        {else}
+                            <strong>{count($scheduler_failure_logs)}</strong>
+                        {/if}
+                    {else}
+                        {tr}Nº of tasks failure during last execution:{/tr}
+                        <strong>{count($scheduler_failure_logs)}</strong>
+                    {/if}
+                    </p>
+
+                    <strong>{tr}Scheduler tasks with errors:{/tr}</strong>
+                    <ul>
+                        {foreach from=$scheduler_failure_logs item=item}
+                            <li>{$item['name']}</li>
+                        {/foreach}
+                    </ul>
+
+                    <p>
+                        <a target="_blank" href="tiki-admin_schedulers.php">
+                            {tr}View Scheduler Details{/tr}
+                        </a>
+                    </p>
+                {/remarksbox}
+            {/if}
+
+            {if $htaccess_global_warning}
+                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                    <p class="mb-2">
+                        {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">
+                            {tr}How to fix{/tr}
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" href="tiki-admin_security.php#content" rel="noopener">
+                            {tr}See details in Security panel{/tr}
+                        </a>
+                    </div>
+                    <details class="small mt-2">
+                        <summary>{tr}Technical details{/tr}</summary>
+                        <ul class="list-unstyled mb-0">
+                            <li>{tr}Reference hash:{/tr} <code>{$htaccess_global_warning.reference_hash|escape}</code></li>
+                            <li>{tr}Active hash:{/tr} <code>{$htaccess_global_warning.hash|escape}</code></li>
+                            {if !empty($htaccess_global_warning.details.symlink_target)}
+                                <li>{tr}Symlink target:{/tr} <code>{$htaccess_global_warning.details.symlink_target|escape}</code></li>
+                            {/if}
+                        </ul>
+                    </details>
                 {/remarksbox}
             {/if}
 
@@ -196,16 +265,37 @@
             {/if}
         </div>
 
-        {if $upgrade_messages|count}
-            {if $upgrade_messages|count eq 1}
+        {* Error box box for critical "unsupported" messages. *}
+        {if $upgrade_errors|count}
+            {remarksbox type="error" title="{tr}Upgrade Required{/tr}" icon="announce"}
+                {foreach from=$upgrade_errors item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Warning box for "approaching EoL" messages. *}
+        {if $upgrade_warnings|count}
+            {remarksbox type="warning" title="{tr}Upgrade Recommended{/tr}" icon="announce"}
+                {foreach from=$upgrade_warnings item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Note box for informational "upgrade available" messages. *}
+        {if $upgrade_notes|count}
+            {if not $is_stable}
+                {$title="{tr}Stable version available{/tr}"}
+            {elseif $upgrade_notes|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}
             {/if}
             {remarksbox type="note" title=$title icon="announce"}
-                {foreach from=$upgrade_messages item=um}
-                    <p>{$um|escape}</p>
-                {/foreach}
+            {foreach from=$upgrade_notes item=um}
+                <p>{$um|safe_html}</p>
+            {/foreach}
             {/remarksbox}
         {/if}
 

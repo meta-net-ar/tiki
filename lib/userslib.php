@@ -64,6 +64,7 @@ class UsersLib extends TikiLib
     public $get_object_permissions_for_user_cache;
     public static $cas_initialized = false;
     public static $userexists_cache = [];
+    public const USERNAME_MANDATORY_VALIDATION_PATTERN = '/^\S*$/';
 
     public function __construct()
     {
@@ -2192,7 +2193,10 @@ class UsersLib extends TikiLib
      */
     public function create_user_ldap($user, $pass)
     {
-        // todo: no more pear::auth! all in pear::ldap2
+        //This calls new Auth('LDAP', $options); below, I can't identify what API that was from, but LdapLib has no method to add a new LDAP user.
+        throw new Error("Adding a LDAP user is not currently supported");
+    /*
+    // todo: no more pear::auth! all in pear::ldap2
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
 
@@ -2232,6 +2236,7 @@ class UsersLib extends TikiLib
         }
 
         return $status;
+        */
     }
 
 
@@ -2496,7 +2501,6 @@ class UsersLib extends TikiLib
 
             $res['groups'] = $groups;
             $res['age'] = $this->now - $res['registrationDate'];
-            $res['user_information'] = $this->get_user_preference($user, 'user_information', 'public');
             $res['editable'] = $this->user_can_be_edited($user);
 
             // indicate whether the user's email is from a disposable mail server
@@ -2657,6 +2661,15 @@ class UsersLib extends TikiLib
             'group' => $group,
             'bulk_import' => $bulk,
         ]);
+
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] Cache invalidation error: ' . $e->getMessage());
+        }
 
         return $result;
     }
@@ -3429,12 +3442,6 @@ class UsersLib extends TikiLib
         }
 
         $isSelf = $auser === $user;
-        // Only process if feature_friends enabled, user_information public or we query ourselfs
-        if (($this->get_user_preference($auser, 'user_information', 'public') != 'public') && ($prefs['feature_friends'] != 'y') && ! $isSelf) {
-            return "<span{$idStr}>$body</span>";
-        }
-
-
         $id = $this->get_user_id($auser);
         if ($id == -1) {
             return $body;
@@ -3444,7 +3451,7 @@ class UsersLib extends TikiLib
         if ($show_popup == "n") {
             //do nothing for adding a tip
             $title = '';
-        } elseif ($prefs['feature_community_mouseover'] == 'y' && ($this->get_user_preference($auser, 'show_mouseover_user_info', 'y') == 'y' || $prefs['feature_friends'] == 'y')) {
+        } else {
             $data = TikiLib::lib('service')->getUrl([
                 'controller' => 'user',
                 'action' => 'info',
@@ -3458,12 +3465,6 @@ class UsersLib extends TikiLib
             } else {
                 $title = tra('User Information');
             }
-        } elseif ($prefs['user_show_realnames'] == 'y') {
-            $class .= ' tips';
-            $title = tr('User') . ':' . $realn;
-        } else {
-            $class .= ' tips';
-            $title = tr('User') . ':' . $auser;
         }
 
         if (empty($prefs['urlOnUsername'])) {
@@ -6958,6 +6959,18 @@ class UsersLib extends TikiLib
         foreach ($groups as $k => $grp) {
             $this->assign_user_to_group($user, $grp, $k != $lastkey);
         }
+
+        try {
+            $xmpplib = TikiLib::lib('xmpp');
+            if (method_exists($xmpplib, 'invalidateUserCache')) {
+                $xmpplib->invalidateUserCache($user);
+            }
+            if (method_exists($xmpplib, 'syncUserGroupsToXmpp')) {
+                $xmpplib->syncUserGroupsToXmpp($user);
+            }
+        } catch (\Throwable $e) {
+            error_log('[XMPP] sync error: ' . $e->getMessage());
+        }
     }
 
     public function ban_user_from_group($user, $group)
@@ -7033,6 +7046,7 @@ class UsersLib extends TikiLib
         global $prefs;
         $cachelib = TikiLib::lib('cache');
         $tikilib = TikiLib::lib('tiki');
+        $userlib = TikiLib::lib('user');
 
         $autogenerate_uname = false;
         if ($prefs['login_autogenerate'] == 'y' && $user == '') {
@@ -7043,11 +7057,11 @@ class UsersLib extends TikiLib
         }
 
         $user = trim($user);
-
         if (
             $this->user_exists($user)
                 || empty($user)
                 || (! empty($prefs['username_pattern']) && ! preg_match($prefs['username_pattern'], $user))
+                || (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $user))
                 || strtolower($user) == 'anonymous'
                 || strtolower($user) == 'registered'
         ) {
@@ -7127,6 +7141,13 @@ class UsersLib extends TikiLib
 
             $this->assign_user_to_group($user, $user);
         }
+
+        // Notify listeners that a local user has been created (e.g. XMPP auto-join)
+        $userGroups = $this->get_user_groups($user);
+        TikiLib::events()->trigger('tiki.user.register.local', [
+            'username' => $user,
+            'groups' => $userGroups,
+        ]);
 
         $this->set_user_default_preferences($user, false); // do not force
 
@@ -7514,6 +7535,51 @@ class UsersLib extends TikiLib
         return $this->getOne($query, [$user]);
     }
 
+    public function get2FAGracePeriod($user)
+    {
+        global $prefs;
+
+        $userInfo = $this->get_user_info($user);
+        if ($userInfo['twoFactorAuthGracePeriod'] !== null) {
+            return (int)$userInfo['twoFactorAuthGracePeriod'];
+        }
+
+        $userGroups = $this->get_user_groups($user);
+        $groupsGracePeriods = array_filter(array_map(function ($group) {
+            return $this->get_group_info($group)['twoFactorAuthGracePeriod'];
+        }, $userGroups), function ($value) {
+            return $value !== null;
+        });
+        $maxGroupGracePeriod = ! empty($groupsGracePeriods) ? max($groupsGracePeriods) : null;
+
+        return (int)($maxGroupGracePeriod !== null ? $maxGroupGracePeriod : $prefs['twoFactorAuthGracePeriod']);
+    }
+
+    public function get2FAGracePeriodStart($user)
+    {
+        $query = 'select `twoFactorGracePeriodStart` from `users_users` where `login`=?';
+        return $this->getOne($query, [$user]);
+    }
+
+    public function reset2FAGracePeriodStart($user)
+    {
+        $query = 'update `users_users` set `twoFactorGracePeriodStart`=? where binary `login`=?';
+        $now = time();
+        $this->query($query, [$now, $user]);
+        return $now;
+    }
+
+    public function setTwoFactorAuthGracePeriod($user, $gracePeriod)
+    {
+        if ($gracePeriod === '') {
+            $gracePeriod = null;
+        }
+
+        $query = 'update `users_users` set `twoFactorAuthGracePeriod`=? where binary `login`=?';
+        $this->query($query, [$gracePeriod, $user]);
+        return $gracePeriod;
+    }
+
     public function validate_two_factor($twoFactorSecret, $pin, $user)
     {
         $google2fa = new Google2FA();
@@ -7584,20 +7650,22 @@ class UsersLib extends TikiLib
     {
 
         $hash = password_hash($pass, PASSWORD_DEFAULT);
-        $new_pass_confirm = $this->now;
 
-        if ($pass_first_login) {                    // if true, set pass_confirm to force passord change upon next login
-            if (! empty($pass)) {
-                $query = 'update `users_users` set `hash`=? , `provpass`=?, `pass_confirm`=? where binary `login`=?';
-                $result = $this->query($query, [$hash, $pass, 0, $user]);
+        if (! empty($pass)) {
+            $query = 'update `users_users` set `hash`=?, `provpass`=?, `pass_confirm`=? where binary `login`=?';
+            // if true, set pass_confirm to force passord change upon next login
+            if ($pass_first_login) {
+                $params = [$hash, $pass, 0, $user];
             } else {
-                $query = 'update `users_users` set `pass_confirm`=? where binary `login`=?';
-                $result = $this->query($query, [0, $user]);
+                $params = [$hash, '', $this->now, $user];
             }
         } else {
-            $query = 'update `users_users` set `hash`=? ,`pass_confirm`=?, `provpass`=? where binary `login`=?';
-            $result = $this->query($query, [$hash, $new_pass_confirm, '', $user]);
+            // No password change, only update confirmation flag
+            $query = 'update `users_users` set `pass_confirm`=? where binary `login`=?';
+            $params = [$pass_first_login ? 0 : $this->now, $user];
         }
+
+        $result = $this->query($query, $params);
 
         if ($result && $result->numRows() === 1) {
             // invalidate the cache so that after a fresh install, the admin (who has no user details at the install) can log in
@@ -7639,7 +7707,8 @@ class UsersLib extends TikiLib
         $color = '',
         $isRole = '',
         $isTplGroup = '',
-        $include_groups = []
+        $include_groups = [],
+        $twaFAGracePeriod = null
     ) {
 
         $tikilib = TikiLib::lib('tiki');
@@ -7669,6 +7738,7 @@ class UsersLib extends TikiLib
             'prorateInterval' => $prorateInterval,
             'isRole' => $isRole,
             'isTplGroup' => empty($isTplGroup) ? 'n' : $isTplGroup,
+            'twoFactorAuthGracePeriod' => $twaFAGracePeriod === '' ? null : $twaFAGracePeriod,
         ];
 
         $id = $this->table('users_groups')->insert($data);
@@ -7709,7 +7779,8 @@ class UsersLib extends TikiLib
         $color = '',
         $isRole = '',
         $isTplGroup = '',
-        $include_groups = []
+        $include_groups = [],
+        $twaFAGracePeriod = null
     ) {
         $isTplGroup = empty($isTplGroup) ? 'n' : $isTplGroup;
         $users = $this->get_group_users($group);
@@ -7742,7 +7813,9 @@ class UsersLib extends TikiLib
                 $prorateInterval,
                 $color,
                 $isRole,
-                $isTplGroup
+                $isTplGroup,
+                [],
+                $twaFAGracePeriod
             );
         }
 
@@ -7770,6 +7843,7 @@ class UsersLib extends TikiLib
             'prorateInterval' => $prorateInterval,
             'isRole' => $isRole,
             'isTplGroup' => $isTplGroup,
+            'twoFactorAuthGracePeriod' => $twaFAGracePeriod === '' ? null : $twaFAGracePeriod,
         ];
 
         $this->table('users_groups')->update($data, ['groupName' => $olgroup]);
@@ -7883,7 +7957,8 @@ class UsersLib extends TikiLib
             $groupInfo["groupColor"],
             $groupInfo["isRole"],
             $groupInfo["isTplGroup"],
-            $includeGroups
+            $includeGroups,
+            $groupInfo["twoFactorAuthGracePeriod"]
         );
         return true;
     }

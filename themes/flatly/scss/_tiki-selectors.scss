@@ -26,12 +26,6 @@
 // Forms
 // Navs
 // Navbar
-    // Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-
     // navbars with too many items overflows the container
 .navbar-expand .navbar-nav {
     flex-wrap: wrap;

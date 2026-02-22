@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $wikilib = TikiLib::lib('wiki');
 include_once('lib/tasks/tasklib.php');
 //get_strings tra('My Account Home');
@@ -32,12 +34,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign('sort_mode', $sort_mode);
 
-//Offset and Step param for pagination
-$offset = 0;
+//Step param for pagination
 $step = 5;
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
 if ($prefs['feature_wiki'] == 'y') {
     $mytiki_pages = $tikilib->get_user_preference($user, 'mytiki_pages', 'y');

@@ -7,6 +7,7 @@
             {include file='admin/include_apply_top.tpl'}
         </div>
     </div>
+    <div class="styling-element">
     <fieldset id="Comments">
         <legend class="h3">{tr}Site-wide features{/tr}</legend>
         <div class="admin featurelist">
@@ -70,5 +71,6 @@
         {preference name=feature_faq_comments}
         {preference name=wikiplugin_trackercomments}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

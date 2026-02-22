@@ -31,13 +31,13 @@
                     <th>{tr}User{/tr}</th>
                 </tr>
                 <tr class="odd">
-                    <td><label><input type="radio" name="lastversion" value="{$info.version}"{if $lastversion==$info.version or $lastversion==0} checked="checked"{/if} title="{tr}Version{/tr} {$info.version}"> <strong>{$info.version}</strong></label></td>
+                    <td><label><input type="radio" class="form-check-input" name="lastversion" value="{$info.version}"{if $lastversion==$info.version or $lastversion==0} checked="checked"{/if} title="{tr}Version{/tr} {$info.version}"> <strong>{$info.version}</strong></label></td>
                     <td><strong>{$info.lastModif|tiki_short_datetime}</strong></td>
                     <td><strong>{$info.user|userlink}</strong></td>
                 </tr>
                 {foreach name=hist item=element from=$history}
                 <tr>
-                    <td class="text"><label><input type="radio" name="lastversion" value="{$element.version}"{if $lastversion==$element.version} checked="checked"{/if} title="{tr}Version{/tr} {$info.version}"> {$element.version}</label></td>
+                    <td class="text"><label><input type="radio" class="form-check-input" name="lastversion" value="{$element.version}"{if $lastversion==$element.version} checked="checked"{/if} title="{tr}Version{/tr} {$info.version}"> {$element.version}</label></td>
                     <td class="date">{$element.lastModif|tiki_short_datetime}</td>
                     <td class="text">{$element.user|userlink}</td>
                 </tr>

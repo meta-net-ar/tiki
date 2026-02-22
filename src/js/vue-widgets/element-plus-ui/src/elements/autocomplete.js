@@ -22,7 +22,7 @@ customElements.define(
                 },
                 { immediate: true, deep: true }
             );
-            return () => h(Autocomplete, { ...internalState, emitCustomEvent }, ctx.slots);
+            return () => h(Autocomplete, { ...internalState, emitCustomEvent, _expose: ctx.expose }, ctx.slots);
         },
         {
             styles: [styles],

@@ -52,16 +52,64 @@ $zip = false;
 $error = '';
 
 if (! $skip) {
-    if (isset($_REQUEST['fileId'])) {
-        if (! is_array($_REQUEST['fileId'])) {
+    if (isset($_REQUEST['fileId']) || isset($_REQUEST['galId'])) {
+        $isBatch = (isset($_REQUEST['fileId']) && is_array($_REQUEST['fileId'])) || ! empty($_REQUEST['galId']);
+
+        if (! $isBatch) {
             if (isset($_GET['draft'])) {
                 $info = \Tiki\FileGallery\FileDraft::id($_REQUEST['fileId'])->getParams();
             } else {
                 $info = $filegallib->get_file($_REQUEST['fileId']);
             }
         } else {
+            // Collect file entries in structured format: ['fileId' => int, 'path' => string]
+            $fileEntries = [];
+
+            // Convert plain fileIds from request to structured format
+            $requestFileIds = $_REQUEST['fileId'] ?? [];
+            if (! is_array($requestFileIds)) {
+                $requestFileIds = [$requestFileIds];
+            }
+            foreach ($requestFileIds as $fid) {
+                $fileEntries[] = ['fileId' => $fid, 'path' => ''];
+            }
+
+            // Process galleries recursively to collect files with paths
+            if (! empty($_REQUEST['galId'])) {
+                $galIds = is_array($_REQUEST['galId']) ? $_REQUEST['galId'] : [$_REQUEST['galId']];
+
+                $visited = [];
+                $processGallery = function ($galId, $currentPath) use (&$fileEntries, $filegallib, &$processGallery, &$visited) {
+                    if (in_array($galId, $visited)) {
+                        return;
+                    }
+                    $visited[] = $galId;
+
+                    $res = $filegallib->get_files(0, -1, 'name_asc', '', $galId, false, true, false, true, false, false, false, false);
+                    if (! empty($res['data'])) {
+                        foreach ($res['data'] as $item) {
+                            // Galleries have both fileId and galleryId; use 'id' for the actual gallery ID
+                            if (! empty($item['isgal']) || (isset($item['galleryId']) && $item['id'] == $item['galleryId'])) {
+                                $subGalId = $item['id'];
+                                if ($subGalId != $galId && ! in_array($subGalId, $visited)) {
+                                    $processGallery($subGalId, $currentPath . $item['name'] . '/');
+                                }
+                            } elseif (isset($item['fileId'])) {
+                                $fileEntries[] = ['fileId' => $item['fileId'], 'path' => $currentPath];
+                            }
+                        }
+                    }
+                };
+
+                foreach ($galIds as $gId) {
+                    $gInfo = $filegallib->get_file_gallery_info($gId);
+                    if ($gInfo) {
+                        $processGallery($gId, $gInfo['name'] . '/');
+                    }
+                }
+            }
             $zipName = $_REQUEST['zipName'] ?? '';
-            $info = $filegallib->zip($_REQUEST['fileId'], $error, $zipName);
+            $info = $filegallib->zip($fileEntries, $error, $zipName);
             $zip = true;
         }
     } elseif (isset($_REQUEST['galleryId']) && isset($_REQUEST['name'])) {
@@ -94,7 +142,7 @@ if (! $skip) {
             TikiLib::lib('cache')->cacheItem($src, serialize($info), 'external_downloaded_files');
         }
     } else {
-        $access->display_error('', tra('Incorrect param'), 400);
+        $access->display_error('', tra('Incorrect param. No file or gallery selected for download.'), 400);
     }
     if (! is_array($info)) {
         $access->display_error(null, tra('File has been deleted'), 404);
@@ -144,8 +192,6 @@ if (! $skip) {
     }
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 //if the file is remote, display, and don't cache
 $attributelib = TikiLib::lib('attribute');
 $attributes = $attributelib->get_attributes('file', $info['fileId']);
@@ -176,7 +222,21 @@ if (! isset($_GET['thumbnail']) && ! isset($_GET['icon'])) {
 
     if ($prefs['feature_actionlog'] == 'y') {
         $logslib = TikiLib::lib('logs');
-        $logslib->add_action('Downloaded', $info['galleryId'], 'file gallery', 'fileId=' . $info['fileId']);
+        if (! empty($info['galleryId']) && ! empty($info['fileId'])) {
+            $logslib->add_action(
+                'Downloaded',
+                $info['galleryId'],
+                'file gallery',
+                'fileId=' . $info['fileId']
+            );
+        } else {
+            $logslib->add_action(
+                'Downloaded',
+                'external',
+                'file gallery',
+                'source_url=' . $src
+            );
+        }
     }
 
     if (! empty($_REQUEST['lock']) && $access->checkCsrf(true)) {
@@ -193,7 +253,6 @@ if (! isset($_GET['thumbnail']) && ! isset($_GET['icon'])) {
 }
 
 session_write_close(); // close the session in case of large downloads to enable further browsing
-error_reporting(E_ALL);
 while (ob_get_level() > 1) {
     ob_end_clean();
 }// Be sure output buffering is turned off
@@ -389,7 +448,7 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                             if (empty($info_thumb)) {
                                 $info_thumb = $filegallib->get_file($_GET['thumbnail']);
                             }
-                            $file_thumb = new \Tiki\TikiFile\File($info_thumb);
+                            $file_thumb = new Tiki\FileGallery\File($info_thumb);
                             $image = Image::create($file_thumb->getContents());
                             $content = null; // Explicitely free memory before getting cache
                             if ($image->isEmpty()) {

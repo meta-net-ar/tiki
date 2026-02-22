@@ -103,6 +103,9 @@ class SelfLink extends Base
 
                 $params['_type'] = $default_type;
 
+                if (! empty($params['_tag']) && $params['_tag'] === 'y') {
+                    $params['_urlencode'] = 'n';
+                }
                 $ret = smarty_function_query($params, $template);
             }
 
@@ -138,7 +141,8 @@ class SelfLink extends Base
                         );
                         unset($params['_onclick']); // Prevent addition to $link later
                     } else {
-                        $ret = 'href="' . $ret . '"';
+                        // Escape href value to prevent XSS injection
+                        $ret = 'href="' . htmlspecialchars($ret, ENT_QUOTES, 'UTF-8') . '"';
                     }
                 }
 

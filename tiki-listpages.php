@@ -10,7 +10,6 @@ use Tiki\Lib\OIntegrate\Response;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 $section_class = 'tiki_wiki_page manage';   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -35,13 +34,15 @@ $inputConfiguration = [
         'listonly'                              => 'bool',               //post
         'exclude_page'                          => 'string',             //post
         'find'                                  => 'string',             //post
-        'offset'                                => 'digits',             //get
-        'sort_mode'                            => 'word',                //get
+        'offset'                                => 'int',                //get
+        'sort_mode'                             => 'alnumdash',          //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $auto_query_args = [
                 'initial',
                 'maxRecords',
@@ -248,11 +249,7 @@ if (! empty($multiprint_pages)) {
         $smarty->assign_by_ref('filter_values', $filter_values);
     }
 
-    if (isset($_REQUEST['initial'])) {
-        $initial = $_REQUEST['initial'];
-    } else {
-        $initial = '';
-    }
+    $initial = $_REQUEST['initial'] ?? '';
 
     $smarty->assign('initial', $initial);
     // What a checked checkbox returns is browser dependant. Don't test on the value, just presence

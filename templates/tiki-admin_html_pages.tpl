@@ -8,6 +8,8 @@
 
 {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Use {literal}{ed id=name}{/literal} or {literal}{ted id=name}{/literal} to insert dynamic zones{/tr}{/remarksbox}
 
+<div class="styling-element">
+
 {if $preview eq 'y'}
     <h2>{tr}Preview{/tr}</h2>
     <div class="wikitext">{$parsed}</div>
@@ -134,3 +136,4 @@
 </div>
 
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

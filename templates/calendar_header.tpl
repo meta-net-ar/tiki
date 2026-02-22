@@ -13,7 +13,7 @@
 
 {* avoid Add Event being shown if no calendar is displayed *}
 {if $tiki_p_add_events eq 'y'}
-    <a {if $isInMainCalendar eq 'y'} style="display:block;"{/if} href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId}" class="btn btn-primary mt-2">{icon name='create'} {tr}Add Event{/tr}</a>
+    <a {if $isInMainCalendar eq 'y'} style="display:block;"{/if} href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId returnURL=$returnURL}" class="btn btn-primary mt-2">{icon name='create'} {tr}Add Event{/tr}</a>
 {/if}
 
 {if $viewlist eq 'list'}

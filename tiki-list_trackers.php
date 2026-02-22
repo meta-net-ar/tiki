@@ -8,18 +8,20 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'trackers';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'trackerId'                => 'int',                //get
-        'sort_mode'                => 'word',               //post
+        'sort_mode'                => 'alnumdash',          //post
         'offset'                   => 'int',                //get
         'find'                     => 'string',             //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_TRACKERS;
+Sections::setCurrentSection($section);
 $trklib = TikiLib::lib('trk');
 $categlib = TikiLib::lib('categ');
 $access->check_feature('feature_trackers');
@@ -41,18 +43,9 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
-
+$find = $_REQUEST["find"] ?? '';
 if ($prefs['tracker_display_categories'] == 'y') {
     // Get all categories
     $categories = $categlib->getCategories(['type' => 'all']);

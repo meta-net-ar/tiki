@@ -35,7 +35,7 @@ function module_last_category_objects_info()
             ],
             'type' => [
                 'name' => tra('Object type filter'),
-                'description' => tra('Type of the objects to list. Example values:') . ' *, ' . tra('wiki page') . ', ' . tra('article') . ', ' . tra('faq') . ', blog, image, ' . tra('file gallery') . ', ' . tra('tracker') . ', ',tra('trackerItem') . ', ' . tra('quiz') . ', ' . tra('poll') . ', ' . tra('survey') . ', ' . tra('sheet') . '. ' . tra('Default value:') . tra(' wiki page'),
+                'description' => tra('Type of the objects to list. Example values:') . ' *, ' . tra('wiki page') . ', ' . tra('article') . ', ' . tra('FAQ') . ', ' . tra('blog') . ', ' . tra('image') . ', ' . tra('file gallery') . ', ' . tra('tracker') . ', ' . tra('tracker item') . ', ' . tra('quiz') . ', ' . tra('poll') . ', ' . tra('survey') . ', ' . tra('sheet') . '. ' . tra('Default value:') . tra(' wiki page'),
                 'filter' => 'striptags',
             ]
         ],

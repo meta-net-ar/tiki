@@ -111,7 +111,7 @@ function prefs_tiki_list()
         'tiki_cdn' => [
             'name' => tra('Content delivery networks'),
             'description' => tra('Use alternate domains to serve static files from this Tiki site to avoid sending cookies, improve local caching and generally improve user-experience performance.'),
-            'hint' => tra('List of URI prefixes to include before static files (one per line), for example: http://cdn1.example.com'),
+            'hint' => tra('List of URI prefixes to include before static files (one per line), for example: http://cdn1.example.org'),
             'help' => 'Content-Delivery-Network',
             'type' => 'textarea',
             'size' => 4,
@@ -121,7 +121,7 @@ function prefs_tiki_list()
         'tiki_cdn_ssl' => [
             'name' => tra('Content delivery networks in SSL'),
             'description' => tra('Use alternate domains to serve static files from this Tiki site to avoid sending cookies, improve local caching and generally improve user-experience performance. Leave empty to disable CDN in SSL mode.'),
-            'hint' => tra('List of URI prefixes to include before static files (one per line), for example: https://sslcdn1.example.com'),
+            'hint' => tra('List of URI prefixes to include before static files (one per line), for example: https://sslcdn1.example.org'),
             'help' => 'Content-Delivery-Network',
             'type' => 'textarea',
             'size' => 4,

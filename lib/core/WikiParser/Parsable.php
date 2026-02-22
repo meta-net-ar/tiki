@@ -150,7 +150,7 @@ class WikiParser_Parsable extends ParserLib
         $argumentParser = new WikiParser_PluginArgumentParser();
 
         foreach ($matches as $match) {
-            if ($this->option['parseimgonly'] && $this->getName() != 'img') {
+            if ($this->option['parseimgonly'] && $match->getName() != 'img') {
                 continue;
             }
 
@@ -454,8 +454,9 @@ if ( \$('#$id') ) {
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $this->parse_wiki_argvariable($data);
-        foreach ($args as &$arg) {
+        foreach ($args as $key => $arg) {
             $this->parse_wiki_argvariable($arg);
+            $args[$key] = $arg;
         }
 
         $outputFormat = 'wiki';
@@ -514,7 +515,13 @@ if ( \$('#$id') ) {
         }
 
         if (! $validationPerformed) {
+            $originalData = $data;
             $this->plugin_apply_filters($name, $data, $args);
+
+            // If validation failed and plugin_apply_filters set $data to WikiParser_PluginOutput::userError message, return it immediately
+            if ($data !== $originalData && strpos($data, tra('Plugin argument(s) missing or invalid:')) !== false) {
+                return $data;
+            }
         }
 
         $result = '';

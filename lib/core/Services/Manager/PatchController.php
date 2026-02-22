@@ -22,8 +22,8 @@ class Services_Manager_PatchController
     public function action_index($input)
     {
         $instanceId = $input->instanceId->int();
-        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {
-            $patches = TikiManager\Application\Patch::getPatches($instanceId);
+        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
+            $patches = TikiManager\Application\Patch::getPatches($instanceId);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             return [
                 'title' => tr('Tiki Manager Instance Patches'),
                 'instance' => $instance,
@@ -47,8 +47,8 @@ class Services_Manager_PatchController
     public function action_apply($input)
     {
         $instanceId = $input->instanceId->int();
-        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {
-            $cmd = new TikiManager\Command\ApplyPatchCommand();
+        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
+            $cmd = new TikiManager\Command\ApplyPatchCommand();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $inputCommand = new ArrayInput(array_merge([
                     'command' => $cmd->getName(),

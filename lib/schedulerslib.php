@@ -15,6 +15,14 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 class SchedulersLib extends TikiLib
 {
     /**
+     * Limit of the name field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_scheduler table
+     */
+    public const MAX_SCHEDULER_DESCRIPTION_LENGTH = 255;
+    /**
      * Let a list of schedulers
      *
      * @param int       $schedulerId    The Scheduler Id
@@ -104,6 +112,7 @@ class SchedulersLib extends TikiLib
         if (! empty($runs) && $runs[0]['status'] == 'running') {
             $runs[0]['output'] = SchedulerRunOutput::getTempLog($runs[0]['id']);
         }
+
         return $runs;
     }
 
@@ -130,10 +139,48 @@ class SchedulersLib extends TikiLib
      *
      * @return int
      */
-    public function countRuns($schedulerId)
+    public function countRuns($schedulerId = null)
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
+        if ($schedulerId === null) {
+            return $schedulersRunTable->fetchCount([]);
+        }
         return $schedulersRunTable->fetchCount(['scheduler_id' => $schedulerId]);
+    }
+
+    /**
+     * Get consolidated logs from all schedulers with scheduler names
+     *
+     * @param int $limit  The number of runs to return
+     * @param int $offset The offset for pagination
+     *
+     * @return array An array with the consolidated scheduler runs found
+     */
+    public function getConsolidatedLogs($limit = 100, $offset = 0)
+    {
+        if (! is_numeric($limit)) {
+            $limit = 100;
+        }
+        if (! is_numeric($offset)) {
+            $offset = 0;
+        }
+
+        $query = "SELECT sr.*, sr.output as scheduler_output, s.name as scheduler_name
+            FROM `tiki_scheduler_run` sr
+            LEFT JOIN `tiki_scheduler` s ON sr.scheduler_id = s.id
+            ORDER BY sr.id DESC
+            LIMIT " . intval($offset) . ", " . intval($limit);
+
+        $runs = $this->fetchAll($query);
+
+        // Handle running tasks with temp log output
+        foreach ($runs as $key => $run) {
+            if ($run['status'] !== 'running') {
+                $runs[$key]['output'] = SchedulerRunOutput::getTempLog($run['id']);
+            }
+        }
+
+        return $runs;
     }
 
     /**
@@ -147,6 +194,19 @@ class SchedulersLib extends TikiLib
     {
         $schedulersRunTable = $this->table('tiki_scheduler_run');
         return $schedulersRunTable->fetchOne('status', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
+    }
+
+    /**
+     * Get scheduler last run stalled status from database
+     *
+     * @param int $scheduler_id The Scheduler Id
+     *
+     * @return bool|mixed
+     */
+    public function getStalled($scheduler_id)
+    {
+        $schedulersRunTable = $this->table('tiki_scheduler_run');
+        return $schedulersRunTable->fetchOne('stalled', ['scheduler_id' => $scheduler_id], ['id' => 'DESC']);
     }
 
     /**
@@ -212,6 +272,15 @@ class SchedulersLib extends TikiLib
     {
         if (empty($end_time)) {
             $end_time = time();
+        }
+
+        // TEXT column has a 65,535 byte limit. Truncate if output exceeds this size.
+        $maxOutputBytes = 65535;
+        $truncationMsg = "\n\n[Output truncated - exceeded TEXT column limit]";
+        $maxContentBytes = $maxOutputBytes - strlen($truncationMsg);
+
+        if (strlen($errorMessage) > $maxOutputBytes) {
+            $errorMessage = substr($errorMessage, 0, $maxContentBytes) . $truncationMsg;
         }
 
         $schedulersRunTable = $this->table('tiki_scheduler_run');
@@ -325,5 +394,80 @@ class SchedulersLib extends TikiLib
     {
         $schedulerTable = $this->table('tiki_scheduler');
         return $schedulerTable->update([$field => $value], ['id' => $scheduler_id]);
+    }
+
+    /**
+     * Get scheduler logs
+     *
+     * @param string $status
+     * @return array
+     */
+    public function getSchedulerFromLogs(?string $status = null)
+    {
+        global $prefs;
+
+        $schedulerFailures = [];
+        $reportMaxDays = $prefs['scheduledTasksReportMaxDays'];
+        $db = TikiDb::get();
+        $values = [$reportMaxDays];
+        $query = 'SELECT ts.*, tsr.*
+            FROM `tiki_scheduler` ts
+            JOIN `tiki_scheduler_run` tsr ON ts.`id` = tsr.`scheduler_id`
+            WHERE tsr.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))';
+
+        if (! empty($status)) {
+            $query .= ' AND tsr.`status` = ?';
+            array_push($values, $status);
+        }
+
+        if (! empty($prefs['scheduledTasksReport']) &&  $prefs['scheduledTasksReport'] === 'last_number_of_hours') {
+            $query .= ' AND tsr.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? HOUR))';
+            array_push($values, $prefs['scheduledTasksReportHours']);
+        } else {
+            $where = '';
+            if (! empty($status)) {
+                $where .= ' AND tsr2.`status` = ?';
+                array_push($values, $status);
+            }
+            array_push($values, $reportMaxDays);
+            $query .= ' AND NOT EXISTS (
+                SELECT 1
+                FROM `tiki_scheduler_run` tsr2
+                WHERE tsr2.`scheduler_id` = ts.`id`
+                    ' . $where . '
+                    AND tsr2.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
+                    AND tsr2.`id` > tsr.`id`)';
+        }
+        $query .= ' ORDER BY tsr.`end_time` DESC;';
+        $schedulerFailures = $db->fetchAll($query, $values);
+
+        return $schedulerFailures;
+    }
+
+    /**
+     * Get the number of minutes since last task run
+     *
+     * @return int
+     */
+    public function getMinutesLastRun()
+    {
+        $query = 'SELECT TIMESTAMPDIFF(MINUTE, FROM_UNIXTIME(`start_time`), FROM_UNIXTIME(UNIX_TIMESTAMP())) AS minutes_since_last_run
+            FROM `tiki_scheduler_run`
+            ORDER BY `id` DESC LIMIT 1;';
+        return $this->getOne($query);
+    }
+
+    /**
+     * Get number of tasks executed in the last hours
+     *
+     * @param int $hours
+     * @return int
+     */
+    public function getExecutedTasksbyTime($hours)
+    {
+        $query = "SELECT COUNT(*) AS tasks_executed_last_hour
+            FROM tiki_scheduler_run
+            WHERE start_time >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? HOUR));";
+        return $this->getOne($query, [$hours]);
     }
 }

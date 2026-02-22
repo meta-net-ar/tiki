@@ -318,7 +318,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                             0 => tr('No'),
                             1 => tr('Yes'),
                         ],
-                        'default' => '1',
+                        'default' => '0',
                         'depends' => [
                             'pref' => 'tracker_clone_item',
                         ],
@@ -353,7 +353,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function addValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         if (! in_array($value, $existing)) {
             $existing[] = $value;
         }
@@ -362,7 +365,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function removeValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         $existing = array_filter($existing, function ($v) use ($value) {
             return $v != $value;
         });
@@ -746,7 +752,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($value)) {
+        if (count($indexRemote) && is_numeric($value) && $value > 0) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
             $item = $trklib->get_tracker_item($value);
@@ -1318,7 +1324,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $getParseIntoTransformFunction = function ($separator) use ($permName, $invertField) {
                     return function (&$info, $value) use ($separator, $permName, $invertField) {
                         $itemIds = [];
-                        foreach (explode($separator, $value) as $val) {
+                        foreach (explode($separator, (string) $value) as $val) {
                             if ($id = $invertField->get($val)) {
                                 $itemIds[] = $id;
                             }
@@ -1490,6 +1496,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $value = $control->getValue();
 
                 if ($value) {
+                    $value = str_replace('trackeritem:', '', $value);
                     if ($multivalue) {
                         $query->filterMultivalue((string) $value, $baseKey);
                     } else {

@@ -188,7 +188,6 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         }
 
         $response = curl_exec($handle);
-        curl_close($handle);
 
         if (! $response) {
             $error = curl_error($handle);

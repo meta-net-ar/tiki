@@ -4,6 +4,7 @@
     <div class="t_navbar mb-4 clearfix">
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_copyright visible="always"}
@@ -18,6 +19,7 @@
             {preference name=blog_feature_copyrights}
             {preference name=faq_feature_copyrights}
         </fieldset>
+    </div>
     </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

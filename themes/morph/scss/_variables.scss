@@ -7,6 +7,8 @@
 
 //
 // Color system
+$dark: #24426d; // More interesting dark background color
+
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 

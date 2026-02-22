@@ -25,7 +25,6 @@ function wikiplugin_perspective_info()
                 'since' => '7.1',
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'perspective',
             ],
             'notperspectives' => [
@@ -36,7 +35,6 @@ function wikiplugin_perspective_info()
                 'since' => '7.1',
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'perspective',
             ],
         ],
@@ -53,10 +51,10 @@ function wikiplugin_perspective($data, $params)
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
-    if (! empty($params['perspectives'])) {
+    if (! is_null($params['perspectives'])) {
         $perspectives = $params['perspectives'];
     }
-    if (! empty($params['notperspectives'])) {
+    if (! is_null($params['notperspectives'])) {
         $notperspectives = $params['notperspectives'];
     }
     if (empty($perspectives) && empty($notperspectives)) {

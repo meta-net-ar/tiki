@@ -12,13 +12,14 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
              'repID'               => 'int',          //post
-             'name'                => 'alpha',        //post
-             'start'               => 'alpha',        //post
-             'cssfile'             => 'alpha',        //post
+             'name'                => 'text',         //post
+             'path'                => 'text',         //post
+             'start'               => 'text',         //post
+             'cssfile'             => 'text',         //post
              'expiration'          => 'int',          //post
              'description'         => 'xss',          //post
-             'vis'                 => 'bool',         //post
-             'cacheable'           => 'bool',         //post
+             'vis'                 => 'alpha',        //post
+             'cacheable'           => 'alpha',        //post
              'action'              => 'striptags',    //post
              'save'                => 'striptags',    //post
         ],
@@ -26,6 +27,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 require_once('lib/integrator/integrator.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 // If Integrator is ON, check permissions...
 $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);

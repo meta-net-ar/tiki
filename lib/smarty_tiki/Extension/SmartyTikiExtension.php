@@ -47,6 +47,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getModifierCallback(string $modifierName)
     {
+        if ($tikilib = TikiLib::lib('tiki')) {
+            $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+            if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
+                return function (...$args) use ($modifierName) {
+                    return call_user_func_array($modifierName, $args);
+                };
+            }
+        }
+
         switch ($modifierName) {
             case 'a_or_an':
                 return [new \SmartyTiki\Modifier\AorAn(), 'handle'];
@@ -88,6 +97,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\FileCanConvertToPdf(), 'handle'];
             case 'file_diagram':
                 return [new \SmartyTiki\Modifier\FileDiagram(), 'handle'];
+            case 'forummaskemail':
+                return [new \SmartyTiki\Modifier\ForumMaskEmail(), 'handle'];
             case 'forumname':
                 return [new \SmartyTiki\Modifier\ForumName(), 'handle'];
             case 'forumtopiccount':
@@ -848,12 +859,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatch($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -865,12 +878,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatchAll($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -927,7 +942,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Name:     substring<br>
      * Purpose:  Returns a substring of string.  Same arguments as
      *           PHP substr function.
-     * @link based on substr(): http://www.zend.com/manual/function.substr.php
+     * @link based on substr(): https://www.php.net/manual/en/function.substr.php
      * @author   Mike Kerr <tiki.kerrnel at kerris dot com>
      * @param string
      * @param position: start position of substring (default=0, negative starts N from end)

@@ -50,6 +50,13 @@ $safePaths = [
     '\./' . DEPRECATED_DEVTOOLS_PATH . '/.*',
     '\./' . TIKI_CONFIG_FILE_PATH,
     '\./' . TIKI_CONFIG_PATH . '/virtuals.inc',
+    '\./node_modules/.*',
+    '\./_custom_dist/.*',
+    '\./_custom/.*',
+
+    '\./public/generated/.*', // generated files
+    '\./src/php/external_lib_sources.*', // External php codebases whose source code have been included in tiki.
+
 
     /* The following are DELIBERATELY PUBLIC. */
     '\./tiki-cookie-jar.php',

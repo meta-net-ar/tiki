@@ -8,9 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $structlib = TikiLib::lib('struct');
 $wikilib = TikiLib::lib('wiki');
 
@@ -112,11 +113,7 @@ $wikilib->processPageDisplayOptions(TikiLib::lib('header'));
 
 // If the url has the param "download", ask the browser to download it (instead of displaying it)
 if (isset($_REQUEST['download']) && $_REQUEST['download'] !== 'n') {
-    if (isset($_REQUEST["filename"])) {
-        $filename = $_REQUEST['filename'];
-    } else {
-        $filename = $page;
-    }
+    $filename = $_REQUEST['filename'] ?? $page;
     $filename = str_replace(['?',"'",'"',':','/','\\'], '_', $filename);    // clean some bad chars
     // add &css to the URL to transfer it as text/css mime type
     if (isset($_REQUEST['css']) && $_REQUEST['css'] !== 'n') {

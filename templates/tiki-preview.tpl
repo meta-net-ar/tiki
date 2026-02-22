@@ -1,5 +1,5 @@
 {* templates/tiki-preview.tpl start *}
-<div class="wikipreview border-bottom border-4" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
+<div class="wikipreview border-bottom border-4 overflow-y-auto overflow-x-hidden" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
     {if $prefs.ajax_autosave eq "y"}
         <div class="mb-3 float-sm-end text-end">
             <div class="">

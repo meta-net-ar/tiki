@@ -19,38 +19,40 @@ $inputConfiguration = [
              'included'               => 'int',            //post
              'action'                 => 'alnumdash',          //post
              'valid'                  => 'int',            //post
-             'addgroup'               => 'bool',           //post
-             'addincluded'            => 'bool',           //post
-             'addemail'               => 'bool',           //post
-             'addall'                 => 'bool',           //post
-             'confirmEmail'           => 'bool',           //post
-             'add'                    => 'bool',           //post
-             'addbatch'               => 'bool',           //post
+             'addgroup'               => 'alpha',          //post
+             'addincluded'            => 'alpha',          //post
+             'addemail'               => 'alpha',          //post
+             'addall'                 => 'alpha',          //post
+             'confirmEmail'           => 'alpha',          //post
+             'add'                    => 'alpha',          //post
+             'addbatch'               => 'alpha',          //post
              'wikiPageName'           => 'pagename',       //post
-             'importPage'             => 'bool',           //post
+             'importPage'             => 'alpha',          //post
              'tracker'                => 'string',         //post
-             'addTracker'             => 'bool',           //post
-             'include_groups'         => 'bool',           //post
+             'addTracker'             => 'alpha',          //post
+             'include_groups'         => 'alpha',          //post
              'page'                   => 'pagename',       //post
-             'sort_mode'              => 'string',         //get
-             'sort_mode_g'            => 'string',         //get
-             'offset'                 => 'string',         //get
-             'offset_g'               => 'string',         //get
+             'sort_mode'              => 'alnumdash',      //get
+             'sort_mode_g'            => 'alnumdash',      //get
+             'offset'                 => 'int',            //get
+             'offset_g'               => 'int',            //get
              'find'                   => 'string',         //get
              'find_g'                 => 'string',         //get
-             'noConfirmEmail'         => 'bool',           //post
-             'noSubscribeEmail'       => 'bool',           //post
-             'addPage'                => 'bool',           //post
-             'export'                => 'bool',            //post
+             'noConfirmEmail'         => 'alpha',          //post
+             'noSubscribeEmail'       => 'alpha',          //post
+             'addPage'                => 'alpha',          //post
+             'export'                 => 'alpha',          //post
         ],
         'staticKeyFiltersForArrays' => [
-            'checked'                => 'string',            //post
+             'checked'               => 'text',            //post
         ],
     ],
 ];
-$section = 'newsletters';
 require_once('tiki-setup.php');
 include_once('lib/newsletters/nllib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 $auto_query_args = [
     'sort_mode',
     'offset',
@@ -64,7 +66,7 @@ $auto_query_args = [
 $access->check_feature('feature_newsletters');
 
 $nlId = 0;
-$offset = 0;
+
 
 if (! isset($_REQUEST["nlId"])) {
     Feedback::errorAndDie(tr('No newsletter indicated'), \Laminas\Http\Response::STATUS_CODE_409);
@@ -337,10 +339,7 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
             $sort_mode = $_REQUEST["sort_mode"];
 }
-
-if (isset($_REQUEST["offset"])) {
-            $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
         $find = $_REQUEST["find"] ?? '';
 

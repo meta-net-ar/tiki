@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Smarty\Exception as SmartyException;
+
 function wikiplugin_appframe_info()
 {
     return [
@@ -412,7 +415,7 @@ function wikiplugin_appframe_template($data, $params, $start)
 
         $smarty->assign('input', $data);
         return $smarty->fetch($file);
-    } catch (SmartyException $e) {
+    } catch (SmartyException) {
         return tr('Template file not found: %0', $file);
     }
 }
@@ -422,7 +425,6 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
     static $counter = 0;
     $function = null;
     $control = null;
-    $label = null;
     $mode = null;
 
     switch ($name = $params->type->word()) {

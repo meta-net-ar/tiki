@@ -11,12 +11,14 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use BOMChecker_Scanner;
+use Tiki\LineEnding\Converter;
 
 /**
- * Fix BOM encoding, windows formatting and other invisible weirdness.
- *
- * Uses dos2unix on all Tiki files
+ * Fix BOM encoding and line endings in files using native PHP implementation.
+ * No longer requires dos2unix - uses native PHP for cross-platform compatibility.
  *
  * @package Tiki\Command
  */
@@ -29,34 +31,41 @@ class FixBOMandUnixCommand extends Command
     protected function configure()
     {
         $this
-            ->setHelp('Fixes BOM encoding, converts windows to Unix line endings and fixes other invisible weirdness in all Tiki files.');
+            ->setHelp('Fixes BOM encoding, converts windows to Unix line endings and fixes other invisible weirdness in all Tiki files.')
+            ->addOption(
+                'report-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Only report issues without fixing them'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Lets first check that some requirements are met.
-        if (! is_callable('exec')) {
-            $output->writeln('<error>Must enable exec() for this command</error>');
-            exit(1);
-        }
-        if (! is_callable('shell_exec')) {
-            $output->writeln('<error>Must enable shell_exec() for this command</error>');
-            exit(1);
-        }
-        if (! exec('dos2unix --version  2>&1')) {
-            $output->writeln('<error>dos2unix must be installed before using this command.</error>');
-            $output->writeln('On mac OS you may install this command by typing: brew install dos2unix');
-            exit(1);
-        }
+        // Get report-only flag from command option
+        $reportOnly = $input->getOption('report-only');
 
-        $filesUpdated = 0;
-        // apply filter only to these file types, excluding any vendor files.
+        // Get files to process (reuse existing globRecursive logic)
         $files = $this->globRecursive(
             '*',
             GLOB_BRACE,
             '',
-            ['vendor_', 'vendor/', 'temp/', 'lib/cypht', '.png', '.jpg', '.gif']
+            ['vendor_', 'vendor/', 'node_modules/', 'bin/', 'temp/', 'lib/cypht', '.png', '.jpg', '.gif']
         );
+
+        $output->writeln(sprintf(
+            '<info>%s %d files...</info>',
+            $reportOnly ? 'Scanning' : 'Processing',
+            count($files)
+        ));
+
+        // Instantiate BOMChecker_Scanner
+        $bomChecker = new BOMChecker_Scanner();
+
+        // Instantiate LineEnding_Converter
+        $lineEndingConverter = new Converter();
+
+        // Setup progress bar
         $progress = new ProgressBar($output, count($files));
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
             $progress->setOverwrite(false);
@@ -65,28 +74,70 @@ class FixBOMandUnixCommand extends Command
         $progress->setFormat('custom');
 
         $progress->start();
+        $progress->setMessage('Checking for BOM...');
 
-        foreach ($files as $fileName) {
-            $progress->setMessage('Processing ' . $fileName);
-            $progress->advance();
-            if (is_file($fileName)) {
-                $beforeHash = hash_file('crc32b', $fileName);
-                $raw = shell_exec('dos2unix ' . $fileName . ' 2>&1');
-                if ($output->isDebug()) {
-                    $output->writeln($raw);
+        // Use the same flag for both operations
+        $bomAffected = $bomChecker->fix($files, $reportOnly);
+
+        $progress->setMessage('Checking line endings...');
+        $lineEndingAffected = $lineEndingConverter->fix($files, $reportOnly);
+
+        $progress->finish();
+        $output->writeln(''); // New line after progress bar
+
+        // Display results
+        if ($reportOnly) {
+            $output->writeln(sprintf(
+                '<comment>Found BOM in %d file(s)</comment>',
+                count($bomAffected)
+            ));
+
+            if (count($bomAffected) > 0 && $output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                foreach ($bomAffected as $file) {
+                    $output->writeln("  <info>BOM:</info> $file");
                 }
-                if ($beforeHash !== hash_file('crc32b', $fileName)) {
-                    $filesUpdated++;
+            }
+
+            $output->writeln(sprintf(
+                '<comment>Found incorrect line endings in %d file(s)</comment>',
+                count($lineEndingAffected)
+            ));
+
+            if (count($lineEndingAffected) > 0 && $output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                foreach ($lineEndingAffected as $file) {
+                    $output->writeln("  <info>Line endings:</info> $file");
                 }
+            }
+
+            $totalIssues = count($bomAffected) + count($lineEndingAffected);
+            if ($totalIssues > 0) {
+                $output->writeln('');
+                $output->writeln('<comment>Run without --report-only to fix these issues.</comment>');
+            } else {
+                $output->writeln('');
+                $output->writeln('<info>All files look good, no issues found.</info>');
+            }
+        } else {
+            $output->writeln(sprintf(
+                '<info>Fixed BOM in %d file(s)</info>',
+                count($bomAffected)
+            ));
+
+            $output->writeln(sprintf(
+                '<info>Fixed line endings in %d file(s)</info>',
+                count($lineEndingAffected)
+            ));
+
+            $totalFixed = count($bomAffected) + count($lineEndingAffected);
+            if ($totalFixed > 0) {
+                $output->writeln('');
+                $output->writeln("<comment>$totalFixed file(s) updated, you may now review and commit.</comment>");
+            } else {
+                $output->writeln('');
+                $output->writeln('<info>All files look good, no changes made.</info>');
             }
         }
 
-        if (! $filesUpdated) {
-            $progress->setMessage('<comment>All files look good, no changes made.</comment>');
-        } else {
-                $progress->setMessage("<comment>$filesUpdated files updated, you may now review and commit.</comment>");
-        }
-        $progress->finish();
         return Command::SUCCESS;
     }
 

@@ -8,6 +8,8 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 
+use Tiki\Sections;
+
 // Handle the current user prefs in session
 if (! isset($_SESSION['u_info']) || $_SESSION['u_info']['login'] != $user) {
     $_SESSION['u_info'] = [];
@@ -36,6 +38,7 @@ $prefs['user_tracker_watch_editor'] = 'n';
 $prefs['user_comment_watch_editor'] = 'n';
 $prefs['user_category_watch_editor'] = 'n';
 $prefs['user_plugin_approval_watch_editor'] = 'n';
+$section = Sections::getCurrentSection();
 
 if ($user) {
     $default_group = $group = $_SESSION['u_info']['group'];
@@ -76,7 +79,7 @@ $smarty->assign('IP', $tikilib->get_ip_address());
 
 $tikilib->set_display_timezone($user);
 
-if (! empty($section) && $section == 'admin' && ! empty($prefs['language_admin'])) {
+if (! empty($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['language_admin'])) {
     $prefs['language'] = $prefs['language_admin'];
 }
 

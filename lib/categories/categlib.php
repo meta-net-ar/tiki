@@ -27,6 +27,14 @@ class CategLib extends ObjectLib
 {
     private $parentCategories = [];
     private $currentObjectCategories = [];
+    /**
+     * Limit of the name field of the tiki_categories table
+     */
+    public const MAX_CATEGORY_NAME_LENGTH = 200;
+    /**
+     * Limit of the description field of the tiki_categories table
+     */
+    public const MAX_CATEGORY_DESCRIPTION_LENGTH = 500;
 
     // Returns a string representing the specified category's path.
     // The path includes all parent categories ordered from the root to the category's parent, and the category itself.
@@ -786,16 +794,34 @@ class CategLib extends ObjectLib
         foreach ($result as $res) {
             if (! in_array($res['objectId'] . '-' . $res['category_ids'], $objs)) { // same object and same categories
                 if (preg_match('/trackeritem/', $res['type']) && $res['description'] == '') {
-                    $trklib = TikiLib::lib('trk');
-                    //This is a performance optimisation, but we can't rely on trackerId being present - benoitg - 2024-03-18
-                    $count = 0;
-                    $trackerIdRes = preg_replace('/^.*trackerId=([0-9]+).*$/', '$1', $res['href'], -1, $count);
-                    $trackerId = $count ? $trackerIdRes : null;
-                    $res['name'] = $trklib->get_isMain_value($trackerId, $res['itemId']);
-                    $filed = $trklib->get_field_id($trackerId, "description");
-                    $res['description'] = $trklib->get_item_value($trackerId, $res['itemId'], $filed);
-                    if (empty($res['description'])) {
-                        $res['description'] = $this->getOne("select `name` from `tiki_trackers` where `trackerId`=?", [(int)$trackerId]);
+                    // Use the Tracker_Item API to get item information
+                    $itemObject = Tracker_Item::fromId($res['itemId']);
+
+                    if ($itemObject) {
+                        $definition = $itemObject->getDefinition();
+                        $trklib = TikiLib::lib('trk');
+                        $res['name'] = $trklib->get_isMain_value(null, $res['itemId']);
+                        if (empty($res['name'])) {
+                            $res['name'] = $definition->getConfiguration('name') . ' #' . $res['itemId'];
+                        }
+
+                        // Try to get a description field
+                        $trackerId = $definition->getConfiguration('trackerId');
+                        $field = $trklib->get_field_id($trackerId, "description");
+                        if (! empty($field)) {
+                            $itemInfo = $itemObject->getInfo();
+                            $res['description'] = $itemInfo[$field] ?? '';
+                        }
+                        if (empty($res['description'])) {
+                            $res['description'] = $definition->getConfiguration('description');
+                        }
+                    } else {
+                        // Item doesn't exist, show a message
+                        Feedback::error(tr('Tracker item #%0 could not be found', $res['itemId']));
+
+                        // We still showing something in the list
+                        $res['name'] = tr('Missing Tracker Item #%0', $res['itemId']);
+                        $res['description'] = tr('This tracker item could not be found');
                     }
                 }
                 if ($prefs['feature_sefurl'] == 'y') {
@@ -1493,7 +1519,7 @@ class CategLib extends ObjectLib
             "calendar" => "calendar",
             "img" => "image",
             "template" => "template",
-        ];    //get_strings tra("article");tra("blog");tra("directory");tra("faq");tra("FAQ");tra("file gallery");tra("forum");tra("image gallery");tra("newsletter");
+        ];    //get_strings tra("article");tra("blog");tra("directory");tra("faq");tra("FAQ");tra("file gallery");tra("forum");tra("newsletter");
         //get_strings tra("poll");tra("quiz");tra("survey");tra("tracker");tra("wiki page");tra("image");tra("calendar");tra("template");
 
         $typetitles = [

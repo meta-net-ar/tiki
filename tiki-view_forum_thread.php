@@ -14,16 +14,17 @@ define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] 
 // TIKI_PRINTING_ALL is true when displaying all content for printing (?display=print_all).
 define('TIKI_PRINTING_ALL', isset($_REQUEST['display']) && $_REQUEST['display'] === 'print_all');
 
-$section = 'forums';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'comments_parentId'       => 'int',     //post
             'threadId'                => 'int',     //get
+            'forumId'                 => 'int',     //get
+            'locale'                  => 'word',    //get
             'topics_offset'           => 'int',     //get
-            'topics_sort_mode'        => 'word',    //get
-            'thread_sort_mode'        => 'word',    //get
-            'topics_find'             => 'word',    //get
+            'topics_sort_mode'        => 'alnumdash',    //get
+            'thread_sort_mode'        => 'alnumdash',    //get
+            'topics_find'             => 'striptags',    //get
             'topics_threshold'        => 'int',     //get
             'quote'                   => 'int',     //get
             'time_control'            => 'int',     //get
@@ -33,13 +34,14 @@ $inputConfiguration = [
             'comments_reply_threadId' => 'int',     //get
             'lock'                    => 'bool',    //get
             'display'                 => 'word',    //get
-            'archive'                 => 'url',     //post
+            'archive'                 => 'bool',     //post
             'report'                  => 'int',     //get
             'post_reported'           => 'word',    //get
             'comments_per_page'       => 'int',     //get
-            'savenotepad'             => 'bool',    //get
-            'watch_event'             => 'word',    //get
-            'watch_object'            => 'word',    //get
+            'savenotepad'             => 'int',    //get
+            'watch_event'             => 'striptags',    //get
+            'watch_action'            => 'alpha',         //get
+            'watch_object'            => 'int',    //get
             'view_atts'               => 'bool',    //get
             'fa_offset'               => 'int',     //get
             'fa_maxRecords'           => 'int',     //get
@@ -47,6 +49,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FORUMS;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_forums');
 
@@ -439,7 +444,6 @@ if (isset($_REQUEST['display'])) {
             header("Content-Type: application/pdf");
             header("Content-Transfer-Encoding: binary");
             header('Content-Length: ' . strlen($pdf));
-            TikiLib::lib('header')->setXRobotsTag($robots);
             echo $pdf;
         }
     } else {

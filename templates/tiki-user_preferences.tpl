@@ -63,13 +63,13 @@
                             </label>
                             <div class="col-md-8">
                                 <label>
-                                    <input type="radio" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Male" {if $user_prefs.gender eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Female" {if $user_prefs.gender eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
                                 </label>
                                 <label>
-                                    <input type="radio" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
+                                    <input type="radio" class="form-check-input" name="gender" value="Hidden" {if $user_prefs.gender eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
                                 </label>
                             </div>
                         </div>
@@ -171,21 +171,6 @@
                                 value="{$customfields[ir].value}" size="{$customfields[ir].size}"></label>
                         {/if}
                     {/section}
-                    <div class="tiki-form-group row">
-                        <label class="col-form-label col-md-4" for="user_information">
-                            {tr}User Information{/tr}
-                        </label>
-                        <div class="col-md-8">
-                            <select class="form-select" id="user_information" name="user_information">
-                                <option value='private' {if $user_prefs.user_information eq 'private'}selected="selected"{/if}>
-                                    {tr}Private{/tr}
-                                </option>
-                                <option value='public' {if $user_prefs.user_information eq 'public'}selected="selected"{/if}>
-                                    {tr}Public{/tr}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="submit text-center">
                         <input type="submit" class="btn btn-primary" name="new_info" value="{tr}Save changes{/tr}">
                     </div>
@@ -460,14 +445,6 @@
                             {tr}Use 12-hour clock in time selectors{/tr}
                         </label>
                     </div>
-                    {if 1 eq 1 || $prefs.feature_community_mouseover eq 'y'}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="show_mouseover_user_info" id="show_mouseover_user_info" {if $show_mouseover_user_info eq 'y'}checked="checked"{/if}>
-                            <label class="form-check-label" for="show_mouseover_user_info">
-                                {tr}Display info tooltip on mouseover for every user who allows his/her information to be public{/tr}
-                            </label>
-                        </div>
-                    {/if}
 
                     {if $prefs.feature_messages eq 'y' and $tiki_p_messages eq 'y'}
                         <legend>{tr}User Messages{/tr}</legend>
@@ -842,7 +819,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-7 p-4">
                         <div class="d-flex mt-4">
                             <div class="well">
                                 {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>

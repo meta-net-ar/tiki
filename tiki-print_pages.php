@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -22,6 +21,7 @@ $inputConfiguration = [
         'clearpages'               => 'bool',                //post
         'clearstructures'          => 'bool',                //post
         'addstructurepages'        => 'bool',                //post
+        'addstructure'             => 'bool',                //post
         ],
         'staticKeyFiltersForArrays' => [
             'structureId'           => 'digits',       //post
@@ -31,6 +31,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $structlib = TikiLib::lib('struct');
 $auto_query_args = ['page_ref_id', 'page', 'find', 'pageName', 'structureId', 'offset', 'printpages', 'printstructures'];
 
@@ -63,11 +66,7 @@ if (! isset($_REQUEST['printpages']) && ! isset($_REQUEST['printstructures'])) {
         $printstructures = [];
     }
 }
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (isset($_REQUEST["addpage"])) {
     if (! isset($_REQUEST["pageName"])) {

@@ -31,7 +31,7 @@ class RefreshRssCommand extends Command
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Refresh all modules'
+                tra('Refresh all modules')
             );
     }
 

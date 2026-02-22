@@ -163,9 +163,26 @@
             {/if}
         </div>
     {else}
-        {remarksbox type=info}
-            {tr}There are no comments at this time.{/tr}
-        {/remarksbox}
+        {if $thread_is_locked eq 'y'}
+            {remarksbox type=warning}
+                {icon name=lock} {tr}Replies are locked for this topic.{/tr}
+            {/remarksbox}
+        {elseif $tiki_p_forum_post eq 'y'}
+            {remarksbox type=info}
+                {tr}No replies yet — Add your thoughts!{/tr}
+            {/remarksbox}
+        {else}
+            {remarksbox type=info}
+                {tr}No replies yet.{/tr}
+                {' '}
+                <a href="tiki-login.php">{tr}Log in{/tr}</a>
+                {if $prefs.allowRegister eq 'y'}
+                    {tr}or{/tr} <a href="tiki-register.php">{tr}register{/tr}</a>
+                {/if}
+                {' '}
+                {tr}to reply!{/tr}
+            {/remarksbox}
+        {/if}
     {/if}
 {/if} {* end read comment *}
 {if $section eq 'forums'}<a id="comments"></a>{/if}

@@ -11,20 +11,26 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-             'menuId'               => 'int',            //post
-             'name'                 => 'alpha',          //post
-             'find'                 => 'alpha',          //post
+             'menuId'               => 'int',            //get
+             'name'                 => 'text',           //post
+             'find'                 => 'striptags',      //post
              'offset'               => 'int',            //get
-             'sort_mode'            => 'alpha',          //get
+             'sort_mode'            => 'alnumdash',      //get
              'remove'               => 'int',            //post
-             'use_items_icons'      => 'bool',           //post
-             'parse'                => 'bool',           //get
-             'description'          => 'xss',            //get
-             'type'                 => 'string',         //get
+             'save'                 => 'alpha',          //post
+             'icon'                 => 'text',           //post
+             'use_items_icons'      => 'alpha',          //post
+             'parse'                => 'alpha',          //post
+             'description'          => 'xss',            //post
+             'type'                 => 'string',         //post
+             'reset'                => 'alpha',          //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $menulib = TikiLib::lib('menu');
 $auto_query_args = [
     'offset',
@@ -98,11 +104,7 @@ if (! isset($_REQUEST['offset'])) {
 }
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 $smarty->assign('find', $find);
 
 $channels = $menulib->list_menus($offset, $maxRecords, $sort_mode, $find);

@@ -10,7 +10,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 global $prefs;
 
-$section = "wiki page";
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -20,6 +19,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $access = TikiLib::lib('access');
 $access->check_permission('tiki_p_edit');
 
@@ -42,7 +44,7 @@ $listparsed = TikiLib::lib('parser')->parse_data(
 $smarty->assign_by_ref('listparsed', $listparsed);
 $smarty->assign_by_ref('listtext', $editwiki);
 
-$page = 'Experiment with plugin LIST';
+$page = tr('Experiment with plugin LIST');
 
 $smarty->assign('page', $page);
 

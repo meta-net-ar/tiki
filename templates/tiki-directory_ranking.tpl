@@ -1,5 +1,5 @@
 {title url="tiki-directory_ranking.php?sort_mode=$sort_mode"}{tr}Directory ranking{/tr}{/title}
-
+<div class="styling-element">
 {* Display the title using parent *}
 {include file='tiki-directory_bar.tpl'}
 <br>
@@ -41,3 +41,4 @@
     </table>
 </div>
 {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+</div>

@@ -43,10 +43,14 @@ $input-border-color:                    var(--#{$prefix}border-color);  // defau
 $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg);  // default // $gray-200;  // default
 
 // Navbar
-$navbar-dark-color:                 rgba($white, .6);  // default
-$navbar-dark-hover-color:           $white;  // default
+
 $navbar-light-hover-color:          $body-color;  // default
 $navbar-light-active-color:         $body-color;  // default
+
+$navbar-dark-color:                 rgba($white, .85); // !default;
+$navbar-dark-hover-color:           rgba($white, .95); // !default;
+$navbar-dark-active-color:          $white; // !default;
+$navbar-dark-disabled-color:        rgba($white, .55); // !default;
 
 // Tooltips
 // Badges

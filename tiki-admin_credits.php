@@ -20,9 +20,8 @@ $inputConfiguration = [
             'use_credit_amount'     => 'float',       //post
             'restore_credit_type'   => 'striptags',   //post
             'restore_credit_amount' => 'float',       //post
-            'credit_types'          => 'striptags',   //post
             'display_text'          => 'striptags',   //post
-            'is_static_level'       => 'bool',        //post
+            'is_static_level'       => 'alpha',        //post
             'save'                  => 'bool',        //post
             'credit_type'           => 'striptags',   //post
             'new_credit_type'       => 'striptags',   //post
@@ -36,12 +35,17 @@ $inputConfiguration = [
         ],
         'staticKeyFiltersForArrays' => [
             'credits'               => 'striptags',   //post
+            'credit_types'          => 'striptags',   //post
             'delete'                => 'int',        //post
         ],
     ],
 ];
-require_once 'tiki-setup.php';
+
+require_once('tiki-setup.php');
 require_once('admin/include_credits.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
 $accesslib = TikiLib::lib('access');

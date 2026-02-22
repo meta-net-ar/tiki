@@ -11,6 +11,11 @@ class PreferencesLib
     private const DEFAULT_HIDDEN_PREFERENCES = [
         'feature_purifier',
         'smarty_security_dirs',
+        'smarty_security_allowed_tags',
+        'smarty_security_disabled_tags',
+        'smarty_security_allowed_modifiers',
+        'smarty_security_disabled_modifiers',
+        'smarty_security_allowed_builtin_php_functions',
         'tiki_allow_trust_input',
         'feature_create_webhelp',
         'scheduler_shell_command',
@@ -49,7 +54,6 @@ class PreferencesLib
 
         $translatablePreferences = [
             'browsertitle',
-            'metatag_keywords',
             'metatag_description',
         ];
 
@@ -642,7 +646,7 @@ class PreferencesLib
 
     public function applyChanges($handled, $data, $limitation = null)
     {
-        global $user_overrider_prefs;
+        global $user_overrider_prefs, $systemConfiguration;
         $tikilib = TikiLib::lib('tiki');
 
         if (is_array($limitation)) {
@@ -653,6 +657,9 @@ class PreferencesLib
 
         $changes = [];
         foreach ($handled as $pref) {
+            if (isset($systemConfiguration->preference->$pref)) {
+                continue;
+            }
             if (in_array($pref, $resets)) {
                 $tikilib->delete_preference($pref);
                 $changes[$pref] = ['type' => 'reset'];

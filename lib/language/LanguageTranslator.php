@@ -7,8 +7,8 @@
 
 namespace I18n;
 
-use Language_Exception;
 use Tiki\Lib\Theme\ThemeLib;
+use TikiLib;
 
 require_once('lib/tikilib.php');
 require_once('lib/init/typography.php');
@@ -33,21 +33,6 @@ class LanguageTranslator
         return self::$instances[$hash];
     }
 
-    public static function getLanguageFromPrefs()
-    {
-        global $user, $user_preferences;
-        if (isset($user) && isset($user_preferences[$user]['language'])) {
-            $retval = $user_preferences[$user]['language'];
-        } else {
-            global $prefs;
-            $retval = $prefs['language'];
-        }
-        if (! $retval) {
-            throw new Language_Exception("Unable to find a language in preferences.  This isn't supposed to happen");
-        }
-        return $retval;
-    }
-
     private function __construct(string $lang, array $options)
     {
         global $prefs;
@@ -65,7 +50,7 @@ class LanguageTranslator
         list($content, $out, $wasTranslated) = $this->traImpl($content, $this->lang, $args);
         $out = typography($out, $this->lang, true);
 
-        $this->populateCollectedTranslations($content, $out, $wasTranslated);
+        $this->populateCollectedTranslations($content, $out, $wasTranslated, $args);
         return $out;
     }
 
@@ -235,10 +220,10 @@ class LanguageTranslator
      * @param $printed
      * @param $isTranslated
      */
-    private function populateCollectedTranslations($original, $printed, $isTranslated)
+    private function populateCollectedTranslations($original, $printed, $isTranslated, $args = [])
     {
         if (self::inInteractiveMode()) {
-            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated];
+            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated, $args];
         }
     }
 

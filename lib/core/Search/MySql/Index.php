@@ -171,6 +171,11 @@ class Search_MySql_Index implements Search_Index_Interface
                 $this->table->expr($condition),
             ];
 
+            if ($query->isCountOnly()) {
+                $totalCount = $this->table->fetchCount($conditions);
+                return new Search_ResultSet([], $totalCount, $resultStart, $resultCount);
+            }
+
             $scoreFields = [];
             $indexes = $this->builder->getRequiredIndexes();
             foreach ($indexes as $index) {

@@ -86,13 +86,25 @@ class Scheduler_Utils
     }
 
     /**
-     * Check if schedulers are configured
+     * Check if schedulers are configured and running properly
      *
-     * @return bool
+     * Returns false only if:
+     * - There are active schedulers configured, AND
+     * - The scheduler has not run recently (based on scheduler_last_run_warning_minutes)
+     *
+     * @return bool true if no warning should be shown, false if warning should be shown
      */
     public function isSchedulerRunConfigured()
     {
         $tikilib = TikiLib::lib('tiki');
+        $schedLib = TikiLib::lib('scheduler');
+
+        // Check if there are any active schedulers first
+        // If no active schedulers exist, don't show the warning
+        $activeSchedulers = $schedLib->get_scheduler(null, 'active');
+        if (empty($activeSchedulers)) {
+            return true;
+        }
 
         $lastRunWarningMinutes = $tikilib->get_preference('scheduler_last_run_warning_minutes', 60);
         $lastRunTimestamp = $tikilib->get_preference('scheduler_last_run_timestamp');

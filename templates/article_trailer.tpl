@@ -5,7 +5,7 @@
                 <div class="alert alert-info" style="width:500px"><h4><span class="icon icon-information fas fa-info-circle fa-fw "></span>&nbsp;<span class="rboxtitle">{tr}Please wait{/tr}</span></h4><div class="rboxcontent" style="display: inline"><span class="fas fa-circle-notch fa-spin" style="font-size:24px"></span>{tr} The PDF is being prepared, please wait...{/tr}</div></div>
             </div>
         {/if}
-        <span>
+        <span class="d-inline-block m-auto text-nowrap">
             {if $show_size eq 'y'}
                 ({$size} {tr}bytes{/tr})
             {/if}

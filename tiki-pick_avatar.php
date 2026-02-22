@@ -8,13 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'showall'                  => 'bool',            //get
-        'view_user'                => 'usename',         //post
+        'view_user'                => 'username',         //post
         'uselib'                   => 'bool',            //post
         'avatar'                   => 'none',            //get
         'reset'                    => 'bool',            //post

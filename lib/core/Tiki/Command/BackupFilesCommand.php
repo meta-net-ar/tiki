@@ -36,13 +36,13 @@ class BackupFilesCommand extends Command
                 'storageonly',
                 null,
                 InputOption::VALUE_NONE,
-                'Backup only storage directories (file galleries, attachments etc...)'
+                tra('Backup only storage directories (file galleries, attachments etc...)')
             )
             ->addOption(
                 'nostorage',
                 null,
                 InputOption::VALUE_NONE,
-                'Backup only the main directory (ignore linked file gallery folders etc...)'
+                tra('Backup only the main directory (ignore linked file gallery folders etc...)')
             );
     }
 
@@ -56,13 +56,13 @@ class BackupFilesCommand extends Command
         }
 
         if (! is_dir($path)) {
-            $output->writeln('<error>Error: Provided path not found</error>');
+            $output->writeln('<error>' . tra('Error: Provided path not found') . '</error>');
             return Command::FAILURE;
         }
 
         $local = \Tiki\TikiInit::getCredentialsFile();
         if (! is_readable($local)) {
-            $output->writeln('<error>Error: "' . $local . '" not readable.</error>');
+            $output->writeln('<error>' . tra('Error: "%0" not readable.', $local) . '</error>');
             return Command::FAILURE;
         }
 
@@ -75,7 +75,7 @@ class BackupFilesCommand extends Command
 
         $root = getcwd();
         if (! $root) {
-            $output->writeln('<error>Error: Unable to derive source path</error>');
+            $output->writeln('<error>' . tra('Error: Unable to derive source path') . '</error>');
             return Command::FAILURE;
         }
 
@@ -95,7 +95,7 @@ class BackupFilesCommand extends Command
             }
             foreach ($storage as $dir) {
                 if (str_contains($dir, '..')) {
-                    $output->writeln('<error>Warning: Unable to backup storage directory ' . $dir . ' (please use absolute path)</error>');
+                    $output->writeln('<error>' . tra('Warning: Unable to backup storage directory %0 (please use absolute path)', $dir) . '</error>');
                     continue;
                 }
                 if (! empty($dir) && $input->getOption('storageonly') && substr($dir, 0, 1) != '/') {

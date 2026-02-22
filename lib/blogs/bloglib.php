@@ -18,6 +18,18 @@ use Tiki\Wiki\WikiPaginationUtils;
 class BlogLib extends TikiDb_Bridge
 {
     /**
+     * Limit of the title field of the tiki_blogs table
+     */
+    public const MAX_BLOG_TITLE_LENGTH = 200;
+    /**
+     * Limit of the description field of the tiki_blogs table
+     */
+    public const MAX_BLOG_DESCRIPTION_LENGTH = 65535;
+    /**
+     * Limit of the title field of the tiki_blog_posts table
+     */
+    public const MAX_BLOG_POST_TITLE_LENGTH = 255;
+    /**
      * List all blogs
      *
      * @param int $offset
@@ -1252,23 +1264,17 @@ class BlogLib extends TikiDb_Bridge
     {
         $query = 'SELECT `blogId` FROM `tiki_blogs` WHERE `blogId`=?';
 
-        if (is_null($this->getOne($query, [$blogId]))) {
-            return false;
-        } else {
-            return true;
-        }
+        return $this->getOne($query, [$blogId]) !== false;
     }
 
     /**
      * Check if a blog exists
      *
      * @param int $blogId
-     * @return bool true or false if blog exists or not
+     * @return void
      */
     public function check_blog_exists($blogId)
     {
-        $smarty = TikiLib::lib('smarty');
-
         if (! $this->blog_exists($blogId)) {
             Feedback::errorAndDie(tra('Blog cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
         }

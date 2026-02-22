@@ -25,7 +25,6 @@ function wikiplugin_perm_info()
                 'since' => '5.0',
                 'filter' => 'text',
                 'separator' => '|',
-                'default' => '',
             ],
             'notperms' => [
                 'required' => false,
@@ -35,7 +34,6 @@ function wikiplugin_perm_info()
                 'since' => '5.0',
                 'filter' => 'text',
                 'separator' => '|',
-                'default' => '',
             ],
             'global' => [
                 'required' => false,
@@ -56,7 +54,6 @@ function wikiplugin_perm_info()
                 'description' => tra('Name or ID of the object to test if not global or the current object'),
                 'since' => '21.3',
                 'filter' => 'text',
-                'default' => '',
             ],
             'type' => [
                 'required' => false,
@@ -64,7 +61,6 @@ function wikiplugin_perm_info()
                 'description' => tra('Type of object referred to in Object ID'),
                 'since' => '21.3',
                 'filter' => 'wordspace',
-                'default' => '',
             ],
         ]
     ];
@@ -76,10 +72,10 @@ function wikiplugin_perm($data, $params)
     $userlib = TikiLib::lib('user');
     $perms = "";
     $notperms = "";
-    if (! empty($params['perms'])) {
+    if (! is_null($params['perms'])) {
         $perms = $params['perms'];
     }
-    if (! empty($params['notperms'])) {
+    if (! is_null($params['notperms'])) {
         $notperms = $params['notperms'];
     }
 
@@ -93,7 +89,7 @@ function wikiplugin_perm($data, $params)
         $global = false;
     }
 
-    if (! empty($params['object']) && ! empty($params['type'])) {
+    if (! is_null($params['object']) && ! is_null($params['type'])) {
         $objectPerms = Perms::get([ 'type' => $params['type'], 'object' => $params['object'] ]);
     } else {
         $objectPerms = null;
@@ -106,7 +102,7 @@ function wikiplugin_perm($data, $params)
         $dataelse = '';
     }
 
-    if (! empty($perms)) {
+    if (! is_null($perms)) {
         $ok = false;
         foreach ($perms as $perm) {
             if ($global) {
@@ -127,7 +123,7 @@ function wikiplugin_perm($data, $params)
             }
         }
     }
-    if (! empty($notperms)) {
+    if (! is_null($notperms)) {
         $ok = true;
         foreach ($notperms as $perm) {
             if ($global) {

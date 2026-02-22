@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label for="priority" class="col-md-3 col-form-label">Priority</label>
+        <label for="priority" class="col-md-3 col-form-label">{tr}Priority{/tr}</label>
         <div class="col-md-9">
             <select name="priority" class="form-select">
                 {foreach $priorities as $key => $info}

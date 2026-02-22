@@ -5,7 +5,7 @@
 {/remarksbox}
 
 <h2>{tr}Create/edit DSN{/tr}</h2>
-<form action="tiki-admin_dsn.php" method="post">
+<form action="tiki-admin_dsn.php" method="post" class="styling-element">
     {ticket}
     <input type="hidden" name="dsnId" value="{$dsnId|escape}">
     <div class="mb-3 row">
@@ -25,7 +25,7 @@
     </div>
 </form>
 <h2>{tr}DSN{/tr}</h2>
-<div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {* table-responsive class cuts off css drop-down menus *}
     <table class="table table-striped table-hover">
         <tr>
             <th>
@@ -75,7 +75,7 @@
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 
 <h2>{tr}Content Authentication{/tr}</h2>
-<form id="source-form" method="post" action="{service controller=auth_source}">
+<form id="source-form" method="post" action="{service controller=auth_source}" class="styling-element">
     {ticket}
     <fieldset>
         <legend>{tr}Identification{/tr}</legend>

@@ -59,6 +59,7 @@
                     {preference name=smarty_security_disabled_tags}
                     {preference name=smarty_security_allowed_modifiers}
                     {preference name=smarty_security_disabled_modifiers}
+                    {preference name=smarty_security_allowed_builtin_php_functions}
                     {preference name=smarty_security_dirs}
                 </div>
                 {preference name=feature_purifier}
@@ -185,6 +186,10 @@
                     {preference name=http_header_public_key_pins_value}
                 </div>
             </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}.htaccess Security{/tr}{help url="Security"}</legend>
+                {preference name=security_warn_htaccess_mismatch}
+            </fieldset>
         {/tab}
 
         {tab name="{tr}Spam Protection{/tr}"}
@@ -243,6 +248,7 @@
             {preference name=use_load_threshold}
             <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                 {preference name=load_threshold}
+                {preference name=load_retry_after}
                 {preference name=site_busy_title}
                 {preference name=site_busy_msg}
                 <div class="col-sm-8 offset-sm-4">
@@ -467,7 +473,7 @@
                                 {if $prefs.feature_user_encryption eq 'y'}
                                     {user_selector multiple='true' name='users' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
                                 {else}
-                                    Depends on "User encryption".
+                                    {tr}Depends on "User encryption".{/tr}
                                 {/if}
                             </div>
                         </div><br>

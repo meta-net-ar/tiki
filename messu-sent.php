@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'user_messages';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_USER_MESSAGES;
+Sections::setCurrentSection($section);
 $messulib = TikiLib::lib('message');
 $access->check_user($user);
 $access->check_feature('feature_messages');
@@ -97,16 +99,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$offset = $_REQUEST["offset"] ?? 0;
+ $find = $_REQUEST["find"] ?? '';
+
 $smarty->assign_by_ref('flag', $_REQUEST['flag']);
 $smarty->assign_by_ref('priority', $_REQUEST['priority']);
 $smarty->assign_by_ref('flagval', $_REQUEST['flagval']);

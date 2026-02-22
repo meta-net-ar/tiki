@@ -11,14 +11,14 @@
 
 // Colors
 
-$primary:       #0001a6;
-$secondary:     #adb5bd;
-$success:       #56C07B;
-$info:          #39A0CB;
-$warning:       #F0AD4E;
-$danger:        #D9534F;
-$light:         $gray-100;
-$dark:          $gray-900;
+$primary:       #206ea7;
+$secondary:     $gray-600;  // default
+$success:       #177D4D; // $green;  // default ---- Darkened for WCAG
+$info:          #087E96; // $primary;
+$warning:       #946F00; // $yellow;  // default
+$danger:        #D42537; // $red;  // default ---- Darkened for WCAG
+$light:         $gray-100;  // default
+$dark:          $gray-900;  // default
 $white: #fff;
 
 $theme-colors: (
@@ -36,16 +36,26 @@ $theme-colors: (
 $enable-gradients: true;
 
 // Body
-$body-color: #222;
-$body-bg:                   $white;  // default
+$body-bg: #f3f3f3;
+$body-color:                #575757; // .text-muted in original
+
+$body-secondary-color:      rgba($body-color, .90);
+$body-secondary-bg:         $gray-200;
+
+$body-tertiary-color:       rgba($body-color, .5);
+$body-tertiary-bg:          $gray-100;
+
+$body-emphasis-color:       $black;
 
 // Links
+$link-color: $primary;
 $link-hover-decoration: none;
 
 // Components
-$component-active-bg: $primary; // #aaaaaa;
+$component-active-color:      $white; // Bootstrap 5.3
+$component-active-bg:         $primary;
 
-// Fonts
+// Typography
 $font-family-sans-serif: system-ui, sans-serif; // "Verdana", "Arial", sans-serif;
 $font-size-base: 1rem; // .9rem;
 
@@ -53,30 +63,57 @@ $headings-font-weight: 700;
 
 // Tables
 // Buttons
+$button-border-radius: var(--tiki-jui-border-radius);
+
 // Forms
 $form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
 $form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
 $form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
-// Dropdowns
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
-
+// Form validation
 // Navs
 // Navbar
-$navbar-light-border: #aaaaaa;
+
+// Dropdowns
+$dropdown-link-active-color:        $component-active-color;
+$dropdown-link-active-bg:           $component-active-bg;
+$dropdown-link-active-color:        $component-active-color;
+$dropdown-link-active-bg:           $component-active-bg;
+
+$dropdown-link-disabled-color:      $gray-500;
+
+$dropdown-dark-color:               $gray-300;
+$dropdown-dark-bg:                  #3B3B3BFF;
+$dropdown-dark-border-color:        $dropdown-border-color;
+$dropdown-dark-divider-bg:          $dropdown-divider-bg;
+$dropdown-dark-box-shadow:          null;
+$dropdown-dark-link-color:          $dropdown-dark-color;
+$dropdown-dark-link-hover-color:    $white;
+$dropdown-dark-link-hover-bg:       rgba($white, .15);
+$dropdown-dark-link-active-color:   $white; //$dropdown-link-active-color;
+$dropdown-dark-link-active-bg:      $dropdown-link-active-bg;
+$dropdown-dark-link-disabled-color: $gray-500;
+$dropdown-dark-header-color:        $gray-500;
 
 // Pagination
-$pagination-active-bg: #aaaaaa;
-$pagination-active-border: darken(#aaa, 10%);
+$pagination-color:                  var(--#{$prefix}link-color);
+$pagination-bg:                     var(--#{$prefix}body-bg);
 
 // Cards
 $card-border-color: var(--bs-tertiary-color); // #999999;
+
+
+// Accordion
+$accordion-button-color:                  var(--tiki-jui-state-default-color);
+$accordion-button-bg:                     var(--tiki-jui-state-default-bg);
+$accordion-button-active-bg:              var(--tiki-jui-state-active-color);
+$accordion-button-active-color:           var(---tiki-jui-state-active-bg);
 
 // Tooltips
 // Popovers
 // Badges
 $badge-font-size:                   .75rem;
-$badge-color:                       $black;
+$badge-color:                       $white;
 $badge-padding-y:                   .35rem;
 $badge-padding-x:                   .65rem;
 

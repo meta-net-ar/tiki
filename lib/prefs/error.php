@@ -61,6 +61,33 @@ function prefs_error_list()
             'default'     => '1',
             'tags'        => ['advanced'],
         ],
+        'error_tracking_tracing_enabled_php' => [
+            'name'        => tra('Enable PHP performance tracing (Sentry/GlitchTip)'),
+            'description' => tra('Send PHP performance data (transaction times, bottlenecks) to your configured error tracking service (Sentry or GlitchTip). Requires error tracking to be enabled with a valid DSN.'),
+            'type'        => 'flag',
+            'default'     => 'n',
+            'tags'        => ['advanced'],
+            'dependencies' => [
+                'error_tracking_enabled_php'
+            ],
+        ],
+        'error_tracking_tracing_enabled_js' => [
+            'name'        => tra('Enable JavaScript performance tracing (Sentry/GlitchTip)'),
+            'description' => tra('Send JavaScript performance data (page load times, client-side bottlenecks) to your configured error tracking service (Sentry or GlitchTip). Requires error tracking to be enabled with a valid DSN.'),
+            'type'        => 'flag',
+            'default'     => 'n',
+            'tags'        => ['advanced'],
+            'dependencies' => [
+                'error_tracking_enabled_js'
+            ],
+        ],
+        'error_tracking_traces_sample_rate' => [
+            'name'        => tra('Traces sample rate'),
+            'description' => tra('Controls the percentage of transactions sent to Sentry for performance monitoring. Use a value between 0 and 1. E.g.: 0.1 (will report 10% of transactions). Lower values reduce performance overhead and costs.'),
+            'type'        => 'text',
+            'default'     => '0.1',
+            'tags'        => ['advanced'],
+        ],
         'error_generic_non_admins'   => [
             'name'        => tra('Show generic error message'),
             'description' => tra('Show a generic error message for non admins users. The error is logged to the database.'),

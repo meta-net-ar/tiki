@@ -11,19 +11,23 @@
 
  namespace SmartyTiki\FunctionHandler;
 
+use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use Tiki\Sections;
+use TikiLib;
 
 class HtmlBodyAttributes extends Base
 {
     // Used in the template to create the html_body_attributes tag which can take a class as parameter and returns the attributes for a standard tiki page body tag
     public function handle($params, Template $template)
     {
-        global $section, $prefs, $page, $section_class, $user;
+        global $prefs, $page, $section_class, $user;
+        $section = Sections::getCurrentSection();
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';
-        $class = 'tiki' . ' ' . $params['class'] ?? '';
+        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . $params['class'] ?? '';
 
         //filename of script called (i.e. tiki-index, tiki-user_information, tiki-view_forum, etc), then sanitize chars
         $script_filename = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME);
@@ -108,7 +112,7 @@ class HtmlBodyAttributes extends Base
         if (! empty($pageLang)) {
             $class .= ' lang_' . $pageLang;
         } else {
-            $class .= ' lang_' . $prefs['language'];
+            $class .= ' lang_' . Language::getCurrentLanguage();
         }
 
         if (getCookie('hide_zone_left')) {

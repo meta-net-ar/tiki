@@ -48,6 +48,7 @@
         <service id="tiki.controller.kaltura" class="Services_Kaltura_Controller"/>
         <service id="tiki.controller.peertube" class="Services_PeerTube_Controller"/>
         <service id="tiki.controller.language" class="Services_Language_Controller"/>
+        <service id="tiki.controller.languagecheck" class="Services_LanguageCheck_Controller"/>
         <service id="tiki.controller.manager" class="Services_Manager_Controller"/>
         <service id="tiki.controller.manager_field" class="Services_Manager_FieldController"/>
         <service id="tiki.controller.manager_patch" class="Services_Manager_PatchController"/>

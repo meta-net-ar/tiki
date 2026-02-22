@@ -59,7 +59,8 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
     });
 
     elementPlusUi.addEventListener("select", (event) => {
-        element.value = event.detail[0].value;
+        const key = valueKey || "value";
+        element.value = event.detail[0][key];
         element.dispatchEvent(new Event("change"));
         if (selectCb) {
             selectCb(event);

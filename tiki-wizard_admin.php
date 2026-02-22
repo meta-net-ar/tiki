@@ -59,6 +59,14 @@ if ($useDefaultPrefs) {
     require_once('lib/wizard/pages/profiles_featured_site_confs.php');
     $pages[] = new ProfilesWizardFeaturedSiteConfs();
 
+    /*
+        ====== TEMPORARILY DISABLED ======
+        Initially, I had the option to remove, comment out, or hide the code, based on Benoit Roy’s instructions.
+        I decided to comment it out instead of deleting it because, before those instructions, Marc mentioned that some profiles might be fixed in the future.
+        So, as I understood it, the goal was not to permanently delete them, but to temporarily disable the broken ones since most of them are currently malfunctioning and causing issues for users.
+        ====== Author: Landry Bitege (@land-bit) — 2025-11-12 ======
+    */
+
     // require_once('lib/wizard/pages/profiles_useful_micro_confs.php');
     // $pages[] = new ProfilesWizardUsefulMicroConfs();
 

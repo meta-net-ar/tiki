@@ -38,7 +38,6 @@ function wikiplugin_realnamelist_info()
                 'description' => tra('Set to sort in ascending or descending order (unsorted by default'),
                 'since' => '4.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Ascending'), 'value' => 'asc'],
@@ -51,7 +50,6 @@ function wikiplugin_realnamelist_info()
                 'description' => tra('Set to table to show results in a table (not shown in a table by default)'),
                 'since' => '4.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Table'), 'value' => 'table']
@@ -63,7 +61,6 @@ function wikiplugin_realnamelist_info()
                 'description' => tra('Make the listed names links to various types of user information'),
                 'since' => '4.0',
                 'filter' => 'word',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('User Information'), 'value' => 'userinfo'],
@@ -77,7 +74,6 @@ function wikiplugin_realnamelist_info()
                 'description' => tra('Exclude certain test or admin names from the list'),
                 'since' => '4.0',
                 'filter' => 'text',
-                'default' => '',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('admin'), 'value' => 'admin'],
@@ -93,19 +89,11 @@ function wikiplugin_realnamelist_info()
 function wikiplugin_realnamelist($data, $params)
 {
     global $prefs, $tiki_p_admin, $tiki_p_admin_users;
-    $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
 
     extract($params, EXTR_SKIP);
 
-    if (! isset($sep)) {
-        $sep = ', ';
-    }
-    if (! isset($max)) {
-        $numRows = -1;
-    } else {
-        $numRows = (int) $max;
-    }
+    $numRows = (int) $max;
 
     if ($data) {
         $mid = 'g.`groupName` like ?';
@@ -120,7 +108,7 @@ function wikiplugin_realnamelist($data, $params)
         $bindvars = [];
         $tableheader = 'all users';
     }
-    if (isset($sort)) {
+    if (! is_null($sort)) {
         $sort = strtolower($sort);
         if (($sort == 'asc') || ($sort == 'desc')) {
             $mid .= ' ORDER BY `value`, `login` ' . $sort;
@@ -128,7 +116,7 @@ function wikiplugin_realnamelist($data, $params)
     }
 
     $exclude_clause = '';
-    if (isset($exclude)) {
+    if (! is_null($exclude)) {
         $exclude = strtolower($exclude);
         if (($exclude == 'test') || ($exclude == 'admin')) {
             $exclude_clause = ' u.`login` NOT LIKE \'%' . $exclude . '%\' AND ' ;
@@ -141,7 +129,7 @@ function wikiplugin_realnamelist($data, $params)
     }
     $pre = '';
     $post = '';
-    if (isset($layout)) {
+    if (! is_null($layout)) {
         if ($layout == 'table') {
             $pre = '<table class=\'sortable\' id=\'' . $tikilib->now . '\'><tr><th>' . tra($tableheader) . '</th></tr><tr><td>';
             $sep = '</td></tr><tr><td>';
@@ -156,7 +144,7 @@ function wikiplugin_realnamelist($data, $params)
 
     while ($row = $result->fetchRow()) {
         $res = '';
-        if (isset($link)) {
+        if (! is_null($link)) {
             if ($link == 'userpage') {
                 if ($prefs['feature_wiki_userpage'] == 'y') {
                     $wikilib = TikiLib::lib('wiki');
@@ -165,16 +153,15 @@ function wikiplugin_realnamelist($data, $params)
                         $res = '<a href="' . $wikilib->sefurl($page) . '" title="' . tra('Page') . '">';
                     }
                 }
-            } elseif (isset($link) && $link == 'userpref') {
+            } elseif ($link == 'userpref') {
                 if ($prefs['feature_userPreferences'] == 'y' && ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y')) {
                     $res = '<a href="tiki-user_preferences.php?userId=' . $row['userId'] . '" title="' . tra('Preferences') . '">';
                 }
-            } elseif (isset($link) && $link == 'userinfo') {
+            } elseif ($link == 'userinfo') {
                 if ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y') {
                     $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
                 } else {
-                    $user_information = $tikilib->get_user_preference($row['login'], 'user_information', 'public');
-                    if (isset($user) && $user_information != 'private' && $row['login'] != $user) {
+                    if (isset($user) && $row['login'] != $user) {
                         $res = '<a href="tiki-user_information.php?userId=' . $row['userId'] . '" title="' . tra('User Information') . '">';
                     }
                 }

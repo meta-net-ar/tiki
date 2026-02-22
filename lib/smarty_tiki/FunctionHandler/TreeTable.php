@@ -12,7 +12,7 @@ use Smarty\Template;
 
 /**
  * Tree Table Smarty func - smarty_function_treetable()
- * Renders a tree table (for use with http://plugins.jquery.com/project/treeTable)
+ * Renders a tree table (for use with https://github.com/ludo/jquery-treetable)
  *
  * Params
  *

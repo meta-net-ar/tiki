@@ -1,14 +1,14 @@
 <form method="get" action="{$filter_action|escape}" class="filter">
     <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label" for="filter~content">{tr}Find{/tr}</label>
-        <div class="col-sm-4">
+        <label class="col-sm-5 col-form-label" for="filter~content">{tr}Find{/tr}</label>
+        <div class="col-sm-7">
             <input type="search" name="filter~content" class="form-control" id="filter~content" value="{$filter_content|escape}">
         </div>
     </div>
     {if $prefs.search_show_sort_order eq 'y'}
         <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label">{tr}Sort By{/tr}</label>
-            <div class="col-sm-3">
+            <label class="col-sm-5 col-form-label">{tr}Sort By{/tr}</label>
+            <div class="col-sm-7">
                 <select name="sort_mode" class="sort_mode form-control">
                     {$sort_found = false}
                     {foreach from=$sort_modes key=k item=t}
@@ -29,8 +29,8 @@
         {/if}
         {if $prefs.feature_search_show_object_filter eq 'y'}
             <div class="mb-3 row">
-                <label class="col-sm-2 col-form-label" for="filter-type">{tr}Type{/tr}</label>
-                <div class="col-sm-4">
+                <label class="col-sm-5 col-form-label" for="filter-type">{tr}Type{/tr}</label>
+                <div class="col-sm-7">
                     <select name="filter~type" id="filter-type" class="form-control">
                         <option value="0" selected>{tr}Any{/tr}</option>
                         {foreach from=$filter_types key=k item=t}
@@ -51,8 +51,8 @@
 
         {if $prefs.feature_categories eq 'y' and $tiki_p_view_category eq 'y' and $prefs.search_show_category_filter eq 'y'}
             <div class="mb-3 row">
-                <label class="col-sm-2 col-form-label" for="filter-categories">{tr}Categories{/tr}</label>
-                <div class="col-sm-4">
+                <label class="col-sm-5 col-form-label" for="filter-categories">{tr}Categories{/tr}</label>
+                <div class="col-sm-7">
                     <div class="form-check d-inline-block">
                         <label for="filter-deep" class="form-check-label">
                             <input type="checkbox" name="filter~deep" id="filter-deep" class="form-check-input" {if $filter_deep} checked="checked"{/if}> {tr}Deep search{/tr}
@@ -69,8 +69,8 @@
         {/if}
         {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and $prefs.search_show_tag_filter eq 'y'}
             <div class="mb-3 row">
-                <label class="col-sm-2 col-form-label" for="filter-tags">{tr}Tags{/tr}</label>
-                <div class="col-sm-4">
+                <label class="col-sm-5 col-form-label" for="filter-tags">{tr}Tags{/tr}</label>
+                <div class="col-sm-7">
                     <input type="text" name="filter~tags" class="tag-wizard d-none" id="filter-tags" value="{$filter_tags|join:' '}">
                     <select id="filter-tags-ui" class="form-control" multiple>
                         {foreach from=$tags item=tag}
@@ -82,8 +82,8 @@
         {/if}
         {if isset($filter.tracker_id)}
             <div class="mb-3 row">
-                <label class="col-sm-2 col-form-label" for="filter-tracker_id">{tr}Tracker{/tr}</label>
-                <div class="col-sm-4">
+                <label class="col-sm-5 col-form-label" for="filter-tracker_id">{tr}Tracker{/tr}</label>
+                <div class="col-sm-7">
                     {object_selector type=tracker _simplevalue=$filter.tracker_id _simplename="filter~tracker_id" _simpleid="filter-tracker_id"}
                 </div>
             </div>
@@ -93,21 +93,25 @@
         {/if}
         {if $prefs.feature_multilingual eq 'y'}
             {if $prefs.search_default_interface_language neq 'y'}
-                <div class="mb-3 row">
-                    <label class="col-sm-2 col-form-label" for="filter-language">{tr}Language{/tr}</label>
-                    <div class="col-sm-4">
-                        <select name="filter~language" class="form-control" id="filter-language">
+                <div class="row mb-3">
+                    <label class="col-sm-5 col-form-label" for="filter-language">{tr}Language{/tr}</label>
+                    <div class="col-sm-7">
+                        <select name="filter~language" class="form-select" id="filter-language">
                             <option value="0" selected>{tr}Any{/tr}</option>
                             {foreach from=$filter_languages item=l}
                                 <option value="{$l.value|escape}"{if $filter_language eq $l.value} selected="selected"{/if}>{$l.name|escape}</option>
                             {/foreach}
                         </select>
                     </div>
-                    <div class="col-sm-5">
-                        <label for="filter-language-unspecified-checkbox">
-                            <input type="checkbox" id="filter-language-unspecified-checkbox" name="filter~language_unspecified"{if $filter_language_unspecified} checked="checked"{/if}>
-                            {tr}Include objects without a specified language{/tr}
-                        </label>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-7 offset-sm-5">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="filter-language-unspecified-checkbox" name="filter~language_unspecified"{if $filter_language_unspecified} checked="checked"{/if}>
+                            <label class="form-check-label" for="filter-language-unspecified-checkbox">
+                                {tr}Include objects without a specified language{/tr}
+                            </label>
+                        </div>
                     </div>
                 </div>
             {else}
@@ -116,55 +120,57 @@
             {/if}
         {/if}
 
-    <div class="text-center">
-        <input type="submit" class="btn btn-info" value="{tr}Search{/tr}">
-        {if $prefs.tracker_tabular_enabled eq 'y' && ! empty($smarty.get.tabularId)}
-            <input type="hidden" name="tabularId" value="{$smarty.get.tabularId|escape}">
-            <button class="tabular-export btn btn-secondary">
-                {icon name=export} {tr}Export{/tr}
-            </button>
-            {jq}
-                $(document).on('click', '.tabular-export', function (e) {
+    <div class="mb-3 row">
+        <div class="col-sm-7 offset-sm-5">
+            <input type="submit" class="btn btn-info" value="{tr}Search{/tr}">
+            {if $prefs.tracker_tabular_enabled eq 'y' && ! empty($smarty.get.tabularId)}
+                <input type="hidden" name="tabularId" value="{$smarty.get.tabularId|escape}">
+                <button class="tabular-export btn btn-secondary">
+                    {icon name=export} {tr}Export{/tr}
+                </button>
+                {jq}
+                    $(document).on('click', '.tabular-export', function (e) {
                     var href = $.service('tabular', 'export_search_csv', {
-                        tabularId: "{{$smarty.get.tabularId}}"
+                    tabularId: "{{$smarty.get.tabularId}}"
                     });
                     e.preventDefault();
                     document.location.href = href + '&' + $(this).closest('form').serialize();
-                });
-            {/jq}
-        {elseif $prefs.tracker_tabular_enabled eq 'y' && ! empty($filter.tracker_id)}
-            <button class="tabular-export btn btn-secondary">
-                {icon name=export} {tr}Export{/tr}
-            </button>
-            {jq}
-                $(document).on('click', '.tabular-export', function (e) {
+                    });
+                {/jq}
+            {elseif $prefs.tracker_tabular_enabled eq 'y' && ! empty($filter.tracker_id)}
+                <button class="tabular-export btn btn-secondary">
+                    {icon name=export} {tr}Export{/tr}
+                </button>
+                {jq}
+                    $(document).on('click', '.tabular-export', function (e) {
                     var href = $.service('tabular', 'export_search_csv', {
-                        trackerId: "{{$filter.tracker_id}}"
+                    trackerId: "{{$filter.tracker_id}}"
                     });
                     e.preventDefault();
                     $.openModal({
-                        remote: href + '&' + $(this).closest('form').serialize()
+                    remote: href + '&' + $(this).closest('form').serialize()
                     });
-                });
-            {/jq}
-        {/if}
-        {if $prefs.storedsearch_enabled eq 'y' and $user}
-            <input type="hidden" name="storeAs" value=""/>
-            <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-info">{tr}Save Search{/tr}</a>
-            <a href="{service controller=search_stored action=list}" class="btn btn-link">{tr}View Saved Searches{/tr}</a>
-            {jq}
-                $('#store-query').clickModal({
+                    });
+                {/jq}
+            {/if}
+            {if $prefs.storedsearch_enabled eq 'y' and $user}
+                <input type="hidden" name="storeAs" value=""/>
+                <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-info">{tr}Save Search{/tr}</a>
+                <a href="{service controller=search_stored action=list}" class="btn btn-link">{tr}View Saved Searches{/tr}</a>
+                {jq}
+                    $('#store-query').clickModal({
                     success: function (data) {
-                        var form = $(this).closest('form')[0];
+                    var form = $(this).closest('form')[0];
 
-                        $(form.storeAs).val(data.queryId);
-                        $(form).attr('method', 'post');
-                        $(form).trigger("submit");
+                    $(form.storeAs).val(data.queryId);
+                    $(form).attr('method', 'post');
+                    $(form).trigger("submit");
                     }
-                });
-            {/jq}
-        {/if}
-        <a href="{bootstrap_modal controller=search action=help}">{tr}Search Help{/tr} {icon name='help'}</a>
+                    });
+                {/jq}
+            {/if}
+            <a href="{bootstrap_modal controller=search action=help}">{tr}Search Help{/tr} {icon name='help'}</a>
+        </div>
     </div>
 </form>
 {jq}

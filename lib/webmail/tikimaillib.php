@@ -59,7 +59,7 @@ class TikiMail
             $this->mail = tiki_get_basic_mail();
             try {
                 $this->mail->from(new Address($from, $fromName));
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // was already set, then do nothing
             }
         } else {
@@ -133,15 +133,18 @@ class TikiMail
     public function setHeader($name, $value)
     {
         $headers = $this->mail->getHeaders();
+        if (is_string($value)) {
+            $value = explode(',', trim($value));
+        }
         switch ($name) {
             case 'Message-Id':
-                $headers->addIdHeader('Message-ID', trim($value));
+                $headers->addIdHeader('Message-ID', $value);
                 break;
             case 'In-Reply-To':
-                $headers->addIdHeader('In-Reply-To', trim($value));
+                $headers->addIdHeader('In-Reply-To', $value);
                 break;
             case 'References':
-                $headers->addIdHeader('References: ', trim($value));
+                $headers->addIdHeader('References', $value);
                 break;
             default:
                 $headers->addTextHeader($name, $value);
@@ -247,7 +250,7 @@ class TikiMail
             }
         }
 
-        if ($prefs['mailer_queue'] == 'y' || $prefs['mailer_handler'] === 'smtp') {
+        if ($prefs['mailer_queue'] == 'y') {
             $query = "INSERT INTO `tiki_mail_queue` (message) VALUES (?)";
             $bindvars = [serialize($this->mail)];
             $tikilib->query($query, $bindvars, -1, 0);

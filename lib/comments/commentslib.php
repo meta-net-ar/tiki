@@ -10,6 +10,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Component\Mime\Address;
 use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Sections;
 
 /**
  *
@@ -18,6 +19,30 @@ class Comments extends TikiLib
 {
     public $time_control = 0;
     private $extras = true;
+    /**
+     * Limit of the title field of the tiki_comments table
+     */
+    public const MAX_COMMENT_TITLE_LENGTH = 255;
+    /**
+     * Limit of the data field of the tiki_comments table
+     */
+    public const MAX_COMMENT_DATA_LENGTH = 65535;
+    /**
+     * Limit of the name field of the tiki_forums table
+     */
+    public const MAX_FORUM_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_forums table
+     */
+    public const MAX_FORUM_DESCRIPTION_LENGTH = 65535;
+    /**
+     * Limit of the section field of the tiki_forums table
+     */
+    public const MAX_FORUM_SECTION_LENGTH = 200;
+    /**
+     * Limit of the forum_password field of the tiki_forums table
+     */
+    public const MAX_FORUM_PASSWORD_LENGTH = 32;
 
     /* Functions for the forums */
     public function report_post($forumId, $parentId, $threadId, $user, $reason = '')
@@ -124,10 +149,7 @@ class Comments extends TikiLib
                 || ($forum_info['att'] == 'att_admin' && $perms->admin_forum == 'y')
                 || ($forum_info['att'] == 'att_perm' && $perms->forum_attach == 'y'))
         ) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra('Permission denied'));
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie(tra('Permission denied'), 401);
             die;
         }
         if (! empty($prefs['forum_match_regex']) && ! preg_match($prefs['forum_match_regex'], $name)) {
@@ -342,6 +364,9 @@ class Comments extends TikiLib
         }
     }
 
+    /**
+     * @throws \Tiki\MailIn\Exception\TransportException
+     */
     public function process_inbound_mail($forumId, $maxImport = 5)
     {
         global $prefs, $user;
@@ -375,11 +400,13 @@ class Comments extends TikiLib
 
             $rawEmailContent = $imap->get_message_content($uid, 0);
             $parsedMessage = $mailMimeParser->parse($rawEmailContent, true);
+
+            // $subject = $parsedMessage->getHeaderValue('Subject');
             // If the mail came from Tiki, we don't need to add it again
             $xTikiHeader = $parsedMessage->getHeaderValue('X-Tiki');
             if ($xTikiHeader === 'yes') {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("Skipping email with X-Tiki: yes. Message ID: " . $messageFromImap->getNumber());
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)");
                 continue;
             }
             // If the connection is done, or the mail has an error, or whatever,
@@ -387,20 +414,18 @@ class Comments extends TikiLib
             // and continue on. --rlpowell
             if (! count($parsedMessage->getAllHeaders())) {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("Skipping email with no headers. Raw content length: " . strlen($rawEmailContent));
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers.");
                 continue;
             }
-//            https://mail-mime-parser.org/usage-guide-0.4.html
-            $addressHeader = $parsedMessage->getHeader('From'); // getHeader('From') returns an AddressHeader object
-            $fromAddress = $addressHeader?->getAddresses()[0] ?? null;
-            $aux['From'] = $fromAddress ? $fromAddress->toString() : '';
-            if ($addressHeader) {
-                $returnPath = $parsedMessage->getHeaderValue('Return-path');
-                if ($returnPath) {
-                    $aux['From'] = $returnPath;
-                } else {
-                    $aux['Return-path'] = "";
-                }
+
+            $addressHeader = $parsedMessage->getHeader('From');
+            $fromAddressPart = $addressHeader?->getAddresses()[0] ?? null;
+            $aux['From'] = $fromAddressPart ? $fromAddressPart->getEmail() : '(none)';
+
+            // Optionally override with Return-Path if available
+            $returnPath = $parsedMessage->getHeaderValue('Return-Path');
+            if ($returnPath) {
+                $aux['From'] = $returnPath;
             }
             //try to get the date from the email:
             $postDate = $parsedMessage->getHeader('Date')?->getDateTime(); // getHeader('Date') returns an DateHeader object
@@ -659,8 +684,10 @@ class Comments extends TikiLib
                 // mark the message to be deleted and keep processing
                 $source_imap->deleteMessages($imap, [$uid]);
             } catch (Exception $e) {
+                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage());
                 Feedback::error(tr('Adding email %0 to the forum failed due to "%1"', $title, $e->getMessage()));
             }
+            $importedCount++;
         }
         if ($imap) {
             $imap->disconnect();
@@ -1523,6 +1550,7 @@ class Comments extends TikiLib
             }
             //need to sort within sections if sections are used (also works if sections aren't used)
             $sections = array_unique(array_column($result, 'section'));
+            $sorted = [];
             foreach ($sections as $section) {
                 foreach ($sortarray as $key => $data) {
                     if ($result[$key]['section'] === $section) {
@@ -1873,6 +1901,7 @@ class Comments extends TikiLib
             $res = $comments->fetchFullRow(['threadId' => $id]);
         }
         if ($res && is_array($res)) { //if there is a comment with that id
+            $res = $this->maskFields($res);
             $this->add_comments_extras($res, $forum_info);
             if (! empty($res['objectType']) && $res['objectType'] == 'forum') {
                 $res['deliberations'] = $this->get_forum_deliberations($res['threadId']);
@@ -1884,6 +1913,33 @@ class Comments extends TikiLib
             $res = null;
         }
         return $res;
+    }
+
+    /**
+     * Mask forum comment fields
+     *
+     * @param array $data
+     * @return array
+     */
+    public function maskFields($data)
+    {
+        if (empty($data) || ! is_array($data)) {
+            return $data;
+        }
+
+        $fieldsToMaks = [
+            'title',
+            'data',
+            'userName'
+        ];
+
+        foreach ($fieldsToMaks as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = smarty_modifier_forummaskemail($data[$field]);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -2303,10 +2359,10 @@ class Comments extends TikiLib
      */
     public function parse_comment_data($data, $threadId = null)
     {
-        global $prefs, $section;
+        global $prefs;
         $parserlib = TikiLib::lib('parser');
 
-        if (($prefs['feature_forum_parse'] == 'y' && $section == 'forums') || $prefs['section_comments_parse'] == 'y') {
+        if (($prefs['feature_forum_parse'] == 'y' && Sections::isCurrentSection(Sections::SECTION_FORUMS)) || $prefs['section_comments_parse'] == 'y') {
             $options = [
                 'objectType' => 'comments',
                 'objectId' => $threadId,
@@ -2628,6 +2684,52 @@ class Comments extends TikiLib
                     }
                 }
             }
+            $ret[$key] = $this->maskFields($ret[$key]);
+        }
+
+        // Sort forum threads by activity date (newest reply) using already-fetched data
+        if ($object[0] == "forum" && $style == 'commentStyle_threaded') {
+            // Helper to find max date in reply tree
+            $findMaxDate = function ($repliesInfo) use (&$findMaxDate) {
+                $maxDate = 0;
+                if (! empty($repliesInfo['replies'])) {
+                    foreach ($repliesInfo['replies'] as $reply) {
+                        $replyDate = $reply['commentDate'] ?? 0;
+                        if ($replyDate > $maxDate) {
+                            $maxDate = $replyDate;
+                        }
+                        // Recurse into nested replies
+                        if (! empty($reply['replies_info'])) {
+                            $nestedMax = $findMaxDate($reply['replies_info']);
+                            if ($nestedMax > $maxDate) {
+                                $maxDate = $nestedMax;
+                            }
+                        }
+                    }
+                }
+                return $maxDate;
+            };
+
+            // Calculate activity date for each thread from its reply tree
+            foreach ($ret as &$row) {
+                $ownDate = $row['commentDate'] ?? 0;
+                $replyMax = isset($row['replies_info']) ? $findMaxDate($row['replies_info']) : 0;
+                $row['lastActivityDate'] = max($ownDate, $replyMax);
+            }
+            unset($row);
+
+            // Sort by calculated activity date
+            $activitySort = (stripos($sort_mode, 'desc') !== false) ? 'DESC' : 'ASC';
+            usort($ret, function ($a, $b) use ($activitySort) {
+                $dateA = $a['lastActivityDate'] ?? 0;
+                $dateB = $b['lastActivityDate'] ?? 0;
+                if ($dateA == $dateB) {
+                    return 0;
+                }
+                return ($activitySort === 'DESC')
+                    ? (($dateA < $dateB) ? 1 : -1)
+                    : (($dateA > $dateB) ? 1 : -1);
+            });
         }
 
         if ($old_sort_mode == 'replies_asc') {
@@ -3348,22 +3450,20 @@ class Comments extends TikiLib
 
             $forum_info = $this->get_forum($object[1]);
 
-            TikiLib::events()->trigger(
-                $finalEvent,
-                [
-                    'type' => $type,
-                    'object' => $threadId,
-                    'parent_id' => $parentId,
-                    'forum_id' => $object[1],
-                    'forum_section' => $forum_info['section'],
-                    'user' => $GLOBALS['user'],
-                    'title' => $title,
-                    'name' => $forum_info['name'],
-                    'parent_title' => $parent_title,
-                    'content' => $data,
-                    'index_handled' => true,
-                ]
-            );
+            // Prepare event arguments for forum post notifications.
+            $eventArguments = [
+                'type' => $type,
+                'object' => $threadId,
+                'parent_id' => $parentId,
+                'forum_id' => $object[1],
+                'forum_section' => $forum_info['section'],
+                'user' => $GLOBALS['user'],
+                'title' => $title,
+                'name' => $forum_info['name'],
+                'parent_title' => $parent_title,
+                'content' => $data,
+                'index_handled' => true,
+            ];
         } else {
             $finalEvent = $parentId ? 'tiki.comment.reply' : 'tiki.comment.post';
 
@@ -3372,26 +3472,32 @@ class Comments extends TikiLib
             } else {
                 $parentobject = 'not implemented';
             }
-            TikiLib::events()->trigger(
-                $finalEvent,
-                [
-                    'type' => $object[0],
-                    'object' => $object[1],
-                    'parentobject' => $parentobject,
-                    'user' => $GLOBALS['user'],
-                    'title' => $title,
-                    'content' => $data,
-                    'commentDate' => (int) $postDate,
-                    'userName' => $userName,
-                    'email' => $anonymous_email,
-                    'website' => $anonymous_website,
-                    'parentId' => (int) $parentId,
-                    'summary' => $summary,
-                    'message_id' => $message_id,
-                    'in_reply_to' => $in_reply_to,
-                ]
-            );
+            $eventArguments = [
+                'type' => $object[0],
+                'object' => $object[1],
+                'parentobject' => $parentobject,
+                'user' => $GLOBALS['user'],
+                'title' => $title,
+                'content' => $data,
+                'commentDate' => (int) $postDate,
+                'userName' => $userName,
+                'email' => $anonymous_email,
+                'website' => $anonymous_website,
+                'parentId' => (int) $parentId,
+                'summary' => $summary,
+                'message_id' => $message_id,
+                'in_reply_to' => $in_reply_to,
+            ];
         }
+
+        // Add email threading headers to event arguments for proper notification grouping.
+        $additionalHeaders = \Tiki\Notifications\Email::getEmailThreadHeaders($object[0], $threadId);
+        $eventArguments = array_merge($additionalHeaders, $eventArguments);
+
+        TikiLib::events()->trigger(
+            $finalEvent,
+            $eventArguments
+        );
 
         // store the related version being commented about as an attribute of this comment
         if ($version) {
@@ -4367,6 +4473,7 @@ class Comments extends TikiLib
         return $this->fetchAll($query, [(int) $sinceDate]);
     }
 }
+
 
 /**
  * @param $ar1

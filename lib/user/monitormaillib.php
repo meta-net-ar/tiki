@@ -130,6 +130,12 @@ class MonitorMailLib
         $mail->setSubject($title);
         $mail->setHtml($html);
 
+        foreach (['In-Reply-To', 'References', 'Message-Id'] as $header) {
+            if (! empty($args[$header])) {
+                $mail->setHeader($header, $args[$header]);
+            }
+        }
+
         if (! empty($prefs['monitor_reply_email_pattern']) && isset($args['reply_action'], $args['type'], $args['object'])) {
             $data = Tiki_Security::get()->encode([
                 'u' => $GLOBALS['user'],

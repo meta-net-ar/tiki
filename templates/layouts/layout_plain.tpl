@@ -11,7 +11,6 @@
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="page_{$page_id}"{/if}{if Language::isRTL()} dir="rtl"{/if}>
     <head>
         {include file='header.tpl'}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body{html_body_attributes}>
         {$cookie_consent_html}
@@ -41,6 +40,7 @@
                     {block name=title}{/block}
                     {block name=navigation}{/block}
                     {feedback}
+                    {queued_tasks_banner}
                     {block name=content}{/block}
                 </div>
             </div>

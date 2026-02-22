@@ -10,6 +10,7 @@
         </div>
     </div>
 
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_webservices visible="always"}
@@ -19,5 +20,6 @@
         <legend class="h3">{tr}Options{/tr}</legend>
         {preference name=webservice_consume_defaultcache}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

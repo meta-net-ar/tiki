@@ -26,7 +26,6 @@ function wikiplugin_timeline_info()
                     Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'upper' => [
@@ -37,7 +36,6 @@ function wikiplugin_timeline_info()
                     Date must be provided in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '3.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'max' => [
@@ -48,7 +46,6 @@ function wikiplugin_timeline_info()
                     in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '29.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'min' => [
@@ -59,7 +56,6 @@ function wikiplugin_timeline_info()
                     in %0YYYY-MM-DD HH:mm:ss%1 format.', '<code>', '</code>'),
                 'since' => '29.0',
                 'filter' => 'datetime',
-                'default' => '',
                 'accepted' => 'Date in YYYY-MM-DD HH:mm:ss format',
             ],
             'scale' => [
@@ -88,7 +84,6 @@ function wikiplugin_timeline_info()
                 ),
                 'since' => '9.0',
                 'filter' => 'text',
-                'default' => ''
             ],
             'orientation' => [
                 'required' => false,
@@ -110,23 +105,23 @@ function wikiplugin_timeline($data, $params)
     $smarty = TikiLib::lib('smarty');
     $default = ['scale' => 'hour', 'width' => '100%', 'height' => '400px'];
     $params = array_merge($default, $params);
-    $start = isset($params['lower']) ? strtotime($params['lower']) : null;
-    $end = isset($params['upper']) ? strtotime($params['upper']) : null;
-    $max = isset($params['max']) ? strtotime($params['max']) : null;
-    $min = isset($params['min']) ? strtotime($params['min']) : null;
-    $step = ! empty($params['step']) ? ($params['step']) : '1';
+    $start = ! is_null($params['lower']) ? strtotime($params['lower']) : null;
+    $end = ! is_null($params['upper']) ? strtotime($params['upper']) : null;
+    $max = ! is_null($params['max']) ? strtotime($params['max']) : null;
+    $min = ! is_null($params['min']) ? strtotime($params['min']) : null;
+    $step = $params['step'] ? ($params['step']) : '1';
 
     $headerlib = TikiLib::lib('header');
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/vis-timeline/dist/vis-timeline-graph2d.min.css');
 
     $js = "var data = []; const options = {};";
-    $js .= ! empty($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
-    $js .= ! empty($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
-    $js .= ! empty($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
-    $js .= ! empty($max) ? "let max = new Date(" . $max * 1000 . "); options.max = max;" : "";
-    $js .= ! empty($min) ? "let min = new Date(" . $min * 1000 . "); options.min = min;" : "";
-    $js .= ! empty($params['scale']) ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
-    $js .= ! empty($params['orientation']) ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
+    $js .= ! is_null($start) ? "let start = new Date(" . $start * 1000 . "); options.start = start;" : "";
+    $js .= ! is_null($end) ? "let end = new Date(" . $end * 1000 . "); options.end = end;" : "";
+    $js .= ! is_null($params['height']) ? "let height = '" . $params['height'] . "';options.height = height;" : "";
+    $js .= ! is_null($max) ? "let max = new Date(" . $max * 1000 . "); options.max = max;" : "";
+    $js .= ! is_null($min) ? "let min = new Date(" . $min * 1000 . "); options.min = min;" : "";
+    $js .= $params['scale'] ? "let scale = '" . $params['scale'] . "'; options.timeAxis = {scale: scale, step: parseInt(" . $step . ")};" : "";
+    $js .= $params['orientation'] ? "let orientation = '" . $params['orientation'] . "'; options.orientation = orientation;" : "";
     $js .= "const container = document.getElementById('timeline-container');\n";
     $js .= "const items = new DataSet(data);";
     $js .= "const timeline = new Timeline(container, items, options);";

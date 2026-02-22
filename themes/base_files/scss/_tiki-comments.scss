@@ -1,8 +1,22 @@
 // Comments
+.comment-highlight{
+  animation: highlight 3000ms ease-out;
+}
+
+@keyframes highlight {
+  50% {
+    background-color: #f5d142;
+    color:#222;
+  }
+  100% {
+    background-color: #d7cece;
+    color:#222;
+  }
+}
 
 #comment-container {
     display: none;
-    margin: 15px 0;
+    //    margin: 15px 0; // Replaced with utility classes in template
 }
 
 #comment-container-below {

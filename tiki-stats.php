@@ -15,16 +15,16 @@ define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] 
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'days'                 => 'digits',       //get
+        'days'                 => 'int',          //get
         'pv_chart'             => 'striptags',    //get
-        'chart'                => 'striptags',    //get
-        'startDate_Year'       => 'digits',       //get
-        'startDate_Month'      => 'digits',       //get
-        'startDate_Day'        => 'digits',       //get
-        'endDate_Year'         => 'digits',       //get
-        'endDate_Month'        => 'digits',       //get
-        'endDate_Day'          => 'digits',       //get
-        'display'              => 'striptags'
+        'chart'                => 'alnumdash',    //get
+        'startDate_Year'       => 'digits',       //post
+        'startDate_Month'      => 'digits',       //post
+        'startDate_Day'        => 'digits',       //post
+        'endDate_Year'         => 'digits',       //post
+        'endDate_Month'        => 'digits',       //post
+        'endDate_Day'          => 'digits',       //post
+        'display'              => 'striptags',    //get
         ],
         'catchAllUnset' => null
     ],

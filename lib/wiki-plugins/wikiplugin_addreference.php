@@ -20,7 +20,6 @@ function wikiplugin_addreference_info()
                 'required' => true,
                 'name' => tra('Biblio Code'),
                 'description' => tra('The code to be added as reference.'),
-                'default' => '',
                 'since' => '10.0',
                 'filter' => 'word',
                 'multiple' => true,
@@ -75,7 +74,7 @@ function wikiplugin_addreference($data, $params)
         $curr_matches = [];
         $temp = array_unique($matchedReferences);
         $i = 0;
-        foreach ($temp as $k => $v) {
+        foreach ($temp as $v) {
             if (strlen(trim($v)) > 0) {
                 $curr_matches[$i] = $v;
                 $i++;

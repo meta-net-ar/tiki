@@ -289,9 +289,14 @@ function get_admin_email()
 }
 
 /**
- * @param $dbTiki
- * @param $prefs
- * @return bool
+ * Updates preferences from the database into the provided preferences array.
+ * This function is used during installation to ensure certain preferences are properly set.
+ *
+ * The function updates all preferences from the database,
+ * ensuring database values take precedence over default values during installation/upgrade.
+ *
+ * @param array &$prefs Reference to the preferences array to update
+ * @return bool True if database query was successful, false otherwise
  */
 function update_preferences(&$prefs)
 {
@@ -299,17 +304,17 @@ function update_preferences(&$prefs)
     $query = "SELECT `name`, `value` FROM `tiki_preferences`";
     @$result = $installer->query($query);
 
-    if ($result) {
-        while ($res = $result->fetchRow()) {
-            if (! isset($prefs[$res['name']])) {
-                $prefs[$res['name']] = $res['value'];
-            }
-        }
-        return true;
+    if (! $result) {
+        return false;
     }
 
-    return false;
+    while ($res = $result->fetchRow()) {
+        $prefs[$res['name']] = $res['value'];
+    }
+
+    return true;
 }
+
 
 /**
  * @param $account

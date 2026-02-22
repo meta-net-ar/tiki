@@ -45,7 +45,7 @@
                                         <div class="col-sm-9">
                                             {if isset($user_picture_id)}
                                                 <div class="userpicture">
-                                                    {wikiplugin _name="img" fileId="$user_picture_id"}{/wikiplugin}
+                                                    {wikiplugin _name="img" fileId="$user_picture_id" responsive="y"}{/wikiplugin}
                                                 </div>
                                             {/if}
                                         </div>

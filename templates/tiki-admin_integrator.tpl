@@ -21,7 +21,7 @@
 
 
 {* Add form *}
-<form action="tiki-admin_integrator.php" method="post">
+<form action="tiki-admin_integrator.php" method="post" class="styling-element">
     <input type="hidden" name="repID" value="{$repID|escape}">
     <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" for="repo_name" title="Human-readable repository name">{tr}Name{/tr}</label>
@@ -88,7 +88,7 @@
 <h2>{tr}Available Repositories{/tr}</h2>
 
 {* Table with list of repositories *}
-<div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {* table-responsive class cuts off css drop-down menus *}
     <table class="table table-striped table-hover" id="integrator-repositories">
         <tr>
             <th rowspan="2">{tr}Name{/tr}</th>
@@ -119,7 +119,7 @@
                                 </a>
                             </action>
                             <action>
-                                <form action="tiki-admin_integrator.php" method="post">
+                                <form action="tiki-admin_integrator.php" method="post" class="styling-element">
                                     {ticket}
                                     <input type="hidden" name="action" value="rm">
                                     <input type="hidden" name="repID" value="{$repositories[rep].repID|escape}">

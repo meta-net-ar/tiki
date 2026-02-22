@@ -34,19 +34,20 @@
                 <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
                 <div class="col col1 col-md-12 pb-4" id="col1">
                     <div id="feedback" role="alert">
-                    {feedback}
+                        {feedback}
                     </div>
-                {block name=quicknav}{/block}
-                {block name=title}{/block}
-                {block name=navigation}{/block}
+                    {queued_tasks_banner}
+                    {block name=quicknav}{/block}
+                    {block name=title}{/block}
+                    {block name=navigation}{/block}
                     <main>
                         <div class="admin-wrapper highlightable">
                             <aside class="admin-nav">
-            {include file='admin/include_anchors.tpl'}
+                                {include file='admin/include_anchors.tpl'}
                             </aside>
                             <div class="admin-content w-100 mx-3-lg">
-            {include file="admin/admin_navbar.tpl"}
-            {block name=content}{/block}
+                                {include file="admin/admin_navbar.tpl"}
+                                {block name=content}{/block}
                             </div>
                         </div>
                     </main>

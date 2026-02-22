@@ -71,7 +71,6 @@ function wikiplugin_html($data, $params)
         $html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
     }
     // exit($html);
-
     // Purify $html before serving it
     if (isset($params['purify']) && $params['purify'] == 'y') {
         $html = TikiFilter::get('html')->filter($html);
@@ -79,7 +78,7 @@ function wikiplugin_html($data, $params)
         Feedback::warning(tr('HTML purification is off. Submitted HTML may cause XSS, bad links, or broken layout. Enable it by setting purify=\'y\' in PluginHtml.'));
     }
 
-    if (isset($params['tohead']) && $params['tohead'] == 1) {
+    if ($params['tohead'] == 1) {
         // Insert in HTML head rather than in body
         TikiLib::lib('header')->add_rawhtml($html);
     } else {

@@ -11,23 +11,28 @@
         {tab name="{tr}General{/tr}"}
             <legend class="h3">{tr}Social network integration{/tr}</legend>
             {preference name=feature_socialnetworks visible="always"}
+            <div class="adminoptionboxchild" id="feature_socialnetworks_childcontainer">
+                <h5 class="h4">{tr}Social network integration using Hybridauth{/tr}</h5>
+                {preference name=hybridauth_login_enabled visible="always"}
+                <div class="adminoptionboxchild" id="hybridauth_login_enabled_childcontainer">
+                    <ol>
+                        <h6>{tr}Enabled Hybridauth social networks{/tr}</h6>
+                        {foreach $prefs["`$socPrefix`enabledProviders"] as $k => $pNum}
+                            {$providerName = $socnetsAll[$pNum]}
+                            {$prefname="`$socPrefix``$providerName`_socnetEnabled" }
+                            {$prefs[$prefname] = 'y'}
+                            <strong><li style="font-size: 15px;">{$providerName}</li></strong>
+                        {/foreach}
+                    </ol>
 
-            <ol>
-                {foreach $prefs["`$socPrefix`enabledProviders"] as $k => $pNum}
-                    {$providerName = $socnetsAll[$pNum]}
-                    {$prefname="`$socPrefix``$providerName`_socnetEnabled" }
-                    {$prefs[$prefname] = 'y'}
-                    <strong><li>{$providerName}  {* debug pNum={$pNum} k={$k} *}</li></strong>
-                {/foreach}
-            </ol>
-
-            <fieldset>
-                <div class="adminoptionbox">
-                    {$prefName = "`$socPrefix`enabledProviders"}
-                    {preference name=$prefName visible="always"}
+                    <fieldset>
+                        <div class="adminoptionbox">
+                            {$prefName = "`$socPrefix`enabledProviders"}
+                            {preference name=$prefName visible="always"}
+                        </div>
+                    </fieldset>
                 </div>
-
-            </fieldset>
+            </div>
 
             {remarksbox type="note" title="{tr}Note{/tr}"}
                 {tr}To enable social network login and/or integration, these steps are required{/tr}
@@ -40,57 +45,87 @@
                  </ol>
                 {tr}Also{/tr}
                 <ol>
-                     <li> {tr}If the login button for the corresponding social network can't be seen or if its appearance needs to be modified, the login module template file (mod-login.tpl) and/or related CSS might need to be adjusted.{/tr}</li>
-                     <li> {tr}If only number 1. is visible but not the configured social network, or there are other problems, then clear the Tiki caches and rebuild the search index.{/tr}</li>
-                     <li> {tr}Also, if some settings become disabled (such as the user prefix), execute the following sequence: disable-apply-enable-apply for the affected social network.{/tr}</li>
+                    <li> {tr}If the login button for the corresponding social network can't be seen or if its appearance needs to be modified, the login module template file (mod-login.tpl) and/or related CSS might need to be adjusted.{/tr}</li>
+                    <li> {tr}If only number 1. is visible but not the configured social network, or there are other problems, then clear the Tiki caches and rebuild the search index.{/tr}</li>
+                    <li> {tr}Also, if some settings become disabled (such as the user prefix), execute the following sequence: disable-apply-enable-apply for the affected social network.{/tr}</li>
                 </ol>
             {/remarksbox}
         {/tab}
         {tab name="{tr}Settings{/tr}"}
+            {if $prefs.hybridauth_login_enabled === 'y'}
+                <legend class="h3">{tr}Configure Selected Hybridauth Social Login{/tr}</legend>
+                <ol>
+                    {foreach $prefs["`$socPrefix`enabledProviders"] as $k => $pNum}
+                        {$providerName = $socnetsAll[$pNum]}
+                        {* TODO check in which cases is needed lower *}
+                        {$providername = $providerName|lower}
+                        <strong><em>{$providerName}</em></strong>
 
-            <ol>
-                {foreach $prefs["`$socPrefix`enabledProviders"] as $k => $pNum}
-                    {$providerName = $socnetsAll[$pNum]}
-                    {* TODO check in which cases is needed lower *}
-                    {$providername = $providerName|lower}
-                    <strong><em>{$providerName}</em></strong>
+                        {* START of adminoptionsbox for {$providerName} *}
+                        <div class="adminoptionbox {$providername} card pb-3">
+                            <ol>
+                                <br>
+                                {foreach from=$socBasePrefs key=basePref item=prefItem}
+                                    {$prefname="`$socPrefix``$providerName``$basePref`"}
+                                    {if ($basePref === '_socnetEnabled')}
+                                        {* skip this iteration *}
+                                        {continue}
+                                    {elseif ($basePref === '_loginEnabled') }
+                                        <div class="col-sm-12 {$providername} _loginEnabled" style="padding-top:5px;">
+                                            {preference name=$prefname}
+                                            <button class="{$providername} socbutton btn btn-secondary dropdown-toggle"
+                                                type="button" id="{$providername}dropdownMenuButton"
+                                                data-bs-toggle="dropdown" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                {tr}More/less...{/tr} <i class="{$providername} fa fa-caret-right d-none"></i>
+                                            </button>
+                                        </div>
+                                    {else}
+                                        <div class="col-sm-12 {$providername} _else_loginEnabled">
+                                            <li>{preference name=$prefname}</li>
+                                        </div>
+                                    {/if}
+                                {/foreach}
+                            </ol>
 
-                    {* START of adminoptionsbox for {$providerName} *}
-                    <div class="adminoptionbox {$providername} card pb-3">
-                        <ol>
-                            <br>
-                            {foreach from=$socBasePrefs key=basePref item=prefItem}
-                                {$prefname="`$socPrefix``$providerName``$basePref`"}
-                                {if ($basePref === '_socnetEnabled')}
-                                    {* skip this iteration *}
-                                    {continue}
-                                {elseif ($basePref === '_loginEnabled') }
-                                    {* if we use closing buttons again... *}
-                                    {* start of _loginEnabled for {$providerName} *}
-                                    <div class="col-sm-12 {$providername} _loginEnabled" style="padding-top:5px;">
-                                        {preference name=$prefname}
-                                        <button class="{$providername} socbutton btn btn-secondary dropdown-toggle"  type="button" id="{$providername}dropdownMenuButton" data-bs-toggle="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {tr}More/less...{/tr} <i class="{$providername} fa fa-caret-right d-none"></i>
-                                        </button>
-                                    </div> {* end of _loginEnabled for {$providerName} *}
-                                {else}
-                                    <div class="col-sm-12 {$providername} _else_loginEnabled">
-                                        <li>{preference name=$prefname}</li>
-                                    </div>
-                                {/if}
-                            {/foreach}
-                        </ol>
-
-                        <div class="col-sm-12 {$providername} _else_loginEnabled">
-                            {remarksbox type="note" title="{tr}Urls for {/tr}{$providerName}"}
-                            Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url: {$callbackUrl}?provider={$providerName}<br>
-                            Remove&nbsp;url: {$callbackUrl}?remove={$providerName}
-                            {/remarksbox}
+                            <div class="col-sm-12 {$providername} _else_loginEnabled">
+                                {remarksbox type="note" title="{tr}Urls for {/tr}{$providerName}"}
+                                Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url:
+                                {$callbackUrl}?provider={$providerName}<br>
+                                Remove&nbsp;url: {$callbackUrl}?remove={$providerName}
+                                {/remarksbox}
+                            </div>
                         </div>
-                    </div> {* END of adminoptionsbox for {$providerName} *}
 
-                {/foreach}
-            </ol>
+                    {/foreach}
+                </ol>
+                <fieldset class="mt-5">
+                    <legend class="h3">{tr}OAuth Callback URL Configuration{/tr}</legend>
+                    <div class="adminoptionbox">
+                        {remarksbox type="note" title="{tr}Note: OAuth Callback/Redirect URL{/tr}"}
+                            <p>
+                                {tr}This is the base URL where social network providers will redirect users after authentication. This URL is an essential part of the OAuth2 authentication flow.{/tr}
+                            </p>
+                            <p>
+                                <strong>{tr}How it works:{/tr}</strong><br>
+                                {tr}When users authenticate with a social network (Facebook, LinkedIn, etc.), that provider redirects them back to this URL with an authorization code. The provider name is appended to this base URL to route the callback to the correct social network handler.{/tr}
+                            </p>
+                            <p>
+                                <strong>{tr}Typical value:{/tr}</strong><br>
+                                <code>{$base_url}tiki-login_hybridauth.php?provider=</code>
+                            </p>
+                            <p>
+                                {tr}System administrators must ensure this URL is correctly configured and matches the Redirect URL you specified in each social network's application settings.{/tr}
+                            </p>
+                        {/remarksbox}
+                        {preference name="`$socPrefix`socLoginBaseUrl"}
+                    </div>
+                </fieldset>
+            {else}
+                <div class="alert alert-warning">
+                    {tr}Enable HybridAuth to configure social login URLs{/tr}
+                </div>
+            {/if}
 
             {jq}
  $("._else_loginEnabled").hide();
@@ -124,16 +159,6 @@
  });
             {/jq}
 
-
-            {************************************}
-            <fieldset class="mt-5">
-                <legend class="h3">{tr}Debug and Logs{/tr}</legend>
-                <div class="adminoptionbox">
-                    {$prefname = "`$socPrefix`socLoginBaseUrl"}
-    {*                {$prefs[$prefname]}*}
-                    {preference name=$prefname}
-                </div>
-            </fieldset>
         {/tab}
         {tab name="{tr}bit.ly{/tr}"}
             <br>

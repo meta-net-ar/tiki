@@ -18,7 +18,7 @@ class Services_IotApps_Controller
         $this->tracker_utilities = new Services_Tracker_Utilities();
         if ($prefs['feature_trackers'] !== 'y' || $prefs['feature_internet_of_things'] !== 'y') {
             Feedback::error(tr("Additional features should be enabled for IoT APIs to work, please check the following:") . "feature_trackers,feature_internet_of_things.");
-            exit(false);
+            exit(1);
         }
         $this->table = new TikiDb_Table(TikiDb::get(), 'tiki_iot_apps');
     }

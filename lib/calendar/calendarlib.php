@@ -18,6 +18,22 @@ if (! defined('ROLE_ORGANIZER')) {
 class CalendarLib extends TikiLib
 {
     /**
+     * Limit of the name field of the tiki_calendars table
+     */
+    public const MAX_CALENDAR_NAME_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_calendars table
+     */
+    public const MAX_CALENDAR_DESCRIPTION_LENGTH = 255;
+    /**
+     * Limit of the name field of the tiki_calendar_items table
+     */
+    public const MAX_CALENDAR_EVENT_TITLE_LENGTH = 255;
+    /**
+     * Limit of the description field of the tiki_calendar_items table
+     */
+    public const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 65535;
+    /**
      * @param $sort_mode
      * @return string
      */
@@ -144,18 +160,20 @@ class CalendarLib extends TikiLib
     {
         global $prefs;
         $canEditAnything = false;
+        $calendars = [];
         foreach ($rawcalsData as $calendar) {
             $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
             $calendars[$calendar['calendarId']] = $calendar;
             // for week and day views
             $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-            $startOfDayHour = $startOfDayUnix / 3600;
-            $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-            $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+
+            $startOfDayHour = intdiv($startOfDayUnix, 3600);
+            $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
+            $minHourOfDay = sprintf('%02d:%02d:00', $startOfDayHour, $startOfDayMinute);
             $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-            $endOfDayHour = $endOfDayUnix / 3600;
-            $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-            $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+            $endOfDayHour = intdiv($endOfDayUnix, 3600);
+            $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
+            $maxHourOfDay = sprintf('%02d:%02d:00', $endOfDayHour, $endOfDayMinute);
             $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
         }
         return  [
@@ -167,6 +185,7 @@ class CalendarLib extends TikiLib
             'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
             'initialDate'      => date("Y-m-d"),
             'canEditAnything' => $canEditAnything,
+            'calendars' => $calendars,
         ];
     }
 

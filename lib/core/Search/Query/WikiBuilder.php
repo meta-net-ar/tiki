@@ -129,17 +129,36 @@ class Search_Query_WikiBuilder
         $query->setSelectionFields(preg_split('/[, ]+/', $value));
     }
 
+    public function wpquery_select_count($query, $value)
+    {
+        $query->setCountOnly(true);
+    }
+
     public function wpquery_filter_editable($query, $editableType, array $arguments)
     {
         $fields = $this->get_fields_from_arguments($arguments);
         $masterField = null;
-        $subquery = new Search_Query(null, 'or');
+        $inputData = $this->input->asArray();
+
+        if (isset($arguments['operator']) && $arguments['operator'] == 'AND') {
+            $subquery = new Search_Query(null, 'and');
+        } else {
+            $subquery = new Search_Query(null, 'or');
+        }
+
         foreach ($fields as $fieldNum => $fieldName) {
             $filter = $this->getEditableFilter($fieldName, $editableType, $fields[0]);
             $filter->applyCondition($subquery);
         }
-        $query->getExpr()->addPart($subquery->getExpr());
+
+        $expr = $subquery->getExpr();
+        if ((isset($arguments['operator']) && $arguments['operator'] == 'NOT') && isset($inputData['filter'])) {
+            $query->getExpr()->addPart(new Search_Expr_Not($expr));
+        } else {
+            $query->getExpr()->addPart($expr);
+        }
     }
+
 
     /**
      * Handle return only the list of results defined by the user

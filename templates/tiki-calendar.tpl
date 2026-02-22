@@ -135,7 +135,7 @@
                 {include file="export_calendar_in_csv_or_ical.tpl" isInMainCalendar="y"}
                 <h5 class="text-center text-secondary border-top border-bottom">
                 {tr}Displayed calendar{/tr}
-                <h5>
+                </h5>
                 <div id="configlinks" class="mb-3 text-end">
                     {if count($checkedCalIds)}
                         {$maxCalsForButton = 20}

@@ -63,10 +63,6 @@ body {
 
 body.fullscreen { background: $body-bg; }
 
-body.tiki.navbar-padding {
-	padding-top: 60px;
-}
-
 section {
     padding-top: 1rem;
     padding-bottom: 1rem;
@@ -85,7 +81,7 @@ article,
     background: var(--tiki-wikitext-link-background); // #b4d5fe;
 }
 
-.wikitext a:not(.btn) {
+.wikitext a:not(.btn,.page-link) {
     padding-bottom: 1px;
     text-decoration: underline; //none;
 
@@ -567,7 +563,6 @@ label.margin-toggle:not(.sidenote-number) {
 }
 
 @media (max-width: 760px) {
-
 	.footnotearea {
 		margin: 1em 0 1em 3em;
 	}

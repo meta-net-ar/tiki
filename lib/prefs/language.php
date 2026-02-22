@@ -51,5 +51,46 @@ function prefs_language_list($partial = false)
             'dependencies' => ['restrict_language',],
             'default' => 3,
         ],
+
+        // Language checking preferences (LanguageTool)
+        'language_tool_url' => [
+            'name' => tra('LanguageTool Server URL'),
+            'description' => tra('URL of your LanguageTool HTTP server. LanguageTool is an open-source grammar and spell checker that can be run as a local HTTP server. For local installations, use http://localhost:8081 (default). For remote servers, enter the full URL. Documentation: https://dev.languagetool.org/http-server'),
+            'type' => 'text',
+            'size' => 50,
+            'default' => Services_LanguageCheck_Controller::DEFAULT_LANGUAGE_TOOL_URL,
+            'dependencies' => ['feature_language_check'],
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
+        ],
+        'language_tool_username' => [
+            'name' => tra('LanguageTool Username'),
+            'description' => tra('Username for LanguageTool premium features (optional)'),
+            'type' => 'text',
+            'size' => 30,
+            'default' => '',
+            'dependencies' => ['feature_language_check'],
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
+        ],
+        'language_check_auto_detect' => [
+            'name' => tra('Auto-detect Language'),
+            'description' => tra('When enabled, LanguageTool automatically detects the language of the text being checked. When disabled, the language is determined from the content language (if available), user language preference, or site default language, in that order.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => ['feature_language_check'],
+            'tags' => ['basic'],
+            'admin' => 'wysiwyg',
+        ],
+        'language_check_debounce_ms' => [
+            'name' => tra('Check Debounce (ms)'),
+            'description' => tra('Delay in milliseconds before checking text after user stops typing'),
+            'type' => 'text',
+            'size' => 10,
+            'default' => '1000',
+            'dependencies' => ['feature_language_check'],
+            'tags' => ['advanced'],
+            'admin' => 'wysiwyg',
+        ],
     ];
 }

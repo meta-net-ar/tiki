@@ -22,7 +22,6 @@ function wikiplugin_category_info()
                 'since' => '1',
                 'filter' => 'digits',
                 'separator' => '+',
-                'default' => '',
                 'profile_reference' => 'category',
             ],
             'types' => [
@@ -243,7 +242,7 @@ function wikiplugin_category($data, $params)
     $split = strtolower($split) == 'y';
     $sub = strtolower($sub) == 'y';
     $and = strtolower($and) == 'y';
-    $filter['language'] = $lang ?: $prefs['language'];
+    $filter['language'] = $lang ?: Language::getCurrentLanguage();
 
     if (! empty($sort)) {
         $list = explode(',', $sort);

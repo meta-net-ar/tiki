@@ -79,8 +79,8 @@ class UsersPasswordCommandTest extends TestCase
         putenv('USERNAME=' . $this::TEST_USER);
         $commandTester = $this->getCommandTester();
 
-        // The prompt will ask for username which we set to null so that the env variable is used
-        $commandTester->setInputs([null]);
+        // The prompt will ask for username which we don't provide so that the env variable is used
+        $commandTester->setInputs(['']);
         $commandTester->execute([
             'command' => $this->commandName,
             'params' => [null, $this::TEST_PASSWORD],
@@ -126,8 +126,8 @@ class UsersPasswordCommandTest extends TestCase
         $commandTester = $this->getCommandTester();
 
         // If the username is not provided as an argument,
-        // the prompt will ask for username which we set to null so that the env variable is used
-        $commandTester->setInputs([null]);
+        // the prompt will ask for username which we don't provide so that the env variable is used
+        $commandTester->setInputs(['']);
         $commandTester->execute([
             'command' => $this->commandName,
             'params' => [],
@@ -157,8 +157,8 @@ class UsersPasswordCommandTest extends TestCase
         $commandTester = $this->getCommandTester();
 
         // If the username is not provided as an argument,
-        // the prompt will ask for username which we set to null to avoid exiting with an error
-        $commandTester->setInputs([null]);
+        // the prompt will ask for username which we set to an empty string to avoid exiting with an error
+        $commandTester->setInputs(['']);
         $commandTester->execute([
             'command' => $this->commandName,
             'params' => ['', $this::TEST_PASSWORD],
@@ -173,8 +173,8 @@ class UsersPasswordCommandTest extends TestCase
         $commandTester = $this->getCommandTester();
 
         // If the password is not provided as an argument,
-        // the prompt will ask for password which we set to null to avoid exiting with an error
-        $commandTester->setInputs([null]);
+        // the prompt will ask for password which we set to an empty string to avoid exiting with an error
+        $commandTester->setInputs(['']);
         $commandTester->execute([
             'command' => $this->commandName,
             'params' => [$this::TEST_USER, ''],

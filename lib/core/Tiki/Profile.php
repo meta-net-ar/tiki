@@ -810,6 +810,7 @@ class Tiki_Profile
                 'prorate_interval' => ! empty($groupInfo['prorateInterval']) ? $groupInfo['prorateInterval'] : '',
                 'include' => [],
                 'autojoin' => 'n',
+                'twoFactorAuthGracePeriod' => null,
             ];
             foreach ($defaultInfo as $key => $value) {
                 if (array_key_exists($key, $data)) {

@@ -22,8 +22,8 @@ class EmailParser extends Manipulator
         $message_content = $file->getContents();
         try {
             $message = \ZBateson\MailMimeParser\Message::from($message_content, false);
-        } catch (\Exception\RuntimeException $e) {
-            Feedback::error(tr('Failed parsing file %0 as an email.', $file->fileId) . '<br />' . $e->getMessage());
+        } catch (\RuntimeException $e) {
+            \Feedback::error(tr('Failed parsing file %0 as an email.', $file->fileId) . '<br />' . $e->getMessage());
             return false;
         }
 

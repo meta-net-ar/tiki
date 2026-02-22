@@ -23,8 +23,8 @@ function wikiplugin_benchmark_info()
                 'name' => tra('Iteration Quantity'),
                 'description' => tra('The number of iterations to process.'),
                 'since' => '17.0',
-                'default' => '1000',
-                'filter' => 'alpha',
+                'default' => '100',
+                'filter' => 'digits',
                 //'profile_reference' => 'wiki_page',
             ],
             'details' => [
@@ -46,11 +46,7 @@ function wikiplugin_benchmark($data, $params)
     $smarty = TikiLib::lib('smarty');
     $parserlib = TikiLib::lib('parser');
 
-    if (! isset($params['times'])) {
-        $params['times'] = 100;
-    }
-
-    if (isset($params['details']) && ($params['details'] == '' || $params['details'] == 'false')) {
+    if ($params['details'] == '' || $params['details'] == 'false') {
         // if were not disclosing details
 
         $iterations = [];

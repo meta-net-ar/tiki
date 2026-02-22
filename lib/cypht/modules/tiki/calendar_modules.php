@@ -244,19 +244,19 @@ class Hm_Handler_add_to_calendar extends Hm_Handler_Module
 
         list($success, $form) = $this->process_form(['calendar_id']);
         if (! $success) {
-            Hm_Msgs::add("No calendar selected", "warning");
+            Hm_Msgs::add(tr("No calendar selected"), "warning");
             return;
         }
 
         $calendar = TikiLib::lib('calendar')->get_calendar($form['calendar_id']);
         if (! $calendar) {
-            Hm_Msgs::add("Selected calendar is unavailable", "danger");
+            Hm_Msgs::add(tr("Selected calendar is unavailable"), "danger");
             return;
         }
 
         $perms = Perms::get('calendar', $form['calendar_id']);
         if (! $perms->add_events) {
-            Hm_Msgs::add("Insufficient permissions to create the event in the selected calendar", "danger");
+            Hm_Msgs::add(tr("Insufficient permissions to create the event in the selected calendar"), "danger");
             return;
         }
 
@@ -306,13 +306,13 @@ class Hm_Handler_update_in_calendar extends Hm_Handler_Module
         $existing = TikiLib::lib('calendar')->find_by_uid(null, $data['uid']);
 
         if (! $existing) {
-            Hm_Msgs::add("Existing event could not be found in your calendar", "danger");
+            Hm_Msgs::add(tr("Existing event could not be found in your calendar"), "danger");
             return;
         }
 
         $perms = Perms::get('event', $existing['calitemId']);
         if (! $perms->change_events) {
-            Hm_Msgs::add("Insufficient permissions to update the event in the calendar", "danger");
+            Hm_Msgs::add(tr("Insufficient permissions to update the event in the calendar"), "danger");
             return;
         }
 
@@ -460,7 +460,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         }
                     }
                 }
-                $res .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></div><div class="col-md-10 col-12"></div></div>';
+                $res .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><button class="btn btn-sm btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></div><div class="col-md-10 col-12"></div></div>';
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'REPLY') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);

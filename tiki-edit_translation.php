@@ -13,10 +13,10 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'id'                     => 'int',              //post
             'page'                   => 'pagename',         //post
-            'type'                   => 'string',           //post
+            'type'                   => 'text',           //post
             'langpage'               => 'lang',             //post
             'target_lang'            => 'lang',             //post
-            'translation_name'       => 'string',           //post
+            'translation_name'       => 'text',           //post
         ],
     ],
 ];

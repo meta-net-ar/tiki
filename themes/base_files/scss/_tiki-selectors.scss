@@ -81,6 +81,18 @@ a.ec-event:hover {
     --fc-page-bg-color: var(--bs-body-bg);
 }
 
+.ec-button:not(:disabled):hover, .ec-button.ec-active,
+.ec-active, .ec-prev, .ec-next {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
+button.ec-today,
+.ec-today .ec-day-head {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
 // tiki-categories.less - tiki-jquery.js - Doesn't show up in a search Apr 21 2024
 // /* Fancy filter */
 //.filter {
@@ -527,10 +539,14 @@ a.toolbar,
 li.toolbar,
 .textarea-toolbar a.toolbar {
     /* each tool button */
-    border: none;
     background: transparent;
     color: var(--bs-body-color);
-    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+//    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+}
+
+a.toolbar,
+.textarea-toolbar a.toolbar {
+    border: none;
 }
 
 a.toolbar:hover,
@@ -700,21 +716,24 @@ ul.all_languages > li {
 }
 
 .editable-inline {
+    padding: 2px;
     padding-right: 20px;
     display: inline-block;
+    border: solid 2px transparent;
+
     .icon {
         font-size: small;
         margin-left: 0.4rem;
         display: inline;
     }
+
+    .popover {
+        z-index: 9;
+    }
 }
 
 .editable-inline.loaded {
-    width: 100%;
     background: $popover-bg;
-    padding: 6px;
-    border: 1px solid #eee;
-    border-radius: 4px;
     z-index: 2;
 }
 
@@ -725,12 +744,11 @@ ul.all_languages > li {
 }
 
 .editable-inline.modified {
-    border: solid 2px $danger;
-    padding: 2px;
+    border-color: $danger;
 }
 
 .editable-inline.unsaved {
-    border: solid 2px $danger;
+    border-color: $danger;
 }
 
 // .admintoclevel .actions input {
@@ -1346,21 +1364,21 @@ blockquote {
         bottom: 0;
     }
 }
-
-@media (min-width: 768px) {
-    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
-        /*     grid-area: link / link / link / link-split-toggler;
-             border-radius: var(--sm-dropdowns-nav-link-border-radius);
-             padding: var(--sm-dropdowns-nav-link-padding-y) var(--sm-dropdowns-nav-link-padding-x);
-             background: var(--sm-dropdowns-nav-link-bg);
-             color: var(--sm-dropdowns-nav-link-color);
-             font-family: var(--sm-font-family);
-             font-size: var(--sm-font-size);
-             font-weight: var(--sm-dropdowns-nav-link-font-weight);
-             line-height: var(--sm-line-height);
-             text-decoration: none; */
-    }
-}
+// Do not use empty rule sets - g_c-l
+//@media (min-width: 768px) {
+//    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
+//        /*     grid-area: link / link / link / link-split-toggler;
+//             border-radius: var(--sm-dropdowns-nav-link-border-radius);
+//             padding: var(--sm-dropdowns-nav-link-padding-y) var(--sm-dropdowns-nav-link-padding-x);
+//             background: var(--sm-dropdowns-nav-link-bg);
+//             color: var(--sm-dropdowns-nav-link-color);
+//             font-family: var(--sm-font-family);
+//             font-size: var(--sm-font-size);
+//             font-weight: var(--sm-dropdowns-nav-link-font-weight);
+//             line-height: var(--sm-line-height);
+//             text-decoration: none; */
+//    }
+//}
 
 
 [data-bs-theme=dark] .sm-navbar {
@@ -1384,4 +1402,28 @@ blockquote {
 p + ul, p + ol {
     margin-top: var(--tiki-list-top-margin);  
     margin-bottom: var(--tiki-list-bottom-margin);
+}
+
+li.highlight {
+    background-color: var(--bs-secondary-bg-subtle);
+    transition: all 0.3s ease;
+}
+
+.password-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    input {
+        padding-right: 30px;
+    }
+
+    i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        visibility: hidden; /* Hidden by default */
+    }
 }

@@ -84,7 +84,7 @@
                     </a>
                 </p>
 
-                    <input type="submit" class="btn btn-success" name="use-changes-wizard" value="{tr}Start Changes Wizard{/tr}" />
+                <input type="submit" class="btn btn-success" name="use-changes-wizard" value="{tr}Start Changes Wizard{/tr}" />
             </div>
         </div>
         <hr>

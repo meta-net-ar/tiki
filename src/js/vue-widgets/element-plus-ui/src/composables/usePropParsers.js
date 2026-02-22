@@ -10,6 +10,8 @@ export function usePropParsers() {
     };
 
     const parseValue = (val) => {
+        // Ensure numeric strings remain unparsed to avoid unintended numeric conversion
+        if (!isNaN(val)) return val;
         try {
             return typeof val === "string" ? JSON.parse(val) : val;
         } catch {

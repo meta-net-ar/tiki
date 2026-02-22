@@ -437,13 +437,13 @@ class FreetagLib extends ObjectLib
      */
     public function get_tags_on_object($itemId, $type, $offset = 0, $maxRecords = -1, $user = null)
     {
-        if (! isset($itemId) || ! isset($type) || empty($itemId) || empty($type) || is_array($itemId) || ! is_string($type)) {
+        if (empty($itemId) || empty($type) || is_array($itemId) || ! is_string($type)) {
             return false;
         }
 
         $bindvals = [$itemId, $type];
 
-        if (isset($user) && (! empty($user))) {
+        if ((! empty($user))) {
             $mid = 'AND `user` = ?';
             $bindvals[] = $user;
         } else {
@@ -1084,11 +1084,9 @@ class FreetagLib extends ObjectLib
 
     public function get_tag_suggestion($exclude = '', $max = 10, $lang = null)
     {
-        global $prefs;
-        if (! $lang && ! empty($prefs['language'])) {
-            $lang = $prefs['language'];
+        if (! $lang) {
+            $lang = Language::getCurrentLanguage();
         }
-
         $query = 'SELECT t.* FROM `tiki_freetags` t, `tiki_freetagged_objects` o'
                         . ' WHERE t.`tagId` = o.`tagId`'
                         . ' AND (`lang` = ? or `lang` IS null)'

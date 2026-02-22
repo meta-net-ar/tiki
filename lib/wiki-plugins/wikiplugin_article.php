@@ -34,6 +34,7 @@ function wikiplugin_article_info()
                     ['text' => tra('Type'), 'value' => 'type'],
                     ['text' => tra('Language'), 'value' => 'lang'],
                 ],
+                'default' => 'body',
                 'since' => '1',
             ],
             'Id' => [

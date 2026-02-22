@@ -415,7 +415,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         $utilities = new Services_Tracker_Utilities();
         $utilities->clearTracker(self::$trackerId);
 
-        $itemId = $this->createItem([
+        $this->createItem([
             'test_date_legacy' => '2021-06-01',
             'test_datetime_legacy' => '2021-06-01 10:00:00',
             'test_date' => $d,

@@ -81,6 +81,7 @@ describe("initSummernote", () => {
                 onInit: expect.any(Function),
                 onKeydown: expect.any(Function),
                 onCodeviewToggled: expect.any(Function),
+                onDestroy: expect.any(Function),
             },
         });
 

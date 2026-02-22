@@ -26,14 +26,15 @@ class SocialNetworksLib extends LogsLib
     *
     * @var string
     */
-    private $graphVersion = 'v9.0';
+    private $graphVersion = 'v18.0';
 
     /**
     * @var array   options for Twitter Zend functions
     */
+    // @tiki-external-link-ok: Twitter OAuth base URL, requires authentication
     public $options = [
             'callbackUrl'    => '',
-            'siteUrl'        => 'http://twitter.com/oauth',
+            'siteUrl'        => 'https://api.twitter.com/oauth',
             'consumerKey'    => '',
             'consumerSecret' => '',
     ];
@@ -460,7 +461,6 @@ class SocialNetworksLib extends LogsLib
         $linkedin_info = json_decode($result);
 
         if (isset($linkedin_info->serviceErrorCode)) {
-            curl_close($curl);
             Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
@@ -480,12 +480,9 @@ class SocialNetworksLib extends LogsLib
             $linkedin_email = json_decode($result);
 
             if (isset($linkedin_email->serviceErrorCode)) {
-                curl_close($curl);
                 Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
-
-        curl_close($curl);
 
         $linkedin_locale = $linkedin_info->firstName->preferredLocale->language;
         if (! empty($linkedin_info->firstName->preferredLocale->country)) {
@@ -585,8 +582,8 @@ class SocialNetworksLib extends LogsLib
     *
     * @return int  -1 if the user did not authorize the site with twitter,
     *                          -2, if the message is longer than 140 characters,
-    *                          a negative number corresponding to the HTTP response codes from twitter
-    *                          (http://dev.twitter.com/pages/streaming_api_response_codes)
+                          a negative number corresponding to the HTTP response codes from Twitter
+                          (see X Developer Platform documentation)
     *                              or a positive tweet id of the message
     */
     public function tweet($message, $user, $cutMessage = false)
@@ -882,7 +879,7 @@ class SocialNetworksLib extends LogsLib
     *
     * Note: These codes are maintained for internal logic and compatibility,
     * but Twitter/X no longer uses or documents numerical error codes like those found at
-    * https://dev.twitter.com/docs/streaming-api/response-codes (deprecated).
+    * https://developer.x.com/en/docs/twitter-api (deprecated).
     */
     public function getTwitterTimeline($user, $timelineType = 'public', $search = 'tikiwiki')
     {

@@ -143,13 +143,13 @@ function wikiplugin_gdgraph_info()
 function wikiplugin_gdgraph($data, $params)
 {
     // check required param
-    if (! isset($params['type']) || ($params['type'] !== 'barvert' && $params['type'] !== 'barhoriz')) {
-        return ("<span class='error'>missing or wrong graph type parameter - only barvert and barhoriz available at present</span>");
+    if (($params['type'] !== 'barvert' && $params['type'] !== 'barhoriz')) {
+        return WikiParser_PluginOutput::error(tr('Error'), tra('missing or wrong graph type parameter - only barvert and barhoriz available at present'));
     }
 
     // check axestext values
     if (($params['axestext'] !== 'Normal-Text' && $params['axestext'] !== 'Large-Text')) {
-        return ("<span class='error'>wrong axestext parameter - only Normal-Text or Large-Text are allowed</span>");
+        return WikiParser_PluginOutput::error(tr('Error'), tra('wrong axestext parameter - only Normal-Text or Large-Text are allowed'));
     }
 
     // parse the body content to allow data to be generated from other plugins and strip tags
@@ -166,13 +166,13 @@ function wikiplugin_gdgraph($data, $params)
     foreach ($data as $line) {
         $pair = explode(',', $line);
         if (count($pair) !== 2) {
-            return "<span class='error'>gdgraph plugin: ERROR: xy data count mismatch - odd number of values</span>";
+            return WikiParser_PluginOutput::error(tr('Error'), tra('gdgraph plugin: ERROR: xy data count mismatch - odd number of values'));
         }
         $xy[] = $pair;
     }
 
     if (empty($xy)) {
-        return "<span class='error'>gdgraph plugin: ERROR: there must be at least one XY data pair</span>";
+        return WikiParser_PluginOutput::error(tr('Error'), tra('gdgraph plugin: ERROR: there must be at least one XY data pair'));
     }
 
     // Set height dynamically for barhoriz if not set as a parameter or default to 300
@@ -199,7 +199,12 @@ function wikiplugin_gdgraph($data, $params)
     }
 // if all y-values are zero don't bother doing the graph
     if (! $ynonzero) {
-        return "<span class='error'>All " . count($xy) . " y-values are zero: so no graph drawn</span>";
+        return WikiParser_PluginOutput::error(tr('Error'), tra(
+            'All %0 y-values are zero: so no graph drawn',
+            '',
+            false,
+            [count($xy)]
+        ));
     }
 
     $imgparams = [
@@ -211,13 +216,13 @@ function wikiplugin_gdgraph($data, $params)
         'usexydata' => json_encode($xydata),
     ];
 
-    if (isset($params['float']) && $params['float'] != "none") {
+    if ($params['float'] != "none") {
         $f = ' float: ' . $params['float'] . '; ';
     } else {
         $f = '';
     }
 
-    if (isset($params['clear']) && $params['clear'] != 0) {
+    if ($params['clear'] != 0) {
         $c = " clear: both;";
     } else {
         $c = "";

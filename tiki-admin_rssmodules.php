@@ -12,22 +12,29 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
             'rssId'            => 'int',      //post
-            'name'             => 'string',      //post
+            'name'             => 'text',        //post
             'url'              => 'url',         //post
             'description'      => 'xss',         //post
-            'refreshMinutes'   => 'digits',      //post
+            'refreshMinutes'   => 'int',         //post
             'showTitle'        => 'bool',        //post
             'showPubDate'      => 'bool',        //post
-            'save'             => 'bool',        //post
+            'save'             => 'alpha',       //post
+            'refresh_all'      => 'alpha',       //post
+            'refresh'          => 'int',         //post
+            'clear'            => 'int',         //post
             'remove'           => 'int',         //get
-            'offset'           => 'bool',        //get
-            'sort_mode'        => 'word',        //get
-            'article'          => 'digits',      //get
-            'view'             => 'digits',      //get
+            'offset'           => 'int',         //get
+            'sort_mode'        => 'alnumdash',   //get
+            'find'             => 'text',        //get
+            'article'          => 'int',         //get
+            'view'             => 'int',         //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 /** @var RSSLib $rsslib */
 $rsslib = TikiLib::lib('rss');
 //get_strings tra('External Feeds')
@@ -38,6 +45,9 @@ $auto_query_args = [
     'sort_mode',
     'find'
 ];
+
+
+
 
 $access->check_permission('tiki_p_admin_rssmodules');
 
@@ -78,6 +88,7 @@ if (isset($_REQUEST["rssId"])) {
 if (! isset($_REQUEST["save"])) {
     $smarty->assign('name', $info["name"]);
     $smarty->assign('description', $info["description"]);
+    $smarty->assign('MAX_EXTERNAL_FEED_NAME_LENGTH', RSSLib::MAX_EXTERNAL_FEED_NAME_LENGTH);
     $smarty->assign('url', $info["url"]);
     $smarty->assign('refreshSeconds', $info["refresh"]);
     $smarty->assign('showTitle', $info["showTitle"]);
@@ -202,6 +213,8 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     if (empty($_REQUEST["name"]) || empty($_REQUEST["url"])) {
         Feedback::error(tr("The name or URL is empty, the external feed has not been created"));
+    } elseif (mb_strlen($_REQUEST["name"]) > RSSLib::MAX_EXTERNAL_FEED_NAME_LENGTH) {
+        Feedback::validateFieldLength("Name", $_REQUEST["name"], RSSLib::MAX_EXTERNAL_FEED_NAME_LENGTH);
     } else {
         if (isset($_REQUEST['showTitle']) == 'on') {
             $smarty->assign('showTitle', 'y');
@@ -251,17 +264,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 if ($prefs['feature_multilingual'] == 'y') {
     $languages = [];
     $langLib = TikiLib::lib('language');

@@ -10,6 +10,7 @@
     </div>
 {/if}
 <br>
+<div class="styling-element">
 {if $subscribe eq 'y'}
     <h2>
         {tr}Subscribe to Newsletter{/tr}
@@ -122,3 +123,4 @@
     </div>
     {pagination_links count=$count offset=$offset step=$maxRecords}{/pagination_links}
 {/if}
+</div>

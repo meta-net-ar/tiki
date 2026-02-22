@@ -87,15 +87,19 @@
         </div>
 
         <div id="admin_schedulers-div">
-            <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
-                {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                <table id="admin_schedulers" class="table normal table-striped table-hover" data-count="{$schedulers|count}">
-                    <thead>
-                    <tr>
-
-                        <th>
-                            {tr}Name{/tr}
-                        </th>
+            <form name="schedulerform" id="schedulerform" method="post">
+                {ticket}
+                <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+                    {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
+                    <table id="admin_schedulers" class="table normal table-striped table-hover" data-count="{$schedulers|count}">
+                        <thead>
+                        <tr>
+                            <th>
+                                {select_all checkbox_names='checked[]'}
+                            </th>
+                            <th>
+                                {tr}Name{/tr}
+                            </th>
                         <th>
                             {tr}Description{/tr}
                         </th>
@@ -116,6 +120,10 @@
                         </th>
                         <th>
                             {*Reserved for stalled notices*}
+                            Stalled
+                        </th>
+                        <th>
+                            {tr}Last Run Status{/tr}
                         </th>
                         <th id="actions"></th>
                     </tr>
@@ -125,6 +133,9 @@
                     {section name=scheduler loop=$schedulers}
                         {$scheduler_name = $schedulers[scheduler].name|escape}
                         <tr>
+                            <td class="checkbox-cell">
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$schedulers[scheduler].id|escape}">
+                            </td>
                             <td class="scheduler_name">
                                 <a class="link tips"
                                     href="tiki-admin_schedulers.php?scheduler={$schedulers[scheduler].id}{if $prefs.feature_tabs ne 'y'}#2{/if}"
@@ -152,8 +163,23 @@
                                 <input type="checkbox" {if $schedulers[scheduler].re_run}checked{/if} disabled>
                             </td>
                             <td class="scheduler_stalled">
-                                {if $schedulers[scheduler].stalled}
-                                    <span class="label label-danger">{tr}Stalled{/tr}</span>
+                                {if $schedulers[scheduler].last_run_stalled}
+                                    <span class="badge bg-danger">{tr}Yes{/tr}</span>
+                                {else}
+                                    <span class="badge bg-secondary">{tr}No{/tr}</span>
+                                {/if}
+                            </td>
+                            <td class="scheduler_last_run_status">
+                                {if $schedulers[scheduler].last_run_status eq 'running'}
+                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
+                                {elseif $schedulers[scheduler].last_run_status eq 'failed'}
+                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                                {elseif $schedulers[scheduler].last_run_status eq 'done'}
+                                    <span class="badge bg-success">{tr}Done{/tr}</span>
+                                {elseif $schedulers[scheduler].stalled}
+                                    <span class="badge bg-danger">{tr}Stalled{/tr}</span>
+                                {else}
+                                    <span class="text-muted">-</span>
                                 {/if}
                             </td>
                             <td class="action">
@@ -200,6 +226,29 @@
                     </tbody>
                 </table>
             </div>
+
+            {if $schedulers|count > 0}
+                <div class="input-group col-sm-8">
+                    <select class="form-select" name="action">
+                        <option value="no_action" selected disabled>
+                            {tr}Select action to perform with checked{/tr}...
+                        </option>
+                        <option value="remove_schedulers">
+                            {tr}Remove schedulers...{/tr}
+                        </option>
+                    </select>
+                    <button
+                        type="submit"
+                        form="schedulerform"
+                        formaction="{bootstrap_modal controller=scheduler action=remove_schedulers}"
+                        class="btn btn-primary"
+                        id="bulk-action-submit"
+                    >
+                        {tr}OK{/tr}
+                    </button>
+                </div>
+            {/if}
+        </form>
         </div>
     {/tab}
 {/if}
@@ -239,14 +288,14 @@
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_name">{tr}Name{/tr} *</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_name' class="form-control" name='scheduler_name'
+                <input maxlength="{$MAX_SCHEDULER_NAME_LENGTH}" type="text" id='scheduler_name' class="form-control" name='scheduler_name'
                     value="{$schedulerinfo.name|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_description">{tr}Description{/tr}</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_description' class="form-control" name='scheduler_description'
+                <input maxlength="{$MAX_SCHEDULER_DESCRIPTION_LENGTH}" type="text" id='scheduler_description' class="form-control" name='scheduler_description'
                     value="{$schedulerinfo.description|escape}">
             </div>
         </div>
@@ -328,69 +377,69 @@
     </form>
 {/tab}
 
-    <a id="tab3"></a>
-    {if isset($schedulerinfo.id) && $schedulerinfo.id}
-        {tab name="{tr}Scheduler logs{/tr}"}
-            <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
-            <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
-            <div class="table-responsive">
-                <table class="table normal table-striped table-hover">
-                    <thead>
+<a id="tab3"></a>
+{if isset($schedulerinfo.id) && $schedulerinfo.id}
+    {tab name="{tr}Scheduler logs{/tr}"}
+        <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
+        <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+        <div class="table-responsive">
+            <table class="table normal table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Output</th>
+                </tr>
+                </thead>
+                <tbody>
+                {section name=run loop=$schedulerruns}
                     <tr>
-                        <th>ID</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Status</th>
-                        <th>Output</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {section name=run loop=$schedulerruns}
-                        <tr>
-                            <td>{$schedulerruns[run].id}</td>
-                            <td>
-                                {$schedulerruns[run].start_time|tiki_short_datetime} ({$display_timezone})
+                        <td>{$schedulerruns[run].id}</td>
+                        <td>
+                            {$schedulerruns[run].start_time|tiki_short_datetime:'':'n'} ({$display_timezone})
+                            {if $display_timezone ne 'UTC'}
+                                <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
+                            {/if}
+                        </td>
+                        <td>
+                            {if $schedulerruns[run].end_time ne null}
+                                {$schedulerruns[run].end_time|tiki_short_datetime:'':'n'} ({$display_timezone})
                                 {if $display_timezone ne 'UTC'}
-                                    <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
                                 {/if}
-                            </td>
-                            <td>
-                                {if $schedulerruns[run].end_time ne null}
-                                    {$schedulerruns[run].end_time|tiki_short_datetime} ({$display_timezone})
-                                    {if $display_timezone ne 'UTC'}
-                                        <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
-                                    {/if}
-                                {/if}
-                            </td>
-                            <td>
-                                {if $schedulerruns[run].status eq 'running'}
-                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
-                                {/if}
-                                {if $schedulerruns[run].status eq 'failed'}
-                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                            {/if}
+                        </td>
+                        <td>
+                            {if $schedulerruns[run].status eq 'running'}
+                                <span class="badge bg-warning">{tr}Running{/tr}</span>
+                            {/if}
+                            {if $schedulerruns[run].status eq 'failed'}
+                                <span class="badge bg-danger">{tr}Failed{/tr}</span>
 
-                                {/if}
-                                {if $schedulerruns[run].status eq 'done'}
-                                    <span class="badge bg-success">{tr}Done{/tr}</span>
-                                {/if}
-                            </td>
-                            <td>
-                                {if isset($schedulerruns[run].can_stop) && $schedulerruns[run].can_stop}
-                                    <a class="btn btn-secondary btn-sm" href="{bootstrap_modal controller=scheduler action=reset schedulerId=$schedulerruns[run].scheduler_id startTime=$schedulerruns[run].start_time}">
-                                    {icon name="undo" _menu_text='y' _menu_icon='y' alt="{tr}Reset{/tr}"}
-                                    </a>
-                                {else}
-                                    {$schedulerruns[run].output|nl2br}
-                                {/if}
-                            </td>
-                        </tr>
-                    {/section}
-                    </tbody>
-                </table>
-            </div>
-            {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
-        {/tab}
-    {/if}
+                            {/if}
+                            {if $schedulerruns[run].status eq 'done'}
+                                <span class="badge bg-success">{tr}Done{/tr}</span>
+                            {/if}
+                        </td>
+                        <td>
+                            {if isset($schedulerruns[run].can_stop) && $schedulerruns[run].can_stop}
+                                <a class="btn btn-secondary btn-sm" href="{bootstrap_modal controller=scheduler action=reset schedulerId=$schedulerruns[run].scheduler_id startTime=$schedulerruns[run].start_time}">
+                                {icon name="undo" _menu_text='y' _menu_icon='y' alt="{tr}Reset{/tr}"}
+                                </a>
+                            {else}
+                                {$schedulerruns[run].output|nl2br}
+                            {/if}
+                        </td>
+                    </tr>
+                {/section}
+                </tbody>
+            </table>
+        </div>
+        {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
+    {/tab}
+{/if}
 
 <a id="tab4"></a>
 {if $jobs|count > 0}
@@ -399,11 +448,16 @@
             {remarksbox type="note" title="{tr}Information{/tr}"}
             {tr}This page lists all scheduled background jobs along with their processing status. You can re-run a job or see a log of the job executions. Note that Tiki Scheduler must be executed periodically by a cron job in order to execute the background jobs. If you see a job in Active status below for too long interval, then your cron job is most probably not running. {/tr}
             {/remarksbox}
-            <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
-                {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                <table id="admin_jobs" class="table normal table-striped table-hover" data-count="{$jobs|count}">
-                    <thead>
-                    <tr>
+            <form name="jobsform" id="jobsform" method="post">
+                {ticket}
+                <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+                    {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
+                    <table id="admin_jobs" class="table normal table-striped table-hover" data-count="{$jobs|count}">
+                        <thead>
+                        <tr>
+                            <th>
+                                {select_all checkbox_names='checked_jobs[]'}
+                            </th>
 
                         <th>
                             {tr}Name{/tr}
@@ -440,6 +494,9 @@
                     {section name=job loop=$jobs}
                         {$job = $jobs[job]}
                         <tr>
+                            <td class="checkbox-cell">
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked_jobs[]" value="{$job.id|escape}">
+                            </td>
                             <td class="scheduler_name">
                                 <a class="link tips"
                                     href="tiki-admin_schedulers.php?scheduler={$job.id}{if $prefs.feature_tabs ne 'y'}#2{/if}"
@@ -505,8 +562,105 @@
                     </tbody>
                 </table>
             </div>
+
+            {if $jobs|count > 0}
+                <div class="input-group col-sm-8">
+                    <select class="form-select" name="job_action">
+                        <option value="no_action" selected disabled>
+                            {tr}Select action to perform with checked{/tr}...
+                        </option>
+                        <option value="remove_jobs">
+                            {tr}Remove jobs...{/tr}
+                        </option>
+                    </select>
+                    <button
+                        type="submit"
+                        form="jobsform"
+                        formaction="{bootstrap_modal controller=scheduler action=remove_jobs}"
+                        class="btn btn-primary"
+                        id="bulk-job-action-submit"
+                    >
+                        {tr}OK{/tr}
+                    </button>
+                </div>
+            {/if}
+        </form>
         </div>
     {/tab}
+{/if}
+
+{* ---------------------- Consolidated Logs Tab -------------------- *}
+<a id="tab5"></a>
+{if !isset($schedulerinfo.id)}
+{tab name="{tr}Logs{/tr}"}
+    <h2>{tr}Scheduler Run Logs{/tr}</h2>
+    <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+    <div id="admin_schedulers_logs-div">
+        <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
+            <table class="table normal table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{tr}Name{/tr}</th>
+                        <th>{tr}Start Time{/tr}</th>
+                        <th>{tr}End Time{/tr}</th>
+                        <th>{tr}Status{/tr}</th>
+                        <th>{tr}Output{/tr}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {section name=run loop=$consolidatedLogs}
+                        <tr>
+                            <td>{$consolidatedLogs[run].id}</td>
+                            <td>
+                                {if $consolidatedLogs[run].scheduler_name}
+                                    {$consolidatedLogs[run].scheduler_name|escape}
+                                {else}
+                                    <span class="text-muted fst-italic">{tr}Scheduler Deleted{/tr}</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {$consolidatedLogs[run].start_time|tiki_short_datetime} ({$display_timezone})
+                                {if $display_timezone ne 'UTC'}
+                                    <br>{$consolidatedLogs[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                {/if}
+                            </td>
+                            <td>
+                                {if $consolidatedLogs[run].end_time ne null}
+                                    {$consolidatedLogs[run].end_time|tiki_short_datetime} ({$display_timezone})
+                                    {if $display_timezone ne 'UTC'}
+                                        <br>{$consolidatedLogs[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    {/if}
+                                {/if}
+                            </td>
+                            <td>
+                                {if $consolidatedLogs[run].status eq 'running'}
+                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
+                                {/if}
+                                {if $consolidatedLogs[run].status eq 'failed'}
+                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                                {/if}
+                                {if $consolidatedLogs[run].status eq 'done'}
+                                    <span class="badge bg-success">{tr}Done{/tr}</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {$consolidatedLogs[run].scheduler_output|nl2br}
+                            </td>
+                        </tr>
+                    {sectionelse}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                {tr}No scheduler logs found{/tr}
+                            </td>
+                        </tr>
+                    {/section}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {pagination_links count=$consolidatedLogsCount step=$numrows offset=$offset}tiki-admin_schedulers.php?consolidated_logs=1{/pagination_links}
+{/tab}
 {/if}
 {/tabset}
 
@@ -540,5 +694,45 @@
 
     $('#notificationUsersCollapse').on('hide.bs.collapse', function() {
         $(this).prev().find('.fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+
+    // Handle bulk action submission
+    $('#bulk-action-submit').on('click', function(e) {
+        var selectedAction = $('select[name="action"]').val();
+        var checkedBoxes = $('input[name="checked[]"]:checked');
+
+        if (!selectedAction || selectedAction === 'no_action') {
+            e.preventDefault();
+            alert('{tr}Please select an action first.{/tr}');
+            return false;
+        }
+
+        if (checkedBoxes.length === 0) {
+            e.preventDefault();
+            alert('{tr}Please select at least one scheduler.{/tr}');
+            return false;
+        }
+
+        // Validation passed - let form submit
+    });
+
+    // Handle bulk job action submission
+    $('#bulk-job-action-submit').on('click', function(e) {
+        var selectedAction = $('select[name="job_action"]').val();
+        var checkedBoxes = $('input[name="checked_jobs[]"]:checked');
+
+        if (!selectedAction || selectedAction === 'no_action') {
+            e.preventDefault();
+            alert('{tr}Please select an action first.{/tr}');
+            return false;
+        }
+
+        if (checkedBoxes.length === 0) {
+            e.preventDefault();
+            alert('{tr}Please select at least one job.{/tr}');
+            return false;
+        }
+
+        // Validation passed - let form submit
     });
 {/jq}

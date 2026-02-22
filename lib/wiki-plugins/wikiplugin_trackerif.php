@@ -18,7 +18,7 @@ function wikiplugin_trackerif_info()
         'defaultfilter' => 'wikicontent',
         'params' => [
             'test' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Test'),
                 'description' => tra('Test'),
                 'since' => '7.0',
@@ -61,7 +61,7 @@ function wikiplugin_trackerif($data, $params)
 
     if (! $trackerId || ! isset($_REQUEST['itemId'])) {
         // Edit mode
-        if (! isset($params['ignore']) || $params['ignore'] == 'y') {
+        if ($params['ignore'] == 'y') {
             return $data;
         }
 

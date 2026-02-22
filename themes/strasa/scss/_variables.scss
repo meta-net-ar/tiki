@@ -30,6 +30,11 @@ $theme-colors: (
     "dark":              $dark, // #000000
 );
 
+:root {
+    --tiki-strasa-darkblue-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
+    --tiki-strasa-lightblue-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
+}
+
 // Options
 // Spacing
 // Body
@@ -80,10 +85,10 @@ $navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8
 $navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default
 $navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default
 
-$navbar-dark-color:                 rgba($white, .55); // !default
-$navbar-dark-hover-color:           rgba($white, .75); // !default
+$navbar-dark-color:                 rgba($white, .85); // !default
+$navbar-dark-hover-color:           rgba($white, .95); // !default
 $navbar-dark-active-color:          $white; // !default
-$navbar-dark-disabled-color:        rgba($white, .25); // !default
+$navbar-dark-disabled-color:        rgba($white, .55); // !default
 
 // Dropdowns
 $dropdown-link-active-bg:           $component-active-bg; //  !default;

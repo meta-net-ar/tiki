@@ -16,7 +16,6 @@
 
 $dieInsteadOfForwardingWithHeader = false;
 global $prefs;
-require_once('lib/debug/Tracer.php');
 
 $inputConfiguration = [
     [ 'staticKeyFilters' => [
@@ -26,10 +25,13 @@ $inputConfiguration = [
         'cancel_edit' => 'url'
     ] ],
 ];
-
-$section = "wiki page";
-$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+
+$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
+require_once('lib/debug/Tracer.php');
 $wikilib = TikiLib::lib('wiki');
 $structlib = TikiLib::lib('struct');
 $notificationlib = TikiLib::lib('notification');
@@ -78,7 +80,7 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
                     $need_lang = false;
                 } else {
                     $smarty->assign('languages', $languages);
-                    $smarty->assign('default_lang', $prefs['language']);
+                    $smarty->assign('default_lang', Language::getCurrentLanguage());
                     $need_lang = true;
                     $smarty->assign('_REQUEST', $_REQUEST);
                 }
@@ -729,13 +731,8 @@ if ($prefs['feature_wiki_footnotes'] === 'y') {
         }
     }
 }
-if (isset($_REQUEST["customTip"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $smarty->assign('customTip', $_REQUEST['customTip']);
-    if (isset($_REQUEST["customTipTitle"])) {
-        $smarty->assign('customTipTitle', tra($_REQUEST["customTipTitle"]));
-    } else {
-        $smarty->assign('customTipTitle', tra('Tip'));
-    }
+if (! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
+    $editlib->assignCustomTipToSmarty($_REQUEST["customTip"] ?? '', $_REQUEST["customTipTitle"] ?? '');
 }
 if (isset($_REQUEST["wikiHeaderTpl"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
     $smarty->assign('wikiHeaderTpl', $smarty->fetch("wiki:{$_REQUEST['wikiHeaderTpl']}"));

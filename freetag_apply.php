@@ -22,11 +22,7 @@ global $tiki_p_freetags_tag;
 if ($prefs['feature_freetags'] == 'y' and $tiki_p_freetags_tag == 'y') {
     $freetaglib = TikiLib::lib('freetag');
 
-    if (isset($_REQUEST['freetag_string'])) {
-        $tag_string = $_REQUEST['freetag_string'];
-    } else {
-        $tag_string = '';
-    }
+    $tag_string = $_REQUEST['freetag_string'] ?? '';
 
     global $user;
 

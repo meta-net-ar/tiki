@@ -2,6 +2,7 @@
 
 namespace Tiki\Lib\core\Toolbar;
 
+use Tiki\Sections;
 use TikiLib;
 
 class ToolbarPicker extends ToolbarDialog
@@ -31,7 +32,6 @@ class ToolbarPicker extends ToolbarDialog
                 $wysiwyg = 'emoji';
                 $label = tra('Emojis');
                 $iconname = 'laugh-wink';
-                $rawList = [];
                 $tool_prefs[] = 'feature_smileys';
                 $list = [];
 
@@ -205,7 +205,7 @@ class ToolbarPicker extends ToolbarDialog
 
     public function getWikiHtml(): string
     {
-        global $section;
+        $section = Sections::getCurrentSection();
 
         if ($this->name === 'specialchar') {
             $this->setupPickerJS();

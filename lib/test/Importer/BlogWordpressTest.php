@@ -720,7 +720,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
     {
         global $prefs, $base_url;
         $prefs['feature_sefurl'] = 'y';
-        $base_url = 'http://localhost/tiki';
+        $base_url = 'http://example.org/tiki';
 
         $this->obj->permalinks = [
             107 => [
@@ -738,8 +738,8 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         ];
 
         $expectedResult = $this->obj->permalinks;
-        $expectedResult[107]['newLink'] = 'http://localhost/tiki/materia';
-        $expectedResult[36]['newLink'] = 'http://localhost/tiki/blogpost10';
+        $expectedResult[107]['newLink'] = 'http://example.org/tiki/materia';
+        $expectedResult[36]['newLink'] = 'http://example.org/tiki/blogpost10';
 
         $this->obj->storeNewLink('materia', ['wp_id' => 107, 'type' => 'page']);
         $this->obj->storeNewLink(10, ['wp_id' => 36, 'type' => 'post']);
@@ -751,7 +751,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
     {
         global $prefs, $base_url;
         $prefs['feature_sefurl'] = 'n';
-        $base_url = 'http://localhost/tiki';
+        $base_url = 'http://example.org/tiki';
 
         $this->obj->permalinks = [
             107 => [
@@ -769,8 +769,8 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         ];
 
         $expectedResult = $this->obj->permalinks;
-        $expectedResult[107]['newLink'] = 'http://localhost/tiki/tiki-index.php?page=materia';
-        $expectedResult[36]['newLink'] = 'http://localhost/tiki/tiki-view_blog_post.php?postId=10';
+        $expectedResult[107]['newLink'] = 'http://example.org/tiki/tiki-index.php?page=materia';
+        $expectedResult[36]['newLink'] = 'http://example.org/tiki/tiki-view_blog_post.php?postId=10';
 
         $this->obj->storeNewLink('materia', ['wp_id' => 107, 'type' => 'page']);
         $this->obj->storeNewLink(10, ['wp_id' => 36, 'type' => 'post']);

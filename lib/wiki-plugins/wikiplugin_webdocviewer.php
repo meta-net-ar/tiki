@@ -52,8 +52,7 @@ function wikiplugin_webdocviewer_info()
 
 function wikiplugin_webdocviewer($data, $params)
 {
-    global $tikilib;
-    global $tikipath, $tikiroot;
+    global $tikiroot;
 
     if (isset($params['fileId'])) {
         $url = $_SERVER['HTTP_HOST'] . $tikiroot . 'tiki-download_file.php?fileId=' . $params['fileId'];

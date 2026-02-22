@@ -119,7 +119,7 @@
                             <div id="fragment-{$fragment}" class="tab-pane{if $fragment eq 1} active{/if}">
                         {/if}
                         {$cname=$slvn_item.cname}
-                        
+                        {$showcname="show_"|cat:$cname}
                         {* Comments section *}
                         {if $pos eq 'comments'}
                             {* Add debug output *}
@@ -129,7 +129,7 @@
                                         {$slvn_item.count}&nbsp;{tr}new comments{/tr}
                                     </a>
                                 </div>
-                                <div class="tab-dependent collapse" id="{$cname|escape}" style="display:{if !isset($cookie.$showcname) or $cookie.$showcname eq 'y'}{$default_folding}{else}{$opposite_folding}{/if};">
+                                <div class="tab-dependent collapse" id="{$cname|escape}" style="display:{if (!isset($cookie[$showcname]) or $cookie[$showcname] eq 'y')}{$default_folding}{else}{$opposite_folding}{/if};">
                                     {if $nonums != 'y'}<ol>{else}<ul>{/if}
                                     {section name=ix loop=$slvn_item.list}
                                         <li>

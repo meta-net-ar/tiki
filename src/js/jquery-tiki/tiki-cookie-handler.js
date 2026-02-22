@@ -64,8 +64,11 @@ window.CookieHandler = (() => {
         }
 
         COOKIE_CONSENT_VALUE.consentGiven = true;
+
         // Store the entire consent object (including action and categories) in a single cookie
-        setCookieBrowser(COOKIE_CONSENT_NAME, encodeURIComponent(JSON.stringify(COOKIE_CONSENT_VALUE)), "", exp);
+        const cookieConsentValue = encodeURIComponent(JSON.stringify(COOKIE_CONSENT_VALUE));
+        jqueryTiki.cookie_consent_value = cookieConsentValue;
+        setCookieBrowser(COOKIE_CONSENT_NAME, cookieConsentValue, "", exp);
         $(document).trigger("cookies.consent.agree");
     }
 

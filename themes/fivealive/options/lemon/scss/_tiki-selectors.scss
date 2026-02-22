@@ -1,20 +1,26 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
 
-
-.postbody-title,
-.bg-dark {
-    background: #977202 !important;
-    background: linear-gradient(to right, #977202 0%,#AA6703 100%) !important;
-}
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
 .text-dark {
     color: #6D5509 !important;
+}
+
+.btn.btn-outline-primary { color: #807300; border-color: #807300; }
+.btn.btn-outline-secondary { color: #8F7000; border-color: #8F7000; }
+.btn.btn-outline-success { color: #3A833A; border-color: #3A833A; }
+.btn.btn-outline-warning { color: #A4660E; border-color: #A4660E; }
+.btn.btn-outline-info { color: #B95B09; border-color: #B95B09; }
+
+.page-link.active, .active > .page-link,
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #000 !important;
 }
 
 .breadcrumb-item.active {
@@ -33,7 +39,6 @@
 }
 
 .badge.bg-primary,
-    //.badge.bg-danger,
 .badge.bg-warning,
 .badge.bg-success,
 .badge.bg-info {
@@ -71,4 +76,7 @@
     .valid-feedback { color: #329F4F; }
     .invalid-feedback { color: #FF4800; }
     .blockquote-footer { color: #848C94; }
+    h3.tiki-card-header-title {
+        color: #000;
+    }
 }

@@ -23,17 +23,17 @@ class FilesSubgalleriesCreateCommand extends Command
             ->addArgument(
                 'trackerId',
                 InputArgument::REQUIRED,
-                'Tracker to migrate files from'
+                tra('Tracker to migrate files from')
             )
             ->addArgument(
                 'parentGalleryId',
                 InputArgument::OPTIONAL,
-                'Parent gallery ID in which to create sub-galleries'
+                tra('Parent gallery ID in which to create sub-galleries')
             )
             ->addArgument(
                 'fieldId',
                 InputArgument::OPTIONAL,
-                'Files field ID for which files to migrate'
+                tra('Files field ID for which files to migrate')
             )
         ;
     }
@@ -52,7 +52,7 @@ class FilesSubgalleriesCreateCommand extends Command
         $trackerId = (int) $input->getArgument('trackerId');
         $definition = Tracker_Definition::get($trackerId);
         if (! $definition) {
-            throw new \Exception('File subgalleries create: Tracker not found');
+            throw new \Exception(tra('File subgalleries create: Tracker not found'));
         }
 
         $parentGalleryId = (int) $input->getArgument('parentGalleryId');
@@ -71,7 +71,7 @@ class FilesSubgalleriesCreateCommand extends Command
             if ($fieldDefinition['type'] === 'FG') {
                 $trackerFileFields[] = $definition->getField($fieldId);
             } else {
-                $output->writeln('<comment> The indicated field is not a Files type</comment>');
+                $output->writeln('<comment>' . tra('The indicated field is not a Files type') . '</comment>');
                 return Command::INVALID;
             }
         } else {
@@ -80,7 +80,7 @@ class FilesSubgalleriesCreateCommand extends Command
         }
 
         if (empty($trackerFileFields)) {
-            $output->writeln('<comment> Files field not found</comment>');
+            $output->writeln('<comment>' . tra('Files field not found') . '</comment>');
             return Command::INVALID;
         }
 

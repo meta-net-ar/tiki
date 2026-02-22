@@ -11,15 +11,17 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'objdata'            => 'word',              //post
-        'type'               => 'word',              //post
-        'assign'             => 'bool',              //post
-        'theme'              => 'word',              //post
+        'objdata'            => 'text',              //post
+        'type'               => 'text',              //post
+        'assign'             => 'alpha',             //post
+        'theme'              => 'alnumdash',         //post
         'delete'             => 'int',               //get
-        'obj'                => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        ],
+        'staticKeyFiltersForArrays' => [
+        'obj'                => 'int',               //post
         ],
     ],
 ];
@@ -153,17 +155,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $themecontrollib->tc_list_objects(null, $offset, $maxRecords, $sort_mode, $find);

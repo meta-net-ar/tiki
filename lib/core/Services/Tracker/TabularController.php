@@ -580,7 +580,7 @@ class Services_Tracker_TabularController
                             $entry = new TrackerSourceEntry($itemId);
                             $row = ['itemId' => $itemId];
                             foreach ($columns as $column) {
-                                $row[$column->getField()] = $entry->render($column, false);
+                                $row[$column->getLabel()] = $row[$column->getField()] = $entry->render($column, false);
                             }
                             $data[] = $row;
                         }
@@ -965,6 +965,7 @@ class Services_Tracker_TabularController
                 'import_transaction' => 0,
                 'bulk_import' => 0,
                 'skip_unmodified' => 0,
+                'skip_validation' => 0,
                 'upload_max_filesize' => $uploadMaxFileSize
             ],
         ];

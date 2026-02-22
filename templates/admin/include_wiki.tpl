@@ -124,6 +124,7 @@
                         {preference name=wikiplugin_footnotearea}
                         {preference name=footnote_popovers}
                     </div>
+                    {preference name=wikiplugin_fancylink}
                 </fieldset>
             </div>
         {/tab}

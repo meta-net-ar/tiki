@@ -491,12 +491,12 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
         /**
          * Postfix with [] for multivalued fields
          * Applicable for:
-         * Category, CountrySelector, DynamicList, ItemLink, Kaltura, MultiSelect, UserSelector
+         * Category, CountrySelector, DynamicList, ItemLink, Kaltura, MultiSelect, UserSelector, ItemsList
          *
          * NOTE: While the Relation field allows multiple values as well, we don't explicitly set the [] postfix for it,
          * because it needs specific keys, notably 'meta' and 'objects' in its value.
          */
-        if (in_array($this->trackerField->getType(), ['e', 'y', 'kaltura', 'M', 'u']) || (in_array($this->trackerField->getType(), ['r', 'w']) && $this->trackerField->getOption('selectMultipleValues') == '1')) {
+        if (in_array($this->trackerField->getType(), ['e', 'y', 'kaltura', 'M', 'u', 'l']) || (in_array($this->trackerField->getType(), ['r', 'w']) && $this->trackerField->getOption('selectMultipleValues') == '1')) {
             $insertId .= '[]';
         }
         return $insertId;

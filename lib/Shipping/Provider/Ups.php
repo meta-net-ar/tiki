@@ -48,6 +48,7 @@ class Ups implements ShippingProvider
             $request = $this->getRequest($from, $to, $packages, $service);
 
             $client = TikiLib::lib('tiki')->get_http_client();
+            // @tiki-external-link-ok: UPS API endpoint, requires authentication
             $client->setUri('https://www.ups.com/ups.app/xml/Rate');
             $client->setRawBody($auth . $request);
 

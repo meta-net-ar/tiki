@@ -19,10 +19,11 @@ class Query extends Base
         static $request = null;
 
         // Modify explicit params to be prefixed if they need to (used in a plugin, module, ...)
-        if (! empty($smarty->url_overriding_prefix)) {
-            foreach ($smarty->url_overriding_prefix[1] as $v) {
+        $prefixInfo = isset($smarty->url_overriding_prefix) ? $smarty->url_overriding_prefix : null;
+        if (is_array($prefixInfo) && isset($prefixInfo[0]) && isset($prefixInfo[1]) && is_array($prefixInfo[1])) {
+            foreach ($prefixInfo[1] as $v) {
                 if (isset($params[$v])) {
-                    $params[$smarty->url_overriding_prefix[0] . $v] = $params[$v];
+                    $params[$prefixInfo[0] . $v] = $params[$v];
                     unset($params[$v]);
                 }
             }
@@ -75,11 +76,19 @@ class Query extends Base
                         $list = explode(",", $param_value ?? "");
                     }
                     if ($param_name == 'sort_mode') {
-                        // multi-column sort has comma-separated values in the request
-                        if (isset($_REQUEST[$param_name]) && (in_array($_REQUEST[$param_name], $list) || array_intersect(explode(',', $_REQUEST[$param_name]), $list))) {
-                            $request_values = explode(',', $_REQUEST[$param_name]);
-                        } elseif (isset($query[$param_name]) && (in_array($query[$param_name], $list) || array_intersect(explode(',', $query[$param_name]), $list))) {
-                            $request_values = explode(',', $query[$param_name]);
+                        // multi-column sort: support array or comma-separated values in the request
+                        if (isset($_REQUEST[$param_name])) {
+                            if (is_array($_REQUEST[$param_name])) {
+                                $request_values = $_REQUEST[$param_name];
+                            } else {
+                                $request_values = explode(',', $_REQUEST[$param_name]);
+                            }
+                        } elseif (isset($query[$param_name])) {
+                            if (is_array($query[$param_name])) {
+                                $request_values = $query[$param_name];
+                            } else {
+                                $request_values = explode(',', $query[$param_name]);
+                            }
                         } else {
                             $request_values = [];
                         }
@@ -160,7 +169,8 @@ class Query extends Base
                     $params['_urlencode'] = 'y';
                 }
                 $sep = $params['_urlencode'] == 'n' ? '&' : '&amp;';
-                $ret = http_build_query($query, '', $sep);
+                $q = is_array($query) ? $query : [];
+                $ret = http_build_query($q, '', $sep);
             }
         }
 
@@ -221,7 +231,8 @@ class Query extends Base
             if (! empty($php_self)) {
                 if (basename($php_self) === 'route.php') {
                     global $inclusion;
-                    $php_self = str_replace('route.php', $inclusion, $php_self);
+                    $inclusion_value = $inclusion === null ? '' : (string) $inclusion;
+                    $php_self = str_replace('route.php', $inclusion_value, $php_self);
                 } elseif (basename($php_self) === 'tiki-ajax_services.php' && ! empty($_SERVER['HTTP_REFERER'])) {
                     //$php_self = str_replace('tiki-ajax_services.php', basename($_SERVER['HTTP_REFERER']), $php_self); // TODO: figure out if this was really needed for anything as it was wrongly replacing the link with the last visited referrer in the PluginH5P Edit button
                     $pos = strpos($php_self, '?');

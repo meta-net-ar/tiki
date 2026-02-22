@@ -447,11 +447,11 @@ if ($(this).val() != '') {
                         <fieldset class="form-text">
                             <legend class="visually-hidden">{tr}Default sort order{/tr}</legend>
                             <label  for="fgal_sortdirection1">
-                                <input type="radio" id="fgal_sortdirection1" name="sortdirection" value="desc" {if $sortdirection == 'desc'}checked="checked"{/if} />
+                                <input type="radio" class="form-check-input" id="fgal_sortdirection1" name="sortdirection" value="desc" {if $sortdirection == 'desc'}checked="checked"{/if} />
                                 &nbsp;{tr}Descending{/tr}&nbsp;
                             </label>
                             <label for="fgal_sortdirection2">
-                                <input type="radio" id="fgal_sortdirection2" name="sortdirection" value="asc" {if $sortdirection == 'asc'}checked="checked"{/if} />
+                                <input type="radio" class="form-check-input" id="fgal_sortdirection2" name="sortdirection" value="asc" {if $sortdirection == 'asc'}checked="checked"{/if} />
                                 &nbsp;{tr}Ascending{/tr}&nbsp;
                             </label>
                         </fieldset>

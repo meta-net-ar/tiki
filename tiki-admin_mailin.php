@@ -12,12 +12,15 @@ $inputConfiguration = [
     [
         'staticKeyFilters'            => [
             'mailin_autocheckFreq'    => 'int',  //post
-            'mailin_autocheck'        => 'bool', //post
+            'mailin_autocheck'        => 'alpha', //post
+            'set_auto'                => 'alpha', //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
-//check if feature is on
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_mailin');
 $access->check_permission(['tiki_p_admin_mailin']);
 

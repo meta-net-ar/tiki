@@ -60,74 +60,71 @@ function module_wiki_last_comments_info()
  */
 function module_wiki_last_comments($mod_reference, $module_params)
 {
-    if (! function_exists('module_last_comments')) {
-        /**
-         * @param $limit
-         * @param string $type
-         * @return array|null
-         */
-        function module_last_comments($limit, array $params)
-        {
-            global $tikilib, $user;
-            $bindvars = [$params['type']];
-            $where = '';
-            switch ($params['type']) {
-                case 'article':
-                    $join = 'left join `tiki_articles` ta on (tc.`object` = ta.`articleId`)';
-                    $get = ', ta.`title` as name';
-                    if (! empty($params['language'])) {
-                        $where .= ' and ta.`lang`=?';
-                        $bindvars[] = $params['language'];
-                    }
-                    global $tiki_p_admin_cms;
-                    if ($tiki_p_admin_cms != 'y') {
-                        $where .= ' and tc.`approved`!=?';
-                        $bindvars[] = 'n';
-                    }
-                    break;
-
-                case 'wiki page':
-                    if (empty($params['language'])) {
-                        $join = '';
-                    } else {
-                        $join = 'left join `tiki_pages` tp on (tc.`object` = tp.`pageName`)';
-                        $where .= ' and tp.`lang`=?';
-                        $bindvars[] = $params['language'];
-                    }
-                    $get = ', tc.`object` as name';
-                    global $tiki_p_admin_wiki;
-                    if ($tiki_p_admin_wiki != 'y') {
-                        $where .= ' and tc.`approved`!=?';
-                        $bindvars[] = 'n';
-                    }
-                    break;
-            }
-
-            $query = "select tc.* $get from `tiki_comments` as tc $join where `objectType`=? $where order by `commentDate` desc";
-            $result = $tikilib->query($query, $bindvars, $limit, 0);
-            $ret = [];
-
-            while ($res = $result->fetchRow()) {
-                switch ($params['type']) {
-                    case 'wiki page':
-                        $perm = 'tiki_p_view';
-                        break;
-
-                    case 'article':
-                        $perm = 'tiki_p_read_article';
-                        break;
-
-                    default:
-                        return null;
+    /**
+     * @param $limit
+     * @param string $type
+     * @return array|null
+     */
+    $module_last_comments = function ($limit, array $params) {
+        global $tikilib, $user;
+        $bindvars = [$params['type']];
+        $where = '';
+        switch ($params['type']) {
+            case 'article':
+                $join = 'left join `tiki_articles` ta on (tc.`object` = ta.`articleId`)';
+                $get = ', ta.`title` as name';
+                if (! empty($params['language'])) {
+                    $where .= ' and ta.`lang`=?';
+                    $bindvars[] = $params['language'];
                 }
-                if ($tikilib->user_has_perm_on_object($user, $res['object'], $res['type'], $perm)) {
-                    $res['title'] = TikiLib::lib('comments')->process_comment_title($res, $params['commentlength']);
-                    $ret[] = $res;
+                global $tiki_p_admin_cms;
+                if ($tiki_p_admin_cms != 'y') {
+                    $where .= ' and tc.`approved`!=?';
+                    $bindvars[] = 'n';
                 }
-            }
-            return $ret;
+                break;
+
+            case 'wiki page':
+                if (empty($params['language'])) {
+                    $join = '';
+                } else {
+                    $join = 'left join `tiki_pages` tp on (tc.`object` = tp.`pageName`)';
+                    $where .= ' and tp.`lang`=?';
+                    $bindvars[] = $params['language'];
+                }
+                $get = ', tc.`object` as name';
+                global $tiki_p_admin_wiki;
+                if ($tiki_p_admin_wiki != 'y') {
+                    $where .= ' and tc.`approved`!=?';
+                    $bindvars[] = 'n';
+                }
+                break;
         }
-    }
+
+        $query = "select tc.* $get from `tiki_comments` as tc $join where `objectType`=? $where order by `commentDate` desc";
+        $result = $tikilib->query($query, $bindvars, $limit, 0);
+        $ret = [];
+
+        while ($res = $result->fetchRow()) {
+            switch ($params['type']) {
+                case 'wiki page':
+                    $perm = 'tiki_p_view';
+                    break;
+
+                case 'article':
+                    $perm = 'tiki_p_read_article';
+                    break;
+
+                default:
+                    return null;
+            }
+            if ($tikilib->user_has_perm_on_object($user, $res['object'], $res['type'], $perm)) {
+                $res['title'] = TikiLib::lib('comments')->process_comment_title($res, $params['commentlength']);
+                $ret[] = $res;
+            }
+        }
+        return $ret;
+    };
     global $prefs;
     if (! isset($module_params['type'])) {
         $module_params['type'] = "wiki page";
@@ -146,8 +143,8 @@ function module_wiki_last_comments($mod_reference, $module_params)
             if (! $prefs['feature_articles']) {
                 return;
             }
-                $module_params['type'] = 'article';
-                $smarty->assign('tpl_module_title', tra('Last article comments'));
+            $module_params['type'] = 'article';
+            $smarty->assign('tpl_module_title', tra('Last article comments'));
             break;
 
         default:
@@ -159,7 +156,7 @@ function module_wiki_last_comments($mod_reference, $module_params)
             break;
     }
 
-    $comments = module_last_comments($mod_reference['rows'], $module_params);
+    $comments = $module_last_comments($mod_reference['rows'], $module_params);
     $smarty->assign_by_ref('comments', $comments);
     $smarty->assign('moretooltips', $module_params['moretooltips'] ?? 'n');
     $smarty->assign('type', $module_params['type']);

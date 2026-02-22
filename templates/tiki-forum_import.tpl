@@ -206,7 +206,7 @@
                         {section name=fforum loop=$fromForums}
                             <tr>
                                 <td>
-                                    <input type="radio" name="fForumid" value="{$fromForums[fforum].id}">
+                                    <input type="radio" class="form-check-input" name="fForumid" value="{$fromForums[fforum].id}">
                                 </td>
                                 <td>{$fromForums[fforum].name}</td>
                                 <td>{$fromForums[fforum].comments}</td>
@@ -232,7 +232,7 @@
                         {section name=tforum loop=$toForums}
                             <tr>
                                 <td>
-                                    <input type="radio" name="tForumid" value="{$toForums[tforum].forumId}">
+                                    <input type="radio" class="form-check-input" name="tForumid" value="{$toForums[tforum].forumId}">
                                 </td>
                                 <td>{$toForums[tforum].name}</td>
                                 <td>{$toForums[tforum].comments}</td>

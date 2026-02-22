@@ -142,7 +142,7 @@ function prefs_login_list()
         ],
         'login_autologin_redirectlogin_url' => [
             'name' => tr('URL of autologin page on remote Tiki to redirect user to login'),
-            'description' => tr('URL of autologin page on remote Tiki to redirect user to login, e.g. https://www.remotetiki.com/PageWithRedirectPlugin'),
+            'description' => tr('URL of autologin page on remote Tiki to redirect user to login, e.g. https://www.remotetiki.example.org/PageWithRedirectPlugin'),
             'type' => 'text',
             'default' => '',
             'tags' => ['advanced'],

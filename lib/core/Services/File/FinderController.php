@@ -236,23 +236,22 @@ class Services_File_FinderController
         return [];
     }
 
-    private function getHashInfo($elFinder, $hashes, $params)
+    private function getHashInfo($elFinder, string $hash, array $params)
     {
         $filegallib = TikiLib::lib('filegal');
-        $ret = [];
-        foreach ($hashes as $hash) {
-            $fileId = $elFinder->realpath($hash);
-            if (str_contains($fileId, 'f_')) {
-                $info = $filegallib->get_file(str_replace('f_', '', $fileId));
-            } else {
-                $info = $filegallib->get_file_gallery(str_replace('d_', '', $fileId));
-            }
-            $info['wiki_syntax'] = $filegallib->getWikiSyntax($info['galleryId'], empty($info['fileId']) ? [] : $info, $params);
-            $info['data'] = ''; // binary data makes JSON fall over
-            $ret[] = $info;
+
+        $fileId = $elFinder->realpath($hash);
+
+        if (str_contains($fileId, 'f_')) {
+            $info = $filegallib->get_file(str_replace('f_', '', $fileId));
+        } else {
+            $info = $filegallib->get_file_gallery(str_replace('d_', '', $fileId));
         }
 
-        return $ret;
+        $info['wiki_syntax'] = $filegallib->getWikiSyntax($info['galleryId'], empty($info['fileId']) ? [] : $info, $params);
+        $info['data'] = '';
+
+        return $info;
     }
 
     /**
