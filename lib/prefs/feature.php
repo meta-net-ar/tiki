@@ -544,7 +544,7 @@ function prefs_feature_list($partial = false)
         ],
         'feature_htmlpurifier_output' => [
             'name' => tra('Output should be HTML purified'),
-            'description' => tra('This activates HTML Purifier on wiki content and other outputs, to filter out potential security problems like XSS code.  Since Tiki 29, HTML5 Purifier has been added to Tiki to make it HTML5 compatible.'),
+            'description' => tra('This activates HTML Purifier on wiki content and other outputs, to filter out potential security problems like XSS code.'),
             'help' => 'Purifier',
             'hint' => tr('If you are trying to use HTML in your pages and it gets stripped out, you should make sure your HTML is valid or de-activate this feature.'),
             'tags' => ['experimental'],

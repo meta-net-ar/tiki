@@ -46,7 +46,7 @@ function wikiplugin_html_info()
             ],
             'purify' => [
                 'required' => false,
-                'name' => tra('Purify html'),
+                'name' => tra('Purify HTML'),
                 'description' => tra('Purify the HTML code.'),
                 'since' => '30',
                 'default' => 'n',
