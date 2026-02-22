@@ -45,32 +45,39 @@ $(window).on('load', function() {
 
     if (!filterForm.length) return;
 
-    const remember_submitted = 'filter_just_submitted_' + filterCounter;
-    const justSubmitted = sessionStorage.getItem(remember_submitted);
+    // Prevent multiple submits per page load
+    let formSubmitted = false;
 
-    if (urlParams.get('filter') === 'Filter' && !justSubmitted) {
-        let hasValues = false;
-
+    if (urlParams.get('filter') === 'Filter') {
         urlParams.forEach((value, key) => {
             if (key === 'filter') return;
             if (!key.startsWith('tf_')) return;
 
             const input = filterForm.find('[name="' + key + '"]')[0];
             if (input) {
-                input.value = value;
-                hasValues = true;
+                input.setAttribute('value', value);
             }
         });
 
-        if (hasValues) {
-            sessionStorage.setItem(remember_submitted, 'true');
+        if (!formSubmitted) {
+            formSubmitted = true;
             filterForm.submit();
-            return;
         }
     }
 
-    if (justSubmitted) {
-        sessionStorage.removeItem(remember_submitted);
-    }
+    filterForm.find('[name^="tf_"]').on('input', function() {
+
+        const newParams = new URLSearchParams(window.location.search);
+
+        filterForm.find('[name^="tf_"]').each(function() {
+            newParams.set(this.name, this.value);
+        });
+
+        newParams.set('filter', 'Filter');
+        const hash = '#list_filter' + filterCounter;
+
+        // Handle param values change in the URL
+        history.replaceState(null, '', '?' + newParams.toString() + hash);
+    });
 });
 {/jq}
