@@ -111,12 +111,17 @@ class ZipScanner implements ScannerInterface
                 }
             }
 
+            $relpath = $this->normRelpath($rel);
+            $mtime   = isset($st['mtime']) ? (int)$st['mtime'] : null;
+
             $out['files'][] = [
                 'relative'         => $rel,
+                'relpath'          => $relpath,
                 'type'             => $type,
                 'page_name'        => $pageName,
                 'title'            => $resolvedTitle,
                 'size_bytes'       => (int)($st['size'] ?? strlen($raw)),
+                'mtime_utc'        => $mtime,
                 'has_front_matter' => $hadFM,
                 'preview'          => mb_substr(trim($this->previewText($bodyNoFm)), 0, 200),
                 'raw'              => $raw,
@@ -376,5 +381,13 @@ class ZipScanner implements ScannerInterface
         }
 
         return false;
+    }
+
+    private function normRelpath(string $p): string
+    {
+        // slashes Unix, pas de ./ ni de leading slash
+        $p = str_replace('\\', '/', $p);
+        $p = preg_replace('~^(\./)+~', '', $p);
+        return ltrim($p, '/');
     }
 }

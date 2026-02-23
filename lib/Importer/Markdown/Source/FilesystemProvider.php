@@ -19,7 +19,8 @@ class FilesystemProvider implements SourceProviderInterface
         private string $mode, // 'upload' | 'path'
         private array $cfg,   // ['local_path' => '/srv/notes' (optionnel for mode=path)]
         private array $ctx    // ['uploadedPath','uploadedName'] for mode=upload
-    ) {}
+    ) {
+    }
 
     public function fetchToTempZip(): string
     {
@@ -31,7 +32,7 @@ class FilesystemProvider implements SourceProviderInterface
         $uploadedPath = $this->ctx['uploadedPath'] ?? null;
         $uploadedName = $this->ctx['uploadedName'] ?? null;
 
-        if (!$uploadedPath || !is_readable($uploadedPath)) {
+        if (! $uploadedPath || ! is_readable($uploadedPath)) {
             throw new \RuntimeException('Uploaded file is missing or not readable.');
         }
 
@@ -39,13 +40,13 @@ class FilesystemProvider implements SourceProviderInterface
 
         if ($ext === 'zip') {
             $dst = $this->tmpZip();
-            if (!copy($uploadedPath, $dst)) {
+            if (! copy($uploadedPath, $dst)) {
                 throw new \RuntimeException('Cannot copy uploaded ZIP to temp.');
             }
             return $dst;
         }
 
-        if (!class_exists(ZipArchive::class)) {
+        if (! class_exists(ZipArchive::class)) {
             throw new \RuntimeException('ZipArchive extension is required.');
         }
         $zipPath = $this->tmpZip();
@@ -54,7 +55,7 @@ class FilesystemProvider implements SourceProviderInterface
             throw new \RuntimeException('Cannot create temporary ZIP.');
         }
         $name = $uploadedName ?: 'note.md';
-        if (!preg_match('~\.(md|markdown)$~i', $name)) {
+        if (! preg_match('~\.(md|markdown)$~i', $name)) {
             $name .= '.md';
         }
         $data = file_get_contents($uploadedPath);
@@ -74,20 +75,20 @@ class FilesystemProvider implements SourceProviderInterface
         if ($path === '') {
             throw new \RuntimeException('Missing local_path.');
         }
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new \RuntimeException('Path does not exist: ' . $path);
         }
 
         // If it's already a ZIP file, just copy it to temp
         if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
             $dst = $this->tmpZip();
-            if (!copy($path, $dst)) {
+            if (! copy($path, $dst)) {
                 throw new \RuntimeException('Cannot copy ZIP to temp.');
             }
             return $dst;
         }
 
-        if (!class_exists(ZipArchive::class)) {
+        if (! class_exists(ZipArchive::class)) {
             throw new \RuntimeException('ZipArchive extension is required.');
         }
 
@@ -110,7 +111,7 @@ class FilesystemProvider implements SourceProviderInterface
     private function addOneFile(ZipArchive $zip, string $full, string $rel): void
     {
         $lower = strtolower($full);
-        if (!str_ends_with($lower, '.md') && !str_ends_with($lower, '.markdown')) {
+        if (! str_ends_with($lower, '.md') && ! str_ends_with($lower, '.markdown')) {
             return;
         }
         $data = @file_get_contents($full);
@@ -128,11 +129,15 @@ class FilesystemProvider implements SourceProviderInterface
             return;
         }
         foreach ($it as $n) {
-            if ($n === '.' || $n === '..') continue;
+            if ($n === '.' || $n === '..') {
+                continue;
+            }
             $full = $dir . '/' . $n;
             $relPath = ltrim($rel . '/' . $n, '/');
             if (is_dir($full)) {
-                if ($n === '.git') continue;
+                if ($n === '.git') {
+                    continue;
+                }
                 $this->addDir($zip, $root, $relPath);
             } else {
                 $this->addOneFile($zip, $full, $relPath);

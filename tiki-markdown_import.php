@@ -42,6 +42,10 @@ $inputConfiguration = [[
         'journal_lang'   => 'word', // en|fr
         'journal_ns'     => 'string',
         'markdown_source' => 'word', // logseq|gfm|commonmark
+
+        // GC / Garbage collect deletions options
+        'gc_mode'                       => 'word', // off|mark|delete
+        'gc_safe_namespace'             => 'word', // ex. 'Journal'
     ],
 ]];
 
@@ -78,6 +82,10 @@ if (! isset($_SESSION['md_import'])) {
             'journal_ns'     => 'Journal',
             'markdown_source' => 'commonmark', // logseq|gfm|commonmark
         ],
+        'gc' => [
+            'mode'                   => 'mark',   // off | mark | delete
+            'safe_namespace'         => '',       // ex. 'Journal'
+        ],
         // Last preview (dry-run)
         'last_preview' => null,
     ];
@@ -87,9 +95,8 @@ if (! isset($_SESSION['md_import'])) {
 // Actions
 $action = $_POST['action'] ?? null;
 
-// 1) Save source
 //TODO: 1.validate fields more strictly 2. Save in prefs/DB
-if ($action === 'save_source' && $access->checkCsrf()) {
+if ($action === 'save_import_options' && $access->checkCsrf()) {
     $type = $_POST['source_type'] ?? 'local';
     $type = in_array($type, ['local', 'git'], true) ? $type : 'local';
 
@@ -104,12 +111,8 @@ if ($action === 'save_source' && $access->checkCsrf()) {
         $src['git_timeout']  = max(5, (int)($_POST['git_timeout'] ?? 30));
     }
     $_SESSION['md_import']['source'] = $src;
-    Feedback::success(tra('Source settings saved.'));
-}
 
-// 2) Save wiki options
-//TODO: 1.validate fields more strictly 2. Save in prefs/DB
-if ($action === 'save_wiki' && $access->checkCsrf()) {
+
     $_SESSION['md_import']['wiki'] = [
         'roots' => trim($_POST['roots'] ?? '.'),
         'recursive' => isset($_POST['recursive']),
@@ -125,10 +128,16 @@ if ($action === 'save_wiki' && $access->checkCsrf()) {
         'markdown_source' => $_POST['markdown_source'] ?? 'commonmark',
         'journal_ns' => trim($_POST['journal_ns'] ?? 'Journal'),
     ];
-    Feedback::success(tra('Import options saved.'));
+
+
+    $_SESSION['md_import']['gc'] = [
+        'mode'                   => in_array(($_POST['gc_mode'] ?? 'off'), ['off', 'mark', 'delete'], true) ? $_POST['gc_mode'] : 'off',
+        'safe_namespace'         => trim($_POST['gc_safe_namespace'] ?? ''),
+    ];
+    Feedback::success(tra('Import options saved successfully.'));
 }
 
-// 4) Dry-run (preview) — placeholder
+// Dry-run (preview) — placeholder
 if ($action === 'dry_run' && $access->checkCsrf()) {
     $sourceCfg = $_SESSION['md_import']['source'] ?? [];
     $wikiOpts = $_SESSION['md_import']['wiki'] ?? [];
@@ -150,7 +159,8 @@ if ($action === 'dry_run' && $access->checkCsrf()) {
     }
 
     $importer = new TikiMarkdownImporter();
-    $res = $importer->previewFromSource($sourceCfg, $wikiOpts, $uploadTmp, $uploadName);
+    $gc = $_SESSION['md_import']['gc'] ?? [];
+    $res = $importer->previewFromSource($sourceCfg, $wikiOpts, $uploadTmp, $uploadName, ['gc' => $gc]);
 
     if (! empty($res['ok'])) {
         $_SESSION['md_import']['last_preview'] = json_encode(
@@ -163,7 +173,7 @@ if ($action === 'dry_run' && $access->checkCsrf()) {
     }
 }
 
-// 5) Import now
+// Import now
 if ($action === 'import_now' && $access->checkCsrf()) {
     $sourceCfg = $_SESSION['md_import']['source'] ?? [];
     $wikiOpts = $_SESSION['md_import']['wiki'] ?? [];
@@ -199,12 +209,14 @@ if ($action === 'import_now' && $access->checkCsrf()) {
 
     // Markdown flavor selection comes from UI (or default)
     $flavor = $_POST['markdown_source'] ?? ($wikiOpts['markdown_source'] ?? 'commonmark');
+    $gc = $_SESSION['md_import']['gc'] ?? [];
 
     $pipelineCfg = [
         'flavor'              => $flavor,
         'strip_front_matter'  => true,
         'runtime_logseq'      => false,
         'blockref_mode'       => 'inline',
+        'gc'                  => $gc,
     ];
 
     $importer = new TikiMarkdownImporter();
@@ -243,9 +255,6 @@ if ($action === 'import_now' && $access->checkCsrf()) {
     }
 }
 
-
-// --------------------- CLI command builder (minimal) ---------------------
-// TODO: Should we save this Scheduler job here directly instead of just displaying a command ?
 
 if (! function_exists('mdimp_val_plain')) {
     function mdimp_val_plain($v): ?string
@@ -323,6 +332,9 @@ $cliDefaults = [
     'git-pull'         => true,
     'repo-token'    => null,
     'git-timeout'    => 30,
+    // Garbage Collector options
+    'gc-mode'                   => 'off',
+    'gc-safe-namespace'         => null,
 ];
 
 $source = $_SESSION['md_import']['source'] ?? [];
@@ -341,7 +353,7 @@ if ($srcType === 'local') {
     $srcOpts[] = mdimp_opt_if_changed('local-path', $localPath ?: 'path_to_your_zip_or_md', $cliDefaults['local-path']);
 } elseif ($srcType === 'git') {
     $srcOpts[] = mdimp_opt_if_changed('source-type', $srcType, $cliDefaults['source-type']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-url', $source['repo_url'] ?? null, $cliDefaults['repo-path']);
+    $srcOpts[] = mdimp_opt_if_changed('repo-url', $source['repo_url'] ?? null, $cliDefaults['repo-url']);
     $srcOpts[] = mdimp_opt_if_changed('repo-branch', $source['repo_branch'] ?? null, $cliDefaults['repo-branch']);
     $srcOpts[] = mdimp_opt_if_changed('git-pull', $source['git_pull'] ?? null, $cliDefaults['git-pull']);
     $srcOpts[] = mdimp_opt_if_changed('repo-token', $source['repo_token'] ?? null, $cliDefaults['repo-token']);
@@ -364,18 +376,26 @@ $common[] = mdimp_opt_if_changed('detect-journal', (bool)($wiki['detect_journal'
 $common[] = mdimp_opt_if_changed('journal-lang', $wiki['journal_lang'] ?? 'en', $cliDefaults['journal-lang']);
 $common[] = mdimp_opt_if_changed('journal-ns', $wiki['journal_ns'] ?? 'Journal', $cliDefaults['journal-ns']);
 
+$gc = $_SESSION['md_import']['gc'] ?? [];
+
+$gcOpts = [];
+$gcOpts[] = mdimp_opt_if_changed('gc-mode', $gc['mode'] ?? 'off', $cliDefaults['gc-mode']);
+$gcOpts[] = mdimp_opt_if_changed('gc-safe-namespace', $gc['safe_namespace'] ?? null, $cliDefaults['gc-safe-namespace']);
+
 // cleanup
 $srcOpts = array_values(array_filter($srcOpts));
 $common  = array_values(array_filter($common));
+$gcOpts = array_values(array_filter($gcOpts));
 
 //Build commands
 $base = 'markdown:importer';
-$cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' --json');
-$cmdImport  = trim($base . ' --mode=import  ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' --json');
+$cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
+$cmdImport  = trim($base . ' --mode=import  ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
 
 $smarty->assign('md_cli_preview', $cmdPreview);
 $smarty->assign('md_cli_import', $cmdImport);
 $smarty->assign('md_cli_sourcetype', $srcType);
+$smarty->assign('md_gc', $_SESSION['md_import']['gc']);
 
 $cfg = $_SESSION['md_import'];
 $smarty->assign('md_source', $cfg['source']);
