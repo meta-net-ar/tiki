@@ -1,0 +1,4 @@
+**/node_modules/
+public/generated/**
+vendor/**
+vendor_bundled/**

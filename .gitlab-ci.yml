@@ -241,6 +241,15 @@ eslint:
   script:
     - npx eslint .
 
+stylelint:
+  stage: code-quality
+  needs:
+    - node_modules
+  image:
+    name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
+  script:
+    - npx stylelint "src/**/*.{css,scss}" "themes/**/*.{css,scss}" --ignore-path .stylelintignore
+
 shlint:
   stage: code-quality
   needs: []
