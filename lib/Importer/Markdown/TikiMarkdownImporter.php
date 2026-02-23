@@ -1,23 +1,20 @@
 <?php
 
-// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-//
-// All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
 namespace Tiki\Lib\Importer\Markdown;
 
+use Perms;
 use Tiki\Lib\Importer\Markdown\Parser\CommonMarkPurifier;
 use Tiki\Lib\Importer\Markdown\Parser\GfmPurifier;
 use Tiki\Lib\Importer\Markdown\Parser\LogseqPurifier;
-use Tiki\Lib\Importer\Markdown\Source\SourceManager;
-use Tiki\Lib\Importer\Markdown\Scanner\ZipScanner;
 use Tiki\Lib\Importer\Markdown\Parser\MarkdownPipeline;
+use Tiki\Lib\Importer\Markdown\Registry\ImportRegistry;
+use Tiki\Lib\Importer\Markdown\Scanner\ZipScanner;
+use Tiki\Lib\Importer\Markdown\Source\SourceManager;
 use TikiLib;
 
 /**
  * End-to-end orchestrator:
- *   SourceManager (-> temp zip) -> ZipScanner (-> files) -> MarkdownPipeline (purify) -> write pages (with history if enabled).
+ * SourceManager (-> temp zip) -> ZipScanner (-> files) -> MarkdownPipeline (purify) -> write pages (with history if enabled) -> Garbage Collect delete/mark
  */
 class TikiMarkdownImporter
 {
@@ -29,12 +26,10 @@ class TikiMarkdownImporter
     {
         return $this->errors;
     }
-
     public function getNotes(): array
     {
         return $this->notesByPage;
     }
-
     public function getError(): string
     {
         return $this->lastError;
@@ -43,12 +38,12 @@ class TikiMarkdownImporter
     /**
      * High-level import entrypoint.
      *
-     * @param array $sourceCfg   SourceManager config (type, ftp*, repo*, …)
-     * @param array $wikiOpts    Scanner/mapping options (roots, recursive…)
-     * @param array $pipelineCfg ['flavor'=>'logseq|gfm|commonmark', …]
-     * @param string|null $uploadTmp   optional uploaded temp file (zip/md)
-     * @param string|null $uploadName  optional uploaded original name
-     * @return array {written:int, counts:array, errors:[], notes:[]}
+     * @param array       $sourceCfg    SourceManager config (type, repo*, …)
+     * @param array       $wikiOpts     Scanner/mapping options (roots, recursive…)
+     * @param array       $pipelineCfg  ['flavor'=>'logseq|gfm|commonmark', 'gc'=>['mode','safe_namespace']]
+     * @param string|null $uploadTmp    optional uploaded temp file (zip/md)
+     * @param string|null $uploadName   optional uploaded original name
+     * @return array {written:int, skipped:int, counts:array, errors:[], notes:[], gc_report:?array}
      */
     public function importFromSource(
         array $sourceCfg,
@@ -59,14 +54,23 @@ class TikiMarkdownImporter
     ): array {
         $mgr = new SourceManager();
         $zip = $mgr->fetchToTempZip($sourceCfg, $uploadTmp, $uploadName);
+        $seenRelpaths = [];
+
         if (! $zip) {
             $this->errors[] = $mgr->getError();
-            return ['written' => 0, 'counts' => ['total' => 0], 'errors' => $this->errors, 'notes' => []];
+            return ['written' => 0, 'skipped' => 0, 'counts' => ['total' => 0], 'errors' => $this->errors, 'notes' => []];
         }
 
         try {
-            $scanner  = new ZipScanner();
-            $preview  = $scanner->scan($zip, $wikiOpts); // ['files'=>[], 'counts'=>...]
+            // 1) Scan
+            $scanner = new ZipScanner();
+            $preview = $scanner->scan($zip, $wikiOpts); // ['files'=>[], 'counts'=>...]
+
+            // 2) Registre avant import
+            $registry  = new ImportRegistry();
+            $sourceKey = ImportRegistry::buildSourceKey($sourceCfg);
+            $existingMap = $registry->getAllBySourceKey($sourceKey); // relpath => row
+            $isFirstRun  = empty($existingMap);
         } finally {
             @unlink($zip);
         }
@@ -76,14 +80,13 @@ class TikiMarkdownImporter
         $written = 0;
         $skipped = 0;
 
-        $flavor   = strtolower($pipelineCfg['flavor'] ?? 'gfm');
-
+        // 3) Pipeline
+        $flavor = strtolower($pipelineCfg['flavor'] ?? 'gfm');
         $pipeline = (new MarkdownPipeline())
             ->registerPurifier(new CommonMarkPurifier())
             ->registerPurifier(new GfmPurifier())
             ->registerPurifier(new LogseqPurifier());
 
-        // Context passed to purifiers (keep defaults friendly for Logseq)
         $ctx = [
             'journal_ns'         => $wikiOpts['journal_ns'] ?? 'Journal',
             'strip_front_matter' => $pipelineCfg['strip_front_matter'] ?? true,
@@ -92,46 +95,109 @@ class TikiMarkdownImporter
         ];
 
         foreach ($files as $f) {
-            $page = $f['page_name'] ?? null;
-            $raw  = $f['raw'] ?? null;
-            if (! $page || ! is_string($raw)) {
+            // relpath robuste (aligne ZipScanner)
+            $relpath = $f['relpath'] ?? $f['relative'] ?? ($f['path'] ?? $f['file'] ?? null);
+            $page    = $f['page_name'] ?? null;
+            $raw     = $f['raw'] ?? null;
+
+            if (! $relpath || ! $page || ! is_string($raw)) {
+                $this->notesByPage['__scanner__'][] = 'Skipping item (missing relpath/page/raw).';
                 continue;
             }
 
+            $seenRelpaths[$relpath] = true;
+
+            // Purify
             $res = $pipeline->purify($flavor, $raw, $ctx);
             $md  = $res['markdown'] ?? $raw;
 
-            if (! empty($res['notes'])) {
-                $this->notesByPage[$page] = $res['notes'];
+            // checksum du markdown purifié
+            $checksum = hash('sha256', $this->canon($md));
+
+            // Unchanged vs registre
+            $row = $existingMap[$relpath] ?? null;
+            if ($row && hash_equals($row['checksum'], $checksum)) {
+                // Upsert pour rafraîchir last_imported + dé-marquer orphan
+                $registry->upsert([
+                    'source_key'    => $sourceKey,
+                    'relpath'       => $relpath,
+                    'page_name'     => $row['page_name'],
+                    'checksum'      => $checksum,
+                    'size_bytes'    => $f['size_bytes'] ?? strlen($raw),
+                    'mtime_utc'     => $f['mtime_utc'] ?? null,
+                    'last_imported' => TikiLib::lib('tiki')->now,
+                    'last_status'   => 'skipped',
+                    'is_journal'    => ($f['type'] ?? '') === 'journal' ? 1 : 0,
+                    'orphaned_at'   => null, // IMPORTANT: on enlève l’état orphelin si présent
+                ]);
+                $skipped++;
+                $this->notesByPage[$page][] = 'Skipped (no changes via registry).';
+                continue;
             }
 
-            if ($this->writeMarkdownPage($page, $md, 'Markdown import')) {
+            // Write / Update page
+            $ok = $this->writeMarkdownPage($page, $md, 'Markdown import');
+            if ($ok) {
                 $written++;
             } else {
                 $skipped++;
-                $this->notesByPage[$page][] = 'Skipped (no changes)';
+                $this->notesByPage[$page][] = 'Skipped (no changes in DB).';
             }
+
+            // Upsert registre (et clear orphan)
+            $registry->upsert([
+                'source_key'    => $sourceKey,
+                'relpath'       => $relpath,
+                'page_name'     => $page,
+                'checksum'      => $checksum,
+                'size_bytes'    => $f['size_bytes'] ?? strlen($raw),
+                'mtime_utc'     => $f['mtime_utc'] ?? null,
+                'last_imported' => TikiLib::lib('tiki')->now,
+                'last_status'   => $ok ? 'ok' : 'skipped',
+                'error_note'    => null,
+                'is_journal'    => ($f['type'] ?? '') === 'journal' ? 1 : 0,
+                'orphaned_at'   => null, // IMPORTANT
+            ]);
+        }
+
+        // 4) Garbage collect
+        $gcCfg  = $pipelineCfg['gc'] ?? [];
+        $gcMode = $gcCfg['mode'] ?? 'mark'; // off|mark|delete
+        if ($isFirstRun && $gcMode === 'delete') {
+            $gcMode = 'mark'; // sécurité premier run
+            $this->notesByPage['__gc__'][] = 'GC mode forced to "mark" on first run.';
+        }
+
+        $gcReport = $this->runGarbageCollect(
+            $registry,
+            $sourceKey,
+            array_keys($seenRelpaths),
+            [
+                'mode'           => $gcMode, // off|mark|delete
+                'safe_namespace' => (string)($gcCfg['safe_namespace'] ?? ''),
+            ]
+        );
+
+        $counts['gc_orphans'] = $gcReport['orphans'] ?? 0;
+        $counts['gc_deleted'] = $gcReport['deleted'] ?? 0;
+        $counts['gc_marked']  = $gcReport['marked'] ?? 0;
+
+        if (! empty($gcReport['errors'])) {
+            $this->errors = array_merge($this->errors, $gcReport['errors']);
         }
 
         return [
-            'written' => $written,
-            'skipped' => $skipped,
-            'counts'  => $counts,
-            'errors'  => $this->errors,
-            'notes'   => $this->notesByPage,
+            'written'   => $written,
+            'skipped'   => $skipped,
+            'counts'    => $counts,
+            'errors'    => $this->errors,
+            'notes'     => $this->notesByPage,
+            'gc_report' => $gcReport,
         ];
     }
 
     /**
-     * Fetch -> Scan -> Purify preview (no write).
-     *
-     * @param array $sourceCfg SourceManager config (type, ftp*, repo*, …)
-     * @param array $wikiOpts Options wiki/mapping + 'markdown_source'
-     * @param string|null $uploadTmp  Temp path of uploaded ZIP/MD (optionnel)
-     * @param string|null $uploadName  Original name of uploaded file (optionnel)
-     * @param array $pipelineCtx Context passed to purifiers (journal_ns, strip_front_matter, runtime_logseq, blockref_mode)
-     *
-     * @return array ['ok'=>bool, 'counts'=>[], 'dialect'=>string, 'items'=>[], 'error'?=>string]
+     * Preview only (no write).
      */
     public function previewFromSource(
         array $sourceCfg,
@@ -148,17 +214,16 @@ class TikiMarkdownImporter
         }
 
         try {
-            // 1) Scan ZIP
             $scanner = new ZipScanner();
             $scan = $scanner->scan($zip, [
                 'roots'          => $wikiOpts['roots'] ?? '.',
                 'recursive'      => $wikiOpts['recursive'] ?? true,
-                'max_depth'      => (int) ($wikiOpts['max_depth'] ?? 0),
+                'max_depth'      => (int)($wikiOpts['max_depth'] ?? 0),
                 'exclude_globs'  => $wikiOpts['exclude_globs'] ?? '',
                 'title_strategy' => $wikiOpts['title_strategy'] ?? 'fm_h1_filename',
                 'naming_mode'    => $wikiOpts['naming_mode'] ?? 'basename',
-                'dir_levels'     => (int) ($wikiOpts['dir_levels'] ?? 2),
-                'separator'      => (string) ($wikiOpts['separator'] ?? ' '),
+                'dir_levels'     => (int)($wikiOpts['dir_levels'] ?? 2),
+                'separator'      => (string)($wikiOpts['separator'] ?? ' '),
                 'namespace'      => $wikiOpts['namespace'] ?? '',
                 'detect_journal' => $wikiOpts['detect_journal'] ?? true,
                 'journal_lang'   => $wikiOpts['journal_lang'] ?? 'en',
@@ -168,7 +233,6 @@ class TikiMarkdownImporter
             @unlink($zip);
         }
 
-        // If no files, return early
         if (empty($scan['files'])) {
             return [
                 'ok'      => true,
@@ -178,23 +242,19 @@ class TikiMarkdownImporter
             ];
         }
 
-        // 2) Pipeline + purifiers
         $pipeline = (new MarkdownPipeline())
             ->registerPurifier(new CommonMarkPurifier())
             ->registerPurifier(new GfmPurifier())
             ->registerPurifier(new LogseqPurifier());
 
         $dialect = $wikiOpts['markdown_source'] ?? 'commonmark';
-
-        // Context passed to purifiers (keep defaults friendly for commonmark)
         $ctx = array_merge([
-            'journal_ns' => $wikiOpts['journal_ns'] ?? 'Journal',
+            'journal_ns'         => $wikiOpts['journal_ns'] ?? 'Journal',
             'strip_front_matter' => true,
-            'runtime_logseq' => false,
-            'blockref_mode' => 'inline',   // inline | code | keep
+            'runtime_logseq'     => false,
+            'blockref_mode'      => 'inline',
         ], $pipelineCtx);
 
-        // 3) Purify each file to preview cleaned excerpt (no write)
         $items = [];
         foreach ($scan['files'] as $f) {
             $page = $f['page_name'] ?? null;
@@ -208,7 +268,7 @@ class TikiMarkdownImporter
 
             $items[] = [
                 'page'              => $page,
-                'type'              => $f['type'] ?? 'pages',
+                'type'              => $f['type'] ?? 'page',
                 'size_bytes'        => $f['size_bytes'] ?? strlen($raw),
                 'has_front_matter'  => $f['has_front_matter'] ?? false,
                 'original_preview'  => mb_substr(trim($raw), 0, 200),
@@ -237,32 +297,27 @@ class TikiMarkdownImporter
         $user = $GLOBALS['user'] ?? 'import';
         $ip   = method_exists($tikilib, 'get_ip_address') ? $tikilib->get_ip_address() : ($_SERVER['REMOTE_ADDR'] ?? '');
 
-        // Tiki Markdown wrapper
-        $content = $this->wrapMarkdown($markdown);
+        $content = $this->wrapMarkdown($markdown); // wrapper fermé
 
         if ($tikilib->page_exists($name)) {
-
             $info = $tikilib->get_page_info($name);
             $oldPageContent = $this->extractMarkdownBody($info['data']);
-
-            // skip if content is identical
             if ($this->canon($oldPageContent ?? '') === $this->canon($markdown)) {
-                return false;
+                return false; // rien à écrire
             }
 
-            // update with history
             if (($prefs['feature_history'] ?? 'y') === 'y') {
-                $newVersion = (int) $info['version'] + 1;
+                $newVersion = (int)$info['version'] + 1;
 
                 // push current into tiki_history
                 $tikilib->query(
                     'INSERT INTO `tiki_history`
-                      (`pageName`,`version`,`lastModif`,`user`,`ip`,`comment`,`data`,`description`)
-                      VALUES (?,?,?,?,?,?,?,?)',
+                       (`pageName`,`version`,`lastModif`,`user`,`ip`,`comment`,`data`,`description`)
+                     VALUES (?,?,?,?,?,?,?,?)',
                     [
                         $name,
                         $newVersion,
-                        (int) $tikilib->now,
+                        (int)$tikilib->now,
                         $user,
                         $ip,
                         $comment,
@@ -274,12 +329,12 @@ class TikiMarkdownImporter
                 // update page
                 $tikilib->query(
                     'UPDATE `tiki_pages`
-                         SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?, `version`=?
-                       WHERE `pageName`=?',
+                       SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?, `version`=?
+                     WHERE `pageName`=?',
                     [
                         $content,
-                        (int) strlen($content),
-                        (int) $tikilib->now,
+                        (int)strlen($content),
+                        (int)$tikilib->now,
                         $user,
                         $ip,
                         $comment,
@@ -288,15 +343,15 @@ class TikiMarkdownImporter
                     ]
                 );
             } else {
-                // update without history
+                // update sans historique
                 $tikilib->query(
                     'UPDATE `tiki_pages`
-                         SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?
-                       WHERE `pageName`=?',
+                       SET `data`=?, `page_size`=?, `lastModif`=?, `user`=?, `ip`=?, `comment`=?
+                     WHERE `pageName`=?',
                     [
                         $content,
-                        (int) strlen($content),
-                        (int) $tikilib->now,
+                        (int)strlen($content),
+                        (int)$tikilib->now,
                         $user,
                         $ip,
                         $comment,
@@ -320,7 +375,7 @@ class TikiMarkdownImporter
             );
         }
 
-        // refresh relations/links if available
+        // refresh relations/links if supported
         if (method_exists($wikilib, 'update_wikicontent_relations')) {
             $wikilib->update_wikicontent_relations($content, 'wiki page', $name, true);
         }
@@ -352,12 +407,92 @@ class TikiMarkdownImporter
 
     private function canon(string $s): string
     {
-        // normalize line endings to \n
         $s = str_replace(["\r\n", "\r"], "\n", $s);
-        // trim trailing spaces/tabs on each line
         $s = preg_replace('/[ \t]+$/m', '', $s);
-        // trim trailing newlines at end of file
         $s = rtrim($s, "\n");
         return $s;
+    }
+
+    /**
+     * Garbage collect orphaned pages per registry (minimal options).
+     * @param ImportRegistry $registry
+     * @param string         $sourceKey
+     * @param array          $seenRelpaths
+     * @param array          $opts ['mode'=>'off|mark|delete', 'safe_namespace'=>'Journal']
+     * @return array ['orphans'=>int, 'deleted'=>int, 'marked'=>int, 'errors'=>[]]
+     */
+    private function runGarbageCollect(ImportRegistry $registry, string $sourceKey, array $seenRelpaths, array $opts): array
+    {
+        $tikilib = TikiLib::lib('tiki');
+
+        $mode   = $opts['mode'] ?? 'mark'; // off|mark|delete
+        $safeNS = trim((string)($opts['safe_namespace'] ?? ''));
+
+        if ($mode === 'off') {
+            return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => []];
+        }
+        if (empty($seenRelpaths)) {
+            return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => ['GC skipped: no files scanned']];
+        }
+
+        $now      = $tikilib->now;
+        $seenMap  = array_flip($seenRelpaths);
+        $existing = $registry->getAllBySourceKey($sourceKey); // relpath => row
+
+        $orphans = [];
+        foreach ($existing as $rel => $row) {
+            if (! isset($seenMap[$rel])) {
+                $orphans[] = $row;
+            }
+        }
+
+        $deleted = 0;
+        $marked  = 0;
+        $errors  = [];
+
+        foreach ($orphans as $row) {
+            $page = $row['page_name'] ?? '';
+            $rel = $row['relpath'] ?? '';
+
+            if ($mode === 'mark') {
+                $registry->markOrphan($sourceKey, $rel, $now);
+                $marked++;
+                continue;
+            }
+
+            // mode delete : limit on authorized namespace
+            if ($safeNS !== '' && ! str_starts_with((string)$page, $safeNS)) {
+                $registry->markOrphan($sourceKey, $rel, $now);
+                $marked++;
+                continue;
+            }
+
+            try {
+                $ok = $tikilib->remove_all_versions($page);
+                if ($ok) {
+                    $deleted++;
+                    $registry->deleteEntry($sourceKey, $rel);
+                } else {
+                    $errors[] = "Delete failed: $page";
+                    $registry->markOrphan($sourceKey, $rel, $now);
+                }
+            } catch (\Throwable $e) {
+                $errors[] = "Delete error: $page - " . $e->getMessage();
+                $registry->markOrphan($sourceKey, $rel, $now);
+            }
+        }
+
+        if ($deleted > 0) {
+            $cachelib = TikiLib::lib('cache');
+            $cachelib->invalidateAll('menu');
+            $cachelib->invalidateAll('structure');
+        }
+
+        return [
+            'orphans' => count($orphans),
+            'deleted' => $deleted,
+            'marked'  => $marked,
+            'errors'  => $errors,
+        ];
     }
 }

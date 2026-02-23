@@ -57,6 +57,10 @@ class MarkdownImporterCommand extends Command
             ->addOption('runtime-logseq', null, InputOption::VALUE_REQUIRED, 'Keep [[..]]/((..)) for runtime ext (1|0)', '0')
             ->addOption('blockref-mode', null, InputOption::VALUE_REQUIRED, 'inline|code|keep', 'inline')
 
+            // Garbage collector delete/mark
+            ->addOption('gc-mode', null, InputOption::VALUE_REQUIRED, 'off|mark|delete', 'mark')
+            ->addOption('gc-safe-namespace', null, InputOption::VALUE_REQUIRED, 'Only delete inside this page prefix', '')
+
             // Output
             ->addOption('json', null, InputOption::VALUE_NONE, 'Print JSON result instead of human text');
     }
@@ -72,7 +76,7 @@ class MarkdownImporterCommand extends Command
         }
 
         $mode = strtolower((string)$input->getOption('mode'));
-        if (!in_array($mode, ['preview', 'import'], true)) {
+        if (! in_array($mode, ['preview', 'import'], true)) {
             $io->error('Invalid --mode. Use preview or import.');
             return Command::FAILURE;
         }
@@ -80,7 +84,7 @@ class MarkdownImporterCommand extends Command
         // -------- Source config (même shape que l’UI/Importer) --------
         $srcTypeRaw = strtolower((string)$input->getOption('source-type') ?: 'local');
         $srcType = ($srcTypeRaw === 'repo') ? 'git' : $srcTypeRaw; // alias
-        if (!in_array($srcType, ['local', 'git'], true)) {
+        if (! in_array($srcType, ['local', 'git'], true)) {
             $srcType = 'local';
         }
 
@@ -102,11 +106,11 @@ class MarkdownImporterCommand extends Command
                 'git_timeout' => (int)$input->getOption('git-timeout') ?: 30,
             ];
         } else { // local
-            if (!$localPath) {
+            if (! $localPath) {
                 $io->error('For --source-type=local you must provide --local-path pointing to a .zip or a .md file.');
                 return Command::FAILURE;
             }
-            if (!is_readable($localPath)) {
+            if (! is_readable($localPath)) {
                 $io->error('local-path not readable: ' . $localPath);
                 return Command::FAILURE;
             }
@@ -130,7 +134,7 @@ class MarkdownImporterCommand extends Command
 
         // -------- Markdown pipeline --------
         $flavor = (string)$input->getOption('markdown-source') ?: 'commonmark';
-        if (!in_array($flavor, ['logseq', 'gfm', 'commonmark'], true)) {
+        if (! in_array($flavor, ['logseq', 'gfm', 'commonmark'], true)) {
             $flavor = 'commonmark';
         }
         $pipelineCfg = [
@@ -138,6 +142,13 @@ class MarkdownImporterCommand extends Command
             'strip_front_matter' => $this->toBool($input->getOption('strip-front-matter'), true),
             'runtime_logseq'     => $this->toBool($input->getOption('runtime-logseq'), false),
             'blockref_mode'      => (string)$input->getOption('blockref-mode') ?: 'inline',
+            'gc'                 => [
+                'mode'           => (function () use ($input) {
+                    $m = strtolower((string)$input->getOption('gc-mode') ?: 'mark');
+                    return in_array($m, ['off', 'mark', 'delete'], true) ? $m : 'mark';
+                })(),
+                'safe_namespace' => (string)$input->getOption('gc-safe-namespace') ?? '',
+            ],
         ];
 
         $jsonOut = (bool)$input->getOption('json');
@@ -198,27 +209,31 @@ class MarkdownImporterCommand extends Command
 
     private function printPreviewHuman(SymfonyStyle $io, TikiMarkdownImporter $importer, array $res): void
     {
-        if (!empty($res['ok'])) {
-            $io->success('Preview OK');
-            if (!empty($res['counts'])) {
-                $io->writeln(sprintf(
-                    "Counts: pages=%d journals=%d total=%d",
-                    (int)($res['counts']['pages'] ?? 0),
-                    (int)($res['counts']['journals'] ?? 0),
-                    (int)($res['counts']['total'] ?? 0)
-                ));
-            }
-            if (!empty($res['sample'])) {
-                $io->section('Sample items');
-                foreach (array_slice($res['sample'], 0, 5) as $s) {
-                    $io->writeln('- ' . ($s['relative'] ?? '(unknown)') . ' → ' . ($s['page_name'] ?? '?'));
-                    if (!empty($s['purified_preview'])) {
-                        $io->writeln("  preview:\n" . $s['purified_preview']);
-                    }
+        if (empty($res['ok'])) {
+            $io->error($importer->getError() ?: ($res['error'] ?? 'Preview failed.'));
+            return;
+        }
+
+        $io->success('Preview OK');
+        if (! empty($res['counts'])) {
+            $io->writeln(sprintf(
+                "Counts: pages=%d journals=%d total=%d",
+                (int)($res['counts']['pages'] ?? 0),
+                (int)($res['counts']['journals'] ?? 0),
+                (int)($res['counts']['total'] ?? 0)
+            ));
+        }
+
+        if (! empty($res['items'])) {
+            $io->section('Sample items');
+            foreach (array_slice($res['items'], 0, 5) as $s) {
+                $rel = $s['relative'] ?? ($s['page'] ?? '(unknown)');
+                $pg  = $s['page'] ?? ($s['page_name'] ?? '?');
+                $io->writeln('- ' . $rel . ' → ' . $pg);
+                if (! empty($s['purified_preview'])) {
+                    $io->writeln("  preview:\n" . $s['purified_preview']);
                 }
             }
-        } else {
-            $io->error($importer->getError() ?: ($res['error'] ?? 'Preview failed.'));
         }
     }
 
@@ -227,7 +242,7 @@ class MarkdownImporterCommand extends Command
         $written = (int)($result['written'] ?? 0);
         $io->success(sprintf('%d page(s) imported or updated.', $written));
 
-        if (!empty($result['errors'])) {
+        if (! empty($result['errors'])) {
             $io->warning('Errors:');
             foreach ($result['errors'] as $e) {
                 if ($e) {
@@ -236,7 +251,7 @@ class MarkdownImporterCommand extends Command
             }
         }
 
-        if (!empty($result['notes'])) {
+        if (! empty($result['notes'])) {
             $io->section('Purifier notes (by page)');
             foreach ($result['notes'] as $page => $notes) {
                 $io->writeln('• ' . $page);
@@ -250,11 +265,19 @@ class MarkdownImporterCommand extends Command
     /** Accepts "1"/"0", "true"/"false", true/false. Default if null. */
     private function toBool($val, bool $default = false): bool
     {
-        if ($val === null) return $default;
-        if (is_bool($val)) return $val;
+        if ($val === null) {
+            return $default;
+        }
+        if (is_bool($val)) {
+            return $val;
+        }
         $v = strtolower((string)$val);
-        if (in_array($v, ['1', 'true', 'yes', 'y'], true)) return true;
-        if (in_array($v, ['0', 'false', 'no', 'n'], true)) return false;
+        if (in_array($v, ['1', 'true', 'yes', 'y'], true)) {
+            return true;
+        }
+        if (in_array($v, ['0', 'false', 'no', 'n'], true)) {
+            return false;
+        }
         return $default;
     }
 
@@ -266,11 +289,11 @@ class MarkdownImporterCommand extends Command
      */
     private function resolveLocalPayload(string $srcType, ?string $path): array
     {
-        if ($srcType !== 'local' || !$path) {
+        if ($srcType !== 'local' || ! $path) {
             return [null, null, null];
         }
 
-        $lower = strtolower($path);
+        $lower = strtolower((string)$path);
         if (str_ends_with($lower, '.zip')) {
             return [$path, basename($path), null];
         }

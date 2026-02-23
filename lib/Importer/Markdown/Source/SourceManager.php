@@ -43,7 +43,7 @@ class SourceManager
                 $prov = new GitWorkingCopyProvider([
                     'repo_url'      => $cfg['repo_url'] ?? '',
                     'repo_branch'   => $cfg['repo_branch'] ?? 'main',
-                    'git_pull'      => !empty($cfg['git_pull']),
+                    'git_pull'      => ! empty($cfg['git_pull']),
                     'repo_token'  => $cfg['repo_token'] ?? null,   // optionnel
                 ], [
                     'timeout'       => (int)($cfg['git_timeout'] ?? 45),

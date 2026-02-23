@@ -8,7 +8,7 @@
     {* ================== TAB 1: Import now ================== *}
     {tab name="{tr}Import now{/tr}"}
 
-        <form method="post" class="form-horizontal my-3" id="form_source">
+        <form method="post" class="form-horizontal my-3" enctype="multipart/form-data" id="form_source">
             {ticket}
 
             <h5 class="mb-3">{tr}Source{/tr}</h5>
@@ -58,10 +58,7 @@
                     </div>
                 </div>
             </div>
-        </form>
-
-        <form method="post" class="form-horizontal my-4" id="form_options">
-            {ticket}
+            
             <h5 class="mb-3">{tr}Import options{/tr}</h5>
             <div class="row mb-2">
                 <label class="col-sm-3 col-form-label">{tr}Roots{/tr}</label>
@@ -177,11 +174,32 @@
                     </select>
                 </div>
             </div>
-        </form>
 
-        <form method="post" class="my-2" enctype="multipart/form-data" id="form_run">
-            {ticket}
-            <div class="row g-2 align-items-center mb-2 d-none" id="local_file_row">
+
+             <h5 class="mb-3 mt-5">{tr}Garbage collect deletions{/tr}</h5>
+
+            <div class="row mb-2">
+                <label class="col-sm-3 col-form-label">{tr}Mode{/tr}</label>
+                <div class="col-sm-9">
+                    <select class="form-select" name="gc_mode">
+                        <option value="off" {if $md_gc.mode=='off'}selected{/if}>{tr}Off{/tr}</option>
+                        <option value="mark" {if $md_gc.mode=='mark'}selected{/if}>{tr}Mark pages as deleted{/tr}</option>
+                        <option value="delete" {if $md_gc.mode=='delete'}selected{/if}>{tr}Delete pages{/tr}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <label class="col-sm-3 col-form-label">{tr}Safe namespace{/tr}</label>
+                <div class="col-sm-9">
+                    <input class="form-control" name="gc_safe_namespace" value="{$md_gc.safe_namespace|escape}" placeholder="eg. Journal">
+                </div>
+            </div>
+
+
+            <hr />
+
+            <div class="row g-2 align-items-center mb-2 d-none mt-4" id="local_file_row">
                 <div class="col-sm-3">
                     <label class="col-form-label">{tr}Local file/zip (optional){/tr}</label>
                 </div>
@@ -189,27 +207,21 @@
                     <input type="file" name="local_file" class="form-control" id="local_file_input">
                 </div>
             </div>
+
+        
+            <div class="d-flex flex-wrap justify-content-end gap-2 mt-3" id="action_toolbar">
+                <button class="btn btn-primary" type="submit" name="action" value="save_import_options" id="btn_save_options">
+                    {tr}Save import options{/tr}
+                </button>
+                <button class="btn btn-outline-info" type="submit"  name="action" value="dry_run" id="btn_preview">
+                    {tr}Preview (dry-run){/tr}
+                </button>
+                <button class="btn btn-success" type="submit"  name="action" value="import_now" id="btn_import">
+                    {tr}Import now{/tr}
+                </button>
+            </div>
+
         </form>
-
-        <div class="d-flex flex-wrap justify-content-end gap-2 mt-3" id="action_toolbar">
-            <button class="btn btn-outline-primary" form="form_source" name="action" value="save_source" id="btn_save_source">
-                {tr}Save source{/tr}
-            </button>
-            <button class="btn btn-outline-secondary" form="form_source" name="action" value="test_source" id="btn_test_source">
-                {tr}Test connection{/tr}
-            </button>
-
-            <button class="btn btn-primary" form="form_options" name="action" value="save_wiki" id="btn_save_options">
-                {tr}Save import options{/tr}
-            </button>
-
-            <button class="btn btn-outline-info" form="form_run" name="action" value="dry_run" id="btn_preview">
-                {tr}Preview (dry-run){/tr}
-            </button>
-            <button class="btn btn-success" form="form_run" name="action" value="import_now" id="btn_import">
-                {tr}Import now{/tr}
-            </button>
-        </div>
 
         {if $md_preview}
             <div class="card my-3">
@@ -285,9 +297,7 @@
   var $localRow    = $('#local_file_row');
   var $localInput  = $('#local_file_input');
 
-  var $btnSaveSrc  = $('#btn_save_source');
-  var $btnTestSrc  = $('#btn_test_source');
-  var $btnSaveOpt  = $('#btn_save_options'); // toujours visible
+  var $btnSaveOpt  = $('#btn_save_options');
   var $btnPreview  = $('#btn_preview');
   var $btnImport   = $('#btn_import');
 
@@ -300,7 +310,6 @@
 
     // By default, hide repo buttons
     $btnSaveSrc.addClass('d-none');
-    $btnTestSrc.addClass('d-none');
 
     if (t === 'local') {
       // LOCAL
@@ -310,8 +319,6 @@
     } else if (t === 'git') {
       // REPO
       $repoBlock.removeClass('d-none');
-      $btnSaveSrc.removeClass('d-none');
-      $btnTestSrc.removeClass('d-none');
     }
 
     $btnPreview.removeClass('d-none');

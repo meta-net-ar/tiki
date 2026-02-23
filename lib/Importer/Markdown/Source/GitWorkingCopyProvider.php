@@ -13,13 +13,14 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     public function __construct(
         private array $cfg,   // ['repo_url'=>..., 'repo_branch'=>'main', 'repo_token'=>'', 'git_pull'=>true]
         private array $ctx = [] // ex: ['timeout'=>45]
-    ) {}
+    ) {
+    }
 
     public function fetchToTempZip(): string
     {
         $repoUrl   = trim((string)($this->cfg['repo_url'] ?? ''));
         $branch    = trim((string)($this->cfg['repo_branch'] ?? 'main'));
-        $gitPull   = !empty($this->cfg['git_pull']);
+        $gitPull   = ! empty($this->cfg['git_pull']);
         $token     = (string)($this->cfg['repo_token'] ?? '');
         $timeout   = (int)($this->ctx['timeout'] ?? 45);
 
@@ -37,7 +38,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $this->ensureDir(\dirname($wcPath));
 
         // Clone initial (with retry) or pull
-        if (!is_dir($wcPath . '/.git')) {
+        if (! is_dir($wcPath . '/.git')) {
             try {
                 $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
                 $this->waitForCloneReady($wcPath);
@@ -57,7 +58,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             $this->gitPull($git, $wcPath, $token, $timeout);
         }
 
-        if (!class_exists(ZipArchive::class)) {
+        if (! class_exists(ZipArchive::class)) {
             throw new \RuntimeException('ZipArchive extension is required.');
         }
 
@@ -96,19 +97,23 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         $candidates = ['/usr/bin/git', '/usr/local/bin/git', '/opt/homebrew/bin/git', '/opt/local/bin/git'];
         foreach ($candidates as $p) {
-            if (is_executable($p)) return $p;
+            if (is_executable($p)) {
+                return $p;
+            }
         }
         $out = [];
         @exec('which git 2>/dev/null', $out);
-        if (!empty($out[0]) && is_executable($out[0])) return $out[0];
+        if (! empty($out[0]) && is_executable($out[0])) {
+            return $out[0];
+        }
         throw new \RuntimeException('git not found. Install command line tools and ensure git is in PATH.');
     }
 
     private function baseEnv(): array
     {
-        // HOME = storage/markdown-importer/.home  
+        // HOME = storage/markdown-importer/.home
         $home = $this->resolveHomeDir();
-        if (!is_dir($home)) {
+        if (! is_dir($home)) {
             @mkdir($home, 0775, true);
             @chmod($home, 0775);
         }
@@ -139,8 +144,10 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $cmd = escapeshellarg($git) . ' ' . $args . ' 2>&1';
         $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
         $proc = @proc_open($cmd, $desc, $pipes, $cwd, $env);
-        if (!\is_resource($proc)) {
-            if ($fatal) throw new \RuntimeException($errLabel . ' (spawn failed)');
+        if (! \is_resource($proc)) {
+            if ($fatal) {
+                throw new \RuntimeException($errLabel . ' (spawn failed)');
+            }
             return;
         }
         fclose($pipes[0]);
@@ -151,7 +158,9 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $out = '';
         while (true) {
             $status = proc_get_status($proc);
-            if (!$status['running']) break;
+            if (! $status['running']) {
+                break;
+            }
             if (time() - $start > $timeout) {
                 @proc_terminate($proc);
                 $out .= "\n[timeout]";
@@ -204,9 +213,13 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         $dir = $rel ? ($root . '/' . $rel) : $root;
         $list = @scandir($dir);
-        if ($list === false) return; // permission denied → on ignore
+        if ($list === false) {
+            return; // permission denied → on ignore
+        }
         foreach ($list as $name) {
-            if ($name === '.' || $name === '..' || $name === '.git') continue;
+            if ($name === '.' || $name === '..' || $name === '.git') {
+                continue;
+            }
 
             $full = $dir . '/' . $name;
             $relPath = ltrim($rel . '/' . $name, '/');
@@ -217,39 +230,52 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             }
 
             $lower = strtolower($name);
-            if (!str_ends_with($lower, '.md') && !str_ends_with($lower, '.markdown') && !str_ends_with($lower, '.zip')) {
+            if (! str_ends_with($lower, '.md') && ! str_ends_with($lower, '.markdown') && ! str_ends_with($lower, '.zip')) {
                 continue;
             }
 
             $data = @file_get_contents($full);
             if ($data !== false) {
                 $zip->addFromString($relPath, $data);
+
+                // set mtime in zip if possible
+                if (method_exists($zip, 'setMtimeName')) {
+                    $mt = @filemtime($full);
+                    if ($mt !== false) {
+                        // aide le scanner à remplir 'mtime_utc'
+                        $zip->setMtimeName($relPath, (int) $mt);
+                    }
+                }
             }
         }
     }
 
     private function ensureDir(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             $old = umask(0002);
             $ok = @mkdir($dir, 0775, true);
             umask($old);
-            if (!$ok && !is_dir($dir)) {
+            if (! $ok && ! is_dir($dir)) {
                 $e = error_get_last();
                 $msg = 'Cannot create dir: ' . $dir;
-                if ($e && !empty($e['message'])) $msg .= ' — ' . $e['message'];
+                if ($e && ! empty($e['message'])) {
+                    $msg .= ' — ' . $e['message'];
+                }
                 throw new \RuntimeException($msg);
             }
             @chmod($dir, 0775);
         }
-        if (!is_writable($dir)) {
+        if (! is_writable($dir)) {
             throw new \RuntimeException('Dir not writable: ' . $dir);
         }
     }
 
     private function rrmdir(string $dir): void
     {
-        if (!is_dir($dir)) return;
+        if (! is_dir($dir)) {
+            return;
+        }
         $it = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
@@ -268,7 +294,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
         // 1) HTTPS/HTTP/SSH explicite
         $u = @parse_url($url);
-        if (is_array($u) && !empty($u['host'])) {
+        if (is_array($u) && ! empty($u['host'])) {
             $host = $u['host'];
             $path = ltrim($u['path'] ?? '', '/');
         } else {
@@ -285,7 +311,9 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $path = preg_replace('~^/+~', '', $path);
         $path = preg_replace('~\.git$~i', '', $path);
         $safe = preg_replace('~[^A-Za-z0-9/_\.-]+~', '-', $path);
-        if ($safe === '' || $safe === '-') $safe = 'wk-' . substr(sha1($repoUrl), 0, 12);
+        if ($safe === '' || $safe === '-') {
+            $safe = 'wk-' . substr(sha1($repoUrl), 0, 12);
+        }
 
         $dir = rtrim($rootDir, '/') . '/' . $host . '/' . $safe;
         $this->ensureDir(\dirname($dir));
@@ -338,7 +366,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
         // .gitconfig minimal (conservé car tu veux le garder)
         $gitconfig = $homeDir . '/.gitconfig';
-        if (!file_exists($gitconfig)) {
+        if (! file_exists($gitconfig)) {
             $cfg = <<<INI
 [user]
     name = tiki-importer
@@ -376,8 +404,12 @@ INI;
     private function inferTokenUsername(string $repoUrl): string
     {
         $h = strtolower(parse_url($repoUrl, PHP_URL_HOST) ?: '');
-        if (str_contains($h, 'github')) return 'x-access-token';
-        if (str_contains($h, 'gitlab')) return 'oauth2';
+        if (str_contains($h, 'github')) {
+            return 'x-access-token';
+        }
+        if (str_contains($h, 'gitlab')) {
+            return 'oauth2';
+        }
         return 'token';
     }
 
