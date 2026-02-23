@@ -11,7 +11,8 @@
     <div id="trackerFilter{$iTrackerFilter}" class="trackerfilter" style="display:{if isset($open) && $open eq 'y'}block{else}none{/if}">
         {if empty($inForm)}
             {if empty($export_action)}
-                <form action="{$smarty.server.SCRIPT_NAME}?{query}#trackerFilter{$iTrackerFilter}-result" method="post" id="form-filter">
+                <form action="{$smarty.server.SCRIPT_NAME}" method="get" id="form-filter">
+                    {query _type='form_input'}
             {else}
                 {jq notonready=true}
                     function tf_export_submit(fm) {
