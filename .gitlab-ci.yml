@@ -248,7 +248,7 @@ stylelint:
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
   script:
-    - npx stylelint "src/**/*.{css,scss}" "themes/**/*.{css,scss}" --ignore-path .stylelintignore
+    - npx stylelint "**/*.{css,scss}" --ignore-path .gitignore
 
 shlint:
   stage: code-quality
