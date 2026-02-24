@@ -102,7 +102,6 @@
     padding-top: var(--dfNodePaddingTop);
     padding-bottom: var(--dfNodePaddingBottom);
     box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
-    box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
 }
 
 .drawflow .drawflow-node:hover {
@@ -111,7 +110,6 @@
     border: var(--dfNodeHoverBorderSize) solid var(--dfNodeHoverBorderColor);
     border-radius: var(--dfNodeHoverBorderRadius);
     box-shadow: var(--dfNodeHoverBoxShadowHL) var(--dfNodeHoverBoxShadowVL) var(--dfNodeHoverBoxShadowBR) var(--dfNodeHoverBoxShadowS) var(--dfNodeHoverBoxShadowColor);
-    box-shadow: var(--dfNodeHoverBoxShadowHL) var(--dfNodeHoverBoxShadowVL) var(--dfNodeHoverBoxShadowBR) var(--dfNodeHoverBoxShadowS) var(--dfNodeHoverBoxShadowColor);
 }
 
 .drawflow .drawflow-node.selected {
@@ -119,7 +117,6 @@
     color: var(--dfNodeSelectedTextColor);
     border: var(--dfNodeSelectedBorderSize) solid var(--dfNodeSelectedBorderColor);
     border-radius: var(--dfNodeSelectedBorderRadius);
-    box-shadow: var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
     box-shadow: var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
 }
 

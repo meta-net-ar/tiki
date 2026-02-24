@@ -84,8 +84,6 @@
     width: 98%;
     border-radius: 0.25rem;
     box-shadow: 0 4px 20px -7px rgb(0 0 0 / 75%);
-    box-shadow: 0 4px 20px -7px rgb(0 0 0 / 75%);
-    box-shadow: 0 4px 20px -7px rgb(0 0 0 / 75%);
     background: white;
     overflow: auto;
 }
@@ -221,10 +219,7 @@
 }
 
 /* Utils */
-.unselectable {
-    user-select: none; /* Safari */
-    user-select: none; /* Firefox */
-    user-select: none; /* IE10+/Edge */
+.unselectable { /* Safari */ /* Firefox */ /* IE10+/Edge */
     user-select: none; /* Standard */
 }
 
