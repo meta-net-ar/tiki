@@ -24,7 +24,7 @@
     --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
-    --tiki-top-border-width: 0x;
+    --tiki-top-border-width: 0px;
     --tiki-top-box-shadow: 0px 1px 10px #a91a5e;
 }
 
@@ -43,7 +43,7 @@
     --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
-    --tiki-top-border-width: 0x;
+    --tiki-top-border-width: 0px;
     --tiki-top-box-shadow: 0px 1px 10px #c0b5e5;
 }
 
@@ -52,6 +52,7 @@
     --tiki-topbar-color:  #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-hover-color};
     --tiki-topbar-text-color: #{$navbar-light-hover-color};
+    --tiki-top-border-width: 0px;
 }
 
 .tiki-top-nav-light {

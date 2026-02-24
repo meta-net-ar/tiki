@@ -300,10 +300,13 @@ html:not([data-bs-theme="dark"]) {
         }
 
         .sm-sub.dropdown-menu.sm-show {
-
+            display: block;
         }
     }
 }
-    .sm-navbar--vertical:not(.sm-navbar--collapsible-only) .sm-nav {}
+
+    .sm-navbar--vertical:not(.sm-navbar--collapsible-only) .sm-nav {
+        display: block;
+    }
 
 // External libraries

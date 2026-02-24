@@ -35,15 +35,11 @@ $breakpoint-medium: 768px;
     }
 
     @media screen and ( #{$breakpoint-small - 1} < width < $breakpoint-medium) {
-        & {
-            width: 80%;
-        }
+        width: 80%;
     }
 
     @media screen and (width < $breakpoint-small) {
-        & {
-            width: 90%;
-        }
+        width: 90%;
     }
 
     & .debugger-tab {

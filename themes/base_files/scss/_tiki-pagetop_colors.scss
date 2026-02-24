@@ -71,7 +71,9 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .page-header .top_modules .navbar,
     .topbar_modules .navbar {
         background: transparent !important;
+
         --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }
@@ -83,7 +85,9 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .topbar_modules,
     .topbar_modules .navbar {
         background: transparent !important;
+
         --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }
@@ -95,7 +99,9 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .topbar,
     .topbar .navbar {
         background: transparent !important;
+
         --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }
