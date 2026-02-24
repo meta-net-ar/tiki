@@ -369,7 +369,7 @@ function wikiplugin_swiper_info()
             'teleprompterSpeed' => [
                 'required' => false,
                 'name' => tr('Teleprompter speed'),
-                'description' => tr('Scroll speed in pixels per second when teleprompter is enabled.'),
+                'description' => tr('Scroll speed in pixels per second when teleprompter is enabled. Example: 60 (px/s).'),
                 'filter' => 'digits',
                 'default' => 60,
                 'advanced' => true,
@@ -377,7 +377,7 @@ function wikiplugin_swiper_info()
             'teleprompterAcceleration' => [
                 'required' => false,
                 'name' => tr('Teleprompter acceleration'),
-                'description' => tr('Acceleration intensity applied when repeatedly changing speed.'),
+                'description' => tr('Acceleration intensity applied when repeatedly changing speed. Example: 3 (level, 1 to 10).'),
                 'filter' => 'digits',
                 'default' => 3,
                 'advanced' => true,
@@ -409,9 +409,9 @@ function wikiplugin_swiper_info()
             'teleprompterFocusMode' => [
                 'required' => false,
                 'name' => tr('Teleprompter focus area'),
-                'description' => tr('Highlight focus area while dimming non-reading areas.'),
+                'description' => tr('Highlight focus area while dimming non-reading areas. Example: middle (none, top, middle, bottom).'),
                 'filter' => 'word',
-                'default' => 'middle',
+                'default' => 'top',
                 'advanced' => true,
                 'options' => [
                     ['text' => tr('None'), 'value' => 'none'],
@@ -435,7 +435,7 @@ function wikiplugin_swiper_info()
             'teleprompterFontScale' => [
                 'required' => false,
                 'name' => tr('Teleprompter font scale'),
-                'description' => tr('Initial font scale percentage for teleprompter mode.'),
+                'description' => tr('Initial font scale percentage for teleprompter mode. Example: 120 (%).'),
                 'filter' => 'digits',
                 'default' => 120,
                 'advanced' => true,
@@ -600,16 +600,11 @@ function wikiplugin_swiper($data, $params)
             '#' . $containerId . ' .teleprompter-block h1{font-size:calc(' . $params['titleSize'] . ' * var(--teleprompter-font-scale));color:' . $params['titleColor'] . ';margin:0 0 .5em;}' .
             '#' . $containerId . ' .teleprompter-media img{max-width:100%;height:auto;display:block;margin:0 auto 1rem;}' .
             '#' . $containerId . ' .teleprompter-focus-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;}' .
-            '#' . $containerId . ' .tp-focus-mask{position:absolute;left:0;right:0;display:none;background:rgba(0,0,0,.35);}' .
-            '#' . $containerId . ' .tp-focus-guide{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.6);display:none;}' .
+            '#' . $containerId . ' .tp-focus-mask{position:absolute;left:0;right:0;display:block;background:rgba(0,0,0,.35);}' .
+            '#' . $containerId . ' .tp-focus-mask-top{top:0;height:0;}' .
+            '#' . $containerId . ' .tp-focus-mask-bottom{bottom:0;height:0;}' .
+            '#' . $containerId . ' .tp-focus-guide{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.6);top:50%;display:block;}' .
             '#' . $containerId . '.teleprompter-focus-none .teleprompter-focus-overlay{display:none;}' .
-            '#' . $containerId . '.teleprompter-focus-top .tp-focus-mask-bottom{display:block;top:34%;bottom:0;}' .
-            '#' . $containerId . '.teleprompter-focus-top .tp-focus-guide{display:block;top:34%;}' .
-            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-mask-top{display:block;top:0;bottom:67%;}' .
-            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-mask-bottom{display:block;top:67%;bottom:0;}' .
-            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-guide{display:block;top:50%;}' .
-            '#' . $containerId . '.teleprompter-focus-bottom .tp-focus-mask-top{display:block;top:0;bottom:34%;}' .
-            '#' . $containerId . '.teleprompter-focus-bottom .tp-focus-guide{display:block;top:66%;}' .
             '#' . $containerId . ' .teleprompter-timer{position:absolute;right:12px;bottom:10px;z-index:3;padding:.25rem .55rem;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-family:monospace;line-height:1;font-variant-numeric:tabular-nums;}' .
             '#' . $containerId . ' .teleprompter-timer-hidden{display:none;}'
         );
@@ -625,18 +620,25 @@ function wikiplugin_swiper($data, $params)
             'var acceleration=' . $teleprompterAcceleration . ';' .
             'var fontScale=' . $teleprompterFontScale . ';' .
             'var showTimer=' . $showTimer . ';' .
+            'var focusMode=' . json_encode($focusMode) . ';' .
             'var pauseOnHover=' . $pauseOnHover . ';' .
+            'var $focusOverlay=$container.find(".teleprompter-focus-overlay");' .
+            'var $focusMaskTop=$container.find(".tp-focus-mask-top");' .
+            'var $focusMaskBottom=$container.find(".tp-focus-mask-bottom");' .
+            'var $focusGuide=$container.find(".tp-focus-guide");' .
             'var minSpeed=10;var maxSpeed=500;var speedStep=10;var minFontScale=70;var maxFontScale=300;var fontScaleStep=5;' .
             'var pausedByUser=false;var pausedByHover=false;var offset=0;var lastTs=null;var loopHeight=1;var lastSpeedInputTs=0;var elapsedMs=0;var lastTimerText="";' .
             'var isPaused=function(){return pausedByUser||pausedByHover;};' .
             'var formatElapsed=function(totalMs){var totalSeconds=Math.floor(totalMs/1000);var hours=Math.floor(totalSeconds/3600);var minutes=Math.floor((totalSeconds%3600)/60);var seconds=totalSeconds%60;var pad=function(value){return value<10?"0"+value:String(value);};if(hours>0){return pad(hours)+":"+pad(minutes)+":"+pad(seconds);}return pad(minutes)+":"+pad(seconds);};' .
             'var updateTimerDisplay=function(){if(!showTimer||!$timer.length){return;}var timerText=formatElapsed(elapsedMs);if(timerText!==lastTimerText){$timer.text(timerText);lastTimerText=timerText;}};' .
             'var refreshLoopHeight=function(){loopHeight=Math.max($first.outerHeight(true),1);};' .
-            'var refreshFontScale=function(){var scaleFactor=Math.max(minFontScale,Math.min(maxFontScale,fontScale))/100;$container.css("--teleprompter-font-scale",String(scaleFactor));refreshLoopHeight();};' .
+            'var getSampleLineHeight=function(){var $sample=$first.find(".teleprompter-block").first();if(!$sample.length){$sample=$first;}var lineHeight=parseFloat($sample.css("line-height"));if(!isFinite(lineHeight)){var fontSize=parseFloat($sample.css("font-size"))||24;lineHeight=fontSize*1.4;}return Math.max(12,lineHeight);};' .
+            'var refreshFocusOverlay=function(){if(focusMode==="none"||!$focusOverlay.length){return;}var containerHeight=$container.innerHeight();if(!containerHeight||containerHeight<=0){return;}var lineHeight=getSampleLineHeight();var focusHeight=Math.min(containerHeight*0.30,Math.max(lineHeight+8,lineHeight*1.35));var anchorRatio=0.5;if(focusMode==="top"){anchorRatio=0.22;}else if(focusMode==="bottom"){anchorRatio=0.78;}var start=(containerHeight*anchorRatio)-(focusHeight/2);var maxStart=Math.max(0,containerHeight-focusHeight);start=Math.max(0,Math.min(maxStart,start));var bottomHeight=Math.max(0,containerHeight-(start+focusHeight));$focusMaskTop.css("height",start+"px");$focusMaskBottom.css("height",bottomHeight+"px");$focusGuide.css("top",(start+(focusHeight/2))+"px");};' .
+            'var refreshFontScale=function(){var scaleFactor=Math.max(minFontScale,Math.min(maxFontScale,fontScale))/100;$container.css("--teleprompter-font-scale",String(scaleFactor));refreshLoopHeight();refreshFocusOverlay();};' .
             'var applySpeedStep=function(direction,stepCount){stepCount=Math.max(1,stepCount||1);var now=Date.now();var elapsed=lastSpeedInputTs?now-lastSpeedInputTs:1000;lastSpeedInputTs=now;var accelerationFactor=1;if(elapsed<500){accelerationFactor=1+((500-elapsed)/500)*Math.max(0,acceleration-1);}var delta=direction*speedStep*stepCount*accelerationFactor;speed=Math.max(minSpeed,Math.min(maxSpeed,speed+delta));};' .
             'var applyFontScaleStep=function(direction,stepCount){stepCount=Math.max(1,stepCount||1);fontScale=Math.max(minFontScale,Math.min(maxFontScale,fontScale+(direction*fontScaleStep*stepCount)));refreshFontScale();};' .
             'var animate=function(ts){if(lastTs===null){lastTs=ts;}var dt=(ts-lastTs)/1000;lastTs=ts;if(!isPaused()){offset+=speed*dt;elapsedMs+=(dt*1000);if(offset>=loopHeight){offset=offset%loopHeight;}$track.css("transform","translate3d(0,-"+offset+"px,0)");}updateTimerDisplay();window.requestAnimationFrame(animate);};' .
-            'refreshFontScale();refreshLoopHeight();updateTimerDisplay();$(window).on("resize",refreshLoopHeight);window.requestAnimationFrame(animate);' .
+            'refreshFontScale();refreshLoopHeight();refreshFocusOverlay();updateTimerDisplay();$(window).on("resize",function(){refreshLoopHeight();refreshFocusOverlay();});window.requestAnimationFrame(animate);' .
             'if(pauseOnHover){$container.on("mouseenter",function(){pausedByHover=true;}).on("mouseleave",function(){pausedByHover=false;});}' .
             '$container.attr("tabindex","0").on("keydown",function(e){var target=e.target;var tagName=target&&target.tagName?target.tagName.toLowerCase():"";if(tagName==="input"||tagName==="textarea"||(target&&target.isContentEditable)){return;}var key=e.key||"";var lowerKey=key.toLowerCase();if(key===" "||key==="Spacebar"){pausedByUser=!pausedByUser;e.preventDefault();return;}if(key==="Backspace"){elapsedMs=0;updateTimerDisplay();e.preventDefault();return;}if(key==="ArrowDown"||lowerKey==="s"){applySpeedStep(1,1);e.preventDefault();return;}if(key==="ArrowUp"||lowerKey==="w"){applySpeedStep(-1,1);e.preventDefault();return;}if(key==="ArrowRight"||lowerKey==="d"){applyFontScaleStep(1,1);e.preventDefault();return;}if(key==="ArrowLeft"||lowerKey==="a"){applyFontScaleStep(-1,1);e.preventDefault();}}).on("wheel",function(e){var originalEvent=e.originalEvent||e;if(!originalEvent||typeof originalEvent.deltaY==="undefined"||originalEvent.deltaY===0){return;}var direction=originalEvent.deltaY>0?1:-1;var stepCount=Math.max(1,Math.min(5,Math.round(Math.abs(originalEvent.deltaY)/100)));applySpeedStep(direction,stepCount);e.preventDefault();});' .
             '});'
