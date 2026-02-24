@@ -163,42 +163,35 @@ class Tracker_Field_Duration extends \Tracker\Field\AbstractItemField implements
             $applicationId = 'new';
         }
 
-        $elementId = 'duration-picker-' . $applicationId;
-        $composedFieldIdJson = json_encode($composedFieldId);
-        $enabledUnitsJson = json_encode($this->enabledUnits());
-        $draftJson = json_encode($_SESSION['duration_drafts'][$composedFieldId]);
-        $chronometerJson = json_encode($this->getOption("chronometer"));
-
-        $headerlib->add_jq_onready("
+        $headerlib->add_jq_onready('
             (async function() {
+                const DurationPickerModule = await importShim("@vue-mf/duration-picker");
+                const containerId = "vue-mf-duration-picker-" + ' . json_encode($applicationId) . ';
+                const container = document.getElementById(containerId);
 
-                const container = document.getElementById(" . json_encode($elementId) . ");
-                if (!container) return;
-
-                import('@vue-mf/duration-picker').then(mod => {
-                    mod.mount[1](container, {
+                if (container) {
+                    DurationPickerModule.mountApp(container, {
                         durationData: {
-                            inputId: " . $composedFieldIdJson . ",
-                            inputName: " . json_encode($this->getInsertId()) . ",
-                            draft: " . $draftJson . ",
-                            value: " . $value . ",
-                            units: " . $enabledUnitsJson . ",
-                            chronometer: " . $chronometerJson . "
+                            inputId: ' . json_encode($composedFieldId) . ',
+                            inputName: ' . json_encode($this->getInsertId()) . ',
+                            draft: ' . json_encode($_SESSION['duration_drafts'][$composedFieldId]) . ',
+                            value: ' . $value . ',
+                            units: ' . json_encode($this->enabledUnits()) . ',
+                            chronometer: ' . $this->getOption("chronometer") . '
+                        },
+                    });
+
+                    const observer = new MutationObserver(() => {
+                        if (!document.contains(container)) {
+                            DurationPickerModule.unmountApp();
+                            observer.disconnect();
                         }
                     });
-                });
-
-                const observer = new MutationObserver(() => {
-                    if (!document.body.contains(container)) {
-                        mod.unmount[1](app);
-                    }
-                });
-                observer.observe(document.body, { childList: true, subtree: true });                
-                
+                    observer.observe(container.parentElement, { childList: true, subtree: true });
+                }
             })();
-        ");
-
-        $appHtml = '<div id="' . $elementId . '" class="wp-duration-picker"></div>';
+        ');
+        $appHtml = '<div id="vue-mf-duration-picker-' . $applicationId . '" class="wp-duration-picker"></div>';
 
         return $appHtml;
     }

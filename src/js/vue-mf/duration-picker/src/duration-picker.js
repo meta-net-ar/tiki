@@ -1,35 +1,38 @@
-import { createApp, h } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
+
 import "../custom.scss";
-import ElementPlus from "element-plus";
-import en from "element-plus/dist/locale/en.mjs";
 
-export function mount(container, props = {}) {
-    const app = createApp({
-        render() {
-            return h(App, {
-                durationData: props.durationData,
-            });
-        },
-    });
+let vueApp = null;
 
-    if (import.meta.env.MODE === "development") {
-        console.log("DurationPicker mounted");
+function createVueApp(props = {}) {
+    if (vueApp) {
+        return vueApp;
     }
 
+    vueApp = createApp(App, props);
+    
+    if (import.meta.env.MODE === "development") {
+        console.log(import.meta.env);
+    }
+    
+    return vueApp;
+}
+
+function mount(container, props = {}) {
+    const app = createVueApp(props);
     app.mount(container);
-
-    app.use(ElementPlus, {
-        locale: en,
-    });
-
     return app;
 }
 
-export function unmount(app) {
-    if (app) {
-        app.unmount();
+function unmount() {
+    if (vueApp) {
+        vueApp.unmount();
+        vueApp = null;
     }
 }
 
+export const bootstrap = () => Promise.resolve();
+export const mountApp = mount;
+export const unmountApp = unmount;
 export const DurationPicker = App;
