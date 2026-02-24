@@ -411,41 +411,33 @@ function wikiplugin_swiper($data, $params)
     static $uid = 0;
     $uid++;
 
+    $plugininfo = wikiplugin_swiper_info();
+    $defaults = [];
+    foreach ($plugininfo['params'] as $key => $param) {
+        $defaults[$key] = $param['default'] ?? '';
+    }
+    $params = array_merge($defaults, $params);
     $params += [
         'teleprompter' => 'n',
         'teleprompterSpeed' => 60,
         'teleprompterMirror' => 'n',
         'teleprompterPauseOnHover' => 'y',
     ];
-    $isTeleprompter = $params['teleprompter'] === 'y';
-    if ($isTeleprompter) {
-        $params['navigation'] = 'n';
-        $params['pagination'] = 'n';
-        $params['displayThumbnails'] = 'n';
-        $params['slidesPerView'] = 1;
-        $params['slidesPerColumn'] = 1;
-        $params['slidesPerColumnFill'] = 'column';
-        $params['centeredSlides'] = 'n';
-        $params['freeMode'] = 'n';
-        $params['slideToClickedSlide'] = 'n';
-        $params['effect'] = 'slide';
-        $params['autoPlay'] = 'y';
-        $params['autoPlayDelay'] = 0;
+    if (trim((string) $params['fileIds']) === '' && trim((string) $params['fgalId']) === '' && trim((string) $data) === '') {
+        Feedback::error(tr('Parameters missing: Please either select file gallery, give file ids or custom slide code in body.'));
+        return;
     }
 
-    $plugininfo = wikiplugin_swiper_info();
+    $isTeleprompter = $params['teleprompter'] === 'y';
     $swiperDigitsParams = [];
     foreach ($plugininfo['params'] as $key => $param) {
-        //separating digits filter parameters
-        if (! empty($param['filter']) && $param['filter'] == "digits") {
+        if (! empty($param['filter']) && $param['filter'] === 'digits') {
             $swiperDigitsParams[] = $key;
         }
     }
 
-    // Handle swiper height
     $heightMode = 'tallest';
     $heightCSS = '';
-
     if ($params['autoHeight'] === 'y') {
         $heightMode = 'variable';
         $heightCSS = 'height: auto;';
@@ -457,78 +449,30 @@ function wikiplugin_swiper($data, $params)
         $heightCSS = 'height: 60vh;';
     }
 
-    if ($params['autoPlay'] != 'n') {
-        $autoplayDelay = max(0, (int) $params['autoPlayDelay']) * 1000;
-        $autoplayExtras = $isTeleprompter ? 'disableOnInteraction: false,' : '';
-        $autoPlay = 'autoplay: {
-            delay: ' . $autoplayDelay . ',
-            ' . $autoplayExtras . '
-        },';
-    } else {
-        $autoPlay = '';
-    }
-    if ($params['pagination'] != 'n') {
-        $pagination = 'pagination: {
-            el: \'.swiper-pagination\',
-            clickable: true,
-            type:"' . $params['pagination'] . '"
-            },';
-        $paginationDiv = "<div class=\"swiper-pagination\"></div>";
-    } else {
-        $pagination = "";
-        $paginationDiv = "";
-    }
-    if ($params['effect'] == "fade") {
-        $fadeEffectCSS = "#swiper-container" . $uid . " .swiper-slide:not(.swiper-slide-active){opacity: 0 !important;}";
-    } else {
-        $fadeEffectCSS = '';
-    }
-    if ($params['navigation'] != 'n') {
-        $navigation = 'navigation: {
-                nextEl: \'#swiper' . $uid . '-button-next\',
-                prevEl: \'#swiper' . $uid . '-button-prev\',
-            },';
-        $navigationDiv = '<div id="swiper' . $uid . '-button-prev" class="swiper-button-prev"></div><div class="swiper-button-next" id="swiper' . $uid . '-button-next"></div>';
-    } else {
-        $navigation = "";
-        $navigationDiv = '';
-    }
     $headerlib = TikiLib::lib('header');
-    $swiper_js_path = SWIPER_DIST_PATH . '/swiper-bundle.min.js';
-    $swiper_css_path = SWIPER_DIST_PATH . '/swiper-bundle.min.css';
-    //checking for swiper existence
-    if (! file_exists($swiper_js_path)) {
-        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_js_path));
-        return;
-    }
-    if (! file_exists($swiper_css_path)) {
-        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_css_path));
-        return;
-    }
-    $headerlib->add_cssfile($swiper_css_path)
-    ->add_jsfile($swiper_js_path);
-    $slides = explode("|", ($data ? $data : ""));
+    $slides = explode('|', ($data ?: ''));
+    $teleprompterBlocks = [];
     $slidesHtml = '';
-    $slideClass = 'swiper-slide' . ($isTeleprompter ? ' teleprompter-slide' : '');
-    $parallaxAttr = $isTeleprompter ? '' : 'data-swiper-parallax="-300"';
-    $teleprompterContainerClass = $isTeleprompter ? ' teleprompter-container' : '';
-    $teleprompterSettings = '';
-    $teleprompterJs = '';
-    //checking if there is a gallery chosen
+    $slideClass = 'swiper-slide';
+    $parallaxAttr = 'data-swiper-parallax="-300"';
+
+    $files = ['data' => []];
     $filegallib = TikiLib::lib('filegal');
     if ($params['fgalId']) {
         $files = $filegallib->get_files(0, -1, '', '', $params['fgalId']);
+        if (empty($files['data'])) {
+            $files['data'] = [];
+        }
     }
     if ($params['fileIds']) {
-        $params['fileIds'] = explode(',', $params['fileIds']);
-        foreach ($params['fileIds'] as $fileId) {
+        foreach (explode(',', $params['fileIds']) as $fileId) {
             $file = $filegallib->get_file($fileId);
-
             if (! is_null($file)) {
                 $files['data'][] = $file;
             }
         }
     }
+
     if (! empty($files['data'])) {
         foreach ($files['data'] as $file) {
             $slidesHtml .= '<div class="' . $slideClass . '"><img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display';
@@ -539,90 +483,164 @@ function wikiplugin_swiper($data, $params)
                     $slidesHtml .= '&amp;scale=' . $params['displaySize'];
                 }
             }
-            $slidesHtml .= '" alt="' . htmlentities($file['description'], ENT_COMPAT) . '" /></div>';
+            $alt = htmlentities((string) ($file['description'] ?? ''), ENT_COMPAT);
+            $imageHtml = '<img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display" alt="' . $alt . '" />';
+            $slidesHtml .= '" alt="' . $alt . '" /></div>';
+            $teleprompterBlocks[] = '<div class="teleprompter-block teleprompter-media">' . $imageHtml . '</div>';
         }
     }
+
+    $parserlib = TikiLib::lib('parser');
     foreach ($slides as $slide) {
         if (trim($slide)) {
-            //processing slides
-            $slideArr = array_filter(explode(";", str_replace(["\n", "\r"], '', $slide)));
+            $slideArr = array_filter(explode(';', str_replace(["\n", "\r"], '', $slide)));
+            $parsedSlide = [];
             if (count($slideArr) > 0) {
                 foreach ($slideArr as $slideValue) {
-                    $slideData = explode(":", $slideValue, 2);
-                    $slideArr[trim($slideData[0])] = trim($slideData[1]);
+                    $slideData = explode(':', $slideValue, 2);
+                    if (count($slideData) === 2) {
+                        $parsedSlide[trim($slideData[0])] = trim($slideData[1]);
+                    }
                 }
-            } else {
-                $slideArr['text'] = $slideArr[0]; //single attribute slide
             }
-            (empty($slideArr['text']) || $slideArr['text'] == '') ? $slideArr['text'] = '' : $slideArr['text'] = '<div>' . TikiLib::lib('parser')->parse_data($slideArr['text'], ['is_html' => true, 'parse_wiki' => true]) . '</div>';
-            if (empty($slideArr['color'])) {
-                $slideArr['color'] = '';
+            if (empty($parsedSlide['text']) && ! empty($slideArr[0])) {
+                $parsedSlide['text'] = $slideArr[0];
             }
-            if (empty($slideArr['bgcolor'])) {
-                $slideArr['bgcolor'] = '';
+
+            $textHtml = '';
+            if (! empty($parsedSlide['text'])) {
+                $textHtml = '<div>' . $parserlib->parse_data($parsedSlide['text'], ['is_html' => true, 'parse_wiki' => true]) . '</div>';
             }
-            if (empty($slideArr['title'])) {
-                $slideArr['title'] = '';
-            }
-            $slidesHtml .= '<div ' . $parallaxAttr . ' class="' . $slideClass . '" style="color:' . $slideArr['color'] . ';background-color:' . $slideArr['bgcolor'] . ';background-image:url(' . $slideArr['image'] . ')"><div class="slide-content' . $uid . '"><h1>' . $slideArr['title'] . '</h1>' . $slideArr['text'] . '</div></div>';
+            $color = $parsedSlide['color'] ?? '';
+            $bgColor = $parsedSlide['bgcolor'] ?? '';
+            $title = $parsedSlide['title'] ?? '';
+            $image = $parsedSlide['image'] ?? '';
+
+            $slidesHtml .= '<div ' . $parallaxAttr . ' class="' . $slideClass . '" style="color:' . $color . ';background-color:' . $bgColor . ';background-image:url(' . htmlspecialchars($image, ENT_QUOTES) . ')"><div class="slide-content' . $uid . '"><h1>' . $title . '</h1>' . $textHtml . '</div></div>';
+            $teleprompterBlocks[] = '<div class="teleprompter-block"><h1>' . $title . '</h1>' . $textHtml . '</div>';
         }
     }
 
     if ($isTeleprompter) {
-        $teleprompterSpeed = (int) $params['teleprompterSpeed'] ?: 60;
-        $teleprompterSettings = "direction:'vertical',allowTouchMove:false,";
-        $headerlib->add_css('#swiper-container' . $uid . '.teleprompter-container{align-items: stretch;} #swiper-container' . $uid . '.teleprompter-container .teleprompter-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align: left;background:' . $params['slideContentBg'] . ';line-height:1.6;padding: 1.5rem 2rem;} #swiper-container' . $uid . '.teleprompter-container .teleprompter-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . ';margin:0 0 0.5em;} #swiper-container' . $uid . '.teleprompter-container .slide-content' . $uid . '{min-width: auto;position: static;background: transparent;padding: 0;}');
-        if ($params['teleprompterMirror'] === 'y') {
-            $headerlib->add_css('#swiper-container' . $uid . '.teleprompter-mirror{transform: scaleX(-1);}');
+        if (empty($teleprompterBlocks) && trim((string) $data) !== '') {
+            $teleprompterBlocks[] = '<div class="teleprompter-block">' . $parserlib->parse_data($data, ['is_html' => true, 'parse_wiki' => true]) . '</div>';
         }
-        $teleprompterJs = 'var $tpContainer' . $uid . ' = $("#swiper-container' . $uid . '");'
-            . 'var updateTeleprompterSpeed' . $uid . ' = function(){'
-            . 'var h = $tpContainer' . $uid . '.innerHeight() || 600;'
-            . 'var ms = Math.max(250, Math.round((h / ' . $teleprompterSpeed . ') * 1000));'
-            . 'swiper' . $uid . '.params.speed = ms;'
-            . 'swiper' . $uid . '.update();'
-            . '};'
-            . 'updateTeleprompterSpeed' . $uid . '();'
-            . '$(window).on("resize", updateTeleprompterSpeed' . $uid . ');'
-            . 'swiper' . $uid . '.autoplay.start();';
-        if ($params['teleprompterPauseOnHover'] === 'y') {
-            $teleprompterJs .= '$tpContainer' . $uid . '.on("mouseenter", function(){ swiper' . $uid . '.autoplay.stop(); });'
-                . '$tpContainer' . $uid . '.on("mouseleave", function(){ swiper' . $uid . '.autoplay.start(); });';
+        if (empty($teleprompterBlocks)) {
+            Feedback::error(tr('No teleprompter content was found.'));
+            return;
         }
-        if ($params['teleprompterMirror'] === 'y') {
-            $teleprompterJs .= '$tpContainer' . $uid . '.addClass("teleprompter-mirror");';
-        }
+
+        $containerId = 'swiper-container' . $uid;
+        $trackId = 'teleprompter-track' . $uid;
+        $contentId = 'teleprompter-content' . $uid;
+        $teleprompterSpeed = max(10, (int) $params['teleprompterSpeed']);
+        $pauseOnHover = $params['teleprompterPauseOnHover'] === 'y' ? 'true' : 'false';
+        $mirrorClass = $params['teleprompterMirror'] === 'y' ? ' teleprompter-mirror' : '';
+        $teleprompterHtml = implode('', $teleprompterBlocks);
+
+        $headerlib->add_css(
+            '#' . $containerId . '{position:relative;overflow:hidden;' . $heightCSS . 'width:' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;}' .
+            '#' . $containerId . '.teleprompter-mirror{transform:scaleX(-1);}' .
+            '#' . $containerId . ' .teleprompter-track{will-change:transform;}' .
+            '#' . $containerId . ' .teleprompter-content{padding:1.5rem 2rem;}' .
+            '#' . $containerId . ' .teleprompter-block{line-height:1.6;font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align:left;background:' . $params['slideContentBg'] . ';padding:0.75rem 0;margin:0;}' .
+            '#' . $containerId . ' .teleprompter-block h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . ';margin:0 0 .5em;}' .
+            '#' . $containerId . ' .teleprompter-media img{max-width:100%;height:auto;display:block;margin:0 auto 1rem;}'
+        );
+
+        $headerlib->add_js(
+            '$(function(){' .
+            'var $container=$("#' . $containerId . '");' .
+            'var $track=$("#' . $trackId . '");' .
+            'var $first=$("#' . $contentId . '");' .
+            'if(!$container.length||!$track.length||!$first.length){return;}' .
+            'var speed=' . $teleprompterSpeed . ';' .
+            'var pauseOnHover=' . $pauseOnHover . ';' .
+            'var paused=false;var offset=0;var lastTs=null;var loopHeight=1;' .
+            'var refreshLoopHeight=function(){loopHeight=Math.max($first.outerHeight(true),1);};' .
+            'var animate=function(ts){if(lastTs===null){lastTs=ts;}var dt=(ts-lastTs)/1000;lastTs=ts;if(!paused){offset+=speed*dt;if(offset>=loopHeight){offset=offset%loopHeight;}$track.css("transform","translate3d(0,-"+offset+"px,0)");}window.requestAnimationFrame(animate);};' .
+            'refreshLoopHeight();$(window).on("resize",refreshLoopHeight);window.requestAnimationFrame(animate);' .
+            'if(pauseOnHover){$container.on("mouseenter",function(){paused=true;}).on("mouseleave",function(){paused=false;});}' .
+            '$container.attr("tabindex","0").on("keydown",function(e){if(e.key===" "){paused=!paused;e.preventDefault();}if(e.key==="ArrowUp"){speed=Math.min(speed+10,500);e.preventDefault();}if(e.key==="ArrowDown"){speed=Math.max(speed-10,10);e.preventDefault();}});' .
+            '});'
+        );
+
+        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . '">' .
+            '<div id="' . $trackId . '" class="teleprompter-track">' .
+            '<div id="' . $contentId . '" class="teleprompter-content">' . $teleprompterHtml . '</div>' .
+            '<div class="teleprompter-content" aria-hidden="true">' . $teleprompterHtml . '</div>' .
+            '</div></div>';
     }
+
+    $swiper_js_path = SWIPER_DIST_PATH . '/swiper-bundle.min.js';
+    $swiper_css_path = SWIPER_DIST_PATH . '/swiper-bundle.min.css';
+    if (! file_exists($swiper_js_path)) {
+        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_js_path));
+        return;
+    }
+    if (! file_exists($swiper_css_path)) {
+        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_css_path));
+        return;
+    }
+    $headerlib->add_cssfile($swiper_css_path)
+        ->add_jsfile($swiper_js_path);
+
+    if ($params['autoPlay'] !== 'n') {
+        $autoplayDelay = max(0, (int) $params['autoPlayDelay']) * 1000;
+        $autoPlay = 'autoplay: {delay: ' . $autoplayDelay . ',disableOnInteraction: false},';
+    } else {
+        $autoPlay = '';
+    }
+    if ($params['pagination'] !== 'n' && $params['pagination'] !== '') {
+        $pagination = 'pagination: {el: ".swiper-pagination",clickable: true,type:"' . $params['pagination'] . '"},';
+        $paginationDiv = '<div class="swiper-pagination"></div>';
+    } else {
+        $pagination = '';
+        $paginationDiv = '';
+    }
+    $fadeEffectCSS = $params['effect'] === 'fade' ? '#swiper-container' . $uid . ' .swiper-slide:not(.swiper-slide-active){opacity:0!important;}' : '';
+    if ($params['navigation'] !== 'n') {
+        $navigation = 'navigation: {nextEl: "#swiper' . $uid . '-button-next",prevEl: "#swiper' . $uid . '-button-prev"},';
+        $navigationDiv = '<div id="swiper' . $uid . '-button-prev" class="swiper-button-prev"></div><div class="swiper-button-next" id="swiper' . $uid . '-button-next"></div>';
+    } else {
+        $navigation = '';
+        $navigationDiv = '';
+    }
+
     $swiperSettings = '';
-    $swiperParams = ['effect','autoHeight','speed','spaceBetween','slidesPerView','slidesPerColumn','slidesPerColumnFill','centeredSlides','slidesOffsetBefore','slidesOffsetAfter','loop','preloadImages','slideToClickedSlide','freeMode','updateOnImagesReady'];
+    $swiperParams = ['effect', 'autoHeight', 'speed', 'spaceBetween', 'slidesPerView', 'slidesPerColumn', 'slidesPerColumnFill', 'centeredSlides', 'slidesOffsetBefore', 'slidesOffsetAfter', 'loop', 'preloadImages', 'slideToClickedSlide', 'freeMode', 'updateOnImagesReady'];
     foreach ($swiperParams as $swiperParam) {
-        $swiperSettings .= $swiperParam . ":";
-        if (! in_array($swiperParam, $swiperDigitsParams)) {
-            $swiperSettings .= "'" . $params[$swiperParam] . "',";
-            if ($params[$swiperParam] == 'creative') {
-                $swiperSettings .= "creativeEffect: generateRandomCreativeEffect(),";
-            }
+        if (in_array($swiperParam, $swiperDigitsParams, true)) {
+            $swiperSettings .= $swiperParam . ':' . ((int) ($params[$swiperParam] ?: 0)) . ',';
         } else {
-            $params[$swiperParam] == '' ? $swiperSettings .= "0," : $swiperSettings .= $params[$swiperParam] . ",";
+            if ($params[$swiperParam] === 'y' || $params[$swiperParam] === 'n') {
+                $swiperSettings .= $swiperParam . ':' . ($params[$swiperParam] === 'y' ? 'true' : 'false') . ',';
+            } else {
+                $swiperSettings .= $swiperParam . ':' . json_encode((string) $params[$swiperParam]) . ',';
+            }
+            if ($params[$swiperParam] === 'creative') {
+                $swiperSettings .= 'creativeEffect: generateRandomCreativeEffect(),';
+            }
         }
     }
+
     $breakpoints = '';
     if ($params['slidesPerViewMobile'] > 0 || $params['slidesPerViewTab'] > 0) {
-        $slidesPerView = $params['slidesPerView'] == '' ? 1 : $params['slidesPerView'];
-        $slidesPerViewTab = $params['slidesPerViewTab'] == '' ? $slidesPerView : $params['slidesPerViewTab']; //if not defined use default slides per view
-        $slidesPerViewMobile = $params['slidesPerViewMobile'] == '' ? $slidesPerViewTab : $params['slidesPerViewMobile']; //if not defined use tablets slides per view
-        $breakpoints = 'breakpointsInverse: true, breakpoints: { 320: { slidesPerView: ' . $slidesPerViewMobile . '},768: {slidesPerView: ' . $slidesPerViewTab . '},1024: {slidesPerView: ' . $slidesPerView . '}},';
+        $slidesPerView = $params['slidesPerView'] === '' ? 1 : (int) $params['slidesPerView'];
+        $slidesPerViewTab = $params['slidesPerViewTab'] === '' ? $slidesPerView : (int) $params['slidesPerViewTab'];
+        $slidesPerViewMobile = $params['slidesPerViewMobile'] === '' ? $slidesPerViewTab : (int) $params['slidesPerViewMobile'];
+        $breakpoints = 'breakpoints: {320:{slidesPerView:' . $slidesPerViewMobile . '},768:{slidesPerView:' . $slidesPerViewTab . '},1024:{slidesPerView:' . $slidesPerView . '}},';
     }
-    $swiperSettings .= $teleprompterSettings;
-    $swiperSettings = str_replace(["'y'","'n'"], ["'true'","'false'"], $swiperSettings);
-    $headerlib->add_css('#swiper-container' . $uid . ' {position: relative; display: flex; align-items: center; overflow: hidden; ' . $heightCSS . 'width: ' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;} #swiper-container' . $uid . ' .swiper-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align: center;width:100%;overflow:hidden;} .gallery-top {height: 80%;width: 100%;}.gallery-thumbs {height: 20%;box-sizing: border-box;padding: 10px 0;overflow: hidden;}.gallery-thumbs img {max-height:120px;height:120px;width:auto;  margin-bottom:2%;cursor:pointer}.gallery-thumbs .swiper-slide {width: 25%; height: 100%;opacity: 0.4;}.gallery-thumbs .swiper-slide-active {opacity: 1;} #swiper-container' . $uid . ' .swiper-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . '} .slide-content' . $uid . '{min-width:60%;position:absolute;' . $params['slideContentPostion'] . ';background:' . $params['slideContentBg'] . ';padding:1%;text-align:left}  .parallax-bg { position: absolute;left: 0;top: 0;width: 130%;height: 100%;-webkit-background-size: cover;background-size: cover;background-position: center;} .swiper-slide img{max-width:100%}' . $fadeEffectCSS);
+
+    $headerlib->add_css('#swiper-container' . $uid . '{position:relative;display:flex;align-items:center;overflow:hidden;' . $heightCSS . 'width:' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;}#swiper-container' . $uid . ' .swiper-slide{font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align:center;width:100%;overflow:hidden;}.gallery-top{height:80%;width:100%;}.gallery-thumbs{height:20%;box-sizing:border-box;padding:10px 0;overflow:hidden;}.gallery-thumbs img{max-height:120px;height:120px;width:auto;margin-bottom:2%;cursor:pointer;}.gallery-thumbs .swiper-slide{width:25%;height:100%;opacity:.4;}.gallery-thumbs .swiper-slide-active{opacity:1;}#swiper-container' . $uid . ' .swiper-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . ';}.slide-content' . $uid . '{min-width:60%;position:absolute;' . $params['slideContentPostion'] . ';background:' . $params['slideContentBg'] . ';padding:1%;text-align:left;}.parallax-bg{position:absolute;left:0;top:0;width:130%;height:100%;-webkit-background-size:cover;background-size:cover;background-position:center;}.swiper-slide img{max-width:100%;}' . $fadeEffectCSS);
+
     $thumbnails = '';
     $thumbclass = '';
     $swiperOpts = '';
     $thumbAfter = '';
     $thumbsSettings = '';
-    if ($params['displayThumbnails'] == "y") {
-        $thumbnails = ' <div id="gallery-thumbs' . $uid . '" class="swiper-container gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>'   ;
+    if ($params['displayThumbnails'] === 'y') {
+        $thumbnails = '<div id="gallery-thumbs' . $uid . '" class="swiper-container gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>';
         $thumbclass = 'gallery-top';
         $swiperOpts = 'var galleryThumbs' . $uid . ' = new Swiper("#gallery-thumbs' . $uid . '", {spaceBetween: 10,
             slidesPerView: 3,
@@ -632,100 +650,74 @@ function wikiplugin_swiper($data, $params)
             watchSlidesProgress: true,
             slideToClickedSlide: true
         });';
-        $thumbsSettings = ''; //' thumbs: {swiper: galleryThumbs'.$uid.'},';
-        $thumbAfter = 'swiper' . $uid . '.controller.control = galleryThumbs' . $uid . ';galleryThumbs' . $uid . '.controller.control =swiper' . $uid . ';';
+        $thumbsSettings = '';
+        $thumbAfter = 'swiper' . $uid . '.controller.control=galleryThumbs' . $uid . ';galleryThumbs' . $uid . '.controller.control=swiper' . $uid . ';';
     }
-    $creativeRandomEffect = "
-    function generateRandomCreativeEffect() {
-            const creativeEffectList = [
-                {
-                    prev: { translate: [0, 0, -100], rotate: [0, 0, 0]},
-                    next: { translate: ['80%', '-100%', -1000], rotate: [0, 0, 0]}
-                },
-                {
-                    prev: { translate: ['100%', 0, -200], rotate: [0, 0, 90]},
-                    next: { translate: ['-100%', 0, -200], rotate: [0, 0, -90]},
-                },
-                {
-                    prev: { translate: ['100%', -200, -1000], rotate: [0, 0, 40], shadow: true},
-                    next: { translate: ['-100%', 200, -1000], rotate: [0, 0, 40], shadow: true},
-                },
-                {
-                    prev: { translate: ['-100%', -200, -1000]},
-                    next: { translate: ['100%', 200, -1000]},
-                },
-                {
-                    prev: { translate: ['-100%', -100, -300], rotate: [-45, -45, -45]},
-                    next: { translate: ['100%', 100, -300], rotate: [45, 45, 45]}
-                }
-            ];
-            return creativeEffectList[Math.floor(Math.random() * creativeEffectList.length)];
-        }
-    ";
-    $swiperOpts .= 'var swiper' . $uid . ' = new Swiper("#swiper-container' . $uid . '",{
-            ' . $swiperSettings . '
-            init:false,
-            ' . $thumbsSettings . '
-            ' . $pagination . '
-            keyboard: {
-                enabled: true,
-                onlyInViewport: false,
-            },
-            ' . $breakpoints . '
-            ' . $autoPlay . '
-            ' . $navigation . '
-     
-            });' . $creativeRandomEffect . $thumbAfter . $teleprompterJs;
 
-    // Add JavaScript for tallest height mode
+    $creativeRandomEffect = 'function generateRandomCreativeEffect(){const creativeEffectList=[{prev:{translate:[0,0,-100],rotate:[0,0,0]},next:{translate:["80%","-100%",-1000],rotate:[0,0,0]}},{prev:{translate:["100%",0,-200],rotate:[0,0,90]},next:{translate:["-100%",0,-200],rotate:[0,0,-90]}},{prev:{translate:["100%","-200",-1000],rotate:[0,0,40],shadow:true},next:{translate:["-100%","200",-1000],rotate:[0,0,40],shadow:true}},{prev:{translate:["-100%","-200",-1000]},next:{translate:["100%","200",-1000]}},{prev:{translate:["-100%","-100",-300],rotate:[-45,-45,-45]},next:{translate:["100%","100",-300],rotate:[45,45,45]}}];return creativeEffectList[Math.floor(Math.random()*creativeEffectList.length)];}';
+    $swiperOpts .= $creativeRandomEffect . 'var swiper' . $uid . ' = new Swiper("#swiper-container' . $uid . '",{'
+        . $swiperSettings
+        . 'init:false,'
+        . $thumbsSettings
+        . $pagination
+        . 'keyboard:{enabled:true,onlyInViewport:false},'
+        . $breakpoints
+        . $autoPlay
+        . $navigation
+        . '});' . $thumbAfter;
+
     if ($heightMode === 'tallest') {
         $swiperOpts .= '
-        $(document).ready(function() {
-            const $swiper = $("#swiper-container' . $uid . '");
-            const $images = $swiper.find(".swiper-slide img");
-            let maxHeight = 0;
-            let loadedCount = 0;
-
-            const checkAllLoadedAndSetHeight = function() {
+        var setTallestHeight' . $uid . ' = function() {
+            var $swiper = $("#swiper-container' . $uid . '");
+            var $images = $swiper.find(".swiper-slide img");
+            if ($images.length === 0) {
+                return;
+            }
+            var maxHeight = 0;
+            var loadedCount = 0;
+            var checkAllLoadedAndSetHeight = function() {
                 loadedCount++;
-                if (loadedCount === $images.length) {
+                if (loadedCount >= $images.length) {
                     $images.each(function() {
-                        maxHeight = Math.max(maxHeight, $(this).height());
+                        maxHeight = Math.max(maxHeight, $(this).height() || 0);
                     });
-                    $swiper.css("height", maxHeight + "px");
+                    if (maxHeight > 0) {
+                        $swiper.css("height", maxHeight + "px");
+                    }
                 }
             };
-
             $images.each(function() {
-                const $img = $(this);
+                var $img = $(this);
                 if (this.complete) {
                     checkAllLoadedAndSetHeight();
                 } else {
                     $img.on("load", checkAllLoadedAndSetHeight)
                         .on("error", function() {
-                            console.error("Image failed to load:", $img.attr("src"));
                             checkAllLoadedAndSetHeight();
                         });
                 }
             });
-        });
+        };
+        setTallestHeight' . $uid . '();
         ';
     }
 
-    if ($params['sliderPosition'] == 'abovetopbar') {
+    if ($params['sliderPosition'] === 'abovetopbar') {
         $headerlib->add_css("#swiper-container" . $uid . "{visibility:hidden;}");
         $swiperOpts .= 'var container=$(".container").first();$("#swiper-container' . $uid . '").insertBefore( container );$("#gallery-thumbs' . $uid . '").insertAfter( "#swiper-container' . $uid . '" );';
-    } elseif ($params['sliderPosition'] == 'undertopbar') {
+    } elseif ($params['sliderPosition'] === 'undertopbar') {
         $headerlib->add_css("#swiper-container" . $uid . "{visibility:hidden;}");
-        $headerlib->add_js('$( document ).ready(function() { $("#swiper-container' . $uid . '").insertAfter( "#page-header" );  $("#gallery-thumbs' . $uid . '").insertAfter( "#swiper-container' . $uid . '" );})');
+        $swiperOpts .= '$("#swiper-container' . $uid . '").insertAfter("#page-header");$("#gallery-thumbs' . $uid . '").insertAfter("#swiper-container' . $uid . '");';
     }
-    //delaying initialization till window is fully loaded
-    $swiperOpts .= 'setTimeout( function(){
-        $(window).trigger("resize")
-        }, 100); $(window).on("resize", function(){swiper' . $uid . '.init(); $("#swiper-container' . $uid . '").css("visibility","visible"); });';
+
+    $swiperOpts .= 'swiper' . $uid . '.init();$("#swiper-container' . $uid . '").css("visibility","visible");' .
+        'var updateSwiper' . $uid . ' = function(){swiper' . $uid . '.update();$("#swiper-container' . $uid . '").css("max-width",$("#swiper-container' . $uid . '").parent().width());};' .
+        '$(window).on("resize", updateSwiper' . $uid . ');updateSwiper' . $uid . '();';
+
     $headerlib->add_js(
-        '$( document ).ready(function() {' . $swiperOpts . ';$("#swiper-container' . $uid . '").css("max-width",$("#swiper-container' . $uid . '").parent().width());})'
+        '$(document).ready(function(){' . $swiperOpts . '})'
     );
-        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . $teleprompterContainerClass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
-        return $swiperCode;
+
+    return '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . '"><div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div><div class="swiper-wrapper">' . $slidesHtml . '</div>' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
 }
