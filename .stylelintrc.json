@@ -29,6 +29,8 @@
     "declaration-block-no-shorthand-property-overrides": null,
     "scss/operator-no-unspaced": null,
     "keyframes-name-pattern": null,
-    "selector-pseudo-element-no-unknown": null
+    "selector-pseudo-element-no-unknown": null,
+    "scss/at-extend-no-missing-placeholder": null,
+    "scss/at-mixin-pattern": null
   }
 }
