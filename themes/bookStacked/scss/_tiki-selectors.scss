@@ -8,6 +8,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //	background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -22,11 +23,11 @@ body:not(.tiki-admin) .col1 {
     padding: 16px 48px;
     margin-bottom: 24px;
     min-height: 60vh;
-
     background-color: var(--tiki-main-content-bg);
+
     .col1top-outer-wrapper {
         background-color: var(--bs-body-bg);
-        margin: -16px -48px 0 -48px;
+        margin: -16px -48px 0;
 
     }
 }
@@ -42,7 +43,7 @@ body:not(.tiki-admin) .col1 {
     padding-top: 24px;
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (width >= 1400px) {
     body:not(.tiki-admin) {
         #left_modules,
         #right_modules {
@@ -51,14 +52,14 @@ body:not(.tiki-admin) .col1 {
             top: 0;
             max-height: 70vh;
             height: 100%;
-            overflow-y: var(--tiki-bookstacked-col2-col3-overflow-y); // auto;
-            overflow-x: hidden;
+            overflow: hidden var(--tiki-bookstacked-col2-col3-overflow-y); // auto;
+
             //          -ms-overflow-style: none;
         }
     }
 }
 
-@media screen and (min-width: 1000px) {
+@media screen and (width >= 1000px) {
     .col2 > *, .col3 > * {
         opacity: .6;
         transition: opacity ease-in-out 120ms
@@ -73,13 +74,13 @@ body:not(.tiki-admin) .col1 {
     }
 }
 
-@media screen and (min-width: 1000px)and (prefers-contrast: more) {
+@media screen and (width >= 1000px)and (prefers-contrast: more) {
     .col2 > *, .col3 > * {
         opacity: 1 !important
     }
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (width >= 1400px) {
     .cat_Bookpage {
         h1.pagetitle,
         article.wikitext,
@@ -91,6 +92,7 @@ body:not(.tiki-admin) .col1 {
             padding-left: 48px;
             padding-right: 48px;
         }
+
         #page-data p:last-of-type {
             margin-bottom: 0;
             padding-bottom: 15px;
@@ -123,7 +125,7 @@ thead, tbody, tfoot, tr, td, th {
 .btn.btn-outline-info { color: #07768D; border-color: #07768D; }
 .btn.btn-outline-light { color: #616A98; border-color: #616A98; }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .btn.btn-outline-primary { color: #479EDC; border-color: #479EDC; }
     .btn.btn-outline-secondary { color: #8F979E; border-color: #8F979E; }
     .btn.btn-outline-success { color: #20B16D; border-color: #20B16D; }
@@ -138,6 +140,7 @@ thead, tbody, tfoot, tr, td, th {
 .searchresults li {
     padding: 8px;
 }
+
 .searchresults li:hover {
     background: var(--bs-secondary-bg-subtle);
 }
@@ -147,13 +150,14 @@ thead, tbody, tfoot, tr, td, th {
 nav:not(.bg-light,.bg-dark) {
     .nav-link {
         color: var(--bs-link-color);
+
         &:hover {
             color: var(--bs-link-hover-color);
         }
     }
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .navbar-light {
         .nav-link,
         .dropdown-toggle,
@@ -171,6 +175,7 @@ nav:not(.bg-light,.bg-dark) {
     .module.card {
         border: none;
         background: transparent;
+
         .card-header {
             border: none;
             background: transparent;
@@ -187,7 +192,7 @@ nav:not(.bg-light,.bg-dark) {
 
 // Progress bars
 // List group
-html:not([data-bs-theme=dark]) {
+html:not([data-bs-theme="dark"]) {
 .list-group-item.list-group-item-action { color: #424242BF; }
 .list-group-item.list-group-item-action.list-group-item-primary { color: #363636BF; }
 .list-group-item.list-group-item-action.list-group-item-secondary { color: #3B3B3BBF; }
@@ -200,7 +205,7 @@ html:not([data-bs-theme=dark]) {
 }
 
 // Figures
-//.figure-caption { color: $text-muted; }
+// .figure-caption { color: $text-muted; }
 
 // Breadcrumbs
 // Code
@@ -209,7 +214,7 @@ html:not([data-bs-theme=dark]) {
 
 // To have Smartmenus in side columns in large displays open downward as in small displays
 // The properties of these classes need to be used on the top ul: sm-nav navbar-nav me-auto nav  flex-column
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .tiki .col2,
     .tiki .col3 {
         .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-nav-link {
@@ -224,12 +229,14 @@ html:not([data-bs-theme=dark]) {
             line-height: var(--sm-line-height);
             text-decoration: none;
         }
+
         .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--vertical .sm-sub-toggler::after {
            // margin-top: 0;
            // transform: rotate(225deg);
             --sm-sub-toggler-icon-size: 0.7rem;
             --sm-sub-toggler-icon-spacing: 0.4rem;
             --sm-sub-toggler-split-icon-spacing: 0px;
+
             content: "+";
             display: inline-block;
             margin-left: var(--sm-sub-toggler-icon-spacing);
@@ -238,29 +245,36 @@ html:not([data-bs-theme=dark]) {
             line-height: var(--sm-sub-toggler-icon-size);
             text-align: center;
         }
+
         .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub .sm-sub-toggler::after,
         .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--vertical .sm-sub-toggler::after {
             margin-top: 0;
             transform: rotate(-45deg);
         }
+
         .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after {
             margin-top: calc(0.5 * var(--sm-collapsible-sub-toggler-icon-size)) !important;
             transform: rotate(-45deg);
         }
+
         .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after,
         .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after {
             margin-top: calc(0.5 * var(--sm-collapsible-sub-toggler-icon-size)) !important;
             transform: rotate(-225deg);
         }
+
         .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub {
             z-index: inherit; // 1001;
-            left: 0px; //93.7109px;
-            top: 0px; // -0.834028px;
+            left: 0; // 93.7109px;
+            top: 0; // -0.834028px;
+
             --sm-height: inherit; // 120.3085708618164px;
+
             grid-area: sub; // none;
             position: static; // absolute;
             min-width: var(--sm-sub-min-width);
         }
+
         .sm-nav-item {
             display: grid;
             grid-template: "link link-split-toggler" auto
@@ -271,6 +285,7 @@ html:not([data-bs-theme=dark]) {
             padding: 0;
             line-height: inherit;
         }
+
         .sm-sub {
             grid-area: sub;
             display: none;
@@ -279,9 +294,11 @@ html:not([data-bs-theme=dark]) {
             padding: 0;
             line-height: inherit;
         }
+
         .sm-sub.sm-show, .sm-sub.sm-hiding {
             display: block;
         }
+
         .sm-sub.dropdown-menu.sm-show {
 
         }

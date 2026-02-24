@@ -6,21 +6,17 @@ $classic-header-bg-dark: #014f63;
 
 // Required
 @import "../../../../../node_modules/bootstrap/scss/functions";
-
 @import "../../akebi/scss/variables";
 @import "../../akebi/scss/variables-dark";
 @import "../../../../default/scss/variables"; // Bootstrap default variables, with a few Tiki overrides
 @import "../../../../default/scss/variables-dark"; // Bootstrap dark mode default variables
 @import "../../akebi/scss/tiki-selectors";
-
 @import "../../../../../node_modules/bootstrap/scss/maps";
 @import "../../../../../node_modules/bootstrap/scss/mixins";
 @import "../../../../../node_modules/bootstrap/scss/utilities";
-
 @import "../../../../../node_modules/bootstrap/scss/root";
 @import "../../../../../node_modules/bootstrap/scss/reboot";
 @import "../../../../../node_modules/bootstrap/scss/buttons";
 @import "../../../../../node_modules/bootstrap/scss/nav";
-
 @import "../../../scss/selectors-for-options";
 @import "../../../scss/selectors-for-classic-options";

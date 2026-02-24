@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -21,6 +21,7 @@
 .topbar {
     //    @include btn-shadow($tiki-navbar-dark-bg);
     filter: none;
+
     @include box-shadow(0 1px 10px rgba(0, 0, 0, 0.1));
 }
 
@@ -59,7 +60,7 @@
 // Code
 // Tiki-specific
 // Dark mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .list-group-item { color: #AAB0B6BF; }
     .list-group-item-primary { color: #A1A9AFBF; }
     .list-group-item-secondary { color: #ACAFB9BF; }

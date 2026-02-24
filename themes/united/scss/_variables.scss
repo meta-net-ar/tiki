@@ -9,44 +9,44 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$primary:       #D14715; // $orange !default;
-$secondary:     #7F736C; // $gray-500 !default;
-$success:       #298537; // $green !default;
-$info:          #128091; // $cyan !default;
-$warning:       #996C0B; // $yellow !default;
-$danger:        #DF3226; // $red !default;
+$primary: #D14715; // $orange !default;
+$secondary: #7F736C; // $gray-500 !default;
+$success: #298537; // $green !default;
+$info: #128091; // $cyan !default;
+$warning: #996C0B; // $yellow !default;
+$danger: #DF3226; // $red !default;
 
 // Options
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
-$enable-dark-mode:            true;  // default
-$color-mode-type:             data;  // default // `data` or `media-query`
+$enable-dark-mode: true;  // default
+$color-mode-type: data;  // default // `data` or `media-query`
 
 // Body
-$body-color:                $gray-800;  // default
+$body-color: $gray-800;  // default
 
 // Link color
 $link-color: #D14715; // Darkened for WCAG compliance
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Forms
-$input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;
+$input-border-color: $gray-400; //    var(--#{$prefix}border-color) !default;
 
 // Navbar
-$navbar-dark-color:                 rgba($white, .85); // !default;
+$navbar-dark-color: rgba($white, .85); // !default;
 
 // Typography
-$font-family-sans-serif:      system-ui, sans-serif; // Ubuntu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-sans-serif: system-ui, sans-serif; // Ubuntu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $blockquote-footer-color: #6D757E;
 
 // Forms
-$input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;
+$input-border-color: $gray-400; //    var(--#{$prefix}border-color) !default;
 
 // Tables
 // Code
-$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
+$code-color: $body-color; //   $pink !default; // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 // Bootswatch overrides
 

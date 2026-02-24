@@ -9,14 +9,14 @@
 // Color system
 
 
-$primary:       #2B70E9; // $blue;  // default
-$secondary:     #717684; // $gray-500;  // default
-$success:       #028857; // $green;  // default
-$info:          #147F90; // $cyan;  // default
-$warning:       #A5660D; // $yellow;  // default
-$danger:        #D4403A; // $red;  // default
-//$light:         $gray-100;  // default
-//$dark:          $gray-800;  // default
+$primary: #2B70E9; // $blue;  // default
+$secondary: #717684; // $gray-500;  // default
+$success: #028857; // $green;  // default
+$info: #147F90; // $cyan;  // default
+$warning: #A5660D; // $yellow;  // default
+$danger: #D4403A; // $red;  // default
+// $light:         $gray-100;  // default
+// $dark:          $gray-800;  // default
 
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
@@ -30,32 +30,32 @@ $prefix: bs-; // default -- Compiling needs this to be declared
 $link-color: #2B70E9;
 
 // Typography
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
-$component-active-color:      $white;  // default
-$component-active-bg:         $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $primary;  // default
 
 // Tables
 // Buttons
 // Forms
-$input-border-color:                    var(--#{$prefix}border-color);  // default // rgba(0, 0, 0, .1);  // default
-$input-group-addon-bg:                  var(--#{$prefix}tertiary-bg);  // default // $gray-200;  // default
+$input-border-color: var(--#{$prefix}border-color);  // default // rgba(0, 0, 0, .1);  // default
+$input-group-addon-bg: var(--#{$prefix}tertiary-bg);  // default // $gray-200;  // default
 
 // Navbar
 
-$navbar-light-hover-color:          $body-color;  // default
-$navbar-light-active-color:         $body-color;  // default
+$navbar-light-hover-color: $body-color;  // default
+$navbar-light-active-color: $body-color;  // default
 
-$navbar-dark-color:                 rgba($white, .85); // !default;
-$navbar-dark-hover-color:           rgba($white, .95); // !default;
-$navbar-dark-active-color:          $white; // !default;
-$navbar-dark-disabled-color:        rgba($white, .55); // !default;
+$navbar-dark-color: rgba($white, .85); // !default;
+$navbar-dark-hover-color: rgba($white, .95); // !default;
+$navbar-dark-active-color: $white; // !default;
+$navbar-dark-disabled-color: rgba($white, .55); // !default;
 
 // Tooltips
 // Badges
 // Alerts
 // Code
-$code-color:                     $body-color; //    $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //    $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables

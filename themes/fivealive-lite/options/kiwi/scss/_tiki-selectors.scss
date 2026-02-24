@@ -6,6 +6,7 @@
 .text-danger {
     color: #D63D00 !important;
 }
+
 .text-dark {
     color: $dark !important;
 }
@@ -25,14 +26,17 @@
     color: #3A833A;
     border-color: #3A833A;
 }
+
 .btn.btn-outline-warning {
     color: #A2630B;
     border-color: #A2630B;
 }
+
 .btn.btn-outline-info {
     color: #6E7425;
     border-color: #6E7425;
 }
+
 .breadcrumb-item.active {
     color: $text-muted !important;
 }
@@ -82,7 +86,7 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .blockquote-footer, .figure-caption { color: #848D94; }
     .valid-feedback { color: #329F4F !important; }
     .invalid-feedback { color: #FF4800 !important; }

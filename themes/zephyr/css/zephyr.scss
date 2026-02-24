@@ -1,9 +1,11 @@
 @charset "UTF-8";
+
 /*!
  * Bootswatch Zephyr theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
 */
+
 /*!
  * Bootswatch v5.3.7 (https://bootswatch.com)
  * Theme: zephyr
@@ -11,6 +13,7 @@
  * Licensed under MIT
  * Based on Bootstrap
 */
+
 /*!
  * Bootstrap  v5.3.7 (https://getbootstrap.com/)
  * Copyright 2011-2025 The Bootstrap Authors
@@ -19,18 +22,16 @@
 
 @import "../scss/variables"; // 2. (This is moved above the functions file to have effect, maybe a quirk of the Bootswatch file arrangement.) The first value declaration (the theme's) is used when it is declared in more than one imported file.
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
-
 @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/zephyr/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
 @import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
 @import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
-
 @import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 8. Remainder of required Bootstrap parts.
 @import "../../../node_modules/bootswatch/dist/zephyr/bootswatch"; // 9. Bootswatch theme selectors
 @import "../../base_files/scss/_tiki-selectors.scss"; // 10. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 11. Optionally imported to group (separately) the top and topbar zone components for styling.
-//@import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+// @import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 

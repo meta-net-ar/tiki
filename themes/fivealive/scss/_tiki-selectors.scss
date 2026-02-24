@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -29,7 +29,7 @@ $imagePath: "../images/";
 }
 
 #fullscreenbutton a {
-    color: #000000;
+    color: #000;
 }
 
 .layout_basic .container.container-std {
@@ -40,7 +40,7 @@ $imagePath: "../images/";
 .layout_basic .top_modules {
     // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#136d9f+0,28a7de+100
     background: linear-gradient(to right, #136d9f 0%, #28a7de 100%);
-    color: #000000;
+    color: #000;
 }
 
 .layout_classic .top_modules.bg-dark-parent {
@@ -87,7 +87,7 @@ $imagePath: "../images/";
     position: fixed;
     top: 0;
     z-index: 10;
-    -webkit-transition: all 0.6s ease-in-out;
+    transition: all 0.6s ease-in-out;
 }
 
 .topbar .navbar-nav > li > a {
@@ -113,7 +113,7 @@ $imagePath: "../images/";
     h3 {
         border-radius: 3px;
         font-size: 34px;
-        padding: 12px 10px 6px 10px;
+        padding: 12px 10px 6px;
     }
 }
 
@@ -121,7 +121,7 @@ $imagePath: "../images/";
 .main-footer {
     min-height: 60px;
     background: black;
-    padding: 1px 0 2px 0;
+    padding: 1px 0 2px;
 }
 
 // Links
@@ -149,14 +149,14 @@ label a:hover {
 }
 
 // Dropdowns
-//.dropdown-menu {
+// .dropdown-menu {
 //    text-transform: none;
 //    background-color: $dropdown-bg; //#005064;
 //    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-//}
+// }
 
-//.dropdown-item a,
-//.dropdown-item .btn.btn-link {
+// .dropdown-item a,
+// .dropdown-item .btn.btn-link {
 //    color: $dropdown-link-color;
 //
 //    &:hover,
@@ -181,21 +181,22 @@ label a:hover {
 //    .dropdown-divider {
 //        background: $dropdown-divider-bg;
 //    }
-//}
+// }
 //
-//.dropdown-item.btn-link.text-danger {
+// .dropdown-item.btn-link.text-danger {
 //    background: color.adjust($danger, $lightness: 40%, $space: hsl) !important; //lighten($danger, 70%);
 //    border-radius: 0 !important;
 //
 //    &:hover {
 //        background: color.adjust($danger, $lightness: 30%, $space: hsl) !important;
 //    }
-//}
+// }
 
 // Pagination
 // Cards
 .card.module {
     border: none;
+
     --bs-card-border-color: transparent !important;
 }
 
@@ -216,22 +217,25 @@ label a:hover {
 // Code
 // Tiki-specific
 
-//.bottom_modules {
+// .bottom_modules {
 //    .card-body { color: #dee2e6; background: #262626; }
-//}
+// }
 
 // Dark page footer
 :root .bottom_modules,
 [data-bs-theme="light"] .bottom_modules,
 [data-bs-theme="dark"] .bottom_modules {
     color: #dee2e6;
+
     .card {
         color: #dee2e6;
         background: #000;
     }
+
     .tiki-card-header-title {
         color: #333 !important;
     }
+
     .card-body {
         color: #dee2e6;
         background: #262626;

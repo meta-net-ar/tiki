@@ -9,6 +9,7 @@
 input.form-control {
     @extend .el-input;
     @extend .el-input__wrapper;
+
     border: none;
     height: var(--el-input-inner-height);
 
@@ -28,11 +29,13 @@ input.form-control {
 
 .input-group .input-group-text {
     @extend .el-input-group__prepend;
+
     border: none;
 }
 
 .input-group input + .input-group-text {
     @extend .el-input-group__append;
+
     border: none;
 }
 

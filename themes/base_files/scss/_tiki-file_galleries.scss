@@ -1,6 +1,6 @@
 $imagePathtoImg: "../../../img/";
 
-//***** File Galleries *****/
+// ***** File Galleries *****/
 body.filegal_popup #tiki-center {
     margin: 0 1em;
 }
@@ -14,7 +14,7 @@ body.filegal_popup #tiki-center {
     text-align: left;
 }
 
-//* treeTable definitions - used in object-perms so far */
+// * treeTable definitions - used in object-perms so far */
 
 table.treetable {
     padding-left: 19px;
@@ -55,7 +55,7 @@ table.treetable tr.expanded span.indenter a {
 //     background-color: $state-warning-bg; // #fdd
 // }
 
-//* tree browser */
+// * tree browser */
 
 .tree {
     list-style: none;
@@ -64,6 +64,7 @@ table.treetable tr.expanded span.indenter a {
 .thumbnailcontener {
     //    border: solid 1px $thumbnail-border; // #d3d3d3
     margin: 1px;
+
 //    padding: 2px;
     text-align: center;
     display: block;
@@ -77,7 +78,7 @@ table.treetable tr.expanded span.indenter a {
     padding: 0 0 .1rem .5rem;
 }
 
-//* treeTable definitions - used in object-perms so far */
+// * treeTable definitions - used in object-perms so far */
 .treeTable .subHeader td {
     font-weight: bold;
 }
@@ -94,7 +95,7 @@ table.treetable tr.expanded span.indenter a {
     margin-left: 25px;
 }
 
-//* FileGals Flash Upload */
+// * FileGals Flash Upload */
 .flashButton {
     display: inline;
     overflow: hidden;
@@ -111,7 +112,7 @@ table.treetable tr.expanded span.indenter a {
     z-index: 2;
 }
 
-//* FileGals Upload Progress Bar */
+// * FileGals Upload Progress Bar */
 
 .progressName {
     text-align: left;
@@ -125,6 +126,7 @@ table.treetable tr.expanded span.indenter a {
 .progressBarError {
     width: 0;
     height: 20px;
+
     //    background-color: $state-info-text;
     margin-top: 2px;
     color: white;
@@ -134,12 +136,14 @@ table.treetable tr.expanded span.indenter a {
 
 .progressBarComplete {
     width: 100%;
+
     //    background-color: $state-success-text;
     visibility: hidden;
 }
 
 .progressBarError {
     width: 100%;
+
     //    background-color: $state-warning-text;
     visibility: hidden;
 }
@@ -159,6 +163,7 @@ table.treetable tr.expanded span.indenter a {
 .progressContainer {
     margin: 5px;
     padding: 4px;
+
     //    border: solid 1px $modal-content-border-color;
     //    background-color: $modal-content-bg;
     overflow: hidden;
@@ -176,7 +181,7 @@ table.treetable tr.expanded span.indenter a {
 /* additions for jquery file upload */
 
 .files .file-list {
-    //overflow-x: scroll;
+    // overflow-x: scroll;
     overflow-y: hidden;
     white-space: nowrap;
 }
@@ -225,6 +230,7 @@ table.treetable tr.expanded span.indenter a {
 @media (max-width: breakpoint-max(sm)) {
     #fgalform {
         .media { display: block; }
+
         [id*="uploadinfos"] .text-right {
             text-align: left !important;
             margin-top: 0.5rem;

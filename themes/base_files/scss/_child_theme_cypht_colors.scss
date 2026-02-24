@@ -18,8 +18,10 @@
         .dropdown-menu {
             background-color: $dropdown-bg !important;
             border-color: $dropdown-border-color !important;
+
             .dropdown-item {
                 &, .icon { color: $dropdown-link-color !important; }
+
                 &:hover, &:focus {
                     &, .icon { color: $dropdown-link-hover-color !important; }
                 }

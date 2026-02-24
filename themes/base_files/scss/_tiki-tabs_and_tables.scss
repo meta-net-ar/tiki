@@ -100,12 +100,15 @@ td.url{
     background: $gray-200;
     color: $black;
 }
+
 #score-table .condition-row, .table .advanced-row {
  padding: 1em;
 }
+
 #score-table .condition-row td {
     border-bottom: none;
 }
+
 #score-table .advanced-row td {
     border-top: none;
 }
@@ -116,12 +119,14 @@ td.url{
     }
 }
 
-@media only screen and (max-width: 991.98px) {
+@media only screen and (width <= 991.98px) {
     .btn.table-expand-toggle,
     .btn.tracker-resize-expand,
     .btn.tracker-resize-compress { display: none; }
+
     .toggle-table-wrap {
         width: 100%; text-align: right;
+
         .btn-link {
             padding: 0; padding-left: 0.75rem;
             text-decoration: none !important;
@@ -132,19 +137,22 @@ td.url{
     .tiki #col1 .table-responsive {
         .form-check-input { position: static; margin-left: 0; }
         .form-check .form-check-input { margin-left: -1.25rem; }
+
         &.large-table {
-            .table:not(.tablesorter):not(.caltable) {
+            .table:not(.tablesorter, .caltable) {
                 thead, tbody {
                     th:not(.visible-header) {
                         position: absolute;
                         top: -9999px;
                         left: -9999px;
                     }
+
                     th.visible-header {
                         display: inline-block;
                         border: none;
                     }
                 }
+
                 tbody th.visible-header {
                     padding-top: 0.35rem;
                     padding-bottom: 0.69rem;
@@ -172,11 +180,13 @@ td.url{
                         border-top: none;
                         text-align: left !important;
                         word-break: break-word;
-                        &:after {
+
+                        &::after {
                             display: block;
                             clear: both;
                             content: "";
                         }
+
                         &.icon + td.checkbox-cell {
                             position: absolute;
                             top: 40px;
@@ -207,6 +217,7 @@ td.url{
                         left: -9999px;
                     }
                 }
+
                 .heading.weeks {
                     width: 50px;
                     ~ td { margin-bottom: 15px; }
@@ -221,15 +232,18 @@ td.url{
     .tiki #pagehistory .table-responsive {
         &.large-table .table:not(.tablesorter) {
             tbody th.compare-pages { float: right; }
+
             tbody tr td:nth-last-child(-n+2) {
                 display: inline-block;
-                input[type=radio] { position: absolute; top: 15px; }
+                input[type="radio"] { position: absolute; top: 15px; }
             }
+
             tbody tr td:nth-last-child(2) {
-                input[type=radio] { right: 65px; }
+                input[type="radio"] { right: 65px; }
             }
+
             tbody tr td:nth-last-child(1) {
-                input[type=radio] { right: 20px; }
+                input[type="radio"] { right: 20px; }
             }
         }
     }
@@ -239,22 +253,24 @@ td.url{
 .tiki .table-sticky {
     overflow: visible !important;
 }
+
 .tiki .table-sticky thead {
-    position: -webkit-sticky;
+
     /* for Safari */
     position: sticky;
     top: 0;
     z-index: 2;
 }
+
 .tiki .table-sticky tbody th {
     position: sticky;
-    position: -webkit-sticky;
     width: 100px;
     min-width: 100px;
     max-width: 100px;
-    left: 0px;
+    left: 0;
     z-index: 1;
 }
+
 // Icon to toggle table formatting for small devices
 .toggle-table-wrap .btn {
     font-family: 'Font Awesome 6 Free';

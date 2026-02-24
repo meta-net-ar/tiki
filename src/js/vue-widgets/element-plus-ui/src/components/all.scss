@@ -3,6 +3,7 @@
 :host, :root {
     --el-border-color: var(--bs-border-color); // added by g_c-l
     --el-color-primary: var(--bs-primary);
+
 //    --el-border-width: var(--bs-border-width); Not working
     --el-border-radius-base: var(--bs-border-radius);
     --el-menu-border-color: var(--el-border-color);
@@ -16,15 +17,19 @@
     .el-select {
         background: var(--bs-body-bg);
         color: var(--tiki-input-color);
+
         --el-text-color-regular: var(--tiki-input-color);
         --el-text-color-placeholder: var(--tiki-input-color);
     }
+
     .el-input__wrapper {
         background-color: var(--bs-body-bg);
+
         .el-input__inner {
             --el-text-color-regular: var(--tiki-input-color);
         }
     }
+
     .el-input {
         --el-input-text-color: var(--tiki-input-color);
     }
@@ -52,7 +57,7 @@
     opacity: 0.8;
 }
 
-.el-popper.is-pure.is-light { //.el-select__popper .el-select-dropdown {
+.el-popper.is-pure.is-light { // .el-select__popper .el-select-dropdown {
     font-size: 16px !important;
     color: var(--bs-body-color) !important;
     background-color: var(--bs-body-bg) !important;

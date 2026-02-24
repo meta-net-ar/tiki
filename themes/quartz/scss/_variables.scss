@@ -7,28 +7,28 @@
 
 //
 // Color system
-$yellow:  #ffc107; // !default;
+$yellow: #ffc107; // !default;
 
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$primary:       #E11973; // $pink;
-$secondary:     rgba($white, .4);
-$success:       #1C8262; // $green;
-$info:          #037DA6; // $cyan;
-$warning:       #946F00; // $yellow;
-$danger:        #C05702; // $orange;
-$light:         $gray-200;
-$dark:          $gray-900; ; // rgba(var(--bs-dark-rgb), var(--bs-bg-opacity 33,37,41,1
+$primary: #E11973; // $pink;
+$secondary: rgba($white, .4);
+$success: #1C8262; // $green;
+$info: #037DA6; // $cyan;
+$warning: #946F00; // $yellow;
+$danger: #C05702; // $orange;
+$light: $gray-200;
+$dark: $gray-900; ; // rgba(var(--bs-dark-rgb), var(--bs-bg-opacity 33,37,41,1
 
-$primary-text-emphasis:   shade-color($primary, 60%); // !default;
+$primary-text-emphasis: shade-color($primary, 60%); // !default;
 $secondary-text-emphasis: black; // shade-color($secondary, 90%); // 60%) !default; ---- These values don't seem to be used for the equivalent CSS variables.
-$success-text-emphasis:   shade-color($success, 60%); // !default;
-$info-text-emphasis:      shade-color($info, 60%); // !default;
-$warning-text-emphasis:   shade-color($warning, 60%); // !default;
-$danger-text-emphasis:    shade-color($danger, 60%); // !default;
-$light-text-emphasis:     $gray-700; // !default;
-$dark-text-emphasis:      $gray-700; // !default;
+$success-text-emphasis: shade-color($success, 60%); // !default;
+$info-text-emphasis: shade-color($info, 60%); // !default;
+$warning-text-emphasis: shade-color($warning, 60%); // !default;
+$danger-text-emphasis: shade-color($danger, 60%); // !default;
+$light-text-emphasis: $gray-700; // !default;
+$dark-text-emphasis: $gray-700; // !default;
 
 $yellow-800: shade-color($yellow, 60%); //  !default;
 
@@ -47,74 +47,74 @@ $spacers: (
     4: $spacer * 1.5,
     5: $spacer * 3,
 );
+
 // scss-docs-end spacer-variables-maps
 
 // Body
-$body-secondary-color:      rgba($body-color, .99);  // default
-$body-secondary-bg:         #7B80DCFF;
-$body-tertiary-color:       rgba($body-color, .65);  // default
-$body-tertiary-bg:          #7479d2;
+$body-secondary-color: rgba($body-color, .99);  // default
+$body-secondary-bg: #7B80DCFF;
+$body-tertiary-color: rgba($body-color, .65);  // default
+$body-tertiary-bg: #7479d2;
 
 // Links
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
-$border-color: #8689cb; //$gray-300 !default;
+$border-color: #8689cb; // $gray-300 !default;
 
 // Fonts
-$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- rgba($white, .7);
-$mark-bg:                     $yellow-800;
-$blockquote-footer-color:     $body-color; // $gray-600 !default;
+$text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- rgba($white, .7);
+$mark-bg: $yellow-800;
+$blockquote-footer-color: $body-color; // $gray-600 !default;
 
 // Tables
-$table-color:                 var(--#{$prefix}body-color);
-$table-hover-color:           $table-color;
+$table-color: var(--#{$prefix}body-color);
+$table-hover-color: $table-color;
 
 // Buttons + Forms
-$input-btn-padding-y:         .375rem;  // default
-$input-btn-padding-x:         .75rem;  // default
+$input-btn-padding-y: .375rem;  // default
+$input-btn-padding-x: .75rem;  // default
 
 // Buttons
 // Forms
-$input-bg:                           var(--#{$prefix}body-bg);  // default // transparent;
-$input-color:                        var(--#{$prefix}body-color);  // default
-$input-disabled-bg:                  var(--#{$prefix}secondary-bg);  // default // rgba($white, .1);
-$input-placeholder-color:            var(--#{$prefix}secondary-color);  // default // $text-muted;
-$form-range-thumb-disabled-bg:       var(--#{$prefix}secondary-color);  // default // $gray-500;
+$input-bg: var(--#{$prefix}body-bg);  // default // transparent;
+$input-color: var(--#{$prefix}body-color);  // default
+$input-disabled-bg: var(--#{$prefix}secondary-bg);  // default // rgba($white, .1);
+$input-placeholder-color: var(--#{$prefix}secondary-color);  // default // $text-muted;
+$form-range-thumb-disabled-bg: var(--#{$prefix}secondary-color);  // default // $gray-500;
 
 // Form validation
-$form-feedback-valid-color:         #FAFEFD; //$success; // !default;
-$form-feedback-invalid-color:       #FFFDFA; // $danger; // !default;
+$form-feedback-valid-color: #FAFEFD; // $success; // !default;
+$form-feedback-invalid-color: #FFFDFA; // $danger; // !default;
 // scss-docs-end form-feedback-variables
 
 // scss-docs-start form-validation-colors
-$form-valid-color:                  $form-feedback-valid-color; // !default;
-$form-valid-border-color:           $form-feedback-valid-color; // !default;
-$form-invalid-color:                $form-feedback-invalid-color; // !default;
-$form-invalid-border-color:         $form-feedback-invalid-color; // !default;
+$form-valid-color: $form-feedback-valid-color; // !default;
+$form-valid-border-color: $form-feedback-valid-color; // !default;
+$form-invalid-color: $form-feedback-invalid-color; // !default;
+$form-invalid-border-color: $form-feedback-invalid-color; // !default;
 
 // Navs
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default // $text-muted;
+$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $text-muted;
 
 // Navbars
-$navbar-dark-color:                 rgba($white, .8);
-$navbar-dark-hover-color:           $white;
-
-$navbar-light-color:                rgba($gray-800, .8);
-$navbar-light-hover-color:          $gray-800;
-$navbar-light-active-color:         $gray-800;
-$navbar-light-disabled-color:       rgba($gray-800, .3);
+$navbar-dark-color: rgba($white, .8);
+$navbar-dark-hover-color: $white;
+$navbar-light-color: rgba($gray-800, .8);
+$navbar-light-hover-color: $gray-800;
+$navbar-light-active-color: $gray-800;
+$navbar-light-disabled-color: rgba($gray-800, .3);
 
 // Dropdowns
-$dropdown-bg:                       #e9ecfb;
-$dropdown-color:                    #6062b0; // --bs-dropdown-color
-$dropdown-link-color:               $dropdown-color;
-$dropdown-link-hover-bg:            #B8145E;
+$dropdown-bg: #e9ecfb;
+$dropdown-color: #6062b0; // --bs-dropdown-color
+$dropdown-link-color: $dropdown-color;
+$dropdown-link-hover-bg: #B8145E;
 
 // Pagination
 // Cards
-$card-spacer-y:                     $spacer; // 1.75rem;
-$card-spacer-x:                     $spacer; // 2rem;
+$card-spacer-y: $spacer; // 1.75rem;
+$card-spacer-x: $spacer; // 2rem;
 
 // Accordion
 $accordion-button-color: #6f3d3d;
@@ -130,8 +130,8 @@ $tooltip-color: $white;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //   $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 $body-bg-image: linear-gradient(90deg, #33b7e2, #5e62b0, #dc307c);

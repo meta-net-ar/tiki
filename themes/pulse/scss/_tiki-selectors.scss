@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -51,7 +51,7 @@ mark { color: #B3BBC1; }
 // Code
 // Tiki-specific
 // Dark mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .figure-caption {
         color: #9CA4ABBF;
     }
@@ -67,7 +67,7 @@ mark { color: #B3BBC1; }
     .list-group-item-primary { color: #969696CC; }
     .list-group-item-secondary { color: #9C9C9CCC; }
     .list-group-item-success { color: #9C9C9CCC; }
-    .list-group-item-danger { color: #999999CC; }
+    .list-group-item-danger { color: #999C; }
     .list-group-item-warning { color: #9C9C9CCC; }
     .list-group-item-info { color: #9C9C9CCC; }
     .list-group-item-light { color: #BDBDBDCC; }

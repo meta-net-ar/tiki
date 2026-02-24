@@ -2,7 +2,6 @@
     This Tiki Wiki CMS Groupware file contains global design
     and layout properties. */
 @import "../../../node_modules/bootstrap/scss/functions";
-
 @import "../../default/scss/_variables.scss";
 
 // @import "../../../node_modules/bootstrap/scss/_variables.scss"; Already imported by vendor bootstrap.scss
@@ -11,15 +10,14 @@
 @import "../../../node_modules/sass-svg-uri/_index.scss";
 
 
-//@import "_bs3-bs4-transition.scss"; obsolete
-//@import "../scss/_tiki-variables.scss";
-//@import "../scss/_tiki-selectors.scss";
+// @import "_bs3-bs4-transition.scss"; obsolete
+// @import "../scss/_tiki-variables.scss";
+// @import "../scss/_tiki-selectors.scss";
 @import "../scss/_tiki-miscellaneous_global";
 @import "../scss/_tiki-modules";
 @import "../scss/_tiki-toolbars";
 @import "../scss/_tiki-boxes_and_cards";
 @import "../scss/_tiki-tabs_and_tables";
-
 @import "../scss/_tiki-articles";
 @import "../scss/_tiki-blogs";
 @import "../scss/_tiki-forums";
@@ -49,5 +47,6 @@
 @import "../scss/_tiki-menus.scss";
 @import "../scss/_tiki-debugger_console.scss";
 @import "../scss/_tiki-show_database_query_log.scss";
-//@import "../scss/_pivot-tiki.scss";
-//@import "../scss/_conversejs-tiki.scss";
+
+// @import "../scss/_pivot-tiki.scss";
+// @import "../scss/_conversejs-tiki.scss";

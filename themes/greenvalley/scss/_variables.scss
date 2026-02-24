@@ -10,16 +10,15 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-$primary:           #B52170; // rgb(218, 56, 143); Darkened for WCAG2 compliance
-$secondary:         #8d7b74;
-$success:           #5cb85c;
-$info:              #4e291b; //#5bc0de;
-$warning:           #f0ad4e;
-$danger:            #d9534f;
-$white:             #fff;
+$primary: #B52170; // rgb(218, 56, 143); Darkened for WCAG2 compliance
+$secondary: #8d7b74;
+$success: #5cb85c;
+$info: #4e291b; // #5bc0de;
+$warning: #f0ad4e;
+$danger: #d9534f;
+$white: #fff;
 $light: #fff;
 $dark: #000;
-
 $theme-colors: (
     "primary":           $primary,
     "secondary":         $secondary,
@@ -33,8 +32,8 @@ $theme-colors: (
 
 
 // Options
-$enable-gradients:            true;
-$enable-shadows:              true;
+$enable-gradients: true;
+$enable-shadows: true;
 
 // Body
 $body-bg: #fff; // #addd63;// darken(#bce380, 7%);
@@ -45,71 +44,69 @@ $link-color: $primary;
 $link-hover-color: color.adjust($link-color, $lightness: 15%, $space: hsl);
 
 // Components
-$component-active-color: #ffffff;
+$component-active-color: #fff;
 $component-active-bg: #cda256;
-$border-color:                $gray-400;  // default
+$border-color: $gray-400;  // default
 
 // Typography
 // Fonts
-$font-family-sans-serif: Century Gothic, Lucida Grande, Arial, Helvetica, sans-serif;
+$font-family-sans-serif: century gothic, lucida grande, arial, helvetica, sans-serif;
 $font-family-base: $font-family-sans-serif;
 $font-size-base: 1rem;
 
 // Tables
 // Buttons
 // Forms
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Dropdowns
-$dropdown-color:                    var(--#{$prefix}body-color); // !default;
-$dropdown-bg:                       var(--#{$prefix}body-bg); //  !default;
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
-$dropdown-link-color:               var(--#{$prefix}body-color); // !default;
-$dropdown-link-hover-color:         $dropdown-link-color; // !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg); // !default;
+$dropdown-color: var(--#{$prefix}body-color); // !default;
+$dropdown-bg: var(--#{$prefix}body-bg); //  !default;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
+$dropdown-link-color: var(--#{$prefix}body-color); // !default;
+$dropdown-link-hover-color: $dropdown-link-color; // !default;
+$dropdown-link-hover-bg: var(--#{$prefix}tertiary-bg); // !default;
 
-$dropdown-link-active-color:        $component-active-color; // !default;
-$dropdown-link-active-bg:           $component-active-bg; // !default;
+$dropdown-link-active-color: $component-active-color; // !default;
+$dropdown-link-active-bg: $component-active-bg; // !default;
 
-$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color); // !default;
+$dropdown-link-disabled-color: var(--#{$prefix}tertiary-color); // !default;
 
 // Navbar
-//$nav-link-color: var(--#{$prefix}link-color);  // default // $link-color;
+// $nav-link-color: var(--#{$prefix}link-color);  // default // $link-color;
 $navbar-light-color: $link-color; // #e0d6cc;
-//$navbar-light-color: $nav-link-color;
+// $navbar-light-color: $nav-link-color;
 $navbar-light-hover-color: $link-hover-color;
 $navbar-light-hover-bg: #42281d;
-$navbar-light-active-color: #555555;
+$navbar-light-active-color: #555;
 $navbar-light-toggle-hover-bg: transparent;
+$navbar-dark-color: rgba($white, .95);
 
-$navbar-dark-color:                 rgba($white, .95);
-//$navbar-dark-color:                 rgba($white, .55) !default;
-$navbar-dark-hover-color:           rgba($white, .75); // !default;
-$navbar-dark-active-color:          $white; // !default;
-$navbar-dark-disabled-color:        rgba($white, .25); // !default;
-$navbar-dark-icon-color:            $navbar-dark-color; // !default;
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // !default;
-$navbar-dark-toggler-border-color:  rgba($white, .1); // !default;
-$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
+// $navbar-dark-color:                 rgba($white, .55) !default;
+$navbar-dark-hover-color: rgba($white, .75); // !default;
+$navbar-dark-active-color: $white; // !default;
+$navbar-dark-disabled-color: rgba($white, .25); // !default;
+$navbar-dark-icon-color: $navbar-dark-color; // !default;
+$navbar-dark-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // !default;
+$navbar-dark-toggler-border-color: rgba($white, .1); // !default;
+$navbar-dark-brand-color: $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color: $navbar-dark-active-color; // !default;
 
 // Dropdowns
-$dropdown-color:                    var(--#{$prefix}body-color) !default;
-$dropdown-bg:                       #EDF3E9; // var(--#{$prefix}body-bg) !default;
+$dropdown-color: var(--#{$prefix}body-color) !default;
+$dropdown-bg: #EDF3E9; // var(--#{$prefix}body-bg) !default;
 // $dropdown-link-active-bg:           $component-active-bg; //  !default;
-$dropdown-link-color:               var(--#{$prefix}body-color) !default;
-$dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-
-$dropdown-link-active-color:        $component-active-color !default;
-$dropdown-link-active-bg:           $component-active-bg !default;
-
-$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
+$dropdown-link-color: var(--#{$prefix}body-color) !default;
+$dropdown-link-hover-color: $dropdown-link-color !default;
+$dropdown-link-hover-bg: var(--#{$prefix}tertiary-bg) !default;
+$dropdown-link-active-color: $component-active-color !default;
+$dropdown-link-active-bg: $component-active-bg !default;
+$dropdown-link-disabled-color: var(--#{$prefix}tertiary-color) !default;
 
 // Pagination
-$pagination-active-color: #ffffff;
+$pagination-active-color: #fff;
 $pagination-active-bg: #cda256;
 $pagination-active-border: #cda256;
 
@@ -118,20 +115,18 @@ $jumbotron-bg: color.adjust(#E6FFB2, $lightness: 10%, $space: hsl);
 $jumbotron-font-size: ceil(($font-size-base * 1.5));
 
 // Cards
-$card-bg:                           var(--tiki-card-bg);
+$card-bg: var(--tiki-card-bg);
 $card-inner-border: #53b042;
 $card-footer-bg: #e6ffb2;
-
 $card-primary-text: $gray-900;
 $card-primary-border: #53b042;
 $card-primary-heading-bg: #e6ffb2;
-
-$card-secondary-text: #ffffff;
+$card-secondary-text: #fff;
 $card-secondary-border: #53b042;
 
 // Accordion
-$accordion-button-color:                  $black;
-$accordion-button-active-color:           $white;
+$accordion-button-color: $black;
+$accordion-button-active-color: $white;
 
 // Tooltips
 // Popovers
@@ -145,6 +140,6 @@ $accordion-button-active-color:           $white;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                        $pink;  // default // Bootstrap 5.3
+$code-color: $pink;  // default // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //

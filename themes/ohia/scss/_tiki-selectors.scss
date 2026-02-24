@@ -7,8 +7,10 @@
 // * Color mode rules
 
 @use "sass:color";
+
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //     background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -38,6 +40,7 @@ body {
 
 body.fullscreen {
     background: var(--#{$prefix}body-bg);
+
     .container {
         border: none;
     }
@@ -73,16 +76,17 @@ h1, h2, h3, h4, h5, h6 {
     --bs-btn-border-color: #949494;
 }
 
-//.btn-outline-primary {
+// .btn-outline-primary {
 //    color: adjust($primary, $lightness: 50%, $space: hsl);
 //    border-color: adjust($primary, $lightness: 50%, $space: hsl);
-//}
+// }
 
 // Forms
 // Navs
 // Navbar
 .navbar-dark {
     background-color: #343a40;
+
     //    .nav-link {
     //        color: rgba($white, .55);;
     //    }
@@ -113,9 +117,9 @@ h1, h2, h3, h4, h5, h6 {
 
 // Accordion
 // Popovers
-//.popover {
+// .popover {
 //    background-color: color.adjust(#030511, $lightness: 10%, $space: hsl);
-//}
+// }
 
 .popover-header {
     background-color: #696969;
@@ -137,6 +141,7 @@ h1, h2, h3, h4, h5, h6 {
 .badge.bg-primary,
 .badge.bg-danger {
     color: #fff;
+
     --bs-badge-color: #fff;
 }
 
@@ -165,7 +170,7 @@ h1, h2, h3, h4, h5, h6 {
 .alert-secondary {
     --bs-alert-color: var(--bs-secondary-text-emphasis);
     --bs-alert-bg: var(--bs-secondary-bg-subtle);
-    --bs-alert-border-color: var(--bs-secondary-text-emphasis); //-border-subtle);
+    --bs-alert-border-color: var(--bs-secondary-text-emphasis); // -border-subtle);
     --bs-alert-link-color: var(--bs-secondary-text-emphasis);
 }
 
@@ -214,41 +219,49 @@ h1, h2, h3, h4, h5, h6 {
 // List group
 .list-group-item-primary {
     background-color: #384706;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-secondary {
     background-color: #2F3D06;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-success {
     background-color: #004070;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-danger {
     background-color: #800000;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-warning {
     background-color: #4E3B18;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-info {
     background-color: #173E63;
+
     --bs-list-group-color: #B9BCC0E6;
 }
 
 .list-group-item-light {
     background-color: $light;
+
     --bs-list-group-color: #2B2B2B;
 }
 
 .list-group-item-dark {
     background-color: $dark;
+
     --bs-list-group-color: #111212BF;
 }
 
@@ -304,6 +317,6 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-    //.dropdown-item {
+    // .dropdown-item {
     //    color: $link-color !important;
-    //}
+    // }

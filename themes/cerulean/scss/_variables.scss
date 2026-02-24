@@ -8,16 +8,16 @@
 //
 // Color system
 //
-$cyan:    #157BB7; //#2fa4e7; Updated for Tiki
+$cyan: #157BB7; // #2fa4e7; Updated for Tiki
 
-$primary:       $cyan; // default
-$secondary:     #A0A5AC; // $gray-200;
-$success:       #58812C; // $green;
-$info:          #077F97; // $blue;
-$warning:       #946F00; // $yellow;
-$danger:        $red; // default;
-$light:         $gray-100; // default;
-$dark:          $gray-800; // default;
+$primary: $cyan; // default
+$secondary: #A0A5AC; // $gray-200;
+$success: #58812C; // $green;
+$info: #077F97; // $blue;
+$warning: #946F00; // $yellow;
+$danger: $red; // default;
+$light: $gray-100; // default;
+$dark: $gray-800; // default;
 
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
@@ -28,19 +28,18 @@ $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 // Links
-$link-color:                            #1578B2; //  $primary;  // default - Darkened for WCAG 2
-$link-shade-percentage:                   20%;  // default
-//$link-hover-color:                        shift-color($link-color, $link-shade-percentage);  // default
+$link-color: #1578B2; //  $primary;  // default - Darkened for WCAG 2
+$link-shade-percentage: 20%;  // default
+// $link-hover-color:                        shift-color($link-color, $link-shade-percentage);  // default
 
 // Typography
-$font-family-sans-serif:        Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-$font-size-base:                1.1rem;
-
+$font-family-sans-serif: seravek, 'Gill Sans Nova', ubuntu, calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+$font-size-base: 1.1rem;
 $headings-color: #1F9CE5; // Darkened for WCAG2.2
 $blockquote-footer-color: #6D767E; // Darkened for WCAG 2
 
 // Components
-$border-color:                $gray-400;
+$border-color: $gray-400;
 
 // Forms
 $form-text-color: #444A50BF;
@@ -50,14 +49,14 @@ $form-valid-color: #58812C;
 
 // Dropdowns
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color) !important; // !important seems to be necessary to override the Bootstrap default caused by importing vendor bootstrap.scss.
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color) !important;
+$nav-link-color: var(--#{$prefix}link-color) !important; // !important seems to be necessary to override the Bootstrap default caused by importing vendor bootstrap.scss.
+$nav-link-hover-color: var(--#{$prefix}link-hover-color) !important;
 
 // Navbar
 $navbar-light-color: #000; // Updated for Tiki
 $navbar-light-hover-color: lighten(#000,10%);
-$navbar-dark-color:       #fff; // Updated for Tiki
-$navbar-dark-hover-color:       $white;
+$navbar-dark-color: #fff; // Updated for Tiki
+$navbar-dark-hover-color: $white;
 
 // Accordion (added for Tiki)
 $accordion-button-active-bg: #2fa4e7;
@@ -67,8 +66,8 @@ $accordion-button-active-color: #fff;
 $figure-caption-color: #444A50BF;
 
 // Code
-$code-color:                        $body-color; // $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; // $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 $tiki-navbar-dark-bg: #343a40;
 $tiki-navbar-light-bg: #2fa4e7;

@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -35,7 +35,7 @@ header.fixed-top {
 
 .top_modules .nav-link {
     font-weight: 700;
-    color: #ffffff;
+    color: #fff;
     text-shadow: #666 0 2px 3px;
 }
 
@@ -46,7 +46,7 @@ header.fixed-top {
 }
 
 body:not(.tiki-admin) .row-middle {
-    background: linear-gradient(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.01)), url('#{$imagePath}page_background_ltr.jpg') repeat;
+    background: linear-gradient(rgb(0 0 0 / 1%), rgb(0 0 0 / 1%)), url('#{$imagePath}page_background_ltr.jpg') repeat;
 }
 
     // White space moved from above run to the columns so that background image reaches the top of the middle section, esp. noticeable in dark mode.
@@ -65,11 +65,13 @@ body:not(.tiki-admin) .row-middle {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     padding-top: 20px;
+
     h3 {
         a,
         a:visited {
             color: #b29980;
         }
+
         &:hover {
             color: #c48054;
         }
@@ -130,7 +132,7 @@ footer.footer {
 .postbody-title .title > .card-title a.link,
 .card-primary > .card-heading .blog-postbody-title,
 .card-primary > .card-heading a {
-    color: #ffffff;
+    color: #fff;
 }
 
 // Accordion
@@ -141,6 +143,7 @@ footer.footer {
     border: none;
     border-radius: 0;
 }
+
 // Badges
 // Alerts
 // Progress bars
@@ -150,7 +153,7 @@ footer.footer {
 // Code
 // Tiki-specific
 .articletitle .titleb {
-    color: #996633;
+    color: #963;
     font-size: 0.9em;
 }
 
@@ -173,7 +176,7 @@ footer.footer {
 // Dark mode
 [data-bs-theme="dark"] {
     body:not(.tiki-admin) .row-middle {
-        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(21, 25, 29, .95)), url('#{$imagePath}page_background_ltr.jpg') repeat;
+        background: linear-gradient(rgb(0 0 0 / 75%), rgb(21 25 29 / 95%)), url('#{$imagePath}page_background_ltr.jpg') repeat;
     }
 }
 

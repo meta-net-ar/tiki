@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -41,6 +41,7 @@ body.tiki.navbar-padding,
         line-height: normal;
     }
 }
+
 body.fullscreen.tiki.navbar-padding {
     padding-top: 0;
 }
@@ -54,25 +55,29 @@ body.fullscreen.tiki.navbar-padding {
 .layout_fixed_top_modules .top_modules,
 .navbar-fixed-top {
     height: $tiki-navbar-fixed-height;
+
      .sitelogo img {
         width: auto !important;
         margin-right: 1.5em;
     }
+
     .sitetitle {
         font-size: 2em;
         margin: 0 0 0 1rem;
         float: left;
+
         a:hover {
             text-decoration: none;
         }
     }
+
     .sitesubtitle {
         float: left;
         font-size: 1.5em;
         margin: 0 0 0 1.5em;
         line-height: $tiki-navbar-fixed-height;
         height: $tiki-navbar-fixed-height;
-        color: #ffffff;
+        color: #fff;
     }
 }
 
@@ -94,7 +99,7 @@ header.header {
 }
 
 #fullscreenbutton a {
-  color: #000000;
+  color: #000;
 }
 
 .page-header {
@@ -122,6 +127,7 @@ header.header {
         margin-top: 0;
         margin-bottom: 0;
     }
+
     .mb-3 {
         margin-bottom: 0;
     }
@@ -132,7 +138,7 @@ header.header {
     min-height: 60px;
     margin-top: 50px;
     background: black;
-    padding: 1px 0 2px 0;
+    padding: 1px 0 2px;
     width: 100%;
     color: #dee2e6; // Color theme switched by JS isn't styling text
 }
@@ -175,7 +181,7 @@ header.header {
 }
 
 .postbody-title {
-    background: $tiki-postbody-title-bg; //url('#{$imagePath}siteheader.png') no-repeat -480px -200px;
+    background: $tiki-postbody-title-bg; // url('#{$imagePath}siteheader.png') no-repeat -480px -200px;
 }
 
 // Accordion
@@ -195,9 +201,9 @@ label a:hover { text-decoration: none; }
 // Code
 // Tiki-specific
 
-//.bottom_modules {
+// .bottom_modules {
 //    .card-body { color: #dee2e6; background: #262626; }
-//}
+// }
 
 // Dark page footer
 :root .bottom_modules,
@@ -206,6 +212,7 @@ label a:hover { text-decoration: none; }
     color: #dee2e6;
     .tiki-card-header-title { color: #fff!important; }
     .card-header { border-bottom: solid 1px  #1174a5; }
+
 //    .card, .card-header { border-color: transparent; }
     .card-body { color: #dee2e6; background: #262626; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: #1ea6be; }

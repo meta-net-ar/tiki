@@ -1,11 +1,11 @@
 header.page-header::before,
-.layout_social > .container:before {
+.layout_social > .container::before {
     content: none;
 }
 
-//.topbar {
+// .topbar {
 //    margin-bottom: 20px;
-//}
+// }
 
 
 // Widens scope of Bootstrap rule to cover L&F admin anchors filter, etc.

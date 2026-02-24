@@ -13,6 +13,7 @@ body {
     text-decoration: none;
     color: white;
 }
+
 .buttonlink:hover {    
     font-family: Verdana, Geneva, Arial, sans-serif;
     font-size: 10px;
@@ -27,10 +28,7 @@ body {
     font-family: Verdana, Geneva, Arial, sans-serif;
     font-size: 10px;
     font-weight: bold;
-    padding-top:2px;
-    padding-bottom:2px;
-    padding-left:2px;
-    padding-right:2px;
+    padding:2px;
     background-color:#10387B;
     height: 30px;
     color: white;

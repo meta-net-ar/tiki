@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -36,6 +36,7 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
     // Tiki - match to button radius inside the input
 .input-group {
     border-radius: 50rem;
+
     & > .form-control {
         padding-left: 2rem; // No start padding seems wrong
     }
@@ -52,8 +53,10 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
     // Make links visible in dark mode
 #col2 .navbar {
     background: transparent;
+
     .nav-link {
         color: var(--tiki-vert-nav-link-color);
+
         &:hover {
             color: var(--tiki-vert-nav-link-hover-color);
         }
@@ -76,6 +79,7 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
     //.alert-danger
     {
     color: #fff;
+
     .alert-link {
         color: #fff;
     }
@@ -105,20 +109,24 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
 // Dark mode
 // External libraries
     // These aren't working
-    //.tiki form.d-flex .el-input,
+    // .tiki form.d-flex .el-input,
 .tiki form.d-flex el-input,
-.el-select__wrapper.is-filterable, .el-select-dropdown, .el-select { //, el-select {
+.el-select__wrapper.is-filterable, .el-select-dropdown, .el-select { // , el-select {
     --el-component-size: 64px !important;
+
     height: 64px !important;
     }
+
 .tiki .el-input .el-input__wrapper {
     padding: 1rem !important;
 }
+
 .tiki .el-input__wrapper .el-input,
 .tiki .el-select__wrapper.is-filterable.el-tooltip__trigger.el-tooltip__trigger {
     --el-input-height: 64px !important;
     --el-input-inner-height: 64px !important;
 }
+
 :host .el-el-input.el-input--suffix {
     --el-component-size: 64px !important;
     --el-input-inner-height: 64px !important;

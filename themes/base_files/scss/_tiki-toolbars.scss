@@ -8,6 +8,7 @@
     // /* right justified section of toolbars */
     padding-left: 8px;
     margin-left: 8px;
+
     //    border-left: medium double $gray-light; (This and other color-related rules are moved to _tiki-selectors.scss.)
 }
 
@@ -20,6 +21,7 @@ a.toolbar {
 .toolbar-list {
     padding: 0 0 0 .5em;
     line-height: 20px;
+
     //    border-left: medium double $gray-light;
 }
 
@@ -29,6 +31,7 @@ a.toolbar {
     width: 128px;
     z-index: 1060;
     line-height: 12px;
+
     //    background: $body-bg;
     //    border: thin solid $body-color;
     //    color: $body-color;
@@ -44,8 +47,10 @@ a.toolbar {
     padding: 4px 0 4px 4px;
     margin: 0;
     display: inline-block;
+
     //    border: 1px solid $body-bg;
     overflow: hidden;
+
     //    color: $body-color;
 }
 
@@ -77,7 +82,7 @@ a.toolbar {
 // .textarea-toolbar > div {
 //     background-color: $gray-300;
 //     border: outset 1px $gray-300;
-//}
+// }
 
 /* tiki-admin_toolbars.php toolbar icon alignment */
 a.cke_button span.cke_icon {

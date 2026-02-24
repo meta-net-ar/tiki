@@ -10,15 +10,14 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Colors
-$primary: #006699;
-$secondary: #003d99; //#4416A1FF;
+$primary: #069;
+$secondary: #003d99; // #4416A1FF;
 $success: #2B8023; // #318A28FF;
 $info: #4d3a7d;
 $warning: #897415; // #debb27;
 $danger: #B85B19; // #df6e1e;
-$light: #ffffff;
-$dark: #000000;
-
+$light: #fff;
+$dark: #000;
 $theme-colors: (
     "primary":           $primary, // #006699,
     "secondary":         $secondary, //#003d99, //#8334b9,
@@ -40,58 +39,57 @@ $theme-colors: (
 // Body
 $body-bg: #fff; // #214d68;
 $body-color: $gray-800;
+$body-secondary-color: rgba($body-color, .75); // !default
+$body-secondary-bg: $gray-200; // !default
 
-$body-secondary-color:      rgba($body-color, .75); // !default
-$body-secondary-bg:         $gray-200; // !default
+$body-tertiary-color: rgba($body-color, .5); // !default
+$body-tertiary-bg: $gray-100; // !default
 
-$body-tertiary-color:       rgba($body-color, .5); // !default
-$body-tertiary-bg:          $gray-100; // !default
-
-$body-emphasis-color:       $black; // !default
+$body-emphasis-color: $black; // !default
 
 // Links
-$link-color:                              #137EA4; // $primary; // !default
-$link-hover-color:                        shift-color($link-color, $link-shade-percentage); // !default
+$link-color: #137EA4; // $primary; // !default
+$link-hover-color: shift-color($link-color, $link-shade-percentage); // !default
 
 // Components
-$component-active-color:      $white;  // default
-$component-active-bg:         $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $primary;  // default
 
 // Fonts
 $font-family-sans-serif: system-ui, sans-serif; // Verdana, Geneva, Arial, Helvetica, sans-serif;
 
 // Tables
 // Buttons
-$btn-primary-color: #ffffff;
+$btn-primary-color: #fff;
 $btn-primary-bg: #1d9ccf;
 $btn-primary-border: #223845;
 
 // Forms
 $input-bg: var(--#{$prefix}body-bg); // !default // #f3fcfe;
-$input-color:                           var(--#{$prefix}body-color); // !default // #000000;
+$input-color: var(--#{$prefix}body-color); // !default // #000000;
 $input-border: #4d7b9b;
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color); // !default
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color); // !default
+$nav-link-color: var(--#{$prefix}link-color); // !default
+$nav-link-hover-color: var(--#{$prefix}link-hover-color); // !default
 
   // Navbar
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65); // !default
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default
+$navbar-light-color: rgb(var(--#{$prefix}emphasis-color-rgb), .65); // !default
+$navbar-light-hover-color: rgb(var(--#{$prefix}emphasis-color-rgb), .8); // !default
+$navbar-light-active-color: rgb(var(--#{$prefix}emphasis-color-rgb), 1); // !default
+$navbar-light-disabled-color: rgb(var(--#{$prefix}emphasis-color-rgb), .3); // !default
 
-$navbar-dark-color:                 rgba($white, .85); // !default
-$navbar-dark-hover-color:           rgba($white, .95); // !default
-$navbar-dark-active-color:          $white; // !default
-$navbar-dark-disabled-color:        rgba($white, .55); // !default
+$navbar-dark-color: rgba($white, .85); // !default
+$navbar-dark-hover-color: rgba($white, .95); // !default
+$navbar-dark-active-color: $white; // !default
+$navbar-dark-disabled-color: rgba($white, .55); // !default
 
 // Dropdowns
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 // Jumbotron
@@ -100,14 +98,15 @@ $card-title-color: #757575; // No effect
 
 // Accordion
 $accordion-button-active-bg: #214D68;
-$accordion-button-active-color: #ffffff;
+$accordion-button-active-color: #fff;
 
 // Tooltips
 // Popovers
 // Badges
 // Modals
 $modal-md: 600px;
-//$modal-header-border-color: #386dbb;
+
+// $modal-header-border-color: #386dbb;
 
 // Alerts
 // Progress bars
@@ -118,7 +117,7 @@ $modal-md: 600px;
 // Carousel
 // Close
 // Code
-$code-color:                      $body-color; //   $pink; // !default // Bootstrap 5.3
+$code-color: $body-color; //   $pink; // !default // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 // (Maybe not being used)

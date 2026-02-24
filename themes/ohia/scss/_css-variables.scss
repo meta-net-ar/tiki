@@ -83,9 +83,11 @@
     --tiki-admin-dropdown-link-color: #fff;
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     .accordion-item {
         border-width: 0 !important;
     }
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -105,9 +107,11 @@
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+
     .accordion-item {
         border-width: 0 !important;
     }
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -128,38 +132,40 @@
 }
 
 //// Color mode preference trumps L&F admin light navbar option
-//[data-bs-theme=dark] {                              // dark color mode
+// [data-bs-theme=dark] {                              // dark color mode
 //    .tiki .tiki-admin-top-nav-light,
 //    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
 //    .tiki .tiki-admin-aside-nav-light {               // light top selectors
 //        @include admin-nav-dark;                      // dark values
 //    }
-//}
+// }
 //// Color mode preference trumps L&F admin dark navbar option
-//[data-bs-theme=light] {                              // light color mode
+// [data-bs-theme=light] {                              // light color mode
 //    .tiki .tiki-admin-top-nav-dark,
 //    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
 //    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
 //        @include admin-nav-dark;                      // dark values
 //    }
-//}
+// }
 
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 :root {
     --tiki-code-bg: #303030;
+
  //   .navbar:not(.bg-light) ul.navbar-nav.sm-nav > .sm-nav-item > .sm-nav-link {
  //       color: var(--bs-link-color);
  //   }
     .el-input__inner {
         --el-font-size-base: 1rem !important;
+
         font-family: var(--bs-body-font-family) !important;
     }
 }
 
-//.accordion {
+// .accordion {
 //    --bs-accordion-active-bg: #E6EDCF;
 //    --bs-accordion-active-color: #2c3a05;
 //    --bs-accordion-btn-bg: #FDF0F0;
 //    --bs-accordion-btn-color: #D45E5A;
-//}
+// }

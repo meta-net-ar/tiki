@@ -4,13 +4,16 @@
     background-color: #ddd;
     margin-right: 10px;
 }
+
 .daterow:hover {
     background-color: #fff;
     cursor: pointer;
 }
+
 .daterow:active {
     border: 1px inset #ddd;
 }
+
 .calendar {
     z-index: 300;
 }

@@ -3,6 +3,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -19,6 +20,7 @@ $imagePath: "../images/";
 .layout_classic .page-header .bg-dark {
     background: $classic-header-bg-dark !important;
 }
+
 // Make logo module background full height of navbar
 // Use CSS variable for padding-right so site admin can adjust per logo or layout
 .top_modules .module:not(.box-login_box):first-child { // This exception is for United Back End, which has the log-in as first module.
@@ -32,6 +34,7 @@ $imagePath: "../images/";
     background: url('#{$imagePath}siteheader2.png') no-repeat top right !important;
     margin-left: -15px !important;
     color: $dark !important;
+
     a {
         color: $dark !important;
     }

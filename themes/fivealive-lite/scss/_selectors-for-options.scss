@@ -2,6 +2,7 @@
 // The file _variables-for-options.scss is used with this file. Theme options import these files and apply their variable definitions.
 
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
@@ -53,13 +54,13 @@ hr {
 .nav-tabs .nav-link {
     // color: $nav-tabs-link-color; //#ffffff;
     // background-color: $tiki-nav-tabs-link-bg; // #0c8a99;
-    border-color: #dee2e6 #dee2e6 #ffffff;
+    border-color: #dee2e6 #dee2e6 #fff;
 }
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
     color: $nav-tabs-link-active-color; // #000;
-    background-color: $nav-tabs-link-active-bg; //#a8e2ec;
+    background-color: $nav-tabs-link-active-bg; // #a8e2ec;
 }
 
 .blog-postbody-title h2.card-title {
@@ -84,6 +85,7 @@ hr {
         --bs-pagination-active-bg: #{$secondary};
         --bs-pagination-active-border-color: #{$secondary};
     }
+
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
         --bs-nav-pills-link-active-bg: #{$secondary};
     }
@@ -102,7 +104,7 @@ hr {
 a.flipmoduletitle,
 #col2 .card-secondary > .card-header a,
 #col3 .card-secondary > .card-header a {
-    color: $tiki-side-column-card-header-color; //#169FB6;
+    color: $tiki-side-column-card-header-color; // #169FB6;
 }
 
 .page-item.disabled,
@@ -111,8 +113,8 @@ a.flipmoduletitle,
 }
 
 .tiki .main-footer {
-    padding: 1px 0 2px 0;
-    background: #000000;
+    padding: 1px 0 2px;
+    background: #000;
 }
 
 .footer_liner {
@@ -125,17 +127,21 @@ a.flipmoduletitle,
     .card-header {
         border: none;
     }
+
     .card {
         background-color: transparent;
         border: none;
+
         --bs-card-title-color: #fff;
         --bs-card-color: #fff;
     }
+
     .card-header {
         color: #fff;
         border-bottom: 1px dotted $tiki-footer_liner-border-color;
         border-bottom: 1px dotted $tiki-footer_liner-card-inner-border;
     }
+
     .module-title,
     .module-title a {
         color: $white;
@@ -149,7 +155,8 @@ a.flipmoduletitle,
     //    color: #dee2e6;
     // .tiki-card-header-title { color: $tiki-dark-footer-card-header-title-color; }
     .card-header { border-bottom: solid 1px $tiki-dark-footer-card-header-border-color; }
-    //.card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
+
+    // .card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
     .card { color: #dee2e6; background: #262626; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: $tiki-dark-footer-link-color; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: $tiki-dark-footer-link-hover-color; }

@@ -1,5 +1,4 @@
 @use "sass:color";
-
 @import "../../../node_modules/bootstrap/scss/_mixins.scss";
 @import "../../../node_modules/bootstrap/scss/_functions.scss";
 @import "../../default/scss/variables";
@@ -59,7 +58,7 @@ Theme Customizer Main Styles
     select { display:block !important; }
 
     .row {
-        margin:0 0 25px 0;
+        margin:0 0 25px;
         padding-bottom:20px;
         border-bottom:1px solid #f0f0f0;
     }
@@ -90,8 +89,8 @@ Theme Customizer Main Styles
             background-color:#fff; color:#000;
 
             &[disabled] {
-                background-color:#ff0000;
-                border:1px solid #ff0000;
+                background-color:#f00;
+                border:1px solid #f00;
                 cursor:not-allowed;
             }
         }
@@ -119,7 +118,7 @@ Theme Customizer Main Styles
             }
 
             input { display:block; }
-            .error:after { padding-right:0; text-align:left; }
+            .error::after { padding-right:0; text-align:left; }
             .input-group-addon { visibility: visible; }
         }
     }
@@ -138,7 +137,7 @@ Theme Customizer Main Styles
                 vertical-align:middle;
             }
 
-            .error:after { padding-right:0; }
+            .error::after { padding-right:0; }
         }
     }
 
@@ -155,7 +154,7 @@ Theme Customizer Main Styles
                 vertical-align:middle;
             }
 
-            .error:not(.picker):after { padding-right:0px; }
+            .error:not(.picker)::after { padding-right:0; }
         }
     }
 
@@ -163,8 +162,8 @@ Theme Customizer Main Styles
 // tables section
     .tables {
         .col-md-9 > p { font-size:1.5em; line-height:1.1; }
-        .row:last-child .error:after { text-align:left; }
-        .row:last-child .picker.error:after { text-align:right; padding-right:88px; }
+        .row:last-child .error::after { text-align:left; }
+        .row:last-child .picker.error::after { text-align:right; padding-right:88px; }
 
         .input {
             label { width:135px; }
@@ -198,7 +197,7 @@ Theme Customizer Main Styles
 
         .input {
             label { width:92px; }
-            .error:after { text-align:right; padding-right:35px; }
+            .error::after { text-align:right; padding-right:35px; }
             p:last-child input { width:200px; }
         }
     }
@@ -209,7 +208,7 @@ Theme Customizer Main Styles
         .input {
             input { width:200px; }
             label { width:125px; }
-            .error:after { text-align:left; padding-right:0; }
+            .error::after { text-align:left; padding-right:0; }
         }
     }
 
@@ -237,8 +236,8 @@ Theme Customizer Main Styles
 
         .input {
             label { width:92px; }
-            .error:after { text-align:left; padding-right:0; }
-            .picker.error:after { text-align:right; padding-right:94px; }
+            .error::after { text-align:left; padding-right:0; }
+            .picker.error::after { text-align:right; padding-right:94px; }
         }
     }
 
@@ -248,7 +247,7 @@ Theme Customizer Main Styles
         .input {
             label { width:135px; }
             .nocolor { width:140px; }
-            .error:after { text-align:left; padding-right:0; }
+            .error::after { text-align:left; padding-right:0; }
         }
     }
 
@@ -259,7 +258,7 @@ Theme Customizer Main Styles
 
         .input {
             label { width:92px; }
-            .error:after { padding-right:40px; }
+            .error::after { padding-right:40px; }
         }
     }
 
@@ -278,7 +277,7 @@ Theme Customizer Main Styles
             text-align:center;
             cursor:pointer;
 
-            &:before {
+            &::before {
                 display:table-cell;
                 vertical-align:middle;
             }
@@ -331,7 +330,7 @@ Theme Customizer Main Styles
             background-color:#f2dede !important;
         }
 
-        &:after {
+        &::after {
             content:"invalid value";
             display:block;
             padding-right:35px;
@@ -396,9 +395,11 @@ Theme Customizer Responsive Design Stuff
 // tablet
 @include media-breakpoint-down(lg) {
     footer { padding-bottom:75px; }
+
     .customizer {
         sl-color-picker { vertical-align: middle; }
         .colors .input span { width:110px; height:110px; }
+
         .input .picker {
             &.d-flex { display: block; }
             label { display: block; }
@@ -451,17 +452,21 @@ Theme Customizer Responsive Design Stuff
         .btn { margin:0 5px 0 0; padding:4px 10px; }
         .icon { display:none; }
         #generate-css { margin-bottom:0; }
+
         #generate-custom-css {
             text-indent: -9999px; line-height: 0; font-size: 1em;
-            &:after {
+
+            &::after {
                 content: "Generate"; display: block;
                 text-indent: 0; line-height: initial;
             }
         }
         #generate-custom-css + label { margin-right: 5px; }
+
         #dLabel {
             text-indent: -9999px; line-height: 0;
-            &:after {
+
+            &::after {
                 content: "Section:"; display: block;
                 text-indent: 0; line-height: initial;
             }

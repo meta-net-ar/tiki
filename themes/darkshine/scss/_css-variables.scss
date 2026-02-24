@@ -51,7 +51,7 @@
     --tiki-topbar-text-color: #{$gray-200};
 }
 
-[data-bs-theme=light] .tiki-topbar-nav-dark {
+[data-bs-theme="light"] .tiki-topbar-nav-dark {
     --tiki-topbar-bg: transparent !important;
 }
 
@@ -72,20 +72,22 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // color mode
+[data-bs-theme="dark"] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
     }
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
+[data-bs-theme="light"] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
         @include top-nav-light;                      // light values
     }
+
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
     }
@@ -102,13 +104,14 @@
     --tiki-admin-top-border: null;
     --tiki-admin-top-border-width: null;
     --tiki-admin-top-box-shadow: 0px 1px 10px #750000;
-    --tiki-admin-aside-nav-bg: var(--tiki-darkshine-admin-diagonals-bg); //var(--tiki-darkshine-navbar-bg); // #{$tiki-top-navbar-bg};
+    --tiki-admin-aside-nav-bg: var(--tiki-darkshine-admin-diagonals-bg); // var(--tiki-darkshine-navbar-bg); // #{$tiki-top-navbar-bg};
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
     --tiki-admin-dropdown-link-color: #{$gray-900};
     --tiki-admin-dropdown-link-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     .accordion-item.search-preferences {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -136,6 +139,7 @@
     --tiki-admin-dropdown-bg:  #{$dropdown-dark-bg};
     --tiki-admin-dropdown-link-hover-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+
     .accordion-item.search-preferences {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -156,15 +160,16 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
@@ -178,7 +183,7 @@
     --tiki-page-content-top-margin: 0;
 }
 
-//[data-bs-theme="dark"] {
+// [data-bs-theme="dark"] {
 //    .layout_classic #middle,
 //    .layout_basic .row-middle,
 //    .layout_social .middle.container,
@@ -201,4 +206,4 @@
 //            color: $link-color-dark;
 //        }
 //    }
-//}
+// }

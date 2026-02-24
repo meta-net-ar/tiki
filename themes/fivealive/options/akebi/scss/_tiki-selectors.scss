@@ -21,6 +21,7 @@ h3.tiki-card-header-title {
 .text-danger {
     color: #D63D00 !important;
 }
+
 .text-dark {
     color: $dark !important;
 }
@@ -34,6 +35,7 @@ h3.tiki-card-header-title {
     background-color: $dark; // This isn't working.
     border-color: $dark;
 }
+
 .breadcrumb-item.active {
     color: $text-muted !important;
 }
@@ -62,7 +64,7 @@ h3.tiki-card-header-title {
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .blockquote-footer { color: #848D94; }
     .valid-feedback { color: #329F4F !important; }
     .invalid-feedback { color: #DC6D1E !important; }

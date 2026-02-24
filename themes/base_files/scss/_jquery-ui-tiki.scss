@@ -4,15 +4,18 @@
     .ui-widget-header {
         background: var(--bs-body-bg); // $tiki-ui-default-bg;
 //        color: #fff;
-        border-color: var(--bs-border-color)//$tiki-ui-default-border;
+        border-color: var(--bs-border-color)// $tiki-ui-default-border;
     }
+
     .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited, a.ui-button, a:link.ui-button, a:visited.ui-button, .ui-button {
         color: var(--bs-link-color); // $tiki-ui-default-link-color;
     }
+
     .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
-        color: var(--bs-link-active-color); //$tiki-ui-default-link-active-color;
+        color: var(--bs-link-active-color); // $tiki-ui-default-link-active-color;
     //    background: $tiki-ui-default-link-active-bg;
     }
+
     .ui-state-default,
     .ui-widget-content .ui-state-default,
     .ui-widget-header .ui-state-default,
@@ -20,11 +23,12 @@
     html .ui-button.ui-state-disabled:hover,
     html .ui-button.ui-state-disabled:active {
         border: 1px solid;
-        border-color: var(--bs-border-color); //$tiki-ui-default-border; //$btn-primary-border;
-        background: var(--bs-body-bg); //$tiki-ui-default-bg; //$btn-primary-bg;
+        border-color: var(--bs-border-color); // $tiki-ui-default-border; //$btn-primary-border;
+        background: var(--bs-body-bg); // $tiki-ui-default-bg; //$btn-primary-bg;
         font-weight: $tiki-ui-font-weight;
         color: var(--bs-body-color); // $tiki-ui-default-color; //$btn-primary-color;
     }
+
     .ui-state-active,
     .ui-widget-content .ui-state-active,
     .ui-widget-header .ui-state-active,
@@ -37,6 +41,7 @@
         font-weight: $tiki-ui-font-weight;
         color: $tiki-ui-active-color;
     }
+
 //    .ui-state-default,
 //    .ui-widget-content .ui-state-default,
 //    .ui-widget-header .ui-state-default,
@@ -50,6 +55,7 @@
         color: $dark; // $btn-primary-color;
         font-size: $font-size-base;
     }
+
 //    .ui-widget-content,
 //    .ui-state-hover,
 //    .ui-widget-header .ui-state-hover,
@@ -64,11 +70,13 @@
         color: $primary; // $btn-primary-color;
     }
     .ui-widget-header a { color: var(--bs-link-color); }
+
     .ui-tabs-nav.ui-widget-header {
         border-top: none;
         border-left: none;
         border-right: none;
     }
+
     .ui-tabs-nav {
         .ui-state-default,
         .ui-widget-content .ui-state-default,
@@ -80,6 +88,7 @@
             border-bottom-width: 0 !important;
         }
     }
+
     .ui-widget.ui-widget-content {
         border-color: var(--bs-border-color);
     }

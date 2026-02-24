@@ -4,12 +4,12 @@
 }
 
 .tooltip-inner {
-    background-color: rgba(33, 37, 41, 0.95);
+    background-color: rgb(33 37 41 / 95%);
     color: #fff;
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 13px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
     max-width: 250px;
     text-align: center;
 }
@@ -17,17 +17,17 @@
 /* Arrow styling */
 .tooltip.bs-tooltip-top .arrow::before,
 .tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
-    border-top-color: rgba(33, 37, 41, 0.95);
+    border-top-color: rgb(33 37 41 / 95%);
 }
 
 /* Hover effect */
 time.timeago {
-    border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+    border-bottom: 1px dotted rgb(0 0 0 / 20%);
     transition: border-color 0.2s ease;
 }
 
 time.timeago:hover {
-    border-bottom-color: rgba(0, 0, 0, 0.4);
+    border-bottom-color: rgb(0 0 0 / 40%);
 }
 
 /* Mobile touch feedback */
@@ -44,20 +44,20 @@ time.timeago:hover {
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
     .tooltip-inner {
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgb(255 255 255 / 95%);
         color: #212529;
     }
 
     .tooltip.bs-tooltip-top .arrow::before,
     .tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
-        border-top-color: rgba(255, 255, 255, 0.95);
+        border-top-color: rgb(255 255 255 / 95%);
     }
 
     time.timeago {
-        border-bottom-color: rgba(255, 255, 255, 0.2);
+        border-bottom-color: rgb(255 255 255 / 20%);
     }
 
     time.timeago:hover {
-        border-bottom-color: rgba(255, 255, 255, 0.4);
+        border-bottom-color: rgb(255 255 255 / 40%);
     }
 }

@@ -9,93 +9,94 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$primary:       #007EA8; // $blue !default;
-$secondary:     $gray-200 !default;
-$success:       #338451; //$green !default;
-$info:          #20809D; //$cyan !default;
-$warning:       #A76702; //$yellow !default;
-$danger:        #E02F10; // $red !default;
-$light:         $gray-200 !default;
-$dark:          $gray-900 !default;
+$primary: #007EA8; // $blue !default;
+$secondary: $gray-200 !default;
+$success: #338451; // $green !default;
+$info: #20809D; // $cyan !default;
+$warning: #A76702; // $yellow !default;
+$danger: #E02F10; // $red !default;
+$light: $gray-200 !default;
+$dark: $gray-900 !default;
 
 // Options
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
-//$min-contrast-ratio:   1.9 !default;
+// $min-contrast-ratio:   1.9 !default;
 
 // Body
 $body-color: $gray-900; // $gray-800 !default;
 
 // Links
 $link-color: #007EA8; // Darkened for WCAG compliance
-$link-shade-percentage:                   20% !default; // Bootstrap 5.3
+$link-shade-percentage: 20% !default; // Bootstrap 5.3
 
 // Components
-//$component-active-color:      $white !default;
-//$component-active-bg:         $primary !default;
+// $component-active-color:      $white !default;
+// $component-active-bg:         $primary !default;
 
 $border-color: $gray-400;
 
 // Typography
-$font-family-sans-serif:      ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT', 'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif; // "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-sans-serif: ui-rounded, 'Hiragino Maru Gothic ProN', quicksand, comfortaa, manjari, 'Arial Rounded MT', 'Arial Rounded MT Bold', calibri, source-sans-pro, sans-serif; // "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 // $blockquote-footer-color:     #737373; Overridden by bootswatch.scss.
 
 // Tables
 // Buttons
 // Forms
-$input-border-color:                 $border-color; //    var(--#{$prefix}border-color) !default;
+$input-border-color: $border-color; //    var(--#{$prefix}border-color) !default;
 
 // Form validation
 // Z-index master list
 // Navs (four below added for Bootstrap 53)
-//$nav-link-color:                    var(--#{$prefix}link-color) !default;
-//$nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
-//$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
-//$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
-//$nav-link-font-size:                null !default;
+// $nav-link-color:                    var(--#{$prefix}link-color) !default;
+// $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
+// $nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
+// $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
+// $nav-link-font-size:                null !default;
 
 // Navbar (four below added for Bootstrap 53)
-//$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
-//$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8) !default;
-//$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
-//$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3) !default;
+// $navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
+// $navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8) !default;
+// $navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
+// $navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3) !default;
 
-//$navbar-dark-color:                 rgba($white, .55) !default;
-//$navbar-dark-hover-color:           rgba($white, .75) !default;
-//$navbar-dark-active-color:          $white !default;
-//$navbar-dark-disabled-color:        rgba($white, .25) !default;
+// $navbar-dark-color:                 rgba($white, .55) !default;
+// $navbar-dark-hover-color:           rgba($white, .75) !default;
+// $navbar-dark-active-color:          $white !default;
+// $navbar-dark-disabled-color:        rgba($white, .25) !default;
 
 // Navs
-//$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // $gray-400 !default;
-//$nav-tabs-border-color:             $dropdown-border-color !default;
-//$nav-tabs-link-hover-border-color:  $nav-tabs-border-color !default;
-//$nav-tabs-link-active-border-color: $nav-tabs-border-color !default;
+// $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // $gray-400 !default;
+// $nav-tabs-border-color:             $dropdown-border-color !default;
+// $nav-tabs-link-hover-border-color:  $nav-tabs-border-color !default;
+// $nav-tabs-link-active-border-color: $nav-tabs-border-color !default;
 
 // Navbar
 // Dropdowns
-//$dropdown-border-color:             rgba($black, .1) !default;
-//$dropdown-divider-bg:               rgba($black, .1) !default;
+// $dropdown-border-color:             rgba($black, .1) !default;
+// $dropdown-divider-bg:               rgba($black, .1) !default;
 
 // Pagination
 $pagination-color: #757575;
-//$pagination-border-color:           $nav-tabs-border-color !default;
-//$pagination-disabled-color:         $gray-200 !default;
+
+// $pagination-border-color:           $nav-tabs-border-color !default;
+// $pagination-disabled-color:         $gray-200 !default;
 
 // Cards
 // Badges
 // Alerts
 // Progress bars
-//$progress-bg:                       $gray-400 !default;
-//$progress-bar-color:                $white !default;
+// $progress-bg:                       $gray-400 !default;
+// $progress-bar-color:                $white !default;
 
 // List group
-//$list-group-disabled-bg:            $gray-200 !default;
+// $list-group-disabled-bg:            $gray-200 !default;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                     $body-color; //    $pink !default; // Bootstrap 5.3
+$code-color: $body-color; //    $pink !default; // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 // Bootswatch overrides
 

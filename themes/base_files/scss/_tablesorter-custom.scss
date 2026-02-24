@@ -1,66 +1,67 @@
 @use "sass:color";
 
-//Less file for the jQuery tablesorter plugin
-//custom formatting for individual themes
+// Less file for the jQuery tablesorter plugin
+// custom formatting for individual themes
 
 // set background and text color
 
-$ts-bg : null;
-$ts-color : null;
-@if(type-of($body-bg) == color and $body-bg != transparent) {
-     $ts-bg        : $body-bg;
-     $ts-color    : $body-color;
- } @else if(type-of($input-bg) == color and $input-bg != transparent) {
-     $ts-bg        : $input-color;
-     $ts-color    : $body-color;
- } @else if(type-of($table-bg) == color and $table-bg != transparent) {
-     $ts-bg        : $table-head-color;
-     $ts-color    : $body-color;
- } @else if(type-of($table-head-bg) == color and $table-head-bg != transparent) {
-     $ts-bg        : $table-head-color;
-     $ts-color    : $body-color;
+$ts-bg: null;
+$ts-color: null;
+
+@if type-of($body-bg) == color and $body-bg != transparent {
+     $ts-bg: $body-bg;
+     $ts-color: $body-color;
+ } @else if type-of($input-bg) == color and $input-bg != transparent {
+     $ts-bg: $input-color;
+     $ts-color: $body-color;
+ } @else if type-of($table-bg) == color and $table-bg != transparent {
+     $ts-bg: $table-head-color;
+     $ts-color: $body-color;
+ } @else if type-of($table-head-bg) == color and $table-head-bg != transparent {
+     $ts-bg: $table-head-color;
+     $ts-color: $body-color;
  } @else {
-     $ts-bg        : white;
-     $ts-color    : black;
+     $ts-bg: white;
+     $ts-color: black;
  }
 
-$ts-color: $body-color;  //Won't this owewrite the above?  benoitg - 2023-11-08
+$ts-color: $body-color;  // Won't this owewrite the above?  benoitg - 2023-11-08
 
 // dark icons and colors for light background
-$unsortedDark        : url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
-$sortedDark            : color.adjust($ts-bg, $lightness: -3%, $space: hsl);
-$sortAscDark        : url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
-$sortDescDark        : url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+$unsortedDark: url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+$sortedDark: color.adjust($ts-bg, $lightness: -3%, $space: hsl);
+$sortAscDark: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+$sortDescDark: url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
 
 // light icons and colors for dark background
-$unsortedLight        : url(data:image/gif;base64,R0lGODlhFQAJAIAAAP///////yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
-$sortedLight        : color.adjust($ts-bg, $lightness: 5%, $space: hsl);
-$sortAscLight        : url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
-$sortDescLight        : url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
+$unsortedLight: url(data:image/gif;base64,R0lGODlhFQAJAIAAAP///////yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+$sortedLight: color.adjust($ts-bg, $lightness: 5%, $space: hsl);
+$sortAscLight: url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+$sortDescLight: url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
 
 //// function to choose the correct icon/text color based on background color lightness
-//@function set-lightness($a, $b) {
+// @function set-lightness($a, $b) {
 //    @if (lightness($ts-bg) >= 50) {
 //        @return $a;
 //    } @else {
 //        @return $b;
 //    }
-//}
+// }
 //
-//@mixin unsorted {
+// @mixin unsorted {
 //    background-image: set-lightness($unsortedDark, $unsortedLight);
-//}
-//@mixin sortAsc {
+// }
+// @mixin sortAsc {
 //    background-image: set-lightness($sortAscDark, $sortAscLight);
 //    background-color: set-lightness($sortedDark, $sortedLight);
-//}
-//@mixin sortDesc {
+// }
+// @mixin sortDesc {
 //    background-image: set-lightness($sortDescDark, $sortDescLight);
 //    background-color: set-lightness($sortedDark, $sortedLight);
-//}
-//@mixin filter-input {
+// }
+// @mixin filter-input {
 //    background-color: set-lightness($sortedDark, $sortedLight);
-//}
+// }
 
 // style header
 table.tablesorter {
@@ -77,15 +78,16 @@ table.tablesorter {
 //                @include sortDesc;
 //            }
         }
+
         tr.tablesorter-filter-row {
 // Testing removal            background-color: var(--tiki-tablesorter-filter-row-bg); // $ts-bg;
             td {
                 input.tablesorter-filter,
                 input.dateFrom,
                 input.dateTo {
-                    //@include filter-input;
+                    // @include filter-input;
                     background: var(--bs-body-bg); // var(--tiki-tablesorter-input-bg);
-                    color: var(--bs-body-color); //var(--tiki-tablesorter-input-bg); // $ts-color;
+                    color: var(--bs-body-color); // var(--tiki-tablesorter-input-bg); // $ts-color;
                     border: 1px solid var(--bs-border-color); // var(--tiki-tablesorter-input-border-color);
                 }
             }
@@ -109,7 +111,7 @@ table.tablesorter thead tr.tablesorter-headerRow th.tablesorter-headerAsc {
 
 
 [data-bs-theme="light"]{
-    --tiki-tablesorter-unsorted-bg-image: #{$unsortedDark}; //url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
+    --tiki-tablesorter-unsorted-bg-image: #{$unsortedDark}; // url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
     --tiki-tablesorter-sorted-descending-bg-image: #{$sortDescDark}; //  url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
     --tiki-tablesorter-sorted-ascending-bg-image: #{$sortAscDark}; // url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
 }
@@ -117,7 +119,7 @@ table.tablesorter thead tr.tablesorter-headerRow th.tablesorter-headerAsc {
 [data-bs-theme="dark"] {
     --tiki-tablesorter-unsorted-bg-image: #{$unsortedLight}; // url(data:image/gif;base64,R0lGODlhFQAJAIAAAP///////yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
     --tiki-tablesorter-sorted-descending-bg-image: #{$sortDescLight}; // url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
-    --tiki-tablesorter-sorted-ascending-bg-image: #{$sortAscLight}; //url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
+    --tiki-tablesorter-sorted-ascending-bg-image: #{$sortAscLight}; // url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
 }
 
 .tablesorter-filter.form-control-sm {

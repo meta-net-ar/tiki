@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -41,9 +41,10 @@ h1, h2, h3, h4, h5, h6,
 }
 
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
         --sm-font-family: #{$headings-font-family};
+
         text-transform: uppercase;
     }
 }
@@ -98,31 +99,36 @@ table.table {
     color: #0258D9;
     border-color: #0258D9;
 }
+
 .btn-outline-secondary {
     color: #5C636A;
     border-color: #5C636A;
 }
+
 .btn-outline-success {
     color: #146B43;
     border-color: #146B43;
 }
+
 .btn-outline-danger {
     color: #BF2231;
     border-color: #BF2231;
 }
+
 .btn-outline-warning {
     color: #7A5C00;
     border-color: #7A5C00;
 }
+
 .btn-outline-info {
      color: #066B7F;
      border-color: #066B7F;
  }
 
     // Tilted buttons are sometimes a feature of neubrutalism but I don't think it works so great here.
-    //.btn-bar,
-    //.t_navbar,
-    //.fc-toolbar {
+    // .btn-bar,
+    // .t_navbar,
+    // .fc-toolbar {
     //    & .btn:nth-child(1) { transform: rotate(2deg); }
     //    & .btn:nth-child(2) { transform: rotate(-1deg); }
     //    & .btn:nth-child(3) { transform: rotate(2deg); }
@@ -132,7 +138,7 @@ table.table {
     //    & .btn:nth-child(7) { transform: rotate(0deg); }
     //    & .btn:nth-child(8) { transform: rotate(-1deg); }
     //    & .btn:nth-child(9) { transform: rotate(2deg); }
-    //}
+    // }
 
 // Forms
     // Form validation
@@ -140,6 +146,7 @@ table.table {
 .valid-feedback {
     color: #157045;
 }
+
 .invalid-feedback {
     color: #BF2231;
 }
@@ -165,18 +172,22 @@ table.table {
     background: var(--tiki-card-bg);
     color: var(--tiki-card-color);
     border: $card-border-width solid $card-border-color;
+
     a:not(.btn) {
         color: var(--tiki-card-link-color);
     }
+
     &:not(.btn):hover {
         color: var(--tiki-card-link-hover-color);
     }
+
     .card-header,
     header.article-title {
         border-bottom: $card-border-width solid $card-border-color;
         padding: 1rem !important;
     }
-    .card-footer { //,
+
+    .card-footer { // ,
 ///   .articletrailer {
         border-top: $card-border-width solid $card-border-color;
     }
@@ -186,6 +197,7 @@ table.table {
 .card.module {
     background: var(--tiki-card-bg);
     color: var(--tiki-card-color);
+
 //    a {
 //        color: var(--tiki-card-link-color);
 //    }
@@ -205,7 +217,7 @@ table.table {
     padding: 1rem;
 }
 
-[data-bs-theme=light] {
+[data-bs-theme="light"] {
     .col2 .modules .card.module {
         &:nth-child(1) .card-header {
             --tiki-card-bg: #cbffa8;
@@ -316,7 +328,7 @@ table.table {
     }
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .col2 .modules .card.module {
         &:nth-child(1) .card-header {
             --tiki-card-bg: #5B734C;
@@ -497,60 +509,74 @@ input:checked + .slide-container .slide {
 }
 
 // Dark mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .popover-body { background: #{$body-secondary-bg-dark}; }
     .btn-link { color: #83b5fd !important; }
     .btn-link:hover {color: #83B5FDFF !important; }
     .dropdown-item:hover, .dropdown-item.active {background: #52525e};
+
     ul.navbar-nav.sm-nav > .sm-nav-item > .sm-nav-link {
         color: #83b5fd !important;
     }
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     --tiki-card-bg: #{$body-secondary-bg-dark};
+
     //    .popover-body { background: #{$body-secondary-bg-dark}; }
     --tiki-card-color: var(--bs-body-color);
+
     .bg-light,
     .navbar.bg-light {
         background: var(--bs-tertiary-bg) !important;
+
         .nav-link {
             color: $link-color-dark;
         }
     }
+
     .btn-outline-primary {
         color: #3F8BFD;
         border-color: #3F8BFD;
     }
+
     .btn-outline-secondary {
         color: #848D94;
         border-color: #848D94;
     }
+
     .btn-outline-success {
         color: #1D9F63;
         border-color: #1D9F63;
     }
+
     .btn-outline-danger {
         color: #E36370;
         border-color: #E36370;
     }
+
     .btn-outline-warning {
         color: #BD8E00;
         border-color: #BD8E00;
     }
+
     .btn-outline-info {
         color: #0898B4;
         border-color: #0898B4;
     }
+
     .blockquote-footer {
         color: #808D93;
     }
+
     .valid-feedback {
         color: #1EA465;
     }
+
     .invalid-feedback {
         color: #E36370;
     }
+
     .figure-caption {
         color: #808D93;
     }

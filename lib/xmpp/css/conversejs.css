@@ -2,16 +2,16 @@
     font-family: Baumans;
     font-style: normal;
     font-weight: 400;
-    src: local("Baumans Regular"), local("Baumans-Regular"), url(../../../public/generated/js/vendor_dist/converse.js/dist/webfonts/baumans.ttf) format("truetype")
+    src: local("Baumans Regular"), local("Baumans-Regular"), url("../../../public/generated/js/vendor_dist/converse.js/dist/webfonts/baumans.ttf") format("truetype")
 }
 
 @font-face {
     font-family: Muli;
     font-style: normal;
     font-weight: 400;
-    src: local("Muli Regular"), local("Muli-Regular"), url(../../../public/generated/js/vendor_dist/converse.js/dist/webfonts/muli.ttf) format("truetype")
+    src: local("Muli Regular"), local("Muli-Regular"), url("../../../public/generated/js/vendor_dist/converse.js/dist/webfonts/muli.ttf") format("truetype")
 }
 
-converse-chat-message[message_type=info] {
+converse-chat-message[message_type="info"] {
     display: none;
 }

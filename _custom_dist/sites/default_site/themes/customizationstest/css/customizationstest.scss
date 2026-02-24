@@ -1,6 +1,6 @@
 /* A sample to show how customizations work */
 
-//To convert base themes, replace  ../../base_files by  themes/base_files.  Tiki root is now in the scss load path.
+// To convert base themes, replace  ../../base_files by  themes/base_files.  Tiki root is now in the scss load path.
 
 @import "base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 @import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.

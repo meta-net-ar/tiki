@@ -21,10 +21,9 @@ $gray-200: #e9ecef;
 $gray-100: #f8f9fa ;
 $white: #fff;
 $black: #000;
-
-$red:     #dc3545;  // default // BS53
-$pink:    #d63384;  // default // BS53 (code color)
-$green:   #198754;  // default // BS53
+$red: #dc3545;  // default // BS53
+$pink: #d63384;  // default // BS53 (code color)
+$green: #198754;  // default // BS53
 $green-300: tint-color($green, 40%);  // default // BS53
 $red-300: tint-color($red, 40%);  // default // BS53
 
@@ -34,7 +33,7 @@ $success: #A5E4A0;
 $info: #D5CDEA;
 $warning: #E4D081;
 $danger: #ef98b5;
-$dark: #450c0c; //#6e0d0d; // #0F7D85; // #ad1d28;
+$dark: #450c0c; // #6e0d0d; // #0F7D85; // #ad1d28;
 $light: #c8e8eb; // #5AE3ED; // #FDF7F9;
 
 $theme-colors: (
@@ -54,103 +53,97 @@ $theme-colors: (
 $body-bg: #0b646b; // #108a93; WAI
 $body-color: #fff;
 $body-tertiary-bg: #16838c;
-$body-secondary-color:      rgba($body-color, .75);
+$body-secondary-color: rgba($body-color, .75);
+$body-secondary-bg: $light; // $gray-200 default;
 
-$body-secondary-bg:         $light; // $gray-200 default;
-
-$body-tertiary-color:       rgba($body-color, .5);  // default
-$body-tertiary-bg:          $gray-800;
-
-$body-emphasis-color:       $white; // $black default
+$body-tertiary-color: rgba($body-color, .5);  // default
+$body-tertiary-bg: $gray-800;
+$body-emphasis-color: $white; // $black default
 
 // Links
 $link-color: #FCF6E8; // lighten(#E4D081FF, 15%); //lighten($warning, 15%);
-$link-decoration:                         underline;
-$link-shade-percentage:                   20%;  // default // BS53
+$link-decoration: underline;
+$link-shade-percentage: 20%;  // default // BS53
 $link-hover-color: shift-color($link-color, $link-shade-percentage); // !default;
 $link-hover-decoration: underline;
 
-//Components
+// Components
 $padding-base-vertical: .5rem;
 $padding-large-vertical: .9rem;
-$component-active-color:       #ddb9af; // $white;  // default
-$component-active-bg:         #981919; // $primary;  // default
+$component-active-color: #ddb9af; // $white;  // default
+$component-active-bg: #981919; // $primary;  // default
 
 // Typography
-$font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;   //"Cabin", Arial, sans-serif;
-$headings-font-family: Superclarendon, 'Bookman Old Style', 'URW Bookman', 'URW Bookman L', 'Georgia Pro', Georgia, serif; // 'Lobster', cursive;
+$font-family-sans-serif: seravek, 'Gill Sans Nova', ubuntu, calibri, 'DejaVu Sans', source-sans-pro, sans-serif;   // "Cabin", Arial, sans-serif;
+$headings-font-family: superclarendon, 'Bookman Old Style', 'URW Bookman', 'URW Bookman L', 'Georgia Pro', georgia, serif; // 'Lobster', cursive;
 $headings-font-style: italic;
 $blockquote-footer-color: #E6E8EA;
-$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0
+$text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0
 $mark-bg: $light;
 
 // Tables
-$table-color:                 var(--#{$prefix}body-color);
-$table-striped-color:         $table-color;
+$table-color: var(--#{$prefix}body-color);
+$table-striped-color: $table-color;
 $table-bg: transparent;
 $table-head-bg: #108a93;
 $table-head-color: #fff;
 
 // Buttons
 // Forms
-$form-text-color:                       var(--#{$prefix}body-color);
+$form-text-color: var(--#{$prefix}body-color);
 $input-bg: var(--#{$prefix}body-bg); // $gray-100;
 $input-color: var(--#{$prefix}body-color); // $gray-800;
 $input-placeholder-color: var(--#{$prefix}secondary-color); // #585E65;
 $input-group-addon-bg: var(--#{$prefix}tertiary-bg);
-
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Form validation
-$form-feedback-invalid-color:       $danger;  // default // BS53
-$form-invalid-color:                $form-feedback-invalid-color;  // default // BS53
+$form-feedback-invalid-color: $danger;  // default // BS53
+$form-invalid-color: $form-feedback-invalid-color;  // default // BS53
 
 // Navs
-$nav-link-color:                  $link-color; // #1A1A1A; // var(--#{$prefix}link-color);  // default // #444;
-$nav-link-hover-color:            var(--#{$prefix}link-hover-color);
-
-$nav-tabs-border-color:             $gray-300;
-$nav-tabs-link-active-color:        var(--#{$prefix}emphasis-color); //  !default; was lighten(#444, 8%);
-$nav-tabs-link-hover-border-color:  $gray-200 $gray-200 $nav-tabs-border-color;
-$nav-tabs-link-active-color:        $gray-200;
-$nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);  // default
+$nav-link-color: $link-color; // #1A1A1A; // var(--#{$prefix}link-color);  // default // #444;
+$nav-link-hover-color: var(--#{$prefix}link-hover-color);
+$nav-tabs-border-color: $gray-300;
+$nav-tabs-link-active-color: var(--#{$prefix}emphasis-color); //  !default; was lighten(#444, 8%);
+$nav-tabs-link-hover-border-color: $gray-200 $gray-200 $nav-tabs-border-color;
+$nav-tabs-link-active-color: $gray-200;
+$nav-tabs-link-active-bg: var(--#{$prefix}body-bg);  // default
 $nav-tabs-link-active-border-color: $gray-300 $gray-300 $nav-tabs-link-active-bg;
-
 $nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // darken($nav-link-color, 10%);
-$nav-pills-link-active-bg:          $component-active-bg; // !default;darken($body-bg, 8%);
+$nav-pills-link-active-bg: $component-active-bg; // !default;darken($body-bg, 8%);
 
 // Navbar
-$navbar-light-color:                $black; // $link-color; // $black;
-$navbar-light-hover-color:          rgba($black, .7);  // default
-$navbar-light-active-color:         rgba($black, .9);  // default
-$navbar-light-disabled-color:       rgba($black, .3);  // default
-//$navbar-color: $link-color;
-//$navbar-light-hover-color: $link-hover-color;
-//$navbar-link-active-color: $link-hover-color;
-$navbar-light-brand-color:          $navbar-light-active-color; // !default;
-$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
+$navbar-light-color: $black; // $link-color; // $black;
+$navbar-light-hover-color: rgba($black, .7);  // default
+$navbar-light-active-color: rgba($black, .9);  // default
+$navbar-light-disabled-color: rgba($black, .3);  // default
+// $navbar-color: $link-color;
+// $navbar-light-hover-color: $link-hover-color;
+// $navbar-link-active-color: $link-hover-color;
+$navbar-light-brand-color: $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color: $navbar-light-active-color; // !default;
 
-$navbar-dark-color:                 $link-color;
-$navbar-dark-hover-color:           rgba($white, .75); // !default; // lighten($navbar-dark-color, 25%);
-$navbar-dark-active-color:          $navbar-dark-color;
-$navbar-dark-disabled-color:        rgba($white, .25); //  !default;lighten($navbar-dark-color, 50%);
-$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
+$navbar-dark-color: $link-color;
+$navbar-dark-hover-color: rgba($white, .75); // !default; // lighten($navbar-dark-color, 25%);
+$navbar-dark-active-color: $navbar-dark-color;
+$navbar-dark-disabled-color: rgba($white, .25); //  !default;lighten($navbar-dark-color, 50%);
+$navbar-dark-brand-color: $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color: $navbar-dark-active-color; // !default;
 
 // Dropdowns
-$dropdown-color:                   #444;
-$dropdown-bg:                      #fff;
-$dropdown-border-color:            #444;
-$dropdown-link-color:              #444;
-$dropdown-link-hover-color:        #fff;
-$dropdown-link-hover-bg:           #15b5c1;
-
-$dropdown-dark-color:               $gray-300;
-$dropdown-dark-bg:                  $gray-800;
-$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-color: #444;
+$dropdown-bg: #fff;
+$dropdown-border-color: #444;
+$dropdown-link-color: #444;
+$dropdown-link-hover-color: #fff;
+$dropdown-link-hover-bg: #15b5c1;
+$dropdown-dark-color: $gray-300;
+$dropdown-dark-bg: $gray-800;
+$dropdown-dark-link-hover-bg: rgba($white, .15);  // default
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 $pagination-bg: var(--#{$prefix}body-bg);  // default
@@ -158,8 +151,8 @@ $pagination-focus-color: var(--#{$prefix}link-hover-color); // !default;darken($
 $pagination-focus-bg: var(--#{$prefix}secondary-bg); // !default
 $pagination-hover-color: $link-color;
 $pagination-hover-bg: var(--#{$prefix}tertiary-bg);// !default
-$pagination-active-color:           $component-active-color;  // default
-$pagination-active-bg:              $component-active-bg;  // default
+$pagination-active-color: $component-active-color;  // default
+$pagination-active-bg: $component-active-bg;  // default
 $pagination-disabled-color: $pagination-focus-color;
 $pagination-disabled-bg: #094344;
 
@@ -170,12 +163,12 @@ $card-border-color: #0d747c;
 $card-cap-bg: #0D676E;
 
 // Accordion
-$accordion-button-bg:                     $dark; // #6e0d0d; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
-$accordion-button-active-bg:              #981919; // tint-color($component-active-bg, 90%) !default;
-$accordion-button-active-color:           #ddb9af; //shade-color($primary, 10%) !default;
+$accordion-button-bg: $dark; // #6e0d0d; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
+$accordion-button-active-bg: #981919; // tint-color($component-active-bg, 90%) !default;
+$accordion-button-active-color: #ddb9af; // shade-color($primary, 10%) !default;
 
-$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
-$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
+$accordion-button-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
+$accordion-button-active-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
 
 // Tooltips
 // Popovers
@@ -192,11 +185,11 @@ $modal-content-bg: var(--#{$prefix}body-bg);  // default
 
 // Alerts
 // Progress bars
-$progress-bg:                       $gray-200;  // default
-//$progress-border-radius:            $border-radius !default;
-//$progress-box-shadow:               $box-shadow-inset !default;
-$progress-bar-color:                $black; // $white !default;
-$progress-bar-bg:                   $primary;  // default
+$progress-bg: $gray-200;  // default
+// $progress-border-radius:            $border-radius !default;
+// $progress-box-shadow:               $box-shadow-inset !default;
+$progress-bar-color: $black; // $white !default;
+$progress-bar-bg: $primary;  // default
 
 // List group
 $list-group-bg: var(--#{$prefix}body-bg);  // default
@@ -211,10 +204,11 @@ $breadcrumb-bg: #0C5055;
 $breadcrumb-active-color: #BDBDBD;
 
 // Code
-$code-color:                        $pink;  // default // BS53
+$code-color: $pink;  // default // BS53
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
 $blockquote-color: #E6E8EA; // Needs to be changed to $tiki-blockquote-color
 $tiki-blockquote-left-border-color: #E6E8EA;
-//$tiki-megamenu-dropdown-link-color: $dropdown-link-color;
+
+// $tiki-megamenu-dropdown-link-color: $dropdown-link-color;

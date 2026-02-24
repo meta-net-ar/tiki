@@ -40,8 +40,8 @@
 @mixin top-nav-light {
     --tiki-top-bg: #F8F9FA;
     --tiki-top-color: #{$navbar-light-color};
-    --tiki-top-hover-color: $navbar-light-hover-color;
-    --tiki-top-text-color: $navbar-light-hover-color;
+    --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
     --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: solid #dedede;
@@ -51,8 +51,8 @@
 @mixin topbar-nav-light {
     --tiki-topbar-bg: #F8F9FA;
     --tiki-topbar-color: #{$navbar-light-color};
-    --tiki-topbar-hover-color: $navbar-light-hover-color;
-    --tiki-topbar-text-color:$navbar-light-hover-color;
+    --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color:#{$navbar-light-hover-color};
     --tiki-topbar-border: solid #dedede;
     --tiki-top-border-width: 1px;
 }
@@ -74,24 +74,25 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option, for pagetop navbars
-[data-bs-theme=dark] {                              // color mode
+[data-bs-theme="dark"] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
     }
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-//[data-bs-theme=light] {                              // color mode
+// [data-bs-theme=light] {                              // color mode
 //    .tiki-top-nav-dark {                           // dark top selector
 //        @include top-nav-light;                      // light values
 //    }
 //    .tiki-topbar-nav-dark {
 //        @include topbar-nav-light;
 //    }
-//}
+// }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
     --tiki-top-border-width: 1px;
@@ -116,6 +117,7 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -124,9 +126,10 @@
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: rgba(50, 93, 136, 1);
+    --tiki-admin-top-nav-bg: rgb(50 93 136 / 100%);
     --tiki-admin-top-nav-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
+
 //    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
     --tiki-admin-top-box-shadow: 0px 1px 10px #31373CFF;
     --tiki-admin-aside-nav-bg: #d9230f;
@@ -136,13 +139,16 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+
     .accordion-item {
         border-width: 0 !important;
     }
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
+
     .accordion-button::after {
         background-image:  url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2366bad6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
@@ -162,15 +168,16 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors

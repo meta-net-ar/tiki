@@ -10,14 +10,14 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Colors
-$primary:       #906060; // #e2d4d4; Here and below darkened for WCAG compliance
-$secondary:     #555B62; // #868e96;
-$success:       #16794B; //#28a745;
-$info:          #117888; // #17a2b8;
-$warning:       #8A6700; // #ffc107;
-$danger:        #D02536; // #dc3545;
-$light:         #fff; // $gray-100;
-$dark:          $gray-900;  // default
+$primary: #906060; // #e2d4d4; Here and below darkened for WCAG compliance
+$secondary: #555B62; // #868e96;
+$success: #16794B; // #28a745;
+$info: #117888; // #17a2b8;
+$warning: #8A6700; // #ffc107;
+$danger: #D02536; // #dc3545;
+$light: #fff; // $gray-100;
+$dark: $gray-900;  // default
 
 $theme-colors: (
     "primary": $primary,
@@ -32,96 +32,92 @@ $theme-colors: (
 
 // Options
 // Prefix for :root CSS variables
-$prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
+$prefix: bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
 
 // Spacing
 // Body
-$body-bg:               #f0f0f0;
-$body-color:            #4F5963; // $gray-500;
+$body-bg: #f0f0f0;
+$body-color: #4F5963; // $gray-500;
 
 // Links
-$link-color:            #656A76; // #6C727F; // $gray-500;
-$link-hover-color:      $primary;
-$link-focus-color:      $primary;
-$link-active-color:     $primary;
+$link-color: #656A76; // #6C727F; // $gray-500;
+$link-hover-color: $primary;
+$link-focus-color: $primary;
+$link-active-color: $primary;
 $link-hover-decoration: none;
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
-$component-active-bg:         $primary;  // default
-$component-active-color:    $gray-500;
-
-$border-color:              $gray-400;
-$border-radius-base:        0;
-$border-radius-large:       0;
-$border-radius-small:       0;
+$component-active-bg: $primary;  // default
+$component-active-color: $gray-500;
+$border-color: $gray-400;
+$border-radius-base: 0;
+$border-radius-large: 0;
+$border-radius-small: 0;
 
 // Typography
-$font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif;
 $font-family-monospace: "Courier New", monospace;
-$headings-font-family:    $font-family-sans-serif;
+$headings-font-family: $font-family-sans-serif;
+$h3-text-transform: uppercase;
+$h4-color: $gray-500;
+$h4-font-weight: 300;
+$h4-margin: 0;
 
-$h3-text-transform:       uppercase;
-$h4-color:                $gray-500;
-$h4-font-weight:          300;
-$h4-margin:               0;
-//$h6-margin:               math.div(10,16)rem 0; <---  Error: There is no module with the namespace "math".
-$text-muted:              var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B; // Darkened for WCAG compliance
-$blockquote-footer-color:     $text-muted; // also darkened
+// $h6-margin:               math.div(10,16)rem 0; <---  Error: There is no module with the namespace "math".
+$text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6B737B; // Darkened for WCAG compliance
+$blockquote-footer-color: $text-muted; // also darkened
 
 // Tables
-//$table-border-color: #dddddd;
+// $table-border-color: #dddddd;
 
 // Buttons
-$btn-primary-color:              $gray-300;
-$btn-primary-bg:                 #ffffff;
-$btn-primary-border:             $body-bg;
-
-$btn-secondary-color:            $btn-primary-color;
-$btn-secondary-bg:               $body-bg;
-$btn-secondary-border:           $btn-primary-border;
+$btn-primary-color: $gray-300;
+$btn-primary-bg: #fff;
+$btn-primary-border: $body-bg;
+$btn-secondary-color: $btn-primary-color;
+$btn-secondary-bg: $body-bg;
+$btn-secondary-border: $btn-primary-border;
 
 // Forms
-$input-border-color:            var(--#{$prefix}border-color);  // default
-$input-border:                  $input-border-color; //   $body-bg;
-$input-border-focus:            $primary;
-$input-color-placeholder:       #646C73; // Darkened for WCAG compliance
+$input-border-color: var(--#{$prefix}border-color);  // default
+$input-border: $input-border-color; //   $body-bg;
+$input-border-focus: $primary;
+$input-color-placeholder: #646C73; // Darkened for WCAG compliance
 
-//$legend-font-size:               math.div(21,16)rem; <---  Error: There is no module with the namespace "math".
-$legend-border-bottom:           #e3e3e3;
-//$legend-margin-bottom:           math.div(21,16)rem; <---  Error: There is no module with the namespace "math".
-//$legend-padding:                 math.div(10,16)rem 0; <---  Error: There is no module with the namespace "math".
-$form-text-color:                $text-muted;
+// $legend-font-size:               math.div(21,16)rem; <---  Error: There is no module with the namespace "math".
+$legend-border-bottom: #e3e3e3;
 
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+// $legend-margin-bottom:           math.div(21,16)rem; <---  Error: There is no module with the namespace "math".
+// $legend-padding:                 math.div(10,16)rem 0; <---  Error: There is no module with the namespace "math".
+$form-text-color: $text-muted;
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Form validation
-$form-feedback-valid-color:         #16794B; //$success !default; Using color variables didn't work, didn't override default
-$form-feedback-invalid-color:       #D02536; // $danger !default;
+$form-feedback-valid-color: #16794B; // $success !default; Using color variables didn't work, didn't override default
+$form-feedback-invalid-color: #D02536; // $danger !default;
 
 // Dropdowns
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Navs
 // Navbar
-$navbar-light-color:             #6E7481;
-$tiki-navbar-light-bg:                #ffffff;
-$navbar-light-border:            transparent;
-
-$navbar-light-hover-color:          $gray-800;
-$navbar-light-toggle-icon-bar-bg:        #cccccc;
-
-$tiki-navbar-dark-bg:                    #222;
-$navbar-dark-color:                 #ffffff;
-$navbar-dark-hover-color:           $gray-300;
-$navbar-dark-hover-bg:              color.adjust($tiki-navbar-dark-bg, $lightness: -6.5%, $space: hsl);
-$navbar-dark-active-color:          #ffffff;
-$navbar-dark-active-bg:            color.adjust($tiki-navbar-dark-bg, $lightness: -6.5%, $space: hsl);
+$navbar-light-color: #6E7481;
+$tiki-navbar-light-bg: #fff;
+$navbar-light-border: transparent;
+$navbar-light-hover-color: $gray-800;
+$navbar-light-toggle-icon-bar-bg: #ccc;
+$tiki-navbar-dark-bg: #222;
+$navbar-dark-color: #fff;
+$navbar-dark-hover-color: $gray-300;
+$navbar-dark-hover-bg: color.adjust($tiki-navbar-dark-bg, $lightness: -6.5%, $space: hsl);
+$navbar-dark-active-color: #fff;
+$navbar-dark-active-bg: color.adjust($tiki-navbar-dark-bg, $lightness: -6.5%, $space: hsl);
 
 // Dropdowns
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 $pagination-active-color: #fff;
@@ -143,11 +139,11 @@ $accordion-button-active-color: color.adjust($body-color, $lightness: -10%, $spa
 // List group
 // Image thumbnails
 // Figures
-$figure-caption-color: #686E78; //#6F7680;
+$figure-caption-color: #686E78; // #6F7680;
 
 // Breadcrumbs
 // Close
 // Code
-$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
+$code-color: $body-color; //   $pink !default; // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //

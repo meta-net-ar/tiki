@@ -2,7 +2,7 @@
 
 @media print {
     // To prevent urls from being printed for all links
-    body a[href]:after {
+    body a[href]::after {
         content: none;
     }
 

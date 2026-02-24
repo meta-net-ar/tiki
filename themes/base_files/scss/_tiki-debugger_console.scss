@@ -22,9 +22,10 @@ $breakpoint-medium: 768px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: #000000;
+        background: #000;
         border-radius: 20px;
     }
+
     &::-webkit-scrollbar-thumb:hover {
         background: #1b1a1a;
     }
@@ -49,12 +50,15 @@ $breakpoint-medium: 768px;
         span.no-wrap {
             white-space: nowrap;
         }
+
         span.off-option {
             opacity: 0.7;
         }
+
         span.on-option {
             color: #0d6efd;
         }
+
         td {
             padding-right: 10px;
         }

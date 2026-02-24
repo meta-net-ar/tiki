@@ -11,14 +11,14 @@
 // To override a variable not listed here, copy it from the original vendor file and update its value.
 
 // Color system
-$primary:       #005faa; // $blue;
-$secondary:     $gray-600;
-$success:       $green;
-$info:          $cyan;
-$warning:       $yellow;
-$danger:        $red;
-$light:         $gray-100;
-$dark:          #191919; // $gray-900;
+$primary: #005faa; // $blue;
+$secondary: $gray-600;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$dark: #191919; // $gray-900;
 
 $theme-colors: (
     "primary":    $primary,
@@ -32,9 +32,9 @@ $theme-colors: (
 );
 
 // Options
-$enable-dark-mode:            true;
-$color-mode-type:             data; // `data` or `media-query`
-$enable-negative-margins:       true;
+$enable-dark-mode: true;
+$color-mode-type: data; // `data` or `media-query`
+$enable-negative-margins: true;
 
 // Gradient
 // Spacing
@@ -50,44 +50,39 @@ $gutters: (
 
 // Position
 // Body
-$body-color:                $gray-900;
-$body-bg:                   $white;
-
-$body-secondary-color:      rgba($body-color, .75);
-$body-secondary-bg:         $gray-200;
-
-$body-tertiary-color:       rgba($body-color, .5);
-$body-tertiary-bg:          $gray-100;
-
-$body-emphasis-color:       $black;
+$body-color: $gray-900;
+$body-bg: $white;
+$body-secondary-color: rgba($body-color, .75);
+$body-secondary-bg: $gray-200;
+$body-tertiary-color: rgba($body-color, .5);
+$body-tertiary-bg: $gray-100;
+$body-emphasis-color: $black;
 
 // Links
-$link-color:                              $primary;
-$link-decoration:                         none;
-$link-shade-percentage:                   20%; // Bootstrap 5.3
-$link-hover-color:                        shift-color($link-color, $link-shade-percentage);
+$link-color: $primary;
+$link-decoration: none;
+$link-shade-percentage: 20%; // Bootstrap 5.3
+$link-hover-color: shift-color($link-color, $link-shade-percentage);
 
 // Paragraphs
 // Grid breakpoints
 // Grid containers
 // Grid columns
 // Components
-$component-active-color:      $white; // Bootstrap 5.3
-$component-active-bg:         $primary;
-
-$border-color:                $gray-300;
-$border-color-translucent:    rgba($black, .175);
+$component-active-color: $white; // Bootstrap 5.3
+$component-active-bg: $primary;
+$border-color: $gray-300;
+$border-color-translucent: rgba($black, .175);
 
 // Typography
-$headings-font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+$headings-font-family: charter, 'Bitstream Charter', 'Sitka Text', cambria, serif;
 $headings-font-weight: normal;
-
-$h1-font-size:                $font-size-base * 3.25; // 2.5 !default;
-$h2-font-size:                $font-size-base * 2; // !default;
-$h3-font-size:                $font-size-base * 1.75; //  !default;
-$h4-font-size:                $font-size-base * 1.5; //  !default;
-$h5-font-size:                $font-size-base * 1.25; //  !default;
-$h6-font-size:                $font-size-base; //  !default;
+$h1-font-size: $font-size-base * 3.25; // 2.5 !default;
+$h2-font-size: $font-size-base * 2; // !default;
+$h3-font-size: $font-size-base * 1.75; //  !default;
+$h4-font-size: $font-size-base * 1.5; //  !default;
+$h5-font-size: $font-size-base * 1.25; //  !default;
+$h6-font-size: $font-size-base; //  !default;
 
 
 $font-sizes: (
@@ -106,58 +101,55 @@ $font-sizes: (
 // Forms
 // Form validation
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color);
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color);
-$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color);
-$nav-link-font-size:                null;
+$nav-link-color: var(--#{$prefix}link-color);
+$nav-link-hover-color: var(--#{$prefix}link-hover-color);
+$nav-link-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+$nav-link-disabled-color: var(--#{$prefix}secondary-color);
+$nav-link-font-size: null;
 
 // Navbar
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65);
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);
-$navbar-light-icon-color:           rgba($body-color, .75);
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-$navbar-light-toggler-border-color: rgba($black, .1);//rgba(var(--#{$prefix}emphasis-color-rgb), .15);
-$navbar-light-brand-color:          $navbar-light-active-color;
-$navbar-light-brand-hover-color:    $navbar-light-active-color;
-
-$navbar-dark-color:                 rgba($white, .85);
-$navbar-dark-hover-color:           rgba($white, .75);
-$navbar-dark-active-color:          $white;
-$navbar-dark-disabled-color:        rgba($white, .25);
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-$navbar-dark-toggler-border-color:  rgba($white, .1);
-$navbar-dark-brand-color:           $navbar-dark-active-color;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color;
+$navbar-light-color: rgb(var(--#{$prefix}emphasis-color-rgb), .65);
+$navbar-light-hover-color: rgb(var(--#{$prefix}emphasis-color-rgb), .8);
+$navbar-light-active-color: rgb(var(--#{$prefix}emphasis-color-rgb), 1);
+$navbar-light-disabled-color: rgb(var(--#{$prefix}emphasis-color-rgb), .3);
+$navbar-light-icon-color: rgba($body-color, .75);
+$navbar-light-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-light-toggler-border-color: rgba($black, .1);// rgba(var(--#{$prefix}emphasis-color-rgb), .15);
+$navbar-light-brand-color: $navbar-light-active-color;
+$navbar-light-brand-hover-color: $navbar-light-active-color;
+$navbar-dark-color: rgba($white, .85);
+$navbar-dark-hover-color: rgba($white, .75);
+$navbar-dark-active-color: $white;
+$navbar-dark-disabled-color: rgba($white, .25);
+$navbar-dark-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+$navbar-dark-toggler-border-color: rgba($white, .1);
+$navbar-dark-brand-color: $navbar-dark-active-color;
+$navbar-dark-brand-hover-color: $navbar-dark-active-color;
 
 // Dropdowns
-$dropdown-min-width:                10rem !default;
-$dropdown-padding-x:                0 !default;
-$dropdown-padding-y:                .5rem !default;
-$dropdown-spacer:                   .125rem !default;
-$dropdown-font-size:                $font-size-base !default;
-$dropdown-color:                    var(--#{$prefix}body-color);
-$dropdown-bg:                       var(--#{$prefix}body-bg);
-$dropdown-border-color:             var(--#{$prefix}border-color-translucent);
-$dropdown-divider-bg:               $dropdown-border-color;
+$dropdown-min-width: 10rem !default;
+$dropdown-padding-x: 0 !default;
+$dropdown-padding-y: .5rem !default;
+$dropdown-spacer: .125rem !default;
+$dropdown-font-size: $font-size-base !default;
+$dropdown-color: var(--#{$prefix}body-color);
+$dropdown-bg: var(--#{$prefix}body-bg);
+$dropdown-border-color: var(--#{$prefix}border-color-translucent);
+$dropdown-divider-bg: $dropdown-border-color;
+$dropdown-link-color: var(--#{$prefix}body-color);
+$dropdown-link-hover-color: $white; // $dropdown-link-color; // $dropdown-link-color;
+$dropdown-link-hover-bg: $component-active-bg; // var(--#{$prefix}tertiary-bg);
 
-$dropdown-link-color:               var(--#{$prefix}body-color);
-$dropdown-link-hover-color:         $white; // $dropdown-link-color; // $dropdown-link-color;
-$dropdown-link-hover-bg:            $component-active-bg; // var(--#{$prefix}tertiary-bg);
-
-$dropdown-link-active-color:        $component-active-color;
-$dropdown-link-active-bg:           $component-active-bg;
-$dropdown-link-active-color:        $component-active-color;
-$dropdown-link-active-bg:           $component-active-bg;
-
-$dropdown-link-disabled-color:      $gray-500;
+$dropdown-link-active-color: $component-active-color;
+$dropdown-link-active-bg: $component-active-bg;
+$dropdown-link-active-color: $component-active-color;
+$dropdown-link-active-bg: $component-active-bg;
+$dropdown-link-disabled-color: $gray-500;
 
 
 // Pagination
-$pagination-color:                  var(--#{$prefix}link-color);
-$pagination-bg:                     var(--#{$prefix}body-bg);
+$pagination-color: var(--#{$prefix}link-color);
+$pagination-bg: var(--#{$prefix}body-bg);
 
 // Cards
 // Accordion
@@ -177,6 +169,6 @@ $pagination-bg:                     var(--#{$prefix}body-bg);
 // Close
 // Offcanvas
 // Code
-$code-color:                        $body-color; // Bootstrap 5.3
+$code-color: $body-color; // Bootstrap 5.3
 
-//------- Tiki SCSS variables
+// ------- Tiki SCSS variables

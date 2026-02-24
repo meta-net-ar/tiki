@@ -10,48 +10,48 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-//$primary:       $blue;  // default
-$secondary:     #77766E; // $gray-600;  // default
-$success:       #5B7F29; // $green;  // default
-$info:          #187DA5; // $cyan;  // default
-$warning:       #CA4F0C; // $orange;  // default
-$danger:        #D4403A; // $red;  // default
-//$light:         $gray-200;  // default
-//$dark:          $gray-800;  // default
+// $primary:       $blue;  // default
+$secondary: #77766E; // $gray-600;  // default
+$success: #5B7F29; // $green;  // default
+$info: #187DA5; // $cyan;  // default
+$warning: #CA4F0C; // $orange;  // default
+$danger: #D4403A; // $red;  // default
+// $light:         $gray-200;  // default
+// $dark:          $gray-800;  // default
 
 // Options
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Components
-$component-active-color:      $white;  // default
-$component-active-bg:         $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $primary;  // default
 
 // Body
 // Links
-$link-color:                #597B28; //$success;  // default
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
-$link-hover-color:                        shift-color($link-color, $link-shade-percentage);  // default
+$link-color: #597B28; // $success;  // default
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
+$link-hover-color: shift-color($link-color, $link-shade-percentage);  // default
 
 // Typography
-$font-family-sans-serif:      system-ui, sans-serif; // Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";  // default
+$font-family-sans-serif: system-ui, sans-serif; // Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";  // default
 $blockquote-footer-color: #77766E;
 
 
 // Dropdowns
 // Navs
 $nav-link-color: #676660; // var(--#{$prefix}link-color);  // default
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default // $gray-300;  // default
+$nav-link-hover-color: var(--#{$prefix}link-hover-color);  // default
+$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $gray-300;  // default
 
 // Navbar
-$navbar-dark-color:                 #FFFFFF99;
-$navbar-dark-hover-color:           $white;  // default
-$navbar-light-hover-color:          $black;  // default
-$navbar-light-active-color:         $black;  // default
+$navbar-dark-color: #FFF9;
+$navbar-dark-hover-color: $white;  // default
+$navbar-light-hover-color: $black;  // default
+$navbar-light-active-color: $black;  // default
 
 // Pagination
-$pagination-color:                  $nav-link-color;
+$pagination-color: $nav-link-color;
 
 // Cards
 // Popovers
@@ -61,9 +61,9 @@ $pagination-color:                  $nav-link-color;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                        $pink;  // default // Bootstrap 5.3
+$code-color: $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 // Bootswatch overrides
 

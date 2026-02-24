@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -23,11 +23,12 @@ $imagePath: "../images/";
 //  Color system
 // Spacing
 
-@media (min-width: 992px) {
+@media (width >= 992px) {
     .col1 {
         padding-left: 40px;
         padding-right: 40px;
     }
+
     .p-40y80x {
         padding-left: 80px;
         padding-right: 80px
@@ -57,6 +58,7 @@ body:not(.fixed-width) .middle-wrapper {
     background-color: var(--tiki-brand-bg-dark);
     margin: 60px 40px 0;
     border-radius: 20px 20px 0 0;
+
     & .card,
     & .card-header {
         background: transparent;
@@ -73,10 +75,10 @@ body:not(.cat_no-content-bg) main {
 
 .tiki-theme-block-dark,
 .tiki-theme-block-light {
-    color:  var(--tiki-theme-block-color); //$body-secondary-color;
-    background-color:  var(--tiki-theme-block-bg); //var(--bs-body-bg); // $body-tertiary-bg; //#fbfbfb; // $body-secondary-bg;
+    color:  var(--tiki-theme-block-color); // $body-secondary-color;
+    background-color:  var(--tiki-theme-block-bg); // var(--bs-body-bg); // $body-tertiary-bg; //#fbfbfb; // $body-secondary-bg;
     a {
-        color: var(--tiki-theme-block-link-color); //$link-color;
+        color: var(--tiki-theme-block-link-color); // $link-color;
         &:hover {
             color: var(--tiki-theme-block-link-hover-color);
         }
@@ -85,10 +87,10 @@ body:not(.cat_no-content-bg) main {
 
 .tiki-brand-block-dark,
 .tiki-brand-block-light {
-    color:  var(--tiki-brand-block-color); //$body-secondary-color;
-    background-color:  var(--tiki-brand-block-bg); //var(--bs-body-bg); // $body-tertiary-bg; //#fbfbfb; // $body-secondary-bg;
+    color:  var(--tiki-brand-block-color); // $body-secondary-color;
+    background-color:  var(--tiki-brand-block-bg); // var(--bs-body-bg); // $body-tertiary-bg; //#fbfbfb; // $body-secondary-bg;
     a {
-        color: var(--tiki-brand-block-link-color); //$link-color;
+        color: var(--tiki-brand-block-link-color); // $link-color;
         &:hover {
             color: var(--tiki-band-block-link-hover-color);
         }
@@ -112,59 +114,73 @@ h1.pagetitle a {
     border: none;
     transition: background-color 0.15s ease-in-out, border 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
 }
+
 .btn:focus {
     color: #506925;
 }
+
 .btn:hover, .btn:focus, .btn:active, .btn:active:focus {
     background-color: #d9e3f1;
     border: none;
     transition: background-color 0.15s ease-in-out, border 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
     color: #506925;
 }
+
 .btn:active, .btn:active:focus {
     border-color: transparent;
 }
+
 .btn-primary:active, .btn-primary:active:focus {
     color: #fff;
     background-color: #378dfc;
 }
+
 .btn-secondary:active, .btn-secondary:active:focus {
     color: #506925;
     background-color: #d9e3f1;
 }
+
 .btn-success:active, .btn-success:active:focus {
     color: #fff;
     background-color: #43cc29;
 }
+
 .btn-info:active, .btn-info:active:focus {
     color: #fff;
     background-color: #5b62f4;
 }
+
 .btn-warning:active, .btn-warning:active:focus {
     color: #fff;
     background-color: #ffc107;
 }
+
 .btn-danger:active, .btn-danger:active:focus {
     color: #fff;
     background-color: #e52527;
 }
+
 .btn-light:active, .btn-light:active:focus {
     color: #506925;
     background-color: #d9e3f1;
 }
+
 .btn-dark:active, .btn-dark:active:focus {
     color: #fff;
     background-color: #212529;
 }
+
 .btn-link {
     font-weight: 600;
     background: transparent;
     color: $link-color;
 }
+
 .btn-link:hover, .btn-link:active, .btn-link:active:focus {
     color: #212529;
     background: transparent;
 }
+
 .btn.disabled {
     color: #506925;
     background-color: #d9e3f1;
@@ -186,10 +202,9 @@ h1.pagetitle a {
 
     @each $color, $value in $theme-colors {
         &-#{$color} {
-
             &:active,
             &:active:focus {
-                @if ($color == secondary or $color == light) {
+                @if $color == secondary or $color == light {
                     color: $gray-700;
                     background-color: $gray-200;
                 } @else {
@@ -212,7 +227,7 @@ h1.pagetitle a {
 }
 
 .navbar.fixed-top {
-    margin: 0 40px 0 40px;
+    margin: 0 40px;
     border-radius: 0 0 20px 20px;
     padding: 20px;
 }
@@ -227,7 +242,7 @@ h1.pagetitle a {
 .topbar-wrapper, // Classic Bootstrap and classic Tiki layouts
 .layout_basic .topbar_modules { // Single container layout
     border-radius: 20px;
-    margin: 32px 40px 0px;
+    margin: 32px 40px 0;
 }
 
 //  Dropdowns
@@ -261,10 +276,12 @@ h1.pagetitle a {
 [data-bs-theme="light"] .bottom_modules,
 [data-bs-theme="dark"] .bottom_modules {
     color: #dee2e6;
+
     .card {
         color: #dee2e6;
         background: var(--tiki-brand-bg-dark);
     }
+
     .tiki-card-header-title {
         color: #dee2e6;
     }

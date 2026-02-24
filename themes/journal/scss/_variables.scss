@@ -11,14 +11,14 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$primary:       #D24141; // $blue !default;
-$secondary:     #757575; // $gray-500 !default;
-$success:       #198639; // $green !default;
-$info:          #60759A; //$cyan !default;
-$warning:       #7F7706; // $yellow !default;
-$danger:        #B85C00; // $red !default;
-//$light:         $gray-100;  // default
-//$dark:          $gray-900;  // default
+$primary: #D24141; // $blue !default;
+$secondary: #757575; // $gray-500 !default;
+$success: #198639; // $green !default;
+$info: #60759A; // $cyan !default;
+$warning: #7F7706; // $yellow !default;
+$danger: #B85C00; // $red !default;
+// $light:         $gray-100;  // default
+// $dark:          $gray-900;  // default
 
 
 // Options
@@ -29,17 +29,17 @@ $prefix: bs-; // default -- Compiling needs this to be declared
 $body-color: $gray-800;  // default
 
 // Links
-$link-color:                #E22822;
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-color: #E22822;
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
 $border-color: $gray-400;
 
 // Typography
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Fonts
-$headings-font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;  // "News Cycle", "Arial Narrow Bold", sans-serif;  // default
+$headings-font-family: inter, roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', arial, sans-serif;  // "News Cycle", "Arial Narrow Bold", sans-serif;  // default
 
 // Buttons
 // Form validation
@@ -48,16 +48,16 @@ $form-invalid-color: #B85C00;
 
 // Navbar
 // 53 $navbar-light-color:                rgba($black, .7);  // default
-$navbar-light-hover-color:          $black;  // default
-$navbar-light-active-color:         $black;  // default
-$navbar-dark-hover-color:           #18bc9c; // Updated for Tiki
+$navbar-light-hover-color: $black;  // default
+$navbar-light-active-color: $black;  // default
+$navbar-dark-hover-color: #18bc9c; // Updated for Tiki
 
 // Pagination
 // Accordion
-$accordion-button-bg:                     var(--#{$prefix}accordion-bg); // !default; ---- No effect
+$accordion-button-bg: var(--#{$prefix}accordion-bg); // !default; ---- No effect
 
 // Code
-$code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //   $pink;  // default // Bootstrap 5.3
 
 // Bootswatch overrides
 $web-font-path: none; // Override value in vendor file

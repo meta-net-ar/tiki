@@ -18,7 +18,7 @@ header.container,
 }
 
 // Vertically center visible content in fixed-top navbar
-@media(min-width: 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
+@media(width >= 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
 
 .top_modules,
 .topbar_modules,
@@ -39,14 +39,14 @@ header.container,
     flex-wrap: wrap;
 }
 
-//.bottom_modules {
+// .bottom_modules {
 //    display: grid;
 //    grid-template-columns: repeat(auto-fill, minmax(273px, 1fr));
 //    grid-gap: 30px;
 //    grid-row-gap: 30px;
-//}
+// }
 
-//***** Site Header & Identity *****/
+// ***** Site Header & Identity *****/
 .box-quickadmin li {
     font-size: 0.9em;
 }
@@ -92,12 +92,13 @@ li.archivedate {
 
 .box-switch_lang .box-data img.highlight {
     padding: .1em;
+
     //    border: .1em solid $alert-danger-border;
 }
 
-//.box-switch_lang .box-data .highlight {
+// .box-switch_lang .box-data .highlight {
 //    border: .1em solid $alert-danger-border;
-//}
+// }
 
 .box-switch_lang li {
     list-style: none;
@@ -126,12 +127,12 @@ li.archivedate {
 
 
 // This is kludgy but works for now.
-#col1 .box-search input[type=submit],
-#col1 .box-search input[type=submit]:hover,
-#col2 .box-search input[type=submit],
-#col2 .box-search input[type=submit]:hover,
-#col3 .box-search input[type=submit],
-#col3 .box-search input[type=submit]:hover {
+#col1 .box-search input[type="submit"],
+#col1 .box-search input[type="submit"]:hover,
+#col2 .box-search input[type="submit"],
+#col2 .box-search input[type="submit"]:hover,
+#col3 .box-search input[type="submit"],
+#col3 .box-search input[type="submit"]:hover {
     margin: 0;
 }
 
@@ -206,7 +207,7 @@ li.archivedate {
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
 }
 
 .fb-author {
@@ -225,7 +226,7 @@ li.archivedate {
 }
 
 .fb-image {
-    margin: 0 -12px 10px -12px;
+    margin: 0 -12px 10px;
     line-height: 0;
     
     img {
@@ -237,7 +238,7 @@ li.archivedate {
 }
 
 .fb-attachment-image {
-    margin: 0 -12px 10px -12px;
+    margin: 0 -12px 10px;
     line-height: 0;
     
     img {
@@ -355,17 +356,21 @@ header:not(.fixed-top) a.sitelogo {
 // Basic layout (layout_social) and Classic Tiki layout (layout_classic)
 .sitetitles {
     display: inline-block;
+
     .sitetitle {
         font-size: var(--tiki-site-title-font-size); // 2rem; These CSS variables are defined in base_files/scss/_tiki-variables.scss or by each theme or in L&F custom CSS.
         font-weight: var(--tiki-site-title-font-weight); // 700;
     }
+
     .sitesubtitle {
         font-size: var(--tiki-site-subtitle-font-size); // 1.6rem;
         font-weight: var(--tiki-site-subtitle-font-weight); // 500;
     }
+
     .d-flex {
         justify-content: center;
         flex-direction: column;
+
 //        align-content: center; Doesn't seem to have any effect here.
         height: 100%;
     }
@@ -380,6 +385,7 @@ header:not(.fixed-top) a.sitelogo {
 .layout_social header .top_modules .navbar {
     --bs-navbar-padding-y: 0;
     --bs-navbar-padding-x: 0;
+
     padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
 }
 
@@ -504,14 +510,17 @@ header.fixed-top {
         //        float: left;
         font-size: var(--tiki-fixed-top-site-title-font-size);
         font-weight: var(--tiki-fixed-top-site-title-font-weight);
+
         //        line-height: 2;
         //        margin-bottom: 0;
         //        margin-left: 1rem;
       }
+
         .sitesubtitle {
             //        float: left;
             font-size: var(--tiki-fixed-top-site-subtitle-font-size);
             font-weight: var(--tiki-fixed-top-site-subtitle-font-weight);
+
             //        margin-left: 1.5rem;
             //    }
             #topbar_modules {
@@ -535,6 +544,7 @@ header.fixed-top {
             //    }
         }
     }
+
 .navbar-fixed-top,
 #navbar-collapse-social {
     .navbar {
@@ -549,13 +559,13 @@ header.fixed-top {
     padding-right: 0;
 }
 
-//@include media-breakpoint-up(sm) {
+// @include media-breakpoint-up(sm) {
 //   .layout_social_modules .navbar-header {
 //        margin-top: -34px;
 //    }
-//}
+// }
 
-//@include media-breakpoint-down(xs) {
+// @include media-breakpoint-down(xs) {
 //    .box-search {
 //        .form-inline .input-group {
 //            margin-left: 0 !important;
@@ -571,7 +581,7 @@ header.fixed-top {
 //            }
 //        }
 //    }
-//}
+// }
 
 @media (max-width: breakpoint-max(sm)) {
     .tiki-admin_modules {
@@ -603,12 +613,15 @@ header.fixed-top {
 .btn-toggle:not(.collapsed) .show-text {
     display: none;
 }
+
 .btn-toggle:not(.collapsed) .hide-text {
     display: inline;
 }
+
 .btn-toggle.collapsed .show-text {
     display: inline;
 }
+
 .btn-toggle.collapsed .hide-text {
     display: none;
 }
@@ -616,6 +629,7 @@ header.fixed-top {
 // Quickadmin module Permissions link
 #quickadmin div.dropdown-item {
     padding: 0 var(--bs-dropdown-item-padding-x);
+
     & .btn-link {
         color: var(--bs-dropdown-link-color);
         padding: 0;

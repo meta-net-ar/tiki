@@ -8,6 +8,7 @@
     a:not(.btn), a:not(.btn):visited {
         color: var(--bs-link-color);
         text-decoration: $link-decoration;
+
         &:hover {
             color: var(--bs-link-hover-color);
             text-decoration: $link-hover-decoration;
@@ -18,6 +19,7 @@
         color: var(--bs-btn-color);
         text-decoration: $link-decoration;
         line-height: initial;
+
         &:hover {
             color: var(--bs-btn-hover-color);
             text-decoration: $link-hover-decoration;
@@ -31,12 +33,14 @@
     h1 {
         color: red;
     }
+
     h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         font-family: $font-family-base;   /* should be $headings-font-family */
         font-weight: $font-weight-base;   /* $headings-font-weight */
         color: var(--bs-body-color);               /* $headings-color */
         text-decoration: $link-hover-decoration;
         line-height: $line-height-base; /* $headings-line-height */
+
         /* no variable? */
         border-bottom: none;
     }
@@ -60,16 +64,20 @@
 
     table {
         background-color: $table-bg;
+
         th {
             background-color: $table-bg;
             color: $table-color;
+
             /* should be a var */
             font-weight: bold;
+
             p {
                 background-color: $table-bg;
                 color: $table-color;
             }
         }
+
         .odd {
             background: $table-accent-bg;
         }
@@ -79,5 +87,5 @@
 
 .tiki .toastui-editor-toolbar-item-wrapper { cursor: pointer; }
 .tiki .tui-widget .single-spa-container { display: inline-block; }
-.tiki>div[id^=single-spa-application] { display: none; }
-.tiki .toastui-editor-md-preview [id^=single-spa-application] { pointer-events: none; }
+.tiki>div[id^="single-spa-application"] { display: none; }
+.tiki .toastui-editor-md-preview [id^="single-spa-application"] { pointer-events: none; }

@@ -29,7 +29,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgb(0 0 0 / 45%);
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
@@ -44,6 +44,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -54,6 +55,7 @@
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -74,7 +76,7 @@ button:active {
     transform: scale(0.98);
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .bg-light.rounded-3 {
         padding: 1rem !important;
         margin: 1rem -1.25rem !important;
@@ -114,7 +116,7 @@ button:active {
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     #record-preview {
         padding: 0;
         align-items: flex-end;

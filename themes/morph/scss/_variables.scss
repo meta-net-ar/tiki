@@ -12,105 +12,104 @@ $dark: #24426d; // More interesting dark background color
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$secondary:     $gray-600 !default;
-
-$gray-700: #506925; //#7b8ab8;  // default
+$secondary: $gray-600 !default;
+$gray-700: #506925; // #7b8ab8;  // default
 
 // Options
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
-$body-color:                #506295;
-$body-secondary-color:      #333D5BBF;
+$body-color: #506295;
+$body-secondary-color: #333D5BBF;
 
 // Links
 $link-color: #035BCE;
 
 // Typography
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
-$component-active-color:       $white;  // default
-$component-active-bg:        $info; // $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $info; // $primary;  // default
 
 // Fonts
 
 // stylelint-disable-next-line value-keyword-case
-$font-family-sans-serif:      system-ui, sans-serif; // Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";  // default
+$font-family-sans-serif: system-ui, sans-serif; // Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";  // default
 
-$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- lighten($body-color, 15%);  // default
+$text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- lighten($body-color, 15%);  // default
 
 // Buttons + Forms
 // Buttons
 // Forms
-$input-bg:                              var(--#{$prefix}body-bg);  // default // $gray-100;  // default
-$input-placeholder-color:               var(--#{$prefix}secondary-color);  // default // $text-muted;  // default
+$input-bg: var(--#{$prefix}body-bg);  // default // $gray-100;  // default
+$input-placeholder-color: var(--#{$prefix}secondary-color);  // default // $text-muted;  // default
 
-$form-select-indicator-color:       var(--#{$prefix}body-color);
-$form-range-track-bg:             var(--#{$prefix}tertiary-bg);  // default // rgba(darken($body-bg, 50%), .15);  // default
-$form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color);  // default // $gray-200;  // default
-$form-file-button-bg:             var(--#{$prefix}tertiary-bg);  // default // $gray-100;  // default
+$form-select-indicator-color: var(--#{$prefix}body-color);
+$form-range-track-bg: var(--#{$prefix}tertiary-bg);  // default // rgba(darken($body-bg, 50%), .15);  // default
+$form-range-thumb-disabled-bg: var(--#{$prefix}secondary-color);  // default // $gray-200;  // default
+$form-file-button-bg: var(--#{$prefix}tertiary-bg);  // default // $gray-100;  // default
 
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Navs
-$nav-link-color:                    var(--#{$prefix}body-color);
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default // $text-muted;  // default
+$nav-link-color: var(--#{$prefix}body-color);
+$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $text-muted;  // default
 
 // Navbar
-$navbar-light-color:                var(--#{$prefix}body-color);
+$navbar-light-color: var(--#{$prefix}body-color);
 
 // Dropdowns
-$dropdown-color:                    var(--#{$prefix}body-color);
-$dropdown-bg:                       $white;  // default
-$dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
+$dropdown-color: var(--#{$prefix}body-color);
+$dropdown-bg: $white;  // default
+$dropdown-border-color: var(--#{$prefix}border-color-translucent);  // default
 
-$dropdown-link-color:               $gray-900;  // default
-$dropdown-link-hover-color:         shade-color($dropdown-link-color, 10%);  // default
-$dropdown-link-hover-bg:            $gray-200;  // default
+$dropdown-link-color: $gray-900;  // default
+$dropdown-link-hover-color: shade-color($dropdown-link-color, 10%);  // default
+$dropdown-link-hover-bg: $gray-200;  // default
 
-$dropdown-dark-color:               $gray-300;  // default
-$dropdown-dark-bg:                  $gray-800;  // default
+$dropdown-dark-color: $gray-300;  // default
+$dropdown-dark-bg: $gray-800;  // default
 
-$dropdown-dark-link-color:          $dropdown-dark-color;  // default
-$dropdown-dark-link-hover-color:    $white;  // default
-$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-dark-link-color: $dropdown-dark-color;  // default
+$dropdown-dark-link-hover-color: $white;  // default
+$dropdown-dark-link-hover-bg: rgba($white, .15);  // default
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
-$pagination-bg:                     var(--#{$prefix}body-bg);
-$pagination-color:                  #506295;
+$pagination-bg: var(--#{$prefix}body-bg);
+$pagination-color: #506295;
 
 // Cards
-$card-bg:                           color.adjust($body-bg, $lightness: 3%, $space: hsl);  // default
+$card-bg: color.adjust($body-bg, $lightness: 3%, $space: hsl);  // default
 
 // Bootswatch overrides
 $web-font-path: none; // Override value in vendor file
 
 // Tooltips
-$tooltip-color:                     var(--#{$prefix}body-color);
+$tooltip-color: var(--#{$prefix}body-color);
 
 // Popovers
-$popover-bg:                        $dropdown-bg;  // default
+$popover-bg: $dropdown-bg;  // default
 
 // Toasts
-$toast-background-color:            $dropdown-bg;  // default
-$toast-header-color:                var(--#{$prefix}body-color);
+$toast-background-color: $dropdown-bg;  // default
+$toast-header-color: var(--#{$prefix}body-color);
 
 // Badges
 // Modals
-$modal-content-bg:                  $dropdown-bg;  // default
+$modal-content-bg: $dropdown-bg;  // default
 
 // Progress bars
 // List groups
-$list-group-bg:                     $card-bg;  // default
+$list-group-bg: $card-bg;  // default
 
 // Breadcrumbs
 // Close
 // Code
-$code-color:                       $body-color; //  $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //  $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables

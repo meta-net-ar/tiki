@@ -79,7 +79,7 @@ span.app-name {
     width: 100%;
 }
 
-@media screen and (max-width:991px) {
+@media screen and (width <=991px) {
     .instance.editor {
         flex-direction: column;
     }
@@ -168,19 +168,17 @@ span.app-name {
 }
 
 .grid-stack-item {
-    background-color: rgb(239, 239, 239);
+    background-color: rgb(239 239 239);
 }
 
 .grid-stack {
     border: 1px solid white;
     border-radius: 10px;
-    background-color: rgb(239, 239, 239);
+    background-color: rgb(239 239 239);
     box-sizing: content-box;
 }
 
 .grid-stack-item-content {
-    text-align: center;
-    background-color: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -203,7 +201,7 @@ span.app-name {
     background-color: #1e1e1e;
     padding: 10px;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgb(0 0 0 / 50%);
     white-space: pre-wrap;
     align-items: flex-start;
     justify-content: flex-start;
@@ -247,16 +245,16 @@ div[data-widget-type]:empty::after {
 }
 
 .io-state[data-io-state='OFF'] {
-    background-color: rgb(231, 28, 28);
+    background-color: rgb(231 28 28);
 }
 
 .io-state[data-io-state='ON'] {
-    background-color: rgb(45, 231, 28);
-    filter: drop-shadow(0 0 0.75rem rgb(45, 231, 28));
+    background-color: rgb(45 231 28);
+    filter: drop-shadow(0 0 0.75rem rgb(45 231 28));
 }
 
 .io-state[data-io-state='pending'] {
-    background-color: rgb(107, 107, 107);
+    background-color: rgb(107 107 107);
 }
 
 .pending-dot {

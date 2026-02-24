@@ -11,7 +11,7 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .btn.btn-outline-primary { color: #D963AA; border-color: #D963AA; }
     .btn.btn-outline-secondary { color: #A47DB5; border-color: #A47DB5; }
     .btn.btn-outline-success { color: #46A046; border-color: #46A046; }

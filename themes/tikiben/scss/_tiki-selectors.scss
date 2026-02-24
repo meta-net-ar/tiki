@@ -8,6 +8,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //	background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -60,10 +61,12 @@ h1 {
 .nav.nav-tabs {
     border-bottom: none;
     padding-left: 40px;
+
     .nav-item:first-of-type,
     .nav-item:first-of-type .nav-link {
         border-top-left-radius: 16px;
     }
+
     .nav-item:last-of-type,
     .nav-item:last-of-type .nav-link {
         border-top-right-radius: 16px;
@@ -104,7 +107,7 @@ h1 {
     border-radius: var(--tikiben-border-radius);
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .nav-link {
         color: var(--bs-body-color);
     }
@@ -158,6 +161,7 @@ h1 {
 
 .inline-cypht {
     background-color: transparent;
+
     .app-container {
         padding: 0;
     }

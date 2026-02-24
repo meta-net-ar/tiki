@@ -10,9 +10,9 @@
     --bs-progress-bar-bg: #{$info};
 }
 
-//h3.tiki-card-header-title {
+// h3.tiki-card-header-title {
 //    color: #fff;
-//}
+// }
 
 // Dropdown partial isn't available to these theme options.
 :root .tiki-admin .dropdown-item.active {
@@ -21,7 +21,7 @@
 
 // Dark color mode
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .blockquote-footer { color: #848D94; }
     .btn.btn-outline-primary { color: #F745A4; border-color: #F745A4; }
     .btn.btn-outline-secondary { color: #E45E8D; border-color: #E45E8D; }

@@ -10,6 +10,7 @@
 .text-danger {
     color: $danger !important;
 }
+
 .text-dark {
     color: #6D5509 !important;
 }
@@ -44,7 +45,7 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .btn.btn-outline-primary { color: #998F0B; border-color: #998F0B; }
     .btn.btn-outline-secondary { color: #D86D3B; border-color: #D86D3B; }
     .btn.btn-outline-success { color: #46A046; border-color: #46A046; }

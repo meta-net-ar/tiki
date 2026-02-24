@@ -10,11 +10,11 @@
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-$red:     #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
-$green:   #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guidelines
+$red: #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
+$green: #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guidelines
 
 $primary: #B5B5B5; // #ababab;//#193c5a // $blue !default
-$secondary: #dddddd; // $gray-600 !default
+$secondary: #ddd; // $gray-600 !default
 $success: #7FC77F; // #7FC77F; // #5cb85c;//#3d6c2a // $green !default
 $info: #62C2DF; // #5bc0de;//#1b6083 // $cyan !default
 $warning: #f0ad4e;// darken(#f0ad4e,30%) // $yellow !default
@@ -38,28 +38,27 @@ $theme-colors: (
 }
 
 // Options
-$enable-dark-mode:            false;
+$enable-dark-mode: false;
 
 // Body
-$body-color:                #e8e8e8; // $gray-900 !default
-$body-bg:                   #474747; // $white !default
+$body-color: #e8e8e8; // $gray-900 !default
+$body-bg: #474747; // $white !default
 
-$body-secondary-color:      #BFBFBF; // rgba($body-color, .20);
-$body-secondary-bg:         #0c0c0c;
+$body-secondary-color: #BFBFBF; // rgba($body-color, .20);
+$body-secondary-bg: #0c0c0c;
+$body-tertiary-color: rgba($body-color, .40);
+$body-tertiary-bg: $gray-100;  // default
 
-$body-tertiary-color:       rgba($body-color, .40);
-$body-tertiary-bg:          $gray-100;  // default
-
-$body-emphasis-color:       $white;
+$body-emphasis-color: $white;
 
 // Links
 $link-color: #B5B5B5; // #ababab;
 $link-hover-color: #858585;
 $link-hover-decoration: none;
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 
 // Components
-$component-active-color: #ffffff;
+$component-active-color: #fff;
 $component-active-bg: #030511;
 
 // Typography
@@ -70,70 +69,61 @@ $blockquote-small-color: $gray-200;
 $blockquote-border-color: $gray-400;
 $page-header-border-color: $gray-500;
 $hr-border: $gray-500;
-
-$font-family-sans-serif:  system-ui, sans-serif; // "Trebuchet MS", "Bitstream Vera Sans", sans-serif; - From https://modernfontstacks.com/
-$font-family-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif; // Georgia, "Times New Roman", Times, serif;
-$font-family-monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; // Menlo, Monaco, Consolas, "Courier New", monospace;
+$font-family-sans-serif: system-ui, sans-serif; // "Trebuchet MS", "Bitstream Vera Sans", sans-serif; - From https://modernfontstacks.com/
+$font-family-serif: charter, 'Bitstream Charter', 'Sitka Text', cambria, serif; // Georgia, "Times New Roman", Times, serif;
+$font-family-monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', menlo, consolas, 'DejaVu Sans Mono', monospace; // Menlo, Monaco, Consolas, "Courier New", monospace;
 $font-family-base: $font-family-sans-serif;
-
 $headings-font-weight: 500;
 $mark-color: $body-color;
 $mark-bg: #586A79;
 
 // Tables
-$table-color:                 $white; // var(--#{$prefix}emphasis-color) !default;
+$table-color: $white; // var(--#{$prefix}emphasis-color) !default;
 $table-bg: #4e4e4e;
-$table-hover-bg: #555555;
+$table-hover-bg: #555;
 $table-active-bg: $table-hover-bg;
 $table-head-bg: #292929;
 $table-border-color: #292929;
-$table-bg-scale:       0%; //        -80% !default;
+$table-bg-scale: 0%; //        -80% !default;
 
 // Buttons
-$btn-secondary-color: #dddddd;
-
-$btn-success-color: #ffffff;
+$btn-secondary-color: #ddd;
+$btn-success-color: #fff;
 $btn-success-bg: $success;
-
-$btn-info-color: #ffffff;
+$btn-info-color: #fff;
 $btn-info-bg: $info;
-
-$btn-warning-color: #ffffff;
+$btn-warning-color: #fff;
 $btn-warning-bg: $warning;
-
-$btn-danger-color: #ffffff;
+$btn-danger-color: #fff;
 $btn-danger-bg: $danger;
-
 $btn-link-disabled-color: $gray-800;
 
 // Forms
-$input-bg:                              var(--#{$prefix}body-bg);  // default
+$input-bg: var(--#{$prefix}body-bg);  // default
 $input-bg-disabled: $gray-800;
 $input-color: #cfcfcf;
 $input-border-color: #4c4c4c;
 $input-focus-border-color: $danger;
 $input-color-placeholder: $gray-800;
-$legend-color: #ffffff;
+$legend-color: #fff;
 $legend-border-color: #e5e5e5;
 $input-group-addon-bg: #4F4F4F;
 $input-group-addon-border-color: $input-border-color;
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"); //  !default;
 
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"); //  !default;
-
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Form validation
-$form-valid-color:         #27D383;
-$form-invalid-color:       #F1A2AB;
+$form-valid-color: #27D383;
+$form-invalid-color: #F1A2AB;
 
 // Navs
 $nav-link-color: #BDBDBD;
 $nav-pills-active-link-hover-bg: $component-active-bg;
 $nav-pills-active-link-hover-color: $component-active-color;
-
-$nav-tabs-border-color: #dddddd;
+$nav-tabs-border-color: #ddd;
 $nav-tabs-link-hover-border-color: $gray-700;
 
 // Navbar
@@ -141,57 +131,50 @@ $navbar-light-color: #fff;
 $navbar-light-hover-color: #f4f4f4;
 $navbar-light-hover-bg: transparent;
 $navbar-light-active-color: #f4f4f4;
-$navbar-light-disabled-color: #cccccc;
+$navbar-light-disabled-color: #ccc;
 $navbar-light-disabled-bg: transparent; // No Bootstrap equivalent
 $navbar-light-brand-color: $navbar-light-color;
 $navbar-light-brand-hover-color: color.adjust($navbar-light-color,$lightness: -10%, $space: hsl);
 $navbar-light-brand-hover-bg: transparent;
-
-$navbar-dark-color:                 $navbar-light-color;
-$navbar-dark-hover-color:           $navbar-light-hover-color;
-$navbar-dark-active-color:          $navbar-light-active-color;
-$navbar-dark-disabled-color:        $navbar-light-disabled-color;
-$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
+$navbar-dark-color: $navbar-light-color;
+$navbar-dark-hover-color: $navbar-light-hover-color;
+$navbar-dark-active-color: $navbar-light-active-color;
+$navbar-dark-disabled-color: $navbar-light-disabled-color;
+$navbar-dark-brand-color: $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color: $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-bg: #242424;
-$dropdown-border-color: rgba(0,0,0,.15);
+$dropdown-border-color: rgb(0 0 0 / 15%);
 $dropdown-divider-bg: #e5e5e5;
-
 $dropdown-link-color: $link-color;
 $dropdown-link-hover-color: $gray-200;
 $dropdown-link-hover-bg: transparent;
 $dropdown-link-active-color: $white;
-
 $dropdown-link-disabled-color: $gray-600;
-
-$dropdown-dark-color:               $link-color;
-$dropdown-dark-bg:                  $dropdown-bg;
-
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-dark-color: $link-color;
+$dropdown-dark-bg: $dropdown-bg;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 $pagination-color: #C9C9C9;
 $pagination-bg: #475762;
 $pagination-border: $gray-500;
-
 $pagination-hover-color: $link-hover-color;
 $pagination-hover-bg: $dropdown-link-hover-bg;
-$pagination-hover-border: #dddddd;
-
+$pagination-hover-border: #ddd;
 $pagination-active-color: #000;
 $pagination-active-bg: $primary;
 $pagination-active-border: $primary;
-
 $pagination-disabled-color: $gray-400;
 $pagination-disabled-bg: #3b464d;
-$pagination-disabled-border: #dddddd;
+$pagination-disabled-border: #ddd;
 
 // Placeholders
 // Cards
 $card-bg: #474747;
-//$card-inner-border: #474747; // No Bootstrap equivalent
+
+// $card-inner-border: #474747; // No Bootstrap equivalent
 $card-border-color: transparent;
 
 // Accordion
@@ -199,8 +182,8 @@ $accordion-bg: #2A2A2D;
 $accordion-button-active-color: #fff;
 
 // Tooltips
-$tooltip-color: #ffffff;
-$tooltip-bg: #000000;
+$tooltip-color: #fff;
+$tooltip-bg: #000;
 
 // Popovers
 $popover-bg: #292929;
@@ -210,21 +193,21 @@ $popover-arrow-color: $popover-bg;
 
 // Toasts
 // Badges
-$badge-color: #ffffff;
+$badge-color: #fff;
 
 // Modals
 // Alerts
 // Progress bars
 $progress-bar-color: #000;
 
-//Listgroup
+// Listgroup
 $list-group-bg: color.adjust($body-bg,$lightness: 8%, $space: hsl);
 $list-group-disabled-color: #e9eecf;
 $list-group-disabled-bg: #303030;
 
 // Image thumbnails
 $thumbnail-bg: $body-bg;
-$thumbnail-border-color: #dddddd;
+$thumbnail-border-color: #ddd;
 
 // Figures
 // Breadcrumbs
@@ -234,21 +217,21 @@ $breadcrumb-padding-y: .75rem;
 $breadcrumb-padding-x: .75rem;
 
 // Carousel
-$carousel-text-shadow:  1px 2px rgba(0,0,0,.6);
-$carousel-control-color: #ffffff;
-$carousel-indicator-active-bg: #ffffff;
-$carousel-indicator-border-color: #ffffff;
-$carousel-caption-color: #ffffff;
+$carousel-text-shadow: 1px 2px rgb(0 0 0 / 60%);
+$carousel-control-color: #fff;
+$carousel-indicator-active-bg: #fff;
+$carousel-indicator-border-color: #fff;
+$carousel-caption-color: #fff;
 
 // Close
 $close-font-weight: bold; // No Bootstrap equivalent
-$btn-close-color: #000000;
-$close-text-shadow: 1px 0 #ffffff; // No Bootstrap equivalent
+$btn-close-color: #000;
+$close-text-shadow: 1px 0 #fff; // No Bootstrap equivalent
 
 // Code
 $code-color: #c7254e;
-$kbd-color: #ffffff;
-$kbd-bg: #333333;
+$kbd-color: #fff;
+$kbd-bg: #333;
 $pre-color: $gray-800;
 
 

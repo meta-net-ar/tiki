@@ -1,9 +1,11 @@
 @charset "UTF-8";
+
 /*!
  * The Boosted theme -- an implementation by the Tiki Community of Orange Boosted for Tiki Wiki CMS Groupware (https://tiki.org)
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
 */
+
 /*!
  * Boosted  v5.2.3 (https://boosted.orange.com/)
  * Copyright 2014-2022 The Boosted Authors
@@ -15,6 +17,7 @@
  * Copyright 2011-2022 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+
 /*!
  * Bootstrap  v5.3.7 (https://getbootstrap.com/)
  * Copyright 2011-2025 The Bootstrap Authors
@@ -32,7 +35,6 @@
 @import "../../default/scss/variables-dark"; // 5. Adds default dark variables for any not declared by the theme dark variables file.
 @import "../scss/css-variables"; // 6. Imported after default CSS variables to override them.
 @import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
-
 @import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 8. Remainder of required Bootstrap parts.
 @import "../../base_files/scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 10. Optionally imported to group (separately) the top and topbar zone components for styling.
@@ -60,10 +62,12 @@
 .form-check-input[type="checkbox"] {
     border-radius: 0;
 }
+
 .form-check .form-check-input {
     float: left;
     margin-left: -1.5em;
 }
+
 .form-check-input {
     width: 1em;
     height: 1em;
@@ -74,15 +78,11 @@
     background-position: center;
     background-size: contain;
     border: .125rem solid #ccc;
-    border-top-color: rgb(204, 204, 204);
-    border-right-color: rgb(204, 204, 204);
-    border-bottom-color: rgb(204, 204, 204);
-    border-left-color: rgb(204, 204, 204);
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    border-color: rgb(204 204 204);
     appearance: none;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
+
 //    print-color-adjust: exact;
 }
 
@@ -102,6 +102,7 @@
 
 .navbar-dark .nav-link {
     --bs-nav-link-color: #fff;
+
     & .active {
         color: #ff7900;
     }
@@ -109,6 +110,7 @@
 
 .accordion { --bs-accordion-body-padding-start: 1.25rem; }
 .accordion-button { --bs-accordion-btn-padding-x: 1.25rem; }
+
 .accordion-body.p-0 {
     --bs-accordion-body-padding-top: 0px;
     --bs-accordion-body-padding-end: 0rem;
