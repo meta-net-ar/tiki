@@ -4449,7 +4449,7 @@ class FileGalLib extends TikiLib
         }
 
         $files = $this->table('tiki_files');
-        $fileIds = $files->fetchCol('fileId', [
+        $fileIds = $files->fetchColumn('fileId', [
             'objectId' => $objectId,
             'objectType' => $objectType
         ]);
