@@ -465,7 +465,7 @@ function wikiplugin_swiper($data, $params)
         'teleprompterAcceleration' => 3,
         'teleprompterMirror' => 'n',
         'teleprompterPauseOnHover' => 'y',
-        'teleprompterFocusMode' => 'middle',
+        'teleprompterFocusMode' => 'top',
         'teleprompterTimer' => 'y',
         'teleprompterFontScale' => 120,
     ];
@@ -475,6 +475,39 @@ function wikiplugin_swiper($data, $params)
     }
 
     $isTeleprompter = $params['teleprompter'] === 'y';
+    if ($isTeleprompter) {
+        $ignoredTeleprompterParams = [
+            'effect',
+            'sliderPosition',
+            'pagination',
+            'navigation',
+            'parallaxBgImg',
+            'autoPlay',
+            'autoPlayDelay',
+            'displayThumbnails',
+            'speed',
+            'spaceBetween',
+            'slidesPerView',
+            'slidesPerViewMobile',
+            'slidesPerViewTab',
+            'slidesPerColumn',
+            'slidesPerColumnFill',
+            'centeredSlides',
+            'slidesOffsetBefore',
+            'slidesOffsetAfter',
+            'slideToClickedSlide',
+            'freeMode',
+            'preloadImages',
+            'updateOnImagesReady',
+            'loop',
+        ];
+        $ignoredOverrides = [];
+        foreach ($ignoredTeleprompterParams as $ignoredParam) {
+            if (isset($defaults[$ignoredParam]) && isset($params[$ignoredParam]) && (string) $params[$ignoredParam] !== (string) $defaults[$ignoredParam]) {
+                $ignoredOverrides[] = $ignoredParam;
+            }
+        }
+    }
     $swiperDigitsParams = [];
     foreach ($plugininfo['params'] as $key => $param) {
         if (! empty($param['filter']) && $param['filter'] === 'digits') {
@@ -580,81 +613,98 @@ function wikiplugin_swiper($data, $params)
         $trackId = 'teleprompter-track' . $uid;
         $contentId = 'teleprompter-content' . $uid;
         $timerId = 'teleprompter-timer' . $uid;
-        $teleprompterSpeed = max(10, (int) $params['teleprompterSpeed']);
-        $teleprompterAcceleration = min(10, max(1, (int) $params['teleprompterAcceleration']));
-        $teleprompterFontScale = min(300, max(70, (int) $params['teleprompterFontScale']));
-        $pauseOnHover = $params['teleprompterPauseOnHover'] === 'y' ? 'true' : 'false';
+        $teleprompterMinSpeed = 10;
+        $teleprompterMaxSpeed = 500;
+        $teleprompterSpeedStep = 10;
+        $teleprompterMinAcceleration = 1;
+        $teleprompterMaxAcceleration = 10;
+        $teleprompterMinFontScale = 70;
+        $teleprompterMaxFontScale = 300;
+        $teleprompterFontScaleStep = 5;
+        $teleprompterResizeDebounceMs = 120;
+
+        $teleprompterSpeed = min($teleprompterMaxSpeed, max($teleprompterMinSpeed, (int) $params['teleprompterSpeed']));
+        $teleprompterAcceleration = min($teleprompterMaxAcceleration, max($teleprompterMinAcceleration, (int) $params['teleprompterAcceleration']));
+        $teleprompterFontScale = min($teleprompterMaxFontScale, max($teleprompterMinFontScale, (int) $params['teleprompterFontScale']));
         $mirrorClass = $params['teleprompterMirror'] === 'y' ? ' teleprompter-mirror' : '';
-        $showTimer = $params['teleprompterTimer'] === 'y' ? 'true' : 'false';
+        $showTimer = $params['teleprompterTimer'] === 'y';
         $timerClass = $params['teleprompterTimer'] === 'y' ? '' : ' teleprompter-timer-hidden';
-        $focusMode = in_array($params['teleprompterFocusMode'], ['none', 'top', 'middle', 'bottom'], true) ? $params['teleprompterFocusMode'] : 'middle';
+        $pauseOnHover = $params['teleprompterPauseOnHover'] === 'y';
+        $focusMode = in_array($params['teleprompterFocusMode'], ['none', 'top', 'middle', 'bottom'], true) ? $params['teleprompterFocusMode'] : 'top';
         $focusClass = ' teleprompter-focus-' . $focusMode;
         $teleprompterHtml = implode('', $teleprompterBlocks);
 
-        $headerlib->add_css(
-            '#' . $containerId . '{--teleprompter-font-scale:' . ($teleprompterFontScale / 100) . ';position:relative;overflow:hidden;' . $heightCSS . 'width:' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;}' .
-            '#' . $containerId . '.teleprompter-mirror{transform:scaleX(-1);}' .
-            '#' . $containerId . ' .teleprompter-track{position:relative;z-index:1;will-change:transform;}' .
-            '#' . $containerId . ' .teleprompter-content{padding:0 2rem;}' .
-            '#' . $containerId . ' .teleprompter-spacer{height:0;pointer-events:none;}' .
-            '#' . $containerId . ' .teleprompter-block{line-height:1.6;font-size:calc(' . $params['descriptionSize'] . ' * var(--teleprompter-font-scale));color:' . $params['descriptionColor'] . ';text-align:left;background:' . $params['slideContentBg'] . ';padding:0.75rem 0;margin:0;}' .
-            '#' . $containerId . ' .teleprompter-block h1{font-size:calc(' . $params['titleSize'] . ' * var(--teleprompter-font-scale));color:' . $params['titleColor'] . ';margin:0 0 .5em;}' .
-            '#' . $containerId . ' .teleprompter-media img{max-width:100%;height:auto;display:block;margin:0 auto 1rem;}' .
-            '#' . $containerId . ' .teleprompter-focus-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;}' .
-            '#' . $containerId . ' .tp-focus-mask{position:absolute;left:0;right:0;display:block;background:rgba(0,0,0,.35);}' .
-            '#' . $containerId . ' .tp-focus-mask-top{top:0;height:0;}' .
-            '#' . $containerId . ' .tp-focus-mask-bottom{bottom:0;height:0;}' .
-            '#' . $containerId . ' .tp-focus-guide{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.6);top:50%;display:block;}' .
-            '#' . $containerId . '.teleprompter-focus-none .teleprompter-focus-overlay{display:none;}' .
-            '#' . $containerId . ' .teleprompter-timer{position:absolute;right:12px;bottom:10px;z-index:3;padding:.25rem .55rem;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-family:monospace;line-height:1;font-variant-numeric:tabular-nums;}' .
-            '#' . $containerId . ' .teleprompter-timer-hidden{display:none;}'
-        );
+        $teleprompterCssFile = 'lib/wiki-plugins/css/swiper-teleprompter.css';
+        $teleprompterJsFile = 'lib/wiki-plugins/js/swiper-teleprompter.js';
+        if (! file_exists(__DIR__ . '/css/swiper-teleprompter.css')) {
+            Feedback::error(tr('File %0 is missing.', $teleprompterCssFile));
+            return;
+        }
+        if (! file_exists(__DIR__ . '/js/swiper-teleprompter.js')) {
+            Feedback::error(tr('File %0 is missing.', $teleprompterJsFile));
+            return;
+        }
 
+        static $teleprompterAssetsLoaded = false;
+        if (! $teleprompterAssetsLoaded) {
+            $headerlib->add_cssfile($teleprompterCssFile)
+                ->add_jsfile($teleprompterJsFile);
+            $teleprompterAssetsLoaded = true;
+        }
+
+        $containerStyles = [
+            '--teleprompter-font-scale:' . ($teleprompterFontScale / 100),
+        ];
+        $instanceStyleMap = [
+            '--teleprompter-title-size' => $params['titleSize'],
+            '--teleprompter-title-color' => $params['titleColor'],
+            '--teleprompter-description-size' => $params['descriptionSize'],
+            '--teleprompter-description-color' => $params['descriptionColor'],
+            '--teleprompter-block-bg' => $params['slideContentBg'],
+            'width' => $params['width'],
+            'background' => $params['background'],
+        ];
+        foreach ($instanceStyleMap as $styleName => $styleValue) {
+            if ((string) $styleValue !== '') {
+                $containerStyles[] = $styleName . ':' . $styleValue;
+            }
+        }
+        if ($heightCSS !== '') {
+            $containerStyles[] = rtrim($heightCSS, ';');
+        }
+        $headerlib->add_css('#' . $containerId . '{' . implode(';', $containerStyles) . ';}');
+
+        $teleprompterOptions = [
+            'containerId' => $containerId,
+            'trackId' => $trackId,
+            'contentId' => $contentId,
+            'timerId' => $timerId,
+            'speed' => $teleprompterSpeed,
+            'acceleration' => $teleprompterAcceleration,
+            'fontScale' => $teleprompterFontScale,
+            'showTimer' => $showTimer,
+            'focusMode' => $focusMode,
+            'pauseOnHover' => $pauseOnHover,
+            'minSpeed' => $teleprompterMinSpeed,
+            'maxSpeed' => $teleprompterMaxSpeed,
+            'speedStep' => $teleprompterSpeedStep,
+            'minFontScale' => $teleprompterMinFontScale,
+            'maxFontScale' => $teleprompterMaxFontScale,
+            'fontScaleStep' => $teleprompterFontScaleStep,
+            'resizeDebounceMs' => $teleprompterResizeDebounceMs,
+        ];
         $headerlib->add_js(
-            '$(function(){' .
-            'var $container=$("#' . $containerId . '");' .
-            'var $track=$("#' . $trackId . '");' .
-            'var $first=$("#' . $contentId . '");' .
-            'var $timer=$("#' . $timerId . '");' .
-            'if(!$container.length||!$track.length||!$first.length){return;}' .
-            'var speed=' . $teleprompterSpeed . ';' .
-            'var acceleration=' . $teleprompterAcceleration . ';' .
-            'var fontScale=' . $teleprompterFontScale . ';' .
-            'var showTimer=' . $showTimer . ';' .
-            'var focusMode=' . json_encode($focusMode) . ';' .
-            'var pauseOnHover=' . $pauseOnHover . ';' .
-            'var $focusOverlay=$container.find(".teleprompter-focus-overlay");' .
-            'var $focusMaskTop=$container.find(".tp-focus-mask-top");' .
-            'var $focusMaskBottom=$container.find(".tp-focus-mask-bottom");' .
-            'var $focusGuide=$container.find(".tp-focus-guide");' .
-            'var $leadSpacer=$first.find(".teleprompter-spacer-before");' .
-            'var $trailSpacer=$first.find(".teleprompter-spacer-after");' .
-            'var minSpeed=10;var maxSpeed=500;var speedStep=10;var minFontScale=70;var maxFontScale=300;var fontScaleStep=5;' .
-            'var pausedByUser=false;var pausedByHover=false;var reachedEnd=false;var offset=0;var lastTs=null;var loopHeight=1;var maxOffset=0;var lastSpeedInputTs=0;var elapsedMs=0;var lastTimerText="";' .
-            'var isPaused=function(){return pausedByUser||pausedByHover;};' .
-            'var formatElapsed=function(totalMs){var totalSeconds=Math.floor(totalMs/1000);var hours=Math.floor(totalSeconds/3600);var minutes=Math.floor((totalSeconds%3600)/60);var seconds=totalSeconds%60;var pad=function(value){return value<10?"0"+value:String(value);};if(hours>0){return pad(hours)+":"+pad(minutes)+":"+pad(seconds);}return pad(minutes)+":"+pad(seconds);};' .
-            'var updateTimerDisplay=function(){if(!showTimer||!$timer.length){return;}var timerText=formatElapsed(elapsedMs);if(timerText!==lastTimerText){$timer.text(timerText);lastTimerText=timerText;}};' .
-            'var refreshLoopHeight=function(){loopHeight=Math.max($first.outerHeight(true),1);var containerHeight=Math.max($container.innerHeight(),1);maxOffset=Math.max(loopHeight-containerHeight,0);if(offset>maxOffset){offset=maxOffset;$track.css("transform","translate3d(0,-"+offset+"px,0)");}reachedEnd=maxOffset>0&&offset>=maxOffset;};' .
-            'var getSampleLineHeight=function(){var $sample=$first.find(".teleprompter-block").first();if(!$sample.length){$sample=$first;}var lineHeight=parseFloat($sample.css("line-height"));if(!isFinite(lineHeight)){var fontSize=parseFloat($sample.css("font-size"))||24;lineHeight=fontSize*1.4;}return Math.max(12,lineHeight);};' .
-            'var refreshSpacers=function(){var containerHeight=Math.max($container.innerHeight(),1);var lineHeight=getSampleLineHeight();var spacerHeight=Math.max(containerHeight,lineHeight*4);if($leadSpacer.length){$leadSpacer.css("height",spacerHeight+"px");}if($trailSpacer.length){$trailSpacer.css("height",spacerHeight+"px");}};' .
-            'var refreshFocusOverlay=function(){if(focusMode==="none"||!$focusOverlay.length){return;}var containerHeight=$container.innerHeight();if(!containerHeight||containerHeight<=0){return;}var lineHeight=getSampleLineHeight();var focusHeight=Math.min(containerHeight*0.30,Math.max(lineHeight+8,lineHeight*1.35));var start=0;if(focusMode==="top"){start=0;}else if(focusMode==="bottom"){start=Math.max(0,containerHeight-focusHeight);}else{start=Math.max(0,(containerHeight-focusHeight)/2);}var bottomHeight=Math.max(0,containerHeight-(start+focusHeight));$focusMaskTop.css("height",start+"px");$focusMaskBottom.css("height",bottomHeight+"px");$focusGuide.css("top",(start+(focusHeight/2))+"px");};' .
-            'var refreshFontScale=function(){var scaleFactor=Math.max(minFontScale,Math.min(maxFontScale,fontScale))/100;$container.css("--teleprompter-font-scale",String(scaleFactor));refreshSpacers();refreshLoopHeight();refreshFocusOverlay();};' .
-            'var applySpeedStep=function(targetDirection,stepCount){targetDirection=targetDirection>=0?1:-1;stepCount=Math.max(1,stepCount||1);if(maxOffset>0&&pausedByUser){if(offset>=maxOffset&&targetDirection<0){speed=-Math.max(minSpeed,Math.min(maxSpeed,Math.abs(speed)));pausedByUser=false;reachedEnd=false;return;}if(offset<=0&&targetDirection>0){speed=Math.max(minSpeed,Math.min(maxSpeed,Math.abs(speed)));pausedByUser=false;return;}}var now=Date.now();var elapsed=lastSpeedInputTs?now-lastSpeedInputTs:1000;lastSpeedInputTs=now;var accelerationFactor=1;if(elapsed<500){accelerationFactor=1+((500-elapsed)/500)*Math.max(0,acceleration-1);}var delta=speedStep*stepCount*accelerationFactor;var currentDirection=speed>=0?1:-1;var currentMagnitude=Math.max(minSpeed,Math.min(maxSpeed,Math.abs(speed)));if(targetDirection===currentDirection){currentMagnitude=Math.min(maxSpeed,currentMagnitude+delta);speed=currentDirection*currentMagnitude;}else{var reducedMagnitude=currentMagnitude-delta;if(reducedMagnitude>minSpeed){speed=currentDirection*reducedMagnitude;}else{var reverseMagnitude=Math.min(maxSpeed,minSpeed+(minSpeed-reducedMagnitude));speed=targetDirection*reverseMagnitude;}}if(pausedByUser&&maxOffset>0&&((offset>=maxOffset&&targetDirection<0)||(offset<=0&&targetDirection>0))){pausedByUser=false;}if(targetDirection<0){reachedEnd=false;}};' .
-            'var applyFontScaleStep=function(direction,stepCount){stepCount=Math.max(1,stepCount||1);fontScale=Math.max(minFontScale,Math.min(maxFontScale,fontScale+(direction*fontScaleStep*stepCount)));refreshFontScale();};' .
-            'var restartFromBeginning=function(){offset=0;elapsedMs=0;lastTs=null;reachedEnd=false;$track.css("transform","translate3d(0,-0px,0)");updateTimerDisplay();};' .
-            'var animate=function(ts){if(lastTs===null){lastTs=ts;}var dt=(ts-lastTs)/1000;lastTs=ts;if(!isPaused()&&maxOffset>0){offset+=speed*dt;elapsedMs+=(dt*1000);if(offset>=maxOffset){offset=maxOffset;reachedEnd=true;if(speed>0){pausedByUser=true;}}else if(offset<=0){offset=0;if(speed<0){pausedByUser=true;}reachedEnd=false;}else{reachedEnd=false;}$track.css("transform","translate3d(0,-"+offset+"px,0)");}updateTimerDisplay();window.requestAnimationFrame(animate);};' .
-            'refreshFontScale();updateTimerDisplay();$(window).on("resize",function(){refreshSpacers();refreshLoopHeight();refreshFocusOverlay();});window.requestAnimationFrame(animate);' .
-            'if(pauseOnHover){$container.on("mouseenter",function(){pausedByHover=true;}).on("mouseleave",function(){pausedByHover=false;});}' .
-            '$container.attr("tabindex","0").on("keydown",function(e){var target=e.target;var tagName=target&&target.tagName?target.tagName.toLowerCase():"";if(tagName==="input"||tagName==="textarea"||(target&&target.isContentEditable)){return;}var key=e.key||"";var lowerKey=key.toLowerCase();if(key===" "||key==="Spacebar"){if(reachedEnd){restartFromBeginning();pausedByUser=false;}else{pausedByUser=!pausedByUser;}e.preventDefault();return;}if(key==="Backspace"){restartFromBeginning();pausedByUser=false;e.preventDefault();return;}if(key==="ArrowDown"||lowerKey==="s"){applySpeedStep(1,1);e.preventDefault();return;}if(key==="ArrowUp"||lowerKey==="w"){applySpeedStep(-1,1);e.preventDefault();return;}if(key==="ArrowRight"||lowerKey==="d"){applyFontScaleStep(1,1);e.preventDefault();return;}if(key==="ArrowLeft"||lowerKey==="a"){applyFontScaleStep(-1,1);e.preventDefault();}}).on("wheel",function(e){var originalEvent=e.originalEvent||e;if(!originalEvent||typeof originalEvent.deltaY==="undefined"||originalEvent.deltaY===0){return;}var direction=originalEvent.deltaY>0?-1:1;var stepCount=Math.max(1,Math.min(5,Math.round(Math.abs(originalEvent.deltaY)/100)));applySpeedStep(direction,stepCount);e.preventDefault();});' .
-            '});'
+            '$(function(){if(typeof window.tikiInitSwiperTeleprompter==="function"){window.tikiInitSwiperTeleprompter(' . json_encode($teleprompterOptions) . ');}});'
         );
 
-        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '">' .
+        $teleprompterRegionLabel = htmlspecialchars(tr('Teleprompter content'), ENT_QUOTES);
+
+        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
             '<div id="' . $trackId . '" class="teleprompter-track">' .
             '<div id="' . $contentId . '" class="teleprompter-content"><div class="teleprompter-spacer teleprompter-spacer-before" aria-hidden="true"></div>' . $teleprompterHtml . '<div class="teleprompter-spacer teleprompter-spacer-after" aria-hidden="true"></div></div>' .
             '</div>' .
             '<div class="teleprompter-focus-overlay" aria-hidden="true"><div class="tp-focus-mask tp-focus-mask-top"></div><div class="tp-focus-mask tp-focus-mask-bottom"></div><div class="tp-focus-guide"></div></div>' .
-            '<div id="' . $timerId . '" class="teleprompter-timer' . $timerClass . '" aria-live="polite">00:00</div>' .
+            '<div id="' . $timerId . '" class="teleprompter-timer' . $timerClass . '" aria-live="polite" aria-atomic="true">00:00</div>' .
             '</div>';
     }
 
