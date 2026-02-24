@@ -374,6 +374,14 @@ function wikiplugin_swiper_info()
                 'default' => 60,
                 'advanced' => true,
             ],
+            'teleprompterAcceleration' => [
+                'required' => false,
+                'name' => tr('Teleprompter acceleration'),
+                'description' => tr('Acceleration intensity applied when repeatedly changing speed.'),
+                'filter' => 'digits',
+                'default' => 3,
+                'advanced' => true,
+            ],
             'teleprompterMirror' => [
                 'required' => false,
                 'name' => tr('Mirror teleprompter'),
@@ -398,6 +406,40 @@ function wikiplugin_swiper_info()
                     ['text' => 'No', 'value' => 'n'],
                 ],
             ],
+            'teleprompterFocusMode' => [
+                'required' => false,
+                'name' => tr('Teleprompter focus area'),
+                'description' => tr('Highlight focus area while dimming non-reading areas.'),
+                'filter' => 'word',
+                'default' => 'middle',
+                'advanced' => true,
+                'options' => [
+                    ['text' => tr('None'), 'value' => 'none'],
+                    ['text' => tr('Top'), 'value' => 'top'],
+                    ['text' => tr('Middle'), 'value' => 'middle'],
+                    ['text' => tr('Bottom'), 'value' => 'bottom'],
+                ],
+            ],
+            'teleprompterTimer' => [
+                'required' => false,
+                'name' => tr('Teleprompter timer'),
+                'description' => tr('Display running timer while prompting.'),
+                'filter' => 'alpha',
+                'default' => 'y',
+                'advanced' => true,
+                'options' => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No', 'value' => 'n'],
+                ],
+            ],
+            'teleprompterFontScale' => [
+                'required' => false,
+                'name' => tr('Teleprompter font scale'),
+                'description' => tr('Initial font scale percentage for teleprompter mode.'),
+                'filter' => 'digits',
+                'default' => 120,
+                'advanced' => true,
+            ],
         ]
     ];
 }
@@ -420,8 +462,12 @@ function wikiplugin_swiper($data, $params)
     $params += [
         'teleprompter' => 'n',
         'teleprompterSpeed' => 60,
+        'teleprompterAcceleration' => 3,
         'teleprompterMirror' => 'n',
         'teleprompterPauseOnHover' => 'y',
+        'teleprompterFocusMode' => 'middle',
+        'teleprompterTimer' => 'y',
+        'teleprompterFontScale' => 120,
     ];
     if (trim((string) $params['fileIds']) === '' && trim((string) $params['fgalId']) === '' && trim((string) $data) === '') {
         Feedback::error(tr('Parameters missing: Please either select file gallery, give file ids or custom slide code in body.'));
@@ -533,19 +579,39 @@ function wikiplugin_swiper($data, $params)
         $containerId = 'swiper-container' . $uid;
         $trackId = 'teleprompter-track' . $uid;
         $contentId = 'teleprompter-content' . $uid;
+        $timerId = 'teleprompter-timer' . $uid;
         $teleprompterSpeed = max(10, (int) $params['teleprompterSpeed']);
+        $teleprompterAcceleration = min(10, max(1, (int) $params['teleprompterAcceleration']));
+        $teleprompterFontScale = min(300, max(70, (int) $params['teleprompterFontScale']));
         $pauseOnHover = $params['teleprompterPauseOnHover'] === 'y' ? 'true' : 'false';
         $mirrorClass = $params['teleprompterMirror'] === 'y' ? ' teleprompter-mirror' : '';
+        $showTimer = $params['teleprompterTimer'] === 'y' ? 'true' : 'false';
+        $timerClass = $params['teleprompterTimer'] === 'y' ? '' : ' teleprompter-timer-hidden';
+        $focusMode = in_array($params['teleprompterFocusMode'], ['none', 'top', 'middle', 'bottom'], true) ? $params['teleprompterFocusMode'] : 'middle';
+        $focusClass = ' teleprompter-focus-' . $focusMode;
         $teleprompterHtml = implode('', $teleprompterBlocks);
 
         $headerlib->add_css(
-            '#' . $containerId . '{position:relative;overflow:hidden;' . $heightCSS . 'width:' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;}' .
+            '#' . $containerId . '{--teleprompter-font-scale:' . ($teleprompterFontScale / 100) . ';position:relative;overflow:hidden;' . $heightCSS . 'width:' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;}' .
             '#' . $containerId . '.teleprompter-mirror{transform:scaleX(-1);}' .
-            '#' . $containerId . ' .teleprompter-track{will-change:transform;}' .
+            '#' . $containerId . ' .teleprompter-track{position:relative;z-index:1;will-change:transform;}' .
             '#' . $containerId . ' .teleprompter-content{padding:1.5rem 2rem;}' .
-            '#' . $containerId . ' .teleprompter-block{line-height:1.6;font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align:left;background:' . $params['slideContentBg'] . ';padding:0.75rem 0;margin:0;}' .
-            '#' . $containerId . ' .teleprompter-block h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . ';margin:0 0 .5em;}' .
-            '#' . $containerId . ' .teleprompter-media img{max-width:100%;height:auto;display:block;margin:0 auto 1rem;}'
+            '#' . $containerId . ' .teleprompter-block{line-height:1.6;font-size:calc(' . $params['descriptionSize'] . ' * var(--teleprompter-font-scale));color:' . $params['descriptionColor'] . ';text-align:left;background:' . $params['slideContentBg'] . ';padding:0.75rem 0;margin:0;}' .
+            '#' . $containerId . ' .teleprompter-block h1{font-size:calc(' . $params['titleSize'] . ' * var(--teleprompter-font-scale));color:' . $params['titleColor'] . ';margin:0 0 .5em;}' .
+            '#' . $containerId . ' .teleprompter-media img{max-width:100%;height:auto;display:block;margin:0 auto 1rem;}' .
+            '#' . $containerId . ' .teleprompter-focus-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;}' .
+            '#' . $containerId . ' .tp-focus-mask{position:absolute;left:0;right:0;display:none;background:rgba(0,0,0,.35);}' .
+            '#' . $containerId . ' .tp-focus-guide{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.6);display:none;}' .
+            '#' . $containerId . '.teleprompter-focus-none .teleprompter-focus-overlay{display:none;}' .
+            '#' . $containerId . '.teleprompter-focus-top .tp-focus-mask-bottom{display:block;top:34%;bottom:0;}' .
+            '#' . $containerId . '.teleprompter-focus-top .tp-focus-guide{display:block;top:34%;}' .
+            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-mask-top{display:block;top:0;bottom:67%;}' .
+            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-mask-bottom{display:block;top:67%;bottom:0;}' .
+            '#' . $containerId . '.teleprompter-focus-middle .tp-focus-guide{display:block;top:50%;}' .
+            '#' . $containerId . '.teleprompter-focus-bottom .tp-focus-mask-top{display:block;top:0;bottom:34%;}' .
+            '#' . $containerId . '.teleprompter-focus-bottom .tp-focus-guide{display:block;top:66%;}' .
+            '#' . $containerId . ' .teleprompter-timer{position:absolute;right:12px;bottom:10px;z-index:3;padding:.25rem .55rem;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-family:monospace;line-height:1;font-variant-numeric:tabular-nums;}' .
+            '#' . $containerId . ' .teleprompter-timer-hidden{display:none;}'
         );
 
         $headerlib->add_js(
@@ -553,23 +619,37 @@ function wikiplugin_swiper($data, $params)
             'var $container=$("#' . $containerId . '");' .
             'var $track=$("#' . $trackId . '");' .
             'var $first=$("#' . $contentId . '");' .
+            'var $timer=$("#' . $timerId . '");' .
             'if(!$container.length||!$track.length||!$first.length){return;}' .
             'var speed=' . $teleprompterSpeed . ';' .
+            'var acceleration=' . $teleprompterAcceleration . ';' .
+            'var fontScale=' . $teleprompterFontScale . ';' .
+            'var showTimer=' . $showTimer . ';' .
             'var pauseOnHover=' . $pauseOnHover . ';' .
-            'var paused=false;var offset=0;var lastTs=null;var loopHeight=1;' .
+            'var minSpeed=10;var maxSpeed=500;var speedStep=10;var minFontScale=70;var maxFontScale=300;var fontScaleStep=5;' .
+            'var pausedByUser=false;var pausedByHover=false;var offset=0;var lastTs=null;var loopHeight=1;var lastSpeedInputTs=0;var elapsedMs=0;var lastTimerText="";' .
+            'var isPaused=function(){return pausedByUser||pausedByHover;};' .
+            'var formatElapsed=function(totalMs){var totalSeconds=Math.floor(totalMs/1000);var hours=Math.floor(totalSeconds/3600);var minutes=Math.floor((totalSeconds%3600)/60);var seconds=totalSeconds%60;var pad=function(value){return value<10?"0"+value:String(value);};if(hours>0){return pad(hours)+":"+pad(minutes)+":"+pad(seconds);}return pad(minutes)+":"+pad(seconds);};' .
+            'var updateTimerDisplay=function(){if(!showTimer||!$timer.length){return;}var timerText=formatElapsed(elapsedMs);if(timerText!==lastTimerText){$timer.text(timerText);lastTimerText=timerText;}};' .
             'var refreshLoopHeight=function(){loopHeight=Math.max($first.outerHeight(true),1);};' .
-            'var animate=function(ts){if(lastTs===null){lastTs=ts;}var dt=(ts-lastTs)/1000;lastTs=ts;if(!paused){offset+=speed*dt;if(offset>=loopHeight){offset=offset%loopHeight;}$track.css("transform","translate3d(0,-"+offset+"px,0)");}window.requestAnimationFrame(animate);};' .
-            'refreshLoopHeight();$(window).on("resize",refreshLoopHeight);window.requestAnimationFrame(animate);' .
-            'if(pauseOnHover){$container.on("mouseenter",function(){paused=true;}).on("mouseleave",function(){paused=false;});}' .
-            '$container.attr("tabindex","0").on("keydown",function(e){if(e.key===" "){paused=!paused;e.preventDefault();}if(e.key==="ArrowUp"){speed=Math.min(speed+10,500);e.preventDefault();}if(e.key==="ArrowDown"){speed=Math.max(speed-10,10);e.preventDefault();}});' .
+            'var refreshFontScale=function(){var scaleFactor=Math.max(minFontScale,Math.min(maxFontScale,fontScale))/100;$container.css("--teleprompter-font-scale",String(scaleFactor));refreshLoopHeight();};' .
+            'var applySpeedStep=function(direction,stepCount){stepCount=Math.max(1,stepCount||1);var now=Date.now();var elapsed=lastSpeedInputTs?now-lastSpeedInputTs:1000;lastSpeedInputTs=now;var accelerationFactor=1;if(elapsed<500){accelerationFactor=1+((500-elapsed)/500)*Math.max(0,acceleration-1);}var delta=direction*speedStep*stepCount*accelerationFactor;speed=Math.max(minSpeed,Math.min(maxSpeed,speed+delta));};' .
+            'var applyFontScaleStep=function(direction,stepCount){stepCount=Math.max(1,stepCount||1);fontScale=Math.max(minFontScale,Math.min(maxFontScale,fontScale+(direction*fontScaleStep*stepCount)));refreshFontScale();};' .
+            'var animate=function(ts){if(lastTs===null){lastTs=ts;}var dt=(ts-lastTs)/1000;lastTs=ts;if(!isPaused()){offset+=speed*dt;elapsedMs+=(dt*1000);if(offset>=loopHeight){offset=offset%loopHeight;}$track.css("transform","translate3d(0,-"+offset+"px,0)");}updateTimerDisplay();window.requestAnimationFrame(animate);};' .
+            'refreshFontScale();refreshLoopHeight();updateTimerDisplay();$(window).on("resize",refreshLoopHeight);window.requestAnimationFrame(animate);' .
+            'if(pauseOnHover){$container.on("mouseenter",function(){pausedByHover=true;}).on("mouseleave",function(){pausedByHover=false;});}' .
+            '$container.attr("tabindex","0").on("keydown",function(e){var target=e.target;var tagName=target&&target.tagName?target.tagName.toLowerCase():"";if(tagName==="input"||tagName==="textarea"||(target&&target.isContentEditable)){return;}var key=e.key||"";var lowerKey=key.toLowerCase();if(key===" "||key==="Spacebar"){pausedByUser=!pausedByUser;e.preventDefault();return;}if(key==="Backspace"){elapsedMs=0;updateTimerDisplay();e.preventDefault();return;}if(key==="ArrowDown"||lowerKey==="s"){applySpeedStep(1,1);e.preventDefault();return;}if(key==="ArrowUp"||lowerKey==="w"){applySpeedStep(-1,1);e.preventDefault();return;}if(key==="ArrowRight"||lowerKey==="d"){applyFontScaleStep(1,1);e.preventDefault();return;}if(key==="ArrowLeft"||lowerKey==="a"){applyFontScaleStep(-1,1);e.preventDefault();}}).on("wheel",function(e){var originalEvent=e.originalEvent||e;if(!originalEvent||typeof originalEvent.deltaY==="undefined"||originalEvent.deltaY===0){return;}var direction=originalEvent.deltaY>0?1:-1;var stepCount=Math.max(1,Math.min(5,Math.round(Math.abs(originalEvent.deltaY)/100)));applySpeedStep(direction,stepCount);e.preventDefault();});' .
             '});'
         );
 
-        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . '">' .
+        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '">' .
             '<div id="' . $trackId . '" class="teleprompter-track">' .
             '<div id="' . $contentId . '" class="teleprompter-content">' . $teleprompterHtml . '</div>' .
             '<div class="teleprompter-content" aria-hidden="true">' . $teleprompterHtml . '</div>' .
-            '</div></div>';
+            '</div>' .
+            '<div class="teleprompter-focus-overlay" aria-hidden="true"><div class="tp-focus-mask tp-focus-mask-top"></div><div class="tp-focus-mask tp-focus-mask-bottom"></div><div class="tp-focus-guide"></div></div>' .
+            '<div id="' . $timerId . '" class="teleprompter-timer' . $timerClass . '" aria-live="polite">00:00</div>' .
+            '</div>';
     }
 
     $swiper_js_path = SWIPER_DIST_PATH . '/swiper-bundle.min.js';
