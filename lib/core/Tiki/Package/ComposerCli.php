@@ -290,7 +290,7 @@ class ComposerCli
                     $safeTimeout = 1;
                 }
                 if ($timeout > $safeTimeout) {
-                    $timeout = (int) $safeTimeout;
+                    $timeout = $safeTimeout;
                 }
             }
 
