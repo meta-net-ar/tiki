@@ -56,7 +56,7 @@ class Reports_EndToEndTest extends TikiDatabaseTestCase
     {
         $this->obj->send();
 
-        $expectedCacheTable = $this->createMySQLXmlDataSet(__DIR__ . '/fixtures/end_to_end_test_result_dataset.xml')
+        $this->createMySQLXmlDataSet(__DIR__ . '/fixtures/end_to_end_test_result_dataset.xml')
             ->getTable('tiki_user_reports_cache');
         $queryCacheTable = $this->getConnection()->createQueryTable('tiki_user_reports_cache', 'SELECT * FROM tiki_user_reports_cache');
         $this->assertEquals(0, $queryCacheTable->getRowCount());

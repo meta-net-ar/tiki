@@ -71,7 +71,7 @@ require_once('tiki-setup_base.php'); //Starting here composer autoloading is ava
 if (! empty($user) && isset($_SESSION['login_time'])) {
     $userInfo = $userlib->get_user_info($user);
 
-    if (! empty($userInfo['lastLogin']) && $_SESSION['login_time'] < $userInfo['lastLogin']) {
+    if (! empty($userInfo['pass_confirm']) && $_SESSION['login_time'] < $userInfo['pass_confirm']) {
         TikiLib::lib('login')->logout();
         if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
             header('Location:tiki-login_scr.php');

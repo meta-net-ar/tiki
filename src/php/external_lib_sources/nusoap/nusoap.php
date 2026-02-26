@@ -2202,6 +2202,11 @@ class soap_transport_http extends nusoap_base {
                                 // certpassword: SSL certificate password
                                 // verifypeer: default is 1
                                 // verifyhost: default is 1
+    public $fragment;
+    public $pass;
+    public $query;
+    public $user;
+
 
     /**
     * constructor

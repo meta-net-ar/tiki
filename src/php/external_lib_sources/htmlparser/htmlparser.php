@@ -91,7 +91,8 @@ if (! defined("_ECHOSERVER_HTML_PARSER")) {
                 return;
             }
             if (! $fp = fopen($this->name, "rb")) {
-                $this->SetError(1, "Can't open file $this->name.", 0, 0, "Error");
+                //This error handler does not exist, but we don't use that codepath in tiki, so... - benoitg - 2026-02-16
+                //$this->SetError(1, "Can't open file $this->name.", 0, 0, "Error");
                 return;
             }
             flock($fp, 1);

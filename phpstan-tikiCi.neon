@@ -10,22 +10,7 @@ parameters:
   #customRulesetUsed: true
   level: 0
   ignoreErrors:
-  # This is what I want to fix right now, but let's get the CI plumbing in place first.
-    -
-      identifier: new.noConstructor
-    -
-      identifier: new.interface
-    -
-      identifier: method.notFound   
-    -
-      identifier: staticMethod.notFound   
-    -
-      identifier: staticProperty.notFound 
-    -
-      identifier: property.notFound
-    -
-      identifier: classConstant.notFound
-  # Real bugs or phpstan misconfiguration for sure, but we have to start somewhere
+  # TODO: phpstan level 0 tests representing Real bugs or phpstan misconfiguration for sure
     -
       identifier: requireOnce.fileNotFound
     -
@@ -36,7 +21,7 @@ parameters:
       identifier: arguments.count
     -
       identifier: unset.offset 
-  # Likely bugs...
+  # TODO: phpstan level 0 tests representing Likely bugs...
     -
       identifier: unset.variable
     -
@@ -51,6 +36,6 @@ parameters:
       identifier: variable.undefined
     -
       identifier: class.nameCase
-  # Maybe that still works, but in this day and age...
+  # TODO: phpstan level 0 tests that represents things that Maybe that still work, but in this day and age...
     -
       identifier: method.staticCall                                 

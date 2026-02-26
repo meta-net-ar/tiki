@@ -174,13 +174,6 @@ class Services_File_Controller
             $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
         }
 
-        /* The above if/else sets $type using finfo_file(). The following uses finfo_buffer(), which gives a type different from that obtained from finfo_file() in the case of Outlook .msg files on PHP 5.6. In this case, finfo_file()'s result is better. It is not impossible that the technique below would give better results in other cases.
-        See https://stackoverflow.com/questions/45243973/fileinfo-finfo-buffer-results-differ-from-finfo-file
-        Chealer 2017-07-21
-        $mimelib = TikiLib::lib('mime');
-        $type = $mimelib->from_content($name, $data);
-        */
-
         if (empty($fileId) && (empty($name) || $size == 0 || empty($data))) {
             $message = tr('File could not be uploaded:') . ' ';
             $error = error_get_last();

@@ -32,7 +32,6 @@ class Tiki_Profile_InstallHandler_WebserviceTemplate extends Tiki_Profile_Instal
 
     public function doInstall()
     {
-        global $tikilib;
         $data = $this->getData();
 
         $this->replaceReferences($data);

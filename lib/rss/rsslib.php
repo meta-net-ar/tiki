@@ -167,9 +167,7 @@ class RSSLib extends TikiDb_Bridge
     public function generate_feed($section, $uniqueid, $feed_version, $changes, $itemurl, $urlparam, $id, $title, $titleId, $desc, $descId, $dateId, $authorId, $fromcache = false)
     {
         global $tiki_p_admin, $prefs;
-        $userlib = TikiLib::lib('user');
         $tikilib = TikiLib::lib('tiki');
-        $smarty = TikiLib::lib('smarty');
 
         // both title and description fields cannot be null
         if (empty($title) || empty($desc)) {
@@ -209,8 +207,6 @@ class RSSLib extends TikiDb_Bridge
         } else {
             $feedLink = htmlspecialchars($tikilib->httpPrefix() . $_SERVER["REQUEST_URI"]);
         }
-
-        $img = htmlspecialchars($URLPrefix . $prefs['feed_img']);
 
         $title = htmlspecialchars($title);
         $desc = htmlspecialchars($desc);
@@ -1048,7 +1044,7 @@ class RSSLib extends TikiDb_Bridge
                 return Laminas\Feed\Reader\Reader::importString($content);
             }
             throw new Laminas\Feed\Exception\RuntimeException('Unreadable feed.');
-        } catch (Laminas\Feed\Exception\ExceptionInterface $e) {
+        } catch (Laminas\Feed\Exception\ExceptionInterface) {
             return null;
         }
     }

@@ -197,8 +197,7 @@ class FaqLib extends TikiLib
      */
     public function remove_faq_question($questionId)
     {
-        $faqId = $this->getOne('select `faqId` from `tiki_faq_questions` where `questionId`=?', [$questionId]);
-        $result = $this->query('delete from `tiki_faq_questions` where `questionId`=?', [$questionId]);
+        $this->query('delete from `tiki_faq_questions` where `questionId`=?', [$questionId]);
         return true;
     }
 
@@ -340,7 +339,7 @@ class FaqLib extends TikiLib
     {
         $query = "delete from `tiki_suggested_faq_questions` where `sfqId`=?";
 
-        $result = $this->query($query, [(int) $sfqId]);
+        $this->query($query, [(int) $sfqId]);
     }
 
     /**

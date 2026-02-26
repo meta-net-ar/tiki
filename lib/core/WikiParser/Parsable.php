@@ -150,7 +150,7 @@ class WikiParser_Parsable extends ParserLib
         $argumentParser = new WikiParser_PluginArgumentParser();
 
         foreach ($matches as $match) {
-            if ($this->option['parseimgonly'] && $this->getName() != 'img') {
+            if ($this->option['parseimgonly'] && $match->getName() != 'img') {
                 continue;
             }
 

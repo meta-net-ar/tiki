@@ -369,7 +369,7 @@ $(document).on("tiki.modal.redraw", function(event) {
         $modalContent = $modalContent.find(".modal-content")
     }
     
-    // Guard (prevents duplicate listeners)
+    // Guard: Prevent duplicate listeners on the same modal
     const el = $modalContent[0];
     if (el.dataset.resizeInit === '1') return;
     el.dataset.resizeInit = '1';
@@ -377,7 +377,7 @@ $(document).on("tiki.modal.redraw", function(event) {
     const modalBody = $modalContent.find(".modal-body")[0];
     if (!modalBody) return;
 
-    let initialWidth, initialHeight;
+    let initialHeight;
     const initialOverflow = getComputedStyle(modalBody).overflow;
 
     const modalId = 'modal' + Math.random().toString(36).substring(7);
@@ -389,10 +389,9 @@ $(document).on("tiki.modal.redraw", function(event) {
         edges: { left: true, right: true, bottom: true, top: true },
         inertia: true,
         listeners: {
-            // The start listener captures the modal's dimensions at the moment resizing begins, which is crucial for the overflow logic to work correctly on the first try.
+            // The start listener captures the modal's initial height if not yet done, at the moment resizing begins.
             start(event) {
-                initialWidth = event.rect.width;
-                initialHeight = event.rect.height;
+                if(! initialHeight) initialHeight = event.rect.height;
             },
             move: (e) => {
                 const target = e.target;
@@ -405,12 +404,13 @@ $(document).on("tiki.modal.redraw", function(event) {
                 const y = (parseFloat(target.dataset.y) || 0) + (e.deltaRect.top || 0);
 
                 target.style.width = `${width}px`;
-                target.style.height = `${height}px`;
+                if (e.edges.top || e.edges.bottom) {
+                    target.style.height = `${height}px`;
+                }
                 target.style.transform = `translate(${x}px, ${y}px)`;
                 target.dataset.x = x;
                 target.dataset.y = y;
-
-                if (width < initialWidth || height < initialHeight) {
+                if (width < modalBody.scrollWidth || height < initialHeight) {
                     modalBody.style.overflow = "auto";
                 } else {
                     modalBody.style.overflow = initialOverflow;

@@ -277,7 +277,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
                 'tracker_item_status' => $typeFactory->identifier($item['status'] ?? false),
             ]);
 
-            foreach (Search_ContentSource_TrackerItemSource::getIndexableHandlers($definition, $item) as $baseKey => $handler) {
+            foreach (Search_ContentSource_TrackerItemSource::getIndexableHandlers($definition, $item) as $handler) {
                 $data = array_merge($data, $handler->getDocumentPart($typeFactory));
             }
         }

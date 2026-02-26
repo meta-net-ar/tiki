@@ -17,10 +17,7 @@ class TikiFilter_PreventXss implements Laminas\Filter\FilterInterface
         }
     }
 
-    /* RemoveXSS initially developped by kallahar - quickwired.com, modified for Tiki
-     * Original code could be found here:
-     * http://quickwired.com/smallprojects/php_xss_filter_function.php
-     */
+    /* RemoveXSS initially developed by kallahar - quickwired.com, modified for Tiki */
     public function RemoveXSS($val)
     {
         static $ra_as_tag_only = null;

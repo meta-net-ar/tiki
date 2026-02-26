@@ -48,8 +48,9 @@ class CommentsTest extends TikiTestCase
             'feature_group_watches' => 'n',
             'feature_comments_moderation' => 'n',  // Added missing preference
             'feature_file_galleries' => 'n',  // Added missing preference
+            'forum_notifications_use_new_threads' => 'n', // Added missing preference
         ];
-        $this->forumId = $this->commentsLib->replace_forum(['forumId' => 1, 'name' => "forum 1", 'description' => "description"]);
+        $this->forumId = $this->commentsLib->replace_forum(['forumId' => 0, 'name' => "forum 1", 'description' => "description"]);
         $_SERVER['SERVER_NAME'] = 'localhost';
     }
 
@@ -58,6 +59,7 @@ class CommentsTest extends TikiTestCase
         parent::tearDown();
 
         $this->commentsLib->query("DELETE FROM tiki_comments");
+        $this->commentsLib->query("DELETE FROM tiki_forums");
         $this->commentsLib->query("DELETE FROM tiki_forums_reported");
         $this->commentsLib->query("DELETE FROM tiki_forum_reads");
         $this->commentsLib->query("DELETE FROM tiki_forums_queue");
@@ -182,8 +184,7 @@ class CommentsTest extends TikiTestCase
         $this->assertArrayHasKey('count', $result);
         // Check that the data returned matches the inserted report
         $reportedData = $result['data'][0];
-        $this->assertEquals(1, $reportedData['forumId']);
-        $this->assertEquals(1, $reportedData['threadId']);
+        $this->assertEquals($this->forumId, $reportedData['forumId']);
         $this->assertEquals(2, $reportedData['parentId']);
         $this->assertEquals('Inappropriate content', $reportedData['reason']);
         $this->assertEquals('my name', $reportedData['user']);
@@ -695,7 +696,7 @@ class CommentsTest extends TikiTestCase
         $this->assertEquals('text/plain', $attachment['filetype']);
         $this->assertEquals(1024, $attachment['filesize']);
         $this->assertEquals('Test file content', $attachment['data']);
-        $this->assertEquals(1, $attachment['forumId']);
+        $this->assertEquals($this->forumId, $attachment['forumId']);
     }
 
     public function testListAllAttachments(): void

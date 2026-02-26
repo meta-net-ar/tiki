@@ -37,7 +37,7 @@ class TikiFilter_PrepareInput
             }
         }
 
-        foreach ($output as $key => & $value) {
+        foreach ($output as &$value) {
             if (is_array($value)) {
                 $value = $this->prepare($value);
             }

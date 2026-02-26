@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Faker\Factory as FakerFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use TikiLib;
-use Tiki\Faker as TikiFaker;
 use Tracker_Definition;
 
 /**
@@ -149,7 +148,7 @@ class FakerTrackerCommand extends Command
         /** @var \TrackerLib $trackerLib */
         $trackerLib = TikiLib::lib('trk');
         $faker = FakerFactory::create();
-        $tikiFaker = new TikiFaker($faker);
+        $tikiFaker = new \Tiki\Faker($faker);// @phpstan-ignore new.noConstructor (depends on fakerphp/faker installed only through packages)
         $tikiFaker->setTikiFilesReuseFiles($reuseFiles);
         $faker->addProvider($tikiFaker);
 

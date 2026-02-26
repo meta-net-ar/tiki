@@ -2160,6 +2160,12 @@ function wikiplugin_trackerlist($data, $params)
             }
 
             if (! is_null($calendarfielddate)) {
+                $associatedWikiPage = [];
+
+                if (! ($prefs['feature_calendar'] == 'y' || $prefs['feature_action_calendar'] == 'y')) {
+                    Feedback::errorAndDie(tra("This feature is disabled, Please go into the settings and enable the calendar feature"), \Laminas\Http\Response::STATUS_CODE_401);
+                }
+
                 foreach ($items['data'] as $i => $item) {
                     if (! empty($wiki)) {
                         $smarty->assign('fields', $item['field_values']);
@@ -2167,9 +2173,9 @@ function wikiplugin_trackerlist($data, $params)
                         $smarty->assign('wiki', "wiki:$wiki");
                         $smarty->assign('showpopup', 'n');
                         try {
-                            $items['data'][$i]['over'] = $smarty->fetch('tracker_pretty_item.tpl');
+                            $associatedWikiPage[$items['data'][$i]['itemId']] = $smarty->fetch('tracker_pretty_item.tpl');
                         } catch (SmartyException $se) {
-                            $items['data'][$i]['over'] = $se->getMessage();
+                            $associatedWikiPage[$items['data'][$i]['itemId']] = $se->getMessage();
                         }
                     }
                     if (! empty($tplwiki)) {
@@ -2178,16 +2184,54 @@ function wikiplugin_trackerlist($data, $params)
                         $smarty->assign('wiki', "tplwiki:$tplwiki");
                         $smarty->assign('showpopup', 'n');
                         try {
-                            $items['data'][$i]['over'] = $smarty->fetch('tracker_pretty_item.tpl');
+                            $associatedWikiPage[$items['data'][$i]['itemId']] = $smarty->fetch('tracker_pretty_item.tpl');
                         } catch (SmartyException $se) {
-                            $items['data'][$i]['over'] = $se->getMessage();
+                            $associatedWikiPage[$items['data'][$i]['itemId']] = $se->getMessage();
                         }
                     }
-                    if (empty($items['data'][$i]['over'])) {
-                        $items['data'][$i]['over'] = $trklib->get_isMain_value($trackerId, $item['itemId']);
+
+                    if (empty($associatedWikiPage[$items['data'][$i]['itemId']])) {
+                        $associatedWikiPage[$items['data'][$i]['itemId']] = $trklib->get_isMain_value($trackerId, $item['itemId']);
                     }
                     $items['data'][$i]['visible'] = 'y';
                 }
+
+                $takePermNames = [];
+                foreach ($allfields['data'] as $value) {
+                    $takePermNames[$value['fieldId']] = $value["permName"];
+                }
+
+                $takeKeysOfTitleAndDescriptionOfEvent = [];
+                foreach (array_diff(array_keys($takePermNames), $calendarfielddate) as $value) {
+                    $takeKeysOfTitleAndDescriptionOfEvent[] = $value;
+                }
+                $urlOfFetchingData = [
+                    'title' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[0], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[0]] : '',
+                    'description' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[1], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[1]] : '',
+                    'trackerId' => $trackerId,
+                    'beginField' => $takePermNames[$calendarfielddate[0]],
+                    'endField' => array_key_exists($calendarfielddate[1], $takePermNames) ? $takePermNames[$calendarfielddate[0]] : null,
+                    'filters' => '',
+                    'maxRecords' => 200,
+                ];
+
+                $smarty->assign(
+                    'eventCalendarParams',
+                    [
+                        'firstDayofWeek'   => 0,
+                        'display_timezone' => $prefs['display_timezone'],
+                        'language'         => $prefs['language'],
+                        'minHourOfDay'     => 00,
+                        'maxHourOfDay'     => 23,
+                        'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
+                        'initialDate'      => date("Y-m-d"),
+                        'initialView'      => 'dayGridMonth',
+                    ]
+                );
+                $moduleCalendarFocusdate = date("Y-m-d");
+                $smarty->assign('associatedWikiPage', $associatedWikiPage);
+                $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
+                $smarty->assign('urlOfFetchingData', $urlOfFetchingData);
                 $trklib->fillTableViewCell($items['data'], $calendarfielddate, $cell);
                 $smarty->assign('cell', $cell);
                 $smarty->assign('show_calendar_module', 'y');

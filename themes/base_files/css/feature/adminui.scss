@@ -12,7 +12,10 @@ $color-light: rgba(0, 0, 0, 0.5); // Not replaced as it's only used for minor de
 
 body.tiki-admin {
     padding-top: 0 !important; // Needed to override CSS-variable-set fixed-navbar height/body padding-top.
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
+
 // Provide space for aside toggle button - small screens (default)
 .tiki-admin.uab #tikifeedback,
 .tiki-admin.uab .admin-content,
@@ -20,31 +23,11 @@ body.tiki-admin {
     padding-left: 3.5rem;
 }
 
-
-// In larger screens, when UAB is active, prevent content from being covered by aside (offcanvas content); may need adjusting -- g_c-l
-@media (min-width: 993px) and (max-width: 2000px /*1675px *//*1370px */) {
-    .tiki-admin.uab #tikifeedback,
-    .tiki-admin.uab .admin-content,
-    .tiki-admin.uab .errors-wrapper,
-    .tiki-admin.uab .bottom_modules {
-        padding-left: 320px;
-    }
-}
-
 // Provide space for aside toggle button in screens with full-width content
 .tiki-admin.uab:not(.fixed_width) #tikifeedback,
 .tiki-admin.uab:not(.fixed_width) .admin-content {
     padding-left: 3.5rem;
 }
-
-@media (min-width: 993px) {
-    .tiki-admin.uab:not(.fixed_width) #tikifeedback,
-    .tiki-admin.uab:not(.fixed_width) .admin-content,
-    .tiki-admin.uab:not(.fixed_width) .bottom_modules {
-        padding-left: 320px;
-    }
-}
-
 
 .tiki-admin .admin-wrapper .navbar-toggler {
     position: absolute;
@@ -56,15 +39,34 @@ body.tiki-admin {
     padding-left: 0;
 }
 
-.tiki-admin .top_modules .box-login_box { padding: 0; }
+.tiki-admin .top_modules .box-login_box {
+    padding: 0;
+}
 
 @media (min-width: 992px) {
-    .tiki-admin.uab aside.admin-nav .navbar-expand-lg .offcanvas  .offcanvas-body {
+    .tiki-admin.uab aside.admin-nav .navbar-expand-lg .offcanvas .offcanvas-body {
         flex-direction: column;
+    }
+
+    // Make offcanvas always visible on desktop
+    .tiki-admin aside.admin-nav .offcanvas {
+        visibility: visible !important;
+        transform: translateX(0) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.show {
+        transform: translateX(0) !important;
+    }
+
+    // Ensure offcanvas backdrop doesn't interfere
+    .tiki-admin aside.admin-nav .offcanvas-backdrop {
+        display: none !important;
     }
 }
 
-.tiki-admin aside.admin-nav > nav {
+.tiki-admin aside.admin-nav>nav {
     top: var(--tiki-admin-top-modules-height) !important; //50px !important;
 }
 
@@ -84,8 +86,10 @@ body.tiki-admin {
 
 // Top links
 .tiki-admin .tiki-admin-top-nav-light .nav-item .nav-link,
-.tiki-admin .tiki-admin-top-nav-dark .nav-item .nav-link { // Scope widened to include accordion.
+.tiki-admin .tiki-admin-top-nav-dark .nav-item .nav-link {
+    // Scope widened to include accordion.
     color: var(--tiki-admin-top-nav-color);
+
     &:hover,
     &:focus {
         color: var(--tiki-admin-top-nav-hover-color);
@@ -101,10 +105,13 @@ body.tiki-admin {
 .tiki-admin-aside-nav-dark .dropdown-menu {
     color: var(--tiki-admin-dropdown-link-color);
     background-color: var(--tiki-admin-dropdown-bg);
+
     .dropdown-item:not(.active) {
         color: var(--tiki-admin-dropdown-link-color);
     }
+
     & .dropdown-item {
+
         &:focus,
         &:hover,
         &.active {
@@ -127,6 +134,7 @@ body.tiki-admin {
 .tiki-admin-aside-nav-light .nav-link,
 .tiki-admin-aside-nav-dark .nav-link {
     color: var(--tiki-admin-aside-nav-color);
+
     &:focus,
     &:hover {
         color: var(--tiki-admin-aside-nav-hover-color);
@@ -134,7 +142,7 @@ body.tiki-admin {
     }
 }
 
-.tiki-admin aside.admin-nav > nav,
+.tiki-admin aside.admin-nav>nav,
 .tiki-admin .top_modules {
     position: fixed;
     left: 0;
@@ -165,7 +173,7 @@ body.tiki-admin {
     margin-left: auto !important;
 }
 
-.tiki-admin .top_modules .nav .open > a:hover {
+.tiki-admin .top_modules .nav .open>a:hover {
     background-color: transparent;
 }
 
@@ -179,7 +187,8 @@ body.tiki-admin {
     overflow: auto;
 }
 
-.tiki-admin aside .admin-navbar .dropdown-menu { // limit to aside dropdowns
+.tiki-admin aside .admin-navbar .dropdown-menu {
+    // limit to aside dropdowns
     border-top-left-radius: unset;
     border-top-right-radius: unset;
     box-shadow: none;
@@ -189,14 +198,16 @@ body.tiki-admin {
     padding: 0 !important;
 }
 
-.tiki-admin .top_modules { //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
+.tiki-admin .top_modules {
+    //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
     width: 100%;
     height: var(--tiki-admin-top-modules-height); // 50px;
-//    padding: 0 1.6rem; This rule is being overridden by something.
+    //    padding: 0 1.6rem; This rule is being overridden by something.
 }
-.tiki-admin aside.admin-nav > nav {
+
+.tiki-admin aside.admin-nav>nav {
     height: calc(100% - var(--tiki-admin-top-modules-height) - 2.3rem);
- //   width: 268px !important;
+    //   width: 268px !important;
     overflow-y: auto;
     overflow-x: hidden;
     top: var(--tiki-admin-top-modules-height) !important; //50px !important;
@@ -231,11 +242,16 @@ body.tiki-admin {
     padding: 4px 0 4px 1.5rem;
 }
 
-.tiki-admin aside.admin-nav /*.navbar-light*/.narrow .navbar-nav .nav-item { // ?
+.tiki-admin aside.admin-nav
+
+/*.navbar-light*/
+.narrow .navbar-nav .nav-item {
+    // ?
     border-bottom: 1px solid $color-light;
 }
 
-.tiki-admin aside.admin-nav ul .nav-item a, .tiki-admin .admin-wrapper .form-inline {
+.tiki-admin aside.admin-nav ul .nav-item a,
+.tiki-admin .admin-wrapper .form-inline {
     padding-left: 1.6rem;
     padding-right: 1.6rem;
 }
@@ -244,6 +260,10 @@ body.tiki-admin {
     font-size: 1rem;
     padding: 0.375rem 0.75rem;
     border: none;
+}
+
+.tiki-admin aside el-input+.btn {
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
 }
 
 .tiki-admin aside nav {
@@ -269,24 +289,490 @@ body.tiki-admin {
     padding-bottom: .4rem;
 }
 
-.tiki-admin .admin-nav .nav-item .collapse.show, .tiki-admin .admin-nav .nav-item .collapsin, .tiki-admin .admin-nav .nav-item .collapsing {
+.tiki-admin .admin-nav .nav-item .collapse.show,
+.tiki-admin .admin-nav .nav-item .collapsin,
+.tiki-admin .admin-nav .nav-item .collapsing {
     margin-bottom: .4rem;
 }
 
-.tiki-admin .admin-nav .narrow .collapse .dropdown-item.icon span:not(.icon), .tiki-admin .admin-nav .narrow .collapsing .dropdown-item.icon span:not(.icon) {
+@media (min-width: 992px) {
+
+    .tiki-admin .admin-nav .narrow .collapse .dropdown-item span:not(.icon),
+    .tiki-admin .admin-nav .narrow .collapsing .dropdown-item span:not(.icon) {
+        display: none;
+    }
+
+    .tiki-admin .admin-wrapper .narrow .form-inline {
+        display: none;
+    }
+
+    .tiki-admin aside.admin-nav .narrow .narrow-hide {
+        display: none;
+    }
+}
+
+.tiki-admin aside.admin-nav .offcanvas,
+.tiki-admin aside.admin-nav .navbar-wrapper {
+    transition: max-width 0.3s ease, width 0.3s ease;
+    height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+    min-height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+@media (min-width: 992px) {
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow,
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow {
+        max-width: 80px !important;
+        width: 80px !important;
+        height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        min-height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    // Ensure collapsed sidebar inner content expands to full height
+    .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-body,
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow .offcanvas-body {
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-body>div,
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow>div {
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .accordion,
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow .accordion {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    // Keep the collapse button at the bottom
+    .tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-collapser,
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow .admin-menu-collapser {
+        margin-top: auto !important;
+    }
+
+    // Ensure full width when not narrow (for hover expansion)
+    .tiki-admin aside.admin-nav .offcanvas:not(.narrow) {
+        max-width: var(--tiki-admin-offcanvas-width, 300px) !important;
+        width: var(--tiki-admin-offcanvas-width, 300px) !important;
+        height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        min-height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .tiki-admin aside.admin-nav .navbar-wrapper:not(.narrow) {
+        max-width: var(--tiki-admin-offcanvas-width, 300px) !important;
+        height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        min-height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    // Keep collapse button at bottom for expanded state too
+    .tiki-admin aside.admin-nav .offcanvas:not(.narrow) .admin-menu-collapser,
+    .tiki-admin aside.admin-nav .navbar-wrapper:not(.narrow) .admin-menu-collapser {
+        margin-top: auto !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas .offcanvas-body {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+        height: 100% !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas .offcanvas-body>div {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+        height: 100% !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas .accordion {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+        overflow-y: auto;
+    }
+
+    // Keep the collapse button at the bottom for ALL states
+    .tiki-admin aside.admin-nav .admin-menu-collapser {
+        margin-top: auto !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-header {
+        padding: 0.5rem;
+        justify-content: center;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-title {
+        display: none;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .btn-close {
+        display: none;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button {
+        justify-content: center;
+        padding: 0.75rem 0.5rem !important;
+    }
+
+    // Hide arrow down icons (chevrons) when sidebar is collapsed - show only icons
+    .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button::after {
+        display: none !important;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button .icon {
+        margin: 0 !important;
+        font-size: 1.2rem;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .admin-dashboard .nav {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        justify-content: center;
+    }
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .admin-dashboard .nav .nav-link {
+        padding-left: 0;
+        padding-right: 0;
+        text-align: center;
+    }
+
+    // Collapsed section headers
+    .tiki-admin aside.admin-nav .offcanvas.narrow h2,
+    .tiki-admin aside.admin-nav .offcanvas.narrow .sections-header {
+        display: flex !important;
+        justify-content: center;
+        padding: 0.75rem 0.5rem !important;
+    }
+
+    // Hide header text in collapsed mode
+    .tiki-admin aside.admin-nav .offcanvas.narrow h2 .narrow-hide,
+    .tiki-admin aside.admin-nav .offcanvas.narrow .sections-header .narrow-hide {
+        display: none !important;
+    }
+
+    // Center header icon
+    .tiki-admin aside.admin-nav .offcanvas.narrow h2 .icon,
+    .tiki-admin aside.admin-nav .offcanvas.narrow .sections-header .icon {
+        margin-right: 0 !important;
+        font-size: 1.1rem;
+    }
+}
+
+// Dynamic Collapse/Expand Text
+.admin-menu-collapser .collapse-text {
+    display: inline;
+}
+
+.admin-menu-collapser .expand-text {
     display: none;
 }
 
-.tiki-admin .admin-wrapper .narrow .form-inline {
+body.sidebar_collapsed .admin-menu-collapser .collapse-text {
     display: none;
 }
 
-// Added for accordion implementation
-.tiki-admin aside.admin-nav .narrow .narrow-hide {
+body.sidebar_collapsed .admin-menu-collapser .expand-text {
+    display: inline;
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser {
+    margin-top: auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    background: transparent;
+}
+
+.tiki-admin-aside-nav-light .admin-menu-collapser,
+.tiki-admin aside.admin-nav .bg-light .admin-menu-collapser {
+    border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.tiki-admin-aside-nav-dark .admin-menu-collapser,
+.tiki-admin aside.admin-nav .navbar-dark .admin-menu-collapser {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser a {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    opacity: 1;
+    visibility: visible;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    min-height: 44px;
+}
+
+.tiki-admin-aside-nav-light .admin-menu-collapser a,
+.tiki-admin aside.admin-nav .bg-light .admin-menu-collapser a {
+    color: var(--tiki-admin-aside-nav-color);
+}
+
+.tiki-admin-aside-nav-dark .admin-menu-collapser a,
+.tiki-admin aside.admin-nav .navbar-dark .admin-menu-collapser a {
+    color: var(--tiki-admin-aside-nav-color);
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser a:hover {
+    background: var(--tiki-admin-aside-nav-hover-bg);
+    color: var(--tiki-admin-aside-nav-hover-color);
+    text-decoration: none;
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser a:focus {
+    outline: 2px solid var(--tiki-admin-aside-nav-hover-color);
+    outline-offset: -2px;
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser a .icon,
+.tiki-admin aside.admin-nav .admin-menu-collapser a i,
+.tiki-admin aside.admin-nav .admin-menu-collapser a [class*="fa-"],
+.tiki-admin aside.admin-nav .admin-menu-collapser a span[class*="icon"],
+.tiki-admin aside.admin-nav .admin-menu-collapser a span[class*="fa-"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: inherit !important;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+    display: inline-block !important;
+    width: 20px;
+    text-align: center;
+    font-family: "Font Awesome 5 Free", "Font Awesome 5 Pro", "Font Awesome 6 Free", "Font Awesome 6 Pro", "FontAwesome" !important;
+    font-weight: 900 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+
+    &::before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+.tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-collapser a {
+    justify-content: center;
+    padding: 0.75rem 0.5rem !important;
+}
+
+.tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-collapser a .icon,
+.tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-collapser a i,
+.tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-collapser a [class*="fa-"] {
+    margin-right: 0;
+}
+
+.tiki-admin aside.admin-nav .admin-menu-collapser a span {
+    opacity: 1;
+    visibility: visible;
+    color: inherit;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.popover.admin-menu-popover {
+    min-width: 200px;
+    max-width: 300px;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    z-index: 10000;
+    margin-left: 5px !important;
+}
+
+.popover.admin-menu-popover .popover-body {
+    padding: 0;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-menu {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    background: var(--tiki-admin-dropdown-bg);
+    border-radius: 4px;
+    border: none;
+    box-shadow: none;
+    position: relative;
+    display: block;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    color: var(--tiki-admin-dropdown-link-color);
+    text-decoration: none;
+    border-radius: 0;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-item:hover,
+.popover.admin-menu-popover .popover-body .dropdown-item:focus {
+    background: var(--tiki-admin-dropdown-link-hover-bg);
+    color: var(--tiki-admin-dropdown-link-hover-color);
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-item.active {
+    background: var(--tiki-admin-dropdown-link-hover-bg);
+    color: var(--tiki-admin-dropdown-link-hover-color);
+    font-weight: 500;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-item .icon {
+    margin-right: 0.5rem;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-item span {
+    flex: 1;
+}
+
+.popover.admin-menu-popover .popover-body .dropdown-divider {
+    margin: 0.25rem 0;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+// Prevent accordion collapse when sidebar is collapsed and showing popover
+.tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button {
+    pointer-events: auto;
+}
+
+.tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button[data-bs-toggle="collapse"] {
+    pointer-events: none;
+}
+
+.tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-trigger {
+    cursor: pointer;
+}
+
+// Rotate collapse icon when sidebar is collapsed (even on hover)
+.tiki-admin.sidebar_collapsed aside.admin-nav .offcanvas .admin-menu-collapser .icon {
+    transform: rotate(180deg);
+}
+
+.tiki-admin aside.admin-nav .offcanvas.narrow h2 {
     display: none;
 }
 
-.tiki-admin .form-inline .mb-3, .tiki-admin .form-inline .mb-3 .input-group {
+.tiki-admin aside.admin-nav .offcanvas.narrow .search-preferences {
+    display: block; // Show the container
+    padding: 0.75rem 0.5rem; // Match item padding
+    margin: 0;
+
+    .search-prefs-container {
+        justify-content: center;
+
+        input {
+            display: none; // Hide the text input
+        }
+
+        button {
+            border: none;
+            background: transparent; // Override btn-primary
+            background-image: none; // Ensure no gradients
+            box-shadow: none; // Remove focus ring
+            outline: none; // Remove outline
+            padding: 0;
+            color: inherit;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+
+            &:focus,
+            &:active,
+            &.active {
+                background: transparent !important;
+                box-shadow: none !important;
+                outline: none !important;
+                color: inherit;
+            }
+
+            .icon {
+                font-size: 1.1rem; // Match other icons
+                margin: 0;
+            }
+
+            &:hover {
+                color: var(--tiki-admin-aside-nav-hover-color);
+                background: var(--tiki-admin-aside-nav-hover-bg) !important;
+            }
+        }
+    }
+
+    form {
+        margin: 0 !important;
+        justify-content: center !important;
+        width: 100%;
+    }
+}
+
+// Adjust content padding when sidebar is collapsed
+body.sidebar_collapsed.tiki-admin.uab #tikifeedback,
+body.sidebar_collapsed.tiki-admin.uab .admin-content,
+body.sidebar_collapsed.tiki-admin.uab .errors-wrapper,
+body.sidebar_collapsed.tiki-admin.uab .bottom_modules {
+    padding-left: 80px !important;
+}
+
+body.tiki-admin .container.container-std {
+    overflow: visible !important;
+}
+
+// Fix: Properly position container to account for fixed sidebar
+// When sidebar is expanded, shift the container to center content in the remaining space
+@media (min-width: 993px) {
+    body.tiki-admin.uab:not(.sidebar_collapsed) .container.container-std {
+        margin-left: var(--tiki-admin-offcanvas-width, 300px);
+        max-width: calc(100% - var(--tiki-admin-offcanvas-width, 300px));
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    // Add spacing between sidebar and content, matching collapsed state spacing
+    body.tiki-admin.uab:not(.sidebar_collapsed) #tikifeedback,
+    body.tiki-admin.uab:not(.sidebar_collapsed) .admin-content,
+    body.tiki-admin.uab:not(.sidebar_collapsed) .errors-wrapper,
+    body.tiki-admin.uab:not(.sidebar_collapsed) .bottom_modules {
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
+    }
+}
+
+@media (min-width: 993px) {
+
+    body.sidebar_collapsed.tiki-admin.uab:not(.fixed_width) #tikifeedback,
+    body.sidebar_collapsed.tiki-admin.uab:not(.fixed_width) .admin-content,
+    body.sidebar_collapsed.tiki-admin.uab:not(.fixed_width) .bottom_modules {
+        padding-left: 80px !important;
+    }
+}
+
+.tiki-admin .form-inline .mb-3,
+.tiki-admin .form-inline .mb-3 .input-group {
     width: 100%;
 }
 
@@ -302,8 +788,23 @@ body.tiki-admin {
 
 @media (max-width: 767.5px) {
 
+    // Hide sidebar toggle on mobile
+    .tiki-admin aside.admin-nav .admin-menu-collapser {
+        display: none;
+    }
+
+    // Reset content padding on mobile (override desktop padding)
+    .tiki-admin.uab #tikifeedback,
+    .tiki-admin.uab .admin-content,
+    .tiki-admin.uab .bottom_modules,
+    .tiki-admin.uab:not(.fixed_width) #tikifeedback,
+    .tiki-admin.uab:not(.fixed_width) .admin-content {
+        padding-left: 0 !important;
+    }
+
     // Dropdown when open
-    .tiki-admin .top_modules .dropdown-menu, .tiki-admin .navbar-collapse {
+    .tiki-admin .top_modules .dropdown-menu,
+    .tiki-admin .navbar-collapse {
         width: 100%;
         position: fixed !important;
         transform: unset !important;
@@ -390,7 +891,7 @@ body.tiki-admin {
         width: calc(100vw - 6rem);
     }
 
-    .tiki-admin .navbar-collapse .navbar-nav.mr-auto li.dropdown > a::after {
+    .tiki-admin .navbar-collapse .navbar-nav.mr-auto li.dropdown>a::after {
         right: 0;
         top: .7rem;
         position: absolute;
@@ -405,7 +906,7 @@ body.tiki-admin {
         transform: none !important;
     }
 
-    .tiki-admin .dropdown.me-1 > .dropdown-menu .dropdown-item {
+    .tiki-admin .dropdown.me-1>.dropdown-menu .dropdown-item {
         margin: 0 -3rem;
         width: 100vw;
     }
@@ -431,7 +932,8 @@ body.tiki-admin {
         border-color: transparent !important;
     }
 
-    .tiki-admin .top_modules .dropdown-menu, .tiki-admin .navbar-collapse .navbar-nav {
+    .tiki-admin .top_modules .dropdown-menu,
+    .tiki-admin .navbar-collapse .navbar-nav {
         left: 0 !important;
     }
 
@@ -445,9 +947,9 @@ body.tiki-admin {
         top: .8rem !important;
     }
 
- //   .tiki-admin .row.row-middle, .tiki-admin .intertrans.text-center {
- // //      margin-left: 60px !important;
- //   }
+    //   .tiki-admin .row.row-middle, .tiki-admin .intertrans.text-center {
+    // //      margin-left: 60px !important;
+    //   }
 
     .tiki-admin .filter-menu .nav-item.dropdown {
         padding: 0 !important;
@@ -480,15 +982,15 @@ body.tiki-admin {
         line-height: 1.2;
     }
 
-    .tiki-admin  .navbar-collapse .dropdown-item {
+    .tiki-admin .navbar-collapse .dropdown-item {
         font-size: 1.1rem !important;
     }
 
     // other changes in mobile menu
-//    .tiki-admin .admin-navbar > .navbar-collapse > .navbar-nav > .nav-item > .nav-link.show {
-//        background-color: #007BFF !important;
-//        color: white !important;
-//    }
+    //    .tiki-admin .admin-navbar > .navbar-collapse > .navbar-nav > .nav-item > .nav-link.show {
+    //        background-color: #007BFF !important;
+    //        color: white !important;
+    //    }
 
     .tiki-admin .admin-navbar .navbar-nav .nav-link {
         display: flex;
@@ -510,7 +1012,7 @@ body.tiki-admin {
     }
 
     aside.admin-nav .navbar-wrapper.fixed-top {
-         right: calc(100% - 60px);
+        right: calc(100% - 60px);
     }
 
 }
@@ -525,7 +1027,8 @@ body.tiki-admin {
     }
 }
 
-.tiki-admin .top_modules .form-control-sm, .tiki-admin .admin-wrapper .form-control-sm {
+.tiki-admin .top_modules .form-control-sm,
+.tiki-admin .admin-wrapper .form-control-sm {
     font-size: .875rem;
 }
 
@@ -550,9 +1053,9 @@ body.tiki-admin {
 }
 
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-brand {
- //   padding: 0;
+    //   padding: 0;
     height: var(--tiki-admin-top-modules-height); //50px;
- //   width: 60px;
+    //   width: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -564,9 +1067,9 @@ body.tiki-admin {
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-brand img {
     height: 100%;
     width: auto;
-//    margin-left: 25px;
-//    max-width: 38px;
-//    max-height: 38px;
+    //    margin-left: 25px;
+    //    max-width: 38px;
+    //    max-height: 38px;
 }
 
 .tiki-admin .admin-icon {
@@ -587,19 +1090,21 @@ body.tiki-admin {
     top: -.15rem;
 }
 
-.tiki-admin input[type="checkbox"].preffilter-toggle-round:checked + label:before {
+.tiki-admin input[type="checkbox"].preffilter-toggle-round:checked+label:before {
     background-color: #28a745;
     border-color: #0062cc;
     color: white;
 }
 
-.tiki-admin aside.admin-nav .navbar-light > ul > li > a, .tiki-admin aside.admin-nav .navbar-dark > ul > li > a,
+.tiki-admin aside.admin-nav .navbar-light>ul>li>a,
+.tiki-admin aside.admin-nav .navbar-dark>ul>li>a,
 .tiki-admin aside .accordion-header .nav-link {
     font-weight: 500 !important;
     font-size: 1.1rem;
 }
 
-.tiki-admin aside.admin-nav .navbar-dark .navbar-nav .nav-link, .tiki-admin aside.admin-nav .navbar-light .navbar-nav .nav-link {
+.tiki-admin aside.admin-nav .navbar-dark .navbar-nav .nav-link,
+.tiki-admin aside.admin-nav .navbar-light .navbar-nav .nav-link {
     line-height: 1.6;
 }
 
@@ -685,13 +1190,13 @@ body.tiki-admin {
     border: none;
     position: fixed;
     left: 0;
-//    padding-left: 7rem;
+    //    padding-left: 7rem;
     z-index: 1050 !important;
 }
 
 .tiki-admin #col1 {
     z-index: unset !important;
-   padding-top: 5rem; // avoid top_modules overlapping page content
+    padding-top: 5rem; // avoid top_modules overlapping page content
 }
 
 // Popovers
@@ -752,7 +1257,7 @@ body.tiki-admin {
 
 // little tweak of the position
 .tiki-admin .admin-content nav.admin-navbar {
-//    padding-left: 6rem;
+    //    padding-left: 6rem;
     top: 0;
 }
 

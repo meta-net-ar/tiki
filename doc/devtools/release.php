@@ -1526,7 +1526,7 @@ function get_contributors_sf_data(&$contributors)
     if (! empty($html) && preg_match('/(<table.*<\/\s*table>)/sim', $html, $matches)) {
         $usersInfo = [];
         if (preg_match_all('/<tr[^>]*>' . str_repeat('\s*<td[^>]*>(.*)<\/td>\s*', 3) . '<\/\s*tr>/Usim', $matches[0], $usersInfo, PREG_SET_ORDER)) {
-            foreach ($usersInfo as $k => $userInfo) {
+            foreach ($usersInfo as $userInfo) {
                 $userInfo = array_map('trim', array_map('strip_tags', $userInfo));
                 $user = strtolower($userInfo['2']);
                 if (empty($user)) {

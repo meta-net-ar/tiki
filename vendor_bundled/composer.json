@@ -124,14 +124,6 @@
         "  pear/xml_util:",
         "    Reported as an abandoned package, but it is still required indirectly by pear/pear.",
         "",
-        "  symfony/polyfill-ctype: ",
-        "    Active package providing ctype_* functions when ext-ctype is not available.",
-        "    Version regression: Tiki 24 uses ^1.27, while Tiki master uses ~1.8.",
-        "    Latest stable is v1.32.0, but constrained to ~1.8 by Symfony 6.4 components:",
-        "    - symfony/filesystem v6.4.13 requires ~1.8",
-        "    - symfony/string v6.4.15 requires ~1.8",
-        "    - symfony/yaml v6.4.18 requires ~1.8",
-        "",
         "  symfony/*",
         "    Upgrading:  ",
         "    Rector always has rules to refactors Symfony code ",
@@ -393,14 +385,6 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "Recommendation: Consider migrating to stable v0.11.0 unless dev-master features are needed",
                 "impact": "Exchange integration may be affected if removed."
-            },
-            "symfony/polyfill-ctype": {
-                "reason": "Provides ctype_* functions when ext-ctype extension is not available.",
-                "mitigation": "Version ~1.8 required by Symfony 6.4 components. Provides fallback functionality.",
-                "reviewed": "2025-08-27",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "No alternatives for ctype function polyfills.",
-                "impact": "Symfony components fail. System likely unusable due to cascading failures."
             }
         }
     },
@@ -441,6 +425,16 @@
             "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore-abandoned": {
+                "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
+                "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
+                "laminas/laminas-text":  "Reported as an abandoned package, but it is still required indirectly by laminas/laminas-captcha. See https://github.com/laminas/laminas-captcha/issues/41 to track progress on removing this dependency.",
+                "pear/structures_graph": " Reported as an abandoned package, but it is still required indirectly by pear/pear",
+                "pear/xml_parser": "This package is abandoned and no longer maintained. No replacement package was suggested.",
+                "pear/xml_util": " Reported as an abandoned package, but it is still required indirectly by pear/pear"
+            }
         }
     },
     "autoload": {

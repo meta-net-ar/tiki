@@ -24,7 +24,7 @@ function prefs_bigbluebutton_list()
             'description' => tra('Full URL to the BigBlueButton installation.'),
             'type' => 'text',
             'filter' => 'url',
-            'hint' => tra('http://host.example.com/'),
+            'hint' => tra('http://host.example.org/'),
             'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
             'size' => 40,
             'tags' => ['basic'],

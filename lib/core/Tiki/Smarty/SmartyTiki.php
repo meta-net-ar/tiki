@@ -752,7 +752,7 @@ class SmartyTiki extends Smarty
 
     /**
      * When calling directly smarty functions, from PHP, you need to provide a object of type \Smarty\Template
-     * The method signature for smarty functions is: smarty_function_xxxx($params, \Smarty\Template $template)
+     * The method signature for smarty functions is: smarty_function_xxxx($params, Smarty\Template $template)
      *
      * @return \Smarty\Template
      */

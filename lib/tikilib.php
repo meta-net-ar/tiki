@@ -6918,7 +6918,7 @@ class TikiLib extends TikiDb_Bridge
     /**
      * @param $vals
      * @param $filter
-     * @return string|array
+     * @return string
      */
     public function array_apply_filter($vals, $filter)
     {

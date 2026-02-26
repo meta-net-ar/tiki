@@ -233,7 +233,14 @@ class ObjectLink extends Base
             $pre .= " ";
         }
 
-        if ($item && $item->canView() && (! $item->getDefinition()->isEnabled('adminOnlyViewEditItem') || Perms::get('trackeritem', $object)->admin_trackers)) {
+        if (
+            $item && $item->canView() &&
+            (
+                ! $item->getDefinition()->isEnabled('adminOnlyViewEditItem') ||
+                Perms::get('trackeritem', $object)->admin_trackers ||
+                \TikiLib::lib('access')->is_serializable_request()
+            )
+        ) {
             return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $title, $type, $url, $params);
         } else {
             if (empty($title)) {

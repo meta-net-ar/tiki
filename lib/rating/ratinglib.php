@@ -307,8 +307,6 @@ class RatingLib extends TikiDb_Bridge
 
     public function votings($threadId, $type = 'comment', $normalize = false)
     {
-        global $prefs;
-
         switch ($type) {
             case 'wiki page':
                 $type = 'wiki';
@@ -562,7 +560,7 @@ class RatingLib extends TikiDb_Bridge
                 $result = $runner->evaluate();
 
                 $ratingconfiglib->record_value($config, $type, $object, $result);
-            } catch (Math_Formula_Exception $e) {
+            } catch (Math_Formula_Exception) {
                 // Some errors are expected for type-specific configurations.
                 // Skip safely. Sufficient validation is made on save to make sure
                 // other errors will not happen.

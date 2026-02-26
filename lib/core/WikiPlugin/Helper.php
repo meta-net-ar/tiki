@@ -84,4 +84,38 @@ class WikiPlugin_Helper
 
         return $params;
     }
+
+    /**
+     * Validate required parameters for a plugin.
+     *
+     * Checks for empty values (after trimming) but does not modify
+     * the original parameter array.
+     *
+     * @param string $pluginName Name of the plugin
+     * @param array  $params Parameters to validate
+     * @return array List of missing required parameters
+     */
+    public static function validateRequiredParams(string $pluginName, array $params): array
+    {
+        $infoFunction = "wikiplugin_{$pluginName}_info";
+
+        if (! function_exists($infoFunction)) {
+            return [];
+        }
+
+        $info = $infoFunction();
+        $missing = [];
+
+        foreach ($info['params'] ?? [] as $key => $definition) {
+            if (! empty($definition['required'])) {
+                $value = trim($params[$key] ?? '');
+
+                if ($value === '') {
+                    $missing[] = $key;
+                }
+            }
+        }
+
+        return $missing;
+    }
 }

@@ -454,8 +454,6 @@ class TWVersion
             return;
         }
         global $tikilib;
-        $upgrade = 0;
-        $major = 0;
         $velements = explode('.', $this->getBaseVersion());
         // .version contains an ordered list of release numbers, one per line. All minor releases from a same major release are grouped.
         $body = $tikilib->httprequest('tiki.org/' . $this->branch . '.version');

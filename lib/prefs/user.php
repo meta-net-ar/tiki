@@ -6,9 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_user_list($partial = false)
 {
-
-    global $prefs;
-
     $fieldFormat = '{title} ({tracker_name})';
     return [
         'user_must_change_password_set_default_on' => [

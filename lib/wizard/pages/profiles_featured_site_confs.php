@@ -22,7 +22,7 @@ class ProfilesWizardFeaturedSiteConfs extends Wizard
 
     public function onSetupPage($homepageUrl)
     {
-        global $prefs, $TWV;
+        global $TWV;
         $smarty = TikiLib::lib('smarty');
         // Run the parent first
         parent::onSetupPage($homepageUrl);

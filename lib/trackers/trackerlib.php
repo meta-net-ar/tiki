@@ -2128,9 +2128,10 @@ class TrackerLib extends TikiLib
             // Old values were prefilled at the begining of the function and only replaced at the end of the iteration
             $fieldId = $array['fieldId'];
             $suppliedFields[] = $fieldId;
-            $old_value = $fil[$fieldId] ?? null;
 
             $handler = $this->get_field_handler($array, array_merge($item_info, $fil));
+
+            $old_value = isset($fil[$fieldId]) && ! empty($fil[$fieldId]) ? $fil[$fieldId] : $handler->getFieldData([])['value'];
 
             if ($handler && method_exists($handler, 'postSaveHook')) {
                 // postSaveHook will be called with final value saved
@@ -2961,7 +2962,8 @@ class TrackerLib extends TikiLib
                     $f['errorMsg'] = tra('Confirmation %0 do not match', $f['name']);
                     $erroneous_values[] = $f;
                 }
-                if ($f['type'] != 'q' and isset($f['isMandatory']) && $f['isMandatory'] == 'y') {
+                // exclude AutoIncrement and GeographicFeature type fields as they are read-only in the default edit form
+                if (! in_array($f['type'], ['q', 'GF']) && isset($f['isMandatory']) && $f['isMandatory'] == 'y') {
                     if (($f['type'] == 'e' || in_array($f['fieldId'], $categorized_fields)) && empty($f['value'])) {    // category: value is now categ id's
                         $mandatory_fields[] = $f;
                     } elseif (in_array($f['type'], ['a', 't']) && ($this->is_multilingual($f['fieldId']) == 'y')) {
@@ -3250,6 +3252,8 @@ class TrackerLib extends TikiLib
                 'trackerId' => $trackerId,
                 'user' => $GLOBALS['user'],
                 'values' => $itemInfo,
+                'index_handled' => true,
+                'action' => 'delete',
             ]
         );
 
@@ -3284,10 +3288,19 @@ class TrackerLib extends TikiLib
 
         $events = TikiLib::events();
         foreach ($itemIds as $itemId) {
+            $res = $this->items()->fetchFullRow(['itemId' => (int) $itemId]);
+            if (! $res) {
+                continue;
+            }
             $events->trigger('tiki.trackeritem.update', [
                 'type' => 'trackeritem',
                 'object' => $itemId,
+                'trackerId' => $res['trackerId'],
                 'user' => $GLOBALS['user'],
+                'values' => [],
+                'old_values' => [],
+                'values_by_permname' => [],
+                'old_values_by_permname' => [],
             ]);
         }
     }
@@ -3790,7 +3803,7 @@ class TrackerLib extends TikiLib
         TikiLib::events()->trigger('tiki.tracker.delete', [
             'type' => 'tracker',
             'object' => $trackerId,
-            'user' => $GLOBALS['user'],
+            'user' => $GLOBALS['user']
         ]);
 
         $transaction->commit();
@@ -3909,7 +3922,7 @@ class TrackerLib extends TikiLib
     public function get_tracker_field($fieldIdOrPermName, $useCache = true)
     {
         static $cache = [];
-        if ($useCache && isset($cache[$fieldIdOrPermName])) {
+        if ($useCache && (is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName)) && isset($cache[$fieldIdOrPermName])) {
             return $cache[$fieldIdOrPermName];
         }
         if ((int)$fieldIdOrPermName > 0) {

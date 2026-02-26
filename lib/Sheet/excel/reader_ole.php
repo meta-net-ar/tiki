@@ -108,7 +108,6 @@ class R_OLE
             }
         }
 
-        //echo '=====2';
         // readSmallBlockDepot();
         $pos = 0;
         $index = 0;
@@ -131,17 +130,8 @@ class R_OLE
         
         // readData(rootStartBlock)
         $block = $this->rootStartBlock;
-        $pos = 0;
         $this->entry = $this->__readData($block);
-        
-        /*
-        while ($block != -2)  {
-            $pos = ($block + 1) * BIG_BLOCK_SIZE;
-            $this->entry = $this->entry.substr($this->data, $pos, BIG_BLOCK_SIZE);
-            $block = $this->bigBlockChain[$block];
-        }
-        */
-        //echo '==='.$this->entry."===";
+
         $this->__readPropertySets();
 
     }

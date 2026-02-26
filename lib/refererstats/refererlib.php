@@ -20,6 +20,7 @@ class RefererLib extends TikiLib
         $query = "delete from tiki_referer_stats";
 
         $result = $this->query($query);
+        return ($result && $result->numRows() > 0);
     }
 
     /**

@@ -96,10 +96,8 @@ class UserWizardPreferencesParams extends Wizard
         $smarty->assign('display_12hr_clock', $display_12hr_clock);
         $userinfo = $userlib->get_user_info($userwatch);
         $smarty->assign_by_ref('userinfo', $userinfo);
-        $llist = [];
         $llist = $tikilib->list_themes();
         $smarty->assign_by_ref('styles', $llist);
-        $languages = [];
         $langLib = TikiLib::lib('language');
         $languages = $langLib->list_languages();
         $smarty->assign_by_ref('languages', $languages);

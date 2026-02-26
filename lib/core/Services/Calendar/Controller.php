@@ -283,26 +283,26 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calendar = $this->calendarLib->get_calendar($calendarId);
                 $calitem = $this->processParticipants($calitem);
                 if (isset($calitem["name"])) {
-                    Feedback::validateFieldLength("Title", $calitem["name"], CalendarLib::MAX_CALENDAR_EVENT_TITLE_LENGTH);
-                    return [];
+                    if (! Feedback::validateFieldLength("Title", $calitem["name"], CalendarLib::MAX_CALENDAR_EVENT_TITLE_LENGTH)) {
+                        return [];
+                    }
                 }
                 if (isset($calitem["description"])) {
-                    Feedback::validateFieldLength("Description", $calitem["description"], CalendarLib::MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH);
-                    return [];
+                    if (! Feedback::validateFieldLength("Description", $calitem["description"], CalendarLib::MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH)) {
+                        return [];
+                    }
                 }
                 // save event
                 if ($input->act->word() === 'saveitem' || $input->act->word() === 'saveas') {
                     if (! $input->calendarchanged->int()) {
                         $saved = $this->saveEvent($calitem, $calendar, $input);
                         if ($saved) { // then redirect?
-                            if ($input->offsetExists('exact_start_end')) {
-                                Feedback::success(tr('Event saved successfully.'));
-                            }
+                            Feedback::success(tr('Event saved successfully.'));
                             if ($input->offsetExists('redirect')) {
                                 return ['url' => $input->redirect->url()];
                             } else {
                                 if ($return_url && ! $access->is_xml_http_request()) {
-                                    return $access->redirect($return_url, tr('The event was saved successfully'));
+                                    $access->redirect($return_url, tr('The event was saved successfully'));
                                 }
                                 // reload the page?
                                 return [];

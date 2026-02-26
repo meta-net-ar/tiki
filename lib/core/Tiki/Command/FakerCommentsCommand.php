@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Faker\Factory as FakerFactory;
 use TikiLib;
-use Tiki\Faker as TikiFaker;
 
 /**
  * Enabled the usage of Faker as a way to load random data to trackers
@@ -144,7 +143,7 @@ class FakerCommentsCommand extends Command
         $maxGap = $input->getOption('maxgap');
 
         $faker = FakerFactory::create();
-        $tikiFaker = new TikiFaker($faker);
+        $tikiFaker = new \Tiki\Faker($faker); // @phpstan-ignore new.noConstructor (depends on fakerphp/faker installed only through packages)
         $faker->addProvider($tikiFaker);
 
         $startDate = $faker->dateTimeBetween($minStart, $maxStart);

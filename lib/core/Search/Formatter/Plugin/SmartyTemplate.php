@@ -164,7 +164,7 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
                     'field' => [
                         'id' => $this->editableId,
                         'type' => 'form',
-                        'wysiwyg' => true,
+                        'wysiwyg' => $this->editable === 'inline' ? false : true,
                     ],
                 ],
             );

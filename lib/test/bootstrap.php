@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Config\Config;
 use Tiki\Installer\Installer;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 const TIKI_IN_TEST = 1;
 
@@ -54,29 +55,24 @@ $tikilib = new TikiLib();
 require_once 'lib/init/initlib.php';
 $installer = Installer::getInstance();
 
+$output = new ConsoleOutput();
+
 if (! $installer->tableExists('tiki_preferences')) {
-    echo "Installing Tiki database...\n";
+    $output->writeln("Installing Tiki database...");
     $installer->cleanInstall();
 } elseif ($installer->requiresUpdate()) {
-    echo "Updating Tiki database...\n";
+    $output->writeln("Updating Tiki database...");
     $installer->update();
     if (count($installer->queries['failed'])) {
         foreach ($installer->queries['failed'] as $key => $error) {
             [$query, $message, $patch] = $error;
 
-            echo "Error $key in $patch\n\t$query\n\t$message\n\n";
+            $output->write("Error $key in $patch\n\t$query\n\t$message\n\n");
         }
-        echo 'Exiting, fix database issues and try again.';
+        $output->writeln('Exiting, fix database issues and try again.');
         exit(1);
     }
 }
-
-// These values are set on console.php
-// which is not executed by unit tests
-const DB_RUNNING = true;
-const DB_STATUS = true;
-const DB_TIKI_SETUP = true;
-const DB_SYNCHRONAL = true;
 
 $smarty = TikiLib::lib('smarty');
 $cachelib = TikiLib::lib('cache');

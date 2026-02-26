@@ -577,7 +577,7 @@ EXPORT;
     {
         $fields = [];
         foreach ($fieldIds as $fieldId) {
-            $field = $field = $definition->getField($fieldId);
+            $field = $definition->getField($fieldId);
 
             if (! $field) {
                 throw new Services_Exception(tr('Field %0 does not exist in tracker', $fieldId), 404);

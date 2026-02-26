@@ -18,7 +18,7 @@ function wikiplugin_peertube_info()
             'url' => [
                 'required' => true,
                 'name' => tra('URL'),
-                'description' => tra('Complete URL to the PeerTube video (e.g., https://videos.example.com/w/abc123xyz)'),
+                'description' => tra('Complete URL to the PeerTube video (e.g., https://videos.example.org/w/abc123xyz)'),
                 'filter' => 'url',
                 'default' => '',
             ],

@@ -146,7 +146,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     private function getObjectRelationInstances(): array
     {
-        $relations = [];
         $relation = $this->trackerField->getOption(TrackerFieldRelation::OPT_RELATION);
         $relations = TikiLib::lib('relation')->getObjectRelations('trackeritem', $this->getItemId(), $relation);
         if ($this->trackerField->getOption(TrackerFieldRelation::OPT_INVERT)) {
@@ -471,7 +470,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     public function handleFieldRemove()
     {
-        $trackerId = $this->getTrackerDefinition()->getConfiguration('trackerId');
         $relationlib = TikiLib::lib('relation');
         $relationlib->remove_relation_type($this->trackerField->getOption(TrackerFieldRelation::OPT_RELATION), $this->getFieldId());
     }
@@ -725,8 +723,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     public function getItemValues()
     {
-        $lib = TikiLib::lib('unifiedsearch');
-
         $data = $this->getFieldData();
         $objects = [];
         foreach ($data['relations'] as $rel) {

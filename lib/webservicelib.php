@@ -172,7 +172,7 @@ class Tiki_Webservice
     {
         $parameters = [];
 
-        foreach ($this->getParameters() as $key => $name) {
+        foreach ($this->getParameters() as $name) {
             if (isset($params[$name])) {
                 $parameters[$name] = $params[$name];
             } else {

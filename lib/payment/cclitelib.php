@@ -327,7 +327,7 @@ class CCLiteLib extends TikiDb_Bridge
             $err_msg = '';      // error message on failure
 
             if ($logon) {
-                // e.g. login failed for jonny_tiki at c2c1:  <a href="http://c2c.ourproject.org/cgi-bin/cclite.cgi">Try again?</a>
+                // e.g. login failed for jonny_tiki at c2c1:  <a href="http://example.org/cgi-bin/cclite.cgi">Try again?</a>
                 if (preg_match('/^(login failed for ' . $username . '.*' . $registry . '[^<]*)/mi', $logon, $results)) {    // no user there?
                     $email = $userlib->get_user_email($username);
                     if ($email) {   // required
@@ -341,7 +341,7 @@ class CCLiteLib extends TikiDb_Bridge
                     }
                 }
 
-                // e.g. test_user at test_reg is not active: confirm or contact the administrator <a href="http://c2c.ourproject.org/cgi-bin/cclite.cgi">Try again?</a>
+                // e.g. test_user at test_reg is not active: confirm or contact the administrator <a href="http://example.org/cgi-bin/cclite.cgi">Try again?</a>
                 // check for other errors & remove cclite link
                 if (preg_match('/^(.*?' . $username . '.*' . $registry . '[^<]*)/mi', $logon, $results)) {
                     $err_msg = trim($results[0]);

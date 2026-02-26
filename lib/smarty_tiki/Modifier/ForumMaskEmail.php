@@ -17,12 +17,16 @@ class ForumMaskEmail
     /**
      * Handle the modifier
      *
-     * @param string $text
+     * @param string|null $text The text to process. Can be null, in which case it will be returned as is.
      * @return string
      */
     public function handle($text)
     {
         global $prefs;
+
+        if (! $text) {
+            return $text;
+        }
 
         if (($prefs['forum_mask_emails'] ?? 'n') === 'n') {
             return $text;

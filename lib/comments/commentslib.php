@@ -3491,7 +3491,7 @@ class Comments extends TikiLib
         }
 
         // Add email threading headers to event arguments for proper notification grouping.
-        $additionalHeaders = \Tiki\Notifications\Email::getEmailThreadHeaders($object[0], $object[1]);
+        $additionalHeaders = \Tiki\Notifications\Email::getEmailThreadHeaders($object[0], $threadId);
         $eventArguments = array_merge($additionalHeaders, $eventArguments);
 
         TikiLib::events()->trigger(

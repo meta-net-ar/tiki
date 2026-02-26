@@ -8,6 +8,63 @@ $relationlib = TikiLib::lib('relation');
 
 class RelationTest extends TikiTestCase
 {
+    protected static $trackerId;
+    protected static $old_prefs;
+    protected static $testItems = [];
+
+    public static function setUpBeforeClass(): void
+    {
+        global $prefs;
+        self::$old_prefs = $prefs;
+        $prefs['feature_trackers'] = 'y';
+
+        parent::setUpBeforeClass();
+
+        $trklib = TikiLib::lib('trk');
+
+        self::$trackerId = $trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
+        $trklib->replace_tracker_field(
+            self::$trackerId,
+            0,
+            'summary',
+            't',
+            'y',
+            'y',
+            'y',
+            'y',
+            'n',
+            'y',
+            10,
+            '',
+            permName: 'summary'
+        );
+
+        $definition = Tracker_Definition::get(self::$trackerId);
+        $fields = $definition->getFields();
+        for ($i = 1; $i <= 4; $i++) {
+            $input = ['ins_' . $fields[0]['fieldId'] => 'Test item ' . $i];
+            $itemObject = Tracker_Item::newItem(self::$trackerId);
+            $processedFields = $itemObject->prepareInput(new JitFilter($input));
+            $itemId = $trklib->replace_item(
+                self::$trackerId,
+                null,
+                ['data' => $processedFields]
+            );
+            self::$testItems[] = $itemId;
+        }
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        global $prefs;
+
+        parent::tearDownAfterClass();
+
+        TikiLib::lib('trk')->remove_tracker(self::$trackerId);
+
+        $prefs = self::$old_prefs;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -143,42 +200,51 @@ class RelationTest extends TikiTestCase
     public function testObjectRetrieval(): void
     {
         $lib = new RelationLib();
-        $lib->add_relation('tiki.test.related', 'trackeritem', 123, 'trackeritem', 321);
+        $srcItemId = self::$testItems[0];
+        $targetItemId = self::$testItems[1];
+        $lib->add_relation('tiki.test.related', 'trackeritem', $srcItemId, 'trackeritem', $targetItemId);
 
-        $relations = $lib->getObjectRelations('trackeritem', 123, 'tiki.test.related');
+        $relations = $lib->getObjectRelations('trackeritem', $srcItemId, 'tiki.test.related');
 
         $this->assertEquals(1, count($relations));
 
         $rel = $relations[0];
         $this->assertEquals('trackeritem', $rel->target->type);
-        $this->assertEquals(321, $rel->target->itemId);
+        $this->assertEquals($targetItemId, $rel->target->itemId);
         $this->assertEquals(null, $rel->getMetadataItemId());
     }
 
     public function testInvertObjectRetrieval(): void
     {
         $lib = new RelationLib();
-        $lib->add_relation('tiki.test.related', 'trackeritem', 123, 'trackeritem', 321);
+        $srcItemId = self::$testItems[0];
+        $targetItemId = self::$testItems[1];
+        $lib->add_relation('tiki.test.related', 'trackeritem', $srcItemId, 'trackeritem', $targetItemId);
 
-        $relations = $lib->getObjectRelations('trackeritem', 321, 'tiki.test.related.invert');
+        $relations = $lib->getObjectRelations('trackeritem', $targetItemId, 'tiki.test.related.invert');
 
         $this->assertEquals(1, count($relations));
-        $this->assertEquals(123, $relations[0]->target->itemId);
+        $this->assertEquals($srcItemId, $relations[0]->target->itemId);
     }
 
     public function testDoubleInvertObjectRetrieval(): void
     {
         $lib = new RelationLib();
-        $lib->add_relation('tiki.test.related.invert', 'trackeritem', 123, 'trackeritem', 321);
-        $lib->add_relation('tiki.test.related', 'trackeritem', 789, 'trackeritem', 987);
+        $srcItemId = self::$testItems[2];
+        $targetItemId = self::$testItems[3];
+        $lib->add_relation('tiki.test.related.invert', 'trackeritem', $srcItemId, 'trackeritem', $targetItemId);
 
-        $relations = $lib->getObjectRelations('trackeritem', 123, 'tiki.test.related', true);
-        $this->assertEquals(1, count($relations));
-        $this->assertEquals(321, $relations[0]->target->itemId);
+        $nonInvertedSrcItemId = self::$testItems[0];
+        $nonInvertedTargetItemId = self::$testItems[1];
+        $lib->add_relation('tiki.test.related', 'trackeritem', $nonInvertedSrcItemId, 'trackeritem', $nonInvertedTargetItemId);
 
-        $relations = $lib->getObjectRelations('trackeritem', 789, 'tiki.test.related.invert', true);
+        $relations = $lib->getObjectRelations('trackeritem', $srcItemId, 'tiki.test.related', true);
         $this->assertEquals(1, count($relations));
-        $this->assertEquals(987, $relations[0]->target->itemId);
+        $this->assertEquals($targetItemId, $relations[0]->target->itemId);
+
+        $relations = $lib->getObjectRelations('trackeritem', $nonInvertedSrcItemId, 'tiki.test.related.invert', true);
+        $this->assertEquals(1, count($relations));
+        $this->assertEquals($nonInvertedTargetItemId, $relations[0]->target->itemId);
     }
 
     private function removeId($data)

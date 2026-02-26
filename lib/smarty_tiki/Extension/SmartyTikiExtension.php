@@ -942,7 +942,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Name:     substring<br>
      * Purpose:  Returns a substring of string.  Same arguments as
      *           PHP substr function.
-     * @link based on substr(): http://www.zend.com/manual/function.substr.php
+     * @link based on substr(): https://www.php.net/manual/en/function.substr.php
      * @author   Mike Kerr <tiki.kerrnel at kerris dot com>
      * @param string
      * @param position: start position of substring (default=0, negative starts N from end)

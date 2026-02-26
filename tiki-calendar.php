@@ -90,6 +90,8 @@ if (empty($rawcals['data'])) {
 
 $minHourOfDay = 12;
 $maxHourOfDay = 12;
+$startOfDayMinute = 0;
+$endOfDayMinute = 0;
 $calendars = [];
 $canEditAnything = false;
 
@@ -100,13 +102,12 @@ foreach ($rawcals['data'] as $calendar) {
 
     // for week and day views
     $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayHour = $startOfDayUnix / 3600;
-    $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-    $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+    $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
+    $minHourOfDay = intdiv($startOfDayUnix, 3600);
+
     $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayHour = $endOfDayUnix / 3600;
-    $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-    $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+    $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
+    $maxHourOfDay = intdiv($endOfDayUnix, 3600);
 
     $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
 }
@@ -236,7 +237,7 @@ if (! empty($_REQUEST['generate_availability'])) {
                 continue;
             }
             $ranges[$day] = [
-                [(int)$minHourOfDay, 0], [(int)$maxHourOfDay, 0]
+                [$minHourOfDay, $startOfDayMinute], [$maxHourOfDay, $endOfDayMinute]
             ];
         }
         $busy_list = [];
