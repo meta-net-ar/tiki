@@ -13,11 +13,13 @@
     "svgedit": "^7.3.3"
   },
   "devDependenciesComment": {
-    "@svgedit/svgcanvas": "https://github.com/SVG-Edit/svgedit/blob/master/packages/svgcanvas/CHANGES.md"
+    "@svgedit/svgcanvas": "https://github.com/SVG-Edit/svgedit/blob/master/packages/svgcanvas/CHANGES.md",
+    "svelte": "This is an indirect dependency of @event-calendar/core. It is pinned to 5.51.0 because later versions break most calendar interactions. See: https://github.com/vkurko/calendar/issues/623"
   },
   "devDependencies": {
     "@svgedit/svgcanvas": "^7.2.1",
     "async-es": "^3.2.6",
-    "summernote": "^0.9.1"
+    "summernote": "^0.9.1",
+    "svelte": "5.51.0"
   }
 }
