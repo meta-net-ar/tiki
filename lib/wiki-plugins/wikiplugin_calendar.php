@@ -159,7 +159,7 @@ function wikiplugin_calendar($data, $params)
         'eventCalendarParams',
         $calendarInitialParams
     );
-
+    $smarty->assign('uniqueId', rand());
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
             ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)

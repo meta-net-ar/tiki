@@ -9,32 +9,20 @@
 
     {if $viewlist neq 'list'}
         {jq}
-            let content = {{$eventCalendarParams|json_encode}};
-            const elt = document.getElementById('date-plugin-calendar');
-            content['initialDate'] = $('#date-plugin-calendar').val();
-            const wikipluginCalendar = [window.pluginCalendar];
-            let returnUrlForPlugin = ('{{$returnURL}}');
-            returnUrlForPlugin = returnUrlForPlugin.toString();
-            $("#plugin-calendar").setupEventCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}', returnUrlForPlugin);
-            if (elt) {
-                elt.addEventListener('change', () => {
-                    document.getElementById('plugin-calendar').innerHTML = "";
-                    content['initialDate'] = $('#date-plugin-calendar').val();
-                    $("#plugin-calendar").setupEventCalendar(content,  wikipluginCalendar, 'plugin-calendar', 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}', returnUrlForPlugin);
-                });
-            }
-            {{if $prefs.print_pdf_from_url neq 'none'}$("#plugin-calendar").addEventCalendarPrint('#calendar-pdf-btn', wikipluginCalendar[0]);{/if}}
+            var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'}
+            var uniqueId = ({{$uniqueId|json_encode}}) || null; // In the case user want to display the same calendar with the same parameter more than one time
+            var moduleCalendarFocusdate = '{{$focusdate}}';
+            var divClassContainer = ".calendar-container";
+            var uniqueId = ({{$uniqueId|json_encode}}) || null;
+            var linkToFindItemsOfCalendar = 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$pluginCalendarIds}}'
+            $('.calendar-container').defineParameterOfMultipleCalendar({{$eventCalendarParams|json_encode}}, printingParams, divClassContainer, moduleCalendarFocusdate, linkToFindItemsOfCalendar, undefined, '{{$returnURL}}');
         {/jq}
     {/if}
-    {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
-        <a id="calendar-pdf-btn" href="#" class="text-end d-none" role="button">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
-    {/if}
+    
     <div id="test"></div>
     {include file="configlinks_calendar.tpl" filterCal="filterPluginCal"}
-    {if $viewlist neq 'list'}
-    <input type="date" value="{$focusdate}" id="date-plugin-calendar">
-    {/if}
-    <div id='plugin-calendar'></div>
+
+    <div class='calendar-container'></div>
     {if $viewlist eq 'list'}
         {$out}
     {/if}
