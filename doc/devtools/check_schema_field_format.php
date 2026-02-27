@@ -131,12 +131,14 @@ class CheckSchemaFieldFormat
             $wherePart = substr($normalizedQuery, $wherePos);
 
             // Match: `column`=<number> where number is NOT followed by a quote
-            if (preg_match_all(
-                '/`(\w+)`\s*=\s*(\d+)(?!\s*\')/i',
-                $wherePart,
-                $whereMatches,
-                PREG_SET_ORDER
-            )) {
+            if (
+                preg_match_all(
+                    '/`(\w+)`\s*=\s*(\d+)(?!\s*\')/i',
+                    $wherePart,
+                    $whereMatches,
+                    PREG_SET_ORDER
+                )
+            ) {
                 foreach ($whereMatches as $match) {
                     $columnName = strtolower($match[1]);
                     $bareValue = $match[2];
