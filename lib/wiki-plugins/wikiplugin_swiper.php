@@ -382,18 +382,6 @@ function wikiplugin_swiper_info()
                 'default' => 3,
                 'advanced' => true,
             ],
-            'teleprompterMirror' => [
-                'required' => false,
-                'name' => tr('Mirror teleprompter'),
-                'description' => tr('Flip text horizontally for physical teleprompter use.'),
-                'filter' => 'alpha',
-                'default' => 'n',
-                'advanced' => true,
-                'options' => [
-                    ['text' => 'No', 'value' => 'n'],
-                    ['text' => 'Yes', 'value' => 'y'],
-                ],
-            ],
             'teleprompterPauseOnHover' => [
                 'required' => false,
                 'name' => tr('Pause teleprompter on hover'),
@@ -463,7 +451,6 @@ function wikiplugin_swiper($data, $params)
         'teleprompter' => 'n',
         'teleprompterSpeed' => 60,
         'teleprompterAcceleration' => 3,
-        'teleprompterMirror' => 'n',
         'teleprompterPauseOnHover' => 'y',
         'teleprompterFocusMode' => 'top',
         'teleprompterTimer' => 'y',
@@ -626,7 +613,6 @@ function wikiplugin_swiper($data, $params)
         $teleprompterSpeed = min($teleprompterMaxSpeed, max($teleprompterMinSpeed, (int) $params['teleprompterSpeed']));
         $teleprompterAcceleration = min($teleprompterMaxAcceleration, max($teleprompterMinAcceleration, (int) $params['teleprompterAcceleration']));
         $teleprompterFontScale = min($teleprompterMaxFontScale, max($teleprompterMinFontScale, (int) $params['teleprompterFontScale']));
-        $mirrorClass = $params['teleprompterMirror'] === 'y' ? ' teleprompter-mirror' : '';
         $showTimer = $params['teleprompterTimer'] === 'y';
         $timerClass = $params['teleprompterTimer'] === 'y' ? '' : ' teleprompter-timer-hidden';
         $pauseOnHover = $params['teleprompterPauseOnHover'] === 'y';
@@ -699,7 +685,7 @@ function wikiplugin_swiper($data, $params)
 
         $teleprompterRegionLabel = htmlspecialchars(tr('Teleprompter content'), ENT_QUOTES);
 
-        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
+        return '<div id="' . $containerId . '" class="teleprompter-container' . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
             '<div id="' . $trackId . '" class="teleprompter-track">' .
             '<div id="' . $contentId . '" class="teleprompter-content"><div class="teleprompter-spacer teleprompter-spacer-before" aria-hidden="true"></div>' . $teleprompterHtml . '<div class="teleprompter-spacer teleprompter-spacer-after" aria-hidden="true"></div></div>' .
             '</div>' .
