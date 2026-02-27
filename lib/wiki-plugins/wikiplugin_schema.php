@@ -1,0 +1,56 @@
+<?php
+// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+//
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+function wikiplugin_schema_info() {
+    return array(
+        'name' => tra('Schema JSON-LD'),
+        'documentation' => tra('Outputs Schema.org JSON-LD based on parameters'),
+        'description' => tra('Generates a script type="application/ld+json" block'),
+        'prefs' => array( 'wikiplugin_schema' ),
+        'params' => array(
+            'type' => array(
+                'required' => true,
+                'name' => tra('Schema Type'),
+                'filter' => 'text',
+                'description' => tra('Schema.org type like Product, Article, Organization'),
+            ),
+            'json' => array(
+                'required' => true,
+                'name' => tra('JSON Body'),
+                'filter' => 'text',
+                'description' => tra('JSON fragment for the schema body (without @context/@type)'),
+            ),
+        ),
+    );
+}
+
+function wikiplugin_schema($data, $params) {
+
+    $headerlib = TikiLib::lib('header');
+    extract($params, EXTR_SKIP);
+
+    if (empty($params['type']) || empty($params['json'])) {
+        return '';
+    }
+
+    $body = json_decode($params['json'], true);
+    if (!is_array($body)) {
+        return '';
+    }
+
+    $schema = array_merge(
+        ['@context' => 'https://schema.org', '@type' => $params['type']],
+        $body
+    );
+
+    $jsonld = json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    $headerlib->add_rawhtml(
+        "<script type=\"application/ld+json\">$jsonld</script>"
+    );
+
+    return '';
+}
