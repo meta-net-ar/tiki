@@ -408,6 +408,18 @@ function wikiplugin_swiper_info()
                     ['text' => 'No', 'value' => 'n'],
                 ],
             ],
+            'teleprompterControls' => [
+                'required' => false,
+                'name' => tr('Teleprompter controls'),
+                'description' => tr('Display touch-friendly Pause/Resume and Restart controls.'),
+                'filter' => 'alpha',
+                'default' => 'y',
+                'advanced' => true,
+                'options' => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No', 'value' => 'n'],
+                ],
+            ],
             'teleprompterFontScale' => [
                 'required' => false,
                 'name' => tr('Teleprompter font scale'),
@@ -441,6 +453,7 @@ function wikiplugin_swiper($data, $params)
         'teleprompterAcceleration' => 3,
         'teleprompterFocusMode' => 'top',
         'teleprompterTimer' => 'y',
+        'teleprompterControls' => 'y',
         'teleprompterFontScale' => 120,
     ];
     if (trim((string) $params['fileIds']) === '' && trim((string) $params['fgalId']) === '' && trim((string) $data) === '') {
@@ -602,6 +615,8 @@ function wikiplugin_swiper($data, $params)
         $teleprompterFontScale = min($teleprompterMaxFontScale, max($teleprompterMinFontScale, (int) $params['teleprompterFontScale']));
         $showTimer = $params['teleprompterTimer'] === 'y';
         $timerClass = $params['teleprompterTimer'] === 'y' ? '' : ' teleprompter-timer-hidden';
+        $showControls = $params['teleprompterControls'] === 'y';
+        $controlsClass = $showControls ? '' : ' teleprompter-controls-hidden';
         $focusMode = in_array($params['teleprompterFocusMode'], ['none', 'top', 'middle', 'bottom'], true) ? $params['teleprompterFocusMode'] : 'top';
         $focusClass = ' teleprompter-focus-' . $focusMode;
         $teleprompterHtml = implode('', $teleprompterBlocks);
@@ -656,6 +671,9 @@ function wikiplugin_swiper($data, $params)
             'fontScale' => $teleprompterFontScale,
             'showTimer' => $showTimer,
             'focusMode' => $focusMode,
+            'showControls' => $showControls,
+            'pauseLabel' => tr('Pause'),
+            'resumeLabel' => tr('Resume'),
             'minSpeed' => $teleprompterMinSpeed,
             'maxSpeed' => $teleprompterMaxSpeed,
             'speedStep' => $teleprompterSpeedStep,
@@ -669,12 +687,19 @@ function wikiplugin_swiper($data, $params)
         );
 
         $teleprompterRegionLabel = htmlspecialchars(tr('Teleprompter content'), ENT_QUOTES);
+        $teleprompterControlsLabel = htmlspecialchars(tr('Teleprompter controls'), ENT_QUOTES);
+        $pauseButtonLabel = htmlspecialchars(tr('Pause'), ENT_QUOTES);
+        $restartButtonLabel = htmlspecialchars(tr('Restart'), ENT_QUOTES);
 
         return '<div id="' . $containerId . '" class="teleprompter-container' . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
             '<div id="' . $trackId . '" class="teleprompter-track">' .
             '<div id="' . $contentId . '" class="teleprompter-content"><div class="teleprompter-spacer teleprompter-spacer-before" aria-hidden="true"></div>' . $teleprompterHtml . '<div class="teleprompter-spacer teleprompter-spacer-after" aria-hidden="true"></div></div>' .
             '</div>' .
             '<div class="teleprompter-focus-overlay" aria-hidden="true"><div class="tp-focus-mask tp-focus-mask-top"></div><div class="tp-focus-mask tp-focus-mask-bottom"></div><div class="tp-focus-guide"></div></div>' .
+            '<div class="teleprompter-controls' . $controlsClass . '" aria-label="' . $teleprompterControlsLabel . '">' .
+            '<button type="button" class="teleprompter-btn teleprompter-btn-toggle" data-tp-toggle="1" aria-pressed="false">' . $pauseButtonLabel . '</button>' .
+            '<button type="button" class="teleprompter-btn teleprompter-btn-restart" data-tp-restart="1">' . $restartButtonLabel . '</button>' .
+            '</div>' .
             '<div id="' . $timerId . '" class="teleprompter-timer' . $timerClass . '" aria-live="polite" aria-atomic="true">00:00</div>' .
             '</div>';
     }
