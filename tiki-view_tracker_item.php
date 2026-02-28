@@ -968,13 +968,28 @@ try {
         $smarty->assign('print_page', 'y');
         //skip_footer controls the inclusion of the footer in templates\tiki-print.tpl, so that it is not included more than once when an item is converted to PDF.
         $smarty->assign('skip_footer', 'y');
-        $trackerData = $smarty->fetch('tiki-print.tpl');
+        // For mPDF, render only the tracker item content instead of full page HTML.
+        // Passing full tiki-print.tpl markup can result in the PDF containing only title/header text.
+        $trackerData = $smarty->fetch('tiki-view_tracker_item.tpl');
         //getting comments associated with tracker item
-        $broker = TikiLib::lib('service')->getBroker();
-        try {
-            $comments = $broker->internalRender("comment", "list", $jitRequest = new JitFilter(["controller" => "comment","action" => "list","type" => "trackeritem","objectId" => $itemId]));
-        } catch (Services_Exception $e) {
-            $comments = $e->getMessage();
+        $comments = '';
+        if (($tracker_info['useComments'] ?? 'n') === 'y') {
+            $broker = TikiLib::lib('service')->getBroker();
+            try {
+                $comments = $broker->internalRender("comment", "list", $jitRequest = new JitFilter(["controller" => "comment","action" => "list","type" => "trackeritem","objectId" => $itemId]));
+            } catch (Services_Exception $e) {
+                trigger_error(
+                    sprintf(
+                        'Tracker PDF comments render failed for itemId=%d trackerId=%d: %s',
+                        (int) $itemId,
+                        (int) $trackerId,
+                        $e->getMessage()
+                    ),
+                    E_USER_WARNING
+                );
+                // Do not inject backend error messages into PDF output.
+                $comments = '';
+            }
         }
 
         require_once 'lib/pdflib.php';
