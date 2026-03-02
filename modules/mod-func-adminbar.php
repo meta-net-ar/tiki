@@ -33,10 +33,6 @@ function module_adminbar($mod_reference, $module_params)
         return;
     }
     $headerlib = TikiLib::lib("header");
-    // FIXME Too late to add css now
-    //$headerlib->add_css('div.contributors div br {clear: both;}');
-
-
     $headerlib->add_js('$(function() {
             $(function() {
                 $(".js-admin-bar").on("click", function() {
@@ -99,7 +95,8 @@ function module_adminbar($mod_reference, $module_params)
         Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_css_path));
         return;
     }
-    $headerlib->add_cssfile($swiper_css_path)
-        ->add_jsfile($swiper_js_path);
+//   We load CSS through js to avoid the error "Too late to modify headers. Headers already sent by output_headers()"
+    $headerlib->add_js('loadCssFile("' . $swiper_css_path . '")');
+    $headerlib->add_jsfile($swiper_js_path);
     TikiLib::lib('smarty')->assign('recent_prefs', TikiLib::lib('prefs')->getRecent());
 }

@@ -1,5 +1,10 @@
 {if isset($contributors_details)}
 {tikimodule title=$tpl_module_title name="contributors" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle error=$module_params.error}
+    <style>
+        div.contributors div br {
+            clear: both;
+        }
+    </style>
     <div class="contributors">
     {foreach from=$contributors_details item=contributor name=contributors}
     <div style="margin-bottom: 17px">
