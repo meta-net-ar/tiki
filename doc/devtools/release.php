@@ -332,7 +332,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
                 }
 
                 foreach ($virtuals as $virtual) {
-                    if (str_contains($entry, "/$virtual/")) {
+                    if (str_contains($file, "/$virtual/")) {
                         continue 2;
                     }
                 }
