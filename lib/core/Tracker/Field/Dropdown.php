@@ -189,7 +189,12 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
         if (! empty($requestData['other_' . $ins_id])) {
             $value = $requestData['other_' . $ins_id];
         } elseif (isset($requestData[$ins_id])) {
-            $value = implode(',', (array) $requestData[$ins_id]);
+            $value = implode(',', array_filter(
+                array_map('trim', (array) $requestData[$ins_id]),
+                static function ($val) {
+                    return $val !== '';
+                }
+            ));
         } elseif (isset($requestData[$ins_id . '_old'])) {
             $value = '';
         } else {
@@ -205,7 +210,12 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
 
     public function addValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = array_filter(
+            array_map('trim', explode(',', (string) $this->getValue())),
+            static function ($v) {
+                return $v !== '';
+            }
+        );
         if (! in_array($value, $existing)) {
             $existing[] = $value;
         }
@@ -214,7 +224,12 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
 
     public function removeValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = array_filter(
+            array_map('trim', explode(',', (string) $this->getValue())),
+            static function ($v) {
+                return $v !== '';
+            }
+        );
         $existing = array_filter($existing, function ($v) use ($value) {
             return $v != $value;
         });
