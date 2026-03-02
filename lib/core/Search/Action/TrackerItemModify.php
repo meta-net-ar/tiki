@@ -6,6 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_Action_TrackerItemModify implements Search_Action_Action
 {
+    private $definition = [];
+
+    public function definitionAware(array $definition)
+    {
+        $this->definition = $definition;
+    }
+
     public function getValues()
     {
         return [
@@ -139,11 +146,19 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         $remove = $data->remove->text();
         $method = $data->method->text();
         $ignore_errors = $data->ignore_errors->text() === 'y';  // y/n
+        $hasValue = $this->isParamDefined('value') || $value !== '';
+        $hasAdd = $this->isParamDefined('add');
+        $hasRemove = $this->isParamDefined('remove');
 
         $trklib = TikiLib::lib('trk');
 
-        $value = $this->stripNp($value);
+        if (is_scalar($value) || $value === null) {
+            $value = $this->stripNp((string) $value);
+        }
         $info = $trklib->get_tracker_item($object_id);
+        if (! is_array($info)) {
+            throw new Search_Action_Exception(tr('Tracker item %0 not found.', $object_id));
+        }
         $definition = Tracker_Definition::get($info['trackerId']);
 
         if (! empty($calc)) {
@@ -174,18 +189,23 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         }
 
         $fieldInfo = $definition->getField($field);
-        $info[$fieldInfo['fieldId']] = $value;
-        $handler = $definition->getFieldFactory()->getHandler($fieldInfo, $info);
+        $handlerContext = $info;
 
-        if (! empty($add)) {
+        if ($hasValue && ! $hasAdd && ! $hasRemove && ! in_array($method, ['add', 'remove'], true)) {
+            $handlerContext[$fieldInfo['fieldId']] = $value;
+        }
+
+        $handler = $definition->getFieldFactory()->getHandler($fieldInfo, $handlerContext);
+
+        if ($hasAdd) {
             $value = $handler->addValue($add);
         }
 
-        if (! empty($remove)) {
+        if ($hasRemove) {
             $value = $handler->removeValue($remove);
         }
 
-        if (empty($add) && empty($remove)) {
+        if (! $hasAdd && ! $hasRemove) {
             if (is_scalar($value)) {
                 $value = ['ins_' . $fieldInfo['fieldId'] => $value];
             }
@@ -232,5 +252,16 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
     private function stripNp($value)
     {
         return str_replace(['~np~', '~/np~'], '', $value);
+    }
+
+    private function isParamDefined(string $name): bool
+    {
+        foreach (['', '_field', '_field_coalesce', '_field_multiple'] as $variant) {
+            if (array_key_exists($name . $variant, $this->definition)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
