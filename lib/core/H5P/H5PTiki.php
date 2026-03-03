@@ -1813,9 +1813,9 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
         global $tikidomainslash;
         if (! empty($tikidomainslash)) {
             $site = trim($tikidomainslash, '/');
-            return 'storage/' . $site . '/' . DEPRECATED_H5P_STORAGE_SUFFIX;
+            return 'storage/' . $site . '/' . H5P_STORAGE_SUFFIX;
         }
-        return DEPRECATED_STORAGE_PUBLIC_H5P_PATH;
+        return STORAGE_PUBLIC_H5P_PATH;
     }
 
     private static function resolveAbsH5PPath(): string
