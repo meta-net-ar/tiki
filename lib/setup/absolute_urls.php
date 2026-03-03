@@ -126,7 +126,7 @@ $url_scheme = $https_mode ? 'https' : 'http';
 $url_host = (! empty($prefs['server_domain'])) ? $prefs['server_domain'] : ((isset($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
 list($url_host,) = preg_split('/:/', $url_host);    // Strip url port
 $url_port = $https_mode ? $prefs['https_port'] : $prefs['http_port'];
-if (($https_mode && ($url_port == 443 || $url_port == 80)) || (! $https_mode && ($url_port == 80 || $url_port == 443))) {
+if ($url_port == 80 || $url_port == 443) {
     $url_port = '';
 }
 $url_path = $tikiroot;

@@ -1164,7 +1164,9 @@ class TikiAccessLib extends TikiLib
             if ($port == ':80' || $port == ':443') {
                 $port = '';
             }
-        }        $url .= $port;
+        }
+
+        $url .= $port;
         if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
             $url .= $_SERVER['HTTP_X_REWRITE_URL'];
         } elseif (isset($_SERVER['REQUEST_URI'])) {
