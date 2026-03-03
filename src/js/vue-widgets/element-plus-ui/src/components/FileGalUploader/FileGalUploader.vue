@@ -81,6 +81,13 @@ const formatFileSize = (bytes) => {
 }
 
 /**
+ * Get file extension from filename
+ */
+const getFileExtension = (fileName) => {
+    return fileName.split('.').pop()?.toUpperCase() || 'FILE';
+}
+
+/**
  * Create canvas preview with actual JPEG compression
  */
 const createCanvasPreview = async (img, quality, maxDimension) => {
@@ -169,17 +176,16 @@ const selectFileForPreview = (index) => {
     if (index < 0 || index >= previewFiles.value.length) return;
     
     const file = previewFiles.value[index];
+    
     if (!file.type.startsWith('image/')) {
-        // Don't show image preview for non-images
-        showPreview.value = false;
+        // Non-image file selected, no preview available
         currentPreviewIndex.value = index;
         return;
     }
 
-    currentPreviewIndex.value = index;
-    
     if (!file.image) return;
 
+    currentPreviewIndex.value = index;
     showPreview.value = true;
 
     // Show preview with current settings - this will create and set dataUrl
@@ -217,6 +223,9 @@ const loadImagePreviews = (files) => {
         if (rawFile.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (e) => {
+                // Set dataUrl immediately for thumbnail display
+                fileObj.dataUrl = e.target.result;
+                
                 const img = new Image();
                 img.onload = () => {
                     fileObj.image = img;
@@ -233,13 +242,19 @@ const loadImagePreviews = (files) => {
         previewFiles.value.push(fileObj);
     });
 
-    // Show preview container
-    if (previewFiles.value.length > 0) {
+    // Only show preview if there's at least one image file
+    const hasImages = previewFiles.value.some(file => file.type.startsWith('image/'));
+    if (hasImages) {
         showPreview.value = true;
-        // If no images selected, just show the file list
+        // Auto-select the first image file
         if (currentPreviewIndex.value === -1) {
-            selectFileForPreview(0);
+            const firstImageIndex = previewFiles.value.findIndex(file => file.type.startsWith('image/'));
+            if (firstImageIndex !== -1) {
+                selectFileForPreview(firstImageIndex);
+            }
         }
+    } else {
+        showPreview.value = false;
     }
 };
 
@@ -371,14 +386,12 @@ const handleUploadSuccess = (response, file) => {
 
     const syntax = response.syntax || `{img fileId="${response.fileId}" thumb="box"}`;
 
-    // Store uploaded file info
     uploadedFiles.value.push({
         name: file.name,
         fileId: response.fileId,
         syntax: syntax
     });
 
-    // // Check if all files are now complete and reset preview
     if (areAllFilesUploaded()) {
         resetPreview();
     }
@@ -454,17 +467,17 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                     >
                         <!-- Image preview thumbnail -->
                         <img 
-                            v-if="fileObj.image && fileObj.type.startsWith('image/')"
-                            :src="fileObj.image.src" 
+                            v-if="fileObj.dataUrl && fileObj.type.startsWith('image/')"
+                            :src="fileObj.dataUrl" 
                             :alt="fileObj.name"
                             style="width: 80px; height: 80px; object-fit: contain; border-radius: 2px; display: block; margin: 0 auto 0.5rem;"
                         >
                         <!-- File type icon for non-images -->
                         <div 
                             v-else
-                            style="width: 80px; height: 80px; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 2px; font-size: 2rem;"
+                            style="width: 80px; height: 80px; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 2px; font-size: 2rem; font-weight: bold; color: #666;"
                         >
-                            <i class="fas fa-file"></i>
+                            {{ getFileExtension(fileObj.name) }}
                         </div>
                         <small class="text-truncate d-block" style="font-size: 0.8rem;">{{ fileObj.name }}</small>
                     </button>
@@ -481,7 +494,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                 >
             </div>
 
-            <div class="preview-info-container">
+            <div v-if="props.compression_enabled === 'true'" class="preview-info-container">
                 <div class="preview-info-panel">
                     <h6 class="preview-title">File: {{ currentPreviewFile().name }}</h6>
                     <div class="preview-dimensions">
@@ -501,6 +514,13 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                     </div>
                     <p class="preview-note">Preview updates as you adjust compression settings.</p>
                 </div>
+            </div>
+        </div>
+        <div v-else-if="currentPreviewFile()" style="display: flex; align-items: center; justify-content: center; min-height: 300px; background: #f5f5f5; border-radius: 4px; margin-top: 1rem;">
+            <div style="text-align: center; color: #999;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                <p style="font-size: 1.2rem; margin: 0;">No preview available for this file type</p>
+                <small style="color: #bbb;">{{ currentPreviewFile().name }}</small>
             </div>
         </div>
 

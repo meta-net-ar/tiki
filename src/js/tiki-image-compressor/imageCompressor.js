@@ -29,7 +29,7 @@ function isSupported(file, mimeType) {
  * @returns {Boolean}
  */
 function isImage(mimeType) {
-    return SUPPORTED_TYPES.images.includes(mimeType);
+    return ALL_SUPPORTED.includes(mimeType);
 }
 
 /**

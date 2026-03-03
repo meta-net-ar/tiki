@@ -92,9 +92,9 @@ function updateState(updates, skipDOMUpdate = false) {
     // Refresh image preview if quality or maxDimension changed
     if (shouldRefreshPreview) {
         refreshPreview(STATE.current);
-        
+
         // Also notify Vue component if it exists (for Element Plus uploader)
-        if (typeof window !== 'undefined' && window.updateVueUploadPreview) {
+        if (typeof window !== "undefined" && window.updateVueUploadPreview) {
             window.updateVueUploadPreview(STATE.current);
         }
     }
@@ -252,7 +252,7 @@ async function initializeEventListeners() {
                 msgEl.textContent = "";
             }
 
-            STATE.current.maxDimension = clamped;
+            updateState({ maxDimension: clamped });
         };
         attachListener(elements.maxDimInput, "input", handler);
     }

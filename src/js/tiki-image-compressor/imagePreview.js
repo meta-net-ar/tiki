@@ -5,7 +5,7 @@
  * 1. File Input: Configurable ID (default: "userfile")
  *    - When user selects image(s), preview loads with current compression settings
  *    - Pass {fileInputId: "your-id"} to initializeImagePreview() to use different input
- * 
+ *
  * 2. Compression Settings: Called from compressionControls.js via refreshPreview()
  *    - When quality slider changes
  *    - When max dimension changes
@@ -15,7 +15,7 @@
  * - Real-time visual preview with JPEG quality artifacts
  * - Original vs estimated file size
  * - Final dimensions after resizing
- * 
+ *
  * Works with batch uploads (displays first image selected)
  */
 
@@ -56,12 +56,11 @@ function estimateCompressedSize(width, height, quality, originalBytes) {
     // Base calculation: quality factor (10%-90% of saved space)
     // At 100% quality, almost no reduction. At 10%, significant reduction.
     const qualityFactor = 0.1 + (quality / 100) * 0.9;
-    
     // Estimate size based on resolution
     const pixelCount = width * height;
     const baseSizePerPixel = originalBytes / (Math.log(pixelCount) * 3);
     const estimatedSize = pixelCount * baseSizePerPixel * (qualityFactor * 0.7);
-    
+
     return Math.max(estimatedSize, originalBytes * 0.1); // Minimum 10% of original
 }
 
@@ -100,11 +99,7 @@ async function createCanvasPreview(canvas, img, quality, maxDimension) {
 
     // Also get the blob size for file size estimate
     const blob = await new Promise((resolve) => {
-        canvas.toBlob(
-            (blob) => resolve(blob),
-            "image/jpeg",
-            quality / 100
-        );
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality / 100);
     });
 
     return { blob, dataUrl, width, height };
@@ -127,10 +122,7 @@ async function updatePreview(settings) {
             return;
         }
 
-        const {
-            quality = 85,
-            maxDimension = 1600,
-        } = settings;
+        const { quality = 85, maxDimension = 1600 } = settings;
 
         try {
             // Create canvas if not exists
@@ -139,12 +131,7 @@ async function updatePreview(settings) {
             }
 
             // Generate preview with actual JPEG compression rendering
-            const result = await createCanvasPreview(
-                PREVIEW_STATE.previewCanvas,
-                PREVIEW_STATE.originalImage,
-                quality,
-                maxDimension
-            );
+            const result = await createCanvasPreview(PREVIEW_STATE.previewCanvas, PREVIEW_STATE.originalImage, quality, maxDimension);
 
             if (!result) {
                 console.warn("[ImagePreview] Failed to create preview");
@@ -168,11 +155,8 @@ async function updatePreview(settings) {
             }
 
             if (estimatedSizeEl) {
-                const reduction = Math.round(
-                    ((PREVIEW_STATE.originalBlob.size - blob.size) / PREVIEW_STATE.originalBlob.size) * 100
-                );
+                const reduction = Math.round(((PREVIEW_STATE.originalBlob.size - blob.size) / PREVIEW_STATE.originalBlob.size) * 100);
                 estimatedSizeEl.textContent = `${formatFileSize(blob.size)} (${reduction}% smaller)`;
-                
                 // Color code based on reduction amount
                 if (reduction > 50) {
                     estimatedSizeEl.className = "text-success fw-bold";
@@ -273,7 +257,7 @@ async function initializeFileListener() {
  * Initialize image preview with real-time updates
  * @param {Object} config - Configuration object
  * @param {string} config.fileInputId - ID of file input element (default: "userfile")
- * 
+ *
  * This function:
  * 1. Listens to file input changes (configurable ID)
  * 2. Listens to compression control changes (quality, maxDimension)
@@ -285,9 +269,9 @@ async function initializeImagePreview(config = {}) {
         if (config.fileInputId) {
             PREVIEW_STATE.fileInputId = config.fileInputId;
         }
-        
+
         await initializeFileListener();
-        
+
         // Request compression controls to notify us of setting changes
         // The compressionControls.js will call refreshPreview() when settings change
     } catch (err) {
@@ -303,7 +287,7 @@ function cleanup() {
         element.removeEventListener(event, handler, options);
     });
     PREVIEW_STATE.listeners = [];
-    
+
     // Clear any pending updates
     if (PREVIEW_STATE.updateDebounceTimer) {
         clearTimeout(PREVIEW_STATE.updateDebounceTimer);
