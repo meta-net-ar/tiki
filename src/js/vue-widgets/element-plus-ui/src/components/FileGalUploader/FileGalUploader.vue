@@ -37,6 +37,15 @@ const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
 
+// Preview state
+const previewFiles = ref([]);  // Array of {file, image, name, type}
+const currentPreviewIndex = ref(-1);  // Index of currently displayed preview
+const showPreview = ref(false);
+const previewDimensions = ref('-');
+const originalSize = ref('-');
+const estimatedSize = ref('-');
+let updateDebounceTimer = null;
+
 onMounted(async () => {
     const searcParams = new URLSearchParams(location.search);
     if (searcParams.get('filegals_manager')) {
@@ -54,8 +63,192 @@ onMounted(async () => {
         };
 
         await initializeCompressionUI(prefs);
+        
+        // Make preview update function globally available for compressionControls
+        window.updateVueUploadPreview = updatePreviewFromSettings;
     }
 })
+
+/**
+ * Format bytes to human-readable size
+ */
+const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+}
+
+/**
+ * Create canvas preview with actual JPEG compression
+ */
+const createCanvasPreview = async (img, quality, maxDimension) => {
+    let width = img.naturalWidth;
+    let height = img.naturalHeight;
+
+    if (width > maxDimension || height > maxDimension) {
+        const ratio = width > height ? maxDimension / width : maxDimension / height;
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', quality / 100);
+    
+    const blob = await new Promise((resolve) => {
+        canvas.toBlob(
+            (blob) => resolve(blob),
+            'image/jpeg',
+            quality / 100
+        );
+    });
+
+    return { blob, dataUrl, width, height };
+};
+
+/**
+ * Get current preview file object
+ */
+const currentPreviewFile = () => {
+    if (currentPreviewIndex.value >= 0 && currentPreviewIndex.value < previewFiles.value.length) {
+        return previewFiles.value[currentPreviewIndex.value];
+    }
+    return null;
+};
+
+/**
+ * Update preview when compression settings change (called from compressionControls)
+ */
+const updatePreviewFromSettings = async (settings) => {
+    const current = currentPreviewFile();
+    if (!current || !current.image || !current.type.startsWith('image/')) return;
+
+    if (updateDebounceTimer) clearTimeout(updateDebounceTimer);
+
+    updateDebounceTimer = setTimeout(async () => {
+        try {
+            const result = await createCanvasPreview(
+                current.image,
+                settings.quality || 85,
+                settings.maxDimension || 1600
+            );
+
+            if (!result) return;
+
+            const { blob, dataUrl, width, height } = result;
+
+            // Update the file object with new preview data (Vue reactive)
+            current.dataUrl = dataUrl;
+            previewDimensions.value = `${width}×${height}px`;
+            
+            const reduction = Math.round(
+                ((current.file.size - blob.size) / current.file.size) * 100
+            );
+            
+            originalSize.value = formatFileSize(current.file.size);
+            estimatedSize.value = `${formatFileSize(blob.size)} (${reduction}% smaller)`;
+        } catch (err) {
+            console.error('[FileGalUploader] Preview update failed:', err);
+        }
+    }, 150);
+};
+
+/**
+ * Load preview for a specific file
+ */
+const selectFileForPreview = (index) => {
+    if (index < 0 || index >= previewFiles.value.length) return;
+    
+    const file = previewFiles.value[index];
+    if (!file.type.startsWith('image/')) {
+        // Don't show image preview for non-images
+        showPreview.value = false;
+        currentPreviewIndex.value = index;
+        return;
+    }
+
+    currentPreviewIndex.value = index;
+    
+    if (!file.image) return;
+
+    showPreview.value = true;
+
+    // Show preview with current settings - this will create and set dataUrl
+    const state = window.COMPRESSION_STATE || {};
+    updatePreviewFromSettings({
+        quality: state.current?.quality || 85,
+        maxDimension: state.current?.maxDimension || 1600,
+    });
+};
+
+/**
+ * Load previews when files are selected
+ */
+const loadImagePreviews = (files) => {
+    previewFiles.value = [];
+    currentPreviewIndex.value = -1;
+    
+    if (!files || files.length === 0) {
+        showPreview.value = false;
+        return;
+    }
+
+    // Process all selected files
+    files.forEach((file, index) => {
+        const rawFile = file.raw;
+        const fileObj = {
+            file: rawFile,
+            image: null,
+            dataUrl: null,  // Store preview data URL for reactivity
+            name: rawFile.name,
+            type: rawFile.type,
+            index: index
+        };
+
+        if (rawFile.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    fileObj.image = img;
+                    // Auto-load preview for first image
+                    if (currentPreviewIndex.value === -1) {
+                        selectFileForPreview(index);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(rawFile);
+        }
+
+        previewFiles.value.push(fileObj);
+    });
+
+    // Show preview container
+    if (previewFiles.value.length > 0) {
+        showPreview.value = true;
+        // If no images selected, just show the file list
+        if (currentPreviewIndex.value === -1) {
+            selectFileForPreview(0);
+        }
+    }
+};
+
+/**
+ * Handle file change event
+ */
+const handleFileChange = (file, fileList) => {
+    loadImagePreviews(fileList);
+};
 
 const submitUpload = async () => {
     uploadRef.value.submit();
@@ -68,7 +261,7 @@ const beforeUpload = async (rawFile) => {
         return false;
     }
 
-    if (props.compression_enabled !== 'true' && props.saveOriginal) return true;
+    if (props.compression_enabled !== 'true') return true;
 
     try {
         isCompressing.value = true;
@@ -147,6 +340,32 @@ const handleUploadError = (error) => {
     checkAllUploadsComplete();
 }
 
+/**
+ * Reset preview state after all uploads complete
+ */
+const resetPreview = () => {
+    previewFiles.value = [];
+    currentPreviewIndex.value = -1;
+    showPreview.value = false;
+    previewDimensions.value = '-';
+    originalSize.value = '-';
+    estimatedSize.value = '-';
+    
+    // Clear file list in upload component
+    // uploadRef.value?.clearFiles();
+};
+
+/**
+ * Check if all files have finished uploading
+ */
+const areAllFilesUploaded = () => {
+    const uploadFiles = uploadRef.value?.uploadFiles || [];
+    if (uploadFiles.length === 0) return true;
+    
+    // Check if any file is still uploading or has failed
+    return uploadFiles.every(file => file.status === 'success' || file.status === 'fail');
+};
+
 const handleUploadSuccess = (response, file) => {
     ElMessage.success(`${file.name} uploaded successfully`)
 
@@ -158,6 +377,11 @@ const handleUploadSuccess = (response, file) => {
         fileId: response.fileId,
         syntax: syntax
     });
+
+    // // Check if all files are now complete and reset preview
+    if (areAllFilesUploaded()) {
+        resetPreview();
+    }
 
     const searcParams = new URLSearchParams(location.search);
     if (insertIntoEditor.value) {
@@ -212,6 +436,74 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
 
 <template>
     <ConfigWrapper :language="language">
+        <div v-if="showPreview && previewFiles.length > 0" class="files-preview-container mt-4 p-3 border rounded bg-light">
+            <strong class="d-block mb-3">Selected Files</strong>
+            <!-- Horizontal scrollable file list -->
+            <div class="file-list-scroll" style="overflow-x: auto; overflow-y: hidden; margin-bottom: 2rem; padding-bottom: 0.5rem;">
+                <div class="d-flex gap-2" style="min-width: max-content;">
+                    <button 
+                        v-for="(fileObj, index) in previewFiles" 
+                        :key="index"
+                        type="button"
+                        class="file-thumbnail-btn"
+                        :class="{ active: currentPreviewIndex === index }"
+                        @click="selectFileForPreview(index)"
+                        :title="fileObj.name"
+                        style="border: 2px solid #ccc; border-radius: 4px; padding: 0.5rem; background: white; cursor: pointer; transition: all 0.2s; min-width: 100px; text-align: center;"
+                        :style="{ borderColor: currentPreviewIndex === index ? '#409EFF' : '#ccc', backgroundColor: currentPreviewIndex === index ? '#E6F7FF' : 'white' }"
+                    >
+                        <!-- Image preview thumbnail -->
+                        <img 
+                            v-if="fileObj.image && fileObj.type.startsWith('image/')"
+                            :src="fileObj.image.src" 
+                            :alt="fileObj.name"
+                            style="width: 80px; height: 80px; object-fit: contain; border-radius: 2px; display: block; margin: 0 auto 0.5rem;"
+                        >
+                        <!-- File type icon for non-images -->
+                        <div 
+                            v-else
+                            style="width: 80px; height: 80px; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 2px; font-size: 2rem;"
+                        >
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <small class="text-truncate d-block" style="font-size: 0.8rem;">{{ fileObj.name }}</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div v-if="currentPreviewFile() && currentPreviewFile().type.startsWith('image/')" class="image-preview-layout">
+           <div class="preview-image-container">
+                <img
+                    v-if="currentPreviewFile().dataUrl"
+                    :src="currentPreviewFile().dataUrl"
+                    :alt="currentPreviewFile().name"
+                    class="preview-main"
+                >
+            </div>
+
+            <div class="preview-info-container">
+                <div class="preview-info-panel">
+                    <h6 class="preview-title">File: {{ currentPreviewFile().name }}</h6>
+                    <div class="preview-dimensions">
+                        Dimensions: {{ previewDimensions }}
+                    </div>
+                    <hr class="preview-divider">
+                    <h6 class="preview-subtitle">
+                        File Size Comparison
+                    </h6>
+                    <div class="preview-size-row">
+                        <span>Original size:</span>
+                        <span class="preview-size-value">{{ originalSize }}</span>
+                    </div>
+                    <div class="preview-size-row">
+                        <span>Estimated after compression:</span>
+                        <span class="preview-size-value preview-size-compressed">{{ estimatedSize }}</span>
+                    </div>
+                    <p class="preview-note">Preview updates as you adjust compression settings.</p>
+                </div>
+            </div>
+        </div>
+
         <el-upload
             :drag="true"
             :multiple="true"
@@ -219,6 +511,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             ref="uploadRef"
             :data="getUploadData"
             :before-upload="beforeUpload"
+            @change="handleFileChange"
             :on-error="handleUploadError"
             :on-success="handleUploadSuccess"
             :limit="maxFiles"

@@ -214,6 +214,34 @@
                     <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
                     <div class="col-md-8">
 
+                        {* Image Preview Section *}
+                        <div id="compression_preview_container" class="d-none mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <strong class="d-block mb-2">{tr}Image Preview & Compression Info{/tr}</strong>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <img id="compression_preview_image" src="" alt="{tr}Image preview{/tr}" class="img-fluid border rounded" style="max-height: 300px; object-fit: contain;">
+                                        <small class="text-muted d-block mt-2">{tr}Dimensions:{/tr} <span id="compression_preview_dimensions">-</span></small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-0">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{tr}File Size Comparison{/tr}</h6>
+                                                <dl class="row">
+                                                    <dt class="col-sm-8">{tr}Original size:{/tr}</dt>
+                                                    <dd class="col-sm-4"><span id="compression_original_size" class="text-muted">-</span></dd>
+                                                    
+                                                    <dt class="col-sm-8">{tr}Estimated after compression:{/tr}</dt>
+                                                    <dd class="col-sm-4"><span id="compression_estimated_size" class="text-muted">-</span></dd>
+                                                </dl>
+                                                <small class="text-muted d-block mt-3">{tr}Preview updates as you adjust compression settings below.{/tr}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {* Default Preset Summary *}
                         <div id="compression_default_summary">
                             <div class="border rounded p-3 bg-light mb-3">

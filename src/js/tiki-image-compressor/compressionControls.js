@@ -5,6 +5,9 @@
  * Centralized state management with proper validation, error handling, and performance optimization
  */
 
+import { refreshPreview } from "./imagePreview.js";
+import initializeImagePreview from "./imagePreview.js";
+
 // STATE MANAGEMENT - Single source of truth
 const STATE = {
     serverDefaults: {},
@@ -12,6 +15,11 @@ const STATE = {
     isInitialized: false,
     listeners: [],
 };
+
+// Make STATE available globally for imagePreview module
+if (typeof window !== "undefined") {
+    window.COMPRESSION_STATE = STATE;
+}
 
 // Validation rules for settings
 const VALIDATION = {
@@ -61,12 +69,17 @@ function validateSetting(key, value) {
  */
 function updateState(updates, skipDOMUpdate = false) {
     const changes = {};
+    const previewRelatedKeys = ["quality", "maxDimension"];
+    let shouldRefreshPreview = false;
 
     for (const [key, value] of Object.entries(updates)) {
         const validated = validateSetting(key, value);
         if (STATE.current[key] !== validated) {
             changes[key] = validated;
             STATE.current[key] = validated;
+            if (previewRelatedKeys.includes(key)) {
+                shouldRefreshPreview = true;
+            }
         }
     }
 
@@ -74,6 +87,16 @@ function updateState(updates, skipDOMUpdate = false) {
 
     if (!skipDOMUpdate) {
         updateDOMFromState();
+    }
+
+    // Refresh image preview if quality or maxDimension changed
+    if (shouldRefreshPreview) {
+        refreshPreview(STATE.current);
+        
+        // Also notify Vue component if it exists (for Element Plus uploader)
+        if (typeof window !== 'undefined' && window.updateVueUploadPreview) {
+            window.updateVueUploadPreview(STATE.current);
+        }
     }
 }
 
@@ -163,7 +186,6 @@ function cleanup() {
     });
     STATE.listeners = [];
 }
-
 /**
  * Ensure elements exist in DOM, wait if needed
  */
@@ -314,6 +336,9 @@ async function initializeCompressionUI(config = {}) {
         updateDOMFromState();
 
         await initializeEventListeners();
+
+        // Initialize image preview module
+        await initializeImagePreview();
 
         STATE.isInitialized = true;
     } catch (err) {
