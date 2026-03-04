@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_perm_info()
 {
     return [
@@ -43,8 +41,12 @@ function wikiplugin_perm_info()
                 'description' => tra('Indicate whether the permissions are global or local to the object'),
                 'since' => '5.0',
                 'filter' => 'text',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0']
+                ],
             ],
             'object' => [
                 'required' => false,

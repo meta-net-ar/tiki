@@ -34,6 +34,19 @@ function wikiplugin_dynamicvariables_info()
                 'filter' => 'xss',
                 'default' => ', ',
             ],
+/*
+            'sort' => array(
+                'required' => false,
+                'name' => tra('Sort order'),
+                'description' => tra('Set to sort in ascending or descending order (unsorted by default'),
+                'default' => '',
+                'options' => array(
+                    array('text' => '', 'value' => ''),
+                    array('text' => tra('Ascending'), 'value' => 'asc'),
+                    array('text' => tra('Descending'), 'value' => 'desc')
+                )
+            ),
+*/
         ]
     ];
 }

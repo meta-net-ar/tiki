@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\FileHelper;
-use Tiki\WikiPlugin\Options\BooleanInteger;
 
 function wikiplugin_sql_info()
 {
@@ -50,9 +49,13 @@ function wikiplugin_sql_info()
                 'name' => tra('Wiki Parse'),
                 'description' => tr('Turn wiki parsing of select results on and off (default is on)'),
                 'since' => '11.0',
+                'default' => '1',
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(null, BooleanInteger::LABELSET_SWITCH),
-                'default' => BooleanInteger::Yes->value,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Off'), 'value' => '0'],
+                    ['text' => tra('On'), 'value' => '1']
+                ]
             ],
             'audit' => [
                 'required' => false,

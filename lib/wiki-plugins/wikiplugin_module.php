@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanInteger;
-use Tiki\WikiPlugin\Options\FloatPosition;
-
 function wikiplugin_module_info()
 {
     global $lang;
@@ -53,7 +49,11 @@ function wikiplugin_module_info()
                 'name' => tra('No Title'),
                 'description' => tr('Select Yes (%0y%1) to hide the title (default is to show the title)', '<code>', '</code>'),
                 'since' => '3.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'filter' => 'alpha',
                 'advanced' => true,
             ],
@@ -76,8 +76,12 @@ function wikiplugin_module_info()
                 'since' => '1',
                 'filter' => 'word',
                 'advanced' => true,
-                'options' => FloatPosition::options(),
-                'default' => FloatPosition::None->value,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => 'No Float', 'value' => 'nofloat'],
+                    ['text' => tra('Left'), 'value' => 'left'],
+                    ['text' => tra('Right'), 'value' => 'right']
+                ]
             ],
             'max' => [
                 'required' => false,
@@ -93,9 +97,13 @@ function wikiplugin_module_info()
                 'name' => tra('Parse'),
                 'description' => tra('Parse wiki syntax.') . ' ' . tra('Default:') . ' ' . tra('No'),
                 'since' => '1',
-                'default' => BooleanInteger::No->value,
+                'default' => '1',
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '0'],
+                    ['text' => tra('No'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'nobox' => [
@@ -106,7 +114,11 @@ function wikiplugin_module_info()
                 'section' => 'appearance',
                 'filter' => 'alpha',
                 'advanced' => true,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'decoration' => [
                 'required' => false,
@@ -115,7 +127,11 @@ function wikiplugin_module_info()
                 'since' => '1',
                 'advanced' => true,
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ]
             ],
             'flip' => [
                 'required' => false,
@@ -125,7 +141,11 @@ function wikiplugin_module_info()
                 'since' => '1',
                 'section' => 'appearance',
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
                 'advanced' => true,
             ],
             'bgcolor' => [
@@ -320,6 +340,9 @@ function wikiplugin_module($data, $params)
 
     extract($params, EXTR_SKIP);
 
+    if (is_null($float)) {
+        $float = 'nofloat';
+    }
 
     if (! $max) {
         if (! isset($rows)) {
@@ -372,7 +395,7 @@ function wikiplugin_module($data, $params)
     }
 
     if (! empty($out)) {
-        if ($float == FloatPosition::Left->value || $float == FloatPosition::Right->value) {
+        if ($float != 'nofloat') {
             $data = "<div style='float: $float;'>$out</div>";
         } else {
             $data = "<div>$out</div>";

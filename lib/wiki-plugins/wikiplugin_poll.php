@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_poll_info()
 {
     return [
@@ -59,8 +57,12 @@ function wikiplugin_poll_info()
                 'description' => tr('Set to No (%0n%1) to not show votes. Default is Yes (%0y%1).', '<code>', '</code>'),
                 'since' => '7.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
         ],
     ];

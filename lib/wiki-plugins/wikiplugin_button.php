@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_button_info()
 {
     return [
@@ -164,10 +160,14 @@ function wikiplugin_button_info()
                     when the content is shown', '<code>n</code>'),
                 'since' => '6.1',
                 'filter' => 'alpha',
+                'default' => '',
                 'advanced' => true,
                 'safe' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             '_flip_default_open' => [
                 'required' => false,
@@ -175,10 +175,14 @@ function wikiplugin_button_info()
                 'description' => tr('If set to %0, the flip is open by default (if no cookie jar)', '<code>y</code>'),
                 'since' => '6.1',
                 'filter' => 'alpha',
+                'default' => '',
                 'advanced' => true,
                 'safe' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             '_escape' => [
                 'required' => false,
@@ -186,10 +190,14 @@ function wikiplugin_button_info()
                 'description' => tr('If set to %0, will escape the apostrophes in onclick', '<code>y</code>'),
                 'since' => '6.1',
                 'filter' => 'alpha',
+                'default' => '',
                 'advanced' => true,
                 'safe' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             '_disabled' => [
                 'required' => false,

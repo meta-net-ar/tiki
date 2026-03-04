@@ -16,8 +16,6 @@
 // {R()}R code{R}. See documentation: https://doc.tiki.org/PluginR
 //
 
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_rr_info()
 {
     return [
@@ -37,7 +35,11 @@ function wikiplugin_rr_info()
                 'description' => tra('Show a code block with the R commands to be run before running them (similarly to the echo command)'),
                 'filter' => 'int',
                 'since' => 'PluginR 0.78',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => false,
             ],
             'echodebug' => [
@@ -46,8 +48,12 @@ function wikiplugin_rr_info()
                 'name' => tra('echo debug'),
                 'description' => tra('Show a code block with the R commands to be run even if the R program fails to execute'),
                 'filter' => 'int',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => '0',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'caption' => [
@@ -62,8 +68,11 @@ function wikiplugin_rr_info()
                 'required' => false,
                 'name' => tra('Word Wrap'),
                 'description' => tra('Enable word wrapping on the code to avoid breaking the layout.'),
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
                 'since' => 'PluginR 0.78',
                 'advanced' => true,
             ],
@@ -79,8 +88,11 @@ function wikiplugin_rr_info()
                 'required' => false,
                 'name' => tra('Line Numbers'),
                 'description' => tra('Show line numbers for each line of code.'),
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
                 'since' => 'PluginR 0.78',
                 'advanced' => true,
             ],
@@ -90,9 +102,13 @@ function wikiplugin_rr_info()
                 'name' => tra('wikisyntax'),
                 'description' => tra('Choose whether the output should be parsed as wiki syntax (Optional). Options: 0 (no parsing, default), 1 (parsing)'),
                 'filter' => 'int',
+                'default' => '0',
                 'since' => 'PluginR 0.1',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => '0', 'value' => '0'],
+                    ['text' => '1', 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'width' => [
@@ -188,9 +204,13 @@ function wikiplugin_rr_info()
                 'name' => tra('onefile'),
                 'description' => tra('Should all plots appear in one file? This is the default value (1); but if you answer no, they will attempt to appear in separate files in the server, even if you currently will not be able to fetch them easily through the internet browser. This param can be used with figure types svg and pdf; however, not many svg viewers support several plots in one svg file'),
                 'filter' => 'int',
+                'default' => '1',
                 'since' => 'PluginR 0.71',
-                'default' => BooleanInteger::Yes->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'loadandsave' => [
@@ -198,9 +218,13 @@ function wikiplugin_rr_info()
                 'name' => tra('LoadAndSave'),
                 'description' => tra('Load a previous R session (.RData, if any) for the same wiki page so that R object will be used while you work within the same page. For pretty trackers are used (wiki pages with itemId), the R session data (.RData) will be shared for the same itemId across wiki pages'),
                 'filter' => 'int',
+                'default' => '0',
                 'since' => 'PluginR 0.61 (multiuser at 0.86)',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'cachestrategy' => [
@@ -311,8 +335,11 @@ function wikiplugin_rr_info()
                 'name' => tra('Custom output'),
                 'description' => tra('Write your custom png creation R command. Use tikiRRfilename for value of output. RR does not produce an output file.'),
                 'filter' => 'int',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
             'security' => [
@@ -321,9 +348,13 @@ function wikiplugin_rr_info()
                 'name' => tra('security'),
                 'description' => tra('Set the security level for the R commands allowed by the plugin. ex: 1. (default in R), 0 for no security checking (default in RR).'),
                 'filter' => 'int',
+                'default' => '1',
                 'since' => 'PluginR 0.4',
-                'default' => BooleanInteger::Yes->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'advanced' => true,
             ],
         ],

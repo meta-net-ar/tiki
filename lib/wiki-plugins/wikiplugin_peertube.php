@@ -5,8 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_peertube_info()
 {
     return [
@@ -43,8 +41,12 @@ function wikiplugin_peertube_info()
                 'name' => tra('Privacy-Enhanced'),
                 'description' => tra('Enable privacy-enhanced mode (if applicable)'),
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'bg' => [
                 'required' => false,
@@ -66,9 +68,12 @@ function wikiplugin_peertube_info()
                 'required' => false,
                 'name' => tra('Border Radius'),
                 'description' => tra('Apply rounded corners. Default: Yes'),
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'advanced' => true,
             ],
             'start' => [
@@ -82,9 +87,12 @@ function wikiplugin_peertube_info()
                 'required' => false,
                 'name' => tra('Allow Full-Screen'),
                 'description' => tra('Enlarge video to full screen size'),
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'advanced' => true,
             ],
         ],

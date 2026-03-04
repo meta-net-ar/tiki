@@ -7,7 +7,6 @@
 
 use Tiki\Lib\TikiDate;
 use Tiki\Package\VendorHelper;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_trackercalendar_info()
 {
@@ -80,8 +79,12 @@ function wikiplugin_trackercalendar_info()
                     pretty tracker supported pages.'),
                 'since' => '12.4',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'url' => [
                 'required' => false,
@@ -99,8 +102,12 @@ function wikiplugin_trackercalendar_info()
                     by Tracker plugins. Will be passed as %0itemid%1 if No (%0n%1)', '<code>', '</code>'),
                 'since' => '12.4',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'parentparam' => ['name' => 'external', 'value' => 'y'],
             ],
             'addAllFields' => [
@@ -110,8 +117,12 @@ function wikiplugin_trackercalendar_info()
                     itemId', '<code>', '</code>'),
                 'since' => '12.4',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'parentparam' => ['name' => 'external', 'value' => 'y'],
             ],
             'useSessionStorage' => [
@@ -121,8 +132,12 @@ function wikiplugin_trackercalendar_info()
                     accessed via JavaScript.', '<code>', '</code>'),
                 'since' => '12.4',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'parentparam' => ['name' => 'addAllFields', 'value' => 'y'],
             ],
             'amonth' => [
@@ -131,8 +146,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to agenda by months'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'aweek' => [
                 'required' => false,
@@ -140,8 +159,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to agenda by weeks'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'aday' => [
                 'required' => false,
@@ -149,8 +172,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to agenda by days'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'lyear' => [
                 'required' => false,
@@ -158,8 +185,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to list by years'),
                 'since' => '20.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'lmonth' => [
                 'required' => false,
@@ -167,8 +198,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to list by months'),
                 'since' => '20.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'lweek' => [
                 'required' => false,
@@ -176,8 +211,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to list by weeks'),
                 'since' => '20.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'lday' => [
                 'required' => false,
@@ -185,8 +224,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to list by days'),
                 'since' => '20.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'rmonth' => [
                 'required' => false,
@@ -194,8 +237,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to resources by months'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'rweek' => [
                 'required' => false,
@@ -203,8 +250,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to resources by weeks'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'rday' => [
                 'required' => false,
@@ -212,8 +263,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Display the option to change the view to resources by days'),
                 'since' => '12.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'dView' => [
                 'required' => false,
@@ -285,8 +340,12 @@ function wikiplugin_trackercalendar_info()
                 'name' => tra('Show Weekends'),
                 'description' => tra('Display Saturdays and Sundays (shown by default)'),
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'minHourOfDay' => [
                 'required' => false,
@@ -318,8 +377,12 @@ function wikiplugin_trackercalendar_info()
                 'description' => tra('Allow resources to overlap in time.'),
                 'since' => '20.1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'maxEvents' => [
                 'required' => false,

@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Sections;
-use Tiki\WikiPlugin\Options\BooleanInteger;
 
 function wikiplugin_attach_info()
 {
@@ -53,8 +52,12 @@ function wikiplugin_attach_info()
                 'description' => tra('Shows the description as the link text instead of the file name (not used by default)'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'bullets' => [
                 'required' => false,
@@ -62,8 +65,12 @@ function wikiplugin_attach_info()
                 'description' => tra('Makes the list of attachments a bulleted list (not set by default)'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'image' => [
                 'required' => false,
@@ -72,8 +79,12 @@ function wikiplugin_attach_info()
                     %0 tag (not set by default)', '<code>img</code>'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'inline' => [
                 'required' => false,
@@ -82,18 +93,26 @@ function wikiplugin_attach_info()
                     or description. Only the first attachment will be listed.', '<code>{ATTACH}</code>'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'all' => [
                 'required' => false,
                 'name' => tra('All'),
                 'description' => tr('Lists links to all attachments for the entire tiki site together with pages they
-                    are attached to when set to %0 (Yes)', '<code>' . BooleanInteger::Yes->value . '</code>'),
+                    are attached to when set to %0 (Yes)', '<code>1</code>'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'num' => [
                 'required' => false,
@@ -117,21 +136,29 @@ function wikiplugin_attach_info()
                 'required' => false,
                 'name' => tra('Downloads'),
                 'description' => tr('The alt text that pops up on mouseover will include the number of downloads of the
-                    attachment at the end when set to %0 (Yes)', '<code>' . BooleanInteger::Yes->value . '</code>'),
+                    attachment at the end when set to %0 (Yes)', '<code>1</code>'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'icon' => [
                 'required' => false,
                 'name' => tra('File Type Icon'),
                 'description' => tr('A file type icon is displayed in front of the attachment link when this is set to
-                    %0 (Yes)', '<code>' . BooleanInteger::Yes->value . '</code>'),
+                    %0 (Yes)', '<code>1</code>'),
                 'since' => '1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options()
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
 
         ],

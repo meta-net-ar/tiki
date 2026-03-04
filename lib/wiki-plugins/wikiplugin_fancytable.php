@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_fancytable_info()
 {
     $tsOn = Table_Check::isEnabled();
@@ -94,8 +92,12 @@ function wikiplugin_fancytable_info()
                  'since' => '26',
                  'required' => false,
                  'filter' => 'alpha',
-                 'default' => BooleanEnglishLetter::No->value,
-                 'options' => BooleanEnglishLetter::options(),
+                 'default' => 'n',
+                 'options' => [
+                     ['text' => '', 'value' => ''],
+                     ['text' => tra('No'), 'value' => 'n'],
+                     ['text' => tra('Yes'), 'value' => 'y']
+                 ]
              ],
              'class' => [
                  'required' => false,

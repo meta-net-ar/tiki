@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_activitystream_info()
 {
     return [
@@ -32,7 +30,10 @@ function wikiplugin_activitystream_info()
                 'default' => 0,
                 'filter' => 'digits',
                 'since' => '12.0',
-                'options' => BooleanInteger::options(null, BooleanInteger::LABELSET_SWITCH),
+                'options' => [
+                    ['value' => 0, 'text' => tr('Off')],
+                    ['value' => 1, 'text' => tr('On')],
+                ],
             ],
         ],
     ];
@@ -51,7 +52,7 @@ function wikiplugin_activitystream($data, $params)
 
     $servicelib = TikiLib::lib('service');
     return $servicelib->render('activitystream', 'render', [
-        'autoscroll' => \Tiki\WikiPlugin\Options\BooleanNormalizer::isTruthy($params['auto']),
+        'autoscroll' => $params['auto'] == 1,
         'stream' => $encoded,
     ]);
 }

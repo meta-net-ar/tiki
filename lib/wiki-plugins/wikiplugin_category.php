@@ -4,11 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_category_info()
 {
     return [
@@ -83,8 +78,12 @@ function wikiplugin_category_info()
                 'description' => tra('Whether multiple categories will be listed on different lines (default is to split them)'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'and' => [
                 'required' => false,
@@ -93,8 +92,12 @@ function wikiplugin_category_info()
                     is to show objects in any of the categories)', '<code>y</code>'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'sub' => [
                 'required' => false,
@@ -102,61 +105,91 @@ function wikiplugin_category_info()
                 'description' => tra('Also list objects in sub-categories of the categories given (default is to list
                     sub-category objects)'),
                 'since' => '4.1',
+                'default' => 'n',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'showdescription' => [
                 'required' => false,
                 'name' => tra('Description'),
                 'description' => tra('Show descriptions (not shown by default)'),
                 'since' => '4.1',
+                'default' => 'n',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'showname' => [
                 'required' => false,
                 'name' => tra('Name'),
                 'description' => tra('Show object names (shown by default)'),
                 'since' => '4.1',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'showtype' => [
                 'required' => false,
                 'name' => tra('Type'),
                 'description' => tra('Show type (shown by default)'),
                 'since' => '4.1',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
             'one' => [
                 'required' => false,
                 'name' => tra('One Per Line'),
                 'description' => tra('Show one object per line (multiple per line shown by default)'),
+                'default' => 'n',
                 'since' => '5.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
             'showlinks' => [
                 'required' => false,
                 'name' => tra('Child Links'),
                 'description' => tra('Show children category links (shown by default)'),
                 'since' => '5.0',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'categoryshowlink' => [
                 'required' => false,
                 'name' => tra('Top Link'),
                 'description' => tra('Show top category link (shown by default)'),
                 'since' => '5.0',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'maxRecords' => [
                 'required' => false,
@@ -171,9 +204,14 @@ function wikiplugin_category_info()
                 'name' => tra('Title'),
                 'description' => tra('Show title text above category object lists (shown by default)'),
                 'since' => '6.1',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
             'lang' => [
                 'required' => false,
                 'name' => tra('Language'),
@@ -201,10 +239,9 @@ function wikiplugin_category($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $split = BooleanNormalizer::isTruthy($split);
-    $sub = BooleanNormalizer::isTruthy($sub);
-    $and = BooleanNormalizer::isTruthy($and);
-
+    $split = strtolower($split) == 'y';
+    $sub = strtolower($sub) == 'y';
+    $and = strtolower($and) == 'y';
     $filter['language'] = $lang ?: Language::getCurrentLanguage();
 
     if (! empty($sort)) {

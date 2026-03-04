@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_layout_info()
 {
     return [
@@ -24,55 +22,74 @@ function wikiplugin_layout_info()
                 'name'        => tra('Display page header'),
                 'description' => tra('Set to No to hide the page header (top module zone).'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+
+                ],
             ],
             'footer'       => [
                 'required'    => false,
                 'name'        => tra('Display page footer'),
                 'description' => tra('Set to No to hide the footer (bottom module zone).'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+                ],
             ],
             'leftcolumn'      => [
                 'required'    => false,
                 'name'        => tra('Display page left column'),
                 'description' => tra('Set to No to hide the left column.'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+                ],
             ],
             'rightcolumn'     => [
                 'required'    => false,
                 'name'        => tra('Display page right column'),
                 'description' => tra('Set to No to hide the right column.'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
                 ],
+            ],
             'fullwidth'    => [
                 'required'    => false,
                 'name'        => tra('Full-width page'),
                 'description' => tra('Override fixed width, if set, to have liquid layout.'),
                 'filter'      => 'alpha',
+                'default'     => 'n',
                 'since'       => '19.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'No ', 'value' => 'n'],
+                    ['text' => 'Yes', 'value' => 'y'],
                 ],
+            ],
             'nosidemargins'    => [
                 'required'    => false,
                 'name'        => tra('Remove full-width content container side margins'),
                 'description' => tra('Enable background images, etc. to span the complete width of the page.'),
                 'filter'      => 'alpha',
+                'default'     => 'n',
                 'since'       => '20.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'No ', 'value' => 'n'],
+                    ['text' => 'Yes', 'value' => 'y'],
                 ],
+            ],
             'contentwidth' => [
                 'required'    => false,
                 'name'        => tra('Page content width'),
@@ -106,6 +123,7 @@ function wikiplugin_layout_info()
                     ['text' => 'no repeat ', 'value' => 'norepeat'],
                 ],
             ],
+
             'fgalId'              => [
                 'required'          => false,
                 'name'              => tra('Page background slideshow images'),
@@ -220,40 +238,55 @@ function wikiplugin_layout_info()
                     'Set to No to hide the page action buttons.'
                 ),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
                 'advanced'    => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+                ],
             ],
             'topbar'       => [
                 'required'    => false,
                 'name'        => tra('Display topbar (below page header)'),
                 'description' => tra('Set to No to hide the topbar (top module zone).'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
                 'advanced'    => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+
+                ],
             ],
             'pagetopbar'       => [
                 'required'    => false,
                 'name'        => tra('Display page-top zone (above page content)'),
                 'description' => tra('Set to No to hide the pagetop module zone.'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
                 'advanced'    => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+
+                ],
             ],
             'pagebottombar'       => [
                 'required'    => false,
                 'name'        => tra('Display page bottom bar (below page content.)'),
                 'description' => tra('Set to No to hide the pagebottom module zone.'),
                 'filter'      => 'alpha',
+                'default'     => 'y',
                 'since'       => '19.0',
                 'advanced'    => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options'     => [
+                    ['text' => 'Yes', 'value' => 'y'],
+                    ['text' => 'No ', 'value' => 'n'],
+
+                ],
             ],
 
 

@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\SortDirections;
-
 function wikiplugin_userlist_info()
 {
     return [
@@ -42,7 +39,11 @@ function wikiplugin_userlist_info()
                 'since' => '3.0',
                 'default' => '',
                 'filter' => 'alpha',
-                'options' => SortDirections::options(''),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Ascending'), 'value' => 'asc'],
+                    ['text' => tra('Descending'), 'value' => 'desc'],
+                ],
             ],
             'layout' => [
                 'required' => false,
@@ -77,8 +78,12 @@ function wikiplugin_userlist_info()
                 'name' => tra('Real Name'),
                 'description' => tra('Display the user\'s real name (when available) instead of login name'),
                 'since' => '4.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'group' => [
                 'required' => false,

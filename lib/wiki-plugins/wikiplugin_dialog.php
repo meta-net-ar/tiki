@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\WikiPlugin\Enums\PluginParameterTags;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_dialog_info()
 {
@@ -88,8 +87,11 @@ function wikiplugin_dialog_info()
                 'description' => tra('If true, the modal will not close when clicking outside of the modal'),
                 'since' => '28.0',
                 'filter' => 'text',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'useWikiContent' => [
                 'required' => false,
@@ -97,8 +99,11 @@ function wikiplugin_dialog_info()
                 'description' => tra('Use wiki page content as the dialog body'),
                 'since' => '28.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'profile_reference' => 'wiki_page',
                 'tag' => PluginParameterTags::Experimental->value,
                 'tagMessage' => tra("The usage of this field is still experimental, and doesn't strictly count as a dependency for the final plugin output.")
@@ -132,8 +137,11 @@ function wikiplugin_dialog_info()
                 'description' => tra('Allow the modal to open with a fade in effect'),
                 'since' => '8.0',
                 'filter' => 'text',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'showCloseIcon' => [
                 'required' => false,
@@ -142,8 +150,11 @@ function wikiplugin_dialog_info()
                 'description' => tra('Show a close icon in the header of the modal'),
                 'since' => '28.0',
                 'filter' => 'text',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'autoOpen' => [
                 'required' => false,
@@ -152,8 +163,12 @@ function wikiplugin_dialog_info()
                 'description' => tra('Open the modal automatically'),
                 'since' => '8.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'openAction' => [
                 'required' => false,

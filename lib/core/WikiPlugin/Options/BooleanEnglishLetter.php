@@ -1,6 +1,6 @@
 <?php
 
-namespace Tiki\WikiPlugin\Options;
+namespace Tiki\Lib\core\WikiPlugin\Options;
 
 enum BooleanEnglishLetter: string implements PluginOptionsInterface
 {

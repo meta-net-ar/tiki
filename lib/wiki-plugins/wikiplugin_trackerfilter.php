@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_trackerfilter_info()
 {
     require_once 'lib/wiki-plugins/wikiplugin_trackerlist.php';
@@ -53,8 +51,12 @@ function wikiplugin_trackerfilter_info()
                 'since' => '2.0',
                 'doctype' => 'show',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'line' => [
                 'required' => false,
@@ -79,8 +81,12 @@ function wikiplugin_trackerfilter_info()
                 'since' => '6.0',
                 'doctype' => 'show',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'export_action' => [
                 'required' => false,
@@ -99,8 +105,12 @@ function wikiplugin_trackerfilter_info()
                 'advanced' => true,
                 'filter' => 'alpha',
                 'doctype' => 'export',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'export_created' => [
                 'required' => false,
@@ -110,8 +120,12 @@ function wikiplugin_trackerfilter_info()
                 'advanced' => true,
                 'filter' => 'alpha',
                 'doctype' => 'export',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'export_modif' => [
                 'required' => false,
@@ -121,8 +135,12 @@ function wikiplugin_trackerfilter_info()
                 'advanced' => true,
                 'filter' => 'alpha',
                 'doctype' => 'export',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'export_charset' => [
                 'required' => false,
@@ -140,17 +158,24 @@ function wikiplugin_trackerfilter_info()
                 'since' => '6.0' . tr(' - was %0 until 12.0', '<code>googlemapButtons</code>'),
                 'filter' => 'alpha',
                 'doctype' => 'show',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'useCssTruncate' => [
                 'required' => false,
                 'name' => tra('Use CSS-based truncation'),
                 'description' => tra('Enable visual truncation using CSS.'),
                 'since' => '29.0',
+                'default' => 'n',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
         ],
         $list['params']

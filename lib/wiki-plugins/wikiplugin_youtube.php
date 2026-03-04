@@ -5,8 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 require_once 'lib/wiki-plugins/shared/embed_helpers.php';
 
 function wikiplugin_youtube_info()
@@ -32,9 +30,13 @@ function wikiplugin_youtube_info()
                 'required' => false,
                 'name' => tra('Privacy-Enhanced'),
                 'description' => tra('Enable privacy-enhanced mode'),
+                'default' => '',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'width' => [
                 'required' => false,
@@ -78,9 +80,12 @@ function wikiplugin_youtube_info()
                 'name' => tra('Allow full-screen'),
                 'description' => tra('Enlarge video to full screen size'),
                 'since' => '5.0',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                 'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                 ],
                  'advanced' => true
             ],
             'related' => [
@@ -88,9 +93,12 @@ function wikiplugin_youtube_info()
                 'name' => tra('Related'),
                 'description' => tra('Show related videos (shown by default)'),
                 'since' => '6.1',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'advanced' => true
             ],
             'bg' => [
@@ -117,9 +125,12 @@ function wikiplugin_youtube_info()
                 'required' => false,
                 'name' => tra('Border Radius'),
                 'description' => tra('Apply rounded corners to the container. Default: ') . '<code>Yes</code>',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'advanced' => true
             ],
         ],

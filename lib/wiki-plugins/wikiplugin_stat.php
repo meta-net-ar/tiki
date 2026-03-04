@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\ActivityStatuses;
+use Tiki\Lib\core\WikiPlugin\Options\ActivityStatuses;
+use Tiki\WikiPlugin\Options\CommonOptions;
 
 function wikiplugin_stat_info()
 {

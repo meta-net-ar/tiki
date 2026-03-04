@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\Auth\Tokens;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_playscorm_info()
 {
@@ -66,9 +65,13 @@ function wikiplugin_playscorm_info()
                 'name' => tra('Scrolling'),
                 'description' => tra('Choose whether to add a scroll bar'),
                 'since' => '12.0',
+                'default' => 'y',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ]
             ],
             'id' => [
                 'required' => false,

@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\Wiki\PluginsLib;
-use Tiki\WikiPlugin\Options\BooleanInteger;
 
 function wikiplugin_wantedpages_info()
 {
@@ -44,18 +43,26 @@ function wikiplugin_wantedpages_info()
                 'name' => tra('Skip Alias'),
                 'description' => tra('Whether to skip wanted pages that have a defined alias (not skipped by default)'),
                 'since' => '12.1',
-                'default' => BooleanInteger::Yes->value,
+                'default' => 1,
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'skipext' => [
                 'required' => false,
                 'name' => tra('Skip Extension'),
                 'description' => tra('Whether to include external wikis in the list (not included by default)'),
                 'since' => '1',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'collect' => [
                 'required' => false,
@@ -84,7 +91,7 @@ function wikiplugin_wantedpages_info()
                     ['text' => tra('No'), 'value' => 0],
                     ['text' => tra('Yes'), 'value' => 1],
                     ['text' => tra('Memory Saver'), 'value' => 2],
-                ],
+                    ],
             ],
             'table' => [
                 'required' => false,

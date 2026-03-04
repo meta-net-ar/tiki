@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_mouseover_info()
 {
     include_once('lib/prefs/jquery.php');
@@ -96,8 +94,12 @@ function wikiplugin_mouseover_info()
                 'since' => '3.0',
                 'filter' => 'alpha',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'parselabel' => [
                 'required' => false,
@@ -105,9 +107,13 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Parse the label as wiki content (parsed by default)'),
                 'since' => '5.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
+                'default' => 'y',
                 'advanced' => true,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'class' => [
                 'required' => false,
@@ -139,8 +145,12 @@ function wikiplugin_mouseover_info()
                 'description' => tra('When enabled, popup stays visible until it is clicked.'),
                 'since' => '3.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'advanced' => true,
             ],
             'padding' => [

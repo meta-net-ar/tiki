@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_sharethis_info()
 {
     return [
@@ -48,7 +44,7 @@ function wikiplugin_sharethis_info()
                     ['text' => tra('Horizontal'), 'value' => 'horizontal'],
                     ['text' => tra('Vertical'), 'value' => 'vertical'],
                     ['text' => tra('Rotate'), 'value' => 'rotate']
-                ]
+                    ]
             ],
             'rotateimage' => [
                 'required' => false,
@@ -56,9 +52,13 @@ function wikiplugin_sharethis_info()
                 'description' => tr('A value of %0y%1 (Yes) will cause the button icon to rotate every 3 seconds between
                     a few icons, cycling through twice before stopping.', '<code>', '</code>'),
                 'since' => '3.2',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => '',
                 'filter' => 'alpha',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'multiple' => [
                 'required' => false,
@@ -131,8 +131,12 @@ function wikiplugin_sharethis_info()
                 'since' => '3.0',
                 'advanced' => true,
                 'filter' => 'word',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'true'],
+                ]
             ],
             'embed' => [
                 'required' => false,
@@ -141,8 +145,12 @@ function wikiplugin_sharethis_info()
                 'since' => '3.0',
                 'advanced' => true,
                 'filter' => 'word',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'true'],
+                ]
             ],
         ]
     ];

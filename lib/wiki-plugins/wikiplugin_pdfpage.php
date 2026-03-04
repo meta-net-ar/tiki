@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-
 function wikiplugin_pdfpage_info()
 {
     //including prefs to set global print settings as default value of parameters
@@ -32,6 +31,7 @@ function wikiplugin_pdfpage_info()
                             ['text' => 'Portrait','value' => 'P'],
                             ['text' => 'Landscape','value' => 'L'],
                         ],
+
                     ],
                     'pagesize' => [
                         'required' => false,
@@ -50,7 +50,7 @@ function wikiplugin_pdfpage_info()
                             ['text' => 'A4','value' => 'A4'],
                             ['text' => 'A5','value' => 'A5'],
                             ['text' => 'A6','value' => 'A6']
-                        ],
+                            ]
                     ],
                     'header' => [
                         'required' => false,

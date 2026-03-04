@@ -5,8 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_pdf_info()
 {
     //including prefs to set global print settings as default value of parameters
@@ -26,8 +24,12 @@ function wikiplugin_pdf_info()
                         'description' => tra('Print friendly option will change theme background color to white and text /headings color to black. If set to \'n\', theme colors will be retained in pdf'),
                         'required' => false,
                         'type' => 'list',
-                        'default' => BooleanEnglishLetter::No->value,
-                        'options' => BooleanEnglishLetter::options(),
+                        'default' => '',
+                        'options' => [
+                            ['text' => 'Default','value' => ''],
+                            ['text' => 'Yes','value' => 'y'],
+                            ['text' => 'No','value' => 'n'],
+                        ],
                     ],
                     'orientation' => [
                         'name' => tra('PDF Orientation'),
@@ -59,7 +61,7 @@ function wikiplugin_pdf_info()
                         ['text' => 'A4','value' => 'A4'],
                         ['text' => 'A5','value' => 'A5'],
                         ['text' => 'A6','value' => 'A6']
-                    ]
+                        ]
                     ],
                     'toc' => [
                         'name' => tra('Generate table of contents'),
@@ -67,15 +69,23 @@ function wikiplugin_pdf_info()
                         'required' => false,
                         'type' => 'list',
                         'default' => $prefs['print_pdf_mpdf_toc'],
-                        'options' => BooleanEnglishLetter::options(null, BooleanEnglishLetter::LABELSET_SWITCH),
+                        'options' => [
+                            ['text' => 'Default','value' => ''],
+                            ['text' => 'On','value' => 'y'],
+                            ['text' => 'Off','value' => 'n'],
+                        ],
                     ],
                     'toclinks' => [
                         'name' => tra('Link TOC with content'),
                         'description' => tra('Link TOC headings with content on PDF document'),
                         'required' => false,
                         'type' => 'list',
-                        'default' => BooleanEnglishLetter::No->value,
-                        'options' => BooleanEnglishLetter::options(),
+                        'default' => 'n',
+                        'options' => [
+                            ['text' => 'Default','value' => ''],
+                            ['text' => 'Yes','value' => 'y'],
+                            ['text' => 'No','value' => 'n'],
+                        ],
                     ],
                     'tocheading' => [
                         'name' => tra('TOC heading'),
@@ -102,8 +112,12 @@ function wikiplugin_pdf_info()
                         'required' => false,
                         'tags' => ['advanced'],
                         'type' => 'list',
-                        'default' => BooleanEnglishLetter::No->value,
-                        'options' => BooleanEnglishLetter::options(),
+                        'default' => '',
+                        'options' => [
+                            ['text' => 'Default','value' => ''],
+                            ['text' => 'Yes','value' => 'y'],
+                            ['text' => 'No','value' => 'n']
+                        ]
                     ],
                     'header' => [
                         'name' => tra('PDF header text'),

@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 /**
  * Wiki Plugin: Lottie
@@ -46,16 +45,22 @@ function wikiplugin_lottie_info()
                 'name' => tra('Loop'),
                 'description' => tra('Loop the animation continuously.'),
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'autoplay' => [
                 'required' => false,
                 'name' => tra('Autoplay'),
                 'description' => tra('Start animation automatically when page loads.'),
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'speed' => [
                 'required' => false,

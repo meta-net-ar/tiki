@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_subscribegroups_info()
 {
     return [
@@ -34,8 +32,12 @@ function wikiplugin_subscribegroups_info()
                     groups the user may register for.'),
                 'since' => '4.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'subscribestyle' => [
                 'required' => false,
@@ -56,8 +58,12 @@ function wikiplugin_subscribegroups_info()
                     change his or her default group.'),
                 'since' => '4.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'showgroupdescription' => [
                 'required' => false,
@@ -65,8 +71,12 @@ function wikiplugin_subscribegroups_info()
                 'description' => tra('Show the description of the group (not shown by default)'),
                 'since' => '4.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'groups' => [
                 'required' => false,
@@ -119,9 +129,13 @@ function wikiplugin_subscribegroups_info()
                 'name' => tra('Always allow leaving group'),
                 'description' => tra('Always allow leaving group even if the group settings do not allow user choice.'),
                 'since' => '8.0',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'filter' => 'alpha',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                                        ['text' => '', 'value' => ''],
+                                        ['text' => tra('Yes'), 'value' => 'y'],
+                                        ['text' => tra('No'), 'value' => 'n']
+                                ]
             ]
         ]
     ];

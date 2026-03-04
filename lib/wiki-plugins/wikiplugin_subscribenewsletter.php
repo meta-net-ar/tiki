@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_subscribenewsletter_info()
 {
     return [
@@ -49,8 +45,12 @@ function wikiplugin_subscribenewsletter_info()
                 'description' => tra('Choose whether the output should be parsed as wiki syntax'),
                 'since' => '6.0',
                 'filter' => 'int',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
             ],
             'inmodule' => [
                 'required' => false,
@@ -58,8 +58,12 @@ function wikiplugin_subscribenewsletter_info()
                 'description' => tra('Display the newsletter subscription form in module view (if included in a Tiki module)'),
                 'since' => '19.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'usecaptcha' => [
                 'required' => false,
@@ -68,8 +72,11 @@ function wikiplugin_subscribenewsletter_info()
                 'description' => tra('Captcha verification for anonymous visitors (yes by default). Turning off this option may lead to have this newsletter list filled by Spambot'),
                 'since' => '22.0',
                 'filter' => 'int',
-                'default' => BooleanInteger::Yes->value,
-                'options' => BooleanInteger::options(),
+                'default' => 1,
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
             ],
         ],
     ];

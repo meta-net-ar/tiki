@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_skype_info()
 {
     return [
@@ -37,9 +34,12 @@ function wikiplugin_skype_info()
                 'name' => tra('Show status'),
                 'description' => tra('Show a status icon or not i.e. if online/offline/etc. Default is to not show status.'),
                 'since' => '7.0',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'filter' => 'alpha',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra('yes'), 'value' => 'y'],
+                    ['text' => tra('no'), 'value' => 'n']
+                ]
             ],
         ]
     ];

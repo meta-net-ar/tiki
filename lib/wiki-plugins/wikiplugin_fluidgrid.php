@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_fluidgrid_info()
 {
     return [
@@ -27,8 +24,12 @@ function wikiplugin_fluidgrid_info()
                 'description' => tra('Merge empty cells into the cell to their left'),
                 'since' => '17',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'devicesize' => [
                 'required' => false,
@@ -133,14 +134,14 @@ function wikiplugin_fluidgrid($data, $params, $pos)
 
     // Remove first <ENTER> if exists...
     // it may be here if present after {FLUIDGRID()} in original text
-    if (str_starts_with($data, "\r\n")) {
+    if (substr($data, 0, 2) == "\r\n") {
         $data2 = substr($data, 2);
     } else {
         $data2 = $data;
     }
 
     extract($params, EXTR_SKIP);
-    $joincols  = BooleanNormalizer::isTruthy($joincols);
+    $joincols  = ($joincols == 'y' || $joincols == 1 ? true : false);
 
         // Check the device size parameter which must be one of 'sm', 'md', 'lg' or 'xl'
     if (! ( ( $devicesize == 'sm' ) || ( $devicesize == 'md' ) || ( $devicesize == 'lg' ) || ( $devicesize == 'xl' ) )) {
@@ -266,7 +267,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
         // Check for a percent symbol on any column
         $percent = false;
         foreach ($colsize as $val) {
-            if (str_contains($val, '%')) {
+            if (strpos($val, '%') !== false) {
                 $percent = true;
                 break;
             }
@@ -302,7 +303,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
             // $tdnosize  = count of columns without a specified size
             for ($i = 0; $i < $maxcols; $i++) {
                 if (isset($tdsize[$i]) && ( trim($tdsize[$i]) != '' )) {
-                    $isPercentCol = (str_contains($tdsize[$i], '%'));
+                    $isPercentCol = ( strpos($tdsize[$i], '%') !== false );
                     $w = abs((int) trim($tdsize[$i])); //The size must always be positive
 
                     if ($isPercentCol) {
@@ -346,7 +347,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
                     // Remaining value to distribute to columns without specified size
                     $remaining = 100 - $tdtotalPercent - ($tdtotal * (100 / 12));
                     for ($i = 0; $i < $maxcols; $i++) {
-                        $isValuePercent = (str_contains($s_array[$i], '%'));
+                        $isValuePercent = ( strpos($s_array[$i], '%') !== false );
                         if ($s_array[$i] == 0) {
                             // No size specified
                             $w_array[$i] = ceil(round(($remaining / $tdnosize * 12) / 100)) ;

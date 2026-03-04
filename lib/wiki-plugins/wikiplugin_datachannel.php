@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_datachannel_info()
 {
     global $prefs;
@@ -68,9 +65,13 @@ function wikiplugin_datachannel_info()
                 'description' => tr('If set to %0, will return quietly after data channel has run which would be needed
                     if plugin is used in non-wiki page context.', '<code>y</code>'),
                 'since' => '6.2',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
             ],
             'buttonLabel' => [
                 'required' => false,
@@ -134,10 +135,14 @@ function wikiplugin_datachannel_info()
                 'description' => tra('Be careful, if debug is on, the page will not be refreshed and previous modules
                     can be obsolete (not on by default)'),
                 'since' => '5.0',
+                'default' => 'n',
                 'filter' => 'alpha',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'array_values' => [
                 'required' => false,
@@ -145,10 +150,14 @@ function wikiplugin_datachannel_info()
                 'description' => tr('Accept arrays of multiple values in the POST. e.g. %0 etc.
                     (multiple values not accepted by default)', '<code>itemId[]=42&itemId=43</code>'),
                 'since' => '6.0',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'filter' => 'alpha',
                 'advanced' => true,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
         ],
     ];
@@ -206,7 +215,7 @@ function wikiplugin_datachannel($data, $params)
                     }
                 }
                 $fields[ $parts[0] ] = $moreparts[0];
-                if (BooleanNormalizer::isTruthy($params['array_values']) && preg_match('/[\[\]\.#\=]/', $moreparts[1])) {    // check for [ ] = or . which would be a jQuery selector
+                if ($params['array_values'] === 'y' && preg_match('/[\[\]\.#\=]/', $moreparts[1])) {    // check for [ ] = or . which would be a jQuery selector
                     // might select multiple inputs
                     $js .= "\n" . '$("input[name=\'' . $parts[0] . '\']").val( unescape($("' . $moreparts[1] . '").serialize()));';
                 } else {    // otherwise it's an id but could have a modifier eg 'text'
@@ -344,7 +353,7 @@ function wikiplugin_datachannel($data, $params)
                     // i guess the idea is to be able to restrict the settable prefs to only harmless ones for security
 
                     $installer->setUserData($userInput);
-                    if (BooleanNormalizer::isTruthy($params['debug'])) {
+                    if ($params['debug'] === 'y') {
                         $installer->setDebug();
                     }
 
@@ -366,8 +375,8 @@ function wikiplugin_datachannel($data, $params)
                 $params['returnErrorURI'] = $params['returnURI'];
             }
 
-            if (BooleanNormalizer::isFalsy($params['debug'])) {
-                if (BooleanNormalizer::isTruthy($params['quietReturn'])) {
+            if (empty($params['debug']) || $params['debug'] != 'y') {
+                if ($params['quietReturn'] == 'y') {
                     return true;
                 } elseif (! empty($installer) && ! empty($profile) && $target = $profile->getInstructionPage()) {
                     $profilefeedback = $installer->getFeedback();

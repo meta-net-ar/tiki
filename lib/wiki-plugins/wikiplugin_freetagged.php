@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_freetagged_info()
 {
     return [
@@ -108,8 +105,12 @@ function wikiplugin_freetagged_info()
                 'description' => tra('n|y'),
                 'since' => '5.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'h_level' => [
                 'required' => false,
@@ -126,8 +127,11 @@ function wikiplugin_freetagged_info()
                 'description' => tra('Choose whether to show titles only (not shown by default)'),
                 'since' => '5.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                ]
             ],
             'max_image_size' => [
                 'required' => false,
@@ -142,8 +146,12 @@ function wikiplugin_freetagged_info()
                 'name' => tra('More'),
                 'description' => tra('Show a \'more\' link that links to the full list of tagged objects (not shown by default)'),
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'moreurl' => [
                 'required' => false,
@@ -229,7 +237,7 @@ function wikiplugin_freetagged($data, $params)
     }
 
     foreach ($objects as &$obj) {
-        if (BooleanNormalizer::isFalsy($titles_only)) {
+        if ($titles_only == 'n') {
             switch ($obj['type']) {
                 case 'article':
                     $artlib = TikiLib::lib('art');

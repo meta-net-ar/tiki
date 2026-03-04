@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_colorbox_info()
 {
     return [
@@ -43,9 +39,13 @@ function wikiplugin_colorbox_info()
                 'description' => tr('Display as a thumbnail or full size.'),
                 'filter' => 'alpha',
                 'accepted' => 'y or n',
-                'default' => BooleanEnglishLetter::Yes->value,
+                'default' => 'y',
                 'since' => '5.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ],
                 ],
             'sort_mode' => [
                 'required' => false,
@@ -64,9 +64,13 @@ function wikiplugin_colorbox_info()
                 'description' => tra('Show file title'),
                 'filter' => 'alpha',
                 'accepted' => 'y or n',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'since' => '5.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showfilename' => [
                 'required' => false,
@@ -74,9 +78,13 @@ function wikiplugin_colorbox_info()
                 'description' => tra('Show file name'),
                 'filter' => 'alpha',
                 'accepted' => 'y or n',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'since' => '5.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showallthumbs' => [
                 'required' => false,
@@ -84,9 +92,13 @@ function wikiplugin_colorbox_info()
                 'description' => tra('Show thumbnails of all the images in the gallery'),
                 'filter' => 'alpha',
                 'accepted' => 'y or n',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'since' => '5.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'parsedescriptions' => [
                 'required' => false,
@@ -94,9 +106,13 @@ function wikiplugin_colorbox_info()
                 'description' => tra('Parse the file descriptions as wiki syntax'),
                 'filter' => 'alpha',
                 'accepted' => 'y or n',
+                'default' => 'n',
                 'since' => '5.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];
@@ -133,17 +149,17 @@ function wikiplugin_colorbox($data, $params)
     }
     foreach ($files['data'] as &$file) {
         $str = '';
-        if (BooleanNormalizer::isTruthy($params['showtitle']) && ! empty($file['name'])) {
+        if ($params['showtitle'] == 'y' && ! empty($file['name'])) {
             $str .= '<strong>' . $file['name'] . '</strong>';
         }
-        if (BooleanNormalizer::isTruthy($params['showfilename']) && ! empty($file['filename'])) {
+        if ($params['showfilename'] == 'y' && ! empty($file['filename'])) {
             $str .= empty($str) ? '' : '<br />';
             $str .= $file['filename'];
         }
         if (! empty($file['description'])) {
             global $prefs;
             $str .= empty($str) ? '' : '<br />';
-            if (BooleanNormalizer::isTruthy($params['parsedescriptions'])) {
+            if ($params['parsedescriptions'] == 'y') {
                 $op = $prefs['feature_wiki_paragraph_formatting'];
                 $op2 = $prefs['feature_wiki_paragraph_formatting_add_br'];
                 $prefs['feature_wiki_paragraph_formatting'] = 'n';

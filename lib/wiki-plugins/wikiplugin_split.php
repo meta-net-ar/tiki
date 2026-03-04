@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Sections;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_split_info()
 {
@@ -28,8 +27,12 @@ function wikiplugin_split_info()
                 'description' => tra('Generate the colspan attribute if columns are missing'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'fixedsize' => [
                 'required' => false,
@@ -37,8 +40,12 @@ function wikiplugin_split_info()
                 'description' => tra('Generate the width attribute for the columns'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'colsize' => [
                 'required' => false,
@@ -70,8 +77,12 @@ function wikiplugin_split_info()
                     parameter is set to %1', '<code>first</code>', '<code>col</code>'),
                 'since' => '1',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'customclass' => [
                 'required' => false,

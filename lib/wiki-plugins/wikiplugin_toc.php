@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanInteger;
-use Tiki\WikiPlugin\Options\SortDirections;
-
 function wikiplugin_toc_info()
 {
     return [
@@ -45,8 +41,12 @@ function wikiplugin_toc_info()
                 'since' => '3.0',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => SortDirections::Ascending->value,
-                'options' => SortDirections::options(),
+                'default' => 'asc',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Ascending'), 'value' => 'asc'],
+                    ['text' => tra('Descending'), 'value' => 'desc']
+                ]
             ],
             'sortalpha' => [
                 'name' => tra('Sort Order'),
@@ -67,8 +67,12 @@ function wikiplugin_toc_info()
                 'since' => '3.0',
                 'required' => false,
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
             ],
             'shownum' => [
                 'name' => tra('Show Numbering'),
@@ -76,8 +80,12 @@ function wikiplugin_toc_info()
                 'since' => '3.0',
                 'required' => false,
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
             ],
             'type' => [
                 'name' => tra('Type'),

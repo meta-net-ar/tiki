@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_cypht_info()
 {
     return [
@@ -39,7 +36,7 @@ function wikiplugin_cypht_info()
                 'name' => tr('IMAP port'),
                 'description' => tr("Default is 993."),
                 'required' => false,
-                'default' => 993,
+                'default' => '993',
                 'filter' => 'text',
                 'since' => '20.0',
             ],
@@ -48,9 +45,13 @@ function wikiplugin_cypht_info()
                 'description' => tr('Use secure connection to IMAP server.'),
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
+                'default' => 'y',
                 'since' => '20.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'imap_username' => [
                 'name' => tra('IMAP username'),
@@ -88,7 +89,7 @@ function wikiplugin_cypht_info()
                 'name' => tr('SMTP port'),
                 'description' => tr("Default is 587."),
                 'required' => false,
-                'default' => 587,
+                'default' => '587',
                 'filter' => 'text',
                 'since' => '20.0',
             ],
@@ -113,18 +114,26 @@ function wikiplugin_cypht_info()
                 'description' => tr('Use secure TLS/SSL connection to SMTP server.'),
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
+                'default' => 'y',
                 'since' => '20.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'smtp_no_auth' => [
                 'name' => tra('SMTP no authentication'),
                 'description' => tr('Disable SMTP authentication if your server does not support it.'),
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'since' => '20.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                ],
             ],
             'use_global_settings' => [
                 'name' => tra('Use global settings'),
@@ -145,9 +154,13 @@ function wikiplugin_cypht_info()
                 'description' => tr('Share this mailbox for Groupmail usage or keep it private.'),
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'since' => '20.0',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                ],
             ],
             'group' => [
                 'name' => tra('Group'),
@@ -249,7 +262,19 @@ function wikiplugin_cypht($data, $params)
     }
     $called = true;
 
-    if (BooleanNormalizer::isTruthy($params['groupmail'])) {
+    if (empty($params['imap_port'])) {
+        $params['imap_port'] = 993;
+    }
+
+    if (empty($params['imap_tls'])) {
+        $params['imap_tls'] = 'y';
+    }
+
+    if (empty($params['smtp_port'])) {
+        $params['smtp_port'] = 587;
+    }
+
+    if ($params['groupmail'] == 'y') {
         $perm = 'tiki_p_use_group_webmail';
     } else {
         $perm = 'tiki_p_use_personal_webmail';

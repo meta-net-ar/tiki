@@ -7,7 +7,6 @@
 
 use Tiki\Lib\Wiki\PluginsLibUtil;
 use Tiki\Lib\Wiki\PluginsLib;
-use Tiki\WikiPlugin\Options\BooleanInteger;
 
 class WikiPluginBackLinks extends PluginsLib
 {
@@ -243,7 +242,11 @@ function wikiplugin_backlinks_info()
                 'advanced' => true,
                 'filter' => 'digits',
                 'default' => 0,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ],
             'noheader' => [
                 'required' => false,

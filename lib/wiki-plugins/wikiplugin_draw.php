@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_draw_info()
 {
     return [
@@ -53,9 +50,13 @@ function wikiplugin_draw_info()
                 'description' => tr('The latest revision of file is automatically shown, by setting archive to Yes (%0),
                 it bypasses this check and shows the archive rather than the latest revision', '<code>y</code>'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '8.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
         ],
     ];
@@ -114,7 +115,7 @@ EOF;
     $fileInfo = $filegallib->get_file_info($id);
 
     //this sets the image to latest in a group of archives
-    if (\Tiki\WikiPlugin\Options\BooleanNormalizer::isFalsy($archive)) {
+    if ($archive != 'y') {
         if (! empty($fileInfo['archiveId']) && $fileInfo['archiveId'] > 0) {
             $id = $fileInfo['archiveId'];
             $fileInfo = $filegallib->get_file_info($id);

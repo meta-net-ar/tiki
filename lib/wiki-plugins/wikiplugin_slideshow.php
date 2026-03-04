@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\SlideshowHelper;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_slideshow_info()
 {
@@ -109,12 +108,12 @@ function wikiplugin_slideshow_info()
                 'default' => 'fade',
                 'since' => '19.0',
                 'options' => [
-                    ['text' => 'Zoom', 'value' => 'zoom'],
+                    ['text' => 'None', 'value' => 'none'],
                     ['text' => 'Fade', 'value' => 'fade'],
                     ['text' => 'Slide', 'value' => 'slide'],
                     ['text' => 'Convex', 'value' => 'convex'],
                     ['text' => 'Concave', 'value' => 'concave'],
-                    ['text' => 'off', 'value' => ''],
+                    ['text' => 'Zoom', 'value' => 'zoom'],
                 ],
             ],
             'controls' => [
@@ -122,9 +121,12 @@ function wikiplugin_slideshow_info()
                 'name' => tra('Controls'),
                 'description' => tra('Display presentation control arrows'),
                 'filter' => 'word',
+                'default' => 'y',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => 'True', 'value' => 'y'],
+                    ['text' => 'False', 'value' => 'n'],
+                ],
             ],
             'controlsLayout' => [
                 'required' => false,
@@ -156,26 +158,37 @@ function wikiplugin_slideshow_info()
                 'name' => tra('Progress'),
                 'description' => tra('Display a presentation progress bar'),
                 'filter' => 'word',
+                'default' => 'y',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => 'True', 'value' => 'y'],
+                    ['text' => 'False', 'value' => 'n'],
+                ],
             ],
             'slideNumber' => [
                 'required' => false,
                 'name' => tra('Slide Number'),
                 'description' => tra('Display the page number of the current slide'),
                 'filter' => 'word',
+                'default' => 'n',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => 'True', 'value' => 'y'],
+                    ['text' => 'False', 'value' => 'n'],
+                ],
+            ],
             'fragments' => [
                 'required' => false,
                 'name' => tra('Fragments'),
                 'description' => tra('Turns fragments on and off globally'),
                 'filter' => 'word',
+                'default' => 'y',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => 'On', 'value' => 'y'],
+                    ['text' => 'Off', 'value' => 'n'],
+                ],
+            ],
             'fragmentClass' => [
                 'required' => false,
                 'name' => tra('Fragment Effects'),
@@ -218,17 +231,25 @@ function wikiplugin_slideshow_info()
                 'name' => tra('Auto Slide Stoppable'),
                 'description' => tra('Stop auto-sliding after user input'),
                 'filter' => 'word',
+                'default' => 'y',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => 'On', 'value' => 'y'],
+                    ['text' => 'Off', 'value' => 'n'],
+                ],
+            ],
             'alignImage' => [
                 'required' => false,
                 'name' => tra('Auto-align Images'),
                 'description' => tra('Automatically move images to left hand side of slide text, will only align images greater than 200px in width'),
                 'filter' => 'word',
+                'default' => 'n',
                 'since' => '19.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(null, BooleanEnglishLetter::LABELSET_SWITCH),            ],
+                'options' => [
+                    ['text' => 'Off', 'value' => 'n'],
+                    ['text' => 'On', 'value' => 'y']
+                ],
+            ],
             'headingLevelSlideSeparator' => [
                 'required' => false,
                 'name' => tra('Title level slide separator'),
@@ -236,10 +257,14 @@ function wikiplugin_slideshow_info()
                 'filter' => 'int',
                 'default' => '3',
                 'since' => '26.0',
-                'options' => array_map(
-                    fn($n) => ['text' => tr('H%0', $n), 'value' => "$n"],
-                    range(1, 6)
-                ),
+                'options' => [
+                    ['text' => 'h1', 'value' => '1'],
+                    ['text' => 'h2', 'value' => '2'],
+                    ['text' => 'h3', 'value' => '3'],
+                    ['text' => 'h4', 'value' => '4'],
+                    ['text' => 'h5', 'value' => '5'],
+                    ['text' => 'h6', 'value' => '6'],
+                ],
             ],
         ],
     ];

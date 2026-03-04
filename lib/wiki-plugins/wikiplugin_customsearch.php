@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanInteger;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_customsearch_info()
 {
     return [
@@ -70,9 +66,13 @@ function wikiplugin_customsearch_info()
                 'description' => tra('In the same session, return users to same search parameters on coming back to the
                     search page after leaving'),
                 'since' => '8.0',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
             ],
             'callbackscript' => [
                 'required' => false,
@@ -94,63 +94,91 @@ function wikiplugin_customsearch_info()
                 'name' => tra('Search On Load'),
                 'description' => tra('Execute the search when the page loads (default: Yes)'),
                 'since' => '9.0',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::Yes->value,
+                'default' => 1,
             ],
             'requireinput' => [
                 'required' => false,
                 'name' => tra('Require Input'),
                 'description' => tra('Require first input field to be filled for search to trigger'),
                 'since' => '12.0',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
             ],
             'forcesortmode' => [
                 'required' => false,
                 'name' => tra('Force Sort'),
                 'description' => tra('Force the use of specified sort mode in place of search relevance even when there is a text search query'),
                 'since' => '13.0',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::Yes->value,
+                'default' => 1,
             ],
             'trimlinefeeds' => [
                 'required' => false,
                 'name' => tra('Trim Linefeeds'),
                 'description' => tra('Remove the linefeeds added after each input which causes the wiki parser to add extra paragraphs.'),
                 'since' => '14.1',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
             ],
             'searchable_only' => [
                 'required' => false,
                 'name' => tra('Searchable Only Results'),
                 'description' => tra('Only include results marked as searchable in the index.'),
                 'since' => '14.1',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::Yes->value,
+                'default' => 1,
             ],
             'customsearchjs' => [
                 'required' => false,
                 'name' => tra('Use custom search JavaScript file'),
                 'description' => tra('Mainly keeps the search state on the URL hash, but also adds some helper functions like easier sorting and page size.'),
                 'since' => '14.1',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
             ],
             'noajaxforbots' => [
                 'required' => false,
                 'name' => tra('No AJAX for bots'),
                 'description' => tra('Renders the default search results when being crawled by a bot.'),
                 'since' => '24.1',
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('No'), 'value' => '0'],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                ],
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
             ],
         ],
     ];
@@ -179,7 +207,7 @@ function wikiplugin_customsearch($data, $params)
         }
         $id = (string) $instance_id;
     }
-    if (BooleanNormalizer::isTruthy($params['recalllastsearch']) && (! isset($_REQUEST['forgetlastsearch']) || $_REQUEST['forgetlastsearch'] != 'y')) {
+    if ($params['recalllastsearch'] == 1 && (! isset($_REQUEST['forgetlastsearch']) || $_REQUEST['forgetlastsearch'] != 'y')) {
         $recalllastsearch = 1;
     } else {
         $recalllastsearch = 0;
@@ -931,7 +959,7 @@ function cs_design_select($id, $fieldname, $fieldid, $arguments, $default, &$scr
     // get the options for an ItemLink field - needs _trackerId and _field set in the {select} plugin
     if (
         empty($options) && empty($labels) && isset($arguments['_field']) &&
-        strpos($arguments['_field'], 'tracker_field_') === 0 && ! empty($arguments['_trackerId'])
+            strpos($arguments['_field'], 'tracker_field_') === 0 && ! empty($arguments['_trackerId'])
     ) {
         $definition = Tracker_Definition::get($arguments['_trackerId']);
         if (! $definition) {

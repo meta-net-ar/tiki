@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_author_info()
 {
     return [
@@ -38,8 +35,11 @@ function wikiplugin_author_info()
                 'description' => tra("Should this author's contribution be visible (default: no)."),
                 'since' => '6.0',
                 'filter' => 'text',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => tra('No'), 'value' => 0],
+                    ['text' => tra('Yes'), 'value' => 1],
+                ],
             ],
             'popup' => [
                 'required'  => false,
@@ -47,8 +47,11 @@ function wikiplugin_author_info()
                 'description' => tra('Generate a popup with names of author(s) (default: no).'),
                 'since' => '6.0',
                 'filter' => 'text',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => tra('No'), 'value' => 0],
+                    ['text' => tra('Yes'), 'value' => 1],
+                ],
             ],
         ], // params
     ];
@@ -66,6 +69,12 @@ function wikiplugin_author($data, $params)
     $blocktags = '/(<+\/?address.*?>|<+\/?blockcode.*?>|<+\/?blockquote.*?>|<+\/?div.*?>|<+\/?h1.*?>|<+\/?h2.*?>|<+\/?h3.*?>|<+\/?h4.*?>|<+\/?h5.*?>|<+\/?h6.*?>|<+\/?hr.*?>|<+\/?h.*?>|<+\/?li.*?>|<+\/?ol.*?>|<+\/?pre.*?>|<+\/?p.*?>|<+\/?section.*?>|<+\/?table.*?>|<+\/?td.*?>|<+\/?th.*?>|<+\/?tr.*?>|<+\/?ul.*?>)/';
     if (! is_array($authors)) {
         $authors = [];
+    }
+    if (empty($params['visible'])) {
+        $params['visible'] = 0;
+    }
+    if (empty($params['popup'])) {
+        $params['popup'] = 0;
     }
 
     $author = $params['author'];

@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\FloatPosition;
-
 function wikiplugin_googlechart_info()
 {
 
@@ -149,8 +147,13 @@ function wikiplugin_googlechart_info()
                 'since' => '15.0',
                 'filter' => 'alpha',
                 'safe' => true,
-                'default' => FloatPosition::None->value,
-                'options' => FloatPosition::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Right'), 'value' => 'right'],
+                    ['text' => tra('Left'), 'value' => 'left'],
+                    ['text' => tra('None'), 'value' => 'none'],
+                ],
             ],
         ],
     ];

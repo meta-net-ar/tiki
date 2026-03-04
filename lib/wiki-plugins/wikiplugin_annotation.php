@@ -4,11 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\HorizontalAlignment;
-
 function wikiplugin_annotation_info()
 {
     global $prefs;
@@ -58,9 +53,14 @@ function wikiplugin_annotation_info()
                 'description' => tra('Image alignment.'),
                 'filter' => 'alpha',
                 'advanced' => true,
+                'default' => 'left',
                 'since' => '2.0',
-                'default' => HorizontalAlignment::Left->value,
-                'options' => HorizontalAlignment::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Left'), 'value' => 'left'],
+                    ['text' => tra('Right'), 'value' => 'right'],
+                    ['text' => tra('Center'), 'value' => 'center'],
+                ],
             ],
             'class' => [
                 'required' => false,
@@ -76,20 +76,28 @@ function wikiplugin_annotation_info()
                 'name' => tra('Show List'),
                 'description' => tra('Show the list of annotations below the image.') . ' ' . tra('(y/n)'),
                 'filter' => 'alpha',
+                'default' => 'y',
                 'since' => '15.0',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showlink' => [
                 'required' => false,
                 'name' => tra('Show Link'),
                 'description' => tra('Show the link below the label in the popups.') . ' ' . tra('(y/n)'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '15.0',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ]
     ];
@@ -162,16 +170,9 @@ FORM;
     }
 
     // inititalise the annotations
-    $showlink = $params['showlink'] === BooleanEnglishLetter::Yes->value;
-    $selector = '#' . $cid;
-    $script = sprintf(
-        '$(%s).imageAnnotation(%s, %s);',
-        json_encode($selector),
-        $annotations,
-        json_encode($showlink)
-    );
+    $showlink = $params['showlink'] === 'y' ? 'true' : 'false';
 
-    $headerlib->add_jq_onready($script);
+    $headerlib->add_jq_onready('$("#' . $cid . '").imageAnnotation(' . $annotations . ', ' . $showlink . ');');
 
     $close = smarty_function_icon(['name' => 'close'], $smarty->getEmptyInternalTemplate());
     $delete = smarty_function_icon(['name' => 'trash'], $smarty->getEmptyInternalTemplate());
@@ -217,7 +218,7 @@ EDITORFORM;
         $editor_form = '';
     }
 
-    if (\Tiki\WikiPlugin\Options\BooleanNormalizer::isTruthy($params['showlist'])) {
+    if ($params['showlist'] === 'y') {
         $list_div = '<div class="list-box"><div>';
     } else {
         $list_div = '';

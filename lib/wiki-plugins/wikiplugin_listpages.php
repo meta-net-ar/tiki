@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_listpages_info()
 {
     return [
@@ -45,8 +42,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Show only the page names'),
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'showNameAndDescriptionOnly' => [
                 'required' => false,
@@ -54,8 +55,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Show only the page names and descriptions'),
                 'since' => '24.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'categId' => [
                 'required' => false,
@@ -77,8 +82,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Filter by structure head'),
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'showPageAlias' => [
                 'required' => false,
@@ -86,8 +95,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Show page alias in the list'),
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'includetag' => [
                 'required' => false,
@@ -109,8 +122,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Show the number of pages matching criteria'),
                 'since' => '10.3',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'advanced' => true,
             ],
             'find' => [
@@ -155,8 +172,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Page name and text entered for the filter parameter must match exactly to be listed'),
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'only_orphan_pages' => [
                 'required' => false,
@@ -164,8 +185,12 @@ function wikiplugin_listpages_info()
                 'description' => tra('Only list orphan pages'),
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'for_list_pages' => [
                 'required' => false,
@@ -173,8 +198,12 @@ function wikiplugin_listpages_info()
                 'description' => '',
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'sort' => [
                 'required' => false,
@@ -216,8 +245,12 @@ function wikiplugin_listpages_info()
                 'description' => 'Option to show checkboxes',
                 'since' => '7.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'offset_arg' => [
                 'required' => false,
@@ -231,7 +264,11 @@ function wikiplugin_listpages_info()
                 'name' => tra('Pagination'),
                 'description' => 'Turn on pagination',
                 'since' => '15.3',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'exclude_pages' => [
                 'required' => false,
@@ -248,8 +285,12 @@ function wikiplugin_listpages_info()
                 'description' => tr('Set to Yes (%0) to have no header for the list results.', '<code>1</code>'),
                 'since' => '24.1',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
             ],
         ]
     ];

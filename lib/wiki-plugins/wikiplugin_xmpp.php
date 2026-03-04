@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_xmpp_info()
 {
     return [
@@ -86,8 +83,12 @@ function wikiplugin_xmpp_info()
                     . ' ' . tra('This preference only works when view mode is overlayed'),
                 'since' => 20,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_occupants_by_default' => [
                 'required' => false,
@@ -96,8 +97,12 @@ function wikiplugin_xmpp_info()
                     . ' ' . tra('This preference only works when view mode is embedded'),
                 'since' => 20,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'groups' => [
                 'name' => tra('Groups (comma-separated)'),
@@ -109,26 +114,38 @@ function wikiplugin_xmpp_info()
             'secret' => [
                 'name' => tra('Is secret?'),
                 'description' => tra('If the room will be listed on public chat room list'),
-                'default' => BooleanEnglishLetter::No->value,
+                'default' => 'n',
                 'filter' => 'alpha',
                 'required' => false,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'archiving' => [
                 'name' => tra('Archiving'),
                 'description' => tra('If room messages will be stored'),
-                'default' => BooleanEnglishLetter::Yes->value,
+                'default' => 'y',
                 'filter' => 'alpha',
                 'required' => false,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'persistent' => [
                 'name' => tra('Persistent'),
                 'description' => tra('If room will continue to exist after last user leaves'),
+                'default' => 'y',
                 'filter' => 'alpha',
                 'required' => false,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'moderated' => [
                 'name' => tra('Moderated'),
@@ -136,7 +153,11 @@ function wikiplugin_xmpp_info()
                 'default' => 'y',
                 'filter' => 'alpha',
                 'required' => false,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];
@@ -218,6 +239,7 @@ function wikiplugin_xmpp($data, $params)
     $openfire_api_enabled = ! empty($prefs['xmpp_openfire_rest_api']);
     $openfire_api_enabled = $openfire_api_enabled && ! empty($prefs['xmpp_openfire_rest_api_username']);
     $openfire_api_enabled = $openfire_api_enabled && ! empty($prefs['xmpp_openfire_rest_api_password']);
+    $openfire_api_enabled = $openfire_api_enabled && ! empty($params['room']);
     $openfire_api_enabled = $openfire_api_enabled && $tiki_p_list_users === 'y';
     $openfire_api_enabled = $openfire_api_enabled && $tiki_p_admin === 'y';
 

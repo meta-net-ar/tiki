@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_ganttchart_info()
 {
     return [
@@ -159,8 +156,11 @@ function wikiplugin_ganttchart_info()
                 'description' => tr('Flag field to allow duplicate tasks'),
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
                 'since' => 23,
             ],
             'ganttId' => [
@@ -425,7 +425,7 @@ function wikiplugin_ganttchart($data, $params)
 
     updateTasks($info, $params, $allResources, $allRoles);
 
-    $canDuplicate = BooleanNormalizer::isTruthy($params['canDuplicate']);
+    $canDuplicate = ($params['canDuplicate'] ?? 'y') === 'y';
 
     if (isset($info['ganttDuplicator']) && $canDuplicate) {
         duplicate($info, $params, $listItems['data'], $levelParam, $depends);

@@ -7,7 +7,6 @@
 
 use Tiki\Lib\Wiki\PluginsLib;
 use Tiki\Lib\Wiki\PluginsLibUtil;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
 
 require_once 'lib/wiki-plugins/wikiplugin_tikidocfromcode.php';
 
@@ -182,10 +181,14 @@ function wikiplugin_pluginmanager_info()
                 'description' => tr('Show the parameter %0doctype%1 value.', '<code>', '</code>'),
                 'since' => '15.0',
                 'filter' => 'alpha',
+                'default' => '',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
-                ],
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
+            ],
             'showtopinfo' => [
                 'required' => false,
                 'name' => tra('Show Top Info'),
@@ -193,9 +196,13 @@ function wikiplugin_pluginmanager_info()
                     version when the plugin became available. Shown by default.'),
                 'since' => '15.0',
                 'filter' => 'alpha',
+                'default' => '',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
         ],
     ];

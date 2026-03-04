@@ -7,7 +7,6 @@
 
 // This plugin takes a block of Tiki content and sorts it line-wise.
 
-
 function wikiplugin_sort_info()
 {
     return [

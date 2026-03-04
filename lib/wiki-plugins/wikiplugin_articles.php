@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-use Tiki\WikiPlugin\Options\TimeUnit;
-
 function wikiplugin_articles_info()
 {
     global $prefs;
@@ -41,11 +37,15 @@ function wikiplugin_articles_info()
             'usePagination' => [
                 'required' => false,
                 'name' => tra('Use Pagination'),
-                'description' => tr('Activate pagination when the articles list is long. Default is %0', '<code>' . BooleanEnglishLetter::No->value . '</code>'),
+                'description' => tr('Activate pagination when the articles list is long. Default is %0', '<code>n</code>'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'max' => [
                 'required' => false,
@@ -151,9 +151,13 @@ function wikiplugin_articles_info()
                 'name' => tra('Quiet'),
                 'description' => tra('Whether to not report when there are no articles (no reporting by default)'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'titleonly' => [
                 'required' => false,
@@ -161,17 +165,25 @@ function wikiplugin_articles_info()
                 'description' => tra('Whether to only show the title of the articles (not set to title only by default)'),
                 'filter' => 'alpha',
                 'since' => '1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'fullbody' => [
                 'required' => false,
                 'name' => tra('Show Article Body'),
                 'description' => tra('Whether to show the body of the articles instead of the heading (not set by default).'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '5',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'start' => [
                 'required' => false,
@@ -214,16 +226,26 @@ function wikiplugin_articles_info()
                 'description' => tr('Time unit used with "Period quantity"'),
                 'filter' => 'word',
                 'since' => '1',
-                'options' => TimeUnit::options()
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tr('Hour'), 'value' => 'hour'],
+                    ['text' => tr('Day'), 'value' => 'day'],
+                    ['text' => tr('Week'), 'value' => 'week'],
+                    ['text' => tr('Month'), 'value' => 'month'],
+                ],
             ],
             'overrideDates' => [
                 'required' => false,
                 'name' => tra('Override Dates'),
                 'description' => tra('Whether to comply with the article type\'s "show before publish" settings (not complied with by default)'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'containerClass' => [
                 'required' => false,
@@ -243,9 +265,13 @@ function wikiplugin_articles_info()
                 'description' => tr('If set to %0 (Yes), the first image will be displayed with the dimension used to
                     view of the article', '<code>y</code>'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '6.0',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'urlparam' => [
                 'required' => false,
@@ -260,9 +286,13 @@ function wikiplugin_articles_info()
                 'description' => tra('Whether to show the buttons and links to do actions on each article (for the
                     actions you have permission to do'),
                 'filter' => 'alpha',
+                'default' => 'n',
                 'since' => '6.1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'translationOrphan' => [
                 'required' => false,
@@ -279,8 +309,12 @@ function wikiplugin_articles_info()
                 'description' => tra('Use the external source URL as link for articles.'),
                 'filter' => 'alpha',
                 'since' => '1',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];
@@ -313,7 +347,7 @@ function wikiplugin_articles($data, $params)
     }
 
     $urlnext = '';
-    if (BooleanNormalizer::isTruthy($usePagination)) {
+    if ($usePagination == 'y') {
         //Set offset when pagination is used
         $start = $_REQUEST["offset"] ?? 0;
         foreach ($auto_args as $arg) {
@@ -393,7 +427,7 @@ function wikiplugin_articles($data, $params)
         $categIds = [ 'AND' => $categId];
     }
 
-    $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, 'admin', $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', BooleanNormalizer::isTruthy($overrideDates), 'y', $filter);
+    $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, 'admin', $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', ($overrideDates == 'y'), 'y', $filter);
     if ($prefs['feature_multilingual'] == 'y' && is_null($translationOrphan)) {
         $multilinguallib = TikiLib::lib('multilingual');
         $listpages['data'] = $multilinguallib->selectLangList('article', $listpages['data'], $pageLang);
@@ -413,7 +447,7 @@ function wikiplugin_articles($data, $params)
                 'fieldName' => 'heading'
             ]
         );
-        if (BooleanNormalizer::isTruthy($fullbody)) {
+        if ($fullbody == 'y') {
             $listpages["data"][$i]["parsed_body"] = TikiLib::lib('parser')->parse_data(
                 $listpages["data"][$i]["body"],
                 [
@@ -455,7 +489,7 @@ function wikiplugin_articles($data, $params)
         $smarty->assign_by_ref('type', $type);
     }
 
-    if (BooleanNormalizer::isTruthy($usePagination)) {
+    if ($usePagination == 'y') {
         $smarty->assign('maxArticles', $max);
         $smarty->assign_by_ref('offset', $start);
         $smarty->assign_by_ref('count', $listpages['count']);
@@ -482,7 +516,7 @@ function wikiplugin_articles($data, $params)
     $smarty->assign_by_ref('actions', $actions);
     $smarty->assign('headerLinks', $headerLinks);
 
-    if (BooleanNormalizer::isTruthy($titleonly)) {
+    if ($titleonly == 'y') {
         return "~np~ " . $smarty->fetch('tiki-view_articles-titleonly.tpl') . " ~/np~";
     } else {
         return "~np~ " . $smarty->fetch('tiki-view_articles.tpl') . " ~/np~";

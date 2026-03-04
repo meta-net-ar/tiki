@@ -6,8 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\TikiDate;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
+
+use function Sabre\Uri\split;
 
 function wikiplugin_convene_info(): array
 {
@@ -76,8 +76,12 @@ function wikiplugin_convene_info(): array
                 'description' => tra("Only admins can edit or delete other users' votes and dates. N.B. This is a guide only as if a user can edit the page they can change this setting, it is intended to make the plugin easier to use for most users."),
                 'since' => '9.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'avatars' => [
                 'required' => false,
@@ -85,8 +89,12 @@ function wikiplugin_convene_info(): array
                 'description' => tra("Show user's profile pictures next to their names."),
                 'since' => '9.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'autolock' => [
                 'required' => false,
@@ -102,8 +110,12 @@ function wikiplugin_convene_info(): array
                 'description' => tra('Prevent further votes or changes from the interface.'),
                 'since' => '20.2',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'id' => [
                 'required' => false,
@@ -363,7 +375,7 @@ function wikiplugin_convene($data, $params): string
     $currentObject = current_object();
     $perms = Perms::get($currentObject);
     $canEdit = $perms->edit;
-    if (BooleanNormalizer::isFalsy($params['adminperms'])) {
+    if ($params['adminperms'] !== 'y') {
         $canAdmin = $canEdit;
     } elseif (isset($currentObject['type'])) {
         if ($currentObject['type'] === 'wiki page') {
@@ -398,7 +410,7 @@ function wikiplugin_convene($data, $params): string
     $smarty->assign('params', $params);
     $smarty->assign('comments', $dataArrayComments);
 
-    if (BooleanNormalizer::isTruthy($params['locked']) && $currentObject) {
+    if ($params['locked'] === "y" && $currentObject) {
         $vote_infos = [
             "autolock" => $params['autolock'],
             "object" => $currentObject['object'],

@@ -6,9 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\TikiDate;
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanInteger;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
 
 function wikiplugin_events_info()
 {
@@ -53,18 +50,26 @@ function wikiplugin_events_info()
                 'name' => tra('Show Time'),
                 'description' => tra('Show the time along with the date (shown by default)'),
                 'since' => '2.0',
+                'default' => 1,
                 'filter' => 'digits',
-                'default' => BooleanInteger::Yes->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
             ],
             'desc' => [
                 'required' => false,
                 'name' => tra('Show Description'),
                 'description' => tra('Show the description of the event (shown by default)'),
                 'since' => '2.0',
+                'default' => 1,
                 'filter' => 'digits',
-                'default' => BooleanInteger::Yes->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
             ],
             // Pagination
             'timespan' => [
@@ -87,8 +92,12 @@ function wikiplugin_events_info()
                 'description' => tr('Activate pagination when Events listing are long. Default is %0.', '<code>n</code>'),
                 'since' => '10.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
             'attendees' => [
                 'required' => false,
@@ -96,8 +105,12 @@ function wikiplugin_events_info()
                 'description' => tr('This parameter allows listing the participants of the event.'),
                 'since' => '28.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
             ],
         ],
     ];
@@ -118,7 +131,7 @@ function wikiplugin_events($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    if (BooleanNormalizer::isTruthy($usePagination)) {
+    if ($usePagination == 'y') {
         $start = $_REQUEST["offset"] ?? 0;
     }
 
@@ -210,11 +223,16 @@ function wikiplugin_events($data, $params)
     $smarty->assign_by_ref('invalideid', $invalideid);
 
     // Pagination
-    if (BooleanNormalizer::isTruthy($usePagination)) {
+    if ($usePagination == 'y') {
         $start = $start ?? 0;
         $smarty->assign('maxEvents', $max);
         $smarty->assign_by_ref('offset', $start);
         $smarty->assign_by_ref('count', $events['count']);
+    }
+
+    // attendees
+    if ($attendees == 'y') {
+        $attendees = 'y';
     }
 
     $listAttendees = $calendarlib->getAttendees();
@@ -240,7 +258,7 @@ function wikiplugin_events($data, $params)
     for ($j = 0; $j < $max; $j++) {
         $tikidateStart->setDate($events[$j]["start"]);
         $tikidateEnd->setDate($events[$j]["end"]);
-        if (BooleanNormalizer::isFalsy($datetime)) {
+        if ($datetime != 1) {
             $eventStart = str_replace(" ", "&nbsp;", $tikidateStart->format($tikilib->get_short_date_format(), true));
             $eventEnd = str_replace(" ", "&nbsp;", $tikidateEnd->format($tikilib->get_short_date_format(), true));
         } else {
@@ -254,7 +272,7 @@ function wikiplugin_events($data, $params)
         }
         $repl .= '<tr class="' . $style . '"><td width="5%">~np~' . $eventStart . '<br/>' . $eventEnd . '~/np~</td>';
         $repl .= '<td><a class="linkmodule" href="tiki-calendar.php?editmode=details&calitemId=' . $events[$j]["calitemId"] . '"><b>' . $events[$j]["name"] . '</b></a>';
-        if (BooleanNormalizer::isTruthy($desc)) {
+        if ($desc == 1) {
             $repl .= '<br/>' . nl2br($events[$j]["description"]);
         }
         $repl .= '</td></tr>';

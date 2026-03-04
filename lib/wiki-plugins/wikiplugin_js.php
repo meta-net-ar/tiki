@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-use Tiki\WikiPlugin\Options\BooleanNormalizer;
-
 function wikiplugin_js_info()
 {
     return [
@@ -34,8 +30,12 @@ function wikiplugin_js_info()
                 'name' => tra('Late Load'),
                 'description' => tra('Late load, use headerlib'),
                 'since' => '9.1',
-                'options' => BooleanEnglishLetter::options(),
-                'default' => BooleanEnglishLetter::No->value,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+                'default' => '',
                 'filter' => 'alpha',
                 'advanced' => true,
             ],
@@ -47,7 +47,7 @@ function wikiplugin_js($data, $params)
     $headerlib = TikiLib::lib('header');
     extract($params, EXTR_SKIP);
 
-    if (BooleanNormalizer::isTruthy($lateload)) {
+    if ($lateload == 'y') {
         if (! is_null($file)) {
             $headerlib->add_jsfile($file);
         } elseif ($data) {

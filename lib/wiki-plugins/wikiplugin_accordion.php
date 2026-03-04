@@ -4,12 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BorderStyle;
-use Tiki\WikiPlugin\Options\FontStyle;
-use Tiki\WikiPlugin\Options\FontWeight;
-use Tiki\WikiPlugin\Options\TextAlignment;
-
 function wikiplugin_accordion_info()
 {
     return [
@@ -69,9 +63,14 @@ function wikiplugin_accordion_info()
                     'Use to change the headers text style.'
                 ),
                 'filter'      => 'text',
-                'default'     => FontStyle::Normal->value,
+                'default'     => 'normal',
                 'since'       => '25.0',
-                'options' => FontStyle::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'normal', 'text' => tra('Normal')],
+                    ['value' => 'italic' , 'text' => tra('Italic')],
+                    ['value' => 'oblique' , 'text' => tra('Oblique')],
+                ],
             ],
             'headerfontsize' => [
                 'required'    => false,
@@ -90,9 +89,16 @@ function wikiplugin_accordion_info()
                     'Use to change the headers text weight.'
                 ),
                 'filter'      => 'text',
-                'default'     => FontStyle::Normal->value,
+                'default'     => 'normal',
                 'since'       => '25.0',
-                'options' => FontStyle::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'normal', 'text' => tra('Normal')],
+                    ['value' => 'bold' , 'text' => tra('Bold')],
+                    ['value' => 'bolder' , 'text' => tra('Bolder')],
+                    ['value' => 'lighter' , 'text' => tra('Lighter')],
+                    ['value' => '900' , 'text' => tra('Boldest')],
+                ],
             ],
             'headerborderstyle' => [
                 'required'    => false,
@@ -100,10 +106,22 @@ function wikiplugin_accordion_info()
                 'description' => tra(
                     'Determine the kind of border to apply to the headers.'
                 ),
-                'default'     => BorderStyle::None->value,
+                'default'     => 'none',
                 'filter'      => 'text',
                 'since'       => '25.0',
-                'options' => BorderStyle::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'none', 'text' => tra('None')],
+                    ['value' => 'hidden' , 'text' => tra('Hidden')],
+                    ['value' => 'dotted' , 'text' => tra('Dotted')],
+                    ['value' => 'dashed' , 'text' => tra('Dashed')],
+                    ['value' => 'solid' , 'text' => tra('Solid')],
+                    ['value' => 'double' , 'text' => tra('Double')],
+                    ['value' => 'groove' , 'text' => tra('Groove')],
+                    ['value' => 'ridge' , 'text' => tra('Ridge')],
+                    ['value' => 'inset' , 'text' => tra('Inset')],
+                    ['value' => 'outset' , 'text' => tra('Outset')],
+                ],
             ],
             'headerborderwidth' => [
                 'required'    => false,
@@ -152,9 +170,14 @@ function wikiplugin_accordion_info()
                     'Use to change the panels text style.'
                 ),
                 'filter'      => 'text',
-                'default'     => FontStyle::Normal->value,
+                'default'     => 'normal',
                 'since'       => '25.0',
-                'options' => FontStyle::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'normal', 'text' => tra('Normal')],
+                    ['value' => 'italic' , 'text' => tra('Italic')],
+                    ['value' => 'oblique' , 'text' => tra('Oblique')],
+                ],
             ],
             'panelfontsize' => [
                 'required'    => false,
@@ -173,9 +196,16 @@ function wikiplugin_accordion_info()
                     'Use to change the panels text weight.'
                 ),
                 'filter'      => 'text',
-                'default'     => FontWeight::Normal->value,
+                'default'     => 'normal',
                 'since'       => '25.0',
-                'options' => FontWeight::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'normal', 'text' => tra('Normal')],
+                    ['value' => 'bold' , 'text' => tra('Bold')],
+                    ['value' => 'bolder' , 'text' => tra('Bolder')],
+                    ['value' => 'lighter' , 'text' => tra('Lighter')],
+                    ['value' => '900' , 'text' => tra('Boldest')],
+                ],
             ],
             'paneltextalignment' => [
                 'required'    => false,
@@ -184,9 +214,15 @@ function wikiplugin_accordion_info()
                     'To set the horizontal alignment of the panels text.'
                 ),
                 'filter'      => 'text',
-                'default'     => TextAlignment::Left->value,
+                'default'     => 'left',
                 'since'       => '25.0',
-                'options' => TextAlignment::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'left', 'text' => tra('Left')],
+                    ['value' => 'right' , 'text' => tra('Right')],
+                    ['value' => 'center' , 'text' => tra('Center')],
+                    ['value' => 'justify' , 'text' => tra('Justify')],
+                ],
             ],
             'panelborderstyle' => [
                 'required'    => false,
@@ -194,10 +230,22 @@ function wikiplugin_accordion_info()
                 'description' => tra(
                     'Determine the kind of border to apply to the panels.'
                 ),
-                'default'     => BorderStyle::None->value,
+                'default'     => 'none',
                 'filter'      => 'text',
                 'since'       => '25.0',
-                'options' => BorderStyle::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['value' => 'none', 'text' => tra('None')],
+                    ['value' => 'hidden' , 'text' => tra('Hidden')],
+                    ['value' => 'dotted' , 'text' => tra('Dotted')],
+                    ['value' => 'dashed' , 'text' => tra('Dashed')],
+                    ['value' => 'solid' , 'text' => tra('Solid')],
+                    ['value' => 'double' , 'text' => tra('Double')],
+                    ['value' => 'groove' , 'text' => tra('Groove')],
+                    ['value' => 'ridge' , 'text' => tra('Ridge')],
+                    ['value' => 'inset' , 'text' => tra('Inset')],
+                    ['value' => 'outset' , 'text' => tra('Outset')],
+                ],
             ],
             'panelborderwidth' => [
                 'required'    => false,

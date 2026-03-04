@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_relations_info()
 {
     return [
@@ -40,8 +38,12 @@ function wikiplugin_relations_info()
                 'description' => tra('Render all qualifiers into a single list without displaying the qualifier name.'),
                 'filter' => 'int',
                 'since' => '8.0',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 0],
+                    ['text' => tra('Yes'), 'value' => 1],
+                ],
             ],
             'emptymsg' => [
                 'required' => false,

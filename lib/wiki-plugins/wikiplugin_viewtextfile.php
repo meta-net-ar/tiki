@@ -4,10 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_viewtextfile_info()
 {
     $info = [
@@ -48,8 +44,12 @@ function wikiplugin_viewtextfile_info()
                 'description' => tr('logic flag to display the file info Yes/No'),
                 'since' => '29.0',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+                'default' => 'n',
             ],
             'showlinenumbers' => [
                 'required' => false,
@@ -58,8 +58,12 @@ function wikiplugin_viewtextfile_info()
                 'description' => tr('logic flag to display line numbers Yes/No'),
                 'since' => '29.0',
                 'advanced' => true,
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => tra(''), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+                'default' => 'n',
             ],
             'width' => [
                 'required' => false,

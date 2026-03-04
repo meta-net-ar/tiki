@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_remarksbox_info()
 {
     return [
@@ -51,8 +49,12 @@ function wikiplugin_remarksbox_info()
                 'description' => tra('Use the highlight class for formatting (not used by default).') ,
                 'since' => '2.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'icon' => [
                 'required' => false,
@@ -68,8 +70,12 @@ function wikiplugin_remarksbox_info()
                 'description' => tra('Show a close button (shown by default).'),
                 'since' => '4.0',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'width' => [
                 'required' => false,
@@ -86,7 +92,11 @@ function wikiplugin_remarksbox_info()
                 'since' => '14.0',
                 'required' => false,
                 'filter' => 'text',
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'id' => [
                 'name' => tr('ID'),

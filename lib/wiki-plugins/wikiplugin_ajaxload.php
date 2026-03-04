@@ -104,7 +104,7 @@ function wikiplugin_ajaxload_info()
                     ['text' => tra('Yes'), 'value' => 'yes'],
                     ['text' => tra('No'), 'value' => 'no'],
                     ['text' => tra('Auto'), 'value' => 'auto'],
-                ],
+                ]
             ],
             'responsive' => [
                 'required' => false,

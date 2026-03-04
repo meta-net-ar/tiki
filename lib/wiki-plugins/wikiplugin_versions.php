@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_versions_info()
 {
     return [
@@ -24,9 +22,13 @@ function wikiplugin_versions_info()
                 'name' => tra('Navigation'),
                 'description' => tra('Display a navigation box that allows users to select a specific version to display.'),
                 'since' => '1',
+                'default' => 'n',
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'title' => [
                 'required' => false,
@@ -34,10 +36,15 @@ function wikiplugin_versions_info()
                 'description' => tr('Display the current version name as the title. No title shows when %0nav="y"%1;
                     otherwise shows by default.', '<code>', '</code>'),
                 'since' => '1',
+                'default' => 'y',
                 'filter' => 'alpha',
                 'parentparam' => ['name' => 'nav', 'value' => 'n'],
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),            ],
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
             'default' => [
                 'required' => false,
                 'name' => tra('Default Label'),

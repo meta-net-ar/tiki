@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-use Tiki\WikiPlugin\Options\BooleanEnglishLetter;
-
 function wikiplugin_pivottable_info()
 {
     return [
@@ -34,8 +31,12 @@ function wikiplugin_pivottable_info()
                 'since' => '18.1',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'width' => [
                 'required' => false,
@@ -233,8 +234,12 @@ function wikiplugin_pivottable_info()
                 'since' => '16.3',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'highlightGroup' => [
                 'name' => tra('Highlight my group items'),
@@ -242,8 +247,12 @@ function wikiplugin_pivottable_info()
                 'since' => '16.3',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'highlightRequest' => [
                 'name' => tra('Highlight items matching field values coming from request.'),
@@ -296,8 +305,11 @@ function wikiplugin_pivottable_info()
                 'since' => '16.3',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'translate' => [
                 'name' => tr('Translate displayed data'),
@@ -305,8 +317,12 @@ function wikiplugin_pivottable_info()
                 'since' => '18.3',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y']
+                ]
             ],
             'displayBeforeFilter' => [
                 'name' => tr('Load data before filters are applied'),
@@ -314,8 +330,12 @@ function wikiplugin_pivottable_info()
                 'since' => '21.1',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::Yes->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'y',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y']
+                ]
             ],
             'dataCallback' => [
                 'name' => tr('Callback run just before rendering the UI with layout and data passed'),
@@ -330,8 +350,12 @@ function wikiplugin_pivottable_info()
                 'since' => '26',
                 'required' => false,
                 'filter' => 'alpha',
-                'default' => BooleanEnglishLetter::No->value,
-                'options' => BooleanEnglishLetter::options(),
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Yes'), 'value' => 'y']
+                ]
             ],
             'lang' => [
                 'name' => tr('Language For Pivot Table'),

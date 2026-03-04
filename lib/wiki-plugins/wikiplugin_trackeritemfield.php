@@ -4,9 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanInteger;
-use Tiki\WikiPlugin\Options\TrackerStatusesSets;
-
 function wikiplugin_trackeritemfield_info()
 {
     return [
@@ -83,7 +80,16 @@ function wikiplugin_trackeritemfield_info()
                 'since' => '2.0',
                 'filter' => 'alpha',
                 'default' => '',
-                'options' => TrackerStatusesSets::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Open'), 'value' => 'o'],
+                    ['text' => tra('Pending'), 'value' => 'p'],
+                    ['text' => tra('Closed'), 'value' => 'c'],
+                    ['text' => tra('Open & Pending'), 'value' => 'op'],
+                    ['text' => tra('Open & Closed'), 'value' => 'oc'],
+                    ['text' => tra('Pending & Closed'), 'value' => 'pc'],
+                    ['text' => tra('Open, Pending & Closed'), 'value' => 'opc'],
+                ]
             ],
             'test' => [
                 'required' => false,
@@ -91,9 +97,13 @@ function wikiplugin_trackeritemfield_info()
                 'description' => tr('Set to Yes (%01%1) to test whether a field is empty (if value parameter is empty)
                     or has a value the same as the value parameter.', '<code>', '</code>'),
                 'since' => '2.0',
+                'default' => '',
                 'filter' => 'digits',
-                'default' => BooleanInteger::No->value,
-                'options' => BooleanInteger::options(),
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0],
+                ],
             ],
             'value' => [
                 'required' => false,

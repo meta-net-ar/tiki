@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\WikiPlugin\Options\BooleanInteger;
-
 function wikiplugin_snarf_info()
 {
     return [
@@ -45,10 +43,14 @@ function wikiplugin_snarf_info()
                 'required' => false,
                 'name' => tra('Word Wrap'),
                 'description' => tra('Enable/disable word wrapping of snippets of code (enabled by default)'),
+                'default' => 1,
                 'since' => '3.0',
                 'filter' => 'digits',
-                'options' => BooleanInteger::options(),
-                'default' => BooleanInteger::Yes->value,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
             ],
             'colors' => [
                 'required' => false,
@@ -66,8 +68,12 @@ function wikiplugin_snarf_info()
                     '<code>1</code>'
                 ),
                 'since' => '3.0',
-                'options' => BooleanInteger::options(),
-                'default' => BooleanInteger::No->value,
+                'default' => null,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
                 'filter' => 'int'
             ],
             'wiki' => [
@@ -75,8 +81,12 @@ function wikiplugin_snarf_info()
                 'name' => tra('Wiki Syntax'),
                 'description' => tra('Parse wiki syntax within the code snippet (not parsed by default).'),
                 'since' => '3.0',
-                'options' => BooleanInteger::options(),
-                'default' => BooleanInteger::No->value,
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
                 'filter' => 'int',
             ],
             'rtl' => [
@@ -84,8 +94,12 @@ function wikiplugin_snarf_info()
                 'name' => tra('Right to Left'),
                 'description' => tra('Switch the text display from left to right to right to left'),
                 'since' => '3.0',
-                'options' => BooleanInteger::options(),
-                'default' => BooleanInteger::No->value,
+                'default' => null,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
                 'filter' => 'int'
             ],
             'ishtml' => [
@@ -94,8 +108,11 @@ function wikiplugin_snarf_info()
                 'description' => tr('Set to Yes (%0) to display the content as is instead of escaping HTML special
                     characters (not set by default).', '<code>1</code>'),
                 'since' => '3.0',
-                'options' => BooleanInteger::options(),
-                'default' => BooleanInteger::No->value,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ],
                 'filter' => 'int'
             ],
             'cache' => [
