@@ -18,7 +18,6 @@ $warning: #897415;
 $danger: #B85B19;
 $light: #fff;
 $dark: #000;
-
 $theme-colors: (
     "primary":    $primary,
     "secondary":  $secondary,
@@ -36,50 +35,52 @@ $body-color: $gray-800; // !default
 $body-bg: #fff; // !default
 
 
-$body-secondary-color:      rgba($body-color, .75); // !default;
-$body-secondary-bg:         $gray-200; // !default;
+$body-secondary-color: rgba($body-color, .75); // !default;
+$body-secondary-bg: $gray-200; // !default;
 
-$body-tertiary-color:       rgba($body-color, .5); // !default;
-$body-tertiary-bg:          $gray-100; // !default;
+$body-tertiary-color: rgba($body-color, .5); // !default;
+$body-tertiary-bg: $gray-100; // !default;
 
 // Links
 $link-color: #177EAB;
 
 // Components
 $border-color: $gray-400;
-//$component-active-color:       #ddb9af; // $white;  // default
-$component-active-bg:         #0c628c; // ($primary);  // default
+
+// $component-active-color:       #ddb9af; // $white;  // default
+$component-active-bg: #0c628c; // ($primary);  // default
 
 // Typography
-$font-family-sans-serif: Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // Switch to system font instead of "Open Sans", sans-serif; // Was Lato
+$font-family-sans-serif: optima, candara, 'Noto Sans', source-sans-pro, sans-serif; // Switch to system font instead of "Open Sans", sans-serif; // Was Lato
 $font-size-base: 1rem;
 $headings-font-weight: 700;
-$headings-color: #333333;
+$headings-color: #333;
 
 // Tables
 // Buttons
-$btn-primary-bg:                 #2098cd; // This seems to be a Tiki SCSS variable, but not used anywhere.
-$btn-link-disabled-color:         #777777; // $gray-600 default
+$btn-primary-bg: #2098cd; // This seems to be a Tiki SCSS variable, but not used anywhere.
+$btn-link-disabled-color: #777; // $gray-600 default
 
 // Forms
-$input-color-placeholder:         #777777; // This seems to be a Tiki SCSS variable, but not used anywhere.
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$input-color-placeholder: #777; // This seems to be a Tiki SCSS variable, but not used anywhere.
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Dropdowns
 // Navs
-$nav-tabs-border-color:             $gray-300; // !default;
+$nav-tabs-border-color: $gray-300; // !default;
 
 // Navbar
 $navbar-padding-y: 0em;
-//$nav-link-padding-y:                 0.9rem;
-$navbar-dark-color:                #efefef; // rgba($white, .55) !default;
-$navbar-dark-hover-color:          #fff; // rgba($white, .75) !default;
-$navbar-dark-hover-bg:             #000; // transparent;
+
+// $nav-link-padding-y:                 0.9rem;
+$navbar-dark-color: #efefef; // rgba($white, .55) !default;
+$navbar-dark-hover-color: #fff; // rgba($white, .75) !default;
+$navbar-dark-hover-bg: #000; // transparent;
 
 // Dropdowns
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 // Cards
@@ -101,7 +102,7 @@ $card-border-color: transparent;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                      $body-color; //!default;
+$code-color: $body-color; // !default;
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 

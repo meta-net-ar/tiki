@@ -15,11 +15,10 @@ $primary: #a25D25;
 $secondary: #783C12;
 $success: #357935;
 $info: #20809D;
-$warning: #D79F12; //#8B6504;
+$warning: #D79F12; // #8B6504;
 $danger: #c02F2a;
 $light: #fffff8;
-$dark: #000000;
-
+$dark: #000;
 $theme-colors: (
         "primary": $primary,
         "secondary": $secondary,
@@ -32,12 +31,12 @@ $theme-colors: (
 );
 
 // Options
-$enable-dark-mode:            true;  // default
-$color-mode-type:             data;  // default // `data` or `media-query`
+$enable-dark-mode: true;  // default
+$color-mode-type: data;  // default // `data` or `media-query`
 // Prefix for :root CSS variables
 
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
+$variable-prefix: bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
+$prefix: $variable-prefix;  // default
 
 // Spacing
 
@@ -46,41 +45,39 @@ $body-bg: #fffff8;
 $body-color: $gray-800;
 
 // Links
-$link-color:            #222;
-$link-hover-color:      color.adjust($link-color, $lightness: -15%, $space: hsl);
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-color: #222;
+$link-hover-color: color.adjust($link-color, $lightness: -15%, $space: hsl);
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 $link-hover-decoration: none; // underline;
 
 // Components
-$component-active-color:      $white;  // default
-$component-active-bg:         $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $primary;  // default
 
-$border-color-translucent:    rgba($black, .175);  // default
+$border-color-translucent: rgba($black, .175);  // default
 
 // Fonts
-$enable-responsive-font-sizes:                true; // from "Options"
+$enable-responsive-font-sizes: true; // from "Options"
 $font-size-base: 1rem;
-$font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-family-serif:       'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif; //et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-$font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
-$font-family-base:        $font-family-serif;
-
-$headings-font-weight:    500;
+$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif;
+$font-family-serif: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', p052, serif; // et-book, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+$font-family-monospace: menlo, monaco, consolas, "Courier New", monospace;
+$font-family-base: $font-family-serif;
+$headings-font-weight: 500;
 $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6D757E; //#686f78;
-$lead-font-weight:            400;
+$lead-font-weight: 400;
+$small-font-size: .875em;  // default
 
-$small-font-size:             .875em;  // default
-
-$blockquote-font-size:        $font-size-base * 1.25;  // default
-$blockquote-footer-color:     var(--#{$prefix}secondary-color);
+$blockquote-font-size: $font-size-base * 1.25;  // default
+$blockquote-footer-color: var(--#{$prefix}secondary-color);
 $blockquote-footer-font-size: $small-font-size;  // default
 
 // Tables
-$table-bg:                      transparent;
-$table-bg-accent:               color.adjust( $body-bg, $lightness: -4%, $space: hsl ); //#f9f9f9;
-$table-bg-hover:                transparent; //#f5f5f5;
-$table-bg-active:               transparent; // $table-bg-hover;
-$table-border-color:            color.adjust( $body-bg, $lightness: -5%, $space: hsl ); // #ddd;
+$table-bg: transparent;
+$table-bg-accent: color.adjust( $body-bg, $lightness: -4%, $space: hsl ); // #f9f9f9;
+$table-bg-hover: transparent; // #f5f5f5;
+$table-bg-active: transparent; // $table-bg-hover;
+$table-border-color: color.adjust( $body-bg, $lightness: -5%, $space: hsl ); // #ddd;
 
 // Buttons + Forms
 //
@@ -92,106 +89,102 @@ $btn-link-disabled-color: #4C5357;
 
 
 // Forms
-//$input-border: #dddddd;
-$input-bg:                       var(--#{$prefix}body-bg);  // default // #fff;
-//$input-color:                    $gray-500;
-//** `<input>` border color
-$input-border:                   #ccc;
-$input-border-focus:             #66afe9;
-$legend-color:                   $gray-800;
-$legend-border-color:            #e5e5e5;
-
-$input-group-addon-bg:           var(--#{$prefix}tertiary-bg);  // default // $gray-300;
+// $input-border: #dddddd;
+$input-bg: var(--#{$prefix}body-bg);  // default // #fff;
+// $input-color:                    $gray-500;
+// ** `<input>` border color
+$input-border: #ccc;
+$input-border-focus: #66afe9;
+$legend-color: $gray-800;
+$legend-border-color: #e5e5e5;
+$input-group-addon-bg: var(--#{$prefix}tertiary-bg);  // default // $gray-300;
 $input-group-addon-border-color: $input-border;
-
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 //// Navs
 //// Navbar
-//$navbar-light-color:             var(--#{$prefix}body-color); // #777;
-////$navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
-////$navbar-light-border:            darken( $navbar-light-bg, 6.5% );
-//$nav-link-font-size:                1.1rem;
+// $navbar-light-color:             var(--#{$prefix}body-color); // #777;
+//// $navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
+//// $navbar-light-border:            darken( $navbar-light-bg, 6.5% );
+// $nav-link-font-size:                1.1rem;
 //
 //// Navbar links
-//$navbar-light-color:                $link-color; //#777;
-//$navbar-light-hover-color:          $link-hover-color; // #333;
-////$navbar-light-hover-bg:             transparent;
-//$navbar-light-active-color:         #555;
-////$navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
-//$navbar-light-disabled-color:       #ccc;
-////$navbar-light-disabled-bg:          transparent;
+// $navbar-light-color:                $link-color; //#777;
+// $navbar-light-hover-color:          $link-hover-color; // #333;
+//// $navbar-light-hover-bg:             transparent;
+// $navbar-light-active-color:         #555;
+//// $navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
+// $navbar-light-disabled-color:       #ccc;
+//// $navbar-light-disabled-bg:          transparent;
 //
 //// Navbar brand label
-//$navbar-light-brand-color:               $navbar-light-color;
-//$navbar-light-brand-hover-color:         color.adjust( $navbar-light-brand-color, $lightness: -10%, $space: hsl );
-//$navbar-light-brand-hover-bg:            transparent;
+// $navbar-light-brand-color:               $navbar-light-color;
+// $navbar-light-brand-hover-color:         color.adjust( $navbar-light-brand-color, $lightness: -10%, $space: hsl );
+// $navbar-light-brand-hover-bg:            transparent;
 //
-//$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
-////$navbar-dark-bg:                         #222;
-////$navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
+// $navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
+//// $navbar-dark-bg:                         #222;
+//// $navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
 //
 //// Inverted navbar links
-//$navbar-dark-hover-color: #242424;
-////$navbar-dark-hover-bg:              transparent;
-//$navbar-dark-active-color:          $navbar-dark-hover-color;
-////$navbar-dark-active-bg:             darken($tiki-navbar-dark-bg, 10%);
-//$navbar-dark-disabled-color:        #444;
-////$navbar-dark-disabled-bg:           transparent;
+// $navbar-dark-hover-color: #242424;
+//// $navbar-dark-hover-bg:              transparent;
+// $navbar-dark-active-color:          $navbar-dark-hover-color;
+//// $navbar-dark-active-bg:             darken($tiki-navbar-dark-bg, 10%);
+// $navbar-dark-disabled-color:        #444;
+//// $navbar-dark-disabled-bg:           transparent;
 //
 //// Inverted navbar brand label
-//$navbar-dark-brand-color:                $navbar-dark-color;
-//$navbar-dark-brand-hover-color:          #fff;
-////$navbar-dark-brand-hover-bg:             transparent;
+// $navbar-dark-brand-color:                $navbar-dark-color;
+// $navbar-dark-brand-hover-color:          #fff;
+//// $navbar-dark-brand-hover-bg:             transparent;
 //
-////$navbar-dark-toggle-hover-bg:            #333;
-////$navbar-dark-toggle-icon-bar-bg:         #fff;
-//$navbar-dark-toggle-border-color:        #333;
+//// $navbar-dark-toggle-hover-bg:            #333;
+//// $navbar-dark-toggle-icon-bar-bg:         #fff;
+// $navbar-dark-toggle-border-color:        #333;
 //
-//$nav-tabs-border-color:                     #ddd;
+// $nav-tabs-border-color:                     #ddd;
 //
-//$nav-tabs-link-hover-border-color:          $gray-300;
+// $nav-tabs-link-hover-border-color:          $gray-300;
 //
-//$nav-tabs-link-active-hover-bg:             $body-bg;
-//$nav-tabs-link-active-hover-color:          $gray-500;
-//$nav-tabs-link-active-hover-border-color:   #ddd;
+// $nav-tabs-link-active-hover-bg:             $body-bg;
+// $nav-tabs-link-active-hover-color:          $gray-500;
+// $nav-tabs-link-active-hover-border-color:   #ddd;
 //
-//$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
+// $nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
 
 // Dropdowns
-$dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
-$dropdown-divider-bg:               $dropdown-border-color;  // default
+$dropdown-border-color: var(--#{$prefix}border-color-translucent);  // default
+$dropdown-divider-bg: $dropdown-border-color;  // default
 $dropdown-font-size: 1.2rem;
+$dropdown-color: var(--#{$prefix}body-color);  // default
+$dropdown-bg: var(--#{$prefix}body-bg);  // default
 
-$dropdown-color:                    var(--#{$prefix}body-color);  // default
-$dropdown-bg:                       var(--#{$prefix}body-bg);  // default
+$dropdown-link-color: var(--#{$prefix}body-color);  // default // $gray-800;
+$dropdown-link-hover-color: $dropdown-link-color;  // default // darken($gray-800, 5%);
+$dropdown-link-hover-bg: var(--#{$prefix}tertiary-bg);  // default // #f5f5f5;
 
-$dropdown-link-color:               var(--#{$prefix}body-color);  // default // $gray-800;
-$dropdown-link-hover-color:         $dropdown-link-color;  // default // darken($gray-800, 5%);
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg);  // default // #f5f5f5;
+$dropdown-link-active-color: $component-active-color;  // default
+$dropdown-link-active-bg: $component-active-bg;  // default
 
-$dropdown-link-active-color:        $component-active-color;  // default
-$dropdown-link-active-bg:           $component-active-bg;  // default
-
-$dropdown-active-color:     $component-active-color; // default
-$dropdown-active-bg:        $component-active-bg; // default
-$dropdown-header-color:     var(--#{$prefix}body-color);
-
-$dropdown-dark-color:               $gray-300;  // default
-$dropdown-dark-bg:                  $gray-800;  // default
-$dropdown-dark-border-color:        $dropdown-border-color;  // default
-$dropdown-dark-divider-bg:          $dropdown-divider-bg;  // default
-$dropdown-dark-box-shadow:          null;  // default
-$dropdown-dark-link-color:          $dropdown-dark-color;  // default
-$dropdown-dark-link-hover-color:    $white;  // default
-$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-$dropdown-dark-link-active-color:   $dropdown-link-active-color;  // default
-$dropdown-dark-link-active-bg:      $dropdown-link-active-bg;  // default
+$dropdown-active-color: $component-active-color; // default
+$dropdown-active-bg: $component-active-bg; // default
+$dropdown-header-color: var(--#{$prefix}body-color);
+$dropdown-dark-color: $gray-300;  // default
+$dropdown-dark-bg: $gray-800;  // default
+$dropdown-dark-border-color: $dropdown-border-color;  // default
+$dropdown-dark-divider-bg: $dropdown-divider-bg;  // default
+$dropdown-dark-box-shadow: null;  // default
+$dropdown-dark-link-color: $dropdown-dark-color;  // default
+$dropdown-dark-link-hover-color: $white;  // default
+$dropdown-dark-link-hover-bg: rgba($white, .15);  // default
+$dropdown-dark-link-active-color: $dropdown-link-active-color;  // default
+$dropdown-dark-link-active-bg: $dropdown-link-active-bg;  // default
 $dropdown-dark-link-disabled-color: $gray-500;  // default
-$dropdown-dark-header-color:        var(--#{$prefix}body-color);
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-dark-header-color: var(--#{$prefix}body-color);
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 $pagination-disabled-color: $btn-link-disabled-color;
@@ -210,7 +203,7 @@ $accordion-button-active-bg: #f5f5e9;
 // Popovers
 // Badges
 // Modals
-//$modal-header-border-color: #386dbb;
+// $modal-header-border-color: #386dbb;
 // $modal-content-bg
 // Alerts
 // Progress bars
@@ -219,16 +212,17 @@ $list-group-disabled-color: $btn-link-disabled-color;
 
 // Image thumbnails
 // Figures
-$figure-caption-color:              $gray-800;
+$figure-caption-color: $gray-800;
 
 // Breadcrumbs
-$breadcrumb-bg:                     transparent;
-$breadcrumb-divider-color:          var(--#{$prefix}body-color);
-$breadcrumb-active-color:           var(--#{$prefix}body-color);
-$breadcrumb-divider:                quote("/");
+$breadcrumb-bg: transparent;
+$breadcrumb-divider-color: var(--#{$prefix}body-color);
+$breadcrumb-active-color: var(--#{$prefix}body-color);
+$breadcrumb-divider: "/";
+
 // Carousel
 // Close
 // Code
-$code-color:                     $body-color; //    $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //    $pink;  // default // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //

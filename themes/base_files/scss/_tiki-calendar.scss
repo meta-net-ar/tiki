@@ -6,6 +6,7 @@
         table-layout: auto;
         .weeks { padding: 8px; }
     }
+
     .wp-trackercalendar {
         min-height: 30em;
     }
@@ -51,6 +52,7 @@
         .ec-event .ec-event-time {
             display: none;
         }
+
         .ec-event .ec-event-title {
             display: "-webkit-box";
             -webkit-line-clamp: 2;
@@ -98,42 +100,53 @@ h4.ec-event-title {
 .ui-datepicker {
     z-index:9999 !important;
 }
+
 .ec .ec-scrollgrid, .ec .ec-scrollgrid table,
 .ec .ec-day-grid {
     width: 100% !important;
 }
+
 .ec-day-grid-harness {
     border-radius: 4px;
-    margin: 0px 3px 0px;
+    margin: 0 3px;
 }
+
 .ec-event {
     display: block;
     white-space: break-spaces;
     margin-top: 1px;
 }
+
 .ec-events .ec-event-time {
-    color: #ffffff;
+    color: #fff;
     font-weight: bold;
 }
+
 .ec-events .ec-event-title {
-    color: #ffffff;
+    color: #fff;
     font-weight: normal;
 }
+
 .ec-time-grid-event .ec-event-time {
     font-weight: bold;
 }
+
 .ec-time-grid .ec-event-title {
     font-weight: normal;
 }
+
 .ec-dark .ec-active {
     color: white;
 }
+
 article.tips {
     display: flex;
 }
+
 .ec-event-tag {
     height: auto;
 }
+
 // Scoped to .ec-body to prevent the "+" from appearing on day headers (Sun, Mon, etc.)
 .ec-body {
     .ec-day,
@@ -144,7 +157,7 @@ article.tips {
 
         &:hover {
             /* Subtle background highlight */
-            background-color: rgba(var(--bs-primary-rgb), 0.05);
+            background-color: rgb(var(--bs-primary-rgb), 0.05);
 
             /* Show the "+" icon */
             &::after {
@@ -161,6 +174,7 @@ article.tips {
                 z-index: 1;
             }
         }
+
         &:has(.ec-event)::after {
             display: none;
         }
@@ -171,21 +185,25 @@ article.tips {
     cursor: pointer;
     z-index: 2;
 }
+
 nav.ec-toolbar {
     flex-wrap: wrap;
 }
 
-@media only screen and (max-width: 767px) {
+@media only screen and (width <= 767px) {
     .ec-toolbar {
         display: block !important;
     }
+
     .ec-toolbar .ec-button .btn-group .btn {
         padding: 0.375rem 0.1rem;
     }
+
     h4.ec-event-title {
-        font-size: 0px;
+        font-size: 0;
     }
 }
+
 @media print {
     .ec .ec-day-grid-day-top {
         border-bottom: 1px solid #dee2e6;

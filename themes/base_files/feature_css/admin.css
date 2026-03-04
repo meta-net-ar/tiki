@@ -1,14 +1,14 @@
 /* Look & feel thumbnail */
 
-/*#style_thumb_div {
+/* #style_thumb_div {
     text-align: center;
 }
 
 .adminoptionpopup a {
     display: block;
-}*/
+} */
 
-/*.multicheckbox label,
+/* .multicheckbox label,
 .multicheckbox > div */
 .multicheckbox ul {
     float: left;
@@ -44,7 +44,7 @@
 .admin2cols label {
    display: block;
     min-width: 20%;
-}*/
+} */
 
 .admin legend img, .admin label img {
     margin-left: 1em;
@@ -103,7 +103,7 @@
     overflow: hidden;
     border-top: 1px #eee solid;
     border-bottom: 1px #ccc solid;
-}*/
+} */
 
 .toolbar img.icon {
     vertical-align: middle;
@@ -114,7 +114,7 @@
     cursor: pointer;
 }
 
-/*.toolbars-admin .rows .row {
+/* .toolbars-admin .rows .row {
     min-height: 20px;
     min-width: 500px;
     overflow: hidden;
@@ -134,6 +134,7 @@
 
 .toolbars-admin ul.full {
     list-style-type: none;
+
  /*   display: inline;
     padding-left: 0pt;
     width: 100%; */
@@ -166,7 +167,7 @@
     width: 18px;
     height: 18px;
     list-style-type: none;
-    background-color: var(--bs-warning-bg-subtle); /*#ff0;*/
+    background-color: var(--bs-warning-bg-subtle); /* #ff0; */
     float: left;
 }
 
@@ -179,25 +180,25 @@
 }
 
 .qt-custom {
-    background-color:  var(--bs-warning-bg-subtle); /*#ff9;*/
+    background-color:  var(--bs-warning-bg-subtle); /* #ff9; */
 }
 
 .qt-noaccess {
-    color: var(--bs-danger-text-emphasis) !important; /*opacity: .4;*/
+    color: var(--bs-danger-text-emphasis) !important; /* opacity: .4; */
 }
 
-/*#toolbar_edit_div label,
+/* #toolbar_edit_div label,
 #toolbar_edit_div input,
 #toolbar_edit_div select {
     display: block;
-}*/
+} */
 
 #toolbar_edit_div input,
 #toolbar_edit_div select {
     clear: right;
 }
 
-/*#toolbar_edit_div input.text {
+/* #toolbar_edit_div input.text {
     margin-bottom:12px;
     width:95%;
     padding: .4em;
@@ -207,7 +208,7 @@
     padding:0;
     border:0;
     margin-top:25px;
-}*/
+} */
 
 #toolbar_edit_div .adminoptionbox {
     text-align: right;
@@ -229,27 +230,27 @@
     border: 1px solid transparent;
 }
 
-/*#assigned_modules tr.odd:hover {
+/* #assigned_modules tr.odd:hover {
     border-color: #ccc;
 }
 
 #assigned_modules tr.even:hover {
     border-color: #bbb;
-}*/
+} */
 
 .module-placeholder {
     width: 160px;
     min-height: 40px;
     list-style-type: none;
-    background-color: var(--bs-warning-bg-subtle); /*#ff8;*/
+    background-color: var(--bs-warning-bg-subtle); /* #ff8; */
     border: #884 2px solid;
     margin: 10px;
     padding: 10px;
 }
 
-/*#module_list {
+/* #module_list {
     padding: 0;
-}*/
+} */
 #module_list li {
     list-style: none;
     user-select: none;
@@ -261,7 +262,7 @@
 }
 
 #save_modules a {
-    background-color: var(--bs-danger-bg-subtle); /*#faa;*/
+    background-color: var(--bs-danger-bg-subtle); /* #faa; */
     background-image: none;
 }
 
@@ -269,8 +270,7 @@
 
 .ui-droppable.modules, .ui-sortable.modules {
     min-height: 10ex;
-    -webkit-box-shadow: inset 0 0 5px 5px rgba(0, 0, 0, .1);
-    box-shadow: inset 0 0 5px 5px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 0 5px 5px rgb(0 0 0 / 10%);
 }
 
 #right_left.ui-sortable, #right_modules.ui-sortable {
@@ -281,6 +281,7 @@
 
 /* tiki 7 theme generator *
  * deliberately pixel based sizes */
+
 /*
 .tgItems {
     list-style: none;
@@ -395,6 +396,7 @@
     width: 300px;
     margin-right: 20px;
     margin-bottom: 20px;
+
 /*    background-color: #f8f9fa;
     border: 1px solid rgba(0, 0, 0, 0.125);
     border-radius: 0.25rem; */
@@ -427,7 +429,7 @@
     padding: 0.50rem 1.25rem 0 1.25rem;
 } */
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
     .toolbars-admin .rows {
         padding: 0;
     }

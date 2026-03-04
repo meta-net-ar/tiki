@@ -17,8 +17,8 @@
         padding: 5px;
     }
 
-    //table.pvtTable .pvtColLabel {text-align: center;}
-    //table.pvtTable .pvtTotalLabel {text-align: right;}
+    // table.pvtTable .pvtColLabel {text-align: center;}
+    // table.pvtTable .pvtTotalLabel {text-align: right;}
 
     table.pvtTable tr td {
         color: $tiki-pvt-table-color;
@@ -26,6 +26,7 @@
         //    padding: 5px;
         background-color: $tiki-pvt-table-bg;
         border-color: $tiki-pvt-table-border-color;
+
         //    vertical-align: top;
         //    text-align: right;
     }
@@ -38,6 +39,7 @@
     .pvtVals {
         text-align: center;
     }
+
     .pvtAggregator,
     .pvtRenderer,
     .pvtSearch,
@@ -54,14 +56,16 @@
         border-color: $tiki-pvt-table-border-color;
         background: $tiki-pvt-table-bg;
         padding: 5px;
+
         //    min-width: 20px;
         //    min-height: 20px;
     }
-    //.pvtAxisContainer li {
+
+    // .pvtAxisContainer li {
     //    padding: 8px 6px;
     //    list-style-type: none;
     //    cursor:move;
-    //}
+    // }
     .pvtAxisContainer li.pvtPlaceholder {  // .tiki .pvtAxisContainer li span.pvtAttr
         padding: 3px 15px;
         border-radius: 5px;
@@ -69,7 +73,7 @@
     }
 
     .pvtAxisContainer li span.pvtAttr {
-        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
         color: $tiki-pvtAttr-color;
         background: $tiki-pvtAttr-bg;
         padding: 2px 5px;
@@ -87,6 +91,7 @@
     .pvtHorizList li {
         display: inline;
     }
+
     .pvtVertList {
         vertical-align: top;
     }
@@ -108,12 +113,15 @@
     .pvtFilterBox h4 {
         margin: 0;
     }
+
     .pvtFilterBox p {
         margin: 1em auto;
     }
+
     .pvtFilterBox label {
         font-weight: normal;
     }
+
     .pvtFilterBox input[type='checkbox'] {
         margin-right: 5px;
     }
@@ -124,6 +132,7 @@
         width: 100%;
         max-height: 200px;
     }
+
     .pvtCheckContainer p {
         margin: 5px;
     }
@@ -131,14 +140,17 @@
     .pvtRendererArea {
         padding: 5px;
     }
+
     .pvtFilterBox button {
         background: $tiki-pvtFilterBox-button-bg;
         border: 1px solid $border-color; //  $btn-primary-border;
         border-radius: $btn-border-radius;
         color: $tiki-pvtFilterBox-button-color;
+
         &:hover {
             background: $tiki-pvtFilterBox-button-hover-bg;
         }
+
         & + button {
             margin-left: 4px;
             margin-bottom: 4px;
@@ -149,6 +161,7 @@
         fill: none;
         stroke: $tiki-c3-color;
     }
+
     select {
         font-size: $tiki-pvtSelect-font-size;
     }

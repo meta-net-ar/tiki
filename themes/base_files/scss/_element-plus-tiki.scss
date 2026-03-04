@@ -11,6 +11,7 @@ el-select, el-autocomplete, el-input {
 
 .input-group el-select ~ .btn, .input-group el-autocomplete ~ .btn, .input-group el-input ~ .btn {
   @extend .btn-sm;
+
   margin-left: 0.5rem !important;
   border-top-left-radius: var(--bs-btn-border-radius) !important;
   border-bottom-left-radius: var(--bs-btn-border-radius) !important;

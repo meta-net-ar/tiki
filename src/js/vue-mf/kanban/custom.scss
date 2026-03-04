@@ -6,6 +6,7 @@
 .ps__thumb-x {
     background-color: #d7d8df;
     height: 6px;
+
     /* there must be 'bottom' for ps__thumb-x */
     bottom: 2px;
 }
@@ -13,6 +14,7 @@
 .ps__thumb-y {
     background-color: #d7d8df;
     width: 6px;
+
     /* there must be 'right' for ps__thumb-y */
     right: 2px;
 }
@@ -43,11 +45,13 @@
 
 // Utils
 .bg-color-transparent {
-    background-color: rgba(255, 255, 255, 0.5) !important;
+    background-color: rgb(255 255 255 / 50%) !important;
 }
+
 .bg-color-grey {
     background-color: #f3f4fa !important;
 }
+
 .kanban-avatar {
     display: flex;
     justify-content: center;

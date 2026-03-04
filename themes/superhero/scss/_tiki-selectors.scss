@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -45,7 +45,7 @@ a.linkmodule {
 .btn-outline-warning { --bs-btn-color: #C79500; --bs-btn-border-color: #C79500; }
 .btn-outline-info { --bs-btn-color: #29A2C7; --bs-btn-border-color: #29A2C7; }
 .btn-outline-light { --bs-btn-color: #f6f6f6; --bs-btn-border-color: #f6f6f6; }
-.btn-outline-dark { --bs-btn-color: #26491BE; --bs-btn-border-color: #26491BE; }
+.btn-outline-dark { --bs-btn-color: #26491B; --bs-btn-border-color: #26491B; }
 .list-group-item-dark { color: #3D4248; }
 
 // Forms
@@ -56,7 +56,7 @@ a.linkmodule {
     // This is added here because the normal variable method didn't work - g_c-l
 .navbar-light.bg-light {
     .nav-link {
-        --bs-nav-link-color: rgba(0, 0, 0, 0.65) !important;
+        --bs-nav-link-color: rgb(0 0 0 / 65%) !important;
     }
 }
 
@@ -79,6 +79,7 @@ a.linkmodule {
 // Alerts
 .alert-light {
     --bs-alert-color: #fff;
+
     background-color: #737373;
 }
 
@@ -103,7 +104,7 @@ a.linkmodule {
 // Tiki-specific
 .tiki_trackers {
     .icon-status-open, .icon-status-pending, .icon-status-closed {
-        filter: drop-shadow(0px 0px 1px black);
+        filter: drop-shadow(0 0 1px black);
     }
 }
 
@@ -116,6 +117,7 @@ a.linkmodule {
             background: transparent;
         }
     }
+
     &.mobile.tiki-cypht {
         .content_title {
             &, .list_controls { background: $card-bg; }

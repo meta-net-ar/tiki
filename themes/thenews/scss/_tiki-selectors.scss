@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -46,6 +46,7 @@ body.fullscreen {
 .navbar:not(.bg-dark,.bg-light) {
     .nav-link {
         color: var(--bs-body-color);
+
         &:hover,
         &:active,
         & .highlighted {
@@ -57,6 +58,7 @@ body.fullscreen {
 .navbar .nav-item {
 //  flex: 1 1 auto !important;
   text-align: center;
+
     * {
         text-align: inherit;
     }
@@ -89,22 +91,25 @@ body.fullscreen {
   height: .5em;
   text-align: center;
   overflow-y: visible;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem;
 }
 
 .module h3.card-title {
   font-family: Mukta, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
+
 //  line-height: 1.8;
   margin: 0 auto;
   position: relative;
   max-width: 90%;
   font-size: .75rem ;
   top: -13px;
-  //color: #666 !important;
+
+  // color: #666 !important;
   span.moduletitle {
     padding: .125em .5em;
+
   //  background: #fbfbfb;
   }
 }
@@ -127,12 +132,13 @@ body.fullscreen {
 // Figures
 // Breadcrumbs
 // Code
-//Tiki-specific
+// Tiki-specific
     // UAB (Admin)
     // Replicate vertical menu text centering in UAB accordion
 button.accordion-button {
     border-left: 1px solid var(--tiki-nav-link-border-left-color);
     border-bottom: 3px solid #09c;
+
     span.ms-1.narrow-hide {
         width: 100%;
         text-align: center; }
@@ -140,8 +146,10 @@ button.accordion-button {
 
 .admin-dashboard {
     padding-top: .5rem;
+
     div {
-        padding: .5rem 0 0 0;
+        padding: .5rem 0 0;
+
         .nav-link {
             padding-bottom: .75rem;
             font-size: .85rem;
@@ -150,31 +158,37 @@ button.accordion-button {
 }
 
 // Dark mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .btn-outline-primary {
         color: #008EFA;
         border-color: #008EFA;
     }
+
     .btn-outline-secondary {
         color: #3888FF;
         border-color: #3888FF;
     }
+
     .btn-outline-success {
         color: #1D9F63;
         border-color: #1D9F63;
     }
+
     .btn-outline-danger {
         color: #E36370;
         border-color: #E36370;
     }
+
     .btn-outline-warning {
         color: #C57A11;
         border-color: #C57A11;
     }
+
     .btn-outline-info {
         color: #208FE9;
         border-color: #208FE9;
     }
+
     .blockquote-footer {
         color: #879097;
     }

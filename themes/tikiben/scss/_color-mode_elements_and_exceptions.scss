@@ -14,8 +14,8 @@ $imagePath: "../images/";
 // - - - - - - - - - - - - - 4. CSS for color mode exceptions -
 // links, text, and other elements that display directly on the body background.
 
-[data-bs-theme=light],
-[data-bs-theme=dark] {
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
     .special-case_colors {
         a:not(.dropdown-item) {
             color: var(--tiki-nonmode-link-color) !important; // #d0d2d2
@@ -93,6 +93,7 @@ $imagePath: "../images/";
     .no-box a, // This may need more specificity to prevent instances inside styling-element, etc.
     .top_modules > .module {
         color: var(--tiki-nonmode-link-color);
+
         &:hover {
             color: var(--tiki-nonmode-link-hover-color);
         }
@@ -112,7 +113,7 @@ $imagePath: "../images/";
         }
     }
 
-    //.description,
+    // .description,
     .pwa-queue {
         color: var(--tiki-nonmode-color);
     }
@@ -132,10 +133,13 @@ $imagePath: "../images/";
             & > ul:not(.dropdown-menu) > .nav-item > .nav-link {
                 --bs-nav-link-color: var(--tiki-nonmode-nav-link-color) !important; // #d0d2d2
             }
+
             .card {
                 color: var(--bs-body-color);
+
                 a {
                     color: var(--bs-link-color) !important;
+
                     &:hover,
                     .active {
                         color: var(--bs-link-hover-color) !important;
@@ -299,6 +303,7 @@ div#forumpostopen,
         box-shadow: none;
         padding: 0;
     }
+
     .color-mode-content {
         background: var(--bs-body-bg);
         color: var(--bs-body-color);
@@ -306,6 +311,7 @@ div#forumpostopen,
         border-radius: 0;
         margin-bottom: 25px;
     }
+
     .card {
         background: var(--bs-body-bg); // $card-bg;
         border-right: 1px solid var(--bs-border-color); // #dbdbdb;
@@ -323,6 +329,7 @@ div#forumpostopen,
     article.wikitext {
         background: transparent !important;
     }
+
     h1.pagetitle,
     .color-mode-content {
         background: var(--bs-body-bg);

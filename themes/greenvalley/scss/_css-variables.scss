@@ -13,7 +13,9 @@
 // * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
 
 @import "variables";
+
 $imagePath: "../images/";
+
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 
 // Used for L&F nav color choice and color mode override
@@ -80,20 +82,22 @@ $imagePath: "../images/";
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // color mode
+[data-bs-theme="dark"] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
     }
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
+[data-bs-theme="light"] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
         @include top-nav-dark;                      // dark values
     }
+
     .tiki-topbar-nav-dark {
         @include topbar-nav-dark;
     }
@@ -153,15 +157,16 @@ $imagePath: "../images/";
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
@@ -190,8 +195,9 @@ $imagePath: "/images/";
 [data-bs-theme="light"] {
     --tiki-greenvalley-row-middle-bg-color: #fff; // url('#{$imagePath}page_background_ltr.jpg') repeat;
     --tiki-greenvalley-row-middle-bg-img-opacity: 1;
+
     #page-data {
-        text-shadow: 1px 1px 0 rgb(255, 255, 255);
+        text-shadow: 1px 1px 0 rgb(255 255 255);
     }
 }
 
@@ -206,10 +212,12 @@ $imagePath: "/images/";
     .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
+
     .ec-event-time,
     .ec-event-title {
         color: var(--bs-body-color) !important;
     }
+
     div.page-content-top-margin { // Space is added instead to top of col1 ,2, and 3 so bg image reaches top of section.
         --tiki-page-content-top-margin: 0;
     }

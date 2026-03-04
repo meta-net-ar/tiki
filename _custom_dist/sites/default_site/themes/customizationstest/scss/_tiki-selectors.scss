@@ -2,6 +2,7 @@
 // This file is for additional SCSS rules beyond what are in variables.scss.
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -11,8 +12,9 @@ $tiki-topbar-row-sidemargins: -15px;
 
 .navbar-dark-parent {
     .sitetitles a {
-        color: #ffffff;
+        color: #fff;
     }
+
     .sitesubtitle {
         color: #91bef5;
     }
@@ -31,12 +33,11 @@ h2.sitesubtitle {
   font-style: italic;
 }
 
-//.page-header,
-//.header_outer.bg-dark-parent,
-.bg-dark//,
-//.topbar.bg-dark > li,
-//.navbar-dark
-    {
+// .page-header,
+// .header_outer.bg-dark-parent,
+.bg-dark {
+    // , .topbar.bg-dark > li,
+    // , .navbar-dark
   background: #1f5daa !important; /* Old browsers */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1f5daa), color-stop(2%, #3977c4), color-stop(3%, #3b7ac7), color-stop(5%, #3877c6), color-stop(7%, #3a7cca), color-stop(9%, #3778c8), color-stop(19%, #3674c7), color-stop(43%, #2c6abf), color-stop(69%, #1c5cb3), color-stop(93%, #1454ac), color-stop(97%, #1455a9), color-stop(98%, #1a57a8), color-stop(100%, #346dba)) !important; /* Chrome,Safari4+ */
   background: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%) !important; /* W3C */
@@ -68,7 +69,7 @@ footer.main-footer .container {
 .modal-header {
   //  background: #3475c6 url('#{$imagePath}title_bg.png') no-repeat 0 0;
   background: #386dbb; /* Old browsers */
-  background: -webkit-linear-gradient(top, #386dbb 0%, #3a6fbb 7%, #457bc3 25%, #4c82ca 54%, #2f6dc0 57%, #3371c4 82%, #3574c4 86%, #3574c4 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(top, #386dbb 0%, #3a6fbb 7%, #457bc3 25%, #4c82ca 54%, #2f6dc0 57%, #3371c4 82%, #3574c4 86%, #3574c4 100%); /* Chrome10+,Safari5.1+ */
   background: linear-gradient(to bottom, #386dbb 0%, #3a6fbb 7%, #457bc3 25%, #4c82ca 54%, #2f6dc0 57%, #3371c4 82%, #3574c4 86%, #3574c4 100%); /* W3C */
   text-transform: uppercase;
   color: #fff;
@@ -122,6 +123,7 @@ h3.card-title {
 // Update for Smartmenus
 .navbar .navbar-nav.sm-vertical {
     .dropdown { border: none;
+
  //    a { color: #005999; }
     }
 }

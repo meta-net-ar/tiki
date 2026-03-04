@@ -2,6 +2,7 @@
 @import "../../../node_modules/bootstrap/scss/_functions.scss";
 @import "../../../node_modules/bootstrap/scss/variables.scss";
 @import "../../../node_modules/bootstrap/scss/mixins.scss";
+
 // $import "../../../vendor_bundled/vendor/twbs/bootstrap/less/panels.less";
 @import "../scss/_tiki-variables.scss";
 
@@ -41,6 +42,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     background-color: $card-bg;
     border: 1px solid transparent;
     border-radius: $card-border-radius;
+
     @include box-shadow(0 1px 1px rgba(0,0,0,.05));
 }
 
@@ -54,6 +56,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .card-header {
 //    padding: $card-header-padding; Todo = find variable or method
     border-bottom: 1px solid transparent;
+
 //    .border-top-radius(($panel-border-radius - 1)); Todo
 }
 
@@ -74,11 +77,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 // Optional footer (stays gray in every modifier class)
-//.panel-footer {
+// .panel-footer {
 //    padding: $card-footer-padding; Todo - find variable or method
 //    background-color: $panel-footer-bg; Todo - find variable or method
 //    border-top: 1px solid $card-border-color; Todo - find variable or method
 //    .border-bottom-radius(($panel-border-radius - 1)); Todo
-//}
+// }
 
 

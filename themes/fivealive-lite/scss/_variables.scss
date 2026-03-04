@@ -18,7 +18,6 @@ $warning: #897415;
 $danger: #B85B19;
 $light: #fff;
 $dark: #000;
-
 $theme-colors: (
     "primary":    $primary,
     "secondary":  $secondary,
@@ -35,22 +34,23 @@ $theme-colors: (
 $body-color: $gray-800; // !default
 $body-bg: #fff; // !default
 
-$body-secondary-color:      rgba($body-color, .75); // !default;
-$body-secondary-bg:         $gray-200; // !default;
+$body-secondary-color: rgba($body-color, .75); // !default;
+$body-secondary-bg: $gray-200; // !default;
 
-$body-tertiary-color:       rgba($body-color, .5); // !default;
-$body-tertiary-bg:          $gray-100; // !default;
+$body-tertiary-color: rgba($body-color, .5); // !default;
+$body-tertiary-bg: $gray-100; // !default;
 
 // Links
 $link-color: #177EAB;
 
 // Components
 $border-color: $gray-400;
-//$component-active-color:       #ddb9af; // $white;  // default
-$component-active-bg:         #0c628c; // ($primary);  // default
+
+// $component-active-color:       #ddb9af; // $white;  // default
+$component-active-bg: #0c628c; // ($primary);  // default
 
 // Typography
-$font-family-sans-serif:  Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif; // Switched to system fonts from Lato, sans-serif !default;
+$font-family-sans-serif: seravek, 'Gill Sans Nova', ubuntu, calibri, 'DejaVu Sans', source-sans-pro, sans-serif; // Switched to system fonts from Lato, sans-serif !default;
 $font-size-base: 1rem;
 $font-weight-normal: 500;
 $headings-font-weight: 500;
@@ -58,22 +58,22 @@ $headings-font-weight: 500;
 // Tables
 // Buttons
 // Forms
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Navs
-$nav-tabs-border-color:             $gray-300; // !default
+$nav-tabs-border-color: $gray-300; // !default
 
 // Navbar
-$navbar-dark-color:                 rgba($white, .85); // !default;
-$navbar-dark-hover-color:           rgba($white, .75); // !default
-$navbar-dark-active-color:          $white; // !default
-$navbar-dark-disabled-color:        rgba($white, .25); // !default
+$navbar-dark-color: rgba($white, .85); // !default;
+$navbar-dark-hover-color: rgba($white, .75); // !default
+$navbar-dark-active-color: $white; // !default
+$navbar-dark-disabled-color: rgba($white, .25); // !default
 
 // Dropdowns
 $dropdown-link-hover-bg: var(--#{$prefix}tertiary-bg); // !default;
-$dropdown-link-active-bg:           $component-active-bg; // !default;
+$dropdown-link-active-bg: $component-active-bg; // !default;
 
 // Pagination
 // Cards
@@ -89,7 +89,7 @@ $dropdown-link-active-bg:           $component-active-bg; // !default;
 // Breadcrumbs
 // Close
 // Code
-$code-color:                      $body-color; // $pink !default; // Bootstrap 5.3
+$code-color: $body-color; // $pink !default; // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
@@ -101,15 +101,16 @@ $tiki-side-column-card-header-border-color: #1174a5 !default;
 $tiki-side-column-card-header-border-width: 0 0 1px 0 !default;
 $tiki-header_outer-bg: color.adjust(#28aae1, $lightness: -10%, $space: hsl) !default;
 $tiki-header_container_header-bg: url('#{$imagePath}siteheader.png') -248px 0 no-repeat;
-$tiki-header-color: #ffffff !default;
+$tiki-header-color: #fff !default;
 $tiki-topbar_container-bg: #28aae1 !default;
 $tiki-topbar-bg: #28a7de !default;
 $tiki-footer-color: #696969 !default;
 $tiki-footer_liner-border-color: #28aae1 !default;
+
 // $tiki-footer-link-color: #a9a9a9 !default;
 $tiki-navbar-dark-navbar-nav-li-a-bg: #28aae1 !default;
 $tiki-postbody-title-bg: $tiki-header_outer-bg !default;
-$tiki-postbody-title-color: #000000 !default;
+$tiki-postbody-title-color: #000 !default;
 $tiki-side-column-border: none !default;
 $tiki-topbar_container-bg: $tiki-navbar-dark-navbar-nav-li-a-bg !default;
 $tiki-navbar-fixed-height: 46px !default;

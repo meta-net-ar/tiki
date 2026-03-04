@@ -1,9 +1,11 @@
 @charset "UTF-8";
+
 /*!
  * Bootswatch Slate theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
 */
+
 /*!
  * Bootswatch v5.3.3 (https://bootswatch.com)
  * Theme: slate
@@ -11,6 +13,7 @@
  * Licensed under MIT
  * Based on Bootstrap
 */
+
 /*!
  * Bootstrap  v5.3.3 (https://getbootstrap.com/)
  * Copyright 2011-2024 The Bootstrap Authors
@@ -18,6 +21,7 @@
  */
 
 /* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
+
 /* Original Bootswatch information:
  * bootswatch v5.3.3
  * Homepage: http://bootswatch.com
@@ -29,31 +33,29 @@
 */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
-
 @import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
-//@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
+// @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/slate/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
-//@import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
+// @import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
 
 @import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
-
 @import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 8. Remainder of required Bootstrap parts.
 @import "../../../node_modules/bootswatch/dist/slate/bootswatch"; // 9. Bootswatch theme selectors
 @import "../../base_files/scss/_tiki-selectors.scss"; // 10. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 11. Optionally imported to group (separately) the top and topbar zone components for styling.
-//@import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+// @import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 
 
 // ----------------------------- Overrides and adjustments ----------------------------- //
 
-//Theme variables aren't overriding default values for these.
-//body {
+// Theme variables aren't overriding default values for these.
+// body {
 //  color: #aaa;
 //  background: #272b30;
-//}
+// }
 
 body.fullscreen { background: var(--#{$prefix}body-bg); }
 
@@ -64,11 +66,12 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
     --bs-navbar-color: #fff;
     --bs-navbar-hover-color: #{$gray-200};
 }
+
 .card-body .navbar {
     border: none;
 }
 
-//.alert-light, .tiki .alert.alert-light .alert-link { color: #FFFFFF; }
+// .alert-light, .tiki .alert.alert-light .alert-link { color: #FFFFFF; }
 .btn-outline-secondary { --bs-btn-color: #93999F; }
 .btn-outline-success { --bs-btn-color: #55BE55; }
 .btn-outline-danger { --bs-btn-color: #EF706C; }
@@ -76,7 +79,7 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
 .btn-outline-info { --bs-btn-color: #289FC3; }
 .btn-outline-light { --bs-btn-color: #DBDBDB; }
 .btn-outline-dark { --bs-btn-color: #999EA8; }
-.list-group-item-light { color: #FFFFFF; }
+.list-group-item-light { color: #FFF; }
 .text-muted { color: #A0A6AB; }
 .list-group-item-light { --bs-list-group-bg: #414141; --bs-list-group-color: #1f1f1f; }
 .list-group-item-light { color: #1f1f1f; }
@@ -91,7 +94,7 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
 
 // Variable not being respected
 .navbar-light .nav-link {
-    color: rgba(0, 0, 0, 0.55);
+    color: rgb(0 0 0 / 55%);
 }
 
 .alert-primary {

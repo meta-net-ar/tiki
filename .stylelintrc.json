@@ -1,0 +1,36 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss"
+  ],
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "declaration-block-no-duplicate-custom-properties": null,
+    "custom-property-no-missing-var-function": null,
+    "property-no-deprecated": null,
+    "declaration-property-value-keyword-no-deprecated": null,
+    "function-linear-gradient-no-nonstandard-direction": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "no-empty-source": null,
+    "selector-max-id": null,
+    "selector-id-pattern": null,
+    "selector-class-pattern": null,
+    "scss/dollar-variable-pattern": null,
+    "scss/load-partial-extension": null,
+    "number-max-precision": null,
+    "scss/load-no-partial-leading-underscore": null,
+    "declaration-block-single-line-max-declarations": null,
+    "scss/comment-no-empty": null,
+    "scss/no-global-function-names": null,
+    "custom-property-pattern": null,
+    "import-notation": null,
+    "no-invalid-position-at-import-rule": null,
+    "declaration-block-no-shorthand-property-overrides": null,
+    "scss/operator-no-unspaced": null,
+    "keyframes-name-pattern": null,
+    "selector-pseudo-element-no-unknown": null,
+    "scss/at-extend-no-missing-placeholder": null,
+    "scss/at-mixin-pattern": null
+  }
+}

@@ -17,7 +17,7 @@
 // Used for L&F nav color choice and color mode override
 
 @mixin top-nav-dark {
-    --tiki-top-bg: var(--tiki-top-bg); //#{$tiki-header-outer-bg};
+    --tiki-top-bg: var(--tiki-top-bg); // #{$tiki-header-outer-bg};
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
     --tiki-top-text-color: #{$navbar-dark-hover-color};
@@ -72,20 +72,22 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // color mode
+[data-bs-theme="dark"] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
     }
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
+[data-bs-theme="light"] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
         @include top-nav-light;                      // light values
     }
+
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
     }
@@ -107,9 +109,11 @@ header.navbar.fixed-top {
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
+
     //   --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     //    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     .accordion-item {
         border-width: 0;
     }
@@ -131,6 +135,7 @@ header.navbar.fixed-top {
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
+
 //    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
 //    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
 //    --tiki-admin-dropdown-link-active-bg: purple;
@@ -138,6 +143,7 @@ header.navbar.fixed-top {
     .accordion-item {
         border-width: 0;
     }
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -158,15 +164,16 @@ header.navbar.fixed-top {
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
@@ -176,7 +183,7 @@ header.navbar.fixed-top {
 
 // - - - - - New admin pages (Unified Admin Backend) end - - - - - - - //
 
-//:root {
+// :root {
 //    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
 //    .fc-v-event {
 //        background: var(--bs-secondary-bg) !important;
@@ -185,9 +192,9 @@ header.navbar.fixed-top {
 //    .fc-event-title {
 //        color: var(--bs-body-color) !important;
 //    }
-//}
+// }
 
-[data-bs-theme=dark] .footer_liner {
+[data-bs-theme="dark"] .footer_liner {
     color: var(--bs-dark-text-emphasis);
     background-color: var(--bs-dark-bg-subtle);
 }

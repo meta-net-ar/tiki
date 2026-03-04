@@ -124,6 +124,7 @@ a.admbox.btn.btn-primary.disabled.disabled-clickable {
 .adminoptionboxchild {
     padding-left: 4em;
     margin-bottom: 2em;
+
     legend {
         margin-bottom: 0;
     }
@@ -155,9 +156,6 @@ input[type="checkbox"].simple-toggle + label {
     position: relative;
     cursor: pointer;
     outline: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -165,16 +163,16 @@ input[type="checkbox"].preffilter-toggle-round + label,
 input[type="checkbox"].simple-toggle-round + label {
     width: 100px;
     height: 30px;
-    background-color: #dddddd;
+    background-color: #ddd;
     border-radius: 20px;
     float: left;
     margin: 7px 0 0 5px;
 }
 
-input[type="checkbox"].preffilter-toggle-round + label:before,
-input[type="checkbox"].preffilter-toggle-round + label:after,
-input[type="checkbox"].simple-toggle-round + label:before,
-input[type="checkbox"].simple-toggle-round + label:after {
+input[type="checkbox"].preffilter-toggle-round + label::before,
+input[type="checkbox"].preffilter-toggle-round + label::after,
+input[type="checkbox"].simple-toggle-round + label::before,
+input[type="checkbox"].simple-toggle-round + label::after {
     display: block;
     position: absolute;
     top: 1px;
@@ -183,14 +181,11 @@ input[type="checkbox"].simple-toggle-round + label:after {
     content: "";
 }
 
-input[type="checkbox"].preffilter-toggle-round + label:before,
-input[type="checkbox"].simple-toggle-round + label:before {
+input[type="checkbox"].preffilter-toggle-round + label::before,
+input[type="checkbox"].simple-toggle-round + label::before {
     right: 1px;
     background-color: #f1f1f1;
     border-radius: 20px;
-    -webkit-transition: background 0.4s;
-    -moz-transition: background 0.4s;
-    -o-transition: background 0.4s;
     transition: background 0.4s;
     content: "Basic";
     font-size: 0.8rem;
@@ -199,25 +194,21 @@ input[type="checkbox"].simple-toggle-round + label:before {
     padding-top: 0.2rem;
 }
 
-input[type="checkbox"].simple-toggle-round + label:before {
+input[type="checkbox"].simple-toggle-round + label::before {
     content: "NO" !important;
 }
 
-input[type="checkbox"].preffilter-toggle-round + label:after,
-input[type="checkbox"].simple-toggle-round + label:after {
+input[type="checkbox"].preffilter-toggle-round + label::after,
+input[type="checkbox"].simple-toggle-round + label::after {
     width: 28px;
     background-color: #fff;
     border-radius: 100%;
-    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    -webkit-transition: margin 0.4s;
-    -moz-transition:margin 0.4s;
-    -o-transition:margin 0.4s;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 30%);
     transition: margin 0.4s;
 }
 
-input[type="checkbox"].preffilter-toggle-round:checked + label:before,
-input[type="checkbox"].simple-toggle-round:checked + label:before {
+input[type="checkbox"].preffilter-toggle-round:checked + label::before,
+input[type="checkbox"].simple-toggle-round:checked + label::before {
     background-color: #8ce196;
     content: "Advanced";
     font-size: 0.8rem;
@@ -226,15 +217,15 @@ input[type="checkbox"].simple-toggle-round:checked + label:before {
     padding-top: 0.2rem;
 }
 
-input[type="checkbox"].simple-toggle-round:checked + label:before {
+input[type="checkbox"].simple-toggle-round:checked + label::before {
     background-color: #17a2e8 !important;
     padding-left: 30px !important;
     content: "YES" !important;
     color: #fff !important;
 }
 
-input[type="checkbox"].preffilter-toggle-round:checked + label:after,
-input[type="checkbox"].simple-toggle-round:checked + label:after {
+input[type="checkbox"].preffilter-toggle-round:checked + label::after,
+input[type="checkbox"].simple-toggle-round:checked + label::after {
     margin-left: 70px;
 }
 
@@ -271,7 +262,6 @@ table.treetable .checkBoxHeader > td,
 
 table.objectperms .checkBoxHeader > div,
 table.objectperms > tbody .checkBoxLabel {
-    -webkit-transform: rotate(305deg);
     transform: rotate(305deg);
     width: 140px;
     display: block;
@@ -283,9 +273,11 @@ table.objectperms > tbody .checkBoxLabel {
     line-height: 2;
     text-indent: 1.7em;
 }
+
 .perms-titles {
     z-index: 1;
 }
+
 // Added 9/6/2017 to position top labels
 .objectperms .checkBoxHeader > div > label {
     width: 140px;
@@ -297,20 +289,20 @@ table.objectperms > tbody .checkBoxLabel {
 
 
 //// Target Firefox to fix checkbox label text not displaying
-//@-moz-document url-prefix() {
+// @-moz-document url-prefix() {
 //    table.objectperms .checkBoxHeader > div,
 //    table.objectperms > tbody .checkBoxLabel {
 //        width: auto;
 //    }
-//}
+// }
 
 //// Target MS Edge to fix checkbox label text not displaying
-//@supports (-ms-ime-align:auto) {
+// @supports (-ms-ime-align:auto) {
 //    table.objectperms .checkBoxHeader > div,
 //    table.objectperms > tbody .checkBoxLabel {
 //        width: auto;
 //    }
-//}
+// }
 
 // Target MS IE to fix checkbox label text not displaying
 @media all and (-ms-high-contrast:none) {
@@ -326,10 +318,10 @@ table.objectperms > tbody .checkBoxLabel {
     }
 }
 
-//table.objectperms .checkBoxHeader > div,
-//table.objectperms > tbody .checkBoxLabel {
-//line-height: 2;
-//text-indent: .6em; }
+// table.objectperms .checkBoxHeader > div,
+// table.objectperms > tbody .checkBoxLabel {
+// line-height: 2;
+// text-indent: .6em; }
 
 .objectperms .checkBoxHeader > div > label { width: 140px; }
 
@@ -343,6 +335,7 @@ table.objectperms > tbody .checkBoxCell {
     padding-left: 10px;
     padding-right: 5px;
 }
+
 // Make global permission checkboxes not display
 table.objectperms thead th { display: none; }
 
@@ -358,6 +351,7 @@ table.objectperms thead th { display: none; }
     .meta-tabs-col1 { width: auto; }
     .meta-tabs-col2 { width: auto; }
 }
+
 .resize-vertical {
     resize: vertical;
 }
@@ -376,7 +370,7 @@ table.objectperms thead th { display: none; }
     margin-bottom: 10px;
 }
 
-@media (max-width: 575.98px) {
+@media (width <= 575.98px) {
     .toggle-unified-admin-panel {
         flex-direction: column;
         align-items: center;

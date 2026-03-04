@@ -10,14 +10,14 @@
         &:hover { color: var(--bs-link-hover-color); }
     }
 
-    input[type=text], textarea, select {
+    input[type="text"], textarea, select {
         background-color: $input-bg;
         color: $input-color;
         border-color: $input-border-color;
     }
 
     form {
-        input[type=text], textarea, select {
+        input[type="text"], textarea, select {
             background-color: $input-bg;
             color: $input-color;
             border-color: $input-border-color;
@@ -25,6 +25,7 @@
 
         &.converse-form {
             background-color: inherit;
+
             .form-help {
                 &, &:hover { color: var(--bs-body-color); }
             }
@@ -60,12 +61,14 @@
 // controlbox
     #controlbox {
         .box-flyout { background: var(--bs-body-bg); }
+
         .controlbox-head, .controlbox-panes, .controlbox-pane {
             background-color: inherit;
         }
 
         #chatrooms {
             .list-toggle { color: var(--bs-body-color); }
+
             .rooms-list .available-chatroom {
                 &:hover {
                     background-color: inherit;
@@ -151,6 +154,7 @@
 
                     ul {
                         padding: 0;
+
                         li.occupant .occupant-status {
                             margin-left: 1px;
                             box-shadow: 0 0 1px 1px #444;

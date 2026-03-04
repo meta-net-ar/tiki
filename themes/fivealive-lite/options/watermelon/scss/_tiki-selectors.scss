@@ -6,6 +6,7 @@
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
+
 .text-dark {
     color: #6D5509 !important;
 }
@@ -51,15 +52,17 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .blockquote-footer, .figure-caption { color: #808D93; }
     .valid-feedback { color: #329F4F !important; }
     .invalid-feedback { color: #DC6D1E !important; }
 
     .btn.btn-outline-primary { color: #F15B74; border-color: #F15B74; }
     .btn.btn-outline-secondary { color: #E35F7B; border-color: #E35F7B; }
+
 //    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
     .btn.btn-outline-danger { color: #FF4800; border-color: #FF4800; }
+
 //    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
     .btn.btn-outline-info { color: #E26077; border-color: #E26077; }
     .btn.btn-outline-dark { color: #E26077; border-color: #E26077; }

@@ -3,7 +3,7 @@
 // /***** Trackers (etc.) *****/
 .statuson,
 .statusoff {
-    padding: 3px 2px 0 2px;
+    padding: 3px 2px 0;
     vertical-align: middle;
     height: 15px;
 }
@@ -29,7 +29,7 @@
     & > img, > span, > button { margin-right: 6px; }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .tracker-item-files .file-actions {
         position: absolute;
         top: 0;
@@ -111,9 +111,11 @@
 .card-accordion {
     > .card-header {
         padding: 0;
+
         h4.card-title {
             padding: 0;
             margin: 0;
+
             a {
                 display: block;
                 padding: $card-spacer-y $card-spacer-x;
@@ -128,7 +130,7 @@
 
 
 [class*="tracker-status"] {
-    &:before {
+    &::before {
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
         display: inline-block;
@@ -138,13 +140,14 @@
         text-rendering: auto;
         line-height: 1;
     }
-    &.highlighted:before {
+
+    &.highlighted::before {
         color: inherit !important;
     }
 }
 
 .tracker-status-open, .tracker-status-o {
-    &:before {
+    &::before {
         content: "\f111";
         color: green;
         font-weight: 900;
@@ -153,7 +156,7 @@
 }
 
 .tracker-status-pending, .tracker-status-p {
-    &:before {
+    &::before {
         content: "\f042";
         color: orange;
         font-weight: 900;
@@ -162,7 +165,7 @@
 }
 
 .tracker-status-closed, .tracker-status-c {
-    &:before {
+    &::before {
         content: "\f057";
         color: grey;
         font-weight: 400;
@@ -178,6 +181,7 @@
 .tiki .html-select-time {
     padding: 0 15px;
     margin-bottom: 5px;
+
     .col {
         padding: 0 5px 0 0;
         flex-grow: 0;
@@ -190,8 +194,6 @@
 
 @media (max-width: breakpoint-max(sm)) {
     .tracker-item-files {
-        -webkit-column-count: 1;
-        -moz-column-count: 1;
         column-count: 1;
         li { padding-bottom: 5px; }
     }
@@ -260,7 +262,7 @@
     
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
     }
   }
 }
@@ -284,13 +286,13 @@
     
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
     }
   }
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .bbb-recordings-container {
     max-height: 300px;
   }

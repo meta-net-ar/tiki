@@ -6,6 +6,7 @@
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
+
 .text-dark {
     color: #6D5509 !important;
 }
@@ -29,7 +30,7 @@
     background-color: #D4452B !important;
 }
 
-//.badge.bg-primary,
+// .badge.bg-primary,
 .badge.bg-light,
 .badge.bg-warning,
 .badge.bg-success,
@@ -49,15 +50,17 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .blockquote-footer, .figure-caption { color: #808D93; }
     .valid-feedback { color: #329F4F !important; }
     .invalid-feedback { color: #F74B81 !important; }
 
     .btn.btn-outline-primary { color: #F740A2; border-color: #F740A2; }
     .btn.btn-outline-secondary { color: #E45E8D; border-color: #E45E8D; }
+
 //    .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
     .btn.btn-outline-danger { color: #EF5757; border-color: #EF5757; }
+
 //    .btn.btn-outline-warning { color: #C57A11; border-color: #C57A11; }
     .btn.btn-outline-info { color: #E35F91; border-color: #E35F91; }
     .btn.btn-outline-dark { color: #F641A2; border-color: #F641A2; }

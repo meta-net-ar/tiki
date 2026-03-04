@@ -17,9 +17,8 @@ $success: #218739; // #28a745; contrast increased
 $info: #17a2b8;
 $warning: #ffc107;
 $danger: #dc3545;
-$light: #ffffff;
+$light: #fff;
 $dark: #252729;
-
 $theme-colors: (
      "primary":           $primary, //#757575, // #ababab, -- Darkened to meet wcag guidelines
      "secondary":         $secondary, //
@@ -32,72 +31,72 @@ $theme-colors: (
 );
 
 // scss-docs-start theme-text-variables
-$primary-text-emphasis:   shade-color($primary, 60%);  // default
+$primary-text-emphasis: shade-color($primary, 60%);  // default
 $secondary-text-emphasis: shade-color($secondary, 60%);  // default
-$success-text-emphasis:   shade-color($success, 60%);  // default
-$info-text-emphasis:      shade-color($info, 60%);  // default
-$warning-text-emphasis:   shade-color($warning, 60%);  // default
-$danger-text-emphasis:    shade-color($danger, 60%);  // default
-$light-text-emphasis:     $gray-700;  // default
-$dark-text-emphasis:      $gray-700;  // default
+$success-text-emphasis: shade-color($success, 60%);  // default
+$info-text-emphasis: shade-color($info, 60%);  // default
+$warning-text-emphasis: shade-color($warning, 60%);  // default
+$danger-text-emphasis: shade-color($danger, 60%);  // default
+$light-text-emphasis: $gray-700;  // default
+$dark-text-emphasis: $gray-700;  // default
 // scss-docs-end theme-text-variables
 
 // scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:       tint-color($primary, 80%);  // default
-$secondary-bg-subtle:     tint-color($secondary, 80%);  // default
-$success-bg-subtle:       tint-color($success, 80%);  // default
-$info-bg-subtle:          tint-color($info, 80%);  // default
-$warning-bg-subtle:       tint-color($warning, 80%);  // default
-$danger-bg-subtle:        tint-color($danger, 80%);  // default
-$light-bg-subtle:         mix($gray-100, $white);  // default
-$dark-bg-subtle:          $gray-400;  // default
+$primary-bg-subtle: tint-color($primary, 80%);  // default
+$secondary-bg-subtle: tint-color($secondary, 80%);  // default
+$success-bg-subtle: tint-color($success, 80%);  // default
+$info-bg-subtle: tint-color($info, 80%);  // default
+$warning-bg-subtle: tint-color($warning, 80%);  // default
+$danger-bg-subtle: tint-color($danger, 80%);  // default
+$light-bg-subtle: mix($gray-100, $white);  // default
+$dark-bg-subtle: $gray-400;  // default
 // scss-docs-end theme-bg-subtle-variables
 
 // scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:   tint-color($primary, 60%);  // default
+$primary-border-subtle: tint-color($primary, 60%);  // default
 $secondary-border-subtle: tint-color($secondary, 60%);  // default
-$success-border-subtle:   tint-color($success, 60%);  // default
-$info-border-subtle:      tint-color($info, 60%);  // default
-$warning-border-subtle:   tint-color($warning, 60%);  // default
-$danger-border-subtle:    tint-color($danger, 60%);  // default
-$light-border-subtle:     $gray-200;  // default
-$dark-border-subtle:      $gray-500;  // default
+$success-border-subtle: tint-color($success, 60%);  // default
+$info-border-subtle: tint-color($info, 60%);  // default
+$warning-border-subtle: tint-color($warning, 60%);  // default
+$danger-border-subtle: tint-color($danger, 60%);  // default
+$light-border-subtle: $gray-200;  // default
+$dark-border-subtle: $gray-500;  // default
 // scss-docs-end theme-border-subtle-variable
 
-$body-secondary-color:      rgba($body-color, .75);  // default
-$body-secondary-bg:         $gray-200;  // default
+$body-secondary-color: rgba($body-color, .75);  // default
+$body-secondary-bg: $gray-200;  // default
 
-$body-tertiary-color:       rgba($body-color, .5);  // default
-$body-tertiary-bg:          $gray-100;  // default
+$body-tertiary-color: rgba($body-color, .5);  // default
+$body-tertiary-bg: $gray-100;  // default
 
-$body-emphasis-color:       $black;  // default
+$body-emphasis-color: $black;  // default
 
 // Options
-$enable-dark-mode:            true;  // default
-$color-mode-type:             data;  // default // `data` or `media-query`
-$enable-negative-margins:       true;
+$enable-dark-mode: true;  // default
+$color-mode-type: data;  // default // `data` or `media-query`
+$enable-negative-margins: true;
 
 // Gradient
 // Spacing
 // Body
 $body-bg: #eee;
 $body-color: $dark;
-$body-secondary-color:      rgba($body-color, .75);  // default
-$body-secondary-bg:         $gray-200;  // default
+$body-secondary-color: rgba($body-color, .75);  // default
+$body-secondary-bg: $gray-200;  // default
 
-$body-tertiary-color:       rgba($body-color, .5);  // default
-$body-tertiary-bg:          $gray-100;  // default
+$body-tertiary-color: rgba($body-color, .5);  // default
+$body-tertiary-bg: $gray-100;  // default
 
-$body-emphasis-color:       $black;  // default
+$body-emphasis-color: $black;  // default
 
 // Links
 $link-color: #696969; // $primary; Darkened for WAC2
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
 $link-hover-color: #999;
 
 // Components
-$component-active-color:       $white;  // default
-$component-active-bg:          $primary;  // default
+$component-active-color: $white;  // default
+$component-active-bg: $primary;  // default
 
 // Typography
 $font-family-sans-serif: system-ui, sans-serif;
@@ -105,74 +104,74 @@ $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.
 $blockquote-footer-color: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #6F7780;
 
 // Tables
-//$table-border-color: #dddddd;
+// $table-border-color: #dddddd;
 
 // Buttons
-$btn-primary-color: #555555;
-$btn-primary-bg: #eeeeee;
-$btn-primary-border: #cccccc;
-
-$btn-secondary-color: #ffffff;
+$btn-primary-color: #555;
+$btn-primary-bg: #eee;
+$btn-primary-border: #ccc;
+$btn-secondary-color: #fff;
 $btn-secondary-bg: $secondary;
 $btn-secondary-border: color.adjust($btn-secondary-bg, $lightness: -5%, $space: hsl);
 
 // Forms
-$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
-$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
-$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-color: $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color: $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg: $component-active-bg; // !default; NECESSARY
 
 // Form validation
-$form-feedback-valid-color:         #16794B; // $success !default;
-$form-feedback-invalid-color:       #CC2435; // $danger !default;
+$form-feedback-valid-color: #16794B; // $success !default;
+$form-feedback-invalid-color: #CC2435; // $danger !default;
 
-$form-valid-color:                  $form-feedback-valid-color; // !default;
-$form-valid-border-color:           $form-feedback-valid-color; // !default;
-$form-invalid-color:                $form-feedback-invalid-color; // !default;
-$form-invalid-border-color:         $form-feedback-invalid-color; // !default;
+$form-valid-color: $form-feedback-valid-color; // !default;
+$form-valid-border-color: $form-feedback-valid-color; // !default;
+$form-invalid-color: $form-feedback-invalid-color; // !default;
+$form-invalid-border-color: $form-feedback-invalid-color; // !default;
 
 // Navs (four below added for Bootstrap 53)
-$nav-link-color:                    var(--#{$prefix}link-color);  // default
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
-$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;  // default
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default
+$nav-link-color: var(--#{$prefix}link-color);  // default
+$nav-link-hover-color: var(--#{$prefix}link-hover-color);  // default
+$nav-link-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;  // default
+$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default
 
 // Navbar
-$navbar-light-color:                #595959; // rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8);  // default
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1);  // default
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3);  // default
-$navbar-light-brand-color:          $navbar-light-active-color; // default
-$navbar-light-brand-hover-color:    $navbar-light-active-color; // default
+$navbar-light-color: #595959; // rgba(var(--#{$prefix}emphasis-color-rgb), .65);  // default
+$navbar-light-hover-color: rgb(var(--#{$prefix}emphasis-color-rgb), .8);  // default
+$navbar-light-active-color: rgb(var(--#{$prefix}emphasis-color-rgb), 1);  // default
+$navbar-light-disabled-color: rgb(var(--#{$prefix}emphasis-color-rgb), .3);  // default
+$navbar-light-brand-color: $navbar-light-active-color; // default
+$navbar-light-brand-hover-color: $navbar-light-active-color; // default
 
-$navbar-dark-color:                 rgba($white, .55); // default
-$navbar-dark-hover-color:           rgba($white, .75); // default
-$navbar-dark-active-color:          $white; // default
-$navbar-dark-disabled-color:        rgba($white, .25); // default
-$navbar-dark-brand-color:           $navbar-dark-active-color; // default
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
+$navbar-dark-color: rgba($white, .55); // default
+$navbar-dark-hover-color: rgba($white, .75); // default
+$navbar-dark-active-color: $white; // default
+$navbar-dark-disabled-color: rgba($white, .25); // default
+$navbar-dark-brand-color: $navbar-dark-active-color; // default
+$navbar-dark-brand-hover-color: $navbar-dark-active-color; // default
 
 
 // Dropdowns
-$dropdown-dark-color:               $gray-300;  // default
-$dropdown-dark-bg:                  $gray-800;  // default
-$dropdown-link-active-bg:           $component-active-bg; //  !default;
+$dropdown-dark-color: $gray-300;  // default
+$dropdown-dark-bg: $gray-800;  // default
+$dropdown-link-active-bg: $component-active-bg; //  !default;
 
 // Pagination
 $pagination-color: var(--#{$prefix}link-color); // !default;
 
 // Jumbotron
 // Cards
-$card-bg:                           var(--tiki-utopias-container-bg);
-//$card-title-color: $body-secondary-color;
-//$card-border-radius: $border-radius-lg;
-//$card-text: #fff;//@gray-lighter;
-//$card-header-bg: #386dbb;
+$card-bg: var(--tiki-utopias-container-bg);
+
+// $card-title-color: $body-secondary-color;
+// $card-border-radius: $border-radius-lg;
+// $card-text: #fff;//@gray-lighter;
+// $card-header-bg: #386dbb;
 
 // Tooltips
 // Popovers
 // Badges
 // Modals
-//$modal-header-border-color: #386dbb;
+// $modal-header-border-color: #386dbb;
 // Alerts
 // Progress bars
 // List group
@@ -184,7 +183,7 @@ $figure-caption-color: #666C75;
 // Carousel
 // Close
 // Code
-$code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //   $pink;  // default // Bootstrap 5.3
 
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
@@ -193,16 +192,19 @@ $tiki-top-bg-light: #fff;
 $tiki-top-light-color: $navbar-light-color;
 $tiki-top-light-link-color: #000;
 $tiki-top-light-link-hover-color: #000;
+
 //
 $tiki-topbar-light-bg: #fff;
-$tiki-topbar-light-color: #888888;
+$tiki-topbar-light-color: #888;
 $tiki-topbar-light-link-color: #595959;
-$tiki-topbar-light-link-hover-color: #888888;
+$tiki-topbar-light-link-hover-color: #888;
+
 //
 $tiki-top-bg-dark: #fafafa;
 $tiki-top-dark-color: #333;
 $tiki-top-dark-link-color: #333;
 $tiki-top-dark-link-hover-color: #333;
+
 //
 $tiki-topbar-bg-dark: #fafafa;
 $tiki-topbar-dark-color: #333;

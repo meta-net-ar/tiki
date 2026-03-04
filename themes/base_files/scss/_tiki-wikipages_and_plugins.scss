@@ -7,13 +7,10 @@ $imagePathToIcons: "../../../img/icons/";
 .trackerfilter_loader{
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    background:rgba(158, 158, 158, 0.2) url('#{$imagePath}trackerfilter_plugin.svg') no-repeat center center;
+    background:rgb(158 158 158 / 20%) url('#{$imagePath}trackerfilter_plugin.svg') no-repeat center center;
     background-size: 100px;
     z-index: 10000;
 }
@@ -76,18 +73,22 @@ $imagePathToIcons: "../../../img/icons/";
 .footlink::before{
     content: "["
 }
+
 .footlink::after{
     content: "]"
 }
+
 .footlink{
     vertical-align: super;
     font-size: smaller
 }
+
 // /* wikiplugin_footnotearea */
 .footnotearea {
     margin-top: 2em;
     font-size: 0.9em
 }
+
 .footnotearea .sameas {
     vertical-align: super;
     font-size: smaller
@@ -143,6 +144,7 @@ table.wikiplugin_trackerlist {
     z-index: 500;
     display: none;
     padding: .4em;
+
     //    background: @popover-bg;
     //    border: 1px solid @popover-border-color;
 }
@@ -200,6 +202,7 @@ table.wikiplugin_trackerlist {
 // /* wikiplugin_tracker */
 .mandatory_note {
     font-style: italic;
+
     //    color: @state-danger-text;
     margin-top: 10px;
 }
@@ -222,6 +225,7 @@ ol.bbb-recordings {
 
 .structuremenu .menuSection {
     margin-left: 6px;
+
     //    border-left: 1px dotted @gray;
 }
 
@@ -243,6 +247,7 @@ ol.bbb-recordings {
 
 .tiki_plugin {
     display: inline-block;
+
     //    background-color: transparent; // /* was #f8f8f8; */
     //    border: 1px solid @gray-light;
 }
@@ -305,7 +310,7 @@ div.tiki_plugin {
 }
 
 .autotoc .nav .nav {
-    //display: none; TODO
+    // display: none; TODO
     padding-bottom: 0;
     list-style: none;
 }
@@ -359,6 +364,7 @@ div.tiki_plugin {
 .autotoc > ul > li.active > a:focus {
     color: inherit;
     background-color: inherit;
+
 //    border: inherit;
     border-bottom-color: transparent;
     cursor: default;
@@ -367,10 +373,12 @@ div.tiki_plugin {
 
 .autotoc .nav {
     margin: 0; padding: 0; overflow: hidden; flex-direction: row;
+
     > li {
         width: 100%;
         > a { white-space: initial; }
         > a.active + ul, &.open > ul { display: block !important; }
+
         .active, &.open > a {
             padding-left: 19px;
             background-color: $gray-100;
@@ -378,12 +386,15 @@ div.tiki_plugin {
             border-left: 1px solid $btn-primary-border;
         }
     }
+
     .nav > li {
         &.open > a, .active, a:hover { padding-left: 29px; }
     }
+
     .nav .nav > li {
         &.open > a, .active, a:hover { padding-left: 39px; }
     }
+
     .nav .nav .nav > li {
         &.open > a, .active, a:hover { padding-left: 49px; }
     }
@@ -406,6 +417,7 @@ div.tiki_plugin {
 
 @media (max-width: breakpoint-max(sm)) {
     #autotoc, #page-data.page-data-autotoc { max-width: 100%; }
+
     .autotoc > .nav {
         position: static;
         max-width: calc(100vw - 30px);
@@ -422,9 +434,11 @@ div.tiki_plugin {
     max-height: 90%;
     overflow: auto;
     z-index: 1000;
+
     //    background: $body-bg;
     //    color: @text-color;
     padding: 10px;
+
     //    border: solid 2px @text-color;
 }
 
@@ -446,10 +460,10 @@ div.tiki_plugin {
     width: 18px;
 }
 
-//.structure_select .cssmenu_horiz ul li {
+// .structure_select .cssmenu_horiz ul li {
 //    //    border: 1px solid @gray;
 //    border-radius: 3px;
-//}
+// }
 
 .structure_select li.tabmark {
     background: none;
@@ -458,7 +472,7 @@ div.tiki_plugin {
     padding: 0;
 }
 
-.structure_select .clearfix:after {
+.structure_select .clearfix::after {
     display: inline-block;
 }
 
@@ -506,8 +520,7 @@ div.tiki_plugin {
 #page_list_container {
     list-style: none;
     max-height: 20em;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
     padding: 0;
 }
 
@@ -519,6 +532,7 @@ div.tiki_plugin {
 .dragging-options li {
     list-style: none;
 }
+
 .options-container #options {
     min-height: 10em;
     border: 4px $gray-200 dashed;
@@ -570,9 +584,11 @@ li .url-group {
     li .url-group {
         max-width: 100%;
     }
+
     .options-container #options {
         padding-left: 0;
     }
+
     .child-options {
         padding-left: 7px;
     }
@@ -593,6 +609,7 @@ li .url-group {
     top: 0 !important;
     left: 0 !important;
     position: fixed !important;
+
     //    background-color: @gray;
     z-index: 100 !important;
 }
@@ -602,9 +619,9 @@ li .url-group {
     height: 100% !important;
 }
 
-//.TextArea-fullscreen textarea {
+// .TextArea-fullscreen textarea {
 //     width: inherit ! important;
-//}
+// }
 
 .TextArea-fullscreen .ui-wrapper #editwiki {
     position: absolute !important;
@@ -637,14 +654,16 @@ li .url-group {
     text-align: center;
     width: 100%;
     z-index: 101 !important;
+
     //    background-color: $body-bg;
     padding: .4em 0 .2em;
+
     //    border-top: @gray-lighter 1px solid;
 }
 
 .TextArea-fullscreen .actions input,
 .CodeMirror-fullscreen .actions input {
-    /*margin: 1px !important;*/
+    /* margin: 1px !important; */
 }
 
 .TextArea-fullscreen .cm-remove, .CodeMirror-fullscreen .cm-remove {
@@ -676,8 +695,7 @@ li .url-group {
 }
 
 #diff_history {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden auto;
     padding: 0 .1em;
 }
 
@@ -701,6 +719,7 @@ li .url-group {
     margin: 1px;
     padding: 1px;
     border-radius: 5px;
+
     //    background: @gray-lighter;
     max-width: 30px;
     white-space: nowrap;
@@ -785,6 +804,7 @@ body.tiki_wiki #comments {
 // See tiki-selectors for commented-out properties
 .codecaption {
     display: inline-block;
+
 //    color: $code-color;
 //    background: $code-bg;
 //    border: 1px solid $code-color;
@@ -794,17 +814,17 @@ body.tiki_wiki #comments {
     font-weight: bold;
 }
 
-//code,
-//pre.codelisting, .CodeMirror.codelisting {
+// code,
+// pre.codelisting, .CodeMirror.codelisting {
 //    color: var(--tiki-code-color); //$code-color;
 //    background: var(--tiki-code-bg); // $code-bg;
 //    border: $border-width solid $border-color;
 //    padding: $kbd-padding-y $kbd-padding-x;
 //    border-radius: $border-radius;
-//}
-//code {
+// }
+// code {
 //    border-radius: $border-radius-sm;
-//}
+// }
 
 pre.codelisting code {
     color: inherit;
@@ -867,9 +887,10 @@ pre.codelisting code {
 // /* wikiplugin quote */
 .quoteheader {
     height: 35px;
+
     .fa {
         font-size: 34px;
-        color: #aaaaaa;
+        color: #aaa;
     }
 }
 
@@ -877,6 +898,7 @@ pre.codelisting code {
     margin-left: 35px;
     padding-left: 10px;
     font-style: italic;
+
     //    border-left: 2px solid @gray-light;
 }
 
@@ -890,6 +912,7 @@ pre.codelisting code {
 // /* wikiplugin tracker */
 .mandatory_star {
     font-weight: bold;
+
     //    color: @alert-danger-border;
 }
 
@@ -918,6 +941,7 @@ pre.codelisting code {
     //    background: @navbar-inverse-bg;
     opacity: 0.75;
     width: 100%;
+
     //    color: @navbar-inverse-color;
     padding: 5px 10px;
 }
@@ -931,18 +955,18 @@ pre.codelisting code {
     background-repeat: no-repeat;
     padding: 0.3em;
     vertical-align: bottom;
-    -webkit-box-shadow: 1px 1px 2px 2px rgba(200, 200, 200, .5);
-    box-shadow: 1px 1px 2px 2px rgba(200, 200, 200, .5);
+    box-shadow: 1px 1px 2px 2px rgb(200 200 200 / 50%);
     border-radius: 2px;
 }
 
-//.wp-cookie-consent-required {
+// .wp-cookie-consent-required {
 //    color: @alert-danger-text;
-//}
+// }
 
 // /* TOC */
 .toc {
     padding-left: 2em;
+
     //    border-top: 1px dotted @gray-light;
     //    border-bottom: 1px dotted @gray-light;
     margin-bottom: 4px;
@@ -976,6 +1000,7 @@ pre.codelisting code {
 /* Structures drill-down menu */
 div.drillshow {
     padding: 3px;
+
     //    border: 1px solid @gray-light;
 }
 
@@ -994,15 +1019,15 @@ div.drillshow {
 }
 
 .wp-annotation .annotation {
-    border: dashed 1px rgba(255, 255, 255, 0.5);
-    background: rgba(255, 200, 40, 0.1);
+    border: dashed 1px rgb(255 255 255 / 50%);
+    background: rgb(255 200 40 / 10%);
     position: absolute;
     cursor: pointer;
 }
 
 .wp-annotation .annotation.selected {
-    border: dashed 1px rgba(69, 255, 97, 0.68);
-    background: rgba(85, 255, 68, 0.25);
+    border: dashed 1px rgb(69 255 97 / 68%);
+    background: rgb(85 255 68 / 25%);
 }
 
 .table-responsive.enlarge {
@@ -1059,10 +1084,7 @@ div.drillshow {
 .heading-link {
     padding-left: .25em;
     opacity: 0;
-
     transition: opacity 0.2s ease-in-out 0.1s;
-    -webkit-transition: opacity 0.2s ease-in-out 0.1s;
-    -moz-transition: opacity 0.2s ease-in-out 0.1s;
 }
 
 .heading-link .icon {
@@ -1083,14 +1105,15 @@ h6:hover .heading-link {
     opacity: 1;
 }
 
-//Gantt Chart
+// Gantt Chart
 .vSplitBar {
-    background: rgba(170, 170, 170, .2) url("../../../vendor_bundled/vendor/robicch/jquery-gantt/res/ganttSplitterGrip.png") no-repeat center center !important;
+    background: rgb(170 170 170 / 20%) url("../../../vendor_bundled/vendor/robicch/jquery-gantt/res/ganttSplitterGrip.png") no-repeat center center !important;
 }
-.milestone{
 
+.milestone{
     background: url("../../../vendor_bundled/vendor/robicch/jquery-gantt/res/milestone.png") no-repeat !important;
 }
+
 .layout.extDep{
     background-image:url("../../../vendor_bundled/vendor/robicch/jquery-gantt/res/hasExternalDeps.png") !important;
 }
@@ -1152,9 +1175,9 @@ h6:hover .heading-link {
     margin-top: auto;
     border: 1px solid #ccc;
     background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgb(0 0 0 / 10%);
     overflow: auto;
-    font-family: "Calibri", sans-serif;
+    font-family: Calibri, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
     padding: 40px;
@@ -1170,6 +1193,7 @@ h6:hover .heading-link {
         display: none;
         z-index: 9;
     }
+
     .wp_wysiwyg:hover ~ .edit_button, .wp_wysiwyg ~ .edit_button:hover {
         display: block;
     }
@@ -1178,20 +1202,23 @@ h6:hover .heading-link {
 .inline-editor + .note-editor .note-statusbar {
     display: none;
 }
+
 .inline-editor + .note-editor.highlight {
     border-color: var(--bs-primary);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .viewtextfile-viewer-container {
         width: 100% !important;
         height: auto;
         min-width: unset;
         padding: 10px;
     }
+
     .viewtextfile-content-wrapper {
         padding: 0;
     }
+
     .viewtextfile-content-wrapper > .viewtextfile-content {
         padding: 20px;
     }

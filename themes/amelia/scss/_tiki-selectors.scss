@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -29,13 +29,14 @@ body.fullscreen { background: $body-bg; }
 .text-success, .valid-feedback { color: #AEE6A7  !important; }
 .text-warning { color: #EDDFA6  !important; }
 .text-danger, .invalid-feedback, .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label { color: #F3D7C4  !important; }
-.text-muted { color: #FFFFFFCC; }
+.text-muted { color: #FFFC; }
 
 // Tables
 // Buttons
 .btn.btn-outline-dark {
     color: #de3b48;
     background: #000;
+
     &:hover {
         background: $gray-800;
     }
@@ -47,8 +48,8 @@ body.fullscreen { background: $body-bg; }
 
 // Forms
 legend {
-    font-family: 'Lobster', cursive;
-    color: #ffffff;
+    font-family: Lobster, cursive;
+    color: #fff;
 }
 
 // Navs
@@ -73,7 +74,7 @@ legend {
 
 .card-header,
 .modal-header{
-  color: #ffffff;
+  color: #fff;
   background-color: $accordion-button-bg !important;
   border-color: #0d747c !important;
 }
@@ -110,6 +111,7 @@ legend {
 .list-group-item-action.list-group-item-light {
     color: #111212BF;
 }
+
 // Figures
 // Breadcrumbs
 // Code

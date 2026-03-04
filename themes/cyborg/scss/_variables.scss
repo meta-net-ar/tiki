@@ -8,108 +8,109 @@
 //
 // Color system
 
-$red:     #EB0000; // #F00000; //#c00;  default
+$red: #EB0000; // #F00000; //#c00;  default
 
-$primary:       #207CA7; // $blue;  // default
-$secondary:     $gray-600;  // default
-$success:       #558000; //#639400; // #558000; // $green !default;
-$info:          $cyan;  // default
-$warning:       #B35F00; // $yellow !default;
-$danger:        $red;  // default
+$primary: #207CA7; // $blue;  // default
+$secondary: $gray-600;  // default
+$success: #558000; // #639400; // #558000; // $green !default;
+$info: $cyan;  // default
+$warning: #B35F00; // $yellow !default;
+$danger: $red;  // default
 $light: #737373; //  $gray-800 !default; Darkened for increased contrast with link color
-$dark: #000000;  // default
+$dark: #000;  // default
 
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-//$min-contrast-ratio:   2.25;  // default
+// $min-contrast-ratio:   2.25;  // default
 
 // Options
-$enable-dark-mode:            false;
+$enable-dark-mode: false;
+
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
-$body-bg:       #060606;  // default
-$body-color:    #999999; // $gray-400 !default; Lightened to meet WCAG minimum
+$body-bg: #060606;  // default
+$body-color: #999; // $gray-400 !default; Lightened to meet WCAG minimum
 
 // Copied from variables-dark and renamed
-$body-secondary-color:         #B0B0B0BF; // rgba($body-color, .75);  // default
-$body-secondary-bg:            $gray-800;  // default
-$body-tertiary-color:          rgba($body-color, .5);  // default
-$body-tertiary-bg:             mix($gray-800, $gray-900, 50%);  // default
-$body-emphasis-color:          $white;  // default
-$border-color:                 $gray-700;  // default
+$body-secondary-color: #B0B0B0BF; // rgba($body-color, .75);  // default
+$body-secondary-bg: $gray-800;  // default
+$body-tertiary-color: rgba($body-color, .5);  // default
+$body-tertiary-bg: mix($gray-800, $gray-900, 50%);  // default
+$body-emphasis-color: $white;  // default
+$border-color: $gray-700;  // default
 
 // Links
-$link-color:                              #56B5E1; // #2799CE; //#2389B8; // $primary !default;
+$link-color: #56B5E1; // #2799CE; //#2389B8; // $primary !default;
 
 // Typography
-$font-family-sans-serif:        Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-$font-size-base:                1.1rem;
-$mark-bg:                     #4D2900;
-$blockquote-footer-color:     #A3A3A3; // $gray-600 !default;
+$font-family-sans-serif: seravek, 'Gill Sans Nova', ubuntu, calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+$font-size-base: 1.1rem;
+$mark-bg: #4D2900;
+$blockquote-footer-color: #A3A3A3; // $gray-600 !default;
 
 // Tables
-$table-color:                   var(--#{$prefix}body-color);  // default // $white !default;
+$table-color: var(--#{$prefix}body-color);  // default // $white !default;
 
 // Buttons
 // Forms
-$input-bg:                          var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
-$input-disabled-bg:                 var(--#{$prefix}secondary-bg);  // default // $gray-400 !default;
-$input-color:                       var(--#{$prefix}body-color); // Changed from $gray-900 !default
-$input-border-color:                var(--#{$prefix}body-color); // Changed from $white !default
-$form-file-button-color:          $white;  // default
+$input-bg: var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
+$input-disabled-bg: var(--#{$prefix}secondary-bg);  // default // $gray-400 !default;
+$input-color: var(--#{$prefix}body-color); // Changed from $gray-900 !default
+$input-border-color: var(--#{$prefix}body-color); // Changed from $white !default
+$form-file-button-color: $white;  // default
 
 $form-text-color: var(--#{$prefix}body-color); // Changed from Bootstrap default - var(--#{$prefix}secondary-color) !default;
-$form-feedback-valid-color:         $success; // !default;
-$form-feedback-invalid-color:       $danger; // !default;
+$form-feedback-valid-color: $success; // !default;
+$form-feedback-invalid-color: $danger; // !default;
 
 // scss-docs-start form-validation-colors
-$form-valid-color:                  $form-feedback-valid-color; // !default;
-$form-valid-border-color:           $form-feedback-valid-color; // !default;
-$form-invalid-color:                $form-feedback-invalid-color; // !default;
-$form-invalid-border-color:         $form-feedback-invalid-color; // !default;
+$form-valid-color: $form-feedback-valid-color; // !default;
+$form-valid-border-color: $form-feedback-valid-color; // !default;
+$form-invalid-color: $form-feedback-invalid-color; // !default;
+$form-invalid-border-color: $form-feedback-invalid-color; // !default;
 
 // Dropdowns
 // Navs
 // Navbar
-$navbar-dark-hover-color:           $white;  // default
+$navbar-dark-hover-color: $white;  // default
 
-$navbar-light-color:                #81ADC5;
-$navbar-light-hover-color:          rgba($black, .7);  // default
-$navbar-light-active-color:         #72BADCFF; // rgba($black, .9);  // default
+$navbar-light-color: #81ADC5;
+$navbar-light-hover-color: rgba($black, .7);  // default
+$navbar-light-active-color: #72BADCFF; // rgba($black, .9);  // default
 $navbar-light-disabled-color: #3C6980FF; // rgba($black, .3);  // default
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
+$navbar-light-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-light-toggler-border-color: rgba($black, .1);  // default
-$navbar-light-brand-color:          $navbar-light-active-color;  // default
-$navbar-light-brand-hover-color:    $navbar-light-active-color;  // default
+$navbar-light-brand-color: $navbar-light-active-color;  // default
+$navbar-light-brand-hover-color: $navbar-light-active-color;  // default
 
 // Pagination
 // Cards
 // Accordion (added for Tiki)
 $accordion-button-active-bg: #222 !important;
-$accordion-button-active-color:           #fff; // var(--#{$prefix}primary-text-emphasis) !default;
+$accordion-button-active-color: #fff; // var(--#{$prefix}primary-text-emphasis) !default;
 
 // Tooltips
-$tooltip-bg:                        $gray-700;  // default
+$tooltip-bg: $gray-700;  // default
 
 // Popovers
 // Toasts
-$toast-header-color:                var(--#{$prefix}body-color);
+$toast-header-color: var(--#{$prefix}body-color);
 
 // Modals
 // Progress bars
-$progress-bg:                       var(--#{$prefix}secondary-bg);  // default;
+$progress-bg: var(--#{$prefix}secondary-bg);  // default;
 
 // List group
 // Breadcrumbs
 // Figures
-$figure-caption-color:  #919191;
+$figure-caption-color: #919191;
 
 // Close
 // Code
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 $web-font-path: none; // Override value in vendor file

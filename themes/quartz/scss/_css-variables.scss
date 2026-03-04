@@ -17,19 +17,19 @@
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
-    --tiki-top-bg: rgba(202, 22, 103, 0.9);
+    --tiki-top-bg: rgb(202 22 103 / 90%);
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
     --tiki-top-text-color: #{$navbar-dark-hover-color};
     --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
-    --tiki-top-border-width: 0x;
+    --tiki-top-border-width: 0px;
     --tiki-top-box-shadow: 0px 1px 10px #a91a5e;
 }
 
 @mixin topbar-nav-dark {
-    --tiki-topbar-bg: rgba(202, 22, 103, 0.85);
+    --tiki-topbar-bg: rgb(202 22 103 / 85%);
     --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
@@ -43,15 +43,16 @@
     --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
-    --tiki-top-border-width: 0x;
+    --tiki-top-border-width: 0px;
     --tiki-top-box-shadow: 0px 1px 10px #c0b5e5;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: rgba(233, 233, 232, 0.85);
+    --tiki-topbar-bg: rgb(233 233 232 / 85%);
     --tiki-topbar-color:  #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-hover-color};
     --tiki-topbar-text-color: #{$navbar-light-hover-color};
+    --tiki-top-border-width: 0px;
 }
 
 .tiki-top-nav-light {
@@ -71,26 +72,28 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // color mode
+[data-bs-theme="dark"] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
+
         --tiki-site-title-color: #{$navbar-dark-color};
         --tiki-site-subtitle-color: #{$navbar-dark-color};
     }
+
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
     }
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-//[data-bs-theme=light] {                              // color mode
+// [data-bs-theme=light] {                              // color mode
 //    .tiki-top-nav-dark {                           // dark top selector
 //        @include top-nav-light;                      // light values
 //    }
 //    .tiki-topbar-nav-dark {
 //        @include topbar-nav-light;
 //    }
-//}
+// }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -107,10 +110,12 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
+
     .accordion-button::after {
         background-image:  url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2366bad6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
@@ -129,6 +134,7 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -151,15 +157,16 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
@@ -171,18 +178,21 @@
 
 [data-bs-theme="light"] {
     --tiki-quartz-body-bg-image: #{$body-bg-image};
-    --bs-secondary-bg: linear-gradient(125deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2) 70%);
+    --bs-secondary-bg: linear-gradient(125deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 20%) 70%);
 }
 
 [data-bs-theme="dark"] {
     --tiki-quartz-body-bg-image: linear-gradient(90deg, #293538, #171825, #34061a);
+
     .bg-light,
     .navbar.bg-light {
         background: var(--bs-tertiary-bg) !important;
+
          .nav-link {
              color: $link-color-dark;
         }
     }
+
     ul.navbar-nav.sm-nav > .sm-nav-item > .sm-nav-link {
         color: $link-color-dark;
     }

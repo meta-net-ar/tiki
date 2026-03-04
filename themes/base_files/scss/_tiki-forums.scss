@@ -1,9 +1,10 @@
 $imagePath: "../../../img/";
 
-////***** Forums *****/
-/*body.tiki_forums .normal {
+//// ***** Forums *****/
+
+/* body.tiki_forums .normal {
     margin: auto;
-}*/
+} */
 
 #forumpostopen {
     display: block;
@@ -16,7 +17,7 @@ $imagePath: "../../../img/";
 }
 
 .post .postbody .content {
-    padding: 0 3px 3px 3px;
+    padding: 0 3px 3px;
     margin: 0;
     text-align: left;
 }
@@ -138,15 +139,16 @@ $imagePath: "../../../img/";
     margin-bottom: 15px;
 }
 
-//* Forum filter collapsible panel. Adds +/-*/
-.filter-panel-heading a:after {
+// * Forum filter collapsible panel. Adds +/-*/
+.filter-panel-heading a::after {
 //    font-family: 'Font-Awesome'; // Is this change ok? Todo
     content: "\2212";
     float: left;
     margin-right: 15px;
+
     //    color: $gray; (moved to _tiki-selectors.scss)
 }
 
-.filter-panel-heading a.collapsed:after {
+.filter-panel-heading a.collapsed::after {
     content: "\2b";
 }

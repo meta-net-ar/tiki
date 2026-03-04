@@ -1,4 +1,5 @@
 /* Enhanced Status Indicators for Tiki Check */
+
 /* Dashboard Container */
 .dashboard-summary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -6,7 +7,7 @@
     padding: 2rem;
     border-radius: 15px;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
     position: relative;
     overflow: hidden;
 }
@@ -14,22 +15,19 @@
 .dashboard-summary::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     opacity: 0.3;
 }
 
 /* Enhanced Status Cards */
 .status-card {
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
     padding: 1.5rem;
     text-align: center;
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgb(255 255 255 / 25%);
     transition: transform 0.2s ease;
     position: relative;
     overflow: hidden;
@@ -51,7 +49,7 @@
 
 .status-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 /* Status Card Variants */
@@ -82,7 +80,7 @@
 .status-card .card-header i {
     font-size: 2.5rem;
     margin-right: 0.75rem;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 4px rgb(0 0 0 / 30%));
     transition: transform 0.3s ease;
 }
 
@@ -94,7 +92,7 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: 700;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 30%);
 }
 
 .status-card .count {
@@ -102,7 +100,7 @@
     font-weight: 900;
     display: block;
     margin-bottom: 0.5rem;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 8px rgb(0 0 0 / 30%);
     line-height: 1;
 }
 
@@ -115,11 +113,11 @@
 
 /* Enhanced Health Bar */
 .system-health-indicator {
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     border-radius: 15px;
     padding: 2rem;
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgb(255 255 255 / 25%);
     position: relative;
 }
 
@@ -134,25 +132,22 @@
     font-weight: 700;
     margin-bottom: 1rem;
     font-size: 1.1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 30%);
 }
 
 .progress {
     height: 25px;
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(255,255,255,0.2);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    background: rgb(255 255 255 / 20%);
+    box-shadow: inset 0 2px 4px rgb(0 0 0 / 20%);
     position: relative;
 }
 
 .progress::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
 }
 
 @keyframes shimmer {
@@ -169,10 +164,7 @@
 .progress-bar::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
 }
 
 @keyframes progressShine {
@@ -185,7 +177,7 @@
     font-size: 1.2em;
     text-align: center;
     margin-top: 10px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 30%);
 }
 
 /* Enhanced Quick Actions */
@@ -194,7 +186,7 @@
     margin-bottom: 1.5rem;
     font-weight: 700;
     font-size: 1.1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 30%);
 }
 
 .btn-group-vertical .btn {
@@ -214,7 +206,7 @@
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255,255,255,0.2);
+    background: rgb(255 255 255 / 20%);
     border-radius: 50%;
     transition: all 0.3s ease;
     transform: translate(-50%, -50%);
@@ -227,8 +219,8 @@
 
 .btn-group-vertical .btn:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
+    border-color: rgb(255 255 255 / 30%);
 }
 
 .btn-group-vertical .btn i {
@@ -242,8 +234,8 @@
 
 /* Enhanced Critical Issues */
 .critical-issues-summary {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.05) 100%);
-    border: 2px solid rgba(220, 53, 69, 0.4);
+    background: linear-gradient(135deg, rgb(220 53 69 / 15%) 0%, rgb(220 53 69 / 5%) 100%);
+    border: 2px solid rgb(220 53 69 / 40%);
     border-radius: 15px;
     padding: 2rem;
     margin-top: 1.5rem;
@@ -272,7 +264,7 @@
     margin-bottom: 1.5rem;
     font-weight: 700;
     font-size: 1.3rem;
-    text-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    text-shadow: 0 2px 4px rgb(220 53 69 / 30%);
 }
 
 .critical-issues-summary ul {
@@ -309,10 +301,12 @@
     background-color: #fff3cd;
     border-left-color: #ffc107;
   }
+
   50% { 
     background-color: #ffeaa7;
     border-left-color: #fdcb6e;
   }
+
   100% { 
     background-color: #fff3cd;
     border-left-color: #ffc107;
@@ -320,7 +314,7 @@
 }
 
 /* Responsive Enhancements */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .dashboard-summary {
         padding: 1.5rem;
     }
@@ -370,21 +364,21 @@
 }
 
 .tooltip-inner {
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: rgb(0 0 0 / 90%) !important;
   color: white !important;
   padding: 8px 12px !important;
   border-radius: 4px !important;
   font-size: 12px !important;
   max-width: 300px !important;
   word-wrap: break-word !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 30%) !important;
   border: none !important;
   text-align: left !important;
   line-height: 1.4 !important;
 }
 
 .tooltip-arrow::before {
-  border-top-color: rgba(0, 0, 0, 0.9) !important;
+  border-top-color: rgb(0 0 0 / 90%) !important;
 }
 
 .tooltip.show {
@@ -398,17 +392,17 @@
 
 /* Custom tooltip positioning for better UX */
 .tooltip.bs-tooltip-top .tooltip-arrow::before {
-  border-top-color: rgba(0, 0, 0, 0.9) !important;
+  border-top-color: rgb(0 0 0 / 90%) !important;
 }
 
 .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
-  border-bottom-color: rgba(0, 0, 0, 0.9) !important;
+  border-bottom-color: rgb(0 0 0 / 90%) !important;
 }
 
 .tooltip.bs-tooltip-start .tooltip-arrow::before {
-  border-left-color: rgba(0, 0, 0, 0.9) !important;
+  border-left-color: rgb(0 0 0 / 90%) !important;
 }
 
 .tooltip.bs-tooltip-end .tooltip-arrow::before {
-  border-right-color: rgba(0, 0, 0, 0.9) !important;
+  border-right-color: rgb(0 0 0 / 90%) !important;
 }

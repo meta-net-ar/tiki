@@ -6,7 +6,7 @@
         border: none;
         display: inline;
         text-align: left;
-        -webkit-appearance: none;
+        appearance: none;
 
         &:not([disable]):hover {
             cursor: pointer;
@@ -54,6 +54,7 @@
 
     .nav {
         margin-left: 1em;
+
         .nav-item {
             color: white;
             line-height: 2em;
@@ -66,6 +67,7 @@
 
             &.active {
                 color: white;
+
                 .nav-link {
                     color: white;
                     font-weight: bold;

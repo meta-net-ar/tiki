@@ -16,6 +16,7 @@ $frosted-opacity: .3 !default;
 @mixin glass($opacity: $frosted-opacity, $bg: $white) {
   border: none;
   box-shadow: inset 1px 1px $border-color, inset -1px -1px rgba($white, .1), $box-shadow;
+
   @include frost($opacity, $bg);
 
   a {
@@ -30,6 +31,7 @@ $frosted-opacity: .3 !default;
 @mixin frost($opacity: $frosted-opacity, $bg: $white) {
   background-color: transparent;
   background-image: linear-gradient(125deg, rgba($bg, ($opacity)), rgba($bg, ($opacity - .1)) 70%);
+
 //  backdrop-filter: blur(5px); Modified for Tiki - was causing loss of focus in Smartmenus dropdowns; backdrop-filter is applied to the dropdowns instead
 }
 
@@ -42,7 +44,7 @@ body {
 // Tables
 
 .table-secondary {
-  --bs-table-hover-color: $white;
+  --bs-table-hover-color: #{$white};
 }
 
 // Buttons
@@ -91,15 +93,16 @@ body {
   box-shadow: inset 1px 1px $border-color, inset -1px -1px rgba($white, .1);
 }
 
-.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+.input-group > :not(:first-child, .dropdown-menu, .valid-tooltip, .valid-feedback, .invalid-tooltip, .invalid-feedback) {
   margin-left: 0;
   border-left: none;
 }
 
-.input-group:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu),
+.input-group:not(.has-validation) > :not(:last-child, .dropdown-toggle, .dropdown-menu),
 .input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n + 3) {
   border-right: none;
 }
+
 .form-select:not([multiple]) {
   transition: border-color .15s ease-in-out;
 
@@ -150,6 +153,7 @@ body {
   .nav-item .nav-link.active,
   .nav-item.show .nav-link {
     @include glass(1, $white);
+
     border-radius: $border-radius;
     transform: scale(1.1);
 
@@ -179,7 +183,8 @@ body {
 // Indicators
 
 .alert {
-  @include glass();
+  @include glass;
+
   position: relative;
   overflow: hidden;
   color: $white;
@@ -215,14 +220,14 @@ body {
 // Containers
 
 .list-group {
-  @include glass();
+  @include glass;
 }
 
 .card {
-  @include glass();
+  @include glass;
 
   @each $color, $value in $theme-colors {
-    @if ($color == secondary) {
+    @if $color == secondary {
       --bs-secondary-rgb: transparent;
     } @else {
       &.bg-#{$color} {
@@ -241,13 +246,13 @@ body {
   &.border {
     @each $color, $value in $theme-colors {
       &-#{$color} {
-        @include glass();
+        @include glass;
 
         .card-header {
           background-color: $value !important;
           border-bottom: none;
 
-          @if ($color == light) {
+          @if $color == light {
             color: $gray-800;
           }
         }
@@ -261,16 +266,17 @@ body {
 }
 
 .accordion-item {
-  @include glass();
+  @include glass;
+
   box-shadow: none;
 }
 
 .toast {
-  @include glass();
+  @include glass;
 }
 
 .popover {
-  @include glass();
+  @include glass;
 
   &-header {
     border-bottom-color: $border-color;
@@ -282,9 +288,9 @@ body {
 }
 
 .modal-content {
-  @include glass();
+  @include glass;
 }
 
 .offcanvas {
-  @include glass();
+  @include glass;
 }

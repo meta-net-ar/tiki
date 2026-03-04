@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -19,7 +19,7 @@
 // Color system
 // Body
 .container {
-  background-color: var(--tiki-utopias-container-bg-color); //#ffffff;
+  background-color: var(--tiki-utopias-container-bg-color); // #ffffff;
 }
 
 .topbar .navbar-collapse {
@@ -59,8 +59,9 @@ a:visited,
 // Components
 // Typography
 h1 {
-  color: $primary; //$body-color; // #000000;
+  color: $primary; // $body-color; // #000000;
 }
+
 h1.pagetitle > a {
     color: $primary; // $body-color;
 }
@@ -71,18 +72,22 @@ h1.pagetitle > a {
     color: #696969;
     border-color: #696969;
 }
+
 .btn-outline-success {
     color: #1E7B34;
     border-color: #1E7B34;
 }
+
 .btn-outline-danger {
     color: #D02536;
     border-color: #D02536;
 }
+
 .btn-outline-warning {
     color: #8A6700;
     border-color: #8A6700;
 }
+
 .btn-outline-info {
     color: #107484;
     border-color: #107484;
@@ -104,7 +109,7 @@ h1.pagetitle > a {
 
 .card-title,
 .card-heading h3 {
-    color: var(--bs-secondary-color); //$body-secondary-color; // #555555;
+    color: var(--bs-secondary-color); // $body-secondary-color; // #555555;
     font-size: 125%;
 }
 
@@ -114,7 +119,7 @@ h1.pagetitle > a {
 }
 
 .card-body a:not(.btn):hover {
-  color: #999999;
+  color: #999;
   text-decoration: none;
 }
 
@@ -123,9 +128,9 @@ h1.pagetitle > a {
 }
 
 .card {
-    border-color: var(--tiki-card-border-color); //$light-border-subtle-dark;
+    border-color: var(--tiki-card-border-color); // $light-border-subtle-dark;
     .card-header {
-        background: var(--tiki-card-header-bg); ///$dark-bg-subtle-dark;
+        background: var(--tiki-card-header-bg); /// $dark-bg-subtle-dark;
         .card-title {
             color: var(--tiki-card-title-color); // $body-color-dark;
         }

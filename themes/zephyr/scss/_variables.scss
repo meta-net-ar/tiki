@@ -9,45 +9,45 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-//$primary:       $blue !default;
-//$secondary:     $white !default;
+// $primary:       $blue !default;
+// $secondary:     $white !default;
 $success: #238560; // Darkened for WCAG2.2 commpliance
-//$info:          $cyan !default;
+// $info:          $cyan !default;
 $warning: #94610A; // Darkened for WCAG2.2 commpliance
-//$danger:        $red !default;
-//$light:         $gray-100 !default;
-//$dark:          $gray-900 !default;
+// $danger:        $red !default;
+// $light:         $gray-100 !default;
+// $dark:          $gray-900 !default;
 
 // Options
-//$enable-dark-mode:            true !default;
-//$color-mode-type:             data !default; // `data` or `media-query`
-$enable-negative-margins:       true;
+// $enable-dark-mode:            true !default;
+// $color-mode-type:             data !default; // `data` or `media-query`
+$enable-negative-margins: true;
 
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
-$body-secondary-color:      rgba($body-color, .85); // .75 default darkened for form-text contrast
+$body-secondary-color: rgba($body-color, .85); // .75 default darkened for form-text contrast
 
 // Links
-$link-shade-percentage:                   20% !default; // Bootstrap 5.3
+$link-shade-percentage: 20% !default; // Bootstrap 5.3
 
 // Components
 // Typography
-$font-family-sans-serif:      Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif; // Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$font-family-sans-serif: inter, roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', arial, sans-serif; // Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 
 // Tables
 // Buttons + Forms
 // Buttons
 // Forms
 $input-border-color: $gray-400; // Added for Tiki
-$input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default; // $gray-100 !default;
-$form-feedback-valid-color:         #238560; // $success !default;
+$input-group-addon-bg: var(--#{$prefix}tertiary-bg) !default; // $gray-100 !default;
+$form-feedback-valid-color: #238560; // $success !default;
 
 // Navs
 // Navbar
-$navbar-dark-color:                 rgba($white, .90); // !default;
-$navbar-dark-hover-color:           rgba($white, .80); // !default;
+$navbar-dark-color: rgba($white, .90); // !default;
+$navbar-dark-hover-color: rgba($white, .80); // !default;
 
 // Dropdowns
 // Pagination
@@ -61,8 +61,8 @@ $list-group-action-color: #42474DD9;
 
 // Breadcrumbs
 // Code
-$code-color:                    $body-color; //     $pink !default; // Bootstrap 5.3
-//--------------------------- Tiki SCSS variables
+$code-color: $body-color; //     $pink !default; // Bootstrap 5.3
+// --------------------------- Tiki SCSS variables
 
 // Bootswatch overrides
 

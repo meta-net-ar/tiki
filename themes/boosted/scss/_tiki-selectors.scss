@@ -8,6 +8,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -37,10 +38,12 @@ h5 {
     color: #BD5800;
     border-color: #BD5800;
 }
+
 .btn-outline-info {
     color: #3C6DD7;
     border-color: #3C6DD7;
 }
+
 .btn-outline-warning {
     color: #8F7200;
     border-color: #8F7200;
@@ -72,6 +75,7 @@ form label {
 // Modals
 .modal-header {
     padding: 1rem;
+
     .btn-close {
         margin-left: auto;
     }

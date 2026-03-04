@@ -33,8 +33,8 @@
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: #f3969a;
     --tiki-topbar-color: #303030;
-    --tiki-topbar-hover-color: rgba(255, 255, 255, 0.9);
-    --tiki-topbar-text-color: rgba(255, 255, 255, 0.9);
+    --tiki-topbar-hover-color: rgb(255 255 255 / 90%);
+    --tiki-topbar-text-color: rgb(255 255 255 / 90%);
 }
 
 @mixin top-nav-light {
@@ -47,7 +47,7 @@
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: rgba(120, 194, 173, 1);
+    --tiki-topbar-bg: rgb(120 194 173 / 100%);
     --tiki-topbar-color: #303030;
     --tiki-topbar-hover-color: rgb(#303030, 0.9);
     --tiki-topbar-text-color:  #303030;
@@ -76,6 +76,7 @@
     --tiki-admin-top-nav-bg: #{$primary};
     --tiki-admin-top-nav-color: #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-light-hover-color};
+
 //    --tiki-admin-top-nav-hover-bg: #{$navbar-light-hover-color};
     --tiki-admin-aside-nav-bg: #{$primary};
     --tiki-admin-aside-nav-color: #{$navbar-light-color};
@@ -84,6 +85,7 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -98,7 +100,7 @@
 // Dark navbar minus top nav (Special treatment due to Minty's relatively light "dark" nav bg color)
 @mixin admin-nav-dark {
     --tiki-admin-top-nav-bg: #f3969a;
-    --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.8);
+    --tiki-admin-top-nav-color: rgb(0 0 0 / 80%);
     --tiki-admin-top-nav-hover-color: #5a5a5a;
     --tiki-admin-top-nav-hover-bg: none ;
     --tiki-admin-top-box-shadow: 0px 1px 10px #d47b7e;
@@ -109,6 +111,7 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+
     button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
@@ -129,15 +132,16 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
+[data-bs-theme="dark"] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
     .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
 }
+
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
+[data-bs-theme="light"] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
@@ -149,8 +153,8 @@
 
 
 :root {
-    --tiki-vert-nav-link-color: $link-color;
-    --tiki-vert-nav-link-hover-color: $link-hover-color;
+    --tiki-vert-nav-link-color: #{$link-color};
+    --tiki-vert-nav-link-hover-color: #{$link-hover-color};
 }
 
  .table-danger {
@@ -158,6 +162,6 @@
  }
 
 [data-bs-theme="dark"] {
-    --tiki-vert-nav-link-color: rgba(var(--bs-link-color-rgb));
-    --tiki-vert-nav-link-hover-color: rgba(var(--bs-link-hover-color-rgb));
+    --tiki-vert-nav-link-color: rgb(var(--bs-link-color-rgb));
+    --tiki-vert-nav-link-hover-color: rgb(var(--bs-link-hover-color-rgb));
 }

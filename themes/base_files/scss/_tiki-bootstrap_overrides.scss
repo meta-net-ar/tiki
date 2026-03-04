@@ -1,9 +1,9 @@
 // Override or add to specific default Bootstrap styles
 
 // Obey the non-fixed width!
-//body:not(.fixed_width) .page-header > div > div {
+// body:not(.fixed_width) .page-header > div > div {
 //    width: auto !important;
-//}
+// }
 body:not(.fixed_width) .container {
     padding-left: calc($grid-gutter-width / 2);
     padding-right: calc($grid-gutter-width / 2);
@@ -17,11 +17,12 @@ body:not(.fixed_width) .container {
     position: fixed;
 }
 
-@media(max-width:768px) {
+@media(width <=768px) {
     .tiki .col-md-12 {
     flex-basis: 100%;
         width: 100% !important;
     }
+
     // Prevent column from imploding horizontally if it contains only narrow content.
     .col2 .module,
     .col3 .module {
@@ -33,9 +34,9 @@ form.admin legend {
     float: none;
 }
 
-//legend + p,
-//legend + .mb-3,
-//legend + input[type="hidden"] + .mb-3,
+// legend + p,
+// legend + .mb-3,
+// legend + input[type="hidden"] + .mb-3,
 legend + * {
     margin-top: 20px;
 }
@@ -46,10 +47,10 @@ legend + * {
     padding-bottom: 0;
 }
 
-//.topbar .navbar { - commented out by gary Nov 2022 - covered by CSS variables
+// .topbar .navbar { - commented out by gary Nov 2022 - covered by CSS variables
 //    margin-bottom: 0;
 //    border: none;
-//}
+// }
 
 // Make exception to dropdown list item behavior: log-in form background shouldn't change on mouseover.
 .dropdown-menu.dropdown-login li:hover {
@@ -74,14 +75,14 @@ legend + * {
     color: var(--bs-link-color);
 }
 
-//body.tiki.navbar-padding {
+// body.tiki.navbar-padding {
 //    padding-top: $tiki-navbar-fixed-height;
-//}
+// }
 
-//body.layout_social.tiki.navbar-padding {
+// body.layout_social.tiki.navbar-padding {
 //    padding-top: $tiki-navbar-fixed-height + 2rem;
 //    padding-bottom: 0;
-//}
+// }
 
 // Cancelling the hardcoded direction of the padding in the navbar set at node_modules/bootstrap/scss/_navbar.scss line:71
 // Padding (any) is not needed in LTR and padding-left is not wanted in RTL languages
@@ -100,6 +101,7 @@ body.fullscreen.tiki.navbar-padding {
         padding-left: 1rem;
         padding-right: 1rem;
     }
+
     img {
         max-width: 100%;
         height: auto;
@@ -108,21 +110,21 @@ body.fullscreen.tiki.navbar-padding {
 
 // .panel-body ul.nav {
 //    overflow: visible;
-///}
+/// }
 // .panel-body ul.nav.collapsing {
 //    overflow: hidden;
-//}
+// }
 
 // Todo: This was causing normal text-containing popovers to be extremely wide, so instances where extremely wide popovers are
 // desired like in tracker item tables need to be dealt with specifically.
-//.tiki .popover {
+// .tiki .popover {
 //    max-width: inherit;
-//}
+// }
 
-//.tiki .popover {
+// .tiki .popover {
 //    word-wrap: break-word;
 //    word-break: break-all;
-//}
+// }
 
 // .tiki .popover.tour-tour { max-width: 276px; } Not needed since default is now this width.
 
@@ -132,10 +134,12 @@ body.fullscreen.tiki.navbar-padding {
 .tiki.tiki_trackers .popover,
 .tiki .wikiplugin-trackerlist .popover {
     max-width: 50vw;
+
 //    word-wrap: normal;
 //    word-break: normal;
 }
-@media (max-width: 768px) {
+
+@media (width <= 768px) {
     .tiki.tiki-list_file_gallery .popover,
     .tiki.tiki_file_galleries .popover,
     .tiki.tiki_trackers .popover,
@@ -150,12 +154,14 @@ body.fullscreen.tiki.navbar-padding {
 
 .tiki .popover {
     p:last-child { margin-bottom: 0; }
+
     z-index: 999999;
 }
 
 .tiki .popover {
     max-width: $popover-max-width + 25px;
     z-index: 1;
+
     .popover-body .table {
         margin-bottom: 0;
         td { word-break: break-word; }
@@ -180,14 +186,14 @@ body.fullscreen.tiki.navbar-padding {
 .tiki #col1 .table-responsive {
     width: 100%;
     margin-bottom: 15px;
-    overflow-y: hidden;
-    overflow-x: auto;
+    overflow: auto hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     -webkit-overflow-scrolling: touch;
 }
 
 .tiki .table-responsive > .table {
     margin-bottom: 0;
+
     // Ensure the content doesn't wrap
     > thead,
     > tbody,
@@ -210,8 +216,8 @@ body.fullscreen.tiki.navbar-padding {
     color: var(--tiki-top-color)
 }
 
-//.layout_social,                   Selectors no longer match the HTML - g_c-l.
-//.layout_social_modules {
+// .layout_social,                   Selectors no longer match the HTML - g_c-l.
+// .layout_social_modules {
 //    a.navbar-brand img {
 //        display: inline;
 //    }
@@ -235,31 +241,31 @@ body.fullscreen.tiki.navbar-padding {
 //    #topbar_modules {               flexbox is now used.
 //        display: inline-block;
 //    }
-//}
+// }
 //
-//.layout_social_modules {        Selectors don't match any HTML
+// .layout_social_modules {        Selectors don't match any HTML
 //    #topbar_modules {
 //        display: block;
 //    }
-//}
+// }
 //
-//.header_outer.navbar {
+// .header_outer.navbar {
 //    margin-bottom: 0;
-//}
+// }
 //
-//.navbar-fixed-top,                 Selectors don't match anything anymore, next 20 lines. g_c-l
-//#navbar-collapse-social {
+// .navbar-fixed-top,                 Selectors don't match anything anymore, next 20 lines. g_c-l
+// #navbar-collapse-social {
 //    .navbar {
 //        margin-bottom: 0;
 //        min-height: 32px;
 //    }
-//}
+// }
 //
-//.navbar-nav {
+// .navbar-nav {
 //    -ms-flex-negative: 0;
-//}
+// }
 //
-//#topbar_modules_social { float: left; }
+// #topbar_modules_social { float: left; }
 //
 // Commented this out for BS4 because it conflicts with img-fluid.
 // https://github.com/twbs/bootstrap/issues/16120
@@ -267,22 +273,22 @@ body.fullscreen.tiki.navbar-padding {
 //    &.media-object {
 //        max-width: none;
 //    }
-//}
+// }
 //
 // Update: .form-horizontal was dropped with Bootstrap 4, so this hasn't worked for a long time.
 // Needed to align checkbox with label, which has a top margin (admin forms with labels on left of input)
-//.tiki .form-horizontal .mb-3 label + div > input[type="checkbox"] { margin-top: .8em; }
-//.tiki .form-horizontal .checkbox input[type="checkbox"] {margin-top: .4em;}
+// .tiki .form-horizontal .mb-3 label + div > input[type="checkbox"] { margin-top: .8em; }
+// .tiki .form-horizontal .checkbox input[type="checkbox"] {margin-top: .4em;}
 //
 //
-//.control-label.text-left {
+// .control-label.text-left {
 //    text-align: left;
-//}
+// }
 //
 // Update: .form-horizontal was dropped with Bootstrap 4, so this hasn't worked for a long time.
 // .form-horizontal .control-label.text-left {
 //    text-align: left;
-//}
+// }
 
 .affix-top {position: static; }
 .affix { position: fixed; top: 10px; max-height: calc(100vh - 20px); overflow-y: auto !important; }
@@ -293,10 +299,10 @@ body.fullscreen.tiki.navbar-padding {
 .col-md-2 .form-inline .form-control { width: 100%; }
 
 // Remove negative side margins on div.row in forms, etc. to keep left and right whitespace
-//.mb-3.row {                        Probably no longer needed as row was removed from .row.mb-3 in forms for Bootstap 5
+// .mb-3.row {                        Probably no longer needed as row was removed from .row.mb-3 in forms for Bootstap 5
 //    margin-left: 0;
 //    margin-right: 0;
-//}
+// }
 
 ///// User layout columns (module zones) switching / toggling (resurrected feature)
 // .side-col-toggle-container {width: 100%; height: 1.5rem; margin-top: -.8rem; display:flex;} - Bootstrap classes in tpl already provide these properties
@@ -304,25 +310,29 @@ body.fullscreen.tiki.navbar-padding {
     .side-col-toggle-container { display: none; }
 }
 
-@media (max-width: 992px) {
+@media (width <= 992px) {
     .hide_zone_left #col2 #left_modules,
     .hide_zone_right #col3 #right_modules {
       display: none;
     }
+
     #col2 .side-col-toggle-small-screen,
     #col3 .side-col-toggle-small-screen {
       text-align: center;
       margin-bottom: 10px;
     }
+
     .side-col-toggle-small-screen {
-        background-image: linear-gradient(to bottom,  transparent, rgba(150,150,150,.25) calc(50% - 1px), var(--bs-border-color) calc(50%), transparent calc(50% + 1px));
+        background-image: linear-gradient(to bottom,  transparent, rgb(150 150 150 / 25%) calc(50% - 1px), var(--bs-border-color) calc(50%), transparent calc(50% + 1px));
     }
 }
-@media (min-width: 992px) {
+
+@media (width >= 992px) {
     .hide_zone_left #col2, // When hidden we simply do not display the columns
     .hide_zone_right #col3 {
         display: none;
     }
+
 //    .col1 .table-responsive > table { // Keep table width inside main column width (no scrolling) in large displays in Chrome/chromium browsers.
 //        table-layout: fixed;
 //    }
@@ -333,6 +343,7 @@ body.fullscreen.tiki.navbar-padding {
     flex: 0 0 83.3334%;
     max-width: 83.3334%;
 }
+
 .hide_zone_right #col1.col-lg-8 { // when right col is hidden
     width: 83.3334%; // TODO: make it computed scss variable?
     flex: 0 0 83.3334%;
@@ -387,6 +398,7 @@ body.fullscreen.tiki.navbar-padding {
     flex: 0 0 100%;
     max-width: 100%;
 }
+
     // modules admin needs to be able to see the modules
     .tiki-admin_modules.hide_zone_left #col2 {
         display: block;
@@ -413,6 +425,7 @@ body.fullscreen.tiki.navbar-padding {
     }
 
 }
+
 // End overrides for wide side column layout
 
 
@@ -421,13 +434,16 @@ body.fullscreen.tiki.navbar-padding {
         width: 100%;
         flex-basis: 100%;
     }
+
     .hide_zone_left #col2,
     .hide_zone_right #col3 {
         display: block;
     }
+
     .hide_zone_right #col2 {
         right: auto;
     }
+
     .toggle_zone {
         display: none;
     }
@@ -454,16 +470,17 @@ body.fullscreen.tiki.navbar-padding {
     margin-bottom: 0;
     color: color-yiq($danger);
 }
+
 .bg-warning h5.card-title {
     margin-bottom: 0;
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (width <= 480px) {
     .tiki #conversejs.converse-embedded {
         margin: 0;
-        right: 0px;
-        left: 0px;
-        bottom: 0px;
+        right: 0;
+        left: 0;
+        bottom: 0;
     }
 }
 

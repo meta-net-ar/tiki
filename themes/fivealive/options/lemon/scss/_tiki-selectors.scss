@@ -8,6 +8,7 @@
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
+
 .text-dark {
     color: #6D5509 !important;
 }
@@ -64,7 +65,7 @@
 }
 
 // Dark color mode
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .btn.btn-outline-primary { color: #988E0B; border-color: #988E0B; }
     .btn.btn-outline-secondary { color: #D86D3B; border-color: #D86D3B; }
     .btn.btn-outline-success { color: #46A046; border-color: #46A046; }
@@ -76,6 +77,7 @@
     .valid-feedback { color: #329F4F; }
     .invalid-feedback { color: #FF4800; }
     .blockquote-footer { color: #848C94; }
+
     h3.tiki-card-header-title {
         color: #000;
     }

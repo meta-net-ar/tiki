@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -34,6 +34,7 @@ body.fullscreen.tiki.navbar-padding {
     padding-bottom: 5px;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+
     //    margin-top: 30px;
     margin-bottom: 20px;
     margin-left: calc(var(--bs-gutter-x) * -0.5);;
@@ -56,20 +57,21 @@ body.fullscreen.tiki.navbar-padding {
 
 #bottom_modules {
     background: #2e3035;
-    color: #999999;
+    color: #999;
 }
 
 #footer {
     color: #999;
     background: #2e3035;
 }
+
 #footer > a {
     color: #aeebff;
 }
 
 // Links
 .card-title {
-    color: #999999;
+    color: #999;
 }
 
 // Components
@@ -80,13 +82,13 @@ body.fullscreen.tiki.navbar-padding {
     }
 
     h2 {
-        color: var(--bs-heading-color); //#309fc0;
+        color: var(--bs-heading-color); // #309fc0;
         border-bottom: solid 1px #3090c0;
         text-transform: uppercase;
     }
 
     h3 {
-        color: var(--bs-heading-color); //#303030;
+        color: var(--bs-heading-color); // #303030;
         font-style: italic;
     }
 
@@ -105,7 +107,7 @@ body.fullscreen.tiki.navbar-padding {
 
 .wikitext.nopagetitle {
     h1 {
-        color: var(--bs-heading-color); //#309fc0;
+        color: var(--bs-heading-color); // #309fc0;
         border-bottom: solid 1px #3090c0;
         text-transform: uppercase;
     }
@@ -118,7 +120,7 @@ body.fullscreen.tiki.navbar-padding {
     }
 
     h3 {
-        color: var(--bs-heading-color); //#3f3f3f;
+        color: var(--bs-heading-color); // #3f3f3f;
         font-style: normal;
         border-bottom: dashed 1px #ccf0ff;
     }
@@ -191,12 +193,15 @@ h1.pagetitle > a:hover {
 .list-group-item.list-group-item-primary {
     color: #343A40CC;
 }
+
 .list-group-item.list-group-item-secondary {
     color: #2E3438BF;
 }
+
 .list-group-item.list-group-item-info {
     color: #30363BBF;
 }
+
 .list-group-item.list-group-item-dark {
     color: #2E3438BF;
 }
@@ -208,10 +213,10 @@ h1.pagetitle > a:hover {
 
 // Light mode dark page footer
 [data-bs-theme="light"] .bottom_modules {
-    color: #999999;
+    color: #999;
     .tiki-card-header-title { color: #DEE2E6 !important; }
     .card, .card-header { border-color: transparent; }
-    .card-body { color: #999999; }
+    .card-body { color: #999; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: #dee2e6; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: #bfbfbf; }
 }

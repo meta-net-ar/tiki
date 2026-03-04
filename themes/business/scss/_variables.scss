@@ -11,15 +11,14 @@
 
 // Color system
 
-$dark:          #01366c;
+$dark: #01366c;
 $light: #f6f6f6;
-
-$primary:       #0074C7; // #0d6efd !default;
-$secondary:     $green; // #4b3891; // #3911ce;
-$success:       #214A21; // #198754 !default;
-$info:          #20809D; // #0dcaf0 !default;
-$warning:       #975D0C; // #ffc107 !default;
-$danger:        #B82D28; // #dc3545 !default;
+$primary: #0074C7; // #0d6efd !default;
+$secondary: $green; // #4b3891; // #3911ce;
+$success: #214A21; // #198754 !default;
+$info: #20809D; // #0dcaf0 !default;
+$warning: #975D0C; // #ffc107 !default;
+$danger: #B82D28; // #dc3545 !default;
 
 $theme-colors: (
     "primary":      $primary,
@@ -39,83 +38,80 @@ $theme-colors: (
 
 // Options
 // Prefix for :root CSS variables
-$enable-shadows:              true;
-$enable-gradients:              true;
+$enable-shadows: true;
+$enable-gradients: true;
 
 // Body
 $body-color: $gray-800; // $gray-900 !default;
 
-//Links
-$link-color: #005999; //#0074C7;
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
-$link-hover-color:                        shift-color($link-color, $link-shade-percentage);  // default
+// Links
+$link-color: #005999; // #0074C7;
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
+$link-hover-color: shift-color($link-color, $link-shade-percentage);  // default
 
-//Components
+// Components
 $border-radius-lg: 8px;
 $border-color: $gray-400;
 
 // Typography
 // Fonts
-$font-family-sans-serif:        Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif; //'Merriweather Sans', sans-serif;
-$font-size-base:                1rem;
-$font-weight-normal:            400;
-$headings-font-weight:          400;
-
-$text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- $gray-700;
+$font-family-sans-serif: inter, roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', arial, sans-serif; // 'Merriweather Sans', sans-serif;
+$font-size-base: 1rem;
+$font-weight-normal: 400;
+$headings-font-weight: 400;
+$text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- $gray-700;
 
 $blockquote-color: #4D4D4D;
-$headings-color:              inherit;  // default
+$headings-color: inherit;  // default
 
 // Tables
-$table-border-color:               #dddddd;
+$table-border-color: #ddd;
 
 // Buttons
-$btn-primary-color: #ffffff;
+$btn-primary-color: #fff;
 $btn-primary-bg: #3676c4;
 $btn-primary-border: #3676c4;
-
-$btn-secondary-color: #ffffff;
+$btn-secondary-color: #fff;
 $btn-secondary-bg: #3676c4;
-
 $btn-info-bg: #fff;
 $btn-info-color: #17a2b8;
 $btn-info-border: #17a2b8;
 
 // Forms
-$input-border: #dddddd;
+$input-border: #ddd;
 $input-group-addon-bg: var(--#{$prefix}tertiary-bg);  // default // #DBDBDB;
 
 // Form validation
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color); // !important;
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color); // !important;
+$nav-link-color: var(--#{$prefix}link-color); // !important;
+$nav-link-hover-color: var(--#{$prefix}link-hover-color); // !important;
 
-//Navbar
-$navbar-light-color:                $link-color;
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
-$navbar-light-active-color:         $navbar-light-hover-color;
-$navbar-light-disabled-color:       rgba($black, .3);  // default
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
+// Navbar
+$navbar-light-color: $link-color;
+$navbar-light-hover-color: rgb(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
+$navbar-light-active-color: $navbar-light-hover-color;
+$navbar-light-disabled-color: rgba($black, .3);  // default
+$navbar-light-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-light-toggler-border-color: rgba($black, .1);  // default
-$navbar-light-brand-color:          $navbar-light-active-color; // !default;
-$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
+$navbar-light-brand-color: $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color: $navbar-light-active-color; // !default;
 
-$navbar-dark-color:             #ffffff;
-$navbar-dark-bg:                 #1f5daa;
-$navbar-dark-border:             color.adjust($navbar-dark-bg, $lightness: -6.5%, $space: hsl);
-$navbar-dark-hover-bg:              transparent;
-$navbar-dark-active-color:          #ffffff;
-$navbar-dark-active-bg:              #3270bd;
-$navbar-dark-disabled-color:         #cccccc;
-$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
+$navbar-dark-color: #fff;
+$navbar-dark-bg: #1f5daa;
+$navbar-dark-border: color.adjust($navbar-dark-bg, $lightness: -6.5%, $space: hsl);
+$navbar-dark-hover-bg: transparent;
+$navbar-dark-active-color: #fff;
+$navbar-dark-active-bg: #3270bd;
+$navbar-dark-disabled-color: #ccc;
+$navbar-dark-brand-color: $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color: $navbar-dark-active-color; // !default;
 
 // Dropdowns
-$dropdown-color:                    $body-color;  // default
-$dropdown-bg:                       #fff; //$white;  // default
-$dropdown-link-color:               $link-color;
-$dropdown-dark-color:               $gray-300;
-$dropdown-dark-bg:                  $gray-800;
+$dropdown-color: $body-color;  // default
+$dropdown-bg: #fff; // $white;  // default
+$dropdown-link-color: $link-color;
+$dropdown-dark-color: $gray-300;
+$dropdown-dark-bg: $gray-800;
 
 // Pagination
 // Cards
@@ -128,7 +124,7 @@ $card-header-bg: #386dbb;
 // Popovers
 // Badges
 // Modals
-$modal-header-border-color:   #386dbb;
+$modal-header-border-color: #386dbb;
 
 // Alerts
 // Progress bars
@@ -137,7 +133,7 @@ $modal-header-border-color:   #386dbb;
 // Figures
 // Breadcrumbs
 // Code
-$code-color:                        $body-color; // $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; // $pink;  // default // Bootstrap 5.3
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 

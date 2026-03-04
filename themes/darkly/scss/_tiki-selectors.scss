@@ -7,7 +7,7 @@
 // * Color mode rules
 
 // Image path example:
-//$imagePath: "../images/";
+// $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -36,7 +36,7 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
 .btn-outline-danger { --bs-btn-color: #FF5252; }
 .btn-outline-warning { --bs-btn-color: #F08000; }
 .btn-outline-info { --bs-btn-color: #BC78DD; }
-.btn-outline-light { --bs-btn-color: #999999; }
+.btn-outline-light { --bs-btn-color: #999; }
 .btn-outline-dark { --bs-btn-color: #949494; }
 
 // Forms
@@ -46,7 +46,7 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
 // Navs
 // Navbar
 .navbar.bg-light {
-    background-color: rgba(55,90,127,1);
+    background-color: rgb(55 90 127 / 100%);
 }
 
 // Dropdowns

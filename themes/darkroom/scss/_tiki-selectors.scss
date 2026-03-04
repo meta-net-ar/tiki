@@ -8,9 +8,10 @@
 
 // Image path example:
 $imagePath: "../images/";
-//body {
+
+// body {
 //    background-image: url('#{$imagePath}bg.jpg');
-//}
+// }
 
 // The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
 // These are the sections that most often have additional Tiki selectors.
@@ -111,13 +112,13 @@ blockquote,
 
 // Forms
 input[type="checkbox"] {
-    color: #ffffff !important;
+    color: #fff !important;
     background: $table-bg;
 }
 
     // Forums
 .form-control {
-    background: linear-gradient(180deg, rgba(71,71,71,1) 1%, rgba(99,99,99,1) 18%);
+    background: linear-gradient(180deg, rgb(71 71 71 / 100%) 1%, rgb(99 99 99 / 100%) 18%);
 }
 
 // Navs
@@ -148,7 +149,7 @@ h3.tiki-card-title { // Was h3.card-title
 
 .card:not(.no-decorations) .card-body {
     border: solid #292929;
-    border-width: 0 8px .5rem 8px;
+    border-width: 0 8px .5rem;
 }
 
 .module.card { border: none; }
@@ -172,7 +173,7 @@ h3.tiki-card-title { // Was h3.card-title
 .tiki a.ui-button:active,
 .tiki .ui-button:active,
 .tiki .ui-button.ui-state-active:hover{
-    color: #ffffff;
+    color: #fff;
     border-color: #dee2e6 !important;
 }
 
@@ -197,7 +198,7 @@ h3.tiki-card-title { // Was h3.card-title
 .tiki .ui-widget-header .ui-state-focus,
 .tiki .ui-button:hover,
 .tiki .ui-button:focus {
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     background: #818181; /* Old browsers */
     background: linear-gradient(to bottom, #818181 0%, #393939 100%) !important; /* W3C */
     font-weight: normal;
@@ -233,10 +234,11 @@ input.reportBuilderInput,
     background-color: #34343C;
 }
 
-//.alert-light a { color: #2B2B2B; }
+// .alert-light a { color: #2B2B2B; }
 
 .alert-light {
     color: #272B35;
+
     a {
         color: #000;
     }
@@ -249,8 +251,8 @@ input.reportBuilderInput,
 
 // List group
 .list-group-item { background: #4D4D4D; }
-.list-group-item-primary { color: #cccccc; background: #545454; }
-.list-group-item-secondary { color: #303030; background: #999999; }
+.list-group-item-primary { color: #ccc; background: #545454; }
+.list-group-item-secondary { color: #303030; background: #999; }
 .list-group-item-success { color: #575757; background: #B1D8B1; }
 .list-group-item-danger { color: #474747; background: #EAA5A4; }
 .list-group-item-warning { color: #5c5c5c; background: #FCCE92; }

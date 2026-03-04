@@ -10,17 +10,16 @@
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
 $red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
-$primary:       #ABD9CD; // #78c2ad;  // default
-$secondary:     $gray-600 !default; // #f3969a;  // default
-$success:       #56cc9d; // $green;  // default
-$info:          #6cc3d5; //$cyan;  // default
-$warning:       #ffce67; // $yellow;  // default
-$danger:        #ff7851; //$red;  // default
-//$light:         $gray-100;  // default
-//$dark:          $gray-800;  // default
+$primary: #ABD9CD; // #78c2ad;  // default
+$secondary: $gray-600 !default; // #f3969a;  // default
+$success: #56cc9d; // $green;  // default
+$info: #6cc3d5; // $cyan;  // default
+$warning: #ffce67; // $yellow;  // default
+$danger: #ff7851; // $red;  // default
+// $light:         $gray-100;  // default
+// $dark:          $gray-800;  // default
 
-$min-contrast-ratio:   2.5;
-
+$min-contrast-ratio: 2.5;
 $secondary-text-emphasis: purple; // shade-color($secondary, 80%) !default;
 
 // Options
@@ -28,60 +27,60 @@ $secondary-text-emphasis: purple; // shade-color($secondary, 80%) !default;
 $prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
-$body-color:                #595959; // $gray-600;  // default Modified for Tiki, for WCAG compliance
-$body-secondary-color:      rgba($body-color, .85);
+$body-color: #595959; // $gray-600;  // default Modified for Tiki, for WCAG compliance
+$body-secondary-color: rgba($body-color, .85);
 
 // Components
 $border-color: #c9c9c9; // darkened for visibility in Tiki
 
 // Typography
-$link-shade-percentage:                   20%;  // default // Bootstrap 5.3
-$link-color: rgb(28 72 60); //#3A826E; // Modified for Tiki, for WCAG compliance
-$font-family-sans-serif:      ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT', 'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif; // system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";  // default
-//$font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;  // default
-// stylelint-enable value-keyword-case
-//$font-family-base:            var(--#{$prefix}font-sans-serif);  // default
+$link-shade-percentage: 20%;  // default // Bootstrap 5.3
+$link-color: rgb(28 72 60); // #3A826E; // Modified for Tiki, for WCAG compliance
+$font-family-sans-serif: ui-rounded, 'Hiragino Maru Gothic ProN', quicksand, comfortaa, manjari, 'Arial Rounded MT', 'Arial Rounded MT Bold', calibri, source-sans-pro, sans-serif; // system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";  // default
+// $font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;  // default
+// $font-family-base:            var(--#{$prefix}font-sans-serif);  // default
 
-//$headings-font-family:        Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;  // default
-$headings-color:              inherit;
-$blockquote-footer-color:     $gray-700;
+// $headings-font-family:        Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;  // default
+$headings-color: inherit;
+$blockquote-footer-color: $gray-700;
 
 // Tables
 // Buttons
-$btn-color:                   #212529; // var(--#{$prefix}body-color);  // default
+$btn-color: #212529; // var(--#{$prefix}body-color);  // default
 
 // Form validation
-$form-feedback-valid-color:        #267E59; // $success !default;
-$form-feedback-invalid-color:      #E03100' // ' $danger !default;
-$form-feedback-icon-valid-color:    $form-feedback-valid-color; // !default;
-$form-feedback-icon-invalid-color:  $form-feedback-invalid-color; // !default;
+$form-feedback-valid-color: #267E59; // $success !default;
+$form-feedback-invalid-color: #E03100' // ' $danger !default;
+$form-feedback-icon-valid-color: $form-feedback-valid-color; // !default;
+$form-feedback-icon-invalid-color: $form-feedback-invalid-color; // !default;
 
 // scss-docs-start form-validation-colors
-$form-valid-color:                  $form-feedback-valid-color !default;
-$form-valid-border-color:           $form-feedback-valid-color !default;
-$form-invalid-color:                $form-feedback-invalid-color !default;
+$form-valid-color: $form-feedback-valid-color !default;
+$form-valid-border-color: $form-feedback-valid-color !default;
+$form-invalid-color: $form-feedback-invalid-color !default;
+
 // Navs
 // Navbar
-$navbar-dark-color:                 rgba($white, .6);  // default
-$navbar-dark-hover-color:           $white;  // default
-$navbar-light-color:                #303030; // rgba($black, .3);  // default
-$navbar-light-hover-color:          $gray-700;  // default
-$navbar-light-active-color:         $gray-700;  // default
-$navbar-light-disabled-color:       rgba($black, .1);  // default
+$navbar-dark-color: rgba($white, .6);  // default
+$navbar-dark-hover-color: $white;  // default
+$navbar-light-color: #303030; // rgba($black, .3);  // default
+$navbar-light-hover-color: $gray-700;  // default
+$navbar-light-active-color: $gray-700;  // default
+$navbar-light-disabled-color: rgba($black, .1);  // default
 
 // Dropdowns
 // Pagination
-$pagination-color:                  #132B25; // Determined with WAVE tool #3A8370; // var(--#{$prefix}link-color); // !default;
-$pagination-active-color:           #1F1F1F; // Determined with WAVE tool
+$pagination-color: #132B25; // Determined with WAVE tool #3A8370; // var(--#{$prefix}link-color); // !default;
+$pagination-active-color: #1F1F1F; // Determined with WAVE tool
 
 // Cards
 // Accordion
 // Popovers
-$popover-bg:                        var(--#{$prefix}body-bg);  // default
-$popover-border-color:              var(--#{$prefix}border-color-translucent);  // default
-$popover-header-bg:                 var(--#{$prefix}secondary-bg);  // default
-$popover-header-color:              $headings-color;  // default
-$popover-body-color:                var(--#{$prefix}body-color);  // default
+$popover-bg: var(--#{$prefix}body-bg);  // default
+$popover-border-color: var(--#{$prefix}border-color-translucent);  // default
+$popover-header-bg: var(--#{$prefix}secondary-bg);  // default
+$popover-header-color: $headings-color;  // default
+$popover-body-color: var(--#{$prefix}body-color);  // default
 
 // Tooltips
 // Badges
@@ -89,8 +88,8 @@ $badge-color: #212529; // Bootswatch .badge rule is overriding this.
 
 // Modals
 // Alerts
-$alert-bg-scale:                -80%; // !default; // Deprecated in v5.2.0, to be removed in v6
-$alert-color-scale:             40%; // !default; // Deprecated in v5.2.0, to be removed in v6
+$alert-bg-scale: -80%; // !default; // Deprecated in v5.2.0, to be removed in v6
+$alert-color-scale: 40%; // !default; // Deprecated in v5.2.0, to be removed in v6
 
 // Progress bars
 // Listgroup
@@ -99,9 +98,9 @@ $list-group-action-color: #212529;
 
 // Breadcrumbs
 // Code
-$code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
+$code-color: $body-color; //   $pink;  // default // Bootstrap 5.3
 
-//--------------------------- Tiki SCSS variables
+// --------------------------- Tiki SCSS variables
 
 // Bootswatch overrides
 

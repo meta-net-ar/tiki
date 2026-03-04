@@ -1,6 +1,6 @@
 .cm-tw-syntaxerror {
-    color: #FFFFFF;
-    background-color: #990000;
+    color: #FFF;
+    background-color: #900;
 }
 
 .cm-tw-deleted {
@@ -10,7 +10,8 @@
 .cm-tw-header5 {
     font-weight: bold;
 }
-.cm-tw-listitem:first-child { /*Added first child to fix duplicate padding when highlighting*/
+
+.cm-tw-listitem:first-child { /* Added first child to fix duplicate padding when highlighting */
     padding-left: 10px;
 }
 
@@ -18,7 +19,8 @@
     color: #9d8859;
 }
 
-/*Removed border attributes from .cm-tw-box since it produced a missplacement with the selections of text inside it. Added grey color instead*/
+/* Removed border attributes from .cm-tw-box since it produced a missplacement with the selections of text inside it. Added grey color instead */
+
 /* .cm-tw-box {
     border-top-width: 0px ! important;
     border-style: solid;
@@ -29,6 +31,7 @@
     color: #808080;
     border: none;
 }
+
 .cm-tw-underline {
     text-decoration: underline;
 }

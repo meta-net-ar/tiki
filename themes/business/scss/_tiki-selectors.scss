@@ -8,6 +8,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -50,14 +51,14 @@ h2.sitesubtitle {
 
 // Navs
 // Navbar
-//.navbar-dark-parent {
+// .navbar-dark-parent {
 //    .sitetitles a {
 //        color: #ffffff;
 //    }
 //    .sitesubtitle {
 //        color: #91bef5;
 //    }
-//}
+// }
 
 .topbar .navbar-dark .navbar-nav > li > a {
   text-transform: uppercase;
@@ -66,6 +67,7 @@ h2.sitesubtitle {
   font-weight: 700;
   font-size: 12px;
 }
+
 // Dropdowns
 .dropdown-menu.dropdown-menu-dark .dropdown-item {
     color: $gray-300 !important;
@@ -82,6 +84,7 @@ h2.sitesubtitle {
   & a:not(.dropdown-item) {
     color: #fff;
   }
+
   .dropdown-item .tips {
     color: $body-color;
 
@@ -124,6 +127,7 @@ h3.tiki-card-title { // Was h3.card-title
 .progress-bar.bg-warning.text-dark {
     color: #fff !important;
 }
+
 // Modals
 .modal-header {
     color: $gray-300;
@@ -166,6 +170,7 @@ $tiki-topbar-row-sidemargins: -15px;
 // Update for Smartmenus
 .navbar .navbar-nav.sm-vertical {
     .dropdown { border: none;
+
         //    a { color: #005999; }
     }
 }

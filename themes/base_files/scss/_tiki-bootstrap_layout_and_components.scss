@@ -1,12 +1,12 @@
 // This is a copy of node_modules/bootstrap/scss/_bootstrap.scss but without the default variables
-//@import "../../../node_modules/bootstrap/scss/mixins/banner"; // copied to _tiki-bootstrap_functions
-//@include bsBanner("");
+// @import "../../../node_modules/bootstrap/scss/mixins/banner"; // copied to _tiki-bootstrap_functions
+// @include bsBanner("");
 
 
 // scss-docs-start import-stack
 // // Configuration
 // @import "../../../node_modules/bootstrap/scss/functions";
-//@import "../../../node_modules/bootstrap/scss/variables";
+// @import "../../../node_modules/bootstrap/scss/variables";
 @import "../../../node_modules/bootstrap/scss/maps";
 @import "../../../node_modules/bootstrap/scss/mixins";
 @import "../../../node_modules/bootstrap/scss/utilities";
@@ -49,7 +49,8 @@
 
 // Utilities
 @import "../../../node_modules/bootstrap/scss/utilities/api";
+
 // scss-docs-end import-stack
 //
-//@import "../../../node_modules/bootstrap/scss/nav"; // Old comment: Needed to move this down to get correct navlink color in ohia and other themes
-//@import "../../../node_modules/bootstrap/scss/navbar"; // Old comment: Needed to move this down to get correct navbar nav-link color in default theme
+// @import "../../../node_modules/bootstrap/scss/nav"; // Old comment: Needed to move this down to get correct navlink color in ohia and other themes
+// @import "../../../node_modules/bootstrap/scss/navbar"; // Old comment: Needed to move this down to get correct navbar nav-link color in default theme

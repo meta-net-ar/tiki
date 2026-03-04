@@ -1,23 +1,21 @@
-//SCSS file for the jQuery tablesorter plugin
-//base formatting that apply to all Tiki themes
+// SCSS file for the jQuery tablesorter plugin
+// base formatting that apply to all Tiki themes
 
-$filterTransitionTime : 0.1s;
-$filterRowHiddenHeight : 4px;
+$filterTransitionTime: 0.1s;
+$filterRowHiddenHeight: 4px;
+
 // becomes height using padding (so it's divided by 2)
 
 // url(icons/loading.gif);
-$processingIcon : url('data:image/gif;base64,R0lGODlhFAAUAKEAAO7u7lpaWgAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQBCgACACwAAAAAFAAUAAACQZRvoIDtu1wLQUAlqKTVxqwhXIiBnDg6Y4eyx4lKW5XK7wrLeK3vbq8J2W4T4e1nMhpWrZCTt3xKZ8kgsggdJmUFACH5BAEKAAIALAcAAAALAAcAAAIUVB6ii7jajgCAuUmtovxtXnmdUAAAIfkEAQoAAgAsDQACAAcACwAAAhRUIpmHy/3gUVQAQO9NetuugCFWAAAh+QQBCgACACwNAAcABwALAAACE5QVcZjKbVo6ck2AF95m5/6BSwEAIfkEAQoAAgAsBwANAAsABwAAAhOUH3kr6QaAcSrGWe1VQl+mMUIBACH5BAEKAAIALAIADQALAAcAAAIUlICmh7ncTAgqijkruDiv7n2YUAAAIfkEAQoAAgAsAAAHAAcACwAAAhQUIGmHyedehIoqFXLKfPOAaZdWAAAh+QQFCgACACwAAAIABwALAAACFJQFcJiXb15zLYRl7cla8OtlGGgUADs=');
+$processingIcon: url('data:image/gif;base64,R0lGODlhFAAUAKEAAO7u7lpaWgAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQBCgACACwAAAAAFAAUAAACQZRvoIDtu1wLQUAlqKTVxqwhXIiBnDg6Y4eyx4lKW5XK7wrLeK3vbq8J2W4T4e1nMhpWrZCTt3xKZ8kgsggdJmUFACH5BAEKAAIALAcAAAALAAcAAAIUVB6ii7jajgCAuUmtovxtXnmdUAAAIfkEAQoAAgAsDQACAAcACwAAAhRUIpmHy/3gUVQAQO9NetuugCFWAAAh+QQBCgACACwNAAcABwALAAACE5QVcZjKbVo6ck2AF95m5/6BSwEAIfkEAQoAAgAsBwANAAsABwAAAhOUH3kr6QaAcSrGWe1VQl+mMUIBACH5BAEKAAIALAIADQALAAcAAAIUlICmh7ncTAgqijkruDiv7n2YUAAAIfkEAQoAAgAsAAAHAAcACwAAAhQUIGmHyedehIoqFXLKfPOAaZdWAAAh+QQFCgACACwAAAIABwALAAACFJQFcJiXb15zLYRl7cla8OtlGGgUADs=');
 
 // Filter widget transition
 @mixin filterWidgetTransition {
-    -webkit-transition: line-height $filterTransitionTime ease;
-    -moz-transition: line-height $filterTransitionTime ease;
-    -o-transition: line-height $filterTransitionTime ease;
     transition: line-height $filterTransitionTime ease;
 }
 
 // Arrows
-$arrowPosition : center right;
+$arrowPosition: center right;
 
 // div around table
 div.tablesorter-resizable-container {
@@ -28,6 +26,7 @@ div.tablesorter-resizable-container {
 table.tablesorter {
     width: 100%;
     margin-bottom: 2px;
+
     // style header
     thead {
         tr.tablesorter-headerRow {
@@ -37,6 +36,7 @@ table.tablesorter {
                 background-color: var(--bs-body-bg); // $body-bg; // Added by Gary as a test.
                 color: var(--bs-body-color);
                 cursor: pointer;
+
                 i {
                     font-weight: 400;
                     position: absolute;
@@ -50,34 +50,41 @@ table.tablesorter {
                     display: inline-block;
                 }
             }
+
             th div.tablesorter-header-inner span {
                 padding-right: 10px;
             }
+
             th.sorter-false {
                 cursor: default;
             }
         }
+
         tr.tablesorter-filter-row {
             background-color: var(--bs-body-bg);  // Added by Gary as a test.
             color: var(--bs-body-color);
+
             td {
                 text-align: center;
                 line-height: normal;
+
                 @include filterWidgetTransition;
+
                 input, select {
                     width: 98%;
                     height: auto;
                     margin: 0;
-                    -webkit-box-sizing: border-box;
-                    -moz-box-sizing: border-box;
                     box-sizing: border-box;
+
                     @include filterWidgetTransition;
                 }
+
                 label {
                     float: left;
                     clear: both;
                     font-size: 70%;
                 }
+
                 input.dateFrom,
                 input.dateTo {
                     width: 60px;
@@ -87,52 +94,56 @@ table.tablesorter {
                     background: var(--bs-body-bg);
                     border: 1px solid var(--bs-border-color);
                 }
+
                 .ui-slider {
                     width: 90%;
-                    margin: 13px auto 2px auto; // add enough top margin so the tooltips will fit
+                    margin: 13px auto 2px; // add enough top margin so the tooltips will fit
                     font-size: 0.9em;
                 }
+
                 .ui-slider .ui-slider-handle {
                     width: 0.9em;
                     height: 0.9em;
                 }
+
                 .ui-datepicker {
                     font-size: 0.8em;
                 }
+
                 span.currange {
 //                    font-size: smaller;
                     font-weight: normal;
                 }
+
                 // Add tooltips to slider handles
-                .value-popup:after {
+                .value-popup::after {
                     content: attr(data-value);
                     position: absolute;
                     bottom: 15px;
                     left: -3px;
                     min-width: 14px;
                     height: 12px;
-                    background-color: #444444;
-                    background-image: -webkit-gradient(linear, left top, left bottom, from(#444444), to(#999999));
-                    background-image: -webkit-linear-gradient(top, #444444, #999999);
-                    background-image: -o-linear-gradient(top, #444444, #999999);
-                    background-image: linear-gradient(to bottom, #444444, #999999);
+                    background-color: #444;
+                    background-image: -webkit-gradient(linear, left top, left bottom, from(#444), to(#999));
+                    background-image: linear-gradient(top, #444, #999);
+                    background-image: linear-gradient(top, #444, #999);
+                    background-image: linear-gradient(to bottom, #444, #999);
                     border-radius: 3px;
-                    -webkit-background-clip: padding-box;
                     background-clip: padding-box;
-                    -webkit-box-shadow: 0 0 4px 0 #777777;
-                    box-shadow: 0 0 4px 0 #777777;
-                    border: #444444 1px solid;
-                    color: #ffffff;
+                    box-shadow: 0 0 4px 0 #777;
+                    border: #444 1px solid;
+                    color: #fff;
                     font: bold 0.9em/1em Arial;
                     padding: 1px;
                     text-align: center;
                 }
-                .value-popup:before {
+
+                .value-popup::before {
                     content: "";
                     position: absolute;
                     width: 0;
                     height: 0;
-                    border-top: 8px solid #777777;
+                    border-top: 8px solid #777;
                     border-left: 8px solid transparent;
                     border-right: 8px solid transparent;
                     top: -8px;
@@ -142,32 +153,38 @@ table.tablesorter {
                 }
             }
         }
+
         tr.tablesorter-filter-row.hideme td {
             padding: calc($filterRowHiddenHeight / 2);
             margin: 0;
             line-height: 0;
             cursor: pointer;
         }
+
         tr.tablesorter-filter-row.hideme .tablesorter-filter {
             height: 1px;
             min-height: 0;
             border: 0;
             padding: 0;
             margin: 0;
+
             // don't use visibility: hidden because it disables tabbing
             opacity: 0;
             filter: alpha(opacity=0);
         }
     }
+
     // no formatting on filter row when filter-false
     thead .disabled {
         display: none;
     }
+
     tbody {
         // rows hidden by filtering (needed for child rows)
         tr.filtered {
             display: none;
         }
+
         td[data-tsmath] {
             font-weight: bold;
             text-align: right;
@@ -185,21 +202,26 @@ div.ts-wrapperdiv {
         label {
             margin: 0 5px;
         }
+
         input[type="checkbox"] {
             margin-right: 6px;
         }
     }
+
     select {
         width: auto;
         display: inline;
+
  //       option {
  //           font-size: smaller;
  //       }
     }
+
     select, input {
         font-size: smaller;
         border: var(--bs-border-width) solid var(--bs-border-color);
     }
+
     div.ts-pager {
         display:flex;
         align-items: center;
@@ -208,16 +230,20 @@ div.ts-wrapperdiv {
         font-size: smaller;
         float: right;
         clear: right;
+
         &.ts-pager-bottom {
             display: none;
         }
+
         .right-margin {
             vertical-align: bottom;
             margin-right: 4px;
         }
+
         .btn-group {
             align-items:center;
         }
+
         &.ts-pager-top {
             min-width: 35%;
         }

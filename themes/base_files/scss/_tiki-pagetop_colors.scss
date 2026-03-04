@@ -20,11 +20,13 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link
     {
         color: var(--tiki-top-color);
+
         &:hover {
             color: var(--tiki-top-hover-color);
             background: var(--tiki-top-hover-bg);
         }
     }
+
     border: var(--tiki-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-top-border-width); // For example, 1px, or 0px 0px 4px 0px
     box-shadow: var(--tiki-top-box-shadow);
@@ -38,6 +40,7 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 {
     background: var(--tiki-topbar-bg) !important;
     color: var(--tiki-topbar-text-color);
+
     a:not(.navbar-brand,.dropdown-item,.dropdown-menu a,.btn,.sm-sub-link,.alert-link),
     .dropdown-toggle, // Moved from tiki-selectors (this and next line)
     .nav-link.dropdown-toggle,
@@ -45,11 +48,13 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .nav-link,
     .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link {
         color: var(--tiki-topbar-color);
+
         &:hover {
             color: var(--tiki-topbar-hover-color);
             background: var(--tiki-topbar-hover-bg);
         }
     }
+
     border: var(--tiki-topbar-border); // Style and color, for example, solid black
     border-width: var(--tiki-topbar-border-width); // For example, 1px, or 0px 0px 4px 0px
     box-shadow: var(--tiki-topbar-box-shadow);
@@ -65,8 +70,10 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .page-header .top_modules,
     .page-header .top_modules .navbar,
     .topbar_modules .navbar {
-        background: transparent;
-        --bs-bg-opacity: 0;
+        background: transparent !important;
+
+        --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }
@@ -77,8 +84,10 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .topbar,
     .topbar_modules,
     .topbar_modules .navbar {
-        background: transparent;
-        --bs-bg-opacity: 0;
+        background: transparent !important;
+
+        --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }
@@ -89,8 +98,10 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     header .top_modules .navbar,
     .topbar,
     .topbar .navbar {
-        background: transparent;
-        --bs-bg-opacity: 0;
+        background: transparent !important;
+
+        --bs-bg-opacity: 0 !important;
+
         box-shadow: none;
         border: none;
     }

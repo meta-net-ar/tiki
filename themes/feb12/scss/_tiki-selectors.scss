@@ -8,6 +8,7 @@
 
 // Image path example:
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
@@ -31,6 +32,7 @@ $imagePath: "../images/";
         border: none;
     }
 }
+
     // end Classic layout
 
 header.container {
@@ -40,6 +42,7 @@ header.container {
 
 .side-col-toggle-container {
     margin-top: -1.8rem;
+
     .toggle_zone {
         padding: 3px;
         border-radius: 2px;
@@ -49,6 +52,7 @@ header.container {
     // Toggle - Dark background
 .bg-dark .toggle_zone {
     color: $navbar-dark-color;
+
     &:hover {
         color: $navbar-dark-hover-color;
     }
@@ -57,10 +61,12 @@ header.container {
     // Toggle - Light background
 .bg-light .toggle_zone {
     color: $navbar-light-color;
+
     &:hover {
         color: $navbar-light-hover-color;
     }
 }
+
     // end Toggle
 
 .navbar-fixed-top .container {
@@ -122,7 +128,7 @@ header.container {
 
 .topbar + .row,
 .layout_social > .container {
-    background: #ffffff url('#{$imagePath}page.jpg') repeat-x;
+    background: #fff url('#{$imagePath}page.jpg') repeat-x;
 }
 
 .topbar + .row {
@@ -153,16 +159,18 @@ header.container {
 .side-col-toggle + .col + .col2 { background-position: 0 -30px; }
 
 body.fullscreen {
-    background: #ffffff url('#{$imagePath}page.jpg') repeat-x;
+    background: #fff url('#{$imagePath}page.jpg') repeat-x;
     .container { border: none; }
 }
 
 #col2 {
     background: var(--tiki-feb12-col2-bg);
+
     .navbar {
         background: transparent;
+
         .nav-link {
-            color: var(--tiki-feb12-col2-nav-link-color); //#214D73;
+            color: var(--tiki-feb12-col2-nav-link-color); // #214D73;
             &:hover {
                 color: var(--tiki-feb12-col2-nav-link-hover-color);
             }
@@ -172,6 +180,7 @@ body.fullscreen {
 
 .bottom_modules nav.navbar.navbar-light.bg-light.navbar-dark.bg-dark {
     background: transparent !important;
+
     .nav-link {
         color: #214D73;
     }
@@ -211,6 +220,7 @@ body.fullscreen {
 .dropdown-item.text-danger {
     background: #fff;
     border-radius: 0;
+
     &:hover {
         color: #fff !important;
         background-color: #d9534f;
@@ -238,8 +248,9 @@ body.fullscreen {
 
 .module legend { font-size: .9rem; }
 
-html:not([data-bs-theme=dark]) {
+html:not([data-bs-theme="dark"]) {
     .form-text { color: #3D4248BF; }
+
     .progress-bar {
         &.bg-success,
         &.bg-info,
@@ -267,7 +278,7 @@ html:not([data-bs-theme=dark]) {
 .footer_liner .text-muted { color: #26282CBF; }
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme="dark"] {
     .figure-caption {
         color: #9CA4ABBF;
     }

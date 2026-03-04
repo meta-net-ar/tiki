@@ -1,6 +1,7 @@
 // This file contains CSS (SCSS) that theme options have in common, mostly color variations from the parent theme.
 
 $imagePath: "../images/";
+
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
@@ -13,24 +14,27 @@ $imagePath: "../images/";
 .card-footer {
     background: var(--tiki-fivealive-theme-bg);
     color: var(--tiki-fivealive-theme-color);
+
     a {
         color: var(--tiki-fivealive-theme-link-color);
+
         &:hover {
             color: var(--tiki-fivealive-theme-link-hover-color);
         }
     }
+
     --bs-heading-color: var(--tiki-fivealive-theme-color);
 }
 
 // Body
 .layout_basic,
-layout_basic.fullscreen,
+.layout_basic.fullscreen,
 .navbar-collapse.collapse.in {
     background-color: #414141;
 }
 
 #fullscreenbutton a {
-    color: #000000;
+    color: #000;
 }
 
 .layout_basic .container.container-std {
@@ -79,17 +83,17 @@ layout_basic.fullscreen,
 }
 
 .nav-tabs .nav-link {
-    border-color: rgba(222, 226, 230, 0.48) rgba(222, 226, 230, 0.48) rgba(255, 255, 255, 0.48);
+    border-color: rgb(222 226 230 / 48%) rgb(222 226 230 / 48%) rgb(255 255 255 / 48%);
 }
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
     color: $nav-tabs-link-active-color; // #000;
-    background-color: $nav-tabs-link-active-bg; //#a8e2ec;
+    background-color: $nav-tabs-link-active-bg; // #a8e2ec;
 }
 
 .flipmodtitle.close {
-    color: $card-cap-color;//#fff;
+    color: $card-cap-color;// #fff;
 }
 
 .card-header {
@@ -105,16 +109,18 @@ layout_basic.fullscreen,
 
 .blog-postbody-title {
     padding: 10px;
+
 //    color: $card-title-color; // #fff;
     h2.card-title {
         font-size: 1.6rem;
     }
+
 //    a {
 //        color: $card-title-color; //#fff;
 //   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .page-header {
         height: auto;
     }
@@ -149,6 +155,7 @@ layout_basic.fullscreen,
         --bs-pagination-active-bg: #{$secondary};
         --bs-pagination-active-border-color: #{$secondary};
     }
+
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
         --bs-nav-pills-link-active-bg: #{$secondary};
     }
@@ -168,13 +175,13 @@ layout_basic.fullscreen,
 }
 
 .tiki .main-footer {
-    padding: 1px 0 2px 0;
-    background: #000000;
+    padding: 1px 0 2px;
+    background: #000;
 }
 
 .footer_liner {
     .card-header {
-        border-width: 0 0 1px 0;
+        border-width: 0 0 1px;
     }
 }
 
@@ -185,12 +192,13 @@ layout_basic.fullscreen,
     //    color: #dee2e6;
     .tiki-card-header-title { color: $tiki-dark-footer-card-header-title-color; }
     .card-header { background: $tiki-dark-footer-card-header-bg; }
-    //.card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
+
+    // .card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
     .card { color: #dee2e6; background: #262626; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: $tiki-dark-footer-link-color; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: $tiki-dark-footer-link-hover-color; }
 }
 
-[data-bs-theme=dark].bottom_modules {
+[data-bs-theme="dark"].bottom_modules {
     color: $body-color-dark;
 }

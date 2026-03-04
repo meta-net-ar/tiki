@@ -3,19 +3,20 @@
 
 // - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
 // CSS is used because Bootstrap partials aren't available for theme variables, etc.
-//body.layout_basic {
+// body.layout_basic {
 //    background-image: linear-gradient(to left bottom, #f2ac8b, #f3af86, #f2b381, #f1b77c, #efbb78, #e7bf76, #dfc275, #d6c675, #c6c979, #b7cb80, #a8cc88, #9acd92);
-//}
+// }
 
 .text-danger {
     color: $danger !important; // #B85B19 !important; // $danger !important;
 }
+
 .text-dark {
     color: #6D5509 !important;
 }
 
 .btn-primary {
-    color: #000000;
+    color: #000;
 }
 
 .bg-dark {
@@ -43,10 +44,12 @@
     color: #3A833A;
     border-color: #3A833A;
 }
+
 .btn.btn-outline-warning {
     color: #A2630B;
     border-color: #A2630B;
 }
+
 .btn.btn-outline-info {
     color: #6E7425;
     border-color: #6E7425;
