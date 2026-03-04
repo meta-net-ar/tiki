@@ -368,9 +368,20 @@
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
 
+            {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
+                <div class="col-sm-12">
+                    <div class="form-check mb-3">
+                        <label for="isbatch" class="form-check-label">
+                            <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
+                                {tr}Unzip zip files{/tr}
+                        </label>
+                    </div>
+                </div>
+            {/if}
+
             {* Image Compression Controls *}
             {if $prefs.fgal_image_compression_enabled eq 'y'}
-                <div class="mb-3 row">
+                <div class="mb-3 row d-none" id="image_compression_controls">
                     <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
                     <div class="col-md-8">
                         {* Default Preset Summary *}
@@ -378,25 +389,20 @@
                             <div class="border rounded p-3 bg-light mb-3">
                                 <strong>{tr}Current Settings:{/tr}</strong>
                                 <ul class="mb-2">
-                                    <li>{tr}Max dimension:{/tr} <span id="default_max_size"
-                                            data-default="{$prefs.fgal_image_compression_max_dimension}">
+                                    <li>
+                                        {tr}Max dimension:{/tr}
+                                        <span id="default_max_size" data-default="{$prefs.fgal_image_compression_max_dimension}">
                                             {$prefs.fgal_image_compression_max_dimension} px
-                                            </span>
+                                        </span>
                                     </li>
-                                    <li>{tr}Compress files larger than:{/tr} <span
-                                            data-default="{$prefs.fgal_image_compression_max_size_mb|default:1}"
-                                            id="default_min_file">{$prefs.fgal_image_compression_max_size_mb|default:1} MB
-                                            </span>
+                                    <li>
+                                        {tr}Compress files larger than:{/tr}
+                                        <span data-default="{$prefs.fgal_image_compression_max_size_mb|default:1}" id="default_min_file">
+                                            {$prefs.fgal_image_compression_max_size_mb|default:1} MB
+                                        </span>
                                     </li>
                                     <li>{tr}Save original:{/tr}
                                        {if $prefs.fgal_image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
-                                    </li>
-                                    <li>{tr}Unzip zip files:{/tr}
-                                        {if isset($isbatch) and $isbatch|@count gt 0}
-                                             {tr}Yes{/tr}
-                                        {else}
-                                             {tr}No{/tr}
-                                        {/if}
                                     </li>
                                 </ul>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="customize-compression-toggle">
@@ -404,91 +410,88 @@
                                 </button>
                             </div>
                         </div>
-    
-                       {* Custom Controls (hidden by default) *}
+
+                        {* Custom Controls (hidden by default) *}
                         <div id="compression_custom_controls" class="d-none">
-      
                             {* Compression type: preset levels or slider *}
                             {if $prefs.fgal_image_compression_preset_type eq 'levels'}
-                                <div class="compression-preset-controls mb-3">
-                                    <label class="form-label">{tr}Compression Level{/tr}</label>
-                                    <div class="btn-group w-100" role="group">
-                                       <input type="radio" class="btn-check" name="compression_preset_main"
-                                            id="compression_high_main" value="high" checked>
-                                        <label class="btn btn-outline-success" for="compression_high_main">
-                                            <i class="fas fa-star"></i> {tr}High Quality{/tr}
-                                            <small class="d-block text-muted">90% - Large file</small>
-                                        </label>
+                                <div class="mb-2 row">
+                                    <label class="col-md-4 col-form-label">{tr}Compression Level{/tr}</label>
+                                    <div class="col-md-8">
+                                        <div class="btn-group w-100" role="group">
+                                           <input type="radio" class="btn-check" name="compression_preset_main"
+                                                id="compression_high_main" value="high" checked>
+                                            <label class="btn btn-outline-success btn-sm" for="compression_high_main">
+                                                <i class="fas fa-star"></i> {tr}High Quality{/tr}
+                                            </label>
 
-                                        <input type="radio" class="btn-check" name="compression_preset_main"
-                                            id="compression_balanced_main" value="balanced">
-                                        <label class="btn btn-outline-primary" for="compression_balanced_main">
-                                            <i class="fas fa-balance-scale"></i> {tr}Balanced{/tr}
-                                            <small class="d-block text-muted">75% - Medium file</small>
-                                        </label>
+                                            <input type="radio" class="btn-check" name="compression_preset_main"
+                                                id="compression_balanced_main" value="balanced">
+                                            <label class="btn btn-outline-primary btn-sm" for="compression_balanced_main">
+                                                <i class="fas fa-balance-scale"></i> {tr}Balanced{/tr}
+                                            </label>
 
-                                        <input type="radio" class="btn-check" name="compression_preset_main"
-                                           id="compression_compressed_main" value="compressed">
-                                        <label class="btn btn-outline-warning" for="compression_compressed_main">
-                                           <i class="fas fa-compress"></i> {tr}Compressed{/tr}
-                                           <small class="d-block text-muted">60% - Small file</small>
-                                        </label>
+                                            <input type="radio" class="btn-check" name="compression_preset_main"
+                                               id="compression_compressed_main" value="compressed">
+                                            <label class="btn btn-outline-warning btn-sm" for="compression_compressed_main">
+                                               <i class="fas fa-compress"></i> {tr}Compressed{/tr}
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             {else}
-                                <div class="compression-quality-controls mb-3">
-                                    <label for="compression_quality_main" class="form-label">{tr}Compression Quality{/tr}</label>
-                                    <div class="d-flex align-items-center">
-                                        <input type="range" class="form-range me-3" id="compression_quality_main"
-                                            name="compression_quality" min="10" max="100"
-                                            value="{$prefs.fgal_image_compression_quality|default:85}">
-                                        <span class="quality-display badge bg-primary"
-                                            id="quality_display_main">{$prefs.fgal_image_compression_quality|default:85}%</span>
+                                <div class="mb-2 row">
+                                    <label for="compression_quality_main" class="col-md-4 col-form-label">{tr}Compression Quality{/tr}</label>
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center">
+                                            <input type="range" class="form-range me-3" id="compression_quality_main"
+                                                name="compression_quality" min="10" max="100"
+                                                value="{$prefs.fgal_image_compression_quality|default:85}">
+                                            <span class="quality-display badge bg-primary"
+                                                id="quality_display_main">{$prefs.fgal_image_compression_quality|default:85}%</span>
+                                        </div>
                                     </div>
                                 </div>
                             {/if}
 
-                            <div class="mb-3">
-                                <label for="compression_max_dimension_main" class="form-label">{tr}Max Image Dimension{/tr}</label>
-                                <input type="number" id="compression_max_dimension_main" name="compression_max_dimension" class="form-control"
-                                    value="{$prefs.fgal_image_compression_max_dimension|default:1600}">
-                                    <small id="compression_max_dimension_msg" class="text-success small mt-1"></small>
-                                <small class="form-text text-muted">{tr}Maximum width or height in pixels. Images larger than this will be resized.{/tr}</small>
+                            <div class="mb-2 row">
+                                <label for="compression_max_dimension_main" class="col-md-4 col-form-label">{tr}Max Image Dimension{/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" id="compression_max_dimension_main" name="compression_max_dimension" class="form-control"
+                                        value="{$prefs.fgal_image_compression_max_dimension|default:1600}">
+                                    <small id="compression_max_dimension_msg" class="text-success small"></small>
+                                    <small class="form-text text-muted d-block">{tr}Maximum width or height in pixels. Images larger than this will be resized.{/tr}</small>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">{tr}Min File Size to Compress{/tr}</label>
-                                <input type="number" name="compression_max_size" class="form-control"
-                                    value="{$prefs.fgal_image_compression_max_size_mb|default:1}" min="1" step="0.5">
-                                <small class="form-text text-muted">{tr}Only compress images larger than this size (MB).{/tr}</small>
+                            <div class="mb-2 row">
+                                <label class="col-md-4 col-form-label">{tr}Min File Size to Compress{/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" name="compression_max_size" class="form-control"
+                                        value="{$prefs.fgal_image_compression_max_size_mb|default:1}" min="1" step="0.5">
+                                    <small class="form-text text-muted d-block">{tr}Only compress images larger than this size (MB).{/tr}</small>
+                                </div>
                             </div>
 
-                            <div class="form-check mb-3">
-                                <input type="checkbox" class="form-check-input" id="compression_save_original_main"
-                                    name="compression_save_original" value="y"
-                                    {if $prefs.fgal_image_compression_save_original eq 'y'}checked{/if}>
-                                <label for="compression_save_original_main" class="form-check-label">{tr}Save original
-                                    file{/tr}</label>
-                            </div>
-
-                            {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
-                                <div class="col-sm-12">
-                                    <div class="form-check mb-3">
-                                        <label for="isbatch" class="form-check-label">
-                                            <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
-                                            {tr}Unzip zip files{/tr}
-                                        </label>
+                            <div class="mb-1 row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-8">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="compression_save_original_main"
+                                            name="compression_save_original" value="y"
+                                            {if $prefs.fgal_image_compression_save_original eq 'y'}checked{/if}>
+                                        <label for="compression_save_original_main" class="form-check-label">{tr}Save original file{/tr}</label>
                                     </div>
                                 </div>
-                            {/if}
+                            </div>
 
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                 id="compression-back-to-default">
-                                <i class="fas fa-arrow-left"></i> {tr}Back to default{/tr}
+                                <i class="fas fa-arrow-left"></i> {tr}Use default compression settings{/tr}
                             </button>
-                       </div>
-                   </div>
-               </div>
+                        </div>
+                    </div>
+                </div>
             {/if}
             {if $prefs.elementplus_upload eq 'y'}
                 <div class="mb-3 row">
@@ -778,5 +781,22 @@ $("#galleryId").on("change", function(){
             console.log(e);
         }
     });
+});
+
+// Show/hide compression controls based on selected file type
+$("#userfile").on("change", function () {
+    const compressionSection = $("#image_compression_controls");
+    const files = this.files;
+    
+    // Check if any image file is selected
+    const hasImageFile = files && files.length > 0 && Array.from(files).some(file => {
+        return file.type.startsWith('image/');
+    });
+    
+    if (hasImageFile) {
+        compressionSection.removeClass('d-none');
+    } else {
+        compressionSection.addClass('d-none');
+    }
 });
 {/jq}

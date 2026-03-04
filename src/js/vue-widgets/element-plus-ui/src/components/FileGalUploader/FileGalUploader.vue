@@ -44,7 +44,14 @@ const showPreview = ref(false);
 const previewDimensions = ref('-');
 const originalSize = ref('-');
 const estimatedSize = ref('-');
+const needsCompression = ref(false);  // Track if current image needs compression
+const compressionReason = ref('');  // Why compression is/isn't needed
 let updateDebounceTimer = null;
+let currentCompressionSettings = {  // Track current settings for dynamic updates
+    quality: 85,
+    maxDimension: 1600,
+    maxSizeMb: 1
+};
 
 onMounted(async () => {
     const searcParams = new URLSearchParams(location.search);
@@ -63,7 +70,14 @@ onMounted(async () => {
         };
 
         await initializeCompressionUI(prefs);
-        
+
+        // Store compression settings for dynamic checks
+        currentCompressionSettings = {
+            quality: prefs.quality,
+            maxDimension: prefs.maxDimension,
+            maxSizeMb: prefs.maxSize
+        };
+
         // Make preview update function globally available for compressionControls
         window.updateVueUploadPreview = updatePreviewFromSettings;
     }
@@ -133,6 +147,25 @@ const currentPreviewFile = () => {
 };
 
 /**
+ * Check if current image needs compression based on settings
+ */
+const checkIfCompressionNeeded = (imageWidth, imageHeight, fileSize, settings) => {
+    const fileSizeMb = fileSize / (1024 * 1024);
+    const exceedsMinFileSize = fileSizeMb >= settings.maxSizeMb;
+    
+    // Primary check: file size must exceed minimum threshold to be worth compressing
+    if (exceedsMinFileSize) {
+        needsCompression.value = true;
+        compressionReason.value = `File size (${fileSizeMb.toFixed(2)}MB) exceeds minimum threshold of ${settings.maxSizeMb}MB and will be compressed`;
+        return true;
+    } else {
+        needsCompression.value = false;
+        compressionReason.value = `File is small (${fileSizeMb.toFixed(2)}MB) and below the ${settings.maxSizeMb}MB compression threshold. No compression needed.`;
+        return false;
+    }
+};
+
+/**
  * Update preview when compression settings change (called from compressionControls)
  */
 const updatePreviewFromSettings = async (settings) => {
@@ -143,10 +176,33 @@ const updatePreviewFromSettings = async (settings) => {
 
     updateDebounceTimer = setTimeout(async () => {
         try {
+            const quality = settings.quality || 85;
+            const maxDimension = settings.maxDimension || 1600;
+            const maxSizeMb = settings.maxSizeMb || currentCompressionSettings.maxSizeMb;
+            
+            // Update current settings
+            currentCompressionSettings = { quality, maxDimension, maxSizeMb };
+            
+            // Check if compression is actually needed
+            const compressionNeeded = checkIfCompressionNeeded(
+                current.image.naturalWidth,
+                current.image.naturalHeight,
+                current.file.size,
+                { maxDimension, maxSizeMb }
+            );
+            
+            if (!compressionNeeded) {
+                // Image doesn't need compression, don't show size comparison
+                previewDimensions.value = `${current.image.naturalWidth}×${current.image.naturalHeight}px`;
+                originalSize.value = formatFileSize(current.file.size);
+                estimatedSize.value = '-';
+                return;
+            }
+            
             const result = await createCanvasPreview(
                 current.image,
-                settings.quality || 85,
-                settings.maxDimension || 1600
+                quality,
+                maxDimension
             );
 
             if (!result) return;
@@ -193,6 +249,7 @@ const selectFileForPreview = (index) => {
     updatePreviewFromSettings({
         quality: state.current?.quality || 85,
         maxDimension: state.current?.maxDimension || 1600,
+        maxSizeMb: state.current?.maxSizeMb || currentCompressionSettings.maxSizeMb || 1
     });
 };
 
@@ -263,6 +320,18 @@ const loadImagePreviews = (files) => {
  */
 const handleFileChange = (file, fileList) => {
     loadImagePreviews(fileList);
+    const compressionSection = document.getElementById('image_compression_controls');
+    if (compressionSection) {
+        const hasImageFile = fileList && fileList.length > 0 && fileList.some(fileItem => {
+            return fileItem.raw && fileItem.raw.type.startsWith('image/');
+        });
+
+        if (hasImageFile) {
+            compressionSection.classList.remove('d-none');
+        } else {
+            compressionSection.classList.add('d-none');
+        }
+    }
 };
 
 const submitUpload = async () => {
@@ -365,7 +434,9 @@ const resetPreview = () => {
     previewDimensions.value = '-';
     originalSize.value = '-';
     estimatedSize.value = '-';
-    
+    needsCompression.value = false;
+    compressionReason.value = '';
+
     // Clear file list in upload component
     // uploadRef.value?.clearFiles();
 };
@@ -434,6 +505,41 @@ const httpRequest = (option) => {
         handleTikiFeedback(xhr);
     };
 }
+
+/**
+ * Remove a file from the preview list
+ */
+const removeFile = (index, event) => {
+    event.stopPropagation();
+    
+    const fileToRemove = previewFiles.value[index];
+    if (!fileToRemove) return;
+    
+    if (uploadRef.value?.uploadFiles) {
+        const uploadFile = uploadRef.value.uploadFiles.find(uploadFile => uploadFile.raw === fileToRemove.file);
+        if (uploadFile) {
+            uploadRef.value.remove(uploadFile);
+        }
+    }
+
+    previewFiles.value.splice(index, 1);
+
+    if (currentPreviewIndex.value === index) {
+        currentPreviewIndex.value = -1;
+        if (previewFiles.value.length > 0) {
+            const nextImageIndex = previewFiles.value.findIndex(file => file.type.startsWith('image/'));
+            if (nextImageIndex !== -1) {
+                selectFileForPreview(nextImageIndex);
+            } else if (previewFiles.value.length > 0) {
+                selectFileForPreview(0);
+            }
+        } else {
+            showPreview.value = false;
+        }
+    } else if (currentPreviewIndex.value > index) {
+        currentPreviewIndex.value--;
+    }
+}
 </script>
 
 <script>
@@ -495,7 +601,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             </div>
 
             <div v-if="props.compression_enabled === 'true'" class="preview-info-container">
-                <div class="preview-info-panel">
+                <div v-if="needsCompression" class="preview-info-panel">
                     <h6 class="preview-title">File: {{ currentPreviewFile().name }}</h6>
                     <div class="preview-dimensions">
                         Dimensions: {{ previewDimensions }}
@@ -514,13 +620,24 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                     </div>
                     <p class="preview-note">Preview updates as you adjust compression settings.</p>
                 </div>
+                <div v-else class="preview-info-panel">
+                    <h6 class="preview-title">File: {{ currentPreviewFile().name }}</h6>
+                    <div class="preview-dimensions">
+                        Dimensions: {{ previewDimensions }}
+                    </div>
+                    <hr class="preview-divider">
+                    <div class="compression-not-needed-alert">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>No compression needed.</strong> {{ compressionReason }}
+                    </div>
+                </div>
             </div>
         </div>
-        <div v-else-if="currentPreviewFile()" style="display: flex; align-items: center; justify-content: center; min-height: 300px; background: #f5f5f5; border-radius: 4px; margin-top: 1rem;">
-            <div style="text-align: center; color: #999;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
-                <p style="font-size: 1.2rem; margin: 0;">No preview available for this file type</p>
-                <small style="color: #bbb;">{{ currentPreviewFile().name }}</small>
+        <div v-else-if="currentPreviewFile()" class="no-preview-container">
+            <div class="no-preview-content">
+                <div class="no-preview-emoji">📄</div>
+                <p class="no-preview-title">No preview available for this file type</p>
+                <small class="no-preview-filename">{{ currentPreviewFile().name }}</small>
             </div>
         </div>
 
@@ -566,9 +683,9 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
         </div>
 
         <el-button type="primary" @click="submitUpload" :data-testid="DATA_TEST_ID.SUBMIT_BUTTON" :disabled="isCompressing">
-        <span v-if="isCompressing">Compressing...</span>
-        <span v-else-if="!insertIntoEditor">Upload</span>
-        <span v-else>Insert</span>
+            <span v-if="isCompressing">Compressing...</span>
+            <span v-else-if="!insertIntoEditor">Upload</span>
+            <span v-else>Insert</span>
         </el-button>
     </ConfigWrapper>
 </template>
