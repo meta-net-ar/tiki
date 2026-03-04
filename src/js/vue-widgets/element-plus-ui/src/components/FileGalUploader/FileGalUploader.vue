@@ -38,16 +38,16 @@ const completedUploads = ref(0);
 const submitCalled = ref(false);
 
 // Preview state
-const previewFiles = ref([]);  // Array of {file, image, name, type}
-const currentPreviewIndex = ref(-1);  // Index of currently displayed preview
+const previewFiles = ref([]);
+const currentPreviewIndex = ref(-1);
 const showPreview = ref(false);
 const previewDimensions = ref('-');
 const originalSize = ref('-');
 const estimatedSize = ref('-');
-const needsCompression = ref(false);  // Track if current image needs compression
-const compressionReason = ref('');  // Why compression is/isn't needed
+const needsCompression = ref(false);
+const compressionReason = ref('');
 let updateDebounceTimer = null;
-let currentCompressionSettings = {  // Track current settings for dynamic updates
+let currentCompressionSettings = {
     quality: 85,
     maxDimension: 1600,
     maxSizeMb: 1
@@ -244,7 +244,6 @@ const selectFileForPreview = (index) => {
     currentPreviewIndex.value = index;
     showPreview.value = true;
 
-    // Show preview with current settings - this will create and set dataUrl
     const state = window.COMPRESSION_STATE || {};
     updatePreviewFromSettings({
         quality: state.current?.quality || 85,
@@ -299,11 +298,9 @@ const loadImagePreviews = (files) => {
         previewFiles.value.push(fileObj);
     });
 
-    // Only show preview if there's at least one image file
     const hasImages = previewFiles.value.some(file => file.type.startsWith('image/'));
     if (hasImages) {
         showPreview.value = true;
-        // Auto-select the first image file
         if (currentPreviewIndex.value === -1) {
             const firstImageIndex = previewFiles.value.findIndex(file => file.type.startsWith('image/'));
             if (firstImageIndex !== -1) {
@@ -506,40 +503,6 @@ const httpRequest = (option) => {
     };
 }
 
-/**
- * Remove a file from the preview list
- */
-const removeFile = (index, event) => {
-    event.stopPropagation();
-    
-    const fileToRemove = previewFiles.value[index];
-    if (!fileToRemove) return;
-    
-    if (uploadRef.value?.uploadFiles) {
-        const uploadFile = uploadRef.value.uploadFiles.find(uploadFile => uploadFile.raw === fileToRemove.file);
-        if (uploadFile) {
-            uploadRef.value.remove(uploadFile);
-        }
-    }
-
-    previewFiles.value.splice(index, 1);
-
-    if (currentPreviewIndex.value === index) {
-        currentPreviewIndex.value = -1;
-        if (previewFiles.value.length > 0) {
-            const nextImageIndex = previewFiles.value.findIndex(file => file.type.startsWith('image/'));
-            if (nextImageIndex !== -1) {
-                selectFileForPreview(nextImageIndex);
-            } else if (previewFiles.value.length > 0) {
-                selectFileForPreview(0);
-            }
-        } else {
-            showPreview.value = false;
-        }
-    } else if (currentPreviewIndex.value > index) {
-        currentPreviewIndex.value--;
-    }
-}
 </script>
 
 <script>
