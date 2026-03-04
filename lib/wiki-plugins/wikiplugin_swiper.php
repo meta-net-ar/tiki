@@ -382,6 +382,19 @@ function wikiplugin_swiper_info()
                 'default' => 3,
                 'advanced' => true,
             ],
+            'teleprompterMirror' => [
+                'required' => false,
+                'name' => tr('Teleprompter mirror mode'),
+                'description' => tr('Mirror text for physical teleprompters. Example: vertical (none, horizontal, vertical). Vertical mode also reverses scroll direction.'),
+                'filter' => 'word',
+                'default' => 'none',
+                'advanced' => true,
+                'options' => [
+                    ['text' => tr('None'), 'value' => 'none'],
+                    ['text' => tr('Horizontal'), 'value' => 'horizontal'],
+                    ['text' => tr('Vertical'), 'value' => 'vertical'],
+                ],
+            ],
             'teleprompterFocusMode' => [
                 'required' => false,
                 'name' => tr('Teleprompter focus area'),
@@ -451,6 +464,7 @@ function wikiplugin_swiper($data, $params)
         'teleprompter' => 'n',
         'teleprompterSpeed' => 60,
         'teleprompterAcceleration' => 3,
+        'teleprompterMirror' => 'none',
         'teleprompterFocusMode' => 'top',
         'teleprompterTimer' => 'y',
         'teleprompterControls' => 'y',
@@ -617,6 +631,13 @@ function wikiplugin_swiper($data, $params)
         $timerClass = $params['teleprompterTimer'] === 'y' ? '' : ' teleprompter-timer-hidden';
         $showControls = $params['teleprompterControls'] === 'y';
         $controlsClass = $showControls ? '' : ' teleprompter-controls-hidden';
+        $mirrorMode = in_array($params['teleprompterMirror'], ['none', 'horizontal', 'vertical'], true) ? $params['teleprompterMirror'] : 'none';
+        $mirrorClass = '';
+        if ($mirrorMode === 'horizontal') {
+            $mirrorClass = ' teleprompter-mirror-horizontal';
+        } elseif ($mirrorMode === 'vertical') {
+            $mirrorClass = ' teleprompter-mirror-vertical';
+        }
         $focusMode = in_array($params['teleprompterFocusMode'], ['none', 'top', 'middle', 'bottom'], true) ? $params['teleprompterFocusMode'] : 'top';
         $focusClass = ' teleprompter-focus-' . $focusMode;
         $teleprompterHtml = implode('', $teleprompterBlocks);
@@ -681,6 +702,7 @@ function wikiplugin_swiper($data, $params)
             'maxFontScale' => $teleprompterMaxFontScale,
             'fontScaleStep' => $teleprompterFontScaleStep,
             'resizeDebounceMs' => $teleprompterResizeDebounceMs,
+            'reverseScroll' => $mirrorMode === 'vertical',
         ];
         $headerlib->add_js(
             '$(function(){if(typeof window.tikiInitSwiperTeleprompter==="function"){window.tikiInitSwiperTeleprompter(' . json_encode($teleprompterOptions) . ');}});'
@@ -691,7 +713,7 @@ function wikiplugin_swiper($data, $params)
         $pauseButtonLabel = htmlspecialchars(tr('Pause'), ENT_QUOTES);
         $restartButtonLabel = htmlspecialchars(tr('Restart'), ENT_QUOTES);
 
-        return '<div id="' . $containerId . '" class="teleprompter-container' . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
+        return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
             '<div id="' . $trackId . '" class="teleprompter-track">' .
             '<div id="' . $contentId . '" class="teleprompter-content"><div class="teleprompter-spacer teleprompter-spacer-before" aria-hidden="true"></div>' . $teleprompterHtml . '<div class="teleprompter-spacer teleprompter-spacer-after" aria-hidden="true"></div></div>' .
             '</div>' .

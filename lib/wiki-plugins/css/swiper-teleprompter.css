@@ -16,6 +16,14 @@
   outline-offset: 2px;
 }
 
+.teleprompter-mirror-horizontal {
+  transform: scaleX(-1);
+}
+
+.teleprompter-mirror-vertical {
+  transform: scaleY(-1);
+}
+
 .teleprompter-track {
   position: relative;
   z-index: 1;
