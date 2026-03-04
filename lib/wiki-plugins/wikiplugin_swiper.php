@@ -366,6 +366,7 @@ function wikiplugin_swiper($data, $params)
     }
     static $uid = 0;
     $uid++;
+
     $plugininfo = wikiplugin_swiper_info();
     foreach ($plugininfo['params'] as $key => $param) {
         //separating digits filter parameters
@@ -373,6 +374,7 @@ function wikiplugin_swiper($data, $params)
             $swiperDigitsParams[] = $key;
         }
     }
+
     // Handle swiper height
     $heightMode = 'tallest';
     $heightCSS = '';
@@ -383,6 +385,7 @@ function wikiplugin_swiper($data, $params)
         $heightMode = 'custom';
         $heightCSS = 'height: ' . $params['height'] . ';';
     }
+
     if ($params['autoPlay'] != 'n') {
         $autoplayDelay = $params['autoPlayDelay'] * 1000;
         $autoPlay = 'autoplay: {
@@ -393,7 +396,7 @@ function wikiplugin_swiper($data, $params)
     }
     if ($params['pagination'] != 'n') {
         $pagination = 'pagination: {
-            el: \' .swiper-pagination\',
+            el: \'.swiper-pagination\',
             clickable: true,
             type:"' . $params['pagination'] . '"
             },';
@@ -575,6 +578,7 @@ function wikiplugin_swiper($data, $params)
             const $images = $swiper.find(".swiper-slide img");
             let maxHeight = 0;
             let loadedCount = 0;
+
             const checkAllLoadedAndSetHeight = function() {
                 loadedCount++;
                 if (loadedCount === $images.length) {
@@ -584,6 +588,7 @@ function wikiplugin_swiper($data, $params)
                     $swiper.css("height", maxHeight + "px");
                 }
             };
+
             $images.each(function() {
                 const $img = $(this);
                 if (this.complete) {
@@ -599,6 +604,7 @@ function wikiplugin_swiper($data, $params)
         });
         ';
     }
+
     if ($params['sliderPosition'] == 'abovetopbar') {
         $headerlib->add_css("#swiper-container" . $uid . "{visibility:hidden;}");
         $swiperOpts .= 'var container=$(".container").first();$("#swiper-container' . $uid . '").insertBefore( container );$("#gallery-thumbs' . $uid . '").insertAfter( "#swiper-container' . $uid . '" );';
