@@ -378,7 +378,6 @@ function wikiplugin_swiper($data, $params)
     // Handle swiper height
     $heightMode = 'tallest';
     $heightCSS = '';
-
     if ($params['autoHeight'] === 'y') {
         $heightMode = 'variable';
         $heightCSS = 'height: auto;';
@@ -446,7 +445,6 @@ function wikiplugin_swiper($data, $params)
         $params['fileIds'] = explode(',', $params['fileIds']);
         foreach ($params['fileIds'] as $fileId) {
             $file = $filegallib->get_file($fileId);
-
             if (! is_null($file)) {
                 $files['data'][] = $file;
             }
@@ -572,7 +570,6 @@ function wikiplugin_swiper($data, $params)
             ' . $navigation . '
      
             });' . $creativeRandomEffect . $thumbAfter;
-
     // Add JavaScript for tallest height mode
     if ($heightMode === 'tallest') {
         $swiperOpts .= '
