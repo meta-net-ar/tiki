@@ -122,20 +122,14 @@ class Installer extends TikiDb_Bridge implements SplSubject
         //  If data file is missing or the batch loader is not available, use the single insert method
         $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.sql';
         $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.data';
+        $secdbDataLoaded = false;
         if (file_exists($secdbData)) {
             // A MySQL datafile exists
             $truncateTable = true;
-            $rc = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
-            if ($rc == false) {
-                // The batch loader failed
-                if (file_exists($secdb)) {
-                    // Mirror runDataFile behavior to avoid duplicate PK rows on re-runs.
-                    $this->truncateSecdbIfExists();
-                    // Run single inserts
-                    $this->runFile($secdb, false);
-                }
-            }
-        } elseif (file_exists($secdb)) {
+            $secdbDataLoaded = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
+        }
+
+        if (! $secdbDataLoaded && file_exists($secdb)) {
             // Keep fallback SQL path idempotent, as with .data loading.
             $this->truncateSecdbIfExists();
             // Run single inserts
