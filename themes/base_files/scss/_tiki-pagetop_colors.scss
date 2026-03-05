@@ -37,6 +37,11 @@ body.layout_social:not(.tiki-admin.uab) .tiki-top-nav-dark
     box-shadow: var(--tiki-top-box-shadow);
 }
 
+body:not(.tiki-admin) .tiki-top-nav-light .navbar,
+body:not(.tiki-admin) .tiki-top-nav-dark .navbar {
+    background: var(--tiki-top-bg);
+}
+
 // Topbar module zone and parent divs
 .tiki .tiki-topbar-nav-light,
 .admin-content .tiki-nav-light, // Legacy admin icons
