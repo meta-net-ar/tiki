@@ -554,6 +554,11 @@ class CategLib extends ObjectLib
     public function uncategorize($catObjectId, $categId)
     {
         global $prefs;
+        $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
+        if (isset($info['type']) && $info['type'] == 'trackeritem') {
+            $trackerItem = Tracker_Item::fromId($catObjectId);
+            return $trackerItem->uncategorizeTrackerItem($categId);
+        }
         $query = "delete from `tiki_category_objects` where `catObjectId`=? and `categId`=?";
         $result = $this->query($query, [(int)$catObjectId, (int)$categId], -1, -1, false);
 
@@ -561,7 +566,6 @@ class CategLib extends ObjectLib
         if ($prefs['categories_cache_refresh_on_object_cat'] != "n") {
             $cachelib->invalidateAll("allcategs");
         }
-        $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if ($prefs['feature_actionlog'] == 'y') {
             $logslib = TikiLib::lib('logs');
             $logslib->add_action('Uncategorized', $info['itemId'], $info['type'], "categId=$categId");
@@ -1100,6 +1104,10 @@ class CategLib extends ObjectLib
      */
     public function categorize_any($type, $identifier, $categIds)
     {
+        if ($type == 'trackeritem') {
+            $trackerItem = Tracker_Item::fromId($identifier);
+            return $trackerItem->categorizeTrackerItem($categIds);
+        }
         $catObjectId = $this->add_categorized_object($type, $identifier, null, null, null, true);
         if ($catObjectId === false) {
             return false;

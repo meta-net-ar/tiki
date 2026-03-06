@@ -737,4 +737,64 @@ class Tracker_Item
             }
         }
     }
+    /**
+     * Categorize a tracker item.
+     *
+     * @param int $categId The category ID to add.
+     * @return int Returns the category ID if the update was successful; otherwise, returns 0.
+     * @throws Services_Exception If a trackeritem has multiple category fields.
+     */
+    public function categorizeTrackerItem(int $categId): int
+    {
+        $trklib = TikiLib::lib('trk');
+        $utilities = new Services_Tracker_Utilities();
+        $trackerId = $this->getDefinition()->getId();
+        $definition = $this->getDefinition()::get($trackerId);
+        if ($fieldIds = $definition->getCategorizedFields()) {
+            if (count($fieldIds) > 1) {
+                throw new Services_Exception("Unable to categorize a tracker item with multiple category fields");
+            }
+            $field = $definition->getField($fieldIds[0]);
+            $field_handler = $trklib->get_field_handler($field);
+            $fieldOptions = $field_handler->getOption('inputtype');
+            $arrayItemValue = array_filter(explode(',', $trklib->get_item_value($trackerId, $this->getId(), $fieldIds[0]) ?? ''));
+            /**
+             * Check if the field can only receive one value; if so, insert the new value.
+             * Otherwise, retrieve the field's previous values, add the new value, and update the field with all the values.
+             */
+            $newValue = $categId;
+            if (! (isset($fieldOptions) && in_array($fieldOptions, ['d', 'radio']))) {
+                array_push($arrayItemValue, $categId);
+                $newValue = implode(',', array_unique($arrayItemValue));
+            }
+            $utilities->updateItem($definition, ['itemId' => $this->getId(), 'fields' => [$field['permName'] => $newValue]]);
+            return $categId;
+        }
+        return 0;
+    }
+    /**
+     * Uncategorize a tracker item.
+     *
+     * @param int $categId The category ID to remove.
+     * @return int Returns the category ID if the update was successful; otherwise, returns 0.
+     */
+    public function uncategorizeTrackerItem(int $categId): int
+    {
+        $trklib = TikiLib::lib('trk');
+        $utilities = new Services_Tracker_Utilities();
+        $trackerId = $this->getDefinition()->getId();
+        $definition = $this->getDefinition()::get($trackerId);
+        if ($fieldIds = $definition->getCategorizedFields()) {
+            $field = $definition->getField($fieldIds[0]);
+            /**
+             * Retrieve the old values ​​from the field, remove the identifier of the category to be decategorized from the trackeritem and update the field.
+             */
+            $arrayItemValue = array_filter(explode(',', $trklib->get_item_value($trackerId, $this->getId(), $fieldIds[0]) ?? ''));
+            $arrayItemValue = array_diff($arrayItemValue, [$categId]);
+            $newValue = implode(',', $arrayItemValue);
+            $utilities->updateItem($definition, ['itemId' => $this->getId(), 'fields' => [$field['permName'] => $newValue]]);
+            return $categId;
+        }
+        return 0;
+    }
 }
