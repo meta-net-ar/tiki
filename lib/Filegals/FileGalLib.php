@@ -3660,7 +3660,7 @@ class FileGalLib extends TikiLib
         return $fileInfo;
     }
 
-    public function upload_single_file($gal_info, $name, $size, $type, $data, $asuser = null, $image_x = null, $image_y = null, $description = '', $created = '', $title = '', $directoryPattern = '', $objectId = null, $objectType = null)
+    public function upload_single_file($gal_info, $name, $size, $type, $data, $asuser = null, $image_x = null, $image_y = null, $description = '', $created = '', $title = '', $directoryPattern = '')
     {
         global $user;
         if (empty($asuser) || ! Perms::get()->admin) {
@@ -3674,24 +3674,12 @@ class FileGalLib extends TikiLib
 
         $tx = $this->begin();
 
-        if ($objectId && $objectType) {
-            $file = new TikiFileLink([
-                'galleryId' => $gal_info['galleryId'],
-                'objectId' => $objectId,
-                'objectType' => $objectType,
-                'description' => $description,
-                'user' => $asuser,
-                'created' => $created
-            ]);
-        } else {
-            $file = new TikiFile([
-                'galleryId' => $gal_info['galleryId'],
-                'description' => $description,
-                'user' => $asuser,
-                'created' => $created
-            ]);
-        }
-
+        $file = new TikiFile([
+            'galleryId' => $gal_info['galleryId'],
+            'description' => $description,
+            'user' => $asuser,
+            'created' => $created
+        ]);
         $file->directoryPattern = $directoryPattern;
         $ret = $file->replace($data, $type, $title, $name, $image_x, $image_y);
 
@@ -4448,18 +4436,11 @@ class FileGalLib extends TikiLib
             return;
         }
 
-        $files = $this->table('tiki_files');
-        $fileIds = $files->fetchColumn('fileId', [
-            'objectId' => $objectId,
-            'objectType' => $objectType
-        ]);
-
-        if (empty($fileIds)) {
-            return;
-        }
-
-        foreach ($fileIds as $fileId) {
-            TikiFile::id($fileId)->delete();
+        $relationlib = TikiLib::lib('relation');
+        $relations = $relationlib->get_relations_from($objectType, $objectId, 'tiki.file.attach');
+        foreach ($relations as $relation) {
+            TikiFile::id($relation['itemId'])->delete();
+            $relationlib->remove_relation($relation['relationId']);
         }
     }
 }
