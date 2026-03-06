@@ -15,7 +15,6 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 $themelib = TikiLib::lib('theme');
 
 if (! Sections::getCurrentSection()) {
-
     $script = basename($_SERVER['SCRIPT_NAME']);
 
     if (strpos($script, 'tiki-admin') === 0) {
