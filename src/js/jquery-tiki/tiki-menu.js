@@ -23,8 +23,6 @@ $(function () {
 
         if (id && id.startsWith("mod-menubottom")) {
             $menu.addClass("dropdown-menu-bottom");
-        } else {
-            $menu.addClass("dropdown-menu-top-t");
         }
     });
 });
