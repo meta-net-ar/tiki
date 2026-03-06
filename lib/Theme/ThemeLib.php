@@ -83,7 +83,11 @@ class ThemeLib extends TikiLib
         }
 
         //consider Admin Theme
+<<<<<<< HEAD
         if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
+=======
+        if (! empty($prefs['theme_admin']) && $section === Sections::SECTION_ADMIN) {       // use admin theme if set
+>>>>>>> 2f67e5fef0 ([FIX] Theme: admin theme incorrectly applied site-wide)
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
