@@ -748,8 +748,8 @@ class Tracker_Item
     {
         $trklib = TikiLib::lib('trk');
         $utilities = new Services_Tracker_Utilities();
-        $trackerId = $this->getDefinition()->getId();
-        $definition = $this->getDefinition()::get($trackerId);
+        $definition = $this->getDefinition();
+        $trackerId = $definition->getId();
         if ($fieldIds = $definition->getCategorizedFields()) {
             if (count($fieldIds) > 1) {
                 throw new Services_Exception("Unable to categorize a tracker item with multiple category fields");
@@ -782,9 +782,12 @@ class Tracker_Item
     {
         $trklib = TikiLib::lib('trk');
         $utilities = new Services_Tracker_Utilities();
-        $trackerId = $this->getDefinition()->getId();
-        $definition = $this->getDefinition()::get($trackerId);
+        $definition = $this->getDefinition();
+        $trackerId = $definition->getId();
         if ($fieldIds = $definition->getCategorizedFields()) {
+            if (count($fieldIds) > 1) {
+                throw new Services_Exception("Unable to categorize a tracker item with multiple category fields");
+            }
             $field = $definition->getField($fieldIds[0]);
             /**
              * Retrieve the old values ​​from the field, remove the identifier of the category to be decategorized from the trackeritem and update the field.
