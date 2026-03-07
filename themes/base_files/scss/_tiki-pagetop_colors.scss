@@ -84,6 +84,18 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     }
 }
 
+.layout_social:not(.tiki-admin) {
+    header .top_modules,
+    header .top_modules .navbar,
+    .topbar,
+    .topbar .navbar {
+        background: transparent;
+        --bs-bg-opacity: 0;
+        box-shadow: none;
+        border: none;
+    }
+}
+
 /* Fix responsive spacing for top modules and page content when using fixed navbar */
 .layout_social .top_modules {
     margin-top: 40px;
