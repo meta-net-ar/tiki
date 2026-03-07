@@ -4428,14 +4428,8 @@ class FileGalLib extends TikiLib
         }
     }
 
-    public function deleteObjectFiles($args)
+    public function deleteObjectFiles($objectType, $objectId)
     {
-        $objectId = $args['object'] ?? null;
-        $objectType = $args['type'] ?? null;
-        if (empty($objectId) || empty($objectType)) {
-            return;
-        }
-
         $relationlib = TikiLib::lib('relation');
         $relations = $relationlib->get_relations_from($objectType, $objectId, 'tiki.file.attach');
         foreach ($relations as $relation) {

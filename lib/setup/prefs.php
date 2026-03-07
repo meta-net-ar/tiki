@@ -174,7 +174,7 @@ function get_default_prefs()
                 style, fontname, fontsize, outdent, indent /
             ',
             'toolbar_global_comments' => '
-                bold, italic, underline, strike , - , link, smiley | help
+                bold, italic, underline, strike , - , link, filerecording | help
             ',
             'toolbar_trackeritem_comments' => '
                 bold, italic, underline, strike , - , link, smiley, linkfile, filerecording | help
