@@ -763,9 +763,13 @@ class Tracker_Item
              * Otherwise, retrieve the field's previous values, add the new value, and update the field with all the values.
              */
             $newValue = $categId;
-            if (! (isset($fieldOptions) && in_array($fieldOptions, ['d', 'radio']))) {
+            $singleValueOnly = isset($fieldOptions) && in_array($fieldOptions, ['d', 'radio']);
+            if (! $singleValueOnly || count($arrayItemValue) > 1) {
                 array_push($arrayItemValue, $categId);
                 $newValue = implode(',', array_unique($arrayItemValue));
+                if ($singleValueOnly && count($arrayItemValue) > 1) {
+                    Feedback::warning(tr("Field %0 can only contain one value, but several values ​​have been assigned to it.", $field['name']));
+                }
             }
             $utilities->updateItem($definition, ['itemId' => $this->getId(), 'fields' => [$field['permName'] => $newValue]]);
             return $categId;
