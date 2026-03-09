@@ -20,30 +20,42 @@ class SourceManager
      * Get a stable, unique identifier for this source.
      * Should be set explicitly in config via 'source_id' key.
      * Falls back to a hash-based identifier if not provided (not recommended).
+     *
+     * @param array|SourceConfig $cfg
      */
-    public function getSourceIdentifier(array $cfg): string
+    public function getSourceIdentifier($cfg): string
+    {
+        return $this->getSourceIdentifierFromConfig($this->normalizeConfig($cfg));
+    }
+
+    /**
+     * Get a stable, unique identifier for this source from a typed configuration object.
+     */
+    public function getSourceIdentifierFromConfig(SourceConfig $cfg): string
     {
         // Prefer explicit source_id from configuration
-        if (! empty($cfg['source_id'])) {
-            return $cfg['source_id'];
+        $sourceId = $cfg->getSourceId();
+        if ($sourceId !== null) {
+            return $sourceId;
         }
 
         // Fallback: generate stable hash
-        $type = $cfg['type'] ?? 'local';
+        $type = $cfg->getType();
 
         if ($type === 'git') {
-            $url = $cfg['repo_url'] ?? '';
-            $branch = $cfg['repo_branch'] ?? 'main';
+            $url = $cfg->getRepoUrl();
+            $branch = $cfg->getRepoBranch();
             // Use hash of normalized repo info
             return 'git_' . hash('sha256', $url . ':' . $branch);
         }
 
-        if ($type === 'local' && ! empty($cfg['local_path'])) {
-            return 'local_' . hash('sha256', realpath($cfg['local_path']) ?: $cfg['local_path']);
+        if ($type === 'local' && $cfg->getLocalPath() !== null) {
+            $localPath = $cfg->getLocalPath();
+            return 'local_' . hash('sha256', realpath($localPath) ?: $localPath);
         }
 
         // Last resort: generic identifier with timestamp
-        return 'source_' . hash('sha256', serialize($cfg));
+        return 'source_' . hash('sha256', serialize($cfg->toArray()));
     }
 
     /**
@@ -53,9 +65,10 @@ class SourceManager
      */
     public function fetchToTempDir(array $cfg, ?string $uploadTmp = null, ?string $uploadName = null): ?string
     {
+        $sourceConfig = SourceConfig::fromArray($cfg);
         $this->error = '';
         try {
-            $type = (string)($cfg['type'] ?? 'local');
+            $type = $sourceConfig->getType();
 
             if ($type === 'local') {
                 // Prioritize upload if provided, otherwise use local path
@@ -72,12 +85,12 @@ class SourceManager
 
             if ($type === 'git') {
                 $prov = new GitWorkingCopyProvider([
-                    'repo_url'      => $cfg['repo_url'] ?? '',
-                    'repo_branch'   => $cfg['repo_branch'] ?? 'main',
-                    'git_pull'      => ! empty($cfg['git_pull']),
-                    'repo_token'  => $cfg['repo_token'] ?? null,   // optional
+                    'repo_url'      => $sourceConfig->getRepoUrl(),
+                    'repo_branch'   => $sourceConfig->getRepoBranch(),
+                    'git_pull'      => $sourceConfig->shouldGitPull(),
+                    'repo_token'    => $sourceConfig->getRepoToken(), // optional
                 ], [
-                    'timeout'       => (int)($cfg['git_timeout'] ?? 45),
+                    'timeout'       => $sourceConfig->getGitTimeout(),
                 ]);
                 return $prov->fetchToTempDir();
             }
@@ -87,5 +100,21 @@ class SourceManager
             $this->error = $e->getMessage();
             return null;
         }
+    }
+
+    /**
+     * @param array|SourceConfig $cfg
+     */
+    private function normalizeConfig($cfg): SourceConfig
+    {
+        if ($cfg instanceof SourceConfig) {
+            return $cfg;
+        }
+
+        if (is_array($cfg)) {
+            return SourceConfig::fromArray($cfg);
+        }
+
+        throw new \InvalidArgumentException('SourceManager expects source config as array or SourceConfig.');
     }
 }

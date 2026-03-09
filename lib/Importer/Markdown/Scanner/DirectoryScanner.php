@@ -26,7 +26,7 @@ class DirectoryScanner implements ScannerInterface
     /**
      * Scan a directory and return normalized items.
      *
-     * @param string $path Absolute path to directory (or ZIP for backward compat)
+        * @param string $path Absolute path to directory or ZIP file
      * @param array  $options Scan options
      * @return array {files: array, counts: array}
      */
@@ -135,8 +135,7 @@ class DirectoryScanner implements ScannerInterface
     }
 
     /**
-     * Scan a ZIP file (backward compatibility).
-     * Extracts to temp directory then scans.
+     * Scan a ZIP file by extracting it to a temp directory, then scan the extracted directory.
      */
     private function scanZip(string $zipPath, array $options): array
     {
