@@ -189,55 +189,60 @@ class MarkdownFileAnalyzer
     {
         $t = trim($title);
 
-        // ISO-like: YYYY-MM-DD with various separators
-        if (preg_match('~^(\d{4})[ \t/_\-.](\d{1,2})[ \t/_\-.](\d{1,2})$~', $t, $m)) {
-            $iso = sprintf('%04d-%02d-%02d', (int)$m[1], (int)$m[2], (int)$m[3]);
-            return true;
-        }
-        // Compact YYYYMMDD
-        if (preg_match('~^(\d{4})(\d{2})(\d{2})$~', $t, $m)) {
-            $iso = sprintf('%04d-%02d-%02d', (int)$m[1], (int)$m[2], (int)$m[3]);
-            return true;
+        if ($t === '') {
+            return false;
         }
 
-        // Remove English ordinals
-        $t2 = preg_replace('~\b(\d{1,2})(st|nd|rd|th)\b~i', '$1', $t);
+        // Normalize separators and remove English ordinals.
+        $t2 = strtr($t, ['_' => '-', '/' => '-', '.' => '-']);
+        $t2 = preg_replace('~\b(\d{1,2})(st|nd|rd|th)\b~i', '$1', $t2);
 
-        // Try IntlDateFormatter
-        $locales = ['en_US', 'fr_FR'];
-        $patterns = [
-            \IntlDateFormatter::LONG,
-            \IntlDateFormatter::MEDIUM,
-            \IntlDateFormatter::SHORT,
+        $formats = [
+            '!Y-m-d',
+            '!Y-n-j',
+            '!Ymd',
+            '!d-m-Y',
+            '!j-n-Y',
+            '!M j Y',
+            '!M j, Y',
+            '!F j Y',
+            '!F j, Y',
+            '!j M Y',
+            '!j F Y',
         ];
+
+        foreach ($formats as $format) {
+            $dt = \DateTime::createFromFormat($format, $t2);
+            if ($dt === false) {
+                continue;
+            }
+
+            $errors = \DateTime::getLastErrors();
+            if (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0) {
+                continue;
+            }
+
+            $iso = $dt->format('Y-m-d');
+            return true;
+        }
+
+        // Try localized parser when month/day names are language-specific.
+        $locales = strtolower($lang) === 'fr' ? ['fr_FR', 'en_US'] : ['en_US', 'fr_FR'];
+        $patterns = [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT];
 
         foreach ($locales as $locale) {
             foreach ($patterns as $pattern) {
-                $formatter = new \IntlDateFormatter(
-                    $locale,
-                    $pattern,
-                    \IntlDateFormatter::NONE,
-                    'UTC'
-                );
-                $ts = $formatter->parse($t2);
-                if ($ts !== false) {
-                    $iso = date('Y-m-d', $ts);
-                    return true;
+                $formatter = new \IntlDateFormatter($locale, $pattern, \IntlDateFormatter::NONE);
+                $formatter->setLenient(false);
+                $pos = 0;
+                $ts = $formatter->parse($t2, $pos);
+                if ($ts === false || $pos !== strlen($t2)) {
+                    continue;
                 }
+
+                $iso = gmdate('Y-m-d', (int) $ts);
+                return true;
             }
-        }
-
-        // Fallback to strtotime
-        $ts = strtotime($t2);
-        if ($ts !== false) {
-            $iso = date('Y-m-d', $ts);
-            return true;
-        }
-
-        // European DD MM YYYY
-        if (preg_match('~^(\d{1,2})[ \t./-](\d{1,2})[ \t./-](\d{4})$~', $t2, $m)) {
-            $iso = sprintf('%04d-%02d-%02d', (int)$m[3], (int)$m[2], (int)$m[1]);
-            return true;
         }
 
         return false;
