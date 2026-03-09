@@ -24,13 +24,7 @@ define('CHANGELOG_FILENAME', 'changelog.txt');
 define('CHANGELOG', ROOT . '/' . CHANGELOG_FILENAME);
 define('COPYRIGHTS_FILENAME', 'copyright.txt');
 define('COPYRIGHTS', ROOT . '/' . COPYRIGHTS_FILENAME);
-define('SF_TW_MEMBERS_URL', 'http://sourceforge.net/p/tikiwiki/_members');
-define('DEV_TW_MEMBERS_URL', 'http://dev.tiki.org/getTikiUser.php');
 define('LICENSE_FILENAME', 'license.txt');
-
-define('PIPELINE_STATUS_PASSED', 'passed');
-define('PIPELINE_STATUS_FAILED', 'failed');
-define('PIPELINES_FETCH_AMOUNT', 25);
 
 // Display all errors and warnings, strict level already included in E_ALL in php 8.4
 define('ERROR_REPORTING_LEVEL', E_ALL);
@@ -170,11 +164,7 @@ if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_F
 $nbCommiters = 0;
 if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_FILENAME . "' file (using final version number '$version')")) {
     if ($ucf = update_copyright_file($mainversion . '.0')) {
-        info(
-            "\r>> Copyrights updated: "
-            . ($ucf['newContributors'] == 0 ? 'No new contributor, ' : "+{$ucf['newContributors']} contributor(s), ")
-            . ($ucf['newCommits'] == 0 ? 'No new commit' : "+{$ucf['newCommits']} commit(s)")
-        );
+        info("\r>> Copyrights updated: {$ucf['contributors']} contributors " . "and {$ucf['commits']} commits");
         important_step("Commit new " . COPYRIGHTS_FILENAME, true, "[REL] Update " . COPYRIGHTS_FILENAME . " for $secdbVersion");
     } else {
         error('Copyrights update failed.');
@@ -716,8 +706,6 @@ function get_options()
     $options = [
         'howto' => false,
         'help' => false,
-        'http-proxy' => false,
-        'mirror-uri' => false,
         'no-commit' => false,
         'no-check-vcs' => false,
         'no-first-update' => false,
@@ -749,23 +737,6 @@ function get_options()
         if (str_starts_with($arg, '--')) {
             if (($opt = substr($arg, 2)) != '' && isset($options[$opt])) {
                 $options[$opt] = true;
-            } elseif (substr($arg, 2, 11) == 'http-proxy=') {
-                if (($proxy = substr($arg, 13)) != '') {
-                    $options[substr($arg, 2, 10)] = stream_context_create(
-                        [
-                            'http' => [
-                                'proxy' => 'tcp://' . $proxy,
-                                'request_fulluri' => true
-                            ]
-                        ]
-                    );
-                } else {
-                    $options[substr($arg, 2, 10)] = true;
-                }
-            } elseif (substr($arg, 2, 15) == 'mirror-uri=') {
-                if (($uri = substr($arg, 17)) != '') {
-                    $options[substr($arg, 2, 14)] = $uri;
-                }
             } elseif (str_contains($arg, '=')) {
                 $parts = explode('=', substr($arg, 2));
                 if (isset($options[$parts[0]])) {
@@ -780,10 +751,6 @@ function get_options()
     }
     $_SERVER['argv'] = $argv;
     unset($argv);
-
-    if ($options['http-proxy'] === true) {
-        error("The --http-proxy option need a value. Use it this way: --http-proxy=HOST_DOMAIN:PORT_NUMBER");
-    }
 
     if ($_SERVER['argc'] == 2) {
         $_SERVER['argv'][] = '';
@@ -996,30 +963,62 @@ EOS;
     return $versionHeader;
 }
 
-/**
- * @param $newVersion
- * @return array|bool
- */
 function update_copyright_file($newVersion)
 {
     if (! is_readable(COPYRIGHTS) || ! is_writable(COPYRIGHTS)) {
         error('The copyright file "' . COPYRIGHTS . '" is not readable or writable.');
     }
-    global $nbCommiters, $nbMembersSf, $options;
-    $nbCommiters = 0;
+    global $nbCommiters;
+
+    // Single git scan (fast)
+    $cmd = 'git log --pretty=format:"%aN||%aE||%at"';
+    $lines = explode("\n", shell_exec($cmd));
+
     $contributors = [];
 
-    $repositoryUri = empty($options['mirror-uri']) ? TIKIVCS : $options['mirror-uri']; //
-    if (str_starts_with($repositoryUri, '/')) {
-        $repositoryUri = 'file://' . $repositoryUri;
+    foreach ($lines as $line) {
+        if (! $line) {
+            continue;
+        }
+
+        list($name, $email, $ts) = explode('||', $line);
+
+        $key = strtolower(trim($email));
+
+        if (! isset($contributors[$key])) {
+            $contributors[$key] = [
+                'Nickname' => $name,
+                'Name' => $name,
+                'FirstTS' => (int)$ts,
+                'LastTS' => (int)$ts,
+                'Number of Commits' => 1,
+            ];
+        } else {
+            $contributors[$key]['Number of Commits']++;
+
+            if ($ts < $contributors[$key]['FirstTS']) {
+                $contributors[$key]['FirstTS'] = (int)$ts;
+            }
+
+            if ($ts > $contributors[$key]['LastTS']) {
+                $contributors[$key]['LastTS'] = (int)$ts;
+            }
+        }
     }
-    $repositoryInfo = get_revision($repositoryUri);
 
-    $oldContributors = parse_copyrights();
-    get_contributors_data($repositoryUri, $contributors, 1, $repositoryInfo);
-    ksort($contributors);
+    // Convert timestamps to readable dates
+    foreach ($contributors as &$c) {
+        $c['First Commit'] = gmdate("Y-m-d", $c['FirstTS']);
+        $c['Last Commit']  = gmdate("Y-m-d", $c['LastTS']);
+        unset($c['FirstTS'], $c['LastTS']);
+    }
+    unset($c);
 
-    $totalContributors = count($contributors);
+    // Sort alphabetically by name
+    uasort($contributors, fn($a, $b) => strcasecmp($a['Name'], $b['Name']));
+
+    $nbCommiters = count($contributors);
+    $totalContributors = $nbCommiters;
     $now = gmdate('Y-m-d');
 
     $copyrights = <<<EOS
@@ -1029,9 +1028,7 @@ Tiki Copyright
 The following list attempts to gather the copyright holders for Tiki
 as of version $newVersion.
 
-Accounts listed below with commits have contributed source code to CVS or SVN.
-Please note that even more people contributed on various other aspects (documentation,
-bug reporting, testing, etc.)
+Accounts listed below with commits have contributed source code.
 
 This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
@@ -1039,144 +1036,38 @@ http://tiki.org/Social+Contract
 List of members of the Community
 As of $now, the community has:
   * $totalContributors members,
-  * $nbMembersSf members on SourceForge.net,
   * $nbCommiters of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
 from git repository by the following script:
   doc/devtools/release.php
 
-Counting the commits is not as trivial as it may sound. If your number of commits
-seems incorrect, it could be that the script is not detecting them all. This
-has been reported especially for commits early on in the project. Nonetheless,
-the list provides a general idea.
-
 ====================================================================
 
 EOS;
 
-    $return = ['newCommits' => 0, 'newContributors' => 0];
-    foreach ($contributors as $author => $infos) {
-        if (isset($oldContributors[$author])) {
-            if ($oldContributors[$author] != $infos) {
-                // Quickfix to keep old dates which may be different due to which time zone is used
-                if (isset($oldContributors[$author]['First Commit'])) {
-                    $infos['First Commit'] = $oldContributors[$author]['First Commit'];
-                    if (
-                        isset($oldContributors[$author]['Number of Commits']) && isset($oldContributors[$author]['Number of Commits'])
-                        && isset($infos['Number of Commits'])  && $oldContributors[$author]['Number of Commits'] == $infos['Number of Commits']
-                    ) {
-                        $infos['Last Commit'] = $oldContributors[$author]['Last Commit'];
-                    }
-                }
-                if (isset($infos['Number of Commits'])) {
-                    if (isset($oldContributors[$author]['Number of Commits'])) {
-                        $return['newCommits'] += ($infos['Number of Commits'] - $oldContributors[$author]['Number of Commits']);
-                    }
-                }
-            }
-        } else {
-            $return['newContributors']++;
-        }
-        $copyrights .= "\nNickname: $author";
-        $orderedKeys = ['Name', 'First Commit', 'Last Commit', 'Number of Commits', 'SF Role'];
+    foreach ($contributors as $info) {
+        $copyrights .= "\nName: {$info['Nickname']}";
+
+        $orderedKeys = ['Name', 'First Commit', 'Last Commit', 'Number of Commits'];
+
         foreach ($orderedKeys as $k) {
-            if (empty($infos[$k]) || ($k == 'Name' && $infos[$k] == $author)) {
+            if (empty($info[$k]) || ($k === 'Name' && $info[$k] === $info['Nickname'])) {
                 continue;
             }
-            $copyrights .= "\n$k: " . $infos[$k];
+
+            $copyrights .= "\n$k: " . $info[$k];
         }
+
         $copyrights .= "\n";
     }
 
-    return file_put_contents(COPYRIGHTS, $copyrights) ? $return : false;
-}
+    file_put_contents(COPYRIGHTS, $copyrights);
 
-/**
- * @return array|bool
- */
-function parse_copyrights()
-{
-    if (! $copyrights = @file(COPYRIGHTS)) {
-        return false;
-    }
-
-    $return = [];
-    $curNickname = '';
-
-    foreach ($copyrights as $line) {
-        if (empty($line)) {
-            continue;
-        }
-        if (str_starts_with($line, 'Nickname: ')) {
-            $curNickname = rtrim(substr($line, 10));
-            $return[$curNickname] = [];
-        } elseif ($curNickname != '' && ($pos = strpos($line, ':')) !== false) {
-            $return[$curNickname][substr($line, 0, $pos)] = rtrim(substr($line, $pos + 2));
-        }
-    }
-
-    return $return;
-}
-
-/**
- * @param $path
- * @param $contributors
- * @param $minRevision
- * @param $maxRevision
- * @param int $step
- * @return mixed
- */
-function get_contributors_data($path, &$contributors, $minRevision, $maxRevision, $step = 20000)
-{
-    global $nbCommiters, $nbMembersSf;
-    if (empty($contributors)) {
-        get_contributors_sf_data($contributors);
-        info(">> Retrieved members list from Sourceforge.");
-    }
-    $nbMembersSf = count($contributors);
-
-    get_contributors($path, $contributors, $minRevision, $maxRevision, $step);
-    $nbCommiters = count(array_filter($contributors, function ($contributor) {
-        // Get count contributors with commits
-        return count($contributor) > 2;
-    }));
-    return $contributors;
-}
-
-/**
- * @param $contributors
- */
-function get_contributors_sf_data(&$contributors)
-{
-    global $options;
-    $matches = [];
-
-    if (! function_exists('iconv')) {
-        error("PHP 'iconv' function is not available on this system. Impossible to get SF.net data.");
-    }
-
-    $html = $options['http-proxy'] ? file_get_contents(SF_TW_MEMBERS_URL, 0, $options['http-proxy']) : file_get_contents(SF_TW_MEMBERS_URL);
-
-    if (! empty($html) && preg_match('/(<table.*<\/\s*table>)/sim', $html, $matches)) {
-        $usersInfo = [];
-        if (preg_match_all('/<tr[^>]*>' . str_repeat('\s*<td[^>]*>(.*)<\/td>\s*', 3) . '<\/\s*tr>/Usim', $matches[0], $usersInfo, PREG_SET_ORDER)) {
-            foreach ($usersInfo as $userInfo) {
-                $userInfo = array_map('trim', array_map('strip_tags', $userInfo));
-                $user = strtolower($userInfo['2']);
-                if (empty($user)) {
-                    continue;
-                }
-                $contributors[$user] = [
-                    'Name' => html_entity_decode(iconv("ISO-8859-15", "UTF-8", $userInfo['1']), ENT_COMPAT, 'UTF-8'),
-                    'SF Role' => $userInfo['3']
-                ];
-            }
-        }
-    } else {
-        error('Impossible to get SF.net users information. If you need to use a web proxy, try the --http-proxy option.');
-        die;
-    }
+    return [
+        'contributors' => $totalContributors,
+        'commits' => count($lines)
+    ];
 }
 
 function display_usage()
@@ -1190,9 +1081,7 @@ Examples:
 Options:
     --howto                   : display the Tiki release HOWTO
     --help                    : display this help
-    --http-proxy=HOST:PORT    : use a http proxy to get copyright data on sourceforge
-    --mirror-uri=URI          : use another repository URI to update the copyrights file (to avoid retrieving data from sourceforge, which is usually slow)
-    --no-commit               : do not commit any changes back to SVN or GIT
+    --no-commit               : do not commit any changes back to GIT
     --no-check-vcs            : do not check if there are uncommitted changes on the checkout used for the release
     --no-first-update         : do not vcs update the checkout used for the release as the first step
     --no-lang-update          : do not update lang/*/language.php files
