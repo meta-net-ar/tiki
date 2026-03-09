@@ -203,13 +203,41 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
 
     // Run enhanced security checks for AJAX
     $db_permissions = check_database_config_permissions();
+    $tracker_perms = check_tracker_anonymous_permissions();
     $phpmyadmin_check = check_phpmyadmin_installations();
     $adminer_check = check_adminer_installations();
     $backup_config_check = check_backup_configuration_files();
     $directory_listing_check = check_directory_listing_vulnerabilities();
     $ssl_check = check_ssl_configuration();
 
-    $tiki_security['Database Configuration Permissions'] = $db_permissions;
+    if (! empty($db_permissions)) {
+        $tiki_security['Database Configuration Permissions'] = array(
+            'fitness' => tra('bad'),
+            'fitness_status' => FITNESS_STATUS_BAD,
+            'message' => tr('Database configuration file has insecure permissions: %0', implode(', ', $db_permissions))
+        );
+    } else {
+        $tiki_security['Database Configuration Permissions'] = array(
+            'fitness' => tra('safe'),
+            'fitness_status' => FITNESS_STATUS_SAFE,
+            'message' => tra('Database configuration file permissions are secure')
+        );
+    }
+
+    if (! empty($tracker_perms)) {
+        $tiki_security['Anonymous Tracker Permissions'] = array(
+            'fitness' => tra('bad'),
+            'fitness_status' => FITNESS_STATUS_BAD,
+            'message' => tr('Anonymous group has global tracker permissions or dangerous defaults: %0', implode(', ', $tracker_perms))
+        );
+    } else {
+        $tiki_security['Anonymous Tracker Permissions'] = array(
+            'fitness' => tra('safe'),
+            'fitness_status' => FITNESS_STATUS_SAFE,
+            'message' => tra('Anonymous tracker permissions are secure')
+        );
+    }
+
     $tiki_security['phpMyAdmin Security'] = $phpmyadmin_check;
     $tiki_security['Adminer Security'] = $adminer_check;
     $tiki_security['Backup Configuration Files'] = $backup_config_check;
@@ -3546,6 +3574,22 @@ if (! empty($db_config_issues)) {
     );
 }
 
+// Check tracker anonymous permissions
+$tracker_perms_issues = check_tracker_anonymous_permissions();
+if (! empty($tracker_perms_issues)) {
+    $tiki_security['Anonymous Tracker Permissions'] = array(
+        'fitness' => tra('bad'),
+        'fitness_status' => FITNESS_STATUS_BAD,
+        'message' => tr('Anonymous group has global tracker permissions or dangerous defaults: %0', implode(', ', $tracker_perms_issues))
+    );
+} else {
+    $tiki_security['Anonymous Tracker Permissions'] = array(
+        'fitness' => tra('safe'),
+        'fitness_status' => FITNESS_STATUS_SAFE,
+        'message' => tra('Anonymous tracker permissions are secure')
+    );
+}
+
 // Check for phpMyAdmin installations
 $phpmyadmin_issues = check_phpmyadmin_installations();
 if (! empty($phpmyadmin_issues)) {
@@ -5636,6 +5680,41 @@ function check_database_config_permissions()
             $perms = fileperms($file);
             if (($perms & 0x0004) || ($perms & 0x0002)) {
                 $issues[] = $file . ' is world-readable';
+            }
+        }
+    }
+
+    return $issues;
+}
+
+/**
+ * Check for anonymous tracker permissions and dangerous defaults
+ * @return array Array of security issues found
+ */
+function check_tracker_anonymous_permissions()
+{
+    $issues = array();
+
+    if (file_exists('db/local.php')) {
+        include 'db/local.php';
+        if (isset($host_tiki) && isset($user_tiki) && isset($pass_tiki) && isset($dbs_tiki)) {
+            $connection = @mysqli_connect($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki);
+            if ($connection) {
+                // Check if Anonymous has global tracker permissions
+                $query = "SELECT permName FROM users_grouppermissions WHERE groupName = 'Anonymous' AND permName IN ('tiki_p_list_trackers', 'tiki_p_view_trackers')";
+                $result = mysqli_query($connection, $query);
+                $permsFound = array();
+                if ($result) {
+                    while ($row = mysqli_fetch_array($result)) {
+                        $permsFound[] = $row['permName'];
+                    }
+                }
+
+                if (! empty($permsFound)) {
+                    $issues[] = tr('Anonymous group has global tracker permissions (%0). Trackers may be publicly discoverable.', implode(', ', $permsFound));
+                }
+
+                mysqli_close($connection);
             }
         }
     }
