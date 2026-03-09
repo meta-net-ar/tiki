@@ -7,6 +7,8 @@
 
 namespace Tiki\Lib\Importer\Markdown\Registry;
 
+use Tiki\Lib\Importer\Markdown\Source\SourceConfig;
+use Tiki\Lib\Importer\Markdown\Source\SourceManager;
 use TikiLib;
 
 /**
@@ -27,11 +29,11 @@ class ImportRegistry
 
     /**
      * Build a unique source key from source configuration.
+     * @param array|SourceConfig $sourceCfg
      */
-    public static function buildSourceKey(array $sourceCfg): string
+    public static function buildSourceKey($sourceCfg): string
     {
-        // Delegate to SourceManager for proper source identification
-        $manager = new \Tiki\Lib\Importer\Markdown\Source\SourceManager();
+        $manager = new SourceManager();
         return $manager->getSourceIdentifier($sourceCfg);
     }
 
