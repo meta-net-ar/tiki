@@ -177,8 +177,8 @@ import { defaults as defaultControls } from "ol/control";
                         var flavor = name.substring(7);
 
                         layer = new ol.layer.Tile({
-                            source: new ol.source.Stamen({
-                                layer: flavor,
+                            source: new ol.source.StadiaMaps({
+                                layer: `stamen_${flavor.replace("-", "_")}`,
                             }),
                             title: "Stamen" + flavor,
                         });

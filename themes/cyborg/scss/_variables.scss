@@ -8,6 +8,7 @@
 //
 // Color system
 
+$blue:      #2DA1D7; // Lightened slightly for contrast against bg-light.
 $red:     #EB0000; // #F00000; //#c00;  default
 
 $primary:       #207CA7; // $blue;  // default
@@ -16,7 +17,7 @@ $success:       #558000; //#639400; // #558000; // $green !default;
 $info:          $cyan;  // default
 $warning:       #B35F00; // $yellow !default;
 $danger:        $red;  // default
-$light: #737373; //  $gray-800 !default; Darkened for increased contrast with link color
+$light:         #303030; // #737373; //  $gray-800 !default; Darkened for increased contrast with body color
 $dark: #000000;  // default
 
 $green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared

@@ -371,7 +371,7 @@ function prefs_user_list($partial = false)
             'description' => tr('Allow user to manage timezone incoherence.'),
             'help' => 'User-Preferences',
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'tags' => ['basic'],
         ],
         'user_default_avatar_style' => [

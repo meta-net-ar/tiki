@@ -28,8 +28,6 @@ define('COPYRIGHTS_FILENAME', 'copyright.txt');
 define('COPYRIGHTS', ROOT . '/' . COPYRIGHTS_FILENAME);
 define('SF_TW_MEMBERS_URL', 'http://sourceforge.net/p/tikiwiki/_members');
 define('DEV_TW_MEMBERS_URL', 'http://dev.tiki.org/getTikiUser.php');
-define('README_FILENAME', 'README');
-define('README', ROOT . '/' . README_FILENAME);
 define('LICENSE_FILENAME', 'license.txt');
 
 define('PIPELINE_STATUS_PASSED', 'passed');
@@ -141,12 +139,6 @@ if (empty($subrelease)) {
     $tag = "tags/$version$subrelease";
     $packageVersion = "$version.$pre$subrelease";
     $secdbVersion = "$version$subrelease";
-}
-
-if (! $options['no-readme-update'] && important_step("Update '" . README_FILENAME . "' file")) {
-    update_readme_file($secdbVersion, $version);
-    info('>> ' . README_FILENAME . ' file updated.');
-    important_step('Commit updated ' . README_FILENAME . ' file', true, "[REL] Update " . README_FILENAME . " file for $secdbVersion");
 }
 
 if (! $options['no-lang-update'] && important_step("Update language files")) {
@@ -1085,7 +1077,6 @@ function get_options()
         'no-check-php-warnings' => false,
         'no-check-smarty' => false,
         'no-first-update' => false,
-        'no-readme-update' => false,
         'no-lang-update' => false,
         'no-changelog-update' => false,
         'no-copyright-update' => false,
@@ -1544,80 +1535,6 @@ function get_contributors_sf_data(&$contributors)
     }
 }
 
-/**
- * @param $releaseVersion
- * @param $mainVersion
- * @return bool
- */
-function update_readme_file($releaseVersion, $mainVersion)
-{
-    if (! is_readable(README) || ! is_writable(README)) {
-        error('The README file "' . README . '" is not readable or writable.');
-        die;
-    }
-
-    $year = gmdate('Y');
-    $copyrights_file = COPYRIGHTS_FILENAME;
-    $license_file = LICENSE_FILENAME;
-
-    $majorVersion = substr($mainVersion, 0, strpos($mainVersion, '.'));
-    $release_notes_url = 'http://doc.tiki.org/Tiki' . $majorVersion;
-    // Changed from Tiki 12 to point to http://doc.tiki.org/Tiki12 instead of http://tiki.org/ReleaseNotes30
-
-    $readme = <<<EOF
-Tiki Wiki CMS Groupware
-Version $releaseVersion
-
-Started in 2002, Tiki Wiki CMS Groupware is a web application combining
-the features of a wiki, a content management system (CMS) and groupware.
-It is the Free/Libre and Open Source (FLOSS) web application with the most built-in features, https://tiki.org/Features.
-
-CONTRIBUTING
-
-* Tiki is driven by the contributions of an active community of developers and
-  translators who participate in its development.
-  You can be the next contributor to the Tiki source code or documentation.
-  Please check the Wishlist, https://dev.tiki.org/Wishlist,
-  for bugs or feature requests you can start developing or create new ones if you don't find them listed.
-
-
-DOCUMENTATION
-
-* You have access to a diverse source of support through documentation, forum, events, etc.
-
-* The documentation for $mainVersion version is ever evolving at http://doc.tiki.org.
-  You're encouraged to contribute.
-
-* It is highly recommended that you refer to the online documentation:
-* http://doc.tiki.org/Installation for a setup guide
-
-* Notes about this release are accessible from $release_notes_url
-* Tiki has an active Gitter community, join us at https://gitter.im/tiki-org/community.
-
-INSTALLATION
-
-* There is a file INSTALL in this directory with notes on how to setup and
-  configure Tiki. Again, see http://doc.tiki.org/Installation for the latest install help.
-
-UPGRADES
-
-* Read the online instructions if you want to upgrade your Tiki from a previous release http://doc.tiki.org/Upgrade
-
-COPYRIGHT
-
-Copyright (c) 2002-$year, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
-Tiki was started under the name tikiwiki by Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
-All Rights Reserved. See $copyrights_file for details and a complete list of authors.
-Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See $license_file for details.
-
-... Have fun!
-
-Note to Tiki developers: update this text through release.php.
-EOF;
-
-    return (bool)file_put_contents(README, $readme);
-}
-
 function display_usage()
 {
     echo "Usage: php doc/devtools/release.php [ Options ] <version-number> [ <subrelease> ]
@@ -1638,7 +1555,6 @@ Options:
     --no-check-php-warnings   : do not display PHP warnings and notices during the PHP syntax check
     --no-check-smarty         : do not check syntax of all Smarty templates
     --no-first-update         : do not vcs update the checkout used for the release as the first step
-    --no-readme-update        : do not update the '" . README_FILENAME . "' file
     --no-lang-update          : do not update lang/*/language.php files
     --no-changelog-update     : do not update the '" . CHANGELOG_FILENAME . "' file
     --no-copyright-update     : do not update the '" . COPYRIGHTS_FILENAME . "' file

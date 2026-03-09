@@ -102,24 +102,6 @@
 
                 </div>
             </div>
-            {if $prefilled}
-            <input type="hidden" name="calitem[end_or_duration]" value="end" id="end_or_duration">
-            <input type="hidden" name="calitem[start]" value="{$calitem.start}">
-            <input type="hidden" name="calitem[end]" value="{$calitem.end}">
-            <input type="hidden" name="exact_start_end" value="1">
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}Start{/tr}</label>
-                <div class="col-sm-7 start">
-                    {$calitem.start|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}End{/tr}</label>
-                <div class="col-sm-7 end">
-                    {$calitem.end|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            {else}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Recurrence{/tr}</label>
                 <div class="col-sm-9">
@@ -211,7 +193,6 @@
                     </span>
                 {/if}
             </div>
-            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">

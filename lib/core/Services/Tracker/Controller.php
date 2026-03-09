@@ -1405,22 +1405,24 @@ class Services_Tracker_Controller
                     $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
                 }
 
-                if ($input->saveAndComment->int()) {
+                if ($input->addComment->bool()) {
+                    $comment = new Services_Comment_Controller();
+
                     $version = TikiLib::lib('trk')->last_log_version($itemId);
 
-                    return [
-                        'FORWARD' => [
-                            'controller' => 'comment',
-                            'action' => 'post',
-                            'type' => 'trackeritem',
-                            'objectId' => $itemId,
-                            'parentId' => 0,
-                            'version' => $version,
-                            'return_url' => $redirect,
-                            'title' => tr('Comment for edit #%0', $version),
-                        ],
-                    ];
+                    $comment->action_post(new JitFilter([
+                        'post' => 1,
+                        'anonymous_name' => $input->comment_anonymous_name->text(),
+                        'comment' => $input->comment->text(),
+                        'objectId' => $itemId,
+                        'type' => 'trackeritem',
+                        'title' => tr('Comment for edit #%0', $version),
+                        'data' => $input->data->wikicontent(),
+                        'return_url' => $input->redirect->none(),
+                        'version' => $version,
+                    ]));
                 }
+
                 //return to page
                 if ($skipRedirect === 1 || ! $redirect) {
                     // Return item data and refresh info
@@ -1528,6 +1530,7 @@ class Services_Tracker_Controller
             'save_return' => $input->save_return->alpha() ?? 'n',
             'can_remove' => $itemObject->canRemove(),
             'skipRefresh' => $input->skipRefresh->bool(),
+            'MAX_COMMENT_DATA_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_DATA_LENGTH,
         ];
     }
 

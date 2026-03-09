@@ -385,10 +385,22 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
             // set up default start and end
             $dateNow->setTZbyID($displayTimezone);
-            if ($input->prefill_start->int()) {
-                $start = $input->prefill_start->int();
-                if ($input->prefill_end->int()) {
-                    $end = $input->prefill_end->int();
+            if ($input->prefill_start->text()) {
+                $prefillStart = $input->prefill_start->text();
+                $prefillEnd = $input->prefill_end->text();
+
+                $tikidate = new TikiDate();
+                $tikidate->setTZbyID($displayTimezone);
+
+                $tikidate->setDate($prefillStart, $displayTimezone);
+                $start = $tikidate->getTime();
+                if ($prefillEnd && strtotime($prefillEnd) !== false) {
+                    $tikidate->setDate($prefillEnd, $displayTimezone);
+                    $end = $tikidate->getTime();
+                    // subtract 1 sec to make it inclusive
+                    if (strlen($prefillEnd) <= 10 || strpos($prefillEnd, '00:00:00') !== false) {
+                        $end -= 1;
+                    }
                     $duration = $end - $start;
                 } else {
                     $duration = 60 * 60;
@@ -408,8 +420,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             } else {
                 $hour = $dateNow->date->format('H');
                 if ($input->offsetExists('todate')) {
-                    // set the correct day clicked on
-                    $dateNow->setDate($input->todate->int());
+                    $dateNow->setTZbyID($displayTimezone);
+                    $dateNow->setDate($input->todate->text(), $displayTimezone);
                     $hour = $dateNow->date->format('H');
                 }
                 $tz = date_default_timezone_get();
@@ -580,7 +592,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'modal'                      => $input->modal->int(),
             'displayTimezone'            => $displayTimezone,
             'timezones'                  => $timezones,
-            'prefilled'                  => $input->prefill_start->int() ? true : false,
+            'prefilled'                  => $input->prefill_start->text() ? true : false,
             // related tracker items
             'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
         ];

@@ -610,7 +610,7 @@ class StructLib extends TikiLib
     public function s_get_page_info($page_ref_id)
     {
         if (empty($this->displayLanguageOrder)) {
-            $query = 'select `pos`, `page_ref_id`, `parent_id`, ts.`page_id`, `pageName`, `page_alias`, `structure_id` ';
+            $query = 'select `pos`, `page_ref_id`, `parent_id`, ts.`page_id`, `pageName`, `description`, `page_alias`, `structure_id` ';
             $query .= 'from `tiki_structures` ts, `tiki_pages` tp ';
             $query .= 'where ts.`page_id`=tp.`page_id` and `page_ref_id`=?';
             $result = $this->query($query, [(int) $page_ref_id]);
@@ -624,6 +624,7 @@ class StructLib extends TikiLib
                     `parent_id`,
                     ts.`page_id`,
                     `pageName`,
+                    `description`,
                     `page_alias`,
                     `structure_id`
                 FROM
@@ -1023,8 +1024,8 @@ class StructLib extends TikiLib
         return [
             'prev' => $this->get_neighbor_info($page_ref_id, 'get_prev_page'),
             'next' => $this->get_neighbor_info($page_ref_id, 'get_next_page'),
-            'prevsibling' => $this->get_neighbor_info($page_ref_id, 'get_prev_sibling'),
-            'nextsibling' => $this->get_neighbor_info($page_ref_id, 'get_next_sibling'),
+            'prevsibling' => $this->get_neighbor_info($page_ref_id, 'getPrevSibling'),
+            'nextsibling' => $this->get_neighbor_info($page_ref_id, 'getNextSibling'),
             'parent' => $this->get_neighbor_info($page_ref_id, 's_get_parent_info'),
             'home' => $this->s_get_structure_info($page_ref_id),
         ];
@@ -1068,7 +1069,7 @@ class StructLib extends TikiLib
     public function s_get_pages($parent_id)
     {
         $ret = [];
-        $query = 'select `pos`, `page_ref_id`, `parent_id`, ts.`page_id`, `pageName`, `page_alias` ';
+        $query = 'select `pos`, `page_ref_id`, `parent_id`, ts.`page_id`, `pageName`, `description`, `page_alias` ';
         $query .= 'from `tiki_structures` ts, `tiki_pages` tp ';
         $query .= 'where ts.`page_id`=tp.`page_id` and `parent_id`=? ';
         $query .= 'order by ' . $this->convertSortMode('pos_asc');

@@ -15,15 +15,7 @@ Note: The show content block must be defined at root level to use the include. A
         {if $prefs.feature_siteloc eq 'page' and $prefs.feature_breadcrumbs eq 'y'}
             {if $prefs.feature_siteloclabel eq 'y'}{tr}Location : {/tr}{/if}
             {breadcrumbs type="trail" loc="page" crumbs=$crumbs}
-            {if $prefs.feature_page_title eq 'y'}
-                {breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}
-            {/if}
         {/if}
-
-        {if $prefs.feature_page_title eq 'y'}
-            <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>
-        {/if}
-
     {/if}
 {/block}
 
@@ -36,6 +28,8 @@ Note: The show content block must be defined at root level to use the include. A
 {/block}
 
 {block name=content}
+    {* hide_page_header = per-page "hide this page's title"; affects trail (title block) and h1 (here). *}
+    {assign var=show_wiki_page_title value=((!isset($hide_page_header) or !$hide_page_header) and ($prefs.feature_page_title eq 'y' or $prefs.wiki_page_name_inside eq 'y'))}
     {if !isset($hide_page_header) or !$hide_page_header}
         {include file='tiki-flaggedrev_approval_header.tpl'}
     {/if}
@@ -86,7 +80,7 @@ Note: The show content block must be defined at root level to use the include. A
         {/section}
     {/if}
 
-    <article id="top" class="wikitext highlightable clearfix{if $prefs.feature_page_title neq 'y'} nopagetitle{/if}">
+    <article id="top" class="wikitext highlightable clearfix{if $prefs.feature_page_title neq 'y' and $prefs.wiki_page_name_inside neq 'y'} nopagetitle{/if}">
         {if !isset($hide_page_header) or !$hide_page_header}
             {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($tags[0]) and $prefs.freetags_show_middle eq 'y'}
                 {include file='freetag_list.tpl'}
@@ -130,10 +124,31 @@ Note: The show content block must be defined at root level to use the include. A
         {/if}
 
         <div id="page-data" class="clearfix">
-
-            {if $prefs.wiki_page_name_inside eq 'y'}
-                <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>
-            {/if}
+            {if $show_wiki_page_title}
+                {if $prefs.wiki_page_name_inside eq 'y'}
+                    <div class="content">
+                        <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>
+                        {if isset($pageLang) and Language::isLanguageRTL($pageLang)}
+                            <div style="direction:RTL; unicode-bidi:embed; text-align: right; {if $pageLang eq 'ar'}font-size: large;{/if}">
+                                {$parsed}
+                            </div>
+                        {else}
+                            {$parsed}
+                        {/if}
+                    </div>
+                {else}
+                    <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>
+                    <div class="content">
+                        {if isset($pageLang) and Language::isLanguageRTL($pageLang)}
+                            <div style="direction:RTL; unicode-bidi:embed; text-align: right; {if $pageLang eq 'ar'}font-size: large;{/if}">
+                                {$parsed}
+                            </div>
+                        {else}
+                            {$parsed}
+                        {/if}
+                    </div>
+                {/if}
+            {else}
             <div class="content">
                 {if isset($pageLang) and Language::isLanguageRTL($pageLang)}
                     <div style="direction:RTL; unicode-bidi:embed; text-align: right; {if $pageLang eq 'ar'}font-size: large;{/if}">
@@ -143,6 +158,7 @@ Note: The show content block must be defined at root level to use the include. A
                     {$parsed}
                 {/if}
             </div>
+            {/if}
             {if $prefs.wysiwyg_inline_editing eq 'y'}
                 <div class="d-none inline-editor-content">{$inline_editor_content}</div>
             {/if}

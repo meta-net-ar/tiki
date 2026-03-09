@@ -34,8 +34,7 @@
     {else}
         <form method="post" action="{service controller=tracker action=update_item format=$format editItemPretty=$editItemPretty suppressFeedback=$suppressFeedback}" id="updateItemForm{$trackerId|escape}">
             {trackerfields trackerId=$trackerId fields=$fields status=$status itemId=$itemId format=$format editItemPretty=$editItemPretty}
-            <hr>
-            <div class="form-check form-switch alert alert-warning">
+            <div class="form-check form-switch alert alert-warning mt-5">
                 <input type="checkbox"
                     class="form-check-input tracker-notify-switch"
                     id="notify_watchers"
@@ -46,13 +45,20 @@
                     {tr}Notify users following this item{/tr}
                 </label>
             </div>
+            {if not empty($saveAndComment) and $saveAndComment neq 'n'}
+                <div class="form-check form-switch mb-4 mt-5">
+                    <input type="checkbox" class="form-check-input" name="addComment" id="add-comment"/>
+                    <label class="form-check-label" for="add-comment">
+                        {tr}Add a comment{/tr}
+                    </label>
+                </div>
+                <div class="comment-form d-none">
+                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId}
+                </div>
+            {/if}
             <div class="submit">
                 {if $skip_preview neq 'y'}
                     <input type="button" class="btn btn-secondary previewItemBtn" title="{tr}Preview your changes.{/tr}" name="preview" value="{tr}Preview{/tr}">
-                {/if}
-                {if not empty($saveAndComment) and $saveAndComment neq 'n'}
-                    <input type="hidden" name="saveAndComment" id="saveAndComment" value="">
-                    <input type="submit" class="btn btn-primary" onclick="$('#saveAndComment').val(1);" value="{tr}Save and Comment{/tr}">
                 {/if}
                 {if $save_return eq 'y'}
                     <input type="submit" class="btn btn-primary" name="save_return" value="{tr}Save Returning to Item List{/tr}" onclick="$('input[name=redirect]').val('{$trackerId|sefurl:'tracker'}'); needToConfirm=false">
@@ -73,7 +79,21 @@
                 {/if}
             </div>
         </form>
-        {* Don't warn on leaving page if the modal is closed without saving *}
-        {jq}$(".modal.fade.show").one("hide.bs.modal", function () {window.needToConfirm=false;});{/jq}
+        {jq}
+            {* Don't warn on leaving page if the modal is closed without saving *}
+            $(".modal.fade.show").one("hide.bs.modal", function () {window.needToConfirm=false;});
+
+            {* Disable the comment editor textarea, so it doesn't interfere with form validation when it's hidden *}
+            $(".comment-form").find("textarea").prop("disabled", true);
+            $("#add-comment").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $(".comment-form").removeClass("d-none");
+                    $(".comment-form").find("textarea").prop("disabled", false);
+                } else {
+                    $(".comment-form").addClass("d-none");
+                    $(".comment-form").find("textarea").prop("disabled", true);
+                }
+            });
+        {/jq}
     {/if}
 {/block}

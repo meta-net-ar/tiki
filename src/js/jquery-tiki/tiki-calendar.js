@@ -12,10 +12,41 @@ $.fn.setupEventCalendar = function (
     returnUrl = "tiki-calendar.php",
     associatedWikiPage = null
 ) {
+    let isOpeningModal = false;
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
         $(calendarEl).tikiModal(tr("Loading..."));
-
+        const openNewEventModal = (startStr, endStr = null) => {
+            if (isOpeningModal) return;
+            const countCals = $("#filtercal ul li").length;
+            if (countCals >= 1 || targetId != "calendar") {
+                isOpeningModal = true;
+                $(calendarEl).tikiModal(" "); // Use the container for the loading overlay
+                const params = {
+                    prefill_start: startStr,
+                    modal: 1,
+                    return_url: returnUrl,
+                };
+                if (endStr) {
+                    params.prefill_end = endStr;
+                }
+                $.openModal({
+                    title: tr("New event"),
+                    size: "modal-lg",
+                    remote: $.service("calendar", "edit_item", params),
+                    open: function () {
+                        $(calendarEl).tikiModal();
+                        $("form:not(.no-ajax)", this).addClass("no-ajax");
+                        isOpeningModal = false;
+                    },
+                    error: function () {
+                        isOpeningModal = false;
+                    },
+                });
+            } else {
+                location.href = "tiki-calendar.php";
+            }
+        };
         calendarContainer[0] = createCalendar(document.getElementById(targetId), [DayGrid, TimeGrid, Interaction, List], {
             eventTimeFormat: {
                 hour: "numeric",
@@ -32,7 +63,12 @@ $.fn.setupEventCalendar = function (
             },
             editable: true,
             selectable: true,
+            unselectAuto: true,
             eventSources: [{ url: urlEventSource }],
+            select: function (info) {
+                // Handle Drag Selection
+                openNewEventModal(info.startStr, info.endStr);
+            },
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,
             nowIndicator: true,
@@ -224,27 +260,13 @@ $.fn.setupEventCalendar = function (
                 }
             },
             dateClick: function (info) {
-                // Handle date clicks in EventCalendar.
-                // If a date number is clicked, switch to Day View for the selected date.
-                // If any other part of the date cell is clicked, open a form to create a new event.
                 if (info.jsEvent.target.classList.contains("ec-day-head")) {
                     calendarContainer[0].changeView("timeGridDay", info.dateStr);
+                    // Prevent 'select' from firing if we are just switching views
+                    calendarContainer[0].unselect();
                 } else {
-                    let $this = $(info.dayEl).tikiModal(" ");
-                    const countCals = $("#filtercal ul li").length;
-                    if (countCals >= 1 || targetId != "calendar") {
-                        $.openModal({
-                            title: tr("New event"),
-                            size: "modal-lg",
-                            remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1, return_url: returnUrl }),
-                            open: function () {
-                                $this.tikiModal();
-                                $("form:not(.no-ajax)", this).addClass("no-ajax"); // Remove default ajax handling, we replace it
-                            },
-                        });
-                    } else {
-                        location.href = "tiki-calendar.php";
-                    }
+                    // Handle Single Click
+                    openNewEventModal(info.dateStr);
                 }
             },
             eventResize: function (info) {
