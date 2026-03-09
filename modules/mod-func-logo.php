@@ -83,6 +83,7 @@ function module_logo($mod_reference, &$module_params)
             'sitesubtitle' => $prefs['sitesubtitle'],
             'class_image'  => 'sitelogo',
             'class_titles' => 'sitetitles',
+            'max_height'   => '',
         ],
         $module_params
     );

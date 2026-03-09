@@ -14,14 +14,15 @@
     <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
     {if !isset($smarty.session.fullscreen) || isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}
-            <header class="site-header" id="site-header" role="banner">
+             <header class="page-header w-100 sticky-top my-0" id="page-header" role=banner>
                 {* Main navigation - uses block for theme customization *}
-                <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar sticky-top{/block}"
+                <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
                      id="main-navbar"
                      role="navigation"
                      aria-label="{tr}Main navigation{/tr}">
 
-                    <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">                        {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                    <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
+                        {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                     </div>
                 </nav>
             </header>
