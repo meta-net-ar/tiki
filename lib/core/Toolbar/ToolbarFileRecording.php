@@ -94,7 +94,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                     text: tr('Start recording'),
                     type: 'primary start-recording',
                     attrs: {
-                        'data-tracker-files': 'true',
+                        'data-textarea-filerecording': 'true',
                         'data-gallery-id': '{$this->recordingGalleryId}',
                         'data-tracker-item-id': '{$this->trackerItemId}',
                         'data-area-id': '{$this->domElementId}'
