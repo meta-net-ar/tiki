@@ -26,7 +26,7 @@ class GfmPurifier implements MarkdownPurifierInterface
      */
     public function purify(string $raw, array $context = []): array
     {
-        $stripFM = $context['strip_front_matter'] ?? true;
+        $stripFM = $context[self::CTX_STRIP_FM] ?? true;
         $out = $raw;
         $notes = [];
 

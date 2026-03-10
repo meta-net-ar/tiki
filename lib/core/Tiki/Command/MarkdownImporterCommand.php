@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Tiki\Lib\Importer\Markdown\TikiMarkdownImporter;
+use Tiki\Lib\Importer\Markdown\Source\SourceManager;
 
 #[AsCommand(
     name: 'markdown:importer',
@@ -16,53 +17,95 @@ use Tiki\Lib\Importer\Markdown\TikiMarkdownImporter;
 )]
 class MarkdownImporterCommand extends Command
 {
+    // ========== CLI OPTION NAMES ==========
+    private const OPT_MODE = 'mode';
+    private const OPT_SOURCE_TYPE = 'source-type';
+    private const OPT_LOCAL_PATH = 'local-path';
+    private const OPT_REPO_URL = 'repo-url';
+    private const OPT_REPO_BRANCH = 'repo-branch';
+    private const OPT_REPO_TOKEN = 'repo-token';
+    private const OPT_GIT_PULL = 'git-pull';
+    private const OPT_GIT_TIMEOUT = 'git-timeout';
+    private const OPT_ROOTS = 'roots';
+    private const OPT_RECURSIVE = 'recursive';
+    private const OPT_MAX_DEPTH = 'max-depth';
+    private const OPT_EXCLUDE_GLOBS = 'exclude-globs';
+    private const OPT_TITLE_STRATEGY = 'title-strategy';
+    private const OPT_NAMING_MODE = 'naming-mode';
+    private const OPT_DIR_LEVELS = 'dir-levels';
+    private const OPT_SEPARATOR = 'separator';
+    private const OPT_NAMESPACE = 'namespace';
+    private const OPT_DETECT_JOURNAL = 'detect-journal';
+    private const OPT_JOURNAL_LANG = 'journal-lang';
+    private const OPT_JOURNAL_NS = 'journal-ns';
+    private const OPT_MARKDOWN_SOURCE = 'markdown-source';
+    private const OPT_STRIP_FM = 'strip-front-matter';
+    private const OPT_RUNTIME_LOGSEQ = 'runtime-logseq';
+    private const OPT_BLOCKREF = 'blockref-mode';
+    private const OPT_GC_MODE = 'gc-mode';
+    private const OPT_GC_SAFE_NS = 'gc-safe-namespace';
+    private const OPT_JSON = 'json';
+
+    // ========== MODES ==========
+    private const MODE_PREVIEW = 'preview';
+    private const MODE_IMPORT = 'import';
+
+    // ========== FLAVORS ==========
+    private const FLAVOR_COMMONMARK = 'commonmark';
+    private const FLAVOR_GFM = 'gfm';
+    private const FLAVOR_LOGSEQ = 'logseq';
+
+    // ========== GC MODES ==========
+    private const GC_OFF = 'off';
+    private const GC_MARK = 'mark';
+    private const GC_DELETE = 'delete';
     protected function configure(): void
     {
         $this
             ->setHelp('Import Markdown files from a local .zip/.md or from a Git repository (HTTPS + token).')
 
             // Mode
-            ->addOption('mode', null, InputOption::VALUE_REQUIRED, 'preview|import', 'preview')
+            ->addOption(self::OPT_MODE, null, InputOption::VALUE_REQUIRED, 'preview|import', self::MODE_PREVIEW)
 
             // Source (local|git). We also accept "repo" as alias.
-            ->addOption('source-type', null, InputOption::VALUE_REQUIRED, 'local|git', 'local')
+            ->addOption(self::OPT_SOURCE_TYPE, null, InputOption::VALUE_REQUIRED, 'local|git', SourceManager::SRC_LOCAL)
 
             // Local
-            ->addOption('local-path', null, InputOption::VALUE_REQUIRED, 'Path to local .zip OR single .md file')
+            ->addOption(self::OPT_LOCAL_PATH, null, InputOption::VALUE_REQUIRED, 'Path to local .zip OR single .md file')
 
             // Git (HTTPS + token)
-            ->addOption('repo-url', null, InputOption::VALUE_REQUIRED, 'Git repository URL (HTTPS), e.g. https://github.com/owner/repo.git')
-            ->addOption('repo-branch', null, InputOption::VALUE_REQUIRED, 'Branch name', 'main')
-            ->addOption('repo-token', null, InputOption::VALUE_REQUIRED, 'Personal Access Token (PAT) if repository is private', '')
-            ->addOption('git-pull', null, InputOption::VALUE_REQUIRED, 'Pull before import (1|0)', '1')
-            ->addOption('git-timeout', null, InputOption::VALUE_REQUIRED, 'Git ops timeout (seconds)', '30')
+            ->addOption(self::OPT_REPO_URL, null, InputOption::VALUE_REQUIRED, 'Git repository URL (HTTPS), e.g. https://github.com/owner/repo.git')
+            ->addOption(self::OPT_REPO_BRANCH, null, InputOption::VALUE_REQUIRED, 'Branch name', 'main')
+            ->addOption(self::OPT_REPO_TOKEN, null, InputOption::VALUE_REQUIRED, 'Personal Access Token (PAT) if repository is private', '')
+            ->addOption(self::OPT_GIT_PULL, null, InputOption::VALUE_REQUIRED, 'Pull before import (1|0)', '1')
+            ->addOption(self::OPT_GIT_TIMEOUT, null, InputOption::VALUE_REQUIRED, 'Git ops timeout (seconds)', '30')
 
             // Scanner / mapping
-            ->addOption('roots', null, InputOption::VALUE_REQUIRED, 'Root(s) in the archive; semicolon/comma-separated', '.')
-            ->addOption('recursive', null, InputOption::VALUE_REQUIRED, 'Recurse into subdirs (1|0)', '1')
-            ->addOption('max-depth', null, InputOption::VALUE_REQUIRED, 'Max recursion depth (0 = unlimited)', '0')
-            ->addOption('exclude-globs', null, InputOption::VALUE_REQUIRED, 'Glob patterns to exclude', '')
-            ->addOption('title-strategy', null, InputOption::VALUE_REQUIRED, 'fm_h1_filename|filename_only|h1_fm_filename', 'fm_h1_filename')
-            ->addOption('naming-mode', null, InputOption::VALUE_REQUIRED, 'basename|prefix|suffix', 'basename')
-            ->addOption('dir-levels', null, InputOption::VALUE_REQUIRED, 'Used by prefix/suffix modes', '2')
-            ->addOption('separator', null, InputOption::VALUE_REQUIRED, 'Separator for path → name', ' ')
-            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Namespace prefix for created pages', '')
-            ->addOption('detect-journal', null, InputOption::VALUE_REQUIRED, 'Detect journal pages (1|0)', '1')
-            ->addOption('journal-lang', null, InputOption::VALUE_REQUIRED, 'en|fr', 'en')
-            ->addOption('journal-ns', null, InputOption::VALUE_REQUIRED, 'Journal page prefix', 'Journal')
+            ->addOption(self::OPT_ROOTS, null, InputOption::VALUE_REQUIRED, 'Root(s) in the archive; semicolon/comma-separated', '.')
+            ->addOption(self::OPT_RECURSIVE, null, InputOption::VALUE_REQUIRED, 'Recurse into subdirs (1|0)', '1')
+            ->addOption(self::OPT_MAX_DEPTH, null, InputOption::VALUE_REQUIRED, 'Max recursion depth (0 = unlimited)', '0')
+            ->addOption(self::OPT_EXCLUDE_GLOBS, null, InputOption::VALUE_REQUIRED, 'Glob patterns to exclude', '')
+            ->addOption(self::OPT_TITLE_STRATEGY, null, InputOption::VALUE_REQUIRED, 'fm_h1_filename|filename_only|h1_fm_filename', 'fm_h1_filename')
+            ->addOption(self::OPT_NAMING_MODE, null, InputOption::VALUE_REQUIRED, 'basename|prefix|suffix', 'basename')
+            ->addOption(self::OPT_DIR_LEVELS, null, InputOption::VALUE_REQUIRED, 'Used by prefix/suffix modes', '2')
+            ->addOption(self::OPT_SEPARATOR, null, InputOption::VALUE_REQUIRED, 'Separator for path → name', ' ')
+            ->addOption(self::OPT_NAMESPACE, null, InputOption::VALUE_REQUIRED, 'Namespace prefix for created pages', '')
+            ->addOption(self::OPT_DETECT_JOURNAL, null, InputOption::VALUE_REQUIRED, 'Detect journal pages (1|0)', '1')
+            ->addOption(self::OPT_JOURNAL_LANG, null, InputOption::VALUE_REQUIRED, 'en|fr', 'en')
+            ->addOption(self::OPT_JOURNAL_NS, null, InputOption::VALUE_REQUIRED, 'Journal page prefix', 'Journal')
 
             // Markdown flavor / pipeline
-            ->addOption('markdown-source', null, InputOption::VALUE_REQUIRED, 'logseq|gfm|commonmark', 'commonmark')
-            ->addOption('strip-front-matter', null, InputOption::VALUE_REQUIRED, 'Remove YAML front matter (1|0)', '1')
-            ->addOption('runtime-logseq', null, InputOption::VALUE_REQUIRED, 'Keep [[..]]/((..)) for runtime ext (1|0)', '0')
-            ->addOption('blockref-mode', null, InputOption::VALUE_REQUIRED, 'inline|code|keep', 'inline')
+            ->addOption(self::OPT_MARKDOWN_SOURCE, null, InputOption::VALUE_REQUIRED, 'logseq|gfm|commonmark', self::FLAVOR_COMMONMARK)
+            ->addOption(self::OPT_STRIP_FM, null, InputOption::VALUE_REQUIRED, 'Remove YAML front matter (1|0)', '1')
+            ->addOption(self::OPT_RUNTIME_LOGSEQ, null, InputOption::VALUE_REQUIRED, 'Keep [[..]]/((..)) for runtime ext (1|0)', '0')
+            ->addOption(self::OPT_BLOCKREF, null, InputOption::VALUE_REQUIRED, 'inline|code|keep', 'inline')
 
             // Garbage collector delete/mark
-            ->addOption('gc-mode', null, InputOption::VALUE_REQUIRED, 'off|mark|delete', 'mark')
-            ->addOption('gc-safe-namespace', null, InputOption::VALUE_REQUIRED, 'Only delete inside this page prefix', '')
+            ->addOption(self::OPT_GC_MODE, null, InputOption::VALUE_REQUIRED, 'off|mark|delete', self::GC_MARK)
+            ->addOption(self::OPT_GC_SAFE_NS, null, InputOption::VALUE_REQUIRED, 'Only delete inside this page prefix', '')
 
             // Output
-            ->addOption('json', null, InputOption::VALUE_NONE, 'Print JSON result instead of human text');
+            ->addOption(self::OPT_JSON, null, InputOption::VALUE_NONE, 'Print JSON result instead of human text');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -75,24 +118,24 @@ class MarkdownImporterCommand extends Command
             return Command::FAILURE;
         }
 
-        $mode = strtolower((string)$input->getOption('mode'));
-        if (! in_array($mode, ['preview', 'import'], true)) {
+        $mode = strtolower((string)$input->getOption(self::OPT_MODE));
+        if (! in_array($mode, [self::MODE_PREVIEW, self::MODE_IMPORT], true)) {
             $io->error('Invalid --mode. Use preview or import.');
             return Command::FAILURE;
         }
 
         // -------- Source config (même shape que l’UI/Importer) --------
-        $srcTypeRaw = strtolower((string)$input->getOption('source-type') ?: 'local');
-        $srcType = ($srcTypeRaw === 'repo') ? 'git' : $srcTypeRaw; // alias
-        if (! in_array($srcType, ['local', 'git'], true)) {
-            $srcType = 'local';
+        $srcTypeRaw = strtolower((string)$input->getOption(self::OPT_SOURCE_TYPE) ?: SourceManager::SRC_LOCAL);
+        $srcType = ($srcTypeRaw === 'repo') ? SourceManager::SRC_GIT : $srcTypeRaw; // 'repo' is a CLI alias for 'git'
+        if (! in_array($srcType, [SourceManager::SRC_LOCAL, SourceManager::SRC_GIT], true)) {
+            $srcType = SourceManager::SRC_LOCAL;
         }
 
         $sourceCfg = ['type' => $srcType];
-        $localPath = (string)$input->getOption('local-path');
+        $localPath = (string)$input->getOption(self::OPT_LOCAL_PATH);
 
-        if ($srcType === 'git') {
-            $repoUrl = (string)$input->getOption('repo-url');
+        if ($srcType === SourceManager::SRC_GIT) {
+            $repoUrl = (string)$input->getOption(self::OPT_REPO_URL);
             if ($repoUrl === '') {
                 $io->error('For --source-type=git you must provide --repo-url (HTTPS).');
                 return Command::FAILURE;
@@ -100,10 +143,10 @@ class MarkdownImporterCommand extends Command
 
             $sourceCfg += [
                 'repo_url'    => $repoUrl,
-                'repo_branch' => (string)$input->getOption('repo-branch') ?: 'main',
-                'git_pull'    => $this->toBool($input->getOption('git-pull'), true),
-                'repo_token'  => (string)$input->getOption('repo-token') ?: '',
-                'git_timeout' => (int)$input->getOption('git-timeout') ?: 30,
+                'repo_branch' => (string)$input->getOption(self::OPT_REPO_BRANCH) ?: 'main',
+                'git_pull'    => $this->toBool($input->getOption(self::OPT_GIT_PULL), true),
+                'repo_token'  => (string)$input->getOption(self::OPT_REPO_TOKEN) ?: '',
+                'git_timeout' => (int)$input->getOption(self::OPT_GIT_TIMEOUT) ?: 30,
             ];
         } else { // local
             if (! $localPath) {
@@ -118,50 +161,50 @@ class MarkdownImporterCommand extends Command
 
         // -------- Scanner options --------
         $scanOpts = [
-            'roots'          => (string)$input->getOption('roots') ?: '.',
-            'recursive'      => $this->toBool($input->getOption('recursive'), true),
-            'max_depth'      => (int)$input->getOption('max-depth'),
-            'exclude_globs'  => (string)$input->getOption('exclude-globs'),
-            'title_strategy' => (string)$input->getOption('title-strategy') ?: 'fm_h1_filename',
-            'naming_mode'    => (string)$input->getOption('naming-mode') ?: 'basename',
-            'dir_levels'     => (int)$input->getOption('dir-levels'),
-            'separator'      => (string)$input->getOption('separator') ?? ' ',
-            'namespace'      => (string)$input->getOption('namespace') ?? '',
-            'detect_journal' => $this->toBool($input->getOption('detect-journal'), true),
-            'journal_lang'   => (string)$input->getOption('journal-lang') ?: 'en',
-            'journal_ns'     => (string)$input->getOption('journal-ns') ?: 'Journal',
+            'roots'          => (string)$input->getOption(self::OPT_ROOTS) ?: '.',
+            'recursive'      => $this->toBool($input->getOption(self::OPT_RECURSIVE), true),
+            'max_depth'      => (int)$input->getOption(self::OPT_MAX_DEPTH),
+            'exclude_globs'  => (string)$input->getOption(self::OPT_EXCLUDE_GLOBS),
+            'title_strategy' => (string)$input->getOption(self::OPT_TITLE_STRATEGY) ?: 'fm_h1_filename',
+            'naming_mode'    => (string)$input->getOption(self::OPT_NAMING_MODE) ?: 'basename',
+            'dir_levels'     => (int)$input->getOption(self::OPT_DIR_LEVELS),
+            'separator'      => (string)$input->getOption(self::OPT_SEPARATOR) ?? ' ',
+            'namespace'      => (string)$input->getOption(self::OPT_NAMESPACE) ?? '',
+            'detect_journal' => $this->toBool($input->getOption(self::OPT_DETECT_JOURNAL), true),
+            'journal_lang'   => (string)$input->getOption(self::OPT_JOURNAL_LANG) ?: 'en',
+            'journal_ns'     => (string)$input->getOption(self::OPT_JOURNAL_NS) ?: 'Journal',
         ];
 
         // -------- Markdown pipeline --------
-        $flavor = (string)$input->getOption('markdown-source') ?: 'commonmark';
-        if (! in_array($flavor, ['logseq', 'gfm', 'commonmark'], true)) {
-            $flavor = 'commonmark';
+        $flavor = (string)$input->getOption(self::OPT_MARKDOWN_SOURCE) ?: self::FLAVOR_COMMONMARK;
+        if (! in_array($flavor, [self::FLAVOR_LOGSEQ, self::FLAVOR_GFM, self::FLAVOR_COMMONMARK], true)) {
+            $flavor = self::FLAVOR_COMMONMARK;
         }
         $pipelineCfg = [
             'flavor'             => $flavor,
-            'strip_front_matter' => $this->toBool($input->getOption('strip-front-matter'), true),
-            'runtime_logseq'     => $this->toBool($input->getOption('runtime-logseq'), false),
-            'blockref_mode'      => (string)$input->getOption('blockref-mode') ?: 'inline',
+            'strip_front_matter' => $this->toBool($input->getOption(self::OPT_STRIP_FM), true),
+            'runtime_logseq'     => $this->toBool($input->getOption(self::OPT_RUNTIME_LOGSEQ), false),
+            'blockref_mode'      => (string)$input->getOption(self::OPT_BLOCKREF) ?: 'inline',
             'gc'                 => [
                 'mode'           => (function () use ($input) {
-                    $m = strtolower((string)$input->getOption('gc-mode') ?: 'mark');
-                    return in_array($m, ['off', 'mark', 'delete'], true) ? $m : 'mark';
+                    $m = strtolower((string)$input->getOption(self::OPT_GC_MODE) ?: self::GC_MARK);
+                    return in_array($m, [self::GC_OFF, self::GC_MARK, self::GC_DELETE], true) ? $m : self::GC_MARK;
                 })(),
-                'safe_namespace' => (string)$input->getOption('gc-safe-namespace') ?? '',
+                'safe_namespace' => (string)$input->getOption(self::OPT_GC_SAFE_NS) ?? '',
             ],
         ];
 
-        $jsonOut = (bool)$input->getOption('json');
+        $jsonOut = (bool)$input->getOption(self::OPT_JSON);
 
         // -------- Importer --------
         $importer = new TikiMarkdownImporter();
         [$uploadTmp, $uploadName, $tmpZipToDelete] = $this->resolveLocalPayload($srcType, $localPath);
 
         try {
-            if ($mode === 'preview') {
+            if ($mode === self::MODE_PREVIEW) {
                 $res = $importer->previewFromSource(
                     $sourceCfg,
-                    array_merge($scanOpts, ['markdown_source' => $flavor]),
+                    array_merge($scanOpts, [self::OPT_MARKDOWN_SOURCE => $flavor]),
                     $uploadTmp,
                     $uploadName
                 );

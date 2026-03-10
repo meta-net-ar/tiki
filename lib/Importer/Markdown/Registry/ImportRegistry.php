@@ -18,6 +18,20 @@ use TikiLib;
 class ImportRegistry
 {
     public const TABLE = 'tiki_markdown_imports';
+    private const COL_SOURCE_KEY = 'source_key';
+    private const COL_RELPATH = 'relpath';
+    private const COL_PAGE_NAME = 'page_name';
+    private const COL_CHECKSUM = 'checksum';
+    private const COL_SIZE_BYTES = 'size_bytes';
+    private const COL_MTIME_UTC = 'mtime_utc';
+    private const COL_LAST_IMPORTED = 'last_imported';
+    private const COL_LAST_STATUS = 'last_status';
+    private const COL_ERROR_NOTE = 'error_note';
+    private const COL_IS_JOURNAL = 'is_journal';
+    private const COL_ORPHANED_AT = 'orphaned_at';
+
+    public const STATUS_OK = 'ok';
+    public const STATUS_ORPHAN = 'orphan';
 
     /** @var \TikiLib */
     private $tikilib;
@@ -41,11 +55,11 @@ class ImportRegistry
     {
         $out = [];
         $rs = $this->tikilib->query(
-            "SELECT * FROM " . self::TABLE . " WHERE source_key = ?",
+            "SELECT * FROM " . self::TABLE . " WHERE " . self::COL_SOURCE_KEY . " = ?",
             [$sourceKey]
         );
         while ($row = $rs->fetchRow()) {
-            $out[$row['relpath']] = $row;
+            $out[$row[self::COL_RELPATH]] = $row;
         }
         return $out;
     }
@@ -53,7 +67,7 @@ class ImportRegistry
     public function getOne(string $sourceKey, string $relpath): ?array
     {
         $rs = $this->tikilib->query(
-            "SELECT * FROM " . self::TABLE . " WHERE source_key = ? AND relpath = ?",
+            "SELECT * FROM " . self::TABLE . " WHERE " . self::COL_SOURCE_KEY . " = ? AND " . self::COL_RELPATH . " = ?",
             [$sourceKey, $relpath]
         );
         return $rs->numRows() ? $rs->fetchRow() : null;
@@ -71,11 +85,11 @@ class ImportRegistry
     {
         $out = [];
         $rs = $this->tikilib->query(
-            "SELECT * FROM " . self::TABLE . " WHERE source_key = ? AND last_status = 'orphan' ORDER BY orphaned_at DESC",
-            [$sourceKey]
+            "SELECT * FROM " . self::TABLE . " WHERE " . self::COL_SOURCE_KEY . " = ? AND " . self::COL_LAST_STATUS . " = ? ORDER BY " . self::COL_ORPHANED_AT . " DESC",
+            [$sourceKey, self::STATUS_ORPHAN]
         );
         while ($row = $rs->fetchRow()) {
-            $out[$row['relpath']] = $row;
+            $out[$row[self::COL_RELPATH]] = $row;
         }
         return $out;
     }
@@ -90,35 +104,35 @@ class ImportRegistry
         $now = $this->tikilib->now;
 
         $q = "INSERT INTO " . self::TABLE . "
-                (source_key, relpath, page_name, checksum, size_bytes, mtime_utc, last_imported, last_status, error_note, is_journal, orphaned_at)
+                (" . self::COL_SOURCE_KEY . ", " . self::COL_RELPATH . ", " . self::COL_PAGE_NAME . ", " . self::COL_CHECKSUM . ", " . self::COL_SIZE_BYTES . ", " . self::COL_MTIME_UTC . ", " . self::COL_LAST_IMPORTED . ", " . self::COL_LAST_STATUS . ", " . self::COL_ERROR_NOTE . ", " . self::COL_IS_JOURNAL . ", " . self::COL_ORPHANED_AT . ")
               VALUES (?,?,?,?,?,?,?,?,?,?,NULL)
               ON DUPLICATE KEY UPDATE
-                page_name     = VALUES(page_name),
-                checksum      = VALUES(checksum),
-                size_bytes    = VALUES(size_bytes),
-                mtime_utc     = VALUES(mtime_utc),
-                last_imported = VALUES(last_imported),
-                last_status   = VALUES(last_status),
-                error_note    = VALUES(error_note),
-                is_journal    = VALUES(is_journal),
-                orphaned_at   = NULL";
+                " . self::COL_PAGE_NAME . "     = VALUES(" . self::COL_PAGE_NAME . "),
+                " . self::COL_CHECKSUM . "      = VALUES(" . self::COL_CHECKSUM . "),
+                " . self::COL_SIZE_BYTES . "    = VALUES(" . self::COL_SIZE_BYTES . "),
+                " . self::COL_MTIME_UTC . "     = VALUES(" . self::COL_MTIME_UTC . "),
+                " . self::COL_LAST_IMPORTED . " = VALUES(" . self::COL_LAST_IMPORTED . "),
+                " . self::COL_LAST_STATUS . "   = VALUES(" . self::COL_LAST_STATUS . "),
+                " . self::COL_ERROR_NOTE . "    = VALUES(" . self::COL_ERROR_NOTE . "),
+                " . self::COL_IS_JOURNAL . "    = VALUES(" . self::COL_IS_JOURNAL . "),
+                " . self::COL_ORPHANED_AT . "   = NULL";
 
         try {
             $result = $this->tikilib->query($q, [
-                (string) $row['source_key'],
-                (string) $row['relpath'],
-                (string) $row['page_name'],
-                (string) $row['checksum'],
-                isset($row['size_bytes']) ? (int) $row['size_bytes'] : null,
-                isset($row['mtime_utc']) ? (int) $row['mtime_utc'] : null,
-                isset($row['last_imported']) ? (int) $row['last_imported'] : $now,
-                (string) ($row['last_status'] ?? 'ok'),
-                $row['error_note'] ?? null,
-                isset($row['is_journal']) ? (int) $row['is_journal'] : 0,
+                (string) $row[self::COL_SOURCE_KEY],
+                (string) $row[self::COL_RELPATH],
+                (string) $row[self::COL_PAGE_NAME],
+                (string) $row[self::COL_CHECKSUM],
+                isset($row[self::COL_SIZE_BYTES]) ? (int) $row[self::COL_SIZE_BYTES] : null,
+                isset($row[self::COL_MTIME_UTC]) ? (int) $row[self::COL_MTIME_UTC] : null,
+                isset($row[self::COL_LAST_IMPORTED]) ? (int) $row[self::COL_LAST_IMPORTED] : $now,
+                (string) ($row[self::COL_LAST_STATUS] ?? self::STATUS_OK),
+                $row[self::COL_ERROR_NOTE] ?? null,
+                isset($row[self::COL_IS_JOURNAL]) ? (int) $row[self::COL_IS_JOURNAL] : 0,
             ]);
             return $result !== false;
         } catch (\Exception $e) {
-            throw new \Exception("Failed to upsert registry entry for {$row['relpath']}: " . $e->getMessage(), 0, $e);
+            throw new \Exception("Failed to upsert registry entry for {$row[self::COL_RELPATH]}: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -130,17 +144,17 @@ class ImportRegistry
     public function markOrphan(string $sourceKey, string $relpath, int $timestamp): void
     {
         $q = "UPDATE " . self::TABLE . "
-                SET last_status='orphan',
-                    orphaned_at = IFNULL(orphaned_at, ?)
-              WHERE source_key=? AND relpath=?";
+                SET " . self::COL_LAST_STATUS . "='" . self::STATUS_ORPHAN . "',
+                    " . self::COL_ORPHANED_AT . " = IFNULL(" . self::COL_ORPHANED_AT . ", ?)
+              WHERE " . self::COL_SOURCE_KEY . "=? AND " . self::COL_RELPATH . "=?";
         $this->tikilib->query($q, [$timestamp, $sourceKey, $relpath]);
     }
 
     public function setStatus(string $sourceKey, string $relpath, string $status, ?string $note = null): void
     {
         $q = "UPDATE " . self::TABLE . "
-                SET last_status = ?, error_note = ?
-              WHERE source_key=? AND relpath=?";
+                SET " . self::COL_LAST_STATUS . " = ?, " . self::COL_ERROR_NOTE . " = ?
+              WHERE " . self::COL_SOURCE_KEY . "=? AND " . self::COL_RELPATH . "=?";
         $this->tikilib->query($q, [$status, $note, $sourceKey, $relpath]);
     }
 

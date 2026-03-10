@@ -31,6 +31,12 @@ use ZipArchive;
  */
 class FilesystemProvider implements SourceProviderInterface
 {
+    private const MODE_UPLOAD = 'upload';
+    private const CTX_UPLOADED_PATH = 'uploadedPath';
+    private const CTX_UPLOADED_NAME = 'uploadedName';
+    private const CFG_LOCAL_PATH = 'local_path';
+    private const EXT_ZIP = 'zip';
+
     public function __construct(
         private string $mode, // 'upload' | 'path'
         private array $cfg,   // ['local_path' => '/srv/notes' (optional for mode=path)]
@@ -40,13 +46,13 @@ class FilesystemProvider implements SourceProviderInterface
 
     public function fetchToTempDir(): string
     {
-        return $this->mode === 'upload' ? $this->fromUpload() : $this->fromPath();
+        return $this->mode === self::MODE_UPLOAD ? $this->fromUpload() : $this->fromPath();
     }
 
     private function fromUpload(): string
     {
-        $uploadedPath = $this->ctx['uploadedPath'] ?? null;
-        $uploadedName = $this->ctx['uploadedName'] ?? null;
+        $uploadedPath = $this->ctx[self::CTX_UPLOADED_PATH] ?? null;
+        $uploadedName = $this->ctx[self::CTX_UPLOADED_NAME] ?? null;
 
         if (! $uploadedPath || ! is_readable($uploadedPath)) {
             throw new \RuntimeException(tra('Uploaded file is missing or not readable.'));
@@ -55,7 +61,7 @@ class FilesystemProvider implements SourceProviderInterface
         $ext = strtolower(pathinfo($uploadedName ?: $uploadedPath, PATHINFO_EXTENSION));
 
         // If ZIP, extract to temp directory
-        if ($ext === 'zip') {
+        if ($ext === self::EXT_ZIP) {
             if (! class_exists(ZipArchive::class)) {
                 throw new \RuntimeException(tra('ZipArchive extension required to extract ZIP files.'));
             }
@@ -100,7 +106,7 @@ class FilesystemProvider implements SourceProviderInterface
 
     private function fromPath(): string
     {
-        $path = (string)($this->cfg['local_path'] ?? '');
+        $path = (string)($this->cfg[self::CFG_LOCAL_PATH] ?? '');
         if ($path === '') {
             throw new \RuntimeException(tra('Local path is not specified.'));
         }
@@ -114,7 +120,7 @@ class FilesystemProvider implements SourceProviderInterface
         }
 
         // If it's a ZIP file, extract to temp directory
-        if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
+        if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === self::EXT_ZIP) {
             if (! class_exists(ZipArchive::class)) {
                 throw new \RuntimeException(tra('ZipArchive extension required to extract ZIP files.'));
             }

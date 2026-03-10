@@ -8,6 +8,21 @@ namespace Tiki\Lib\Importer\Markdown\Source;
 
 class SourceManager
 {
+    public const SRC_GIT = 'git';
+    public const SRC_LOCAL = 'local';
+
+    private const MODE_UPLOAD = 'upload';
+    private const MODE_PATH = 'path';
+
+    private const CFG_REPO_URL = 'repo_url';
+    private const CFG_REPO_BRANCH = 'repo_branch';
+    private const CFG_GIT_PULL = 'git_pull';
+    private const CFG_REPO_TOKEN = 'repo_token';
+
+    private const CTX_UPLOADED_PATH = 'uploadedPath';
+    private const CTX_UPLOADED_NAME = 'uploadedName';
+    private const CTX_TIMEOUT = 'timeout';
+
     private string $error = '';
     private ?string $sourceId = null;
 
@@ -42,14 +57,14 @@ class SourceManager
         // Fallback: generate stable hash
         $type = $cfg->getType();
 
-        if ($type === 'git') {
+        if ($type === self::SRC_GIT) {
             $url = $cfg->getRepoUrl();
             $branch = $cfg->getRepoBranch();
             // Use hash of normalized repo info
             return 'git_' . hash('sha256', $url . ':' . $branch);
         }
 
-        if ($type === 'local' && $cfg->getLocalPath() !== null) {
+        if ($type === self::SRC_LOCAL && $cfg->getLocalPath() !== null) {
             $localPath = $cfg->getLocalPath();
             return 'local_' . hash('sha256', realpath($localPath) ?: $localPath);
         }
@@ -73,25 +88,25 @@ class SourceManager
         $sourceConfig = SourceConfig::fromArray($cfg);
         $type = $sourceConfig->getType();
 
-        if ($type === 'local') {
+        if ($type === self::SRC_LOCAL) {
             // Prioritize upload if provided, otherwise use local path
             if ($uploadTmp) {
-                return new FilesystemProvider('upload', $cfg, [
-                    'uploadedPath' => $uploadTmp,
-                    'uploadedName' => $uploadName,
+                return new FilesystemProvider(self::MODE_UPLOAD, $cfg, [
+                    self::CTX_UPLOADED_PATH => $uploadTmp,
+                    self::CTX_UPLOADED_NAME => $uploadName,
                 ]);
             }
-            return new FilesystemProvider('path', $cfg, []);
+            return new FilesystemProvider(self::MODE_PATH, $cfg, []);
         }
 
-        if ($type === 'git') {
+        if ($type === self::SRC_GIT) {
             return new GitWorkingCopyProvider([
-                'repo_url'      => $sourceConfig->getRepoUrl(),
-                'repo_branch'   => $sourceConfig->getRepoBranch(),
-                'git_pull'      => $sourceConfig->shouldGitPull(),
-                'repo_token'    => $sourceConfig->getRepoToken(),
+                self::CFG_REPO_URL      => $sourceConfig->getRepoUrl(),
+                self::CFG_REPO_BRANCH   => $sourceConfig->getRepoBranch(),
+                self::CFG_GIT_PULL      => $sourceConfig->shouldGitPull(),
+                self::CFG_REPO_TOKEN    => $sourceConfig->getRepoToken(),
             ], [
-                'timeout'       => $sourceConfig->getGitTimeout(),
+                self::CTX_TIMEOUT       => $sourceConfig->getGitTimeout(),
             ]);
         }
 

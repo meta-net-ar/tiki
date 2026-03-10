@@ -18,6 +18,76 @@ use TikiLib;
  */
 class TikiMarkdownImporter
 {
+    private const STATUS_ERROR = 'error';
+    private const STATUS_SKIPPED = 'skipped';
+
+    private const GC_OFF = 'off';
+    private const GC_MARK = 'mark';
+    private const GC_DELETE = 'delete';
+
+    private const RES_WRITTEN = 'written';
+    private const RES_SKIPPED = 'skipped';
+    private const RES_FAILED = 'failed';
+    private const RES_COUNTS = 'counts';
+    private const RES_ERRORS = 'errors';
+    private const RES_NOTES = 'notes';
+    private const RES_GC_REPORT = 'gc_report';
+    private const RES_ORPHANED = 'orphaned';
+
+    private const CNT_TOTAL = 'total';
+    private const CNT_GC_ORPHANS = 'gc_orphans';
+    private const CNT_GC_DELETED = 'gc_deleted';
+    private const CNT_GC_MARKED = 'gc_marked';
+
+    private const CFG_TYPE = 'type';
+    private const CFG_LOCAL_PATH = 'local_path';
+    private const GC_OPT_MODE = 'mode';
+    private const GC_OPT_SAFE_NS = 'safe_namespace';
+    private const PIPE_OPT_FLAVOR = 'flavor';
+    private const PIPE_OPT_GC = 'gc';
+    private const PIPE_OPT_STRIP_FM = 'strip_front_matter';
+    private const PIPE_OPT_RUNTIME_LOGSEQ = 'runtime_logseq';
+    private const PIPE_OPT_BLOCKREF = 'blockref_mode';
+    private const PIPE_OPT_JOURNAL_NS = 'journal_ns';
+
+    private const SCAN_RELPATH = 'relpath';
+    private const SCAN_RELATIVE = 'relative';
+    private const SCAN_PAGE_NAME = 'page_name';
+    private const SCAN_RAW = 'raw';
+    private const SCAN_FILES = 'files';
+    private const SCAN_COUNTS = 'counts';
+
+    private const OPT_ROOTS = 'roots';
+    private const OPT_RECURSIVE = 'recursive';
+    private const OPT_MAX_DEPTH = 'max_depth';
+    private const OPT_EXCLUDE_GLOBS = 'exclude_globs';
+    private const OPT_TITLE_STRATEGY = 'title_strategy';
+    private const OPT_NAMING_MODE = 'naming_mode';
+    private const OPT_DIR_LEVELS = 'dir_levels';
+    private const OPT_SEPARATOR = 'separator';
+    private const OPT_NAMESPACE = 'namespace';
+    private const OPT_DETECT_JOURNAL = 'detect_journal';
+    private const OPT_JOURNAL_LANG = 'journal_lang';
+    private const OPT_MARKDOWN_SOURCE = 'markdown_source';
+
+    private const WIKI_OPT_ROOTS = 'roots';
+    private const WIKI_OPT_RECURSIVE = 'recursive';
+    private const WIKI_OPT_MAX_DEPTH = 'max_depth';
+    private const WIKI_OPT_EXCLUDE_GLOBS = 'exclude_globs';
+    private const WIKI_OPT_TITLE_STRATEGY = 'title_strategy';
+    private const WIKI_OPT_NAMING_MODE = 'naming_mode';
+    private const WIKI_OPT_DIR_LEVELS = 'dir_levels';
+    private const WIKI_OPT_SEPARATOR = 'separator';
+    private const WIKI_OPT_NAMESPACE = 'namespace';
+    private const WIKI_OPT_DETECT_JOURNAL = 'detect_journal';
+    private const WIKI_OPT_JOURNAL_LANG = 'journal_lang';
+    private const WIKI_OPT_MARKDOWN_SOURCE = 'markdown_source';
+
+    private const FILE_TYPE_JOURNAL = 'journal';
+    private const DEFAULT_FLAVOR = 'gfm';
+    private const DEFAULT_GC_MODE = self::GC_MARK;
+    private const DEFAULT_JOURNAL_NS = 'Journal';
+
     private array $errors = [];
     private array $notesByPage = [];
     private string $lastError = '';
@@ -59,12 +129,12 @@ class TikiMarkdownImporter
 
         if (! $dirPath) {
             $this->errors[] = $mgr->getError();
-            return ['written' => 0, 'skipped' => 0, 'counts' => ['total' => 0], 'errors' => $this->errors, 'notes' => []];
+            return [self::RES_WRITTEN => 0, self::RES_SKIPPED => 0, self::RES_COUNTS => [self::CNT_TOTAL => 0], self::RES_ERRORS => $this->errors, self::RES_NOTES => []];
         }
 
         // Detect if temp directory should be cleaned up
-        if ($uploadTmp || (isset($sourceCfg['type']) && $sourceCfg['type'] === 'local' && isset($sourceCfg['local_path']))) {
-            $localPath = $sourceCfg['local_path'] ?? null;
+        if ($uploadTmp || (isset($sourceCfg[self::CFG_TYPE]) && $sourceCfg[self::CFG_TYPE] === SourceManager::SRC_LOCAL && isset($sourceCfg[self::CFG_LOCAL_PATH]))) {
+            $localPath = $sourceCfg[self::CFG_LOCAL_PATH] ?? null;
             if ($uploadTmp || ($localPath && ! is_dir($localPath))) {
                 $isUploadedTemp = true; // Extracted ZIP or copied single file
             }
@@ -87,30 +157,30 @@ class TikiMarkdownImporter
             }
         }
 
-        $files   = $preview['files'] ?? [];
-        $counts  = $preview['counts'] ?? ['total' => count($files)];
+        $files   = $preview[self::SCAN_FILES] ?? [];
+        $counts  = $preview[self::SCAN_COUNTS] ?? [self::CNT_TOTAL => count($files)];
         $written = 0;
         $skipped = 0;
         $errors  = 0;
 
         // 3) Pipeline
-        $flavor = strtolower($pipelineCfg['flavor'] ?? 'gfm');
+        $flavor = strtolower($pipelineCfg[self::PIPE_OPT_FLAVOR] ?? self::DEFAULT_FLAVOR);
         $pipeline = (new MarkdownPipeline())
             ->registerPurifier(new CommonMarkPurifier())
             ->registerPurifier(new GfmPurifier())
             ->registerPurifier(new LogseqPurifier());
 
         $ctx = [
-            'journal_ns'         => $wikiOpts['journal_ns'] ?? 'Journal',
-            'strip_front_matter' => $pipelineCfg['strip_front_matter'] ?? true,
-            'runtime_logseq'     => $pipelineCfg['runtime_logseq'] ?? false,
-            'blockref_mode'      => $pipelineCfg['blockref_mode'] ?? 'inline',
+            self::PIPE_OPT_JOURNAL_NS => $wikiOpts[self::PIPE_OPT_JOURNAL_NS] ?? self::DEFAULT_JOURNAL_NS,
+            self::PIPE_OPT_STRIP_FM => $pipelineCfg[self::PIPE_OPT_STRIP_FM] ?? true,
+            self::PIPE_OPT_RUNTIME_LOGSEQ => $pipelineCfg[self::PIPE_OPT_RUNTIME_LOGSEQ] ?? false,
+            self::PIPE_OPT_BLOCKREF => $pipelineCfg[self::PIPE_OPT_BLOCKREF] ?? 'inline',
         ];
 
         foreach ($files as $f) {
-            $relpath = $f['relpath'] ?? $f['relative'] ?? ($f['path'] ?? $f['file'] ?? null);
-            $page    = $f['page_name'] ?? null;
-            $raw     = $f['raw'] ?? null;
+            $relpath = $f[self::SCAN_RELPATH] ?? $f[self::SCAN_RELATIVE] ?? ($f['path'] ?? $f['file'] ?? null);
+            $page    = $f[self::SCAN_PAGE_NAME] ?? null;
+            $raw     = $f[self::SCAN_RAW] ?? null;
 
             if (! $relpath || ! $page || ! is_string($raw)) {
                 $this->notesByPage['__scanner__'][] = tra('Skipping item (missing relpath/page/raw).');
@@ -131,10 +201,10 @@ class TikiMarkdownImporter
             if ($row && hash_equals($row['checksum'], $checksum)) {
                 // Retry if last import failed, even if content unchanged
                 $lastStatus = $row['last_status'] ?? '';
-                if ($lastStatus !== 'error') {
+                if ($lastStatus !== self::STATUS_ERROR) {
                     $skipped++;
                     $this->notesByPage[$page][] = tra('Skipped (no changes via registry).');
-                    $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'skipped');
+                    $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, self::STATUS_SKIPPED);
                     continue;
                 }
                 // If last_status='error', fall through to retry the write
@@ -151,19 +221,19 @@ class TikiMarkdownImporter
                 }
 
                 // Upsert registry (clear orphan status)
-                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, $ok ? 'ok' : 'skipped');
+                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, $ok ? ImportRegistry::STATUS_OK : self::STATUS_SKIPPED);
             } catch (\Exception $e) {
                 $errors++;
                 $this->notesByPage[$page][] = tra('Error: %0', $e->getMessage());
-                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'error');
+                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, self::STATUS_ERROR);
             }
         }
 
         // 4) Garbage collect
-        $gcCfg  = $pipelineCfg['gc'] ?? [];
-        $gcMode = $gcCfg['mode'] ?? 'mark'; // off|mark|delete
-        if ($isFirstRun && $gcMode === 'delete') {
-            $gcMode = 'mark'; // security for first run
+        $gcCfg  = $pipelineCfg[self::PIPE_OPT_GC] ?? [];
+        $gcMode = $gcCfg[self::GC_OPT_MODE] ?? self::DEFAULT_GC_MODE; // off|mark|delete
+        if ($isFirstRun && $gcMode === self::GC_DELETE) {
+            $gcMode = self::GC_MARK; // security for first run
             $this->notesByPage['__gc__'][] = tra('GC mode downgraded to "mark" on first run for safety.');
         }
 
@@ -172,14 +242,14 @@ class TikiMarkdownImporter
             $sourceKey,
             array_keys($seenRelpaths),
             [
-                'mode'           => $gcMode, // off|mark|delete
-                'safe_namespace' => (string)($gcCfg['safe_namespace'] ?? ''),
+                self::GC_OPT_MODE => $gcMode, // off|mark|delete
+                self::GC_OPT_SAFE_NS => (string)($gcCfg[self::GC_OPT_SAFE_NS] ?? ''),
             ]
         );
 
-        $counts['gc_orphans'] = $gcReport['orphans'] ?? 0;
-        $counts['gc_deleted'] = $gcReport['deleted'] ?? 0;
-        $counts['gc_marked']  = $gcReport['marked'] ?? 0;
+        $counts[self::CNT_GC_ORPHANS] = $gcReport['orphans'] ?? 0;
+        $counts[self::CNT_GC_DELETED] = $gcReport['deleted'] ?? 0;
+        $counts[self::CNT_GC_MARKED]  = $gcReport['marked'] ?? 0;
 
         if (! empty($gcReport['errors'])) {
             $this->errors = array_merge($this->errors, $gcReport['errors']);
@@ -188,14 +258,14 @@ class TikiMarkdownImporter
         $orphanedEntries = $registry->getOrphanedBySourceKey($sourceKey);
 
         return [
-            'written'      => $written,
-            'skipped'      => $skipped,
-            'failed'       => $errors,
-            'counts'       => $counts,
-            'errors'       => $this->errors,
-            'notes'        => $this->notesByPage,
-            'gc_report'    => $gcReport,
-            'orphaned'     => $orphanedEntries,
+            self::RES_WRITTEN => $written,
+            self::RES_SKIPPED => $skipped,
+            self::RES_FAILED => $errors,
+            self::RES_COUNTS => $counts,
+            self::RES_ERRORS => $this->errors,
+            self::RES_NOTES => $this->notesByPage,
+            self::RES_GC_REPORT => $gcReport,
+            self::RES_ORPHANED => $orphanedEntries,
         ];
     }
 
@@ -217,8 +287,8 @@ class TikiMarkdownImporter
         }
 
         $isUploadedTemp = false;
-        if ($uploadTmp || (isset($sourceCfg['type']) && $sourceCfg['type'] === 'local' && isset($sourceCfg['local_path']))) {
-            $localPath = $sourceCfg['local_path'] ?? null;
+        if ($uploadTmp || (isset($sourceCfg[self::CFG_TYPE]) && $sourceCfg[self::CFG_TYPE] === SourceManager::SRC_LOCAL && isset($sourceCfg[self::CFG_LOCAL_PATH]))) {
+            $localPath = $sourceCfg[self::CFG_LOCAL_PATH] ?? null;
             if ($uploadTmp || ($localPath && ! is_dir($localPath))) {
                 $isUploadedTemp = true;
             }
@@ -227,18 +297,18 @@ class TikiMarkdownImporter
         try {
             $scanner = new DirectoryScanner();
             $scan = $scanner->scan($dirPath, [
-                'roots'          => $wikiOpts['roots'] ?? '.',
-                'recursive'      => $wikiOpts['recursive'] ?? true,
-                'max_depth'      => (int)($wikiOpts['max_depth'] ?? 0),
-                'exclude_globs'  => $wikiOpts['exclude_globs'] ?? '',
-                'title_strategy' => $wikiOpts['title_strategy'] ?? 'fm_h1_filename',
-                'naming_mode'    => $wikiOpts['naming_mode'] ?? 'basename',
-                'dir_levels'     => (int)($wikiOpts['dir_levels'] ?? 2),
-                'separator'      => (string)($wikiOpts['separator'] ?? ' '),
-                'namespace'      => $wikiOpts['namespace'] ?? '',
-                'detect_journal' => $wikiOpts['detect_journal'] ?? true,
-                'journal_lang'   => $wikiOpts['journal_lang'] ?? 'en',
-                'journal_ns'     => $wikiOpts['journal_ns'] ?? 'Journal',
+                self::OPT_ROOTS => $wikiOpts[self::WIKI_OPT_ROOTS] ?? '.',
+                self::OPT_RECURSIVE => $wikiOpts[self::WIKI_OPT_RECURSIVE] ?? true,
+                self::OPT_MAX_DEPTH => (int)($wikiOpts[self::WIKI_OPT_MAX_DEPTH] ?? 0),
+                self::OPT_EXCLUDE_GLOBS => $wikiOpts[self::WIKI_OPT_EXCLUDE_GLOBS] ?? '',
+                self::OPT_TITLE_STRATEGY => $wikiOpts[self::WIKI_OPT_TITLE_STRATEGY] ?? 'fm_h1_filename',
+                self::OPT_NAMING_MODE => $wikiOpts[self::WIKI_OPT_NAMING_MODE] ?? 'basename',
+                self::OPT_DIR_LEVELS => (int)($wikiOpts[self::WIKI_OPT_DIR_LEVELS] ?? 2),
+                self::OPT_SEPARATOR => (string)($wikiOpts[self::WIKI_OPT_SEPARATOR] ?? ' '),
+                self::OPT_NAMESPACE => $wikiOpts[self::WIKI_OPT_NAMESPACE] ?? '',
+                self::OPT_DETECT_JOURNAL => $wikiOpts[self::WIKI_OPT_DETECT_JOURNAL] ?? true,
+                self::OPT_JOURNAL_LANG => $wikiOpts[self::WIKI_OPT_JOURNAL_LANG] ?? 'en',
+                self::PIPE_OPT_JOURNAL_NS => $wikiOpts[self::PIPE_OPT_JOURNAL_NS] ?? self::DEFAULT_JOURNAL_NS,
             ]);
         } finally {
             if ($isUploadedTemp && is_dir($dirPath)) {
@@ -246,11 +316,11 @@ class TikiMarkdownImporter
             }
         }
 
-        if (empty($scan['files'])) {
+        if (empty($scan[self::SCAN_FILES])) {
             return [
                 'ok'      => true,
-                'counts'  => $scan['counts'] ?? ['pages' => 0, 'journals' => 0, 'total' => 0],
-                'dialect' => $wikiOpts['markdown_source'] ?? 'commonmark',
+                'counts'  => $scan[self::SCAN_COUNTS] ?? ['pages' => 0, 'journals' => 0, 'total' => 0],
+                'dialect' => $wikiOpts[self::WIKI_OPT_MARKDOWN_SOURCE] ?? 'commonmark',
                 'items'   => [],
             ];
         }
@@ -260,18 +330,18 @@ class TikiMarkdownImporter
             ->registerPurifier(new GfmPurifier())
             ->registerPurifier(new LogseqPurifier());
 
-        $dialect = $wikiOpts['markdown_source'] ?? 'commonmark';
+        $dialect = $wikiOpts[self::WIKI_OPT_MARKDOWN_SOURCE] ?? 'commonmark';
         $ctx = array_merge([
-            'journal_ns'         => $wikiOpts['journal_ns'] ?? 'Journal',
-            'strip_front_matter' => true,
-            'runtime_logseq'     => false,
-            'blockref_mode'      => 'inline',
+            self::PIPE_OPT_JOURNAL_NS => $wikiOpts[self::PIPE_OPT_JOURNAL_NS] ?? self::DEFAULT_JOURNAL_NS,
+            self::PIPE_OPT_STRIP_FM => true,
+            self::PIPE_OPT_RUNTIME_LOGSEQ => false,
+            self::PIPE_OPT_BLOCKREF => 'inline',
         ], $pipelineCtx);
 
         $items = [];
-        foreach ($scan['files'] as $f) {
-            $page = $f['page_name'] ?? null;
-            $raw  = $f['raw'] ?? '';
+        foreach ($scan[self::SCAN_FILES] as $f) {
+            $page = $f[self::SCAN_PAGE_NAME] ?? null;
+            $raw  = $f[self::SCAN_RAW] ?? '';
             if (! $page || ! is_string($raw)) {
                 continue;
             }
@@ -280,19 +350,19 @@ class TikiMarkdownImporter
             $md  = $res['markdown'] ?? $raw;
 
             $items[] = [
-                'page'              => $page,
-                'type'              => $f['type'] ?? 'page',
-                'size_bytes'        => $f['size_bytes'] ?? strlen($raw),
-                'has_front_matter'  => $f['has_front_matter'] ?? false,
-                'original_preview'  => mb_substr(trim($raw), 0, 200),
-                'purified_preview'  => mb_substr(trim($md), 0, 200),
-                'notes'             => $res['notes'] ?? [],
+                'page' => $page,
+                'type' => $f['type'] ?? 'page',
+                'size_bytes' => $f['size_bytes'] ?? strlen($raw),
+                'has_front_matter' => $f['has_front_matter'] ?? false,
+                'original_preview' => mb_substr(trim($raw), 0, 200),
+                'purified_preview' => mb_substr(trim($md), 0, 200),
+                'notes' => $res['notes'] ?? [],
             ];
         }
 
         return [
             'ok'      => true,
-            'counts'  => $scan['counts'] ?? [],
+            'counts'  => $scan[self::SCAN_COUNTS] ?? [],
             'dialect' => $dialect,
             'items'   => $items,
         ];
@@ -410,7 +480,7 @@ class TikiMarkdownImporter
                 'last_imported' => TikiLib::lib('tiki')->now,
                 'last_status'   => $status,
                 'error_note'    => null,
-                'is_journal'    => ($fileData['type'] ?? '') === 'journal' ? 1 : 0,
+                'is_journal'    => ($fileData['type'] ?? '') === self::FILE_TYPE_JOURNAL ? 1 : 0,
                 'orphaned_at'   => null, // Clear orphan status
             ]);
         } catch (\Exception $e) {
@@ -457,10 +527,10 @@ class TikiMarkdownImporter
     {
         $tikilib = TikiLib::lib('tiki');
 
-        $mode   = $opts['mode'] ?? 'mark'; // off|mark|delete
-        $safeNS = trim((string)($opts['safe_namespace'] ?? ''));
+        $mode   = $opts[self::GC_OPT_MODE] ?? self::DEFAULT_GC_MODE; // off|mark|delete
+        $safeNS = trim((string)($opts[self::GC_OPT_SAFE_NS] ?? ''));
 
-        if ($mode === 'off') {
+        if ($mode === self::GC_OFF) {
             return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => []];
         }
         if (empty($seenRelpaths)) {
@@ -486,7 +556,7 @@ class TikiMarkdownImporter
             $page = $row['page_name'] ?? '';
             $rel = $row['relpath'] ?? '';
 
-            if ($mode === 'mark') {
+            if ($mode === self::GC_MARK) {
                 $registry->markOrphan($sourceKey, $rel, $now);
                 $marked++;
                 continue;
@@ -520,12 +590,7 @@ class TikiMarkdownImporter
             $cachelib->invalidateAll('structure');
         }
 
-        return [
-            'orphans' => count($orphans),
-            'deleted' => $deleted,
-            'marked'  => $marked,
-            'errors'  => $errors,
-        ];
+        return ['orphans' => count($orphans), 'deleted' => $deleted, 'marked' => $marked, 'errors' => $errors];
     }
 
     /**
