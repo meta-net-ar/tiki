@@ -60,6 +60,27 @@ class ImportRegistry
     }
 
     /**
+     * Get all orphaned entries for a given source.
+     * Returns pages that were present in previous imports but missing from recent ones.
+     * Useful for audit/recovery and showing marked-but-not-deleted pages outside safe_namespace.
+     *
+     * @param string $sourceKey Source identifier
+     * @return array Associative array keyed by relpath => row data
+     */
+    public function getOrphanedBySourceKey(string $sourceKey): array
+    {
+        $out = [];
+        $rs = $this->tikilib->query(
+            "SELECT * FROM " . self::TABLE . " WHERE source_key = ? AND last_status = 'orphan' ORDER BY orphaned_at DESC",
+            [$sourceKey]
+        );
+        while ($row = $rs->fetchRow()) {
+            $out[$row['relpath']] = $row;
+        }
+        return $out;
+    }
+
+    /**
      * Insert or update an entry in the registry.
      * @return bool True if the operation succeeded, false otherwise.
      * @throws \Exception if the query fails critically.
