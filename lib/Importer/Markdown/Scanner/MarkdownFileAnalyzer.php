@@ -14,6 +14,28 @@ namespace Tiki\Lib\Importer\Markdown\Scanner;
  */
 class MarkdownFileAnalyzer
 {
+    // ========== RESULT KEYS ==========
+    public const RES_TYPE = 'type';
+    public const RES_PAGE_NAME = 'page_name';
+    public const RES_TITLE = 'title';
+    public const RES_HAS_FM = 'has_front_matter';
+    public const RES_PREVIEW = 'preview';
+
+    // ========== FILE TYPES ==========
+    public const FT_PAGE = 'page';
+    public const FT_JOURNAL = 'journal';
+
+    // ========== STRATEGIES ==========
+    public const TITLE_FM_H1_FILENAME = 'fm_h1_filename';
+
+    // ========== DEFAULTS ==========
+    private const DEF_TITLE_STRATEGY = self::TITLE_FM_H1_FILENAME;
+    private const DEF_DETECT_JOURNAL = true;
+    private const DEF_JOURNAL_LANG = 'en';
+    private const DEF_JOURNAL_NS = 'Journal';
+    private const DEF_NAMING_MODE = 'basename';
+    private const DEF_DIR_LEVELS = 2;
+    private const DEF_SEPARATOR = ' ';
     /**
      * Analyze a markdown file content and metadata.
      *
@@ -24,14 +46,14 @@ class MarkdownFileAnalyzer
      */
     public function analyze(string $content, string $relpath, array $options = []): array
     {
-        $titleStrategy = $options['title_strategy'] ?? 'fm_h1_filename';
-        $detectJournal = $options['detect_journal'] ?? true;
-        $journalLang   = $options['journal_lang'] ?? 'en';
-        $journalNs     = $options['journal_ns'] ?? 'Journal';
-        $namingMode    = $options['naming_mode'] ?? 'basename';
-        $dirLevels     = $options['dir_levels'] ?? 2;
-        $separator     = $options['separator'] ?? ' ';
-        $namespace     = trim($options['namespace'] ?? '');
+        $titleStrategy = $options[ScannerInterface::OPT_TITLE_STRATEGY] ?? self::DEF_TITLE_STRATEGY;
+        $detectJournal = $options[ScannerInterface::OPT_DETECT_JOURNAL] ?? self::DEF_DETECT_JOURNAL;
+        $journalLang   = $options[ScannerInterface::OPT_JOURNAL_LANG] ?? self::DEF_JOURNAL_LANG;
+        $journalNs     = $options[ScannerInterface::OPT_JOURNAL_NS] ?? self::DEF_JOURNAL_NS;
+        $namingMode    = $options[ScannerInterface::OPT_NAMING_MODE] ?? self::DEF_NAMING_MODE;
+        $dirLevels     = $options[ScannerInterface::OPT_DIR_LEVELS] ?? self::DEF_DIR_LEVELS;
+        $separator     = $options[ScannerInterface::OPT_SEPARATOR] ?? self::DEF_SEPARATOR;
+        $namespace     = trim($options[ScannerInterface::OPT_NAMESPACE] ?? '');
 
         // Extract front-matter
         $hadFM = false;
@@ -48,7 +70,7 @@ class MarkdownFileAnalyzer
         $pageName = $this->buildPageName($relpath, $namingMode, $dirLevels, $separator, $namespace);
 
         // Detect journal
-        $type = 'page';
+        $type = self::FT_PAGE;
         if ($detectJournal) {
             $iso = null;
             $baseDash  = strtr($fileBase, ['_' => '-', ' ' => '-', '.' => '-']);
@@ -61,17 +83,17 @@ class MarkdownFileAnalyzer
                 $this->tryParseJournalDate($baseSpace, $iso, $journalLang)     ||
                 ($looksLikeJournalDir && $this->tryParseJournalDate($fileBase, $iso, $journalLang))
             ) {
-                $type = 'journal';
+                $type = self::FT_JOURNAL;
                 $pageName = ($namespace !== '' ? $namespace . $separator : '') . $journalNs . '-' . $iso;
             }
         }
 
         return [
-            'type'             => $type,
-            'page_name'        => $pageName,
-            'title'            => $resolvedTitle,
-            'has_front_matter' => $hadFM,
-            'preview'          => mb_substr(trim($this->previewText($bodyNoFm)), 0, 200),
+            self::RES_TYPE => $type,
+            self::RES_PAGE_NAME => $pageName,
+            self::RES_TITLE => $resolvedTitle,
+            self::RES_HAS_FM => $hadFM,
+            self::RES_PREVIEW => mb_substr(trim($this->previewText($bodyNoFm)), 0, 200),
         ];
     }
 

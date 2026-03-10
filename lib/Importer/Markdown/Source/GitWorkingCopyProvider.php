@@ -8,6 +8,16 @@ namespace Tiki\Lib\Importer\Markdown\Source;
 
 class GitWorkingCopyProvider implements SourceProviderInterface
 {
+    private const CFG_REPO_URL = 'repo_url';
+    private const CFG_REPO_BRANCH = 'repo_branch';
+    private const CFG_GIT_PULL = 'git_pull';
+    private const CFG_REPO_TOKEN = 'repo_token';
+
+    private const CTX_TIMEOUT = 'timeout';
+
+    private const DEF_BRANCH = 'main';
+    private const DEF_TIMEOUT = 45;
+
     public function __construct(
         private array $cfg,   // ['repo_url'=>..., 'repo_branch'=>'main', 'repo_token'=>'', 'git_pull'=>true]
         private array $ctx = [] // ex: ['timeout'=>45]
@@ -16,11 +26,11 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
     public function fetchToTempDir(): string
     {
-        $repoUrl   = trim((string)($this->cfg['repo_url'] ?? ''));
-        $branch    = trim((string)($this->cfg['repo_branch'] ?? 'main'));
-        $gitPull   = ! empty($this->cfg['git_pull']);
-        $token     = (string)($this->cfg['repo_token'] ?? '');
-        $timeout   = (int)($this->ctx['timeout'] ?? 45);
+        $repoUrl   = trim((string)($this->cfg[self::CFG_REPO_URL] ?? ''));
+        $branch    = trim((string)($this->cfg[self::CFG_REPO_BRANCH] ?? self::DEF_BRANCH));
+        $gitPull   = ! empty($this->cfg[self::CFG_GIT_PULL]);
+        $token     = (string)($this->cfg[self::CFG_REPO_TOKEN] ?? '');
+        $timeout   = (int)($this->ctx[self::CTX_TIMEOUT] ?? self::DEF_TIMEOUT);
 
         if ($repoUrl === '') {
             throw new \RuntimeException(tra('Missing repo_url.'));

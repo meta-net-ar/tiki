@@ -14,13 +14,15 @@ namespace Tiki\Lib\Importer\Markdown\Parser;
  */
 interface MarkdownPurifierInterface
 {
+    public const CTX_STRIP_FM = 'strip_front_matter';
+
     /**
      * Purify/normalize a Markdown document coming from a specific source.
      *
      * @param string $raw Raw Markdown input
-     * @param array  $context Common contextual options shared by purifiers:
-     *   - 'strip_front_matter' (bool) Remove YAML front-matter (default true)
-     *   - plus source-specific flags documented in each concrete purifier
+     * @param array  $context Common contextual options:
+     *   - CTX_STRIP_FM (bool) Remove YAML front-matter (default: true)
+     *   - Additional source-specific options documented in each purifier
      *
      * @return array { 'markdown' => string, 'notes' => string[] }
      */

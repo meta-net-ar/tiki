@@ -18,6 +18,21 @@ namespace Tiki\Lib\Importer\Markdown\Parser;
  */
 class LogseqPurifier implements MarkdownPurifierInterface
 {
+    // ========== LOGSEQ-SPECIFIC CONTEXT KEYS ==========
+    public const CTX_JOURNAL_NS = 'journal_ns';
+    public const CTX_RUNTIME_LOGSEQ = 'runtime_logseq';
+    public const CTX_BLOCKREF_MODE = 'blockref_mode';
+
+    // ========== BLOCKREF MODES ==========
+    public const MODE_INLINE = 'inline';
+    public const MODE_CODE = 'code';
+    public const MODE_KEEP = 'keep';
+
+    // ========== LOGSEQ-SPECIFIC DEFAULTS ==========
+    public const DEF_JOURNAL_NS = 'Journal';
+    public const DEF_RUNTIME_LOGSEQ = false;
+    public const DEF_BLOCKREF_MODE = self::MODE_INLINE;
+
     public static function id(): string
     {
         return 'logseq';
@@ -44,10 +59,10 @@ class LogseqPurifier implements MarkdownPurifierInterface
     public function purify(string $raw, array $context = []): array
     {
         $opts = array_merge([
-            'journal_ns'         => 'Journal',
-            'strip_front_matter' => true,
-            'runtime_logseq'     => false,      // if true keep [[...]]/((...))
-            'blockref_mode'      => 'inline',   // inline | code | keep
+            self::CTX_JOURNAL_NS => self::DEF_JOURNAL_NS,
+            self::CTX_STRIP_FM => true,
+            self::CTX_RUNTIME_LOGSEQ => self::DEF_RUNTIME_LOGSEQ,      // if true keep [[...]]/((...))
+            self::CTX_BLOCKREF_MODE => self::DEF_BLOCKREF_MODE,   // inline | code | keep
         ], $context);
 
         $notes = [];
@@ -59,7 +74,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
         $rmLogs = false; // removed logbook entries
         $journalLinks = 0;
 
-        if ($opts['strip_front_matter']) {
+        if ($opts[self::CTX_STRIP_FM]) {
             [$out, $had] = CommonMarkPurifier::removeFrontMatter($out);
             if ($had) {
                 $notes[] = tra('Front matter stripped');
@@ -85,16 +100,16 @@ class LogseqPurifier implements MarkdownPurifierInterface
         }
 
         // 4) ((block-id)) handling
-        if ($opts['blockref_mode'] !== 'keep') {
-            $out = $this->convertBlockRefs($out, $opts['blockref_mode'], $brcount);
+        if ($opts[self::CTX_BLOCKREF_MODE] !== self::MODE_KEEP) {
+            $out = $this->convertBlockRefs($out, $opts[self::CTX_BLOCKREF_MODE], $brcount);
             if ($brcount) {
                 $notes[] = tra('Block references converted');
             }
         }
 
         // 5) [[wikilinks]]
-        if (! $opts['runtime_logseq']) {
-            $out = $this->convertWikilinksToMarkdown($out, $opts['journal_ns'], $wlcount, $journalLinks);
+        if (! $opts[self::CTX_RUNTIME_LOGSEQ]) {
+            $out = $this->convertWikilinksToMarkdown($out, $opts[self::CTX_JOURNAL_NS], $wlcount, $journalLinks);
             if ($wlcount) {
                 $notes[] = tr('Converted %0 wikilinks', $wlcount);
             }

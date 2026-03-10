@@ -38,7 +38,7 @@ class DirectoryScanner implements ScannerInterface
         }
 
         if (! is_dir($path)) {
-            return ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
         }
 
         return $this->scanDirectory($path, $options);
@@ -49,12 +49,12 @@ class DirectoryScanner implements ScannerInterface
      */
     private function scanDirectory(string $dirPath, array $options): array
     {
-        $out = ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+        $out = [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
 
-        $roots = $this->listOpt($options['roots'] ?? '.');
-        $recursive = (bool)($options['recursive'] ?? true);
-        $maxDepth = max(0, (int)($options['max_depth'] ?? 0));
-        $excludeGlobs = $this->listOpt($options['exclude_globs'] ?? '');
+        $roots = $this->listOpt($options[self::OPT_ROOTS] ?? '.');
+        $recursive = (bool)($options[self::OPT_RECURSIVE] ?? true);
+        $maxDepth = max(0, (int)($options[self::OPT_MAX_DEPTH] ?? 0));
+        $excludeGlobs = $this->listOpt($options[self::OPT_EXCLUDE_GLOBS] ?? '');
 
         $iterator = $recursive
             ? new RecursiveIteratorIterator(
@@ -114,24 +114,24 @@ class DirectoryScanner implements ScannerInterface
 
             $mtime = filemtime($fullPath);
 
-            $out['files'][] = [
+            $out[self::SCAN_FILES][] = [
                 'relative'         => $relPath,
                 'relpath'          => $this->normRelpath($relPath),
-                'type'             => $analyzed['type'],
-                'page_name'        => $analyzed['page_name'],
-                'title'            => $analyzed['title'],
+                'type'             => $analyzed[MarkdownFileAnalyzer::RES_TYPE],
+                'page_name'        => $analyzed[MarkdownFileAnalyzer::RES_PAGE_NAME],
+                'title'            => $analyzed[MarkdownFileAnalyzer::RES_TITLE],
                 'size_bytes'       => strlen($content),
                 'mtime_utc'        => $mtime !== false ? $mtime : null,
-                'has_front_matter' => $analyzed['has_front_matter'],
-                'preview'          => $analyzed['preview'],
+                'has_front_matter' => $analyzed[MarkdownFileAnalyzer::RES_HAS_FM],
+                'preview'          => $analyzed[MarkdownFileAnalyzer::RES_PREVIEW],
                 'raw'              => $content,
             ];
 
-            $out['counts']['total']++;
-            if ($analyzed['type'] === 'journal') {
-                $out['counts']['journals']++;
+            $out[self::SCAN_COUNTS][self::COUNT_TOTAL]++;
+            if ($analyzed[MarkdownFileAnalyzer::RES_TYPE] === MarkdownFileAnalyzer::FT_JOURNAL) {
+                $out[self::SCAN_COUNTS][self::COUNT_JOURNALS]++;
             } else {
-                $out['counts']['pages']++;
+                $out[self::SCAN_COUNTS][self::COUNT_PAGES]++;
             }
         }
 
@@ -149,19 +149,19 @@ class DirectoryScanner implements ScannerInterface
 
         $zip = new \ZipArchive();
         if ($zip->open($zipPath) !== true) {
-            return ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
         }
 
         // Extract to temp directory
         $tempDir = sys_get_temp_dir() . '/mdimp_extract_' . uniqid();
         if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
             $zip->close();
-            return ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
         }
 
         if (! $zip->extractTo($tempDir)) {
             $zip->close();
-            return ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
         }
         $zip->close();
 
