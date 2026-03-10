@@ -26,7 +26,7 @@ class DirectoryScanner implements ScannerInterface
     /**
      * Scan a directory and return normalized items.
      *
-        * @param string $path Absolute path to directory or ZIP file
+      * @param string $path Absolute path to directory or ZIP file
      * @param array  $options Scan options
      * @return array {files: array, counts: array}
      */
@@ -95,7 +95,11 @@ class DirectoryScanner implements ScannerInterface
             }
 
             // Read file content
-            $content = @file_get_contents($fullPath);
+            if (! is_readable($fullPath)) {
+                continue;
+            }
+
+            $content = file_get_contents($fullPath);
             if ($content === false) {
                 continue;
             }
@@ -108,7 +112,7 @@ class DirectoryScanner implements ScannerInterface
             // Analyze
             $analyzed = $this->analyzer->analyze($content, $relPath, $options);
 
-            $mtime = @filemtime($fullPath);
+            $mtime = filemtime($fullPath);
 
             $out['files'][] = [
                 'relative'         => $relPath,
@@ -150,7 +154,10 @@ class DirectoryScanner implements ScannerInterface
 
         // Extract to temp directory
         $tempDir = sys_get_temp_dir() . '/mdimp_extract_' . uniqid();
-        @mkdir($tempDir, 0755, true);
+        if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
+            $zip->close();
+            return ['files' => [], 'counts' => ['pages' => 0, 'journals' => 0, 'total' => 0]];
+        }
 
         if (! $zip->extractTo($tempDir)) {
             $zip->close();
@@ -177,7 +184,11 @@ class DirectoryScanner implements ScannerInterface
      */
     private function detectAndUnwrapTopFolder(string $dir): string
     {
-        $items = @scandir($dir);
+        if (! is_dir($dir)) {
+            return $dir;
+        }
+
+        $items = scandir($dir);
         if ($items === false) {
             return $dir;
         }
@@ -209,9 +220,19 @@ class DirectoryScanner implements ScannerInterface
             RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($it as $file) {
-            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
+            if ($file->isDir()) {
+                if (! rmdir($file->getPathname())) {
+                    trigger_error(tra('Failed to remove directory: %0', $file->getPathname()), E_USER_WARNING);
+                }
+            } else {
+                if (! unlink($file->getPathname())) {
+                    trigger_error(tra('Failed to remove file: %0', $file->getPathname()), E_USER_WARNING);
+                }
+            }
         }
-        @rmdir($dir);
+        if (! rmdir($dir)) {
+            trigger_error(tra('Failed to remove directory: %0', $dir), E_USER_WARNING);
+        }
     }
 
     private function makeRelative(string $fullPath, string $basePath): string

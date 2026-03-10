@@ -66,7 +66,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         $deadline = microtime(true) + ($ms / 1000);
         do {
-            if (@is_file($wcPath . '/.git/HEAD')) {
+            if (is_file($wcPath . '/.git/HEAD')) {
                 clearstatcache();
                 return;
             }
@@ -89,7 +89,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             }
         }
         $out = [];
-        @exec('which git 2>/dev/null', $out);
+        exec('which git 2>/dev/null', $out);
         if (! empty($out[0]) && is_executable($out[0])) {
             return $out[0];
         }
@@ -101,8 +101,12 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         // HOME = storage/markdown-importer/.home
         $home = $this->resolveHomeDir();
         if (! is_dir($home)) {
-            @mkdir($home, 0775, true);
-            @chmod($home, 0775);
+            if (! mkdir($home, 0775, true) && ! is_dir($home)) {
+                throw new \RuntimeException(tra('Cannot create HOME dir:') . ' ' . $home);
+            }
+            if (! chmod($home, 0775)) {
+                trigger_error(tra('Failed to set directory permissions: %0', $home), E_USER_WARNING);
+            }
         }
         return [
             'HOME' => $home,
@@ -130,7 +134,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         $cmd = escapeshellarg($git) . ' ' . $args . ' 2>&1';
         $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
-        $proc = @proc_open($cmd, $desc, $pipes, $cwd, $env);
+        $proc = proc_open($cmd, $desc, $pipes, $cwd, $env);
         if (! \is_resource($proc)) {
             if ($fatal) {
                 throw new \RuntimeException($errLabel . ' (spawn failed)');
@@ -149,7 +153,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
                 break;
             }
             if (time() - $start > $timeout) {
-                @proc_terminate($proc);
+                proc_terminate($proc);
                 $out .= "\n[timeout]";
                 break;
             }
@@ -157,9 +161,13 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             $out .= (string)stream_get_contents($pipes[2]);
             usleep(100_000);
         }
-        @fclose($pipes[1]);
-        @fclose($pipes[2]);
-        $code = @proc_close($proc);
+        if (is_resource($pipes[1])) {
+            fclose($pipes[1]);
+        }
+        if (is_resource($pipes[2])) {
+            fclose($pipes[2]);
+        }
+        $code = proc_close($proc);
 
         if ($fatal && $code !== 0) {
             // Mask secrets in output
@@ -184,7 +192,8 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     private function gitPull(string $git, string $path, string $token, int $timeout): void
     {
         // Determine origin URL to setup auth if needed
-        $originUrl = @file_get_contents($path . '/.git/config');
+        $configPath = $path . '/.git/config';
+        $originUrl = is_readable($configPath) ? file_get_contents($configPath) : false;
         $origin = null;
         if ($originUrl && preg_match('~url\s*=\s*(.+)~i', $originUrl, $m)) {
             $origin = trim($m[1]);
@@ -200,7 +209,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         if (! is_dir($dir)) {
             $old = umask(0002);
-            $ok = @mkdir($dir, 0775, true);
+            $ok = mkdir($dir, 0775, true);
             umask($old);
             if (! $ok && ! is_dir($dir)) {
                 $e = error_get_last();
@@ -210,7 +219,9 @@ class GitWorkingCopyProvider implements SourceProviderInterface
                 }
                 throw new \RuntimeException($msg);
             }
-            @chmod($dir, 0775);
+            if (! chmod($dir, 0775)) {
+                trigger_error(tra('Failed to set directory permissions: %0', $dir), E_USER_WARNING);
+            }
         }
         if (! is_writable($dir)) {
             throw new \RuntimeException(tra('Dir not writable:') . ' ' . $dir);
@@ -227,9 +238,19 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             \RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($it as $f) {
-            $f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
+            if ($f->isDir()) {
+                if (! rmdir($f->getPathname())) {
+                    trigger_error(tra('Failed to remove directory: %0', $f->getPathname()), E_USER_WARNING);
+                }
+            } else {
+                if (! unlink($f->getPathname())) {
+                    trigger_error(tra('Failed to remove file: %0', $f->getPathname()), E_USER_WARNING);
+                }
+            }
         }
-        @rmdir($dir);
+        if (! rmdir($dir)) {
+            trigger_error(tra('Failed to remove directory: %0', $dir), E_USER_WARNING);
+        }
     }
 
     private function computeRepoPath(string $rootDir, string $repoUrl): string
@@ -239,7 +260,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $path = null;
 
         // 1) HTTPS/HTTP/SSH explicite
-        $u = @parse_url($url);
+        $u = parse_url($url);
         if (is_array($u) && ! empty($u['host'])) {
             $host = $u['host'];
             $path = ltrim($u['path'] ?? '', '/');
@@ -300,10 +321,12 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
         // Test write permissions
         $probe = $repoRoot . '/.write-test';
-        if (@file_put_contents($probe, 'ok') === false) {
+        if (file_put_contents($probe, 'ok') === false) {
             throw new \RuntimeException(tra('Repo root not writable:') . ' ' . $repoRoot);
         }
-        @unlink($probe);
+        if (file_exists($probe) && ! unlink($probe)) {
+            trigger_error(tra('Failed to remove probe file: %0', $probe), E_USER_WARNING);
+        }
 
         // Minimal .gitconfig
         $gitconfig = $homeDir . '/.gitconfig';
@@ -317,8 +340,12 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 [core]
     askPass = 
 INI;
-            @file_put_contents($gitconfig, $cfg);
-            @chmod($gitconfig, 0600);
+            if (file_put_contents($gitconfig, $cfg) === false) {
+                throw new \RuntimeException(tra('Failed to write git config:') . ' ' . $gitconfig);
+            }
+            if (! chmod($gitconfig, 0600)) {
+                trigger_error(tra('Failed to set file permissions: %0', $gitconfig), E_USER_WARNING);
+            }
         }
     }
 
@@ -335,8 +362,12 @@ INI;
             "  *Password*) echo \"$token\" ;;\n" .
             "  *) echo \"\" ;;\n" .
             "esac\n";
-        @file_put_contents($ask, $script);
-        @chmod($ask, 0700);
+        if (file_put_contents($ask, $script) === false) {
+            throw new \RuntimeException(tra('Failed to write askpass script:') . ' ' . $ask);
+        }
+        if (! chmod($ask, 0700)) {
+            trigger_error(tra('Failed to set file permissions: %0', $ask), E_USER_WARNING);
+        }
 
         $env['GIT_ASKPASS'] = $ask;
         return $env;

@@ -10,8 +10,24 @@ use ZipArchive;
 
 /**
  * FilesystemProvider
- * - mode 'upload' : upload via HTTP (single .md/.zip file)
- * - mode 'path'   : local filesystem path (file or dir)
+ *
+ * Unified provider handling both **transient** (uploads) and **persistent** (local paths) sources.
+ * Although this appears to conflate multiple concerns, the design reflects real usage patterns:
+ *
+ * 1. **HTTP Uploads (mode='upload')**: Single transient files (.md or .zip) that must be
+ *    extracted and normalized to a temp directory structure. Import typically happens once.
+ *
+ * 2. **Local Filesystem Paths (mode='path')**: Files or directories (including .zip archives)
+ *    that exist on the server. May be re-imported, rotated, or part of a batch operation.
+ *
+ * Both modes produce the same output: a normalized temp directory ready for DirectoryScanner.
+ * This normalization (ZIP extraction, auto-unwrap single root folder) is identical across
+ * both modes, justifying the unified class. Future refactoring could extract shared logic
+ * into a separate normalizer if the class becomes more complex.
+ *
+ * Modes:
+ * - 'upload' : upload via HTTP (single .md/.zip file)
+ * - 'path'   : local filesystem path (file, directory, or .zip)
  */
 class FilesystemProvider implements SourceProviderInterface
 {
@@ -45,7 +61,9 @@ class FilesystemProvider implements SourceProviderInterface
             }
 
             $tempDir = sys_get_temp_dir() . '/mdimp_upload_' . uniqid();
-            @mkdir($tempDir, 0755, true);
+            if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
+                throw new \RuntimeException(tra('Failed to create temporary directory for ZIP extraction.'));
+            }
 
             $zip = new ZipArchive();
             if ($zip->open($uploadedPath) !== true) {
@@ -68,7 +86,9 @@ class FilesystemProvider implements SourceProviderInterface
         }
 
         $tempDir = sys_get_temp_dir() . '/mdimp_upload_' . uniqid();
-        @mkdir($tempDir, 0755, true);
+        if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
+            throw new \RuntimeException(tra('Failed to create temporary directory for uploaded file.'));
+        }
 
         $targetFile = $tempDir . '/' . ($uploadedName ?: 'note.md');
         if (! copy($uploadedPath, $targetFile)) {
@@ -100,7 +120,9 @@ class FilesystemProvider implements SourceProviderInterface
             }
 
             $tempDir = sys_get_temp_dir() . '/mdimp_local_' . uniqid();
-            @mkdir($tempDir, 0755, true);
+            if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
+                throw new \RuntimeException(tra('Failed to create temporary directory for ZIP extraction.'));
+            }
 
             $zip = new ZipArchive();
             if ($zip->open($path) !== true) {
@@ -124,7 +146,9 @@ class FilesystemProvider implements SourceProviderInterface
         }
 
         $tempDir = sys_get_temp_dir() . '/mdimp_local_' . uniqid();
-        @mkdir($tempDir, 0755, true);
+        if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
+            throw new \RuntimeException(tra('Failed to create temporary directory for local file.'));
+        }
 
         $targetFile = $tempDir . '/' . basename($path);
         if (! copy($path, $targetFile)) {
@@ -141,7 +165,11 @@ class FilesystemProvider implements SourceProviderInterface
      */
     private function detectAndUnwrapTopFolder(string $dir): string
     {
-        $items = @scandir($dir);
+        if (! is_dir($dir)) {
+            return $dir;
+        }
+
+        $items = scandir($dir);
         if ($items === false) {
             return $dir;
         }
