@@ -666,7 +666,6 @@ foreach ($fieldDefinitions as $i => $current_field) {
 
                 if (isset($insert_values['storeRecordingComments']) && $insert_values['storeRecordingComments'] === 'y') {
                     $smarty->assign('allowRecordingInComments', true);
-                    $smarty->assign('recordingFieldId', $fid);
                     $smarty->assign('recordingGalleryId', $insert_values['galleryId']);
                 }
             }

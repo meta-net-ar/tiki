@@ -72,7 +72,6 @@ class ToolbarsList
         $objectId = $params['objectId'] ?? '';
         $extraParams = [
             'allowRecording' => $params['allowRecording'] ?? false,
-            'recordingFieldId' => $params['recordingFieldId'] ?? 0,
             'recordingGalleryId' => $params['recordingGalleryId'] ?? 0,
         ];
 

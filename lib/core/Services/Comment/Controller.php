@@ -72,7 +72,6 @@ class Services_Comment_Controller
             'allow_moderate'    => $this->canModerate($type, $objectId),
             'allow_vote'        => $this->canVote($type, $objectId),
             'allowRecording' => $input->allowRecording->bool(),
-            'recordingFieldId' => $input->recordingFieldId->int(),
             'recordingGalleryId' => $input->recordingGalleryId->int(),
         ];
 
@@ -355,7 +354,6 @@ class Services_Comment_Controller
             'version' => $version,
             'diffInfo' => $diffInfo,
             'allowRecording' => $input->allowRecording->bool(),
-            'recordingFieldId' => $input->recordingFieldId->int(),
             'recordingGalleryId' => $input->recordingGalleryId->int(),
         ];
     }
