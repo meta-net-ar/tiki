@@ -43,7 +43,7 @@ class TikiMarkdownImporter
      * @param array       $pipelineCfg  ['flavor'=>'logseq|gfm|commonmark', 'gc'=>['mode','safe_namespace']]
      * @param string|null $uploadTmp    optional uploaded temp file (zip/md)
      * @param string|null $uploadName   optional uploaded original name
-     * @return array {written:int, skipped:int, counts:array, errors:[], notes:[], gc_report:?array}
+     * @return array {written:int, skipped:int, counts:array, errors:[], notes:[], gc_report:?array, orphaned:array}
      */
     public function importFromSource(
         array $sourceCfg,
@@ -185,6 +185,8 @@ class TikiMarkdownImporter
             $this->errors = array_merge($this->errors, $gcReport['errors']);
         }
 
+        $orphanedEntries = $registry->getOrphanedBySourceKey($sourceKey);
+
         return [
             'written'      => $written,
             'skipped'      => $skipped,
@@ -193,6 +195,7 @@ class TikiMarkdownImporter
             'errors'       => $this->errors,
             'notes'        => $this->notesByPage,
             'gc_report'    => $gcReport,
+            'orphaned'     => $orphanedEntries,
         ];
     }
 
