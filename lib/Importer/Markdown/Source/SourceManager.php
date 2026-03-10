@@ -59,43 +59,77 @@ class SourceManager
     }
 
     /**
-     * @param array $cfg        ['type' => 'local'|'git', 'local_path'? , 'repo_url'? , 'git_pull'?]
-     * @param ?string $uploadTmp
-     * @param ?string $uploadName
+     * Create a pre-configured SourceProvider based on configuration and context.
+     * Separates Provider instantiation from execution for cleaner architecture.
+     *
+     * @param array $cfg Source configuration
+     * @param ?string $uploadTmp Uploaded file path (for FilesystemProvider upload mode)
+     * @param ?string $uploadName Uploaded file name (for FilesystemProvider upload mode)
+     * @return SourceProviderInterface Pre-configured provider ready to fetch
+     * @throws \RuntimeException if source type is unsupported
+     */
+    public function createProvider(array $cfg, ?string $uploadTmp = null, ?string $uploadName = null): SourceProviderInterface
+    {
+        $sourceConfig = SourceConfig::fromArray($cfg);
+        $type = $sourceConfig->getType();
+
+        if ($type === 'local') {
+            // Prioritize upload if provided, otherwise use local path
+            if ($uploadTmp) {
+                return new FilesystemProvider('upload', $cfg, [
+                    'uploadedPath' => $uploadTmp,
+                    'uploadedName' => $uploadName,
+                ]);
+            }
+            return new FilesystemProvider('path', $cfg, []);
+        }
+
+        if ($type === 'git') {
+            return new GitWorkingCopyProvider([
+                'repo_url'      => $sourceConfig->getRepoUrl(),
+                'repo_branch'   => $sourceConfig->getRepoBranch(),
+                'git_pull'      => $sourceConfig->shouldGitPull(),
+                'repo_token'    => $sourceConfig->getRepoToken(),
+            ], [
+                'timeout'       => $sourceConfig->getGitTimeout(),
+            ]);
+        }
+
+        throw new \RuntimeException(tra('Unsupported source type:') . ' ' . $type);
+    }
+
+    /**
+     * Fetch source to temporary directory using a pre-configured Provider.
+     * Preferred method for clean separation of concerns.
+     *
+     * @param SourceProviderInterface $provider Pre-configured provider
+     * @return ?string Path to temporary directory, or null on error
+     */
+    public function fetchWithProvider(SourceProviderInterface $provider): ?string
+    {
+        $this->error = '';
+        try {
+            return $provider->fetchToTempDir();
+        } catch (\Throwable $e) {
+            $this->error = $e->getMessage();
+            return null;
+        }
+    }
+
+    /**
+     * Convenience method that combines createProvider() + fetchWithProvider().
+     * Kept for backward compatibility with existing callers.
+     *
+     * @param array $cfg Source configuration
+     * @param ?string $uploadTmp Uploaded file path (optional)
+     * @param ?string $uploadName Uploaded file name (optional)
+     * @return ?string Path to temporary directory, or null on error
      */
     public function fetchToTempDir(array $cfg, ?string $uploadTmp = null, ?string $uploadName = null): ?string
     {
-        $sourceConfig = SourceConfig::fromArray($cfg);
-        $this->error = '';
         try {
-            $type = $sourceConfig->getType();
-
-            if ($type === 'local') {
-                // Prioritize upload if provided, otherwise use local path
-                if ($uploadTmp) {
-                    $prov = new FilesystemProvider('upload', $cfg, [
-                        'uploadedPath' => $uploadTmp,
-                        'uploadedName' => $uploadName,
-                    ]);
-                    return $prov->fetchToTempDir();
-                }
-                $prov = new FilesystemProvider('path', $cfg, []);
-                return $prov->fetchToTempDir();
-            }
-
-            if ($type === 'git') {
-                $prov = new GitWorkingCopyProvider([
-                    'repo_url'      => $sourceConfig->getRepoUrl(),
-                    'repo_branch'   => $sourceConfig->getRepoBranch(),
-                    'git_pull'      => $sourceConfig->shouldGitPull(),
-                    'repo_token'    => $sourceConfig->getRepoToken(), // optional
-                ], [
-                    'timeout'       => $sourceConfig->getGitTimeout(),
-                ]);
-                return $prov->fetchToTempDir();
-            }
-
-            throw new \RuntimeException(tra('Unsupported source type:') . ' ' . $type);
+            $provider = $this->createProvider($cfg, $uploadTmp, $uploadName);
+            return $this->fetchWithProvider($provider);
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
             return null;
