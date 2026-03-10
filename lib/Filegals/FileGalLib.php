@@ -21,7 +21,6 @@ use Tiki\FileGallery\Definition as GalleryDefinition;
 use Tiki\FileGallery\FileWrapper\WrapperInterface as FileWrapper;
 use Tiki\FileGallery\File as TikiFile;
 use Tiki\FileGallery\FileDraft as TikiFileDraft;
-use Tiki\FileGallery\FileLink as TikiFileLink;
 use Tiki\FileGallery\ImageTransformer;
 use Tiki\Lib\Filegals\FileIsNotSafeException;
 use Symfony\Component\Filesystem\Filesystem;
