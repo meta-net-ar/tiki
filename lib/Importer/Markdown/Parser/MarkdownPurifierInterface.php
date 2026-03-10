@@ -18,11 +18,9 @@ interface MarkdownPurifierInterface
      * Purify/normalize a Markdown document coming from a specific source.
      *
      * @param string $raw Raw Markdown input
-     * @param array  $context Contextual options:
-     *   - 'journal_ns' (string)  Namespace for journals (default 'Journal')
+     * @param array  $context Common contextual options shared by purifiers:
      *   - 'strip_front_matter' (bool) Remove YAML front-matter (default true)
-     *   - 'runtime_logseq' (bool) Keep Logseq markers to be handled at runtime (default false)
-     *   - any other source-specific flags…
+     *   - plus source-specific flags documented in each concrete purifier
      *
      * @return array { 'markdown' => string, 'notes' => string[] }
      */

@@ -23,6 +23,24 @@ class LogseqPurifier implements MarkdownPurifierInterface
         return 'logseq';
     }
 
+    /**
+     * Apply Logseq-specific markdown normalization.
+     *
+     * Supported context keys:
+     * - strip_front_matter (bool, default: true): remove YAML front-matter block when present.
+     * - journal_ns (string, default: 'Journal'): namespace prefix used for detected journal links.
+     * - runtime_logseq (bool, default: false): keep Logseq wikilinks/blockrefs for runtime handling.
+     * - blockref_mode ('inline'|'code'|'keep', default: 'inline'): output strategy for ((block-id)).
+     *
+     * @param string $raw Raw markdown source content.
+     * @param array{
+     *   strip_front_matter?: bool,
+     *   journal_ns?: string,
+     *   runtime_logseq?: bool,
+     *   blockref_mode?: string
+     * } $context Optional purifier options.
+     * @return array{markdown: string, notes: string[]} Purified markdown and informational notes.
+     */
     public function purify(string $raw, array $context = []): array
     {
         $opts = array_merge([

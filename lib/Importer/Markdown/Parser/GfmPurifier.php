@@ -14,6 +14,16 @@ class GfmPurifier implements MarkdownPurifierInterface
         return 'gfm';
     }
 
+    /**
+     * Apply GFM-oriented normalization to markdown input.
+     *
+     * Supported context keys:
+     * - strip_front_matter (bool, default: true): remove YAML front-matter block when present.
+     *
+     * @param string $raw Raw markdown source content.
+     * @param array{strip_front_matter?: bool} $context Optional purifier options.
+     * @return array{markdown: string, notes: string[]} Purified markdown and informational notes.
+     */
     public function purify(string $raw, array $context = []): array
     {
         $stripFM = $context['strip_front_matter'] ?? true;
