@@ -533,8 +533,18 @@ class TikiMarkdownImporter
             \RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($it as $file) {
-            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
+            if ($file->isDir()) {
+                if (! rmdir($file->getPathname())) {
+                    trigger_error(tra('Failed to remove directory: %0', $file->getPathname()), E_USER_WARNING);
+                }
+            } else {
+                if (! unlink($file->getPathname())) {
+                    trigger_error(tra('Failed to remove file: %0', $file->getPathname()), E_USER_WARNING);
+                }
+            }
         }
-        @rmdir($dir);
+        if (! rmdir($dir)) {
+            trigger_error(tra('Failed to remove directory: %0', $dir), E_USER_WARNING);
+        }
     }
 }
