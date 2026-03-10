@@ -129,10 +129,15 @@ class TikiMarkdownImporter
             // Unchanged vs registre
             $row = $existingMap[$relpath] ?? null;
             if ($row && hash_equals($row['checksum'], $checksum)) {
-                $skipped++;
-                $this->notesByPage[$page][] = tra('Skipped (no changes via registry).');
-                $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'skipped');
-                continue;
+                // Retry if last import failed, even if content unchanged
+                $lastStatus = $row['last_status'] ?? '';
+                if ($lastStatus !== 'error') {
+                    $skipped++;
+                    $this->notesByPage[$page][] = tra('Skipped (no changes via registry).');
+                    $this->updateRegistry($registry, $sourceKey, $relpath, $page, $checksum, $f, $raw, 'skipped');
+                    continue;
+                }
+                // If last_status='error', fall through to retry the write
             }
 
             // Write / Update page (with error handling)
