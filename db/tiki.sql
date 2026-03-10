@@ -1782,6 +1782,10 @@ INSERT INTO `tiki_menu_options` (`menuId`,`type`,`name`,`url`,`position`,`sectio
 (42,'s','PeerTube Video','tiki-list_peertube_entries.php',960,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,'video'),
 (42,'o','List PeerTube Media','tiki-list_peertube_entries.php',962,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,NULL),
 (42,'o','Upload PeerTube Video','tiki-peertube_upload.php',964,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_upload_videos','',0,NULL);
+INSERT INTO `tiki_menu_options` (`menuId`,`type`,`name`,`url`,`position`,`section`,`perm`,`groupname`,`userlevel`,`icon`) VALUES
+(42,'s','Vimeo Video','tiki-list_vimeo_entries.php',970,'vimeo_upload','tiki_p_admin | tiki_p_list_videos | tiki_p_upload_videos','',0,'vimeo'),
+(42,'o','List Vimeo Media','tiki-list_vimeo_entries.php',972,'vimeo_upload','tiki_p_admin | tiki_p_list_videos','',0,NULL),
+(42,'o','Upload Vimeo Video','tiki-vimeo_upload.php',974,'vimeo_upload','tiki_p_admin | tiki_p_upload_videos','',0,NULL);
 
 DROP TABLE IF EXISTS `tiki_menus`;
 CREATE TABLE `tiki_menus` (
@@ -2970,6 +2974,9 @@ CREATE TABLE `users_permissions` (
 -- PeerTube permissions
 INSERT INTO `users_permissions` (`permName`, `level`) VALUES
 ('tiki_p_admin_peertube','admin');
+-- Vimeo permissions
+INSERT INTO `users_permissions` (`permName`, `level`) VALUES
+('tiki_p_admin_vimeo','admin');
 
 DROP TABLE IF EXISTS `users_usergroups`;
 CREATE TABLE `users_usergroups` (
@@ -3647,6 +3654,8 @@ UPDATE tiki_menu_options SET icon = 'bookmarks' WHERE name = 'References';
 UPDATE tiki_menu_options SET icon = 'route' WHERE name = 'Custom Routes';
 UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List PeerTube Media';
 UPDATE tiki_menu_options SET icon = 'upload' WHERE name = 'Upload PeerTube Video';
+UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List Vimeo Media';
+UPDATE tiki_menu_options SET icon = 'upload' WHERE name = 'Upload Vimeo Video';
 UPDATE tiki_menu_options SET icon = 'tasks' WHERE name = 'Queued Tasks';
 
 UPDATE tiki_menus SET use_items_icons = 'y' WHERE menuId = 42;
