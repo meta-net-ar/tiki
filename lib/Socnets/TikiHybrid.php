@@ -89,7 +89,7 @@ class TikiHybrid extends LogsLib
 
         //$this->hybridauth = new Hybridauth($confhybrid, $guzzle, null, $this->logger );
         } catch (\Throwable $e) {
-            error_log($e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (catch block — reports auth errors to system log)
+            TikiLib::lib('logs')->add_log('TikiHybrid', $e->getMessage());
             Feedback::error('TikiHybrid construct error: ' . $e->getMessage());
         }
     }

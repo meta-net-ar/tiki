@@ -56,7 +56,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
                         }
                     }
                 } else {
-                    error_log("File " . $rel['itemId'] . ", referenced from " . $objectType . $objectId . " no longer exists."); // @phpstan-ignore disallowedFunctions.errorLog (missing file warning in search indexer)
+                    TikiLib::lib('logs')->add_log('FileAttachmentSource', tr("File %0, referenced from %1 %2 no longer exists.", $rel['itemId'], $objectType, $objectId));
                 }
             }
         }

@@ -1,0 +1,6 @@
+parameters:
+	disallowedFunctionCalls:
+	    -
+	        function: 'error_log()'
+	        message: 'do not use error_log() in the script'
+	        errorTip: "Replace by Built-in 'TikiLib::lib('logs')->add_log()'"

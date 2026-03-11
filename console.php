@@ -150,9 +150,7 @@ function custom_error_handler($number, $message, $file, $line): void
             throw $exception;
         }
 
-        // Non-Fatal Errors (ERROR/WARNING/NOTICE)
-        // Log the error if it's enabled, otherwise just ignore it
-        error_log($message . ' on line ' . $line . ' of ' . $file, 0); // @phpstan-ignore disallowedFunctions.errorLog (PHP error handler — reports syntax errors to system log)
+        TikiLib::lib('logs')->add_log('Console', $message . ' on line ' . $line . ' of ' . $file);
     }
 }
 

@@ -893,8 +893,7 @@ class TikiAccessLib extends TikiLib
     {
         global $prefs;
         $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
-        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
-            PHP_EOL
+        self::lib('log')->add_log('AccessLib', PHP_EOL
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']

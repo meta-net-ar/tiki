@@ -7,15 +7,22 @@
 
 namespace Tiki\Videogals;
 
+use TikiLib;
+
 class PeerTubeLib
 {
     private $sessionType;
     private $initialized = false;
     private $localClientCache = null;
+    /**
+     * @var array|mixed|object|Container|\Symfony\Component\DependencyInjection\ContainerBuilder|TikiLib|null
+     */
+    private TikiLib $tikilog;
 
     public function __construct($session_type = 0)
     {
         $this->sessionType = $session_type;
+        $this->tikilog = TikiLib::lib('logs');
     }
 
     public function testSetup()
@@ -112,12 +119,12 @@ class PeerTubeLib
             try {
                 $token = $this->getAccessToken();
                 if (empty($token)) {
-                    throw new \Exception('Authentication token is empty');
+                    throw new \Exception(tr('Authentication token is empty'));
                 }
                 $headers[] = 'Authorization: Bearer ' . $token;
             } catch (\Exception $e) {
-                error_log("Authentication error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
-                throw new \Exception('Failed to obtain access token: ' . $e->getMessage());
+                $this->tikilog->add_log("Peertubelib", tr("Authentication error: %0", $e->getMessage()));
+                throw new \Exception(tr("Failed to obtain access token: %0", $e->getMessage()));
             }
         }
 
@@ -131,9 +138,9 @@ class PeerTubeLib
                 rewind($verbose);
                 $verboseLog = stream_get_contents($verbose);
                 fclose($verbose);
-                error_log("cURL verbose log: $verboseLog"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
+                $this->tikilog->add_log('Peertubelib', tr("cURL verbose log: %0", $verboseLog));
             }
-            throw new \Exception("cURL error: $error");
+            throw new \Exception(tr("cURL error: %0", $error));
         }
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -143,7 +150,7 @@ class PeerTubeLib
             $verboseLog = stream_get_contents($verbose);
             fclose($verbose);
             if (! empty($verboseLog)) {
-                error_log("cURL verbose log: $verboseLog"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
+                $this->tikilog->add_log('Peertubelib', tr("cURL verbose log: %0", $verboseLog));
             }
         }
 
@@ -151,7 +158,7 @@ class PeerTubeLib
             $this->clearCachedToken();
             return $this->makeRequest($method, $url, $data, $auth, $rawBody);
         } elseif ($httpCode >= 400) {
-            error_log("HTTP error $httpCode: $response"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
+            $this->tikilog->add_log('Peertubelib', tr("HTTP error %0: %1", $httpCode, $response));
             $msg = "HTTP error $httpCode";
             $j = json_decode($response, true);
             if (is_array($j)) {
@@ -234,7 +241,10 @@ class PeerTubeLib
             $url .= '&search=' . rawurlencode($find);
         }
 
+        $this->tikilog->add_log('Peertubelib', tr("[PeerTube/listVideos] URL: %0", $url));
+
         $response = $this->makeRequest('GET', $url);
+        $this->tikilog->add_log('Peertubelib', tr("[PeerTube/listVideos] Response: %0", substr($response, 0, 1000)));
         return json_decode($response);
     }
 
@@ -282,8 +292,8 @@ class PeerTubeLib
 
             throw new \Exception("HTTP error $httpCode. Response: $response");
         } catch (\Exception $e) {
-            error_log("PeerTube deleteVideo error: " . $e->getMessage() . " | UUID: $uuid | URL: $deleteUrl"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
-            throw new \Exception("Failed to delete video: " . $e->getMessage());
+            $this->tikilog->add_log("Peertubelib", tr("PeerTube deleteVideo error: %0 | UUID: %1 | URL: %2", $e->getMessage(), $uuid, $deleteUrl));
+            throw new \Exception(tr("Failed to delete video: %0", $e->getMessage()));
         }
     }
 
@@ -314,7 +324,7 @@ class PeerTubeLib
         $data = json_decode($response, true);
 
         if (! isset($data['account']) || ! isset($data['account']['name'])) {
-            throw new \Exception('Could not retrieve account name from PeerTube');
+            throw new \Exception(tr('Could not retrieve account name from PeerTube'));
         }
 
         return $data['account']['name'];
@@ -325,7 +335,7 @@ class PeerTubeLib
         global $prefs;
 
         if (empty($prefs['peertube_service_url'])) {
-            throw new \Exception('Missing PeerTube service URL.');
+            throw new \Exception(tr('Missing PeerTube service URL.'));
         }
 
         $accountName = $this->getMyAccountName();
@@ -383,7 +393,7 @@ class PeerTubeLib
         $clientResponse = $this->makeRequest('GET', $clientUrl, [], false);
         $clientData = json_decode($clientResponse, true);
         if (! is_array($clientData) || empty($clientData['client_id']) || empty($clientData['client_secret'])) {
-            throw new \Exception('Unable to retrieve client credentials from PeerTube');
+            throw new \Exception(tr('Unable to retrieve client credentials from PeerTube'));
         }
         $_SESSION[$sessionKey] = [
             'client_id'     => $clientData['client_id'],

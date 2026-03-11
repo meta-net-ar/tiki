@@ -304,6 +304,7 @@
         "sebastian/diff": "~5.1",
         "squizlabs/php_codesniffer": "~4.0",
         "smarty/smarty-lint" : "~0.3",
+        "spaze/phpstan-disallowed-calls": "~4.9",
         "stevegrunwell/phpunit-markup-assertions": "~2.0",
         "symfony/browser-kit": "~6.4",
         "symfony/http-client": "~6.4"

@@ -13,11 +13,13 @@ class StructLib extends TikiLib
 {
     public $displayLanguageOrder;
 
+    private Tikilib $tikilog;
+
     public function __construct()
     {
         global $prefs;
         parent::__construct();
-
+        $this->tikilog = TikiLib::lib('logs');
         $this->displayLanguageOrder = [];
     }
     public function s_export_structure_tree($structure_id, $level = 0)
@@ -1018,7 +1020,7 @@ class StructLib extends TikiLib
     public function get_navigation_info($page_ref_id)
     {
         if (! $page_ref_id || ! is_numeric($page_ref_id)) {
-            error_log("Invalid page_ref_id: " . $page_ref_id); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
+            $this->tikilog->add_log('StructLib NavigationInfos', tr("Invalid page_ref_id: %0", $page_ref_id));
             return null;
         }
         return [
@@ -1059,7 +1061,7 @@ class StructLib extends TikiLib
             }
         } else {
             // Log the error or handle it gracefully
-            error_log("Method not found: $fn"); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
+            $this->tikilog->add_log('StructLib NeighborInfo', tr("Method not found: %0", $fn));
             return null;
         }
     }

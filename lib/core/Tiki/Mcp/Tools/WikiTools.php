@@ -10,6 +10,7 @@ namespace Tiki\Mcp\Tools;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Exception\ToolCallException;
 use Mcp\Schema\ToolAnnotations;
+use TikiLib;
 
 /**
  * MCP tools for wiki page operations.
@@ -34,10 +35,13 @@ class WikiTools
     private string $user;
     private string $ip;
 
+    private TikiLib $tikilog;
+
     public function __construct(string $user, string $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;
+        $this->tikilog = TikiLib::lib('logs');
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -362,7 +366,7 @@ class WikiTools
         // Verify page exists first for a clear error message
         $exists = $this->captureOutput(fn() => \TikiLib::lib('tiki')->page_exists($page));
         if (! $exists) {
-            throw new ToolCallException("Page '$page' not found.");
+            throw new ToolCallException(tr("Page '%0' not found.", $page));
         }
 
         $this->brokerCallConfirmed('wiki', 'remove_pages', [
@@ -401,14 +405,14 @@ class WikiTools
                 fn() => \TikiLib::lib('service')->internal($controller, $action, $params)
             );
         } catch (\Services_Exception_Denied $e) {
-            throw new ToolCallException("Permission denied: " . $e->getMessage());
+            throw new ToolCallException(tr("Permission denied: ") . $e->getMessage());
         } catch (\Services_Exception_NotFound $e) {
             throw new ToolCallException($e->getMessage());
         } catch (\Services_Exception $e) {
-            throw new ToolCallException("Error: " . $e->getMessage());
+            throw new ToolCallException(tra("Error: ") . $e->getMessage());
         } catch (\Throwable $e) {
-            error_log('[MCP] Unexpected exception in brokerCall: ' . get_class($e) . ': ' . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (MCP protocol error — logs unexpected exceptions to system log)
-            throw new ToolCallException("An unexpected error occurred.");
+            $this->tikilog->add_log('McpWikiTools', tr("[MCP] Unexpected exception in brokerCall: '%0': '%1'", get_class($e), $e->getMessage()));
+            throw new ToolCallException(tr("An unexpected error occurred."));
         }
     }
 
@@ -457,7 +461,7 @@ class WikiTools
         } finally {
             $output = ob_get_clean();
             if ($output !== '' && $output !== false) {
-                error_log('[MCP] Captured stray output: ' . $output); // @phpstan-ignore disallowedFunctions.errorLog (MCP protocol — logs unexpected PHP output to system log)
+                $this->tikilog->add_log('McpWikiTools', tr("[MCP] Captured stray output: %0", $output));
             }
         }
         return $result;
