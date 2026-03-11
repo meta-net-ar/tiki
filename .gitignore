@@ -133,5 +133,7 @@ themes/**/*.css.map
 # Handwritten CSS files.
 !themes/base_files/feature_css/*.css
 
+# Generated changelog file
+/generated_changelog.md
 # macOS filesystem info
 .DS_Store
