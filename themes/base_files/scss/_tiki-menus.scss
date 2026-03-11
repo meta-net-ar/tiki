@@ -36,6 +36,13 @@
     --sm-navbar-z-index: inherit !important;
 }
 
+// SmartMenus 2.x lacks the legacy javascript-driven scroll arrows.
+// This allows dropdowns to naturally scroll if they exceed the viewport.
+.tiki .sm-navbar .sm-sub {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
 /* Smartmenus navbars (Megamenu static) */
 .mega-menu-static {
     position: relative;
@@ -166,8 +173,6 @@
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .dropdown-menu-top-t,
@@ -175,10 +180,7 @@
 .dropdown-menu-start-r {
     top: 100%;
     bottom: auto;
-    max-height: 40vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 2000 !important;
+    z-index: 2000;
 }
 
 .dropdown-menu-bottom-b {

@@ -14,10 +14,10 @@
  */
 
 $(function () {
-    $(".sm-nav-item, .dropdown, .mega-menu").each(function () {
+    $(".dropdown, .mega-menu").each(function () {
         const $parent = $(this);
         const $menu = $parent.find(".dropdown-menu, ul").first();
-        if (!$menu.length) return;
+        if (!$menu.length || $parent.hasClass("sm-nav-item") || $menu.hasClass("sm-sub")) return;
 
         const id = $parent.closest(".card-body").attr("id");
 
@@ -47,17 +47,9 @@ $(function () {
             var viewportH = window.innerHeight;
 
             var menuMaxW = Math.min(viewportW - 16, Math.max(200, $menu.outerWidth()));
-            $menu.css({ position: "fixed", "box-sizing": "border-box", width: menuMaxW + "px" });
-
-            var menuH = Math.min($menu.outerHeight(), viewportH - 16);
-            $menu.css("max-height", menuH + "px");
-
-            var topBelow = rect.bottom + 8;
-            var topAbove = rect.top - menuH - 8;
-            var top = topBelow + menuH <= viewportH - 8 ? topBelow : Math.max(8, topAbove);
-
             var left = Math.round(rect.left + (rect.width - menuMaxW) / 2);
             left = Math.max(8, Math.min(left, viewportW - menuMaxW - 8));
+            var top = rect.bottom + 4;
 
             $menu.css({ top: top + "px", left: left + "px", right: "auto", transform: "none", zIndex: 1060 });
 
