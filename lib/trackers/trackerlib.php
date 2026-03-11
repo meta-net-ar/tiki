@@ -1430,6 +1430,7 @@ class TrackerLib extends TikiLib
                 $fv = $filtervalue;
                 $ev = $exactvalue;
                 $ff = (int) $filterfield;
+                $ff_array = $filterfield;
                 $nb_filtered_fields = 1;
             } else {
                 $nb_filtered_fields = count($filterfield);
@@ -1444,7 +1445,21 @@ class TrackerLib extends TikiLib
                     $ev = ! empty($exactvalue[$i]) ? $exactvalue[$i] : null;
                     $fv = ! empty($filtervalue[$i]) ? $filtervalue[$i] : null;
                 }
-                $filter = $this->get_tracker_field($ff);
+                $isCompositeFilter = is_array($ff_array)
+                    && (
+                        (isset($ff_array['sqlsearch']) && is_array($ff_array['sqlsearch']))
+                        || (isset($ff_array['usersearch']) && is_array($ff_array['usersearch']))
+                    );
+                if ($isCompositeFilter) {
+                    $filter = ['type' => null];
+                } else {
+                    $field = $this->get_tracker_field($ff);
+                    if ($field) {
+                        $filter = $field;
+                    } else {
+                        $filter = ['type' => null];
+                    }
+                }
 
                 // Determine if field is an item list field and postpone filtering till later if so
                 if ($filter["type"] == 'l' && isset($filter['options_array'][2]) && isset($filter['options_array'][2]) && isset($filter['options_array'][3])) {
@@ -3998,9 +4013,12 @@ class TrackerLib extends TikiLib
     public function get_tracker_field($fieldIdOrPermName, $useCache = true)
     {
         static $cache = [];
-        if ($useCache && (is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName)) && isset($cache[$fieldIdOrPermName])) {
+        $isCacheableKey = is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName);
+
+        if ($useCache && $isCacheableKey && isset($cache[$fieldIdOrPermName])) {
             return $cache[$fieldIdOrPermName];
         }
+
         if ((int)$fieldIdOrPermName > 0) {
             $res = $this->fields()->fetchFullRow(['fieldId' => (int)$fieldIdOrPermName]);
         } else {
@@ -4016,7 +4034,9 @@ class TrackerLib extends TikiLib
             if (TikiLib::lib('tiki')->isMemoryLow()) {
                 $cache = [];
             }
-            $cache[$fieldIdOrPermName] = $res;
+            if ($isCacheableKey) {
+                $cache[$fieldIdOrPermName] = $res;
+            }
             return $res;
         }
     }

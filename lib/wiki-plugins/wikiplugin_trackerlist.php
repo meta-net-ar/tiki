@@ -1114,7 +1114,19 @@ function wikiplugin_trackerlist($data, $params)
         }
 
         if (! empty($filterfield) && ! empty($limit)) {
-            $limit = array_unique(array_merge($limit, $filterfield));
+            $flattenedFilterFields = [];
+            foreach ($filterfield as $ff) {
+                if (is_array($ff)) {
+                    if (! empty($ff['sqlsearch']) && is_array($ff['sqlsearch'])) {
+                        $flattenedFilterFields = array_merge($flattenedFilterFields, $ff['sqlsearch']);
+                    } elseif (! empty($ff['usersearch']) && is_array($ff['usersearch'])) {
+                        $flattenedFilterFields = array_merge($flattenedFilterFields, $ff['usersearch']);
+                    }
+                } else {
+                    $flattenedFilterFields[] = $ff;
+                }
+            }
+            $limit = array_unique(array_merge($limit, $flattenedFilterFields));
         }
 
         // for some reason if param popup is set but empty, the array contains 2 empty elements. We filter them out.
@@ -2031,10 +2043,16 @@ function wikiplugin_trackerlist($data, $params)
             $catfilternotvalue = [];
             if (! empty($filterfield)) {
                 foreach ($filterfield as $k => $ff) {
-                    if (! empty($ff['usersearch'])) {
+                    if (is_array($ff) && (! empty($ff['usersearch']) || ! empty($ff['sqlsearch']))) {
+                        continue;
+                    }
+                    if (! is_scalar($ff)) {
                         continue;
                     }
                     $filterfieldinfo = $trklib->get_tracker_field($ff);
+                    if (! is_array($filterfieldinfo) || ! isset($filterfieldinfo['type'])) {
+                        continue;
+                    }
                     if ($filterfieldinfo['type'] == 'e') {
                         $catfilters[] = $k;
                         if (! empty($filtervalue[$k]) && empty($exactvalue[$k])) {
