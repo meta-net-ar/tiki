@@ -65,6 +65,9 @@ class Services_RecordRtc_Controller
         $audioFilename = $input->audiofilename->text();
         $ticket = $input->ticket->text();
         $galleryId = $input->galleryId->text() ?: $prefs['fgal_use_record_rtc_screen_gallery_id'];
+        $relatedObjectId = $input->relatedObjectId->int();
+        $relatedObjectType = $input->relatedObjectType->text();
+        $relationType = $input->relationType->text();
 
         if (empty($audioFilename) && empty($videoFilename)) {
             throw new Services_Exception_NotFound('Empty file name.');
@@ -110,6 +113,12 @@ class Services_RecordRtc_Controller
 
         if ($galleryId) {
             $_FILES['data']['galleryId'] = $galleryId;
+        }
+
+        if ($relatedObjectId && $relatedObjectType && $relationType) {
+            $_FILES['data']['relatedObjectId'] = $relatedObjectId;
+            $_FILES['data']['relatedObjectType'] = $relatedObjectType;
+            $_FILES['data']['relationType'] = $relationType;
         }
 
         $files = new Services_File_Controller();

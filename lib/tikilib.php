@@ -2254,9 +2254,6 @@ class TikiLib extends TikiDb_Bridge
             $filegallib = TikiLib::lib('filegal');
             // remove fgal backlinks
             $filegallib->deleteBacklinks(['type' => $type, 'object' => $id]);
-
-            // remove attached files
-            $filegallib->deleteObjectFiles($type, $id);
         }
         // remove object
         $objectlib->delete_object($type, $id);

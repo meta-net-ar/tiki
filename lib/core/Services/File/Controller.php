@@ -115,8 +115,9 @@ class Services_File_Controller
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
         $directoryPattern = $input->directoryPattern->text();
-        $objectId = $input->objectId->int();
-        $objectType = $input->objectType->text();
+        $relatedObjectId = $input->relatedObjectId->int();
+        $relatedObjectType = $input->relatedObjectType->text();
+        $relationType = $input->relationType->text();
         $categlib = TikiLib::lib('categ');
         $categories = $fileId ? $categlib->get_object_categories('file', $fileId) : [];
 
@@ -199,8 +200,8 @@ class Services_File_Controller
                 $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
             } else {
                 $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
-                if ($fileId && $objectId && $objectType) {
-                    TikiLib::lib('relation')->add_relation('tiki.file.attach', $objectType, $objectId, 'file', $fileId, false);
+                if ($fileId && $relatedObjectId && $relatedObjectType && $relationType) {
+                    TikiLib::lib('relation')->add_relation($relationType, $relatedObjectType, $relatedObjectId, 'file', $fileId, false);
                 }
             }
         } else {
