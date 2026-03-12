@@ -132,10 +132,10 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
                     'field' => "{$trackerName}_title_field",
                     'label' => 'Title',
                     'mode' => 'link',
-                    "isPrimary" => false,
+                    "isPrimary" => true,
                     "isReadOnly" => false,
                     "isExportOnly" => false,
-                    "isUniqueKey" => false
+                    "isUniqueKey" => true
                 ],
                 [
                     'field' => "{$trackerName}_desc_field",
