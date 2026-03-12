@@ -6,20 +6,28 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 /**
- * Tiki\Sections - Section Configuration & Object Detection
+ * Tiki\Sections - Section configuration and object detection helper.
  *
- * Defines all application sections and their metadata for permissions,
- * toolbars, and object type mapping. Provides automatic object detection
- * from request parameters.
+ * Defines all logical sections of the application and their associated
+ * metadata (features, request keys, object types, etc.).
+ *
+ * Sections are used across the system for:
+ * - permission checks
+ * - module visibility
+ * - layout and UI behaviour
+ * - theme selection (e.g. admin vs site theme)
+ *
+ * This class also provides utilities to detect the current object being
+ * accessed based on request parameters.
  *
  * USAGE:
- * - Access section metadata: $sections = Sections::getSections()
- * - Detect current object: $object = Sections::currentObject($_REQUEST)
- * - Use constants ex:
- *   $section = Sections::SECTION_WIKI;
+ * - Retrieve section definitions: $sections = Sections::getSections()
+ * - Detect the current object: $object = Sections::currentObject($_REQUEST)
+ * - Set the current section: Sections::setCurrentSection(Sections::SECTION_WIKI)
+ * - Get the current section: $section = Sections::getCurrentSection()
  *
- * Each section defines required features, request parameters, and object types
- * for proper permission checking and UI behavior.
+ * Each section definition specifies the required feature, request keys,
+ * and object types needed for proper permission handling and UI behavior.
  */
 
 namespace Tiki;
