@@ -14,6 +14,10 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 $themelib = TikiLib::lib('theme');
 
+if (! Sections::getCurrentSection() && ! empty($section)) {
+    Sections::setCurrentSection($section);
+}
+
 list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
 //Write back global variable and prefs so that they can be accessed elsewhere
 //This is not a great pattern, but it was like that and I didn't have time to refactor further.  At least now it's right after it's computed - benoitg - 2024-04-08
