@@ -48,10 +48,16 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH'])) {
                         $value = $partPieces[1] ?? '';
 
                         if ($filename) {
-                            $_POST[$name] = base64_encode($value);
-                            $_POST['name'] = $_POST['filename'] = $filename;
-                            $_POST['size'] = strlen($value);
-                            $_POST['type'] = 'application/octet-stream';
+                            $tmpFile = tempnam(sys_get_temp_dir(), 'tiki_test_upload_');
+                            // Multipart format adds a trailing \r\n before the boundary — strip it
+                            file_put_contents($tmpFile, substr($value, 0, -2));
+                            $_FILES[$name] = [
+                                'name'     => $filename,
+                                'type'     => 'application/octet-stream',
+                                'tmp_name' => $tmpFile,
+                                'error'    => UPLOAD_ERR_OK,
+                                'size'     => filesize($tmpFile),
+                            ];
                         } else {
                             // For regular form fields, trim the value
                             $_POST[$name] = trim($value);
