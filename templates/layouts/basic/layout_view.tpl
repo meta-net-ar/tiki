@@ -20,9 +20,7 @@
 <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std d-flex min-vh-100 flex-column my-0">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         <div class="row">
-            {******************************************************************
-         * SITE HEADER STRUCTURE
-         ******************************************************************}
+            {******************************************************************* SITE HEADER STRUCTURE******************************************************************}
             <header class="site-header" id="site-header" role="banner">
                 <nav class="{block name=navClasses}navbar w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
                      id="main-navbar"

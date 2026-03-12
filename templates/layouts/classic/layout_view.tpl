@@ -19,11 +19,7 @@
         {if $prefs.feature_layoutshadows eq 'y'}
             <div id="header-shadow">{eval var=$prefs.header_shadow_start}
         {/if}
-
-        {******************************************************************
-         * SITE HEADER STRUCTURE
-         * Same pattern as social layout for consistency
-         ******************************************************************}
+        {******************************************************************* SITE HEADER STRUCTURE Same pattern as social layout for consistency ******************************************************************}
         <header class="site-header" id="site-header" role="banner">
 
             <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
