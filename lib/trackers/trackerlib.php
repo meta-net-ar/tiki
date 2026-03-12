@@ -3185,7 +3185,6 @@ class TrackerLib extends TikiLib
         }
 
         // remove the object and uncategorize etc while the item still exists
-        TikiLib::lib('filegal')->deleteObjectFiles('trackeritem', $itemId, 'tiki.item.recording');
         $this->remove_object("trackeritem", $itemId);
         $itemFields = $this->itemFields()->fetchAll(['fieldId'], ['itemId' => $itemId]);
         foreach ($itemFields as $itemField) {

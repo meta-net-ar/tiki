@@ -1419,6 +1419,7 @@ class Services_Tracker_Controller
                         'data' => $input->data->wikicontent(),
                         'return_url' => $input->redirect->none(),
                         'version' => $version,
+                        'related_files' => $input->related_files->raw(),
                     ]));
                 }
 

@@ -200,9 +200,6 @@ class Services_File_Controller
                 $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
             } else {
                 $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
-                if ($fileId && $relatedObjectId && $relatedObjectType && $relationType) {
-                    TikiLib::lib('relation')->add_relation($relationType, $relatedObjectType, $relatedObjectId, 'file', $fileId, false);
-                }
             }
         } else {
             $fileId = false;

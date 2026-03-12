@@ -115,12 +115,6 @@ class Services_RecordRtc_Controller
             $_FILES['data']['galleryId'] = $galleryId;
         }
 
-        if ($relatedObjectId && $relatedObjectType && $relationType) {
-            $_FILES['data']['relatedObjectId'] = $relatedObjectId;
-            $_FILES['data']['relatedObjectType'] = $relatedObjectType;
-            $_FILES['data']['relationType'] = $relationType;
-        }
-
         $files = new Services_File_Controller();
         $input = new JitFilter($_FILES['data']);
         $_POST['ticket'] = $ticket;
