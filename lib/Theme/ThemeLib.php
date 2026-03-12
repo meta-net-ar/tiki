@@ -58,7 +58,7 @@ class ThemeLib extends TikiLib
     public static function getActiveThemeAndOption(): array
     {
         global $prefs, $smarty;
-
+    
         $section = Sections::getCurrentSection();
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';

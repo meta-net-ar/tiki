@@ -38,7 +38,7 @@ $prefs['user_tracker_watch_editor'] = 'n';
 $prefs['user_comment_watch_editor'] = 'n';
 $prefs['user_category_watch_editor'] = 'n';
 $prefs['user_plugin_approval_watch_editor'] = 'n';
-$section = $section ?? Sections::getCurrentSection();
+$section = Sections::getCurrentSection();
 
 if ($user) {
     $default_group = $group = $_SESSION['u_info']['group'];

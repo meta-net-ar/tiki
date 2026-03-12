@@ -17,21 +17,17 @@ $sections = Sections::getSections();
 if (! isset($section)) {
     $section = '';
 }
-if (! $section) {
+
+if (! Sections::getCurrentSection()) {
     $script = basename($_SERVER['SCRIPT_NAME']);
 
     if (str_starts_with($script, 'tiki-admin')) {
-        $section = Sections::SECTION_ADMIN;
-    } elseif (str_starts_with($script, 'tiki-view_tracker')) {
-        $section = Sections::SECTION_TRACKERS;
-    } elseif (str_starts_with($script, 'tiki-view_blog')) {
-        $section = Sections::SECTION_BLOGS;
-    } elseif (str_starts_with($script, 'tiki-index')) {
-        $section = Sections::SECTION_WIKI;
+        Sections::setCurrentSection(Sections::SECTION_ADMIN);
     } else {
-        $section = Sections::SECTION_GLOBAL;
+        Sections::setCurrentSection(Sections::SECTION_GLOBAL);
     }
 }
+
 $sections_enabled = [];
 
 foreach ($sections as $sec => $dat) {
