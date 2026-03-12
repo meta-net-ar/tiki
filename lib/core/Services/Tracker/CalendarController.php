@@ -74,7 +74,14 @@ class Services_Tracker_CalendarController
         $response = [];
 
         $fields = [];
+        $isDateOnly = false;
         if ($definition = Tracker_Definition::get($input->trackerId->int())) {
+            $beginFieldInfo = $definition->getField($input->beginField->word());
+            if (! empty($beginFieldInfo) && in_array($beginFieldInfo['type'], ['f', 'j'], true)) {
+                // Date-only fields should be emitted as all-day events.
+                // Sending them as timezone-aware datetimes can move them one day backward/forward.
+                $isDateOnly = ($beginFieldInfo['options_map']['datetime'] ?? '') === 'd';
+            }
             foreach ($definition->getPopupFields() as $fieldId) {
                 if ($field = $definition->getField($fieldId)) {
                     $fields[] = $field;
@@ -139,6 +146,12 @@ class Services_Tracker_CalendarController
 
             $dtStart = $this->getTimestamp($row[$start]);
             $dtEnd = $this->getTimestamp($row[$end]);
+            // Fallback safeguards for legacy/inconsistent metadata in index rows:
+            // - plain YYYY-MM-DD index value
+            // - lucene-style YYYYMMDDHHMMSS with zeroed HHMMSS
+            $isDateOnlyEvent = $isDateOnly
+                || (is_string($row[$start]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $row[$start]))
+                || (is_string($row[$start]) && preg_match('/^\d{14}$/', $row[$start]) && substr($row[$start], 8, 6) === '000000');
 
             $response[] = [
                 'id'               => $row['object_id'],
@@ -146,9 +159,10 @@ class Services_Tracker_CalendarController
                 'title'            => $row[$title] ?: $row['title'],
                 'extendedProps'      => ['description' => $row[$description] ?: $row['description']],
                 'url'              => smarty_modifier_sefurl($row['object_id'], $row['object_type']),
-                'allDay'           => false,
-                'start'            => $useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false),
-                'end'              => $useTimestamp ? $dtEnd : TikiLib::date_format("c", $dtEnd, $user, 5, false),
+                // For all-day events, return date-only strings so FullCalendar does not apply timezone conversions that can shift the visible day.
+                'allDay'           => $isDateOnlyEvent,
+                'start'            => $isDateOnlyEvent ? gmdate('Y-m-d', $dtStart) : ($useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false)),
+                'end'              => $isDateOnlyEvent ? gmdate('Y-m-d', $dtEnd) : ($useTimestamp ? $dtEnd : TikiLib::date_format("c", $dtEnd, $user, 5, false)),
                 'editable'         => $item->canModify(),
                 'color'            => $row[$coloring] ? ($row[$coloring] ?: $row['coloring']) : ($this->getColor($row[$coloring] ?? '', $colormap)),
                 'textColor'        => '#000',
