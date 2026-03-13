@@ -173,7 +173,7 @@
             {* -------------------------------------------------- section with comments --- *}
             {if $tracker_info.useComments eq 'y' and ($tiki_p_tracker_view_comments ne 'n' or $tiki_p_comment_tracker_items ne 'n' or $canViewCommentsAsItemOwner) and $prefs.tracker_show_comments_below eq 'y'}
                 <a id="Comments"></a>
-                <div id="comment-container-below" class="well well-sm" data-bs-target="{service controller=comment action=list type=trackeritem objectId=$itemId allowRecording=$allowRecordingInComments recordingGalleryId=$recordingGalleryId}"></div>
+                <div id="comment-container-below" class="well well-sm" data-bs-target="{service controller=comment action=list type=trackeritem objectId=$itemId}"></div>
                 {jq}
                     var id = '#comment-container-below';
                     $(id).comment_load($(id).data('bs-target'));
@@ -191,7 +191,7 @@
         {if $tracker_info.useComments eq 'y' and ($tiki_p_tracker_view_comments ne 'n' or $tiki_p_comment_tracker_items ne 'n' or $canViewCommentsAsItemOwner) and $prefs.tracker_show_comments_below ne 'y'}
 
             {tab name="{tr}Comments{/tr} (`$comCount`)" print=n}
-                <div id="comment-container" data-bs-target="{service controller=comment action=list type=trackeritem objectId=$itemId allowRecording=$allowRecordingInComments recordingGalleryId=$recordingGalleryId}"></div>
+                <div id="comment-container" data-bs-target="{service controller=comment action=list type=trackeritem objectId=$itemId}"></div>
                 {jq}
                     var id = '#comment-container';
                     $(id).comment_load($(id).data('bs-target'));

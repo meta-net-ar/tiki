@@ -7,11 +7,9 @@ use TikiLib;
 class ToolbarFileRecording extends ToolbarUtilityItem
 {
     private $id;
-    private $recordingGalleryId;
 
-    public function __construct($domElementId, $isWysiwyg = false, $recordingGalleryId = 0)
+    public function __construct($domElementId, $isWysiwyg = false)
     {
-        $this->recordingGalleryId = $recordingGalleryId;
         $this->domElementId = $domElementId;
         $this->id = $this->domElementId . '_toolbar-file-recording';
         $this->setLabel(tra('Start recording'))
@@ -82,6 +80,9 @@ class ToolbarFileRecording extends ToolbarUtilityItem
 
     public function getOnClick(): string
     {
+        global $prefs;
+        $galleryId = $prefs['fgal_use_record_rtc_screen_gallery_id'];
+
         return <<<JS
         $.openModal({
             title: tr("What do you want to record?"),
@@ -93,7 +94,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                     type: 'primary start-recording',
                     attrs: {
                         'data-textarea-filerecording': 'true',
-                        'data-gallery-id': '{$this->recordingGalleryId}',
+                        'data-gallery-id': "$galleryId",
                         'data-area-id': '{$this->domElementId}'
                     },
                     onClick: function() {}

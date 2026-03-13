@@ -59,7 +59,7 @@ abstract class ToolbarItem
     }
 
 
-    public static function getTag(string $tagName, bool $wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = '', string|null $objectId = '', $extraParams = []): ?ToolbarItem
+    public static function getTag(string $tagName, bool $wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = '', string|null $objectId = ''): ?ToolbarItem
     {
         $section = Sections::getCurrentSection();
 
@@ -106,8 +106,8 @@ abstract class ToolbarItem
             return new ToolbarLaunchPlugins();
         } elseif ($tagName == 'languagecheck') {
             return new ToolbarLanguageCheck();
-        } elseif ($tagName == 'filerecording' && ($extraParams['allowRecording'] ?? false)) {
-            return new ToolbarFileRecording($domElementId, $wysiwyg, $extraParams['recordingGalleryId']);
+        } elseif ($tagName == 'filerecording') {
+            return new ToolbarFileRecording($domElementId, $wysiwyg);
         }
         return null;
     }

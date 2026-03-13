@@ -663,11 +663,6 @@ foreach ($fieldDefinitions as $i => $current_field) {
 
             if ($insert_values) {
                 $current_field_ins = array_merge($current_field_ins, $insert_values);
-
-                if (isset($insert_values['storeRecordingComments']) && $insert_values['storeRecordingComments'] === 'y') {
-                    $smarty->assign('allowRecordingInComments', true);
-                    $smarty->assign('recordingGalleryId', $insert_values['galleryId']);
-                }
             }
         }
     }
