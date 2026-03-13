@@ -14,7 +14,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 $themelib = TikiLib::lib('theme');
 if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || str_starts_with(basename($_SERVER['SCRIPT_NAME']), 'tiki-admin'))) {
-   Sections::setCurrentSection(Sections::SECTION_ADMIN); 
+    Sections::setCurrentSection(Sections::SECTION_ADMIN);
 }
 
 list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
