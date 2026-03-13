@@ -58,7 +58,6 @@ class ThemeLib extends TikiLib
     public static function getActiveThemeAndOption(): array
     {
         global $prefs, $smarty;
-        $section = Sections::getCurrentSection();
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';
         $theme_option_active = $prefs['theme_option'] ?? '';
@@ -84,10 +83,14 @@ class ThemeLib extends TikiLib
 
         //consider Admin Theme
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
 =======
         if (! empty($prefs['theme_admin']) && $section === Sections::SECTION_ADMIN) {       // use admin theme if set
 >>>>>>> 2f67e5fef0 ([FIX] Theme: admin theme incorrectly applied site-wide)
+=======
+        if (! empty($prefs['theme_admin']) && Sections::getCurrentSection() === Sections::SECTION_ADMIN) {       // use admin theme if set
+>>>>>>> ffbfe8f211 (Fix layout_social spacing and ensure section initialization during bootstrap)
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }

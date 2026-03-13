@@ -273,6 +273,11 @@ class Sections
         ],
     ];
 
+    /**
+     * Sets the current application section (e.g. admin, wiki, trackers).
+     * Validates the section and updates the internal state.
+     * Triggers registered callbacks so other components can react to the section change.
+    */
     public static function setCurrentSection(string $section): void
     {
         if (! in_array($section, self::getAllSections(), true)) {

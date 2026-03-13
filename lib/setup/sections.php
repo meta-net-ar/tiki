@@ -18,16 +18,6 @@ if (! isset($section)) {
     $section = '';
 }
 
-if (! Sections::getCurrentSection()) {
-    $script = basename($_SERVER['SCRIPT_NAME']);
-
-    if (str_starts_with($script, 'tiki-admin')) {
-        Sections::setCurrentSection(Sections::SECTION_ADMIN);
-    } else {
-        Sections::setCurrentSection(Sections::SECTION_GLOBAL);
-    }
-}
-
 $sections_enabled = [];
 
 foreach ($sections as $sec => $dat) {
