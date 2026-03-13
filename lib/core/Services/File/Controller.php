@@ -115,9 +115,6 @@ class Services_File_Controller
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
         $directoryPattern = $input->directoryPattern->text();
-        $relatedObjectId = $input->relatedObjectId->int();
-        $relatedObjectType = $input->relatedObjectType->text();
-        $relationType = $input->relationType->text();
         $categlib = TikiLib::lib('categ');
         $categories = $fileId ? $categlib->get_object_categories('file', $fileId) : [];
 
