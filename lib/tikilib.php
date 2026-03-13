@@ -2250,9 +2250,9 @@ class TikiLib extends TikiDb_Bridge
         // remove links from this object to pages
         $linkhandle = "objectlink:$type:$id";
         $this->table('tiki_links')->deleteMultiple(['fromPage' => $linkhandle]);
+        // remove fgal backlinks
         if ($prefs['feature_file_galleries'] == 'y') {
             $filegallib = TikiLib::lib('filegal');
-            // remove fgal backlinks
             $filegallib->deleteBacklinks(['type' => $type, 'object' => $id]);
         }
         // remove object
