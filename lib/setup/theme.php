@@ -17,7 +17,7 @@ $themelib = TikiLib::lib('theme');
 //Write back global variable and prefs so that they can be accessed elsewhere
 //This is not a great pattern, but it was like that and I didn't have time to refactor further.  At least now it's right after it's computed - benoitg - 2024-04-08
 $theme_active = $prefs['theme'];
-$theme_option_active = $prefs['theme_option']; 
+$theme_option_active = $prefs['theme_option'];
 
 //START loading theme related items
 //This bundle Loads bootstrap JS and popper JS
@@ -81,7 +81,7 @@ if (! empty($prefs['header_custom_scss'])) {
 } else {
     //first load the main theme css
     $theme_css = ThemeLib::getThemeCssFilePath($theme_active, '');
-    
+
     if ($theme_css) {
         // exclude the main theme css if the option's css also includes it (pref is set)
         if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {

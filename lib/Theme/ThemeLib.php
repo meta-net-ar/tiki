@@ -540,7 +540,7 @@ class ThemeLib extends TikiLib
             return $this->list_theme_options($theme);
         }
     }
-    
+
     public static function setupThemeHeaders(): void
     {
         static $initialized = false;
