@@ -1249,22 +1249,27 @@ class NlLib extends TikiLib
     public function list_tpls()
     {
         global $tikidomain;
+
+        // Determine the correct path to scan
+        $path = "templates/$tikidomain/newsletters/";
+        if (! is_dir($path)) {
+            $path = "templates/newsletters/";
+        }
+
+        if (! is_dir($path)) {
+            return [];
+        }
+
         $tpls = [];
-        if (is_dir("templates/$tikidomain/newsletters/")) {
-            $h = opendir("templates/$tikidomain/newsletters/");
-            while ($file = readdir($h)) {
-                if (preg_match('/\.tpl$/', $file)) {
-                    $tpls[] = $file;
-                }
-            }
-        } elseif (is_dir("templates/newsletters/")) {
-            $h = opendir("templates/newsletters/");
-            while ($file = readdir($h)) {
-                if (preg_match('/\.tpl$/', $file)) {
-                    $tpls[] = $file;
-                }
+        $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            if (str_ends_with($filename, '.tpl')) {
+                $tpls[] = $filename;
             }
         }
+
         return $tpls;
     }
 

@@ -83,14 +83,26 @@ if (isset($_REQUEST["reset"])) {
     $userprefslib->set_user_avatar($userwatch, '0', '', '', '', '', '');
     $userprefslib->remove_file_gallery_image($userwatch);
 }
+
 $avatars = [];
-$h = opendir("img/avatars/");
-while ($file = readdir($h)) {
-    if ($file != '.' && $file != '..' && $file != 'index.php' && substr($file, 0, 1) != "." && $file != "CVS" && $file != "README") {
-        $avatars[] = 'img/avatars/' . $file;
+
+$iterator = new FilesystemIterator('img/avatars', FilesystemIterator::SKIP_DOTS);
+
+foreach ($iterator as $fileInfo) {
+    // 1. Skip directories immediately
+    if (! $fileInfo->isFile()) {
+        continue;
     }
+
+    $filename = $fileInfo->getFilename();
+
+    if (str_starts_with($filename, '.') || in_array($filename, ['index.php', 'CVS', 'README'], true)) {
+        continue;
+    }
+
+    $avatars[] = $fileInfo->getPathname();
 }
-closedir($h);
+
 $smarty->assign_by_ref('avatars', $avatars);
 $smarty->assign('numav', count($avatars));
 $smarty->assign('yours', mt_rand(0, count($avatars)));

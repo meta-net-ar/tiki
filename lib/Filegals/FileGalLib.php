@@ -810,61 +810,106 @@ class FileGalLib extends TikiLib
     public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors)
     {
         $extract_dir = 'temp/' . basename($file) . '/';
-        mkdir($extract_dir);
+        mkdir($extract_dir, 0777, true);
+
         $archive = new PclZip($file);
         $archive->extract(PCLZIP_OPT_PATH, $extract_dir, PCLZIP_OPT_REMOVE_ALL_PATH);
         unlink($file);
-        $h = opendir($extract_dir);
 
-        // check filters
-        $upl = 1;
         $errors = [];
-        while (($file = readdir($h)) !== false) {
-            if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
-                if (! $this->is_filename_valid($file)) {
-                    $errors[] = tra('Invalid filename (using filters for filenames)') . ': ' . $file;
-                    $upl = 0;
+        $validFiles = [];
+
+        try {
+            $iterator = new \FilesystemIterator($extract_dir, \FilesystemIterator::SKIP_DOTS);
+        } catch (Exception $e) {
+            $errors[] = tra('Could not open extract directory');
+            return false;
+        }
+
+        // Validation Loop
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $name = $fileInfo->getFilename();
+                $isValid = true;
+
+                if (! $this->is_filename_valid($name)) {
+                    $errors[] = tra('Invalid filename (using filters for filenames)') . ': ' . $name;
+                    $isValid = false;
                 }
 
                 try {
-                    $this->assertUploadedFileIsSafe($file);
+                    $this->assertUploadedFileIsSafe($name);
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
-                    $upl = 0;
+                    $isValid = false;
                 }
 
-                if (! $this->checkQuota(filesize($extract_dir . $file), $galleryId, $error)) {
-                    $errors[] = $error;
-                    $upl = 0;
+                if (! $this->checkQuota($fileInfo->getSize(), $galleryId, $quotaError)) {
+                    $errors[] = $quotaError;
+                    $isValid = false;
+                }
+
+                if ($isValid) {
+                    $validFiles[] = $fileInfo; // Store the object for processing
                 }
             }
         }
-        if (! $upl) {
+
+        if (! empty($errors)) {
+            foreach ($iterator as $fileInfo) {
+                if ($fileInfo->isFile()) {
+                    @unlink($fileInfo->getPathname());
+                }
+            }
+            rmdir($extract_dir);
             return false;
         }
-        rewinddir($h);
-        while (($file = readdir($h)) !== false) {
-            if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
-                if (false === $data = @file_get_contents($extract_dir . $file)) {
-                    $errors[] = tra('Cannot open this file:') . "temp/$file";
-                    return false;
-                }
-                $tikiFile = new TikiFile([
-                    'galleryId' => $galleryId,
-                    'description' => $description,
-                    'user' => $user,
-                ]);
-                $type = TikiLib::lib('mime')->from_path($file, $extract_dir . $file);
-                $fileId = $tikiFile->replace($data, $type, $file, $file);
-                unlink($extract_dir . $file);
+
+        foreach ($validFiles as $fileInfo) {
+            $name = $fileInfo->getFilename();
+            $path = $fileInfo->getPathname();
+
+            if (false === $data = @file_get_contents($path)) {
+                $errors[] = tra('Cannot open this file:') . " temp/$name";
+                return false;
             }
+
+            $tikiFile = new TikiFile([
+                'galleryId' => $galleryId,
+                'description' => $description,
+                'user' => $user,
+            ]);
+
+            $type = TikiLib::lib('mime')->from_path($name, $path);
+            $tikiFile->replace($data, $type, $name, $name);
+            unlink($path);
         }
 
-        closedir($h);
         rmdir($extract_dir);
         return true;
     }
 
+
+    /**
+     * Helper function to recursively remove directory
+     */
+    private function removeDirRecursive(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        foreach (
+            new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            ) as $fileInfo
+        ) {
+            $fileInfo->isDir() ? rmdir($fileInfo->getPathname()) : unlink($fileInfo->getPathname());
+        }
+
+        rmdir($dir);
+    }
     public function get_file_info($fileId, $include_search_data = true, $include_data = true, $use_draft = false)
     {
         global $prefs, $user;

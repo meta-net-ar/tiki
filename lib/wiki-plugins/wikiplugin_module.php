@@ -360,16 +360,15 @@ function wikiplugin_module($data, $params)
         $out .= '<option value="">' . tra('Please choose a module') . '</option>';
         $out .= '<option value="" style="background-color:#bebebe;">' . tra('to be used as argument') . '</option>';
         $out .= '<option value="" style="background-color:#bebebe;">{MODULE(module=>name_of_module)}</option>';
-        $handle = opendir('modules');
+        $iterator = new FilesystemIterator('modules', FilesystemIterator::SKIP_DOTS);
 
-        while ($file = readdir($handle)) {
-            if ((str_starts_with($file, "mod-")) and (str_ends_with($file, ".php"))) {
-                $mod = substr(substr(basename($file), 4), 0, -4);
-
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            if (str_starts_with($filename, 'mod-') && str_ends_with($filename, '.php')) {
+                $mod = substr($fileInfo->getBasename('.php'), 4);
                 $out .= "<option value=\"$mod\">$mod</option>";
             }
         }
-
         $out .= '</select></form>';
     } else {
         $instance++;

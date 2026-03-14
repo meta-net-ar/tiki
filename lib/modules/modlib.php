@@ -307,17 +307,17 @@ class ModLib extends TikiLib
         }
 
         // Now add all the system modules
-        $h = opendir(TEMPLATES_MODULES_PATH);
-        while (($file = readdir($h)) !== false) {
-            if (str_starts_with($file, 'mod-') && preg_match("/\.tpl$/", $file)) {
+        $iterator = new FilesystemIterator(TEMPLATES_MODULES_PATH, FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            $file = $fileInfo->getFilename();
+            if (str_starts_with($file, 'mod-') && str_ends_with($file, '.tpl')) {
                 if (! str_contains($file, "nocache")) {
-                    $name = substr($file, 4, strlen($file) - 8);
-
-                    $all_modules[] = $name;
+                    // Remove 'mod-' (4 chars) from start and '.tpl' (4 chars) from end
+                    $all_modules[] = substr($file, 4, -4);
                 }
             }
         }
-        closedir($h);
+
         return $all_modules;
     }
 
@@ -375,20 +375,26 @@ class ModLib extends TikiLib
         if ($tikidomain) {
             $dircache .= "/$tikidomain";
         }
-        $h = opendir($dircache);
+
+        if (! is_dir($dircache)) {
+            return 0;
+        }
+
         $i = 0;
-        while (($file = readdir($h)) !== false) {
-            if (str_starts_with($file, 'mod-')) {
-                $file = "$dircache/$file";
-                $result = unlink($file);
-                if ($result) {
+        $iterator = new FilesystemIterator($dircache, FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+            if (str_starts_with($fileInfo->getFilename(), 'mod-')) {
+                // unlink() returns true on success
+                if (unlink($fileInfo->getPathname())) {
                     $i++;
                 }
             }
         }
-        closedir($h);
+
         return $i;
     }
+
     /* @param module_info = info of a module
      * @param user_groups = list of groups of a user
      * @param user = the user
@@ -857,20 +863,24 @@ class ModLib extends TikiLib
      */
     public function list_module_files()
     {
+        if (! is_dir(MODULES_PATH)) {
+            return [];
+        }
+
         $files = [];
-        if (is_dir(MODULES_PATH)) {
-            if ($dh = opendir(MODULES_PATH)) {
-                while (($file = readdir($dh)) !== false) {
-                    if (preg_match("/^mod-func-.*\.php$/", $file)) {
-                        $files[] = $file;
-                    }
-                }
-                closedir($dh);
+        $iterator = new FilesystemIterator(MODULES_PATH, FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            // Match mod-func-*.php
+            if (str_starts_with($filename, 'mod-func-') && str_ends_with($filename, '.php')) {
+                $files[] = $filename;
             }
         }
+
         sort($files);
         return $files;
     }
+
 
     /**
      * @param $module
