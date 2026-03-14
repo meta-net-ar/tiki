@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\RobotsTxt\Matcher;
+use Tiki\Sections;
 
 require_once("path_js_importmap_generator.php");
 /**
@@ -530,6 +531,7 @@ class HeaderLib
      */
     public function output_headers(): string
     {
+        Tiki\Lib\Theme\ThemeLib::setupThemeHeaders();
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
 

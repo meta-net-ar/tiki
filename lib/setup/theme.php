@@ -13,15 +13,11 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 }
 
 $themelib = TikiLib::lib('theme');
-if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || str_starts_with(basename($_SERVER['SCRIPT_NAME']), 'tiki-admin'))) {
-    Sections::setCurrentSection(Sections::SECTION_ADMIN);
-}
 
-list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
 //Write back global variable and prefs so that they can be accessed elsewhere
 //This is not a great pattern, but it was like that and I didn't have time to refactor further.  At least now it's right after it's computed - benoitg - 2024-04-08
-$prefs['theme'] = $theme_active;
-$prefs['theme_option'] = $theme_option_active;
+$theme_active = $prefs['theme'];
+$theme_option_active = $prefs['theme_option']; 
 
 //START loading theme related items
 //This bundle Loads bootstrap JS and popper JS
@@ -85,6 +81,7 @@ if (! empty($prefs['header_custom_scss'])) {
 } else {
     //first load the main theme css
     $theme_css = ThemeLib::getThemeCssFilePath($theme_active, '');
+    
     if ($theme_css) {
         // exclude the main theme css if the option's css also includes it (pref is set)
         if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
@@ -224,7 +221,11 @@ if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetiza
 
 // set the color of header bar and address bar
 if ($prefs['theme_header_and_address_bar_color'] === 'y') {
+<<<<<<< HEAD
     if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
+=======
+    if (Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+>>>>>>> c43dfcc47f (Fix theme initialization order to prevent admin theme being overridden by user preferences)
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
     } else {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";

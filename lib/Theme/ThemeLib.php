@@ -355,6 +355,7 @@ class ThemeLib extends TikiLib
     {
         global $tikidomain;
         list($activeTheme, $activeThemeOption) = self::getActiveThemeAndOption();
+
         $path = null;
         $dir_base = '';
         if ($tikidomain && is_dir(BASE_THEMES_SRC_PATH . "/$tikidomain")) {
@@ -537,6 +538,35 @@ class ThemeLib extends TikiLib
             return $available_options;
         } else {
             return $this->list_theme_options($theme);
+        }
+    }
+    
+    public static function setupThemeHeaders(): void
+    {
+        static $initialized = false;
+
+        if ($initialized) {
+            return;
+        }
+
+        $initialized = true;
+
+        global $headerlib, $prefs;
+
+        list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+
+        $prefs['theme'] = $theme_active;
+        $prefs['theme_option'] = $theme_option_active;
+
+        $theme_css = self::getThemeCssFilePath($theme_active, '');
+
+        if ($theme_css) {
+            $headerlib->add_cssfile($theme_css);
+
+            if (! empty($theme_option_active)) {
+                $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
+                $headerlib->add_cssfile($option_css);
+            }
         }
     }
 }
