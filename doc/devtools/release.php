@@ -431,37 +431,31 @@ function rrmdir($dir)
  * @param array $files An array of file names to delete.
  */
 
-function removeFiles($src, $files)
+function removeFiles(string $src, array $files): void
 {
-    $dir = opendir($src);
-    while (false !== ($file = readdir($dir))) {
-        if (($file != '.') && ($file != '..')) {
-            $full = $src . '/' . $file;
-            if (is_dir($full)) {
-                $flag = false;
+    $lookup = array_flip($files);
 
-                foreach ($files as $delfile) {
-                    if (basename($full) === $delfile) {
-                        rrmdir($full);
-                        $flag = true;
-                        break;
-                    }
-                }
-                if (! $flag) {
-                    removeFiles($full, $files);
-                }
-            } else {
-                foreach ($files as $delfile) {
-                    if (basename($full) === $delfile) {
-                        @chmod($full, 0777);
-                        unlink($full);
-                        break;
-                    }
-                }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $path => $info) {
+        $name = $info->getFilename();
+
+        if (! isset($lookup[$name])) {
+            continue;
+        }
+
+        if ($info->isDir()) {
+            rrmdir($path);
+        } else {
+            if (! is_writable($path)) {
+                chmod($path, 0777);
             }
+            unlink($path);
         }
     }
-    closedir($dir);
 }
 
 
@@ -472,24 +466,24 @@ function removeFiles($src, $files)
  * @param string $src The directory to set permissions for
  */
 
-function setPermissions($src)
+function setPermissions(string $src): void
 {
-    $dir = opendir($src);
-    while (false !== ($file = readdir($dir))) {
-        if (($file != '.') && ($file != '..')) {
-            $full = $src . '/' . $file;
-            if (is_dir($full)) {
-                setPermissions($full);
-                chmod($full, 0755);
-            } else {
-                if (is_link($full)) {
-                    continue;
-                }
-                chmod($full, 0664);
-            }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $path => $info) {
+        if ($info->isLink()) {
+            continue;
+        }
+
+        if ($info->isDir()) {
+            chmod($path, 0755);
+        } else {
+            chmod($path, 0664);
         }
     }
-    closedir($dir);
 }
 
 
@@ -553,7 +547,7 @@ function build_packages($releaseVersion)
     echo "Downloading composer.phar" . "\n";
     $checksum = file_get_contents('https://composer.github.io/installer.sig');
     $composerInstaller = $workDir . '/composer-setup.php';
-    if (! file_put_contents($composerInstaller, file_get_contents('http://getcomposer.org/installer'))) {
+    if (! file_put_contents($composerInstaller, file_get_contents('https://getcomposer.org/installer'))) {
         echo "Can't create tikipack/composer-setup.php. Aborting." . "\n";
         die();
     }
@@ -577,10 +571,6 @@ function build_packages($releaseVersion)
 
     echo 'Installing dependencies through composer... [may take a while]' . "\n";
     $shellout = shell_exec('php ' . escapeshellarg($workDir . '/composer.phar') . ' install -d ' . escapeshellarg($sourceDir . '/' . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH) . ' --prefer-dist --no-dev 2>&1');
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
-    }
-
     if ($options['debug-packaging']) {
         echo $shellout . "\n";
     }
@@ -653,38 +643,36 @@ function build_packages($releaseVersion)
     setPermissions($sourceDir);
 
     $relDir = escapeshellarg($relDir);
+    $isMac = (PHP_OS_FAMILY === 'Darwin');
+    $macPrefix = $isMac ? 'COPYFILE_DISABLE=1 ' : '';
+    // exclude the .DS_Store files which are macOS generated files
+    $archives = [
+        'tar.gz'  => "{$macPrefix}tar -czp --exclude='*.DS_Store' -f {archive} {source}",
+        'tar.bz2' => "{$macPrefix}tar -cjp --exclude='*.DS_Store' -f {archive} {source}",
+        'tar.xz'  => "{$macPrefix}tar -cJp --exclude='*.DS_Store' -f {archive} {source}",
+        'zip'     => "zip -ry {archive} {source} -x '*.DS_Store' -9",
+        '7z'      => "7za a {archive} {source} -xr!*.DS_Store -mx=9",
+    ];
+//    'zip' => "zip -r9X {archive} {source} -x '*.DS_Store'",
+    foreach ($archives as $ext => $cmdTemplate) {
+        $archive = escapeshellarg("$fileName.$ext");
+        $source  = escapeshellarg($fileName);
 
-    echo "Creating $fileName.tar.gz\n";
-    $shellout = shell_exec("cd $relDir; tar -pczf " . escapeshellarg($fileName . ".tar.gz") . ' ' . escapeshellarg($fileName) . " --exclude '*.DS_Store' 2>&1");
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
-    }
+        $command = str_replace(
+            ['{archive}', '{source}'],
+            [$archive, $source],
+            $cmdTemplate
+        );
 
-    echo "Creating $fileName.tar.bz2\n";
-    $shellout = shell_exec("cd $relDir; tar -pcjf " . escapeshellarg($fileName . ".tar.bz2") . ' ' . escapeshellarg($fileName) . " --exclude '*.DS_Store' 2>&1");
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
-    }
+        echo "Creating $fileName.$ext \n";
+        $shellout = shell_exec("cd $relDir; $command 2>&1");
+        if (! empty($options['debug-packaging'])) {
+            echo $shellout . "\n";
+        }
 
-    echo "Creating $fileName.tar.xz\n";
-    $shellout = shell_exec("cd $relDir; tar -pcJf " . escapeshellarg($fileName . ".tar.xz") . ' ' . escapeshellarg($fileName) . " --exclude '*.DS_Store' 2>&1");
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
-    }
-
-    echo "Creating $fileName.zip\n";
-    $shellout = shell_exec("cd $relDir; zip -ry " . escapeshellarg($fileName . ".zip") . ' ' . escapeshellarg($fileName) . ' -x "*.DS_Store" -9 2>&1');
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
-    }
-
-    echo "Creating $fileName.7z\n";
-    $shellout = shell_exec("cd $relDir; 7za a " . escapeshellarg($fileName . ".7z") . ' ' . escapeshellarg($fileName) . ' -xr!*.DS_Store -mx=9 2>&1');
-    if (str_contains($shellout, 'command not found')) {
-        error("7za not installed. Archive creation failed.\n");
-    }
-    if ($options['debug-packaging']) {
-        echo $shellout . "\n";
+        if ($ext === '7z' && str_contains($shellout, 'command not found')) {
+            error("7za not installed. Archive creation failed.\n");
+        }
     }
 
     echo color("\nTo upload the 'tarballs', copy-paste and execute the following line (and change '\$SF_LOGIN' by your SF.net login):\n", 'yellow');
