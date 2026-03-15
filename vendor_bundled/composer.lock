@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5758feed1d143e5b77722048fa30eb8",
+    "content-hash": "27fec80f8035cd7aee966c9542985a37",
     "packages": [
         {
             "name": "amphp/amp",
@@ -741,16 +741,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.379.3",
+            "version": "3.379.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "54a7dbb04489a8b330db64ec07c1f658c9262433"
+                "reference": "587f0bafd28a7dc3395b0c55f93f2474657767e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/54a7dbb04489a8b330db64ec07c1f658c9262433",
-                "reference": "54a7dbb04489a8b330db64ec07c1f658c9262433",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/587f0bafd28a7dc3395b0c55f93f2474657767e2",
+                "reference": "587f0bafd28a7dc3395b0c55f93f2474657767e2",
                 "shasum": ""
             },
             "require": {
@@ -832,9 +832,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.379.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.379.6"
             },
-            "time": "2026-04-20T18:13:51+00:00"
+            "time": "2026-04-23T18:11:11+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -3293,12 +3293,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "8b224bdbb43365103270bae77b104d1f50da0703"
+                "reference": "62f1ab35aebf56c6768dfdecc8c94f9b6143ba5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/8b224bdbb43365103270bae77b104d1f50da0703",
-                "reference": "8b224bdbb43365103270bae77b104d1f50da0703",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/62f1ab35aebf56c6768dfdecc8c94f9b6143ba5e",
+                "reference": "62f1ab35aebf56c6768dfdecc8c94f9b6143ba5e",
                 "shasum": ""
             },
             "require": {
@@ -3376,7 +3376,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-04-20T12:43:29+00:00"
+            "time": "2026-04-24T10:45:02+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -3529,16 +3529,16 @@
         },
         {
             "name": "kaltura/api-client-library",
-            "version": "v22.16.0",
+            "version": "v22.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kaltura/KalturaGeneratedAPIClientsPHP53.git",
-                "reference": "bceca3294bbaeae1d04ac75ac64b565084681312"
+                "reference": "62e2c219da7a351f1925b1b517c1703ca9f5fd4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kaltura/KalturaGeneratedAPIClientsPHP53/zipball/bceca3294bbaeae1d04ac75ac64b565084681312",
-                "reference": "bceca3294bbaeae1d04ac75ac64b565084681312",
+                "url": "https://api.github.com/repos/kaltura/KalturaGeneratedAPIClientsPHP53/zipball/62e2c219da7a351f1925b1b517c1703ca9f5fd4a",
+                "reference": "62e2c219da7a351f1925b1b517c1703ca9f5fd4a",
                 "shasum": ""
             },
             "require": {
@@ -3571,9 +3571,9 @@
             ],
             "support": {
                 "issues": "https://github.com/kaltura/KalturaGeneratedAPIClientsPHP53/issues",
-                "source": "https://github.com/kaltura/KalturaGeneratedAPIClientsPHP53/tree/v22.16.0"
+                "source": "https://github.com/kaltura/KalturaGeneratedAPIClientsPHP53/tree/v22.17.0"
             },
-            "time": "2026-03-29T06:07:42+00:00"
+            "time": "2026-04-12T06:27:15+00:00"
         },
         {
             "name": "laminas/laminas-captcha",
@@ -11751,16 +11751,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.24.0",
+            "version": "4.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "5055cc792f630a427fdf9dcccd88faa94b50fd30"
+                "reference": "bfee3381e1f6dea8a5f3a18adba6419fe81c5f54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/5055cc792f630a427fdf9dcccd88faa94b50fd30",
-                "reference": "5055cc792f630a427fdf9dcccd88faa94b50fd30",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/bfee3381e1f6dea8a5f3a18adba6419fe81c5f54",
+                "reference": "bfee3381e1f6dea8a5f3a18adba6419fe81c5f54",
                 "shasum": ""
             },
             "require": {
@@ -11792,6 +11792,7 @@
                 "spiral/roadrunner-worker": "^3.6"
             },
             "suggest": {
+                "ext-excimer": "Enable Sentry profiling with the Excimer PHP extension.",
                 "monolog/monolog": "Allow sending log messages to Sentry by using the included Monolog handler."
             },
             "type": "library",
@@ -11828,7 +11829,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.24.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.25.0"
             },
             "funding": [
                 {
@@ -11840,20 +11841,20 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-04-01T14:34:34+00:00"
+            "time": "2026-04-23T12:50:03+00:00"
         },
         {
             "name": "smalot/pdfparser",
-            "version": "v2.12.4",
+            "version": "v2.12.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smalot/pdfparser.git",
-                "reference": "028d7cc0ceff323bc001d763caa2bbdf611866c4"
+                "reference": "2cfa0d92bd557875c9f52a75fde0e8392302a354"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/028d7cc0ceff323bc001d763caa2bbdf611866c4",
-                "reference": "028d7cc0ceff323bc001d763caa2bbdf611866c4",
+                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/2cfa0d92bd557875c9f52a75fde0e8392302a354",
+                "reference": "2cfa0d92bd557875c9f52a75fde0e8392302a354",
                 "shasum": ""
             },
             "require": {
@@ -11889,9 +11890,9 @@
             ],
             "support": {
                 "issues": "https://github.com/smalot/pdfparser/issues",
-                "source": "https://github.com/smalot/pdfparser/tree/v2.12.4"
+                "source": "https://github.com/smalot/pdfparser/tree/v2.12.5"
             },
-            "time": "2026-03-10T15:39:47+00:00"
+            "time": "2026-04-17T11:37:58+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -18165,11 +18166,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.50",
+            "version": "2.1.51",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d452086fb4cf648c6b2d8cf3b639351f79e4f3e2",
-                "reference": "d452086fb4cf648c6b2d8cf3b639351f79e4f3e2",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/dc3b523c45e714c70de2ac5113b958223b55dc59",
+                "reference": "dc3b523c45e714c70de2ac5113b958223b55dc59",
                 "shasum": ""
             },
             "require": {
@@ -18214,7 +18215,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-17T13:10:32+00:00"
+            "time": "2026-04-21T18:22:01+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -19710,6 +19711,53 @@
             "time": "2023-02-07T11:34:05+00:00"
         },
         {
+            "name": "smarty/smarty-lint",
+            "version": "v0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/umakantp/SmartyLint.git",
+                "reference": "db59610dc006a723684f267e6a8603da8f49441a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/umakantp/SmartyLint/zipball/db59610dc006a723684f267e6a8603da8f49441a",
+                "reference": "db59610dc006a723684f267e6a8603da8f49441a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Umakantp\\SmartyLint\\": "SmartLint/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Umakant Patil",
+                    "email": "patil@umakant.com"
+                }
+            ],
+            "description": "SmartyLint is a PHP tool that helps you find issues in your Smarty template files. It's designed to assist you in writing cleaner and more consistent Smarty templates",
+            "homepage": "https://github.com/umakantp/SmartyLint",
+            "keywords": [
+                "lint",
+                "php",
+                "smarty",
+                "template"
+            ],
+            "support": {
+                "issues": "https://github.com/umakantp/SmartyLint/issues",
+                "source": "https://github.com/umakantp/SmartyLint/tree/v0.3.1"
+            },
+            "time": "2026-04-22T09:51:14+00:00"
+        },
+        {
             "name": "squizlabs/php_codesniffer",
             "version": "4.0.1",
             "source": {
@@ -20041,16 +20089,6 @@
                 }
             ],
             "time": "2025-11-17T20:03:58+00:00"
-        },
-        {
-            "name": "umakantp/smartylint",
-            "version": "0.1.4-p1",
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.tiki.org/dist/umakantp/smartylint/umakantp-smartylint-0.1.4-p1.zip",
-                "shasum": "db8c31c54599c95dcdd74d6b3ba6d60563dc7100"
-            },
-            "type": "library"
         }
     ],
     "aliases": [],
@@ -20078,7 +20116,7 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
@@ -20086,5 +20124,5 @@
         "ext-sockets": "0",
         "ext-ftp": "0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

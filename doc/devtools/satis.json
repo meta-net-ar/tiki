@@ -1908,17 +1908,6 @@
         {
             "type": "package",
             "package": {
-                "name": "umakantp/smartylint",
-                "version": "0.2.0",
-                "dist": {
-                    "url": "https://github.com/umakantp/SmartyLint/archive/refs/tags/v0.2.0.zip",
-                    "type": "zip"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
                 "name": "undojs/undojs",
                 "version": "1",
                 "dist": {
@@ -2345,7 +2334,7 @@
         "twbs/bootstrap": ">=3.3.7",
         "twbs/bootstrap-icons": "^1.8",
         "twitter/bootstrap": ">=3.3.6",
-        "umakantp/smartylint": ">=0.1.4 || ~0.2",
+        "umakantp/smartylint": ">=0.1.4",
         "undojs/undojs": "1",
         "vimeo/froogaloop": "1.0",
         "web-auth/webauthn-lib": "^4.8.7",
