@@ -17,7 +17,7 @@
  */
 function generateJsImportmapScripts(bool $useBaseUrl = false)
 {
-    global $tikiroot, $base_url;
+    global $tikiroot, $base_url, $prefs;
 
     $tikiUrl = $useBaseUrl ? $base_url : $tikiroot;
 
@@ -94,8 +94,8 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "three" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/three/build/three.module.min.js",
 
                 "underscore" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/underscore/underscore-esm-min.js",
-                // currently we don't use the prod build to improve the experience for SFC
-                "vue" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue/dist/vue.esm-browser.js",
+                // Use production build by default; configurable via the vuejs_build_mode preference (Admin > Features)
+                "vue" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue/dist/" . (isset($prefs['vuejs_build_mode']) && $prefs['vuejs_build_mode'] === 'development' ? 'vue.esm-browser.js' : 'vue.esm-browser.prod.js'),
                 "vue3-sfc-loader" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue3-sfc-loader/dist/vue3-sfc-loader.esm.js",
 
                 /* src/js/common_reexported */

@@ -180,6 +180,10 @@
         {tab name="{tr}Interface{/tr}" key=interface}
             <br>
             <fieldset class="mb-3 w-100 clearfix featurelist">
+                <legend class="h3"><h4 class="showhide_heading" id="vuejs"> {tr}Vue.js{/tr}  <a href="#vuejs" class="heading-link" aria-label="{tr}Vue.js{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
+                {preference name=vuejs_build_mode}
+            </fieldset>
+            <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="element-plus"> {tr}Element Plus{/tr}  <a href="#element-plus" class="heading-link" aria-label="{tr}Element Plus{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
                 {preference name=feature_elementplus}
                 <div class="adminoptionboxchild" id="feature_elementplus_childcontainer">
