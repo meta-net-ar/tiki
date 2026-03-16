@@ -36,7 +36,6 @@ class UserSelector extends Base
     {
         global $prefs, $user, $tiki_p_admin;
         $tikilib = TikiLib::lib('tiki');
-        $headerlib = TikiLib::lib('header');
         $userlib = TikiLib::lib('user');
 
         static $iUserSelector = 0;
@@ -77,12 +76,6 @@ class UserSelector extends Base
             $mt = ' multiple="multiple"';
         } else {
             $mt = '';
-        }
-
-        if (! empty($params['class'])) {
-            $class = ' class="' . $params['class'] . '"';
-        } else {
-            $class = '';
         }
 
         $groupNames = [];

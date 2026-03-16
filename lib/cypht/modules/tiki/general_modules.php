@@ -25,16 +25,40 @@ class Hm_Handler_load_tiki_contacts extends Hm_Handler_Module
         global $user;
         $contactlib = TikiLib::lib('contact');
         $contacts = $this->get('contact_store');
+
+        $company_field_ids = [];
+        $ext_fields = $contactlib->get_ext_list($user);
+        $company_field_names = ['Company', 'Organization', 'Department', 'Division'];
+        if (is_array($ext_fields)) {
+            foreach ($ext_fields as $ext_field) {
+                if (in_array($ext_field['fieldname'], $company_field_names)) {
+                    $company_field_ids[(int) $ext_field['fieldId']] = $ext_field['fieldname'];
+                }
+            }
+        }
+
         $tiki_contacts = $contactlib->list_contacts($user);
         foreach ($tiki_contacts as $contact) {
             // skip adding if it already exists
             if ($contacts->get(null, false, $contact['email'])) {
                 continue;
             }
+
+            $company_parts = [];
+            if (! empty($contact['ext']) && ! empty($company_field_ids)) {
+                foreach ($company_field_ids as $field_id => $field_name) {
+                    if (! empty($contact['ext'][$field_id])) {
+                        $company_parts[] = $contact['ext'][$field_id];
+                    }
+                }
+            }
+
             $contacts->add_contact([
                 'source' => 'tiki',
                 'email_address' => $contact['email'],
                 'display_name' => $contact['firstName'] . ($contact['lastName'] ? ' ' . $contact['lastName'] : ''),
+                'nickname' => ! empty($contact['nickname']) ? $contact['nickname'] : '',
+                'company' => implode(', ', $company_parts),
                 'external' => true,
             ]);
         }
@@ -310,6 +334,7 @@ class Hm_Output_enable_oauth2_over_imap_setting extends Hm_Output_Module
         $gmail_client_secret = " ";
         $gmail_client_uri = " ";
         $gmail_auth_uri = "https://accounts.google.com/o/oauth2/auth";
+        // @tiki-external-link-ok: OAuth2 token endpoint, requires POST authentication
         $gmail_token_uri = "https://www.googleapis.com/oauth2/v3/token";
         $gmail_refresh_uri = "https://www.googleapis.com/oauth2/v3/token";
 
@@ -317,6 +342,7 @@ class Hm_Output_enable_oauth2_over_imap_setting extends Hm_Output_Module
         $outlook_client_secret = " ";
         $outlook_client_uri = " ";
         $outlook_auth_uri = "https://login.live.com/oauth20_authorize.srf";
+        // @tiki-external-link-ok: OAuth2 token endpoint, requires POST authentication
         $outlook_token_uri = "https://login.live.com/oauth20_token.srf";
         $outlook_refresh_uri = "https://login.live.com/oauth20_token.srf";
         $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-clockwise refresh_list reset_default_value_checkbox"></i></span>';
@@ -377,7 +403,7 @@ class Hm_Output_filter_message_headers_mpdf extends Hm_Output_Module
     {
         $headers = $this->get('msg_headers');
         if (is_string($headers) && TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
-            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary me-2" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
+            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
             $headers = append_to_msg_headers($headers, $pdf_link);
             $this->out('msg_headers', $headers, false);
         }

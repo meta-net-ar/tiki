@@ -13,6 +13,7 @@ use Tiki\Lib\OIntegrate\OIntegrate;
 
 class Multilingual_MachineTranslation_GoogleTranslateWrapper implements Multilingual_MachineTranslation_Interface
 {
+    // @tiki-external-link-ok: Google Translate API endpoint
     private const SERVICE_URL = "https://www.googleapis.com/language/translate/v2";
 
     //wiki markup (keep this regex in case we decide to translate wiki markup and not html)

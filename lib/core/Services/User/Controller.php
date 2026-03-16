@@ -144,16 +144,11 @@ class Services_User_Controller
             'shared_groups' => '',
         ];
 
-        if (
-            $prefs['feature_community_mouseover'] == 'y' &&
-            $this->lib->get_user_preference($user, 'show_mouseover_user_info', 'y') == 'y' ||
-            $prefs['feature_friends'] == 'y'
-        ) {
+        if ($other_user) {
             $result['other_user'] = $other_user;
             if (
                 $this->lib->user_exists($other_user) &&
-                ($tikilib->get_user_preference($other_user, 'user_information', 'public') === 'public' ||
-                $user == $other_user ||
+                ($user == $other_user ||
                 $prefs['feature_friends'] == 'y')
             ) {
                 $info = $this->lib->get_user_info($other_user);

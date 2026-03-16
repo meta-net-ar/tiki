@@ -122,7 +122,7 @@ class Record
     {
         $fields = [];
         foreach ($this->getFilters() as $filter) {
-            foreach ($filter['arguments'] as $name => $value) {
+            foreach ($filter['arguments'] as $value) {
                 $look_for = [];
                 if ($parent) {
                     $look_for[] = 'parent';

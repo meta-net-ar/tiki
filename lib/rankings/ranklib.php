@@ -23,7 +23,7 @@ class RankLib extends TikiLib
      */
     public function wiki_ranking_top_pages($limit, $categ = [], $lang = null)
     {
-        global $user, $prefs;
+        global $prefs;
         $pagesAdded = [];
 
         $bindvals = [];
@@ -134,7 +134,7 @@ class RankLib extends TikiLib
      */
     public function wiki_ranking_last_pages($limit, $categ = [])
     {
-        global $user, $prefs;
+        global $user;
 
         $bindvals = [];
         $mid = '';
@@ -248,25 +248,14 @@ $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
      */
     public function forums_ranking_last_posts($limit, $toponly = false, $forumId = '')
     {
-        global $user;
-        $offset = 0;
-        $count = 0;
         $ret = [];
         $result = TikiLib::lib('comments')->get_all_comments('forum', 0, $limit, 'commentDate_desc', '', '', '', $toponly, $forumId);
         $result['data'] = Perms::filter(['type' => 'forum'], 'object', $result['data'], ['object' => 'object'], 'forum_read');
         foreach ($result['data'] as $res) {
             $aux['name'] = $res['title'];
             $aux['title'] = $res['parentTitle'];
-            $tmp = $res['parentId'];
-            if ($tmp == 0) {
-                $tmp = $res['threadId'];
-            }
             $aux['href'] = $res['href'];
             $aux['hits'] = $this->get_long_datetime($res['commentDate']);
-            $tmp = $res['parentId'];
-            if ($tmp == 0) {
-                $tmp = $res['threadId'];
-            }
             $aux['date'] = $res['commentDate'];
             $aux['user'] = $res['userName'];
             $ret[] = $aux;
@@ -355,7 +344,6 @@ $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
     {
         $result = TikiLib::lib('comments')->list_forums(0, $limit, 'hits_desc');
         $ret = [];
-        $count = 0;
         foreach ($result['data'] as $res) {
             $aux['name'] = $res['name'];
             $aux['hits'] = $res['hits'];
@@ -378,7 +366,6 @@ $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
     {
         $result = TikiLib::lib('comments')->list_forums(0, $limit, 'comments_desc');
         $ret = [];
-        $count = 0;
         foreach ($result['data'] as $res) {
             $aux['name'] = $res['name'];
             $aux['hits'] = $res['hits'];
@@ -600,8 +587,6 @@ $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
      */
     public function wiki_ranking_top_authors($limit, $categ = [])
     {
-        global $user;
-
         $bindvals = [];
         $mid = '';
         if ($categ) {

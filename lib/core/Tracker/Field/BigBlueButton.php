@@ -221,14 +221,14 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
 
     public function getFilterCollection(): Tracker\Filter\Collection
     {
-        $filters = parent::getFilterCollection();
+        $collection = new Tracker\Filter\Collection($this->getTrackerDefinition());
         $permName = $this->getFieldDefinition()['permName'] ?? '';
 
-        $filters->addNew($permName, 'manual')
+        $collection->addNew($permName, 'manual')
             ->setLabel($this->getFieldDefinition()['name'] ?? '')
             ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}"));
 
-        return $filters;
+        return $collection;
     }
 
     public function handleSave($value, $oldValue): array

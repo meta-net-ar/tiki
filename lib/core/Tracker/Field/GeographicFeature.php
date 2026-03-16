@@ -44,8 +44,9 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractItemField i
     public function renderInput($context = [])
     {
         $ins_id = $this->getInsertId();
+        $value = $this->getValue();
         //This input is useful for facilitating the execution of rules
-        $hiddenInput = "<input type='hidden' name='$ins_id'>";
+        $hiddenInput = "<input type='hidden' name='$ins_id' value='$value'>";
         $translatedText = tr("Feature cannot be set or modified through this interface.");
         return $hiddenInput . $translatedText;
     }

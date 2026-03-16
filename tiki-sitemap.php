@@ -13,37 +13,35 @@ if ($prefs['sitemap_enable'] !== 'y') {
     Feedback::errorAndDie(tra('Required features: sitemap_enable. If you do not have permission to activate these features, ask the site administrator.'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$siteMapFile = ! empty($_REQUEST['file']) ? (string)$_REQUEST['file'] : Generator::BASE_FILE_NAME . '-index.xml';
-$siteMapPath = realpath(Generator::getRelativePath() . $siteMapFile);
+$siteMapFile = basename((string) ($_REQUEST['file'] ?? Generator::BASE_FILE_NAME . '-index.xml'));
+$siteMapBase = realpath(Generator::getRelativePath());
+$siteMapPath = $siteMapBase . DIRECTORY_SEPARATOR . $siteMapFile;
 
 // filter valid file names
 if (
-    ! preg_match('/^.*\.(xml)$/', $siteMapFile, $matches)
-    || dirname($siteMapPath) !== realpath(Generator::getRelativePath())
-    || ! file_exists($siteMapPath)
+    substr($siteMapFile, -4) !== '.xml'
+    || strpbrk($siteMapFile, '/\\') !== false
+    || dirname($siteMapPath) !== $siteMapBase
 ) {
-    Feedback::errorAndDie(tra('The sitemap file is not available. Please check <a href="tiki-admin_sitemap.php" class="alert-link"> sitemap administration </a> to build it.'), \Laminas\Http\Response::STATUS_CODE_404);
+    Feedback::errorAndDie(tra('The sitemap file is not available.'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
-header('Content-Type: application/xml; charset=utf-8');
+// on fly sitemaps.
+// TODO: add cache and should be flushed on item-type changed.
+// and the auto Generate Must be skipped when cache is active.
+if ($prefs['sitemap_method'] === 'auto') {
+    $sitemap = new \Tiki\Sitemap\Generator();
 
-if ($siteMapFile === Generator::BASE_FILE_NAME . '-index.xml') {
-    $xml = new DOMDocument('1.0', 'UTF-8');
-    $xml->load($siteMapPath);
-    $root = $xml->documentElement;
-    $siteMap = $root->getElementsByTagName('sitemap');
-
-    foreach ($siteMap as $item) {
-        $loc = $item->getElementsByTagName('loc');
-        if (str_contains($loc->item(0)->nodeValue, $path)) {
-            if ($prefs['feature_sefurl'] === 'y') {
-                $loc->item(0)->nodeValue = str_replace($path, '', $loc->item(0)->nodeValue);
-            } else {
-                $loc->item(0)->nodeValue = str_replace($path, 'tiki-sitemap.php?file=', $loc->item(0)->nodeValue);
-            }
-        }
+    if ($sitemap->generateSitemap($base_url, $siteMapPath) === false) {
+         Feedback::errorAndDie(tra('The sitemap file is not available.'), \Laminas\Http\Response::STATUS_CODE_404);
     }
-    echo $xml->saveXML();
-} else {
-    echo file_get_contents($siteMapPath);
 }
+
+// ensure file existence
+if (file_exists($siteMapPath) === false) {
+    Feedback::errorAndDie(tra('The sitemap file is not available. Please check <a href="tiki-admin_sitemap.php" class="alert-link"> sitemap administration </a> to configure it.'), \Laminas\Http\Response::STATUS_CODE_404);
+}
+
+// serve the manual built sitemap file.
+header('Content-Type: application/xml; charset=utf-8');
+readfile($siteMapPath);

@@ -220,6 +220,16 @@ class Search_Indexer
         $this->searchIndex->endUpdate();
     }
 
+    public function removeDocument($objectType, $objectId)
+    {
+        $this->log("deleteObject $objectType $objectId");
+
+        $this->searchIndex->invalidateMultiple([[
+            'object_type' => $objectType,
+            'object_id' => $objectId,
+        ]]);
+    }
+
     private function addDocument($objectType, $objectId)
     {
         $this->log("addDocument $objectType $objectId");

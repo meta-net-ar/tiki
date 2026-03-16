@@ -353,7 +353,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function addValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         if (! in_array($value, $existing)) {
             $existing[] = $value;
         }
@@ -362,7 +365,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function removeValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         $existing = array_filter($existing, function ($v) use ($value) {
             return $v != $value;
         });

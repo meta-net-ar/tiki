@@ -95,7 +95,6 @@ Some more text
         $tags = $headerlib->output_js_files();
         $wikilib->set_page_auto_toc($this->pageName, -1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $headerlib = clone $headerlibVirginCopy;
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc off, page set to off');
 
         $headerlib = clone $headerlibVirginCopy;

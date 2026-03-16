@@ -109,7 +109,7 @@ function prefs_geo_list()
             'name' => tra('Bing Maps API Key'),
             'description' => tra('Needed for Bing Map Layers'),
             'type' => 'text',
-            'help' => 'http://www.bingmapsportal.com/',
+            'help' => 'https://www.bingmapsportal.com/',
             'filter' => 'striptags',
             'default' => '',
         ],

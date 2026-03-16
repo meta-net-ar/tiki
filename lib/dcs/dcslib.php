@@ -102,10 +102,9 @@ class DCSLib extends TikiLib
     public function remove_contents($contentId)
     {
         $query = "delete from `tiki_programmed_content` where `contentId`=?";
-
-        $result = $this->query($query, [$contentId]);
+        $this->query($query, [$contentId]);
         $query = "delete from `tiki_content` where `contentId`=?";
-        $result = $this->query($query, [$contentId]);
+        $this->query($query, [$contentId]);
     }
 
     /**

@@ -166,13 +166,14 @@ class CalendarLib extends TikiLib
             $calendars[$calendar['calendarId']] = $calendar;
             // for week and day views
             $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-            $startOfDayHour = $startOfDayUnix / 3600;
-            $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-            $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+
+            $startOfDayHour = intdiv($startOfDayUnix, 3600);
+            $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
+            $minHourOfDay = sprintf('%02d:%02d:00', $startOfDayHour, $startOfDayMinute);
             $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-            $endOfDayHour = $endOfDayUnix / 3600;
-            $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-            $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+            $endOfDayHour = intdiv($endOfDayUnix, 3600);
+            $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
+            $maxHourOfDay = sprintf('%02d:%02d:00', $endOfDayHour, $endOfDayMinute);
             $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
         }
         return  [
@@ -2383,5 +2384,60 @@ class CalendarLib extends TikiLib
             }
         }
         return count(array_unique($dates));
+    }
+
+    /**
+     * Prepares an event array for cloning/copying.
+     * Removes unique identifiers, resets status, and sets the new owner.
+     *
+     * @param int $sourceCalItemId The ID of the event to copy
+     * @param string $user The current user (new owner)
+     * @return array|null Returns the cleaned event array or null if not found
+     */
+    public function getCopyData($sourceCalItemId, $user)
+    {
+        $item = $this->get_item($sourceCalItemId);
+
+        if (! $item) {
+            return null;
+        }
+
+        $item['calitemId'] = 0;
+        $item['recurrenceId'] = 0;
+        $item['uid'] = ''; // Will be regenerated on save
+        $item['uri'] = '';
+        $item['created'] = 0;
+        $item['lastModif'] = 0;
+
+        $item['user'] = $user;
+        $item['organizers'] = [$user];
+        $item['name'] = tr('Copy of %0', $item['name']);
+        $userInParticipants = false;
+
+        if (! empty($item['participants'])) {
+            foreach ($item['participants'] as &$participant) {
+                $participant['partstat'] = '';
+                $participant['comment'] = '';
+                if ($participant['username'] === $user) {
+                    $userInParticipants = true;
+                }
+            }
+        } else {
+            $item['participants'] = [];
+        }
+        if (! $userInParticipants) {
+            $item['participants'][] = [
+                'username' => $user,
+                'role' => '',
+                'partstat' => '',
+                'comment' => ''
+            ];
+            if (isset($item['selected_participants'])) {
+                $item['selected_participants'][] = $user;
+            } else {
+                $item['selected_participants'] = [$user];
+            }
+        }
+        return $item;
     }
 }

@@ -137,6 +137,7 @@ order by mailin.username, p2.pageName, p.pageName
         $bindvars = [$username, $subj_pattern, $body_pattern, (int)$structure_id, (int)$page_id, $is_active];
         $query = "insert into `tiki_user_mailin_struct`(`username`,`subj_pattern`,`body_pattern`,`structure_id`,`page_id`,`is_active`) values(?,?,?,?,?,?)";
         $result = $this->query($query, $bindvars);
+        return ($result && $result->numRows() > 0);
     }
 
     public function update_user_mailin_struct($mailin_struct_id, $username, $subj_pattern, $body_pattern, $structure_id, $page_id, $is_active)
@@ -145,7 +146,7 @@ order by mailin.username, p2.pageName, p.pageName
             $bindvars = [$username, $subj_pattern, $body_pattern, (int)$structure_id, (int)$page_id, $is_active, (int)$mailin_struct_id];
             $query = "update `tiki_user_mailin_struct` set `username`=?, `subj_pattern`=?, `body_pattern`=?, `structure_id`=?, `page_id`=?, `is_active`=? where `mailin_struct_id`=?";
             $result = $this->query($query, $bindvars);
-            return true;
+            return (bool) $result;
         }
         return false;
     }

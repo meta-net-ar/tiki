@@ -5580,7 +5580,6 @@
             "Services_Calendar_Controller::action_del_me": true,
             "Services_Calendar_Controller::action_list_items": true,
             "Services_Calendar_Controller::action_edit_item": true,
-            "Services_Calendar_Controller::action_copy_item": true,
             "Services_Calendar_Controller::action_view_item": true,
             "Services_Calendar_Controller::action_delete_item": true,
             "Services_Calendar_Controller::action_delete_recurrent_items": true

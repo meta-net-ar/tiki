@@ -73,10 +73,12 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderOutput($context = [])
     {
         $smarty = TikiLib::lib('smarty');
+        $rawValue = (string) $this->getConfiguration('value');
+        $parsedWikiLink = self::extractParsedWikiLinkData(trim($rawValue));
 
-        $url = $this->getConfiguration('value');
+        $url = self::normalizeStoredValueToUrl($rawValue);
 
-        if (empty($url) || $context['list_mode'] == 'csv' || $this->getOption('linkToURL') == 1) {
+        if ($url === '' || ($context['list_mode'] ?? '') === 'csv' || $this->getOption('linkToURL') == 1) {
             return $url;
         } elseif ($this->getOption('linkToURL') == 2) { // Site title as link
             return smarty_function_object_link(
@@ -91,7 +93,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 [
                     'type' => 'external',
                     'id' => $url,
-                    'title' => $url,
+                    'title' => $parsedWikiLink['label'] ?? $url,
                 ],
                 $smarty->getEmptyInternalTemplate()
             );
@@ -117,9 +119,52 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
         }
     }
 
+    protected static function isWikiSyntaxLink(string $value): bool
+    {
+        return (str_starts_with($value, '((') && str_ends_with($value, '))'))
+            || (str_starts_with($value, '[') && str_ends_with($value, ']'));
+    }
+
+    public function isValid($ins_fields_data)
+    {
+        $fieldId = $this->getFieldId();
+        $value = $ins_fields_data[$fieldId]['value'] ?? $this->getValue();
+        $trimmed = trim((string) $value);
+
+        if ($trimmed === '') {
+            return true;
+        }
+
+        if (self::isWikiSyntaxLink($trimmed)) {
+            $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
+            if ($resolvedHref === null) {
+                return tr('Invalid wiki syntax. The link target could not be resolved.');
+            }
+            if (! self::isSyntacticallyValidUrl($resolvedHref)) {
+                return tr('Invalid wiki syntax. The resolved link target "%0" is not a valid URL.', $resolvedHref);
+            }
+            // Non-blocking warning for internal non existing yet wiki page target
+            $target = self::extractWikiLinkTarget($trimmed);
+            if ($target !== null && ! self::looksLikeExternalUrl($target) && ! TikiLib::lib('tiki')->page_exists($target)) {
+                Feedback::warning(tr('Warning: Target wiki page "%0" does not exist yet.', $target));
+            }
+            return true;
+        }
+
+        if (! self::isSyntacticallyValidUrl($trimmed)) {
+            return tr('Invalid URL syntax.');
+        }
+
+        return true;
+    }
+
     public function renderInput($context = [])
     {
-        return $this->renderTemplate("trackerinput/url.tpl", $context);
+        $templateData = [
+            'wikiSyntaxInfo' => tr('You can also use complete wiki-link syntax: ((PageName)) or [url|text].'),
+        ];
+
+        return $this->renderTemplate("trackerinput/url.tpl", $context, $templateData);
     }
 
     public function importRemote($value)
@@ -154,5 +199,94 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             });
 
         return $schema;
+    }
+
+    // Keep wiki-syntax handling intentionally limited to full-value wrappers like ((PageName)) or [url|text].
+    // For full wiki parsing consistency (escaping, multilingual behavior, shared parsing path),
+    // consider refactoring URL to inherit Tracker_Field_Text.
+    protected static function normalizeStoredValueToUrl(string $value): string
+    {
+        $trimmed = trim($value);
+
+        if (! self::isWikiSyntaxLink($trimmed)) {
+            return $value;
+        }
+
+        $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
+        // Normalization keeps only the resolved target URL.
+        // The optional wiki-link label is extracted separately for rendering.
+        return $resolvedHref ?? $value;
+    }
+
+    protected static function extractParsedWikiLinkData(string $value): ?array
+    {
+        $parsed = TikiLib::lib('parser')->parse_data_simple($value);
+
+        if (! preg_match('/<a\b[^>]*\bhref=(["\'])(.*?)\1[^>]*>(.*?)<\/a>/is', $parsed, $matches)) {
+            return null;
+        }
+
+        $label = trim(html_entity_decode(strip_tags($matches[3]), ENT_QUOTES, 'UTF-8'));
+
+        return [
+            'href' => html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8'),
+            'label' => $label !== '' ? $label : null,
+        ];
+    }
+
+    protected static function isSyntacticallyValidUrl(string $url): bool
+    {
+        if ($url === '') {
+            return true;
+        }
+
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            return true;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return ! preg_match('/\s/', $url);
+        }
+
+        $parsed = parse_url($url);
+        if ($parsed === false) {
+            return false;
+        }
+
+        if (isset($parsed['scheme'])) {
+            return (bool) preg_match('/^[a-z][a-z0-9+.-]*$/i', $parsed['scheme']) && ! preg_match('/\s/', $url);
+        }
+
+        return ! preg_match('/\s/', $url);
+    }
+
+    protected static function extractWikiLinkTarget(string $value): ?string
+    {
+        if (str_starts_with($value, '((') && str_ends_with($value, '))')) {
+            $inside = trim(substr($value, 2, -2));
+            if ($inside === '') {
+                return null;
+            }
+
+            $parts = preg_split('/[|#]/', $inside, 2);
+            return trim($parts[0] ?? '');
+        }
+
+        if (str_starts_with($value, '[') && str_ends_with($value, ']')) {
+            $inside = trim(substr($value, 1, -1));
+            if ($inside === '') {
+                return null;
+            }
+
+            $parts = explode('|', $inside, 2);
+            return trim($parts[0]);
+        }
+
+        return null;
+    }
+
+    protected static function looksLikeExternalUrl(string $value): bool
+    {
+        return (bool) preg_match('/^(https?:\/\/|ftp:\/\/|mailto:|news:)/i', $value);
     }
 }

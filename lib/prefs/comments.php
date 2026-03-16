@@ -81,7 +81,7 @@ function prefs_comments_list()
         ],
         'comments_heading_links' => [
             'name' => tr('Anchor links on headings'),
-            'description' => tr('Cause a link icon to appear on hover over each heading, useful for sharing the URL to an exact location on a page.'),
+            'description' => tr('Displays a link icon on hover over each comment heading, allowing users to copy the link for easy sharing.'),
             'keywords' => 'Display hidden anchor on mouseover of headings',
             'type' => 'flag',
             'default' => 'y',

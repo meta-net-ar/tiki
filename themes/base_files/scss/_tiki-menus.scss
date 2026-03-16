@@ -203,22 +203,6 @@
     display: none;
 }
 
-.sm-sub.collapse.dropdown-menu,
-.sm-sub.collapsing.dropdown-menu {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-    position: static;
-    padding-left: 1.5rem;
-}
-
-.sm-sub.collapse .dropdown-item,
-.sm-sub.collapse .sm-sub-link {
-    background: transparent;
-    border: none;
-    padding: 0.5rem 1rem;
-}
-
 .sm-sub.collapse.show {
     display: block;
 }

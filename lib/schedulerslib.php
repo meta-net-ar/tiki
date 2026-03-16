@@ -395,4 +395,79 @@ class SchedulersLib extends TikiLib
         $schedulerTable = $this->table('tiki_scheduler');
         return $schedulerTable->update([$field => $value], ['id' => $scheduler_id]);
     }
+
+    /**
+     * Get scheduler logs
+     *
+     * @param string $status
+     * @return array
+     */
+    public function getSchedulerFromLogs(?string $status = null)
+    {
+        global $prefs;
+
+        $schedulerFailures = [];
+        $reportMaxDays = $prefs['scheduledTasksReportMaxDays'];
+        $db = TikiDb::get();
+        $values = [$reportMaxDays];
+        $query = 'SELECT ts.*, tsr.*
+            FROM `tiki_scheduler` ts
+            JOIN `tiki_scheduler_run` tsr ON ts.`id` = tsr.`scheduler_id`
+            WHERE tsr.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))';
+
+        if (! empty($status)) {
+            $query .= ' AND tsr.`status` = ?';
+            array_push($values, $status);
+        }
+
+        if (! empty($prefs['scheduledTasksReport']) &&  $prefs['scheduledTasksReport'] === 'last_number_of_hours') {
+            $query .= ' AND tsr.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? HOUR))';
+            array_push($values, $prefs['scheduledTasksReportHours']);
+        } else {
+            $where = '';
+            if (! empty($status)) {
+                $where .= ' AND tsr2.`status` = ?';
+                array_push($values, $status);
+            }
+            array_push($values, $reportMaxDays);
+            $query .= ' AND NOT EXISTS (
+                SELECT 1
+                FROM `tiki_scheduler_run` tsr2
+                WHERE tsr2.`scheduler_id` = ts.`id`
+                    ' . $where . '
+                    AND tsr2.`end_time` >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
+                    AND tsr2.`id` > tsr.`id`)';
+        }
+        $query .= ' ORDER BY tsr.`end_time` DESC;';
+        $schedulerFailures = $db->fetchAll($query, $values);
+
+        return $schedulerFailures;
+    }
+
+    /**
+     * Get the number of minutes since last task run
+     *
+     * @return int
+     */
+    public function getMinutesLastRun()
+    {
+        $query = 'SELECT TIMESTAMPDIFF(MINUTE, FROM_UNIXTIME(`start_time`), FROM_UNIXTIME(UNIX_TIMESTAMP())) AS minutes_since_last_run
+            FROM `tiki_scheduler_run`
+            ORDER BY `id` DESC LIMIT 1;';
+        return $this->getOne($query);
+    }
+
+    /**
+     * Get number of tasks executed in the last hours
+     *
+     * @param int $hours
+     * @return int
+     */
+    public function getExecutedTasksbyTime($hours)
+    {
+        $query = "SELECT COUNT(*) AS tasks_executed_last_hour
+            FROM tiki_scheduler_run
+            WHERE start_time >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? HOUR));";
+        return $this->getOne($query, [$hours]);
+    }
 }

@@ -103,8 +103,6 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
      */
     public function getPrincipalByPath($path)
     {
-        global $prefs;
-
         $user = null;
         if (preg_match('#principals/(.*)$#', $path, $m)) {
             if (TikiLib::lib('user')->user_exists($m[1])) {
@@ -189,8 +187,6 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
             'by_email' => [],
         ];
 
-        $query = 'SELECT uri FROM ' . $this->tableName . ' WHERE ';
-        $values = [];
         foreach ($searchProperties as $property => $value) {
             switch ($property) {
                 case '{DAV:}displayname':
@@ -245,8 +241,6 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
      */
     public function findByUri($uri, $principalPrefix)
     {
-        $value = null;
-        $scheme = null;
         list($scheme, $value) = explode(":", $uri, 2);
         if (empty($value)) {
             return null;

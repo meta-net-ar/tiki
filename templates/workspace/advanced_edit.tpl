@@ -30,7 +30,7 @@
         </div>
         <div class="mb-3 row">
             <div class="col-sm-12">
-                {textarea syntax='tiki' codemirror='true'}{$definition}{/textarea}
+                {textarea _syntax='tiki' codemirror='true'}{$definition}{/textarea}
             </div>
         </div>
         <div class="submit text-center">

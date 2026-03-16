@@ -34,8 +34,8 @@ function prefs_ajax_list()
             'dependencies' => ['ajax_inline_edit'],
         ],
         'ajax_edit_previews' => [
-            'name' => tr('Preview Edits in Text Areas'),
-            'description' => tr('Add a preview tab to text areas.'),
+            'name' => tr('Preview Edit Tabs in Text Areas'),
+            'description' => tr('Enable edit and preview tabs in supported text areas.'),
             'type' => 'flag',
             'default' => 'n',
         ],

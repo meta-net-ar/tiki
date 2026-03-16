@@ -18,7 +18,7 @@ use Tiki\TikiInit;
 
 /**
  * Routing method, receives the path portion of the URL relative to tiki root.
- * http://example.com/tiki/hello-world?foo-bar
+ * http://example.org/tiki/hello-world?foo-bar
  * $path is expectedto be hello-world
  */
 function tiki_route($path)

@@ -89,11 +89,6 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
     padding-bottom: 0;
 }
 
-// Variable not being respected
-.navbar-light .nav-link {
-    color: rgba(0, 0, 0, 0.55);
-}
-
 .alert-primary {
     --bs-alert-color: #fff;
     --bs-alert-bg: #757575;

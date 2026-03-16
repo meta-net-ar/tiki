@@ -476,11 +476,29 @@ function wikiplugin_trackerfilter_build_trackerlist_filter($input, $formats, &$f
                 $val = '';
             }
             $fieldId = substr($key, 2);
-            $field = $tracker_definition->getField((int)$fieldId);
 
             if ($fieldId == 'status') {
                 continue;
             }
+            $isComposite = preg_match('/^\(?\d+(?::\d+)+\)?$/', $fieldId) === 1;
+            if ($isComposite) {
+                $ffs[] = ['sqlsearch' => explode(':', str_replace(['(', ')'], '', $fieldId))];
+                if (isset($formats[$fieldId]) && ($formats[$fieldId] == 't' || $formats[$fieldId] == 'i')) {
+                    $exactValues[] = '';
+                    $values[] = $val;
+                } else {
+                    if (! empty($formats[$fieldId]) && preg_match('/[\>\<]+/', $formats[$fieldId])) {
+                        $exactValues[] = [$formats[$fieldId] => $val];
+                    } else {
+                        $exactValues[] = $val;
+                    }
+                    $values[] = '';
+                }
+                continue;
+            }
+
+            $fieldLookupId = (is_numeric($fieldId) || preg_match('/^\d+/', $fieldId)) ? (int)$fieldId : $fieldId;
+            $field = $tracker_definition->getField($fieldLookupId);
             if (preg_match('/([0-9]+)(Month|Day|Year|Hour|Minute|Second)/', $fieldId, $matches)) { // a date
                 if (! in_array($matches[1], $ffs)) {
                     $fieldId = $matches[1];
@@ -527,11 +545,7 @@ function wikiplugin_trackerfilter_build_trackerlist_filter($input, $formats, &$f
                         }
                     }
                 }
-                if (! is_numeric($fieldId)) { // composite filter
-                    $ffs[] = ['sqlsearch' => explode(':', str_replace(['(', ')'], '', $fieldId))];
-                } else {
-                    $ffs[] = $fieldId;
-                }
+                $ffs[] = $fieldId;
                 if (isset($formats[$fieldId]) && ($formats[$fieldId] == 't' || $formats[$fieldId] == 'i')) {
                     $exactValues[] = '';
                     $values[] = ($formats[$fieldId] == 'i') ? "$val%" : $val;
@@ -988,7 +1002,17 @@ function wikiplugin_trackerFilter_build_urlquery($params)
     }
     $urlquery = [];
     foreach ($params['filterfield'] as $key => $filter) {
-        $filterfield[] = $filter;
+        if (is_array($filter)) {
+            if (! empty($filter['sqlsearch']) && is_array($filter['sqlsearch'])) {
+                $filterfield[] = '(' . implode(':', $filter['sqlsearch']) . ')';
+            } elseif (! empty($filter['usersearch']) && is_array($filter['usersearch'])) {
+                $filterfield[] = '(' . implode(':', $filter['usersearch']) . ')';
+            } else {
+                continue;
+            }
+        } else {
+            $filterfield[] = $filter;
+        }
         if (! empty($params['exactvalue'][$key]) && empty($params['filtervalue'][$key])) {
             $filtervalue[] = '';
             $exactvalue[] = $params['exactvalue'][$key];

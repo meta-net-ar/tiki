@@ -1456,7 +1456,6 @@ class TikiLib extends TikiDb_Bridge
             $query = "select s.`user`, p.`value` as `realName`, `timestamp`, `tikihost` from `tiki_sessions` s left join `tiki_user_preferences` p on s.`user`<>? and s.`user` = p.`user` and p.`prefName` = 'realName' where s.`user` is not null;";
             $result = $this->fetchAll($query, ['']);
             foreach ($result as $res) {
-                $res['user_information'] = $this->get_user_preference($res['user'], 'user_information', 'public');
                 $res['allowMsgs'] = $this->get_user_preference($res['user'], 'allowMsgs', 'y');
                 $this->online_users_cache[$res['user']] = $res;
             }
@@ -6919,7 +6918,7 @@ class TikiLib extends TikiDb_Bridge
     /**
      * @param $vals
      * @param $filter
-     * @return string|array
+     * @return string
      */
     public function array_apply_filter($vals, $filter)
     {

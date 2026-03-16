@@ -5517,7 +5517,7 @@ class BenchmarkPhp
  * Identify files, like backup copies made by editors, or manual copies of the local.php files,
  * that may be accessed remotely and, because they are not interpreted as PHP, may expose the source,
  * which might contain credentials or other sensitive information.
- * Ref: http://feross.org/cmsploit/
+ * Ref: https://github.com/feross/CMSploit
  *
  * @param array $files Array of filenames. Suspicious files will be added to this array.
  * @param string $sourceDir Path of the directory to check

@@ -26,6 +26,8 @@
             <pattern>templates/tiki-searchfacets.tpl</pattern>
             <pattern>templates/tiki-searchindex_form.tpl</pattern>
             <pattern>templates/tiki-view_tracker_item.tpl</pattern>
+            <!-- Gantt JST templates are parsed client-side from HTML comments by jquery.JST, so we need to ignore HTML comments in the below template file -->
+            <pattern>templates/wiki-plugins/wikiplugin_ganttchart.tpl</pattern>
         </rule>
 
         <!-- Most of TPL files uses {* *} as file docblock -->

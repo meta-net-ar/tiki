@@ -72,7 +72,6 @@ class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
             $value = $requestData[$ins_id];
         } else {
             $userlib = TikiLib::lib('user');
-            $trklib = TikiLib::lib('trk');
 
             $value = '';
             $itemId = $this->getItemId();

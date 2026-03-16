@@ -25,7 +25,7 @@ class UserPrefsLib extends TikiLib
         global $prefs, $tikidomainslash;
         $userlib = TikiLib::lib('user');
         $query = "update `users_users` set `avatarType` = ?, `avatarLibName` = ?, `avatarName` = ?, `avatarSize` = ?, `avatarFileType` = ?, `avatarData` = ?  where `login`=?";
-        $result = $this->query($query, [$type, $avatarLibName, $avatarName, ($avatarSize ? $avatarSize : null), $avatarType, $avatarData, $user]);
+        $this->query($query, [$type, $avatarLibName, $avatarName, ($avatarSize ?: null), $avatarType, $avatarData, $user]);
         if ($sendToIntertiki && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster']) && $prefs['feature_intertiki_import_preferences'] == 'y') { //send to the master
             $userlib->interSendUserInfo($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $user);
         }
@@ -139,7 +139,6 @@ class UserPrefsLib extends TikiLib
     {
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
-        $filegallib = TikiLib::lib('filegal');
         if (! $prefs["user_picture_gallery_id"]) {
             return false;
         }

@@ -80,7 +80,7 @@ if (is_dir(__DIR__ . '/../../' . TIKI_VENDOR_CUSTOM_PATH)) {
             $packagePath = $fileInfo->getPathname();
             if (is_dir($packagePath . '/lib/') && $composerJson = json_decode(file_get_contents($packagePath . '/composer.json'), true)) {
                 $packageName = $composerJson['name'] ?? '';
-                if ($packageName && \Tiki\Package\ExtensionManager::isExtension($packageName, $packagePath) && \Tiki\Package\ExtensionManager::isEnabled($packageName)) {
+                if ($packageName && \Tiki\Package\ExtensionManager::isExtension($packageName, $packagePath) && \Tiki\Package\ExtensionManager::isExtensionEnabled($packageName)) {
                     $autoloader->addPsr4(str_replace('/', '\\', $packageName) . '\\', $packagePath . '/lib/');
                 }
             }

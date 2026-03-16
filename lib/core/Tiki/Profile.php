@@ -355,8 +355,6 @@ class Tiki_Profile
     {
         $this->pageContent = $content;
 
-        $pos = 0;
-
         $this->data = [];
 
         $matches = WikiParser_PluginMatcher::match($content);
@@ -810,6 +808,7 @@ class Tiki_Profile
                 'prorate_interval' => ! empty($groupInfo['prorateInterval']) ? $groupInfo['prorateInterval'] : '',
                 'include' => [],
                 'autojoin' => 'n',
+                'twoFactorAuthGracePeriod' => null,
             ];
             foreach ($defaultInfo as $key => $value) {
                 if (array_key_exists($key, $data)) {
@@ -990,7 +989,6 @@ class Tiki_Profile
     public function getPath()
     {
         $domain = $this->domain;
-        $profile = $this->profile;
         if (! str_contains($domain, '://')) {
             if (is_dir($domain)) {
                 $domain = "file://" . $domain;

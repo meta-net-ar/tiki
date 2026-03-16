@@ -1,5 +1,5 @@
 diff --git a/dist/pivot.js b/dist/pivot.js
-index 489e412a7aa5d198e329315d39824b0947b1f33c..d6e77079c1d14bcf974984b64fecdabcfd4e39d5 100644
+index 489e412..1c85e61 100644
 --- a/dist/pivot.js
 +++ b/dist/pivot.js
 @@ -455,7 +455,11 @@
@@ -94,3 +94,78 @@ index 489e412a7aa5d198e329315d39824b0947b1f33c..d6e77079c1d14bcf974984b64fecdabc
            return refresh();
          });
          $("<td>").addClass('pvtVals pvtUiCell').appendTo(tr1).append(aggregator).append(rowOrderArrow).append(colOrderArrow).append($("<br>"));
+@@ -1753,6 +1781,74 @@
+       return this;
+     };
+ 
++    /*
++    Support Touch Event
++     */
++    var supportTouch = function () {
++        $.support.touch = true;
++
++        if (!$.support.touch) {
++            return;
++        }
++
++        var proto = $.ui.mouse.prototype,
++            _mouseInit = proto._mouseInit;
++
++        $.extend(proto, {
++            _getElementToBind: function() {
++                var el = this.element;
++                return el;
++            },
++
++            _mouseInit: function() {
++                this._getElementToBind().bind("touchstart." + this.widgetName, $.proxy(this, "_touchStart"));
++                _mouseInit.apply(this, arguments);
++            },
++
++            _touchStart: function(event) {
++                if (event.originalEvent.targetTouches.length != 1) {
++                    return false;
++                }
++
++                if (!this._mouseCapture(event, false)) {
++                    return true;
++                }
++
++                this.element
++                    .bind("touchmove." + this.widgetName, $.proxy(this, "_touchMove"))
++                    .bind("touchend." + this.widgetName, $.proxy(this, "_touchEnd"));
++
++                this._modifyEvent(event);
++
++                $(document).trigger($.Event("mouseup"));
++                this._mouseDown(event);
++
++                return false;
++            },
++
++            _touchMove: function(event) {
++                this._modifyEvent(event);
++                this._mouseMove(event);
++            },
++
++            _touchEnd: function(event) {
++                this.element
++                    .unbind("touchmove." + this.widgetName)
++                    .unbind("touchend." + this.widgetName);
++                this._mouseUp(event);
++            },
++
++            _modifyEvent: function(event) {
++                event.which = 1;
++                var target = event.originalEvent.targetTouches[0];
++                event.pageX = target.clientX;
++                event.pageY = target.clientY;
++            }
++
++        });
++    }
++    supportTouch();
++
+     /*
+     Barchart post-processing
+      */

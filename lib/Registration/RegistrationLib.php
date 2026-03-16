@@ -136,7 +136,7 @@ class RegistrationLib extends TikiLib
 
                 // Judgment is that service is preparing though begin by 220 getting string after connection .
                 // fgets function reference : http://www.php.net/manual/en/function.fgets.php
-                if (preg_match('/^220/', $Out = fgets($Connect, 1024))) {
+                if (str_starts_with(fgets($Connect, 1024), '220')) {
                     // Inform client's reaching to server who connect.
                     fputs($Connect, "HELO $HTTP_HOST\r\n");
 
@@ -175,7 +175,7 @@ class RegistrationLib extends TikiLib
                     // Server's answering cord about MAIL and TO command checks.
                     // Server about listener's address reacts to 550 codes if there does not exist
                     // checking that mailbox is in own E-Mail account.
-                    if (! preg_match('/^250/', $From) || ! preg_match('/^250/', $To)) {
+                    if (! str_starts_with($From, '250') || ! str_starts_with($To, '250')) {
                         $Return[0] = false;
                         $Return[1] = 'not_recognized';
                         if ($Debug) {
@@ -267,7 +267,7 @@ class RegistrationLib extends TikiLib
             }
 
             if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $registration['name'])) {
-                return tra("Username cannot contain any spaces");
+                $errors[] = new RegistrationError('name', tra('Username cannot contain any spaces'));
             }
 
             if ($prefs['login_is_email'] != 'y') {
@@ -304,7 +304,7 @@ class RegistrationLib extends TikiLib
             }
 
             if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $registration['name'])) {
-                return tra("Username cannot contain any spaces.");
+                $errors[] = new RegistrationError('name', tra('Username cannot contain any spaces.'));
             }
 
             // Check the mode
@@ -333,7 +333,6 @@ class RegistrationLib extends TikiLib
                 $errors[] = new RegistrationError('chosenGroup', tra('Invalid group selected'));
             }
 
-            $email_valid = 'y';
             if (! validate_email($registration['email'], $this->merged_prefs['validateEmail'])) {
                 $errors[] = new RegistrationError('email', tra('Email not valid. Should be in the format "mailbox@example.com".'));
             }
@@ -357,7 +356,7 @@ class RegistrationLib extends TikiLib
 
         $result = '';
 
-        $newPass = $registration['pass'] ? $registration['pass'] : $registration["genepass"];
+        $newPass = $registration['pass'] ?: $registration["genepass"];
 
         $pending = false;
         $confirmed = false;
@@ -669,7 +668,6 @@ class RegistrationLib extends TikiLib
                     passAgain: { equalTo: "#pass1" }';
 
             if ($prefs['user_must_choose_group'] === 'y') {
-                $choosable_groups = $this->merged_prefs['choosable_groups'];
                 $js .= ',
                     chosenGroup: {
                         required: true

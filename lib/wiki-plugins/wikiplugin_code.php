@@ -75,7 +75,7 @@ function wikiplugin_code_info()
             'colors' => [
                 'required' => false,
                 'name' => tra('Colors'),
-                'description' => tra('Any supported language listed at http://codemirror.net/mode  Pref feature_syntax_highlighter must be true for this to have any effect'),
+                'description' => tra('Any supported language listed at https://codemirror.net/mode/  Pref feature_syntax_highlighter must be true for this to have any effect'),
                 'since' => '17',
                 'filter' => 'text',
                 'options' => $colors,

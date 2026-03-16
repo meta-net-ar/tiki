@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use Tiki\Lib\Diff\DiffUtils;
 
 /**
  * To display with difference between two blocks of text, often wiki syntax or html
@@ -31,7 +32,7 @@ class WikiDiff extends Base
 
         $params = array_merge($defaults, $params);
 
-        if (! $params['object_id']) {
+        if ($params['object_type'] === 'wiki page' && ! $params['object_id']) {
             return '<span class="text-danger">' . tra('wikidiff: error - no object_id specified') . '</span>';
         }
 
@@ -75,6 +76,31 @@ class WikiDiff extends Base
 
             $html = $smarty->fetch('pagehistory.tpl');
             return $html;
+        } else if ($params['object_type'] === 'direct') {
+            $diff = DiffUtils::diff2($params['oldver'], $params['newver'], $params['diff_style']);
+            $result = '';
+
+            if (is_array($diff)) {
+                // unidiff mode
+                foreach ($diff as $part) {
+                    if ($part["type"] == "diffdeleted") {
+                        foreach ($part["data"] as $chunk) {
+                            $result .= "<blockquote>- $chunk</blockquote>";
+                        }
+                    }
+                    if ($part["type"] == "diffadded") {
+                        foreach ($part["data"] as $chunk) {
+                            $result .= "<blockquote>+ $chunk</blockquote>";
+                        }
+                    }
+                }
+            } else {
+                $result = strpos($diff, '<tr') === 0 ? '<table>' . $diff . '</table>' : $diff;
+                $result = preg_replace('/<tr class="diffheader">.*?<\/tr>/', '', $result);
+                $result = str_replace('<table>', '<table class="table">', $result);
+            }
+
+            return $result;
         } else {
             // TODO for other types, e.g. tracker items
 

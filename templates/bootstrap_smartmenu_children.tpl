@@ -6,7 +6,7 @@
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>
             {/if}
-            <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>&nbsp;<small>{icon name="caret-down"}</small>
+            <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>&nbsp;<small>{icon name="caret-down"}</small>
         </a>
         <ul id="sm_submenu_{$item.optionId|escape}" class="sm-sub dropdown-menu collapse">
             {* {if $sub}

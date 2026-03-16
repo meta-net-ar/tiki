@@ -51,7 +51,7 @@ function prefs_metatag_list()
             'description' => tra('The latitude and longitude of the physical location of the site. For example "38.898748, -77.037684".'),
             'type' => 'text',
             'size' => '50',
-            'help' => 'http://geotags.com/geo/geotags2.html',
+            'help' => 'https://en.wikipedia.org/wiki/Geotagging',
             'default' => '',
         ],
         'metatag_georegion' => [

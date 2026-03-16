@@ -19,7 +19,7 @@ function wikiplugin_figlet_info(): array
             'font' => [
                 'required' => true,
                 'name' => tra('Font face'),
-                'description' => tra('Path to "fif" font file. Find more fonts here http://www.figlet.org/fontdb.cgi'),
+                'description' => tra('Path to "fif" font file. Find more fonts at https://www.figlet.org/cgi-bin/fontdb.cgi'),
                 'filter' => 'text',
             ],
             'width' => [

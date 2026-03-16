@@ -1,4 +1,10 @@
 {strip}
+    {if $prefs.ajax_edit_previews eq 'y' and $field.options_map.previewtabs eq 'y'}
+        {assign var='tracker_previews' value='y'}
+    {else}
+        {assign var='tracker_previews' value='n'}
+    {/if}
+
     {capture assign='charCount'}
         {if $field.options_map.max}
             <div class="charCount form-text">
@@ -28,11 +34,11 @@
             <input type="text" id="{$data.element_id|escape}" name="{$field.ins_id}"{if $field.options_map.width > 0} size="{$field.options_map.width}"{/if}{if $field.options_map.max gt 0} maxlength="{$field.options_map.max}"{/if} value="{$field.value|escape}" onkeyup={$data.keyup} />
         {else}
             {if $field.options_map.wysiwyg == 'y'}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$tracker_previews}
                     {$field.value}
                 {/textarea}
             {else}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$tracker_previews}
                     {$field.value}
                 {/textarea}
             {/if}
@@ -43,7 +49,7 @@
         {foreach name=lg from=$field.lingualvalue item=ling}
             <label for="{$data.element_id|escape}_{$ling.lang}">{$ling.lang|langname}</label>
             {if $field.options_map.wysiwyg == 'y'}
-                {textarea _class='form-control' id="{$data.element_id}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" section="trackers"  switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {textarea _class='form-control' id="{$data.element_id}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" section="trackers"  switcheditor='n' _preview=$tracker_previews}
                     {$ling.value}
                 {/textarea}
             {else}

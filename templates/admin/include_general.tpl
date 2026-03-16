@@ -175,6 +175,14 @@
                 {preference name=scheduler_keep_logs}
                 {preference name=scheduler_last_run_warning_minutes}
             </fieldset>
+            <fieldset id="SchedulerLogs">
+                <legend>{tr}Scheduler Logs{/tr}</legend>
+                {preference name=scheduledTasksReport}
+                <div class="adminoptionbox scheduledTasksReport_childcontainer last_number_of_hours">
+                    {preference name=scheduledTasksReportHours}
+                </div>
+                {preference name=scheduledTasksReportMaxDays}
+            </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Headless Browser Integration{/tr}</legend>
                 {preference name=headlessbrowser_integration_type}

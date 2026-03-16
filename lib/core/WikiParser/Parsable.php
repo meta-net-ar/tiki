@@ -150,7 +150,7 @@ class WikiParser_Parsable extends ParserLib
         $argumentParser = new WikiParser_PluginArgumentParser();
 
         foreach ($matches as $match) {
-            if ($this->option['parseimgonly'] && $this->getName() != 'img') {
+            if ($this->option['parseimgonly'] && $match->getName() != 'img') {
                 continue;
             }
 
@@ -496,7 +496,7 @@ if ( \$('#$id') ) {
         $func_name = 'wikiplugin_' . $name;
 
         $plugins_parsing_data = ['accordion', 'benchmark', 'button', 'code', 'fade', 'footnote', 'gdgraph', 'html', 'markdown', 'pdfpage', 'quote',
-                                'registermemberpayment', 'rr_info', 'shorten', 'slideshowslide', 'swiper', 'tabs', 'tour', 'tracker', 'param', 'trackerquerytemplate', 'split', 'wantedpages', 'fluidgrid', 'sort'];
+                                'registermemberpayment', 'rr_info', 'shorten', 'slideshowslide', 'swiper', 'teleprompter', 'tabs', 'tour', 'tracker', 'param', 'trackerquerytemplate', 'split', 'wantedpages', 'fluidgrid', 'sort'];
         if (($this->option['is_markdown'] ?? false) && ! in_array($name, $plugins_parsing_data)) {
             if ($name == 'fancytable') {
                 $data = str_replace('~|~', '{ftlongseparator}', $data);

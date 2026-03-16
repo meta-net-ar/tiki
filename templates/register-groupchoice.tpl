@@ -21,12 +21,6 @@
     {* Groups *}
     {if isset($theChoiceGroup)}
         <input type="hidden" name="chosenGroup" value="{$theChoiceGroup|escape}">
-        {jq}
-$.getJSON('group_tracker_ajax.php', {chosenGroup:'{{$theChoiceGroup}}'}, function(data) {
-    $("#registerTracker").html(data['res']).tikiModal();
-});
-        {/jq}
-        <div id="registerTracker"></div>
     {elseif isset($listgroups)}
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label">

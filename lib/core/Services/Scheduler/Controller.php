@@ -95,6 +95,15 @@ class Services_Scheduler_Controller
 
         if ($result['status'] == 'failed') {
             $message .= tr('Scheduler %0 - FAILED', $schedulerTask->name) . '<br>' . $result['message'];
+            // Send to GlitchTip/Sentry
+            TikiLib::lib('errortracking')->captureException(
+                new \Exception($message),
+                [
+                    'scheduler.task' => $schedulerTask->name,
+                    'scheduler.id' => $scheduler['id'],
+                    'error.type' => 'web_execution_failed'
+                ]
+            );
         } else {
             $message .= tr('Scheduler %0 - OK', $schedulerTask->name) . '<br>';
             $message .= $result['message'];

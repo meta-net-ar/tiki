@@ -90,6 +90,9 @@ class ExternalLinksChecker
             // Open source project documentation
             'github.com' => 'GitHub repositories/documentation',
             'github.io' => 'GitHub Pages documentation sites',
+
+            // Package repositories (required for Composer/Satis builds)
+            'asset-packagist.org' => 'Composer asset repository',
         ];
 
         // Pattern-based whitelist for Tiki domains

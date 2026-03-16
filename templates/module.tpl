@@ -8,7 +8,7 @@
 {if $module_nobox neq 'y'}
 {if !isset($moduleId)}{$moduleId=' '}{/if}
 <div id="module_{$moduleId}"
-    class="card box-{$module_name} {if $module_decorations eq 'n'}no-decorations{/if} module" {if !empty($tpl_module_style) or $module_decorations eq 'n'}style="{$tpl_module_style}  {if $module_decorations eq 'n'}border-color: transparent !important; background: transparent;{/if} "{/if}>
+    class="card box-{$module_name}{if $module_decorations eq 'n'} no-decorations{/if}{if $nobox eq 'y'} no-box{/if} module" {if !empty($tpl_module_style) or $module_decorations eq 'n'}style="{$tpl_module_style}  {if $module_decorations eq 'n'}border-color: transparent !important; background: transparent;{/if} "{/if}>
    {* {if $module_decorations ne 'n'} *} {* Code updated so module title isn't affected by $module_decorations (actually it already wasn't).  *}
    <div class="card-header" {if !empty($module_params.bgcolor) || $module_decorations eq 'n'}style="{if !empty($module_params.bgcolor)}background-color:{$module_params.bgcolor};{/if}{if $module_decorations eq 'n'}border-color: transparent !important; background: transparent !important; padding-bottom: 0 !important;{/if}"{/if}>
             {if ($module_notitle ne 'y' && !empty($module_title)) || ($module_flip eq 'y') || $prefs.menus_items_icons eq 'y'}

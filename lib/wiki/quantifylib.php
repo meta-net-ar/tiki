@@ -38,7 +38,7 @@ class QuantifyLib extends TikiLib
         $added = 0;
         $removed = 0;
 
-        foreach ($engine->edits as $key => $modif) {
+        foreach ($engine->edits as $modif) {
             if (is_array($modif)) {
                 $added += count($modif);
             } elseif (is_int($modif) && $modif < 0) {
@@ -97,7 +97,6 @@ class QuantifyLib extends TikiLib
 
     public function wiki_update($arguments)
     {
-        $tikilib = TikiLib::lib('tiki');
         $this->recordChangeSize($arguments['page_id'], $arguments['version'], $arguments['old_data'], $arguments['data']);
     }
 }

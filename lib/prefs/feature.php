@@ -2449,14 +2449,6 @@ function prefs_feature_list($partial = false)
             ],
             'default' => 'n',
         ],
-        'feature_community_mouseover' => [
-            'name' => tra("Allow showing user's information on mouseover"),
-            'description' => tra("Show users' information on mouseover."),
-            'type' => 'flag',
-            'help' => 'User-Preferences',
-            'hint' => tra("Requires user's information to be public"),
-            'default' => 'n',
-        ],
         'feature_community_mouseover_name' => [
             'name' => tra('Real name'),
             'description' => tra("Show the user's real name"),

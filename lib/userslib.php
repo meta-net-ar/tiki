@@ -2501,7 +2501,6 @@ class UsersLib extends TikiLib
 
             $res['groups'] = $groups;
             $res['age'] = $this->now - $res['registrationDate'];
-            $res['user_information'] = $this->get_user_preference($user, 'user_information', 'public');
             $res['editable'] = $this->user_can_be_edited($user);
 
             // indicate whether the user's email is from a disposable mail server
@@ -2669,7 +2668,7 @@ class UsersLib extends TikiLib
                 $xmpplib->invalidateUserCache($user);
             }
         } catch (\Throwable $e) {
-            error_log('[XMPP] Cache invalidation error: ' . $e->getMessage());
+            // Handle cache invalidation error silently
         }
 
         return $result;
@@ -3443,12 +3442,6 @@ class UsersLib extends TikiLib
         }
 
         $isSelf = $auser === $user;
-        // Only process if feature_friends enabled, user_information public or we query ourselfs
-        if (($this->get_user_preference($auser, 'user_information', 'public') != 'public') && ($prefs['feature_friends'] != 'y') && ! $isSelf) {
-            return "<span{$idStr}>$body</span>";
-        }
-
-
         $id = $this->get_user_id($auser);
         if ($id == -1) {
             return $body;
@@ -3458,7 +3451,7 @@ class UsersLib extends TikiLib
         if ($show_popup == "n") {
             //do nothing for adding a tip
             $title = '';
-        } elseif ($prefs['feature_community_mouseover'] == 'y' && ($this->get_user_preference($auser, 'show_mouseover_user_info', 'y') == 'y' || $prefs['feature_friends'] == 'y')) {
+        } else {
             $data = TikiLib::lib('service')->getUrl([
                 'controller' => 'user',
                 'action' => 'info',
@@ -3472,12 +3465,6 @@ class UsersLib extends TikiLib
             } else {
                 $title = tra('User Information');
             }
-        } elseif ($prefs['user_show_realnames'] == 'y') {
-            $class .= ' tips';
-            $title = tr('User') . ':' . $realn;
-        } else {
-            $class .= ' tips';
-            $title = tr('User') . ':' . $auser;
         }
 
         if (empty($prefs['urlOnUsername'])) {
@@ -6978,11 +6965,11 @@ class UsersLib extends TikiLib
             if (method_exists($xmpplib, 'invalidateUserCache')) {
                 $xmpplib->invalidateUserCache($user);
             }
-            if (method_exists($xmpplib, 'syncUserGroupsToXmpp')) {
-                $xmpplib->syncUserGroupsToXmpp($user);
+            if (method_exists($xmpplib, 'markUserXmppSyncNeeded')) {
+                $xmpplib->markUserXmppSyncNeeded($user);
             }
         } catch (\Throwable $e) {
-            error_log('[XMPP] sync error: ' . $e->getMessage());
+            // Handle sync error silently
         }
     }
 

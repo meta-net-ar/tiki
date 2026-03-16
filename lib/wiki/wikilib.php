@@ -164,7 +164,6 @@ class WikiLib extends TikiLib
         global $prefs;
 
         $tikilib = TikiLib::lib('tiki');
-        $userlib = TikiLib::lib('user');
         $globalperms = Perms::get();
 
         $info = $tikilib->get_page_info($name);
@@ -793,7 +792,7 @@ class WikiLib extends TikiLib
     {
         $query = 'update `tiki_pages` set `cache`=?, `cache_timestamp`=? where `pageName`=?';
         $result = $this->query($query, [$data, $this->now, $page]);
-        return true;
+        return (bool) $result;
     }
 
     public function addToPageHttpHeaders($info)
@@ -834,10 +833,14 @@ class WikiLib extends TikiLib
 
         $query = "delete from `tiki_wiki_attachments` where `attId`=?";
         $result = $this->query($query, [$attId]);
-        if ($prefs['feature_actionlog'] == 'y') {
-            $logslib = TikiLib::lib('logs');
-            $logslib->add_action('Removed', $attId, 'wiki page attachment');
+        if ($result && $result->numRows() > 0) {
+            if ($prefs['feature_actionlog'] == 'y') {
+                $logslib = TikiLib::lib('logs');
+                $logslib->add_action('Removed', $attId, 'wiki page attachment');
+            }
+            return true;
         }
+        return false;
     }
 
     public function wiki_attach_file($page, $name, $type, $size, $data, $comment, $user, $fhash, $date = '')
@@ -1099,7 +1102,7 @@ class WikiLib extends TikiLib
                 );
             }
             $ret = $histlib->remove_version($res['pageName'], $res['version']);
-            $ret2 = $histlib->restore_page_from_history($res['pageName']);
+            $histlib->restore_page_from_history($res['pageName']);
         } else {
             $ret = $this->remove_all_versions($page);
         }
@@ -1180,7 +1183,6 @@ class WikiLib extends TikiLib
     public function get_like_pages($page)
     {
         global $user, $prefs;
-        $semanticlib = TikiLib::lib('semantic');
         $tikilib = TikiLib::lib('tiki');
 
         preg_match_all("/([A-Z])([a-z]+)/", $page, $words);
@@ -1246,7 +1248,7 @@ class WikiLib extends TikiLib
         $tikilib = TikiLib::lib('tiki');
         $access = TikiLib::lib('access');
 
-        $request_uri = ($prefs['feature_sefurl'] == 'y' || ! $_SERVER['QUERY_STRING']) ? ($request_uri = basename(debug_backtrace()[0]['file']) . '?page=' . $page) : $base_uri;
+        $request_uri = ($prefs['feature_sefurl'] == 'y' || ! $_SERVER['QUERY_STRING']) ? (basename(debug_backtrace()[0]['file']) . '?page=' . $page) : $base_uri;
 
         $pathInfo = parse_url($request_uri);
         $queryString = $pathInfo['query'];
@@ -1302,7 +1304,6 @@ class WikiLib extends TikiLib
 
     public function get_locked()
     {
-        $locked = [];
         $query = "select `pageName`, 'lockedby', 'lastModif' from `tiki_pages` where `flag`='L'";
         return $this->fetchAll($query);
     }
@@ -1388,33 +1389,38 @@ class WikiLib extends TikiLib
     {
         global $user;
         $tikilib = TikiLib::lib('tiki');
+        try {
+            $this->beginTransaction();
+            $query = "update `tiki_pages` set `flag`='' where `pageName`=?";
+            $this->query($query, [$page]);
 
-        $query = "update `tiki_pages` set `flag`='' where `pageName`=?";
-        $result = $this->query($query, [$page]);
+            if (isset($user)) {
+                $info = $tikilib->get_page_info($page);
 
-        if (isset($user)) {
-            $info = $tikilib->get_page_info($page);
+                $query = "update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?";
+                $this->query($query, [$user, tra('Page unlocked'), $info['version'] + 1, $page]);
 
-            $query = "update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?";
-            $result = $this->query($query, [$user, tra('Page unlocked'), $info['version'] + 1, $page]);
-
-            $query = "insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`) values(?,?,?,?,?,?,?,?)";
-            $result = $this->query(
-                $query,
-                [
-                    $page,
-                    (int) $info['version'] + 1,
-                    (int) $info['lastModif'],
-                    $user,
-                    $info['ip'],
-                    tra('Page unlocked'),
-                    $info['data'],
-                    $info['description']
-                ]
-            );
+                $query = "insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`) values(?,?,?,?,?,?,?,?)";
+                $this->query(
+                    $query,
+                    [
+                        $page,
+                        (int) $info['version'] + 1,
+                        (int) $info['lastModif'],
+                        $user,
+                        $info['ip'],
+                        tra('Page unlocked'),
+                        $info['data'],
+                        $info['description']
+                    ]
+                );
+            }
+            $this->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->rollBack();
+            return false;
         }
-
-        return true;
     }
 
     // Returns backlinks for a given page
@@ -1472,7 +1478,6 @@ class WikiLib extends TikiLib
     //get all backlinks
     public function getAllBacklinks()
     {
-        global $prefs;
         $tikilib = TikiLib::lib('tiki');
 
         $query = "select `fromPage`, `toPage` from `tiki_links` order by lastmodif desc";
@@ -1533,7 +1538,7 @@ class WikiLib extends TikiLib
     {
         $parent_pages = [];
         $backlinks_info = $this->get_backlinks($child_page);
-        foreach ($backlinks_info as $index => $backlink) {
+        foreach ($backlinks_info as $backlink) {
             $parent_pages[] = $backlink['objectId'];
         }
         return $parent_pages;
@@ -1544,7 +1549,6 @@ class WikiLib extends TikiLib
         $parserlib = TikiLib::lib('parser');
 
         if ($with_help) {
-            global $prefs;
             $cachelib = TikiLib::lib('cache');
             $commonKey = '{{{area-id}}}';
             $cachetag = 'plugindesc' . $this->get_language();
@@ -1811,7 +1815,6 @@ class WikiLib extends TikiLib
     public function get_page_hide_title($pageName)
     {
         $attributes = TikiLib::lib('attribute')->get_attributes('wiki page', $pageName);
-        $rc = 0;
         if (! isset($attributes['tiki.wiki.page_hide_title'])) {
             return 0;
         }

@@ -34,6 +34,8 @@ if ($user) {
         // Check if user has taken this quiz
         if ($quizlib->user_has_taken_quiz($user, $_REQUEST["quizId"])) {
             Feedback::errorAndDie(tra("You cannot take this quiz twice"), \Laminas\Http\Response::STATUS_CODE_401);
+        } else {
+            $quizlib->user_takes_quiz($user, $_REQUEST["quizId"]);
         }
     }
 }
@@ -42,17 +44,6 @@ if (isset($_REQUEST["timeleft"])) {
     $smarty->assign('ans', 'y');
     $_SESSION["finishQuiz"] = $tikilib->now;
     $elapsed = $_SESSION["finishQuiz"] - $_SESSION["startQuiz"];
-    if ($user) {
-        // If the quiz cannot be repeated
-        if ($quiz_info["canRepeat"] == 'n') {
-            // Check if user has taken this quiz
-            if ($quizlib->user_has_taken_quiz($user, $_REQUEST["quizId"])) {
-                Feedback::errorAndDie(tra("You cannot take this quiz twice"), \Laminas\Http\Response::STATUS_CODE_401);
-            } else {
-                $quizlib->user_takes_quiz($user, $_REQUEST["quizId"]);
-            }
-        }
-    }
     // Now get the quiz information
     // Verify time limit if appropiate
     if ($quiz_info["timeLimited"] == 'y') {

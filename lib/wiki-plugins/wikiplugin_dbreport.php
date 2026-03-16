@@ -583,7 +583,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_object->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -721,7 +721,7 @@ function wikiplugin_dbreport_parse(&$code)
                                     break;
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_line->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -765,7 +765,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_cell->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -832,7 +832,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_text->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state
@@ -871,7 +871,7 @@ function wikiplugin_dbreport_parse(&$code)
                             switch (TikiLib::strtoupper($token->content)) {
                                 case '<':
                                     unset($parse_link);
-                                    $parse_link = new Link($token);   // create the link object
+                                    $parse_link = new Link();   // create the link object
                                     $parse_object->link =& $parse_link;
                                     $parse_link_return = $parse_state; // return to this state
                                     $parse_state = 5;   // switch state

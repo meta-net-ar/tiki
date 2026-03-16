@@ -128,6 +128,7 @@ class Tiki_Package_ComposerCliTest extends TikiTestCase
         vfsStream::create(
             [
                 'composer.json' => $composerJson,
+                'composer.lock' => '{}',
             ],
             $this->root
         );

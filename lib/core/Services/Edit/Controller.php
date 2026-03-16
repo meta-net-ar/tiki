@@ -272,7 +272,7 @@ $(window).on("load", function(){
         if ($input->markdown_wysiwyg->int() || $input->markdown->int()) {
             $help_sections[] = [
                 'id' => 'wiki-help',
-                'title' => tr('Mardown Syntax Help'),
+                'title' => tr('Markdown Syntax Help'),
                 'content' => $smarty->fetch('tiki-edit_help_markdown.tpl'),
             ];
         }

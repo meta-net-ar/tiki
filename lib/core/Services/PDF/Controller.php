@@ -16,7 +16,12 @@ class Services_PDF_Controller
         global $prefs;
 
         // edit permission is needed to convert arbitrary text to PDF
-        if (! Perms::get()->edit) {
+        if ($input->page->pagename()) {
+            $perms = Perms::get('wiki page', $input->page->pagename());
+        } else {
+            $perms = Perms::get();
+        }
+        if (! $perms->edit) {
             throw new Services_Exception_Denied();
         }
 

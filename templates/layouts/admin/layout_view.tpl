@@ -1,12 +1,3 @@
-{capture assign='modzonetop'}
-    {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
-{/capture}
-{capture assign='modzonetopbar'}
-    {modulelist zone=topbar class="topbar_modules topbar navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Navigation and related functionality and content{/tr}'}
-{/capture}
-{capture assign='modzonebottom'}
-    {modulelist zone=bottom class='bottom_modules p-3 mx-0' heading_text='{tr}Site information, links, etc.{/tr}' role=contentinfo}
-{/capture}
 <!DOCTYPE html>
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if Language::isRTL()} dir="rtl"{/if}>
     <head>
@@ -25,12 +16,12 @@
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
             <div class="row">
                 <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
-                {$modzonetop}
+                {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
                </header>
             </div>
     {/if}
             <div class="row row-middle" id="row-middle">
-                {$modzonetopbar}
+        {modulelist zone=topbar class="topbar_modules topbar navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Navigation and related functionality and content{/tr}'}
                 <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
                 <div class="col col1 col-md-12 pb-4" id="col1">
                     <div id="feedback" role="alert">
@@ -57,7 +48,7 @@
 {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
             <footer class="row footer main-footer" id="footer">
                 <div class="footer_liner w-100">
-                    {$modzonebottom}
+            {modulelist zone=bottom class='bottom_modules p-3 mx-0' heading_text='{tr}Site information, links, etc.{/tr}' role=contentinfo}
                 </div>
             </footer>
 {/if}

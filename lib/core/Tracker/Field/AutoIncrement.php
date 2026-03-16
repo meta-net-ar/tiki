@@ -149,6 +149,62 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
         return false;
     }
 
+    /**
+     * After the item is saved, check for duplicate auto-increment values that
+     * can occur when concurrent processes both read the same maximum value
+     * before either has persisted its result. If a duplicate is found,
+     * re-read the current maximum and assign a new unique value.
+     */
+    public function postSaveHook($value)
+    {
+        // itemId mode uses the actual DB item ID — duplicates are impossible
+        if ($this->getOption('itemId') == 'itemId') {
+            return;
+        }
+
+        $itemId = $this->getItemId();
+        $fieldId = $this->getConfiguration('fieldId');
+
+        if (! $itemId || $value === false || $value === null || $value === '') {
+            return;
+        }
+
+        // prevent deduplication when an odbc tabular is used as remote value might interfere
+        try {
+            $definition = $this->getTrackerDefinition();
+            $tabulars = $definition->getSynchronizedTabulars('odbc');
+            if (! empty($tabulars)) {
+                return;
+            }
+        } catch (Exception $e) {
+            return;
+        }
+
+        global $prefs;
+        $trklib = TikiLib::lib('trk');
+        $table = TikiDb::get()->table('tiki_tracker_item_fields');
+
+        $maxRetries = 3;
+        for ($i = 0; $i < $maxRetries; $i++) {
+            $duplicateCount = $table->fetchCount([
+                'fieldId' => (int)$fieldId,
+                'value' => (string)$value,
+            ]);
+
+            if ($duplicateCount <= 1) {
+                break;
+            }
+
+            $maxValue = $trklib->get_maximum_value($fieldId);
+            if ($prefs['tracker_autoincrement_resettable'] == 'y') {
+                $value = max($maxValue + 1, $this->getOption('start', 1));
+            } else {
+                $value = $maxValue + 1;
+            }
+            $trklib->modify_field($itemId, $fieldId, $value);
+        }
+    }
+
     public function getTabularSchema()
     {
         $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());

@@ -5,7 +5,7 @@
 {/block}
 
 {block name="content"}
-<form method="post" action="{service controller="tracker" action="remove_item"}">
+<form method="post" action="{service controller="tracker" action="remove_item" multiple=$multiple}">
     {if $affectedCount}
         <div class="mb-3 row mx-0">
             <label class="col-form-label" for="replacement">{tr}Replacement{/tr}</label>
@@ -15,7 +15,11 @@
             </div>
         </div>
     {/if}
-    <p>{tr}Are you sure you want to delete this item?{/tr}</p>
+    {if $multiple}
+        <p>{tr _0=$removeCount}You are about to delete %0 items. Are you sure you want to proceed?{/tr}</p>
+    {else}
+        <p>{tr}Are you sure you want to delete this item?{/tr}</p>
+    {/if}
     <div class="submit">
         <input type="hidden" name="trackerId" value="{$trackerId|escape}">
         <input type="hidden" name="itemId" value="{$itemId|escape}">
