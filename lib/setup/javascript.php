@@ -9,6 +9,7 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Lib\TikiDate;
 use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\Sections;
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
@@ -270,6 +271,7 @@ if (empty($object)) {
     $object = ['type' => '', 'object' => ''];
 }
 $jqueryTiki['current_object'] = $object;
+
 $username_pattern = " / ^ ['\-_a-zA-Z0-9\.]*$/";
 if (is_string($prefs['username_pattern'])) {
     if (trim($prefs['username_pattern']) && trim($prefs['username_pattern']) !== '') {
@@ -453,6 +455,10 @@ EOT;
 }
 
 $headerlib->add_js($js);
+
+Sections::onSectionChange(function ($section) use ($headerlib) {
+    $headerlib->add_js("jqueryTiki.current_object = " . json_encode(current_object()) . ";");
+});
 
 if ($prefs['feature_ajax'] != 'y') {
     $prefs['ajax_autosave'] = 'n';

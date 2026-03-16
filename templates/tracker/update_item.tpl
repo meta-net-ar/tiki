@@ -53,7 +53,7 @@
                     </label>
                 </div>
                 <div class="comment-form d-none">
-                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId}
+                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId data='' title=$commentTitle}
                 </div>
             {/if}
             <div class="submit">

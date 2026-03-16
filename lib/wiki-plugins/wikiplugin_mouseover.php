@@ -13,7 +13,6 @@ function wikiplugin_mouseover_info()
         $jqfx[] = ['text' => $v, 'value' => $k];
     }
 
-
     return [
         'name' => tra('Mouseover'),
         'documentation' => 'PluginMouseover',
@@ -265,32 +264,40 @@ function wikiplugin_mouseover($data, $params)
     $headerlib = TikiLib::lib('header');
     $headerlib->add_css('.plugin-mouseover-anchor:not([href]) { border-bottom: 1px dotted; color: inherit; cursor: help; text-decoration: none; }');
 
-    if ($closeDelay && $sticky) {
-        $closeDelayStr = "setTimeout(function() {hideJQ('#$id', '$effect', '$speed')}, " . ($closeDelay * 1000) . ");";
-    } else {
-        $closeDelayStr = '';
-    }
+    // Plugin parameter exposes only "closeDelay" (seconds). Internally we split timing:
+    // - closeDelayMs: sticky auto-close timer
+    // - hideDelayMs: non-sticky mouseleave debounce to avoid flicker on inline anchors
+    // offsetX/offsetY are cursor deltas, not absolute page coordinates.
+    // Base cursor position is captured at mouseenter (popup init), then updated on mousemove.
+    $closeDelayMs = max(0, $closeDelay * 1000);
+    $hideDelayMs = $closeDelayMs > 0 ? $closeDelayMs : 80;
+    $jsConfig = json_encode([
+        'anchorId' => "$id-link",
+        'popupId' => $id,
+        'isSticky' => $sticky,
+        'closeDelayMs' => $closeDelayMs,
+        'hideDelayMs' => $hideDelayMs,
+        'offsetX' => $offsetx,
+        'offsetY' => $offsety,
+        'effect' => $effect,
+        'speed' => $speed,
+    ]);
+    $headerlib->add_js_module(
+        'import { initMouseoverPlugin } from "@jquery-tiki/wikiplugin-mouseover";'
+        . "initMouseoverPlugin($jsConfig);"
+    );
 
-    $js = "\$('#$id-link').on('mouseover', function(event) {
-    var pos  = $(this).position();
-    $(this).closest('td').css('position', 'relative');
-    \$('#$id').css('position', 'absolute').css('left', pos.left + $offsetx + 'px').css('top', pos.top + $offsety + 'px');
-    showJQ('#$id', '$effect', '$speed'); $closeDelayStr });
-";
-    if ($sticky) {
-        $js .= "\$('#$id').on('click', function(event) { hideJQ('#$id', '$effect', '$speed'); }).css('cursor','pointer');\n";
-    } else {
-        $js .= "\$('#$id-link').on('mouseout', function(event) { setTimeout(function() {hideJQ('#$id', '$effect', '$speed')}, " . ($closeDelay * 1000) . "); });";
-    }
-    $headerlib->add_jq_onready($js);
-
-    $bgcolor   = ! is_null($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
+    $bgcolor = ! is_null($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
     $textcolor = ! is_null($params['textcolor']) ? ("color:" . $params['textcolor'] . ';') : '';
-    $class     = is_null($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
-    $href      = $url ? 'href="' . $url . '"' : '';
+    $class = is_null($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
+    $href = $url ? 'href="' . $url . '"' : '';
+    // In non-sticky mode the popup must not capture pointer events, or hover can flicker.
+    $pointerEvents = $sticky ? 'auto' : 'none';
 
     $html = "~np~<$tag id=\"$id-link\" $href class=\"plugin-mouseover-anchor\">$label</$tag>" .
-        "<span id=\"$id\" $class style=\"width: {$width}px; " . (! empty($params['height']) ? "height: {$height}px; " : "") . "{$bgcolor} {$textcolor} {$padding} \">$text</span>~/np~";
+        "<span id=\"$id\" $class style=\"display: none; position: absolute; width: {$width}px; " .
+        (! empty($params['height']) ? "height: {$height}px; " : "") .
+        "{$bgcolor} {$textcolor} {$padding} pointer-events: {$pointerEvents};\">$text</span>~/np~";
 
     return $html;
 }

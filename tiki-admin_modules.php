@@ -141,18 +141,17 @@ if (! empty($_REQUEST['edit_assign'])) {
     }
 
     $modinfo = $modlib->get_module_info($info['name']);
-    if ($modinfo['type'] != 'function') {
-        $smarty->assign_by_ref('assign_rows', $info['rows']);
-        $smarty->assign_by_ref('assign_params', $info['params']); // For old-style (user) modules
-    } else {
-        if (empty($info['params'])) {
-            $info['params'] = [];
-        }
-        $modlib->dispatchValues($info['params'], $modinfo['params']);
-        if (isset($modinfo['params']['rows'])) {
-            $modinfo['params']['rows']['value'] = $info['rows'];
+    $params = [];
+
+    if (! empty($info['params'])) {
+        if (is_array($info['params'])) {
+            $params = $info['params'];
+        } else {
+            parse_str($info['params'], $params);
         }
     }
+
+    $modlib->dispatchValues($params, $modinfo['params']);
     $smarty->assign('assign_info', $modinfo);
 }
 //post is used for preview because there is another submit item on the form requiring it

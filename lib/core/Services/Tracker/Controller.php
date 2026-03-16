@@ -1246,6 +1246,8 @@ class Services_Tracker_Controller
             throw new Services_Exception_Denied();
         }
 
+        $version = TikiLib::lib('trk')->last_log_version($itemId) + 1;
+
         $access = TikiLib::lib('access');
         if ($prefs['feature_warn_on_edit'] == 'y' && $input->conflictoverride->int() !== 1) {
             try {
@@ -1407,16 +1409,13 @@ class Services_Tracker_Controller
 
                 if ($input->addComment->bool()) {
                     $comment = new Services_Comment_Controller();
-
-                    $version = TikiLib::lib('trk')->last_log_version($itemId);
-
                     $comment->action_post(new JitFilter([
                         'post' => 1,
                         'anonymous_name' => $input->comment_anonymous_name->text(),
                         'comment' => $input->comment->text(),
                         'objectId' => $itemId,
                         'type' => 'trackeritem',
-                        'title' => tr('Comment for edit #%0', $version),
+                        'title' => $input->title->text(),
                         'data' => $input->data->wikicontent(),
                         'return_url' => $input->redirect->none(),
                         'version' => $version,
@@ -1530,7 +1529,9 @@ class Services_Tracker_Controller
             'save_return' => $input->save_return->alpha() ?? 'n',
             'can_remove' => $itemObject->canRemove(),
             'skipRefresh' => $input->skipRefresh->bool(),
+            'commentTitle' => tr('Comment for edit #%0', $version),
             'MAX_COMMENT_DATA_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_DATA_LENGTH,
+            'MAX_COMMENT_TITLE_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_TITLE_LENGTH,
         ];
     }
 

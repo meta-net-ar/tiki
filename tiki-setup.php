@@ -1068,7 +1068,6 @@ if ($prefs['openpgp_gpg_pgpmimemail'] == 'y') {
 //adding pdf creation javascript, used to integrate plugins like tablesorter, trackerfilter with mpdf.
 if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('lib/jquery_tiki/pdf.js');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.min.js", true);
 }
 
 if (file_exists(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE)) {
@@ -1117,6 +1116,7 @@ if ($prefs['tiki_monitor_performance'] == 'y') {
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
+// Why are these in global setup, and unconditional?  color picking is not a frequent user operation - benoitg - 2026-03-09
 $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
 $headerlib->add_js_module("import { textareaColorpicker } from '@tiki/ui-utils'; textareaColorpicker();");

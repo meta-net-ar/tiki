@@ -42,11 +42,9 @@ $headerlib->add_js_module('
 ');
 $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
 
-if ($prefs['feature_fixed_width'] === 'y') {
+if ($prefs['feature_fixed_width'] === 'y' && ! empty($prefs['layout_fixed_width'])) {
     $headerlib->add_css(
-        '@media (min-width: 1200px) { .container { max-width:' .
-        (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
-        '; } }'
+        "@media (min-width: 1200px) { .container { max-width:{$prefs['layout_fixed_width']}; } }"
     );
 }
 

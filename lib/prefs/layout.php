@@ -11,12 +11,12 @@ function prefs_layout_list()
             'name' => tra('Layout width'),
             'description' => tra('The width of the site\'s content area (Bootstrap container div), centered in the browser window.'),
             'type' => 'text',
-            'hint' => tra('The default is 1170px.'),
+            'hint' => tra('The default is to use the Bootstrap responsive default.'),
             'dependencies' => [
                 'feature_fixed_width',
             ],
             'tags' => ['basic'],
-            'default' => '1170px',
+            'default' => '',
         ],
         'layout_tabs_optional' => [
             'name' => tra('Tabs optional'),

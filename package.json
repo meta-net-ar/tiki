@@ -126,23 +126,24 @@
         ]
     },
     "workspaces": [
-    "src/js/common-externals",
+    "src/js/avatar-generator",
+    "src/js/common-externals*",
     "src/js/common-reexported",
     "src/js/jquery-tiki",
+    "src/js/tiki-figlet",
+    "src/js/tiki-iot",
     "src/js/tiki-glightbox",
     "src/js/tiki-html5-qrcode",
     "src/js/tiki-lottie",
     "src/js/tiki-mermaid",
-    "src/js/tiki-sentry-browser",
-    "src/js/tiki-figlet",
-    "src/js/tiki-iot",
     "src/js/tiki-model3dviewer",
+    "src/js/tiki-sentry-browser",
     "src/js/tiki-toast-ui",
-    "src/js/tiki-vue-sfc-loader",
     "src/js/tiki-ui-utils",
+    "src/js/tiki-vue-sfc-loader",
     "src/js/vue-mf/*",
     "src/js/vue-widgets/*",
-    "src/scss",
-    "src/js/avatar-generator"
+    "src/js/wysiwyg",
+    "src/scss"
   ]
 }

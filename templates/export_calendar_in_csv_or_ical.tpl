@@ -1,16 +1,11 @@
 {if $tiki_p_view_events eq 'y' and $prefs.calendar_export eq 'y'}
-    {if $isInMainCalendar eq 'y'}
-        {button href="#" _onclick="toggle('exportcal');return false;" _text='{tr}Export{/tr}' _icon_name='export' _type='info' _style='display: block;'}
-    {else}
-        {button href="#" _onclick="toggle('exportcal');return false;" _text='{tr}Export{/tr}' _icon_name='export' _type='info'}
-    {/if}
-    
+    {button href="#" _onclick="toggle('{$exportCal}');return false;" _text='{tr}Export{/tr}' _icon_name='export' _type='info' _style="{$style}"}
     <div class="d-inline-block">
-        <form id="exportcal" class="card" method="post" action="tiki-calendar_export_ical.php" name="f" style="display:none;">
+        <form id="{$exportCal}" class="card" method="post" action="tiki-calendar_export_ical.php" name="f" style="display:none;">
             <input type="hidden" name="export" value="y">
             <div class="card-header caltitle py-1 px-2">
                 <strong>{tr}Export calendars{/tr}</strong>
-                <button type="button" class="btn-close float-end"  onclick="toggle('exportcal')" aria-hidden="true"></button>
+                <button type="button" class="btn-close float-end"  onclick="toggle('{$exportCal}')" aria-hidden="true"></button>
             </div>
             <div class="caltoggle">
                 {select_all checkbox_names='calendarIds[]' label="{tr}Check / Uncheck All{/tr}"}

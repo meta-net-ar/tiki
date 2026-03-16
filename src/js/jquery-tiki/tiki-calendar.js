@@ -385,4 +385,42 @@ $(function () {
         $(".slot-container.date" + $(this).val()).show();
         return false;
     });
+
+    $(document).on("submit", ".filtercal", function (e) {
+        e.preventDefault();
+        const form = this;
+        const url = new URL($(form).attr("action"), window.location.origin);
+
+        const checkboxes = $("input[name='calIds[]']", form);
+        const checked = checkboxes.filter(":checked");
+
+        const pageName = url.searchParams.get("page");
+        // remove existing parameters
+        url.search = "";
+
+        // set page parameter
+        if (pageName) {
+            url.searchParams.set("page", pageName);
+        }
+
+        // show all calendars
+        if (checked.length === checkboxes.length) {
+            url.searchParams.set("allCals", "y");
+            window.location.href = url.toString();
+            return;
+        }
+
+        checked.each(function () {
+            url.searchParams.append("calIds[]", this.value);
+        });
+
+        const todate = $("input[name='todate']", form).val();
+        if (todate) {
+            url.searchParams.set("todate", todate);
+        }
+
+        url.searchParams.set("refresh", "Refresh");
+
+        window.location.href = url.toString();
+    });
 });

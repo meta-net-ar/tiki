@@ -963,6 +963,104 @@ class Services_Wiki_Controller
     }
 
     /**
+     * Partially updates a wiki page (SEO title, description, categories, tags)
+     * @param $input
+     * @return array
+     * @throws Services_Exception_NotFound
+     * @throws Services_Exception_Denied
+     */
+    public function action_patch_page($input)
+    {
+        global $user, $prefs;
+
+        $page = $input->page->pagename();
+        $tikilib = TikiLib::lib('tiki');
+        $info = $tikilib->get_page_info($page);
+
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        $perms = Perms::get('wiki page', $page);
+        if (! $perms->edit) {
+            throw new Services_Exception_Denied();
+        }
+
+        $updated = [];
+
+        // Update SEO title (stored as a wiki page attribute)
+        // Uses JitFilter 'text' filter which applies StripTags — safe for unicode (ä, ö, ü, ß, etc.)
+        if (isset($input['seo_title'])) {
+            $seoTitle = $input->seo_title->text();
+            // Use mb_strlen for correct character count with multibyte characters (e.g. German, Japanese)
+            if (mb_strlen($seoTitle, 'UTF-8') > 160) {
+                throw new Services_Exception(tr('seo_title exceeds maximum length of 160 characters.'));
+            }
+            $attributelib = TikiLib::lib('attribute');
+            $attributelib->set_attribute('wiki page', $page, 'tiki.wiki.page_title', $seoTitle);
+            $updated[] = 'seo_title';
+        }
+
+        // Update SEO description (stored in tiki_pages.description)
+        // Uses JitFilter 'text' filter which applies StripTags — safe for unicode
+        if (isset($input['seo_description'])) {
+            $seoDesc = $input->seo_description->text();
+            // Use mb_strlen for correct character count with multibyte characters
+            if (mb_strlen($seoDesc, 'UTF-8') > 200) {
+                throw new Services_Exception(tr('seo_description exceeds maximum length of 200 characters.'));
+            }
+            $tikilib->update_page(
+                $page,
+                $info['data'],
+                'API PATCH update',
+                $user,
+                $tikilib->get_ip_address(),
+                $seoDesc,
+                1
+            );
+            $updated[] = 'seo_description';
+        }
+
+        // Update categories (full replace of assigned categories)
+        if (isset($input['categories'])) {
+            if ($prefs['feature_categories'] === 'y') {
+                $categlib = TikiLib::lib('categ');
+                $categlib->update_object_categories(
+                    $input->asArray('categories'),
+                    $page,
+                    'wiki page',
+                    $info['description'],
+                    $page,
+                    'tiki-index.php?page=' . urlencode($page)
+                );
+                $updated[] = 'categories';
+            }
+        }
+
+        // Update tags / freetags (full replace)
+        // Multi-word tags are auto-quoted so freetaglib handles them as single tags
+        if (isset($input['tags'])) {
+            global $tiki_p_freetags_tag;
+            if ($prefs['feature_freetags'] === 'y' && $tiki_p_freetags_tag === 'y') {
+                $freetaglib = TikiLib::lib('freetag');
+                $freetaglib->add_object('wiki page', $page, false, $info['description'], $page, 'tiki-index.php?page=' . urlencode($page));
+                $tagParts = array_map(function ($tag) {
+                    return strpos($tag, ' ') !== false ? '"' . $tag . '"' : $tag;
+                }, $input->asArray('tags'));
+                $tagString = implode(' ', $tagParts);
+                $freetaglib->update_tags($user, $page, 'wiki page', $tagString, false, $info['lang']);
+                $updated[] = 'tags';
+            }
+        }
+
+        return [
+            'status'         => 'success',
+            'page'           => $page,
+            'updated_fields' => $updated,
+        ];
+    }
+
+    /**
      * Perform a plugin execution with specific input data (e.g. for ListExecute plugin)
      */
     public function action_execute($input)

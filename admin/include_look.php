@@ -1144,7 +1144,7 @@ function edit_custom_mode(el,id,name,icon){
                 //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
                 layoutDropDown.val(current);
                 if (!layoutDropDown.val()){
-                    layoutDropDown.val($default_layout);
+                    layoutDropDown.val("$default_layout");
                 }
             }
             layoutDropDown.trigger("change");

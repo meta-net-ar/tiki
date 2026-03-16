@@ -23,45 +23,87 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
 
     $importmap = (object) [
             // NOTE: Keep the list alphabetically sorted.
+            //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
+                /* src/js/@tiki/ui-utils */
+                "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
+
+                /* src/js/avatar-generator */
+                "avatar-generator" => $tikiUrl . JS_ASSETS_PATH . "/avatar-generator.js",
+
                 /* common_externals available in ESM format */
+                "@dicebear/collection" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/collection/lib/index.js",
+                "@dicebear/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/core/lib/index.js",
+
+                //The following @dicebear likely need updating if @dicebear/collection above is updated.
+                //To check, update, and access http://tiki.local/tiki-pick_avatar.php, open the js console, ans see if there is an error at the top
+                "@dicebear/adventurer" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/adventurer/lib/index.js",
+                "@dicebear/adventurer-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/adventurer-neutral/lib/index.js",
+                "@dicebear/avataaars" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/avataaars/lib/index.js",
+                "@dicebear/avataaars-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/avataaars-neutral/lib/index.js",
+                "@dicebear/big-ears" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/big-ears/lib/index.js",
+                "@dicebear/big-ears-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/big-ears-neutral/lib/index.js",
+                "@dicebear/big-smile" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/big-smile/lib/index.js",
+                "@dicebear/bottts" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/bottts/lib/index.js",
+                "@dicebear/bottts-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/bottts-neutral/lib/index.js",
+                "@dicebear/croodles" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/croodles/lib/index.js",
+                "@dicebear/croodles-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/croodles-neutral/lib/index.js",
+                "@dicebear/dylan" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/fun-emoji/lib/index.js",
+                "@dicebear/fun-emoji" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/collection/lib/index.js",
+                "@dicebear/glass" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/glass/lib/index.js",
+                "@dicebear/icons" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/icons/lib/index.js",
+                "@dicebear/identicon" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/identicon/lib/index.js",
+                "@dicebear/initials" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/initials/lib/index.js",
+                "@dicebear/lorelei" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/lorelei/lib/index.js",
+                "@dicebear/lorelei-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/lorelei-neutral/lib/index.js",
+                "@dicebear/micah" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/micah/lib/index.js",
+                "@dicebear/miniavs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/miniavs/lib/index.js",
+                "@dicebear/notionists" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/notionists/lib/index.js",
+                "@dicebear/notionists-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/notionists-neutral/lib/index.js",
+                "@dicebear/open-peeps" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/open-peeps/lib/index.js",
+                "@dicebear/personas" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/personas/lib/index.js",
+                "@dicebear/pixel-art" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/pixel-art/lib/index.js",
+                "@dicebear/pixel-art-neutral" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/pixel-art-neutral/lib/index.js",
+                "@dicebear/rings" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/rings/lib/index.js",
+                "@dicebear/shapes" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/shapes/lib/index.js",
+                "@dicebear/thumbs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/thumbs/lib/index.js",
+                "@dicebear/toon-head" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@dicebear/toon-head/lib/index.js",
+
                 "@kurkle/color" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@kurkle/color/dist/color.esm.js",
+                "@lottiefiles/dotlottie-wc" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@lottiefiles/dotlottie-wc/dist/index.js",
                 "@popperjs/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@popperjs/core/dist/esm/index.js",
                 "animejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/anime/dist/anime.es.js",
                 "@shoelace/color-picker" => $tikiUrl . JS_ASSETS_PATH . "/color-picker.js",
                 "bootstrap" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/bootstrap/dist/js/bootstrap.esm.min.js",
                 "chartjs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/chart.js/dist/chart.js",
                 "clipboard" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/clipboard/dist/clipboard.min.js",
-                "dompurify" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/dompurify/dist/purify.es.js",
+                "dompurify" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/dompurify/dist/purify.es.mjs",
                 "driver.js" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/driver.js/dist/driver.js.mjs",
                 "fieldslinker" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/fieldslinker/dist/fieldsLinker.js",
+                "html2canvas-pro" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.esm.js",
                 "jquery" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.js",
                 // We can't add jquery-validation because it's not available as ESM
+                "mermaid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/mermaid/dist/mermaid.esm.min.mjs",
                 "moment" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/moment/dist/moment.js",
                 "ol" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/ol/dist/ol.js",
                 "smartmenus" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/smartmenus/dist/js/smartmenus.esm.js",
                 "sortablejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/sortablejs/modular/sortable.esm.js",
                 "summernote" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/summernote/dist/summernote-bs5.min.js",
+                "svgedit" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/svgedit/dist/editor/Editor.js",
                 "timeline" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vis-timeline/dist/vis-timeline-graph2d.esm.js",
+                "three" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/three/build/three.module.min.js",
+
+                "underscore" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/underscore/underscore-esm-min.js",
                 // currently we don't use the prod build to improve the experience for SFC
                 "vue" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue/dist/vue.esm-browser.js",
+                "vue3-sfc-loader" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue3-sfc-loader/dist/vue3-sfc-loader.esm.js",
 
-                /* html5-qrcode */
-                "@html5-qrcode/html5-qrcode" => $tikiUrl . JS_ASSETS_PATH . "/tiki-html5-qrcode.js",
+                /* src/js/common_reexported */
+                "common-reexported/jspdf" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/jspdf.js",
 
-                /* common_reexported */
-                "common-reexported/jspdf" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/jspdf/index.js",
-
-                /* jquery_tiki */
+                /* src/js/jquery_tiki */
                 "@jquery-tiki/asyncLoop" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-async-loop.js",
                 "@jquery-tiki/constants" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/constants.js",
-                "@jquery-tiki/plugin-edit" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugin-edit/index.js",
-                "@jquery-tiki/plugin-edit/buttons" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugin-edit/buttons.js",
-                "@jquery-tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugins/bigbluebutton.js",
-                "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugins/cypht.js",
-                "@jquery-tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugins/dialog.js",
-                "@jquery-tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugins/pagetabs.js",
-                "@jquery-tiki/plugins/wysiwyg" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/plugins/wysiwyg.js",
                 "@jquery-tiki/tiki-calendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-calendar.js",
                 "@jquery-tiki/tiki-cookie-handler" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-cookie-handler.js",
                 "@jquery-tiki/tiki-editor_settings" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-editor_settings.js",
@@ -70,6 +112,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-admin_menu_options" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_menu_options.js",
                 "@jquery-tiki/tiki-admin_2fa" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_2fa.js",
                 "@jquery-tiki/tiki-edit_structure" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-edit_structure.js",
+                "@jquery-tiki/wikiplugin-mouseover" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-mouseover.js",
                 "@jquery-tiki/wikiplugin-trackercalendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-trackercalendar.js",
                 "@jquery-tiki/eventcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/eventcalendar_to_pdf.js",
                 "@jquery-tiki/tiki-maps-ol3" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js",
@@ -77,22 +120,53 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-field_limiter" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-field_limiter.js",
                 "@jquery-tiki/languageCheckTextarea" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/languageCheckTextarea.js",
                 "@jquery-tiki/timeago" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/timeago.js",
-                "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/emailFolder.js",
-                "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/files.js",
-                "@jquery-tiki/tracker-fields/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tracker-fields/all.dirtyCheck.js",
                 "@jquery-tiki/validate-alt-image" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/validate-alt-image.js",
-                "@tiki-modules/sentryBrowser" => $tikiUrl . JS_ASSETS_PATH . "/tiki-sentry-browser.js",
-                "@mermaidPack" => $tikiUrl . JS_ASSETS_PATH . "/tiki-mermaid.js",
-                "@tiki-lottie" => $tikiUrl . JS_ASSETS_PATH . "/tiki-lottie.js",
-                "@tiki-glightbox" => $tikiUrl . JS_ASSETS_PATH . "/tiki-glightbox.js",
+
+                /* src/js/MOVE_THIS_CONTENT_ELSEWHERE
+                Note that most of the incorrect @jquery-tiki/ have not been corrected, to minimize immediate impact.
+                */
+                "@jquery-tiki/plugin-edit" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/plugin-edit.js",
+                "@jquery-tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/bigbluebutton.js",
+                "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/cypht.js",
+                "@jquery-tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/dialog.js",
+                "@jquery-tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/pagetabs.js",
+                "@jquery-tiki/plugins/wysiwyg" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/wysiwyg.js",
+                "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-emailFolder.js",
+                "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-files.js",
+                "@jquery-tiki/tracker-fields/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-all.dirtyCheck.js",
+
+                /* src/js/tiki-3d-model-viewer */
+                "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
+
+                /* src/js/tiki-figlet */
                 "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
 
-                /* Toast-ui editor */
+                /* src/js/tiki-glightbox */
+                "@tiki-glightbox" => $tikiUrl . JS_ASSETS_PATH . "/tiki-glightbox.js",
+
+                /* src/js/tiki-html5-qrcode */
+                "@html5-qrcode/html5-qrcode" => $tikiUrl . JS_ASSETS_PATH . "/tiki-html5-qrcode.js",
+
+                /* src/js/tiki-iot */
+                "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",
+                "@tiki-iot/tiki-iot-dashboard" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard.js",
+
+                /* src/js/tiki-lottie */
+                "@tiki-lottie" => $tikiUrl . JS_ASSETS_PATH . "/tiki-lottie.js",
+
+                /* src/js/tiki-mermaid */
+                "@mermaidPack" => $tikiUrl . JS_ASSETS_PATH . "/tiki-mermaid.js",
+
+                /* src/js/tiki-sentry-browser */
+                "@tiki-modules/sentryBrowser" => $tikiUrl . JS_ASSETS_PATH . "/tiki-sentry-browser.js",
+
+                /* src/js/tiki-toast-ui Toast-ui editor */
                 "@tiki-toast-ui/editor-index" => $tikiUrl . JS_ASSETS_PATH . "/tiki-toast-ui.js",
 
-                "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
+                /* src/js/tiki-vue-sfc-loader */
+                "@tiki-vue-sfc-loader" => $tikiUrl . JS_ASSETS_PATH . "/tiki-vue-sfc-loader.js",
 
-                /* single-spa microfrontends and common files (root and styleguide) */
+                /* src/js/vue-mf single-spa microfrontends and common files (root and styleguide) */
                 "@vue-mf/duration-picker" => $tikiUrl . JS_ASSETS_PATH . "/duration-picker.js",
                 "@vue-mf/emoji-picker" => $tikiUrl . JS_ASSETS_PATH . "/emoji-picker.js",
                 "@vue-mf/kanban" => $tikiUrl . JS_ASSETS_PATH . "/kanban.js",
@@ -102,7 +176,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-mf/toolbar-dialogs" => $tikiUrl . JS_ASSETS_PATH . "/toolbar-dialogs.js",
                 "@vue-mf/tracker-rules" => $tikiUrl . JS_ASSETS_PATH . "/tracker-rules.js",
 
-                /* vue widgets */
+                /* src/js/vue-widgets vue widgets */
                 "@vue-widgets/el-autocomplete" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/autocomplete.js",
                 "@vue-widgets/el-date-picker" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/datepicker.js",
                 "@vue-widgets/el-file-gal-uploader" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/fileGalUploader.js",
@@ -114,19 +188,8 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
                 "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backTop.js",
 
-                /* tiki-3d-model-viewer */
-                "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
-
-                /* tiki-iot */
-                "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",
-                "@tiki-iot/tiki-iot-dashboard" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard.js",
-
-                /* tiki-vue-sfc-loader */
-                "@tiki-vue-sfc-loader" => $tikiUrl . JS_ASSETS_PATH . "/tiki-vue-sfc-loader.js",
-
+                /* src/js/wysiwyg */
                 "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg-summernote.js",
-
-                "avatar-generator" => $tikiUrl . JS_ASSETS_PATH . "/avatar-generator.js",
             ]
         ];
     $importmapJson = json_encode($importmap, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
