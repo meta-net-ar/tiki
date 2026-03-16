@@ -154,8 +154,7 @@ abstract class AbstractTrackerField
     {
         if (is_numeric($key)) {
             return $this->options->getParamFromIndex($key, $default);
-        }
-        else {
+        } else {
             return $this->options->getParam($key, $default);
         }
     }
