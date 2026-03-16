@@ -38,9 +38,20 @@
 
 // SmartMenus 2.x lacks the legacy javascript-driven scroll arrows.
 // This allows dropdowns to naturally scroll if they exceed the viewport.
+// Note: Offset 120px = ~70px (common header height) + ~50px (mobile browser UI buffer).
+// These values are based on standard Bootstrap navbar heights and mobile safe area insets.
+$sm-sub-top-offset: 70px;    // Safe distance from top to avoid covering the navbar
+$sm-sub-bottom-buffer: 50px; // Safety buffer at bottom to clear browser toolbars
+
 .tiki .sm-navbar .sm-sub {
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - (#{$sm-sub-top-offset} + #{$sm-sub-bottom-buffer}));
     overflow-y: auto;
+
+    // On small screens, we allow the menu to cover the header to maximize available scroll area,
+    // keeping only the mandatory bottom buffer to clear system UI navigation elements.
+    @media (max-width: 767.98px) {
+        max-height: calc(100vh - #{$sm-sub-bottom-buffer});
+    }
 }
 
 /* Smartmenus navbars (Megamenu static) */
