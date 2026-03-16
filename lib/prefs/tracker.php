@@ -242,13 +242,6 @@ function prefs_tracker_list()
             'tags' => ['experimental'],
             'warning' => tra('Use with care, potential for data loss.'),
         ],
-        'trackerfield_url_strict_validation' => [
-            'name' => tr('Strict validation for URL fields'),
-            'description' => tr('Validate URL tracker field values with the stricter syntax checks introduced for wiki-link aware URL fields. Disable this to preserve legacy values such as UNC/network paths, and hide the wiki-link syntax help text.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'dependencies' => ['feature_trackers', 'trackerfield_url'],
-        ],
         'tracker_currency_default_locale' => [
             'name' => tr('Default locale for currency formatting'),
             'description' => tr('Currency fields use a system locale to format the output of currency values. Set the default one here when none is selected in the field themselves. Visit "Server Check" page for a list of available system locales.'),
