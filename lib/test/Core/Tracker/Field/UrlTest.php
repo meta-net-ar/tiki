@@ -9,6 +9,26 @@ namespace TikiTests;
 
 class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
 {
+    private $oldStrictValidationPref;
+
+    protected function setUp(): void
+    {
+        global $prefs;
+
+        $this->oldStrictValidationPref = $prefs['trackerfield_url_strict_validation'] ?? null;
+    }
+
+    protected function tearDown(): void
+    {
+        global $prefs;
+
+        if ($this->oldStrictValidationPref === null) {
+            unset($prefs['trackerfield_url_strict_validation']);
+        } else {
+            $prefs['trackerfield_url_strict_validation'] = $this->oldStrictValidationPref;
+        }
+    }
+
     /**
      * @dataProvider supportedWikiSyntaxProvider
      */
@@ -47,11 +67,44 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testStrictValidationPrefDisabledAllowsInvalidUrlValues(): void
+    {
+        global $prefs;
+
+        $prefs['trackerfield_url_strict_validation'] = 'n';
+
+        $this->assertTrue($this->invokeIsValid('not a valid url'));
+    }
+
+    public function testStrictValidationPrefEnabledRejectsInvalidUrlValues(): void
+    {
+        global $prefs;
+
+        $prefs['trackerfield_url_strict_validation'] = 'y';
+
+        $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('not a valid url'));
+    }
+
     private function invokeIsWikiSyntaxLink(string $value): bool
     {
         $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'isWikiSyntaxLink');
         $method->setAccessible(true);
 
         return (bool) $method->invoke(null, $value);
+    }
+
+    private function invokeIsValid(string $value)
+    {
+        $field = $this->getMockBuilder(\Tracker_Field_Url::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getFieldId', 'getValue'])
+            ->getMock();
+
+        $field->method('getFieldId')->willReturn(1);
+        $field->method('getValue')->willReturn('');
+
+        return $field->isValid([
+            1 => ['value' => $value],
+        ]);
     }
 }

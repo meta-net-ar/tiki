@@ -11,6 +11,13 @@
  */
 class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface
 {
+    protected static function isStrictValidationEnabled(): bool
+    {
+        global $prefs;
+
+        return ($prefs['trackerfield_url_strict_validation'] ?? 'n') === 'y';
+    }
+
     public static function getManagedTypesInfo(): array
     {
         return [
@@ -135,6 +142,10 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return true;
         }
 
+        if (! self::isStrictValidationEnabled()) {
+            return true;
+        }
+
         if (self::isWikiSyntaxLink($trimmed)) {
             $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
             if ($resolvedHref === null) {
@@ -161,6 +172,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderInput($context = [])
     {
         $templateData = [
+            'strictValidationEnabled' => self::isStrictValidationEnabled(),
             'wikiSyntaxInfo' => tr('You can also use complete wiki-link syntax: ((PageName)) or [url|text].'),
         ];
 
