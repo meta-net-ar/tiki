@@ -3652,8 +3652,6 @@ class FileGalLib extends TikiLib
     {
         if (strpos($title, '.zip') !== strlen($title) - 4) {
             $title = preg_replace('/\.[^\.]*$/', '', $title); // remove extension
-            $title = preg_replace('/[\-_]+/', ' ', $title); // turn _ etc into spaces
-            $title = ucwords($title);
         }
         if (strlen($title) > 200) {       // trim to length of name column in database
             $title = substr($title, 0, 200);
