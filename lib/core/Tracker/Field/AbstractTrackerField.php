@@ -154,7 +154,8 @@ abstract class AbstractTrackerField
     {
         if (is_numeric($key)) {
             return $this->options->getParamFromIndex($key, $default);
-        } else {
+        }
+        else {
             return $this->options->getParam($key, $default);
         }
     }
@@ -163,10 +164,20 @@ abstract class AbstractTrackerField
      * Called after field values are saved to determine if the item's
      * lastModif/lastModifBy metadata should be NOT be updated.
      *
-     * @return bool true to exclude from lastModif update.
+     * @param array $trackerOldDbRow The raw database row of the tracker item.
+     * @return array The values for the columns to be updated (if any).
      */
-    public function handleTrackerItemSave(): bool
+    public function handleTrackerItemSave(array $trackerOldDbRow): array
     {
-        return ($this->fieldRow['excludeFromTrackerItemLastModificationDate'] ?? 'n') === 'y';
+        global $tikilib, $user;
+
+        if (($this->fieldRow['excludeFromTrackerItemLastModificationDate'] ?? 'n') === 'y') {
+            return [];
+        }
+
+        return [
+            'lastModif' => $tikilib->now,
+            'lastModifBy' => $user,
+        ];
     }
 }

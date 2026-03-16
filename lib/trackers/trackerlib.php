@@ -2369,30 +2369,19 @@ class TrackerLib extends TikiLib
         ];
 
         if (! empty($itemId) && ! empty($fieldsModified)) {
-            $hasNonExcludedField = false;
+            $rowUpdatedColumns = [];
             $definition = \Tracker_Definition::get($trackerId);
             foreach ($fieldsModified as $fieldId => $array) {
-                try {
-                    $trackerField = $definition->getFieldInstance($fieldId);
-                    if ($trackerField && ! $trackerField->handleTrackerItemSave()) {
-                        $hasNonExcludedField = true;
-                        break;
-                    }
-                } catch (\Throwable $e) {
-                    $hasNonExcludedField = true;
-                    break;
+                $trackerField = $definition->getFieldInstance($fieldId);
+                if ($trackerField) {
+                    $updatedColumns = $trackerField->handleTrackerItemSave($item_info);
+                    $item_info = array_merge($item_info, $updatedColumns);
+                    $rowUpdatedColumns = array_merge($rowUpdatedColumns, $updatedColumns);
                 }
             }
 
-            if ($hasNonExcludedField) {
-                $this->update_items(
-                    [$itemId],
-                    [
-                        'lastModif' => $tikilib->now,
-                        'lastModifBy' => $user,
-                    ],
-                    false
-                );
+            if (! empty($rowUpdatedColumns)) {
+                $this->update_items([$itemId], $rowUpdatedColumns, false);
             }
         }
 
