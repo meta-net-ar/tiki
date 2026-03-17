@@ -380,7 +380,7 @@
             {/if}
 
             {* Image Compression Controls *}
-            {if $prefs.fgal_image_compression_enabled eq 'y'}
+            {if isset($gal_info.image_compression_enabled) && $gal_info.image_compression_enabled eq 'y'}
                 <div class="mb-3 row d-none" id="image_compression_controls">
                     <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
                     <div class="col-md-8">
@@ -391,24 +391,26 @@
                                 <ul class="mb-2">
                                     <li>
                                         {tr}Max width (X):{/tr}
-                                        <span id="default_max_size_x" data-default="{$prefs.fgal_image_max_size_x}">
-                                            {$prefs.fgal_image_max_size_x} px
+                                        <span id="default_max_size_x" data-default="{$gal_info.image_max_size_x}">
+                                            {$gal_info.image_max_size_x} px
                                         </span>
                                     </li>
                                     <li>
                                         {tr}Max height (Y):{/tr}
-                                        <span id="default_max_size_y" data-default="{$prefs.fgal_image_max_size_y}">
-                                            {$prefs.fgal_image_max_size_y} px
+                                        <span id="default_max_size_y" data-default="{$gal_info.image_max_size_y}">
+                                            {$gal_info.image_max_size_y} px
                                         </span>
                                     </li>
                                     <li>
                                         {tr}Compress files larger than:{/tr}
-                                        <span data-default="{$prefs.fgal_image_compression_max_size_mb|default:1}" id="default_min_file">
-                                            {$prefs.fgal_image_compression_max_size_mb|default:1} MB
+                                        <span data-default="{$gal_info.image_compression_max_size_mb}" id="default_min_file">
+                                            {$gal_info.image_compression_max_size_mb} MB
                                         </span>
                                     </li>
                                     <li>{tr}Save original:{/tr}
-                                       {if $prefs.fgal_image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
+                                       <span id="default_save_original">
+                                           {if $gal_info.image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
+                                       </span>
                                     </li>
                                 </ul>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="customize-compression-toggle">
@@ -420,7 +422,7 @@
                         {* Custom Controls (hidden by default) *}
                         <div id="compression_custom_controls" class="d-none">
                             {* Compression type: preset levels or slider *}
-                            {if $prefs.fgal_image_compression_preset_type eq 'levels'}
+                            {if $gal_info.image_compression_preset_type eq 'levels'}
                                 <div class="mb-2 row">
                                     <label class="col-md-4 col-form-label">{tr}Compression Level{/tr}</label>
                                     <div class="col-md-8">
@@ -452,9 +454,9 @@
                                         <div class="d-flex align-items-center">
                                             <input type="range" class="form-range me-3" id="compression_quality_main"
                                                 name="compression_quality" min="10" max="100"
-                                                value="{$prefs.fgal_image_compression_quality|default:85}">
+                                                value="{$gal_info.image_compression_quality}">
                                             <span class="quality-display badge bg-primary"
-                                                id="quality_display_main">{$prefs.fgal_image_compression_quality|default:85}%</span>
+                                                id="quality_display_main">{$gal_info.image_compression_quality}%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -464,7 +466,7 @@
                                 <label for="compression_max_dimension_x_main" class="col-md-4 col-form-label">{tr}Max Image Width (X){/tr}</label>
                                 <div class="col-md-8">
                                     <input type="number" id="compression_max_dimension_x_main" name="compression_max_dimension_x" class="form-control"
-                                        value="{$prefs.fgal_image_max_size_x|default:1600}">
+                                        value="{$gal_info.image_max_size_x}">
                                     <small id="compression_max_dimension_x_msg" class="text-success small"></small>
                                     <small class="form-text text-muted d-block">{tr}Maximum width in pixels. Images wider than this will be resized.{/tr}</small>
                                 </div>
@@ -474,7 +476,7 @@
                                 <label for="compression_max_dimension_y_main" class="col-md-4 col-form-label">{tr}Max Image Height (Y){/tr}</label>
                                 <div class="col-md-8">
                                     <input type="number" id="compression_max_dimension_y_main" name="compression_max_dimension_y" class="form-control"
-                                        value="{$prefs.fgal_image_max_size_y|default:1200}">
+                                        value="{$gal_info.image_max_size_y}">
                                     <small id="compression_max_dimension_y_msg" class="text-success small"></small>
                                     <small class="form-text text-muted d-block">{tr}Maximum height in pixels. Images taller than this will be resized.{/tr}</small>
                                 </div>
@@ -484,7 +486,7 @@
                                 <label class="col-md-4 col-form-label">{tr}Min File Size to Compress{/tr}</label>
                                 <div class="col-md-8">
                                     <input type="number" name="compression_max_size" class="form-control"
-                                        value="{$prefs.fgal_image_compression_max_size_mb|default:1}" min="1" step="0.5">
+                                        value="{$gal_info.image_compression_max_size_mb}" min="1" step="0.5">
                                     <small class="form-text text-muted d-block">{tr}Only compress images larger than this size (MB).{/tr}</small>
                                 </div>
                             </div>
@@ -495,7 +497,7 @@
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="compression_save_original_main"
                                             name="compression_save_original" value="y"
-                                            {if $prefs.fgal_image_compression_save_original eq 'y'}checked{/if}>
+                                            {if $gal_info.image_compression_save_original eq 'y'}checked{/if}>
                                         <label for="compression_save_original_main" class="form-check-label">{tr}Save original file{/tr}</label>
                                     </div>
                                 </div>
@@ -516,13 +518,13 @@
                         accept="{$allowedMimeTypes}"
                         max-size="{$max_upload_size}"
                         max-files="{$max_file_uploads}"
-                        compression_enabled="{if $prefs.fgal_image_compression_enabled eq 'y'}true{else}false{/if}"
-                        compression_preset_type="{$prefs.fgal_image_compression_preset_type}"
-                        compression_quality="{$prefs.fgal_image_compression_quality|default:85}"
-                        compression_max_dimension_x="{$gal_info.fgal_image_max_size_x|default:1600}"
-                        compression_max_dimension_y="${$gal_info.fgal_image_max_size_y|default:1200}"
-                        compression_max_size_mb="{$prefs.fgal_image_compression_max_size_mb|default:1}"
-                        compression_save_original="{$prefs.fgal_image_compression_save_original}"
+                        compression_enabled="{if isset($gal_info.image_compression_enabled) && $gal_info.image_compression_enabled eq 'y'}true{else}false{/if}"
+                        compression_preset_type="{if isset($gal_info.image_compression_preset_type)}{$gal_info.image_compression_preset_type}{/if}"
+                        compression_quality="{if isset($gal_info.image_compression_quality)}{$gal_info.image_compression_quality}{/if}"
+                        compression_max_dimension_x="{if isset($gal_info.image_max_size_x) && $gal_info.image_max_size_x > 0}{$gal_info.image_max_size_x}{/if}"
+                        compression_max_dimension_y="{if isset($gal_info.image_max_size_y) && $gal_info.image_max_size_y > 0}{$gal_info.image_max_size_y}{/if}"
+                        compression_max_size_mb="{if isset($gal_info.image_compression_max_size_mb)}{$gal_info.image_compression_max_size_mb}{/if}"
+                        compression_save_original="{if isset($gal_info.image_compression_save_original)}{$gal_info.image_compression_save_original}{/if}"
                     />
                 </div>
             {/if}
@@ -783,7 +785,7 @@ $("#galleryId").on("change", function(){
             if (data.canUpload) {
                 $("#gallery_type").attr('value', data.type);
 
-                // Handle separate X and Y dimensions if provided by backend
+                // Update image dimensions display
                 if (data.image_max_size_x && data.image_max_size_y) {
                     $("#imageResizeInfo").html(data.image_max_size_x + 'px (width) × ' + data.image_max_size_y + 'px (height)');
                 } else if (data.image_max_size_x || data.image_max_size_y) {
@@ -793,9 +795,54 @@ $("#galleryId").on("change", function(){
                 } else {
                     $("#imageResizeInfo").html('(No resize)');
                 }
+
+                // Update compression settings from gallery info
+                if (data.image_compression_enabled === 'y') {
+                    $("#image_compression_controls").removeClass('d-none');
+                    
+                    // Update default summary display
+                    if (data.image_max_size_x) {
+                        $("#default_max_size_x").text(data.image_max_size_x + ' px').attr('data-default', data.image_max_size_x);
+                    }
+                    if (data.image_max_size_y) {
+                        $("#default_max_size_y").text(data.image_max_size_y + ' px').attr('data-default', data.image_max_size_y);
+                    }
+                    if (data.image_compression_max_size_mb) {
+                        $("#default_min_file").text(data.image_compression_max_size_mb + ' MB').attr('data-default', data.image_compression_max_size_mb);
+                    }
+                    if (data.image_compression_save_original !== undefined) {
+                        const saveOrigText = data.image_compression_save_original === 'y' ? tr("Yes") : tr("No");
+                        $("#default_save_original").text(saveOrigText);
+                    }
+
+                    // Update custom controls
+                    if (data.image_compression_preset_type === 'levels') {
+                        $('input[name="compression_preset_main"]').prop('checked', false);
+                        $('input[name="compression_preset_main"][value="high"]').prop('checked', true);
+                    } else if (data.image_compression_quality) {
+                        $("#compression_quality_main").val(data.image_compression_quality);
+                        $("#quality_display_main").text(data.image_compression_quality + '%');
+                    }
+
+                    if (data.image_max_size_x) {
+                        $("#compression_max_dimension_x_main").val(data.image_max_size_x);
+                    }
+                    if (data.image_max_size_y) {
+                        $("#compression_max_dimension_y_main").val(data.image_max_size_y);
+                    }
+                    if (data.image_compression_max_size_mb) {
+                        $('input[name="compression_max_size"]').val(data.image_compression_max_size_mb);
+                    }
+                    if (data.image_compression_save_original !== undefined) {
+                        $("#compression_save_original_main").prop('checked', data.image_compression_save_original === 'y');
+                    }
+                } else {
+                    $("#image_compression_controls").addClass('d-none');
+                }
             } else {
                 $("#gallery_type").attr('value', '');
                 $("#imageResizeInfo").html('');
+                $("#image_compression_controls").addClass('d-none');
             }
         },
         error: function (e) {

@@ -271,6 +271,15 @@ if (empty($fileId)) {
     $smarty->assign('treeRootId', $galleries['parentId']);
 }
 
+// If gal_info is not set, load the root gallery (id=1)
+if (empty($gal_info)) {
+    $root_gallery_info = $filegallib->get_file_gallery(1);
+    if (!empty($root_gallery_info)) {
+        $tikilib->get_perm_object(1, 'file gallery', $root_gallery_info, true);
+        $smarty->assign_by_ref('gal_info', $root_gallery_info);
+    }
+}
+
 if ($prefs['fgal_limit_hits_per_file'] == 'y') {
     $smarty->assign('hit_limit', $filegallib->get_download_limit($fileId));
 }
@@ -298,12 +307,12 @@ if ($prefs['elementplus_upload'] === 'y') {
 }
 
 if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_upload'] !== 'y') {
-    $quality = (int)$prefs['fgal_image_compression_quality'];
-    $maxDimensionX = (int)$prefs['fgal_image_max_size_x'];
-    $maxDimensionY = (int)$prefs['fgal_image_max_size_y'];
-    $saveOriginal = json_encode($prefs['fgal_image_compression_save_original']);
-    $preset = json_encode($prefs['fgal_image_compression_preset_type']);
-    $maxSize = (float)$prefs['fgal_image_compression_max_size_mb'] ?? 1;
+    $quality = (int)$gal_info['image_compression_quality'];
+    $maxDimensionX = (int)$gal_info['image_max_size_x'];
+    $maxDimensionY = (int)$gal_info['image_max_size_y'];
+    $saveOriginal = json_encode($gal_info['image_compression_save_original']);
+    $preset = json_encode($gal_info['image_compression_preset_type']);
+    $maxSize = (float)$gal_info['image_compression_max_size_mb'] ?? 1;
 
     $headerlib->add_js_module("
         import initCompression, {getCompressionSettings} from '@tiki/image-compressor-controls';
