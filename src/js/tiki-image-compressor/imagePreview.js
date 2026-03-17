@@ -8,7 +8,7 @@
  *
  * 2. Compression Settings: Called from compressionControls.js via refreshPreview()
  *    - When quality slider changes
- *    - When max dimension changes
+ *    - When max dimensions (X/Y) change
  *    - Updates canvas rendering to show visual impact
  *
  * DISPLAYS:
@@ -70,16 +70,19 @@ function estimateCompressedSize(width, height, quality, originalBytes) {
  * @param {HTMLCanvasElement} canvas - Canvas to draw to
  * @param {HTMLImageElement} img - Image element to draw from
  * @param {number} quality - Quality 0-100
- * @param {number} maxDimension - Max width or height (for resizing)
+ * @param {number} maxDimensionX - Max width (for resizing)
+ * @param {number} maxDimensionY - Max height (for resizing)
  * @returns {Object} - {blob, dataUrl, width, height}
  */
-async function createCanvasPreview(canvas, img, quality, maxDimension) {
-    // Calculate dimensions with constraint
+async function createCanvasPreview(canvas, img, quality, maxDimensionX, maxDimensionY) {
+    // Calculate dimensions with constraints
     let width = img.naturalWidth;
     let height = img.naturalHeight;
 
-    if (width > maxDimension || height > maxDimension) {
-        const ratio = width > height ? maxDimension / width : maxDimension / height;
+    if (width > maxDimensionX || height > maxDimensionY) {
+        let ratioX = width > maxDimensionX ? maxDimensionX / width : 1;
+        let ratioY = height > maxDimensionY ? maxDimensionY / height : 1;
+        let ratio = Math.min(ratioX, ratioY);
         width = Math.round(width * ratio);
         height = Math.round(height * ratio);
     }
@@ -108,7 +111,7 @@ async function createCanvasPreview(canvas, img, quality, maxDimension) {
 /**
  * Update preview display with debouncing
  * Listens to any settings change and re-renders the preview with new quality/dimensions
- * @param {Object} settings - {quality, maxDimension}
+ * @param {Object} settings - {quality, maxDimensionX, maxDimensionY}
  */
 async function updatePreview(settings) {
     // Clear any pending update
@@ -122,7 +125,7 @@ async function updatePreview(settings) {
             return;
         }
 
-        const { quality = 85, maxDimension = 1600 } = settings;
+        const { quality = 85, maxDimensionX = 1600, maxDimensionY = 1200 } = settings;
 
         try {
             // Create canvas if not exists
@@ -131,7 +134,7 @@ async function updatePreview(settings) {
             }
 
             // Generate preview with actual JPEG compression rendering
-            const result = await createCanvasPreview(PREVIEW_STATE.previewCanvas, PREVIEW_STATE.originalImage, quality, maxDimension);
+            const result = await createCanvasPreview(PREVIEW_STATE.previewCanvas, PREVIEW_STATE.originalImage, quality, maxDimensionX, maxDimensionY);
 
             if (!result) {
                 console.warn("[ImagePreview] Failed to create preview");
@@ -209,7 +212,8 @@ async function loadImageFromFile(file) {
             const state = window.COMPRESSION_STATE || {};
             updatePreview({
                 quality: state.current?.quality || 85,
-                maxDimension: state.current?.maxDimension || 1600,
+                maxDimensionX: state.current?.maxDimensionX || 1600,
+                maxDimensionY: state.current?.maxDimensionY || 1200,
             });
         };
         img.onerror = () => {
@@ -296,8 +300,8 @@ function cleanup() {
 
 /**
  * Refresh preview from external module (compressionControls.js)
- * Called whenever quality or maxDimension settings change
- * @param {Object} settings - {quality, maxDimension}
+ * Called whenever quality or dimension settings change
+ * @param {Object} settings - {quality, maxDimensionX, maxDimensionY}
  */
 function refreshPreview(settings) {
     // Only update if we have an image loaded
@@ -308,7 +312,8 @@ function refreshPreview(settings) {
     // Trigger update with new settings
     updatePreview({
         quality: settings.quality || 85,
-        maxDimension: settings.maxDimension || 1600,
+        maxDimensionX: settings.maxDimensionX || 1600,
+        maxDimensionY: settings.maxDimensionY || 1200,
     });
 }
 

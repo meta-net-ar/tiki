@@ -24,7 +24,8 @@ if (typeof window !== "undefined") {
 // Validation rules for settings
 const VALIDATION = {
     quality: { min: 10, max: 100, type: "number" },
-    maxDimension: { min: 100, max: 10000, type: "number" },
+    maxDimensionX: { min: 100, max: 10000, type: "number" },
+    maxDimensionY: { min: 100, max: 10000, type: "number" },
     maxSize: { min: 0.1, max: 1000, type: "number" },
     saveOriginal: { type: "enum", values: ["y", "n"] },
     preset: { type: "enum", values: ["slider", "levels"] },
@@ -69,7 +70,7 @@ function validateSetting(key, value) {
  */
 function updateState(updates, skipDOMUpdate = false) {
     const changes = {};
-    const previewRelatedKeys = ["quality", "maxDimension"];
+    const previewRelatedKeys = ["quality", "maxDimensionX", "maxDimensionY"];
     let shouldRefreshPreview = false;
 
     for (const [key, value] of Object.entries(updates)) {
@@ -89,7 +90,7 @@ function updateState(updates, skipDOMUpdate = false) {
         updateDOMFromState();
     }
 
-    // Refresh image preview if quality or maxDimension changed
+    // Refresh image preview if quality or dimensions changed
     if (shouldRefreshPreview) {
         refreshPreview(STATE.current);
 
@@ -127,10 +128,16 @@ function updateDOMFromState() {
         qualitySlider.value = state.quality;
     }
 
-    // Max dimension input
-    const maxDimInput = document.querySelector("[name='compression_max_dimension']");
-    if (maxDimInput && maxDimInput.value != state.maxDimension) {
-        maxDimInput.value = state.maxDimension;
+    // Max dimension X input
+    const maxDimXInput = document.querySelector("[name='compression_max_dimension_x']");
+    if (maxDimXInput && maxDimXInput.value != state.maxDimensionX) {
+        maxDimXInput.value = state.maxDimensionX;
+    }
+
+    // Max dimension Y input
+    const maxDimYInput = document.querySelector("[name='compression_max_dimension_y']");
+    if (maxDimYInput && maxDimYInput.value != state.maxDimensionY) {
+        maxDimYInput.value = state.maxDimensionY;
     }
 
     // Max size input
@@ -154,7 +161,8 @@ function updateDOMFromState() {
  */
 function updateDefaultSummary(settings) {
     const updates = [
-        ["default_max_size", settings.maxDimension + " px"],
+        ["default_max_size_x", settings.maxDimensionX + " px"],
+        ["default_max_size_y", settings.maxDimensionY + " px"],
         ["default_min_file", settings.maxSize + " MB"],
         ["default_save_original", settings.saveOriginal === "y" ? "Yes" : "No"],
         ["default_unzip", "No"],
@@ -211,12 +219,14 @@ async function initializeEventListeners() {
     const elements = await waitForElements({
         qualitySlider: "#compression_quality_main",
         qualityDisplay: "#quality_display_main",
-        maxDimInput: "[name='compression_max_dimension']",
+        maxDimXInput: "[name='compression_max_dimension_x']",
+        maxDimYInput: "[name='compression_max_dimension_y']",
         maxSizeInput: "[name='compression_max_size']",
         saveOrigChk: "#compression_save_original_main",
         toggleBtn: "#customize-compression-toggle",
         backBtn: "#compression-back-to-default",
-        maxSizeMsgEl: "#compression_max_dimension_msg",
+        maxDimXMsgEl: "#compression_max_dimension_x_msg",
+        maxDimYMsgEl: "#compression_max_dimension_y_msg",
     });
 
     if (elements.qualitySlider) {
@@ -227,12 +237,12 @@ async function initializeEventListeners() {
         attachListener(elements.qualitySlider, "input", handler);
     }
 
-    if (elements.maxDimInput) {
+    if (elements.maxDimXInput) {
         const handler = (e) => {
-            const msgEl = elements.maxSizeMsgEl;
+            const msgEl = elements.maxDimXMsgEl;
             let value = parseInt(e.target.value, 10);
-            const min = VALIDATION.maxDimension.min;
-            const max = VALIDATION.maxDimension.max;
+            const min = VALIDATION.maxDimensionX.min;
+            const max = VALIDATION.maxDimensionX.max;
 
             if (isNaN(value)) {
                 msgEl.textContent = "";
@@ -252,9 +262,39 @@ async function initializeEventListeners() {
                 msgEl.textContent = "";
             }
 
-            updateState({ maxDimension: clamped });
+            updateState({ maxDimensionX: clamped });
         };
-        attachListener(elements.maxDimInput, "input", handler);
+        attachListener(elements.maxDimXInput, "input", handler);
+    }
+
+    if (elements.maxDimYInput) {
+        const handler = (e) => {
+            const msgEl = elements.maxDimYMsgEl;
+            let value = parseInt(e.target.value, 10);
+            const min = VALIDATION.maxDimensionY.min;
+            const max = VALIDATION.maxDimensionY.max;
+
+            if (isNaN(value)) {
+                msgEl.textContent = "";
+                return;
+            }
+
+            let clamped = value;
+            if (value < min) {
+                clamped = min;
+                msgEl.textContent = `Too low, will use ${min} px internally.`;
+                msgEl.className = "text-success small mt-1";
+            } else if (value > max) {
+                clamped = max;
+                msgEl.textContent = `Too high, will use ${max} px internally.`;
+                msgEl.className = "text-success small mt-1";
+            } else {
+                msgEl.textContent = "";
+            }
+
+            updateState({ maxDimensionY: clamped });
+        };
+        attachListener(elements.maxDimYInput, "input", handler);
     }
 
     if (elements.maxSizeInput) {
@@ -320,7 +360,8 @@ async function initializeCompressionUI(config = {}) {
     try {
         STATE.serverDefaults = {
             quality: validateSetting("quality", config.quality || 65),
-            maxDimension: validateSetting("maxDimension", config.maxDimension || 1600),
+            maxDimensionX: validateSetting("maxDimensionX", config.maxDimensionX || 1600),
+            maxDimensionY: validateSetting("maxDimensionY", config.maxDimensionY || 1200),
             maxSize: validateSetting("maxSize", config.maxSize || 1),
             saveOriginal: validateSetting("saveOriginal", config.saveOriginal || "n"),
             preset: validateSetting("preset", config.preset || "slider"),

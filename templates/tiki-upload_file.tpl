@@ -516,13 +516,11 @@
                         accept="{$allowedMimeTypes}"
                         max-size="{$max_upload_size}"
                         max-files="{$max_file_uploads}"
-                        max-width="{if isset($gal_info.fgal_image_max_size_x)}{$gal_info.fgal_image_max_size_x}{/if}"
-                        max-height="{if isset($gal_info.fgal_image_max_size_y)}{$gal_info.fgal_image_max_size_y}{/if}"
                         compression_enabled="{if $prefs.fgal_image_compression_enabled eq 'y'}true{else}false{/if}"
                         compression_preset_type="{$prefs.fgal_image_compression_preset_type}"
                         compression_quality="{$prefs.fgal_image_compression_quality|default:85}"
-                        compression_max_dimension_x="{$prefs.fgal_image_max_size_x|default:1600}"
-                        compression_max_dimension_y="{$prefs.fgal_image_max_size_y|default:1200}"
+                        compression_max_dimension_x="{$gal_info.fgal_image_max_size_x|default:1600}"
+                        compression_max_dimension_y="${$gal_info.fgal_image_max_size_y|default:1200}"
                         compression_max_size_mb="{$prefs.fgal_image_compression_max_size_mb|default:1}"
                         compression_save_original="{$prefs.fgal_image_compression_save_original}"
                     />
@@ -716,19 +714,23 @@
     {/if}
 {/if}
 {jq}
-var defaultDim= $("#image_max_dimension").attr('value');
+var defaultDimX = $("#image_max_dimension_x").attr('value');
+var defaultDimY = $("#image_max_dimension_y").attr('value');
 
 $("#imagesize").on("click", function () {
     if ($(this).prop("checked")) {
         $("#customsize").css("display", "none");
         //resetting size to default
-        $("#image_max_dimension").attr('value',defaultDim);
-        $("element-plus-ui#uploader").attr('max-width', defaultDim);
-        $("element-plus-ui#uploader").attr('max-height', defaultDim);
+        $("#image_max_dimension_x").attr('value', defaultDimX);
+        $("#image_max_dimension_y").attr('value', defaultDimY);
+        $("element-plus-ui#uploader").attr('max-width', defaultDimX);
+        $("element-plus-ui#uploader").attr('max-height', defaultDimY);
     } else {
         $("#customsize").css("display", "");
-        $("#image_max_dimension").on("change", function () {
+        $("#image_max_dimension_x").on("change", function () {
             $("element-plus-ui#uploader").attr('max-width', $(this).val());
+        });
+        $("#image_max_dimension_y").on("change", function () {
             $("element-plus-ui#uploader").attr('max-height', $(this).val());
         });
     }
@@ -782,11 +784,11 @@ $("#galleryId").on("change", function(){
                 $("#gallery_type").attr('value', data.type);
 
                 // Handle separate X and Y dimensions if provided by backend
-                if (data.image_max_dimension_x && data.image_max_dimension_y) {
-                    $("#imageResizeInfo").html(data.image_max_dimension_x + 'px (width) × ' + data.image_max_dimension_y + 'px (height)');
-                } else if (data.image_max_dimension_x || data.image_max_dimension_y) {
-                    const dimX = data.image_max_dimension_x || 'unlimited';
-                    const dimY = data.image_max_dimension_y || 'unlimited';
+                if (data.image_max_size_x && data.image_max_size_y) {
+                    $("#imageResizeInfo").html(data.image_max_size_x + 'px (width) × ' + data.image_max_size_y + 'px (height)');
+                } else if (data.image_max_size_x || data.image_max_size_y) {
+                    const dimX = data.image_max_size_x || 'unlimited';
+                    const dimY = data.image_max_size_y || 'unlimited';
                     $("#imageResizeInfo").html(dimX + 'px (width) × ' + dimY + 'px (height)');
                 } else {
                     $("#imageResizeInfo").html('(No resize)');

@@ -72,7 +72,8 @@ $inputConfiguration = [
         'fgal_show_path'               => 'bool',              //post
         'fgal_list_ocr_state'          => 'string',            //get
         'fgal_show_slideshow'          => 'bool',              //post
-        'image_max_dimension'             => 'int',            //post
+        'image_max_size_x'             => 'int',               //post
+        'image_max_size_y'             => 'int',               //post
         'viewitem'                     => 'bool',              //post
         'backlinkPerms'                => 'bool',              //post
         'fgal_list_backlinks'          => 'string',            //post
@@ -751,7 +752,8 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         'parentId',
         'creator',
         'quota',
-        'image_max_dimension',
+        'image_max_size_x',
+        'image_max_size_y',
         'wiki_syntax',
         'icon_fileId',
         'ocr_langs',
@@ -860,7 +862,8 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
             'show_ocr_state' => $_POST['fgal_list_ocr_state'],
             'default_view' => $_REQUEST['fgal_default_view'],
             'quota' => $_REQUEST['quota'],
-            'image_max_dimension' => $_REQUEST['image_max_dimension'],
+            'image_max_size_x' => $_REQUEST['image_max_size_x'],
+            'image_max_size_y' => $_REQUEST['image_max_size_y'],
             'backlinkPerms' => isset($_REQUEST['backlinkPerms']) ? 'y' : 'n',
             'show_backlinks' => $_REQUEST['fgal_list_backlinks'],
             'wiki_syntax' => $_REQUEST['wiki_syntax'],

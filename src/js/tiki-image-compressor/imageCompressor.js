@@ -33,24 +33,71 @@ function isImage(mimeType) {
 }
 
 /**
+ * Resizes image to fit within max dimensions while maintaining aspect ratio.
+ *
+ * @param {Blob|File} file - Image file to compress
+ * @param {number} maxWidth - Maximum width
+ * @param {number} maxHeight - Maximum height
+ * @returns {Promise<Blob>} - Resized image blob
+ */
+function resizeImage(file, maxWidth, maxHeight) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const url = URL.createObjectURL(file);
+        img.src = url;
+
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+
+            let { width, height } = img;
+
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+
+            if (ratio < 1) {
+                width *= ratio;
+                height *= ratio;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) return resolve(file);
+                resolve(blob);
+            }, file.type, 0.95);
+        };
+    });
+}
+
+/**
  * Compress image using browser-image-compression
  *
  * @private
  */
 async function compressImage(fileBlob, prefs) {
     const quality = prefs.quality || 65;
-    const maxDimension = prefs.maxDimension || 1600;
+    const maxDimensionX = prefs.maxDimensionX || 1600;
+    const maxDimensionY = prefs.maxDimensionY || 1200;
     const maxSize = prefs.maxSize || 1;
 
+    // Step 1: resize
+    const resizedBlob = await resizeImage(fileBlob, maxDimensionX, maxDimensionY);
+
+    // Step 2: compress
     const compressionOptions = {
         maxSizeMB: maxSize,
-        maxWidthOrHeight: maxDimension,
+        maxWidthOrHeight: Math.max(maxDimensionX, maxDimensionY),
         useWebWorker: typeof Worker !== "undefined",
-        quality: quality / 100, // Convert 0-100 to 0-1
-        alwaysKeepResolution: false,
+        initialQuality: quality / 100,
+        alwaysKeepResolution: true,
     };
 
-    return imageCompression(fileBlob, compressionOptions);
+    return imageCompression(resizedBlob, compressionOptions);
 }
 
 /**
@@ -60,7 +107,8 @@ async function compressImage(fileBlob, prefs) {
  * @param {Blob|File} fileBlob - File to compress
  * @param {Object} prefs - Compression preferences
  *   - quality: 0-100
- *   - maxDimension: pixels for images
+ *   - maxDimensionX: pixels for image width
+ *   - maxDimensionY: pixels for image height
  *   - maxSize: MB
  * @param {Object} options - Additional options
  *   - mimeType: override file MIME type
@@ -147,7 +195,7 @@ async function compressMultiple(files, prefs = {}, options = {}) {
  * Updates file input with compressed files using DataTransfer
  *
  * @param {FileList} fileList - FileList from input[type="file"]
- * @param {Object} prefs - Compression settings (quality, maxDimension, maxSize)
+ * @param {Object} prefs - Compression settings (quality, maxDimensionX, maxDimensionY, maxSize)
  * @returns {Promise<DataTransfer>} - DataTransfer with compressed files
  */
 async function compressFileList(fileList, prefs = {}) {

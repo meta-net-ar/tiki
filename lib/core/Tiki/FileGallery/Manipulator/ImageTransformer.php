@@ -75,9 +75,6 @@ class ImageTransformer extends Manipulator
             $image_size_y = $gal_info["image_max_size_y"];
         }
 
-        // $image_size_info = getimagesize($work_file);
-        // $image_x = $image_size_info[0];
-        // $image_y = $image_size_info[1];
         $image_size_info = getimagesize($work_file);
 
         if (! is_array($image_size_info)) {

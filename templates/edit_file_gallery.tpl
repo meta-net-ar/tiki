@@ -353,14 +353,26 @@ if ($(this).val() != '') {
                     {/if}
                 {/if}
                 <div class="tiki-form-group row">
-                    <label for="image_max_dimension" class="col-sm-4 col-form-label">{tr}Maximum image dimension in gallery{/tr}</label>
+                    <label for="image_max_dimension_x" class="col-sm-4 col-form-label">{tr}Maximum image width in gallery{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_dimension" id="image_max_dimension" value="{$gal_info.image_max_dimension|escape}" class="form-control text-end">
+                                <input type="number" name="image_max_dimension_x" id="image_max_dimension_x" value="{$gal_info.image_max_size_x|default:1600|escape}" class="form-control text-end">
                                 <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
-                            <span class="form-text">{tr}If an image is larger than this dimension (width or height), it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
+                            <span class="form-text">{tr}If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tiki-form-group row">
+                    <label for="image_max_dimension_y" class="col-sm-4 col-form-label">{tr}Maximum image height in gallery{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-control-plaintext">
+                            <div class="input-group col-sm-4">
+                                <input type="number" name="image_max_dimension_y" id="image_max_dimension_y" value="{$gal_info.image_max_size_y|default:1200|escape}" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
+                            </div>
+                            <span class="form-text">{tr}If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
                         </div>
                     </div>
                 </div>

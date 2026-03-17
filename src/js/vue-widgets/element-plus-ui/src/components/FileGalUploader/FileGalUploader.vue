@@ -14,14 +14,13 @@ const props = defineProps([
     'accept',
     'maxSize',
     'maxFiles',
-    'maxWidth',
-    'maxHeight',
     'vimeoUrl',
     'language',
     'compression_enabled',
     'compression_preset_type',
     'compression_quality',
-    'compression_max_dimension',
+    'compression_max_dimension_x',
+    'compression_max_dimension_y',
     'compression_max_size_mb',
     'compression_save_original'
 ]);
@@ -49,7 +48,8 @@ const compressionReason = ref('');
 let updateDebounceTimer = null;
 let currentCompressionSettings = {
     quality: 85,
-    maxDimension: 1600,
+    maxDimensionX: 1600,
+    maxDimensionY: 1200,
     maxSizeMb: 1
 };
 
@@ -64,7 +64,8 @@ onMounted(async () => {
         const prefs = {
             preset: props.compression_preset_type || 'slider',
             quality: parseInt(props.compression_quality, 10) || 85,
-            maxDimension: parseInt(props.compression_max_dimension, 10) || 1600,
+            maxDimensionX: parseInt(props.compression_max_dimension_x, 10) || 1600,
+            maxDimensionY: parseInt(props.compression_max_dimension_y, 10) || 1200,
             maxSize: parseFloat(props.compression_max_size_mb) || 1,
             saveOriginal: props.compression_save_original,
         };
@@ -74,7 +75,8 @@ onMounted(async () => {
         // Store compression settings for dynamic checks
         currentCompressionSettings = {
             quality: prefs.quality,
-            maxDimension: prefs.maxDimension,
+            maxDimensionX: prefs.maxDimensionX,
+            maxDimensionY: prefs.maxDimensionY,
             maxSizeMb: prefs.maxSize
         };
 
@@ -104,12 +106,14 @@ const getFileExtension = (fileName) => {
 /**
  * Create canvas preview with actual JPEG compression
  */
-const createCanvasPreview = async (img, quality, maxDimension) => {
+const createCanvasPreview = async (img, quality, maxDimensionX, maxDimensionY) => {
     let width = img.naturalWidth;
     let height = img.naturalHeight;
 
-    if (width > maxDimension || height > maxDimension) {
-        const ratio = width > height ? maxDimension / width : maxDimension / height;
+    if (width > maxDimensionX || height > maxDimensionY) {
+        let ratioX = width > maxDimensionX ? maxDimensionX / width : 1;
+        let ratioY = height > maxDimensionY ? maxDimensionY / height : 1;
+        let ratio = Math.min(ratioX, ratioY);
         width = Math.round(width * ratio);
         height = Math.round(height * ratio);
     }
@@ -152,15 +156,27 @@ const currentPreviewFile = () => {
 const checkIfCompressionNeeded = (imageWidth, imageHeight, fileSize, settings) => {
     const fileSizeMb = fileSize / (1024 * 1024);
     const exceedsMinFileSize = fileSizeMb >= settings.maxSizeMb;
-    
-    // Primary check: file size must exceed minimum threshold to be worth compressing
-    if (exceedsMinFileSize) {
+    const exceedsMaxWidth = imageWidth > settings.maxDimensionX;
+    const exceedsMaxHeight = imageHeight > settings.maxDimensionY;
+
+    // Check if compression is needed: file size OR dimensions exceed limits
+    if (exceedsMinFileSize || exceedsMaxWidth || exceedsMaxHeight) {
         needsCompression.value = true;
-        compressionReason.value = `File size (${fileSizeMb.toFixed(2)}MB) exceeds minimum threshold of ${settings.maxSizeMb}MB and will be compressed`;
+        let reason = [];
+        if (exceedsMinFileSize) {
+            reason.push(`file size (${fileSizeMb.toFixed(2)}MB) exceeds minimum threshold of ${settings.maxSizeMb}MB`);
+        }
+        if (exceedsMaxWidth) {
+            reason.push(`width (${imageWidth}px) exceeds maximum of ${settings.maxDimensionX}px`);
+        }
+        if (exceedsMaxHeight) {
+            reason.push(`height (${imageHeight}px) exceeds maximum of ${settings.maxDimensionY}px`);
+        }
+        compressionReason.value = `Image will be compressed because ${reason.join(', ')}.`;
         return true;
     } else {
         needsCompression.value = false;
-        compressionReason.value = `File is small (${fileSizeMb.toFixed(2)}MB) and below the ${settings.maxSizeMb}MB compression threshold. No compression needed.`;
+        compressionReason.value = `File is small (${fileSizeMb.toFixed(2)}MB) and dimensions (${imageWidth}×${imageHeight}px) are within limits. No compression needed.`;
         return false;
     }
 };
@@ -177,18 +193,19 @@ const updatePreviewFromSettings = async (settings) => {
     updateDebounceTimer = setTimeout(async () => {
         try {
             const quality = settings.quality || 85;
-            const maxDimension = settings.maxDimension || 1600;
+            const maxDimensionX = settings.maxDimensionX || 1600;
+            const maxDimensionY = settings.maxDimensionY || 1200;
             const maxSizeMb = settings.maxSizeMb || currentCompressionSettings.maxSizeMb;
             
             // Update current settings
-            currentCompressionSettings = { quality, maxDimension, maxSizeMb };
+            currentCompressionSettings = { quality, maxDimensionX, maxDimensionY, maxSizeMb };
             
             // Check if compression is actually needed
             const compressionNeeded = checkIfCompressionNeeded(
                 current.image.naturalWidth,
                 current.image.naturalHeight,
                 current.file.size,
-                { maxDimension, maxSizeMb }
+                { maxDimensionX, maxDimensionY, maxSizeMb }
             );
             
             if (!compressionNeeded) {
@@ -202,7 +219,8 @@ const updatePreviewFromSettings = async (settings) => {
             const result = await createCanvasPreview(
                 current.image,
                 quality,
-                maxDimension
+                maxDimensionX,
+                maxDimensionY
             );
 
             if (!result) return;
@@ -247,7 +265,8 @@ const selectFileForPreview = (index) => {
     const state = window.COMPRESSION_STATE || {};
     updatePreviewFromSettings({
         quality: state.current?.quality || 85,
-        maxDimension: state.current?.maxDimension || 1600,
+        maxDimensionX: state.current?.maxDimensionX || 1600,
+        maxDimensionY: state.current?.maxDimensionY || 1200,
         maxSizeMb: state.current?.maxSizeMb || currentCompressionSettings.maxSizeMb || 1
     });
 };
