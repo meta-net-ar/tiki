@@ -66,10 +66,14 @@ function resizeImage(file, maxWidth, maxHeight) {
 
             ctx.drawImage(img, 0, 0, width, height);
 
-            canvas.toBlob((blob) => {
-                if (!blob) return resolve(file);
-                resolve(blob);
-            }, file.type, 0.95);
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) return resolve(file);
+                    resolve(blob);
+                },
+                file.type,
+                0.95
+            );
         };
     });
 }

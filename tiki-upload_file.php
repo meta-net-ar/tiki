@@ -274,7 +274,7 @@ if (empty($fileId)) {
 // If gal_info is not set, load the root gallery (id=1)
 if (empty($gal_info)) {
     $root_gallery_info = $filegallib->get_file_gallery(1);
-    if (!empty($root_gallery_info)) {
+    if (! empty($root_gallery_info)) {
         $tikilib->get_perm_object(1, 'file gallery', $root_gallery_info, true);
         $smarty->assign_by_ref('gal_info', $root_gallery_info);
     }
@@ -306,7 +306,7 @@ if ($prefs['elementplus_upload'] === 'y') {
     $headerlib->add_js_module("import '@vue-widgets/el-file-gal-uploader';");
 }
 
-if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_upload'] !== 'y') {
+if ($prefs['elementplus_upload'] !== 'y') {
     $quality = (int)$gal_info['image_compression_quality'];
     $maxDimensionX = (int)$gal_info['image_max_size_x'];
     $maxDimensionY = (int)$gal_info['image_max_size_y'];

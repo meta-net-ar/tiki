@@ -770,6 +770,8 @@ $("#current_gallery").on("change", function (e) {
     }
 });
 
+var currentGalInfo = {};
+
 $("#galleryId").on("change", function(){
     var galleryId = $("#galleryId").val();
     var action = $("#galleryId").attr('data-action');
@@ -782,64 +784,69 @@ $("#galleryId").on("change", function(){
         data: { galleryId },
         dataType: 'json',
         success: function (data) {
-            if (data.canUpload) {
-                $("#gallery_type").attr('value', data.type);
+            if (data.canUpload && data.gal_info) {
+                // Store complete gal_info object
+                currentGalInfo = data.gal_info;
+                
+                // Update gallery type
+                $("#gallery_type").attr('value', currentGalInfo.type);
 
                 // Update image dimensions display
-                if (data.image_max_size_x && data.image_max_size_y) {
-                    $("#imageResizeInfo").html(data.image_max_size_x + 'px (width) × ' + data.image_max_size_y + 'px (height)');
-                } else if (data.image_max_size_x || data.image_max_size_y) {
-                    const dimX = data.image_max_size_x || 'unlimited';
-                    const dimY = data.image_max_size_y || 'unlimited';
+                if (currentGalInfo.image_max_size_x && currentGalInfo.image_max_size_y) {
+                    $("#imageResizeInfo").html(currentGalInfo.image_max_size_x + 'px (width) × ' + currentGalInfo.image_max_size_y + 'px (height)');
+                } else if (currentGalInfo.image_max_size_x || currentGalInfo.image_max_size_y) {
+                    const dimX = currentGalInfo.image_max_size_x || 1600;
+                    const dimY = currentGalInfo.image_max_size_y || 1200;
                     $("#imageResizeInfo").html(dimX + 'px (width) × ' + dimY + 'px (height)');
                 } else {
                     $("#imageResizeInfo").html('(No resize)');
                 }
 
                 // Update compression settings from gallery info
-                if (data.image_compression_enabled === 'y') {
+                if (currentGalInfo.image_compression_enabled === 'y') {
                     $("#image_compression_controls").removeClass('d-none');
                     
                     // Update default summary display
-                    if (data.image_max_size_x) {
-                        $("#default_max_size_x").text(data.image_max_size_x + ' px').attr('data-default', data.image_max_size_x);
+                    if (currentGalInfo.image_max_size_x) {
+                        $("#default_max_size_x").text(currentGalInfo.image_max_size_x + ' px').attr('data-default', currentGalInfo.image_max_size_x);
                     }
-                    if (data.image_max_size_y) {
-                        $("#default_max_size_y").text(data.image_max_size_y + ' px').attr('data-default', data.image_max_size_y);
+                    if (currentGalInfo.image_max_size_y) {
+                        $("#default_max_size_y").text(currentGalInfo.image_max_size_y + ' px').attr('data-default', currentGalInfo.image_max_size_y);
                     }
-                    if (data.image_compression_max_size_mb) {
-                        $("#default_min_file").text(data.image_compression_max_size_mb + ' MB').attr('data-default', data.image_compression_max_size_mb);
+                    if (currentGalInfo.image_compression_max_size_mb) {
+                        $("#default_min_file").text(currentGalInfo.image_compression_max_size_mb + ' MB').attr('data-default', currentGalInfo.image_compression_max_size_mb);
                     }
-                    if (data.image_compression_save_original !== undefined) {
-                        const saveOrigText = data.image_compression_save_original === 'y' ? tr("Yes") : tr("No");
+                    if (currentGalInfo.image_compression_save_original !== undefined) {
+                        const saveOrigText = currentGalInfo.image_compression_save_original === 'y' ? tr("Yes") : tr("No");
                         $("#default_save_original").text(saveOrigText);
                     }
 
                     // Update custom controls
-                    if (data.image_compression_preset_type === 'levels') {
+                    if (currentGalInfo.image_compression_preset_type === 'levels') {
                         $('input[name="compression_preset_main"]').prop('checked', false);
                         $('input[name="compression_preset_main"][value="high"]').prop('checked', true);
-                    } else if (data.image_compression_quality) {
-                        $("#compression_quality_main").val(data.image_compression_quality);
-                        $("#quality_display_main").text(data.image_compression_quality + '%');
+                    } else if (currentGalInfo.image_compression_quality) {
+                        $("#compression_quality_main").val(currentGalInfo.image_compression_quality);
+                        $("#quality_display_main").text(currentGalInfo.image_compression_quality + '%');
                     }
 
-                    if (data.image_max_size_x) {
-                        $("#compression_max_dimension_x_main").val(data.image_max_size_x);
+                    if (currentGalInfo.image_max_size_x) {
+                        $("#compression_max_dimension_x_main").val(currentGalInfo.image_max_size_x);
                     }
-                    if (data.image_max_size_y) {
-                        $("#compression_max_dimension_y_main").val(data.image_max_size_y);
+                    if (currentGalInfo.image_max_size_y) {
+                        $("#compression_max_dimension_y_main").val(currentGalInfo.image_max_size_y);
                     }
-                    if (data.image_compression_max_size_mb) {
-                        $('input[name="compression_max_size"]').val(data.image_compression_max_size_mb);
+                    if (currentGalInfo.image_compression_max_size_mb) {
+                        $('input[name="compression_max_size"]').val(currentGalInfo.image_compression_max_size_mb);
                     }
-                    if (data.image_compression_save_original !== undefined) {
-                        $("#compression_save_original_main").prop('checked', data.image_compression_save_original === 'y');
+                    if (currentGalInfo.image_compression_save_original !== undefined) {
+                        $("#compression_save_original_main").prop('checked', currentGalInfo.image_compression_save_original === 'y');
                     }
                 } else {
                     $("#image_compression_controls").addClass('d-none');
                 }
             } else {
+                currentGalInfo = {};
                 $("#gallery_type").attr('value', '');
                 $("#imageResizeInfo").html('');
                 $("#image_compression_controls").addClass('d-none');

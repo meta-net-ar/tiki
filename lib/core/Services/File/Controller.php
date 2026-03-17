@@ -358,17 +358,15 @@ class Services_File_Controller
     {
         $gal_info = $this->checkTargetGallery($input);
 
-        return [
+        $response = [
             'canUpload' => (bool) $gal_info,
-            'type' => $gal_info['type'],
-            'image_max_size_x' => (int) $gal_info['image_max_size_x'],
-            'image_max_size_y' => (int) $gal_info['image_max_size_y'],
-            'image_compression_enabled' => $gal_info['image_compression_enabled'] ?? null,
-            'image_compression_preset_type' => $gal_info['image_compression_preset_type'] ?? null,
-            'image_compression_quality' => $gal_info['image_compression_quality'] ?? null,
-            'image_compression_save_original' => $gal_info['image_compression_save_original'] ?? null,
-            'image_compression_max_size_mb' => $gal_info['image_compression_max_size_mb'] ?? null,
         ];
+
+        if ($gal_info) {
+            $response['gal_info'] = $gal_info;
+        }
+
+        return $response;
     }
 
     public function action_thumbnail_gallery($input)

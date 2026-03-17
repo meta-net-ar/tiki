@@ -148,6 +148,10 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/tiki-html5-qrcode */
                 "@html5-qrcode/html5-qrcode" => $tikiUrl . JS_ASSETS_PATH . "/tiki-html5-qrcode.js",
 
+                /* tiki-image-compressor */
+                "@tiki/image-compressor" => $tikiUrl . JS_ASSETS_PATH . "/tiki-image-compressor.js",
+                "@tiki/image-compressor-controls" => $tikiUrl . JS_ASSETS_PATH . "/tiki-image-compressor-controls.js",
+
                 /* src/js/tiki-iot */
                 "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",
                 "@tiki-iot/tiki-iot-dashboard" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard.js",
