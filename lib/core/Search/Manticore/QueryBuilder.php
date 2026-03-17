@@ -271,7 +271,7 @@ class QueryBuilder
             $terms = $this->getQuoted($node);
             if (is_array($terms)) {
                 $key = 'tf_' . uniqid();
-                $terms = implode(',', array_filter(array_map(function ($v) use ($field) {
+                $terms = implode(',', array_filter(array_map(function ($v) {
                     if (is_scalar($v)) {
                         return $this->pdo_client->quote(strval($v));
                     } else {
@@ -285,9 +285,15 @@ class QueryBuilder
                 }
                 return "$key = 1";
             }
-            if ($node->getType() == 'identifier' || str_ends_with($field, '_ts')) {
+            if (str_ends_with($field, '_ts')) {
                 $value = $this->getQuoted($node);
                 return "{$field} = $value";
+            } elseif ($node->getType() == 'identifier') {
+                $raw = $this->getRaw($node);
+                $value = $this->pdo_client->quote(strval($raw));
+                $key = 'tf_' . uniqid();
+                $this->select[$key] = "TO_STRING({$field}) = $value";
+                return "$key = 1";
             } else {
                 $value = $this->getQuoted($node, '(?i)');
                 $key = 'tf_' . uniqid();

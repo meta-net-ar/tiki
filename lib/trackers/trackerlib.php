@@ -5710,14 +5710,17 @@ class TrackerLib extends TikiLib
             }
             include_once('lib/webmail/tikimaillib.php');
             if ($simpleEmail == "n") {
+                $desc = "";
                 $mail_main_value_fieldId = $tracker_definition->getMainFieldId();
-                $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
-                if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
-                    // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
-                    $handler = $this->get_field_handler($mail_main_value_field);
-                    $desc = $handler->renderOutput(['list_mode' => 'csv']);
-                } else {
-                    $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                if ($mail_main_value_fieldId) {
+                    $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
+                    if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
+                        // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
+                        $handler = $this->get_field_handler($mail_main_value_field);
+                        $desc = $handler->renderOutput(['list_mode' => 'csv']);
+                    } else {
+                        $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                    }
                 }
                 $smarty = TikiLib::lib('smarty');
                 $desc = $this->removeInlineSyntaxTags($desc);

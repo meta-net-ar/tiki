@@ -1365,6 +1365,12 @@ class UnifiedSearchLib
             throw new Exception('Invalid filter type provided in query. It must be an array.');
         }
 
+        // Support expert sort configuration via meta-parameter
+        if (isset($filter['_sort']) && $filter['_sort']) {
+            $query->setOrder($filter['_sort']);
+            unset($filter['_sort']);
+        }
+
         if (isset($filter['type']) && $filter['type']) {
             $query->filterType($filter['type']);
         }
@@ -1480,11 +1486,13 @@ class UnifiedSearchLib
         unset($filter['autocomplete']);
         unset($filter['groups']);
 
+
         foreach ($filter as $key => $value) {
             if ($value) {
                 $query->filterContent($value, $key);
             }
         }
+
         return $query;
     }
 
