@@ -63,14 +63,16 @@ class ImageTransformer extends Manipulator
         }
 
         // If it's an image format we can handle and gallery has limits on image sizes
-        if (empty($gal_info["image_max_dimension"]) && (! $image_size_x && ! $image_size_y)) {
+        if (! ($gal_info["image_max_size_x"] && ! $gal_info["image_max_size_y"]) && (! $image_size_x && ! $image_size_y)) {
             unlink($work_file);
             return;
         }
 
-        if (is_null($image_size_x) && is_null($image_size_y)) {
-            $image_size_x = $gal_info["image_max_dimension"];
-            $image_size_y = $gal_info["image_max_dimension"];
+        if (is_null($image_size_x)) {
+            $image_size_x = $gal_info["image_max_size_x"];
+        }
+        if (is_null($image_size_y)) {
+            $image_size_y = $gal_info["image_max_size_y"];
         }
 
         // $image_size_info = getimagesize($work_file);

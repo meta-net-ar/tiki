@@ -271,7 +271,7 @@ class Tiki_Profile_InstallHandler_FileGallery extends Tiki_Profile_InstallHandle
         }
 
         // Include any simple field whose value is different from the default
-        $simple = ['description', 'public', 'type', 'direct', 'lockable', 'archives', 'quota', 'image_max_dimension', 'backlinkPerms', 'wiki_syntax', 'sort_mode', 'maxRows', 'max_desc', 'subgal_conf', 'default_view', 'template'];
+        $simple = ['description', 'public', 'type', 'direct', 'lockable', 'archives', 'quota', 'image_max_size_x', 'image_max_size_y', 'backlinkPerms', 'wiki_syntax', 'sort_mode', 'maxRows', 'max_desc', 'subgal_conf', 'default_view', 'template'];
         foreach ($simple as $field) {
             if ($info[$field] != $default[$field]) {
                 $out[$field] = $info[$field];

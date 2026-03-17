@@ -390,9 +390,15 @@
                                 <strong>{tr}Current Settings:{/tr}</strong>
                                 <ul class="mb-2">
                                     <li>
-                                        {tr}Max dimension:{/tr}
-                                        <span id="default_max_size" data-default="{$prefs.fgal_image_compression_max_dimension}">
-                                            {$prefs.fgal_image_compression_max_dimension} px
+                                        {tr}Max width (X):{/tr}
+                                        <span id="default_max_size_x" data-default="{$prefs.fgal_image_max_size_x}">
+                                            {$prefs.fgal_image_max_size_x} px
+                                        </span>
+                                    </li>
+                                    <li>
+                                        {tr}Max height (Y):{/tr}
+                                        <span id="default_max_size_y" data-default="{$prefs.fgal_image_max_size_y}">
+                                            {$prefs.fgal_image_max_size_y} px
                                         </span>
                                     </li>
                                     <li>
@@ -455,12 +461,22 @@
                             {/if}
 
                             <div class="mb-2 row">
-                                <label for="compression_max_dimension_main" class="col-md-4 col-form-label">{tr}Max Image Dimension{/tr}</label>
+                                <label for="compression_max_dimension_x_main" class="col-md-4 col-form-label">{tr}Max Image Width (X){/tr}</label>
                                 <div class="col-md-8">
-                                    <input type="number" id="compression_max_dimension_main" name="compression_max_dimension" class="form-control"
-                                        value="{$prefs.fgal_image_compression_max_dimension|default:1600}">
-                                    <small id="compression_max_dimension_msg" class="text-success small"></small>
-                                    <small class="form-text text-muted d-block">{tr}Maximum width or height in pixels. Images larger than this will be resized.{/tr}</small>
+                                    <input type="number" id="compression_max_dimension_x_main" name="compression_max_dimension_x" class="form-control"
+                                        value="{$prefs.fgal_image_max_size_x|default:1600}">
+                                    <small id="compression_max_dimension_x_msg" class="text-success small"></small>
+                                    <small class="form-text text-muted d-block">{tr}Maximum width in pixels. Images wider than this will be resized.{/tr}</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-2 row">
+                                <label for="compression_max_dimension_y_main" class="col-md-4 col-form-label">{tr}Max Image Height (Y){/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" id="compression_max_dimension_y_main" name="compression_max_dimension_y" class="form-control"
+                                        value="{$prefs.fgal_image_max_size_y|default:1200}">
+                                    <small id="compression_max_dimension_y_msg" class="text-success small"></small>
+                                    <small class="form-text text-muted d-block">{tr}Maximum height in pixels. Images taller than this will be resized.{/tr}</small>
                                 </div>
                             </div>
 
@@ -500,12 +516,13 @@
                         accept="{$allowedMimeTypes}"
                         max-size="{$max_upload_size}"
                         max-files="{$max_file_uploads}"
-                        max-width="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"
-                        max-height="{if isset($gal_info.image_max_dimension)}{$gal_info.image_max_dimension}{/if}"
+                        max-width="{if isset($gal_info.fgal_image_max_size_x)}{$gal_info.fgal_image_max_size_x}{/if}"
+                        max-height="{if isset($gal_info.fgal_image_max_size_y)}{$gal_info.fgal_image_max_size_y}{/if}"
                         compression_enabled="{if $prefs.fgal_image_compression_enabled eq 'y'}true{else}false{/if}"
                         compression_preset_type="{$prefs.fgal_image_compression_preset_type}"
                         compression_quality="{$prefs.fgal_image_compression_quality|default:85}"
-                        compression_max_dimension="{$prefs.fgal_image_compression_max_dimension|default:1600}"
+                        compression_max_dimension_x="{$prefs.fgal_image_max_size_x|default:1600}"
+                        compression_max_dimension_y="{$prefs.fgal_image_max_size_y|default:1200}"
                         compression_max_size_mb="{$prefs.fgal_image_compression_max_size_mb|default:1}"
                         compression_save_original="{$prefs.fgal_image_compression_save_original}"
                     />
@@ -764,17 +781,19 @@ $("#galleryId").on("change", function(){
             if (data.canUpload) {
                 $("#gallery_type").attr('value', data.type);
 
-                $("#image_max_dimension").attr('value', data.image_max_dimension);
-                if (data.image_max_dimension) {
-                    $("#imageResizeInfo").html(data.image_max_dimension + 'px');
+                // Handle separate X and Y dimensions if provided by backend
+                if (data.image_max_dimension_x && data.image_max_dimension_y) {
+                    $("#imageResizeInfo").html(data.image_max_dimension_x + 'px (width) × ' + data.image_max_dimension_y + 'px (height)');
+                } else if (data.image_max_dimension_x || data.image_max_dimension_y) {
+                    const dimX = data.image_max_dimension_x || 'unlimited';
+                    const dimY = data.image_max_dimension_y || 'unlimited';
+                    $("#imageResizeInfo").html(dimX + 'px (width) × ' + dimY + 'px (height)');
                 } else {
                     $("#imageResizeInfo").html('(No resize)');
                 }
             } else {
                 $("#gallery_type").attr('value', '');
-                $("#image_max_dimension").attr('value','');
                 $("#imageResizeInfo").html('');
-                defaultDim='';
             }
         },
         error: function (e) {

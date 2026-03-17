@@ -969,8 +969,8 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', $gal_info);
         if ($perms['tiki_p_upload_files'] === 'y') {
                //checking if gallery has dimensions restrictions
-            $image_x = $gal_info["image_max_dimension"];
-            $image_y = $gal_info["image_max_dimension"];
+            $image_x = $gal_info["image_max_size_x"];
+            $image_y = $gal_info["image_max_size_y"];
 
             if (! $image_x) {
                 $image_x = null;

@@ -677,7 +677,8 @@ class FileGalLib extends TikiLib
             'lockable' => 'n',
             'archives' => $prefs['fgal_file_max_archives'],
             'quota' => $prefs['fgal_quota_default'],
-            'image_max_dimension' => $prefs['fgal_image_compression_max_dimension'],
+            'image_max_size_x' => $prefs['fgal_image_max_size_x'],
+            'image_max_size_y' => $prefs['fgal_image_max_size_y'],
             'backlinkPerms' => 'n',
             'show_backlinks' => 'n',
             'show_deleteAfter' => $prefs['fgal_list_deleteAfter'],
@@ -3738,11 +3739,11 @@ class FileGalLib extends TikiLib
                     } else {
                         $title = $params["name"][$key];
                         if (! $params['imagesize'][$key]) {
-                            $image_x = $params["image_max_dimension"];
-                            $image_y = $params["image_max_dimension"];
+                            $image_x = $params["image_max_size_x"];
+                            $image_y = $params["image_max_size_y"];
                         } else {
-                            $image_x = $gal_info["image_max_dimension"];
-                            $image_y = $gal_info["image_max_dimension"];
+                            $image_x = $gal_info["image_max_size_x"];
+                            $image_y = $gal_info["image_max_size_y"];
                         }
                         $fileId = $file->replace($data, $type, $title, $name, $image_x, $image_y);
                     }

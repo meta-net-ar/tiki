@@ -199,7 +199,8 @@
                         <legend class="h5">{tr}Upload Processing{/tr}</legend>
                         {preference name='fgal_image_compression_quality'}
                         {preference name='fgal_image_compression_max_size_mb'}
-                        {preference name='fgal_image_compression_max_dimension'}
+                        {preference name='fgal_image_max_size_x'}
+                        {preference name='fgal_image_max_size_y'}
                     </div>
                     {preference name='fgal_image_compression_preset_type'}
                     <small class="form-text mb-2">{tr}Users will see predefined compression levels (High Quality, Balanced, Compressed) or a quality slider.{/tr}</small>
@@ -218,7 +219,8 @@
             {preference name='fgal_search'}
             {preference name='fgal_search_in_content'}
             {preference name='fgal_show_thumbactions'}
-            
+            {preference name='fgal_thumb_max_size'}
+            {preference name='fgal_browse_name_max_length'}
             {preference name='maxRowsGalleries'}
             {preference name='fgal_list_ratio_hits'}
             {preference name='fgal_display_properties'}

@@ -298,7 +298,8 @@ if ($prefs['elementplus_upload'] === 'y') {
 
 if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_upload'] !== 'y') {
     $quality = (int)$prefs['fgal_image_compression_quality'];
-    $maxDimension = (int)$prefs['fgal_image_compression_max_dimension'];
+    $maxDimensionX = (int)$prefs['fgal_image_max_size_x'];
+    $maxDimensionY = (int)$prefs['fgal_image_max_size_y'];
     $saveOriginal = json_encode($prefs['fgal_image_compression_save_original']);
     $preset = json_encode($prefs['fgal_image_compression_preset_type']);
     $maxSize = (float)$prefs['fgal_image_compression_max_size_mb'] ?? 1;
@@ -309,7 +310,8 @@ if ($prefs['fgal_image_compression_enabled'] === 'y' && $prefs['elementplus_uplo
 
         initCompression({
             quality: " . $quality . ",
-            maxDimension: " . $maxDimension . ",
+            maxDimensionX: " . $maxDimensionX . ",
+            maxDimensionY: " . $maxDimensionY . ",
             saveOriginal: " . $saveOriginal . ",
             preset: " . $preset . ",
             maxSize: " . $maxSize . "
