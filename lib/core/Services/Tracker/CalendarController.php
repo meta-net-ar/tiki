@@ -74,14 +74,21 @@ class Services_Tracker_CalendarController
         $response = [];
 
         $fields = [];
-        $isDateOnly = false;
+        $beginDateFieldHandler = null;
+        $endDateFieldHandler = null;
         if ($definition = Tracker_Definition::get($input->trackerId->int())) {
+            $factory = $definition->getFieldFactory();
+
             $beginFieldInfo = $definition->getField($input->beginField->word());
-            if (! empty($beginFieldInfo) && in_array($beginFieldInfo['type'], ['f', 'j'], true)) {
-                // Date-only fields should be emitted as all-day events.
-                // Sending them as timezone-aware datetimes can move them one day backward/forward.
-                $isDateOnly = ($beginFieldInfo['options_map']['datetime'] ?? '') === 'd';
+            if ($beginFieldInfo) {
+                $beginDateFieldHandler = $factory->getHandler($beginFieldInfo);
             }
+
+            $endFieldInfo = $definition->getField($input->endField->word());
+            if ($endFieldInfo) {
+                $endDateFieldHandler = $factory->getHandler($endFieldInfo);
+            }
+
             foreach ($definition->getPopupFields() as $fieldId) {
                 if ($field = $definition->getField($fieldId)) {
                     $fields[] = $field;
@@ -146,12 +153,14 @@ class Services_Tracker_CalendarController
 
             $dtStart = $this->getTimestamp($row[$start]);
             $dtEnd = $this->getTimestamp($row[$end]);
-            // Fallback safeguards for legacy/inconsistent metadata in index rows:
-            // - plain YYYY-MM-DD index value
-            // - lucene-style YYYYMMDDHHMMSS with zeroed HHMMSS
-            $isDateOnlyEvent = $isDateOnly
-                || (is_string($row[$start]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $row[$start]))
-                || (is_string($row[$start]) && preg_match('/^\d{14}$/', $row[$start]) && substr($row[$start], 8, 6) === '000000');
+            $startValue = $row[$start] ?? null;
+            $endValue = $row[$end] ?? null;
+
+            $beginIsDateOnly = $beginDateFieldHandler instanceof Tracker_Field_DateTime
+                && $beginDateFieldHandler->isDateOnlyCalendarValue($startValue);
+            $endIsDateOnly = $endDateFieldHandler instanceof Tracker_Field_DateTime
+                && $endDateFieldHandler->isDateOnlyCalendarValue($endValue);
+            $isDateOnlyEvent = $beginIsDateOnly && $endIsDateOnly;
 
             $response[] = [
                 'id'               => $row['object_id'],
