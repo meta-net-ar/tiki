@@ -2,7 +2,11 @@
     {if empty($subscribeThanks)}
         {tr}Subscription confirmed!{/tr}
     {else}
-        {$subscribeThanks|escape}
+        {if !empty($subscribeThanksIsHtml)}
+            {$subscribeThanks nofilter}
+        {else}
+            {$subscribeThanks|escape}
+        {/if}
     {/if}
     
 {elseif $alreadySubscribed}
@@ -11,6 +15,7 @@
     {/remarksbox}
 
 {else}
+    <link rel="stylesheet" href="themes/base_files/feature_css/wikiplugin-subscribenewsletter.css">
     <form name="wpSubscribeNL" method="post">
         <input type="hidden" name="wpNlId" value="{$subscribeInfo.nlId|escape}">
 
@@ -20,14 +25,15 @@
             {/remarksbox}
         {/if}
 
-        <div class="d-flex flex-row flex-wrap align-items-center row">
+        <div class="form-inline row wp-subscribe-inline">
             <div class="input-group">
-                <input type="email" class="form-control fa" id="wpEmail" name="wpEmail" size="80" value="{$subscribeEmail|escape}" placeholder="{tr}Enter your email address{/tr}" required>
-                {if empty($subcribeMessage)}
-                    <input type="submit" class="btn btn-primary" name="wpSubscribe" value="{tr}Subscribe to the newsletter:{/tr} {$subscribeInfo.name}">
-                {else}
-                    <input type="submit" class="btn btn-primary" name="wpSubscribe" value="{$subcribeMessage|escape}">
-                {/if}
+                <div class="wp-subscribe-email-wrap">
+                    <span class="wp-subscribe-email-icon"><i class="fa fa-envelope" aria-hidden="true"></i></span>
+                    <input type="email" class="form-control" id="wpEmail" name="wpEmail" size="50" value="{$subscribeEmail|escape}" placeholder="{tr}Enter your email address{/tr}" required>
+                </div>
+                <div class="input-group-append">
+                    <input type="submit" class="btn btn-primary" name="wpSubscribe" value="{$subscribeButtonLabel|escape}">
+                </div>
             </div>
         </div>
 
