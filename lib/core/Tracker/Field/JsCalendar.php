@@ -104,6 +104,11 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             try {
                 // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
                 $this->validateTimestamp($value);
+
+                if ($this->getOption('datetime') === 'd' && is_numeric($value)) {
+                    $timezone = $requestData[$ins_id . '_timezone'] ?? null;
+                    $value = $this->normalizeDateOnlyTimestamp((int) $value, $timezone);
+                }
             } catch (Services_Exception $e) {
                 $value = '';
                 Feedback::error(tr('Date Picker Field: %0', $e->getMessage()));
@@ -113,6 +118,30 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         return [
             'value' => $value,
         ];
+    }
+
+    private function normalizeDateOnlyTimestamp(int $timestamp, ?string $timezone = null): int
+    {
+        if ($timestamp % 86400 === 0) {
+            return $timestamp;
+        }
+
+        $timezone = $timezone ?: TikiLib::lib('tiki')->get_display_timezone();
+
+        try {
+            $tz = new DateTimeZone($timezone);
+        } catch (Exception $e) {
+            $tz = new DateTimeZone('UTC');
+        }
+
+        $dateInTimezone = new DateTime('@' . $timestamp);
+        $dateInTimezone->setTimezone($tz);
+
+        $utcMidnight = new DateTime('now', new DateTimeZone('UTC'));
+        $utcMidnight->setDate((int) $dateInTimezone->format('Y'), (int) $dateInTimezone->format('n'), (int) $dateInTimezone->format('j'));
+        $utcMidnight->setTime(0, 0, 0);
+
+        return (int) $utcMidnight->format('U');
     }
 
     public function renderInput($context = [])
