@@ -9,26 +9,6 @@ namespace TikiTests;
 
 class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
 {
-    private $oldStrictValidationPref;
-
-    protected function setUp(): void
-    {
-        global $prefs;
-
-        $this->oldStrictValidationPref = $prefs['trackerfield_url_strict_validation'] ?? null;
-    }
-
-    protected function tearDown(): void
-    {
-        global $prefs;
-
-        if ($this->oldStrictValidationPref === null) {
-            unset($prefs['trackerfield_url_strict_validation']);
-        } else {
-            $prefs['trackerfield_url_strict_validation'] = $this->oldStrictValidationPref;
-        }
-    }
-
     /**
      * @dataProvider supportedWikiSyntaxProvider
      */
@@ -67,22 +47,29 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testStrictValidationPrefDisabledAllowsInvalidUrlValues(): void
+    public function testStrictValidationOptionDisabledAllowsInvalidUrlValues(): void
     {
-        global $prefs;
-
-        $prefs['trackerfield_url_strict_validation'] = 'n';
-
-        $this->assertTrue($this->invokeIsValid('not a valid url'));
+        $this->assertTrue($this->invokeIsValid('not a valid url', 0));
     }
 
-    public function testStrictValidationPrefEnabledRejectsInvalidUrlValues(): void
+    public function testStrictValidationOptionEnabledRejectsInvalidUrlValues(): void
     {
-        global $prefs;
+        $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('not a valid url', 1));
+    }
 
-        $prefs['trackerfield_url_strict_validation'] = 'y';
-
+    public function testStrictValidationDefaultsToEnabled(): void
+    {
         $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('not a valid url'));
+    }
+
+    public function testStrictValidationEnabledRejectsWindowsUncPath(): void
+    {
+        $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('\\\\192.168.1.10\\public\\docs\\file.txt', 1));
+    }
+
+    public function testStrictValidationEnabledRejectsBrokenWikiSyntaxPrefix(): void
+    {
+        $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('((Test-Link-Parsing', 1));
     }
 
     private function invokeIsWikiSyntaxLink(string $value): bool
@@ -93,15 +80,22 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         return (bool) $method->invoke(null, $value);
     }
 
-    private function invokeIsValid(string $value)
+    private function invokeIsValid(string $value, ?int $strictValidation = null)
     {
         $field = $this->getMockBuilder(\Tracker_Field_Url::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getFieldId', 'getValue'])
+            ->onlyMethods(['getFieldId', 'getValue', 'getOption'])
             ->getMock();
 
         $field->method('getFieldId')->willReturn(1);
         $field->method('getValue')->willReturn('');
+        $field->method('getOption')->willReturnCallback(function (string $name, $default = null) use ($strictValidation) {
+            if ($name === 'strictValidation') {
+                return $strictValidation ?? 1;
+            }
+
+            return $default;
+        });
 
         return $field->isValid([
             1 => ['value' => $value],

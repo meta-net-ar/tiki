@@ -22,14 +22,5 @@ function prefs_trackerfield_list($partial = false)
             'help' => isset($type['help']) ? urlencode($type['help']) : false,
         ];
     }
-
-    $prefs['trackerfield_url_strict_validation'] = [
-        'name' => tr('Strict validation for URL fields'),
-        'description' => tr('Validate URL tracker field values with the stricter syntax checks introduced for wiki-link aware URL fields. Disable this to preserve legacy values such as UNC/network paths, and hide the wiki-link syntax help text.'),
-        'type' => 'flag',
-        'default' => 'n',
-        'dependencies' => ['feature_trackers', 'trackerfield_url'],
-    ];
-
     return $prefs;
 }
