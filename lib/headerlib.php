@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\RobotsTxt\Matcher;
-use Tiki\Sections;
 
 require_once("path_js_importmap_generator.php");
 /**
