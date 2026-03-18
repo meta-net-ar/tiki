@@ -541,16 +541,8 @@ class ThemeLib extends TikiLib
         }
     }
 
-    public static function setupThemeHeaders(): void
+    public static function applyThemeForSection(): void
     {
-        static $initialized = false;
-
-        if ($initialized) {
-            return;
-        }
-
-        $initialized = true;
-
         global $headerlib, $prefs;
 
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();

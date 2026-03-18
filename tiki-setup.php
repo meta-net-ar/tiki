@@ -208,6 +208,7 @@ require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
 require_once('lib/core/Sections.php');
 use Tiki\Sections;
+use Tiki\Lib\Theme\ThemeLib;
 // Initialize language settings after section is set and autoloader is available
 Language::setSectionLanguage();
 
@@ -216,6 +217,7 @@ Language::setSectionLanguage();
 // the language is automatically updated (e.g., admin section gets admin language)
 Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
+    ThemeLib::applyThemeForSection();
 });
 
 Sections::onSectionChange(function ($section) use ($prefs) {
