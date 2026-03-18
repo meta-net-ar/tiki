@@ -530,6 +530,7 @@ class HeaderLib
      */
     public function output_headers(): string
     {
+        Tiki\Lib\Theme\ThemeLib::setupThemeHeaders();
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
 

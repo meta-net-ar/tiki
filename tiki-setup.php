@@ -217,7 +217,6 @@ Language::setSectionLanguage();
 // the language is automatically updated (e.g., admin section gets admin language)
 Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
-    ThemeLib::applyThemeForSection();
 });
 
 Sections::onSectionChange(function ($section) use ($prefs) {
