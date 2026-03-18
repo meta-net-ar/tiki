@@ -5,6 +5,11 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
+    header('location: index.php');
+    exit;
+}
+
 require_once(__DIR__ . '/../php_version_constants.php');
 
 // Check that PHP version is sufficient or if the PHP version is too recent, i.e. higher than the required version.
