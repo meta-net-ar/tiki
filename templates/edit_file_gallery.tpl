@@ -352,31 +352,6 @@ if ($(this).val() != '') {
                         </div>
                     {/if}
                 {/if}
-                <div class="tiki-form-group row">
-                    <label for="image_max_size_x" class="col-sm-4 col-form-label">{tr}Maximum image width in gallery{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="form-control-plaintext">
-                            <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|default:1600|escape}" class="form-control text-end">
-                                <span class="input-group-text">{tr}pixels{/tr}</span>
-                            </div>
-                            <span class="form-text">{tr}If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="tiki-form-group row">
-                    <label for="image_max_size_y" class="col-sm-4 col-form-label">{tr}Maximum image height in gallery{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="form-control-plaintext">
-                            <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|default:1200|escape}" class="form-control text-end">
-                                <span class="input-group-text">{tr}pixels{/tr}</span>
-                            </div>
-                            <span class="form-text">{tr}If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
-                        </div>
-                    </div>
-                </div>
-
                 {* Compression Settings *}
                 <hr class="my-4">
                 <h3>{tr}Image Compression{/tr}</h3>
@@ -425,6 +400,32 @@ if ($(this).val() != '') {
                 </div>
 
                 <div class="tiki-form-group row">
+                    <label for="image_max_size_x" class="col-sm-4 col-form-label">{tr}Maximum image width in gallery{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-control-plaintext">
+                            <div class="input-group col-sm-4">
+                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|default:1600|escape}" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
+                            </div>
+                            <span class="form-text">{tr}If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
+                    <label for="image_max_size_y" class="col-sm-4 col-form-label">{tr}Maximum image height in gallery{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-control-plaintext">
+                            <div class="input-group col-sm-4">
+                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|default:1200|escape}" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
+                            </div>
+                            <span class="form-text">{tr}If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
                     <label class="col-sm-4">{tr}Keep original image{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
@@ -433,6 +434,8 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                 </div>
+
+                <hr class="my-4">
 
                 <div class="tiki-form-group row">
                     <label for="wiki_syntax" class="col-sm-4 col-form-label">{tr}Wiki markup to enter when image selected from "file gallery manager"{/tr}</label>
