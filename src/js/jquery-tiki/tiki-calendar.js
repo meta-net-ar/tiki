@@ -18,7 +18,7 @@ $.fn.setupEventCalendar = function (
         $(calendarEl).tikiModal(tr("Loading..."));
         const openNewEventModal = (startStr, endStr = null) => {
             if (isOpeningModal) return;
-            const countCals = $("#filtercal ul li").length;
+            const countCals = $(".filtercal ul li").length;
             if (countCals >= 1 || targetId != "calendar") {
                 isOpeningModal = true;
                 $(calendarEl).tikiModal(" "); // Use the container for the loading overlay
