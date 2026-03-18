@@ -51,9 +51,17 @@ class ThemeLib extends TikiLib
     }
 
     /**
-     * Retrieve the active theme and option
-     * Usually accessed as list($theme, $themeOption) = ThemeLib::getActiveThemeAndOption();
-     * @return array array of two strings, first is the theme, second is the theme option if any.
+     * Retrieve the active theme and option.
+     *
+     * This method determines the active theme based on the current context,
+     * including user preferences, group settings, and admin overrides.
+     *
+     * Usually accessed as:
+     * list($theme, $themeOption) = ThemeLib::getActiveThemeAndOption();
+     *
+     * @return array Array containing:
+     *               - [0] => active theme name
+     *               - [1] => active theme option (if any)
      */
     public static function getActiveThemeAndOption(): array
     {
@@ -547,22 +555,12 @@ class ThemeLib extends TikiLib
 
     public static function setupThemeHeaders(): void
     {
-        global $headerlib, $prefs;
+        global $prefs;
 
+        $headerlib = TikiLib::lib('header');
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
 
         $prefs['theme'] = $theme_active;
         $prefs['theme_option'] = $theme_option_active;
-
-        $theme_css = self::getThemeCssFilePath($theme_active, '');
-
-        if ($theme_css) {
-            $headerlib->add_cssfile($theme_css);
-
-            if (! empty($theme_option_active)) {
-                $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
-                $headerlib->add_cssfile($option_css);
-            }
-        }
     }
 }
