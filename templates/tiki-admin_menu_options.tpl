@@ -20,7 +20,7 @@
     {/if}
 </div>
 {remarksbox type="tip" title="{tr}Tip{/tr}" close="y"}
-    {tr}To add a visual separator, click{/tr} <strong>{tr}Create menu option{/tr}</strong>, {tr}set{/tr} <strong>{tr}Type{/tr}</strong> {tr}to{/tr} <strong>{tr}separator{/tr}</strong>, {tr}then save your menu.{/tr}
+    {tr _0='<strong>' _1='</strong>' _2='<strong>' _3='</strong>' _4='<strong>' _5='</strong>'}To add a visual separator, click %0Create menu option%1, set %2Type%3 to %4separator%5, then save your menu.{/tr}
 {/remarksbox}
 
 {tabset name="admin_menu_options"}
