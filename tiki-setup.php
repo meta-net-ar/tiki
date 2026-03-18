@@ -208,7 +208,6 @@ require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
 require_once('lib/core/Sections.php');
 use Tiki\Sections;
-use Tiki\Lib\Theme\ThemeLib;
 // Initialize language settings after section is set and autoloader is available
 Language::setSectionLanguage();
 
