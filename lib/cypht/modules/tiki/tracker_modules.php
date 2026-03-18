@@ -1289,3 +1289,96 @@ class Hm_Handler_tiki_load_smtp_is_imap_forward extends Hm_Handler_Module
         }
     }
 }
+
+
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trackers_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('trackers_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('trackers_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Starts the Trash section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_trackers_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the trackers view
+     */
+    protected function output() {
+        return '<tr><td data-target=".trackers_setting" colspan="2" class="settings_subtitle cursor-pointer">'.
+            '<i class="bi bi-database fs-5 me-2"></i>'.
+            $this->trans('Trackers').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_trackers_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('trackers_per_source', $settings)) {
+            $sources = $settings['trackers_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" class="form-control form-control-sm w-auto" size="2" id="trackers_per_source" name="trackers_per_source" value="'.$this->html_safe($sources).'" data-default-value="' . DEFAULT_PER_SOURCE . '" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "since" date range for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_trackers_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE; 
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('trackers_since', $settings) && $settings['trackers_since']) {
+            $since = $settings['trackers_since'];
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_since">'.
+            $this->trans('Show trackers messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'trackers_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Add trackers link to main menu
+ * @subpackage tiki/handler
+ */
+class Hm_Output_combined_trackers_link extends Hm_Output_Module {
+    protected function output() {
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="page=message_list&list_path=combined_trackers">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-database account_icon"></i> ';
+        }
+        $res .= $this->trans('Trackers').'</a></li>';
+
+        if ($this->format == 'HTML5') {
+            return $res;
+        }
+        $this->concat('formatted_folder_list', $res);
+    }
+}

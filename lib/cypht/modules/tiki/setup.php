@@ -122,7 +122,12 @@ add_handler('settings', 'before_save_user_settings', true, 'tiki', 'save_user_se
 add_handler('settings', 'after_save_user_settings', true, 'tiki', 'save_user_settings', 'after');
 add_handler('settings', 'process_enable_oauth2_over_imap', true, 'tiki', 'save_user_settings', 'before');
 add_handler('settings', 'process_enable_gmail_contacts_module', true, 'tiki', 'save_user_settings', 'before');
+add_handler('settings', 'process_trackers_setting', true, 'core', 'date', 'after');
+
 add_output('settings', 'debug_mode_setting', true, 'tiki', 'start_unread_settings', 'before');
+add_output('settings', 'start_trackers_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'trackers_since_setting', true, 'core', 'start_trackers_settings', 'after');
+add_output('settings', 'trackers_source_max_setting', true, 'core', 'trackers_since_setting', 'after');
 add_output('settings', 'start_advanced_settings', true, 'core', 'end_settings_form', 'before');
 add_output('settings', 'allow_external_images_setting', true, 'tiki', 'start_advanced_settings', 'after');
 add_output('settings', 'enable_oauth2_over_imap_setting', true, 'tiki', 'allow_external_images_setting', 'after');
@@ -218,6 +223,7 @@ add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after'
 
 /* folder list */
 add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');
+add_output('ajax_hm_folders', 'combined_trackers_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* sieve filters */
 add_handler('sieve_filters', 'tiki_add_sieve_config_host', true, 'tiki', 'load_imap_servers_from_config', 'after');
@@ -343,5 +349,7 @@ return [
     'limit' => FILTER_VALIDATE_INT,
     'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'auto_move' => FILTER_VALIDATE_BOOLEAN,
+    'trackers_per_source' => FILTER_VALIDATE_INT,
+    'trackers_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
   ]
 ];
