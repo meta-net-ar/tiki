@@ -109,9 +109,6 @@ index.php
 # Test coverage reports
 /coverage
 
-# Custom files
-/_custom/*
-
 # Release scripts etc output
 /securityreport.html
 /prefreport.csv
