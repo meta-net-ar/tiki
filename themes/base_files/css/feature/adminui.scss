@@ -707,6 +707,10 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     padding: 0.75rem 0.5rem; // Match item padding
     margin: 0;
 
+    .my-1.mx-4 {
+        margin: 0
+    }
+
     .search-prefs-container {
         justify-content: center;
 
@@ -827,7 +831,7 @@ body.tiki-admin .container.container-std {
     .tiki-admin.uab .bottom_modules,
     .tiki-admin.uab:not(.fixed_width) #tikifeedback,
     .tiki-admin.uab:not(.fixed_width) .admin-content {
-        padding-left: 0 !important;
+        padding-left: 1rem; // Standard mobile content inset (16px)
     }
 
     // Dropdown when open
