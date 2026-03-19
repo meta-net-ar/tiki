@@ -22,7 +22,7 @@
                         <div class="dropdown-menu {if !empty($item.selected)}show{/if}" aria-labelledby="menu_option{$item.optionId|escape}">
                             {foreach from=$item.children item=sub}
                                 {if $sub.type eq '-' or ($sub.type eq 's' and empty($sub.name))}
-                                    <div role="separator" class="dropdown-divider border-secondary-subtle opacity-100 my-2"></div>
+                                    <div role="separator" class="dropdown-divider my-2"></div>
                                 {else}
                                     <a class="dropdown-item {$sub.class|escape} {if $sub.selected|default:null}active{/if}" href="{$sub.sefurl|escape}">
                                         {if $menu_info.use_items_icons eq "y" && $sub.icon}
@@ -46,7 +46,7 @@
                             {foreach from=$item.children item=sub}
                                 {if $sub.type eq '-' or ($sub.type eq 's' and empty($sub.name))}
                                     <li class="nav-item" role="separator">
-                                        <hr class="dropdown-divider border-secondary-subtle opacity-100 my-2">
+                                        <hr class="dropdown-divider my-2">
                                     </li>
                                 {else}
                                     <li class="nav-item {$sub.class|escape|default:null} {if !empty($sub.selected)}active{/if}">
@@ -67,7 +67,7 @@
             {else}
                 {if $item.type eq '-' or ($item.type eq 's' and empty($item.name))}
                     <li class="nav-item" role="separator">
-                        <hr class="dropdown-divider border-secondary-subtle opacity-100 my-2">
+                        <hr class="dropdown-divider my-2">
                     </li>
                 {else}
                     <li class="nav-item {$item.class|escape|default:null} {if !empty($item.selected)}active{/if}">
