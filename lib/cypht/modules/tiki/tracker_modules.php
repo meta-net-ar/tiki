@@ -1370,7 +1370,7 @@ class Hm_Output_trackers_since_setting extends Hm_Output_Module {
  */
 class Hm_Output_combined_trackers_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="page=message_list&list_path=combined_trackers">';
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="page=message_list&list_path=trackers">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-database account_icon"></i> ';
         }
@@ -1380,5 +1380,67 @@ class Hm_Output_combined_trackers_link extends Hm_Output_Module {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * Load IMAP servers for message list page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_load_trackers_data_sources extends Hm_Handler_Module
+{
+    public $user_config;
+    /**
+     * Used by trackers view
+     */
+    public function process()
+    {
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
+            $this->out('data_sources', [['hook' => 'ajax_tiki_trackers', 'type' => 'custom', 'params' => [
+                'trackerIds' => 1
+            ]]]);
+        }
+    }
+}
+
+/**
+ * Fetch messages for the Groupmail page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_trackers_fetch_messages extends Hm_Handler_Module
+{
+    public $user_config;
+    public $request;
+    public $session;
+    public $config;
+    /**
+     * Returns all messages for trackers
+     */
+    public function process()
+    {
+        list($success, $form) = $this->process_form([]);
+        if ($success) {
+            $limit = $this->user_config->get('trackers_per_source', DEFAULT_PER_SOURCE);
+            list($msg_list, ) = tiki_fetch_tracker_messages('inbox', $limit, $this->user_config->get('trackers_since', DEFAULT_SINCE));
+            $this->out('trackers_message_list_data', $msg_list);
+        }
+    }
+}
+
+/**
+ * Format message headers for the trackers page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_trackers_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the trackers message list
+     */
+    protected function output() {
+        if ($this->get('trackers_message_list_data')) {
+            prepare_tracker_message_list($this->get('trackers_message_list_data'), $this, $this->get('list_path'));
+        }
+        else {
+            $this->out('formatted_message_list', array());
+        }
     }
 }
