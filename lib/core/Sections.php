@@ -60,6 +60,7 @@ class Sections
     public const SECTION_SHARE = 'share';
     public const SECTION_SHEET = 'sheet';
     public const SECTION_CHAT = 'chat';
+    public const SECTION_ADMIN_LAYOUT = 'admin layout';
 
     private static $currentSection;
 
@@ -109,6 +110,7 @@ class Sections
             self::SECTION_SHARE,
             self::SECTION_SHEET,
             self::SECTION_CHAT,
+            self::SECTION_ADMIN_LAYOUT,
         ];
     }
 
