@@ -34,6 +34,7 @@ report.xml
 /.composercache
 /before
 /after
+/coverage
 /.npm/
 
 #PRODUCTION AND SYSADMIN SECTION
@@ -105,9 +106,6 @@ index.php
 /vendor_custom/*
 #From lib/structures/structlib.php
 /whelp
-
-# Test coverage reports
-/coverage
 
 # Release scripts etc output
 /securityreport.html
