@@ -222,7 +222,6 @@ function wikiplugin_category_info()
                 ),
                 'since' => '8.0',
                 'filter' => 'lang',
-                'default' => '',
             ],
         ],
     ];
@@ -255,8 +254,10 @@ function wikiplugin_category($data, $params)
     }
     if (! empty($lang)) {
         $filter['language'] = $lang;
-    } else {
+    } elseif (isset($params['lang'])) {
         $filter['language'] = Language::getCurrentLanguage();
+    } else {
+        $filter = null;
     }
 
     if (isset($and) and substr(strtolower($and), 0, 1) == 'y') {
