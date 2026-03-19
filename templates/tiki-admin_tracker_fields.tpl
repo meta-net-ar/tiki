@@ -17,7 +17,8 @@
 
 {block name="content"}
     <form class="form save-fields" method="post" action="{service controller=tracker action=save_fields}">
-        <table id="fields" class="table table-responsive table-condensed table-hover">
+    <div class="table-responsive">
+        <table id="fields" class="table table-condensed table-hover">
             <thead>
                 <tr>
                     <th>{select_all checkbox_names="fields[]"}</th>
@@ -59,6 +60,7 @@
             <tbody>
             </tbody>
         </table>
+        </div>
         <div class="mb-3 row">
             <div class="input-group col-sm-6">
                 <select name="action" class="form-control">
