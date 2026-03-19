@@ -66,11 +66,11 @@
                         <tr id="row-template" class="d-none" style="display: none;">
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="field-label form-control" readonly/>
+                                    <input type="text" class="field-label form-control" readonly disabled/>
                                     <div class="input-group-text">
-                                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" disabled>
                                             <span class="align">{tr}Left{/tr}</span>
-                                            <input class="display-align" type="hidden" value="left">
+                                            <input class="display-align" type="hidden" value="left" disabled>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end" role="menu">
                                             <a class="dropdown-item align-option" href="#left">{tr}Left{/tr}</a>
@@ -82,7 +82,7 @@
                                 </div>
                             </td>
                             <td class="tiki-form-group">
-                                <select class="form-select type">
+                                <select class="form-select type" disabled>
                                     {foreach from=$types key=k item=info}
                                         <option value="{$k}" {if $k eq 't'}selected{/if}>{$info.name|escape} {if !empty($info.deprecated)}- Deprecated{/if}</option>
                                     {/foreach}
@@ -92,7 +92,7 @@
                                 {*</ul>*}
 
                             </td>
-                            <td><input class="primary" type="radio" name="pk" required aria-label="{tr}Primary Key:{/tr}" /></td>
+                            <td><input class="primary" type="radio" name="pk" aria-label="{tr}Primary Key:{/tr}" disabled /></td>
                             <td><input class="unique-key form-check-input" type="checkbox" aria-label="{tr}Unique Key:{/tr}" /></td>
                             <td><input class="read-only form-check-input" type="checkbox" aria-label="{tr}Read-only:{/tr}" /></td>
                             <td><input class="export-only form-check-input" type="checkbox" aria-label="{tr}Export-Only{/tr}" /></td>
@@ -179,6 +179,9 @@
         </div>
         <div class="tiki-form-group submit">
             <div class="col-sm-9 offset-sm-3">
+                <div id="primary-key-error" class="alert alert-danger mb-3" style="display:none">
+                    {tr}Please select a Primary Key (PK) for one of the fields.{/tr}
+                </div>
                 <input type="submit" class="btn btn-primary" value="{tr}Import{/tr}">
             </div>
         </div>
@@ -214,6 +217,7 @@
             $('#tracker-columns').find('tr[id^="row"]:not(".d-none")').each(function(){
                 $(this).remove();
             });
+            $('#primary-key-error').hide();
 
             if (!fileUpload.value) {
                 $('#tracker-columns').hide();
@@ -233,7 +237,7 @@
                     } else if (delimiter == '\t') {
                         var rows = Plotly.d3.dsv('\t').parse(e.target.result);
                     } else {
-                        var rows = Plotly.d3.csv.parse(e.target.result);
+                        var rows = Plotly.d3.dsv(',').parse(e.target.result);
                     }
                     
                     var columns = Object.keys(rows[0]);
@@ -243,6 +247,8 @@
                         $elem.attr('id', 'row'+i);
                         $elem.removeClass('d-none');
                         $elem.find('input[type="text"]').val(columns[i]);
+                        // Make template inputs submittable
+                        $elem.find('input, select, button').prop('disabled', false);
                         $elem.show();
                         $('#tracker-columns table tbody').append($elem);
                     }
@@ -262,6 +268,17 @@
                     $('#file-size-error').show();
                 }
             }
+        });
+
+        // Validate that a Primary Key is selected before submitting
+        $('form.edit-tabular').on('submit', function(e) {
+            var $visibleRows = $('#tracker-columns').find('tr[id^="row"]:not(".d-none")');
+            if ($visibleRows.length > 0 && $visibleRows.find('input.primary:checked').length === 0) {
+                e.preventDefault();
+                $('#primary-key-error').show();
+                return false;
+            }
+            $('#primary-key-error').hide();
         });
 
     {/jq}
