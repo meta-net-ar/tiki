@@ -105,7 +105,7 @@
                                         <span class="input-group-text">{icon name='sort'}</span>
                                         {if $option.type eq '-' or ($option.type eq 's' and empty($option.name))}
                                             <div class="form-control d-flex align-items-center bg-body-tertiary py-2">
-                                                <hr class="dropdown-divider border-secondary-subtle opacity-100 my-0 w-100">
+                                                <hr class="dropdown-divider my-0 w-100">
                                             </div>
                                         {else}
                                             <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
