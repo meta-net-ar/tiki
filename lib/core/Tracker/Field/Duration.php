@@ -183,7 +183,7 @@ class Tracker_Field_Duration extends \Tracker\Field\AbstractItemField implements
 
                     const observer = new MutationObserver(() => {
                         if (!document.contains(container)) {
-                            DurationPickerModule.unmountApp();
+                            DurationPickerModule.unmountApp(container);
                             observer.disconnect();
                         }
                     });

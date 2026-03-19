@@ -3,32 +3,30 @@ import App from "./App.vue";
 
 import "../custom.scss";
 
-let vueApp = null;
+const mountedApps = new Map();
 
 function createVueApp(props = {}) {
-    if (vueApp) {
-        return vueApp;
-    }
+    const app = createApp(App, props);
 
-    vueApp = createApp(App, props);
-    
     if (import.meta.env.MODE === "development") {
         console.log(import.meta.env);
     }
-    
-    return vueApp;
+
+    return app;
 }
 
 function mount(container, props = {}) {
     const app = createVueApp(props);
     app.mount(container);
+    mountedApps.set(container, app);
     return app;
 }
 
-function unmount() {
-    if (vueApp) {
-        vueApp.unmount();
-        vueApp = null;
+function unmount(container) {
+    if (container && mountedApps.has(container)) {
+        const app = mountedApps.get(container);
+        app.unmount();
+        mountedApps.delete(container);
     }
 }
 
