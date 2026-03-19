@@ -968,7 +968,7 @@ CREATE TABLE `tiki_file_galleries` (
   `show_share` char(1) default NULL,
   `image_max_size_x` int(8) NOT NULL default '1600',
   `image_max_size_y` int(8) NOT NULL default '1200',
-  `image_compression_enabled` char(1) NOT NULL DEFAULT 'y',
+  `image_compression_enabled` char(1) NOT NULL DEFAULT 'n',
   `image_compression_preset_type` varchar(50) NOT NULL DEFAULT 'slider',
   `image_compression_quality` int(8) NOT NULL DEFAULT '85',
   `image_compression_save_original` varchar(1) NOT NULL DEFAULT 'n',

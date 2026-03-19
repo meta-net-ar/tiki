@@ -185,7 +185,7 @@
             <br>
             <span class="form-text">{tr}Configuration for gallery listings{/tr}</span>
             {remarksbox title="Note"}
-                {tr}These settings will affect all new uploaded files to filegalleries. {/tr}
+                {tr _0='<em>' _1='</em>'}Changing these settings %0will not affect%1 existing file galleries. These changes %0will apply only%1 to new file galleries.{/tr}
             {/remarksbox}
             <fieldset>
                 <legend class="h3">{tr}Image Compression{/tr}{help url="Image-Compression"}</legend>

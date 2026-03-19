@@ -920,7 +920,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'name' => tra('Enable image compression on upload'),
             'description' => tra('Automatically compress images during upload to reduce file size and improve page load times.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'help' => 'Image-Compression',
         ],
         'fgal_image_compression_preset_type' => [
