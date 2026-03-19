@@ -21,6 +21,7 @@ function prefs_connect_list()
             'name' => tra('Send site information'),
             'description' => tra('Additionally send keywords, location, etc. to tiki.org so you can connect with other Tiki sites near you.'),
             'type' => 'flag',
+            'help' => 'Connect-Settings',
             'dependencies' => 'connect_feature',
             'default' => 'y',
             'tags' => ['basic'],
@@ -30,6 +31,7 @@ function prefs_connect_list()
             'description' => tra('Name of site to be listed on Tiki Connect'),
             'warning' => tra('Site title is required to send site information.'),
             'type' => 'text',
+            'help' => 'Connect-Settings',
             'dependencies' => 'connect_send_info',
             'default' => '',
             'tags' => ['basic'],
@@ -38,6 +40,7 @@ function prefs_connect_list()
             'name' => tra('Email contact'),
             'description' => tra('Email to register'),
             'type' => 'text',
+            'help' => 'Connect-Settings',
             'dependencies' => 'connect_send_info',
             'default' => '',
             'tags' => ['basic'],
@@ -46,6 +49,7 @@ function prefs_connect_list()
             'name' => tra('URL'),
             'description' => tra('URL to register'),
             'type' => 'text',
+            'help' => 'Connect-Settings',
             'dependencies' => 'connect_send_info',
             'default' => '',
             'tags' => ['basic'],
@@ -54,6 +58,7 @@ function prefs_connect_list()
             'name' => tra('Key words'),
             'description' => tra('Key words or tags describing your site'),
             'type' => 'textarea',
+            'help' => 'Connect-Settings',
             'dependencies' => 'connect_send_info',
             'default' => '',
             'tags' => ['basic'],
@@ -61,6 +66,7 @@ function prefs_connect_list()
         'connect_site_location' => [
             'name' => tra('Site location'),
             'description' => tra('Site location expressed as longitude, latitude, and zoom'),
+            'help' => 'Connect-Settings',
             'type' => 'text',
             'size' => 60,
             'dependencies' => 'connect_send_info',
@@ -70,6 +76,7 @@ function prefs_connect_list()
         'connect_send_anonymous_info' => [
             'name' => tra('Send anonymous information'),
             'description' => tra('Send anonymous usage information.'),
+            'help' => 'Connect-Settings',
             'type' => 'flag',
             'dependencies' => 'connect_feature',
             'default' => 'y',
@@ -77,6 +84,7 @@ function prefs_connect_list()
         'connect_frequency' => [
             'name' => tra('Connection frequency'),
             'description' => tra('How often to send information'),
+            'help' => 'Connect-Settings',
             'units' => tra('hours'),
             'type' => 'text',
             'dependencies' => 'connect_feature',
@@ -89,6 +97,7 @@ function prefs_connect_list()
         'connect_server' => [
             'name' => tra('Tiki connect server URL'),
             'description' => tra('Where to send the information.'),
+            'help' => 'Connect-Settings',
             'type' => 'text',
             'dependencies' => 'connect_feature',
             'default' => 'https://mother.tiki.org',
@@ -97,6 +106,8 @@ function prefs_connect_list()
         ],
         'connect_last_post' => [
             'name' => tra('Last connection'),
+            'description' => tra('Last time information was sent to the connect server.'),
+            'help' => 'Connect-Settings',
             'type' => 'text',
             'dependencies' => 'connect_feature',
             'filter' => 'digits',
@@ -106,6 +117,7 @@ function prefs_connect_list()
         'connect_server_mode' => [
             'name' => tra('Connect server mode'),
             'description' => tra('For use by mother.tiki.org.'),
+            'help' => 'Connect-Settings',
             'type' => 'flag',
             'dependencies' => 'connect_feature',
             'default' => 'n',
@@ -114,6 +126,7 @@ function prefs_connect_list()
         'connect_guid' => [
             'name' => tra('Connect GUID'),
             'description' => tra('For use by mother.tiki.org. Do not modify'),
+            'help' => 'Connect-Settings',
             'type' => 'text',
             'size' => 60,
             'dependencies' => 'connect_feature',

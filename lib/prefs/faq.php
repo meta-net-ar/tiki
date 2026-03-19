@@ -11,6 +11,7 @@ function prefs_faq_list()
             'name' => tra('Default number of comments per page'),
             'description' => tra('Maximum number of comments to display on each page. Users may override this number.'),
             'type' => 'text',
+            'help' => 'FAQ-Admin',
             'units' => tra('comments'),
             'size' => '5',
             'default' => 10,
@@ -19,6 +20,7 @@ function prefs_faq_list()
             'name' => tra('Default order of comments'),
             'description' => tra('In which order to list the comments on the page.'),
             'type' => 'list',
+            'help' => 'FAQ-Admin',
             'options' => [
                 'commentDate_desc' => tra('Newest first'),
                 'commentDate_asc' => tra('Oldest first'),
@@ -30,6 +32,7 @@ function prefs_faq_list()
             'name' => tra('Prefix for answers'),
             'description' => tra('The prefix for that Tiki should display for each FAQ answer.'),
             'type' => 'list',
+            'help' => 'FAQ-Admin',
             'options' => [
                 'none' => tra('None'),
                 'QA' => tra('Q and A'),
@@ -41,6 +44,7 @@ function prefs_faq_list()
             'name' => tra('FAQ copyright'),
             'description' => tra('Apply copyright management preferences to this feature.'),
             'type' => 'flag',
+            'help' => 'FAQ-Admin',
             'dependencies' => [
                 'feature_faqs',
             ],

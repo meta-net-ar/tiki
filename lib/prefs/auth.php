@@ -155,14 +155,16 @@ function prefs_auth_list()
             'description' => tra('If this option is set, users that are created using Tiki are not authenticated via LDAP. This can be useful to let external users (ex.: partners or consultants) access Tiki, without being in your main user list in LDAP.'),
             'type' => 'flag',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => 'n',
         ],
         'auth_ldap_host' => [
             'name' => tra('Host'),
-            'description' => tra('The hostnames, ip addresses or URIs of your LDAP servers. Separate multiple entries with Whitespace or ‘,’. If you use URIs, then the settings for Port number and SSL are ignored. Example: “localhost ldaps://master.ldap.example.org:63636” will try to connect to localhost unencrypted and if if fails it will try the master LDAP server at a special port with SSL.'),
+            'description' => tra('The hostnames, ip addresses or URIs of your LDAP servers. Separate multiple entries with Whitespace or ', '. If you use URIs, then the settings for Port number and SSL are ignored. Example: "localhost ldaps://master.ldap.example.org:63636" will try to connect to localhost unencrypted and if if fails it will try the master LDAP server at a special port with SSL.'),
             'type' => 'text',
             'size' => 20,
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
             'extensions' => ['ldap'],
         ],
@@ -173,6 +175,7 @@ function prefs_auth_list()
             'size' => 5,
             'filter' => 'digits',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
             'extensions' => ['ldap'],
         ],
@@ -182,6 +185,7 @@ function prefs_auth_list()
             'type' => 'flag',
             'perspective' => false,
             'warning' => tra('Do not enable this option for production sites.'),
+            'help' => 'LDAP-authentication',
             'default' => 'n',
             'view' => 'tiki-syslog.php',
         ],
@@ -189,12 +193,14 @@ function prefs_auth_list()
             'name' => tra('Use SSL (ldaps)'),
             'type' => 'flag',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => 'n',
         ],
         'auth_ldap_starttls' => [
             'name' => tra('Use TLS'),
             'type' => 'flag',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => 'n',
         ],
         'auth_ldap_type' => [
@@ -217,6 +223,7 @@ function prefs_auth_list()
             'description' => tra('Used after authentication for getting user and group information.'),
             'type' => 'list',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'options' => [
                 'sub' => tra('Subtree'),
                 'one' => tra('One level'),
@@ -229,6 +236,7 @@ function prefs_auth_list()
             'type' => 'text',
             'size' => 15,
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
         ],
         'auth_ldap_userdn' => [
@@ -236,6 +244,7 @@ function prefs_auth_list()
             'type' => 'text',
             'size' => 20,
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
         ],
         'auth_ldap_userattr' => [
@@ -243,6 +252,7 @@ function prefs_auth_list()
             'type' => 'text',
             'size' => 20,
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => 'uid',
         ],
         'auth_ldap_useroc' => [
@@ -250,6 +260,7 @@ function prefs_auth_list()
             'type' => 'text',
             'size' => 20,
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => 'inetOrgPerson',
         ],
         'auth_ldap_nameattr' => [
@@ -341,6 +352,7 @@ function prefs_auth_list()
             'size' => 15,
             'autocomplete' => 'off',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
         ],
         'auth_ldap_adminpass' => [
@@ -349,6 +361,7 @@ function prefs_auth_list()
             'size' => 15,
             'autocomplete' => 'off',
             'perspective' => false,
+            'help' => 'LDAP-authentication',
             'default' => '',
         ],
         'auth_ldap_group_external' => [

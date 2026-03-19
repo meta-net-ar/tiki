@@ -31,6 +31,7 @@ function prefs_available_list($partial = false)
             'name' => tra('Available languages'),
             'description' => tra('By default, all languages supported by Tiki are available on multilingual sites. This option allows limiting the languages to a subset.'),
             'filter' => 'lang',
+            'help' => 'Languages',
             'type' => 'multilist',
             'dependencies' => [
                 'feature_multilingual',
@@ -43,6 +44,7 @@ function prefs_available_list($partial = false)
         'available_themes' => [
             'name' => tra('Available themes'),
             'description' => tra('Restrict available themes'),
+            'help' => 'Themes',
             'type' => 'multilist',
             'options' => $themes,
             'dependencies' => [

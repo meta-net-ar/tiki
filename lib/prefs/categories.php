@@ -23,6 +23,7 @@ function prefs_categories_list()
             'description' => tra('Pages in selected categories will have a class with syntax like "cat_catname" added to the body tag.'),
             'separator' => ',',
             'type' => 'text',
+            'help' => 'Category',
             'size' => '15',
             'dependencies' => [
                 'feature_categories', 'categories_used_in_tpl',
@@ -35,6 +36,7 @@ function prefs_categories_list()
             'description' => tra('A cache is used to avoid having to fetch all categories from the database every time; this clears the cache when an object is categorized to keep the count up to date.'),
             'warning' => tra('Can slow saving objects on sites with a lot of categories. You may need to manually clear caches to update category object counts.'),
             'type' => 'flag',
+            'help' => 'Category',
             'dependencies' => [
                 'feature_categories',
             ],

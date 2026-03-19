@@ -40,6 +40,7 @@ function prefs_alchemy_list()
             'name' => tra('Alchemy Image library'),
             'description' => tra('Select either Image Magick or GD Graphics Library.'),
             'type' => 'list',
+            'help' => 'https://imagine.readthedocs.io/en/latest/usage/introduction.html#drivers',
             'options' => [
                 'imagick' => tra('Imagemagick'),
                 'gd' => tra('GD')

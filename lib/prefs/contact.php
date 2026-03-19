@@ -33,6 +33,7 @@ function prefs_contact_list()
             'name' => tra('Contact user'),
             'description' => tra('User to contact'),
             'type' => 'text',
+            'help' => 'Contact-us',
             'size' => 40,
             'dependencies' => [
                 'feature_contact',

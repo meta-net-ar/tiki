@@ -9,13 +9,17 @@ function prefs_box_list()
     return [
         'box_shadow_start' => [
             'name' => tra('Module (box) shadow start'),
+            'description' => tra('Extra HTML before each boxed module (with Shadow layer on). Pair with Module shadow end.'),
             'type' => 'textarea',
+            'help' => 'Shadow-Layers',
             'size' => '2',
             'default' => '',
         ],
         'box_shadow_end' => [
             'name' => tra('Module (box) shadow end'),
+            'description' => tra('Extra HTML after each boxed module.'),
             'type' => 'textarea',
+            'help' => 'Shadow-Layers',
             'size' => '2',
             'default' => '',
         ],

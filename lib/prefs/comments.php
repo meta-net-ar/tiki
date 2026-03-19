@@ -95,6 +95,7 @@ function prefs_comments_list()
         ],
         'comments_per_page'      => [
             'name'         => tr('Number of comments per page'),
+            'description'  => tra('How many comments to show per page.'),
             'type'         => 'text',
             'filter'       => 'digits',
             'default'      => 25,
@@ -102,6 +103,7 @@ function prefs_comments_list()
         ],
         'comments_sort_mode'     => [
             'name'    => tr('Sort mode for comments'),
+            'description' => tra('Show oldest or newest comments first.'),
             'type'    => 'list',
             'default' => 'commentDate_asc',
             'options' => [
@@ -111,6 +113,7 @@ function prefs_comments_list()
         ],
         'comments_threshold_indent'     => [
             'name'    => tr('Limit indentation on thread reply'),
+            'description' => tra('How many levels of replies are indented. Pick "All indented" for no limit.'),
             'type'    => 'list',
             'default' => '5',
             'filter' => 'digits',

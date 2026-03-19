@@ -12,6 +12,7 @@ function prefs_categorypath_list()
             'description' => tra('Category path won\'t appear for these category IDs.'),
             'separator' => ',',
             'type' => 'text',
+            'help' => 'Category',
             'size' => '15',
             'profile_reference' => 'category',
             'default' => [''], //empty string needed to keep preference from setting unexpectedly
@@ -20,6 +21,7 @@ function prefs_categorypath_list()
             'name' => tr('Category path format'),
             'description' => tr('Alter how the category path will be rendered.'),
             'type' => 'list',
+            'help' => 'Category',
             'default' => 'link_when_visible',
             'options' => [
                 'link_when_visible' => tr('Links to the category when the category is visible'),

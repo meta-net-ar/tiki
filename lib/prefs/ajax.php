@@ -11,7 +11,7 @@ function prefs_ajax_list()
         'ajax_autosave' => [
             'name' => tra('Ajax auto-save'),
             'description' => tra('Save content during editing, enabling work to be recovered after any interruption. Also enable a real-time preview. This option is required for WYSIWYG plugin processing.'),
-            'help' => 'Lost-Edit-Protection',
+            'help' => 'Lost-edit',
             'type' => 'flag',
             'dependencies' => [
                 'feature_ajax',

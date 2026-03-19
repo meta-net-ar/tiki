@@ -9,13 +9,17 @@ function prefs_footer_list()
     return [
         'footer_shadow_start' => [
             'name' => tra('Footer shadow div start'),
+            'description' => tra('Extra HTML before the footer area (with Shadow layer on). Pair with Footer shadow div end.'),
             'type' => 'textarea',
+            'help' => 'Shadow-Layer',
             'size' => '2',
             'default' => '',
         ],
         'footer_shadow_end' => [
             'name' => tra('Footer shadow div end'),
+            'description' => tra('Extra HTML after the footer area.'),
             'type' => 'textarea',
+            'help' => 'Shadow-Layer',
             'size' => '2',
             'default' => '',
         ],

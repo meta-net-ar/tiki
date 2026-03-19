@@ -11,6 +11,7 @@ function prefs_file_list()
             'name' => tra('Number per page'),
             'description' => tra('Number of comments per page'),
             'type' => 'text',
+            'help' => 'Comments',
             'size' => '5',
             'units' => tra('comments'),
             'default' => 10,
@@ -19,6 +20,7 @@ function prefs_file_list()
             'name' => tra('Default order'),
             'description' => tra('Default order of comments.'),
             'type' => 'list',
+            'help' => 'Comments',
             'options' => [
                 'commentDate_desc' => tra('Newest first'),
                 'commentDate_asc' => tra('Oldest first'),
@@ -31,6 +33,7 @@ function prefs_file_list()
             'description' => tra('If enabled, redirect all requests to images that were migrated from the image gallery to the corresponding file in the file gallery'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'File-Gallery-General-Settings',
         ],
     ];
 }
