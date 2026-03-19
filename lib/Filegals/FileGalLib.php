@@ -3119,10 +3119,9 @@ class FileGalLib extends TikiLib
             $numQuery = preg_replace("/ ORDER BY .*$/", "", $query);
             $numQuery = "SELECT COUNT(*) FROM (" . $numQuery . ") AS grouped";
             $numResults = $this->getOne($numQuery, $bindvars);
-            $limit = $offset == -1 ? 0 : $offset;
-            $limit .= ', ' . ($maxRecords == -1 ? PHP_INT_MAX : $maxRecords);
-            $query .= " LIMIT $limit";
-            $result = $this->fetchAll($query, $bindvars);
+            $fetchOffset = ($offset == -1) ? -1 : (int)$offset;
+            $fetchMaxRecords = ($maxRecords == -1) ? -1 : (int)$maxRecords;
+            $result = $this->fetchAll($query, $bindvars, $fetchMaxRecords, $fetchOffset);
         } else {
             $result = $this->fetchAll($query, $bindvars);
             $numResults = count($result);

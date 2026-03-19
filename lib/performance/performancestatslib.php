@@ -52,11 +52,14 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnAverageRequestTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC', string $orderType = '')
     {
-        $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
+        $order = strtoupper($order);
+        if (! in_array($order, ['ASC', 'DESC'])) {
+            $order = 'DESC';
+        }
         if ($orderType == 'no_of_requests') {
-            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY number_of_requests $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY number_of_requests $order", ["%$find%"], $amount, $offset);
         } else {
-            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY average_time_taken $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY average_time_taken $order", ["%$find%"], $amount, $offset);
         }
     }
 
@@ -70,8 +73,11 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnMaximumProcessingTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC')
     {
-        $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
-        return $this->query("SELECT url, MAX(time_taken) AS maximum_time_taken FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY maximum_time_taken $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+        $order = strtoupper($order);
+        if (! in_array($order, ['ASC', 'DESC'])) {
+            $order = 'DESC';
+        }
+        return $this->query("SELECT url, MAX(time_taken) AS maximum_time_taken FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY maximum_time_taken $order", ["%$find%"], $amount, $offset);
     }
 
     /**
