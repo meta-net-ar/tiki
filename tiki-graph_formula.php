@@ -15,71 +15,26 @@ use Tiki\Lib\GraphEngine\PDFLibGRenderer;
 
 require_once('tiki-setup.php');
 
-// List of valid functions
-$valid = [
-    'abs',
-    'acos',
-    'acosh',
-    'asin',
-    'asinh',
-    'atan2',
-    'atan',
-    'atanh',
-    'ceil',
-    'cos',
-    'cosh',
-    'deg2rad',
-    'exp',
-    'expm1',
-    'floor',
-    'fmod',
-    'hypot',
-    'log10',
-    'log1p',
-    'log',
-    'max',
-    'min',
-    'pi',
-    'pow',
-    'rad2deg',
-    'round',
-    'sin',
-    'sinh',
-    'sqrt',
-    'tan',
-    'tanh'
-];
-
 /**
- * @param $formula
- * @return string
+ * @param string $formula
+ * @return callable
  */
 function convert_formula($formula)
 {
-    global $valid;
-
-    // Stripping all quotes
-    $chars = [ '`', "'", '"', '&', '[', ']', '$', '{', '}' ];
-    $formula = str_replace($chars, array_fill(0, count($chars), ''), $formula);
-
-    // Make sure only valid functions are used
-    preg_match_all('/([a-z0-9_]+)/i', $formula, $out, PREG_PATTERN_ORDER);
-    foreach ($out[0] as $match) {
-        if (! is_numeric($match) && ! in_array(strtolower($match), $valid) && $match !== 'x') {
-            die("Invalid function call {$match}");
-        }
+    $parser = new Math_Formula_Parser();
+    try {
+        $element = $parser->parse(trim($formula));
+    } catch (Math_Formula_Parser_Exception $e) {
+        die('Invalid formula: ' . htmlspecialchars($e->getMessage()));
     }
 
-    // Replace spaces for commas
-    $formula = preg_replace('/\s+/', ', ', $formula);
+    $runner = new Math_Formula_Runner(['Math_Formula_Function_' => null]);
+    $runner->setFormula($element);
 
-    $formula = str_replace('x', '$x', $formula);
-
-    $function = function ($x) use ($formula) {
-        eval('$result = ' . $formula . ';');
-        return $result;
+    return function ($x) use ($runner) {
+        $runner->setVariables(['x' => $x]);
+        return $runner->evaluate();
     };
-    return $function;
 }
 
 $access->check_permission('feature_sheet');
