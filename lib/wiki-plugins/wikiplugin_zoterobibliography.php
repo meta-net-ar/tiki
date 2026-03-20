@@ -1,4 +1,5 @@
 <?php
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -33,52 +34,74 @@ function wikiplugin_zoterobibliography_info()
 function getCommonCSLStyles()
 {
     return [
-        ['text' => 'Site Default', 'value' => ''],
-        ['text' => 'Chicago (Author-Date)', 'value' => 'chicago-author-date'],
-        ['text' => 'Chicago (Notes-Bibliography)', 'value' => 'chicago-notes-bibliography'],
-        ['text' => 'MLA 9th Edition', 'value' => 'modern-language-association'],
-        ['text' => 'MLA 8th Edition', 'value' => 'modern-language-association-8th-edition'],
-        ['text' => 'Elsevier Harvard', 'value' => 'elsevier-harvard2'],
-        ['text' => 'IEEE', 'value' => 'ieee'],
-        ['text' => 'Nature', 'value' => 'nature'],
-        ['text' => 'Science', 'value' => 'science'],
-        ['text' => 'Cell', 'value' => 'cell'],
-        ['text' => 'The Lancet', 'value' => 'the-lancet'],
-        ['text' => 'Vancouver', 'value' => 'vancouver'],
+        ['text' => tra('Site Default'), 'value' => ''],
+        ['text' => tra('Chicago (Author-Date)'), 'value' => 'chicago-author-date'],
+        ['text' => tra('Chicago (Notes-Bibliography)'), 'value' => 'chicago-notes-bibliography'],
+        ['text' => tra('MLA 9th Edition'), 'value' => 'modern-language-association'],
+        ['text' => tra('MLA 8th Edition'), 'value' => 'modern-language-association-8th-edition'],
+        ['text' => tra('Elsevier Harvard'), 'value' => 'elsevier-harvard2'],
+        ['text' => tra('IEEE'), 'value' => 'ieee'],
+        ['text' => tra('Nature'), 'value' => 'nature'],
+        ['text' => tra('Science'), 'value' => 'science'],
+        ['text' => tra('Cell'), 'value' => 'cell'],
+        ['text' => tra('The Lancet'), 'value' => 'the-lancet'],
+        ['text' => tra('Vancouver'), 'value' => 'vancouver'],
     ];
+}
+
+function zoteroBibliographyAlert(string $type, string $message, bool $sendGlobalFeedback = false)
+{
+    if ($sendGlobalFeedback && class_exists('Feedback')) {
+        switch ($type) {
+            case 'danger':
+                Feedback::error($message);
+                break;
+            case 'warning':
+                Feedback::warning($message);
+                break;
+            case 'success':
+                Feedback::success($message);
+                break;
+            default:
+                Feedback::note($message);
+                break;
+        }
+    }
+
+    return '<div class="alert alert-' . $type . '">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</div>';
 }
 
 function wikiplugin_zoterobibliography($data, $params)
 {
     global $prefs;
-    
+
     if (empty($prefs['zotero_pandoc_enabled']) || $prefs['zotero_pandoc_enabled'] !== 'y') {
-        return '<div class="alert alert-warning">Pandoc citations not enabled</div>';
+        return zoteroBibliographyAlert('warning', tra('Pandoc citations not enabled'), true);
     }
-    
+
     $content = getContentFromContext();
-    
+
     if (empty($content)) {
-        return '<div class="alert alert-warning">Could not read content for bibliography generation</div>';
+        return zoteroBibliographyAlert('warning', tra('Could not read content for bibliography generation'), true);
     }
-    
+
     $keys = extractCitationKeys($content);
-    
+
     if (empty($keys)) {
-        return '<div class="alert alert-info">No citations found in this content.</div>';
+        return zoteroBibliographyAlert('info', tra('No citations found in this content.'));
     }
-    
+
     $libraryPath = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
-    
+
     $stylePath = null;
-    if (!empty($params['style'])) {
+    if (! empty($params['style'])) {
         $stylePath = 'storage/csl-styles/' . $params['style'] . '.csl';
     } else {
         $stylePath = 'storage/csl-styles/' . ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date') . '.csl';
     }
-    
+
     $bibliography = generateBibliography($keys, $libraryPath, $stylePath);
-    
+
     return $bibliography;
 }
 
@@ -89,36 +112,36 @@ function wikiplugin_zoterobibliography($data, $params)
 function getContentFromContext()
 {
     global $page;
-    
+
     $tikilib = TikiLib::lib('tiki');
-    
-    if (!empty($page)) {
+
+    if (! empty($page)) {
         $pageInfo = $tikilib->get_page_info($page);
-        if (!empty($pageInfo['data'])) {
+        if (! empty($pageInfo['data'])) {
             return $pageInfo['data'];
         }
     }
-    
-    if (!empty($_REQUEST['postId'])) {
-        $postId = $_REQUEST['postId'];
+
+    $postId = isset($_REQUEST['postId']) ? (int) $_REQUEST['postId'] : 0;
+    if ($postId > 0) {
         $bloglib = TikiLib::lib('blog');
         $post = $bloglib->get_post($postId);
-        
-        if (!empty($post['data'])) {
+
+        if (! empty($post['data'])) {
             return $post['data'];
         }
     }
-    
-    if (!empty($_REQUEST['articleId'])) {
-        $articleId = $_REQUEST['articleId'];
+
+    $articleId = isset($_REQUEST['articleId']) ? (int) $_REQUEST['articleId'] : 0;
+    if ($articleId > 0) {
         $artlib = TikiLib::lib('art');
         $article = $artlib->get_article($articleId);
-        
-        if (!empty($article['body'])) {
+
+        if (! empty($article['body'])) {
             return $article['heading'] . "\n\n" . $article['body'];
         }
     }
-    
+
     return '';
 }
 
@@ -129,22 +152,22 @@ function getContentFromContext()
 function extractCitationKeys($content)
 {
     $keys = [];
-    
+
     if (preg_match_all('/\{-?@([^}]+)\}/', $content, $matches)) {
         foreach ($matches[1] as $match) {
             $parts = explode(';', $match);
-            
+
             foreach ($parts as $part) {
                 $part = trim($part);
                 $part = ltrim($part, '@');
-                
+
                 if (preg_match('/^([a-zA-Z0-9_\-:.$]+)/', $part, $keyMatch)) {
                     $keys[] = $keyMatch[1];
                 }
             }
         }
     }
-    
+
     return array_unique($keys);
 }
 
@@ -154,48 +177,52 @@ function extractCitationKeys($content)
 function generateBibliography($keys, $libraryPath, $stylePath)
 {
     global $prefs;
-    
+
     $markdown = "---\nnocite: |\n";
     foreach ($keys as $key) {
         $markdown .= "  @" . $key . "\n";
     }
     $markdown .= "---\n\n";
-    
+
     $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
-    
+
     $cmd = escapeshellcmd($pandocPath);
     $cmd .= ' --citeproc';
     $cmd .= ' --bibliography=' . escapeshellarg($libraryPath);
     $cmd .= ' --csl=' . escapeshellarg($stylePath);
     $cmd .= ' -f markdown';
     $cmd .= ' -t html';
-    
+
     $descriptors = [
         0 => ['pipe', 'r'],
         1 => ['pipe', 'w'],
         2 => ['pipe', 'w'],
     ];
-    
+
     $process = proc_open($cmd, $descriptors, $pipes);
-    
-    if (!is_resource($process)) {
-        return '<div class="alert alert-danger">Bibliography rendering failed: Could not start Pandoc</div>';
+
+    if (! is_resource($process)) {
+        return zoteroBibliographyAlert('danger', tra('Bibliography rendering failed: Could not start Pandoc'), true);
     }
-    
+
     fwrite($pipes[0], $markdown);
     fclose($pipes[0]);
-    
+
     $output = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
-    
+
     $errors = stream_get_contents($pipes[2]);
     fclose($pipes[2]);
-    
+
     $returnCode = proc_close($process);
-    
+
     if ($returnCode !== 0) {
-        return '<div class="alert alert-danger">Bibliography rendering failed: ' . htmlspecialchars($errors) . '</div>';
+        return zoteroBibliographyAlert(
+            'danger',
+            tr('Bibliography rendering failed: %0', trim($errors)),
+            true
+        );
     }
-    
-    return '<div id="refs" class="references csl-bib-body">' . "\n" . $output . "\n" . '</div>';
+
+    return trim($output);
 }

@@ -19,7 +19,7 @@ use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use Tiki\WikiParser\Markdown\Extension as TikiExtension;
-use Tiki\WikiParser\Markdown\ZoteroCitationExtension; 
+use Tiki\WikiParser\Markdown\ZoteroCitationExtension;
 
 class WikiParser_ParsableMarkdown extends ParserLib
 {
@@ -51,9 +51,9 @@ class WikiParser_ParsableMarkdown extends ParserLib
         $environment->addExtension(new FootnoteExtension());
         $environment->addExtension(new TikiExtension());
 
-        if (!empty($prefs['zotero_pandoc_enabled']) && $prefs['zotero_pandoc_enabled'] === 'y') {
-           $environment->addExtension(new ZoteroCitationExtension());
-}
+        if (! empty($prefs['zotero_pandoc_enabled']) && $prefs['zotero_pandoc_enabled'] === 'y') {
+            $environment->addExtension(new ZoteroCitationExtension());
+        }
         if ($this->option['autotoc']) {
             $environment->addExtension(new HeadingPermalinkExtension());
         }
