@@ -1,6 +1,6 @@
 <div id="configlinks" class="mb-3 text-end">
     {if count($checkedCalIds)}
-        {$maxCalsForButton = 1}
+        {$maxCalsForButton = 20}
         {if count($checkedCalIds) > $maxCalsForButton}<select size="5">{/if}
         {foreach $checkedCalIds as $checkedCalId}
             {if $calendars}
