@@ -573,7 +573,7 @@ function tiki_fetch_tracker_messages($folder, $limit, $since)
                 $fieldId = (int) $field['fieldId'];
                 $rawValue = $trk->get_item_value($trackerId, $itemId, $fieldId);
 
-                if (!$rawValue) {
+                if (! $rawValue) {
                     continue;
                 }
 
@@ -614,19 +614,26 @@ function tiki_fetch_tracker_messages($folder, $limit, $since)
 
     if (! empty($since)) {
         $sinceTs = strtotime($since);
-        if ($sinceTs !== false) {
-            $messages = array_values(array_filter($messages, function ($m) use ($sinceTs) {
-                $ts = isset($m['date']) ? strtotime($m['date']) : false;
-                return $ts !== false && $ts >= $sinceTs;
-            }));
+        $formattedMessages = [];
+
+        foreach ($messages as $m) {
+            $rawDate = $m['date'] ?? false;
+            $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
+
+            // Filter to only keep if it's newer than $since
+            if ($ts !== false && $ts >= $sinceTs) {
+                // Transform to string date format as for imap messages for correct output
+                $m['date'] = date('r', $ts);
+                $formattedMessages[] = $m;
+            }
         }
     }
 
-    usort($messages, function ($a, $b) {
+    usort($formattedMessages, function ($a, $b) {
         return strtotime($b['date'] ?? '') <=> strtotime($a['date'] ?? '');
     });
 
-    return array_slice($messages, 0, (int) $limit);
+    return array_slice($formattedMessages, 0, (int) $limit);
 }
 
 /**
@@ -638,9 +645,10 @@ function tiki_fetch_tracker_messages($folder, $limit, $since)
  * @param string $style 'email' or 'news' layout style
  * @return array formatted message rows
  */
-function format_tracker_message_list($msg_list, $output_module, $parent_list = false, $style = 'email') {
-    $res = array();
-    if ($msg_list === array(false) || empty($msg_list)) {
+function format_tracker_message_list($msg_list, $output_module, $parent_list = false, $style = 'email')
+{
+    $res = [];
+    if ($msg_list === [false] || empty($msg_list)) {
         return $msg_list;
     }
 
@@ -658,7 +666,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $id = sprintf("tracker_%s_%s_%s_%s", $msg['fileId'], $msg['itemId'], $msg['fieldId'], $msg['trackerId']);
 
         // Set default subject
-        if (!trim($msg['subject'] ?? '')) {
+        if (! trim($msg['subject'] ?? '')) {
             $msg['subject'] = '[No Subject]';
         }
         $subject = $msg['subject'];
@@ -678,13 +686,13 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $from = is_array($from) ? implode(', ', $from) : $from;
         $from = format_imap_from_fld($from);
         $nofrom = '';
-        if (!trim($from)) {
+        if (! trim($from)) {
             $from = '[No From]';
             $nofrom = ' nofrom';
         }
 
         // Determine date display
-        if (isset($msg['date']) && !empty($msg['date'])) {
+        if (isset($msg['date']) && ! empty($msg['date'])) {
             $date = translate_time_str(human_readable_interval($msg['date']), $output_module);
             $timestamp = strtotime($msg['date']);
         } else {
@@ -692,10 +700,10 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
             $timestamp = time();
         }
 
-        $flags = array();
+        $flags = [];
 
         // Check for seen flag
-        if (!isset($msg['flags']) || !array_key_exists('seen', $msg['flags'])) {
+        if (!isset($msg['flags']) || ! array_key_exists('seen', $msg['flags'])) {
             $flags[] = 'unseen';
             if ($icon != 'sent') {
                 $icon = 'env_closed';
@@ -705,7 +713,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         }
 
         // Check for other common flags
-        foreach (array('attachment', 'deleted', 'flagged', 'answered', 'draft') as $flag) {
+        foreach (['attachment', 'deleted', 'flagged', 'answered', 'draft'] as $flag) {
             if (isset($msg['flags']) && array_key_exists($flag, $msg['flags'])) {
                 $flags[] = $flag;
             }
@@ -755,15 +763,15 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
 
         // Build message row based on style
         if ($style == 'news') {
-            $res[$id] = message_list_row(array(
-                    array('checkbox_callback', $id),
-                    array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg),
-                    array('safe_output_callback', 'source', $source),
-                    array('safe_output_callback', 'from' . $nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'] ?? '')),
-                    array('date_callback', $date, $timestamp, false),
-                    array('dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''),
-                ),
+            $res[$id] = message_list_row([
+                    ['checkbox_callback', $id],
+                    ['icon_callback', $flags],
+                    ['subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg],
+                    ['safe_output_callback', 'source', $source],
+                    ['safe_output_callback', 'from' . $nofrom, $from, null, str_replace([$from, '<', '>'], '', $msg['from'] ?? '')],
+                    ['date_callback', $date, $timestamp, false],
+                    ['dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''],
+                ],
                 $id,
                 $style,
                 $output_module,
@@ -772,15 +780,15 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
                 $inReplyTo
             );
         } else {
-            $res[$id] = message_list_row(array(
-                    array('checkbox_callback', $id),
-                    array('safe_output_callback', 'source', $source, $icon),
-                    array('safe_output_callback', 'from' . $nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'] ?? '')),
-                    array('subject_callback', $subject, $url, $flags, null, $preview_msg, $type_msg),
-                    array('date_callback', $date, $timestamp, false),
-                    array('icon_callback', $flags),
-                    array('dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''),
-                ),
+            $res[$id] = message_list_row([
+                    ['checkbox_callback', $id],
+                    ['safe_output_callback', 'source', $source, $icon],
+                    ['safe_output_callback', 'from' . $nofrom, $from, null, str_replace([$from, '<', '>'], '', $msg['from'] ?? '')],
+                    ['subject_callback', $subject, $url, $flags, null, $preview_msg, $type_msg],
+                    ['date_callback', $date, $timestamp, false],
+                    ['icon_callback', $flags],
+                    ['dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''],
+                ],
                 $id,
                 $style,
                 $output_module,
