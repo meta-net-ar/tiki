@@ -539,7 +539,7 @@ function find_relevant_tracker_items($keywords, $multivalueField = '', $searchAr
     return $resultSet->jsonSerialize()['result'];
 }
 
-function tiki_fetch_tracker_messages($folder, $limit, $since)
+function tiki_fetch_tracker_messages($folder, $limit, $since, $keyword = '')
 {
     $trk = TikiLib::lib('trk');
     $efFields = $trk->get_fields_by_type('EF');
@@ -612,20 +612,46 @@ function tiki_fetch_tracker_messages($folder, $limit, $since)
         }
     }
 
-    if (! empty($since)) {
-        $sinceTs = strtotime($since);
-        $formattedMessages = [];
+    $needle = mb_strtolower(trim((string) $keyword));
 
-        foreach ($messages as $m) {
-            $rawDate = $m['date'] ?? false;
-            $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
+    $sinceTs = strtotime($since);
+    $formattedMessages = [];
 
-            // Filter to only keep if it's newer than $since
-            if ($ts !== false && $ts >= $sinceTs) {
-                // Transform to string date format as for imap messages for correct output
-                $m['date'] = date('r', $ts);
-                $formattedMessages[] = $m;
+    foreach ($messages as $m) {
+        $rawDate = $m['date'] ?? false;
+        $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
+
+        if ($needle !== '') {
+            $fields = [
+                $m['from'] ?? '',
+                $m['to'] ?? '',
+                $m['subject'] ?? '',
+            ];
+
+            $haystack = mb_strtolower(implode(' ', $fields));
+            $needleNormalized = mb_strtolower($needle);
+
+            if (extension_loaded('intl')) {
+                $haystack = transliterator_transliterate(
+                    'NFD; [:Nonspacing Mark:] Remove; NFC;',
+                    $haystack
+                );
+                $needleNormalized = transliterator_transliterate(
+                    'NFD; [:Nonspacing Mark:] Remove; NFC;',
+                    $needleNormalized
+                );
             }
+
+            if (mb_strpos($haystack, $needleNormalized) === false) {
+                continue;
+            }
+        }
+
+        // Filter to only keep if it's newer than $since
+        if ($ts !== false && $ts >= $sinceTs) {
+            // Transform to string date format as for imap messages for correct output
+            $m['date'] = date('r', $ts);
+            $formattedMessages[] = $m;
         }
     }
 
@@ -703,7 +729,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $flags = [];
 
         // Check for seen flag
-        if (!isset($msg['flags']) || ! array_key_exists('seen', $msg['flags'])) {
+        if (! isset($msg['flags']) || ! array_key_exists('seen', $msg['flags'])) {
             $flags[] = 'unseen';
             if ($icon != 'sent') {
                 $icon = 'env_closed';
@@ -746,7 +772,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
             $url .= '&keyword=' . $output_module->html_safe($list_keyword);
         }
 
-        if (!$show_icons) {
+        if (! $show_icons) {
             $icon = false;
         }
 
@@ -763,7 +789,8 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
 
         // Build message row based on style
         if ($style == 'news') {
-            $res[$id] = message_list_row([
+            $res[$id] = message_list_row(
+                [
                     ['checkbox_callback', $id],
                     ['icon_callback', $flags],
                     ['subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg],
@@ -780,7 +807,8 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
                 $inReplyTo
             );
         } else {
-            $res[$id] = message_list_row([
+            $res[$id] = message_list_row(
+                [
                     ['checkbox_callback', $id],
                     ['safe_output_callback', 'source', $source, $icon],
                     ['safe_output_callback', 'from' . $nofrom, $from, null, str_replace([$from, '<', '>'], '', $msg['from'] ?? '')],
@@ -810,7 +838,8 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
  * @param string $type list path type
  * @return void
  */
-function prepare_tracker_message_list($msgs, $mod, $type) {
+function prepare_tracker_message_list($msgs, $mod, $type)
+{
     $style = $mod->get('news_list_style') ? 'news' : 'email';
     if ($mod->get('is_mobile')) {
         $style = 'news';

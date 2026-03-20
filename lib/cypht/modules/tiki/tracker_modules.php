@@ -1336,7 +1336,7 @@ class Hm_Output_trackers_source_max_setting extends Hm_Output_Module
     protected function output()
     {
         $sources = DEFAULT_PER_SOURCE;
-        $settings = $this->get('user_settings', array());
+        $settings = $this->get('user_settings', []);
         $reset = '';
         if (array_key_exists('trackers_per_source', $settings)) {
             $sources = $settings['trackers_per_source'];
@@ -1345,7 +1345,7 @@ class Hm_Output_trackers_source_max_setting extends Hm_Output_Module
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="trackers_setting"><td><label for="trackers_per_source">' .
-            $this->trans('Max messages per source').'</label></td>' .
+            $this->trans('Max messages per source') . '</label></td>' .
             '<td><input type="text" class="form-control form-control-sm w-auto" size="2" id="trackers_per_source" name="trackers_per_source" value="' . $this->html_safe($sources) . '" data-default-value="' . DEFAULT_PER_SOURCE . '" />' . $reset . '</td></tr>';
     }
 }
@@ -1361,8 +1361,8 @@ class Hm_Output_trackers_since_setting extends Hm_Output_Module
      */
     protected function output()
     {
-        $since = DEFAULT_SINCE; 
-        $settings = $this->get('user_settings', array());
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', []);
         if (array_key_exists('trackers_since', $settings) && $settings['trackers_since']) {
             $since = $settings['trackers_since'];
         }
@@ -1376,11 +1376,12 @@ class Hm_Output_trackers_since_setting extends Hm_Output_Module
  * Add trackers link to main menu
  * @subpackage tiki/handler
  */
-class Hm_Output_combined_trackers_link extends Hm_Output_Module {
+class Hm_Output_combined_trackers_link extends Hm_Output_Module
+{
     protected function output()
     {
         $res = '<li class="menu_combined_trackers"><a class="unread_link" href="page=message_list&list_path=trackers">';
-        if (!$this->get('hide_folder_icons')) {
+        if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-database account_icon"></i> ';
         }
         $res .= $this->trans('Trackers') . '</a></li>';
@@ -1410,9 +1411,10 @@ class Hm_Handler_load_trackers_data_sources extends Hm_Handler_Module
 
             $this->out('data_sources', [['hook' => 'ajax_tiki_trackers', 'type' => 'custom', 'params' => []]]);
             $this->out('list_path', 'trackers');
-            $this->out('mailbox_list_title', array('All Tracker items emails'));
+            $this->out('mailbox_list_title', ['All Tracker items emails']);
             $this->out('message_list_since', $since);
-            $this->out('per_source_limit', $limit);        }
+            $this->out('per_source_limit', $limit);
+        }
     }
 }
 
@@ -1434,8 +1436,9 @@ class Hm_Handler_trackers_fetch_messages extends Hm_Handler_Module
         if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
             $limit = $this->user_config->get('trackers_per_source_setting', DEFAULT_PER_SOURCE);
             $since = $this->user_config->get('trackers_since_setting', DEFAULT_SINCE);
+            $keyword = $this->request->get['keyword'] ?? '';
 
-            $msg_list = tiki_fetch_tracker_messages('inbox', $limit, $since);
+            $msg_list = tiki_fetch_tracker_messages('inbox', $limit, $since, $keyword);
 
             $this->out('trackers_message_list_data', $msg_list);
         }
@@ -1455,9 +1458,8 @@ class Hm_Output_filter_trackers_data extends Hm_Output_Module
     {
         if ($this->get('trackers_message_list_data')) {
             prepare_tracker_message_list($this->get('trackers_message_list_data'), $this, $this->get('list_path'));
-        }
-        else {
-            $this->out('formatted_message_list', array());
+        } else {
+            $this->out('formatted_message_list', []);
         }
     }
 }
