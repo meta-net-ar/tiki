@@ -4,7 +4,7 @@ import { goToURLWithData } from "./helpers";
 export default function handleDatePicker(selector, options) {
     const element = $(selector);
     const pickerType = String(element.attr("type") || "");
-    const isDateOnlyMode = ! pickerType.includes("time");
+    const isDateOnlyMode = pickerType === "date" || pickerType === "daterange";
 
     const toDateOnlyUnix = (value) => {
         const selected = moment(value);

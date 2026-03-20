@@ -128,20 +128,9 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 
         $timezone = $timezone ?: TikiLib::lib('tiki')->get_display_timezone();
 
-        try {
-            $tz = new DateTimeZone($timezone);
-        } catch (Exception $e) {
-            $tz = new DateTimeZone('UTC');
-        }
+        $dateInTimezone = TikiLib::date_format('Y-m-d', $timestamp, false, 5, false, $timezone);
 
-        $dateInTimezone = new DateTime('@' . $timestamp);
-        $dateInTimezone->setTimezone($tz);
-
-        $utcMidnight = new DateTime('now', new DateTimeZone('UTC'));
-        $utcMidnight->setDate((int) $dateInTimezone->format('Y'), (int) $dateInTimezone->format('n'), (int) $dateInTimezone->format('j'));
-        $utcMidnight->setTime(0, 0, 0);
-
-        return (int) $utcMidnight->format('U');
+        return (int) strtotime($dateInTimezone . ' UTC');
     }
 
     public function renderInput($context = [])

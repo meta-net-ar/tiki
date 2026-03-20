@@ -444,7 +444,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
 
     /**
      * Determine if a calendar value should be treated as date-only (all-day).
-     * 
+     *
      * @param mixed $value Optional value to check. If not provided, the field's current value will be used.
      * @return bool True if the value should be treated as date-only, false otherwise.
      */
