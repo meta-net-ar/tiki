@@ -1,5 +1,5 @@
-{if $item.type eq '-'}
-    <li class="dropdown-divider"></li>
+{if $item.type eq '-' or ($item.type eq 's' and empty($item.name))}
+    <li role="separator"><hr class="dropdown-divider my-2"></li>
 {elseif not empty($item.children)}
     <li class="mega-menu--item mega-menu--item-level-{$item.sectionLevel}">
         <a href="{$item.sefurl|escape}" class="" data-bs-toggle="dropdown">
