@@ -103,7 +103,7 @@ function wikiplugin_param($data, $params)
                 $value = $jitGet->offsetExists($name) ? $jitGet->$name->filter($filter) : null;
                 break;
             case 'post':
-                $value = $jitPost>offsetExists($name) ? $jitPost->$name->filter($filter) : null;
+                $value = $jitPost->offsetExists($name) ? $jitPost->$name->filter($filter) : null;
                 break;
             case 'cookie':
                 $value = $jitCookie->offsetExists($name) ? $jitCookie->$name->filter($filter) : null;
