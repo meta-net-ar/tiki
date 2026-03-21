@@ -130,7 +130,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/cypht.js",
                 "@jquery-tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/dialog.js",
                 "@jquery-tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/pagetabs.js",
-                "@jquery-tiki/plugins/wysiwyg" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/wysiwyg.js",
                 "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-emailFolder.js",
                 "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-files.js",
                 "@jquery-tiki/tracker-fields/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-all.dirtyCheck.js",
@@ -189,7 +188,8 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backTop.js",
 
                 /* src/js/wysiwyg */
-                "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg-summernote.js",
+                "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/summernote.js",
+                "@wysiwyg/plugin" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/plugin.js",
             ]
         ];
     $importmapJson = json_encode($importmap, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
