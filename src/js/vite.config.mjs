@@ -104,6 +104,7 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
+        { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
     ]);
 
     Object.assign(rollupInput, {

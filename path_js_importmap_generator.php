@@ -31,6 +31,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/dialog.js",
                 "@tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/pagetabs.js",
                 "@tiki/tracker-field-base/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-field-base/dirtyCheck.js",
+                "@tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-fields/emailFolder.js",
                 
                 /* src/js/@tiki/ui-utils */
                 "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
@@ -120,6 +121,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-admin_menu_options" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_menu_options.js",
                 "@jquery-tiki/tiki-admin_2fa" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_2fa.js",
                 "@jquery-tiki/tiki-edit_structure" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-edit_structure.js",
+                "@jquery-tiki/tiki-inline_audio_player" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-inline_audio_player.js",
                 "@jquery-tiki/wikiplugin-mouseover" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-mouseover.js",
                 "@jquery-tiki/wikiplugin-trackercalendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-trackercalendar.js",
                 "@jquery-tiki/eventcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/eventcalendar_to_pdf.js",
@@ -129,12 +131,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/languageCheckTextarea" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/languageCheckTextarea.js",
                 "@jquery-tiki/timeago" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/timeago.js",
                 "@jquery-tiki/validate-alt-image" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/validate-alt-image.js",
-
-                /* src/js/MOVE_THIS_CONTENT_ELSEWHERE
-                Note that most of the incorrect @jquery-tiki/ have not been corrected, to minimize immediate impact.
-                */
-                "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-emailFolder.js",
-                "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-files.js",
 
                 /* src/js/tiki-3d-model-viewer */
                 "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
