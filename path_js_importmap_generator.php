@@ -28,6 +28,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@tiki/plugin-base/buttonParamHandler" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/buttonParamHandler.js",
                 "@tiki/plugin-base/registerFieldDependency" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/registerFieldDependency.js",
                 "@tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/dialog.js",
+                "@tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/pagetabs.js",
                 
                 /* src/js/@tiki/ui-utils */
                 "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
@@ -131,7 +132,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 Note that most of the incorrect @jquery-tiki/ have not been corrected, to minimize immediate impact.
                 */
                 "@jquery-tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/bigbluebutton.js",
-                "@jquery-tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/pagetabs.js",
                 "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-emailFolder.js",
                 "@jquery-tiki/tracker-fields/files" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-files.js",
                 "@jquery-tiki/tracker-fields/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-all.dirtyCheck.js",
