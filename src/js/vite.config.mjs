@@ -101,6 +101,8 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
         { prefix: "common-reexported/", src: "src/js/common-reexported" },
         { prefix: "MOVE_THIS_CONTENT_ELSEWHERE/", src: "src/js/MOVE_THIS_CONTENT_ELSEWHERE" },
+        { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
+        { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
     ]);
 
     Object.assign(rollupInput, {
@@ -140,8 +142,6 @@ export default defineConfig(({ command, mode }) => {
         "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
-        "@tiki/plugin-base/buttonParamHandler": resolve(__dirname, "@tiki/plugin-base/buttonParamHandler.js"),
-        "@tiki/plugin-base/registerFieldDependency": resolve(__dirname, "@tiki/plugin-base/registerFieldDependency.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
         "wysiwyg/plugin": resolve(__dirname, "wysiwyg/plugin.js"),
