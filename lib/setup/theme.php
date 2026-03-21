@@ -208,6 +208,7 @@ $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_opt
 // and add js support file
 $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
 <<<<<<< HEAD
+<<<<<<< HEAD
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
 //Note: if Theme Control is active, than tiki-tc.php can modify the active theme
@@ -245,3 +246,6 @@ $smarty->initializePaths();
 =======
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> e050c16f08 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
+=======
+$headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
+>>>>>>> 0594ca1aa9 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)

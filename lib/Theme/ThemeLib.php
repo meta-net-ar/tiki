@@ -584,11 +584,7 @@ class ThemeLib extends TikiLib
         // FIXED WIDTH
         // ===============================
         if ($prefs['feature_fixed_width'] === 'y') {
-            $headerlib->add_css(
-                '@media (min-width: 1200px) { .container { max-width:' .
-                (!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
-                '; } }'
-            );
+            $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' .(!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .'; } }');
         }
 
         // ===============================
@@ -617,9 +613,9 @@ class ThemeLib extends TikiLib
         // ===============================
         // THEME CSS
         // ===============================
-        if (!empty($prefs['header_custom_scss'])) {
+        if (! empty($prefs['header_custom_scss'])) {
             // TODO
-        } elseif ($theme_active == 'custom_url' && !empty($prefs['theme_custom_url'])) {
+        } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
 
             $custom_theme = $prefs['theme_custom_url'];
 
@@ -639,7 +635,7 @@ class ThemeLib extends TikiLib
                     $headerlib->add_cssfile($theme_css);
                 }
 
-                if (!empty($theme_option_active)) {
+                if (! empty($theme_option_active)) {
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
@@ -662,7 +658,7 @@ class ThemeLib extends TikiLib
         // ===============================
         // CUSTOM CSS
         // ===============================
-        if (!empty($theme_option_active)) {
+        if (! empty($theme_option_active)) {
             $main_theme_path       = $themelib->get_theme_path($theme_active);
             $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
 
@@ -688,7 +684,7 @@ class ThemeLib extends TikiLib
         // ===============================
         // FAVICONS
         // ===============================
-        if (!isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {
+        if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {
 
             $favicon_path = $themelib->get_theme_path(
                 $prefs['theme'],
@@ -751,9 +747,7 @@ class ThemeLib extends TikiLib
         // ===============================
         // WEB MONETIZATION
         // ===============================
-        if ($prefs['webmonetization_all_website'] === 'y' &&
-            !empty($prefs['webmonetization_default_payment_pointer'])) {
-
+        if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetization_default_payment_pointer'])) {
             $headerlib->add_meta(
                 'monetization',
                 $prefs['webmonetization_default_payment_pointer']
@@ -812,7 +806,7 @@ class ThemeLib extends TikiLib
         if ($prefs['feature_fixed_width'] === 'y') {
             $headerlib->add_css(
                 '@media (min-width: 1200px) { .container { max-width:' .
-                (!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
+                (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
                 '; } }'
             );
         }
@@ -835,9 +829,9 @@ class ThemeLib extends TikiLib
         }
 
         // Theme CSS
-        if (!empty($prefs['header_custom_scss'])) {
+        if (! empty($prefs['header_custom_scss'])) {
             // TODO
-        } elseif ($theme_active == 'custom_url' && !empty($prefs['theme_custom_url'])) {
+        } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
 
             $custom_theme = $prefs['theme_custom_url'];
 
@@ -857,7 +851,7 @@ class ThemeLib extends TikiLib
                     $headerlib->add_cssfile($theme_css);
                 }
 
-                if (!empty($theme_option_active)) {
+                if (! empty($theme_option_active)) {
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
@@ -902,8 +896,8 @@ class ThemeLib extends TikiLib
             $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
 
             if (
-                !str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') &&
-                !str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') &&
+                ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') &&
+                ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') &&
                 strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false
             ) {
                 $prefs['site_layout_admin'] = 'admin';
@@ -922,7 +916,7 @@ class ThemeLib extends TikiLib
                 $smarty->assign('admin_icons', $admin_icons);
             }
 
-            if (!str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
+            if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
                 $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
             }
 
