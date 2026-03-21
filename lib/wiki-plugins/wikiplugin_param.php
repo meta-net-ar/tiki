@@ -100,13 +100,13 @@ function wikiplugin_param($data, $params)
 
         switch ($params['source']) {
             case 'get':
-                $value = $jitGet->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
+                $value = $jitGet->offsetExists($name) ? $jitGet->$name->filter($filter) : null;
                 break;
             case 'post':
-                $value = $jitPost>offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
+                $value = $jitPost>offsetExists($name) ? $jitPost->$name->filter($filter) : null;
                 break;
             case 'cookie':
-                $value = $jitCookie->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
+                $value = $jitCookie->offsetExists($name) ? $jitCookie->$name->filter($filter) : null;
                 break;
             default:
                 $value = $jitRequest->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
