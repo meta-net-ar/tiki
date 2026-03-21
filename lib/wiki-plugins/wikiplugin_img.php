@@ -605,7 +605,6 @@ function wikiplugin_img($data, $params)
     $imgdata = [];
     $imgdata['galleryId'] = '';
     $imgdata['alt'] = '';
-    $imgdata['responsive'] = $prefs['image_responsive_class'];
     $imgdata['fromFieldId'] = 0;        // "private" params set by Tracker_Field_Files
     $imgdata['fromItemId']  = 0;        // ditto
     $imgdata['checkItemPerms']  = 'y';  // ditto
@@ -618,6 +617,8 @@ function wikiplugin_img($data, $params)
     }, $params);
 
     $imgdata = array_merge($imgdata, $params);
+
+    $imgdata['responsive'] = $imgdata['responsive'] ?: $prefs['image_responsive_class'];
 
     $srcset = '';
     $sizes = '';

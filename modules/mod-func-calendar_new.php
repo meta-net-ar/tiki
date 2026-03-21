@@ -82,6 +82,7 @@ function module_calendar_new($mod_reference, $module_params)
     $default = ['viewnavbar' => 'y', 'viewmode' => 'month', 'showaction' => 'y'];
     $module_params = array_merge($default, $module_params);
     $defaultCalendarId = 0;
+    $current_url = $base_uri;
     if (isset($_REQUEST['viewmode'])) {
         $save_viewmode = $_REQUEST['viewmode'];
     }
@@ -122,13 +123,13 @@ function module_calendar_new($mod_reference, $module_params)
         if (! is_array($module_params['calIds'])) {
             $calIds = preg_split('/[\|:\&,]/', $calIds);
         }
-    } elseif (! empty($_SESSION['CalendarViewGroups'])) {
-        $calIds = $_SESSION['CalendarViewGroups'];
+    } elseif (! empty($_SESSION['ModuleCalendarViewGroups'])) {
+        $calIds = $_SESSION['ModuleCalendarViewGroups'];
     } elseif ($prefs['feature_default_calendars'] == 'n') {
         $calendars = $calendarlib->list_calendars();
         $calIds = array_keys($calendars['data']);
     } elseif (! empty($prefs['default_calendars'])) {
-        $calIds = $_SESSION['CalendarViewGroups'] = is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']);
+        $calIds = $_SESSION['ModuleCalendarViewGroups'] = is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']);
     } else {
         $calIds = [];
     }
@@ -172,11 +173,16 @@ function module_calendar_new($mod_reference, $module_params)
         $calendarInitialParams
     );
 
-    $current_url = $base_uri;
-    $smarty->assign('returnURL', $current_url);
-    $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
-    $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
-    $smarty->assign('defaultCalendarId', $defaultCalendarId);
+    // set up list of groups
+    if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_intersect($_REQUEST["calIds"], array_keys($calendars));
+    } elseif (isset($_REQUEST["calIds"]) and ! is_array($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_intersect([$_REQUEST["calIds"]], array_keys($calendars));
+    } elseif (! empty($_REQUEST['allCals'])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_keys($calendars);
+    } elseif (isset($_REQUEST["refresh"]) and ! isset($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = [];
+    }
 
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
@@ -203,10 +209,29 @@ function module_calendar_new($mod_reference, $module_params)
             $smarty->assign($tc_key, $tc_val);
         }
 
+        $checkedCalIds = [];
+        if (is_array($_SESSION['ModuleCalendarViewGroups'])) {
+            foreach ($calendars as $calendarId => $calendar) {
+                if (in_array($calendarId, $_SESSION['ModuleCalendarViewGroups'])) {
+                    $checkedCalIds[] = $calendarId;
+                }
+            }
+            $displayedcals = $_SESSION['ModuleCalendarViewGroups'];
+            $moduleCalendarIds = implode(',', $_SESSION['ModuleCalendarViewGroups']);
+        } else {
+            $displayedcals = $calIds;
+            $checkedCalIds = $calIds;
+        }
+
+        $smarty->assign('viewnavbar', $module_params['viewnavbar']);
         $smarty->assign('name', 'calendar_new');
         $smarty->assign('calendars', $calendars);
-        $smarty->assign_by_ref('checkedCalIds', $calIds);
-
+        $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
+        $smarty->assign('displayedcals', $displayedcals);
+        $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
+        $smarty->assign('returnURL', $current_url);
+        $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
+        $smarty->assign('defaultCalendarId', $defaultCalendarId);
 
         $smarty->assign('show_calendar_module', 'y');
         if (isset($save_todate)) {

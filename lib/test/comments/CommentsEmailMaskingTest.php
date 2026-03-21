@@ -51,10 +51,14 @@ class CommentsEmailMaskingTest extends TikiTestCase
             // Required by search indexing
             'feature_search' => 'n',
             'unified_forum_deepindexing' => 'n',
+            // Required by email threading system
+            'forum_notifications_use_new_threads' => 'n',
+            // Used in Tikilib()->object_post_save() called during comment posting
+            'feature_file_galleries' => 'n',
         ];
 
         $this->forumId = $this->commentsLib->replace_forum([
-            'forumId' => 1,
+            'forumId' => 0,
             'name' => "Test Forum for Email Masking",
             'description' => "Forum for testing email masking"
         ]);
@@ -67,6 +71,7 @@ class CommentsEmailMaskingTest extends TikiTestCase
         parent::tearDown();
 
         $this->commentsLib->query("DELETE FROM tiki_comments");
+        $this->commentsLib->query("DELETE FROM tiki_forums");
         $this->commentsLib->query("ALTER TABLE tiki_comments AUTO_INCREMENT = 1");
 
         // Restore original prefs or unset if there weren't any

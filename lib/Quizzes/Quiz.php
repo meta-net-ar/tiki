@@ -105,14 +105,14 @@ class Quiz
         ];
         $this->id = 0;
         $this->bDeleted = 0;
-        $this->timestamp = $this->now;
+        $this->timestamp = time();
         $this->nAuthor = $userlib->get_user_id($user);
         $this->sAuthor = $user;
         $this->bOnline = 'n';
         $this->nTaken = 'n';
         $this->sName = "";
         $this->sDescription = "";
-        $this->datePub = $this->now;
+        $this->datePub = time();
         $this->dateExp = TikiLib::make_time(0, 0, 0, 1, 1, TikiLib::date_format("%Y") + 10);
         $this->bRandomQuestions = "y";
         $this->nRandomQuestions = 10;
@@ -135,48 +135,6 @@ class Quiz
         $this->forumName = "";
         $this->prologue = "";
         $this->epilogue = "";
-    }
-
-    // dump as html text
-    /**
-     * @return array
-     */
-    public function show_html()
-    {
-        $userlib = TikiLib::lib('user');
-        $lines = [];
-        $lines[] = "id = " . $this->id . "<br />";
-        $lines[] = "deleted = " . $this->deleted . "<br />";
-        $authorInfo = $userlib->get_userid_info($this->author);
-        $lines[] = "author id = " . $this->author . "; author login = " . $authorInfo["login"] . "<br />";
-        $lines[] = "version = " . $this->version . "<br />";
-        $lines[] = "timestamp = " . $this->date_format("%a, %e %b %Y %H:%M:%S %O", $this->timestamp) . "<br />";
-        $lines[] = "online = " . $this->online . "<br />";
-        $lines[] = "studentAttempts = " . $this->studentAttempts . "<br />";
-        $lines[] = "name = " . $this->name . "<br />";
-        $lines[] = "description = " . $this->description . "<br />";
-        $lines[] = "datePub = " . $this->date_format("%a, %e %b %Y %H:%M:%S %O", $this->datePub) . "<br />";
-        $lines[] = "dateExp = " . $this->date_format("%a, %e %b %Y %H:%M:%S %O", $this->dateExp) . "<br />";
-        $lines[] = "nQuestion = " . $this->nQuestion . "<br />";
-        $lines[] = "nQuestions = " . $this->nQuestions . "<br />";
-        $lines[] = "shuffleQuestions = " . $this->shuffleQuestions . "<br />";
-        $lines[] = "shuffleAnswers = " . $this->shuffleAnswers . "<br />";
-        $lines[] = "limitDisplay = " . $this->limitDisplay . "<br />";
-        $lines[] = "questionsPerPage = " . $this->questionsPerPage . "<br />";
-        $lines[] = "timeLimited = " . $this->timeLimited . "<br />";
-        $lines[] = "timeLimit = " . $this->timeLimit . "<br />";
-        $lines[] = "multiSession = " . $this->multiSession . "<br />";
-        $lines[] = "canRepeat = " . $this->canRepeat . "<br />";
-        $lines[] = "repetitions = " . $this->repetitions . "<br />";
-        $lines[] = "gradingMethod = " . $this->gradingMethod . "<br />";
-        $lines[] = "showScore = " . $this->showScore . "<br />";
-        $lines[] = "showCorrectAnswers = " . $this->showCorrectAnswers . "<br />";
-        $lines[] = "publishStats = " . $this->publishStats . "<br />";
-        $lines[] = "additionalQuestions = " . $this->additionalQuestions . "<br />";
-        $lines[] = "forum = " . $this->forum . "<br />";
-        $lines[] = "forumName = " . $this->forumName . "<br />";
-        $lines[] = "data = " . $this->data . "<br />";
-        return $lines;
     }
 
     // Use any data in the array to replace the instance data.

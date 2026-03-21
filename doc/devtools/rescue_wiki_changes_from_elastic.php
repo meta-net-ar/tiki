@@ -28,7 +28,7 @@ require_once('tiki-setup.php');
  */
 class ESRescueCommand extends Command
 {
-    protected static $defaultDescription = "Rescues wiki changes from the activity stream in an Elasticsearch index\nExample usage: php doc/devtools/rescue_wiki_changes_from_elastic.php rescue -u http://elastic.example.com:9200/ -i mytiki_main";
+    protected static $defaultDescription = "Rescues wiki changes from the activity stream in an Elasticsearch index\nExample usage: php doc/devtools/rescue_wiki_changes_from_elastic.php rescue -u http://elastic.example.org:9200/ -i mytiki_main";
     private $elasticUri;
     private $indexName;
 

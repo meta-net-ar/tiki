@@ -77,24 +77,23 @@ class DiagramHelper
     {
         if (is_int($identifier)) {
             $diagramRoot = self::getDiagramsFromFileID($identifier, $page);
-        } else {
+        } elseif (is_string($identifier)) {
             $diagramRoot = self::getDiagramsFromXmlString($identifier, $page);
         }
 
-        if ($diagramRoot === false && ! empty($identifier)) {
-            Feedback::error(tr('The provided diagram XML is not valid. Please check and validate the diagram structure.'));
-        }
-
         $diagrams = [];
+        if ($diagramRoot !== false) {
+            foreach ($diagramRoot->diagram as $diagram) {
+                $diagramName = (string) $diagram->attributes()->name;
 
-        foreach ($diagramRoot->diagram as $diagram) {
-            $diagramName = (string) $diagram->attributes()->name;
+                if (! empty($page) && $page != $diagramName) {
+                    continue;
+                }
 
-            if (! empty($page) && $page != $diagramName) {
-                continue;
+                $diagrams[] = $diagram->asXML();
             }
-
-            $diagrams[] = $diagram->asXML();
+        } elseif (! empty($identifier)) { //We ignore a completely empty DIAGRAM plugin tag
+            Feedback::error(tr('The provided diagram XML is not valid. Please check and validate the diagram structure.'));
         }
 
         return $diagrams;
@@ -107,9 +106,13 @@ class DiagramHelper
      * @param string $page (optional) Name of the specific diagram page to return. If empty, all diagrams will be returned.
      * @return object
      */
-    public static function getDiagramsFromXmlString(string $rawXmlContent, string $page = '')
+    public static function getDiagramsFromXmlString(string $rawXmlContent, string $page = ''): \SimpleXMLElement|false
     {
-        return $diagramRoot = simplexml_load_string($rawXmlContent);
+        if ($rawXmlContent) {
+            return $diagramRoot = simplexml_load_string($rawXmlContent);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -119,7 +122,7 @@ class DiagramHelper
      * @param string $page (optional) Name of the specific diagram page to return. If empty, all diagrams will be returned.
      * @return false|object
      */
-    public static function getDiagramsFromFileID(int $identifier, string $page = '')
+    public static function getDiagramsFromFileID(int $identifier, string $page = ''): \SimpleXMLElement|false
     {
         $file = File::id($identifier);
 

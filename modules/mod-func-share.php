@@ -257,7 +257,7 @@ function module_share($mod_reference, $module_params)
     }
     $smarty->assign('fb_div_attributes', $fbDivAttr);
 
-    // TODO find a way of matching up tiki lang with https://www.facebook.com/translations/FacebookLocales.xml
+    // TODO find a way of matching up tiki lang with Facebook Locales
 
     if (! empty($module_params['facebook_locale'])) {
         $smarty->assign('fb_locale', $module_params['facebook_locale']);

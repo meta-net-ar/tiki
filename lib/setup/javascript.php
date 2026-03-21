@@ -9,6 +9,7 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Lib\TikiDate;
 use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\Sections;
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
@@ -270,6 +271,7 @@ if (empty($object)) {
     $object = ['type' => '', 'object' => ''];
 }
 $jqueryTiki['current_object'] = $object;
+
 $username_pattern = " / ^ ['\-_a-zA-Z0-9\.]*$/";
 if (is_string($prefs['username_pattern'])) {
     if (trim($prefs['username_pattern']) && trim($prefs['username_pattern']) !== '') {
@@ -369,7 +371,7 @@ $(document).on("tiki.modal.redraw", function(event) {
         $modalContent = $modalContent.find(".modal-content")
     }
     
-    // Guard (prevents duplicate listeners)
+    // Guard: Prevent duplicate listeners on the same modal
     const el = $modalContent[0];
     if (el.dataset.resizeInit === '1') return;
     el.dataset.resizeInit = '1';
@@ -377,7 +379,7 @@ $(document).on("tiki.modal.redraw", function(event) {
     const modalBody = $modalContent.find(".modal-body")[0];
     if (!modalBody) return;
 
-    let initialWidth, initialHeight;
+    let initialHeight;
     const initialOverflow = getComputedStyle(modalBody).overflow;
 
     const modalId = 'modal' + Math.random().toString(36).substring(7);
@@ -389,10 +391,9 @@ $(document).on("tiki.modal.redraw", function(event) {
         edges: { left: true, right: true, bottom: true, top: true },
         inertia: true,
         listeners: {
-            // The start listener captures the modal's dimensions at the moment resizing begins, which is crucial for the overflow logic to work correctly on the first try.
+            // The start listener captures the modal's initial height if not yet done, at the moment resizing begins.
             start(event) {
-                initialWidth = event.rect.width;
-                initialHeight = event.rect.height;
+                if(! initialHeight) initialHeight = event.rect.height;
             },
             move: (e) => {
                 const target = e.target;
@@ -405,12 +406,13 @@ $(document).on("tiki.modal.redraw", function(event) {
                 const y = (parseFloat(target.dataset.y) || 0) + (e.deltaRect.top || 0);
 
                 target.style.width = `${width}px`;
-                target.style.height = `${height}px`;
+                if (e.edges.top || e.edges.bottom) {
+                    target.style.height = `${height}px`;
+                }
                 target.style.transform = `translate(${x}px, ${y}px)`;
                 target.dataset.x = x;
                 target.dataset.y = y;
-
-                if (width < initialWidth || height < initialHeight) {
+                if (width < modalBody.scrollWidth || height < initialHeight) {
                     modalBody.style.overflow = "auto";
                 } else {
                     modalBody.style.overflow = initialOverflow;
@@ -453,6 +455,10 @@ EOT;
 }
 
 $headerlib->add_js($js);
+
+Sections::onSectionChange(function ($section) use ($headerlib) {
+    $headerlib->add_js("jqueryTiki.current_object = " . json_encode(current_object()) . ";");
+});
 
 if ($prefs['feature_ajax'] != 'y') {
     $prefs['ajax_autosave'] = 'n';

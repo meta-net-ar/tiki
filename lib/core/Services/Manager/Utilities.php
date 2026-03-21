@@ -45,7 +45,7 @@ class Services_Manager_Utilities
 
         if (! empty($vcs)) {
             $versions = $vcs->getAvailableBranches();
-            foreach ($versions as $key => $version) {
+            foreach ($versions as $version) {
                 preg_match('/(\d+\.|trunk|master)/', $version->branch, $matches);
                 if (! array_key_exists(0, $matches)) {
                     continue;

@@ -9,10 +9,10 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "_comments": [
-    "We moved the Toast-UI editor here to simplify maintenance, as it has many dependencies. Therefore, we preferred to retrieve its files directly from node_modules, since placing it in common_external would have made maintenance more difficult."
+  "devDependenciesComments": [
+    "We moved the Toast-UI editor here to simplify maintenance, as it has many dependencies. Therefore, we preferred to retrieve its files directly from node_modules, since placing it in common_external would have made maintenance more difficult - frank  Also, it's a cjs module - benoitg"
   ],
-  "dependencies": {
+  "devDependencies": {
     "@toast-ui/editor": "^3.2.2"
   }
 }

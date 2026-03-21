@@ -32,6 +32,9 @@ $auto_query_args = ['offset', 'find', 'sort_mode', 'faqId'];
 $access->check_feature('feature_faqs');
 $access->check_permission('tiki_p_view_faqs');
 //get_strings tra('Admin FAQs')
+$maxFaqTitleLength = $faqlib->getFaqTitleMaxLength();
+$smarty->assign('MAX_FAQ_TITLE_LENGTH', $maxFaqTitleLength);
+
 if (! isset($_REQUEST["faqId"])) {
     $_REQUEST["faqId"] = 0;
 }
@@ -51,33 +54,59 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     if ($tiki_p_admin_faqs != 'y') {
         Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
     }
-    $faqlib->remove_faq($_REQUEST["remove"]);
+    try {
+        $faqToRemove = $faqlib->get_faq($_REQUEST["remove"]);
+        if ($faqToRemove) {
+            $faqTitle = htmlspecialchars($faqToRemove['title'] ?? tra('Untitled'), ENT_QUOTES, 'UTF-8');
+            $faqlib->remove_faq($_REQUEST["remove"]);
+            Feedback::success(tr("FAQ '%0' has been successfully deleted.", $faqTitle));
+        } else {
+            Feedback::error(tra("The FAQ you are trying to delete was not found."));
+        }
+    } catch (Exception $e) {
+        Feedback::error(tr("An error occurred while deleting the FAQ: %0", $e->getMessage()));
+    }
 }
 if (isset($_REQUEST["save"])) {
-    if (empty($_REQUEST["title"])) {
-        Feedback::errorAndDie(tra("You can not create a FAQ without a title "), \Laminas\Http\Response::STATUS_CODE_409);
-    }
     $access->checkCsrf();
     $access->check_permission('tiki_p_admin_faqs');
-    if (mb_strlen($_REQUEST["title"]) > 200) {
-        Feedback::errorAndDie(tra("You have exceeded the number of characters allowed (200 max) for the FAQ title field"), \Laminas\Http\Response::STATUS_CODE_409);
-    }
-    if (isset($_REQUEST["canSuggest"]) && $_REQUEST["canSuggest"] == 'on') {
-        $canSuggest = 'y';
+
+    $title = trim($_REQUEST["title"] ?? '');
+    $description = trim($_REQUEST["description"] ?? '');
+    $canSuggest = (isset($_REQUEST["canSuggest"]) && $_REQUEST["canSuggest"] === 'on') ? 'y' : 'n';
+    $submittedFaqId = (int) ($_REQUEST["faqId"] ?? 0);
+
+    // Preserve submitted values when validation fails.
+    $smarty->assign('faqId', $submittedFaqId);
+    $smarty->assign('title', $title);
+    $smarty->assign('description', $description);
+    $smarty->assign('canSuggest', $canSuggest);
+
+    if ($title === '') {
+        Feedback::error(tra("You cannot create a FAQ without a title."));
+    } elseif (! Feedback::validateFieldLength("Title", $title, $maxFaqTitleLength)) {
     } else {
-        $canSuggest = 'n';
+        $isEdit = $submittedFaqId > 0;
+        $fid = $faqlib->replace_faq($submittedFaqId, $title, $description, $canSuggest);
+        $escapedTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $successMessage = $isEdit ?
+            tr("FAQ '%0' has been successfully updated.", $escapedTitle) :
+            tr("FAQ '%0' has been successfully created.", $escapedTitle);
+        Feedback::success($successMessage);
+        // Categorize
+        $cat_type = 'faq';
+        $cat_objid = $fid;
+        $cat_desc = substr($description, 0, 200);
+        $cat_name = $title;
+        $cat_href = "tiki-view_faq.php?faqId=" . $cat_objid;
+        include_once("categorize.php");
+
+        // Clear the form
+        $smarty->assign('faqId', 0);
+        $smarty->assign('title', '');
+        $smarty->assign('description', '');
+        $smarty->assign('canSuggest', '');
     }
-    $fid = $faqlib->replace_faq($_REQUEST["faqId"], $_REQUEST["title"], $_REQUEST["description"], $canSuggest);
-    $cat_type = 'faq';
-    $cat_objid = $fid;
-    $cat_desc = substr($_REQUEST["description"], 0, 200);
-    $cat_name = $_REQUEST["title"];
-    $cat_href = "tiki-view_faq.php?faqId=" . $cat_objid;
-    include_once("categorize.php");
-    $smarty->assign('faqId', 0);
-    $smarty->assign('title', '');
-    $smarty->assign('description', '');
-    $smarty->assign('canSuggest', '');
 }
 if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = 'title_asc';

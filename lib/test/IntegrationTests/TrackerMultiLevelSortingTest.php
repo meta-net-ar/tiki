@@ -29,6 +29,7 @@ class TrackerMultiLevelSortingTest extends TikiTestCase
             self::$old_prefs = $prefs;
             $prefs['feature_trackers'] = 'y';
             $prefs['feature_categories'] = 'y';
+            $prefs['trackerfield_starsystem'] = 'y';
             parent::setUpBeforeClass();
             self::$trklib = TikiLib::lib('trk');
             self::$categlib = TikiLib::lib('categ');

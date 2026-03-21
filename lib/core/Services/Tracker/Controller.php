@@ -1246,6 +1246,8 @@ class Services_Tracker_Controller
             throw new Services_Exception_Denied();
         }
 
+        $version = TikiLib::lib('trk')->last_log_version($itemId) + 1;
+
         $access = TikiLib::lib('access');
         if ($prefs['feature_warn_on_edit'] == 'y' && $input->conflictoverride->int() !== 1) {
             try {
@@ -1405,22 +1407,21 @@ class Services_Tracker_Controller
                     $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
                 }
 
-                if ($input->saveAndComment->int()) {
-                    $version = TikiLib::lib('trk')->last_log_version($itemId);
-
-                    return [
-                        'FORWARD' => [
-                            'controller' => 'comment',
-                            'action' => 'post',
-                            'type' => 'trackeritem',
-                            'objectId' => $itemId,
-                            'parentId' => 0,
-                            'version' => $version,
-                            'return_url' => $redirect,
-                            'title' => tr('Comment for edit #%0', $version),
-                        ],
-                    ];
+                if ($input->addComment->bool()) {
+                    $comment = new Services_Comment_Controller();
+                    $comment->action_post(new JitFilter([
+                        'post' => 1,
+                        'anonymous_name' => $input->comment_anonymous_name->text(),
+                        'comment' => $input->comment->text(),
+                        'objectId' => $itemId,
+                        'type' => 'trackeritem',
+                        'title' => $input->title->text(),
+                        'data' => $input->data->wikicontent(),
+                        'return_url' => $input->redirect->none(),
+                        'version' => $version,
+                    ]));
                 }
+
                 //return to page
                 if ($skipRedirect === 1 || ! $redirect) {
                     // Return item data and refresh info
@@ -1528,6 +1529,9 @@ class Services_Tracker_Controller
             'save_return' => $input->save_return->alpha() ?? 'n',
             'can_remove' => $itemObject->canRemove(),
             'skipRefresh' => $input->skipRefresh->bool(),
+            'commentTitle' => tr('Comment for edit #%0', $version),
+            'MAX_COMMENT_DATA_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_DATA_LENGTH,
+            'MAX_COMMENT_TITLE_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_TITLE_LENGTH,
         ];
     }
 
@@ -1939,37 +1943,59 @@ class Services_Tracker_Controller
             throw new Services_Exception_NotFound();
         }
 
-        if (! $itemId = $input->itemId->int()) {
+        $itemIds = [];
+        if ($input->multiple->bool()) {
+            $item = array_map('intval', explode(',', $input->itemId->text()));
+            foreach ($item as $i) {
+                if (! empty($i)) {
+                    $itemIds[] = $i;
+                }
+            }
+        } else {
+            $itemIds[] = $input->itemId->int();
+        }
+
+        if (empty($itemIds)) {
             throw new Services_Exception_MissingValue('itemId');
         }
 
         $trklib = TikiLib::lib('trk');
+        $affectedCount = 0;
+        $removedIds = [];
 
-        $itemInfo = $trklib->get_tracker_item($itemId);
-        if (! $itemInfo || $itemInfo['trackerId'] != $trackerId) {
-            throw new Services_Exception_NotFound();
+        foreach ($itemIds as $itemId) {
+            $itemInfo = Tracker_Item::fromId($itemId)?->getInfo();
+            if (! $itemInfo || $itemInfo['trackerId'] != $trackerId) {
+                throw new Services_Exception_NotFound();
+            }
+
+            $itemObject = Tracker_Item::fromInfo($itemInfo);
+            if (! $itemObject->canRemove()) {
+                throw new Services_Exception_Denied();
+            }
+
+            $uncascaded = $trklib->findUncascadedDeletes($itemId, $trackerId);
+            $affectedCount += count($uncascaded);
+
+            if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'DELETE') {
+                $this->utilities->removeItemAndReferences($definition, $itemObject, $uncascaded, $input->replacement->int() ?: '');
+
+                $removedIds[] = $itemId;
+            }
         }
 
-        $itemObject = Tracker_Item::fromInfo($itemInfo);
-        if (! $itemObject->canRemove()) {
-            throw new Services_Exception_Denied();
-        }
-
-        $uncascaded = $trklib->findUncascadedDeletes($itemId, $trackerId);
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'DELETE') {
-            $this->utilities->removeItemAndReferences($definition, $itemObject, $uncascaded, $input->replacement->int() ?: '');
-
-            Feedback::success(tr('Tracker item %0 has been successfully deleted.', $itemId));
-
+        if (count($removedIds)) {
+            Feedback::success(tr('Tracker items: %0 has been successfully deleted.', implode(', ', $removedIds)));
             TikiLib::events()->trigger('tiki.process.redirect'); // wait for indexing to complete before loading of next request to ensure updated info shown
         }
 
         return [
             'title' => tr('Remove'),
             'trackerId' => $trackerId,
-            'itemId' => $itemId,
-            'affectedCount' => count($uncascaded['itemIds']),
+            'itemId' => implode(',', $itemIds),
+            'affectedCount' => $affectedCount,
+            'multiple' => $input->multiple->bool(),
+            'removeCount' => count($itemIds),
         ];
     }
 

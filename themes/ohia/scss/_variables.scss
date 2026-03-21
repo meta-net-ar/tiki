@@ -4,6 +4,7 @@
 // The color palette for this theme is derived from the ohia lehua tree and its enviorment in Hawaii.
 // These are just physical attributes and  no reference is implied regarding the cultural aspects of the tree.
 $sky-light: #398ad8; //#4C95D6;
+$sky-new: #194E80;
 $sky-deep: #005EA6;
 $cloud: #b9bcc0;
 $wood: #987255;
@@ -85,7 +86,7 @@ $success:       $sky-deep; // #aad4ab;
 $info:          $sky-light; // #aad0e2;
 $warning:       $blossom-yellow; // #deceb3;
 $danger:        $blossom-red; // #dda8a7;
-$light:         #acafb2; // $cloud; //$gray-100;
+$light:         $sky-new; // #acafb2; // $cloud; //$gray-100;
 $dark:          $cooled-lava-dark; //#000;
 
 $theme-colors: (
@@ -95,7 +96,7 @@ $theme-colors: (
     "info":              $sky-light,
     "warning":           $blossom-yellow,
     "danger":            $blossom-red,
-    "light":             $sky-light,
+    "light":             $sky-new,
     "dark":              $cooled-lava-dark
 );
 
@@ -245,7 +246,7 @@ $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);
 $nav-tabs-link-active-border-color: $wood $wood $nav-tabs-link-active-bg;
 
 // Navbar
-$navbar-dark-color:                 rgba($white, .55);  // default
+$navbar-dark-color:                 rgba($white, .64);  // default
 $navbar-dark-hover-color:           rgba($white, .75);  // default
 $navbar-dark-active-color:          $white;  // default
 $navbar-dark-disabled-color:        rgba($white, .25);  // default
@@ -253,7 +254,7 @@ $navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://w
 $navbar-dark-toggler-border-color:  rgba($white, .1);  // default
 
 // Navbar links
-$navbar-light-color: #000; // #fd0006;
+$navbar-light-color: #BDBDBD; // #fd0006;
 $navbar-light-hover-color: #333333;
 $navbar-light-hover-bg:transparent;
 $navbar-light-active-color: #141414;

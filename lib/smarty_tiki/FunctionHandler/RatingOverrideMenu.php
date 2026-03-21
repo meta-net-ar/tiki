@@ -16,7 +16,6 @@ class RatingOverrideMenu extends Base
     public function handle($params, Template $template)
     {
         global $prefs;
-        $headerlib = TikiLib::lib('header');
         $ratinglib = TikiLib::lib('rating');
 
         $menu = '';

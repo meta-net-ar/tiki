@@ -36,7 +36,7 @@ location /ws {
     proxy_pass ws://127.0.0.1:8080;
 }
 
-Systemd service via virtualmin: https://lab12.evoludata.com:10000/init/edit_systemd.cgi?new=1&xnavigation=1
+Systemd service via virtualmin: https://example.org/init/edit_systemd.cgi?new=1&xnavigation=1
 Start WS server with the same user that Tiki web requests run as (to avoid permission issues) - e.g. sudo -u www-data php tiki-realtime.php
 */
 

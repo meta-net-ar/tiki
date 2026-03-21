@@ -439,6 +439,22 @@
                         </div>
                     </div>
 
+                    <div class="tiki-form-group row">
+                        <label class="col-form-label col-md-4" for="user_localtimezonesync">
+                            {tr}Show a synchronization pop-up when I move to a different timezone.{/tr}
+                        </label>
+                        <div class="col-md-8">
+                            <select id="user_localtimezonesync" name="user_localtimezonesync" class="form-control" >
+                                <option value="n" {if $prefs.user_localtimezonesync eq "n"}selected="selected"{/if}>
+                                    {tr}no{/tr}
+                                </option>
+                                <option value="y" {if $prefs.user_localtimezonesync eq "y"}selected="selected"{/if}>
+                                    {tr}yes{/tr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="display_12hr_clock" id="display_12hr_clock" {if $user_prefs.display_12hr_clock eq 'y'}checked="checked"{/if}>
                         <label class="form-check-label" for="display_12hr_clock">

@@ -52,6 +52,21 @@ lang = {
     "Select Some Options" : "Sélectionnez quelques options",
     "No results match" : "Aucun résultat ne correspond",
     "Warning: You have exceeded the allowed limit of %0 characters" : "Attention : vous avez dépassé la limite autorisée de %0 caractères.",
+    "Bogus entry" : "Entrée erronnée",
+    "day" : "jour",
+    "today" : "aujourd'hui",
+    "all-day" : "toute la journée",
+    "week" : "semaine",
+    "month" : "mois",
+    "One-Month" : "Un mois",
+    "Quarter" : "Trimestre",
+    "Semester" : "Semestre",
+    "list" : "liste",
+    "Loading..." : "Chargement...",
+    "Copy link to this event" : "Copier le lien de cet événement",
+    "Copied to clipboard" : "Copié dans le presse-papiers",
+    "Failure to copy. Check permissions for clipboard" : "Échec de la copie. Vérifiez les permissions du presse-papiers",
+    "New event" : "Nouvel événement",
+    "Edit event" : "Modifier l'événement"
     // remember the IE does not support ending comma on last item
-    "Bogus entry" : "Entrée erronnée"
 };

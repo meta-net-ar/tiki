@@ -8,6 +8,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "devDependenciesComment":{
+  "jspdf" : "ESM module is not directly usable.  NOTE:  Depends on html2canvas, but remapped to html2canvas-pro in vite.config.js)"
+  },
   "devDependencies":{
   "jspdf" : "^4.0.0"
   }

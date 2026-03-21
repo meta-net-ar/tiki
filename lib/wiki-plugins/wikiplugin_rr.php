@@ -1161,7 +1161,7 @@ function checkCommands($input)
             'get', 'rgl.init', # Suggested by Carlos J. Gil Bellosta , and Miguel Angel Rodriguez Muinos from list r-help-es
             'call', 'eval',  # added by suggestion of M. Cassin
             'paste',     # added by suggestion of Philippe Grosjean from Numerical Ecology of Aquatic Systems, Mons University, Belgium
-            'ggsave' ];  # from ggplot: http://rgm2.lab.nig.ac.jp/RGM2/R_man-2.9.0/library/ggplot2/man/ggsave-ao.html
+            'ggsave' ];  # from ggplot: https://ggplot2.tidyverse.org/reference/ggsave.html
     $found = [];
 
     foreach ($banned as $suspected) {

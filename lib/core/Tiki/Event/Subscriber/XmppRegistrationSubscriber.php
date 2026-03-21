@@ -27,7 +27,6 @@ class XmppRegistrationSubscriber implements EventSubscriberInterface
             // If trigger() ever accepts an object
             $event = $data;
         } else {
-            error_log('[XMPP] Invalid event data for UserRegistered');
             return;
         }
 
@@ -42,13 +41,8 @@ class XmppRegistrationSubscriber implements EventSubscriberInterface
             $userJid = $xmpplib->getUserJidForLogin($username);
             $result = $xmpplib->ensureRoomExists($roomJid);
 
-            if (! $result) {
-                error_log("[XMPP] Failed to ensure Registered room {$roomJid} exists");
-            } elseif (! $xmpplib->setUserAffiliation($roomJid, $userJid, 'member')) {
-                error_log("[XMPP] Failed to set affiliation for {$userJid} in Registered room {$roomJid}");
-            } else {
+            if ($result && $xmpplib->setUserAffiliation($roomJid, $userJid, 'member')) {
                 $joined[] = $roomJid;
-                error_log("[XMPP] {$username} joined Registered room {$roomJid}");
             }
         }
 
@@ -70,7 +64,6 @@ class XmppRegistrationSubscriber implements EventSubscriberInterface
                 $userJid = $xmpplib->getUserJidForLogin($username);
                 if ($xmpplib->ensureRoomExists($roomJid) && $xmpplib->setUserAffiliation($roomJid, $userJid, 'member')) {
                     $joined[] = $roomJid;
-                    error_log("[XMPP] {$username} joined {$g} room {$roomJid}");
                 }
             }
         }

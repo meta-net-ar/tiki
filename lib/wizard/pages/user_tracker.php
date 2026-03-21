@@ -97,7 +97,6 @@ class UserWizardUserTracker extends Wizard
                 }
 
                 $definition = Tracker_Definition::get($_REQUEST['trackerId']);
-                $xfields = ['data' => $definition->getFields()];
                 $smarty->assign('tracker_is_multilingual', $prefs['feature_multilingual'] == 'y' && $definition->getLanguageField());
 
                 $smarty->assign('itemId', $_REQUEST["itemId"]);
@@ -111,7 +110,6 @@ class UserWizardUserTracker extends Wizard
                     $smarty->assign('userTrackerHasDescription', true);
                 }
                 if (isset($_REQUEST['error']) && $_REQUEST['error'] === 'y') {
-                    $result = null;
                     $smarty->assign('msg', '');
                     $smarty->assign('showmsg', 'n');
                 } elseif (isset($_REQUEST['name'])) {       // user tracker saved ok
@@ -166,7 +164,6 @@ class UserWizardUserTracker extends Wizard
                     $userWizardDetailsFieldIds = explode(':', $userWizardDetailsFieldIds);
                 }
                 $userTrackerData = TikiLib::lib('parser')->invokePlugin('tracker', '', ['trackerId' => $re['usersTrackerId'], 'fields' => $userWizardDetailsFieldIds, 'showdesc' => 'n', 'showmandatory' => 'y', 'embedded' => 'n', 'action' => 'Save_User_Details', 'registration' => 'n', 'userField' => $re['usersFieldId']]);
-                $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
 
                 $utid = $userlib->get_tracker_usergroup($user);
 
@@ -174,9 +171,6 @@ class UserWizardUserTracker extends Wizard
                     $_REQUEST['trackerId'] = $utid['usersTrackerId'];
                     $_REQUEST["itemId"] = $trklib->get_item_id($_REQUEST['trackerId'], $utid['usersFieldId'], $user);
                 }
-
-                $definition = Tracker_Definition::get($_REQUEST['trackerId']);
-                $xfields = ['data' => $definition->getFields()];
             }
         }
     }

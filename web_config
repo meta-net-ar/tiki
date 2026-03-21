@@ -3,7 +3,9 @@
 <!-- DEVELOPERS: 
 This is the sample configuration file for IIS.  Must be linked to web.config to be active.
 
-This configuration must be kept synchronized with the configuration for other Web servers. See http://dev.tiki.org/Operating+System+independence#Keep_web.config_and_.htaccess_synchronized -->
+This configuration must be kept synchronized with the configuration for other Web servers.
+If you change any rule in this file, also review and update ./_htaccess.
+See http://dev.tiki.org/Operating+System+independence#Keep_web.config_and_.htaccess_synchronized -->
 
 <configuration>
   <system.webServer>

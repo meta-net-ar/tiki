@@ -134,7 +134,43 @@ article.tips {
 .ec-event-tag {
     height: auto;
 }
+// Scoped to .ec-body to prevent the "+" from appearing on day headers (Sun, Mon, etc.)
+.ec-body {
+    .ec-day,
+    .ec-slot {
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.1s ease-in-out;
 
+        &:hover {
+            /* Subtle background highlight */
+            background-color: rgba(var(--bs-primary-rgb), 0.05);
+
+            /* Show the "+" icon */
+            &::after {
+                content: "+";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 1.8rem;
+                font-weight: 300;
+                color: var(--bs-primary);
+                opacity: 0.5;
+                pointer-events: none;
+                z-index: 1;
+            }
+        }
+        &:has(.ec-event)::after {
+            display: none;
+        }
+    }
+}
+
+.ec-event {
+    cursor: pointer;
+    z-index: 2;
+}
 nav.ec-toolbar {
     flex-wrap: wrap;
 }

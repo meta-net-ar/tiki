@@ -274,7 +274,13 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     if (isset($_POST['display_timezone'])) {
         $tikilib->set_user_preference($userwatch, 'display_timezone', $_POST['display_timezone']);
     }
-
+    if (array_key_exists('user_localtimezonesync', $_POST)) {
+        $tikilib->set_user_preference(
+            $userwatch,
+            'user_localtimezonesync',
+            $_POST['user_localtimezonesync'] === 'y' ? 'y' : 'n'
+        );
+    }
     if (isset($_POST['display_12hr_clock']) && $_POST['display_12hr_clock'] == 'on') {
         $tikilib->set_user_preference($userwatch, 'display_12hr_clock', 'y');
         $smarty->assign('display_12hr_clock', 'y');

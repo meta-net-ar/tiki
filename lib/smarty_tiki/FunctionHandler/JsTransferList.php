@@ -63,7 +63,7 @@ class JsTransferList extends Base
         JS);
 
         return "
-        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' id='{$id}' field-name='{$params['fieldName']}' filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
+        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' id='{$id}' field-name='{$params['fieldName']}' filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' show-edit='{$params['showEdit']}'>
         </el-transfer>";
     }
 }

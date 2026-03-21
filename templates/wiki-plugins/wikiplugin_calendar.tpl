@@ -3,7 +3,8 @@
         <a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId return_url=$returnURL}" class="btn btn-primary">{icon name='create'} {tr}Add Event{/tr}</a>
     {/if}
     {if count($calendars) >= 1 && $viewnavbar eq 'y'}
-        {include file="export_calendar_in_csv_or_ical.tpl"}
+        {include file="checkboxes_calendar_form.tpl" filterCal="filterPluginCal"}
+        {include file="export_calendar_in_csv_or_ical.tpl" exportCal="exportPluginCal"}
     {/if}
 
     {if $viewlist neq 'list'}
@@ -29,29 +30,7 @@
         <a id="calendar-pdf-btn" href="#" class="text-end d-none" role="button">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
     {/if}
     <div id="test"></div>
-    <div id="configlinks" class="mb-3 text-end">
-        <div id="configlinks" class="mb-3 text-end">
-            {if count($checkedCalIds)}
-                {$maxCalsForButton = 20}
-                {if count($checkedCalIds) > $maxCalsForButton}<select size="5">{/if}
-                {foreach $checkedCalIds as $checkedCalId}
-                    {if $calendars}
-                        {$thiscustombgcolor = $calendars[$checkedCalId].custombgcolor}
-                        {$thiscustomfgcolor = $calendars[$checkedCalId].customfgcolor}
-                        {$thiscalendarsname = $calendars[$checkedCalId].displayName|escape}
-                        {if count($checkedCalIds) > $maxCalsForButton}
-                            <option style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};" onclick="toggle('filtercal')">
-                                {$thiscalendarsname}
-                            </option>
-                        {else}
-                            {button href="{$checkedCalId|sefurl:'calendar'}" _style="background:#$thiscustombgcolor;color:#$thiscustomfgcolor;border:1px solid #$thiscustomfgcolor; " _text="{$thiscalendarsname}" _class='btn btn-sm me-2 mt-2' _icon_name='calendar'}
-                        {/if}
-                    {/if}
-                {/foreach}
-                {if count($checkedCalIds) > $maxCalsForButton}</select>{/if}
-            {/if}
-        </div>    
-    </div>
+    {include file="configlinks_calendar.tpl" filterCal="filterPluginCal"}
     {if $viewlist neq 'list'}
     <input type="date" value="{$focusdate}" id="date-plugin-calendar">
     {/if}

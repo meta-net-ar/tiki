@@ -26,6 +26,11 @@
     display: block !important;
 }
 
+.el-checkbox__label {
+    display: flex !important;
+    gap: 0.5rem;
+}
+
 // On mobile, hide the buttons, and prefer only to use drag-and-drop
 @media (max-width: 768px) {
     .el-transfer__buttons {
@@ -47,4 +52,9 @@
     & > .el-transfer-panel__header {
         border-color: var(--bs-danger) var(--bs-danger) var(--el-border-color) var(--bs-danger);
     }
+}
+
+.transfer-footer {
+    margin-left: 15px;
+    padding: 6px 5px;
 }

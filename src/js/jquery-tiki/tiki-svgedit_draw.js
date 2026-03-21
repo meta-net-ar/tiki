@@ -1,4 +1,4 @@
-import Editor from "svgedit/dist/editor/Editor.js";
+import Editor from "svgedit";
 import "svgedit/dist/editor/svgedit.css";
 
 $.fn.replaceDraw = function (o) {
@@ -108,8 +108,8 @@ $.fn.loadDraw = function (o) {
         userExtensions: [],
         canvas_expansion: 2,
         lang: $.lang ? $.lang : "en",
-        imgPath: "node_modules/svgedit/dist/editor/images/",
-        extPath: "node_modules/svgedit/dist/editor/extensions/",
+        imgPath: "public/generated/js/vendor_dist/svgedit/dist/editor/images",
+        extPath: "public/generated/js/vendor_dist/svgedit/dist/editor/extensions/",
     });
     svgEditor.init();
 

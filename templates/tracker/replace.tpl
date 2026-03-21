@@ -15,7 +15,9 @@
             </div>
             <div class="mb-3 mx-0">
                 <label for="description">{tr}Description{/tr}</label>
-                {textarea class="form-control" name="description" id="description" cols="40"}{$info.description|escape}{/textarea}
+                {* if the _syntax param is empty, {textarea} will work out the best one, "none" forces a plain <textarea> to be created *}
+                {$descriptionSyntax = $info.descriptionIsParsed eq 'y' ? '' : 'none'}
+                {textarea class="form-control" name="description" id="description" cols="40" _syntax=$descriptionSyntax}{$info.description|escape}{/textarea}
             </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="descriptionIsParsed" id="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">

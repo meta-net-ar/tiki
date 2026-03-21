@@ -2327,7 +2327,7 @@ FILL;
         }
 
         if (! empty($params['_ajax_form_ins_id'])) {    // save new js in a function for the form init fn
-            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->output_js(false) . '}', 10);
+            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->outputInlineJS(false) . '}', 10);
 
             // put back the pre-existing js
             $headerlib->js = array_merge($headerlib->js, $old_js['js']);

@@ -1,7 +1,39 @@
 {* Note that when there in only one item it needs to be unformatted as it is often used inline in pretty trackers *}
 <div class="itemslist-field display_f{$field.fieldId|escape}"
         data-trackerid="{$field.trackerId}" data-itemid="{$item.itemId}" data-fieldId="{$field.fieldId}" data-listmode="{$context.list_mode}">
-    {if $data.num > 1}
+    {if $context.edit_mode && $field.options_map.useTransfer}
+        {jstransfer_list fieldName="{$field.html_name|escape}" defaultSelected=$data.itemIdsArray
+        data=$data.possibilities sourceListTitle=$field.options_map.sourceListTitle
+        targetListTitle=$field.options_map.targetListTitle filterable=$field.options_map.filterable
+        filterPlaceholder=$field.options_map.filterPlaceholder ordering=$field.options_map.ordering cardinalityParam=$field.validationParam validationMessage=$field.validationMessage showEdit="{$field.options_map.editItem}"}
+        <div class="d-none">
+            {if $field.options_map.editItem}
+                <a class="itemslist-btn edit px-1" href="#">
+                    {icon name="edit" ititle='{tr}Edit item{/tr}'}
+                </a>
+            {/if}
+            {if $field.options_map.deleteItem}
+                <a class="text-danger itemslist-btn px-1" href="#">
+                    {icon name="remove" ititle='{tr}Delete item{/tr}'}
+                </a>
+            {/if}
+        </div>
+        {jq}
+            const transferElement = $('.itemslist-field.display_f{{$field.fieldId}} el-transfer');
+            const perm = {{json_encode($data.itemPermissions)}};
+            transferElement.on('edit', (e) => {
+                const itemId = e.detail[0].value;
+                if (!perm[itemId] || !perm[itemId].can_modify) {
+                    showMessage('{tr}You do not have permission to edit this item.{/tr}', 'error');
+                    return;
+                }
+                const url = $.service('tracker', 'update_item', {trackerId: {{$field.options_map.trackerId}}, itemId: itemId});
+                const editBtn = transferElement.siblings('div.d-none').find('a.itemslist-btn.edit');
+                editBtn.attr('href', url);
+                editBtn.trigger('click');
+            });
+        {/jq}
+    {elseif $data.num > 1}
         <ul class="list-unstyled">
             {foreach from=$data.items key=id item=label}
                 <li class="d-flex justify-content-between">

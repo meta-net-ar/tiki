@@ -26,7 +26,7 @@ function wikiplugin_lsdir_info()
                 'required' => false,
                 'name' => tra('URL Prefix'),
                 'description' => tra('Make the file name a link to the file by adding the URL path preceding the file
-                    name. Example:') . ' <code>http://yoursite.com/tiki/</code>',
+                    name. Example:') . ' <code>http://example.org/tiki/</code>',
                 'since' => '1',
                 'default' => null,
                 'filter' => 'url',

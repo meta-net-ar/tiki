@@ -31,7 +31,6 @@ class RequestTest extends TikiTestCase
 
     public function testEndToEndCli()
     {
-        global $argv, $argc;
         $_SERVER['argv'] = ['someKey=someValue', 'otherKey=otherValue'];
         $_SERVER['argc'] = 3;
         $expectedResult = ['someKey' => 'someValue', 'otherKey' => 'otherValue'];

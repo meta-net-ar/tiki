@@ -954,13 +954,8 @@ class HeaderLib
         return $this;
     }
 
-    public function output_js($wrap = true)
+    public function outputInlineJS($wrap = true)
     {
-        // called in tiki.tpl - JS output at end of file now (pre 5.0)
-        $this->outputStaticJSFooterWasStartedBy = $this->getOutputCallerInfo();
-        global $prefs;
-
-
         ksort($this->js);
         ksort($this->jq_onready);
 
@@ -998,6 +993,14 @@ class HeaderLib
         }
 
         return $back;
+    }
+
+    public function output_js($wrap = true)
+    {
+        // called in tiki.tpl - JS output at end of file now (pre 5.0)
+        $this->outputStaticJSFooterWasStartedBy = $this->getOutputCallerInfo();
+
+        return $this->outputInlineJS($wrap);
     }
 
     /**

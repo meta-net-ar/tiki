@@ -1962,7 +1962,6 @@ function iconset_bootstrap_icon_font()
             'skip-start-circle',
             'skip-start-circle-fill',
             'skip-start-fill',
-            'skype',
             'slack',
             'slash',
             'slash-circle',

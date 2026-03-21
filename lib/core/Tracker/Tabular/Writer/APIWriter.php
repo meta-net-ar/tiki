@@ -272,7 +272,7 @@ class APIWriter
             $formatted_row = $format;
             if (@json_decode($format) !== null) {
                 foreach ($columns as $column) {
-                    $formatted_row = str_replace('%' . $column->getLabel() . '%', preg_replace(["/\r/", "/\n/"], ["", "\\n"], addslashes($row[$column->getLabel()])), $formatted_row);
+                    $formatted_row = str_replace('%' . $column->getLabel() . '%', substr(json_encode((string) $row[$column->getLabel()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 1, -1), $formatted_row);
                 }
             } else {
                 foreach ($columns as $column) {

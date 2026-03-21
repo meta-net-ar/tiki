@@ -745,6 +745,11 @@ class SmartyTiki extends Smarty
         $this->addLayoutTemplatesFromTemplatePath(SMARTY_TEMPLATES_PATH);
         $this->addTemplateDir($this->main_template_dir);
 
+        // webservices create temporary templates
+        if ($prefs['feature_webservices'] === 'y') {
+            $this->addTemplateDir(realpath(TEMP_CACHE_PATH));
+        }
+
         //Test templates
         $this->addTemplateDir(TIKI_PATH . '/lib/test/Core/Search/');
         //var_dump($this->getTemplateDir());
@@ -752,7 +757,7 @@ class SmartyTiki extends Smarty
 
     /**
      * When calling directly smarty functions, from PHP, you need to provide a object of type \Smarty\Template
-     * The method signature for smarty functions is: smarty_function_xxxx($params, \Smarty\Template $template)
+     * The method signature for smarty functions is: smarty_function_xxxx($params, Smarty\Template $template)
      *
      * @return \Smarty\Template
      */

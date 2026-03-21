@@ -48,6 +48,7 @@ class Ups implements ShippingProvider
             $request = $this->getRequest($from, $to, $packages, $service);
 
             $client = TikiLib::lib('tiki')->get_http_client();
+            // @tiki-external-link-ok: UPS API endpoint, requires authentication
             $client->setUri('https://www.ups.com/ups.app/xml/Rate');
             $client->setRawBody($auth . $request);
 
@@ -59,7 +60,7 @@ class Ups implements ShippingProvider
             $dom->loadXML($body);
 
             return $dom;
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             return null;
         }
     }
@@ -141,7 +142,7 @@ class Ups implements ShippingProvider
         $type->appendChild($dom->createElement('Code', '00'));
         $package->appendChild($packageWeight = $dom->createElement('PackageWeight'));
         $packageWeight->appendChild($unit = $dom->createElement('UnitOfMeasurement'));
-        $unit->appendChild($code = $dom->createElement('Code', 'LBS'));
+        $unit->appendChild($dom->createElement('Code', 'LBS'));
         $packageWeight->appendChild($weight = $dom->createElement('Weight'));
 
         $weight->appendChild($dom->createTextNode($data['weight'] * 2.20462262));

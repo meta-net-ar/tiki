@@ -19,6 +19,9 @@
         </a>
     {/if}
 </div>
+{remarksbox type="tip" title="{tr}Tip{/tr}" close="y"}
+    {tr _0='<strong>' _1='</strong>'}To add a visual separator, click %0Create menu option%1, set %0Type%1 to %0separator%1, then save your menu.{/tr}
+{/remarksbox}
 
 {tabset name="admin_menu_options"}
 {tab name="{tr}Manage menu{/tr} {$editable_menu_info.name}"}
@@ -100,9 +103,9 @@
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">{icon name='sort'}</span>
-                                        {if $option.type eq '-'}
-                                            <div class="form-control d-flex align-items-center" style="background-color: #f8f9fa; padding: 0.5rem;">
-                                                <hr class="menu-separator">
+                                        {if $option.type eq '-' or ($option.type eq 's' and empty($option.name))}
+                                            <div class="form-control d-flex align-items-center bg-body-tertiary py-2">
+                                                <hr class="dropdown-divider my-0 w-100">
                                             </div>
                                         {else}
                                             <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">

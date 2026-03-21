@@ -30,7 +30,7 @@ function prefs_url_list()
             'default' => 'n',
         ],
         'url_fragment_format' => [
-            'name' => tra('URL Frgament format'),
+            'name' => tra('URL Fragment format'),
             'description' => tra('Provides ability to change anchor format'),
             'detail' => tra('Set to "Complete" to change the encoding and allow anchors to contain other characters in addition to ASCII letters and digits.'),
             'type' => 'list',

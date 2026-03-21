@@ -32,8 +32,6 @@ class Tiki_Profile_InstallHandler_Webmail extends Tiki_Profile_InstallHandler
 
     public function canInstall()
     {
-        global $user;
-
         $data = $this->getData();
 
         if (! isset($data['to']) && ! isset($data['cc']) && ! isset($data['bcc']) && ! isset($data['subject']) && ! isset($data['body'])) {
@@ -45,7 +43,7 @@ class Tiki_Profile_InstallHandler_Webmail extends Tiki_Profile_InstallHandler
 
     public function doInstall()
     {
-        global $tikilib, $tikipath, $user;
+        global $tikilib, $user;
         $data = $this->getData();
 
         $this->replaceReferences($data);

@@ -21,19 +21,19 @@
 //    --bs-navbar-hover-color: #2aad9d;
 //    --bs-navbar-active-color: #2aad9d;
 //}
-:root {
-    --bs-light-rgb: 68, 217, 232;
-    .bg-light {
-        --bs-bg-opacity: 1;
-        background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
-    }
-}
+//:root {
+//    --bs-light-rgb: 68, 217, 232;
+//    .bg-light {
+//        --bs-bg-opacity: 1;
+//        background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
+//    }
+//}
 
 @mixin top-nav-dark {
     --tiki-top-bg: #{$primary};
-    --tiki-top-color: rgba(255, 255, 255, 0.55);
-    --tiki-top-hover-color: rgba(255, 255, 255, 0.75);
-    --tiki-top-text-color: rgba(255, 255, 255, 0.75);
+    --tiki-top-color: rgba(255, 255, 255, 0.80);
+    --tiki-top-hover-color: rgba(255, 255, 255, 0.85);
+    --tiki-top-text-color: rgba(255, 255, 255, 0.80);
     --tiki-top-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
@@ -41,9 +41,9 @@
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: #{$dark}; // rgb(111, 66, 193);
-    --tiki-topbar-color: rgba(255, 255, 255, 0.55);
-    --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
-    --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
+    --tiki-topbar-color: rgba(255, 255, 255, 0.80);
+    --tiki-topbar-hover-color: rgba(255, 255, 255, 0.85);
+    --tiki-topbar-text-color: rgba(255, 255, 255, 0.80);
     --tiki-topbar-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
 }
 
@@ -206,4 +206,6 @@ body {
     --tiki-input-select-color: var(--tiki-input-color);
     --tiki-input-select-bg: var(--tiki-input-bg);
     --bs-border-width: 1px;
+    --bs-light-bg-subtle: $light;
+    --bs-info-bg-subtle: #065e94; // ($info)
 }

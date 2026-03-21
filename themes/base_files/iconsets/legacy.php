@@ -696,7 +696,6 @@ function iconset_legacy()
                 'id' => 'share_link',
             ],
             //sharethis in defaults
-            //skype in defaults
             'smile' => [
                 'prepend' => 'img/smiles/',
                 'id' => 'icon_smile',
@@ -900,7 +899,6 @@ function iconset_legacy()
             'plugin',
             'quotes',
             'sharethis',
-            'skype',
             'star',
             'table',
             'user',

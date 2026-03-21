@@ -715,7 +715,7 @@ npm_setup() {
 
     echo "Running node install and build"
     set -x
-    npm install --clean-install --engine-strict
+    npm clean-install --engine-strict
     {
         exitCode=$?
         if [ $exitCode -ne 0 ]; then

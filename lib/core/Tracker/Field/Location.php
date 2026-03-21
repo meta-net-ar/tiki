@@ -143,6 +143,7 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
 
     public function renderInput($context = [])
     {
+        TikiLib::lib('header')->add_map();
         return $this->renderTemplate('trackerinput/location.tpl', $context);
     }
 

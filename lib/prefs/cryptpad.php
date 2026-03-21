@@ -21,7 +21,7 @@ function prefs_cryptpad_list($partial = false)
         ],
         'cryptpad_base_url' => [
             'name' => tra('CryptPad base URL'),
-            'description' => tra('Base URL of your CryptPad instance (e.g., https://cryptpad.example.com). Required for embedding the editor.'),
+            'description' => tra('Base URL of your CryptPad instance (e.g., https://cryptpad.example.org). Required for embedding the editor.'),
             'type' => 'text',
             'size' => '60',
             'filter' => 'url',

@@ -507,9 +507,17 @@ class UnifiedSearchLib
             self::INCREMENT_QUEUE,
             [
                 'object_type' => $type,
-                'object_id' => $objectId
+                'object_id' => $objectId,
             ]
         );
+    }
+
+    public function deleteObject($type, $objectId)
+    {
+        $index = $this->getIndex('data-write');
+        $index = new Search_Index_TypeAnalysisDecorator($index);
+        $indexer = $this->buildIndexer($index);
+        $indexer->removeDocument($type, $objectId);
     }
 
     /**
@@ -1357,6 +1365,12 @@ class UnifiedSearchLib
             throw new Exception('Invalid filter type provided in query. It must be an array.');
         }
 
+        // Support expert sort configuration via meta-parameter
+        if (isset($filter['_sort']) && $filter['_sort']) {
+            $query->setOrder($filter['_sort']);
+            unset($filter['_sort']);
+        }
+
         if (isset($filter['type']) && $filter['type']) {
             $query->filterType($filter['type']);
         }
@@ -1472,11 +1486,13 @@ class UnifiedSearchLib
         unset($filter['autocomplete']);
         unset($filter['groups']);
 
+
         foreach ($filter as $key => $value) {
             if ($value) {
                 $query->filterContent($value, $key);
             }
         }
+
         return $query;
     }
 

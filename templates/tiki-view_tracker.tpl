@@ -343,8 +343,7 @@
                                 {$itemoff=$itemoff+1}
                             {/section}
                         </table>
-                        </div>
-                    </form>
+                    </div>
                     
                     {* JavaScript to handle the sorting functionality *}
                     {jq}

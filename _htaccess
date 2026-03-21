@@ -14,7 +14,8 @@
 #
 # DEVELOPERS: 
 # This is the sample configuration file for Apache. Must be linked to .htaccess to be active.
-# This configuration must be kept synchronized with the configuration for other Web servers.
+# This configuration must be kept synchronized with the configuration for other Web servers .
+# If you change any rule in this file, also review and update ./web_config for IIS (Windows server).
 # See http://dev.tiki.org/Operating+System+independence#Keep_web.config_and_.htaccess_synchronized
 
 # -- Prevent Browsing of Certain File Extensions -- #

@@ -684,8 +684,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             ->setLabel($name)
             ->setPlainReplacement('username')
             ->setRenderTransform(function ($value) {
-                $smarty = TikiLib::lib('smarty');
-
                 if ($value) {
                     return implode(', ', array_map('smarty_modifier_userlink', TikiLib::lib('trk')->parse_user_field($value)));
                 }
@@ -696,8 +694,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             ->setLabel($name)
             ->setReadOnly(true)
             ->setRenderTransform(function ($value) {
-                $smarty = TikiLib::lib('smarty');
-
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
                     foreach ($value as &$v) {
@@ -778,7 +774,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
         if (! isset($localCache[$CACHE_KEY])) {
             $userlib = TikiLib::lib('user');
             $tikilib = TikiLib::lib('tiki');
-            $smarty = TikiLib::lib('smarty');
             $users = [];
 
             $groupIds = $this->getOption('groupIds');
@@ -818,13 +813,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
     public function getFilterCollection()
     {
         global $prefs;
-
-        if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
-            $smarty = TikiLib::lib('smarty');
-            $showRealname = true;
-        } else {
-            $showRealname = false;
-        }
 
         $users = $this->getPossibleItemValues();
         asort($users, SORT_NATURAL | SORT_FLAG_CASE);

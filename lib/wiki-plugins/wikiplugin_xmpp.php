@@ -222,9 +222,6 @@ function wikiplugin_xmpp($data, $params)
         $authorizedFull = array_map(fn($r) => $xmpplib->buildRoomJid($r), $authorizedRooms);
 
         if (! in_array($requestedFull, $authorizedFull, true)) {
-            if (! empty($prefs['xmpp_conversejs_debug']) && $prefs['xmpp_conversejs_debug'] === 'y') {
-                error_log("[XMPP Plugin] User '{$user}' blocked from {$requestedFull}. Allowed: " . implode(',', $authorizedFull));
-            }
             return '<div class="alert alert-warning">'
                 . tra('This chat room is restricted.')
                 . '</div>';

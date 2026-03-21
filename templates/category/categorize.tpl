@@ -9,7 +9,7 @@
             {include file="access/render_list.tpl" list=$objects}
             <h5 class="w-100">{tr}In these categories{/tr}</h5>
             <div class="w-100">
-                <select name="to[]" class="form-select" multiple>
+                <select name="categIds[]" class="form-select" multiple>
                     {foreach $categories as $cat}}
                         <option value="{$cat.name|escape}-{$cat.id|escape}" selected>
                             {$cat.name|escape}

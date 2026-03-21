@@ -1,4 +1,18 @@
 // Comments
+.comment-highlight{
+  animation: highlight 3000ms ease-out;
+}
+
+@keyframes highlight {
+  50% {
+    background-color: #f5d142;
+    color:#222;
+  }
+  100% {
+    background-color: #d7cece;
+    color:#222;
+  }
+}
 
 #comment-container {
     display: none;

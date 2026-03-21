@@ -23,6 +23,8 @@ if (! defined("_ECHOSERVER_HTML_GRAMMARPARSER")) {
         public $name;
         public $allreadyparsed;
         public $errors;
+        public $err;
+        public $errstr;
         public $errpos;
         public $quotstate;
         public $firstprev;
@@ -33,6 +35,7 @@ if (! defined("_ECHOSERVER_HTML_GRAMMARPARSER")) {
         public $mode;
         public $tagname;
         public $parname;
+
 /**********************************************************************************
  * Class constructor
  **********************************************************************************/

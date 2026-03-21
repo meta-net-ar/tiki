@@ -458,6 +458,29 @@ body.fullscreen.tiki.navbar-padding {
     margin-bottom: 0;
 }
 
+.btn-tinted-primary {
+    --bs-btn-color: var(--bs-primary);
+    --bs-btn-bg: rgba(var(--bs-primary-rgb), 0.08);
+    --bs-btn-border-color: transparent;
+
+    --bs-btn-hover-color: var(--bs-primary);
+    --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), 0.15);
+    --bs-btn-hover-border-color: transparent;
+
+    --bs-btn-active-color: var(--bs-primary);
+    --bs-btn-active-bg: rgba(var(--bs-primary-rgb), 0.20);
+    --bs-btn-active-border-color: transparent;
+
+    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+
+    color: var(--bs-btn-color) !important;
+
+    &:focus,
+    &:active {
+        box-shadow: none !important;
+    }
+}
+
 @media screen and (max-width: 480px) {
     .tiki #conversejs.converse-embedded {
         margin: 0;

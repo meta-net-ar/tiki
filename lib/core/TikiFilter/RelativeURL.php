@@ -28,7 +28,7 @@ class TikiFilter_RelativeURL implements Laminas\Filter\FilterInterface
 
         try {
             $url = Laminas\Uri\UriFactory::factory($url);
-        } catch (InvalidUriPartException $e) {
+        } catch (InvalidUriPartException) {
             // if the url is invalid, return a blank string.
             return '';
         }

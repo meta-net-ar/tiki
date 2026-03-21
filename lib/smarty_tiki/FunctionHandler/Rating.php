@@ -42,7 +42,6 @@ class Rating extends Base
                     }
                 }
 
-                $tikilib = \TikiLib::lib('tiki');
                 if ($type == 'comment') {
                     $forum_id = $commentslib->get_comment_forum_id($id);
                     $forum_info = $commentslib->get_forum($forum_id);

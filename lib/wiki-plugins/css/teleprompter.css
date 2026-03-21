@@ -1,0 +1,155 @@
+.teleprompter-container {
+  --teleprompter-font-scale: 1;
+  --teleprompter-title-size: 32px;
+  --teleprompter-title-color: inherit;
+  --teleprompter-description-size: 16px;
+  --teleprompter-description-color: inherit;
+  --teleprompter-block-bg: transparent;
+
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.teleprompter-container:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+.teleprompter-mirror-horizontal {
+  transform: scaleX(-1);
+}
+
+.teleprompter-mirror-vertical {
+  transform: scaleY(-1);
+}
+
+.teleprompter-track {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+}
+
+.teleprompter-content {
+  padding: 0 2rem;
+}
+
+.teleprompter-spacer {
+  height: 0;
+  pointer-events: none;
+}
+
+.teleprompter-block {
+  line-height: 1.6;
+  font-size: calc(var(--teleprompter-description-size) * var(--teleprompter-font-scale));
+  color: var(--teleprompter-description-color);
+  text-align: left;
+  background: var(--teleprompter-block-bg);
+  padding: 0.75rem 0;
+  margin: 0;
+}
+
+.teleprompter-block h1 {
+  font-size: calc(var(--teleprompter-title-size) * var(--teleprompter-font-scale));
+  color: var(--teleprompter-title-color);
+  margin: 0 0 0.5em;
+}
+
+.teleprompter-media img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.teleprompter-focus-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tp-focus-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.tp-focus-mask-top {
+  top: 0;
+  height: 0;
+}
+
+.tp-focus-mask-bottom {
+  bottom: 0;
+  height: 0;
+}
+
+.tp-focus-guide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.6);
+  top: 50%;
+  display: block;
+}
+
+.teleprompter-focus-none .teleprompter-focus-overlay {
+  display: none;
+}
+
+.teleprompter-controls {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.teleprompter-controls-hidden {
+  display: none;
+}
+
+.teleprompter-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+.teleprompter-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.teleprompter-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+.teleprompter-timer {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  font-family: monospace;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.teleprompter-timer-hidden {
+  display: none;
+}

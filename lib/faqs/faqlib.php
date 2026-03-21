@@ -13,6 +13,35 @@
 class FaqLib extends TikiLib
 {
     /**
+     * Fallback limit of the title field of the tiki_faqs table.
+     */
+    public const MAX_FAQ_TITLE_LENGTH = 200;
+
+    /**
+     * Reads the FAQ title length directly from DB schema to avoid hardcoded usage.
+     * Falls back to MAX_FAQ_TITLE_LENGTH if schema lookup fails.
+     */
+    public function getFaqTitleMaxLength(): int
+    {
+        static $cachedLength = null;
+
+        if ($cachedLength !== null) {
+            return $cachedLength;
+        }
+
+        $column = $this->fetchAll("SHOW COLUMNS FROM `tiki_faqs` LIKE 'title'");
+        $type = is_array($column) ? ($column[0]['Type'] ?? '') : '';
+
+        if (preg_match('/^varchar\((\d+)\)/i', $type, $matches)) {
+            $cachedLength = (int) $matches[1];
+            return $cachedLength;
+        }
+
+        $cachedLength = self::MAX_FAQ_TITLE_LENGTH;
+        return $cachedLength;
+    }
+
+    /**
      * @param $offset
      * @param $maxRecords
      * @param $sort_mode
@@ -197,8 +226,7 @@ class FaqLib extends TikiLib
      */
     public function remove_faq_question($questionId)
     {
-        $faqId = $this->getOne('select `faqId` from `tiki_faq_questions` where `questionId`=?', [$questionId]);
-        $result = $this->query('delete from `tiki_faq_questions` where `questionId`=?', [$questionId]);
+        $this->query('delete from `tiki_faq_questions` where `questionId`=?', [$questionId]);
         return true;
     }
 
@@ -340,7 +368,7 @@ class FaqLib extends TikiLib
     {
         $query = "delete from `tiki_suggested_faq_questions` where `sfqId`=?";
 
-        $result = $this->query($query, [(int) $sfqId]);
+        $this->query($query, [(int) $sfqId]);
     }
 
     /**

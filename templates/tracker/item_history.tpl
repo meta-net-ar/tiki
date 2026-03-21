@@ -77,7 +77,7 @@
                 {if $hist.value neq $hist.new or $hist.version == 0}
                     {$fieldId=$hist.fieldId}
                     {$field_value=$field_option[$fieldId]}
-                    {if is_array($field_value) and ($field_value.visibleInHistoryMode eq 'y' or $hist.version == 0)}
+                    {if is_array($field_value) and ($field_value.visibleInHistoryMode eq 'y' or $hist.version == 0 or $hist.fieldId == -1)}
                         <tr>
                             <td class="id"><strong>{$hist.version|escape}</strong></td>
                             <td class="date"><strong>{if not empty($hist.lastModif)}{$hist.lastModif|tiki_short_datetime}{/if}</strong></td>
@@ -89,7 +89,7 @@
                                 {if $fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
                             </td>
                             {if empty($diff_style)}
-                                {if !empty($field_value.fieldId)}
+                                {if !empty($field_value.fieldId) && $field_value.fieldId > 0}
                                     <td class="text">{$field_value.value=$hist.value}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
                                     <td class="text">{$field_value.value=$hist.new}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
                                 {else}
@@ -98,8 +98,12 @@
                                 {/if}
                             {else}
                                 <td colspan="2" class="tracker-diff {$diff_style}">
-                                    {$field_value.value=$hist.new}
-                                    {trackeroutput field=$field_value list_mode='y' history=y item=$item_info process=y oldValue=$hist.value diff_style=$diff_style}
+                                    {if !empty($field_value.fieldId) && $field_value.fieldId > 0}
+                                        {$field_value.value=$hist.new}
+                                        {trackeroutput field=$field_value list_mode='y' history=y item=$item_info process=y oldValue=$hist.value diff_style=$diff_style}
+                                    {else}
+                                        {wikidiff object_type=direct oldver=$hist.value newver=$hist.new diff_style=$diff_style}
+                                    {/if}
                                 </td>
                             {/if}
                         </tr>
