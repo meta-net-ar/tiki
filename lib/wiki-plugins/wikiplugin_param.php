@@ -48,12 +48,25 @@ function wikiplugin_param_info()
                 'since' => '13.1',
                 'filter' => 'text',
             ],
+            'filter' => [
+                'required' => false,
+                'name' => tra('Filter'),
+                'separator' => '|',
+                'description' => tra('Filter for the values.  Multiple values can be separated by a pipe | character.' .
+                    'If empty then "text" is used".'),
+                'since' => '27.6',
+                'filter' => 'word',
+                'default' => 'text',
+                'advanced' => true,
+            ],
         ]
     ];
 }
 
 function wikiplugin_param($data, $params)
 {
+    global $jitGet, $jitPost, $jitCookie, $jitRequest;
+
     $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_param_info());
 
     $dataelse = '';
@@ -68,24 +81,35 @@ function wikiplugin_param($data, $params)
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
-    if (empty($params['source'])) {
-        $params['source'] = 'request';
+    $defaults = [];
+    $plugininfo = wikiplugin_param_info();
+    foreach ($plugininfo['params'] as $key => $param) {
+        $defaults["$key"] = $param['default'];
+    }
+    $params = array_merge($defaults, $params);
+
+    if (count($params['name']) > 1) {
+        if (! is_array($params['filter'])) {
+            $params['filter'] = array_fill(0, count($params['name']), $params['filter']);
+        }
     }
 
-    foreach ($params['name'] as $name) {
+    foreach ($params['name'] as $i => $name) {
         $value = null;
+        $filter = $params['filter'][$i];
+
         switch ($params['source']) {
             case 'get':
-                $value = $_GET[$name] ?? null;
+                $value = $jitGet->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
                 break;
             case 'post':
-                $value = $_POST[$name] ?? null;
+                $value = $jitPost>offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
                 break;
             case 'cookie':
-                $value = $_COOKIE[$name] ?? null;
+                $value = $jitCookie->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
                 break;
             default:
-                $value = $_REQUEST[$name] ?? null;
+                $value = $jitRequest->offsetExists($name) ? $jitRequest->$name->filter($filter) : null;
                 break;
         }
         if (isset($params['value'])) {
