@@ -25,6 +25,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             // NOTE: Keep the list alphabetically sorted.
             //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
+                "@tiki/plugin-base/buttonParamHandler" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/buttonParamHandler.js",
                 "@tiki/plugin-base/registerFieldDependency" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/registerFieldDependency.js",
                 
                 /* src/js/@tiki/ui-utils */
@@ -127,7 +128,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/MOVE_THIS_CONTENT_ELSEWHERE
                 Note that most of the incorrect @jquery-tiki/ have not been corrected, to minimize immediate impact.
                 */
-                "@jquery-tiki/plugin-edit" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/plugin-edit.js",
                 "@jquery-tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/bigbluebutton.js",
                 "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/cypht.js",
                 "@jquery-tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/dialog.js",
