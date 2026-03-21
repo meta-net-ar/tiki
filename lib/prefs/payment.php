@@ -27,6 +27,7 @@ function prefs_payment_list()
             'admin' => 'payment',
             'view' => 'tiki-payment.php',
             'keywords' => 'shopping',
+            'tags' => ['experimental'],
         ],
         'payment_system' => [
             'name' => tra('Payment system'),
