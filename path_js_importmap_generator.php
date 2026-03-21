@@ -107,6 +107,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/jquery_tiki */
                 "@jquery-tiki/asyncLoop" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-async-loop.js",
                 "@jquery-tiki/constants" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/constants.js",
+                "@jquery-tiki/cypht" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/cypht.js",
                 "@jquery-tiki/tiki-calendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-calendar.js",
                 "@jquery-tiki/tiki-cookie-handler" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-cookie-handler.js",
                 "@jquery-tiki/tiki-editor_settings" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-editor_settings.js",
@@ -129,7 +130,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 Note that most of the incorrect @jquery-tiki/ have not been corrected, to minimize immediate impact.
                 */
                 "@jquery-tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/bigbluebutton.js",
-                "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/cypht.js",
                 "@jquery-tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/dialog.js",
                 "@jquery-tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/pagetabs.js",
                 "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/MOVE_THIS_CONTENT_ELSEWHERE/tracker-fields-emailFolder.js",
