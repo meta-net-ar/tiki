@@ -5,9 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\Lib\Theme\ThemeLib;
-use Tiki\Sections;
-
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
@@ -210,6 +207,7 @@ if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 
 $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
 // and add js support file
 $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
+<<<<<<< HEAD
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
 //Note: if Theme Control is active, than tiki-tc.php can modify the active theme
@@ -244,3 +242,6 @@ if ($prefs['theme_header_and_address_bar_color'] === 'y') {
 }
 //finish
 $smarty->initializePaths();
+=======
+$headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
+>>>>>>> e050c16f08 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)

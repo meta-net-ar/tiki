@@ -266,6 +266,10 @@ if (! TIKI_API) {
 }
 
 require_once('lib/setup/theme.php');
+Tiki\Lib\Theme\ThemeLib::registerThemeAssets();
+
+//6) include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
+
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {

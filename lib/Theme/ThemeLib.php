@@ -553,14 +553,382 @@ class ThemeLib extends TikiLib
         }
     }
 
+    /**
+     * Setup theme assets (CSS, JS, favicon, meta).
+     * Keeps compatibility with Tiki bootstrap lifecycle.
+     */
     public static function setupThemeHeaders(): void
     {
-        global $prefs;
+        global $prefs, $smarty;
 
+        $themelib  = TikiLib::lib('theme');
         $headerlib = TikiLib::lib('header');
+
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
 
-        $prefs['theme'] = $theme_active;
+        // Sync prefs
+        $prefs['theme']        = $theme_active;
         $prefs['theme_option'] = $theme_option_active;
+
+        // ===============================
+        // JS
+        // ===============================
+        $headerlib->add_js_module('
+            import * as bootstrap from "bootstrap";
+            window.bootstrap = bootstrap;
+        ');
+
+        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
+
+        // ===============================
+        // FIXED WIDTH
+        // ===============================
+        if ($prefs['feature_fixed_width'] === 'y') {
+            $headerlib->add_css(
+                '@media (min-width: 1200px) { .container { max-width:' .
+                (!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
+                '; } }'
+            );
+        }
+
+        // ===============================
+        // BASE CSS
+        // ===============================
+        $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
+        $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
+
+        if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
+            $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+        }
+
+        // ===============================
+        // EXTENSIONS CSS
+        // ===============================
+        foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $package) {
+            $finder = new \Symfony\Component\Finder\Finder();
+
+            foreach ($finder->in($package['path'])->path('/^css/')->name('*.css') as $file) {
+                $headerlib->add_cssfile(
+                    $package['path'] . '/' . $file->getRelativePathname()
+                );
+            }
+        }
+
+        // ===============================
+        // THEME CSS
+        // ===============================
+        if (!empty($prefs['header_custom_scss'])) {
+            // TODO
+        } elseif ($theme_active == 'custom_url' && !empty($prefs['theme_custom_url'])) {
+
+            $custom_theme = $prefs['theme_custom_url'];
+
+            if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
+                $headerlib->add_cssfile($custom_theme, 'external');
+            } else {
+                $headerlib->add_cssfile($custom_theme);
+            }
+
+        } else {
+
+            $theme_css = self::getThemeCssFilePath($theme_active, '');
+
+            if ($theme_css) {
+
+                if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
+                    $headerlib->add_cssfile($theme_css);
+                }
+
+                if (!empty($theme_option_active)) {
+                    $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
+                    $headerlib->add_cssfile($option_css);
+                }
+
+            } else {
+
+                trigger_error(
+                    "The requested theme's CSS file could not be read. Falling back to default theme.",
+                    E_USER_WARNING
+                );
+
+                $theme_active        = 'default';
+                $theme_option_active = '';
+
+                $theme_css = self::getThemeCssFilePath($theme_active, null);
+                $headerlib->add_cssfile($theme_css);
+            }
+        }
+
+        // ===============================
+        // CUSTOM CSS
+        // ===============================
+        if (!empty($theme_option_active)) {
+            $main_theme_path       = $themelib->get_theme_path($theme_active);
+            $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
+
+            if (is_readable($main_theme_custom_css)) {
+                $headerlib->add_cssfile($main_theme_custom_css, 53);
+            }
+        }
+
+        $custom_css = $themelib->get_theme_path(
+            $theme_active,
+            $theme_option_active,
+            'custom.css'
+        );
+
+        if (empty($custom_css)) {
+            $custom_css = $themelib->get_theme_path('', '', 'custom.css');
+        }
+
+        if (is_readable($custom_css)) {
+            $headerlib->add_cssfile($custom_css, 53);
+        }
+
+        // ===============================
+        // FAVICONS
+        // ===============================
+        if (!isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {
+
+            $favicon_path = $themelib->get_theme_path(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'favicon-16x16.png',
+                'favicons'
+            );
+
+            if ($favicon_path) {
+
+                $headerlib->add_link('icon', $favicon_path, '16x16', 'image/png');
+
+                $favicon_path = dirname($favicon_path);
+
+                if (is_file($favicon_path . '/apple-touch-icon.png')) {
+                    $headerlib->add_link('apple-touch-icon', $favicon_path . '/apple-touch-icon.png', '180x180');
+                }
+
+                if (is_file($favicon_path . '/favicon-32x32.png')) {
+                    $headerlib->add_link('icon', $favicon_path . '/favicon-32x32.png', '32x32', 'image/png');
+                }
+
+                if ($prefs['pwa_feature'] === 'y') {
+                    if (is_file($favicon_path . '/site.webmanifest')) {
+                        $headerlib->add_link('manifest', $favicon_path . '/site.webmanifest');
+                    } elseif (is_file($favicon_path . '/manifest.json')) {
+                        $headerlib->add_link('manifest', $favicon_path . '/manifest.json');
+                    }
+                }
+
+                if (is_file($favicon_path . '/favicon.ico')) {
+                    $headerlib->add_link('shortcut icon', $favicon_path . '/favicon.ico');
+                }
+
+                if (is_file($favicon_path . '/safari-pinned-tab.svg')) {
+                    $headerlib->add_link('mask-icon', $favicon_path . '/safari-pinned-tab.svg', '', '', '#5bbad5');
+                }
+
+                if (is_file($favicon_path . '/browserconfig.xml')) {
+                    $headerlib->add_meta('msapplication-config', $favicon_path . '/browserconfig.xml');
+                }
+
+            } else {
+
+                $headerlib->add_link('icon', 'themes/base_files/favicons/favicon-16x16.png', '16x16', 'image/png');
+                $headerlib->add_link('apple-touch-icon', 'themes/base_files/favicons/apple-touch-icon.png', '180x180');
+                $headerlib->add_link('icon', 'themes/base_files/favicons/favicon-32x32.png', '32x32', 'image/png');
+                $headerlib->add_link('shortcut icon', 'themes/base_files/favicons/favicon.ico');
+                $headerlib->add_link('mask-icon', 'themes/base_files/favicons/safari-pinned-tab.svg', '', '', '#5bbad5');
+                $headerlib->add_meta('msapplication-config', 'themes/base_files/favicons/browserconfig.xml');
+
+                if ($prefs['pwa_feature'] === 'y') {
+                    $headerlib->add_link('manifest', 'themes/base_files/favicons/site.webmanifest');
+                }
+            }
+
+            unset($favicon_path);
+        }
+
+        // ===============================
+        // WEB MONETIZATION
+        // ===============================
+        if ($prefs['webmonetization_all_website'] === 'y' &&
+            !empty($prefs['webmonetization_default_payment_pointer'])) {
+
+            $headerlib->add_meta(
+                'monetization',
+                $prefs['webmonetization_default_payment_pointer']
+            );
+        }
+
+        // ===============================
+        // THEME COLOR
+        // ===============================
+        if ($prefs['theme_header_and_address_bar_color'] === 'y') {
+
+            if (Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
+            } else {
+                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";
+            }
+
+            $jq  = "var color = window.getComputedStyle(document.documentElement).getPropertyValue('{$css_color_variable}');";
+            $jq .= "$('meta[name=\"theme-color\"]').attr('content', color);";
+
+            $headerlib->add_meta("theme-color", "");
+            $headerlib->add_meta("apple-mobile-web-app-capable", "yes");
+            $headerlib->add_meta("apple-mobile-web-app-status-bar-style", "black-translucent");
+
+            $headerlib->add_jq_onready($jq, 5);
+        }
+
+        $smarty->initializePaths();
     }
+
+    /**
+     * Register base theme CSS and icon assets.
+     *
+     * @param object $headerlib
+     * @param array $prefs
+     */
+   public static function registerThemeAssets()
+   {
+        global $prefs, $smarty, $user;
+
+        $headerlib = TikiLib::lib('header');
+        $userlib = TikiLib::lib('user');
+
+        $theme_active = $prefs['theme'];
+        $theme_option_active = $prefs['theme_option'];
+
+        // JS
+        $headerlib->add_js_module('
+            import * as bootstrap from "bootstrap";
+            window.bootstrap = bootstrap;
+        ');
+
+        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
+
+        // Fixed width
+        if ($prefs['feature_fixed_width'] === 'y') {
+            $headerlib->add_css(
+                '@media (min-width: 1200px) { .container { max-width:' .
+                (!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .
+                '; } }'
+            );
+        }
+
+        // Base CSS
+        $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
+        $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
+
+        if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
+            $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+        }
+
+        // Extensions
+        foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $package) {
+            $finder = new \Symfony\Component\Finder\Finder();
+            foreach ($finder->in($package['path'])->path('/^css/')->name('*.css') as $file) {
+                $cssFile = $package['path'] . '/' . $file->getRelativePathname();
+                $headerlib->add_cssfile($cssFile);
+            }
+        }
+
+        // Theme CSS
+        if (!empty($prefs['header_custom_scss'])) {
+            // TODO
+        } elseif ($theme_active == 'custom_url' && !empty($prefs['theme_custom_url'])) {
+
+            $custom_theme = $prefs['theme_custom_url'];
+
+            if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
+                $headerlib->add_cssfile($custom_theme, 'external');
+            } else {
+                $headerlib->add_cssfile($custom_theme);
+            }
+
+        } else {
+
+            $theme_css = self::getThemeCssFilePath($theme_active, '');
+
+            if ($theme_css) {
+
+                if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
+                    $headerlib->add_cssfile($theme_css);
+                }
+
+                if (!empty($theme_option_active)) {
+                    $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
+                    $headerlib->add_cssfile($option_css);
+                }
+
+            } else {
+
+                trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
+
+                $theme_active = 'default';
+                $theme_option_active = '';
+
+                $theme_css = self::getThemeCssFilePath($theme_active, null);
+                $headerlib->add_cssfile($theme_css);
+            }
+        }
+
+        // Admin (STRICT ORIGINAL)
+        $groups = $userlib->get_user_groups($user);
+
+        if (
+            $prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups)
+            && (strpos($_SERVER['PHP_SELF'], 'admin')
+            || strpos($_SERVER['PHP_SELF'], 'cache')
+            || strpos($_SERVER['PHP_SELF'], 'import')
+            || strpos($_SERVER['PHP_SELF'], 'manage')
+            || strpos($_SERVER['PHP_SELF'], 'permissions')
+            || strpos($_SERVER['PHP_SELF'], 'stats')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-export')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-import')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-received')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
+        ) {
+
+            $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
+
+            if (
+                !str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') &&
+                !str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') &&
+                strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false
+            ) {
+                $prefs['site_layout_admin'] = 'admin';
+                $prefs['site_layout'] = 'admin';
+
+                Sections::setCurrentSection(Sections::SECTION_ADMIN);
+
+                include_once 'admin/define_admin_icons.php';
+
+                foreach ($admin_icons as &$admin_icon) {
+                    foreach ($admin_icon['children'] as &$child) {
+                        $child = array_merge(['disabled' => false, 'description' => ''], $child);
+                    }
+                }
+
+                $smarty->assign('admin_icons', $admin_icons);
+            }
+
+            if (!str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
+                $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
+            }
+
+        } else {
+            $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
+        }
+    }
+
 }
