@@ -13,10 +13,13 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 }
 require_once('tiki-setup.php');
 if ($prefs['feature_theme_control'] == 'y' && empty($_SESSION['try_theme'])) {
-    //we arrive here after lib/setup/theme.php has finished, so $prefs['theme'] and $prefs['theme_active_option'] are already set. Here we want to overwrite them according to the theme control setting
-    // defined: $cat_type and cat_objid
-    // search for theme for $cat_type
-    // then search for theme for md5($cat_type.cat_objid)
+    // At this point, theme initialization is already done,
+    // so $prefs['theme'] and $prefs['theme_active_option'] are set.
+    // Here we may override them depending on theme control settings.
+    //
+    // Defined: $cat_type and $cat_objid
+    // Search for a theme for $cat_type,
+    // then for a more specific theme using md5($cat_type . $cat_objid).
     global $prefs, $iconset;
     $themelib = TikiLib::lib('theme');
     $themecontrollib = TikiLib::lib('themecontrol');
@@ -42,8 +45,8 @@ if ($prefs['feature_theme_control'] == 'y' && empty($_SESSION['try_theme'])) {
         if ($prefs['feature_theme_control_savesession'] == 'y' && ! empty($tc_theme_option)) {
             $_SESSION['tc_theme'] = $tc_theme_option;
         }
-        //DROP css files (theme, theme_option and custom.css) added by lib/setup/theme.php that became unnecessary now that we have tc_theme
-        $themesetup_path = $themelib->get_theme_path($prefs['theme']);
+        // DROP css files (theme, theme_option and custom.css) that are no longer needed
+        // now that tc_theme is used.        $themesetup_path = $themelib->get_theme_path($prefs['theme']);
         $headerlib->drop_cssfile("{$themesetup_path}/css/{$prefs['theme']}.css"); //drop main theme css
         $headerlib->drop_cssfile("{$themesetup_path}/css/custom.css"); //drop main theme custom css
         if (! empty($prefs['theme_option'])) {

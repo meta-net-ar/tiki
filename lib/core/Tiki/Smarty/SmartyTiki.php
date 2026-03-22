@@ -668,22 +668,22 @@ class SmartyTiki extends Smarty
         }
     }
 
-    /**
-        * Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths.  It's dependent on
-
-        * $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
-
-        * The load order for main templates is
-        * - theme_option path
-        * - theme path
-        * - themes/templates/
-        * - tikidomain path
-        * - tiki extension modules templates/
-        * - templates/ (at project root)
-
-
-        * The effective template will be the one present in the last directory loaded.
-    */
+   /**
+     * Add Smarty template paths from where tpl files should be loaded.
+     * This function initializes theme-specific template paths.
+     * It depends on:
+     * $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
+     *
+     * The load order for main templates is:
+     * - theme_option path
+     * - theme path
+     * - themes/templates/
+     * - tikidomain path
+     * - tiki extension modules templates/
+     * - templates/ (at project root)
+     *
+     * The effective template will be the one present in the last directory loaded.
+     */
     public function initializePaths(): void
     {
         global $prefs, $tikidomainslash;
