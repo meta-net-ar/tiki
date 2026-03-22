@@ -583,7 +583,7 @@ class ThemeLib extends TikiLib
         // FIXED WIDTH
         // ===============================
         if ($prefs['feature_fixed_width'] === 'y') {
-            $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' .(!empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') .'; } }');
+            $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' . (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') . '; } }');
         }
 
         // ===============================
