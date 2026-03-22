@@ -740,7 +740,6 @@ class ThemeLib extends TikiLib
 
             $headerlib->add_jq_onready($jq, 5);
         }
-        
         $smarty->initializePaths();
     }
 
