@@ -762,7 +762,7 @@ class HeaderLib
         // other header templates like send_newsletter_header.tpl, tiki-live_support_client.tpl, etc..
         //
         if ($mid !== null) {
-            $back .= $this->output_metatags($mid);
+            $back .= $this->outputMetatags($mid);
             $back .= "\n";
         }
         $back .= generateJsImportmapScripts();
@@ -831,7 +831,7 @@ class HeaderLib
      *
      * @return string
      */
-    private function output_metatags($mid): string
+    private function outputMetatags($mid): string
     {
         return (string) new HtmlHead($mid);
     }
