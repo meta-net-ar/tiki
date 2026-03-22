@@ -58,8 +58,43 @@
                     <p>{tr}Or you can use directly the command line:{/tr} <code>php console.php sitemap:generate {$base_url}</code></p>
                 {/remarksbox}
             {/if}
+        {/tab}
 
+        {tab name="{tr}Schema.org{/tr}"}
+            {title help="Schema.org" admpage="seoprefs&cookietab=3&highlight=schema_enable"}{tr}Schema.org Structured Data{/tr}{/title}
 
+            <form action="tiki-admin.php?page=seoprefs" method="post" class="admin">
+                {ticket}
+                <input type="hidden" name="modulesetup" />
+
+                <div class="adminoptionbox clearfix mb-4">
+                    <fieldset class="mb-3 w-100">
+                        <legend class="h4 pt-4">{tr}Structured Data Settings{/tr}</legend>
+                        {preference name=schema_enable}
+                    </fieldset>
+                </div>
+
+                {include file='admin/include_apply_bottom.tpl'}
+            </form>
+
+            {if $prefs.schema_enable eq 'y'}
+                {remarksbox type="info" title="{tr}Schema.org Status{/tr}" close="n"}
+                    <p>{tr}Structured data markup is <strong>enabled</strong>. JSON-LD Schema.org data will be included in page headers.{/tr}</p>
+                    <p>{tr}Supported schema types:{/tr}</p>
+                    <ul>
+                        <li>{tr}Article{/tr}</li>
+                        <li>{tr}BlogPosting{/tr}</li>
+                        <li>{tr}WebPage{/tr}</li>
+                        <li>{tr}BreadcrumbList{/tr}</li>
+                        <li>{tr}Organization{/tr}</li>
+                    </ul>
+                {/remarksbox}
+            {else}
+                {remarksbox type="info" title="{tr}Enable Structured Data{/tr}" close="n"}
+                    <p>{tr}Enable Schema.org structured data to improve how your content appears in search results with rich snippets.{/tr}</p>
+                    <p>{tr}Learn more about Schema.org:{/tr} <a href="https://schema.org/" target="_blank" class="alert-link">schema.org</a></p>
+                {/remarksbox}
+            {/if}
         {/tab}
 
         {tab name="{tr}Tag title{/tr}"}

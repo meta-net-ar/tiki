@@ -747,7 +747,7 @@ class HeaderLib
      *
      * @return string The raw output headers
      */
-    public function output_headers(): string
+    public function output_headers(string $mid = ''): string
     {
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
@@ -755,8 +755,10 @@ class HeaderLib
         ksort($this->cssfiles);
         ksort($this->css);
         ksort($this->rssfeeds);
-        $back = generateJsImportmapScripts();
+        $back = $this->output_metatags($mid);
         $back .= "\n";
+        $back .= generateJsImportmapScripts();
+
         if ($this->title) {
             $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
@@ -803,7 +805,6 @@ class HeaderLib
             $back .= "-->\n</style>\n";
         }
 
-
         if (count($this->rssfeeds)) {
             foreach ($this->rssfeeds as $x => $rssf) {
                 $back .= "<!-- rss $x -->\n";
@@ -816,16 +817,16 @@ class HeaderLib
         return $back;
     }
 
-
     /**
      * Build SEO meta tags and JSON-LD schema.
      *
      * @return string
      */
-    public function build_metatags($mid): string
+    private function output_metatags($mid): string
     {
         return (string) new HtmlHead($mid);
     }
+
 
     /**
      * Force JS Files being added after tiki-setup.php is done to the rank/loadorder 'late' if rank is not 'external'.
@@ -939,7 +940,6 @@ class HeaderLib
 
         return $output;
     }
-
 
     /**
      * Minify multiple JS files over multiple ranks into one single JS file.
@@ -1157,8 +1157,6 @@ class HeaderLib
 
         return $output;
     }
-
-
 
     public function output_js_config($wrap = true)
     {

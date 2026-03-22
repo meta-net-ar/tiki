@@ -8,8 +8,8 @@
 namespace Tiki\HtmlHead;
 
 use TikiLib;
-use Melbahja\Seo\MetaTags;
 use Melbahja\Seo\Schema;
+use Melbahja\Seo\MetaTags;
 use Melbahja\Seo\Schema\Thing;
 use Melbahja\Seo\Schema\Organization;
 use Melbahja\Seo\Schema\CreativeWork\Article;
@@ -463,14 +463,11 @@ class HtmlHead
     {
         global $prefs, $base_url_canonical;
 
-        $meta = new \Melbahja\Seo\MetaTags();
+        $meta = new MetaTags();
 
-        $meta->title($this->getTitle())
-            ->description($this->getDescription());
+        $meta->title($this->getTitle())->description($this->getDescription());
 
-        $canonicalPath = $this->getCanonicalPath();
-
-        if (!empty($canonicalPath)) {
+        if (!empty($canonicalPath = $this->getCanonicalPath())) {
             $meta->canonical($base_url_canonical . $canonicalPath);
             $meta->url($base_url_canonical . $canonicalPath);
         } elseif (!empty($base_url_canonical)) {
@@ -541,8 +538,11 @@ class HtmlHead
             $meta->meta('google', 'nositelinkssearchbox');
         }
 
-        $this->addSchema($meta);
         $this->addAltLinks($meta);
+
+        if (($prefs['schema_enable'] ?? 'n') === 'y') {
+            $this->addSchema($meta);
+        }
 
         return (string) $meta;
     }
