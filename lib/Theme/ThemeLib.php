@@ -633,7 +633,6 @@ class ThemeLib extends TikiLib
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
-
             } else {
                 trigger_error(
                     "The requested theme's CSS file could not be read. Falling back to default theme.",
@@ -715,7 +714,6 @@ class ThemeLib extends TikiLib
                 if (is_file($favicon_path . '/browserconfig.xml')) {
                     $headerlib->add_meta('msapplication-config', $favicon_path . '/browserconfig.xml');
                 }
-
             } else {
                 $headerlib->add_link('icon', 'themes/base_files/favicons/favicon-16x16.png', '16x16', 'image/png');
                 $headerlib->add_link('apple-touch-icon', 'themes/base_files/favicons/apple-touch-icon.png', '180x180');
@@ -768,8 +766,8 @@ class ThemeLib extends TikiLib
      * @param object $headerlib
      * @param array $prefs
      */
-   public static function registerThemeAssets($iconset)
-   {
+    public static function registerThemeAssets($iconset)
+    {
         global $prefs, $smarty, $user;
 
         $headerlib = TikiLib::lib('header');
@@ -824,7 +822,6 @@ class ThemeLib extends TikiLib
             } else {
                 $headerlib->add_cssfile($custom_theme);
             }
-
         } else {
             $theme_css = self::getThemeCssFilePath($theme_active, '');
 
@@ -836,7 +833,6 @@ class ThemeLib extends TikiLib
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
-
             } else {
                 trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
                 $theme_active = 'default';
