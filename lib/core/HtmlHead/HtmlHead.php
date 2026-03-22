@@ -86,36 +86,36 @@ class HtmlHead
         $desc = '';
 
         if ($section === 'blogs') {
-            if (!empty($post_info['parsed_excerpt'])) {
+            if (! empty($post_info['parsed_excerpt'])) {
                 $desc = strip_tags($post_info['parsed_excerpt']);
-            } elseif (!empty($post_info['parsed_data'])) {
+            } elseif (! empty($post_info['parsed_data'])) {
                 $desc = strip_tags($post_info['parsed_data']);
             } else {
-                $postTitle = !empty($post_info['title']) ? $post_info['title'] : '';
-                $blogTitle = (!empty($blog_data) && !empty($blog_data['title'])) ? $blog_data['title'] : '';
+                $postTitle = ! empty($post_info['title']) ? $post_info['title'] : '';
+                $blogTitle = (! empty($blog_data) && ! empty($blog_data['title'])) ? $blog_data['title'] : '';
                 $desc = $postTitle . ($postTitle && $blogTitle ? ' - ' : '') . $blogTitle;
             }
         } elseif ($section === 'cms') {
-            if (!empty($parsed_heading)) {
+            if (! empty($parsed_heading)) {
                 $desc = strip_tags($parsed_heading);
-            } elseif (!empty($parsed_body)) {
+            } elseif (! empty($parsed_body)) {
                 $desc = strip_tags($parsed_body);
             }
         } elseif ($section === 'file_galleries') {
-            if (!empty($gal_info['description'])) {
+            if (! empty($gal_info['description'])) {
                 $desc = strip_tags($gal_info['description']);
             }
-        } elseif (!empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && !empty($description)) {
+        } elseif (! empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && ! empty($description)) {
             $desc = strip_tags($description);
-        } elseif (!empty($prefs['metatag_description_translated'])) {
+        } elseif (! empty($prefs['metatag_description_translated'])) {
             $desc = $prefs['metatag_description_translated'];
-        } elseif (!empty($prefs['metatag_description'])) {
+        } elseif (! empty($prefs['metatag_description'])) {
             $desc = $prefs['metatag_description'];
         }
 
         if (empty($desc)) {
             $browserTitle = $this->getBrowserTitle();
-            $sep = !empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+            $sep = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
             $pageTitle = isset($title) ? $title : '';
             $desc = $browserTitle . ($browserTitle && $pageTitle ? " $sep " : '') . $pageTitle;
         }
@@ -130,7 +130,7 @@ class HtmlHead
     public function getBrowserTitle(): string
     {
         global $prefs;
-        return !empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? '');
+        return ! empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? '');
     }
 
     public function getBreadcrumbsTitle(): ?string
@@ -148,12 +148,12 @@ class HtmlHead
         ) {
             $crumbTitles = [];
             foreach ($trail as $crumb) {
-                if (!empty($crumb['title'])) {
+                if (! empty($crumb['title'])) {
                     $crumbTitles[] = $crumb['title'];
                 }
             }
 
-            if (!empty($crumbTitles)) {
+            if (! empty($crumbTitles)) {
                 if (($prefs['site_title_breadcrumb'] ?? '') === 'desc') {
                     $this->breadcrumbTitle = implode(' > ', array_reverse($crumbTitles));
                 } else {
@@ -178,7 +178,7 @@ class HtmlHead
 
         $pageTitle = '';
 
-        if (!empty($sswindowtitle)) {
+        if (! empty($sswindowtitle)) {
             if ($sswindowtitle === 'none') {
                 $pageTitle = '&nbsp;';
             } else {
@@ -186,46 +186,46 @@ class HtmlHead
             }
         } else {
             $localAlias = $aliasname;
-            if (empty($localAlias) && isset($structure) && $structure === 'y' && !empty($structure_path) && is_array($structure_path)) {
+            if (empty($localAlias) && isset($structure) && $structure === 'y' && ! empty($structure_path) && is_array($structure_path)) {
                 $lastItem = end($structure_path);
                 $localAlias = $lastItem['page_alias'] ?? null;
             }
 
             $breadcrumbsTitle = $this->getBreadcrumbsTitle();
-            if (!empty($breadcrumbsTitle)) {
+            if (! empty($breadcrumbsTitle)) {
                 $middleTitle = $breadcrumbsTitle;
             } else {
-                if (!empty($tracker_item_main_value)) {
+                if (! empty($tracker_item_main_value)) {
                     $middleTitle = strlen($tracker_item_main_value) > 255
                         ? substr($tracker_item_main_value, 0, 252) . '...'
                         : $tracker_item_main_value;
-                } elseif (!empty($tagTitle)) {
+                } elseif (! empty($tagTitle)) {
                     $middleTitle = $tagTitle;
-                } elseif (!empty($title) && !is_array($title)) {
+                } elseif (! empty($title) && ! is_array($title)) {
                     $middleTitle = $title;
-                } elseif (!empty($localAlias)) {
+                } elseif (! empty($localAlias)) {
                     $middleTitle = $localAlias;
-                } elseif (!empty($arttitle)) {
+                } elseif (! empty($arttitle)) {
                     $middleTitle = $arttitle;
-                } elseif (!empty($thread_info['title'])) {
+                } elseif (! empty($thread_info['title'])) {
                     $middleTitle = $thread_info['title'];
-                } elseif (!empty($forum_info['name'])) {
+                } elseif (! empty($forum_info['name'])) {
                     $middleTitle = $forum_info['name'];
-                } elseif (!empty($categ_info['name'])) {
+                } elseif (! empty($categ_info['name'])) {
                     $middleTitle = $categ_info['name'];
-                } elseif (!empty($userinfo['login'])) {
+                } elseif (! empty($userinfo['login'])) {
                     $middleTitle = $userinfo['login'];
-                } elseif (!empty($tracker_info['pagetitle'])) {
+                } elseif (! empty($tracker_info['pagetitle'])) {
                     $middleTitle = $tracker_info['pagetitle'];
-                } elseif (!empty($tracker_info['name'])) {
+                } elseif (! empty($tracker_info['name'])) {
                     $middleTitle = $tracker_info['name'];
-                } elseif (!empty($page) && !empty($prefs['site_title_breadcrumb']) && $prefs['site_title_breadcrumb'] === 'pagetitle') {
+                } elseif (! empty($page) && ! empty($prefs['site_title_breadcrumb']) && $prefs['site_title_breadcrumb'] === 'pagetitle') {
                     $middleTitle = $page;
-                } elseif (!empty($description)) {
+                } elseif (! empty($description)) {
                     $middleTitle = $description;
-                } elseif (!empty($page)) {
+                } elseif (! empty($page)) {
                     $middleTitle = $page;
-                } elseif (!empty($headtitle)) {
+                } elseif (! empty($headtitle)) {
                     $middleTitle = str_replace('&nbsp;', ' ', $headtitle);
                 } else {
                     $middleTitle = '';
@@ -233,8 +233,8 @@ class HtmlHead
             }
 
             $browserTitle = $this->getBrowserTitle();
-            $sep = !empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
-            $location = !empty($prefs['site_title_location']) ? $prefs['site_title_location'] : '';
+            $sep = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+            $location = ! empty($prefs['site_title_location']) ? $prefs['site_title_location'] : '';
 
             if ($location === 'only') {
                 $pageTitle = $browserTitle;
@@ -257,11 +257,11 @@ class HtmlHead
         global $author, $post_info;
 
         $pageAuthor = $author;
-        if (empty($pageAuthor) && $this->getPageType() === 'blog_post' && !empty($post_info['author'])) {
+        if (empty($pageAuthor) && $this->getPageType() === 'blog_post' && ! empty($post_info['author'])) {
             $pageAuthor = $post_info['author'];
         }
 
-        return !empty($pageAuthor) ? $pageAuthor : null;
+        return ! empty($pageAuthor) ? $pageAuthor : null;
     }
 
     public function getCanonicalPath(): ?string
@@ -273,7 +273,7 @@ class HtmlHead
         }
 
         $url = null;
-        if (($prefs['feature_canonical_url'] ?? '') === 'y' && !empty($this->mid)) {
+        if (($prefs['feature_canonical_url'] ?? '') === 'y' && ! empty($this->mid)) {
             switch ($this->mid) {
                 case 'tiki-show_page.tpl':
                 case 'tiki-index_p.tpl':
@@ -281,50 +281,50 @@ class HtmlHead
                 case 'tiki-all_languages.tpl':
                 case 'tiki-show_content.tpl':
                 case 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl':
-                    if (!empty($page)) {
-                        $url = \filter_out_sefurl($page) . (!empty($canonical_ending) ? $canonical_ending : '');
+                    if (! empty($page)) {
+                        $url = \filter_out_sefurl($page) . (! empty($canonical_ending) ? $canonical_ending : '');
                     }
                     break;
 
                 case 'tiki-view_tracker_item.tpl':
-                    if (!empty($_REQUEST['itemId'])) {
+                    if (! empty($_REQUEST['itemId'])) {
                         $url = \filter_out_sefurl($_REQUEST['itemId'], 'trackeritem', null, null, 'n');
                     }
                     break;
 
                 case 'tiki-view_forum.tpl':
-                    if (!empty($_REQUEST['forumId'])) {
+                    if (! empty($_REQUEST['forumId'])) {
                         $url = \filter_out_sefurl($_REQUEST['forumId'], 'forum');
                     }
                     break;
 
                 case 'tiki-view_forum_thread.tpl':
                 case 'tiki-print_forum_thread.tpl':
-                    if (!empty($_REQUEST['comments_parentId'])) {
+                    if (! empty($_REQUEST['comments_parentId'])) {
                         $url = \filter_out_sefurl($_REQUEST['comments_parentId'], 'forumthread');
                     }
                     break;
 
                 case 'tiki-view_blog.tpl':
-                    if (!empty($_REQUEST['blogId'])) {
+                    if (! empty($_REQUEST['blogId'])) {
                         $url = \filter_out_sefurl($_REQUEST['blogId'], 'blog', null, null, 'n');
                     }
                     break;
 
                 case 'tiki-view_blog_post.tpl':
-                    if (!empty($_REQUEST['postId'])) {
+                    if (! empty($_REQUEST['postId'])) {
                         $url = \filter_out_sefurl($_REQUEST['postId'], 'blogpost', null, null, 'n');
                     }
                     break;
 
                 case 'tiki-read_article.tpl':
-                    if (!empty($_REQUEST['articleId'])) {
+                    if (! empty($_REQUEST['articleId'])) {
                         $url = \filter_out_sefurl($_REQUEST['articleId'], 'article', null, null, 'n');
                     }
                     break;
 
                 case 'tiki-browse_categories.tpl':
-                    if (!empty($_REQUEST['parentId'])) {
+                    if (! empty($_REQUEST['parentId'])) {
                         $url = \filter_out_sefurl($_REQUEST['parentId'], 'category');
                     }
                     break;
@@ -351,7 +351,7 @@ class HtmlHead
 
     public function getImages(): array
     {
-        if (!empty($this->images)) {
+        if (! empty($this->images)) {
             return $this->images;
         }
 
@@ -359,33 +359,33 @@ class HtmlHead
 
         $images = [];
 
-        if (!empty($header_featured_images) && is_array($header_featured_images)) {
+        if (! empty($header_featured_images) && is_array($header_featured_images)) {
             $images = $header_featured_images;
         } elseif (
             $prefs['feature_canonical_url'] === 'y'
             && $this->mid === 'tiki-read_article.tpl'
-            && ((!empty($hasImage) && $hasImage === 'y') || !empty($topics['image_name']))
+            && ((! empty($hasImage) && $hasImage === 'y') || ! empty($topics['image_name']))
         ) {
             $imgUrl = '';
             $articleId = $_REQUEST['articleId'] ?? null;
             $topicId = $_REQUEST['topicId'] ?? null;
 
-            if (!empty($hasImage) && $hasImage === 'y' && !empty($articleId)) {
+            if (! empty($hasImage) && $hasImage === 'y' && ! empty($articleId)) {
                 $imgUrl = $base_url_canonical . 'article_image.php?image_type=article&id=' . $articleId;
-            } elseif (!empty($topics['image_name']) && !empty($topicId)) {
+            } elseif (! empty($topics['image_name']) && ! empty($topicId)) {
                 $imgUrl = $base_url_canonical . 'article_image.php?image_type=topic&id=' . $topicId;
             }
 
-            if (!empty($imgUrl)) {
+            if (! empty($imgUrl)) {
                 $images[] = $imgUrl;
             }
         }
 
         if (empty($images)) {
-            if (!empty($prefs['socialnetworks_facebook_site_image'])) {
+            if (! empty($prefs['socialnetworks_facebook_site_image'])) {
                 $images[] = $prefs['socialnetworks_facebook_site_image'];
             }
-            if (!empty($prefs['socialnetworks_twitter_site_image'])) {
+            if (! empty($prefs['socialnetworks_twitter_site_image'])) {
                 $images[] = $prefs['socialnetworks_twitter_site_image'];
             }
         }
@@ -400,15 +400,15 @@ class HtmlHead
         global $prefs, $metatag_robotscustom, $metatag_robots;
 
         $content = null;
-        if (!empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && !empty($metatag_robotscustom)) {
+        if (! empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && ! empty($metatag_robotscustom)) {
             $content = $metatag_robotscustom;
         } else {
-            $hasGlobal = !empty($prefs['metatag_robots']);
-            $hasScript = !empty($metatag_robots);
+            $hasGlobal = ! empty($prefs['metatag_robots']);
+            $hasScript = ! empty($metatag_robots);
 
-            if ($hasGlobal && !$hasScript) {
+            if ($hasGlobal && ! $hasScript) {
                 $content = $prefs['metatag_robots'];
-            } elseif (!$hasGlobal && $hasScript) {
+            } elseif (! $hasGlobal && $hasScript) {
                 $content = $metatag_robots;
             } elseif ($hasGlobal && $hasScript) {
                 $scriptLower = strtolower($metatag_robots);
@@ -435,9 +435,9 @@ class HtmlHead
 
         $date = null;
 
-        if ($this->getPageType() === 'blog_post' && !empty($post_info['created'])) {
+        if ($this->getPageType() === 'blog_post' && ! empty($post_info['created'])) {
             $date = $post_info['created'];
-        } elseif (!empty($publishDate)) {
+        } elseif (! empty($publishDate)) {
             $date = $publishDate;
         }
 
@@ -450,9 +450,9 @@ class HtmlHead
 
         $date = null;
 
-        if ($this->getPageType() === 'blog_post' && !empty($post_info['lastModif'])) {
+        if ($this->getPageType() === 'blog_post' && ! empty($post_info['lastModif'])) {
             $date = $post_info['lastModif'];
-        } elseif (!empty($edit_data)) {
+        } elseif (! empty($edit_data)) {
             $date = $edit_data;
         }
 
@@ -467,14 +467,14 @@ class HtmlHead
 
         $meta->title($this->getTitle())->description($this->getDescription());
 
-        if (!empty($canonicalPath = $this->getCanonicalPath())) {
+        if (! empty($canonicalPath = $this->getCanonicalPath())) {
             $meta->canonical($base_url_canonical . $canonicalPath);
             $meta->url($base_url_canonical . $canonicalPath);
-        } elseif (!empty($base_url_canonical)) {
+        } elseif (! empty($base_url_canonical)) {
             $meta->url($base_url_canonical);
         }
 
-        if (!empty($base_url_canonical)) {
+        if (! empty($base_url_canonical)) {
             $meta->twitter('domain', $base_url_canonical);
         }
 
@@ -482,11 +482,11 @@ class HtmlHead
         $isArticle = in_array($pageType, ['article', 'blog_post']);
         $meta->og('type', $isArticle ? 'article' : 'website');
 
-        if ($isArticle && !empty($pubDate = $this->getPublishDate())) {
+        if ($isArticle && ! empty($pubDate = $this->getPublishDate())) {
             $meta->articleMeta($pubDate, $this->getModifiedDate(), $this->getAuthor());
         }
 
-        if (!empty($images = $this->getImages())) {
+        if (! empty($images = $this->getImages())) {
             foreach ($images as $img) {
                 $meta->image($img, 'summary');
             }
@@ -494,39 +494,39 @@ class HtmlHead
             $meta->twitter('card', 'summary');
         }
 
-        $siteName = !empty($prefs['socialnetworks_facebook_site_name']) ? $prefs['socialnetworks_facebook_site_name'] : $this->getBrowserTitle();
-        if (!empty($siteName)) {
+        $siteName = ! empty($prefs['socialnetworks_facebook_site_name']) ? $prefs['socialnetworks_facebook_site_name'] : $this->getBrowserTitle();
+        if (! empty($siteName)) {
             $meta->og('site_name', $siteName);
         }
 
-        $twitterSite = !empty($prefs['socialnetworks_twitter_site']) ? $prefs['socialnetworks_twitter_site'] : $siteName;
-        if (!empty($twitterSite)) {
+        $twitterSite = ! empty($prefs['socialnetworks_twitter_site']) ? $prefs['socialnetworks_twitter_site'] : $siteName;
+        if (! empty($twitterSite)) {
             $meta->twitter('site', $twitterSite);
         }
 
-        if (!empty($prefs['socialnetworks_facebook_application_id'])) {
+        if (! empty($prefs['socialnetworks_facebook_application_id'])) {
             $meta->push('meta', ['property' => 'fb:app_id', 'content' => $prefs['socialnetworks_facebook_application_id']]);
         }
 
-        if (!empty($robots = $this->getRobots())) {
+        if (! empty($robots = $this->getRobots())) {
             $meta->robots($robots);
             $meta->robots($robots, 'googlebot');
         }
 
-        if (!empty($prefs['site_google_analytics_site_ownership'])) {
+        if (! empty($prefs['site_google_analytics_site_ownership'])) {
             $meta->verification('google', $prefs['site_google_analytics_site_ownership']);
         }
 
-        if (!empty($prefs['metatag_geoposition'])) {
+        if (! empty($prefs['metatag_geoposition'])) {
             $meta->meta('geo.position', $prefs['metatag_geoposition']);
             $meta->meta('ICBM', str_replace(';', ',', $prefs['metatag_geoposition']));
         }
 
-        if (!empty($prefs['metatag_georegion'])) {
+        if (! empty($prefs['metatag_georegion'])) {
             $meta->meta('geo.region', $prefs['metatag_georegion']);
         }
 
-        if (!empty($prefs['metatag_geoplacename'])) {
+        if (! empty($prefs['metatag_geoplacename'])) {
             $meta->meta('geo.placename', $prefs['metatag_geoplacename']);
         }
 
@@ -570,23 +570,23 @@ class HtmlHead
             list($feature, $perm, $pref, $titlePref, $url, $defaultTitle) = $feed;
 
             if (
-                !empty($prefs["feature_{$feature}"]) && $prefs["feature_{$feature}"] === 'y' &&
-                !empty($prefs[$pref]) && $prefs[$pref] === 'y' &&
+                ! empty($prefs["feature_{$feature}"]) && $prefs["feature_{$feature}"] === 'y' &&
+                ! empty($prefs[$pref]) && $prefs[$pref] === 'y' &&
                 (empty($perm) || $perm === 'y')
             ) {
-                $feedTitle = !empty($prefs[$titlePref]) ? $prefs[$titlePref] : tra($defaultTitle);
+                $feedTitle = ! empty($prefs[$titlePref]) ? $prefs[$titlePref] : tra($defaultTitle);
                 $meta->feed("{$url}?ver=" . $ver, 'application/rss+xml', $feedTitle);
             }
         }
 
         if (
-            !empty($prefs['feature_trackers']) && $prefs['feature_trackers'] === 'y'
-            && !empty($prefs['feed_tracker']) && $prefs['feed_tracker'] === 'y'
-            && !empty($rsslist_trackers)
+            ! empty($prefs['feature_trackers']) && $prefs['feature_trackers'] === 'y'
+            && ! empty($prefs['feed_tracker']) && $prefs['feed_tracker'] === 'y'
+            && ! empty($rsslist_trackers)
         ) {
             foreach ($rsslist_trackers as $tracker) {
-                if (!empty($tracker['trackerId'])) {
-                    $baseTitle = !empty($prefs['feed_tracker_title']) ? $prefs['feed_tracker_title'] : tra('RSS Tracker');
+                if (! empty($tracker['trackerId'])) {
+                    $baseTitle = ! empty($prefs['feed_tracker_title']) ? $prefs['feed_tracker_title'] : tra('RSS Tracker');
                     $feedTitle = $baseTitle . ' - ' . ($tracker['name'] ?? '');
                     $url = "tiki-tracker_rss.php?ver=" . $ver . "&trackerId=" . $tracker['trackerId'];
                     $meta->feed($url, 'application/rss+xml', $feedTitle);
@@ -594,16 +594,16 @@ class HtmlHead
             }
         }
 
-        if (!empty($editable) && $editable && !empty($page)) {
-            $canEdit = (!empty($tiki_p_edit) && $tiki_p_edit === 'y') ||
+        if (! empty($editable) && $editable && ! empty($page)) {
+            $canEdit = (! empty($tiki_p_edit) && $tiki_p_edit === 'y') ||
                        (strtolower($page) === 'sandbox') ||
-                       (!empty($tiki_p_admin_wiki) && $tiki_p_admin_wiki === 'y');
+                       (! empty($tiki_p_admin_wiki) && $tiki_p_admin_wiki === 'y');
 
             if ($canEdit) {
                 $meta->push('link', [
                     'rel' => 'alternate',
                     'type' => 'application/x-wiki',
-                    'title' => tra('Edit this page!'),
+                    'title' => tra('Edit this page! '),
                     'href' => 'tiki-editpage.php?page=' . urlencode($page)
                 ]);
             }
@@ -624,7 +624,7 @@ class HtmlHead
             'description' => $this->getDescription()
         ];
 
-        if (!empty($siteName = $this->getBrowserTitle())) {
+        if (! empty($siteName = $this->getBrowserTitle())) {
             $entities[] = new Organization([
                 '@id' => "{$base_url_canonical}#organization",
                 'name' => $siteName,
@@ -633,10 +633,10 @@ class HtmlHead
             ]);
         }
 
-        if (!empty($trail) && is_array($trail) && count($trail) > 0) {
+        if (! empty($trail) && is_array($trail) && count($trail) > 0) {
             $listItems = [];
             foreach ($trail as $k => $crumb) {
-                if (!empty($crumb['title'])) {
+                if (! empty($crumb['title'])) {
                     $position = $k + 1;
                     $item = [
                         '@type' => 'ListItem',
@@ -644,7 +644,7 @@ class HtmlHead
                         'name' => $crumb['title']
                     ];
 
-                    if (!empty($crumb['url']) && $position < count($trail)) {
+                    if (! empty($crumb['url']) && $position < count($trail)) {
                         $item['item'] = (strpos($crumb['url'], 'http') === 0) ? $crumb['url'] : $base_url_canonical . $crumb['url'];
                     }
 
@@ -652,7 +652,7 @@ class HtmlHead
                 }
             }
 
-            if (!empty($listItems)) {
+            if (! empty($listItems)) {
                 $entities[] = new BreadcrumbList([
                     '@id' => "{$pageUrl}#breadcrumb",
                     'itemListElement' => $listItems
@@ -668,7 +668,7 @@ class HtmlHead
         $articleId = $_REQUEST['articleId'] ?? null;
         $postId = $_REQUEST['postId'] ?? null;
 
-        if (($pageType === 'article' && !empty($articleId)) || ($pageType === 'blog_post' && !empty($postId))) {
+        if (($pageType === 'article' && ! empty($articleId)) || ($pageType === 'blog_post' && ! empty($postId))) {
             $postData = [
                 'headline' => $this->getTitle(),
                 'description' => $this->getDescription(),
@@ -677,19 +677,19 @@ class HtmlHead
                 'publisher' => ['@id' => "{$base_url_canonical}#organization"]
             ];
 
-            if (!empty($images = $this->getImages())) {
+            if (! empty($images = $this->getImages())) {
                 $postData['image'] = count($images) === 1 ? $images[0] : $images;
             }
 
-            if (!empty($author = $this->getAuthor())) {
+            if (! empty($author = $this->getAuthor())) {
                 $postData['author'] = new Thing(type: 'Person', props: ['name' => $author]);
             }
 
-            if (!empty($pubDate = $this->getPublishDate())) {
+            if (! empty($pubDate = $this->getPublishDate())) {
                 $postData['datePublished'] = $pubDate;
             }
 
-            if (!empty($modDate = $this->getModifiedDate())) {
+            if (! empty($modDate = $this->getModifiedDate())) {
                 $postData['dateModified'] = $modDate;
             }
 
@@ -700,7 +700,7 @@ class HtmlHead
             }
         } // TODO: resolve/detect other types.
 
-        if (!empty($entities)) {
+        if (! empty($entities)) {
             $schema = new Schema(...$entities);
             $meta->schema($schema);
         }
