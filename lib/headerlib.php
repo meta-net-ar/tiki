@@ -747,7 +747,7 @@ class HeaderLib
      *
      * @return string The raw output headers
      */
-    public function output_headers(string $mid = ''): string
+    public function output_headers(?string $mid = null): string
     {
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
@@ -755,9 +755,18 @@ class HeaderLib
         ksort($this->cssfiles);
         ksort($this->css);
         ksort($this->rssfeeds);
-        $back = $this->output_metatags($mid);
-        $back .= "\n";
+        $back = '';
+
+        //
+        // $mid passed only in templates/header.tpl and this function will not be called on
+        // other header templates like send_newsletter_header.tpl, tiki-live_support_client.tpl, etc..
+        //
+        if ($mid !== null) {
+            $back .= $this->output_metatags($mid);
+            $back .= "\n";
+        }
         $back .= generateJsImportmapScripts();
+        $back .= "\n";
 
         if ($this->title) {
             $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
