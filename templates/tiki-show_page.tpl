@@ -198,9 +198,11 @@ Note: The show content block must be defined at root level to use the include. A
 
     <footer class="form-text">
         {if $prefs.wiki_simple_ratings eq 'y' && $tiki_p_wiki_vote_ratings eq 'y'}
-            {tr}Rate this page:{/tr}
             <form method="post" action="">
-                {rating type="wiki page" id=$page_id}
+                <fieldset>
+                    <legend>{tr}Rate this page:{/tr}</legend>
+                    {rating type="wiki page" id=$page_id}
+                </fieldset>
             </form>
         {/if}
 
