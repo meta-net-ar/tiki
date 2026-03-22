@@ -17,6 +17,11 @@ use Tiki\WikiParser\Markdown\Node\Citation;
  */
 class CitationRenderer implements NodeRendererInterface
 {
+    private const CACHE_TYPE = 'zotero_pandoc_citation_';
+    private const CACHE_VERSION = '1';
+
+    private static array $renderCache = [];
+
     public function render(Node $node, ChildNodeRendererInterface $childRenderer)
     {
         if (! ($node instanceof Citation)) {
@@ -34,13 +39,63 @@ class CitationRenderer implements NodeRendererInterface
 
         $libraryPath = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
         $stylePath = 'storage/csl-styles/' . ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date') . '.csl';
+        $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
 
-        $rendered = $this->callPandoc($pandocMarkdown, $libraryPath, $stylePath);
+        // Request-level static cache to avoid repeated Pandoc calls for identical citation input.
+        $cacheKey = $this->buildCacheKey($pandocMarkdown, $libraryPath, $stylePath, $pandocPath);
+        if (array_key_exists($cacheKey, self::$renderCache)) {
+            $rendered = self::$renderCache[$cacheKey];
+        } else {
+            $cachelib = class_exists('\TikiLib') ? \TikiLib::lib('cache') : null;
+            $cached = $cachelib ? $cachelib->getCached($cacheKey, self::CACHE_TYPE) : false;
+
+            if ($cached !== false) {
+                $rendered = $cached;
+            } else {
+                $rendered = $this->callPandoc($pandocMarkdown, $libraryPath, $stylePath, $pandocPath);
+                if ($rendered !== false && $cachelib) {
+                    $cachelib->cacheItem($cacheKey, $rendered, self::CACHE_TYPE);
+                }
+            }
+
+            self::$renderCache[$cacheKey] = $rendered;
+        }
+
         if ($rendered === false) {
             return '<span class="text-danger">[' . tra('Citation rendering failed') . ']</span>';
         }
 
         return $rendered;
+    }
+
+    private function buildCacheKey(string $markdown, string $libraryPath, string $stylePath, string $pandocPath): string
+    {
+        $libraryFingerprint = $this->getFileFingerprint($libraryPath);
+        $styleFingerprint = $this->getFileFingerprint($stylePath);
+
+        return hash(
+            'sha256',
+            self::CACHE_VERSION
+            . "\n" . $pandocPath
+            . "\n" . $libraryFingerprint
+            . "\n" . $styleFingerprint
+            . "\n" . $markdown
+        );
+    }
+
+    private function getFileFingerprint(string $path): string
+    {
+        $resolvedPath = realpath($path);
+        $normalizedPath = $resolvedPath !== false ? $resolvedPath : $path;
+
+        if (! is_file($normalizedPath)) {
+            return $normalizedPath . '|missing';
+        }
+
+        $mtime = @filemtime($normalizedPath) ?: 0;
+        $size = @filesize($normalizedPath) ?: 0;
+
+        return $normalizedPath . '|' . $mtime . '|' . $size;
     }
 
     private function citationsToPandocMarkdown(array $citations): string
@@ -73,12 +128,8 @@ class CitationRenderer implements NodeRendererInterface
         return '[' . implode('; ', $parts) . ']';
     }
 
-    private function callPandoc(string $markdown, string $libraryPath, string $stylePath)
+    private function callPandoc(string $markdown, string $libraryPath, string $stylePath, string $pandocPath)
     {
-        global $prefs;
-
-        $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
-
         $cmd = escapeshellcmd($pandocPath);
         $cmd .= ' --citeproc';
         $cmd .= ' --bibliography=' . escapeshellarg($libraryPath);

@@ -100,9 +100,52 @@ function wikiplugin_zoterobibliography($data, $params)
         $stylePath = 'storage/csl-styles/' . ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date') . '.csl';
     }
 
-    $bibliography = generateBibliography($keys, $libraryPath, $stylePath);
+    $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
+    $cachelib = class_exists('TikiLib') ? TikiLib::lib('cache') : null;
+    $cacheKey = zoteroBibliographyBuildCacheKey($keys, $libraryPath, $stylePath, $pandocPath);
+
+    if ($cachelib) {
+        $cachedBibliography = $cachelib->getCached($cacheKey, 'zotero_pandoc_bibliography_');
+        if ($cachedBibliography !== false) {
+            return $cachedBibliography;
+        }
+    }
+
+    $renderSucceeded = false;
+    $bibliography = generateBibliography($keys, $libraryPath, $stylePath, $renderSucceeded);
+
+    if ($renderSucceeded && $cachelib) {
+        $cachelib->cacheItem($cacheKey, $bibliography, 'zotero_pandoc_bibliography_');
+    }
 
     return $bibliography;
+}
+
+function zoteroBibliographyBuildCacheKey(array $keys, string $libraryPath, string $stylePath, string $pandocPath): string
+{
+    return hash(
+        'sha256',
+        '1'
+        . "\n" . $pandocPath
+        . "\n" . zoteroBibliographyFileFingerprint($libraryPath)
+        . "\n" . zoteroBibliographyFileFingerprint($stylePath)
+        . "\n" . implode(';', $keys)
+    );
+}
+
+function zoteroBibliographyFileFingerprint(string $path): string
+{
+    $resolvedPath = realpath($path);
+    $normalizedPath = $resolvedPath !== false ? $resolvedPath : $path;
+
+    if (! is_file($normalizedPath)) {
+        return $normalizedPath . '|missing';
+    }
+
+    $mtime = @filemtime($normalizedPath) ?: 0;
+    $size = @filesize($normalizedPath) ?: 0;
+
+    return $normalizedPath . '|' . $mtime . '|' . $size;
 }
 
 /**
@@ -174,7 +217,7 @@ function extractCitationKeys($content)
 /**
  * Generate bibliography HTML using Pandoc
  */
-function generateBibliography($keys, $libraryPath, $stylePath)
+function generateBibliography($keys, $libraryPath, $stylePath, &$renderSucceeded = false)
 {
     global $prefs;
 
@@ -202,6 +245,7 @@ function generateBibliography($keys, $libraryPath, $stylePath)
     $process = proc_open($cmd, $descriptors, $pipes);
 
     if (! is_resource($process)) {
+        $renderSucceeded = false;
         return zoteroBibliographyAlert('danger', tra('Bibliography rendering failed: Could not start Pandoc'), true);
     }
 
@@ -217,6 +261,7 @@ function generateBibliography($keys, $libraryPath, $stylePath)
     $returnCode = proc_close($process);
 
     if ($returnCode !== 0) {
+        $renderSucceeded = false;
         return zoteroBibliographyAlert(
             'danger',
             tr('Bibliography rendering failed: %0', trim($errors)),
@@ -224,5 +269,6 @@ function generateBibliography($keys, $libraryPath, $stylePath)
         );
     }
 
+    $renderSucceeded = true;
     return trim($output);
 }
