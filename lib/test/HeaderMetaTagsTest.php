@@ -86,6 +86,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         // Initialize Smarty
         $smarty = \TikiLib::lib('smarty');
         $smarty->assign('prefs', $prefs);
+        $smarty->assign('mid', 'tiki-show_page.tpl');
         // base_url_canonical might not be available in CI, provide default
         $smarty->assign('base_url_canonical', $base_url_canonical ?? 'http://localhost/');
         $smarty->assign('metatag_robotscustom', $metatag_robotscustom);
@@ -503,7 +504,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         $output = $this->renderHeaderTemplate(['site_google_analytics_site_ownership' => $testVerification]);
 
         $this->assertStringContainsString(
-            '<meta name="google-site-verification" content="' . $testVerification . '">',
+            '<meta name="google-site-verification" content="' . $testVerification . '" />',
             $output,
             'google-site-verification meta tag should be rendered when site_google_analytics_site_ownership preference is set'
         );
@@ -517,7 +518,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         $output = $this->renderHeaderTemplate(['metatag_google_notranslate' => 'y']);
 
         $this->assertStringContainsString(
-            '<meta name="google" content="notranslate">',
+            '<meta name="google" content="notranslate" />',
             $output,
             'google notranslate meta tag should be rendered when metatag_google_notranslate is enabled'
         );
@@ -525,7 +526,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         // Test that it's NOT rendered when disabled
         $outputDisabled = $this->renderHeaderTemplate(['metatag_google_notranslate' => 'n']);
         $this->assertStringNotContainsString(
-            '<meta name="google" content="notranslate">',
+            '<meta name="google" content="notranslate" />',
             $outputDisabled,
             'google notranslate meta tag should NOT be rendered when metatag_google_notranslate is disabled'
         );
@@ -539,7 +540,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         $output = $this->renderHeaderTemplate(['metatag_nositelinkssearchbox' => 'y']);
 
         $this->assertStringContainsString(
-            '<meta name="google" content="nositelinkssearchbox">',
+            '<meta name="google" content="nositelinkssearchbox" />',
             $output,
             'google nositelinkssearchbox meta tag should be rendered when metatag_nositelinkssearchbox is enabled'
         );
@@ -547,7 +548,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         // Test that it's NOT rendered when disabled
         $outputDisabled = $this->renderHeaderTemplate(['metatag_nositelinkssearchbox' => 'n']);
         $this->assertStringNotContainsString(
-            '<meta name="google" content="nositelinkssearchbox">',
+            '<meta name="google" content="nositelinkssearchbox" />',
             $outputDisabled,
             'google nositelinkssearchbox meta tag should NOT be rendered when metatag_nositelinkssearchbox is disabled'
         );
@@ -562,13 +563,13 @@ class HeaderMetaTagsTest extends TikiTestCase
         $output = $this->renderHeaderTemplate(['metatag_robots' => $testRobots]);
 
         $this->assertStringContainsString(
-            '<meta name="robots" content="' . $testRobots . '">',
+            '<meta name="robots" content="' . $testRobots . '" />',
             $output,
             'robots meta tag should be rendered when metatag_robots preference is set'
         );
 
         $this->assertStringContainsString(
-            '<meta name="googlebot" content="' . $testRobots . '">',
+            '<meta name="googlebot" content="' . $testRobots . '" />',
             $output,
             'googlebot meta tag should be rendered when metatag_robots preference is set'
         );
