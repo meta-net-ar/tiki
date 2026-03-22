@@ -559,10 +559,11 @@ class ThemeLib extends TikiLib
      */
     public static function setupThemeHeaders(): void
     {
-        global $prefs, $smarty;
+        global $prefs;
 
         $themelib  = TikiLib::lib('theme');
         $headerlib = TikiLib::lib('header');
+        $smarty = TikiLib::lib('smarty');
 
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
 
@@ -739,6 +740,7 @@ class ThemeLib extends TikiLib
 
             $headerlib->add_jq_onready($jq, 5);
         }
+        
         $smarty->initializePaths();
     }
 
