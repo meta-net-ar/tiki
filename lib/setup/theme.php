@@ -1,5 +1,9 @@
+<?php
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e64f2f0b69 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -11,6 +15,7 @@ use Tiki\Sections;
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
+<<<<<<< HEAD
 
 $themelib = TikiLib::lib('theme');
 
@@ -483,3 +488,5 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> 0594ca1aa9 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
 =======
 >>>>>>> 21dd47d727 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
+=======
+>>>>>>> e64f2f0b69 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
