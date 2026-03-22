@@ -13,8 +13,8 @@
     {if isset($assign_info)}<div class="description form-text">{$assign_info.description}{if isset($assign_info.documentation)} {help url=$assign_info.documentation}{/if}</div>{/if}
 </div>
 <div id="module_params">
-{tabset name="module_params{$assign_name}" toggle="n"}
-    {if !empty($assign_name)}
+{if !empty($assign_name)}
+    {tabset name="module_params{$assign_name}" toggle="n" cookietab=1}
         {tab name="{tr}Basic{/tr}" key=basic}
             <fieldset id="param_section_basic">
                 <div class="clearfix mb-3">
@@ -158,7 +158,7 @@
             <input type="submit" class="btn btn-secondary me-2" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
             <input type="submit" class="btn btn-primary" name="assign" value="{tr}Assign{/tr}" onclick="needToConfirm=false;">
         </div>
-    {/if}
+    {/tabset}
+{/if}
 
-{/tabset}
 </div>
