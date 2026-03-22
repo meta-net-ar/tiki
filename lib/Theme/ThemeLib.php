@@ -577,7 +577,6 @@ class ThemeLib extends TikiLib
             import * as bootstrap from "bootstrap";
             window.bootstrap = bootstrap;
         ');
-
         $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
 
         // ===============================
@@ -616,7 +615,6 @@ class ThemeLib extends TikiLib
         if (! empty($prefs['header_custom_scss'])) {
             // TODO
         } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
-
             $custom_theme = $prefs['theme_custom_url'];
 
             if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
@@ -624,29 +622,23 @@ class ThemeLib extends TikiLib
             } else {
                 $headerlib->add_cssfile($custom_theme);
             }
-
         } else {
-
             $theme_css = self::getThemeCssFilePath($theme_active, '');
 
             if ($theme_css) {
-
                 if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
                     $headerlib->add_cssfile($theme_css);
                 }
-
                 if (! empty($theme_option_active)) {
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
 
             } else {
-
                 trigger_error(
                     "The requested theme's CSS file could not be read. Falling back to default theme.",
                     E_USER_WARNING
                 );
-
                 $theme_active        = 'default';
                 $theme_option_active = '';
 
@@ -685,7 +677,6 @@ class ThemeLib extends TikiLib
         // FAVICONS
         // ===============================
         if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {
-
             $favicon_path = $themelib->get_theme_path(
                 $prefs['theme'],
                 $prefs['theme_option'],
@@ -694,9 +685,7 @@ class ThemeLib extends TikiLib
             );
 
             if ($favicon_path) {
-
                 $headerlib->add_link('icon', $favicon_path, '16x16', 'image/png');
-
                 $favicon_path = dirname($favicon_path);
 
                 if (is_file($favicon_path . '/apple-touch-icon.png')) {
@@ -728,7 +717,6 @@ class ThemeLib extends TikiLib
                 }
 
             } else {
-
                 $headerlib->add_link('icon', 'themes/base_files/favicons/favicon-16x16.png', '16x16', 'image/png');
                 $headerlib->add_link('apple-touch-icon', 'themes/base_files/favicons/apple-touch-icon.png', '180x180');
                 $headerlib->add_link('icon', 'themes/base_files/favicons/favicon-32x32.png', '32x32', 'image/png');
@@ -740,7 +728,6 @@ class ThemeLib extends TikiLib
                     $headerlib->add_link('manifest', 'themes/base_files/favicons/site.webmanifest');
                 }
             }
-
             unset($favicon_path);
         }
 
@@ -758,7 +745,6 @@ class ThemeLib extends TikiLib
         // THEME COLOR
         // ===============================
         if ($prefs['theme_header_and_address_bar_color'] === 'y') {
-
             if (Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
                 $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
             } else {
@@ -767,14 +753,12 @@ class ThemeLib extends TikiLib
 
             $jq  = "var color = window.getComputedStyle(document.documentElement).getPropertyValue('{$css_color_variable}');";
             $jq .= "$('meta[name=\"theme-color\"]').attr('content', color);";
-
             $headerlib->add_meta("theme-color", "");
             $headerlib->add_meta("apple-mobile-web-app-capable", "yes");
             $headerlib->add_meta("apple-mobile-web-app-status-bar-style", "black-translucent");
 
             $headerlib->add_jq_onready($jq, 5);
         }
-
         $smarty->initializePaths();
     }
 
@@ -784,7 +768,7 @@ class ThemeLib extends TikiLib
      * @param object $headerlib
      * @param array $prefs
      */
-   public static function registerThemeAssets()
+   public static function registerThemeAssets($iconset)
    {
         global $prefs, $smarty, $user;
 
@@ -801,7 +785,8 @@ class ThemeLib extends TikiLib
         ');
 
         $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
-
+        $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
+        $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
         // Fixed width
         if ($prefs['feature_fixed_width'] === 'y') {
             $headerlib->add_css(
@@ -832,7 +817,6 @@ class ThemeLib extends TikiLib
         if (! empty($prefs['header_custom_scss'])) {
             // TODO
         } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
-
             $custom_theme = $prefs['theme_custom_url'];
 
             if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
@@ -842,27 +826,21 @@ class ThemeLib extends TikiLib
             }
 
         } else {
-
             $theme_css = self::getThemeCssFilePath($theme_active, '');
 
             if ($theme_css) {
-
                 if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
                     $headerlib->add_cssfile($theme_css);
                 }
-
                 if (! empty($theme_option_active)) {
                     $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
                     $headerlib->add_cssfile($option_css);
                 }
 
             } else {
-
                 trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
-
                 $theme_active = 'default';
                 $theme_option_active = '';
-
                 $theme_css = self::getThemeCssFilePath($theme_active, null);
                 $headerlib->add_cssfile($theme_css);
             }
@@ -871,40 +849,13 @@ class ThemeLib extends TikiLib
         // Admin (STRICT ORIGINAL)
         $groups = $userlib->get_user_groups($user);
 
-        if (
-            $prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups)
-            && (strpos($_SERVER['PHP_SELF'], 'admin')
-            || strpos($_SERVER['PHP_SELF'], 'cache')
-            || strpos($_SERVER['PHP_SELF'], 'import')
-            || strpos($_SERVER['PHP_SELF'], 'manage')
-            || strpos($_SERVER['PHP_SELF'], 'permissions')
-            || strpos($_SERVER['PHP_SELF'], 'stats')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-export')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-import')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-received')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
-        ) {
-
+        if ($prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups) && (strpos($_SERVER['PHP_SELF'], 'admin') || strpos($_SERVER['PHP_SELF'], 'cache') || strpos($_SERVER['PHP_SELF'], 'import') || strpos($_SERVER['PHP_SELF'], 'manage') || strpos($_SERVER['PHP_SELF'], 'permissions') || strpos($_SERVER['PHP_SELF'], 'stats') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz') || strpos($_SERVER['PHP_SELF'], 'tiki-export') || strpos($_SERVER['PHP_SELF'], 'tiki-import') || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners') || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments') || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents') || strpos($_SERVER['PHP_SELF'], 'tiki-plugins') || strpos($_SERVER['PHP_SELF'], 'tiki-received') || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))) {
             $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
 
-            if (
-                ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') &&
-                ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') &&
-                strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false
-            ) {
+            if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') && ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) {
                 $prefs['site_layout_admin'] = 'admin';
                 $prefs['site_layout'] = 'admin';
-
                 Sections::setCurrentSection(Sections::SECTION_ADMIN);
-
                 include_once 'admin/define_admin_icons.php';
 
                 foreach ($admin_icons as &$admin_icon) {
@@ -912,17 +863,13 @@ class ThemeLib extends TikiLib
                         $child = array_merge(['disabled' => false, 'description' => ''], $child);
                     }
                 }
-
                 $smarty->assign('admin_icons', $admin_icons);
             }
-
             if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
                 $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
             }
-
         } else {
             $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
         }
     }
-
 }
