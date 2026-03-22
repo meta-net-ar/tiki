@@ -570,25 +570,19 @@ class ThemeLib extends TikiLib
         $prefs['theme']        = $theme_active;
         $prefs['theme_option'] = $theme_option_active;
 
-        // ===============================
         // JS
-        // ===============================
         $headerlib->add_js_module('
             import * as bootstrap from "bootstrap";
             window.bootstrap = bootstrap;
         ');
         $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
 
-        // ===============================
         // FIXED WIDTH
-        // ===============================
         if ($prefs['feature_fixed_width'] === 'y') {
             $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' . (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') . '; } }');
         }
 
-        // ===============================
         // BASE CSS
-        // ===============================
         $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
         $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 
@@ -596,9 +590,7 @@ class ThemeLib extends TikiLib
             $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
         }
 
-        // ===============================
         // EXTENSIONS CSS
-        // ===============================
         foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $package) {
             $finder = new \Symfony\Component\Finder\Finder();
 
@@ -609,9 +601,7 @@ class ThemeLib extends TikiLib
             }
         }
 
-        // ===============================
         // THEME CSS
-        // ===============================
         if (! empty($prefs['header_custom_scss'])) {
             // TODO
         } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
@@ -646,9 +636,7 @@ class ThemeLib extends TikiLib
             }
         }
 
-        // ===============================
         // CUSTOM CSS
-        // ===============================
         if (! empty($theme_option_active)) {
             $main_theme_path       = $themelib->get_theme_path($theme_active);
             $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
@@ -672,9 +660,7 @@ class ThemeLib extends TikiLib
             $headerlib->add_cssfile($custom_css, 53);
         }
 
-        // ===============================
         // FAVICONS
-        // ===============================
         if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {
             $favicon_path = $themelib->get_theme_path(
                 $prefs['theme'],
@@ -729,9 +715,7 @@ class ThemeLib extends TikiLib
             unset($favicon_path);
         }
 
-        // ===============================
         // WEB MONETIZATION
-        // ===============================
         if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetization_default_payment_pointer'])) {
             $headerlib->add_meta(
                 'monetization',
@@ -739,9 +723,7 @@ class ThemeLib extends TikiLib
             );
         }
 
-        // ===============================
         // THEME COLOR
-        // ===============================
         if ($prefs['theme_header_and_address_bar_color'] === 'y') {
             if (Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
                 $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
