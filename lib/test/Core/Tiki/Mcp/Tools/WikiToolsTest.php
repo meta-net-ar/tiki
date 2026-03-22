@@ -27,6 +27,8 @@ class WikiToolsTest extends \TikiTestCase
     private static array $createdPages = [];
 
     private static ?\Perms_Context $permContext = null;
+    private static ?string $oldUser = null;
+    private static ?string $oldFeatureSearch = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -37,8 +39,12 @@ class WikiToolsTest extends \TikiTestCase
         $_SERVER['SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? 'localhost';
         $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
-        // Set global user context (mirrors mcp.php bootstrap)
+        // Save original global state
         global $user, $prefs;
+        self::$oldUser = $user;
+        self::$oldFeatureSearch = $prefs['feature_search'] ?? null;
+
+        // Set global user context (mirrors mcp.php bootstrap)
         $user = 'admin';
         self::$permContext = new \Perms_Context('admin');
 
@@ -57,6 +63,15 @@ class WikiToolsTest extends \TikiTestCase
             if ($tikilib->page_exists($page)) {
                 $tikilib->remove_all_versions($page);
             }
+        }
+
+        // Restore global state
+        global $user, $prefs;
+        $user = self::$oldUser;
+        if (self::$oldFeatureSearch !== null) {
+            $prefs['feature_search'] = self::$oldFeatureSearch;
+        } else {
+            unset($prefs['feature_search']);
         }
 
         // Release permission context
