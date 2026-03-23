@@ -1,8 +1,8 @@
 <div{if !empty($field.options_map.labelasplaceholder)} class="input-group"{/if}>
     <input type="text" class="form-control{if !empty($field.options_map.labelasplaceholder)} labelasplaceholder{/if}"
            name="{$field.ins_id}" id="{$field.ins_id}" value="{$field.value|escape}" size="60"
-           data-url-wiki-wrapper-validation-input=""
-           data-url-wiki-wrapper-feedback-id="{$field.ins_id}_wikiSyntaxLive"
+           {if $data.strictValidationEnabled}data-url-wiki-wrapper-validation-input=""
+           data-url-wiki-wrapper-feedback-id="{$field.ins_id}_wikiSyntaxLive"{/if}
            {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name}"{/if}
     >
     {if $field.options_map.labelasplaceholder and $field.isMandatory eq 'y'}
