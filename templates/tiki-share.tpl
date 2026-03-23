@@ -11,7 +11,26 @@
         {else}
             {tr}Your report was sent to the Webmaster{/tr}
         {/if}
-        {if isset($emailSent) and $report ne 'y'}
+        {if isset($share_generated_link) and $report ne 'y'}
+            <div class="share-generated-link mb-2">
+                <strong>{tr}Shareable link{/tr}</strong>
+                <div class="input-group mt-1 mb-1">
+                    <input
+                        type="text"
+                        id="share-generated-link-input"
+                        class="form-control"
+                        value="{$share_generated_link|escape}"
+                        readonly
+                    >
+                    <button type="button" class="btn btn-outline-secondary" id="copy-share-link-btn">
+                        {icon name='copy'} {tr}Copy{/tr}
+                    </button>
+                </div>
+                <div id="copy-share-link-status" class="form-text"></div>
+                <span class="form-text d-block">{tr}Copy this link to share access without sending email.{/tr}</span>
+            </div>
+        {/if}
+        {if isset($emailSent) and $emailSent and $report ne 'y'}
             <div>
                 {tr}The link was sent via email to the following addresses:{/tr} {$addresses|escape}
             </div>
@@ -58,7 +77,7 @@
 
 {if !isset($sent) && empty($errors)}
     <div id="ajaxmsg"></div>
-    <form method="post" action="tiki-share.php?url={$url|escape:url}" id="share-form">
+    <form method="post" action="tiki-share.php?url={$url|escape:url}" id="share-form" data-auth-token-access="{if $auth_token_access_enabled}1{else}0{/if}">
         {ticket}
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3">
@@ -133,9 +152,14 @@
                                     {tr}Separate multiple email addresses with a comma and a space{/tr}
                                 </span>
                             {else}
-                                <input class="form-control" type="text" size="60" name="addresses" value="{$addresses|escape}">
+                                <input class="form-control" type="text" size="60" name="addresses" id="addresses" value="{$addresses|escape}">
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma.{/tr}
+                                </span>
+                            {/if}
+                            {if $report != 'y' && $auth_token_access_enabled}
+                                <span class="form-text d-block mt-1 text-info">
+                                    {tr}Leave empty to generate a shareable access link only (no email).{/tr}
                                 </span>
                             {/if}
                         </div>
@@ -482,34 +506,120 @@
     <p><a href="javascript:window.history.go(-2);">{tr}Return to previous page{/tr}</a></p>
 {/if}
 {jq}
-    $('#share-form').on("submit", function(e){
-            if($('#addresses').val() !='' || ! $('#emailtable:visible').length) {
-                    $(this).tikiModal("Please wait....");
-                    var postData = $(this).serializeArray();
-                    var formURL = 'tiki-share.php?send=share';
-                    $.ajax({
-                            url : formURL,
-                            type: "POST",
-                            data : postData,
-                            success:function(data, textStatus, jqXHR) {
-                                    var shrsuccess = $($.parseHTML(data)).find("#success").html();
-                                    var shrerror = $($.parseHTML(data)).find("#shareerror").html();
-                                    if(shrsuccess) {
-                                            $('#ajaxmsg').html("<div class='alert alert-success'>"+shrsuccess+"</div>");
-                                    } else {
-                                            $('#ajaxmsg').html("<div class='alert alert-warning'>"+shrerror+"</div>");
-                                    }
-                                    $('#share-form').tikiModal("");
-                                    $('#addresses').val('');
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                    $('#share-form').tikiModal("");
-                            }
-                    });
-            } else {
-                    alert("You must provide at least one recipient email address");
+    function shareGetAddressesRaw() {
+        var $a = $('#addresses');
+        var v;
+        if ($a.length) {
+            v = $a.val();
+        } else {
+            v = $('input[name="addresses"]').val();
+        }
+        if ($.isArray(v)) {
+            return v.join(', ');
+        }
+        return v || '';
+    }
+    function shareSplitAddresses(s) {
+        if (!s || !$.trim(s)) {
+            return [];
+        }
+        return s.split(/[,;]/).map(function (x) { return $.trim(x); }).filter(function (x) { return x.length > 0; });
+    }
+    function shareIsValidEmailLocal(part) {
+        if (!part || part.length > 254) {
+            return false;
+        }
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(part);
+    }
+    function shareShowCopyStatus(msg, ok) {
+        var $status = $('#copy-share-link-status');
+        if (!$status.length) {
+            return;
+        }
+        $status
+            .text(msg)
+            .removeClass('text-success text-danger')
+            .addClass(ok ? 'text-success' : 'text-danger');
+    }
+    $(document).tiki('copy')(
+        function () {
+            return $('#share-generated-link-input').val() || '';
+        },
+        function () {
+            var text = $('#share-generated-link-input').val() || '';
+            if (! $.trim(text)) {
+                shareShowCopyStatus("{tr}No link to copy.{/tr}", false);
+                return;
             }
+            shareShowCopyStatus("{tr}Link copied to clipboard.{/tr}", true);
+        },
+        function () {
+            shareShowCopyStatus("{tr}Copy failed. Please copy manually.{/tr}", false);
+        },
+        '#copy-share-link-btn'
+    );
+    $('#share-form').on("submit", function(e){
             e.preventDefault();
+            var $form = $(this);
+            var doEmail = $('input[name="do_email"]:checked').val() === '1';
+            var emailDetailsVisible = $('.share-email-details').length && !$('.share-email-details').hasClass('hidden');
+            var authToken = $form.data('auth-token-access') === 1 || $form.data('auth-token-access') === '1';
+            var report = $('input[name="report"]').val() === 'y';
+            if (doEmail && emailDetailsVisible && !report) {
+                var raw = shareGetAddressesRaw();
+                var parts = shareSplitAddresses(raw);
+                if (parts.length === 0 && !authToken) {
+                    alert("{tr}Enter at least one recipient email address.{/tr}");
+                    return false;
+                }
+                var bad = [];
+                for (var i = 0; i < parts.length; i++) {
+                    if (!shareIsValidEmailLocal(parts[i])) {
+                        bad.push(parts[i]);
+                    }
+                }
+                if (bad.length) {
+                    alert("{tr}Invalid email(s):{/tr} " + bad.join(', '));
+                    return false;
+                }
+                var sender = ($('input[name="email"]').val() || '').trim();
+                if (parts.length > 0 && !sender) {
+                    alert("{tr}Your email is mandatory{/tr}");
+                    return false;
+                }
+            }
+            $form.tikiModal("{tr}Please wait....{/tr}");
+            var postData = $form.serializeArray();
+            var formURL = 'tiki-share.php?send=share';
+            $.ajax({
+                    url : formURL,
+                    type: "POST",
+                    data : postData,
+                    success:function(data, textStatus, jqXHR) {
+                            var shrsuccess = $($.parseHTML(data)).find("#success").html();
+                            var shrerror = $($.parseHTML(data)).find("#shareerror").html();
+                            if (shrsuccess) {
+                                    $('#ajaxmsg').html("<div class='alert alert-success'>"+shrsuccess+"</div>");
+                                    $('#addresses').val('');
+                            } else if (shrerror && $.trim(shrerror)) {
+                                    $('#ajaxmsg').html("<div class='alert alert-warning'>"+shrerror+"</div>");
+                            } else {
+                                    $('#ajaxmsg').html("<div class='alert alert-warning'>{tr}The server response could not be interpreted. If the problem persists, check the site logs.{/tr}</div>");
+                            }
+                            $form.tikiModal("");
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                            var msg = "{tr}Request failed.{/tr}";
+                            if (jqXHR.status) {
+                                msg += " (" + jqXHR.status + ")";
+                            }
+                            if (errorThrown) {
+                                msg += " " + errorThrown;
+                            }
+                            $('#ajaxmsg').html("<div class='alert alert-danger'>" + $('<div/>').text(msg).html() + "</div>");
+                            $form.tikiModal("");
+                    }
+            });
             return false;
     });
     $(".share-email-hide").on("click", function(){
