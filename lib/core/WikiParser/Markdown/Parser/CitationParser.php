@@ -40,15 +40,22 @@ class CitationParser implements InlineParserInterface
             return false;
         }
 
-        $suppressAuthor = ($groups[1] === '-');
+        $groupSuppressAuthor = ($groups[1] === '-');
         $content = $groups[2];
 
         $citations = [];
         $parts = array_map('trim', explode(';', $content));
 
-        foreach ($parts as $part) {
-            // Strip leading @ if present
-            $part = ltrim($part, '@');
+        foreach ($parts as $index => $part) {
+            $partSuppressAuthor = ($groupSuppressAuthor && $index === 0);
+
+            // Allow explicit per-citation -@ and @ markers.
+            if (str_starts_with($part, '-@')) {
+                $partSuppressAuthor = true;
+                $part = substr($part, 2);
+            } else {
+                $part = ltrim($part, '@');
+            }
 
             // Allow $ in citation keys (though we recommend against it)
             if (preg_match('/^([a-zA-Z0-9_\-:.$]+)(?:,\s*(.+))?$/', $part, $citMatch)) {
@@ -72,7 +79,7 @@ class CitationParser implements InlineParserInterface
                     'key' => $key,
                     'locator' => $locator,
                     'label' => $label,
-                    'suppress_author' => $suppressAuthor,
+                    'suppress_author' => $partSuppressAuthor,
                 ];
             }
         }
