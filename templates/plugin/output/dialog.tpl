@@ -18,4 +18,4 @@
     </div>
   </div>
 </div>
-<script type="module">{literal}import { initializeDialog } from "@jquery-tiki/plugins/dialog";{/literal}initializeDialog("{{$id}}", Boolean("{{$autoOpen}}" === "y"), {{$openAction}});</script> {* It is actually impossible to use proper formatting here, the plugin parser is introducing a <p> wherever it encounters a line break. *}
+<script type="module">{literal}import { initializeDialog } from "@tiki/plugins/dialog";{/literal}initializeDialog("{{$id}}", Boolean("{{$autoOpen}}" === "y"), {{$openAction}});</script> {* It is actually impossible to use proper formatting here, the plugin parser is introducing a <p> wherever it encounters a line break. *}

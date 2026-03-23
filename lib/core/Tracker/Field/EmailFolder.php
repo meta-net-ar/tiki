@@ -310,7 +310,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
         $compose_path .= "page=compose&list_path=tracker_folder_" . $this->getItemId() . "_" . $this->getConfiguration('fieldId') . "&list_parent=tracker_" . $this->getTrackerDefinition()->getConfiguration('trackerId');
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/emailFolder";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-fields/emailFolder";');
 
         return $this->renderTemplate('trackeroutput/email_folder.tpl', $context, [
             'emails' => $emails,
