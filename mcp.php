@@ -50,29 +50,19 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
 });
 
 // --- Bootstrap Tiki ---
-$statusCode = 1100;
+$tikiReady = false;
 try {
     $bypass_siteclose_check = true;
     require_once 'tiki-setup.php';
 
-    if (\Tiki\Installer\Installer::getInstance()->requiresUpdate()) {
-        $statusCode = 1004;
+    if (! \Tiki\Installer\Installer::getInstance()->requiresUpdate()) {
+        $tikiReady = true;
     }
-} catch (\Tiki\Command\ConsoleSetupException $e) {
-    $statusCode = $e->getCode();
 } catch (Throwable $e) {
-    $statusCode = 1001;
     error_log("MCP bootstrap error: " . $e->getMessage());
 }
 
-if (! defined('DB_RUNNING')) {
-    define('DB_RUNNING', $statusCode > 1001);
-    define('DB_STATUS', $statusCode > 1002);
-    define('DB_TIKI_SETUP', $statusCode > 1003);
-    define('DB_SYNCHRONAL', $statusCode > 1004);
-}
-
-if ($statusCode < 1100) {
+if (! $tikiReady) {
     http_response_code(503);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Service unavailable']);
