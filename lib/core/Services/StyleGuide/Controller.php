@@ -49,27 +49,26 @@ class Services_StyleGuide_Controller
             ->add_jsfile('lib/jquery_tiki/theme-customizer.js')
         ;
 
+        $generatedCss = is_readable(THEME_CUSTOMIZER_GENERATED_CSS_PATH)
+            ? file_get_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH)
+            : '';
+
         return [
             'title' => tr('Theme Customizer'),
             'sections' => $sections,
+            'generated_css' => $generatedCss,
         ];
     }
 
     public function action_save_generated_css($input)
     {
         Services_Exception_Denied::checkGlobal('admin');
-        $customCss = $input->header_custom_generated_css->text();
-        $tikilib = TikiLib::lib('tiki');
+        $customCss = $input->generated_css->text();
 
-        try {
-            $updated = $tikilib->set_preference('header_custom_generated_css', $customCss);
-            if ($updated) {
-                Feedback::success(tr('The custom generated CSS preference has been updated'));
-            } else {
-                Feedback::warning(tr('An error occurred while updating the custom generated CSS preference'));
-            }
-        } catch (Exception $e) {
-            Feedback::error(tr("Couldn't update the custom generated CSS preference: %0", $e->getMessage()));
+        if (file_put_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH, $customCss) !== false) {
+            Feedback::success(tr('The custom generated CSS has been saved'));
+        } else {
+            Feedback::error(tr("Couldn't save the custom generated CSS file. Check that themes/css/ is writable."));
         }
         return true;
     }
