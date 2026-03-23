@@ -47,25 +47,18 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
     return true;
 });
 
-$bypass_siteclose_check = true;
 require_once 'tiki-setup.php';
 
 // --- Require authenticated user ---
 // tiki-setup_base.php sets $user from the Bearer token when TIKI_API is true.
 // Reject unauthenticated requests.
-global $user, $prefs;
+// Site closed check is handled by lib/setup/site_closed.php during bootstrap,
+// which returns a JSON error when TIKI_API is true.
+global $user;
 if (empty($user)) {
     http_response_code(401);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Authentication required. Use: Authorization: Bearer <token>']);
-    exit(1);
-}
-
-// --- Respect site maintenance mode ---
-if (! empty($prefs['site_closed']) && $prefs['site_closed'] === 'y') {
-    http_response_code(503);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Site is in maintenance mode']);
     exit(1);
 }
 
