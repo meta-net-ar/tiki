@@ -59,9 +59,6 @@ function zoteroBibliographyAlert(string $type, string $message, bool $sendGlobal
             case 'warning':
                 Feedback::warning($message);
                 break;
-            case 'success':
-                Feedback::success($message);
-                break;
             default:
                 Feedback::note($message);
                 break;
@@ -75,14 +72,14 @@ function wikiplugin_zoterobibliography($data, $params)
 {
     global $prefs;
 
-    if (empty($prefs['zotero_pandoc_enabled']) || $prefs['zotero_pandoc_enabled'] !== 'y') {
+    if (($prefs['zotero_pandoc_enabled'] ?? 'n') !== 'y') {
         return zoteroBibliographyAlert('warning', tra('Pandoc citations not enabled'), true);
     }
 
     $content = getContentFromContext();
 
     if (empty($content)) {
-        return zoteroBibliographyAlert('warning', tra('Could not read content for bibliography generation'), true);
+        return zoteroBibliographyAlert('warning', tra('Could not read content for bibliography generation'));
     }
 
     $keys = extractCitationKeys($content);
@@ -91,30 +88,44 @@ function wikiplugin_zoterobibliography($data, $params)
         return zoteroBibliographyAlert('info', tra('No citations found in this content.'));
     }
 
-    $libraryPath = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
+    $libraryPreference = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
+    $libraryPath = zoteroResolveFilePath($libraryPreference, ['storage/zotero/', zoteroStorageBaseDir() . 'zotero/']);
+    if ($libraryPath === null || ! is_file($libraryPath)) {
+        return zoteroBibliographyAlert(
+            'danger',
+            tr('Bibliography rendering failed: Library file not found: %0', $libraryPreference),
+            true
+        );
+    }
 
-    $stylePath = null;
-    if (! empty($params['style'])) {
-        $stylePath = 'storage/csl-styles/' . $params['style'] . '.csl';
-    } else {
-        $stylePath = 'storage/csl-styles/' . ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date') . '.csl';
+    $styleName = ! empty($params['style']) ? (string) $params['style'] : ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date');
+    $styleName = preg_replace('/\.csl$/i', '', trim($styleName));
+    if ($styleName === '' || preg_match('/[^a-zA-Z0-9._-]/', $styleName)) {
+        return zoteroBibliographyAlert('danger', tra('Bibliography rendering failed: Invalid CSL style name.'), true);
+    }
+
+    $stylePath = zoteroResolveFilePath($styleName . '.csl', ['storage/csl-styles/', zoteroStorageBaseDir() . 'csl-styles/']);
+    if ($stylePath === null || ! is_file($stylePath)) {
+        return zoteroBibliographyAlert(
+            'danger',
+            tr('Bibliography rendering failed: CSL style not found: %0', $styleName),
+            true
+        );
     }
 
     $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
-    $cachelib = class_exists('TikiLib') ? TikiLib::lib('cache') : null;
+    $cachelib = TikiLib::lib('cache');
     $cacheKey = zoteroBibliographyBuildCacheKey($keys, $libraryPath, $stylePath, $pandocPath);
 
-    if ($cachelib) {
-        $cachedBibliography = $cachelib->getCached($cacheKey, 'zotero_pandoc_bibliography_');
-        if ($cachedBibliography !== false) {
-            return $cachedBibliography;
-        }
+    $cachedBibliography = $cachelib->getCached($cacheKey, 'zotero_pandoc_bibliography_');
+    if ($cachedBibliography !== false) {
+        return $cachedBibliography;
     }
 
     $renderSucceeded = false;
     $bibliography = generateBibliography($keys, $libraryPath, $stylePath, $renderSucceeded);
 
-    if ($renderSucceeded && $cachelib) {
+    if ($renderSucceeded) {
         $cachelib->cacheItem($cacheKey, $bibliography, 'zotero_pandoc_bibliography_');
     }
 
@@ -148,6 +159,43 @@ function zoteroBibliographyFileFingerprint(string $path): string
     return $normalizedPath . '|' . $mtime . '|' . $size;
 }
 
+function zoteroStorageBaseDir(): string
+{
+    global $tikidomainslash;
+
+    return DEPRECATED_STORAGE_PATH . '/' . ($tikidomainslash ?? '');
+}
+
+function zoteroResolveFilePath(string $path, array $prefixCandidates = []): ?string
+{
+    $trimmed = trim($path);
+    if ($trimmed === '') {
+        return null;
+    }
+
+    $candidates = [$trimmed];
+    foreach ($prefixCandidates as $prefix) {
+        $candidates[] = rtrim($prefix, '/') . '/' . ltrim($trimmed, '/');
+    }
+
+    if (defined('TIKI_PATH')) {
+        foreach ($candidates as $candidate) {
+            if (! preg_match('/^(\/|[A-Za-z]:[\/\\\\])/', $candidate)) {
+                $candidates[] = rtrim(TIKI_PATH, '/') . '/' . ltrim($candidate, '/');
+            }
+        }
+    }
+
+    foreach ($candidates as $candidate) {
+        $resolved = realpath($candidate);
+        if ($resolved !== false && is_file($resolved)) {
+            return $resolved;
+        }
+    }
+
+    return null;
+}
+
 /**
  * Get content from current Tiki context
  * Supports: Wiki pages, Blog posts, Articles
@@ -160,6 +208,15 @@ function getContentFromContext()
 
     if (! empty($page)) {
         $pageInfo = $tikilib->get_page_info($page);
+        if (! empty($pageInfo['data'])) {
+            return $pageInfo['data'];
+        }
+    }
+
+    // Save flow fallback where global $page may be empty, but request still carries page name.
+    $requestPage = isset($_REQUEST['page']) ? trim((string) $_REQUEST['page']) : '';
+    if ($requestPage !== '') {
+        $pageInfo = $tikilib->get_page_info($requestPage);
         if (! empty($pageInfo['data'])) {
             return $pageInfo['data'];
         }
@@ -185,6 +242,11 @@ function getContentFromContext()
         }
     }
 
+    // Preview/edit fallback
+    if (! empty($_REQUEST['data']) && is_string($_REQUEST['data'])) {
+        return $_REQUEST['data'];
+    }
+
     return '';
 }
 
@@ -202,7 +264,10 @@ function extractCitationKeys($content)
 
             foreach ($parts as $part) {
                 $part = trim($part);
-                $part = ltrim($part, '@');
+                $part = preg_replace('/^[-@]+/', '', $part);
+                if ($part === '') {
+                    continue;
+                }
 
                 if (preg_match('/^([a-zA-Z0-9_\-:.$]+)/', $part, $keyMatch)) {
                     $keys[] = $keyMatch[1];
@@ -211,7 +276,7 @@ function extractCitationKeys($content)
         }
     }
 
-    return array_unique($keys);
+    return array_values(array_unique($keys));
 }
 
 /**

@@ -11,13 +11,16 @@ if (PHP_SAPI !== 'cli') {
 
 require_once dirname(__DIR__, 2) . '/tiki-setup.php';
 
-function failUpdateCslStyles($message, $exitCode = 1)
+function failUpdateCslStyles(string $message, int $exitCode = 1): never
 {
     fwrite(STDERR, $message . "\n");
     exit($exitCode);
 }
 
-function acquireUpdateCslStylesLock($lockFile)
+/**
+ * @return resource
+ */
+function acquireUpdateCslStylesLock(string $lockFile): mixed
 {
     $handle = @fopen($lockFile, 'c+');
     if (! $handle) {
@@ -39,21 +42,21 @@ function acquireUpdateCslStylesLock($lockFile)
     return $handle;
 }
 
-function parseUpdateCslStylesOptions($argv)
+function parseUpdateCslStylesOptions(array $argv): array
 {
     return [
         'debug' => in_array('--debug', $argv, true),
     ];
 }
 
-function debugUpdateCslStyles($debugEnabled, $message)
+function debugUpdateCslStyles(bool $debugEnabled, string $message): void
 {
     if ($debugEnabled) {
         echo '[DEBUG] ' . $message . "\n";
     }
 }
 
-function responseHeaderValue($response, $headerName)
+function responseHeaderValue(object $response, string $headerName): string
 {
     $header = $response->getHeaders()->get($headerName);
     if (! $header) {
@@ -71,7 +74,7 @@ function responseHeaderValue($response, $headerName)
     return (string) $header;
 }
 
-function downloadCslArchive($tikilib, $zipUrls, $debugEnabled = false)
+function downloadCslArchive(TikiLib $tikilib, array|string $zipUrls, bool $debugEnabled = false): string
 {
     if (! is_array($zipUrls)) {
         $zipUrls = [$zipUrls];

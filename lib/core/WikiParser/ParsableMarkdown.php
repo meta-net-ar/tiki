@@ -51,7 +51,7 @@ class WikiParser_ParsableMarkdown extends ParserLib
         $environment->addExtension(new FootnoteExtension());
         $environment->addExtension(new TikiExtension());
 
-        if (! empty($prefs['zotero_pandoc_enabled']) && $prefs['zotero_pandoc_enabled'] === 'y') {
+        if (($prefs['zotero_pandoc_enabled'] ?? 'n') === 'y') {
             $environment->addExtension(new ZoteroCitationExtension());
         }
         if ($this->option['autotoc']) {

@@ -30,7 +30,7 @@ class CitationRenderer implements NodeRendererInterface
 
         global $prefs;
 
-        if (empty($prefs['zotero_pandoc_enabled']) || $prefs['zotero_pandoc_enabled'] !== 'y') {
+        if (($prefs['zotero_pandoc_enabled'] ?? 'n') !== 'y') {
             return '<span class="text-danger">[' . tra('Pandoc citations not enabled') . ']</span>';
         }
 
@@ -46,14 +46,14 @@ class CitationRenderer implements NodeRendererInterface
         if (array_key_exists($cacheKey, self::$renderCache)) {
             $rendered = self::$renderCache[$cacheKey];
         } else {
-            $cachelib = class_exists('\TikiLib') ? \TikiLib::lib('cache') : null;
-            $cached = $cachelib ? $cachelib->getCached($cacheKey, self::CACHE_TYPE) : false;
+            $cachelib = \TikiLib::lib('cache');
+            $cached = $cachelib->getCached($cacheKey, self::CACHE_TYPE);
 
             if ($cached !== false) {
                 $rendered = $cached;
             } else {
                 $rendered = $this->callPandoc($pandocMarkdown, $libraryPath, $stylePath, $pandocPath);
-                if ($rendered !== false && $cachelib) {
+                if ($rendered !== false) {
                     $cachelib->cacheItem($cacheKey, $rendered, self::CACHE_TYPE);
                 }
             }
