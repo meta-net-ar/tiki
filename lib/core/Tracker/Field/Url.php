@@ -56,7 +56,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                     ],
                     'strictValidation' => [
                         'name' => tr('Strict validation'),
-                        'description' => tr('Validate this URL field with stricter syntax checks. Disable this to preserve legacy values such as relative or Windows/UNC-style paths.'),
+                        'description' => tr('This field expects data that resolves to syntactically valid URLs. Setting this to No disables URL syntax validation at data entry and import.  This will allow you to use currently unsupported data in this field such as raw file paths, but doing so may trigger problems in code that uses this data if it expects valid URLs.  If you set this to No, test the interfaces that use this field in your site thoroughly.'),
                         'filter' => 'int',
                         'legacy_index' => 3,
                         'default' => 1,
