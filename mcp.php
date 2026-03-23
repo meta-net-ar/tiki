@@ -70,13 +70,9 @@ if (! empty($prefs['site_closed']) && $prefs['site_closed'] === 'y') {
 }
 
 // --- Build MCP server ---
-// FileSessionStore persists sessions across PHP requests (required for HTTP transport).
-// Store outside the document root so sessions are never web-accessible,
-// regardless of web server config (.htaccess, Nginx, AllowOverride).
-$sessionDir = sys_get_temp_dir() . '/tiki-mcp-' . md5(__FILE__);
-if (! is_dir($sessionDir)) {
-    mkdir($sessionDir, 0700, true);
-}
+// FileSessionStore persists MCP protocol sessions across PHP requests
+// (required for HTTP transport). Uses Tiki's temp directory (TEMP_PATH).
+$sessionDir = TEMP_PATH . '/mcp-sessions';
 $sessionStore = new FileSessionStore($sessionDir);
 
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
