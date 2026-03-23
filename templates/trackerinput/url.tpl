@@ -11,9 +11,7 @@
         </span>
     {/if}
 </div>
-{if $data.strictValidationEnabled}
-    <div id="{$field.ins_id}_wikiSyntaxLive"
-         class="form-text text-muted js-url-wiki-syntax-feedback"
-         data-default-info="{$data.wikiSyntaxInfo|escape:'htmlattr'}"
-    >{$data.wikiSyntaxInfo|escape}</div>
-{/if}
+<div id="{$field.ins_id}_wikiSyntaxLive"
+     class="form-text text-muted js-url-wiki-syntax-feedback"
+     data-default-info="{$data.wikiSyntaxInfo|escape:'htmlattr'}"
+>{$data.wikiSyntaxInfo|escape}</div>
