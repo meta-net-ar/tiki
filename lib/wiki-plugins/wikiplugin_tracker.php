@@ -641,6 +641,19 @@ function wikiplugin_tracker_info()
                 'description' => tra('Use ajax to create and update tracker items instead of form submission via request variables.'),
                 'default' => 'n',
             ],
+            'antibot' => [
+                'required' => false,
+                'name' => tra('Use antibot'),
+                'description' => tr(
+                    'Optional per-form antibot control. Set to %0No%1 to disable captcha for this form when global antibot is enabled. This does not override global antibot when it is disabled site-wide.',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '30.0',
+                'filter' => 'alpha',
+                'options' => BooleanEnglishLetter::options(''),
+                'advanced' => true,
+            ],
             'rules' => [
                 'required' => false,
                 'name' => tra('Use field rules'),
@@ -716,6 +729,8 @@ function wikiplugin_tracker($data, $params)
 
     $thisIsThePlugin = isset($_REQUEST['iTRACKER']) && $_REQUEST['iTRACKER'] == $iTRACKER;
     $registration = BooleanEnglishLetter::tryFrom($registration);
+    $disableAntibotForThisForm = BooleanEnglishLetter::tryFrom($antibot ?? '') === BooleanEnglishLetter::No;
+    $useAntibot = $prefs['feature_antibot'] == 'y' && ! $disableAntibotForThisForm;
     if (! is_null($fields)) {
         $fields = array_filter((array) $fields);
     }
@@ -1225,7 +1240,7 @@ function wikiplugin_tracker($data, $params)
             }
 
             // Check if antibot question was submited with the form (for anonymous users)
-            if ($prefs['feature_antibot'] == 'y' && empty($user) && ($registration !== BooleanEnglishLetter::Yes || $prefs["user_register_prettytracker"] != 'y')) {
+            if ($useAntibot && empty($user) && ($registration !== BooleanEnglishLetter::Yes || $prefs["user_register_prettytracker"] != 'y')) {
                 if (! $captchalib->validate()) {
                     // if antibot question was not submited during the transaction, set error
                     if (! (isset($_SESSION[$transactionName]) && $_SESSION[$transactionName]['captchaValidated'])) {
@@ -1862,7 +1877,7 @@ function wikiplugin_tracker($data, $params)
                 $customvalidation .= '} } } ';
                 $customvalidation .= '}, ';
                 $customvalidation_m .= 'name: { required: "' . tra("This field is required") . '"}, ';
-                if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
+                if ($useAntibot && extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
                     // antibot validation
                     $customvalidation .= '"captcha[input]": { ';
                     $customvalidation .= 'required: true, ';
@@ -2268,14 +2283,14 @@ FILL;
             $back .= '    </div>';
             $back .= '</div>';
         }
-        if ($prefs['feature_antibot'] == 'y' && (empty($user) || (! empty($user) && isset($_REQUEST['error']) && $_REQUEST['error'] == 'y'))) {
+        if ($useAntibot && (empty($user) || (! empty($user) && isset($_REQUEST['error']) && $_REQUEST['error'] == 'y'))) {
             $smarty->assign('showantibot', true);
         }
 
         $smarty->assign('showmandatory', $showmandatory);
 
         if (
-            $prefs['feature_antibot'] == 'y' && empty($user)
+            $useAntibot && empty($user)
             && (is_null($transactionStep) || $transactionStep == 0)
             && BooleanEnglishLetter::tryFrom($params['formtag']) != BooleanEnglishLetter::No
             && ($registration !== BooleanEnglishLetter::Yes || $prefs["user_register_prettytracker"] != 'y')
