@@ -49,12 +49,18 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
 
 require_once 'tiki-setup.php';
 
-// --- Require authenticated user ---
-// tiki-setup_base.php sets $user from the Bearer token when TIKI_API is true.
-// Reject unauthenticated requests.
+// --- Require API tokens feature and authenticated user ---
 // Site closed check is handled by lib/setup/site_closed.php during bootstrap,
 // which returns a JSON error when TIKI_API is true.
-global $user;
+global $user, $prefs;
+if ($prefs['auth_api_tokens'] !== 'y') {
+    http_response_code(403);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'API access is not enabled.']);
+    exit(1);
+}
+
+// tiki-setup_base.php sets $user from the Bearer token when TIKI_API is true.
 if (empty($user)) {
     http_response_code(401);
     header('Content-Type: application/json');
@@ -68,7 +74,7 @@ if (empty($user)) {
 $sessionDir = TEMP_PATH . '/mcp-sessions';
 $sessionStore = new FileSessionStore($sessionDir);
 
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
 $wikiTools = new WikiTools($user, $clientIp);
 $server = TikiMcpServer::create('tiki-wiki', '1.0.0', [$wikiTools], $sessionStore);
 

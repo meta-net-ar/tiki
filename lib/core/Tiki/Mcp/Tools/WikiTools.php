@@ -10,7 +10,6 @@ namespace Tiki\Mcp\Tools;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Exception\ToolCallException;
 use Mcp\Schema\ToolAnnotations;
-use Tiki\Mcp\Context\TikiContext;
 
 /**
  * MCP tools for wiki page operations.
@@ -29,15 +28,13 @@ class WikiTools
         'hits_desc', 'hits_asc',
     ];
 
-    private TikiContext $context;
     private string $user;
     private string $ip;
 
-    public function __construct(string $user, string $ip = '0.0.0.0')
+    public function __construct(string $user, string $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;
-        $this->context = new TikiContext($user);
     }
 
     /**
@@ -69,7 +66,7 @@ class WikiTools
             $sort = 'lastModif_desc';
         }
 
-        $result = $this->context->captureOutput(
+        $result = $this->captureOutput(
             function () use ($offset, $limit, $sort, $search, $initial) {
                 return \TikiLib::lib('tiki')->list_pages($offset, $limit, $sort, $search, $initial, false);
             }
@@ -110,7 +107,7 @@ class WikiTools
     )]
     public function getPage(string $page): array
     {
-        $info = $this->context->captureOutput(
+        $info = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->get_page_info($page);
             }
@@ -157,7 +154,7 @@ class WikiTools
         $offset = max($offset, 0);
 
         // Verify page exists
-        $exists = $this->context->captureOutput(
+        $exists = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->page_exists($page);
             }
@@ -167,7 +164,7 @@ class WikiTools
             throw new ToolCallException("Page '$page' not found.");
         }
 
-        $history = $this->context->captureOutput(
+        $history = $this->captureOutput(
             function () use ($page, $offset, $limit) {
                 // fetchdata=false to skip content for each version (performance)
                 return \TikiLib::lib('hist')->get_page_history($page, false, $offset, $limit);
@@ -187,7 +184,7 @@ class WikiTools
         }
 
         // Get total count from page info
-        $pageInfo = $this->context->captureOutput(
+        $pageInfo = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->get_page_info($page, false);
             }
@@ -228,7 +225,7 @@ class WikiTools
                 return $this->unifiedSearch($query, $limit);
             } catch (\Throwable $e) {
                 // Fall through to list_pages fallback
-                fwrite(STDERR, "Unified search failed, falling back to list_pages: " . $e->getMessage() . "\n");
+                error_log("[MCP] Unified search failed, falling back to list_pages: " . $e->getMessage());
             }
         }
 
@@ -268,7 +265,7 @@ class WikiTools
         }
 
         // Check page doesn't already exist
-        $exists = $this->context->captureOutput(
+        $exists = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->page_exists($page);
             }
@@ -279,7 +276,7 @@ class WikiTools
         }
 
         // Create the page
-        $result = $this->context->captureOutput(
+        $result = $this->captureOutput(
             function () use ($page, $content, $comment, $description, $lang) {
                 return \TikiLib::lib('tiki')->create_page(
                     $page,
@@ -327,7 +324,7 @@ class WikiTools
         string $description = ''
     ): array {
         // Verify page exists
-        $info = $this->context->captureOutput(
+        $info = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->get_page_info($page, false);
             }
@@ -338,7 +335,7 @@ class WikiTools
         }
 
         // Update the page
-        $this->context->captureOutput(
+        $this->captureOutput(
             function () use ($page, $content, $comment, $description) {
                 \TikiLib::lib('tiki')->update_page(
                     $page,
@@ -359,7 +356,7 @@ class WikiTools
         );
 
         // Get updated version (skipCache=true to bypass stale cache after write)
-        $updatedInfo = $this->context->captureOutput(
+        $updatedInfo = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->get_page_info($page, false, true);
             }
@@ -386,7 +383,7 @@ class WikiTools
     public function deletePage(string $page): array
     {
         // Verify page exists
-        $exists = $this->context->captureOutput(
+        $exists = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->page_exists($page);
             }
@@ -397,7 +394,7 @@ class WikiTools
         }
 
         // Delete all versions
-        $result = $this->context->captureOutput(
+        $result = $this->captureOutput(
             function () use ($page) {
                 return \TikiLib::lib('tiki')->remove_all_versions($page);
             }
@@ -448,7 +445,7 @@ class WikiTools
      */
     private function listPagesSearch(string $query, int $limit): array
     {
-        $result = $this->context->captureOutput(
+        $result = $this->captureOutput(
             function () use ($query, $limit) {
                 return \TikiLib::lib('tiki')->list_pages(0, $limit, 'lastModif_desc', $query, '', false);
             }
@@ -470,5 +467,30 @@ class WikiTools
             'results' => $results,
             'total' => (int)($result['count'] ?? 0),
         ];
+    }
+
+    /**
+     * Execute a callable while capturing any stray output.
+     *
+     * TikiLib methods sometimes echo directly -- this prevents that
+     * from corrupting the JSON-RPC response body. Captured output
+     * is redirected to error_log for debugging.
+     *
+     * @template T
+     * @param callable(): T $fn
+     * @return T
+     */
+    private function captureOutput(callable $fn): mixed
+    {
+        ob_start();
+        try {
+            $result = $fn();
+        } finally {
+            $output = ob_get_clean();
+            if ($output !== '' && $output !== false) {
+                error_log('[MCP] Captured stray output: ' . $output);
+            }
+        }
+        return $result;
     }
 }
