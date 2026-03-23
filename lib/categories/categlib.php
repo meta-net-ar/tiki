@@ -556,7 +556,7 @@ class CategLib extends ObjectLib
         global $prefs;
         $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if (isset($info['type']) && $info['type'] == 'trackeritem') {
-            $trackerItem = Tracker_Item::fromId($catObjectId);
+            $trackerItem = Tracker_Item::fromId($info['itemId']);
             return $trackerItem->uncategorizeTrackerItem($categId);
         }
         $query = "delete from `tiki_category_objects` where `catObjectId`=? and `categId`=?";

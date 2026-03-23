@@ -612,6 +612,10 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     {
         return $this->trackerField->getOption($key, $default);
     }
+    public function singleValueOnly(): bool
+    {
+        return $this->trackerField->singleValueOnly();
+    }
 
     /**
      * Get the tracker definition object

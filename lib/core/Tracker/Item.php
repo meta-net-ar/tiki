@@ -756,14 +756,13 @@ class Tracker_Item
             }
             $field = $definition->getField($fieldIds[0]);
             $field_handler = $trklib->get_field_handler($field);
-            $fieldOptions = $field_handler->getOption('inputtype');
             $arrayItemValue = array_filter(explode(',', $trklib->get_item_value($trackerId, $this->getId(), $fieldIds[0]) ?? ''));
             /**
              * Check if the field can only receive one value; if so, insert the new value.
              * Otherwise, retrieve the field's previous values, add the new value, and update the field with all the values.
              */
             $newValue = $categId;
-            $singleValueOnly = isset($fieldOptions) && in_array($fieldOptions, ['d', 'radio']);
+            $singleValueOnly = $field_handler->singleValueOnly();
             if (! $singleValueOnly || count($arrayItemValue) > 1) {
                 array_push($arrayItemValue, $categId);
                 $newValue = implode(',', array_unique($arrayItemValue));
