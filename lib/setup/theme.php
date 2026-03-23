@@ -163,7 +163,7 @@ Sections::onSectionChange(function ($section) {
 
     //8) include optional Theme Customizer generated CSS if present
     if ($prefs['theme_customizer'] === 'y' && is_readable(THEME_CUSTOMIZER_GENERATED_CSS_PATH)) {
-        $headerlib->add_cssfile(THEME_CUSTOMIZER_GENERATED_CSS_PATH, 54);
+        $headerlib->add_cssfile(THEME_CUSTOMIZER_GENERATED_CSS_PATH . '?' . filemtime(THEME_CUSTOMIZER_GENERATED_CSS_PATH), 54);
     }
 
     if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {    // if favicons are disabled in preferences, skip the lot of it.

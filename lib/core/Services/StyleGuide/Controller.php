@@ -72,4 +72,21 @@ class Services_StyleGuide_Controller
         }
         return true;
     }
+
+    public function action_reset_generated_css($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin');
+
+        if (! file_exists(THEME_CUSTOMIZER_GENERATED_CSS_PATH)) {
+            Feedback::note(tr('No custom generated CSS file found.'));
+            return true;
+        }
+
+        if (file_put_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH, '') !== false) {
+            Feedback::success(tr('The custom generated CSS has been reset'));
+        } else {
+            Feedback::error(tr("Couldn't reset the custom generated CSS file. Check that themes/css/ is writable."));
+        }
+        return true;
+    }
 }
