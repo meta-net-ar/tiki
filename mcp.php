@@ -20,21 +20,19 @@
 use GuzzleHttp\Psr7\ServerRequest;
 use Mcp\Server\Session\FileSessionStore;
 use Mcp\Server\Transport\StreamableHttpTransport;
-use Tiki\Mcp\Auth\ApiTokenAuthProvider;
-use Tiki\Mcp\Auth\AuthenticationException;
 use Tiki\Mcp\Server as TikiMcpServer;
 use Tiki\Mcp\Tools\WikiTools;
 
-// --- Composer autoloader ---
-if (! include 'vendor_bundled/vendor/autoload.php') {
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Server configuration error.']);
-    exit(1);
-}
+// --- Bootstrap Tiki (API mode) ---
+// TIKI_API enables Bearer token auth in tiki-setup_base.php, which handles
+// token validation, REDIRECT_HTTP_AUTHORIZATION, OAuth JWT, hit tracking,
+// and permission context initialization via lib/setup/perms.php.
+define('TIKI_API', true);
 
-// --- Custom error handler: suppress stdout noise ---
-// Errors go to error_log, not the response body.
+// Stateless: no session cookies, no CSRF (same as tiki-api.php)
+ini_set('session.use_cookies', 0);
+
+// Custom error handler: suppress stdout noise so MCP JSON-RPC is not corrupted.
 set_error_handler(function (int $number, string $message, string $file, int $line): bool {
     if (0 === error_reporting()) {
         return true;
@@ -49,62 +47,27 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
     return true;
 });
 
-// --- Bootstrap Tiki ---
-$tikiReady = false;
-try {
-    $bypass_siteclose_check = true;
-    require_once 'tiki-setup.php';
+$bypass_siteclose_check = true;
+require_once 'tiki-setup.php';
 
-    if (! \Tiki\Installer\Installer::getInstance()->requiresUpdate()) {
-        $tikiReady = true;
-    }
-} catch (Throwable $e) {
-    error_log("MCP bootstrap error: " . $e->getMessage());
-}
-
-if (! $tikiReady) {
-    http_response_code(503);
+// --- Require authenticated user ---
+// tiki-setup_base.php sets $user from the Bearer token when TIKI_API is true.
+// Reject unauthenticated requests.
+global $user, $prefs;
+if (empty($user)) {
+    http_response_code(401);
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Service unavailable']);
+    echo json_encode(['error' => 'Authentication required. Use: Authorization: Bearer <token>']);
     exit(1);
 }
 
-// --- Respect site maintenance mode (#12) ---
-global $prefs;
+// --- Respect site maintenance mode ---
 if (! empty($prefs['site_closed']) && $prefs['site_closed'] === 'y') {
     http_response_code(503);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Site is in maintenance mode']);
     exit(1);
 }
-
-// --- Determine authenticated user ---
-// Requires a valid Bearer token from the Authorization header.
-// Tokens are validated against tiki_api_tokens table.
-
-// Apache CGI/FastCGI may place the Authorization header in REDIRECT_HTTP_AUTHORIZATION.
-// Replicate the same fix from tiki-setup_base.php to ensure token auth works in all configs.
-if (! empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-    $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-}
-
-$authProvider = new ApiTokenAuthProvider();
-try {
-    $asUser = $authProvider->authenticate([
-        'authorization' => $_SERVER['HTTP_AUTHORIZATION'] ?? '',
-    ]);
-} catch (AuthenticationException $e) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => $e->getMessage()]);
-    exit(1);
-}
-$permissionContext = new \Perms_Context($asUser);
-
-// --- Set $_SERVER defaults for TikiLib ---
-$_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/mcp.php';
-$_SERVER['SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? 'localhost';
-$_SERVER['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 // --- Build MCP server ---
 // FileSessionStore persists sessions across PHP requests (required for HTTP transport).
@@ -117,7 +80,7 @@ if (! is_dir($sessionDir)) {
 $sessionStore = new FileSessionStore($sessionDir);
 
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$wikiTools = new WikiTools($asUser, $clientIp);
+$wikiTools = new WikiTools($user, $clientIp);
 $server = TikiMcpServer::create('tiki-wiki', '1.0.0', [$wikiTools], $sessionStore);
 
 // --- Create PSR-7 request and run HTTP transport ---
