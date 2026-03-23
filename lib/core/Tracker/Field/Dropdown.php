@@ -167,7 +167,12 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
         if (! empty($requestData['other_' . $ins_id])) {
             $value = $requestData['other_' . $ins_id];
         } elseif (isset($requestData[$ins_id])) {
-            $value = implode(',', (array) $requestData[$ins_id]);
+            $value = implode(',', array_filter(
+                array_map('trim', (array) $requestData[$ins_id]),
+                static function ($val) {
+                    return $val !== '';
+                }
+            ));
         } elseif (isset($requestData[$ins_id . '_old'])) {
             $value = '';
         } else {
@@ -183,8 +188,19 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
 
     public function addValue($value)
     {
-        $existing = explode(',', $this->getValue());
-        if (! in_array($value, $existing)) {
+        $value = $this->resolveOptionValue($value);
+        $existing = array_filter(
+            array_map('trim', explode(',', (string) $this->getValue())),
+            static function ($v) {
+                return $v !== '';
+            }
+        );
+
+        if ($value === '') {
+            return implode(',', $existing);
+        }
+
+        if (! in_array($value, $existing, true)) {
             $existing[] = $value;
         }
         return implode(',', $existing);
@@ -192,11 +208,49 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
 
     public function removeValue($value)
     {
-        $existing = explode(',', $this->getValue());
-        $existing = array_filter($existing, function ($v) use ($value) {
-            return $v != $value;
+        $value = $this->resolveOptionValue($value);
+        $existing = array_filter(
+            array_map('trim', explode(',', (string) $this->getValue())),
+            static function ($v) {
+                return $v !== '';
+            }
+        );
+
+        if ($value === '') {
+            return implode(',', $existing);
+        }
+
+        $existing = array_filter($existing, static function ($v) use ($value) {
+            return $v !== $value;
         });
         return implode(',', $existing);
+    }
+
+    private function resolveOptionValue($value)
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        $options = $this->getPossibleItemValues();
+        if (isset($options[$value])) {
+            return $value;
+        }
+
+        foreach ($options as $key => $label) {
+            if ($label === $value) {
+                return (string) $key;
+            }
+        }
+
+        foreach ($options as $key => $label) {
+            if (strcasecmp((string) $label, $value) === 0) {
+                return (string) $key;
+            }
+        }
+
+        return $value;
     }
 
     public function renderInput($context = [])
