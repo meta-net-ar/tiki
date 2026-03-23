@@ -55,6 +55,11 @@ class ApiTokenAuthProvider implements AuthProviderInterface
             throw new AuthenticationException('API token has no associated user.');
         }
 
+        // Verify the token's user actually exists in Tiki
+        if (! \TikiLib::lib('user')->user_exists($token['user'])) {
+            throw new AuthenticationException('Authentication failed.');
+        }
+
         // Track token usage
         $apiTokenLib->hit($token);
 

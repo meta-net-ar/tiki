@@ -99,13 +99,6 @@ try {
     echo json_encode(['error' => $e->getMessage()]);
     exit(1);
 }
-
-if (! \TikiLib::lib('user')->user_exists($asUser)) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Authentication failed.']);
-    exit(1);
-}
 $permissionContext = new \Perms_Context($asUser);
 
 // --- Set $_SERVER defaults for TikiLib ---
