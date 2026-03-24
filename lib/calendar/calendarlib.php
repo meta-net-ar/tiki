@@ -177,6 +177,7 @@ class CalendarLib extends TikiLib
             $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
         }
         return  [
+            'timeFormat'       => $prefs['display_12hr_clock'] === 'y',
             'firstDayofWeek'   => 0,//$firstDayofWeek,
             'display_timezone' => $prefs['display_timezone'],
             'language'         => $prefs['language'],
