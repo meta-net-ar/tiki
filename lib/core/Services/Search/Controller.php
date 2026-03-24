@@ -253,6 +253,15 @@ class Services_Search_Controller
                 ];
                 if ($item['object_type'] == 'trackeritem') {
                     $transformed['status_icon'] = smarty_function_tracker_item_status_icon(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
+
+                    try {
+                        $popupContent = Services_Object_Controller::getTrackerItemPopupContent((int) $item['object_id']);
+                        if ($popupContent !== null) {
+                            $transformed['popup_content'] = $popupContent;
+                        }
+                    } catch (Exception $e) {
+                        trigger_error($e->getMessage(), E_USER_WARNING);
+                    }
                 }
                 return $transformed;
             });

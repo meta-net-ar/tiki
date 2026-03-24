@@ -1170,10 +1170,6 @@ function iconset_default()
                 'id' => 'skyatlas',
                 'prepend' => 'fab fa-'
             ],
-            'skype' => [
-                'id' => 'skype',
-                'prepend' => 'fab fa-'
-            ],
             'slack' => [
                 'id' => 'slack',
                 'prepend' => 'fab fa-'
@@ -4240,7 +4236,6 @@ function iconset_default()
             'sith',
             'sketch',
             'skyatlas',
-            'skype',
             'slack',
             'slack-hash',
             'slideshare',

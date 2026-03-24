@@ -140,8 +140,8 @@ function custom_error_handler($number, $message, $file, $line): void
 
     if ($error_is_enabled) {
         $exception = new ErrorException($message, 0, $number, $file, $line);
-        // Check if autoloader is available, then call TikiLib
-        if ($GLOBALS['_autoloaderIsAvailable']) {
+        // Check if autoloader is available, then call TikiLib if it has loaded properly
+        if ($GLOBALS['_autoloaderIsAvailable'] && is_callable('TikiLib::lib')) {
             TikiLib::lib('errortracking')->captureException($exception);
         }
         // Fatal Errors

@@ -383,7 +383,7 @@ $code-bg: #f9f2f4;
 $kbd-color: #ffffff;
 $kbd-bg: #333333;
 $pre-bg: #f5f5f5;
-$pre-color: $gray-800;
+$pre-color: var(--#{$prefix}body-color); // $gray-800;
 $pre-border-color: #cccccc;
 
 // Pills

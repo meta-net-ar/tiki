@@ -159,6 +159,12 @@ class ObjectLink extends Base
 
         $class = ' class="' . implode(' ', $classList) . '"';
 
+        // Add target attribute if specified
+        $targetAttribute = '';
+        if (! empty($params['target'])) {
+            $targetAttribute = ' target="' . smarty_modifier_escape($params['target']) . '"';
+        }
+
         if (! str_contains($escapedHref, '://')) {
             //$html = '<a href="' . $base_url . $escapedHref . '"' . $class . $titleAttribute . $metadata . '>' . $escapedText . '</a>';
             // When the link is created for a tiki page, then we do NOT want the baseurl included,
@@ -166,9 +172,9 @@ class ObjectLink extends Base
             // configured for teh ip adress we run our webserver.
             // Eaxmple: Fqdn = tiki.mydomain.com -> port forwarding/nat to: 192.168.1.110.
             // In this case links should NOT be generated as absolut urls pointing to  192.168.1.110 which would be the part of the baseUrl.
-            $html = '<a href="' . $escapedHref . '"' . $class . $titleAttribute . $metadata . '>' . $escapedText . '</a>';
+            $html = '<a href="' . $escapedHref . '"' . $class . $titleAttribute . $targetAttribute . $metadata . '>' . $escapedText . '</a>';
         } else {
-            $html = '<a rel="external" href="' . $escapedHref . '"' . $class . $titleAttribute . $metadata . '>' . $escapedText . '</a>';
+            $html = '<a rel="external" href="' . $escapedHref . '"' . $class . $titleAttribute . $targetAttribute . $metadata . '>' . $escapedText . '</a>';
         }
 
         $attributelib = \TikiLib::lib('attribute');

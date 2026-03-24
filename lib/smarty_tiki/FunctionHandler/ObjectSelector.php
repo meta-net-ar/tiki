@@ -55,20 +55,27 @@ class ObjectSelector extends Base
             'wildcard' => $prefs['tiki_object_selector_wildcardsearch'] ?? "",
         ];
 
-        // Handle reserved parameters
-        foreach (array_keys($arguments) as $var) {
-            if (isset($params["_$var"])) {
-                $arguments[$var] = $params["_$var"];
+        $filters = [];
+        foreach ($params as $key => $value) {
+            $argName = str_starts_with($key, '_') ? substr($key, 1) : null;
+            if ($argName && array_key_exists($argName, $arguments)) {
+                if ($argName === 'filter' && is_array($value)) {
+                    $arguments['filter'] = array_merge($arguments['filter'], $value);
+                } else {
+                    $arguments[$argName] = $value;
+                }
+            } else {
+                $filters[$key] = $value;
             }
-            unset($params["_$var"]);
         }
 
         if ($prefs['feature_search'] !== 'y') {
             if ($arguments['simplename'] && isset($arguments['simplevalue'])) {
-                if ($params['type'] === 'trackerfield' && $arguments['separator'] === ',') {
+                if (isset($filters['type']) && $filters['type'] === 'trackerfield' && $arguments['separator'] === ',') {
                     $help = tra('Comma-separated list of field IDs');
                 } else {
-                    $help = tr('%0 list separated with "%1"', ucfirst($params['type']), $arguments['separator']);
+                    $type = $filters['type'] ?? tr('Object');
+                    $help = tr('%0 list separated with "%1"', ucfirst($type), $arguments['separator']);
                 }
                 return "<input type='text' name='{$arguments['simplename']}' value='{$arguments['simplevalue']}' size='50'>" .
                     "<div class='form-text'>" . $help . "</div>";
@@ -84,11 +91,7 @@ class ObjectSelector extends Base
             $arguments['simpleid'] = 'object_selector_' . ++$uniqid;
         }
 
-        if ($arguments['filter']) {
-            $arguments['filter'] = array_merge($arguments['filter'], $params);
-        } else {
-            $arguments['filter'] = $params;
-        }
+        $arguments['filter'] = array_merge($arguments['filter'], $filters);
 
         if ($arguments['simplevalue'] && ! $arguments['value'] && isset($arguments['filter']['type'])) {
             $arguments['value'] = "{$arguments['filter']['type']}:{$arguments['simplevalue']}";
