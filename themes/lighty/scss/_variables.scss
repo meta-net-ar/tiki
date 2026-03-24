@@ -104,6 +104,8 @@ $form-feedback-invalid-color:       #D02536; // $danger !default;
 // Dropdowns
 $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
+$dropdown-dark-bg: #5c636b; // Added to lighten bg to increase contrast with accordion button bg in admin sidebar
+
 // Navs
 // Navbar
 $navbar-light-color:             #6E7481;
