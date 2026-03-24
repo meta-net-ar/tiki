@@ -14,9 +14,16 @@ use Mcp\Schema\ToolAnnotations;
 /**
  * MCP tools for wiki page operations.
  *
- * All tools use TikiLib/WikiLib service layer directly (in-process).
- * Permission checks happen automatically via Perms_Context set at bootstrap.
- * Output buffering wraps TikiLib calls to prevent stdout corruption.
+ * Most tools use the Services Broker to call wiki controller actions,
+ * inheriting permission checks, feature-flag guards (via setUp()),
+ * input sanitization (JitFilter), and cross-cutting concerns
+ * (multilingual, geolocation, categories, etc.).
+ *
+ * History and search use Services_Wiki_Utilities because no matching
+ * controller actions exist. A follow-up MR will add write methods to
+ * Utilities and migrate the controller to use them as well.
+ *
+ * Output buffering wraps all calls to prevent stdout corruption of JSON-RPC.
  */
 class WikiTools
 {
@@ -33,12 +40,27 @@ class WikiTools
 
     public function __construct(string $user, string $ip = '')
     {
+        // Verify the wiki feature is enabled. Broker-based tools get this
+        // check via the controller's setUp(), but Utilities-based tools
+        // (history, search) bypass the controller entirely.
+        global $prefs;
+        if (empty($prefs['feature_wiki']) || $prefs['feature_wiki'] !== 'y') {
+            throw new \RuntimeException('Wiki feature is not enabled.');
+        }
+
         $this->user = $user;
         $this->ip = $ip;
     }
 
+    // ──────────────────────────────────────────────────────────────────────
+    // Read tools
+    // ──────────────────────────────────────────────────────────────────────
+
     /**
      * List wiki pages with optional filtering and pagination.
+     *
+     * Uses the broker to call Services_Wiki_Controller::action_pages(),
+     * which checks Perms::get()->view and returns list_pages() data.
      *
      * @param string $search  Search term to filter page names (optional)
      * @param int    $offset  Pagination offset (default: 0)
@@ -66,11 +88,13 @@ class WikiTools
             $sort = 'lastModif_desc';
         }
 
-        $result = $this->captureOutput(
-            function () use ($offset, $limit, $sort, $search, $initial) {
-                return \TikiLib::lib('tiki')->list_pages($offset, $limit, $sort, $search, $initial, false);
-            }
-        );
+        $result = $this->brokerCall('wiki', 'pages', [
+            'offset' => $offset,
+            'maxRecords' => $limit,
+            'sortMode' => $sort,
+            'find' => $search,
+            'initial' => $initial,
+        ]);
 
         $pages = [];
         if (! empty($result['data'])) {
@@ -97,6 +121,10 @@ class WikiTools
     /**
      * Get full page content (raw wiki syntax) and metadata.
      *
+     * Uses the broker to call Services_Wiki_Controller::action_get_page()
+     * with raw=1, which returns raw wiki syntax instead of parsed HTML.
+     * The controller handles permission checks and feature-flag guards.
+     *
      * @param string $page Page name (required)
      * @return array Page content and metadata
      */
@@ -107,33 +135,31 @@ class WikiTools
     )]
     public function getPage(string $page): array
     {
-        $info = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->get_page_info($page);
-            }
-        );
-
-        if (! $info) {
-            throw new ToolCallException("Page '$page' not found.");
-        }
+        $result = $this->brokerCall('wiki', 'get_page', [
+            'page' => $page,
+            'raw' => 1,
+        ]);
 
         return [
-            'pageName' => $info['pageName'],
-            'data' => $info['data'] ?? '',
-            'description' => $info['description'] ?? '',
-            'lastModif' => (int)($info['lastModif'] ?? 0),
-            'user' => $info['user'] ?? '',
-            'creator' => $info['creator'] ?? '',
-            'version' => (int)($info['version'] ?? 0),
-            'lang' => $info['lang'] ?? '',
-            'is_html' => (bool)($info['is_html'] ?? false),
-            'page_size' => (int)($info['page_size'] ?? 0),
-            'comment' => $info['comment'] ?? '',
+            'pageName' => $result['pageName'],
+            'data' => $result['data'] ?? '',
+            'description' => $result['description'] ?? '',
+            'lastModif' => (int)($result['lastModif'] ?? 0),
+            'user' => $result['user'] ?? '',
+            'creator' => $result['creator'] ?? '',
+            'version' => (int)($result['version'] ?? 0),
+            'lang' => $result['lang'] ?? '',
+            'is_html' => (bool)($result['is_html'] ?? false),
+            'page_size' => (int)($result['page_size'] ?? 0),
+            'comment' => $result['comment'] ?? '',
         ];
     }
 
     /**
      * Get version history for a wiki page.
+     *
+     * Uses Services_Wiki_Utilities::getPageHistory() -- no controller action exists.
+     * Permission check is explicit since this bypasses the controller.
      *
      * @param string $page   Page name (required)
      * @param int    $offset Pagination offset (default: 0)
@@ -153,47 +179,22 @@ class WikiTools
         $limit = min(max($limit, 1), 50);
         $offset = max($offset, 0);
 
-        // Verify page exists
-        $exists = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->page_exists($page);
-            }
-        );
+        // Explicit permission check -- no controller in the path
+        $perms = \Perms::get('wiki page', $page);
+        if (! $perms->view) {
+            throw new ToolCallException("Permission denied: cannot view '$page'.");
+        }
 
-        if (! $exists) {
+        $utilities = new \Services_Wiki_Utilities();
+        try {
+            $result = $this->captureOutput(fn() => $utilities->getPageHistory($page, $offset, $limit));
+        } catch (\Services_Exception_NotFound $e) {
             throw new ToolCallException("Page '$page' not found.");
         }
 
-        $history = $this->captureOutput(
-            function () use ($page, $offset, $limit) {
-                // fetchdata=false to skip content for each version (performance)
-                return \TikiLib::lib('hist')->get_page_history($page, false, $offset, $limit);
-            }
-        );
-
-        $versions = [];
-        if (! empty($history)) {
-            foreach ($history as $entry) {
-                $versions[] = [
-                    'version' => (int)($entry['version'] ?? 0),
-                    'lastModif' => (int)($entry['lastModif'] ?? 0),
-                    'user' => $entry['user'] ?? '',
-                    'comment' => $entry['comment'] ?? '',
-                ];
-            }
-        }
-
-        // Get total count from page info
-        $pageInfo = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->get_page_info($page, false);
-            }
-        );
-        $total = (int)($pageInfo['version'] ?? count($versions));
-
         return [
-            'versions' => $versions,
-            'total' => $total,
+            'versions' => $result['versions'],
+            'total' => $result['total'],
             'offset' => $offset,
             'limit' => $limit,
         ];
@@ -202,8 +203,8 @@ class WikiTools
     /**
      * Full-text search across wiki pages.
      *
-     * Uses Tiki's unified search if available, falls back to list_pages with
-     * the find parameter for basic title/content matching.
+     * Uses Services_Wiki_Utilities::searchPages() -- no controller action exists.
+     * Search results are filtered by Tiki's search layer which respects permissions.
      *
      * @param string $query Search query string (required)
      * @param int    $limit Maximum results to return (default: 10, max: 50)
@@ -218,25 +219,22 @@ class WikiTools
     {
         $limit = min(max($limit, 1), 50);
 
-        // Try unified search if available
-        global $prefs;
-        if (! empty($prefs['feature_search']) && $prefs['feature_search'] === 'y') {
-            try {
-                return $this->unifiedSearch($query, $limit);
-            } catch (\Throwable $e) {
-                // Fall through to list_pages fallback
-                error_log("[MCP] Unified search failed, falling back to list_pages: " . $e->getMessage());
-            }
-        }
-
-        // Fallback: use list_pages with find parameter
-        return $this->listPagesSearch($query, $limit);
+        $utilities = new \Services_Wiki_Utilities();
+        return $this->captureOutput(fn() => $utilities->searchPages($query, $limit));
     }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Write tools -- via Services Broker (controller handles permissions)
+    // ──────────────────────────────────────────────────────────────────────
 
     /**
      * Create a new wiki page.
      *
-     * @param string $page        Page name (required, max 158 characters)
+     * Uses the broker to call Services_Wiki_Controller::action_create_update_page(),
+     * which checks permissions and handles multilingual, geolocation, and other
+     * cross-cutting concerns.
+     *
+     * @param string $page        Page name (required)
      * @param string $content     Page content in wiki syntax (required)
      * @param string $comment     Creation comment (optional)
      * @param string $description Page description (optional)
@@ -255,46 +253,27 @@ class WikiTools
         string $description = '',
         string $lang = ''
     ): array {
-        // Validate page name length
-        if (strlen($page) > 158) {
-            throw new ToolCallException("Page name must be 158 characters or less (got " . strlen($page) . ").");
-        }
-
         if (trim($page) === '') {
             throw new ToolCallException("Page name cannot be empty.");
         }
 
-        // Check page doesn't already exist
-        $exists = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->page_exists($page);
-            }
-        );
-
+        // Intentional behavior difference from the web UI: the controller's
+        // create_update_page with create=1 does not check for existing pages
+        // and would silently overwrite. For an AI-driven tool, an explicit
+        // "already exists" error is safer than silent overwrite.
+        $exists = $this->captureOutput(fn() => \TikiLib::lib('tiki')->page_exists($page));
         if ($exists) {
             throw new ToolCallException("Page '$page' already exists. Use wiki_update_page to modify it.");
         }
 
-        // Create the page
-        $result = $this->captureOutput(
-            function () use ($page, $content, $comment, $description, $lang) {
-                return \TikiLib::lib('tiki')->create_page(
-                    $page,
-                    0,              // hits
-                    $content,
-                    time(),         // lastModif
-                    $comment,
-                    $this->user,
-                    $this->ip,       // ip
-                    $description,
-                    $lang
-                );
-            }
-        );
-
-        if (! $result) {
-            throw new ToolCallException("Failed to create page '$page'.");
-        }
+        $result = $this->brokerCall('wiki', 'create_update_page', [
+            'create' => 1,
+            'pageName' => $page,
+            'data' => $content,
+            'comment' => $comment,
+            'description' => $description,
+            'lang' => $lang,
+        ]);
 
         return [
             'pageName' => $page,
@@ -306,10 +285,13 @@ class WikiTools
     /**
      * Update an existing wiki page's content.
      *
+     * Uses the broker to call Services_Wiki_Controller::action_create_update_page(),
+     * which checks permissions and handles cross-cutting concerns.
+     *
      * @param string $page        Page name (required)
      * @param string $content     New page content in wiki syntax (required)
      * @param string $comment     Edit comment describing the change (optional)
-     * @param string $description Updated page description (optional, null keeps existing)
+     * @param string $description Updated page description (optional, empty keeps existing)
      * @return array Updated page info
      */
     #[McpTool(
@@ -323,54 +305,29 @@ class WikiTools
         string $comment = '',
         string $description = ''
     ): array {
-        // Verify page exists
-        $info = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->get_page_info($page, false);
-            }
-        );
+        $result = $this->brokerCall('wiki', 'create_update_page', [
+            'create' => 0,
+            'page' => $page,
+            'data' => $content,
+            'comment' => $comment,
+            'description' => $description,
+        ]);
 
-        if (! $info) {
-            throw new ToolCallException("Page '$page' not found. Use wiki_create_page to create it.");
-        }
-
-        // Update the page
-        $this->captureOutput(
-            function () use ($page, $content, $comment, $description) {
-                \TikiLib::lib('tiki')->update_page(
-                    $page,
-                    $content,
-                    $comment,
-                    $this->user,
-                    $this->ip,                               // ip
-                    $description ?: null,                    // null keeps existing
-                    0,                                       // is_minor
-                    '',                                      // lang (keep existing)
-                    null,                                    // is_html (keep existing)
-                    null,                                    // hash
-                    null,                                    // saveLastModif (use current time)
-                    '',                                      // wysiwyg (keep existing)
-                    ''                                       // wiki_authors_style
-                );
-            }
-        );
-
-        // Get updated version (skipCache=true to bypass stale cache after write)
-        $updatedInfo = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->get_page_info($page, false, true);
-            }
-        );
+        $info = $result['info'] ?? [];
 
         return [
             'pageName' => $page,
-            'version' => (int)($updatedInfo['version'] ?? 0),
+            'version' => (int)($info['version'] ?? 0),
             'updated' => true,
         ];
     }
 
     /**
      * Delete a wiki page and all its versions.
+     *
+     * Uses the broker to call Services_Wiki_Controller::action_remove_pages(),
+     * which checks per-page remove permissions via Perms::simpleFilter().
+     * CSRF is automatically bypassed because TIKI_API=true (tikiaccesslib.php:459).
      *
      * @param string $page Page name to delete (required)
      * @return array Deletion confirmation
@@ -382,27 +339,17 @@ class WikiTools
     )]
     public function deletePage(string $page): array
     {
-        // Verify page exists
-        $exists = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->page_exists($page);
-            }
-        );
-
+        // Verify page exists first for a clear error message
+        $exists = $this->captureOutput(fn() => \TikiLib::lib('tiki')->page_exists($page));
         if (! $exists) {
             throw new ToolCallException("Page '$page' not found.");
         }
 
-        // Delete all versions
-        $result = $this->captureOutput(
-            function () use ($page) {
-                return \TikiLib::lib('tiki')->remove_all_versions($page);
-            }
-        );
-
-        if (! $result) {
-            throw new ToolCallException("Failed to delete page '$page'.");
-        }
+        $this->brokerCallConfirmed('wiki', 'remove_pages', [
+            'items' => [$page],
+            'version' => 'all',
+            'one' => false,
+        ]);
 
         return [
             'pageName' => $page,
@@ -410,63 +357,65 @@ class WikiTools
         ];
     }
 
+    // ──────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────────────────────────────────
+
     /**
-     * Perform unified search for wiki pages.
+     * Call a controller action via the Services Broker, converting exceptions.
+     *
+     * Uses ServiceLib->internal() which calls Broker->internal() to invoke
+     * the action method directly, returning the raw array output without
+     * rendering. Input is automatically wrapped in JitFilter by the broker.
+     *
+     * @param string $controller Controller name (e.g. 'wiki')
+     * @param string $action     Action name (e.g. 'pages', 'create_update_page')
+     * @param array  $params     Parameters for the action
+     * @return mixed Raw return value from the controller action
+     * @throws ToolCallException on permission denied, not found, or other service errors
      */
-    private function unifiedSearch(string $query, int $limit): array
+    private function brokerCall(string $controller, string $action, array $params): mixed
     {
-        $searchlib = \TikiLib::lib('unifiedsearch');
-        $index = $searchlib->getIndex();
-
-        $searchQuery = new \Search_Query($query);
-        $searchQuery->filterType('wiki page');
-        $searchQuery->setRange(0, $limit);
-
-        $searchResult = $searchQuery->search($index);
-
-        $results = [];
-        foreach ($searchResult as $entry) {
-            $results[] = [
-                'pageName' => $entry['title'] ?? '',
-                'description' => $entry['description'] ?? '',
-                'lastModif' => (int)($entry['modification_date'] ?? 0),
-                'relevance' => $entry['score'] ?? null,
-            ];
+        try {
+            return $this->captureOutput(
+                fn() => \TikiLib::lib('service')->internal($controller, $action, $params)
+            );
+        } catch (\Services_Exception_Denied $e) {
+            throw new ToolCallException("Permission denied: " . $e->getMessage());
+        } catch (\Services_Exception_NotFound $e) {
+            throw new ToolCallException($e->getMessage());
+        } catch (\Services_Exception $e) {
+            throw new ToolCallException("Error: " . $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log('[MCP] Unexpected exception in brokerCall: ' . get_class($e) . ': ' . $e->getMessage());
+            throw new ToolCallException("An unexpected error occurred.");
         }
-
-        return [
-            'results' => $results,
-            'total' => $searchResult->count(),
-        ];
     }
 
     /**
-     * Fallback search using list_pages with find parameter.
+     * Call a controller action that uses the two-pass confirmation modal.
+     *
+     * Injects $_POST['confirmForm'] = 'y' to skip the modal and proceed
+     * directly to the action. This is the same mechanism ApiBridge uses
+     * (ApiBridge.php:36-38). CSRF is bypassed because TIKI_API=true
+     * (tikiaccesslib.php:459). State is restored in a finally block.
+     *
+     * @param string $controller Controller name
+     * @param string $action     Action name
+     * @param array  $params     Parameters for the action
+     * @return mixed Raw return value from the controller action
+     * @throws ToolCallException on error
      */
-    private function listPagesSearch(string $query, int $limit): array
+    private function brokerCallConfirmed(string $controller, string $action, array $params): mixed
     {
-        $result = $this->captureOutput(
-            function () use ($query, $limit) {
-                return \TikiLib::lib('tiki')->list_pages(0, $limit, 'lastModif_desc', $query, '', false);
-            }
-        );
-
-        $results = [];
-        if (! empty($result['data'])) {
-            foreach ($result['data'] as $page) {
-                $results[] = [
-                    'pageName' => $page['pageName'],
-                    'description' => $page['description'] ?? '',
-                    'lastModif' => (int)($page['lastModif'] ?? 0),
-                    'relevance' => null,
-                ];
-            }
+        $savedPost = $_POST ?? [];
+        $_POST = $_POST ?? [];
+        $_POST['confirmForm'] = 'y';
+        try {
+            return $this->brokerCall($controller, $action, $params);
+        } finally {
+            $_POST = $savedPost;
         }
-
-        return [
-            'results' => $results,
-            'total' => (int)($result['count'] ?? 0),
-        ];
     }
 
     /**

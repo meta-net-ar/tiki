@@ -72,7 +72,9 @@ class Services_Wiki_Controller
     public function action_get_page($input)
     {
         $page = $input->page->text();
-        $info = TikiLib::lib('wiki')->get_page_info($page);
+        // skipCache=true to avoid stale reads within the same PHP request
+        // (e.g. MCP or API where multiple operations share a process).
+        $info = TikiLib::lib('wiki')->get_page_info($page, true, true);
         if (! $info) {
             throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
         }
@@ -80,6 +82,12 @@ class Services_Wiki_Controller
         $perms = Perms::get('wiki page', $page);
         if (! $perms->view) {
             throw new Services_Exception_Denied();
+        }
+
+        // raw=1: return raw wiki syntax for programmatic consumers (MCP, API).
+        // Default behavior (no raw param): return parsed HTML for web UI.
+        if ($input->raw->int()) {
+            return $info;
         }
 
         $canBeRefreshed = false;

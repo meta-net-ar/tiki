@@ -34,10 +34,17 @@ class WikiToolsTest extends \TikiTestCase
     {
         parent::setUpBeforeClass();
 
-        // Set $_SERVER defaults that TikiLib methods expect
+        // Define TIKI_API if not already set -- needed for broker calls
+        // (CSRF bypass and isActionPost checks reference this constant)
+        if (! defined('TIKI_API')) {
+            define('TIKI_API', true);
+        }
+
+        // Set $_SERVER defaults that TikiLib methods and broker expect
         $_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/test';
         $_SERVER['SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? 'localhost';
         $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $_SERVER['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'POST';
 
         // Save original global state
         global $user, $prefs;
@@ -47,6 +54,9 @@ class WikiToolsTest extends \TikiTestCase
         // Set global user context (mirrors mcp.php bootstrap)
         $user = 'admin';
         self::$permContext = new \Perms_Context('admin');
+
+        // Ensure wiki feature is enabled (WikiTools constructor checks this)
+        $prefs['feature_wiki'] = 'y';
 
         // Disable unified search so wiki_search uses list_pages fallback.
         // Unified search index won't have just-created test pages.
@@ -121,7 +131,7 @@ class WikiToolsTest extends \TikiTestCase
     public function testCreatePageNameTooLongFails(): void
     {
         $this->expectException(ToolCallException::class);
-        $this->expectExceptionMessage('158 characters');
+        $this->expectExceptionMessage('158');
         self::$tools->createPage(str_repeat('A', 159), 'content');
     }
 
@@ -177,7 +187,7 @@ class WikiToolsTest extends \TikiTestCase
     public function testUpdatePageNotFoundFails(): void
     {
         $this->expectException(ToolCallException::class);
-        $this->expectExceptionMessage('not found');
+        $this->expectExceptionMessage('Not found');
         self::$tools->updatePage('NonExistentPage_' . uniqid(), 'content');
     }
 
