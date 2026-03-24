@@ -26,7 +26,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
             $this->setupWikiJs();
         }
 
-        TikiLib::lib('header')->add_js_module('import { handRecordingTypeInputsState } from "@jquery-tiki/tracker-fields/files"; window.handRecordingTypeInputsState = handRecordingTypeInputsState;');
+        TikiLib::lib('header')->add_js_module('import { handRecordingTypeInputsState } from "@tiki/editor-toolbar/fileRecording"; window.handRecordingTypeInputsState = handRecordingTypeInputsState;');
     }
 
     private function setupWikiJs()
