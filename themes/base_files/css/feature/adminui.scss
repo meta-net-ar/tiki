@@ -35,10 +35,6 @@ body.tiki-admin {
     border: inherit;
 }
 
-.tiki-admin .container.container-std .col1 {
-    padding-left: 0;
-}
-
 .tiki-admin .top_modules .box-login_box {
     padding: 0;
 }
@@ -831,7 +827,7 @@ body.tiki-admin .container.container-std {
     .tiki-admin.uab .bottom_modules,
     .tiki-admin.uab:not(.fixed_width) #tikifeedback,
     .tiki-admin.uab:not(.fixed_width) .admin-content {
-        padding-left: 1rem; // Standard mobile content inset (16px)
+        padding-left: 0 !important;
     }
 
     // Dropdown when open
