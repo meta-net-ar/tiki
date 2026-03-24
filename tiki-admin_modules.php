@@ -62,6 +62,8 @@ $modlib = TikiLib::lib('mod');
 $menulib = TikiLib::lib('menu');
 $tikilib = TikiLib::lib('tiki');
 
+$modlib->setModuleAssignmentMode(true);
+
 $userHasAssignedModules = $prefs['user_assigned_modules'] === 'y'
     && TikiLib::lib('usermodules')->user_has_assigned_modules($user);
 

@@ -13,7 +13,7 @@ class InlineAudioPlayer extends \Smarty\FunctionHandler\Base
 {
     public function handle($params, \Smarty\Template $template)
     {
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/files";');
+        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tiki-inline_audio_player";');
         $icon = smarty_function_icon(['name' => 'play'], $template);
         $pauseIcon = smarty_function_icon(['name' => 'pause', 'size' => 1], $template);
         $stopIcon = smarty_function_icon(['name' => 'xmark', 'size' => 1], $template);

@@ -162,7 +162,7 @@ $dropdown-link-color:               $dropdown-color; // var(--#{$prefix}link-col
 $dropdown-link-active-bg:           $component-active-bg; // default
 
 $dropdown-dark-color:               $gray-300; // default
-$dropdown-dark-bg:                  $gray-800; // default
+$dropdown-dark-bg:                  $gray-700; // lightened from default for better contrast vs accordion buttons in admin sidebar
 $dropdown-dark-border-color:        $dropdown-border-color; // default
 $dropdown-dark-divider-bg:          $dropdown-divider-bg; // default
 $dropdown-dark-box-shadow:          null; // default
