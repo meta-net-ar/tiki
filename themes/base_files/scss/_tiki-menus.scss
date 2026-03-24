@@ -15,7 +15,7 @@
 }
 
 // Align the various width icons and the menu option text labels nicely
-.navbar-nav .nav-item > .nav-link .icon {
+.navbar-nav .nav-item>.nav-link .icon {
     min-width: var(--bs-gutter-x);
     text-align: center;
 }
@@ -31,27 +31,27 @@
     right: 10px; */
 }
 
-// Make Smartmenus dropdowns open on top of, not under, other navbars
+// Stacking Layer Isolation:
+// Ensures dropdowns (9999) appear over fixed headers while keeping 
+// the navbar container at its natural stacking level to respect sidebars.
 .tiki .sm-navbar {
     --sm-navbar-z-index: inherit !important;
+
+    .sm-sub {
+        z-index: 9999;
+    }
 }
 
-// SmartMenus 2.x lacks the legacy javascript-driven scroll arrows.
-// This allows dropdowns to naturally scroll if they exceed the viewport.
-// Note: Offset 120px = ~70px (common header height) + ~50px (mobile browser UI buffer).
-// These values are based on standard Bootstrap navbar heights and mobile safe area insets.
-$sm-sub-top-offset: 70px;    // Safe distance from top to avoid covering the navbar
-$sm-sub-bottom-buffer: 50px; // Safety buffer at bottom to clear browser toolbars
+// Dropdown Vertical Reachability:
+// Implements a viewport-relative max-height to ensure long menus remain 
+// scrollable and accessible, especially in fixed-header layouts.
+$sm-sub-top-offset: 70px;    // Estimated header height
+$sm-sub-bottom-buffer: 120px; // Safety margin for viewport edges
+$sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
 
 .tiki .sm-navbar .sm-sub {
-    max-height: calc(100vh - (#{$sm-sub-top-offset} + #{$sm-sub-bottom-buffer}));
+    max-height: $sm-sub-max-height;
     overflow-y: auto;
-
-    // On small screens, we allow the menu to cover the header to maximize available scroll area,
-    // keeping only the mandatory bottom buffer to clear system UI navigation elements.
-    @media (max-width: 767.98px) {
-        max-height: calc(100vh - #{$sm-sub-bottom-buffer});
-    }
 }
 
 /* Smartmenus navbars (Megamenu static) */
