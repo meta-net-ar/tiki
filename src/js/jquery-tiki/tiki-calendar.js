@@ -233,7 +233,7 @@ $.fn.setupEventCalendar = function (
                     calendarContainer[0].changeView("timeGridDay", info.dateStr);
                 } else {
                     let $this = $(info.dayEl).tikiModal(" ");
-                    const countCals = $("#filtercal ul li").length;
+                    const countCals = $(".filtercal ul li").length;
                     if (countCals >= 1 || targetId != "calendar") {
                         $.openModal({
                             title: tr("New event"),
