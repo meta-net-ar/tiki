@@ -2095,7 +2095,7 @@ function wikiplugin_tracker($data, $params)
                     } else {
                         $mand = ($isFieldMandatory($f)) ? "&nbsp;<strong class='mandatory_star text-danger tips' title=':" . tra("This field is mandatory") . "'>*</strong>&nbsp;" : '';
 
-                        if (isset($showfielddesc) && $showfielddesc === 'y' && ! empty($f['description'])) {
+                        if (isset($showfieldsdesc) && $showfieldsdesc === 'y' && ! empty($f['description'])) {
                             $desc = $f['descriptionIsParsed'] == 'y' ? TikiLib::lib('parser')->parse_data($f['description']) : htmlspecialchars(tra($f['description']));
                             $desc = '<div class="trackerplugindesc">' . $desc . '</div>';
                         } else {
