@@ -104,6 +104,14 @@ function wikiplugin_convene_info(): array
                 'filter' => 'datetime',
                 'default' => '',
             ],
+            'tieextendminutes' => [
+                'required' => false,
+                'name' => tra('Tie extension (minutes)'),
+                'description' => tra('When there is a tie at lock time, extend voting by this many minutes, capped to remain before the earliest proposed date.'),
+                'since' => '30.0',
+                'filter' => 'digits',
+                'default' => 0,
+            ],
             'locked' => [
                 'required' => false,
                 'name' => tra('Locked'),
@@ -353,12 +361,34 @@ function wikiplugin_convene($data, $params): string
         }
         $lockDate = new TikiDate();
         $lockDate->setDate($params['autolock']);
+        $effectiveLockDate = clone $lockDate;
+        $extendedByTie = false;
 
-        if ($lockDate < $tikiDate) {
+        $tieExtendMinutes = (int) ($params['tieextendminutes'] ?? 0);
+        $hasTie = count($topVoteStamps) > 1;
+
+        // Extend only once lock time has been reached and only if a tie still exists.
+        if ($tieExtendMinutes > 0 && $hasTie && $lockDate <= $tikiDate && ! empty($data)) {
+            $earliestProposedStamp = min(array_keys($data));
+            $extensionSafetySeconds = 300; // "a bit" before the first possible time
+            $latestAllowedLockStamp = $earliestProposedStamp - $extensionSafetySeconds;
+
+            if ($latestAllowedLockStamp > $lockDate->getTime()) {
+                $extendedLockStamp = $lockDate->getTime() + ($tieExtendMinutes * 60);
+                $effectiveLockDate->setDate(min($extendedLockStamp, $latestAllowedLockStamp));
+                $extendedByTie = $effectiveLockDate > $lockDate;
+            }
+        }
+
+        if ($effectiveLockDate < $tikiDate) {
             $params['locked'] = 'y';
-            $autolockMessage = tr('Voting ended: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($params['autolock']));
+            $autolockMessage = tr('Voting ended: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($effectiveLockDate->getTime()));
         } else {
-            $autolockMessage = tr('Voting ends: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($params['autolock']));
+            if ($extendedByTie) {
+                $autolockMessage = tr('Voting extended due to tie. New end: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($effectiveLockDate->getTime()));
+            } else {
+                $autolockMessage = tr('Voting ends: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($effectiveLockDate->getTime()));
+            }
         }
     }
 
@@ -366,6 +396,9 @@ function wikiplugin_convene($data, $params): string
 
     // perms for this object
     $currentObject = current_object();
+    if (! empty($currentObject['type']) && $currentObject['type'] === 'wiki page' && ! empty($currentObject['object'])) {
+        $params['page'] = $currentObject['object'];
+    }
     $perms = Perms::get($currentObject);
     $canEdit = $perms->edit;
     if ($params['adminperms'] !== 'y') {
