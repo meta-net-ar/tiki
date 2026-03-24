@@ -1028,7 +1028,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         $itemId = 0;
         $util = new Services_Utilities();
@@ -1304,7 +1304,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $access->preventRedirect(true);

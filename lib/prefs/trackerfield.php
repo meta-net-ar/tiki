@@ -22,6 +22,5 @@ function prefs_trackerfield_list($partial = false)
             'help' => isset($type['help']) ? urlencode($type['help']) : false,
         ];
     }
-
     return $prefs;
 }

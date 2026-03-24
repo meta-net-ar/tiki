@@ -16,6 +16,7 @@ use Tiki\Sections;
 class ModLib extends TikiLib
 {
     public $pref_errors = [];
+    private bool $moduleAssignmentMode = false;
 
     // additional module zones added to this array will be exposed to tiki.tpl
     // TODO change modules user interface to enable additional zones
@@ -516,8 +517,16 @@ class ModLib extends TikiLib
     }
 
     /**
-     * @param $module
-     * @return bool
+     * Decide if a module should be shown in the current request context.
+     *
+     * Applies module-level preferences, unified admin backend rules and
+     * various visibility constraints (language, section, page, groups, etc.).
+     * When the unified admin backend is enabled, non-admin modules are
+     * normally hidden on control panel pages. Module assignment mode can
+     * override this so modules can be displayed in the site layout context.
+     *
+     * @param array $module tiki_modules row with parsed params
+     * @return bool true if the module should be displayed
      */
     public function filter_active_module($module)
     {
@@ -533,13 +542,21 @@ class ModLib extends TikiLib
                 return true;
             }
         }
-        // Load only the Unified Admin Interface (UAB) specific modules for Admins on admin panels/management pages
+        // Load only Unified Admin Interface specific modules for admins on admin panels.
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
         $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
 
-        if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
+        if (
+            $prefs['theme_unified_admin_backend'] === 'y'
+            && $isControlPanel
+            && ! $this->isModuleAssignmentMode()
+            && $module['position'] !== 'admin'
+            && ! $topLogin
+            && ! $footer
+            && ! $topQA
+        ) {
             return false;
         }
 
@@ -1247,10 +1264,14 @@ class ModLib extends TikiLib
     }
 
     /**
-     * Returns true if on the admin modules page
+     * Returns true when we are on the Admin Modules screen with permission.
      *
-     * @param bool $ifShowingHiddenModules   - check for $_REQUEST['show_hidden_modules'] as well
+     * Used to detect the modules management context (tiki-admin_modules.php).
+     * When $ifShowingHiddenModules is true, this only returns true if the
+     * request also has show_hidden_modules set, which some modules use to
+     * decide whether to render additional admin-only or placeholder output.
      *
+     * @param bool $ifShowingHiddenModules also require show_hidden_modules in the request
      * @return bool
      */
     public function is_admin_mode($ifShowingHiddenModules = false)
@@ -1263,6 +1284,30 @@ class ModLib extends TikiLib
         }
         return $ok && $tiki_p_admin_modules === 'y' &&
                 strpos($_SERVER["SCRIPT_NAME"], 'tiki-admin_modules.php') !== false;
+    }
+
+    /**
+     * Returns true when the current request is managing module assignments.
+     *
+     * This is used to override normal layout filtering so modules can be
+     * displayed in context on tiki-admin_modules.php.
+     *
+     * @return bool
+     */
+    public function isModuleAssignmentMode()
+    {
+        return $this->moduleAssignmentMode;
+    }
+
+    /**
+     * Enable or disable module assignment mode for the current request.
+     *
+     * @param bool $enabled
+     * @return void
+     */
+    public function setModuleAssignmentMode($enabled)
+    {
+        $this->moduleAssignmentMode = (bool) $enabled;
     }
 
     /**

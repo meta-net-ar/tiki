@@ -130,10 +130,17 @@ function wikiplugin_calendar($data, $params)
             $initialView = 'dayGridMonth';
     }
 
-    // Keep only calendars set as parameters
-    $rawCalsData = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $params['calIds']));
-    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawCalsData);
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
+
+    if (! empty($params['calIds'])) {
+        $calendarInitialParams['calendars'] = array_intersect_key(
+            $calendarInitialParams['calendars'],
+            array_flip($params['calIds'])
+        );
+    }
+
+    $smarty->assign('eventCalendarParams', $calendarInitialParams);
     $calendars = $calendarInitialParams['calendars'];
     // set up list of groups
     if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {

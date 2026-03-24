@@ -131,7 +131,7 @@ function wikiplugin_bigbluebutton($data, $params)
         $smarty->assign('bbb_params', Tiki_Security::get()->encode($params));
         $smarty->assign('meetId', $meeting);
         if ($prefs['bigbluebutton_use_iframe'] === 'y') {
-            $headerlib->add_js_module("import { setupBBBMeetingInIframe } from '@jquery-tiki/plugins/bigbluebutton'; setupBBBMeetingInIframe(" . json_encode($meeting) . ");");
+            $headerlib->add_js_module("import { setupBBBMeetingInIframe } from '@tiki/plugins/bigbluebutton'; setupBBBMeetingInIframe(" . json_encode($meeting) . ");");
         }
 
         if (! $bigbluebuttonlib->roomExists($meeting)) {

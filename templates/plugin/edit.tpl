@@ -12,7 +12,7 @@
     {function registerFieldDependency}
         <script type="module">
             {literal}
-                import {registerFieldDependency} from '@jquery-tiki/plugin-edit';
+                import registerFieldDependency from '@tiki/plugin-base/registerFieldDependency';
             {/literal}
             registerFieldDependency("{{$dependantFieldId}}", "{{$dependencyField}}", "{{$dependencyValue}}");
         </script>

@@ -345,6 +345,13 @@ check-external-links:
   script:
     - php -d display_errors=On doc/devtools/check_external_links.php
 
+check-security-static:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php -d display_errors=On doc/devtools/securitycheck.php
+
 translation:
   stage: tiki-check
   needs:
