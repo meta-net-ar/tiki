@@ -61,6 +61,8 @@ class Sections
     public const SECTION_SHEET = 'sheet';
     public const SECTION_CHAT = 'chat';
     public const SECTION_ADMIN_LAYOUT = 'admin layout';
+    // 'admin layout' section is used for admin-like pages that should not fully behave as control panel sections.
+    // It allows to reuse some of the admin templates and features without being in the actual admin section, which is useful for some tracker admin pages for example.
 
     private static $currentSection;
 

@@ -546,7 +546,7 @@ class ModLib extends TikiLib
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
 
         if (
             $prefs['theme_unified_admin_backend'] === 'y'
