@@ -324,6 +324,28 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         ]);
     }
 
+    /**
+     * Return a plain text
+     * Intended for simple contexts like titles (isMain)
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $emails = $this->getConfiguration('emails');
+        $output = "";
+        foreach ($this->getFolders() as $folder => $folderName) {
+            if (! empty($emails[$folder])) {
+                $output .= $folderName . ":\n";
+                foreach ($emails[$folder] as $email) {
+                    $output .= "- " . $email['subject'] . "\n";
+                }
+            }
+        }
+        return $output;
+    }
+
     public function handleSave($value, $oldValue)
     {
         $existing = json_decode($oldValue, true);
