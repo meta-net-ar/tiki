@@ -1,0 +1,25 @@
+{
+  "source_label": "Axet SMS Gate",
+  "subject_prefix": "[SMS Relay]",
+  "keywords": [
+    "visa direct",
+    "transaction",
+    "fraud",
+    "confirm",
+    "verification code",
+    "paypal",
+    "desjardins",
+    "td"
+  ],
+  "senders": [
+    "td",
+    "desjardins",
+    "paypal"
+  ],
+  "recipients": [
+    "ghufran@example.com",
+    "maxs@wikisuite.chat"
+  ],
+  "require_sender_match": false,
+  "require_keyword_match": true
+}

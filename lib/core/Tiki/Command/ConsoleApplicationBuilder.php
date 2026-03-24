@@ -217,6 +217,7 @@ class ConsoleApplicationBuilder
                 new Disable2FACommand(),
                 new ForumProcessInboundMail(),
                 new SecurityFileGenerateCommand(),
+                new SmsRelayCommand(),
                 ],
             ],[
             'condition' => 'checkIsOCRAvailable',
