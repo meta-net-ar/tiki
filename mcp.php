@@ -70,8 +70,8 @@ if (empty($user)) {
 
 // --- Build MCP server ---
 // FileSessionStore persists MCP protocol sessions across PHP requests
-// (required for HTTP transport). Uses Tiki's temp directory (TEMP_PATH).
-$sessionDir = TEMP_PATH . '/mcp-sessions';
+// (required for HTTP transport). Uses Tiki's configured temp directory.
+$sessionDir = $prefs['tmpDir'] . '/mcp-sessions';
 $sessionStore = new FileSessionStore($sessionDir);
 
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
