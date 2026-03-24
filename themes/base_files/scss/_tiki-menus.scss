@@ -45,8 +45,8 @@
 // Dropdown Vertical Reachability:
 // Implements a viewport-relative max-height to ensure long menus remain 
 // scrollable and accessible, especially in fixed-header layouts.
-$sm-sub-top-offset: 70px;    // Estimated header height
-$sm-sub-bottom-buffer: 120px; // Safety margin for viewport edges
+$sm-sub-top-offset: 70px; // Estimated header height
+$sm-sub-bottom-buffer: 50px; // Safety margin for viewport edges
 $sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
 
 .tiki .sm-navbar .sm-sub {
