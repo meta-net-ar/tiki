@@ -57,9 +57,9 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('not a valid url', 1));
     }
 
-    public function testStrictValidationDefaultsToEnabled(): void
+    public function testStrictValidationDefaultsToDisabled(): void
     {
-        $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('not a valid url'));
+        $this->assertTrue($this->invokeIsValid('not a valid url'));
     }
 
     public function testStrictValidationEnabledRejectsWindowsUncPath(): void
@@ -91,7 +91,7 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         $field->method('getValue')->willReturn('');
         $field->method('getOption')->willReturnCallback(function (string $name, $default = null) use ($strictValidation) {
             if ($name === 'strictValidation') {
-                return $strictValidation ?? 1;
+                return $strictValidation ?? 0;
             }
 
             return $default;
