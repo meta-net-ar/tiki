@@ -1,6 +1,6 @@
 <form method="get" action="{$filter_action|escape}" class="filter">
     <div class="mb-3 row">
-        <label class="col-sm-5 col-form-label" for="filter~content">{tr}Find{/tr}</label>
+        <label class="col-sm-5 col-form-label" for="filter~content">{tr}Search{/tr}</label>
         <div class="col-sm-7">
             <input type="search" name="filter~content" class="form-control" id="filter~content" value="{$filter_content|escape}">
         </div>
