@@ -70,30 +70,14 @@ if (empty($rawcals['data'])) {
     die;
 }
 
-$minHourOfDay = 12;
-$maxHourOfDay = 12;
-$calendars = [];
-$canEditAnything = false;
+$calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+$calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
+$smarty->assign('eventCalendarParams', $calendarInitialParams);
 
-foreach ($rawcals['data'] as $calendar) {
-    $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-
-    $calendars[$calendar['calendarId']] = $calendar;
-
-    // for week and day views
-    $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayHour = $startOfDayUnix / 3600;
-    $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-    $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-
-    $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayHour = $endOfDayUnix / 3600;
-    $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-    $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
-
-    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-}
-
+$calendars = $calendarInitialParams['calendars'];
+$canEditAnything = $calendarInitialParams['canEditAnything'];
+$minHourOfDay = $calendarInitialParams['minHourOfDay'];
+$maxHourOfDay = $calendarInitialParams['maxHourOfDay'];
 $rawsubs = $calendarlib->get_subscriptions($user);
 foreach ($rawsubs['data'] as $sub) {
     $calendars['s' . $sub['subscriptionId']] = $sub;
