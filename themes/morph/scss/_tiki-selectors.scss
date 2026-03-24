@@ -129,3 +129,5 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
 ::v-deep(el-autocomplete) {
     height: 64px !important;
 }
+
+.tiki-admin-aside-nav-dark .nav-pills .nav-link { color: $link-color; }
