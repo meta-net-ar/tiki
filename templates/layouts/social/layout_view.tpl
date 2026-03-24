@@ -37,13 +37,13 @@
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}            
             <header
                 class="navbar navbar-expand-md tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-header-top fixed-top p-0">
-                <div class="container{if $prefs.feature_fixed_width neq 'y'}-fluid{/if}">
+                <div class="container-fluid">
                     {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                 </div>
             </header>
         {/if}
     {/if}
-    <div class="middle_outer" id="middle_outer" style="margin-top: 70px;">
+    <div class="middle_outer" id="middle_outer">
         {if !isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}
                 {modulelist zone=top class="top_modules uab top navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}

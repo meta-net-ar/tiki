@@ -1,6 +1,6 @@
 <script type="module">
     {literal}
-        import { submitNewButton, generateButtonsFromInput } from '@jquery-tiki/plugin-edit';
+        import { submitNewButton, generateButtonsFromInput } from '@tiki/plugin-base/buttonParamHandler';
     {/literal}
     window.submitNewButton = submitNewButton;
 

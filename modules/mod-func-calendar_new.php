@@ -163,15 +163,18 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     $moduleCalendarFocusdate = date("Y-m-d");
-    $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $calIds));
-
     $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
     $calendarInitialParams['initialView'] = $initialView;
+
+    if (! empty($calIds)) {
+        $calendarInitialParams['calendars'] = array_intersect_key(
+            $calendarInitialParams['calendars'],
+            array_flip($calIds)
+        );
+    }
+
+    $smarty->assign('eventCalendarParams', $calendarInitialParams);
     $calendars = $calendarInitialParams['calendars'];
-    $smarty->assign(
-        'eventCalendarParams',
-        $calendarInitialParams
-    );
 
     // set up list of groups
     if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {

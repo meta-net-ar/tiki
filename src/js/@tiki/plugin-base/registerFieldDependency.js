@@ -1,4 +1,4 @@
-function registerFieldDependency(fieldId, dependencyName, dependencyValue) {
+export default function registerFieldDependency(fieldId, dependencyName, dependencyValue) {
     const field = $(`#${fieldId}`);
     const fieldContainer = field.closest(".field-container");
     const dependency = $(`[name='params[${dependencyName}]']`);
@@ -31,5 +31,3 @@ function registerFieldDependency(fieldId, dependencyName, dependencyValue) {
         }
     });
 }
-
-export { registerFieldDependency };

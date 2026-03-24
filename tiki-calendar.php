@@ -88,29 +88,16 @@ if (empty($rawcals['data'])) {
     Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$minHourOfDay = 12;
-$maxHourOfDay = 12;
-$startOfDayMinute = 0;
-$endOfDayMinute = 0;
-$calendars = [];
-$canEditAnything = false;
+$calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+$calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
+$smarty->assign('eventCalendarParams', $calendarInitialParams);
 
-foreach ($rawcals['data'] as $calendar) {
-    $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-
-    $calendars[$calendar['calendarId']] = $calendar;
-
-    // for week and day views
-    $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
-    $minHourOfDay = intdiv($startOfDayUnix, 3600);
-
-    $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
-    $maxHourOfDay = intdiv($endOfDayUnix, 3600);
-
-    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-}
+$calendars = $calendarInitialParams['calendars'];
+$canEditAnything = $calendarInitialParams['canEditAnything'];
+$minHourOfDay = (int)explode(':', $calendarInitialParams['minHourOfDay'])[0];
+$maxHourOfDay = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[0];
+$startOfDayMinute = (int)explode(':', $calendarInitialParams['minHourOfDay'])[1];
+$endOfDayMinute = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[1];
 
 $rawsubs = $calendarlib->get_subscriptions($user);
 foreach ($rawsubs['data'] as $sub) {

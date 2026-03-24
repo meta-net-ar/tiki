@@ -175,28 +175,15 @@
 .dropdown-menu-start-r {
     top: 100%;
     bottom: auto;
-    max-height: 40vh;
+    max-height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 2000 !important;
 }
 
 .dropdown-menu-bottom-b {
-    max-height: 65vh;
+    max-height: 90vh;
     z-index: 3000;
-}
-
-/* Menu separator styling */
-.menu-separator {
-    height: 0;
-    margin: var(--bs-dropdown-divider-margin-y) 0;
-    overflow: hidden;
-    border-top: 1px solid var(--bs-dropdown-divider-bg);
-    opacity: 1;
-}
-
-.form-control .menu-separator {
-    margin: 0;
 }
 
 .sm-sub-toggler[data-bs-toggle="collapse"]::after {
@@ -205,4 +192,8 @@
 
 .sm-sub.collapse.show {
     display: block;
+}
+
+.dropdown-divider {
+    --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
 }
