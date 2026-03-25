@@ -3881,9 +3881,11 @@ class TikiLib extends TikiDb_Bridge
      * @param string $filter
      * @param bool $onlyCount
      * @param string $ref
+     * @param int $date_min Minimum creation date timestamp
+     * @param int $date_max Maximum creation date timestamp
      * @return array
      */
-    public function list_pages($offset = 0, $maxRecords = -1, $sort_mode = 'pageName_desc', $find = '', $initial = '', $exact_match = true, $onlyName = false, $forListPages = false, $only_orphan_pages = false, $filter = [], $onlyCount = false, $ref = '', $exclude_pages = '')
+    public function list_pages($offset = 0, $maxRecords = -1, $sort_mode = 'pageName_desc', $find = '', $initial = '', $exact_match = true, $onlyName = false, $forListPages = false, $only_orphan_pages = false, $filter = [], $onlyCount = false, $ref = '', $exclude_pages = '', $date_min = 0, $date_max = 0)
     {
         global $prefs, $tiki_p_wiki_view_ratings;
 
@@ -3943,6 +3945,20 @@ class TikiLib extends TikiDb_Bridge
             foreach ($exclude_pages as $epVal) {
                 $bindvars[] = $epVal;
             }
+        }
+
+        // date filers.
+        if ($date_min !== 0 || $date_max !== 0) {
+            if ($date_max <= 0) {
+                $date_max = $this->now;
+            }
+            if (! empty($mid)) {
+                $mid .= " AND (`created` >= ? AND `created` <= ?) ";
+            } else {
+                $mid = " where (`created` >= ? AND `created` <= ?) ";
+            }
+            $bindvars[] = $date_min;
+            $bindvars[] = $date_max;
         }
 
         $categlib = TikiLib::lib('categ');
