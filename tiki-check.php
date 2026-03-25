@@ -32,7 +32,6 @@ use Tiki\Lib\Unoconv\UnoserverStrategy;
 use Tiki\Package\ComposerManager;
 use Tiki\Sections;
 
-// Define fitness status constants early
 define('FITNESS_STATUS_GOOD', 'good');
 define('FITNESS_STATUS_BAD', 'bad');
 define('FITNESS_STATUS_UNSURE', 'unsure');
@@ -91,13 +90,10 @@ if ($standalone) {
 }
 // AJAX dashboard refresh
 if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalone) {
-    // AJAX runs both in standalone and inside Tiki.
-    // Standalone detection should rely on template availability, not DB config presence.
     $template_exists = file_exists('./templates/tiki-check.tpl');
     $standalone = ! $template_exists;
     if (! $standalone && file_exists('./tiki-setup.php')) {
         require_once 'tiki-setup.php';
-        // Same permission as the main (non-standalone) page
         $access->check_permission('tiki_p_admin');
     }
     if (! function_exists('tra')) {
@@ -157,8 +153,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         );
     }
 
-    // Check security-sensitive PHP functions (recommended: disable at server level unless explicitly needed)
-    // Note: parse_ini_file is required by Tiki (System Configuration feature) and MUST remain enabled.
     $security_sensitive_functions = array('exec', 'passthru', 'shell_exec', 'system', 'proc_open', 'popen', 'curl_exec', 'curl_multi_exec');
     foreach ($security_sensitive_functions as $func) {
         if (function_exists($func)) {
@@ -184,7 +178,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         }
     }
 
-    // Required function
     if (function_exists('parse_ini_file')) {
         $security['parse_ini_file'] = array(
             'fitness' => tra('good'),
@@ -201,7 +194,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         );
     }
 
-    // Check allow_url_fopen (recommended: disable at server level)
     if (ini_get('allow_url_fopen')) {
         $security['allow_url_fopen'] = array(
             'fitness' => tra('bad'),
@@ -299,7 +291,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $tiki_security['Directory Listing Security'] = $directory_listing_check;
     $tiki_security['SSL/TLS Configuration'] = $ssl_check;
 
-    // Count issues from different sections
     $all_properties = array_merge(
         $server_properties,
         $mysql_properties,
@@ -366,10 +357,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $warning_percentage = $total_checks > 0 ? round(($warning_count / $total_checks) * 100) : 0;
     $health_percentage = $total_checks > 0 ? round((($good_count + $info_count) / $total_checks) * 100) : 100;
 
-    // Critical issues are now handled by the template
-
-    // Use Smarty template for dashboard
-    // Use Smarty template for dashboard (if available)
     if (! isset($smarty) || ! is_object($smarty)) {
         if (class_exists('Smarty\\Smarty')) {
             $smarty = new Smarty();
@@ -387,7 +374,13 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $smarty->setCompileDir('./temp/');
     $smarty->setCacheDir('./temp/');
 
-    // Assign variables to template
+    if (! function_exists('tr')) {
+        function tr($string)
+        {
+            return $string;
+        }
+    }
+
     $smarty->assign('critical_count', $critical_count);
     $smarty->assign('warning_count', $warning_count);
     $smarty->assign('info_count', $info_count);
@@ -397,7 +390,7 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $smarty->assign('critical_percentage', $critical_percentage);
     $smarty->assign('health_score', $health_score);
     $smarty->assign('critical_issues', $critical_issues);
-    // Provide grouped issue lists for infrastructure-agnostic dashboard rendering
+
     $server_critical_issues = array();
     $security_warning_issues = array();
     $optional_recommendations = array();
@@ -408,8 +401,7 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         }
         $msg = (string) $item['message'];
 
-        // Determine the correct section based on which array the item came from
-        $section = 'Server_Properties'; // default
+        $section = 'Server_Properties';
         if (isset($server_properties[$key])) {
             $section = 'Server_Properties';
         } elseif (isset($mysql_properties[$key])) {
@@ -445,7 +437,6 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         'good' => array('main' => 0, 'packages' => 0, 'ocr' => 0)
     ));
 
-    // Render dashboard using template
     $dashboard_html = $smarty->fetch('tiki-check-dashboard.tpl');
     die($dashboard_html);
 }
@@ -5180,22 +5171,18 @@ if ($standalone && ! $nagios) {
         }
     }
 
-    // Calculate health score (0-100)
     $total_checks = $critical_count + $warning_count + $info_count + $good_count;
     $health_score = $total_checks > 0 ? round((($good_count + $info_count * 0.5) / $total_checks) * 100) : 100;
 
-    // Calculate percentages for progress bar
     $critical_percentage = $total_checks > 0 ? round(($critical_count / $total_checks) * 100) : 0;
     $warning_percentage = $total_checks > 0 ? round(($warning_count / $total_checks) * 100) : 0;
     $health_percentage = $total_checks > 0 ? round((($good_count + $info_count) / $total_checks) * 100) : 100;
 
-    // Assign dashboard variables
     $smarty->assign('critical_count', $critical_count);
     $smarty->assign('warning_count', $warning_count);
     $smarty->assign('info_count', $info_count);
     $smarty->assign('good_count', $good_count);
     $smarty->assign('critical_issues', $critical_issues);
-    // Build grouped issue lists for infrastructure-agnostic dashboard sections
     $server_critical_issues = array();
     $security_warning_issues = array();
     $optional_recommendations = array();
@@ -5207,8 +5194,7 @@ if ($standalone && ! $nagios) {
         }
         $msg = (string) $item['message'];
 
-        // Determine the correct section based on which array the item came from
-        $section = 'Server_Properties'; // default
+        $section = 'Server_Properties';
         if (isset($server_properties[$key])) {
             $section = 'Server_Properties';
         } elseif (isset($mysql_properties[$key])) {
@@ -5260,7 +5246,6 @@ if ($standalone && ! $nagios) {
     $smarty->assign('warning_percentage', $warning_percentage);
     $smarty->assign('total_checks', $total_checks);
 
-    // Calculate source breakdowns for tooltips
     $main_critical = 0;
     $main_warning = 0;
     $main_info = 0;
@@ -5274,7 +5259,6 @@ if ($standalone && ! $nagios) {
     $ocr_info = 0;
     $ocr_good = 0;
 
-    // Count main checks (from all_properties)
     foreach ($all_properties as $key => $item) {
         switch ($item['fitness_status']) {
             case FITNESS_STATUS_BAD:
@@ -5295,7 +5279,6 @@ if ($standalone && ! $nagios) {
         }
     }
 
-    // Count packages
     if (isset($packagesToDisplay)) {
         foreach ($packagesToDisplay as $package) {
             switch ($package['fitness_status']) {
@@ -5318,7 +5301,6 @@ if ($standalone && ! $nagios) {
         }
     }
 
-    // Count OCR
     if (isset($ocrToDisplay)) {
         foreach ($ocrToDisplay as $ocr) {
             switch ($ocr['fitness_status']) {
@@ -5341,7 +5323,6 @@ if ($standalone && ! $nagios) {
         }
     }
 
-    // Create source breakdown array for tooltips
     $source_breakdown = array(
         'critical' => array(
             'main' => $main_critical,
@@ -5365,7 +5346,6 @@ if ($standalone && ! $nagios) {
         )
     );
 
-    // Assign source breakdown to Smarty
     $smarty->assign('source_breakdown', $source_breakdown);
 
     $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
@@ -5867,10 +5847,8 @@ function check_database_config_permissions()
 {
     $issues = array();
 
-    // Check db/local.php permissions
     if (file_exists('db/local.php')) {
         $perms = fileperms('db/local.php');
-        // Check if world readable (others can read)
         if (($perms & 0x0004) || ($perms & 0x0002)) {
             $issues[] = 'db/local.php is world-readable';
         }
@@ -5965,7 +5943,6 @@ function check_phpmyadmin_installations()
 {
     $issues = array();
 
-    // Common phpMyAdmin paths to check
     $phpmyadmin_paths = array(
         'phpmyadmin',
         'pma',
@@ -5977,14 +5954,12 @@ function check_phpmyadmin_installations()
         'phpmyadmin4'
     );
 
-    // Check for phpMyAdmin directories
     foreach ($phpmyadmin_paths as $path) {
         if (is_dir($path)) {
             $issues[] = 'phpMyAdmin directory found: ' . $path;
         }
     }
 
-    // Check for phpMyAdmin files in document root
     $phpmyadmin_files = array(
         'phpmyadmin.php',
         'pma.php',
@@ -6008,8 +5983,7 @@ function check_phpmyadmin_installations()
 function check_adminer_installations()
 {
     $issues = array();
-
-    // Check for Adminer files
+ 
     $adminer_files = array(
         'adminer.php',
         'adminer-*.php',
@@ -6019,7 +5993,6 @@ function check_adminer_installations()
 
     foreach ($adminer_files as $pattern) {
         if (str_contains($pattern, '*')) {
-            // Handle wildcard patterns
             $files = glob($pattern);
             foreach ($files as $file) {
                 $issues[] = 'Adminer file found: ' . $file;
@@ -6031,7 +6004,6 @@ function check_adminer_installations()
         }
     }
 
-    // Check for Adminer directory
     if (is_dir('adminer')) {
         $issues[] = 'Adminer directory found: adminer/';
     }
@@ -6047,10 +6019,8 @@ function check_backup_configuration_files()
 {
     $issues = array();
 
-    // Directories to check for backup files
     $directories = array('.', 'db', 'lib', 'templates');
 
-    // Backup file patterns
     $backup_patterns = array(
         '*.bak',
         '*.backup',
@@ -6068,7 +6038,6 @@ function check_backup_configuration_files()
             foreach ($backup_patterns as $pattern) {
                 $files = glob($dir . '/' . $pattern);
                 foreach ($files as $file) {
-                    // Skip if it's a PHP file that will be interpreted
                     if (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
                         continue;
                     }
@@ -6088,8 +6057,7 @@ function check_backup_configuration_files()
 function check_directory_listing_vulnerabilities()
 {
     $issues = array();
-
-    // Check for .htaccess files that might enable directory listing
+    
     $htaccess_files = array('.htaccess', 'htaccess.txt');
 
     foreach ($htaccess_files as $file) {
@@ -6116,12 +6084,10 @@ function check_ssl_configuration()
 {
     $issues = array();
 
-    // Check if HTTPS is being used
     if (! isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
         $issues[] = 'HTTPS not detected - connection may not be encrypted';
     }
 
-    // Check for secure headers
     if (function_exists('getallheaders')) {
         $headers = getallheaders();
         if (! isset($headers['X-Forwarded-Proto']) || $headers['X-Forwarded-Proto'] !== 'https') {
@@ -6187,8 +6153,6 @@ function countFitnessStatuses($arrays)
     return $counts;
 }
 
-
-
 // Initialize undefined arrays to prevent warnings
 if (! isset($tiki_performance)) {
     $tiki_performance = array();
@@ -6233,7 +6197,6 @@ if (! isset($database_properties)) {
     $database_properties = array();
 }
 
-// Count statuses in all arrays
 $all_arrays = array(
     'php_properties' => $php_properties,
     'server_properties' => $server_properties,
@@ -6256,7 +6219,6 @@ $all_arrays = array(
 
 $fitness_counts = countFitnessStatuses($all_arrays);
 
-// Calculate dashboard statistics for main template (same as AJAX section)
 $main_critical = 0;
 $main_warning = 0;
 $main_info = 0;
@@ -6288,7 +6250,6 @@ foreach ($all_properties as $key => $item) {
             $main_critical++;
             $critical_count++;
 
-            // Determine the correct section based on which array the item came from
             $section = 'Server_Properties'; // default
             if (isset($server_properties[$key])) {
                 $section = 'Server_Properties';
@@ -6332,7 +6293,6 @@ foreach ($all_properties as $key => $item) {
     }
 }
 
-// Count from packages
 $packages_critical = 0;
 $packages_warning = 0;
 $packages_info = 0;
@@ -6369,7 +6329,6 @@ if (isset($packagesToDisplay)) {
     }
 }
 
-// Count from OCR
 $ocr_critical = 0;
 $ocr_warning = 0;
 $ocr_info = 0;
@@ -6406,7 +6365,6 @@ if (isset($ocrToDisplay)) {
     }
 }
 
-// Calculate health score (0-100)
 $total_checks = $critical_count + $warning_count + $info_count + $good_count;
 $health_score = $total_checks > 0 ? round((($good_count + $info_count * 0.5) / $total_checks) * 100) : 100;
 
@@ -6415,13 +6373,12 @@ $critical_percentage = $total_checks > 0 ? round(($critical_count / $total_check
 $warning_percentage = $total_checks > 0 ? round(($warning_count / $total_checks) * 100) : 0;
 $health_percentage = $total_checks > 0 ? round((($good_count + $info_count) / $total_checks) * 100) : 100;
 
-// Assign dashboard variables to Smarty
 $smarty->assign('critical_count', $critical_count);
 $smarty->assign('warning_count', $warning_count);
 $smarty->assign('info_count', $info_count);
 $smarty->assign('good_count', $good_count);
 $smarty->assign('critical_issues', $critical_issues);
-// Build grouped issue lists for infrastructure-agnostic dashboard sections
+
 $server_critical_issues = array();
 $security_warning_issues = array();
 $optional_recommendations = array();
@@ -6432,8 +6389,7 @@ foreach ($all_properties as $key => $item) {
     }
     $msg = (string) $item['message'];
 
-    // Determine the correct section based on which array the item came from
-    $section = 'Server_Properties'; // default
+    $section = 'Server_Properties';
     if (isset($server_properties[$key])) {
         $section = 'Server_Properties';
     } elseif (isset($mysql_properties[$key])) {
@@ -6487,7 +6443,6 @@ $smarty->assign('health_percentage', $health_percentage);
 $smarty->assign('critical_percentage', $critical_percentage);
 $smarty->assign('warning_percentage', $warning_percentage);
 
-// Calculate source breakdowns for tooltips
 $source_breakdown = array(
     'critical' => array(
         'main' => $main_critical,
@@ -6511,10 +6466,8 @@ $source_breakdown = array(
     )
 );
 
-// Also add to Smarty for template access
 $smarty->assign('fitness_counts', $fitness_counts);
 
-// Create formatted tooltip HTML for each status type
 function formatTooltipHtml($type, $breakdown)
 {
     $title = ucfirst($type) . ' Breakdown:';
@@ -6535,6 +6488,5 @@ $tooltip_html = array(
     'good' => formatTooltipHtml('good', $source_breakdown['good'])
 );
 
-// Assign source breakdown to Smarty
 $smarty->assign('source_breakdown', $source_breakdown);
 $smarty->assign('tooltip_html', $tooltip_html);

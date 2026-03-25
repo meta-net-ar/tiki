@@ -1,6 +1,9 @@
-{* Dashboard Template - Used by both main page and AJAX response *}
-{* Executive Summary Dashboard *}
-<div class="dashboard-summary mb-4">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>{tr}Server Check Summary{/tr}</strong>
+    </div>
+    <div class="panel-body">
+        <div class="dashboard-summary">
     <div class="row">
         <div class="col-md-3 mb-3">
             <div class="status-card critical" data-toggle="tooltip" data-html="true" 
@@ -86,7 +89,7 @@
         </div>
     </div>
     
-    {* Critical Issues Summary (server-level must-fix) *}
+    {* Critical Issues Summary *}
     {if $server_critical_issues && count($server_critical_issues) > 0}
     <div class="critical-issues-summary mt-3">
         <div class="alert alert-danger">
@@ -142,4 +145,6 @@
         </div>
     </div>
     {/if}
+        </div>
+    </div>
 </div>
