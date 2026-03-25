@@ -152,13 +152,10 @@ class Generator
             if (
                 $context['type'] !== 'blogs' &&
                 (
-                    ($prefs['sitemap_split'] === 'none' &&
-                    !empty($context['split'])) ||
+                    ($prefs['sitemap_split'] === 'none' && ! empty($context['split'])) ||
                     ($prefs['sitemap_split'] === 'year' &&
-                    (str_contains($context['split'] ?? '', '_') ||
-                    empty($context['split']))) ||
-                    ($prefs['sitemap_split'] === 'year_month' &&
-                    substr_count($context['split'] ?? '', '_') !== 1)
+                    (str_contains($context['split'] ?? '', '_') || empty($context['split']))) ||
+                    ($prefs['sitemap_split'] === 'year_month' && substr_count($context['split'] ?? '', '_') !== 1)
                 )
             ) {
                 return false;

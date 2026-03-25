@@ -256,7 +256,7 @@ abstract class AbstractType
                     'lastMod' => $row['lastMod']
                 ];
 
-                if ($split === 'year_month' && !empty($row['month'])) {
+                if ($split === 'year_month' && ! empty($row['month'])) {
                     $range['month'] = str_pad($row['month'], 2, '0', STR_PAD_LEFT);
                 }
 
