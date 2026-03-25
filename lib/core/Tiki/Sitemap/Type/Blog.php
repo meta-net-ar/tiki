@@ -25,15 +25,17 @@ class Blog extends AbstractType
             return;
         }
 
-        $blogLib = TikiLib::lib('blog');
-
+        $blogLib   = TikiLib::lib('blog');
         $listPages = $blogLib->list_blogs();
         $this->addEntriesToSitemap($listPages, '/tiki-view_blog.php?blogId=%s', 'blogId', 'blog', 'blogs.xml', 'title', 'lastModif', '0.8');
 
         $ranges = $this->getTypeDateRanges('Blog', $prefs['sitemap_split']);
         foreach ($ranges as $range) {
-            // on auto mode only gen what requested for
-            if ($auto && intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)) {
+
+            // On automatic mode skip non requested ranges.
+            if ($auto
+                && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))) {
                 continue;
             }
 

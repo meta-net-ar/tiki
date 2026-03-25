@@ -32,8 +32,11 @@ class Articles extends AbstractType
 
         $ranges = $this->getTypeDateRanges('Articles', $prefs['sitemap_split']);
         foreach ($ranges as $range) {
-            // on auto mode only gen what requested for
-            if ($auto && intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)) {
+
+            // On automatic mode skip non requested ranges.
+            if ($auto
+                && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))) {
                 continue;
             }
 
