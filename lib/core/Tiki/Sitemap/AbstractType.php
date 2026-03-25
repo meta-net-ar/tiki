@@ -185,15 +185,11 @@ abstract class AbstractType
 
         switch ($type) {
             case 'Articles':
-
                 if ($split === 'year') {
-
                     $sql = "SELECT YEAR(FROM_UNIXTIME(publishDate)) as year, MAX(publishDate) as lastMod
                             FROM tiki_articles WHERE publishDate IS NOT NULL AND publishDate > 0
                             GROUP BY YEAR(FROM_UNIXTIME(publishDate)) ORDER BY year DESC";
-
                 } elseif ($split === 'year_month') {
-
                     $sql = "SELECT YEAR(FROM_UNIXTIME(publishDate)) as year, MONTH(FROM_UNIXTIME(publishDate)) as month,
                             MAX(publishDate) as lastMod FROM tiki_articles WHERE publishDate IS NOT NULL AND publishDate > 0
                             GROUP BY YEAR(FROM_UNIXTIME(publishDate)), MONTH(FROM_UNIXTIME(publishDate)) ORDER BY year DESC, month DESC";
@@ -202,15 +198,11 @@ abstract class AbstractType
                 break;
 
             case 'Blog':
-
                 if ($split === 'year') {
-
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
                             FROM tiki_blog_posts WHERE created IS NOT NULL
                             GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
-
                 } elseif ($split === 'year_month') {
-
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
                             FROM tiki_blog_posts WHERE created IS NOT NULL
                             GROUP BY YEAR(FROM_UNIXTIME(created)), MONTH(FROM_UNIXTIME(created)) ORDER BY year DESC, month DESC";
@@ -220,13 +212,10 @@ abstract class AbstractType
                 break;
 
             case 'Pages':
-
                 if ($split === 'year') {
-
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
                             FROM tiki_pages WHERE created IS NOT NULL AND created > 0
                             GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
-
                 } elseif ($split === 'year_month') {
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
                             FROM tiki_pages WHERE created IS NOT NULL AND created > 0
@@ -236,12 +225,10 @@ abstract class AbstractType
                 break;
 
             case 'Forums':
-
                 if ($split === 'year') {
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
                             FROM tiki_forums WHERE created IS NOT NULL AND created > 0
                             GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
-
                 } elseif ($split === 'year_month') {
                     $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
                             FROM tiki_forums WHERE created IS NOT NULL AND created > 0
@@ -263,7 +250,6 @@ abstract class AbstractType
         $result = $tikilib->fetchAll($sql);
         foreach ($result as $row) {
             if ($row['year']) {
-
                 $range = [
                     'prefix'  => $prefix,
                     'year'    => $row['year'],

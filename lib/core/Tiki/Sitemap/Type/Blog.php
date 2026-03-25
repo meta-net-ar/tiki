@@ -31,11 +31,12 @@ class Blog extends AbstractType
 
         $ranges = $this->getTypeDateRanges('Blog', $prefs['sitemap_split']);
         foreach ($ranges as $range) {
-
             // On automatic mode skip non requested ranges.
-            if ($auto
+            if (
+                $auto
                 && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
-                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))) {
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))
+            ) {
                 continue;
             }
 

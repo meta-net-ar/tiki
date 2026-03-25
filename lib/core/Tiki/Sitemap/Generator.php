@@ -148,14 +148,17 @@ class Generator
         $generatorClass = self::NAMESPACE_PREFIX . "Index";
 
         if ($context['type'] !== 'index') {
-
             // Prevent wrong range access outside of pref sitemap_split
             if (
                 $context['type'] !== 'blogs' &&
                 (
-                    ($prefs['sitemap_split'] === 'none' && !empty($context['split']))
-                    || ($prefs['sitemap_split'] === 'year' && (str_contains($context['split'] ?? '', '_') || empty($context['split'])))
-                    || ($prefs['sitemap_split'] === 'year_month' && substr_count($context['split'] ?? '', '_') !== 1)
+                    ($prefs['sitemap_split'] === 'none' &&
+                    !empty($context['split'])) ||
+                    ($prefs['sitemap_split'] === 'year' &&
+                    (str_contains($context['split'] ?? '', '_') ||
+                    empty($context['split']))) ||
+                    ($prefs['sitemap_split'] === 'year_month' &&
+                    substr_count($context['split'] ?? '', '_') !== 1)
                 )
             ) {
                 return false;
@@ -195,7 +198,6 @@ class Generator
             /** @var AbstractType $typeHandler */
             $typeHandler = new $generatorClass($sitemap);
             if (is_subclass_of($typeHandler, self::BASE_CLASS)) {
-
                 if (! empty($context['split'])) {
                     $ymonth = explode('_', $context['split']);
                     $context['year']  = $ymonth[0];
