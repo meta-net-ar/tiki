@@ -95,13 +95,34 @@ function resizeImage(file, maxWidth, maxHeight) {
 
             canvas.toBlob(
                 (blob) => {
-                    if (!blob) return resolve(file);
+                    if (!blob) {
+                        return resolve(file);
+                    }
                     resolve(blob);
                 },
                 file.type,
                 0.95
             );
         };
+    });
+}
+
+function getImageDimensions(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Failed to read image dimensions"));
+        };
+
+        img.src = url;
     });
 }
 
@@ -115,19 +136,24 @@ async function compressImage(fileBlob, prefs) {
     const maxDimensionX = normalizeResizeDimension(prefs.maxDimensionX);
     const maxDimensionY = normalizeResizeDimension(prefs.maxDimensionY);
     const maxSize = prefs.maxSize || 1;
+    const hasResizeConstraints = maxDimensionX > 0 || maxDimensionY > 0;
 
     // Step 1: resize
     const resizedBlob = await resizeImage(fileBlob, maxDimensionX, maxDimensionY);
+    const { width, height } = await getImageDimensions(resizedBlob);
 
     // Step 2: compress
     const compressionOptions = {
         maxSizeMB: maxSize,
+        maxWidthOrHeight: Math.max(width, height),
         useWebWorker: typeof Worker !== "undefined",
         initialQuality: quality / 100,
-        alwaysKeepResolution: true,
+        alwaysKeepResolution: hasResizeConstraints,
     };
 
-    return imageCompression(resizedBlob, compressionOptions);
+    const compressedBlob = await imageCompression(resizedBlob, compressionOptions);
+
+    return compressedBlob;
 }
 
 /**
@@ -192,8 +218,6 @@ async function compress(fileBlob, prefs = {}, options = {}) {
         if (options.fallbackOnError !== false) {
             result.blob = fileBlob;
         }
-
-        console.log("[ImageCompressor]", error);
         return result;
     }
 }
@@ -300,7 +324,6 @@ async function compressFileList(fileList, prefs = {}) {
                 });
             }
         } catch (err) {
-            console.error("[ImageCompressor] Error compressing file:", file.name, err);
             dataTransfer.items.add(file);
             results.push({
                 name: file.name,
@@ -312,7 +335,6 @@ async function compressFileList(fileList, prefs = {}) {
         }
     }
 
-    console.log("[ImageCompressor] Compression results:", results);
     return dataTransfer;
 }
 

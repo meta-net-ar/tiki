@@ -1,5 +1,5 @@
 <script setup>
-import { UploadFilled } from '@element-plus/icons-vue'
+import { Loading, UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { ajaxUpload as defaultHttpRequest } from 'element-plus/es/components/upload/src/ajax';
 import { ref, onMounted } from 'vue'
@@ -7,7 +7,7 @@ import getUploadData from '../../helpers/fileGalUploader/getUploadData';
 import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
-import { compressFileList, normalizeResizeDimension } from '../../../../../tiki-image-compressor/imageCompressor.js';
+import { compress, compressFileList, normalizeResizeDimension } from '../../../../../tiki-image-compressor/imageCompressor.js';
 import initializeCompressionUI, { getCompressionSettings } from '../../../../../tiki-image-compressor/compressionControls.js';
 
 const props = defineProps([
@@ -45,12 +45,81 @@ const originalSize = ref('-');
 const estimatedSize = ref('-');
 const needsCompression = ref(false);
 const compressionReason = ref('');
+const isPreviewUpdating = ref(false);
 let updateDebounceTimer = null;
+let previewRequestId = 0;
 let currentCompressionSettings = {
     quality: 85,
     maxDimensionX: 0,
     maxDimensionY: 0,
     maxSizeMb: 2
+};
+
+const revokePreviewObjectUrl = (fileObj) => {
+    if (fileObj?.previewObjectUrl) {
+        URL.revokeObjectURL(fileObj.previewObjectUrl);
+        fileObj.previewObjectUrl = null;
+    }
+};
+
+const resetPreviewImage = (fileObj) => {
+    revokePreviewObjectUrl(fileObj);
+    if (fileObj?.originalDataUrl) {
+        fileObj.dataUrl = fileObj.originalDataUrl;
+    }
+};
+
+const formatSizeDelta = (originalBytes, resultBytes) => {
+    const delta = resultBytes - originalBytes;
+    const percent = Math.round(Math.abs(delta / originalBytes) * 100);
+
+    if (delta < 0) {
+        return `${formatFileSize(resultBytes)} (${percent}% smaller)`;
+    }
+
+    if (delta > 0) {
+        return `${formatFileSize(resultBytes)} (${percent}% larger)`;
+    }
+
+    return `${formatFileSize(resultBytes)} (no change)`;
+};
+
+const getPreviewCompressionResult = async (file, settings) => {
+    const result = await compress(
+        file,
+        {
+            quality: settings.quality,
+            maxDimensionX: settings.maxDimensionX,
+            maxDimensionY: settings.maxDimensionY,
+            maxSize: settings.maxSizeMb,
+        },
+        { fallbackOnError: false }
+    );
+
+    if (!result.success || !result.blob) {
+        return null;
+    }
+
+    const objectUrl = URL.createObjectURL(result.blob);
+
+    try {
+        const dimensions = await new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+            image.onerror = reject;
+            image.src = objectUrl;
+        });
+
+        return {
+            blob: result.blob,
+            objectUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+        };
+    } catch (error) {
+        URL.revokeObjectURL(objectUrl);
+        throw error;
+    }
 };
 
 onMounted(async () => {
@@ -104,46 +173,6 @@ const getFileExtension = (fileName) => {
 }
 
 /**
- * Create canvas preview with actual JPEG compression
- */
-const createCanvasPreview = async (img, quality, maxDimensionX, maxDimensionY) => {
-    let width = img.naturalWidth;
-    let height = img.naturalHeight;
-
-    const normalizedMaxWidth = normalizeResizeDimension(maxDimensionX);
-    const normalizedMaxHeight = normalizeResizeDimension(maxDimensionY);
-
-    if ((normalizedMaxWidth && width > normalizedMaxWidth) || (normalizedMaxHeight && height > normalizedMaxHeight)) {
-        let ratioX = normalizedMaxWidth && width > normalizedMaxWidth ? normalizedMaxWidth / width : 1;
-        let ratioY = normalizedMaxHeight && height > normalizedMaxHeight ? normalizedMaxHeight / height : 1;
-        let ratio = Math.min(ratioX, ratioY);
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-
-    ctx.drawImage(img, 0, 0, width, height);
-
-    const dataUrl = canvas.toDataURL('image/jpeg', quality / 100);
-    
-    const blob = await new Promise((resolve) => {
-        canvas.toBlob(
-            (blob) => resolve(blob),
-            'image/jpeg',
-            quality / 100
-        );
-    });
-
-    return { blob, dataUrl, width, height };
-};
-
-/**
  * Get current preview file object
  */
 const currentPreviewFile = () => {
@@ -193,6 +222,9 @@ const updatePreviewFromSettings = async (settings) => {
 
     if (updateDebounceTimer) clearTimeout(updateDebounceTimer);
 
+    const requestId = ++previewRequestId;
+    isPreviewUpdating.value = true;
+
     updateDebounceTimer = setTimeout(async () => {
         try {
             const quality = settings.quality || 85;
@@ -210,38 +242,50 @@ const updatePreviewFromSettings = async (settings) => {
                 current.file.size,
                 { maxDimensionX, maxDimensionY, maxSizeMb }
             );
+
+            if (requestId !== previewRequestId) {
+                return;
+            }
             
             if (!compressionNeeded) {
-                // Image doesn't need compression, don't show size comparison
+                resetPreviewImage(current);
                 previewDimensions.value = `${current.image.naturalWidth}×${current.image.naturalHeight}px`;
                 originalSize.value = formatFileSize(current.file.size);
                 estimatedSize.value = '-';
                 return;
             }
             
-            const result = await createCanvasPreview(
-                current.image,
+            const result = await getPreviewCompressionResult(current.file, {
                 quality,
                 maxDimensionX,
-                maxDimensionY
-            );
+                maxDimensionY,
+                maxSizeMb,
+            });
 
             if (!result) return;
 
-            const { blob, dataUrl, width, height } = result;
+            if (requestId !== previewRequestId) {
+                if (result.objectUrl) {
+                    URL.revokeObjectURL(result.objectUrl);
+                }
+                return;
+            }
 
-            // Update the file object with new preview data (Vue reactive)
-            current.dataUrl = dataUrl;
+            const { blob, objectUrl, width, height } = result;
+
+            revokePreviewObjectUrl(current);
+            current.previewObjectUrl = objectUrl;
+            current.dataUrl = objectUrl;
             previewDimensions.value = `${width}×${height}px`;
             
-            const reduction = Math.round(
-                ((current.file.size - blob.size) / current.file.size) * 100
-            );
-            
             originalSize.value = formatFileSize(current.file.size);
-            estimatedSize.value = `${formatFileSize(blob.size)} (${reduction}% smaller)`;
+            estimatedSize.value = formatSizeDelta(current.file.size, blob.size);
         } catch (err) {
             console.error('[FileGalUploader] Preview update failed:', err);
+        } finally {
+            if (requestId === previewRequestId) {
+                isPreviewUpdating.value = false;
+            }
         }
     }, 150);
 };
@@ -278,6 +322,8 @@ const selectFileForPreview = (index) => {
  * Load previews when files are selected
  */
 const loadImagePreviews = (files) => {
+    previewRequestId++;
+    isPreviewUpdating.value = false;
     previewFiles.value = [];
     currentPreviewIndex.value = -1;
     
@@ -293,6 +339,8 @@ const loadImagePreviews = (files) => {
             file: rawFile,
             image: null,
             dataUrl: null,  // Store preview data URL for reactivity
+            originalDataUrl: null,
+            previewObjectUrl: null,
             name: rawFile.name,
             type: rawFile.type,
             index: index
@@ -303,6 +351,7 @@ const loadImagePreviews = (files) => {
             reader.onload = (e) => {
                 // Set dataUrl immediately for thumbnail display
                 fileObj.dataUrl = e.target.result;
+                fileObj.originalDataUrl = e.target.result;
                 
                 const img = new Image();
                 img.onload = () => {
@@ -447,6 +496,9 @@ const handleUploadError = (error) => {
  * Reset preview state after all uploads complete
  */
 const resetPreview = () => {
+    previewRequestId++;
+    isPreviewUpdating.value = false;
+    previewFiles.value.forEach((fileObj) => revokePreviewObjectUrl(fileObj));
     previewFiles.value = [];
     currentPreviewIndex.value = -1;
     showPreview.value = false;
@@ -595,6 +647,10 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                     <h6 class="preview-subtitle">
                         File Size Comparison
                     </h6>
+                    <div v-if="isPreviewUpdating" class="preview-loading-state alert alert-secondary d-flex align-items-center gap-2 py-2">
+                        <el-icon class="is-loading" aria-hidden="true"><loading /></el-icon>
+                        <span>Updating preview values...</span>
+                    </div>
                     <div class="preview-size-row">
                         <span>Original size:</span>
                         <span class="preview-size-value">{{ originalSize }}</span>
@@ -603,7 +659,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                         <span>Estimated after compression:</span>
                         <span class="preview-size-value preview-size-compressed">{{ estimatedSize }}</span>
                     </div>
-                    <p class="preview-note">Preview updates as you adjust compression settings.</p>
+                    <p v-if="!isPreviewUpdating" class="preview-note">Preview updates as you adjust compression settings.</p>
                 </div>
                 <div v-else class="preview-info-panel">
                     <h6 class="preview-title">File: {{ currentPreviewFile().name }}</h6>
@@ -611,6 +667,10 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
                         Dimensions: {{ previewDimensions }}
                     </div>
                     <hr class="preview-divider">
+                    <div v-if="isPreviewUpdating" class="preview-loading-state alert alert-secondary d-flex align-items-center gap-2 py-2 mb-3">
+                        <el-icon class="is-loading" aria-hidden="true"><loading /></el-icon>
+                        <span>Updating preview values...</span>
+                    </div>
                     <div class="compression-not-needed-alert">
                         <i class="fas fa-info-circle"></i> 
                         <strong>No compression needed.</strong> {{ compressionReason }}

@@ -941,7 +941,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'type' => 'text',
             'units' => tra('%'),
             'size' => 5,
-            'default' => 65,
+            'default' => 85,
             'help' => 'Image-Compression',
             'dependencies' => ['fgal_image_compression_enabled'],
         ],

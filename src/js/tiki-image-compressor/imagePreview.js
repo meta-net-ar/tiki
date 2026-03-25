@@ -1,4 +1,4 @@
-import { normalizeResizeDimension } from "./imageCompressor.js";
+import { compress, normalizeResizeDimension } from "./imageCompressor.js";
 
 /**
  * Image Preview Module
@@ -25,7 +25,7 @@ const PREVIEW_STATE = {
     originalFile: null,
     originalBlob: null,
     originalImage: null,
-    previewCanvas: null,
+    previewObjectUrl: null,
     listeners: [],
     updateDebounceTimer: null,
     DEBOUNCE_DELAY: 150, // ms - delay before rendering preview after setting change
@@ -45,78 +45,70 @@ function formatFileSize(bytes) {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
 }
 
-/**
- * Estimate compressed file size based on quality and dimensions
- * Uses a heuristic based on quality and resolution
- * @param {number} width - Image width
- * @param {number} height - Image height
- * @param {number} quality - Quality 0-100 (100 = original, 10 = minimal)
- * @param {number} originalBytes - Original file size
- * @returns {number} - Estimated bytes
- */
-function estimateCompressedSize(width, height, quality, originalBytes) {
-    // Base calculation: quality factor (10%-90% of saved space)
-    // At 100% quality, almost no reduction. At 10%, significant reduction.
-    const qualityFactor = 0.1 + (quality / 100) * 0.9;
-    // Estimate size based on resolution
-    const pixelCount = width * height;
-    const baseSizePerPixel = originalBytes / (Math.log(pixelCount) * 3);
-    const estimatedSize = pixelCount * baseSizePerPixel * (qualityFactor * 0.7);
-
-    return Math.max(estimatedSize, originalBytes * 0.1); // Minimum 10% of original
+function revokePreviewObjectUrl() {
+    if (PREVIEW_STATE.previewObjectUrl) {
+        URL.revokeObjectURL(PREVIEW_STATE.previewObjectUrl);
+        PREVIEW_STATE.previewObjectUrl = null;
+    }
 }
 
-/**
- * Create a preview of compressed image using canvas with quality rendering
- * This renders the actual JPEG quality artifacts so the user sees the visual impact
- * @param {HTMLCanvasElement} canvas - Canvas to draw to
- * @param {HTMLImageElement} img - Image element to draw from
- * @param {number} quality - Quality 0-100
- * @param {number} maxDimensionX - Max width (for resizing)
- * @param {number} maxDimensionY - Max height (for resizing)
- * @returns {Object} - {blob, dataUrl, width, height}
- */
-async function createCanvasPreview(canvas, img, quality, maxDimensionX, maxDimensionY) {
-    // Calculate dimensions with constraints
-    let width = img.naturalWidth;
-    let height = img.naturalHeight;
+function formatSizeDelta(originalBytes, resultBytes) {
+    const delta = resultBytes - originalBytes;
+    const percent = Math.round(Math.abs(delta / originalBytes) * 100);
 
-    const normalizedMaxWidth = normalizeResizeDimension(maxDimensionX);
-    const normalizedMaxHeight = normalizeResizeDimension(maxDimensionY);
-
-    if ((normalizedMaxWidth && width > normalizedMaxWidth) || (normalizedMaxHeight && height > normalizedMaxHeight)) {
-        let ratioX = normalizedMaxWidth && width > normalizedMaxWidth ? normalizedMaxWidth / width : 1;
-        let ratioY = normalizedMaxHeight && height > normalizedMaxHeight ? normalizedMaxHeight / height : 1;
-        let ratio = Math.min(ratioX, ratioY);
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
+    if (delta < 0) {
+        return `${formatFileSize(resultBytes)} (${percent}% smaller)`;
     }
 
-    canvas.width = width;
-    canvas.height = height;
+    if (delta > 0) {
+        return `${formatFileSize(resultBytes)} (${percent}% larger)`;
+    }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
+    return `${formatFileSize(resultBytes)} (no change)`;
+}
 
-    // Draw the resized image onto canvas
-    ctx.drawImage(img, 0, 0, width, height);
+async function getPreviewCompressionResult(file, settings) {
+    const result = await compress(
+        file,
+        {
+            quality: settings.quality,
+            maxDimensionX: normalizeResizeDimension(settings.maxDimensionX),
+            maxDimensionY: normalizeResizeDimension(settings.maxDimensionY),
+            maxSize: settings.maxSize,
+        },
+        { fallbackOnError: false }
+    );
 
-    // Get actual JPEG with quality compression - this creates visible artifacts
-    // that show the user what quality setting does
-    const dataUrl = canvas.toDataURL("image/jpeg", quality / 100);
+    if (!result.success || !result.blob) {
+        return null;
+    }
 
-    // Also get the blob size for file size estimate
-    const blob = await new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality / 100);
-    });
+    const objectUrl = URL.createObjectURL(result.blob);
 
-    return { blob, dataUrl, width, height };
+    try {
+        const dimensions = await new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+            image.onerror = reject;
+            image.src = objectUrl;
+        });
+
+        return {
+            blob: result.blob,
+            objectUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+        };
+    } catch (error) {
+        URL.revokeObjectURL(objectUrl);
+        throw error;
+    }
 }
 
 /**
  * Update preview display with debouncing
  * Listens to any settings change and re-renders the preview with new quality/dimensions
- * @param {Object} settings - {quality, maxDimensionX, maxDimensionY}
+ * @param {Object} settings - {quality, maxDimensionX, maxDimensionY, maxSize}
  */
 async function updatePreview(settings) {
     // Clear any pending update
@@ -134,31 +126,30 @@ async function updatePreview(settings) {
             quality = 85,
             maxDimensionX = 0,
             maxDimensionY = 0,
+            maxSize = 1,
         } = settings;
 
         try {
-            // Create canvas if not exists
-            if (!PREVIEW_STATE.previewCanvas) {
-                PREVIEW_STATE.previewCanvas = document.createElement("canvas");
-            }
-
-            // Generate preview with actual JPEG compression rendering
-            const result = await createCanvasPreview(PREVIEW_STATE.previewCanvas, PREVIEW_STATE.originalImage, quality, maxDimensionX, maxDimensionY);
+            const result = await getPreviewCompressionResult(PREVIEW_STATE.originalFile, {
+                quality,
+                maxDimensionX,
+                maxDimensionY,
+                maxSize,
+            });
 
             if (!result) {
-                console.warn("[ImagePreview] Failed to create preview");
                 return;
             }
 
-            const { blob, dataUrl, width, height } = result;
+            const { blob, objectUrl, width, height } = result;
 
-            // Update preview image - shows actual JPEG artifacts from compression
             const previewImg = document.getElementById("compression_preview_image");
             if (previewImg) {
-                previewImg.src = dataUrl;
+                revokePreviewObjectUrl();
+                PREVIEW_STATE.previewObjectUrl = objectUrl;
+                previewImg.src = objectUrl;
             }
 
-            // Update file size display
             const originalSizeEl = document.getElementById("compression_original_size");
             const estimatedSizeEl = document.getElementById("compression_estimated_size");
 
@@ -167,13 +158,14 @@ async function updatePreview(settings) {
             }
 
             if (estimatedSizeEl) {
-                const reduction = Math.round(((PREVIEW_STATE.originalBlob.size - blob.size) / PREVIEW_STATE.originalBlob.size) * 100);
-                estimatedSizeEl.textContent = `${formatFileSize(blob.size)} (${reduction}% smaller)`;
-                // Color code based on reduction amount
-                if (reduction > 50) {
+                const delta = blob.size - PREVIEW_STATE.originalBlob.size;
+                estimatedSizeEl.textContent = formatSizeDelta(PREVIEW_STATE.originalBlob.size, blob.size);
+                if (delta < -0.5 * PREVIEW_STATE.originalBlob.size) {
                     estimatedSizeEl.className = "text-success fw-bold";
-                } else if (reduction > 20) {
+                } else if (delta < -0.2 * PREVIEW_STATE.originalBlob.size) {
                     estimatedSizeEl.className = "text-info fw-bold";
+                } else if (delta > 0) {
+                    estimatedSizeEl.className = "text-warning fw-bold";
                 } else {
                     estimatedSizeEl.className = "text-muted";
                 }
@@ -223,6 +215,7 @@ async function loadImageFromFile(file) {
                 quality: state.current?.quality || 85,
                 maxDimensionX: state.current?.maxDimensionX ?? 0,
                 maxDimensionY: state.current?.maxDimensionY ?? 0,
+                maxSize: state.current?.maxSize ?? 1,
             });
         };
         img.onerror = () => {
@@ -300,6 +293,7 @@ function cleanup() {
         element.removeEventListener(event, handler, options);
     });
     PREVIEW_STATE.listeners = [];
+    revokePreviewObjectUrl();
 
     // Clear any pending updates
     if (PREVIEW_STATE.updateDebounceTimer) {
@@ -310,7 +304,7 @@ function cleanup() {
 /**
  * Refresh preview from external module (compressionControls.js)
  * Called whenever quality or dimension settings change
- * @param {Object} settings - {quality, maxDimensionX, maxDimensionY}
+ * @param {Object} settings - {quality, maxDimensionX, maxDimensionY, maxSize}
  */
 function refreshPreview(settings) {
     // Only update if we have an image loaded
@@ -323,6 +317,7 @@ function refreshPreview(settings) {
         quality: settings.quality || 85,
         maxDimensionX: settings.maxDimensionX ?? 0,
         maxDimensionY: settings.maxDimensionY ?? 0,
+        maxSize: settings.maxSize ?? 1,
     });
 }
 
