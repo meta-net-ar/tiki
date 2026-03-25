@@ -127,6 +127,7 @@
             {preference name=feature_fixed_width}
             <div class="adminoptionboxchild" id="feature_fixed_width_childcontainer">
                 {preference name=layout_fixed_width}
+                {preference name=layout_fixed_width_header}
             </div>
             {preference name=site_layout}
             {preference name=site_layout_per_object}
