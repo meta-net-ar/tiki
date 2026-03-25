@@ -5,6 +5,7 @@
  * Centralized state management with proper validation, error handling, and performance optimization
  */
 
+import { normalizeResizeDimension } from "./imageCompressor.js";
 import { refreshPreview } from "./imagePreview.js";
 import initializeImagePreview from "./imagePreview.js";
 
@@ -24,8 +25,8 @@ if (typeof window !== "undefined") {
 // Validation rules for settings
 const VALIDATION = {
     quality: { min: 10, max: 100, type: "number" },
-    maxDimensionX: { min: 100, max: 10000, type: "number" },
-    maxDimensionY: { min: 100, max: 10000, type: "number" },
+    maxDimensionX: { min: 0, max: 10000, type: "number" },
+    maxDimensionY: { min: 0, max: 10000, type: "number" },
     maxSize: { min: 0.1, max: 1000, type: "number" },
     saveOriginal: { type: "enum", values: ["y", "n"] },
     preset: { type: "enum", values: ["slider", "levels"] },
@@ -40,6 +41,13 @@ const VALIDATION = {
 function validateSetting(key, value) {
     const rule = VALIDATION[key];
     if (!rule) return value;
+
+    if (key === "maxDimensionX" || key === "maxDimensionY") {
+        return normalizeResizeDimension(value, {
+            fallback: STATE.serverDefaults[key] ?? 0,
+            max: rule.max,
+        });
+    }
 
     if (rule.type === "number") {
         const num = parseFloat(value);
@@ -161,8 +169,8 @@ function updateDOMFromState() {
  */
 function updateDefaultSummary(settings) {
     const updates = [
-        ["default_max_size_x", settings.maxDimensionX + " px"],
-        ["default_max_size_y", settings.maxDimensionY + " px"],
+        ["default_max_size_x", settings.maxDimensionX > 0 ? settings.maxDimensionX + " px" : "No resize"],
+        ["default_max_size_y", settings.maxDimensionY > 0 ? settings.maxDimensionY + " px" : "No resize"],
         ["default_min_file", settings.maxSize + " MB"],
         ["default_save_original", settings.saveOriginal === "y" ? "Yes" : "No"],
         ["default_unzip", "No"],
@@ -241,7 +249,6 @@ async function initializeEventListeners() {
         const handler = (e) => {
             const msgEl = elements.maxDimXMsgEl;
             let value = parseInt(e.target.value, 10);
-            const min = VALIDATION.maxDimensionX.min;
             const max = VALIDATION.maxDimensionX.max;
 
             if (isNaN(value)) {
@@ -249,10 +256,12 @@ async function initializeEventListeners() {
                 return;
             }
 
-            let clamped = value;
-            if (value < min) {
-                clamped = min;
-                msgEl.textContent = `Too low, will use ${min} px internally.`;
+            let clamped = normalizeResizeDimension(value, {
+                fallback: STATE.current.maxDimensionX ?? 0,
+                max,
+            });
+            if (value > 0 && value < 100) {
+                msgEl.textContent = "Too low, will use 100 px internally.";
                 msgEl.className = "text-success small mt-1";
             } else if (value > max) {
                 clamped = max;
@@ -271,7 +280,6 @@ async function initializeEventListeners() {
         const handler = (e) => {
             const msgEl = elements.maxDimYMsgEl;
             let value = parseInt(e.target.value, 10);
-            const min = VALIDATION.maxDimensionY.min;
             const max = VALIDATION.maxDimensionY.max;
 
             if (isNaN(value)) {
@@ -279,10 +287,12 @@ async function initializeEventListeners() {
                 return;
             }
 
-            let clamped = value;
-            if (value < min) {
-                clamped = min;
-                msgEl.textContent = `Too low, will use ${min} px internally.`;
+            let clamped = normalizeResizeDimension(value, {
+                fallback: STATE.current.maxDimensionY ?? 0,
+                max,
+            });
+            if (value > 0 && value < 100) {
+                msgEl.textContent = "Too low, will use 100 px internally.";
                 msgEl.className = "text-success small mt-1";
             } else if (value > max) {
                 clamped = max;
@@ -360,8 +370,8 @@ async function initializeCompressionUI(config = {}) {
     try {
         STATE.serverDefaults = {
             quality: validateSetting("quality", config.quality || 65),
-            maxDimensionX: validateSetting("maxDimensionX", config.maxDimensionX || 1600),
-            maxDimensionY: validateSetting("maxDimensionY", config.maxDimensionY || 1200),
+            maxDimensionX: validateSetting("maxDimensionX", config.maxDimensionX ?? 0),
+            maxDimensionY: validateSetting("maxDimensionY", config.maxDimensionY ?? 0),
             maxSize: validateSetting("maxSize", config.maxSize || 1),
             saveOriginal: validateSetting("saveOriginal", config.saveOriginal || "n"),
             preset: validateSetting("preset", config.preset || "slider"),

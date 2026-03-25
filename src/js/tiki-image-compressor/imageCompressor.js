@@ -10,6 +10,23 @@ import imageCompression from "browser-image-compression";
 
 const ALL_SUPPORTED = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif", "image/bmp"];
 
+function normalizeResizeDimension(value, options = {}) {
+    const { fallback = 0, max } = options;
+    const parsed = Number.parseInt(value, 10);
+
+    if (Number.isNaN(parsed)) {
+        return fallback;
+    }
+
+    if (parsed <= 0) {
+        return 0;
+    }
+
+    const normalized = parsed < 100 ? 100 : parsed;
+
+    return typeof max === "number" ? Math.min(normalized, max) : normalized;
+}
+
 /**
  * Check if file type is supported
  *
@@ -54,7 +71,17 @@ function resizeImage(file, maxWidth, maxHeight) {
 
             let { width, height } = img;
 
-            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            const normalizedMaxWidth = normalizeResizeDimension(maxWidth);
+            const normalizedMaxHeight = normalizeResizeDimension(maxHeight);
+
+            if (!normalizedMaxWidth && !normalizedMaxHeight) {
+                resolve(file);
+                return;
+            }
+
+            const widthRatio = normalizedMaxWidth ? normalizedMaxWidth / width : 1;
+            const heightRatio = normalizedMaxHeight ? normalizedMaxHeight / height : 1;
+            const ratio = Math.min(widthRatio, heightRatio);
 
             if (ratio < 1) {
                 width *= ratio;
@@ -85,8 +112,8 @@ function resizeImage(file, maxWidth, maxHeight) {
  */
 async function compressImage(fileBlob, prefs) {
     const quality = prefs.quality || 65;
-    const maxDimensionX = prefs.maxDimensionX || 1600;
-    const maxDimensionY = prefs.maxDimensionY || 1200;
+    const maxDimensionX = normalizeResizeDimension(prefs.maxDimensionX);
+    const maxDimensionY = normalizeResizeDimension(prefs.maxDimensionY);
     const maxSize = prefs.maxSize || 1;
 
     // Step 1: resize
@@ -95,7 +122,6 @@ async function compressImage(fileBlob, prefs) {
     // Step 2: compress
     const compressionOptions = {
         maxSizeMB: maxSize,
-        maxWidthOrHeight: Math.max(maxDimensionX, maxDimensionY),
         useWebWorker: typeof Worker !== "undefined",
         initialQuality: quality / 100,
         alwaysKeepResolution: true,
@@ -290,5 +316,5 @@ async function compressFileList(fileList, prefs = {}) {
     return dataTransfer;
 }
 
-export { compress, compressMultiple, compressFileList, isSupported, isImage };
+export { compress, compressMultiple, compressFileList, isSupported, isImage, normalizeResizeDimension };
 export default compress;

@@ -1,3 +1,5 @@
+import { normalizeResizeDimension } from "./imageCompressor.js";
+
 /**
  * Image Preview Module
  *
@@ -79,9 +81,12 @@ async function createCanvasPreview(canvas, img, quality, maxDimensionX, maxDimen
     let width = img.naturalWidth;
     let height = img.naturalHeight;
 
-    if (width > maxDimensionX || height > maxDimensionY) {
-        let ratioX = width > maxDimensionX ? maxDimensionX / width : 1;
-        let ratioY = height > maxDimensionY ? maxDimensionY / height : 1;
+    const normalizedMaxWidth = normalizeResizeDimension(maxDimensionX);
+    const normalizedMaxHeight = normalizeResizeDimension(maxDimensionY);
+
+    if ((normalizedMaxWidth && width > normalizedMaxWidth) || (normalizedMaxHeight && height > normalizedMaxHeight)) {
+        let ratioX = normalizedMaxWidth && width > normalizedMaxWidth ? normalizedMaxWidth / width : 1;
+        let ratioY = normalizedMaxHeight && height > normalizedMaxHeight ? normalizedMaxHeight / height : 1;
         let ratio = Math.min(ratioX, ratioY);
         width = Math.round(width * ratio);
         height = Math.round(height * ratio);
@@ -125,7 +130,11 @@ async function updatePreview(settings) {
             return;
         }
 
-        const { quality = 85, maxDimensionX = 1600, maxDimensionY = 1200 } = settings;
+        const {
+            quality = 85,
+            maxDimensionX = 0,
+            maxDimensionY = 0,
+        } = settings;
 
         try {
             // Create canvas if not exists
@@ -212,8 +221,8 @@ async function loadImageFromFile(file) {
             const state = window.COMPRESSION_STATE || {};
             updatePreview({
                 quality: state.current?.quality || 85,
-                maxDimensionX: state.current?.maxDimensionX || 1600,
-                maxDimensionY: state.current?.maxDimensionY || 1200,
+                maxDimensionX: state.current?.maxDimensionX ?? 0,
+                maxDimensionY: state.current?.maxDimensionY ?? 0,
             });
         };
         img.onerror = () => {
@@ -312,8 +321,8 @@ function refreshPreview(settings) {
     // Trigger update with new settings
     updatePreview({
         quality: settings.quality || 85,
-        maxDimensionX: settings.maxDimensionX || 1600,
-        maxDimensionY: settings.maxDimensionY || 1200,
+        maxDimensionX: settings.maxDimensionX ?? 0,
+        maxDimensionY: settings.maxDimensionY ?? 0,
     });
 }
 

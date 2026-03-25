@@ -404,10 +404,10 @@ if ($(this).val() != '') {
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|default:1600|escape}" class="form-control text-end">
+                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|default:0|escape}" min="0" class="form-control text-end">
                                 <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
-                            <span class="form-text">{tr}If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
+                            <span class="form-text">{tr}Set to 0 to disable width-based resizing. Values from 1 to 99 will use 100 pixels internally. If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
                         </div>
                     </div>
                 </div>
@@ -417,10 +417,10 @@ if ($(this).val() != '') {
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|default:1200|escape}" class="form-control text-end">
+                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|default:0|escape}" min="0" class="form-control text-end">
                                 <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
-                            <span class="form-text">{tr}If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
+                            <span class="form-text">{tr}Set to 0 to disable height-based resizing. Values from 1 to 99 will use 100 pixels internally. If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
                         </div>
                     </div>
                 </div>
