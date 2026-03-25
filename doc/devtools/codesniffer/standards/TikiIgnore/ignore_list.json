@@ -9859,7 +9859,7 @@
             "ocrLib": true
         },
         "lib/core/Services/Wiki/Utilities.php": {
-            "class:Services_Wiki_Utilities": true
+            "Services_Wiki_Utilities": true
         }
     }
 }
