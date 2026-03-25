@@ -140,6 +140,16 @@ class CookieConsentLib
     {
         global $tikilib, $user;
 
+        if ($user) {
+            $userPreferences = $tikilib->get_user_preference($user, 'cookie_consent_user_pref', '');
+            if ($userPreferences) {
+                $consentPreferences = json_decode($userPreferences, true);
+                if (is_array($consentPreferences)) {
+                    return $consentPreferences;
+                }
+            }
+        }
+
         return null;
     }
 
