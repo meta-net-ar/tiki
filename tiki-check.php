@@ -291,14 +291,14 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $tiki_security['Directory Listing Security'] = $directory_listing_check;
     $tiki_security['SSL/TLS Configuration'] = $ssl_check;
 
-    $all_properties = array_merge(
+    $all_properties = build_dashboard_all_properties(
         $server_properties,
         $mysql_properties,
         $php_properties,
         $security,
         $tiki_security,
-        isset($apache_properties) && is_array($apache_properties) ? $apache_properties : array(),
-        isset($iis_properties) && is_array($iis_properties) ? $iis_properties : array()
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array()
     );
 
     foreach ($all_properties as $key => $item) {
@@ -311,23 +311,16 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
             case FITNESS_STATUS_RISKY:
                 $critical_count++;
 
-                // Determine the correct section based on which array the item came from
-                $section = 'Server_Properties'; // default
-                if (isset($server_properties[$key])) {
-                    $section = 'Server_Properties';
-                } elseif (isset($mysql_properties[$key])) {
-                    $section = 'MySQL_or_MariaDB_Database_Properties';
-                } elseif (isset($php_properties[$key])) {
-                    $section = 'PHP_scripting_language_properties';
-                } elseif (isset($security[$key])) {
-                    $section = 'Tiki_Security';
-                } elseif (isset($tiki_security[$key])) {
-                    $section = 'Tiki_Security';
-                } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-                    $section = 'Apache_properties';
-                } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-                    $section = 'IIS_properties';
-                }
+                $section = resolve_dashboard_section(
+                    $key,
+                    $server_properties,
+                    $mysql_properties,
+                    $php_properties,
+                    $security,
+                    $tiki_security,
+                    isset($apache_properties) ? $apache_properties : array(),
+                    isset($iis_properties) ? $iis_properties : array()
+                );
 
                 $critical_issues[] = array(
                     'title' => $key,
@@ -391,41 +384,19 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $smarty->assign('health_score', $health_score);
     $smarty->assign('critical_issues', $critical_issues);
 
-    $server_critical_issues = array();
-    $security_warning_issues = array();
-    $optional_recommendations = array();
-
-    foreach ($all_properties as $key => $item) {
-        if (! isset($item['fitness_status']) || ! isset($item['message'])) {
-            continue;
-        }
-        $msg = (string) $item['message'];
-
-        $section = 'Server_Properties';
-        if (isset($server_properties[$key])) {
-            $section = 'Server_Properties';
-        } elseif (isset($mysql_properties[$key])) {
-            $section = 'MySQL_or_MariaDB_Database_Properties';
-        } elseif (isset($php_properties[$key])) {
-            $section = 'PHP_scripting_language_properties';
-        } elseif (isset($security[$key])) {
-            $section = 'Tiki_Security';
-        } elseif (isset($tiki_security[$key])) {
-            $section = 'Tiki_Security';
-        } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-            $section = 'Apache_properties';
-        } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-            $section = 'IIS_properties';
-        }
-
-        if (strpos($msg, '[Critical') === 0) {
-            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        } elseif (strpos($msg, '[Warning') === 0) {
-            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        } elseif (strpos($msg, '[Optional') === 0) {
-            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        }
-    }
+    $issue_groups = collect_prefixed_issue_groups(
+        $all_properties,
+        $server_properties,
+        $mysql_properties,
+        $php_properties,
+        $security,
+        $tiki_security,
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array()
+    );
+    $server_critical_issues = $issue_groups['server_critical_issues'];
+    $security_warning_issues = $issue_groups['security_warning_issues'];
+    $optional_recommendations = $issue_groups['optional_recommendations'];
 
     $smarty->assign('server_critical_issues', $server_critical_issues);
     $smarty->assign('security_warning_issues', $security_warning_issues);
@@ -5061,14 +5032,14 @@ if ($standalone && ! $nagios) {
     $critical_issues = array();
 
     // Count issues from different sections
-    $all_properties = array_merge(
+    $all_properties = build_dashboard_all_properties(
         $server_properties,
         $mysql_properties,
         $php_properties,
         $security,
         $tiki_security,
-        isset($apache_properties) && is_array($apache_properties) ? $apache_properties : array(),
-        isset($iis_properties) && is_array($iis_properties) ? $iis_properties : array()
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array()
     );
 
     foreach ($all_properties as $key => $item) {
@@ -5078,23 +5049,16 @@ if ($standalone && ! $nagios) {
             case FITNESS_STATUS_RISKY:
                 $critical_count++;
 
-                // Determine the correct section based on which array the item came from
-                $section = 'Server_Properties'; // default
-                if (isset($server_properties[$key])) {
-                    $section = 'Server_Properties';
-                } elseif (isset($mysql_properties[$key])) {
-                    $section = 'MySQL_or_MariaDB_Database_Properties';
-                } elseif (isset($php_properties[$key])) {
-                    $section = 'PHP_scripting_language_properties';
-                } elseif (isset($security[$key])) {
-                    $section = 'Tiki_Security';
-                } elseif (isset($tiki_security[$key])) {
-                    $section = 'Tiki_Security';
-                } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-                    $section = 'Apache_properties';
-                } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-                    $section = 'IIS_properties';
-                }
+                $section = resolve_dashboard_section(
+                    $key,
+                    $server_properties,
+                    $mysql_properties,
+                    $php_properties,
+                    $security,
+                    $tiki_security,
+                    isset($apache_properties) ? $apache_properties : array(),
+                    isset($iis_properties) ? $iis_properties : array()
+                );
 
                 $critical_issues[] = array(
                     'title' => $key,
@@ -5183,59 +5147,22 @@ if ($standalone && ! $nagios) {
     $smarty->assign('info_count', $info_count);
     $smarty->assign('good_count', $good_count);
     $smarty->assign('critical_issues', $critical_issues);
-    $server_critical_issues = array();
-    $security_warning_issues = array();
-    $optional_recommendations = array();
-
-    // From core checks
-    foreach ($all_properties as $key => $item) {
-        if (! isset($item['message']) || ! isset($item['fitness_status'])) {
-            continue;
-        }
-        $msg = (string) $item['message'];
-
-        $section = 'Server_Properties';
-        if (isset($server_properties[$key])) {
-            $section = 'Server_Properties';
-        } elseif (isset($mysql_properties[$key])) {
-            $section = 'MySQL_or_MariaDB_Database_Properties';
-        } elseif (isset($php_properties[$key])) {
-            $section = 'PHP_scripting_language_properties';
-        } elseif (isset($security[$key])) {
-            $section = 'Tiki_Security';
-        } elseif (isset($tiki_security[$key])) {
-            $section = 'Tiki_Security';
-        } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-            $section = 'Apache_properties';
-        } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-            $section = 'IIS_properties';
-        }
-
-        if (strpos($msg, '[Critical') === 0) {
-            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        } elseif (strpos($msg, '[Warning') === 0) {
-            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        } elseif (strpos($msg, '[Optional') === 0) {
-            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-        }
-    }
-
-    // From OCR checks
-    if (isset($ocrToDisplay)) {
-        foreach ($ocrToDisplay as $ocr) {
-            if (! isset($ocr['message']) || ! isset($ocr['name'])) {
-                continue;
-            }
-            $msg = (string) $ocr['message'];
-            if (strpos($msg, '[Critical') === 0) {
-                $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-            } elseif (strpos($msg, '[Warning') === 0) {
-                $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-            } elseif (strpos($msg, '[Optional') === 0) {
-                $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-            }
-        }
-    }
+    $issue_groups = collect_prefixed_issue_groups(
+        $all_properties,
+        $server_properties,
+        $mysql_properties,
+        $php_properties,
+        $security,
+        $tiki_security,
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array(),
+        array(),
+        array(),
+        isset($ocrToDisplay) ? $ocrToDisplay : array()
+    );
+    $server_critical_issues = $issue_groups['server_critical_issues'];
+    $security_warning_issues = $issue_groups['security_warning_issues'];
+    $optional_recommendations = $issue_groups['optional_recommendations'];
 
     $smarty->assign('server_critical_issues', $server_critical_issues);
     $smarty->assign('security_warning_issues', $security_warning_issues);
@@ -5983,7 +5910,7 @@ function check_phpmyadmin_installations()
 function check_adminer_installations()
 {
     $issues = array();
- 
+
     $adminer_files = array(
         'adminer.php',
         'adminer-*.php',
@@ -6057,7 +5984,6 @@ function check_backup_configuration_files()
 function check_directory_listing_vulnerabilities()
 {
     $issues = array();
-    
     $htaccess_files = array('.htaccess', 'htaccess.txt');
 
     foreach ($htaccess_files as $file) {
@@ -6120,6 +6046,149 @@ function no_cache_found()
             'message' => tra('OPcache is being used as the ByteCode Cache; if one of these were used and correctly configured, performance would be increased. See Admin->Performance in the Tiki for more details.')
         );
     }
+}
+
+/**
+ * Build the merged properties array used by dashboard computations.
+ */
+function build_dashboard_all_properties(
+    $server_properties,
+    $mysql_properties,
+    $php_properties,
+    $security,
+    $tiki_security,
+    $apache_properties = array(),
+    $iis_properties = array(),
+    $tiki_properties = array(),
+    $database_properties = array()
+) {
+    return array_merge(
+        is_array($server_properties) ? $server_properties : array(),
+        is_array($mysql_properties) ? $mysql_properties : array(),
+        is_array($php_properties) ? $php_properties : array(),
+        is_array($security) ? $security : array(),
+        is_array($tiki_security) ? $tiki_security : array(),
+        is_array($apache_properties) ? $apache_properties : array(),
+        is_array($iis_properties) ? $iis_properties : array(),
+        is_array($tiki_properties) ? $tiki_properties : array(),
+        is_array($database_properties) ? $database_properties : array()
+    );
+}
+
+/**
+ * Resolve which dashboard section an item belongs to.
+ */
+function resolve_dashboard_section(
+    $key,
+    $server_properties,
+    $mysql_properties,
+    $php_properties,
+    $security,
+    $tiki_security,
+    $apache_properties = array(),
+    $iis_properties = array(),
+    $tiki_properties = array(),
+    $database_properties = array()
+) {
+    if (isset($server_properties[$key])) {
+        return 'Server_Properties';
+    }
+    if (isset($mysql_properties[$key])) {
+        return 'MySQL_or_MariaDB_Database_Properties';
+    }
+    if (isset($php_properties[$key])) {
+        return 'PHP_scripting_language_properties';
+    }
+    if (isset($security[$key])) {
+        return 'Tiki_Security';
+    }
+    if (isset($tiki_security[$key])) {
+        return 'Tiki_Security';
+    }
+    if (isset($apache_properties[$key])) {
+        return 'Apache_properties';
+    }
+    if (isset($iis_properties[$key])) {
+        return 'IIS_properties';
+    }
+    if (isset($tiki_properties[$key])) {
+        return 'Tiki_Properties';
+    }
+    if (isset($database_properties[$key])) {
+        return 'Database_Properties';
+    }
+
+    return 'Server_Properties';
+}
+
+/**
+ * Build grouped issue lists based on message prefixes.
+ */
+function collect_prefixed_issue_groups(
+    $all_properties,
+    $server_properties,
+    $mysql_properties,
+    $php_properties,
+    $security,
+    $tiki_security,
+    $apache_properties = array(),
+    $iis_properties = array(),
+    $tiki_properties = array(),
+    $database_properties = array(),
+    $ocrToDisplay = array()
+) {
+    $server_critical_issues = array();
+    $security_warning_issues = array();
+    $optional_recommendations = array();
+
+    foreach ($all_properties as $key => $item) {
+        if (! isset($item['message']) || ! isset($item['fitness_status'])) {
+            continue;
+        }
+        $msg = (string) $item['message'];
+        $section = resolve_dashboard_section(
+            $key,
+            $server_properties,
+            $mysql_properties,
+            $php_properties,
+            $security,
+            $tiki_security,
+            $apache_properties,
+            $iis_properties,
+            $tiki_properties,
+            $database_properties
+        );
+
+        if (strpos($msg, '[Critical') === 0) {
+            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Warning') === 0) {
+            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Optional') === 0) {
+            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        }
+    }
+
+    if (is_array($ocrToDisplay)) {
+        foreach ($ocrToDisplay as $ocr) {
+            if (! isset($ocr['message']) || ! isset($ocr['name'])) {
+                continue;
+            }
+            $msg = (string) $ocr['message'];
+            if (strpos($msg, '[Critical') === 0) {
+                $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            } elseif (strpos($msg, '[Warning') === 0) {
+                $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            } elseif (strpos($msg, '[Optional') === 0) {
+                $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            }
+        }
+    }
+
+    return array(
+        'server_critical_issues' => $server_critical_issues,
+        'security_warning_issues' => $security_warning_issues,
+        'optional_recommendations' => $optional_recommendations,
+    );
 }
 
 // Debug: Count FITNESS_STATUS constants
@@ -6230,16 +6299,16 @@ $good_count = 0;
 $critical_issues = array();
 
 // Count issues from different sections (same logic as AJAX section)
-$all_properties = array_merge(
+$all_properties = build_dashboard_all_properties(
     $server_properties,
     $mysql_properties,
     $php_properties,
     $security,
     $tiki_security,
-    isset($apache_properties) && is_array($apache_properties) ? $apache_properties : array(),
-    isset($iis_properties) && is_array($iis_properties) ? $iis_properties : array(),
-    isset($tiki_properties) && is_array($tiki_properties) ? $tiki_properties : array(),
-    isset($database_properties) && is_array($database_properties) ? $database_properties : array()
+    isset($apache_properties) ? $apache_properties : array(),
+    isset($iis_properties) ? $iis_properties : array(),
+    isset($tiki_properties) ? $tiki_properties : array(),
+    isset($database_properties) ? $database_properties : array()
 );
 
 foreach ($all_properties as $key => $item) {
@@ -6250,26 +6319,18 @@ foreach ($all_properties as $key => $item) {
             $main_critical++;
             $critical_count++;
 
-            $section = 'Server_Properties'; // default
-            if (isset($server_properties[$key])) {
-                $section = 'Server_Properties';
-            } elseif (isset($mysql_properties[$key])) {
-                $section = 'MySQL_or_MariaDB_Database_Properties';
-            } elseif (isset($php_properties[$key])) {
-                $section = 'PHP_scripting_language_properties';
-            } elseif (isset($security[$key])) {
-                $section = 'Tiki_Security';
-            } elseif (isset($tiki_security[$key])) {
-                $section = 'Tiki_Security';
-            } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-                $section = 'Apache_properties';
-            } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-                $section = 'IIS_properties';
-            } elseif (isset($tiki_properties) && isset($tiki_properties[$key])) {
-                $section = 'Tiki_Properties';
-            } elseif (isset($database_properties) && isset($database_properties[$key])) {
-                $section = 'Database_Properties';
-            }
+            $section = resolve_dashboard_section(
+                $key,
+                $server_properties,
+                $mysql_properties,
+                $php_properties,
+                $security,
+                $tiki_security,
+                isset($apache_properties) ? $apache_properties : array(),
+                isset($iis_properties) ? $iis_properties : array(),
+                isset($tiki_properties) ? $tiki_properties : array(),
+                isset($database_properties) ? $database_properties : array()
+            );
 
             $critical_issues[] = array(
                 'title' => $key,
@@ -6379,61 +6440,22 @@ $smarty->assign('info_count', $info_count);
 $smarty->assign('good_count', $good_count);
 $smarty->assign('critical_issues', $critical_issues);
 
-$server_critical_issues = array();
-$security_warning_issues = array();
-$optional_recommendations = array();
-
-foreach ($all_properties as $key => $item) {
-    if (! isset($item['message']) || ! isset($item['fitness_status'])) {
-        continue;
-    }
-    $msg = (string) $item['message'];
-
-    $section = 'Server_Properties';
-    if (isset($server_properties[$key])) {
-        $section = 'Server_Properties';
-    } elseif (isset($mysql_properties[$key])) {
-        $section = 'MySQL_or_MariaDB_Database_Properties';
-    } elseif (isset($php_properties[$key])) {
-        $section = 'PHP_scripting_language_properties';
-    } elseif (isset($security[$key])) {
-        $section = 'Tiki_Security';
-    } elseif (isset($tiki_security[$key])) {
-        $section = 'Tiki_Security';
-    } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
-        $section = 'Apache_properties';
-    } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
-        $section = 'IIS_properties';
-    } elseif (isset($tiki_properties) && isset($tiki_properties[$key])) {
-        $section = 'Tiki_Properties';
-    } elseif (isset($database_properties) && isset($database_properties[$key])) {
-        $section = 'Database_Properties';
-    }
-
-    if (strpos($msg, '[Critical') === 0) {
-        $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-    } elseif (strpos($msg, '[Warning') === 0) {
-        $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-    } elseif (strpos($msg, '[Optional') === 0) {
-        $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
-    }
-}
-
-if (isset($ocrToDisplay)) {
-    foreach ($ocrToDisplay as $ocr) {
-        if (! isset($ocr['message']) || ! isset($ocr['name'])) {
-            continue;
-        }
-        $msg = (string) $ocr['message'];
-        if (strpos($msg, '[Critical') === 0) {
-            $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-        } elseif (strpos($msg, '[Warning') === 0) {
-            $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-        } elseif (strpos($msg, '[Optional') === 0) {
-            $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
-        }
-    }
-}
+$issue_groups = collect_prefixed_issue_groups(
+    $all_properties,
+    $server_properties,
+    $mysql_properties,
+    $php_properties,
+    $security,
+    $tiki_security,
+    isset($apache_properties) ? $apache_properties : array(),
+    isset($iis_properties) ? $iis_properties : array(),
+    isset($tiki_properties) ? $tiki_properties : array(),
+    isset($database_properties) ? $database_properties : array(),
+    isset($ocrToDisplay) ? $ocrToDisplay : array()
+);
+$server_critical_issues = $issue_groups['server_critical_issues'];
+$security_warning_issues = $issue_groups['security_warning_issues'];
+$optional_recommendations = $issue_groups['optional_recommendations'];
 
 $smarty->assign('server_critical_issues', $server_critical_issues);
 $smarty->assign('security_warning_issues', $security_warning_issues);
