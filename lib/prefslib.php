@@ -107,6 +107,22 @@ class PreferencesLib
         return '';
     }
 
+    /**
+     * Clearly this was meant as the main accessor for preferences information (would be more adequately called getPreferenceInfo).
+     * It is the only place I could find that lists all the possible values
+     * for the keys contained in the preference definition (although it doesn't document them)
+     *
+     * I do not know why (historically) a true refactoring from the global $pref variable was
+     * never started.
+     *
+     * There is a TikiLib::get_preference() to directly return the value, but it has questionable fallbacks, and is independent of this code:
+     * It does not read the type, so can't be relied upon unless you know in advance it returns an array.
+     * @param [type] $name
+     * @param boolean $deps Process dependencies (does not currently enforce them, just returns information)
+     * @param ?array $source Is set, will look for the preference value in this variable instead of the global $pref array.
+     * @param boolean $get_pages If true, will return the result of $this->getPreferenceLocations($name) in the 'pages' key.
+     * @return false on failure or an array of information on the preference.  That actual value is in the 'value' key.
+     */
     public function getPreference($name, $deps = true, $source = null, $get_pages = false)
     {
         global $prefs, $systemConfiguration;
@@ -117,7 +133,7 @@ class PreferencesLib
             return false;
         }
         $defaults = [
-            'type' => '',
+            'type' => '', //Possible values appear to be 'flag', 'list' as in selection from a list as opposed to array, 'multilist' (as in array), 'text', 'textarea', 'password', 'multicheckbox', 'group'
             'helpurl' => '',
             'help' => '',
             'adminurl' => 'tiki-admin.php?lm_criteria=' . urlencode($name) . '&amp;exact',

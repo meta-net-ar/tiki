@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\CookieConsent;
 
+use InvalidArgumentException;
+
 class CookieConsentLib
 {
     // Define constants for cookie categories
@@ -46,6 +48,39 @@ class CookieConsentLib
         ];
     }
 
+    private static function getDisabledCookieCategoryKeys(): array
+    {
+        $disabledCategoriesInfo = \TikiLib::lib('prefs')->getPreference('cookie_consent_disable_builtin_categories');
+        return $disabledCategoriesInfo['value'];
+    }
+
+    /**
+     * Stub function to minimize code churn.  In the future this will return all consent categories that were requested
+     * by tiki code for the current request.
+     *
+     * Right now, it will return the categories not included in the temporary cookie_consent_disable_builtin_categories prefs
+     *
+     * @return array Cookie categories requested by tiki code in the current request.
+     */
+    public static function getRequestedCookieCategories(): array
+    {
+
+        $requestedCategories = self::getCookieCategories();
+
+        $disabledCategories = self::getDisabledCookieCategoryKeys();
+        if ($disabledCategories) {
+            //Strip out the disabled categories
+            foreach ($disabledCategories as $disabledCategoryKey) {
+                if (isset($requestedCategories[$disabledCategoryKey])) {
+                    unset($requestedCategories[$disabledCategoryKey]);
+                } else {
+                    \Feedback::error(tr("Category %0 from pref cookie_consent_disable_builtin_categories not found in: %1", $disabledCategoryKey, implode(', ', array_keys($requestedCategories))));
+                }
+            }
+        }
+        return $requestedCategories;
+    }
+
     /**
      * Initialize the consent preferences based on existing cookies.
      *
@@ -62,6 +97,7 @@ class CookieConsentLib
         ];
 
         // First, try to read the consent cookie from browser cookie
+        // FIXME:  This is wrong, it will override the stored prefreneces - benoitg - 2026-03-24
         $rawConsentCookie = self::getCookie(self::COOKIE_CONSENT_NAME);
         $consentCookie = $rawConsentCookie !== null ? urldecode($rawConsentCookie) : null;
 
@@ -146,7 +182,7 @@ class CookieConsentLib
      * @param string $category The category to check (e.g., 'analytics').
      * @return bool True if the category is explicitly allowed (true), false otherwise.
      */
-    public static function isCategoryAllowed(string $category)
+    public static function isCategoryAllowed(string $category): bool
     {
         if (! array_key_exists($category, self::getCookieCategories())) {
             throw new \InvalidArgumentException('Invalid category.');
@@ -154,6 +190,12 @@ class CookieConsentLib
         // throw an error when category not provided
         if (empty($category)) {
             throw new \InvalidArgumentException('Category not provided.');
+        }
+
+        $disabledCategories = self::getDisabledCookieCategoryKeys();
+        if (isset($disabledCategories[$category])) {
+            //The category is disabled, act as if the user refused consent.
+            return false;
         }
         // Retrieve the stored consent for the given category.
         // getConsentPreferences($category) should return

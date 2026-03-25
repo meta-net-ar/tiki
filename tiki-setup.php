@@ -270,8 +270,7 @@ if (! TIKI_API) {
                 }
             }
             // Get cookie categories
-            $cookie_categories = CookieConsentLib::getCookieCategories();
-            $smarty->assign('cookie_categories', $cookie_categories);
+            $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');
         }
     }

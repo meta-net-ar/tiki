@@ -189,6 +189,7 @@
                         {preference name=cookie_consent_description}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
+                        {preference name=cookie_consent_disable_builtin_categories}
                         {preference name=cookie_consent_disable}
                     </div>
                 </fieldset>
