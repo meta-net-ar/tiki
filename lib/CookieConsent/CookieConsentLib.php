@@ -90,22 +90,28 @@ class CookieConsentLib
     {
         global $tikilib, $user, $prefs;
 
-        $consentPreferences = [
+        $defaultConsentPreferences = [
             'action' => 'customized',
             'consentGiven' => false, // Helps determine if the user has given consent or not
             'categories' => array_map(fn() => false, array_keys(self::getCookieCategories())) // Default to false for all categories
         ];
+        $consentPreferences = null;
+        /* FIXME:  This is incomplete.  There are at least the following cases to deal with:
+            1- The browser cookie is absent, user not logged in.
+                * Right now we ask consent systematically (can't improve until we collect the functions that request consent)
+                * The consent form is modal, and you can't do anything unless you clear it.  Which you can't. This is stupid, and I can't remember another website that does this.
+            2- The browser cookie is present, user not logged in.  No need to re-ask consent, unless new categories requested (which isn't working now, but since we ask for all of them, and it's a bit unlikely to have new categories added beyond the BUILTIN ones, it may be tolerable for the time being)
+            3- The browser cookie is absent, user logs in.  Consent needs to be written back.
+                * This scenario is impossible now (the consent interface being modal) But it looks like it would work with the 2026-03-24 fixes..
+            4- The browser cookie is present, user logs in and had no prefs set.  Consent needs to be migrated over.  This does not work now as far as I can tell
+            5- The browser cookie is present, user logs in and had inconsistent prefs set.  This isn't dealt with at all.
+            6- User is or isn't logged in, consent is updated manually.  This wasn't working if the user was logged-in.  Fixed with the 2026-03-24 fixes for logged in users.
+                * I cannot find where an anonymous user is supposed to do this.
 
-        // First, try to read the consent cookie from browser cookie
-        // FIXME:  This is wrong, it will override the stored prefreneces - benoitg - 2026-03-24
-        $rawConsentCookie = self::getCookie(self::COOKIE_CONSENT_NAME);
-        $consentCookie = $rawConsentCookie !== null ? urldecode($rawConsentCookie) : null;
+            benoitg - 2026-03-24
+        */
 
-        if ($consentCookie) {
-            $consentPreferences = json_decode(urldecode($consentCookie), true);
-            return $consentPreferences;
-        }
-        // If the user is logged in, try to load their stored preference
+        // First, if the user is logged in, try to load their stored preference
         if ($user) {
             $userPreferences = $tikilib->get_user_preference($user, 'cookie_consent_user_pref', '');
             if ($userPreferences) {
@@ -113,10 +119,26 @@ class CookieConsentLib
                 if (is_array($consentPreferences)) {
                     // Sync the cookie with the user preference
                     self::setConsentPreferences($consentPreferences);
-                    return $consentPreferences;
                 }
             }
         }
+
+        // Second, try to read the consent cookie from browser cookie
+        if (! $consentPreferences) {
+            $rawConsentCookie = self::getCookie(self::COOKIE_CONSENT_NAME);
+            $consentCookie = $rawConsentCookie !== null ? urldecode($rawConsentCookie) : null;
+
+            if ($consentCookie) {
+                $consentPreferences = json_decode(urldecode($consentCookie), true);
+                return $consentPreferences;
+            }
+        }
+
+        // Third, fallback to defaults
+        if (! $consentPreferences) {
+            $consentPreferences = $defaultConsentPreferences;
+        }
+
         return $consentPreferences;
     }
 
@@ -191,31 +213,27 @@ class CookieConsentLib
         if (empty($category)) {
             throw new \InvalidArgumentException('Category not provided.');
         }
-
         $disabledCategories = self::getDisabledCookieCategoryKeys();
         if (isset($disabledCategories[$category])) {
             //The category is disabled, act as if the user refused consent.
             return false;
         }
+
+        //Uncomment to debug effective cookies consent.  The js variable in jqueryTiki isn't really readable from page source.
+        //echo "Cookies consent before first check: \n";var_dump(self::getConsentPreferences()); die;
+
         // Retrieve the stored consent for the given category.
         // getConsentPreferences($category) should return
         // true (allowed), false (refused) or null (not answered).
-        return self::getConsentPreferences()['categories'][$category] ?? false;
-    }
+        $preference = self::getConsentPreferences()['categories'][$category];
 
-    /**
-     * Public wrapper to check if a specific category is allowed.
-     *
-     * @param string $category The category to check (e.g., 'analytics').
-     * @return bool True if the category is allowed, false otherwise.
-     */
-    public static function checkAllowedCookieCategory(string $category)
-    {
-        return self::isCategoryAllowed($category);
+        return $preference ?? false;
     }
 
     /**
      * Set a cookie at runtime with the specified category, if allowed.
+     *
+     * TODO:  Write a simple setCookie() function to mirror getCookie().  This function's signature is what it is only for legacy reasons - benoitg - 2026-03-25
      *
      * @return bool Returns true if the cookie was set, false if consent was not given.
      */
@@ -230,10 +248,9 @@ class CookieConsentLib
         bool $secure = false,
         bool $httpOnly = false
     ): bool {
-        // Retrieve the stored consent preferences
-        $preferences = self::initializeConsentPreferences();
         // Check if the category is allowed
-        if (isset($preferences['categories'][$category]) && $preferences['categories'][$category] === true) {
+
+        if (self::isCategoryAllowed($category)) {
             self::setCookieSection(
                 $name,
                 $value,
@@ -250,7 +267,7 @@ class CookieConsentLib
 
     private static function setCookieSection($name, $value, $section = '', $expire = 0, $path = '', $domain = '', $secure = '')
     {
-        global $feature_no_cookie;
+        global $feature_no_cookie;  //This global is undocumented, but I can only find one place that assigns it, and it's not a global there!  benoitg - 2026-06-25
 
         if (TIKI_API) {
             return;
@@ -272,6 +289,7 @@ class CookieConsentLib
             }
         } else {
             if ($feature_no_cookie) {
+                // See note at the begining of fucntion.  As far as I can tell, this is unreachable code - benoitg - 2026-06-25
                 $_SESSION['tiki_cookie_jar'][$name] = $value;
             } else {
                 setcookie($name, $value, $expire, $path, $domain, $secure);

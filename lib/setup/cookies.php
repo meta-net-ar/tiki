@@ -30,6 +30,10 @@ if (isset($_SESSION['tiki_cookie_jar'])) {
 
 $smarty->assign_by_ref('cookie', $_COOKIE);
 
+/**
+ * This seems to be the mirror function of CookieConsentLib::setCookieSection(), but
+ * I am not 100% sure since CookieConsentLib has it's own setCookie() method - benoitg - 2026-03-26
+ */
 function getCookie($name, $section = null, $default = null)
 {
     global $feature_no_cookie, $jitCookie;
