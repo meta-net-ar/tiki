@@ -27,10 +27,39 @@ class Forums extends AbstractType
         }
 
         $commentsLib = TikiLib::lib('comments');
-        $channels = $commentsLib->list_forums();
 
-        $channels['data'] = Perms::filter(['type' => 'forum'], 'object', $channels['data'], ['object' => 'forumId'], 'forum_read');
+        $ranges = $this->getTypeDateRanges('Forums', $prefs['sitemap_split']);
+        foreach ($ranges as $range) {
 
-        $this->addEntriesToSitemap($channels, '/tiki-view_forum.php?forumId=%s', 'forumId', null, 'forum.xml', '', 'lastPost', '0.6', 'daily');
+            // On automatic mode skip non requested ranges.
+            if ($auto
+                && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))) {
+                continue;
+            }
+
+            [$min, $max] = $this->getRangeDateFilters($range);
+
+            $channels = $commentsLib->list_forums(
+                date_min: $min,
+                date_max: $max
+            );
+
+            $channels['data'] = Perms::filter(['type' => 'forum'], 'object', $channels['data'], ['object' => 'forumId'], 'forum_read');
+
+            if (empty($channels['data'])) {
+                continue;
+            }
+
+            $fileName = $range['prefix'] . '.xml';
+            if (isset($range['year'])) {
+                $fileName = $range['prefix'] . '-' . $range['year'] . '.xml';
+                if (isset($range['month'])) {
+                    $fileName = $range['prefix'] . '-' . $range['year'] . '_' . $range['month'] . '.xml';
+                }
+            }
+
+            $this->addEntriesToSitemap($channels, '/tiki-view_forum.php?forumId=%s', 'forumId', null, $fileName, '', 'lastPost', '0.6', 'daily');
+        }
     }
 }
