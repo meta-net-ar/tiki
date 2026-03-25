@@ -86,17 +86,55 @@
         </div>
     </div>
     
-    {* Critical Issues Summary *}
-    {if $critical_issues && count($critical_issues) > 0}
+    {* Critical Issues Summary (server-level must-fix) *}
+    {if $server_critical_issues && count($server_critical_issues) > 0}
     <div class="critical-issues-summary mt-3">
         <div class="alert alert-danger">
-            <h5><i class="fas fa-exclamation-triangle"></i> {tr}Critical Issues Requiring Attention{/tr}</h5>
+            <h5><i class="fas fa-exclamation-triangle"></i> {tr}Critical Issues (Server Configuration - Must Fix){/tr}</h5>
             <ul class="mb-0">
-                {foreach from=$critical_issues item=issue}
+                {foreach from=$server_critical_issues item=issue}
                 <li>
                     <strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
                     <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-danger ml-2">{tr}View Details{/tr}</a>
+                    {/if}
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+    {/if}
+
+    {* Security Warnings *}
+    {if $security_warning_issues && count($security_warning_issues) > 0}
+    <div class="critical-issues-summary mt-3">
+        <div class="alert alert-warning">
+            <h5><i class="fas fa-exclamation-circle"></i> {tr}Security Warnings (Verify and Harden){/tr}</h5>
+            <ul class="mb-0">
+                {foreach from=$security_warning_issues item=issue}
+                <li>
+                    <strong>{$issue.title}</strong>: {$issue.message}
+                    {if $issue.section}
+                    <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-warning ml-2">{tr}View Details{/tr}</a>
+                    {/if}
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+    {/if}
+
+    {* Optional Features / Recommendations *}
+    {if $optional_recommendations && count($optional_recommendations) > 0}
+    <div class="critical-issues-summary mt-3">
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle"></i> {tr}Optional Features / Recommendations{/tr}</h5>
+            <ul class="mb-0">
+                {foreach from=$optional_recommendations item=issue}
+                <li>
+                    <strong>{$issue.title}</strong>: {$issue.message}
+                    {if $issue.section}
+                    <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-info ml-2">{tr}View Details{/tr}</a>
                     {/if}
                 </li>
                 {/foreach}

@@ -91,6 +91,28 @@ if ($standalone) {
 }
 // AJAX dashboard refresh
 if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalone) {
+    // AJAX runs both in standalone and inside Tiki.
+    // Standalone detection should rely on template availability, not DB config presence.
+    $template_exists = file_exists('./templates/tiki-check.tpl');
+    $standalone = ! $template_exists;
+    if (! $standalone && file_exists('./tiki-setup.php')) {
+        require_once 'tiki-setup.php';
+        // Same permission as the main (non-standalone) page
+        $access->check_permission('tiki_p_admin');
+    }
+    if (! function_exists('tra')) {
+        function tra($string)
+        {
+            return $string;
+        }
+    }
+    if (! function_exists('tr')) {
+        function tr($string)
+        {
+            return $string;
+        }
+    }
+
     // Initialize variables for AJAX calculation
     $critical_count = 0;
     $warning_count = 0;
@@ -135,40 +157,64 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
         );
     }
 
-    // Check critical security functions
-    $dangerous_functions = array('exec', 'passthru', 'shell_exec', 'system', 'proc_open', 'popen', 'curl_exec', 'curl_multi_exec', 'parse_ini_file');
-    foreach ($dangerous_functions as $func) {
+    // Check security-sensitive PHP functions (recommended: disable at server level unless explicitly needed)
+    // Note: parse_ini_file is required by Tiki (System Configuration feature) and MUST remain enabled.
+    $security_sensitive_functions = array('exec', 'passthru', 'shell_exec', 'system', 'proc_open', 'popen', 'curl_exec', 'curl_multi_exec');
+    foreach ($security_sensitive_functions as $func) {
         if (function_exists($func)) {
             $security[$func] = array(
                 'fitness' => tra('bad'),
                 'fitness_status' => FITNESS_STATUS_BAD,
                 'setting' => 'Enabled',
-                'message' => tra('This function is enabled and could be a security risk.')
+                'message' => tr(
+                    "[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows PHP to execute or proxy system/network actions that can be abused if an application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Some optional Tiki features may require it; enable only with a clear need and compensating controls.",
+                    $func
+                ),
             );
         } else {
             $security[$func] = array(
                 'fitness' => tra('good'),
                 'fitness_status' => FITNESS_STATUS_GOOD,
                 'setting' => 'Disabled',
-                'message' => tra('This function is disabled, which is good for security.')
+                'message' => tr(
+                    "[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Some optional features may not work unless this function is enabled.",
+                    $func
+                ),
             );
         }
     }
 
-    // Check allow_url_fopen
+    // Required function
+    if (function_exists('parse_ini_file')) {
+        $security['parse_ini_file'] = array(
+            'fitness' => tra('good'),
+            'fitness_status' => FITNESS_STATUS_GOOD,
+            'setting' => 'Enabled',
+            'message' => tra("[Good - Required]<br>The PHP function 'parse_ini_file' is enabled.<br>&rarr; Required by Tiki for the System Configuration feature."),
+        );
+    } else {
+        $security['parse_ini_file'] = array(
+            'fitness' => tra('bad'),
+            'fitness_status' => FITNESS_STATUS_BAD,
+            'setting' => 'Disabled',
+            'message' => tra("[Critical - Server configuration]<br>The PHP function 'parse_ini_file' is disabled.<br>&rarr; Impact: Required functionality will not work (System Configuration).<br>&rarr; Fix: Remove it from disable_functions in your PHP configuration (php.ini or per-site PHP config)."),
+        );
+    }
+
+    // Check allow_url_fopen (recommended: disable at server level)
     if (ini_get('allow_url_fopen')) {
         $security['allow_url_fopen'] = array(
             'fitness' => tra('bad'),
             'fitness_status' => FITNESS_STATUS_BAD,
             'setting' => tra('Enabled'),
-            'message' => tr('%0 is enabled, which could be a security risk.', 'allow_url_fopen')
+            'message' => tra("[Critical - Server configuration]<br>The PHP setting 'allow_url_fopen' is enabled.<br>&rarr; Risk: Enables remote file/URL access via filesystem functions (increases SSRF/RFI risk).<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Set allow_url_fopen=0 in your PHP configuration (php.ini or per-site PHP config).")
         );
     } else {
         $security['allow_url_fopen'] = array(
             'fitness' => tra('good'),
             'fitness_status' => FITNESS_STATUS_GOOD,
             'setting' => tra('Disabled'),
-            'message' => tr('%0 is disabled, which is good for security.', 'allow_url_fopen')
+            'message' => tra("[Good - Server configuration]<br>The PHP setting 'allow_url_fopen' is disabled (recommended for security hardening).")
         );
     }
 
@@ -323,6 +369,20 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     // Critical issues are now handled by the template
 
     // Use Smarty template for dashboard
+    // Use Smarty template for dashboard (if available)
+    if (! isset($smarty) || ! is_object($smarty)) {
+        if (class_exists('Smarty\\Smarty')) {
+            $smarty = new Smarty();
+        }
+    }
+    if (! isset($smarty) || ! is_object($smarty)) {
+        header('Content-Type: text/html; charset=utf-8');
+        die(
+            '<div class="alert alert-danger">'
+            . 'Dashboard refresh is not available because Smarty is not loaded in this environment.'
+            . '</div>'
+        );
+    }
     $smarty->setTemplateDir('./templates/');
     $smarty->setCompileDir('./temp/');
     $smarty->setCacheDir('./temp/');
@@ -337,6 +397,47 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
     $smarty->assign('critical_percentage', $critical_percentage);
     $smarty->assign('health_score', $health_score);
     $smarty->assign('critical_issues', $critical_issues);
+    // Provide grouped issue lists for infrastructure-agnostic dashboard rendering
+    $server_critical_issues = array();
+    $security_warning_issues = array();
+    $optional_recommendations = array();
+
+    foreach ($all_properties as $key => $item) {
+        if (! isset($item['fitness_status']) || ! isset($item['message'])) {
+            continue;
+        }
+        $msg = (string) $item['message'];
+
+        // Determine the correct section based on which array the item came from
+        $section = 'Server_Properties'; // default
+        if (isset($server_properties[$key])) {
+            $section = 'Server_Properties';
+        } elseif (isset($mysql_properties[$key])) {
+            $section = 'MySQL_or_MariaDB_Database_Properties';
+        } elseif (isset($php_properties[$key])) {
+            $section = 'PHP_scripting_language_properties';
+        } elseif (isset($security[$key])) {
+            $section = 'Tiki_Security';
+        } elseif (isset($tiki_security[$key])) {
+            $section = 'Tiki_Security';
+        } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
+            $section = 'Apache_properties';
+        } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
+            $section = 'IIS_properties';
+        }
+
+        if (strpos($msg, '[Critical') === 0) {
+            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Warning') === 0) {
+            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Optional') === 0) {
+            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        }
+    }
+
+    $smarty->assign('server_critical_issues', $server_critical_issues);
+    $smarty->assign('security_warning_issues', $security_warning_issues);
+    $smarty->assign('optional_recommendations', $optional_recommendations);
     $smarty->assign('source_breakdown', array(
         'critical' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
         'warning' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
@@ -2915,21 +3016,17 @@ if (! $standalone) {
 
     if (! $ocrVersion) {
         $ocrVersion = tra('Not Installed');
-        $ocrMessage = tra(
-            'Tesseract PHP package could not be found. Try installing through Packages.'
-        );
-        $ocrStatus = 'bad';
-        $fitness_status = FITNESS_STATUS_BAD;
+        $ocrMessage = tra('[Optional - Application feature]<br>Tesseract PHP package is not installed.<br>&rarr; This is only required if you plan to use OCR features.<br>&rarr; Fix: Install OCR dependencies via Tiki Packages (or your deployment process) if OCR is needed.');
+        $ocrStatus = 'info';
+        $fitness_status = FITNESS_STATUS_INFO;
     } elseif (version_compare($ocrVersion, $tesseractPkgMinVersion, '>=')) {
         $ocrMessage = tra('Tesseract PHP dependency installed.');
         $ocrStatus = 'good';
         $fitness_status = FITNESS_STATUS_GOOD;
     } else {
-        $ocrMessage = tra(
-            'The installed Tesseract version is lower than the required version.'
-        );
-        $ocrStatus = 'bad';
-        $fitness_status = FITNESS_STATUS_BAD;
+        $ocrMessage = tra('[Warning - Application feature]<br>The installed Tesseract PHP package version is lower than the required version.<br>&rarr; Impact: OCR may fail or behave unexpectedly.<br>&rarr; Fix: Upgrade the Tesseract PHP package if OCR is used.');
+        $ocrStatus = 'unsure';
+        $fitness_status = FITNESS_STATUS_UNSURE;
     }
 
     $ocrToDisplay = array(array(
@@ -2970,11 +3067,9 @@ if (! $standalone) {
 
     if (! $ocrVersion) {
         $ocrVersion = tra('Not Found');
-        $ocrMessage = tra(
-            'Tesseract could not be found.'
-        );
-        $ocrStatus = 'bad';
-        $fitness_status = FITNESS_STATUS_BAD;
+        $ocrMessage = tra('[Optional - Server dependency]<br>Tesseract binary was not found on the server.<br>&rarr; This is only required if OCR is used.<br>&rarr; Fix: Install Tesseract on the server and configure the path preferences if OCR is needed.');
+        $ocrStatus = 'info';
+        $fitness_status = FITNESS_STATUS_INFO;
     } elseif ($ocr->checkTesseractVersion()) {
         $ocrMessage = tra(
             'Tesseract meets or exceeds the version requirements.'
@@ -2982,11 +3077,9 @@ if (! $standalone) {
         $ocrStatus = 'good';
         $fitness_status = FITNESS_STATUS_GOOD;
     } else {
-        $ocrMessage = tra(
-            'The installed Tesseract version is lower than the required version.'
-        );
-        $ocrStatus = 'bad';
-        $fitness_status = FITNESS_STATUS_BAD;
+        $ocrMessage = tra('[Warning - Server dependency]<br>The installed Tesseract binary version is lower than the required version.<br>&rarr; Impact: OCR may fail or behave unexpectedly.<br>&rarr; Fix: Upgrade the server package (Ops task) if OCR is used.');
+        $ocrStatus = 'unsure';
+        $fitness_status = FITNESS_STATUS_UNSURE;
     }
 
     $ocrToDisplay[] = array(
@@ -2998,11 +3091,9 @@ if (! $standalone) {
     );
     try {
         if (empty($prefs['ocr_tesseract_path'])    || $prefs['ocr_tesseract_path'] === 'tesseract') {
-            $ocrStatus = 'bad';
-            $fitness_status = FITNESS_STATUS_BAD;
-            $ocrMessage = tra(
-                'Your path preference is not configured. It may work now but will likely fail with cron. Specify an absolute path.'
-            );
+            $ocrStatus = 'info';
+            $fitness_status = FITNESS_STATUS_INFO;
+            $ocrMessage = tra('[Optional - Application configuration]<br>The OCR Tesseract path preference is not configured (uses default lookup).<br>&rarr; If you use OCR, set an absolute path to avoid cron/scheduler path issues.');
         } elseif ($prefs['ocr_tesseract_path'] === $ocr->whereIsExecutable('tesseract')) {
             $ocrStatus = 'good';
             $fitness_status = FITNESS_STATUS_GOOD;
@@ -3021,11 +3112,9 @@ if (! $standalone) {
             empty($prefs['ocr_tesseract_path'])
             || $prefs['ocr_tesseract_path'] === 'tesseract'
         ) {
-            $ocrStatus = 'bad';
-            $fitness_status = FITNESS_STATUS_BAD;
-            $ocrMessage = tra(
-                'Your path preference is not configured. It may work now but will likely fail with cron. Specify an absolute path.'
-            );
+            $ocrStatus = 'info';
+            $fitness_status = FITNESS_STATUS_INFO;
+            $ocrMessage = tra('[Optional - Application configuration]<br>The OCR Tesseract path preference is not configured (uses default lookup).<br>&rarr; If you use OCR, set an absolute path to avoid cron/scheduler path issues.');
         } else {
             $ocrStatus = 'unsure';
             $fitness_status = FITNESS_STATUS_UNSURE;
@@ -3057,9 +3146,9 @@ if (! $standalone) {
         $fitness_status = FITNESS_STATUS_GOOD;
         $ocrMessage = tra('It appears that pdfimages is installed on your system.');
     } else {
-        $ocrStatus = 'bad';
-        $fitness_status = FITNESS_STATUS_BAD;
-        $ocrMessage = tra('Could not find pdfimages. PDF files will not be processed.');
+        $ocrStatus = 'info';
+        $fitness_status = FITNESS_STATUS_INFO;
+        $ocrMessage = tra('[Optional - Server dependency]<br>Could not find pdfimages.<br>&rarr; This is only needed for OCR processing of PDF files.<br>&rarr; Fix: Install pdfimages/poppler-utils (Ops task) if OCR on PDFs is required.');
     }
 
     $ocrToDisplay[] = array(
@@ -3072,9 +3161,9 @@ if (! $standalone) {
 
     try {
         if (empty($prefs['ocr_pdfimages_path']) || $prefs['ocr_pdfimages_path'] === 'pdfimages') {
-            $ocrStatus = 'bad';
-            $fitness_status = FITNESS_STATUS_BAD;
-            $ocrMessage = tra('Your path preference is not configured. It may work now but will likely fail with cron. Specify an absolute path.');
+            $ocrStatus = 'info';
+            $fitness_status = FITNESS_STATUS_INFO;
+            $ocrMessage = tra('[Optional - Application configuration]<br>The OCR pdfimages path preference is not configured (uses default lookup).<br>&rarr; If you use OCR, set an absolute path to avoid cron/scheduler path issues.');
         } elseif ($prefs['ocr_pdfimages_path'] === $ocr->whereIsExecutable('pdfimages')) {
             $ocrStatus = 'good';
             $fitness_status = FITNESS_STATUS_GOOD;
@@ -3087,9 +3176,9 @@ if (! $standalone) {
         }
     } catch (Exception $e) {
         if (empty($prefs['ocr_pdfimages_path']) || $prefs['ocr_pdfimages_path'] === 'pdfimages') {
-            $ocrStatus = 'bad';
-            $fitness_status = FITNESS_STATUS_BAD;
-            $ocrMessage = tra('Your path preference is not configured. It may work now but will likely fail with cron. Specify an absolute path.');
+            $ocrStatus = 'info';
+            $fitness_status = FITNESS_STATUS_INFO;
+            $ocrMessage = tra('[Optional - Application configuration]<br>The OCR pdfimages path preference is not configured (uses default lookup).<br>&rarr; If you use OCR, set an absolute path to avoid cron/scheduler path issues.');
         } else {
             $ocrStatus = 'unsure';
             $fitness_status = FITNESS_STATUS_UNSURE;
@@ -3120,9 +3209,9 @@ if (! $standalone) {
     } else {
         $ocrToDisplay[] = array(
             'name'    => tra('Scheduler'),
-            'status'  => tra('bad'),
-            'fitness_status' => FITNESS_STATUS_BAD,
-            'message' => tra('Scheduler needs to have a console command of "ocr:all" set.'),
+            'status'  => tra('info'),
+            'fitness_status' => FITNESS_STATUS_INFO,
+            'message' => tra('[Optional - Application feature]<br>OCR scheduler task "ocr:all" is not active.<br>&rarr; This is only required if you want automated OCR processing.<br>&rarr; Fix: Configure Scheduler with console command "ocr:all" if OCR automation is desired.'),
         );
     }
 
@@ -3189,48 +3278,84 @@ if (isset($prefs) && $prefs['feature_blogs'] == 'y') {
 $fcts = array(
          array(
             'function' => 'exec',
-            'risky' => tr('Exec can potentially be used to execute arbitrary code on the server. Tiki does not need it; perhaps it should be disabled. However, the Plugins R/RR need it. If you use the Plugins R/RR and the other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tr('Exec can be potentially be used to execute arbitrary code on the server. Tiki needs it to run the Plugins R/RR. If this is needed and the other PHP software on the server can be trusted, this should be enabled.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows execution of system commands from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Optional Tiki features (Plugins R/RR) may require it; enable only if you explicitly use them.", 'exec'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Optional Tiki features (Plugins R/RR) will not work unless enabled.", 'exec'),
          ),
          array(
             'function' => 'passthru',
-            'risky' => tr('Passthru is similar to exec. Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts may need it.'),
-            'safe' => tr('Passthru is similar to exec. Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts may need it.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows execution of system commands from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Some Composer-based workflows may require it; prefer running Composer outside the web process.", 'passthru'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Some Composer workflows may require it.", 'passthru'),
          ),
          array(
             'function' => 'shell_exec',
-            'risky' => tr('Shell_exec is similar to exec. Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). %0 If this is needed and the other PHP software on the server can be trusted, this should be enabled.', $pdf_webkit),
-            'safe' => tr('Shell_exec is similar to exec. Tiki needs it to run PDF from URL: WebKit (wkhtmltopdf). %0 If this is needed and the other PHP software on the server can be trusted, this should be enabled.', $pdf_webkit)
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows execution of system commands from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Optional features like 'PDF from URL: WebKit (wkhtmltopdf)' require it. %1", 'shell_exec', $pdf_webkit),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Optional features like 'PDF from URL: WebKit (wkhtmltopdf)' will not work unless enabled. %1", 'shell_exec', $pdf_webkit),
          ),
          array(
             'function' => 'system',
-            'risky' => tr('System is similar to exec. Tiki does not need it; perhaps it should be disabled.'),
-            'safe' => tr('System is similar to exec. Tiki does not need it; it is good that it is disabled.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows execution of system commands from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).", 'system'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).", 'system'),
          ),
         array(
             'function' => 'proc_open',
-            'risky' => tr('Proc_open is similar to exec. Tiki does not need it; perhaps it should be disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the %0admin interface%1 may need it. The Sendmail mailer option also requires it.', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>'),
-            'safe' => tr('Proc_open is similar to exec. Tiki does not need it; it is good that it is disabled. However, the Composer package manager used for installations in git checkouts or when using the package manager from the %0admin interface%1 may need it. The Sendmail mailer option also requires it.', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows spawning processes from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Some optional admin features (Packages/Composer, sendmail mailer) may require it. %1Packages docs%2", 'proc_open', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Some optional admin features (Packages/Composer, sendmail mailer) may require it. %1Packages docs%2", 'proc_open', '<a href="https://doc.tiki.org/Packages" target="_blank">', '</a>'),
         ),
          array(
             'function' => 'popen',
-            'risky' => tr('popen is similar to exec. Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tr('popen is similar to exec. Tiki needs it for file search indexing in file galleries. If this is needed and other PHP software on the server can be trusted, this should be enabled.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows spawning processes from PHP if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: File gallery indexing and some file handlers may require it.", 'popen'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: File gallery indexing and some file handlers may require it.", 'popen'),
          ),
          array(
             'function' => 'curl_exec',
-            'risky' => tr('Curl_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tr('Curl_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows outgoing HTTP requests from PHP (SSRF/exfiltration risk) if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Optional features requiring remote HTTP (e.g. some integrations) may not work.", 'curl_exec'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Optional features requiring remote HTTP may not work.", 'curl_exec'),
          ),
          array(
             'function' => 'curl_multi_exec',
-            'risky' => tr('Curl_multi_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.'),
-            'safe' => tr('Curl_multi_exec can potentially be abused to write malicious code. Tiki needs it to run features like Kaltura, CAS login and CClite. If these are needed and other PHP software on the server can be trusted, this should be enabled.')
+            'enabled_fitness' => 'bad',
+            'enabled_fitness_status' => FITNESS_STATUS_BAD,
+            'enabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is enabled.<br>&rarr; Risk: Allows outgoing HTTP requests from PHP (SSRF/exfiltration risk) if the application is compromised.<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Disable via disable_functions in your PHP configuration (php.ini, per-site PHP config, or PHP-FPM pool config).<br>&rarr; Note: Optional features requiring remote HTTP may not work.", 'curl_multi_exec'),
+            'disabled_fitness' => 'safe',
+            'disabled_fitness_status' => FITNESS_STATUS_SAFE,
+            'disabled_message' => tr("[Good - Server configuration]<br>The PHP function '%0' is disabled (recommended for security hardening).<br>&rarr; Note: Optional features requiring remote HTTP may not work.", 'curl_multi_exec'),
          ),
          array(
             'function' => 'parse_ini_file',
-            'risky' => tr('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned. It is required for the %0System Configuration%1 feature.', '<a href="http://doc.tiki.org/System-Configuration" target="_blank">', '</a>'),
-            'safe' => tr('It is probably an urban myth that this is dangerous. Tiki team will reconsider this check, but be warned. It is required for the %0System Configuration%1 feature.', '<a href="http://doc.tiki.org/System-Configuration" target="_blank">', '</a>'),
+            'enabled_fitness' => 'good',
+            'enabled_fitness_status' => FITNESS_STATUS_GOOD,
+            'enabled_message' => tr("[Good - Required]<br>The PHP function '%0' is enabled.<br>&rarr; Required by Tiki for the %1System Configuration%2 feature.", 'parse_ini_file', '<a href="http://doc.tiki.org/System-Configuration" target="_blank">', '</a>'),
+            'disabled_fitness' => 'bad',
+            'disabled_fitness_status' => FITNESS_STATUS_BAD,
+            'disabled_message' => tr("[Critical - Server configuration]<br>The PHP function '%0' is disabled.<br>&rarr; Impact: Required functionality will not work (System Configuration).<br>&rarr; Fix: Remove it from disable_functions in your PHP configuration (php.ini or per-site PHP config).", 'parse_ini_file'),
          )
     );
 
@@ -3239,15 +3364,16 @@ foreach ($fcts as $fct) {
         $security[$fct['function']] = array(
             'setting' => tra('Enabled'),
             'fitness' => tra('risky'),
-            'fitness_status' => FITNESS_STATUS_RISKY,
-            'message' => $fct['risky']
+            'fitness' => tra($fct['enabled_fitness']),
+            'fitness_status' => $fct['enabled_fitness_status'],
+            'message' => $fct['enabled_message'],
         );
     } else {
         $security[$fct['function']] = array(
             'setting' => tra('Disabled'),
-            'fitness' => tra('safe'),
-            'fitness_status' => FITNESS_STATUS_SAFE,
-            'message' => $fct['safe']
+            'fitness' => tra($fct['disabled_fitness']),
+            'fitness_status' => $fct['disabled_fitness_status'],
+            'message' => $fct['disabled_message'],
         );
     }
 }
@@ -3291,16 +3417,16 @@ $s = ini_get('allow_url_fopen');
 if ($s == 1) {
     $security['allow_url_fopen'] = array(
         'setting' => tra('Enabled'),
-        'fitness' => tra('risky'),
-        'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tr('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. %0 If this Tiki does not use the Blogs feature, this can be switched off.', $feature_blogs)
+        'fitness' => tra('bad'),
+        'fitness_status' => FITNESS_STATUS_BAD,
+        'message' => tr("[Critical - Server configuration]<br>The PHP setting '%0' is enabled.<br>&rarr; Risk: Enables remote file/URL access via filesystem functions (increases SSRF/RFI risk).<br>&rarr; Recommendation: Disable at the server level unless explicitly required.<br>&rarr; Fix: Set allow_url_fopen=0 in your PHP configuration (php.ini or per-site PHP config).<br>&rarr; Note: Some tooling (e.g. Composer) may rely on it in some environments; prefer running tooling outside the web process. %1", 'allow_url_fopen', $feature_blogs)
     );
 } else {
     $security['allow_url_fopen'] = array(
         'setting' => tra('Disabled'),
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tr('allow_url_fopen may potentially be used to upload remote data or scripts. Also used by Composer to fetch dependencies. %0 If this Tiki does not use the Blogs feature, this can be switched off.', $feature_blogs)
+        'message' => tr("[Good - Server configuration]<br>The PHP setting '%0' is disabled (recommended for security hardening). %1", 'allow_url_fopen', $feature_blogs)
     );
 }
 
@@ -3582,13 +3708,13 @@ if (! empty($db_config_issues)) {
     $tiki_security['Database Configuration Permissions'] = array(
         'fitness' => tra('bad'),
         'fitness_status' => FITNESS_STATUS_BAD,
-        'message' => tr('Database configuration file has insecure permissions: %0', implode(', ', $db_config_issues))
+        'message' => tr("[Critical - Server filesystem permissions]<br>Database configuration file has insecure permissions: %0<br>&rarr; Risk: Credentials may be readable by other local users/processes on the server.<br>&rarr; Recommendation: Restrict access (e.g. 600/640 owned by the web/PHP user and group).<br>&rarr; Fix: Adjust file ownership/permissions at the server level (control panel or command line).", implode(', ', $db_config_issues))
     );
 } else {
     $tiki_security['Database Configuration Permissions'] = array(
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('Database configuration file permissions are secure')
+        'message' => tra('[Good - Server filesystem permissions]<br>Database configuration file permissions look secure.')
     );
 }
 
@@ -3660,15 +3786,15 @@ if (! empty($backup_file_issues)) {
 $directory_listing_issues = check_directory_listing_vulnerabilities();
 if (! empty($directory_listing_issues)) {
     $tiki_security['Directory Listing Security'] = array(
-        'fitness' => tra('risky'),
-        'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tr('Directory listing may be enabled in sensitive directories: %0', implode(', ', $directory_listing_issues))
+        'fitness' => tra('bad'),
+        'fitness_status' => FITNESS_STATUS_BAD,
+        'message' => tr("[Critical - Web server configuration]<br>Directory listing appears to be enabled: %0<br>&rarr; Risk: Can expose configuration, templates, backups, and other sensitive files.<br>&rarr; Recommendation: Disable directory listing at the web server level.<br>&rarr; Fix: Remove/disable any 'Indexes'/'autoindex' directives (for example 'Options +Indexes') in your web server configuration.", implode(', ', $directory_listing_issues))
     );
 } else {
     $tiki_security['Directory Listing Security'] = array(
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('Directory listing security is properly configured')
+        'message' => tra('[Good - Web server configuration]<br>No evidence of directory listing being enabled was found by this heuristic check.')
     );
 }
 
@@ -3678,13 +3804,13 @@ if (! empty($ssl_issues)) {
     $tiki_security['SSL/TLS Configuration'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
-        'message' => tr('SSL/TLS configuration issues detected: %0', implode(', ', $ssl_issues))
+        'message' => tr("[Warning - Deployment topology]<br>SSL/TLS configuration issues detected: %0<br>&rarr; Note: This check can be misleading behind reverse proxies or TLS terminators. Verify end-to-end HTTPS and forwarded headers (e.g. X-Forwarded-Proto).", implode(', ', $ssl_issues))
     );
 } else {
     $tiki_security['SSL/TLS Configuration'] = array(
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
-        'message' => tra('SSL/TLS configuration appears secure')
+        'message' => tra('[Good - Deployment topology]<br>SSL/TLS configuration appears secure based on limited heuristics.')
     );
 }
 
@@ -5069,6 +5195,65 @@ if ($standalone && ! $nagios) {
     $smarty->assign('info_count', $info_count);
     $smarty->assign('good_count', $good_count);
     $smarty->assign('critical_issues', $critical_issues);
+    // Build grouped issue lists for infrastructure-agnostic dashboard sections
+    $server_critical_issues = array();
+    $security_warning_issues = array();
+    $optional_recommendations = array();
+
+    // From core checks
+    foreach ($all_properties as $key => $item) {
+        if (! isset($item['message']) || ! isset($item['fitness_status'])) {
+            continue;
+        }
+        $msg = (string) $item['message'];
+
+        // Determine the correct section based on which array the item came from
+        $section = 'Server_Properties'; // default
+        if (isset($server_properties[$key])) {
+            $section = 'Server_Properties';
+        } elseif (isset($mysql_properties[$key])) {
+            $section = 'MySQL_or_MariaDB_Database_Properties';
+        } elseif (isset($php_properties[$key])) {
+            $section = 'PHP_scripting_language_properties';
+        } elseif (isset($security[$key])) {
+            $section = 'Tiki_Security';
+        } elseif (isset($tiki_security[$key])) {
+            $section = 'Tiki_Security';
+        } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
+            $section = 'Apache_properties';
+        } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
+            $section = 'IIS_properties';
+        }
+
+        if (strpos($msg, '[Critical') === 0) {
+            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Warning') === 0) {
+            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        } elseif (strpos($msg, '[Optional') === 0) {
+            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+        }
+    }
+
+    // From OCR checks
+    if (isset($ocrToDisplay)) {
+        foreach ($ocrToDisplay as $ocr) {
+            if (! isset($ocr['message']) || ! isset($ocr['name'])) {
+                continue;
+            }
+            $msg = (string) $ocr['message'];
+            if (strpos($msg, '[Critical') === 0) {
+                $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            } elseif (strpos($msg, '[Warning') === 0) {
+                $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            } elseif (strpos($msg, '[Optional') === 0) {
+                $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+            }
+        }
+    }
+
+    $smarty->assign('server_critical_issues', $server_critical_issues);
+    $smarty->assign('security_warning_issues', $security_warning_issues);
+    $smarty->assign('optional_recommendations', $optional_recommendations);
     $smarty->assign('health_score', $health_score);
     $smarty->assign('health_percentage', $health_percentage);
     $smarty->assign('critical_percentage', $critical_percentage);
@@ -5916,19 +6101,9 @@ function check_directory_listing_vulnerabilities()
         }
     }
 
-    // Check sensitive directories for index files
-    $sensitive_dirs = array('db', 'lib', 'templates', 'temp');
-
-    foreach ($sensitive_dirs as $dir) {
-        if (is_dir($dir)) {
-            $index_files = array('index.php', 'index.html', 'index.htm');
-            foreach ($index_files as $index_file) {
-                if (file_exists($dir . '/' . $index_file)) {
-                    $issues[] = 'Index file found in sensitive directory: ' . $dir . '/' . $index_file;
-                }
-            }
-        }
-    }
+    // Note: The presence of index.php/html/htm in a directory is generally a mitigation
+    // (it prevents directory listing), so do not treat it as a vulnerability here.
+    // Directory listing is primarily a web server configuration concern.
 
     return $issues;
 }
@@ -6246,6 +6421,67 @@ $smarty->assign('warning_count', $warning_count);
 $smarty->assign('info_count', $info_count);
 $smarty->assign('good_count', $good_count);
 $smarty->assign('critical_issues', $critical_issues);
+// Build grouped issue lists for infrastructure-agnostic dashboard sections
+$server_critical_issues = array();
+$security_warning_issues = array();
+$optional_recommendations = array();
+
+foreach ($all_properties as $key => $item) {
+    if (! isset($item['message']) || ! isset($item['fitness_status'])) {
+        continue;
+    }
+    $msg = (string) $item['message'];
+
+    // Determine the correct section based on which array the item came from
+    $section = 'Server_Properties'; // default
+    if (isset($server_properties[$key])) {
+        $section = 'Server_Properties';
+    } elseif (isset($mysql_properties[$key])) {
+        $section = 'MySQL_or_MariaDB_Database_Properties';
+    } elseif (isset($php_properties[$key])) {
+        $section = 'PHP_scripting_language_properties';
+    } elseif (isset($security[$key])) {
+        $section = 'Tiki_Security';
+    } elseif (isset($tiki_security[$key])) {
+        $section = 'Tiki_Security';
+    } elseif (isset($apache_properties) && isset($apache_properties[$key])) {
+        $section = 'Apache_properties';
+    } elseif (isset($iis_properties) && isset($iis_properties[$key])) {
+        $section = 'IIS_properties';
+    } elseif (isset($tiki_properties) && isset($tiki_properties[$key])) {
+        $section = 'Tiki_Properties';
+    } elseif (isset($database_properties) && isset($database_properties[$key])) {
+        $section = 'Database_Properties';
+    }
+
+    if (strpos($msg, '[Critical') === 0) {
+        $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+    } elseif (strpos($msg, '[Warning') === 0) {
+        $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+    } elseif (strpos($msg, '[Optional') === 0) {
+        $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+    }
+}
+
+if (isset($ocrToDisplay)) {
+    foreach ($ocrToDisplay as $ocr) {
+        if (! isset($ocr['message']) || ! isset($ocr['name'])) {
+            continue;
+        }
+        $msg = (string) $ocr['message'];
+        if (strpos($msg, '[Critical') === 0) {
+            $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+        } elseif (strpos($msg, '[Warning') === 0) {
+            $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+        } elseif (strpos($msg, '[Optional') === 0) {
+            $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+        }
+    }
+}
+
+$smarty->assign('server_critical_issues', $server_critical_issues);
+$smarty->assign('security_warning_issues', $security_warning_issues);
+$smarty->assign('optional_recommendations', $optional_recommendations);
 $smarty->assign('health_score', $health_score);
 $smarty->assign('health_percentage', $health_percentage);
 $smarty->assign('critical_percentage', $critical_percentage);
