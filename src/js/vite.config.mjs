@@ -100,7 +100,7 @@ export default defineConfig(({ command, mode }) => {
     addGlobEntries(rollupInput, [
         { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
         { prefix: "common-reexported/", src: "src/js/common-reexported" },
-        { prefix: "MOVE_THIS_CONTENT_ELSEWHERE/", src: "src/js/MOVE_THIS_CONTENT_ELSEWHERE" },
+        { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },

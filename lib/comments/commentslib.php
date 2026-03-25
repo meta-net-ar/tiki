@@ -3575,6 +3575,8 @@ class Comments extends TikiLib
         }
         global $prefs;
 
+        // Remove file recordings of this comment
+        TikiLib::lib('filegal')->deleteObjectFiles('comment', $threadId, 'tiki.comment.recording');
         $this->delete_forum_deliberations($threadId);
 
         $comments = $this->table('tiki_comments');
