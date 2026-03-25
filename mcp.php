@@ -68,16 +68,6 @@ if (empty($user)) {
     exit(1);
 }
 
-// --- Require wiki feature ---
-// Fail early if wiki is disabled rather than returning errors on every tool call.
-// (Controllers also check via setUp(), but this gives a clearer error at request time.)
-if ($prefs['feature_wiki'] !== 'y') {
-    http_response_code(403);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Wiki feature is not enabled.']);
-    exit(1);
-}
-
 // --- Build MCP server ---
 // FileSessionStore persists MCP protocol sessions across PHP requests
 // (required for HTTP transport). Uses Tiki's configured temp directory.

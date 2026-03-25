@@ -40,14 +40,6 @@ class WikiTools
 
     public function __construct(string $user, string $ip = '')
     {
-        // Verify the wiki feature is enabled. Broker-based tools get this
-        // check via the controller's setUp(), but Utilities-based tools
-        // (history, search) bypass the controller entirely.
-        global $prefs;
-        if (empty($prefs['feature_wiki']) || $prefs['feature_wiki'] !== 'y') {
-            throw new \RuntimeException('Wiki feature is not enabled.');
-        }
-
         $this->user = $user;
         $this->ip = $ip;
     }
@@ -185,9 +177,11 @@ class WikiTools
             throw new ToolCallException("Permission denied: cannot view '$page'.");
         }
 
-        $utilities = new \Services_Wiki_Utilities();
         try {
+            $utilities = new \Services_Wiki_Utilities();
             $result = $this->captureOutput(fn() => $utilities->getPageHistory($page, $offset, $limit));
+        } catch (\Services_Exception_Disabled $e) {
+            throw new ToolCallException("Wiki feature is not enabled.");
         } catch (\Services_Exception_NotFound $e) {
             throw new ToolCallException("Page '$page' not found.");
         }
@@ -219,7 +213,11 @@ class WikiTools
     {
         $limit = min(max($limit, 1), 50);
 
-        $utilities = new \Services_Wiki_Utilities();
+        try {
+            $utilities = new \Services_Wiki_Utilities();
+        } catch (\Services_Exception_Disabled $e) {
+            throw new ToolCallException("Wiki feature is not enabled.");
+        }
         return $this->captureOutput(fn() => $utilities->searchPages($query, $limit));
     }
 

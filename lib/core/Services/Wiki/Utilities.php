@@ -17,6 +17,13 @@
  */
 class Services_Wiki_Utilities
 {
+    public function __construct()
+    {
+        // Same feature guard as Services_Wiki_Controller::setUp().
+        // Ensures wiki data is not exposed when the feature is disabled.
+        Services_Exception_Disabled::check('feature_wiki');
+    }
+
     /**
      * Get version history for a wiki page.
      *
