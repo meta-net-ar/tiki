@@ -6,13 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_Action_TrackerItemModify implements Search_Action_Action
 {
-    private $definition = [];
-
-    public function definitionAware(array $definition)
-    {
-        $this->definition = $definition;
-    }
-
     public function getValues()
     {
         return [
@@ -146,93 +139,73 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         $remove = $data->remove->text();
         $method = $data->method->text();
         $ignore_errors = $data->ignore_errors->text() === 'y';  // y/n
-        $hasValue = $this->isParamDefined('value') || $value !== '';
-        $hasAdd = $this->isParamDefined('add');
-        $hasRemove = $this->isParamDefined('remove');
 
         $trklib = TikiLib::lib('trk');
 
-        if (is_scalar($value) || $value === null) {
-            $value = $this->stripNp((string) $value);
+        if (is_string($value)) {
+            $value = $this->stripNp($value);
         }
         $info = $trklib->get_tracker_item($object_id);
-        if (! is_array($info)) {
+        if (! $info) {
             throw new Search_Action_Exception(tr('Tracker item %0 not found.', $object_id));
         }
         $definition = Tracker_Definition::get($info['trackerId']);
 
-        if (! empty($calc)) {
-            $runner = new Math_Formula_Runner(
-                [
-                    'Math_Formula_Function_' => '',
-                    'Tiki_Formula_Function_' => '',
-                ]
-            );
-            try {
-                $runner->setFormula($calc);
-                $data = ['itemId' => $object_id];
-                foreach ($runner->inspect() as $fieldName) {
-                    if (is_string($fieldName) || is_numeric($fieldName)) {
-                        $tField = $definition->getField($fieldName);
-                        if ($tField && isset($info[$tField['fieldId']])) {
-                            $data[$fieldName] = $info[$tField['fieldId']];
+        $fieldInfo = $definition->getField($field);
+        $handler = $definition->getFieldFactory()->getHandler($fieldInfo, $info);
+        // Ref: https://doc.tiki.org/PluginListExecute#tracker_item_modify
+        if ($add) {
+            $value = $handler->addValue($add);
+        } elseif ($remove) {
+            $value = $handler->removeValue($remove);
+        } elseif (in_array($method, ['add', 'remove'], true)) {
+            $value = $this->normalizeAssignedValue($handler, $value, $fieldInfo['fieldId']);
+            if (! $value) {
+                throw new Services_Exception_MissingValue('value');
+            }
+            $values = explode(',', $value);
+            $computed = '';
+
+            foreach ($values as $val) {
+                if ($method === 'add') {
+                    $computed .= $handler->addValue($val) . ',';
+                } else {
+                    $computed = $handler->removeValue($val);
+                }
+            }
+
+            $values = explode(',', $computed);
+            $value =  implode(',', array_unique(array_filter($values, static function ($v) {
+                return $v !== '';
+            })));
+        } else {
+            if (! empty($calc)) {
+                $runner = new Math_Formula_Runner(
+                    [
+                        'Math_Formula_Function_' => '',
+                        'Tiki_Formula_Function_' => '',
+                    ]
+                );
+                try {
+                    $runner->setFormula($calc);
+                    $data = ['itemId' => $object_id];
+                    foreach ($runner->inspect() as $fieldName) {
+                        if (is_string($fieldName) || is_numeric($fieldName)) {
+                            $tField = $definition->getField($fieldName);
+                            if ($tField && isset($info[$tField['fieldId']])) {
+                                $data[$fieldName] = $info[$tField['fieldId']];
+                            }
                         }
                     }
+                    $item = Tracker_Item::fromInfo($info);
+                    $item->prepareFieldValues($data);
+                    $runner->setVariables($data);
+                    $value = $runner->evaluate();
+                } catch (Math_Formula_Exception $e) {
+                    throw new Search_Action_Exception(tr('Error applying tracker_item_modify calc formula to item %0: %1', $object_id, $e->getMessage()));
                 }
-                $item = Tracker_Item::fromInfo($info);
-                $item->prepareFieldValues($data);
-                $runner->setVariables($data);
-                $value = $runner->evaluate();
-            } catch (Math_Formula_Exception $e) {
-                throw new Search_Action_Exception(tr('Error applying tracker_item_modify calc formula to item %0: %1', $object_id, $e->getMessage()));
             }
-        }
-
-        $fieldInfo = $definition->getField($field);
-        $handlerContext = $info;
-
-        if ($hasValue && ! $hasAdd && ! $hasRemove && ! in_array($method, ['add', 'remove'], true)) {
-            $handlerContext[$fieldInfo['fieldId']] = $value;
-        }
-
-        $handler = $definition->getFieldFactory()->getHandler($fieldInfo, $handlerContext);
-
-        if ($hasAdd) {
-            $value = $handler->addValue($add);
-        }
-
-        if ($hasRemove) {
-            $value = $handler->removeValue($remove);
-        }
-
-        if (! $hasAdd && ! $hasRemove) {
-            if (is_scalar($value)) {
-                $value = ['ins_' . $fieldInfo['fieldId'] => $value];
-            }
-            $data = $handler->getFieldData($value);
-            $value = $data['value'];
-
-            switch ($method) {
-                case 'add':
-                    $values = explode(',', $value);
-                    $value = '';
-                    foreach ($values as $val) {
-                        $value .= $handler->addValue($val) . ',';
-                    }
-                    $values = explode(',', $value);
-                    $value = implode(',', array_unique(array_filter($values)));
-                    break;
-                case 'remove':
-                    $values = explode(',', $value);
-                    $value = '';
-                    foreach ($values as $val) {
-                        // FIXME only the last value gets removed
-                        $value = $handler->removeValue($val) . ',';
-                    }
-                    $values = explode(',', $value);
-                    $value = implode(',', array_unique(array_filter($values)));
-                    break;
-            }
+            $value = $this->normalizeAssignedValue($handler, $value, $fieldInfo['fieldId']);
         }
 
         $utilities = new Services_Tracker_Utilities();
@@ -254,14 +227,13 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         return str_replace(['~np~', '~/np~'], '', $value);
     }
 
-    private function isParamDefined(string $name): bool
+    private function normalizeAssignedValue($handler, $value, int $fieldId): string
     {
-        foreach (['', '_field', '_field_coalesce', '_field_multiple'] as $variant) {
-            if (array_key_exists($name . $variant, $this->definition)) {
-                return true;
-            }
+        if (is_scalar($value)) {
+            $value = ['ins_' . $fieldId => $value];
         }
 
-        return false;
+        $data = $handler->getFieldData($value);
+        return $data['value'];
     }
 }
