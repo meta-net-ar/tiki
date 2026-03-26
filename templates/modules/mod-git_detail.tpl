@@ -17,5 +17,12 @@
         <span class="date">{$content.author.date|tiki_long_datetime}</span>
     </p>
 </div>
+{else}
+<div class="mod-git_detail">
+    <p>
+        <span class="label">{tr}Tiki version:{/tr}</span>
+        <span class="branch">{$content.version}</span>
+    </p>
+</div>
 {/if}
 {/tikimodule}
