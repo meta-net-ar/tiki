@@ -370,10 +370,10 @@ if ($(this).val() != '') {
                     <label for="image_compression_preset_type" class="col-sm-4 col-form-label">{tr}Compression preset{/tr}</label>
                     <div class="col-sm-8">
                         <select name="image_compression_preset_type" id="image_compression_preset_type" class="form-control">
-                            <option value="levels" {if $gal_info.image_compression_preset_type eq 'levels'}selected="selected"{/if}>{tr}Levels (manual quality){/tr}</option>
-                            <option value="auto" {if $gal_info.image_compression_preset_type eq 'auto'}selected="selected"{/if}>{tr}Auto (balanced){/tr}</option>
+                            <option value="slider" {if $gal_info.image_compression_preset_type eq 'slider'}selected="selected"{/if}>{tr}Slider (0 - 100% quality){/tr}</option>
+                            <option value="levels" {if $gal_info.image_compression_preset_type eq 'levels'}selected="selected"{/if}>{tr}Levels (High, Medium, Low quality){/tr}</option>
                         </select>
-                        <span class="form-text">{tr}Choose how compression quality is determined{/tr}</span>
+                        <span class="form-text">{tr}Choose how compression quality will be seen in the gallery (Levels or Slider){/tr}</span>
                     </div>
                 </div>
 

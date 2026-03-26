@@ -122,12 +122,7 @@ async function updatePreview(settings) {
             return;
         }
 
-        const {
-            quality = 85,
-            maxDimensionX = 0,
-            maxDimensionY = 0,
-            maxSize = 1,
-        } = settings;
+        const { quality = 85, maxDimensionX = 0, maxDimensionY = 0, maxSize = 1 } = settings;
 
         try {
             const result = await getPreviewCompressionResult(PREVIEW_STATE.originalFile, {
