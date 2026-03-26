@@ -120,7 +120,7 @@
             <input type="hidden" name="offset" value="{$offset|escape}">
             <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
             <div class="input-group">
-                <input type="text" name="find" value="{$find|escape}" class="form-control" placeholder="{tr}Find{/tr}...">
+                <input type="text" name="find" value="{$find|escape}" class="form-control" placeholder="{tr}Search{/tr}...">
                 <input type="submit" class="btn btn-primary" name="filter" value="{tr}Filter{/tr}">
             </div>
         </div>

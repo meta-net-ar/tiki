@@ -32,7 +32,7 @@
             {if !$ts.enabled}
                 <form method="get" action="tiki-adminusers.php">
                     <div class="mb-3 row">
-                        <label class="col-form-label col-sm-5" for="find">{tr}Find{/tr}</label>
+                        <label class="col-form-label col-sm-5" for="find">{tr}Search{/tr}</label>
                         <div class="col-sm-7">
                             <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                         </div>
@@ -96,7 +96,7 @@
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
                             <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
-                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                         </div>
                     </div>
                 </form>

@@ -38,7 +38,7 @@
                                                  value="{$filegals_manager|escape}">{/if}
             {query _type='form_input' maxRecords='NULL' type='NULL' types='NULL' find='NULL' topic='NULL' lang='NULL' exact_match='NULL' categId='NULL' cat_categories='NULL' filegals_manager='NULL' save='NULL' offset=0 searchlist='NULL' searchmap='NULL'}
             <div>
-                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Find{/tr}" value="{$find|escape}"
+                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Search{/tr}" value="{$find|escape}"
                        placeholder="{if empty($whatlabel)}{tr}Search{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
                        title="{if ! empty($find_in)}{$find_in|escape}{/if}" data-html="true" data-bs-toggle="focus">
                 {if isset($autocomplete)}

@@ -429,10 +429,10 @@
                         <span class="input-group-text">
                             {icon name="search"}
                         </span>
-                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Find{/tr}..." aria-label={tr}Find{/tr}>
+                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Search{/tr}..." aria-label={tr}Search{/tr}>
                         <input type="hidden" name="where" value="forums">
                         <input type="hidden" name="forumId" value="{$forum_info.forumId}">
-                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Find{/tr}">
+                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Search{/tr}">
                     </div>
                 </div>
             </form>

@@ -167,9 +167,9 @@
                 <div>
                     <input type="hidden" name="page_ref_id" value="{$page_ref_id}">
                     <div class="tiki-form-group row">
-                        <label class="sr-only" for="find_objects">{tr}Find{/tr}</label>
+                        <label class="sr-only" for="find_objects">{tr}Search{/tr}</label>
                         <div class="input-group">
-                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
+                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Search{/tr}...">
                             <input type="submit" class="btn btn-primary btn-sm" value="{tr}Filter{/tr}" name="search_objects">
                             {autocomplete element='#find_objects' type='pagename'}
                         </div>
