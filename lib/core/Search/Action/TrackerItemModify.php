@@ -160,24 +160,18 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
             $value = $handler->removeValue($remove);
         } elseif (in_array($method, ['add', 'remove'], true)) {
             $value = $this->normalizeAssignedValue($handler, $value, $fieldInfo['fieldId']);
-            if (! $value) {
-                throw new Services_Exception_MissingValue('value');
-            }
             $values = explode(',', $value);
-            $computed = '';
+            $computed = $handler->getValue();
 
             foreach ($values as $val) {
-                if ($method === 'add') {
-                    $computed .= $handler->addValue($val) . ',';
-                } else {
-                    $computed = $handler->removeValue($val);
-                }
+                $currentInfo = $info;
+                $currentInfo[$fieldInfo['fieldId']] = $computed;
+                $currentHandler = $definition->getFieldFactory()->getHandler($fieldInfo, $currentInfo);
+                $computed = $method === 'add'
+                    ? $currentHandler->addValue($val)
+                    : $currentHandler->removeValue($val);
             }
-
-            $values = explode(',', $computed);
-            $value =  implode(',', array_unique(array_filter($values, static function ($v) {
-                return $v !== '';
-            })));
+            $value = $computed;
         } else {
             if (! empty($calc)) {
                 $runner = new Math_Formula_Runner(

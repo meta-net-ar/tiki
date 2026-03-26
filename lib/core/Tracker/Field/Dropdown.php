@@ -189,12 +189,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
         if (! empty($requestData['other_' . $ins_id])) {
             $value = $requestData['other_' . $ins_id];
         } elseif (isset($requestData[$ins_id])) {
-            $value = implode(',', array_filter(
-                array_map('trim', (array) $requestData[$ins_id]),
-                static function ($val) {
-                    return $val !== '';
-                }
-            ));
+            $value = implode(',', (array) $requestData[$ins_id]);
         } elseif (isset($requestData[$ins_id . '_old'])) {
             $value = '';
         } else {
@@ -514,7 +509,13 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
     {
         if ($this->getConfiguration('type') !== 'D') {
             $value = $this->getValue($this->getDefaultValue());
-            $allValues = $value === '' ? [] : explode(',', $value);
+            $allValues = $value === '' ? []
+                : array_filter(
+                    array_map('trim', explode(',', $value)),
+                    static function ($val) {
+                        return $val !== '';
+                    }
+                );
 
             if (! empty($allValues)) {
                 foreach ($allValues as $val) {
