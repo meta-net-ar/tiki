@@ -771,11 +771,17 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             return;
         }
 
+        // Only process tracker-stored messages; skip regular IMAP messages
+        $list_path = $this->request->post['list_path'] ?? '';
+        if (strpos($list_path, 'tracker_folder_') !== 0) {
+            return;
+        }
+
         $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
         $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
 
         $this->out('msg_text_uid', $form['imap_msg_uid']);
-        $this->out('msg_list_path', $this->request->post['list_path']);
+        $this->out('msg_list_path', $list_path);
         $part_num = false;
         if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
             $part_num = $this->request->post['imap_msg_part'];
@@ -785,7 +791,7 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         }
         $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
 
-        $email = tiki_parse_message($this->request->post['list_path'], $form['imap_msg_uid']);
+        $email = tiki_parse_message($list_path, $form['imap_msg_uid']);
         if (! $email) {
             return;
         }
