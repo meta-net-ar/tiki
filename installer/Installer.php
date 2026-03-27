@@ -203,6 +203,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 try {
                     $status = $this->runFile($schema);
                 } catch (Exception $e) {
+                    if (str_contains($e->getMessage(), 'MySQL Warning(s) caught')) {
+                        throw $e;
+                    }
                 }
             }
 
@@ -353,7 +356,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
             if ($countQueries) {
                 $this->queries['successful'][] = $query;
             }
-            if (!empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS')) {
+            if (! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS')) {
                 if (stripos(trim($query), 'SHOW WARNINGS') !== 0) {
                     $warnErr = '';
                     $warnResult = $this->queryError('SHOW WARNINGS', $warnErr);
@@ -364,7 +367,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
                                 $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
                             }
                         }
-                        if (!empty($warnings)) {
+                        if (! empty($warnings)) {
                             throw new Exception("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
                         }
                     }
