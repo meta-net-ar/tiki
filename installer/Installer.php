@@ -364,8 +364,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
                         $warnings = [];
                         while ($row = $warnResult->fetchRow()) {
                             if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
-                                if (in_array($row['Code'], [1060, 1061, 1062, 1091, 1681, 1831])) {
-                                    // These are common warnings from old patches that we can safely skip. 
+                                if (in_array($row['Code'], [124, 1060, 1061, 1062, 1091, 1681, 1831])) {
+                                    // These are common warnings from old patches that we can safely skip.
+                                    // 124: InnoDB rebuilding table (happens during fulltext index creation)
                                     // 1060: Duplicate column name
                                     // 1061: Duplicate key name
                                     // 1062: Duplicate entry
