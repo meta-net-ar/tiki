@@ -353,6 +353,23 @@ class Installer extends TikiDb_Bridge implements SplSubject
             if ($countQueries) {
                 $this->queries['successful'][] = $query;
             }
+            if (!empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS')) {
+                if (stripos(trim($query), 'SHOW WARNINGS') !== 0) {
+                    $warnErr = '';
+                    $warnResult = $this->queryError('SHOW WARNINGS', $warnErr);
+                    if ($warnResult) {
+                        $warnings = [];
+                        while ($row = $warnResult->fetchRow()) {
+                            if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                                $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
+                            }
+                        }
+                        if (!empty($warnings)) {
+                            throw new Exception("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
+                        }
+                    }
+                }
+            }
             return $result;
         } else {
             if ($countQueries) {
