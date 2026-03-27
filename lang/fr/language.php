@@ -19429,7 +19429,7 @@ $lang_current = array(
 // "Wiki attachments not migrated" => "Wiki attachments not migrated",
 // "Wiki attachments storage is set to use File Galleries but attachments:migrate console command hasn't been run to convert existing wiki attachments to Tiki Files" => "Wiki attachments storage is set to use File Galleries but attachments:migrate console command hasn't been run to convert existing wiki attachments to Tiki Files",
 "The Scheduler does not seem to have been executed recently." => "Il semble que le planificateur n'ait pas été exécuté récemment.",
-"In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background" => "Dans la plupart des installations de Tiki, il est utile de configurer le planificateur pour exécuter les tâches en arrière-plan.",
+"In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background." => "Dans la plupart des installations de Tiki, il est utile de configurer le planificateur pour exécuter les tâches en arrière-plan.",
 "Find out more about the Scheduler at" => "Pour en savoir plus sur le planificateur, consultez :",
 "Search index failure" => "Échec d'index de recherche",
 // "Please proceed to <a class=\"alert-link\" href=\"{bootstrap_modal controller=search action=rebuild}\">{tr}rebuild Index" => "Please proceed to <a class=\"alert-link\" href=\"{bootstrap_modal controller=search action=rebuild}\">{tr}rebuild Index",
