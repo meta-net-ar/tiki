@@ -1,7 +1,9 @@
 // Formerly _button_color_variables.scss, this file evolved with variables moving to the variables file
 // and CSS selectors remaining.
 
-// - - - - - - - - - -  - - - - - - Other CSS, if any - - - - - - - - - - - - - - - - - //
+@import "variables";
+
+// - - - - - - - - - -  - - - - - - Other CSS - - - - - - - - - - - - - - - - - //
 
 .text-danger {
     color: #D63D00 !important;
