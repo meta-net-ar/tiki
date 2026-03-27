@@ -40,7 +40,7 @@ function prefs_tiki_list()
         ],
         'tiki_monitor_performance' => [
             'name' => tra('Monitor Tiki Performance'),
-            'description' => tra('Register multiple parameters related to tiki\'s performance'),
+            'description' => tra('Register multiple parameters related to tiki\'s performance. This feature consumes a lot of resources and should be used temporarily, not enabled 24/7.'),
             'type' => 'flag',
             'default' => 'n',
             'admin' => 'tiki-performance_stats.php',
