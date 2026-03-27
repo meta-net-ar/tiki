@@ -140,21 +140,16 @@ foreach ($chans as $chan) {
             if ($daytmes == $daytnow) {
                 $t = date("H:i", $row['ts']);
             } else {
-                if ($prefs['display_field_order'] == 'DMY') {
-                    $t = date("d/m/y H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'DYM') {
-                    $t = date("d/y/m H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'MDY') {
-                    $t = date("m/d/y H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'MYD') {
-                    $t = date("m/y/d H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'YDM') {
-                    $t = date("y/d/m H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'YMD') {
-                    $t = date("y/m/d H:i", $row['ts']);
-                } else {
-                    $t = date("H:i", $row['ts']);
-                }
+                $formats = [
+                    'DMY' => "d/m/y H:i",
+                    'DYM' => "d/y/m H:i",
+                    'MDY' => "m/d/y H:i",
+                    'MYD' => "m/y/d H:i",
+                    'YDM' => "y/d/m H:i",
+                    'YMD' => "y/m/d H:i",
+                ];
+                $format = $formats[$prefs['display_field_order']] ?? "H:i";
+                $t = date($format, $row['ts']);
             }
 
             $nick_html = ($row['nick'] == '' ? "<em>" . tra('Anonymous') . "</em>" : smarty_modifier_userlink($row['user']));

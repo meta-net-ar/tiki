@@ -110,16 +110,16 @@ class ShoutboxLib extends TikiLib
         if ($count) {
             // at least update  the timestamp - can be convenient if message is thanks or hello - we can see the last post
             $query = "update `tiki_shoutbox` set `timestamp`=? where `user`=? and `hash`=?";
-            $bindvars = [(int) $this->now, $user, $hash];
+            $bindvars = [$this->now, $user, $hash];
         } elseif ($msgId) {
             $query = "update `tiki_shoutbox` set `user`=?, `message`=?, `hash`=? where `msgId`=?";
             $bindvars = [$user, $message, $hash, (int) $msgId];
         } else {
             $query = "delete from `tiki_shoutbox` where `user`=? and `timestamp`=? and `hash`=?";
-            $bindvars = [$user, (int) $this->now, $hash];
+            $bindvars = [$user, $this->now, $hash];
             $this->query($query, $bindvars);
             $query = "insert into `tiki_shoutbox`(`message`,`user`,`timestamp`,`hash`) values(?,?,?,?)";
-            $bindvars = [$message, $user, (int) $this->now, $hash];
+            $bindvars = [$message, $user, $this->now, $hash];
         }
 
         $result = $this->query($query, $bindvars);

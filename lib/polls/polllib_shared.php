@@ -341,13 +341,10 @@ class PollLibShared extends TikiLib
             $query = "update `tiki_polls` set `title`=?,`active`=?,`publishDate`=?, `voteConsiderationSpan`=? where `pollId`=?";
             $result = $this->query($query, [$title, $active, $publishDate, $voteConsiderationSpan, $pollId]);
         } else {
-            $query = "insert into tiki_polls(`title`,`active`,`publishDate`,`votes`, `voteConsiderationSpan`) values(?,?,?,?,?)";
+            $query = "insert into `tiki_polls` (`title`,`active`,`publishDate`,`votes`, `voteConsiderationSpan`) values(?,?,?,?,?)";
             $result = $this->query($query, [$title, $active, $publishDate, 0, $voteConsiderationSpan]);
 
-            $pollId = $this->getOne(
-                "select max(`pollId`) from `tiki_polls` where `title`=? and `publishDate`=?",
-                [$title, $publishDate]
-            );
+            $pollId = $this->lastInsertId();
         }
         return $pollId;
     }

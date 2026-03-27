@@ -362,39 +362,34 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     }
 
     if (! isset($_REQUEST["create_zone"])) {
-        $bannerId = $bannerlib->replace_banner(
-            $_REQUEST["bannerId"],
-            $_REQUEST["client"],
-            $_REQUEST["url"],
-            '',
-            '',
-            $_REQUEST["use"],
-            $_REQUEST["imageData"],
-            $_REQUEST["imageType"],
-            $_REQUEST["imageName"],
-            $_REQUEST["HTMLData"],
-            $_REQUEST["fixedURLData"],
-            $_REQUEST["textData"],
-            $fromDate,
-            $toDate,
-            $useDates,
-            $Dmon,
-            $Dtue,
-            $Dwed,
-            $Dthu,
-            $Dfri,
-            $Dsat,
-            $Dsun,
-            $fromTime,
-            $toTime,
-            $_REQUEST["maxImpressions"],
-            $_REQUEST["maxClicks"],
-            $_REQUEST["zone"] ?? null,
-            $_REQUEST["maxUserImpressions"],
-            $_REQUEST['onlyInURIs'],
-            $_REQUEST['exceptInURIs']
-        );
+        // 1. Prepare the data payload
+        $bannerProperties = [
+            'client'             => $_REQUEST["client"],
+            'url'                => $_REQUEST["url"],
+            'title'              => $_REQUEST["title"] ?? '',
+            'alt'                => $_REQUEST["alt"] ?? '',
+            'which'              => $_REQUEST["use"],
+            'imageData'          => $_REQUEST["imageData"],
+            'imageType'          => $_REQUEST["imageType"],
+            'imageName'          => $_REQUEST["imageName"],
+            'HTMLData'           => $_REQUEST["HTMLData"],
+            'fixedURLData'       => $_REQUEST["fixedURLData"],
+            'textData'           => $_REQUEST["textData"],
+            'fromDate'           => $fromDate,
+            'toDate'             => $toDate,
+            'useDates'           => $useDates,
+            'mon' => $Dmon, 'tue' => $Dtue, 'wed' => $Dwed, 'thu' => $Dthu, 'fri' => $Dfri, 'sat' => $Dsat, 'sun' => $Dsun,
+            'hourFrom'           => $fromTime,
+            'hourTo'             => $toTime,
+            'maxImpressions'     => $_REQUEST["maxImpressions"],
+            'maxClicks'          => $_REQUEST["maxClicks"],
+            'zone'               => $_REQUEST["zone"],
+            'maxUserImpressions' => $_REQUEST["maxUserImpressions"] ?? 1,
+            'onlyInURIs'         => $_REQUEST['onlyInURIs'] ?? null,
+            'exceptInURIs'       => $_REQUEST['exceptInURIs'] ?? null,
+        ];
 
+        $bannerId = $bannerlib->replace_banner($_REQUEST["bannerId"], $bannerProperties);
         header("location:tiki-list_banners.php");
     }
 }
