@@ -364,6 +364,12 @@ class Installer extends TikiDb_Bridge implements SplSubject
                         $warnings = [];
                         while ($row = $warnResult->fetchRow()) {
                             if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                                if ($row['Code'] == 1681) {
+                                    // Ignore Warning 1681: Integer display width is deprecated.
+                                    // This is a common legacy deprecation in existing patches (e.g. INT(11))
+                                    // and does not represent a logical data integrity failure.
+                                    continue;
+                                }
                                 $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
                             }
                         }
