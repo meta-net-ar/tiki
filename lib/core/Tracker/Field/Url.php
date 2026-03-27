@@ -84,8 +84,10 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderOutput($context = [])
     {
         $smarty = TikiLib::lib('smarty');
+        $rawValue = (string) $this->getConfiguration('value');
+        $parsedWikiLink = self::extractParsedWikiLinkData(trim($rawValue));
 
-        $url = self::normalizeStoredValueToUrl((string) $this->getConfiguration('value'));
+        $url = self::normalizeStoredValueToUrl($rawValue);
 
         if ($url === '' || ($context['list_mode'] ?? '') === 'csv' || $this->getOption('linkToURL') == 1) {
             return $url;
@@ -102,7 +104,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 [
                     'type' => 'external',
                     'id' => $url,
-                    'title' => $url,
+                    'title' => $parsedWikiLink['label'] ?? $url,
                 ],
                 $smarty->getEmptyInternalTemplate()
             );
@@ -154,7 +156,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
         }
 
         if (self::isWikiSyntaxLink($trimmed)) {
-            $resolvedHref = self::extractFirstHrefFromParsedWikiLink($trimmed);
+            $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
             if ($resolvedHref === null) {
                 return tr('Invalid wiki syntax. The link target could not be resolved.');
             }
@@ -231,19 +233,26 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return $value;
         }
 
-        $resolvedHref = self::extractFirstHrefFromParsedWikiLink($trimmed);
+        $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
+        // Normalization keeps only the resolved target URL.
+        // The optional wiki-link label is extracted separately for rendering.
         return $resolvedHref ?? $value;
     }
 
-    protected static function extractFirstHrefFromParsedWikiLink(string $value): ?string
+    protected static function extractParsedWikiLinkData(string $value): ?array
     {
         $parsed = TikiLib::lib('parser')->parse_data_simple($value);
 
-        if (! preg_match('/<a\b[^>]*\bhref=(["\'])(.*?)\1/i', $parsed, $matches)) {
+        if (! preg_match('/<a\b[^>]*\bhref=(["\'])(.*?)\1[^>]*>(.*?)<\/a>/is', $parsed, $matches)) {
             return null;
         }
 
-        return html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8');
+        $label = trim(html_entity_decode(strip_tags($matches[3]), ENT_QUOTES, 'UTF-8'));
+
+        return [
+            'href' => html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8'),
+            'label' => $label !== '' ? $label : null,
+        ];
     }
 
     protected static function isSyntacticallyValidUrl(string $url): bool
