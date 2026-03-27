@@ -54,6 +54,17 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                             1 => tr('Yes'),
                         ],
                     ],
+                    'strictValidation' => [
+                        'name' => tr('Strict validation'),
+                        'description' => tr('This field expects data that resolves to syntactically valid URLs. Setting this to No disables URL syntax validation at data entry and import.  This will allow you to use currently unsupported data in this field such as raw file paths, but doing so may trigger problems in code that uses this data if it expects valid URLs.  If you set this to No, test the interfaces that use this field in your site thoroughly.'),
+                        'filter' => 'int',
+                        'legacy_index' => 3,
+                        'default' => 1,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -125,6 +136,11 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             || (str_starts_with($value, '[') && str_ends_with($value, ']'));
     }
 
+    protected function isStrictValidationEnabled(): bool
+    {
+        return (int) $this->getOption('strictValidation') === 1;
+    }
+
     public function isValid($ins_fields_data)
     {
         $fieldId = $this->getFieldId();
@@ -132,6 +148,10 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
         $trimmed = trim((string) $value);
 
         if ($trimmed === '') {
+            return true;
+        }
+
+        if (! $this->isStrictValidationEnabled()) {
             return true;
         }
 
@@ -161,6 +181,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderInput($context = [])
     {
         $templateData = [
+            'strictValidationEnabled' => $this->isStrictValidationEnabled(),
             'wikiSyntaxInfo' => tr('You can also use complete wiki-link syntax: ((PageName)) or [url|text].'),
         ];
 
@@ -257,7 +278,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return (bool) preg_match('/^[a-z][a-z0-9+.-]*$/i', $parsed['scheme']) && ! preg_match('/\s/', $url);
         }
 
-        return ! preg_match('/\s/', $url);
+        return false;
     }
 
     protected static function extractWikiLinkTarget(string $value): ?string

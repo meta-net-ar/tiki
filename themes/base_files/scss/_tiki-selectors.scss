@@ -1251,9 +1251,10 @@ blockquote {
     position: relative;
 }
 
-.sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
-    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
-}
+// Not sure the reason for this rule but the navbar background color should be set by L&F option, not the dropdown bg color. Reverts MR6966.
+//.sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
+//    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
+//}
 
 .sm-sub-toggler::after {
     --sm-sub-toggler-icon-size: 0.7rem;

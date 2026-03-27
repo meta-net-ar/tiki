@@ -11,8 +11,8 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'unsubscribe'          => 'bool',        //post
-        'confirm_subscription' => 'bool',        //post
+        'unsubscribe'          => 'word',        //post
+        'confirm_subscription' => 'word',        //post
         'nlId'                 => 'int',         //post
         'subscribe'            => 'bool',        //post
         'email'                => 'email',       //post

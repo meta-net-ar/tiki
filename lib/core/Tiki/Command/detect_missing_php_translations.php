@@ -5,6 +5,10 @@
  * Detects untranslated strings in PHP files (missing tra() or _())
  */
 
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
+
 $baseDir = isset($argv[1]) && $argv[1] !== '' ? $argv[1] : __DIR__;
 $baseDir = rtrim($baseDir, '/');
 

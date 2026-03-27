@@ -198,6 +198,9 @@ $card-border-color: transparent;
 $accordion-bg: #2A2A2D;
 $accordion-button-active-color: #fff;
 
+$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default for dark mode
+$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default for dark mode
+
 // Tooltips
 $tooltip-color: #ffffff;
 $tooltip-bg: #000000;
@@ -249,8 +252,6 @@ $close-text-shadow: 1px 0 #ffffff; // No Bootstrap equivalent
 $code-color: #c7254e;
 $kbd-color: #ffffff;
 $kbd-bg: #333333;
-$pre-color: $gray-800;
-
 
 // - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 

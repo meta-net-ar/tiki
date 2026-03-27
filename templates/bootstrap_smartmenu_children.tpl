@@ -1,5 +1,5 @@
-{if $item.type eq '-'}
-    <li class="dropdown-divider"></li>
+{if $item.type eq '-' or ($item.type eq 's' and empty($item.name)) or (empty($item.name) and empty($item.sefurl) and empty($item.children) and empty($item.block))}
+    <li role="separator" class="px-3"><hr class="dropdown-divider my-2"></li>
 {elseif not empty($item.children)}
     <li class="sm-sub-item {if $item.selected|default:null} active{/if} {$item.class|escape}">
         <a href="#sm_submenu_{$item.optionId|escape}" class="sm-sub-link dropdown-item sm-sub-toggler" data-bs-toggle="collapse" aria-expanded="false">
