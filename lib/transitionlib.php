@@ -154,7 +154,7 @@ class TransitionLib
             [$this->transitionType, $from, $to, $name, (int) $preserve, json_encode($guards)]
         );
 
-        return $db->getOne('SELECT MAX(`transitionId`) FROM `tiki_transitions`');
+        return $db->lastInsertId();
     }
 
     /**
