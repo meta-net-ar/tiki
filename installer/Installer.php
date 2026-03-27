@@ -364,10 +364,15 @@ class Installer extends TikiDb_Bridge implements SplSubject
                         $warnings = [];
                         while ($row = $warnResult->fetchRow()) {
                             if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
-                                if ($row['Code'] == 1681) {
-                                    // Ignore Warning 1681: Integer display width is deprecated.
-                                    // This is a common legacy deprecation in existing patches (e.g. INT(11))
-                                    // and does not represent a logical data integrity failure.
+                                if (in_array($row['Code'], [1060, 1061, 1062, 1091, 1681, 1831])) {
+                                    // These are common warnings from old patches that we can safely skip. 
+                                    // 1060: Duplicate column name
+                                    // 1061: Duplicate key name
+                                    // 1062: Duplicate entry
+                                    // 1091: Can't DROP '...'; check that column/key exists
+                                    // 1681: Integer display width is deprecated
+                                    // 1831: Duplicate index
+                                    // These usually happen when we re-run the same patch more than once.
                                     continue;
                                 }
                                 $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
