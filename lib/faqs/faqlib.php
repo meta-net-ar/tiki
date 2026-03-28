@@ -13,33 +13,10 @@
 class FaqLib extends TikiLib
 {
     /**
-     * Fallback limit of the title field of the tiki_faqs table.
+     * Maximum length of the title field of the tiki_faqs table.
+     * Should match the varchar length defined in the DB schema.
      */
     public const MAX_FAQ_TITLE_LENGTH = 200;
-
-    /**
-     * Reads the FAQ title length directly from DB schema to avoid hardcoded usage.
-     * Falls back to MAX_FAQ_TITLE_LENGTH if schema lookup fails.
-     */
-    public function getFaqTitleMaxLength(): int
-    {
-        static $cachedLength = null;
-
-        if ($cachedLength !== null) {
-            return $cachedLength;
-        }
-
-        $column = $this->fetchAll("SHOW COLUMNS FROM `tiki_faqs` LIKE 'title'");
-        $type = is_array($column) ? ($column[0]['Type'] ?? '') : '';
-
-        if (preg_match('/^varchar\((\d+)\)/i', $type, $matches)) {
-            $cachedLength = (int) $matches[1];
-            return $cachedLength;
-        }
-
-        $cachedLength = self::MAX_FAQ_TITLE_LENGTH;
-        return $cachedLength;
-    }
 
     /**
      * @param $offset
