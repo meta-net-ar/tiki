@@ -402,10 +402,6 @@ const handleFileChange = (file, fileList) => {
     }
 };
 
-const submitUpload = async () => {
-    uploadRef.value.submit();
-}
-
 const beforeUpload = async (rawFile) => {
     if (rawFile.size > maxSize) {
         const maxSizeKB = props.maxSize / 1000;
@@ -441,12 +437,6 @@ const beforeUpload = async (rawFile) => {
 }
 
 const submitUpload = async () => {
-    // Compress files first if handler available
-    const canProceed = await compressFiles();
-    if (!canProceed) {
-        return;
-    }
-
     submitCalled.value = true;
     if (uploadRef.value && uploadRef.value.uploadFiles) {
         totalFilesToUpload.value = uploadRef.value.uploadFiles.length;
@@ -457,14 +447,6 @@ const submitUpload = async () => {
     }
 
     uploadRef.value.submit();
-}
-
-const beforeUpload = (rawFile) => {
-    if (rawFile.size > maxSize) {
-        const maxSizeKB = props.maxSize / 1000;
-        ElMessage.error(`File size cannot exceed ${maxSizeKB}KB`);
-        return false;
-    }
 }
 
 /**
