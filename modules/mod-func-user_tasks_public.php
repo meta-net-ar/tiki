@@ -29,7 +29,7 @@ function module_user_tasks_public_info()
  */
 function module_user_tasks_public($mod_reference, $module_params)
 {
-    global $user, $tiki_p_tasks, $prefs;
+    global $user, $tiki_p_tasks, $prefs, $access;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
     if ($user && isset($tiki_p_tasks) && $tiki_p_tasks == 'y') {

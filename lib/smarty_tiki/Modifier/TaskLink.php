@@ -21,13 +21,18 @@ class TaskLink
         $info = $tasklib->get_task($user, $taskId);
         $description = "";
 
-        $my_length = strlen($info['description']);
+        $info_description = '';
+        if ($info !== null && isset($info['description']) && $info['description'] !== null) {
+            $info_description = $info['description'];
+        }
+
+        $my_length = strlen($info_description);
         $my_pos = 0;
         $line = 0;
         if ($my_length > 0) {
             do {
                 $line++;
-                $my_pos = strpos($info['description'], "\n", ($my_pos + 1));
+                $my_pos = strpos($info_description, "\n", ($my_pos + 1));
             } while (($line <= 15) && ($my_pos != ''));
         }
 
@@ -35,10 +40,10 @@ class TaskLink
             if ($line < 15) {
                 $my_pos = 1300;
             }
-            $description .= substr($info['description'], 0, min(1300, $my_pos + 1));
+            $description .= substr($info_description, 0, min(1300, $my_pos + 1));
             $append = "<br /><center><span class=\'highlight\'>" . tra("Text cut here") . "</span></center>";
         } else {
-            $description = $info['description'];
+            $description = $info_description;
             $append = '';
         }
 
