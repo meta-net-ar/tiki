@@ -332,7 +332,6 @@ class Captcha
         ];
         if ($this->type === 'altcha') {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
-            return;
         } elseif (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
         } else {
@@ -349,7 +348,7 @@ class Captcha
     public function getErrors()
     {
         if ($this->type === 'altcha') {
-            return '<br />' . tr('Invalid Captcha.');
+            return '<br />' . tra('Invalid Captcha.');
         }
         return implode('<br />', $this->captcha->getMessages());
     }
