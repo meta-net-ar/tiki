@@ -1613,8 +1613,9 @@ class ParserLib extends TikiDb_Bridge
                 if ($file) {
                     $fileId = $file['fileId'];
                     $filename = $file['name'];
+                    $type = $file['filetype'];
                     $icon = smarty_function_icon(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                    return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-id='$fileId'>$icon $filename</span>";
+                    return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-type='$type' data-file-ref-id='$fileId'>$icon $filename</span>";
                 }
                 return $matches[0];
             }, $data);

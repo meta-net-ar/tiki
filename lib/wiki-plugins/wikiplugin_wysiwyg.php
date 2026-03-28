@@ -104,7 +104,7 @@ function wikiplugin_wysiwyg($data, $params)
         ['lang' => $lang, 'filePath' => $langFilePath] = TikiLib::lib('wysiwyg')->getEditorLang();
 
         TikiLib::lib('header')->add_js_module(<<<JS
-            import('@jquery-tiki/plugins/wysiwyg').then((module) => {
+            import('@wysiwyg/plugin').then((module) => {
                 module.default('{$exec_key}', JSON.parse('{$tools}'), '{$sourcepage}', {
                     lang: '{$lang}',
                     langFilePath: '{$langFilePath}',

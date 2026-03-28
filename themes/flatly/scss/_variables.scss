@@ -105,6 +105,8 @@ $dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg);  // default
 $dropdown-link-active-color:        $component-active-color;  // default
 $dropdown-link-active-bg:           $component-active-bg;  // default
 
+$dropdown-dark-bg:                  #4a545f; // Lightened for contrast in admin sidebar
+
 // Navs
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color);  // default // $gray-600 !default;
 $nav-tabs-border-color:             $gray-200;  // default

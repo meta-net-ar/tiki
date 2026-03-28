@@ -64,10 +64,14 @@
                             {/if}
                         {/if}
                         {if $comment.userName ne $user and $comment.approved eq 'y' and $allow_vote}
+                            <div class="commentRating d-inline-block ms-3">
                             <form class="commentRatingForm" method="post">
-                                {rating type="comment" id=$comment.threadId}
-                                <input type="hidden" name="id" value="{$comment.threadId}" />
-                                <input type="hidden" name="type" value="comment" />
+                                <fieldset>
+                                    <legend class="fs-6">{tr}Rate this comment:{/tr}</legend>
+                                    {rating type="comment" id=$comment.threadId}
+                                    <input type="hidden" name="id" value="{$comment.threadId}" />
+                                    <input type="hidden" name="type" value="comment" />
+                                </fieldset>
                             </form>
                             {jq}
                                 var crf = $('form.commentRatingForm').on("submit", function() {
@@ -102,7 +106,7 @@
                                 </div>
                             </div>
                         {/if}
-
+                            </div>
                     </div>{* End of comment-footer *}
                 </div>{* End of comment-item *}
                 {if ! $level || $prefs.comments_threshold_indent eq '0' || $level lt $prefs.comments_threshold_indent}
