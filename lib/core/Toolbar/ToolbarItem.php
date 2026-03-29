@@ -106,6 +106,8 @@ abstract class ToolbarItem
             return new ToolbarLaunchPlugins();
         } elseif ($tagName == 'languagecheck') {
             return new ToolbarLanguageCheck();
+        } elseif ($tagName == 'filerecording') {
+            return new ToolbarFileRecording($domElementId, $wysiwyg);
         }
         return null;
     }
@@ -217,7 +219,8 @@ abstract class ToolbarItem
                     'task',
                     'codeblock',
                     'linkfile',
-                    'languagecheck'
+                    'languagecheck',
+                    'filerecording',
                 ],
                 $plugins
             )

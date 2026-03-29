@@ -181,12 +181,12 @@
     }
 }
 
-// - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
-
 // Navbar border seems to cause permanent scrollbar on side menu
 .tiki-admin .navbar-wrapper.fixed-top > .navbar-expand-lg {
     height: calc(100vh - var(--tiki-admin-top-modules-height) - 4px)
 }
+
+// - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 :root {
     --tiki-vert-nav-link-color: $link-color;

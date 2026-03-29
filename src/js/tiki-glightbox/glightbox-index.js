@@ -195,5 +195,7 @@ export default function initGlightbox(config) {
         setupTitles(selector);
         setupShadowboxParams(selector);
         setAttrInlineMedia(".cboxInlineMedia");
+
+        return glightbox;
     };
 }

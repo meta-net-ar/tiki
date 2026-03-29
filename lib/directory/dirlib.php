@@ -519,8 +519,8 @@ class DirLib extends TikiLib
             Feedback::success($feedback);
         } else {
             $query = "insert into `tiki_directory_sites`(`name`,`description`,`url`,`country`,`isValid`,`hits`,`created`,`lastModif`) values(?,?,?,?,?,?,?,?)";
-            $this->query($query, [$name,$description,$url,$country,$isValid,0,(int)$this->now,(int)$this->now]);
-            $siteId = $this->getOne("select max(siteId) from `tiki_directory_sites` where `created`=? and `name`=?", [(int)$this->now,$name]);
+            $this->query($query, [$name, $description, $url, $country, $isValid, 0, $this->now, $this->now]);
+            $siteId = $this->lastInsertId();
             $feedback = sprintf(tra('Site directory %s was created.'), $name);
             Feedback::success($feedback);
 
@@ -559,7 +559,7 @@ class DirLib extends TikiLib
         } else {
             $query = "insert into `tiki_directory_categories`(`parent`,`hits`,`name`,`description`,`childrenType`,`viewableChildren`,`allowSites`,`showCount`,`editorGroup`,`sites`) values(?,?,?,?,?,?,?,?,?,?)";
             $this->query($query, [(int)$parent,0,$name,$description,$childrenType,(int)$viewableChildren,$allowSites,$showCount,$editorGroup,0]);
-            $categId = $this->getOne("select max(`categId`) from `tiki_directory_categories` where `name`=?", [$name]);
+            $categId = $this->lastInsertId();
             $feedback = sprintf(tra('Category %s was created.'), $name);
             Feedback::success($feedback);
         }

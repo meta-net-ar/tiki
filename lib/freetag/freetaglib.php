@@ -577,9 +577,7 @@ class FreetagLib extends ObjectLib
                 $bindvals = [$normalized_tag, $tag];
                 $this->query($query, $bindvals);
             }
-
-            $query = 'SELECT MAX(`tagId`) FROM `tiki_freetags` WHERE `tag`=? AND `raw_tag`=?';
-            $tagId = $this->getOne($query, array_slice($bindvals, 0, 2));
+            $tagId = $this->lastInsertId();
         }
 
         if (! ($tagId > 0)) {
@@ -609,8 +607,7 @@ class FreetagLib extends ObjectLib
     public function safe_tag($user, $itemId, $type, $tag, $lang = null)
     {
         if (
-            ! isset($itemId) || ! isset($type) || ! isset($tag) ||
-                empty($itemId) || empty($type) || empty($tag)
+            empty($itemId) || empty($type) || empty($tag)
         ) {
             throw new Exception('Missing safe_tag argument.');
         }

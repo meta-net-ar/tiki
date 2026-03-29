@@ -83,7 +83,7 @@
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments"
+            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showComments">

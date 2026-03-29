@@ -101,12 +101,12 @@ $res = $tikilib->query("SELECT * FROM `tiki_invite` ORDER BY `ts` DESC");
 $tikidate = new TikiDate();
 while (is_array($row = $res->fetchRow())) {
     $tikidate->setDate($row['ts']);
-    $row['datetime'] = $tikidate->format('%c', true);
+    $row['datetime'] = $tikidate->format('%c');
     $previous[$row['id']] = $row;
 }
 $smarty->assign('previous', $previous);
 
-if (isset($_REQUEST['loadprevious']) && ! empty($_REQUEST['loadprevious']) && isset($previous[(int)$_REQUEST['loadprevious']])) {
+if (! empty($_REQUEST['loadprevious']) && isset($previous[(int)$_REQUEST['loadprevious']])) {
     $prev = $previous[(int)$_REQUEST['loadprevious']];
     $res = $tikilib->query("SELECT * FROM `tiki_invited` WHERE id_invite=?", [(int)$_REQUEST['loadprevious']]);
     $prev_invited = "";
@@ -180,19 +180,18 @@ if (isset($_REQUEST['send'])) {
                 empty($_REQUEST['wikipageafter']) ? null : $_REQUEST['wikipageafter'],
             ]
         );
-        $res = $tikilib->query(
-            "SELECT MAX(id) AS `id` FROM `tiki_invite` WHERE `inviter`=? AND `ts`=?",
-            [$user, $tikilib->now]
-        );
-        $row = $res->fetchRow();
-        $id = $row['id'];
+
+        $id = $tikilib->lastInsertId();
+        $values = [];
+        $bindvars = [];
 
         foreach ($emails as $m) {
-            $tikilib->query(
-                "INSERT INTO `tiki_invited` (id_invite, email, firstname, lastname, used) VALUES (?,?,?,?,?)",
-                [$id, $m['email'], $m['firstname'], $m['lastname'], "no"]
-            );
+            $values[] = "(?, ?, ?, ?, ?)";
+            array_push($bindvars, $id, $m['email'], $m['firstname'], $m['lastname'], "no");
         }
+
+        $query = "INSERT INTO `tiki_invited` (id_invite, email, firstname, lastname, used) VALUES " . implode(',', $values);
+        $tikilib->query($query, $bindvars);
 
         foreach ($emails as $m) {
             $mail = new TikiMail();
