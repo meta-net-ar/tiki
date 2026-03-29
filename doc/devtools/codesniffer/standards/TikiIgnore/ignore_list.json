@@ -3566,9 +3566,6 @@
         },
         "doc/devtools/ggg-trace.php": {
             "class:GggTrace": true
-        },
-        "lib/core/Services/Wiki/Utilities.php": {
-            "class:Services_Wiki_Utilities": true
         }
     },
     "PSR1.Methods.CamelCapsMethodName.NotCamelCaps": {
@@ -9857,9 +9854,6 @@
         },
         "lib/ocrlib.php": {
             "ocrLib": true
-        },
-        "lib/core/Services/Wiki/Utilities.php": {
-            "Services_Wiki_Utilities": true
         }
     }
 }

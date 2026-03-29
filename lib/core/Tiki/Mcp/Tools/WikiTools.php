@@ -14,14 +14,10 @@ use Mcp\Schema\ToolAnnotations;
 /**
  * MCP tools for wiki page operations.
  *
- * Most tools use the Services Broker to call wiki controller actions,
+ * All tools use the Services Broker to call controller actions,
  * inheriting permission checks, feature-flag guards (via setUp()),
  * input sanitization (JitFilter), and cross-cutting concerns
  * (multilingual, geolocation, categories, etc.).
- *
- * History and search use Services_Wiki_Utilities because no matching
- * controller actions exist. A follow-up MR will add write methods to
- * Utilities and migrate the controller to use them as well.
  *
  * Output buffering wraps all calls to prevent stdout corruption of JSON-RPC.
  */
@@ -130,6 +126,7 @@ class WikiTools
         $result = $this->brokerCall('wiki', 'get_page', [
             'page' => $page,
             'raw' => 1,
+            'nocache' => 1,
         ]);
 
         return [
@@ -150,8 +147,8 @@ class WikiTools
     /**
      * Get version history for a wiki page.
      *
-     * Uses Services_Wiki_Utilities::getPageHistory() -- no controller action exists.
-     * Permission check is explicit since this bypasses the controller.
+     * Uses the broker to call Services_Wiki_Controller::action_history(),
+     * which checks permissions and feature-flag guards.
      *
      * @param string $page   Page name (required)
      * @param int    $offset Pagination offset (default: 0)
@@ -171,20 +168,11 @@ class WikiTools
         $limit = min(max($limit, 1), 50);
         $offset = max($offset, 0);
 
-        // Explicit permission check -- no controller in the path
-        $perms = \Perms::get('wiki page', $page);
-        if (! $perms->view) {
-            throw new ToolCallException("Permission denied: cannot view '$page'.");
-        }
-
-        try {
-            $utilities = new \Services_Wiki_Utilities();
-            $result = $this->captureOutput(fn() => $utilities->getPageHistory($page, $offset, $limit));
-        } catch (\Services_Exception_Disabled $e) {
-            throw new ToolCallException("Wiki feature is not enabled.");
-        } catch (\Services_Exception_NotFound $e) {
-            throw new ToolCallException("Page '$page' not found.");
-        }
+        $result = $this->brokerCall('wiki', 'history', [
+            'page' => $page,
+            'offset' => $offset,
+            'maxRecords' => $limit,
+        ]);
 
         return [
             'versions' => $result['versions'],
@@ -197,12 +185,13 @@ class WikiTools
     /**
      * Full-text search across wiki pages.
      *
-     * Uses Services_Wiki_Utilities::searchPages() -- no controller action exists.
-     * Search results are filtered by Tiki's search layer which respects permissions.
+     * Uses the broker to call Services_Search_Controller::action_lookup()
+     * with a wiki page type filter. Falls back to listing pages by name
+     * when unified search is unavailable.
      *
      * @param string $query Search query string (required)
      * @param int    $limit Maximum results to return (default: 10, max: 50)
-     * @return array Search results with page names and relevance info
+     * @return array Search results with page names
      */
     #[McpTool(
         name: 'wiki_search',
@@ -213,12 +202,45 @@ class WikiTools
     {
         $limit = min(max($limit, 1), 50);
 
-        try {
-            $utilities = new \Services_Wiki_Utilities();
-        } catch (\Services_Exception_Disabled $e) {
-            throw new ToolCallException("Wiki feature is not enabled.");
+        // Try unified search via search controller lookup
+        global $prefs;
+        if (! empty($prefs['feature_search']) && $prefs['feature_search'] === 'y') {
+            try {
+                $result = $this->brokerCall('search', 'lookup', [
+                    'filter' => ['type' => 'wiki page', 'content' => $query],
+                    'maxRecords' => $limit,
+                ]);
+
+                $resultset = $result['resultset'];
+                $serialized = $resultset->jsonSerialize();
+                $results = [];
+                foreach ($serialized['result'] as $item) {
+                    $results[] = [
+                        'pageName' => $item['object_id'],
+                        'title' => $item['title'] ?? $item['object_id'],
+                    ];
+                }
+                return ['results' => $results, 'total' => (int)($serialized['count'] ?? 0)];
+            } catch (ToolCallException $e) {
+                // Fall through to list_pages fallback
+            }
         }
-        return $this->captureOutput(fn() => $utilities->searchPages($query, $limit));
+
+        // Fallback: search page names via wiki controller
+        $result = $this->brokerCall('wiki', 'pages', [
+            'find' => $query,
+            'maxRecords' => $limit,
+            'sortMode' => 'lastModif_desc',
+        ]);
+
+        $results = [];
+        foreach ($result['data'] ?? [] as $page) {
+            $results[] = [
+                'pageName' => $page['pageName'],
+                'title' => $page['pageName'],
+            ];
+        }
+        return ['results' => $results, 'total' => (int)($result['count'] ?? 0)];
     }
 
     // ──────────────────────────────────────────────────────────────────────

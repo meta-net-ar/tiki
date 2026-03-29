@@ -72,9 +72,8 @@ class Services_Wiki_Controller
     public function action_get_page($input)
     {
         $page = $input->page->text();
-        // skipCache=true to avoid stale reads within the same PHP request
-        // (e.g. MCP or API where multiple operations share a process).
-        $info = TikiLib::lib('wiki')->get_page_info($page, true, true);
+        $skipCache = (bool) $input->nocache->int();
+        $info = TikiLib::lib('wiki')->get_page_info($page, true, $skipCache);
         if (! $info) {
             throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
         }
@@ -95,6 +94,48 @@ class Services_Wiki_Controller
         $result = array_merge($info, ['data' => $data]);
 
         return $result;
+    }
+
+    /**
+     * Get version history for a wiki page.
+     *
+     * @param $input JitFilter with: page (text), offset (int), maxRecords (int)
+     * @return array{versions: array, total: int}
+     * @throws Services_Exception_NotFound
+     * @throws Services_Exception_Denied
+     */
+    public function action_history($input)
+    {
+        $page = $input->page->text();
+        $info = TikiLib::lib('tiki')->get_page_info($page, false);
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        $perms = Perms::get('wiki page', $page);
+        if (! $perms->view) {
+            throw new Services_Exception_Denied();
+        }
+
+        $offset = $input->offset->int();
+        $limit = $input->maxRecords->int() ?: -1;
+
+        $history = TikiLib::lib('hist')->get_page_history($page, false, $offset, $limit);
+
+        $versions = [];
+        foreach ($history as $entry) {
+            $versions[] = [
+                'version' => (int)($entry['version'] ?? 0),
+                'lastModif' => (int)($entry['lastModif'] ?? 0),
+                'user' => $entry['user'] ?? '',
+                'comment' => $entry['comment'] ?? '',
+            ];
+        }
+
+        return [
+            'versions' => $versions,
+            'total' => (int)($info['version'] ?? count($versions)),
+        ];
     }
 
     /**
