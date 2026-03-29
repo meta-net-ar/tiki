@@ -18,6 +18,35 @@ function wikiplugin_fade_info()
         'introduced' => 3,
         'tags' => [ 'basic' ],
         'params' => [
+            'summary' => [
+                'required' => false,
+                'name' => tra('Summary'),
+                'filter' => 'wikicontent',
+                'description' => tra('Optional visible summary above the collapsible details (Wiki syntax). When set, a generic toggle label is used unless you set label explicitly.'),
+                'default' => '',
+                'since' => '29.0',
+            ],
+            'expanded' => [
+                'required' => false,
+                'name' => tra('Expanded'),
+                'filter' => 'alpha',
+                'description' => tra('Start with details shown (y) or hidden (n). If not set, the site preference for the Fade plugin applies.'),
+                'default' => '',
+                'since' => '29.0',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
+            'group' => [
+                'required' => false,
+                'name' => tra('Group'),
+                'filter' => 'text',
+                'description' => tra('Optional group name (letters, digits, underscore and hyphen) for future tools such as expand all.'),
+                'default' => '',
+                'since' => '29.0',
+            ],
             'label' => [
                 'required' => true,
                 'name' => tra('Label'),
@@ -94,94 +123,165 @@ function wikiplugin_fade_info()
     ];
 }
 
-function wikiplugin_fade($body, $params)
+function wikiplugin_fade($body, $params, $offset = 0, $context = null)
 {
-    static $id = 0;
+    global $prefs;
 
-    //validate speed parameters
+    static $id = 0;
+    static $fadeAssetsAdded = false;
+
     $params['show_speed'] = validate_speed($params['show_speed']);
     $params['hide_speed'] = validate_speed($params['hide_speed']);
 
     $unique = 'wpfade-' . ++$id;
     $unique_link = $unique . '-link';
 
-    if ($params['icon'] == 'y') {
-        $span_class = 'wpfade-span-icon';
-        $a_class_hidden = '\'wpfade-hidden\'';
-        $a_class_shown = '\'wpfade-shown\'';
-        $div_class = 'wpfade-div-icon';
-    } else {
-        $span_class = 'wpfade-span-plain';
-        $a_class_hidden = '';
-        $a_class_shown = '';
-        $div_class = 'wpfade-div-plain';
+    $headerlib = TikiLib::lib('header');
+    if (! $fadeAssetsAdded) {
+        $fadeAssetsAdded = true;
+        $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-fade.js', true);
     }
 
-      // We specify format html, so parse the contained wiki text
     $body = trim($body);
     $body = TikiLib::lib('parser')->parse_data($body);
 
-    // Both variants will need $headerlib
-    $headerlib = TikiLib::lib('header');
+    $groupNorm = wikiplugin_fade_normalize_group($params['group'] ?? '');
+    $isExpanded = wikiplugin_fade_resolve_expanded($params);
+    $dataAttrs = wikiplugin_fade_format_data_attrs($unique, $groupNorm, $params);
+
+    $summaryRaw = trim((string) ($params['summary'] ?? ''));
+    $hasSummary = $summaryRaw !== '';
+    $summaryHtml = '';
+    if ($hasSummary) {
+        $summaryHtml = TikiLib::lib('parser')->parse_data($summaryRaw);
+    }
+
+    $defaultLabel = tra('Unspecified label');
+    $toggleText = (string) $params['label'];
+    if ($hasSummary && ($toggleText === $defaultLabel || trim($toggleText) === '')) {
+        $toggleText = tra('Show / hide details');
+    }
+
+    if ($params['icon'] == 'y') {
+        $span_class = 'wpfade-span-icon';
+        $div_class = 'wpfade-div-icon';
+    } else {
+        $span_class = 'wpfade-span-plain';
+        $div_class = 'wpfade-div-plain';
+    }
+
+    $ae = $isExpanded ? 'true' : 'false';
 
     if ($params['bootstrap'] == 'y') {
         $unique_outer = $unique . '-outer';
         $unique_inner = $unique . '-inner';
 
-      // The java script is used to toggle the chevron icon from down to up.
-      //
-      // It is based on the suggestion by zessz here
-      // http://stackoverflow.com/a/18337268/1626109
-      // and the working example here
-      // http://jsfiddle.net/zessx/R6EAW/12/
-      //
-      // It might not be necessary to go back to the 'card-header' before
-      // going forward to the icon.
+        $wrapperClass = 'wikiplugin-fade card ' . trim($params['class'] ?? '');
+        if ($hasSummary) {
+            $wrapperClass .= ' wikiplugin-fade--summary';
+        }
+        if ($isExpanded) {
+            $wrapperClass .= ' wikiplugin-fade--initial-open';
+        }
+        $wrapperClass = trim($wrapperClass);
 
-        $jq = "function toggleChevron(e) 
-             {
-               $(e.target)
-                  .prev('.card-header')
-                  .find('span.icon')
-                  .toggleClass('fa-chevron-down fa-chevron-up');
-             }
-             $('#" . $unique_outer . "').on('hide.bs.collapse', toggleChevron);
-             $('#" . $unique_outer . "').on('show.bs.collapse', toggleChevron);" ;
+        $summaryBlock = '';
+        if ($hasSummary) {
+            $summaryBlock = '<div class="wikiplugin-fade__summary card-body border-bottom py-2">' . $summaryHtml . '</div>';
+        }
 
-        $headerlib->add_jq_onready($jq);
+        $collapseClass = 'collapse' . ($isExpanded ? ' show' : '');
+        $chevronExtra = $isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
 
-        return "<div id='" . $unique_outer . "' class='card " . ($params['class']) . "'>"
-                . "<div class='card-header'>"
-                  . "<a data-bs-toggle='collapse' class='d-block' href='#" . $unique_inner . "'>" . htmlspecialchars($params['label']) . "<span class='icon icon-menu-extra fas fa-chevron-down fa-fw' style='float:right'></span>" . "</a>"
-                . "</div>"
-                . "<div id='" . $unique_inner . "' class='panel-collapse collapse'>"
-                  . "<div class='card-body'>" . $body . "</div>"
-                . "</div>"
-              . "</div>" ;
-    } else {
-        $jq = '
-                $(function() {
-                    $(\'#' . $unique_link . '\').on("click", 
-                        function() {
-                            if ( $(\'#' . $unique . '\').is(":hidden") ) {
-                                $(\'#' . $unique . '\').show(\'blind\', {}, \'' . $params['show_speed'] . '\');
-                                $(\'#' . $unique_link . '\').addClass(' . $a_class_shown . ').removeClass(' . $a_class_hidden . ');
-                            } else {
-                                $(\'#' . $unique . '\').hide(\'blind\', {}, \'' . $params['hide_speed'] . '\');
-                                $(\'#' . $unique_link . '\').addClass(' . $a_class_hidden . ').removeClass(' . $a_class_shown . ');
-                            }
-                        }
-                    );
-                    return false;
-                });';
-        $headerlib->add_jq_onready($jq);
-    //wrapping in an extra div makes animation smoother
-        return (($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
-            . "\r\t" . '<span class="' . $span_class . '">' . "\r\t\t"
-        . '<a id="' . $unique_link . '" class=' . $a_class_hidden . '>' . "\r\t\t\t" . htmlspecialchars($params['label']) . "\r\t\t"
-        . '</a>' . "\r\t" . '</span>' . "\r\t" . '<div id="' . $unique . '" class="' . $div_class . '">' . "\r\t\t\t"
-        . $body . "\r\t" . '</div>' . "\r" . '</div>' . "\r";
+        $toggleEsc = htmlspecialchars($toggleText, ENT_QUOTES, 'UTF-8');
+
+        return '<div id="' . htmlspecialchars($unique_outer, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($wrapperClass, ENT_QUOTES, 'UTF-8') . '"'
+            . $dataAttrs
+            . '>' . $summaryBlock
+                . '<div class="card-header">'
+                  . '<a data-bs-toggle="collapse" class="d-block" role="button" href="#' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '" aria-controls="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '">' . $toggleEsc
+                  . '<span class="wikiplugin-fade__chevron icon icon-menu-extra fas fa-fw ' . $chevronExtra . '" style="float:right" aria-hidden="true"></span></a>'
+                . '</div>'
+                . '<div id="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($collapseClass, ENT_QUOTES, 'UTF-8') . '">'
+                  . '<div class="card-body">' . $body . '</div>'
+                . '</div>'
+              . '</div>';
     }
+
+    $outerClass = 'wikiplugin-fade';
+    if ($hasSummary) {
+        $outerClass .= ' wikiplugin-fade--summary';
+    }
+    if ($isExpanded) {
+        $outerClass .= ' wikiplugin-fade--initial-open';
+    }
+    if (trim($params['class'] ?? '') !== '') {
+        $outerClass .= ' ' . trim($params['class']);
+    }
+
+    $linkClasses = 'wpfade-legacy-toggle';
+    if ($params['icon'] == 'y') {
+        $linkClasses .= $isExpanded ? ' wpfade-shown' : ' wpfade-hidden';
+    }
+
+    $toggleEsc = htmlspecialchars($toggleText, ENT_QUOTES, 'UTF-8');
+
+    $summaryBlock = '';
+    if ($hasSummary) {
+        $summaryBlock = '<div class="wikiplugin-fade__summary mb-2">' . $summaryHtml . '</div>';
+    }
+
+    // Inline display beats global .wpfade-div-plain { display: none } when theme SCSS override is missing from the bundle.
+    $legacyBodyStyle = $isExpanded ? ' style="display: block !important;"' : '';
+
+    return '<div class="' . htmlspecialchars($outerClass, ENT_QUOTES, 'UTF-8') . '"' . $dataAttrs . '>'
+        . $summaryBlock
+        . '<span class="' . htmlspecialchars($span_class, ENT_QUOTES, 'UTF-8') . '">' . "\r\t\t"
+        . '<a id="' . htmlspecialchars($unique_link, ENT_QUOTES, 'UTF-8') . '" href="#" class="' . htmlspecialchars($linkClasses, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '">' . "\r\t\t\t"
+        . $toggleEsc . "\r\t\t" . '</a>' . "\r\t" . '</span>' . "\r\t"
+        . '<div id="' . htmlspecialchars($unique, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($div_class, ENT_QUOTES, 'UTF-8') . '"' . $legacyBodyStyle . '>' . "\r\t\t\t"
+        . $body . "\r\t" . '</div>' . "\r" . '</div>' . "\r";
+}
+
+function wikiplugin_fade_normalize_group($group)
+{
+    $group = trim((string) $group);
+    if ($group === '') {
+        return '';
+    }
+    $group = preg_replace('/[^a-zA-Z0-9_-]+/', '', $group);
+
+    return substr($group, 0, 120);
+}
+
+function wikiplugin_fade_resolve_expanded(array $params)
+{
+    global $prefs;
+    $ex = trim((string) ($params['expanded'] ?? ''));
+    if ($ex === 'y') {
+        return true;
+    }
+    if ($ex === 'n') {
+        return false;
+    }
+
+    return ! empty($prefs['wikiplugin_fade_default_expanded']) && $prefs['wikiplugin_fade_default_expanded'] === 'y';
+}
+
+function wikiplugin_fade_format_data_attrs($fadeId, $group, array $params)
+{
+    global $prefs;
+    $mobile = ! empty($prefs['wikiplugin_fade_mobile_expand']) && $prefs['wikiplugin_fade_mobile_expand'] === 'y';
+
+    $out = ' data-fade-id="' . htmlspecialchars($fadeId, ENT_QUOTES, 'UTF-8') . '"';
+    $out .= ' data-fade-mobile-pref="' . ($mobile ? 'y' : 'n') . '"';
+    if ($group !== '') {
+        $out .= ' data-fade-group="' . htmlspecialchars($group, ENT_QUOTES, 'UTF-8') . '"';
+    }
+    $out .= ' data-fade-show-speed="' . htmlspecialchars((string) $params['show_speed'], ENT_QUOTES, 'UTF-8') . '"';
+    $out .= ' data-fade-hide-speed="' . htmlspecialchars((string) $params['hide_speed'], ENT_QUOTES, 'UTF-8') . '"';
+
+    return $out;
 }
 
 function validate_speed($speed_param)
