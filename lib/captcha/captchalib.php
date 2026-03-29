@@ -6,8 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
 
-use AltchaOrg\Altcha\ChallengeOptions;
-use AltchaOrg\Altcha\Altcha as AltchaLib;
+use AltchaOrg\Altcha\V1\ChallengeOptions;
+use AltchaOrg\Altcha\V1\Altcha as AltchaLib;
 use Tiki\Captcha\CaptchaTypeResolver;
 
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
@@ -16,7 +16,7 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 }
 
 /**
- * A simple class to switch between Laminas\Captcha\Image and
+ * A simple class to switch between Laminas\Captcha\Image, AltchaOrg\Altcha\V1\Altcha and
  * Laminas\Captcha\ReCaptcha based on admin preference
  */
 class Captcha
@@ -30,7 +30,7 @@ class Captcha
     public $type = '';
 
     /**
-     * An instance of Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha
+     * An instance of Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or AltchaOrg\Altcha\V1\Altcha
      * depending on the value of $this->type
      *
      * @var object
@@ -38,8 +38,15 @@ class Captcha
     public $captcha = '';
 
     /**
+     * Fallback error messages for captcha implementations without Laminas-style message APIs.
+     *
+     * @var array<string, string>
+     */
+    private $errorMessages = [];
+
+    /**
      * Class constructor: decides whether to create an instance of
-     * Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or Captcha_Question
+     * Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or Captcha_Question or AltchaOrg\Altcha\V1\Altcha
      *
      * @param string $type recaptcha|questions|default|dumb
      */
@@ -322,7 +329,11 @@ class Captcha
         } else {
             $errors['missingID'] = tra('CAPTCHA ID field is missing');
         }
-        $this->captcha->setMessages($errors);
+        $this->errorMessages = $errors;
+
+        if (method_exists($this->captcha, 'setMessages')) {
+            $this->captcha->setMessages($errors);
+        }
     }
 
     /**
@@ -333,9 +344,14 @@ class Captcha
     public function getErrors()
     {
         if ($this->type === 'altcha') {
-            return '<br />' . tra('Invalid Captcha.');
+            return '<br />' . ($this->errorMessages['errCaptcha'] ?? tra('Invalid Captcha.'));
         }
-        return implode('<br />', $this->captcha->getMessages());
+
+        if (method_exists($this->captcha, 'getMessages')) {
+            return implode('<br />', $this->captcha->getMessages());
+        }
+
+        return implode('<br />', $this->errorMessages);
     }
 
     /**
