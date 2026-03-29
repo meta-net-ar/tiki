@@ -7,15 +7,6 @@
 function prefs_altcha_list()
 {
     return [
-        'altcha_enabled' => [
-            'name' => tra('Use Altcha'),
-            'description' => tra('Enable Altcha, a privacy-friendly CAPTCHA alternative to protect forms.'),
-            'hint' => tra('You can self-host Altcha or use an existing instance like altcha.org.'),
-            'keywords' => 'captcha altcha',
-            'help' => 'Spam-protection',
-            'type' => 'flag',
-            'default' => 'n',
-        ],
         'altcha_hmac_key' => [
             'name' => tra('Altcha Hmac Key'),
             'type' => 'text',
