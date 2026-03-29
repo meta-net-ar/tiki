@@ -160,8 +160,11 @@ abstract class AbstractTrackerField
     }
 
     /**
-     * Called after field values are saved to determine if the item's
-     * lastModif/lastModifBy metadata should be NOT be updated.
+     * Handle the save of a tracker item field.
+     *
+     * This method is called after the field values are saved. It can be used to
+     * determine additional updates that should be performed on the item, for
+     * example updating the lastModif/lastModifBy metadata.
      *
      * @param array $trackerOldDbRow The raw database row of the tracker item.
      * @return array The values for the columns to be updated (if any).
@@ -175,8 +178,8 @@ abstract class AbstractTrackerField
         }
 
         return [
-            'lastModif' => $tikilib->now,
-            'lastModifBy' => $user,
+            \Tracker_Item::LAST_MODIF => $tikilib->now,
+            \Tracker_Item::LAST_MODIF_BY => $user,
         ];
     }
 }

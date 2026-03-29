@@ -4544,7 +4544,7 @@ class TrackerLib extends TikiLib
                 $field['visibleInViewMode'],
                 $field['visibleInEditMode'],
                 $field['visibleInHistoryMode'],
-                $field['excludeFromTrackerItemLastModificationDate'] ?? 'n'
+                $field['excludeFromTrackerItemLastModificationDate']
             );
             if ($options['defaultOrderKey'] == $field['fieldId']) {
                 $options['defaultOrderKey'] = $newFieldId;
