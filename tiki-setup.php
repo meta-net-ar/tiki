@@ -15,7 +15,7 @@
 use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
-use Tiki\Captcha\TypeResolver;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
@@ -467,7 +467,7 @@ if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
 }
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
-    $captchaType = TypeResolver::getConfiguredType($prefs);
+    $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
     if (in_array($captchaType, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
         if ($captchaType == 'recaptcha20') {
             if (! empty($prefs['language'])) {
@@ -824,7 +824,7 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
-    if (TypeResolver::getConfiguredType($prefs) === 'altcha') {
+    if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
         $headerlib->add_js_module('import altcha from "@altcha";');
     }
 }

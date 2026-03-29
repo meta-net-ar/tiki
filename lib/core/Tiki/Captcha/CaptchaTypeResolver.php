@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Captcha;
 
-class TypeResolver
+class CaptchaTypeResolver
 {
     public static function getConfiguredType(array $prefs): string
     {

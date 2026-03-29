@@ -8,7 +8,7 @@
 
 use AltchaOrg\Altcha\ChallengeOptions;
 use AltchaOrg\Altcha\Altcha as AltchaLib;
-use Tiki\Captcha\TypeResolver;
+use Tiki\Captcha\CaptchaTypeResolver;
 
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
@@ -48,7 +48,7 @@ class Captcha
         global $prefs;
 
         if (empty($type)) {
-            $type = TypeResolver::getConfiguredType($prefs);
+            $type = CaptchaTypeResolver::getConfiguredType($prefs);
         }
 
         if ($type === 'recaptcha') {
