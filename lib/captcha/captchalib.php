@@ -180,8 +180,13 @@ class Captcha
     /**
      * Return CAPTCHA ID
      *
-     * Note: Not all CAPTCHA implementations provide an ID.
-     * For CAPTCHAs without an ID (e.g., Altcha), this will return an empty string.
+     * The ID is used by the classic CAPTCHA flow to identify the generated challenge,
+     * post it back as captcha[id], and store successful validation in session.
+     *
+     * Not all CAPTCHA implementations expose such an ID. For providers without one
+     * (for example Altcha), this returns an empty string. That is acceptable for
+     * those providers because they use their own challenge/payload validation flow
+     * instead of the legacy captcha[id] mechanism.
      *
      * @return string captcha ID or empty string if not available
      */

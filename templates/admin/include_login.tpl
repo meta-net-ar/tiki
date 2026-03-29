@@ -71,24 +71,31 @@
                         {preference name=feature_antibot}
                         <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
                             {preference name=captcha_type}
-                            <h4 class="mt-3">{tr}Classic CAPTCHA{/tr}</h4>
-                            <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
-                                {preference name=captcha_wordLen}
-                                {preference name=captcha_width}
-                                {preference name=captcha_noise}
-                                <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h4>
-                                {preference name=captcha_questions}
-                            </div>
-                            <h4 class="mt-4">{tr}Google reCAPTCHA{/tr}</h4>
+                            {remarksbox type="tip" title="{tr}Tip{/tr}" close="n"}
+                                {tr}Use the selector above to choose the active CAPTCHA implementation. The selected CAPTCHA must also be configured in its section below before it can be used. Other CAPTCHA settings remain available but inactive until selected.{/tr}
+                            {/remarksbox}
                             <div class="adminoptionboxchild">
-                                {preference name=recaptcha_pubkey}
-                                {preference name=recaptcha_privkey}
-                                {preference name=recaptcha_theme}
-                                {preference name=recaptcha_version}
-                            </div>
-                            <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>
-                            <div class="adminoptionboxchild">
-                                {preference name=altcha_hmac_key}
+                                <h5 class="mt-3">{tr}Classic CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                                    {preference name=captcha_wordLen}
+                                    {preference name=captcha_width}
+                                    {preference name=captcha_noise}
+                                </div>
+                                <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild" id="captcha_questions_childcontainer">
+                                    {preference name=captcha_questions}
+                                </div>
+                                <h5 class="mt-4">{tr}Google reCAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild">
+                                    {preference name=recaptcha_pubkey}
+                                    {preference name=recaptcha_privkey}
+                                    {preference name=recaptcha_theme}
+                                    {preference name=recaptcha_version}
+                                </div>
+                                <h5 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild">
+                                    {preference name=altcha_hmac_key}
+                                </div>
                             </div>
                         </div>
                     </fieldset>
