@@ -386,12 +386,11 @@ class Tokens
 
             ]
         );
+        $tokenId = $this->db->lastInsertId();
 
-        $max = $this->db->getOne('SELECT MAX(tokenId) FROM tiki_auth_tokens');
+        $this->db->query('UPDATE tiki_auth_tokens SET token = ' . self::SCHEME . ' WHERE tokenId = ?', [ $tokenId ]);
 
-        $this->db->query('UPDATE tiki_auth_tokens SET token = ' . self::SCHEME . ' WHERE tokenId = ?', [ $max ]);
-
-        return $this->db->getOne('SELECT token FROM tiki_auth_tokens WHERE tokenId = ?', [ $max ]);
+        return $this->db->getOne('SELECT token FROM tiki_auth_tokens WHERE tokenId = ?', [ $tokenId ]);
     }
 
     /**

@@ -35,10 +35,6 @@ body.tiki-admin {
     border: inherit;
 }
 
-.tiki-admin .container.container-std .col1 {
-    padding-left: 0;
-}
-
 .tiki-admin .top_modules .box-login_box {
     padding: 0;
 }
@@ -706,6 +702,10 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     display: block; // Show the container
     padding: 0.75rem 0.5rem; // Match item padding
     margin: 0;
+
+    .my-1.mx-4 {
+        margin: 0
+    }
 
     .search-prefs-container {
         justify-content: center;

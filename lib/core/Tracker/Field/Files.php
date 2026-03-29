@@ -391,6 +391,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
             'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
+
         ];
     }
 

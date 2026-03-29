@@ -103,7 +103,11 @@ if (isset($_REQUEST["save"])) {
         Feedback::error($feedback);
     } else {
         $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'] ?? [], $ext_result);
-        $feedback = sprintf(tra('Contact %s was created.'), $_REQUEST['firstName']);
+        if ($_REQUEST["contactId"]) {
+            $feedback = tr('Contact for %0 %1 was edited.', $_REQUEST['firstName'], $_REQUEST['lastName']);
+        } else {
+            $feedback = tr('Contact for %0 %1 was created.', $_REQUEST['firstName'], $_REQUEST['lastName']);
+        }
         Feedback::success($feedback);
         $info["firstName"] = '';
         $info["lastName"] = '';

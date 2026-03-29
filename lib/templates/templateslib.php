@@ -256,23 +256,17 @@ class TemplatesLib extends TikiLib
     {
         TikiLib::lib('access')->check_permission('edit_content_templates', 'Edit template', 'template', $templateId);
 
-        $bindvars = [$content, $name, (int) $this->now, $type];
+        $bindvars = [$content, $name, $this->now, $type];
         if ($templateId) {
             $query = "update `tiki_content_templates` set `content`=?, `name`=?, `created`=?, `template_type`=? where `templateId`=?";
             $bindvars[] = (int) $templateId;
+            $this->query($query, $bindvars);
+            return $templateId;
         } else {
-            $query = "delete from `tiki_content_templates` where `content`=? and `name`=?";
-            $this->query($query, [$content, $name], -1, -1, false);
-            $query = "insert into `tiki_content_templates`(`content`,`name`,`created`,`template_type`) values(?,?,?,?)";
+            $query = "replace into `tiki_content_templates` (`content`, `name`, `created`, `template_type`) values (?, ?, ?, ?)";
+            $this->query($query, $bindvars);
+            return $this->lastInsertId();
         }
-
-        $result = $this->query($query, $bindvars);
-        $id = $this->getOne(
-            "select max(`templateId`) from `tiki_content_templates` where `created`=? and `name`=?",
-            [(int) $this->now, $name]
-        );
-
-        return $id;
     }
 
     /**

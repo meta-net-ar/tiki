@@ -127,6 +127,7 @@ if (! empty($_REQUEST['edit_assign'])) {
     $smarty->assign_by_ref('assign_position', $info['position']);
     $smarty->assign_by_ref('assign_cache', $info['cache_time']);
     $smarty->assign_by_ref('assign_type', $info['type']);
+    $smarty->assign_by_ref('assign_rows', $info['rows']);
     $smarty->assign_by_ref('assign_order', $cosa);
     $smarty->assign_by_ref('info', $info);
     if (! $info['name']) {
@@ -152,6 +153,7 @@ if (! empty($_REQUEST['edit_assign'])) {
             parse_str($info['params'], $params);
         }
     }
+    $params['rows'] = $info['rows'];
 
     $modlib->dispatchValues($params, $modinfo['params']);
     $smarty->assign('assign_info', $modinfo);
@@ -413,7 +415,6 @@ if (isset($_REQUEST['assign']) && $access->checkCsrf()) {
             $_REQUEST['assign_type']
         );
         $logslib->add_log('adminmodules', 'assigned module ' . $assign_name);
-        $modlib->reorder_modules();
         if ($result) {
             Feedback::success(tr('Module assigned'));
         } else {

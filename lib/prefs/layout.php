@@ -18,6 +18,18 @@ function prefs_layout_list()
             'tags' => ['basic'],
             'default' => '',
         ],
+        'layout_fixed_width_header' => [
+            'name' => tra('Layout fixed width header'),
+            'description' => tra('The width of the site\'s header will match the content area width.'),
+            'type' => 'flag',
+            'hint' => tra('The default is to use a full width header.'),
+            'dependencies' => [
+                'feature_fixed_width',
+                'layout_fixed_width',
+            ],
+            'tags' => ['basic'],
+            'default' => 'n',
+        ],
         'layout_tabs_optional' => [
             'name' => tra('Tabs optional'),
             'description' => tra('Users can choose not to have tabs. A <b>no tabs</b> button will be displayed.'),
