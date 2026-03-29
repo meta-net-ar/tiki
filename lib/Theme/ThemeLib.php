@@ -740,7 +740,6 @@ class ThemeLib extends TikiLib
 
             $headerlib->add_jq_onready($jq, 5);
         }
-        $smarty->initializePaths();
     }
 
     /**
@@ -850,5 +849,6 @@ class ThemeLib extends TikiLib
         } else {
             $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
         }
+        $smarty->initializePaths();
     }
 }
