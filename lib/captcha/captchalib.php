@@ -8,6 +8,7 @@
 
 use AltchaOrg\Altcha\ChallengeOptions;
 use AltchaOrg\Altcha\Altcha as AltchaLib;
+use Tiki\Captcha\TypeResolver;
 
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
@@ -47,23 +48,7 @@ class Captcha
         global $prefs;
 
         if (empty($type)) {
-            if ($prefs['recaptcha_enabled'] == 'y' && ! empty($prefs['recaptcha_privkey']) && ! empty($prefs['recaptcha_pubkey'])) {
-                if ($prefs['recaptcha_version'] == '2') {
-                    $type = 'recaptcha20';
-                } elseif ($prefs['recaptcha_version'] == '3') {
-                    $type = 'recaptcha30';
-                } else {
-                    $type = 'recaptcha';
-                }
-            } elseif (! empty($prefs['altcha_hmac_key']) && $prefs['altcha_enabled'] === 'y') {
-                $type = 'altcha';
-            } elseif ($prefs['captcha_questions_active'] == 'y' && ! empty($prefs['captcha_questions'])) {
-                $type = 'questions';
-            } elseif (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox')) {
-                $type = 'default';
-            } else {
-                $type = 'dumb';
-            }
+            $type = TypeResolver::getConfiguredType($prefs);
         }
 
         if ($type === 'recaptcha') {

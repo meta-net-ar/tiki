@@ -200,30 +200,26 @@
                 <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                 {preference name=feature_antibot}
                 <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
+                    {preference name=captcha_type}
                     <h4 class="mt-3">{tr}Classic CAPTCHA{/tr}</h4>
                     <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
                         {preference name=captcha_wordLen}
                         {preference name=captcha_width}
                         {preference name=captcha_noise}
                         <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h4>
-                        {preference name=captcha_questions_active}
-                        <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                            {preference name=captcha_questions}
-                        </div>
+                        {preference name=captcha_questions}
                     </div>
                     <h4 class="mt-4">{tr}Google reCAPTCHA{/tr}</h4>
-                    {preference name=recaptcha_enabled}
-                    <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
-                        {preference name=altcha_hmac_key}
+                    <div class="adminoptionboxchild">
+                        {preference name=recaptcha_pubkey}
+                        {preference name=recaptcha_privkey}
+                        {preference name=recaptcha_theme}
+                        {preference name=recaptcha_version}
                     </div>
                     
                     <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>
-                    {preference name=altcha_enabled}
-                    <div class="adminoptionboxchild" id="altcha_enabled_childcontainer">
-                        {preference name=altcha_site_url}
-                        {preference name=altcha_theme}
-                        {preference name=altcha_difficulty}
-                        {preference name=altcha_telemetry_url}
+                    <div class="adminoptionboxchild">
+                        {preference name=altcha_hmac_key}
                     </div>
                 </div>
             </fieldset>
