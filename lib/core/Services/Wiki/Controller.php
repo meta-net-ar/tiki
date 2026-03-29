@@ -84,8 +84,12 @@ class Services_Wiki_Controller
         }
 
         // raw=1: return raw wiki syntax for programmatic consumers (MCP, API).
-        // Default behavior (no raw param): return parsed HTML for web UI.
+        // Requires edit permission — raw source may contain plugin calls,
+        // SQL queries, and other content that get_parse() would filter.
         if ($input->raw->int()) {
+            if (! $perms->edit) {
+                throw new Services_Exception_Denied(tr('Edit permission required for raw page source'));
+            }
             return $info;
         }
 
