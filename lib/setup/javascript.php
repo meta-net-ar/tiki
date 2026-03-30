@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Build\ViteManifest;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Lib\TikiDate;
@@ -85,23 +86,35 @@ $custom_js_modules[] = ThemeLib::getThemePath(null, null, 'js/custom.module.js')
 
 //Is there a _custom/shared/js/custom.js
 $custom_js_files[] = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
+$custom_js_modules[] = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_MODULE_PATH_FRAGMENT);
 
 //Is there a _custom/sites/my.domain/js/custom.js
 $custom_js_files[] = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
+$custom_js_modules[] = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_MODULE_PATH_FRAGMENT);
 
 foreach ($custom_js_files as $custom_js_file) {
     if (! empty($custom_js_file)) {
-        $headerlib->add_jsfile($custom_js_file);
+        $headerlib->add_jsfile($custom_js_file . '?v=' . filemtime($custom_js_file));
     }
 }
 
 foreach ($custom_js_modules as $custom_js_module) {
     if (! empty($custom_js_module)) {
-        $headerlib->add_js_module(
-            "
-import \"./$custom_js_module\";
+        $versioned = ViteManifest::resolve($custom_js_module);
+        if ($versioned) {
+            $headerlib->add_js_module(
+                "
+import \"./$versioned\";
 "
-        );
+            );
+        } else {
+            $version = filemtime($custom_js_module);
+            $headerlib->add_js_module(
+                "
+import \"./$custom_js_module?v=$version\";
+"
+            );
+        }
     }
 }
 
@@ -367,7 +380,7 @@ $(document).on("tiki.modal.redraw", function(event) {
     if (!$modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    
+
     // Guard: Prevent duplicate listeners on the same modal
     const el = $modalContent[0];
     if (el.dataset.resizeInit === '1') return;
