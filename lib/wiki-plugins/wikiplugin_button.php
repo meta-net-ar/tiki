@@ -209,6 +209,16 @@ function wikiplugin_button_info()
                 'advanced' => true,
                 'safe' => true,
             ],
+            '_onclick' => [
+                'required' => false,
+                'name' => tra('OnClick'),
+                'description' => tra('JavaScript for the onclick handler. Example: tikiFadeToggleAll(\'group\'); return false; For tikiFade* helpers, include a {FADE} on the page or use a handler containing tikiFade to load wikiplugin-fade.js automatically.'),
+                'since' => '29.0',
+                'filter' => 'none',
+                'default' => '',
+                'advanced' => true,
+                'safe' => true,
+            ],
             'data' => [
                 'required' => false,
                 'name' => tra('Data attributes'),
@@ -247,6 +257,10 @@ function wikiplugin_button($data, $params)
 
     // Parse wiki argument variables in the url, if any (i.e.: {{itemId}} for it's numeric value).
     $parserlib->parse_wiki_argvariable($params['href']);
+
+    if (! empty($params['_onclick']) && str_contains($params['_onclick'], 'tikiFade')) {
+        TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/wikiplugin-fade.js', true);
+    }
 
     $content = \SmartyTiki\FunctionHandler\Button::render($params, $smarty->getEmptyInternalTemplate());
     return '~np~' . $content . '~/np~';

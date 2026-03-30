@@ -202,6 +202,14 @@ class Button extends Base implements TikiSmartyExtensionInterface
                 unset($params['href']);
             }
 
+            if (
+                ! empty($params['_onclick'])
+                && empty($params['_anchor'] ?? '')
+                && (! isset($params['_script']) || $params['_script'] === '')
+            ) {
+                $params['_script'] = 'javascript:void(0)';
+            }
+
             if (! isset($params['_text'])) { // avoid NOTICE (E_NOTICE): Undefined index
                 $params['_text'] = '';
             }

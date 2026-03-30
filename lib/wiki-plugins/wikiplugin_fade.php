@@ -159,7 +159,7 @@ function wikiplugin_fade($body, $params, $offset = 0, $context = null)
     $defaultLabel = tra('Unspecified label');
     $toggleText = (string) $params['label'];
     if ($hasSummary && ($toggleText === $defaultLabel || trim($toggleText) === '')) {
-        $toggleText = tra('Show / hide details');
+        $toggleText = tra('Details');
     }
 
     if ($params['icon'] == 'y') {
