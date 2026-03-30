@@ -842,9 +842,78 @@ pre.codelisting code {
     margin-bottom: 0;
 }
 
-.wikiplugin-fade.wikiplugin-fade--initial-open .wpfade-div-plain,
-.wikiplugin-fade.wikiplugin-fade--initial-open .wpfade-div-icon {
-    display: block !important;
+.wikiplugin-fade--inline {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.wikiplugin-fade--inline .wikiplugin-fade__summary.card-header {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.wikiplugin-fade--inline .wikiplugin-fade__summary > a {
+    cursor: pointer;
+    border-radius: .25rem;
+    color: var(--bs-body-color);
+    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.wikiplugin-fade--inline .wikiplugin-fade__summary > a:hover {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-link-hover-color);
+}
+
+.wikiplugin-fade--inline .wikiplugin-fade__summary > a:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
+    border-color: var(--bs-primary);
+}
+
+.wikiplugin-fade__header > a {
+    cursor: pointer;
+}
+
+.wikiplugin-fade__header > a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.wikiplugin-fade__summary-text {
+    min-width: 0;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.wikiplugin-fade__legacy-header {
+    display: block;
+}
+
+.wikiplugin-fade__content {
+    padding: .15rem 0 .5rem 0;
+}
+
+.wikiplugin-fade .wpfade-shown,
+.wikiplugin-fade .wpfade-hidden {
+    background: none !important;
+    background-image: none !important;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.wpfade-shown,
+.wpfade-hidden {
+    background: none !important;
+    background-image: none !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+.wpfade-legacy-toggle::before,
+.wpfade-legacy-toggle::after {
+    content: none !important;
 }
 
 @media print {
