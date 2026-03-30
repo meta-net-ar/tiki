@@ -1579,28 +1579,25 @@ import { defaults as defaultControls } from "ol/control";
                                     } else if (i.geo_file) {
                                         // load a file containing geometry, set using tracker Files indexGeometry option
 
-                                        var format,
-                                            files = i.geo_file.split(","),
-                                            proj4326 = new ol.proj.Projection("EPSG:4326"),
-                                            proj900913 = new ol.proj.Projection("EPSG:900913");
+                                        let format;
+                                        const files = i.geo_file.split(",");
 
                                         layer = container.getLayer(layerName);
 
-                                        if (i.geo_file_format == "geojson") {
+                                        if (i.geo_file_format === "geojson") {
                                             format = new ol.format.GeoJSON();
                                         } else {
-                                            if (i.geo_file_format == "gpx") {
+                                            if (i.geo_file_format === "gpx") {
                                                 format = new ol.format.GPX();
                                             }
                                         }
-                                        for (var f = 0; f < files.length; f++) {
+                                        for (let f = 0; f < files.length; f++) {
                                             $.get(files[f], function (data) {
-                                                if (data.indexOf("&quot;") > -1) {
-                                                    // decode html entities coming from file galleries
-                                                    data = $("<div/>").html(data).text();
-                                                }
                                                 try {
-                                                    features = format.readFeatures(data);
+                                                    features = format.readFeatures(data, {
+                                                        dataProjection: "EPSG:4326",
+                                                        featureProjection: "EPSG:900913",
+                                                    });
                                                 } catch (e) {
                                                     // Corrupted feature - display plain marker
                                                     $(container).addMapMarker({
@@ -1631,12 +1628,6 @@ import { defaults as defaultControls } from "ol/control";
                                                     }
                                                     if (!feature.get("popup_tpl")) {
                                                         feature.set("popup_tpl", $(form).data("popup-tpl"));
-                                                    }
-                                                    // for some reason geometry needs to be in 900913 projection to correctly appear
-                                                    // in the "Editable" vector layer, even though layer.projection === "EPSG:4326"
-                                                    let geometry = feature.getGeometry();
-                                                    if (geometry) {
-                                                        geometry.transform(proj4326, proj900913);
                                                     }
                                                 });
                                                 layer.getSource().addFeatures(features);
