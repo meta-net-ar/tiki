@@ -4,7 +4,11 @@
         {if !empty($field.options_map.prepend)}
             <span class="input-group-text">{$field.options_map.prepend}&nbsp</span>
         {/if}
-        <input type="text" class="form-control" value="{$field.value|escape}" disabled="disabled">
+        {if $field.options_map.overridable}
+            <input type="text" class="form-control" id="{$field.ins_id|replace:'[':'_'|replace:']':''}" name="{$field.ins_id}" value="{$field.value|escape}">
+        {else}
+            <input type="text" class="form-control" value="{$field.value|escape}" disabled="disabled">
+        {/if}
         {if !empty($field.options_map.append)}
             <span class="input-group-text">{$field.options_map.append}</span>
         {/if}
