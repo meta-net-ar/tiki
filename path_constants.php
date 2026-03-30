@@ -79,10 +79,6 @@ const STORAGE_PREFSDOC_PATH = 'storage/prefsdoc';
 const FILE_GALLERY_DEFAULT_STORAGE_PATH = 'storage/fgal';
 const H5P_STORAGE_SUFFIX = 'public/h5p';
 const STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
-/** DEPRECATED: use H5P_STORAGE_SUFFIX */
-const DEPRECATED_H5P_STORAGE_SUFFIX = 'public/h5p';
-/** DEPRECATED: use STORAGE_PUBLIC_H5P_PATH */
-const DEPRECATED_STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
 
 const SMARTY_COMPILED_TEMPLATES_PATH = 'temp/templates_c';
 /** Currently this is both the top level template path and the relative template path in themes and packages. Needs to be separated if moved */
