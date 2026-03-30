@@ -626,23 +626,6 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 ');
 }
 
-if ($prefs['feature_syntax_highlighter'] == 'y') {
-    //add codemirror stuff
-    $headerlib
-        ->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
-        ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
-    //add tiki stuff
-        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
-        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js');
-    //add interactjs
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
-
-    require_once("lib/codemirror_tiki/tiki_codemirror.php");
-    createCodemirrorModes();
-}
-
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.

@@ -29,7 +29,7 @@
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label">{tr}Description{/tr}</label>
-                <textarea class="form-control" id="description" name="description" rows="5" data-codemirror="true" data-syntax="tiki">{$description|escape}</textarea>
+                {textarea name='description' id='description' codemirror='true' syntax='tiki' rows='5' class='form-control' }{$description|escape}{/textarea}
             </div>
             <div class="mb-3 row">
                 <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}"/>

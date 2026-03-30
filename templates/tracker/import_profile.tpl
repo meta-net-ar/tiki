@@ -3,7 +3,10 @@
 {block name="title"}
     {title}{$title}{/title}
 {/block}
-
+{function name="render_editor" content=""}
+    {textarea name='yaml' id='importFromProfileYaml' codemirror='true' syntax='yaml' class='form-control' style="height: 400px;" required="required"}{/textarea}
+{/function}
+{$loadtextarea={render_editor}}
 {block name="content"}
     <form class="form" id="forumImportFromProfile" action="{service controller=tracker action=import_profile trackerId=$trackerId confirm=1}" method="post" enctype="multipart/form-data">
         {remarksbox type="warning" title="{tr}Warning{/tr}"}
@@ -11,7 +14,7 @@
         {/remarksbox}
         <div class="mb-3 row mx-0">
             <label class="col-form-label">{tr}YAML{/tr}</label>
-            <textarea name="yaml" id="importFromProfileYaml" data-codemirror="true" data-syntax="yaml" data-line-numbers="true" style="height: 400px;" class="form-control" required="required"></textarea>
+            {$loadtextarea}
         </div>
         <div class="submit text-center">
             {if !$modal}
