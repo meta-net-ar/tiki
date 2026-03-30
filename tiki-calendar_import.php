@@ -11,8 +11,8 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'import'                         => 'word',      //post
-            'calendarId'                      => 'int',      //post
+            'import'                      => 'word',      // post
+            'calendarId'                  => 'int',       // post
         ],
     ],
 ];

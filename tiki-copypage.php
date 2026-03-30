@@ -12,14 +12,14 @@ $section_class = "tiki_wiki_page manage";   // This will be body class instead o
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'page'                         => 'pagename',          //get
-            'version'                      => 'string',            //get
-            'copy'                         => 'bool',              //post
-            'confirm'                      => 'bool',              //post
-            'badname'                      => 'pagename',          //post
-            'newpage'                      => 'pagename',          //post
-            'dupCateg'                     => 'bool',              //post
-            'dupTags'                      => 'bool',              //post
+            'page'                         => 'pagename',          // get
+            'version'                      => 'word',               // get
+            'copy'                         => 'bool',              // post
+            'confirm'                      => 'bool',              // post
+            'badname'                      => 'pagename',          // post
+            'newpage'                      => 'pagename',          // post
+            'dupCateg'                     => 'word',              // post
+            'dupTags'                      => 'word',              // post
         ],
     ],
 ];
