@@ -22,6 +22,16 @@ class RSSLib extends TikiDb_Bridge
      */
     public const MAX_EXTERNAL_FEED_NAME_LENGTH = 200;
 
+    /**
+     * The lowest unix timestamp for an empty cache, allowing it to be refreshed as soon as possible.
+     */
+    private const EMPTY_CACHE_UPDATED_AT = 1;
+
+    /**
+     * The default TTL for the feed in case the feed does not specify it.
+     */
+    private const DEFAULT_FEED_TTL = 0;
+
     public function __construct()
     {
         self::$cachelib = $cachelib ?? TikiLib::lib('cache');
@@ -119,7 +129,7 @@ class RSSLib extends TikiDb_Bridge
                     'name' => $uniqueid,
                     'rssVer' => $rss_version,
                     'refresh' => (int) $prefs['feed_cache_time'],
-                    'lastUpdated' => 1,
+                    'lastUpdated' => self::EMPTY_CACHE_UPDATED_AT,
                     'cache' => '-',
                 ]
             );
@@ -559,7 +569,7 @@ class RSSLib extends TikiDb_Bridge
     private function update_feed($url, $rssId = null, $actions = null): array
     {
         global $tikilib;
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => 0, 'lastUpdated' => $tikilib->now];
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => self::DEFAULT_FEED_TTL, 'lastUpdated' => $tikilib->now];
         $filter = $this->createFilter();
         $feed = $this->fetchFeed($url);
         if (! $feed) {
@@ -1098,10 +1108,10 @@ class RSSLib extends TikiDb_Bridge
         $xpath = new DOMXPath($DOM);
 
         $ttlNodes = $xpath->query('//*[local-name()="channel"]/*[local-name()="ttl"]');
-        if ($ttlNodes->length > 0) {
+        if ($ttlNodes->length > self::DEFAULT_FEED_TTL) {
             return (int)$ttlNodes->item(0)->nodeValue;
         }
-        return 0;
+        return self::DEFAULT_FEED_TTL;
     }
 
     public function loadRss(array $params): array
