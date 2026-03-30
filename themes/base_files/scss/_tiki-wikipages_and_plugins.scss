@@ -521,7 +521,7 @@ div.tiki_plugin {
 }
 .options-container #options {
     min-height: 10em;
-    border: 4px $gray-200 dashed;
+    border: 4px dashed var(--bs-border-color);
 }
 
 .options-container li {
@@ -543,7 +543,7 @@ li .url-group {
 }
 
 .options-container > ol > li {
-    outline: 1px solid $gray-200;
+    outline: 1px solid var(--bs-border-color);
     margin-bottom: 5px;
 }
 
