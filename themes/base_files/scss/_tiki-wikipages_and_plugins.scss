@@ -857,7 +857,7 @@ pre.codelisting code {
 .wikiplugin-fade--inline .wikiplugin-fade__summary > a {
     cursor: pointer;
     border-radius: .25rem;
-    color: var(--bs-body-color);
+    color: var(--bs-link-color);
     transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
 
@@ -881,6 +881,27 @@ pre.codelisting code {
     outline-offset: 2px;
 }
 
+// Classic Bootstrap FADE (bootstrap=y, no summary): left expand/collapse icon; state tracks aria-expanded (see wikiplugin-fade.js).
+.wikiplugin-fade.card .wikiplugin-fade__header > a::before {
+    content: '';
+    flex-shrink: 0;
+    width: 19px;
+    height: 1.25rem;
+    align-self: flex-start;
+    margin-top: .125rem;
+    margin-right: .35rem;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.wikiplugin-fade.card .wikiplugin-fade__header > a[aria-expanded='true']::before {
+    background-image: url('#{$imagePath}toggle-collapse-dark.png');
+}
+
+.wikiplugin-fade.card .wikiplugin-fade__header > a[aria-expanded='false']::before {
+    background-image: url('#{$imagePath}toggle-expand-dark.png');
+}
+
 .wikiplugin-fade__summary-text {
     min-width: 0;
     line-height: 1.4;
@@ -893,27 +914,6 @@ pre.codelisting code {
 
 .wikiplugin-fade__content {
     padding: .15rem 0 .5rem 0;
-}
-
-.wikiplugin-fade .wpfade-shown,
-.wikiplugin-fade .wpfade-hidden {
-    background: none !important;
-    background-image: none !important;
-    margin-left: 0;
-    padding-left: 0;
-}
-
-.wpfade-shown,
-.wpfade-hidden {
-    background: none !important;
-    background-image: none !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-}
-
-.wpfade-legacy-toggle::before,
-.wpfade-legacy-toggle::after {
-    content: none !important;
 }
 
 @media print {

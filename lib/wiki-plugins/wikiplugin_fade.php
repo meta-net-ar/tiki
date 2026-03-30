@@ -24,7 +24,7 @@ function wikiplugin_fade_info()
                 'filter' => 'wikicontent',
                 'description' => tra('Optional visible summary above the collapsible details (Wiki syntax). When set, a generic toggle label is used unless you set label explicitly.'),
                 'default' => '',
-                'since' => '29.0',
+                'since' => '30.0',
             ],
             'expanded' => [
                 'required' => false,
@@ -32,7 +32,7 @@ function wikiplugin_fade_info()
                 'filter' => 'alpha',
                 'description' => tra('Start with details shown (y) or hidden (n). If not set, the site preference for the Fade plugin applies.'),
                 'default' => '',
-                'since' => '29.0',
+                'since' => '30.0',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -45,7 +45,7 @@ function wikiplugin_fade_info()
                 'filter' => 'text',
                 'description' => tra('Optional group name (letters, digits, underscore and hyphen) for future tools such as expand all.'),
                 'default' => '',
-                'since' => '29.0',
+                'since' => '30.0',
             ],
             'label' => [
                 'required' => true,
@@ -182,16 +182,6 @@ function wikiplugin_fade($body, $params, $offset = 0, $context = null)
     if ($useBootstrap) {
         $unique_outer = $unique . '-outer';
         $unique_inner = $unique . '-inner';
-
-        $wrapperClass = 'wikiplugin-fade wikiplugin-fade--inline ' . trim($params['class'] ?? '');
-        if ($hasSummary) {
-            $wrapperClass .= ' wikiplugin-fade--summary';
-        }
-        if ($isExpanded) {
-            $wrapperClass .= ' wikiplugin-fade--initial-open';
-        }
-        $wrapperClass = trim($wrapperClass);
-
         $collapseClass = 'collapse' . ($isExpanded ? ' show' : '');
 
         if ($hasSummary) {
@@ -199,19 +189,42 @@ function wikiplugin_fade($body, $params, $offset = 0, $context = null)
             if ($userSetCustomLabel) {
                 $headerInner .= '<span class="wikiplugin-fade__extra-label small text-muted me-2 align-self-center flex-shrink-0">' . htmlspecialchars($userLabelRaw, ENT_QUOTES, 'UTF-8') . '</span>';
             }
-        } else {
-            $headerInner = '<span class="flex-grow-1 me-2">' . $toggleEsc . '</span>';
+            $wrapperClass = 'wikiplugin-fade wikiplugin-fade--inline ' . trim($params['class'] ?? '');
+            $wrapperClass .= ' wikiplugin-fade--summary';
+            if ($isExpanded) {
+                $wrapperClass .= ' wikiplugin-fade--initial-open';
+            }
+            $wrapperClass = trim($wrapperClass);
+
+            return '<div id="' . htmlspecialchars($unique_outer, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($wrapperClass, ENT_QUOTES, 'UTF-8') . '"'
+                . $dataAttrs
+                . '><div class="wikiplugin-fade__summary card-header p-0">'
+                    . '<a data-bs-toggle="collapse" class="d-flex align-items-start w-100 text-decoration-none py-1" role="button" href="#' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '" aria-controls="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '"' . $fadeSummaryAriaAttr . '>'
+                    . $headerInner
+                    . '</a>'
+                . '</div>'
+                    . '<div id="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($collapseClass, ENT_QUOTES, 'UTF-8') . '">'
+                      . '<div class="wikiplugin-fade__content">' . $body . '</div>'
+                    . '</div>'
+                  . '</div>';
         }
+
+        $headerInner = '<span class="flex-grow-1 me-2">' . $toggleEsc . '</span>';
+        $wrapperClass = 'wikiplugin-fade card ' . trim($params['class'] ?? '');
+        if ($isExpanded) {
+            $wrapperClass .= ' wikiplugin-fade--initial-open';
+        }
+        $wrapperClass = trim($wrapperClass);
 
         return '<div id="' . htmlspecialchars($unique_outer, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($wrapperClass, ENT_QUOTES, 'UTF-8') . '"'
             . $dataAttrs
-            . '><div class="wikiplugin-fade__summary card-header p-0">'
-                . '<a data-bs-toggle="collapse" class="d-flex align-items-start w-100 text-decoration-none  py-1" role="button" href="#' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '" aria-controls="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '"' . $fadeSummaryAriaAttr . '>'
+            . '><div class="card-header wikiplugin-fade__header p-0">'
+                . '<a data-bs-toggle="collapse" class="d-flex align-items-start w-100 text-decoration-none text-body px-3 py-2" role="button" href="#' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '" aria-controls="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '"' . $fadeSummaryAriaAttr . '>'
                 . $headerInner
                 . '</a>'
             . '</div>'
                 . '<div id="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($collapseClass, ENT_QUOTES, 'UTF-8') . '">'
-                  . '<div class="wikiplugin-fade__content">' . $body . '</div>'
+                  . '<div class="card-body">' . $body . '</div>'
                 . '</div>'
               . '</div>';
     }
