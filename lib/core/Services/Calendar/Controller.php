@@ -413,25 +413,34 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 // set up default start and end
                 $dateNow->setTZbyID($displayTimezone);
                 if ($input->prefill_start->text()) {
-                    $prefillStart = $input->prefill_start->text();
-                    $prefillEnd = $input->prefill_end->text();
+                    $prefillStart = trim($input->prefill_start->text());
+                    $prefillEnd = trim((string) $input->prefill_end->text());
+                    $prefillTimezoneRequested = trim((string) $input->prefill_tz->text());
+                    $prefillTimezone = $this->resolvePrefillTimezone($prefillTimezoneRequested, $displayTimezone);
 
-                    $tikidate = new TikiDate();
-                    $tikidate->setTZbyID($displayTimezone);
-
-                    $tikidate->setDate($prefillStart, $displayTimezone);
-                    $start = $tikidate->getTime();
-                    if ($prefillEnd && strtotime($prefillEnd) !== false) {
-                        $tikidate->setDate($prefillEnd, $displayTimezone);
-                        $end = $tikidate->getTime();
-                        // subtract 1 sec to make it inclusive
-                        if (strlen($prefillEnd) <= 10 || strpos($prefillEnd, '00:00:00') !== false) {
-                            $end -= 1;
+                    $start = $this->parsePrefillDateTime($prefillStart, $prefillTimezone);
+                    if (! is_null($start) && $prefillEnd !== '') {
+                        $end = $this->parsePrefillDateTime($prefillEnd, $prefillTimezone);
+                        if (! is_null($end)) {
+                            // convert exclusive all-day selection end to inclusive end
+                            if ($this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
+                                $end -= 1;
+                            }
+                            if ($end <= $start) {
+                                $duration = 60 * 60;
+                                $end = $start + $duration;
+                            } else {
+                                $duration = $end - $start;
+                            }
+                        } else {
+                            $duration = 60 * 60;
+                            $end = $start + $duration;
                         }
-                        $duration = $end - $start;
-                    } else {
+                    } elseif (! is_null($start)) {
                         $duration = 60 * 60;
                         $end = $start + $duration;
+                    } else {
+                        [$start, $end, $duration] = $this->getDefaultStartEndDurationFromDateNow($dateNow, $displayTimezone);
                     }
                     if ($input->target_user->text()) {
                         if ($user) {
@@ -445,26 +454,12 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                         ];
                     }
                 } else {
-                    $hour = $dateNow->date->format('H');
                     if ($input->offsetExists('todate')) {
                         // set the correct day clicked on
                         $dateNow->setTZbyID($displayTimezone);
                         $dateNow->setDate($input->todate->text(), $displayTimezone);
-                        $hour = $dateNow->date->format('H');
                     }
-                    $tz = date_default_timezone_get();
-                    date_default_timezone_set($displayTimezone);
-                    $start = mktime(
-                        $hour,
-                        $dateNow->date->format('i'),
-                        $dateNow->date->format('s'),
-                        $dateNow->date->format('m'),
-                        $dateNow->date->format('d'),
-                        $dateNow->date->format('Y')
-                    );
-                    date_default_timezone_set($tz);
-                    $duration = 60 * 60;
-                    $end = $start + $duration;
+                    [$start, $end, $duration] = $this->getDefaultStartEndDurationFromDateNow($dateNow, $displayTimezone);
                 }
 
                 $calitem = [
@@ -622,6 +617,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'displayTimezone'            => $displayTimezone,
             'timezones'                  => $timezones,
             'prefilled'                  => $input->prefill_start->text() ? true : false,
+            'requireParticipant'         => $input->target_user->text() !== '',
+            'hideCalendarSelector'       => $input->prefill_start->text() !== '' && $input->target_user->text() !== '',
             // related tracker items
             'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
         ];
@@ -941,6 +938,89 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             $recurrence->setHideParticipants(true);
         }
         return $recurrence;
+    }
+
+    /**
+     * Build default start/end in the display timezone from current date/time context.
+     *
+     * @return array{0:int,1:int,2:int}
+     */
+    private function getDefaultStartEndDurationFromDateNow(TikiDate $dateNow, string $displayTimezone): array
+    {
+        $hour = $dateNow->date->format('H');
+        $tz = date_default_timezone_get();
+        date_default_timezone_set($displayTimezone);
+        $start = mktime(
+            $hour,
+            $dateNow->date->format('i'),
+            $dateNow->date->format('s'),
+            $dateNow->date->format('m'),
+            $dateNow->date->format('d'),
+            $dateNow->date->format('Y')
+        );
+        date_default_timezone_set($tz);
+
+        $duration = 60 * 60;
+        $end = $start + $duration;
+
+        return [$start, $end, $duration];
+    }
+
+    /**
+     * Resolve prefill timezone from request, falling back to display timezone when missing or invalid.
+     */
+    private function resolvePrefillTimezone(string $requestedTimezone, string $displayTimezone): string
+    {
+        if ($requestedTimezone === '') {
+            return $displayTimezone;
+        }
+
+        try {
+            new DateTimeZone($requestedTimezone);
+            return $requestedTimezone;
+        } catch (\Exception $e) {
+            return $displayTimezone;
+        }
+    }
+
+    /**
+     * Parse prefilled date string from calendar click/drag.
+     * Accepts timezone-aware ISO strings and falls back to display timezone when no offset is present.
+     */
+    private function parsePrefillDateTime(string $value, string $displayTimezone): ?int
+    {
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            if (preg_match('/^-?\\d+$/', $value) === 1) {
+                return (int) $value;
+            }
+
+            $date = new DateTimeImmutable($value, new DateTimeZone($displayTimezone));
+            return $date->getTimestamp();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Detects whether a prefill value points to local start-of-day.
+     */
+    private function isPrefillStartOfDay(string $value, string $displayTimezone): bool
+    {
+        try {
+            if (preg_match('/^-?\\d+$/', $value) === 1) {
+                $date = new DateTimeImmutable('@' . $value);
+                $date = $date->setTimezone(new DateTimeZone($displayTimezone));
+            } else {
+                $date = new DateTimeImmutable($value, new DateTimeZone($displayTimezone));
+            }
+            return $date->format('H:i:s') === '00:00:00';
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
