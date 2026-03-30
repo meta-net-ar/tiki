@@ -4,11 +4,17 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-TikiLib::lib('cart');
 
 class Payment_CartTest extends TikiTestCase
 {
     public $obj;
+    private static $cartlib;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        self::$cartlib = TikiLib::lib('cart');
+    }
     protected function setUp(): void
     {
         global $prefs;
