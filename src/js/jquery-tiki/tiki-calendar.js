@@ -16,20 +16,56 @@ $.fn.setupEventCalendar = function (
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
         $(calendarEl).tikiModal(tr("Loading..."));
-        const openNewEventModal = (startStr, endStr = null) => {
+        const toTimezoneStableIso = (dateValue) => moment(dateValue).format("YYYY-MM-DD[T]HH:mm:ssZ");
+        const browserTimezone = (() => {
+            try {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+            } catch (e) {
+                return null;
+            }
+        })();
+        const toPrefillParamValue = (value) => {
+            if (value === null || typeof value === "undefined") {
+                return null;
+            }
+            if (typeof value === "string") {
+                return value;
+            }
+            if (value instanceof Date && !isNaN(value.getTime())) {
+                return toTimezoneStableIso(value);
+            }
+            return String(value);
+        };
+
+        const openNewEventModal = (startValue, endValue = null) => {
             if (isOpeningModal) return;
             const countCals = $(".filtercal ul li").length;
             if (countCals >= 1 || targetId != "calendar") {
                 isOpeningModal = true;
                 $(calendarEl).tikiModal(" "); // Use the container for the loading overlay
+                const prefillStart = toPrefillParamValue(startValue);
+                if (!prefillStart) {
+                    isOpeningModal = false;
+                    return;
+                }
+
                 const params = {
-                    prefill_start: startStr,
+                    prefill_start: prefillStart,
                     modal: 1,
                     return_url: returnUrl,
                 };
-                if (endStr) {
-                    params.prefill_end = endStr;
+
+                if (browserTimezone) {
+                    params.prefill_tz = browserTimezone;
                 }
+
+                if (endValue !== null && typeof endValue !== "undefined") {
+                    const prefillEnd = toPrefillParamValue(endValue);
+                    if (prefillEnd) {
+                        params.prefill_end = prefillEnd;
+                    }
+                }
+
                 $.openModal({
                     title: tr("New event"),
                     size: "modal-lg",
@@ -67,7 +103,7 @@ $.fn.setupEventCalendar = function (
             eventSources: [{ url: urlEventSource }],
             select: function (info) {
                 // Handle Drag Selection
-                openNewEventModal(info.startStr, info.endStr);
+                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end);
             },
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,
@@ -266,7 +302,7 @@ $.fn.setupEventCalendar = function (
                     calendarContainer[0].unselect();
                 } else {
                     // Handle Single Click
-                    openNewEventModal(info.dateStr);
+                    openNewEventModal(info.dateStr ?? info.date);
                 }
             },
             eventResize: function (info) {

@@ -32,7 +32,7 @@
             {if $prefs.calendar_addtogooglecal == 'y'}
                 {wikiplugin _name="addtogooglecal" calitemid=$calitemId}{/wikiplugin}
             {/if}
-            {if $prefilled}
+            {if $hideCalendarSelector}
             <input type="hidden" name="calitem[calendarId]" value="{$calitem.calendarId}">
             {else}
             <div class="mb-3 row">
@@ -442,7 +442,7 @@
         <div class="submit">
             <input type="hidden" id="act" name="act" value="">
             <input type="submit" class="btn btn-secondary cleanable-false" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
-            <input type="submit" class="btn btn-primary cleanable-false {if $prefilled}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
+            <input type="submit" class="btn btn-primary cleanable-false {if $requireParticipant}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
             {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
                        class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" data-bs-dismiss="modal" value="{tr}Delete event{/tr}">
