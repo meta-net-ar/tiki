@@ -636,7 +636,7 @@ check-directories:
     - composer require tikiwiki/diagram ^10 --no-progress
     - composer require thiagoalessio/tesseract_ocr ^2.7.0 --no-progress
     - composer require mathjax/mathjax ^2.7 --no-progress
-    - composer require media-alchemyst/media-alchemyst ^0.5.1 --no-progress
+    - composer require tikiwiki/media-alchemyst ^4.2 --no-progress
     - composer require npm-asset/pdfjs-dist ~2.0.487 --no-progress
     - composer require bower-asset/wodo.texteditor ^0.5.9 --no-progress
     - composer require j0k3r/php-readability ^1.1.10 --no-progress
