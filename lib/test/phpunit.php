@@ -14,6 +14,10 @@ declare(strict_types=1);
 // `composer test -d vendor_bundled` again.
 // https://github.com/sebastianbergmann/phpunit/issues/552
 
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
+
 if (! ini_get('date.timezone')) {
     ini_set('date.timezone', 'UTC');
 }
