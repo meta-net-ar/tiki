@@ -14,6 +14,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
 {
     // H5P required subdirectories (used by the H5P library for content, cache, exports, and temporary uploads)
     public const H5P_REQUIRED_SUBDIRS = ['cachedassets', 'content', 'exports', 'libraries', 'temp'];
+    private const H5P_LIBRARIES_SUBDIR = 'libraries';
 
     // properties for table objects
     private $tiki_h5p_contents = null;
@@ -51,23 +52,13 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         self::$h5p_abs  = self::resolveAbsH5PPath();
 
         // Ensure H5P storage is ready
-        list($ok, $abs,) = self::ensureStorageReady(true);
+        list($ok, $abs, $why) = self::ensureStorageReady(true);
         self::$h5p_abs  = $abs;
 
-        if (! is_writable(self::$h5p_abs)) {
-            \Feedback::error(tr("H5P directory is not writable: %0", self::$h5p_abs));
+        if (! $ok) {
+            \Feedback::error(tr("H5P directory is not writable: %0 (%1)", self::$h5p_abs, $why));
 
             return;
-        }
-
-        // double check that  subdirectories exist and are writable
-        foreach (self::H5P_REQUIRED_SUBDIRS as $dir) {
-            $path = $abs . '/' . $dir;
-            if (! is_dir($path)) {
-                @mkdir($path, 0775, true);
-            } elseif (! is_writable($path)) {
-                \Feedback::error(tr('H5P directory is not writable: %0', $path));
-            }
         }
 
         if ($this->getOption('cron_last_run') < time() - 86400 && ! empty($_SERVER['HTTP_HOST'])) {
@@ -146,7 +137,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             '<code>sh setup.sh -n fix</code>',
             '<code>' . htmlspecialchars($path) . '</code>'
         );
-        $msg = tr('H5P directory is not writable: %0. %1', $path, $hint);
+        $msg = tr('H5P directory is not writable: %0 (%1). %2', $path, $why, $hint);
 
         TikiLib::lib('tiki')->add_feedback('error', $msg);
         return false;
@@ -263,7 +254,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         $response = curl_exec($handle);
         if (! $response) {
             $error = curl_error($handle);
-            error_log("H5P: Error fetching URL $url: $error");
+            \Feedback::warning(tr('H5P fetch failed for %0: %1', $url, $error));
         }
         curl_close($handle);
 
@@ -1122,7 +1113,7 @@ WHERE hll.`library_id` = ?',
 
     private function getSemanticsFromFile($name, $majorVersion, $minorVersion)
     {
-        $semanticsPath = self::$h5p_abs . '/libraries/' . $name . '-' . $majorVersion . '.' . $minorVersion . '/semantics.json';
+        $semanticsPath = self::$h5p_abs . '/' . self::H5P_LIBRARIES_SUBDIR . '/' . $name . '-' . $majorVersion . '.' . $minorVersion . '/semantics.json';
 
         if (file_exists($semanticsPath)) {
             $semantics = file_get_contents($semanticsPath);
@@ -1228,7 +1219,7 @@ WHERE hll.`library_id` = ?',
 
         // Delete files
         H5PCore::deleteFileTree(
-            self::$h5p_abs . '/libraries/' . $library->machine_name . '-' . $library->major_version . '.' . $library->minor_version
+            self::$h5p_abs . '/' . self::H5P_LIBRARIES_SUBDIR . '/' . $library->machine_name . '-' . $library->major_version . '.' . $library->minor_version
         );
 
         // Delete data in database (won't delete content)
@@ -1677,7 +1668,8 @@ GROUP BY l.`name`, l.`major_version`, l.`minor_version`');
     public function getLibraryFileUrl($libraryFolderName, $fileName)
     {
         global $tikiroot;
-        return rtrim($tikiroot, '/') . '/' . self::$h5p_path . '/libraries/' . $libraryFolderName . '/' . $fileName;
+        // Keep tikiroot to generate correct URLs when Tiki is installed under a subpath.
+        return rtrim($tikiroot, '/') . '/' . self::$h5p_path . '/' . self::H5P_LIBRARIES_SUBDIR . '/' . $libraryFolderName . '/' . $fileName;
     }
 
     /**

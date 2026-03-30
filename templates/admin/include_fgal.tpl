@@ -409,20 +409,6 @@
                     {preference name='h5p_enable_lrs_content_types'}
                     {preference name='h5p_custom_js_files'}
                     {preference name='h5p_custom_css_files'}
-
-                    {* H5P storage status - H5P content is stored as file gallery items *}
-                    {if $prefs.feature_h5p eq 'y' && isset($h5p_storage_ok)}
-                        {if $h5p_storage_ok}
-                            {remarksbox type="success" title="{tr}H5P storage{/tr}"}
-                                {tr}OK:{/tr} <code>{$h5p_storage_abs|escape}</code>
-                            {/remarksbox}
-                        {else}
-                            {remarksbox type="warning" title="{tr}H5P storage{/tr}"}
-                                {tr}Directory is missing or not writable:{/tr} <code>{$h5p_storage_abs|escape}</code><br>
-                                {tr}Run{/tr} <code>sh setup.sh fix</code> {tr}and/or adjust ownership & permissions{/tr}.
-                            {/remarksbox}
-                        {/if}
-                    {/if}
                     {remarksbox type="info" title="{tr}H5P Info{/tr}"}
                         {tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
                         <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">
