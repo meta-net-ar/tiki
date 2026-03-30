@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$menuInfo.title|escape}{/title}
+    {title}{$menuInfo.title}{/title}
 {/block}
 
 {block name="content"}
