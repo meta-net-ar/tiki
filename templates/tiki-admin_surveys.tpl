@@ -142,6 +142,13 @@
                 </div>
             </div>
             <div class="tiki-form-group row">
+                <label for="redirect_after" class="col-sm-2 col-form-label">{tr}Redirect after completion{/tr}</label>
+                <div class="col-sm-10">
+                    <input type="text" name="redirect_after" id="redirect_after" class="form-control" value="{$info.redirect_after|escape}" placeholder="{tr}e.g. ThankYou or https://example.com/thanks{/tr}">
+                    <div class="form-text">{tr}Wiki page name or full URL to redirect to after survey completion. Leave empty to redirect to the survey list.{/tr}</div>
+                </div>
+            </div>
+            <div class="tiki-form-group row">
                 <div class="col-sm-10 offset-sm-2">
                     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
                 </div>

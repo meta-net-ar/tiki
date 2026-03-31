@@ -2437,6 +2437,7 @@ CREATE TABLE `tiki_surveys` (
   `lastTaken` int(14) default NULL,
   `created` int(14) default NULL,
   `status` char(1) default NULL,
+  `redirect_after` varchar(255) default NULL,
   PRIMARY KEY (`surveyId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 

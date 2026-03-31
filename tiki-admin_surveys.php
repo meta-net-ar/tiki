@@ -19,6 +19,7 @@ $inputConfiguration = [
             'description'           => 'xss',                //post
             'save'                  => 'alpha',              //post
             'status'                => 'alpha',              //post
+            'redirect_after'        => 'url',                //post
             'remove'                => 'int',                //post
             'find'                  => 'string',             //post
         ],
@@ -57,23 +58,45 @@ if (isset($_REQUEST["save"])) {
 
         $isUpdating = ! empty($_REQUEST["surveyId"]);
 
-        $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $restriction, $_REQUEST["status"]);
-        if ($sid) {
-            if ($isUpdating) {
-                Feedback::success(tr('Survey updated successfully.'));
-            } else {
-                Feedback::success(tr('Survey created successfully.'));
-            }
-            $cat_type = 'survey';
-            $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
-            $cat_desc = substr($_REQUEST["description"], 0, 200);
-            $cat_name = $_REQUEST["name"];
-            $cat_href = "tiki-take_survey.php?surveyId=" . $cat_objid;
-            include_once("categorize.php");
-            $cookietab = 1;
-            $_REQUEST["surveyId"] = 0;
+        $redirect_after = isset($_REQUEST["redirect_after"]) ? trim($_REQUEST["redirect_after"]) : '';
+        // Validate redirect_after: only allow wiki page names (alphanumeric, spaces, dashes, underscores) or valid URLs
+        $redirect_after_valid = true;
+        if (! empty($redirect_after) && ! preg_match('#^https?://#', $redirect_after) && ! preg_match('/^[\w\s\-]+$/u', $redirect_after)) {
+            Feedback::error(
+                tr(
+                    'Invalid redirect value in the field "Redirect after completion". Please enter a wiki page name (letters, numbers, spaces, dashes) or a full URL starting with http:// or https://. Leave empty to redirect to the survey list.'
+                )
+            );
+            $redirect_after_valid = false;
+        }
+        if (! $redirect_after_valid) {
+            $cookietab = 2;
         } else {
-            Feedback::error(tr('Failed to save survey.'));
+            $sid = $srvlib->replace_survey(
+                $_REQUEST["surveyId"],
+                $_REQUEST["name"],
+                $_REQUEST["description"],
+                $restriction,
+                $_REQUEST["status"],
+                $redirect_after
+            );
+            if ($sid) {
+                if ($isUpdating) {
+                    Feedback::success(tr('Survey updated successfully.'));
+                } else {
+                    Feedback::success(tr('Survey created successfully.'));
+                }
+                $cat_type = 'survey';
+                $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
+                $cat_desc = substr($_REQUEST["description"], 0, 200);
+                $cat_name = $_REQUEST["name"];
+                $cat_href = "tiki-take_survey.php?surveyId=" . $cat_objid;
+                include_once("categorize.php");
+                $cookietab = 1;
+                $_REQUEST["surveyId"] = 0;
+            } else {
+                Feedback::error(tr('Failed to save survey.'));
+            }
         }
     }
 }
