@@ -22,6 +22,20 @@ function wikiplugin_listexecute_info()
         'introduced' => 11,
         'tags' => [ 'advanced' ],
         'params' => [
+            'approval' => [
+                'required' => false,
+                'name' => tra('Skip plugin approval'),
+                'description' => tra(
+                    'When this parameter is present, this plugin is not subject to wiki plugin approval fingerprinting, so changes inside the plugin body (such as filter values or wiki variables) do not require re-approval. This bypass is only honored for users with plugin approval permission. Use only on pages where editors are trusted: LISTEXECUTE can run destructive actions.'
+                ),
+                'since' => '29.0',
+                'filter' => 'alnum',
+                'default' => '',
+                'options' => [
+                    ['text' => tra('No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                ],
+            ],
             'button_label' => [
                 'required' => false,
                 'name' => tra('Button label'),
