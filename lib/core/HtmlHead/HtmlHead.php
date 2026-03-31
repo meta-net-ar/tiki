@@ -23,21 +23,20 @@ if (function_exists('\filter_out_sefurl') === false) {
 
 class HtmlHead
 {
-    protected string $mid;
     protected array $images = [];
     protected ?string $title = null;
     protected ?string $canonicalPath = null;
     protected ?array $breadcrumbTitle = null;
+    protected string $middleSectionTemplate;
 
-
-    public function __construct(string $mid)
+    public function __construct()
     {
-        $this->mid = $mid;
+        $this->middleSectionTemplate = TikiLib::lib('smarty')->getTemplateVars('mid');
     }
 
     public function getPageType(): ?string
     {
-        switch ($this->mid) {
+        switch ($this->middleSectionTemplate) {
             case 'tiki-read_article.tpl':
                 return 'article';
 
@@ -273,8 +272,8 @@ class HtmlHead
         }
 
         $url = null;
-        if (($prefs['feature_canonical_url'] ?? '') === 'y' && ! empty($this->mid)) {
-            switch ($this->mid) {
+        if (($prefs['feature_canonical_url'] ?? '') === 'y' && ! empty($this->middleSectionTemplate)) {
+            switch ($this->middleSectionTemplate) {
                 case 'tiki-show_page.tpl':
                 case 'tiki-index_p.tpl':
                 case 'tiki-show_page_raw.tpl':
@@ -363,7 +362,7 @@ class HtmlHead
             $images = $header_featured_images;
         } elseif (
             $prefs['feature_canonical_url'] === 'y'
-            && $this->mid === 'tiki-read_article.tpl'
+            && $this->middleSectionTemplate === 'tiki-read_article.tpl'
             && ((! empty($hasImage) && $hasImage === 'y') || ! empty($topics['image_name']))
         ) {
             $imgUrl = '';
@@ -459,13 +458,15 @@ class HtmlHead
         return $date ? date('c', is_numeric($date) ? $date : strtotime($date)) : null;
     }
 
-    public function __toString(): string
+    public function generate(): string
     {
         global $prefs, $base_url_canonical;
 
         $meta = new MetaTags();
 
-        $meta->title($this->getTitle())->description($this->getDescription());
+        $meta->title($this->getTitle())
+            ->description($this->getDescription())
+            ->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
 
         if (! empty($canonicalPath = $this->getCanonicalPath())) {
             $meta->canonical($base_url_canonical . $canonicalPath);
@@ -682,7 +683,10 @@ class HtmlHead
             }
 
             if (! empty($author = $this->getAuthor())) {
-                $postData['author'] = new Thing(type: 'Person', props: ['name' => $author]);
+                $postData['author'] = new Thing(
+                    type: 'Person',
+                    props: ['name' => $author]
+                );
             }
 
             if (! empty($pubDate = $this->getPublishDate())) {

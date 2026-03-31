@@ -747,7 +747,7 @@ class HeaderLib
      *
      * @return string The raw output headers
      */
-    public function output_headers(?string $mid = null): string
+    public function output_headers(bool $generateHtmlHead = false): string
     {
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
@@ -755,19 +755,14 @@ class HeaderLib
         ksort($this->cssfiles);
         ksort($this->css);
         ksort($this->rssfeeds);
-        $back = '';
 
-        //
-        // $mid passed only in templates/header.tpl and this function will not be called on
-        // other header templates like send_newsletter_header.tpl, tiki-live_support_client.tpl, etc..
-        //
-        if ($mid !== null) {
-            $back .= $this->outputMetatags($mid);
-            $back .= "\n";
+        $back = '';
+        if ($generateHtmlHead) {
+            $back .= (new HtmlHead())->generate() . "\n";
         }
+
         $back .= generateJsImportmapScripts();
         $back .= "\n";
-
         if ($this->title) {
             $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
@@ -824,16 +819,6 @@ class HeaderLib
             $back .= "\n";
         }
         return $back;
-    }
-
-    /**
-     * Build SEO meta tags and JSON-LD schema.
-     *
-     * @return string
-     */
-    private function outputMetatags($mid): string
-    {
-        return (string) new HtmlHead($mid);
     }
 
 
