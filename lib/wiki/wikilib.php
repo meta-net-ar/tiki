@@ -2014,4 +2014,20 @@ class WikiLib extends TikiLib
             }
         }
     }
+
+    /**
+     * @param string $source_code The wikipage source (raw content)
+     *
+     * @return string the syntax type (tiki or markdown)
+     */
+    public function getWikiPageSyntaxType(string $source_code): string
+    {
+        $type = 'tiki';
+        if (str_starts_with($source_code, '{syntax')) {
+            if (preg_match('/\{syntax\b[^}]*\btype="([^"]+)"/', $source_code, $matches)) {
+                $type = $matches[1];
+            }
+        }
+        return $type;
+    }
 }

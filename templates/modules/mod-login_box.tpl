@@ -27,7 +27,7 @@ $(document).ready(function () {
     function show2FactorInputElement(btn, event) {
         const btnStep = parseInt(btn.attr('step')) + 1;
         btn.attr('step', btnStep);
-        $(event.currentTarget).find('fieldset').children().not('#two_factor_div').hide();
+        $(event.currentTarget).find('#two_factor_div').siblings().not('#two_factor_div').hide();
         $(event.currentTarget).find('#two_factor_div').show();
         $(event.currentTarget).find('div#webauthn_div').hide();
         $(btn).parent().show();

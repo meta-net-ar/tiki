@@ -61,7 +61,7 @@ if ($user) {
     }
 
     // Prefs overriding
-    $prefs = array_merge($prefs, $user_preferences[$user]);
+    $prefs = array_merge($prefs, $user_preferences[$user] ?? []);
 
     // Set the userPage name for this user since other scripts use this value.
     $userPage = $prefs['feature_wiki_userpage_prefix'] . $user;
