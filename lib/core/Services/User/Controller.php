@@ -147,9 +147,7 @@ class Services_User_Controller
         if ($other_user) {
             $result['other_user'] = $other_user;
             if (
-                $this->lib->user_exists($other_user) &&
-                ($user == $other_user ||
-                $prefs['feature_friends'] == 'y')
+                $this->lib->user_exists($other_user) || $prefs['feature_friends'] == 'y'
             ) {
                 $info = $this->lib->get_user_info($other_user);
 
