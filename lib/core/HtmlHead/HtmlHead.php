@@ -27,7 +27,7 @@ class HtmlHead
     protected ?string $title = null;
     protected ?string $canonicalPath = null;
     protected ?array $breadcrumbTitle = null;
-    protected string $middleSectionTemplate;
+    protected ?string $middleSectionTemplate;
 
     public function __construct()
     {
