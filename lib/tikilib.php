@@ -228,7 +228,7 @@ class TikiLib extends TikiDb_Bridge
      * @param array $options
      * @return mixed|Laminas\Http\Client
      */
-    public function get_http_client($url = false, $options = null, $user = null)
+    public function get_http_client($url = false, $options = null, $user = null, $rss_proxy = null)
     {
         global $prefs;
 
@@ -249,6 +249,17 @@ class TikiLib extends TikiDb_Bridge
         } elseif (function_exists('curl_init') && ($prefs['http_use_curl'] ?? 'n') === 'y') {
             // Laminas\Http\Client defaults to sockets, which aren't allowed in all environments so use curl when available if selected
             $config['adapter'] = 'Laminas\Http\Client\Adapter\Curl';
+        }
+
+        if (! empty($rss_proxy)) {
+            $config['adapter'] = 'Laminas\Http\Client\Adapter\Proxy';
+            $config["proxy_host"] = $rss_proxy['host_name'];
+            $config["proxy_port"] = $rss_proxy['port'];
+
+            if ($rss_proxy['username'] || $rss_proxy['password']) {
+                $config["proxy_user"] = $rss_proxy['username'];
+                $config["proxy_pass"] = $rss_proxy['password'];
+            }
         }
 
         if (($prefs['http_sslverifypeer'] ?? 'n') === 'y') {
@@ -498,7 +509,7 @@ class TikiLib extends TikiDb_Bridge
      * @param string $reqmethod
      * @return bool
      */
-    public function httprequest($url, $reqmethod = "GET")
+    public function httprequest($url, $reqmethod = "GET", $rss_proxy = null)
     {
         // test url :
         // rewrite url if sloppy # added a case for https urls
@@ -510,7 +521,7 @@ class TikiLib extends TikiDb_Bridge
         }
 
         try {
-            $client = $this->get_http_client($url);
+            $client = $this->get_http_client($url, rss_proxy: $rss_proxy);
             /* @var $response Laminas\Http\Response */
             $response = $this->http_perform_request($client);
 

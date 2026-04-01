@@ -143,6 +143,52 @@
         </div>
     {/tab}
 
+    {tab name="{tr}Proxy{/tr}"}
+        <h2>{tr}External Feeds Proxy{/tr}</h2>
+
+        <form action="tiki-admin_rssmodules.php" method="post">
+            {ticket}
+            <div class="mb-3 row">
+                <label for="host_name" class="col-form-label col-sm-3">{tr}Host name{/tr}</label>
+                <div class="col-sm-9">
+                    <input type="text" name="host_name" id="host_name" value="{$host_name|escape}" class="form-control" required="required">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="port" class="col-form-label col-sm-3">{tr}Port{/tr}</label>
+                <div class="col-sm-9">
+                    <input type="text" name="port" id="port" value="{$port|escape}" class="form-control" required="required">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="username" class="col-form-label col-sm-3">{tr}User name{/tr}</label>
+                <div class="col-sm-9">
+                    <input type="text" name="username" id="username" value="{$username|escape}" class="form-control">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="password" class="col-form-label col-sm-3">{tr}Password{/tr}</label>
+                <div class="col-sm-9">
+                    <input type="text" name="password" id="password" value="{$password|escape}" class="form-control">
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-sm-9 offset-sm-3">
+                    <input type="submit" class="btn btn-primary" name="save_proxy" value="{tr}Save{/tr}">
+                    {if !empty($host_name)}
+                        <a class="btn btn-danger" href="tiki-admin_rssmodules.php?offset={$offset|escape}&amp;sort_mode={$sort_mode|escape}&amp;remove_proxy=1"
+                           onclick="confirmPopup('{tr}Remove feeds proxy?{/tr}', '{ticket mode="get"}')">
+                            {tr}Remove{/tr}
+                        </a>
+                    {/if}
+                </div>
+            </div>
+        </form>
+
+
+    {/tab}
+
     {if $rssId > 0}
         {$feedEditLabel="{tr}Edit Feed{/tr}"}
     {else}

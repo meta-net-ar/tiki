@@ -12,6 +12,7 @@ class RSSLib extends TikiDb_Bridge
     private $items;
     private $feeds;
     private $modules;
+    private $proxy;
     private bool $updateArticles = true;
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
@@ -38,6 +39,7 @@ class RSSLib extends TikiDb_Bridge
         $this->items = $this->table('tiki_rss_items');
         $this->feeds = $this->table('tiki_rss_feeds');
         $this->modules = $this->table('tiki_rss_modules');
+        $this->proxy = $this->table('tiki_rss_proxy');
     }
 
     /**
@@ -440,6 +442,36 @@ class RSSLib extends TikiDb_Bridge
     public function get_rss_module($rssId)
     {
         return $this->modules->fetchFullRow(['rssId' => $rssId]);
+    }
+
+    public function get_rss_proxy()
+    {
+        return $this->proxy->fetchAll(numrows: 1)[0];
+    }
+
+    public function set_rss_proxy($host_name, $port, $usermane = "", $password = "")
+    {
+        $data = [
+            'host_name' => $host_name,
+            'port' => $port,
+            'username' => $usermane,
+            'password' => $password,
+        ];
+        $this->proxy->insertOrUpdate($data, ['id' => 1]);
+        return true;
+    }
+
+    /* Return true if there is a rss proxy in the db */
+    public function check_rss_proxy()
+    {
+        return empty($this->proxy->fetchAll(numrows: 1)[0]) ? false : true;
+    }
+
+    /* remove rss feed from db */
+    public function remove_rss_proxy()
+    {
+        $resultItem = $this->proxy->delete([]);
+        return ['item' => $resultItem];
     }
 
     /**
@@ -1073,8 +1105,15 @@ class RSSLib extends TikiDb_Bridge
     private function fetchFeed(string $url)
     {
         global $tikilib;
+        $rsslib = TikiLib::lib('rss');
         try {
-            $content = $tikilib->httprequest($url);
+            if ($rsslib->check_rss_proxy()) {
+                $proxy_config = $rsslib->get_rss_proxy();
+                $content = $tikilib->httprequest($url, rss_proxy: $proxy_config);
+            } else {
+                $content = $tikilib->httprequest($url);
+            }
+
             if ($content) {
                 return Laminas\Feed\Reader\Reader::importString($content);
             }

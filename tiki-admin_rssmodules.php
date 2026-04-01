@@ -85,6 +85,33 @@ if (isset($_REQUEST["rssId"])) {
     $info["showPubDate"] = 'n';
 }
 
+if ($_REQUEST["save_proxy"]) {
+    $rsslib->set_rss_proxy($_REQUEST['host_name'], $_REQUEST['port'], $_REQUEST['username'], $_REQUEST['password']);
+}
+
+if (isset($_REQUEST["remove_proxy"]) && $access->checkCsrf(true)) {
+    $result = $rsslib->remove_rss_proxy();
+    if ($result['item'] && $result['item']->numRows()) {
+        Feedback::success(tr('The proxy has been removed'));
+    } else {
+        Feedback::error(tr('The proxy has not been removed, please retry'));
+    }
+}
+
+$proxy_config = $rsslib->get_rss_proxy();
+if (empty($proxy_config)) {
+    $proxy_config['host_name'] = "";
+    $proxy_config['port'] = "";
+    $proxy_config['username'] = "";
+    $proxy_config['password'] = "";
+}
+
+$smarty->assign('host_name', $proxy_config['host_name']);
+$smarty->assign('port', $proxy_config['port']);
+$smarty->assign('username', $proxy_config['username']);
+$smarty->assign('password', $proxy_config['password']);
+
+
 if (! isset($_REQUEST["save"])) {
     $smarty->assign('name', $info["name"]);
     $smarty->assign('description', $info["description"]);
