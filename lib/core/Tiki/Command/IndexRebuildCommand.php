@@ -197,7 +197,12 @@ class IndexRebuildCommand extends Command
                 if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
                     $io->section("\nUnused Indexes Detected");
                     $io->listing($unusedIndices['indices']);
-                    $io->note("If you don't need them (for debugging), run the command: php console.php index:cleanup");
+                    $io->note("If you don't need them (for debugging), run the following command:");
+                    $io->writeln("<info>php console.php index:cleanup</info> (Delete unused indexes)");
+                    $io->writeln("<comment> --dry-run </comment> List unused indexes without deleting");
+                    $io->writeln("<comment> --all </comment> Delete all indexes, ignoring prefix");
+                    $io->writeln("<comment> --all --dry-run </comment> List all indexes without deleting");
+                    $io->writeln("<comment> -i <index_name> </comment> Remove a specific index");
                 } elseif (isset($unusedIndices['error'])) {
                     $io->error($unusedIndices['error']);
                 }

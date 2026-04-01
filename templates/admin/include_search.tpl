@@ -96,6 +96,7 @@
                         {preference name="unified_mysql_restore_indexes"}
                     </div>
 
+                    {preference name="unified_check_unused_indexes"}
                     {preference name="unified_search_default_operator"}
                     {preference name=unified_excluded_categories}
                     {preference name=unified_excluded_plugins}
