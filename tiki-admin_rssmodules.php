@@ -86,11 +86,11 @@ if (isset($_REQUEST["rssId"])) {
 }
 
 if ($_REQUEST["save_proxy"]) {
-    $rsslib->set_rss_proxy($_REQUEST['host_name'], $_REQUEST['port'], $_REQUEST['username'], $_REQUEST['password']);
+    $rsslib->setRssProxy($_REQUEST['host_name'], $_REQUEST['port'], $_REQUEST['username'], $_REQUEST['password']);
 }
 
 if (isset($_REQUEST["remove_proxy"]) && $access->checkCsrf(true)) {
-    $result = $rsslib->remove_rss_proxy();
+    $result = $rsslib->removeRssProxy();
     if ($result['item'] && $result['item']->numRows()) {
         Feedback::success(tr('The proxy has been removed'));
     } else {
@@ -98,7 +98,7 @@ if (isset($_REQUEST["remove_proxy"]) && $access->checkCsrf(true)) {
     }
 }
 
-$proxy_config = $rsslib->get_rss_proxy();
+$proxy_config = $rsslib->getRssProxy();
 if (empty($proxy_config)) {
     $proxy_config['host_name'] = "";
     $proxy_config['port'] = "";
