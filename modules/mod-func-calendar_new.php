@@ -188,9 +188,7 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     if ($calendarInitialParams['canEditAnything']) {
-        TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+        TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 
     foreach ($calIds as $i => $cal_id) {
