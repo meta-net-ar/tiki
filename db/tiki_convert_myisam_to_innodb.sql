@@ -167,6 +167,7 @@ ALTER TABLE `tiki_related_categories` ENGINE=InnoDB;
 ALTER TABLE `tiki_rss_feeds` ENGINE=InnoDB;
 ALTER TABLE `tiki_rss_items` ENGINE=InnoDB;
 ALTER TABLE `tiki_rss_modules` ENGINE=InnoDB;
+ALTER TABLE `tiki_rss_proxy` ENGINE=InnoDB;
 ALTER TABLE `tiki_schema` ENGINE=InnoDB;
 ALTER TABLE `tiki_score` ENGINE=InnoDB;
 ALTER TABLE `tiki_search_stats` ENGINE=InnoDB;
