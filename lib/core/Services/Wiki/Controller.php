@@ -72,7 +72,8 @@ class Services_Wiki_Controller
     public function action_get_page($input)
     {
         $page = $input->page->text();
-        $info = TikiLib::lib('wiki')->get_page_info($page);
+        $skipCache = (bool) $input->nocache->int();
+        $info = TikiLib::lib('wiki')->get_page_info($page, true, $skipCache);
         if (! $info) {
             throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
         }
@@ -82,11 +83,63 @@ class Services_Wiki_Controller
             throw new Services_Exception_Denied();
         }
 
+        // raw=1: return raw wiki syntax for programmatic consumers (MCP, API).
+        // Requires edit permission — raw source may contain plugin calls,
+        // SQL queries, and other content that get_parse() would filter.
+        if ($input->raw->int()) {
+            if (! $perms->edit) {
+                throw new Services_Exception_Denied(tr('Edit permission required for raw page source'));
+            }
+            return $info;
+        }
+
         $canBeRefreshed = false;
         $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed);
         $result = array_merge($info, ['data' => $data]);
 
         return $result;
+    }
+
+    /**
+     * Get version history for a wiki page.
+     *
+     * @param $input JitFilter with: page (text), offset (int), maxRecords (int)
+     * @return array{versions: array, total: int}
+     * @throws Services_Exception_NotFound
+     * @throws Services_Exception_Denied
+     */
+    public function action_history($input)
+    {
+        $page = $input->page->text();
+        $info = TikiLib::lib('tiki')->get_page_info($page, false);
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        $perms = Perms::get('wiki page', $page);
+        if (! $perms->view) {
+            throw new Services_Exception_Denied();
+        }
+
+        $offset = $input->offset->int();
+        $limit = $input->maxRecords->int() ?: -1;
+
+        $history = TikiLib::lib('hist')->get_page_history($page, false, $offset, $limit);
+
+        $versions = [];
+        foreach ($history as $entry) {
+            $versions[] = [
+                'version' => (int)($entry['version'] ?? 0),
+                'lastModif' => (int)($entry['lastModif'] ?? 0),
+                'user' => $entry['user'] ?? '',
+                'comment' => $entry['comment'] ?? '',
+            ];
+        }
+
+        return [
+            'versions' => $versions,
+            'total' => (int)($info['version'] ?? count($versions)),
+        ];
     }
 
     /**
