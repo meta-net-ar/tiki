@@ -84,7 +84,10 @@ class Services_Wiki_Controller
 
         $canBeRefreshed = false;
         $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed);
-        $result = array_merge($info, ['data' => $data]);
+        $result = array_merge($info, [
+            'title' => $page,
+            'data' => $data,
+        ]);
 
         return $result;
     }
