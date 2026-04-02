@@ -294,7 +294,7 @@ import { defaults as defaultControls } from "ol/control";
                     let borderColor = feature.get("color") ?? "#999";
                     let fillColor = feature.get("fillColor");
 
-                    if (! fillColor) {
+                    if (!fillColor) {
                         // from theme-customizer.js
                         //fillColor = lightenDarkenColor(borderColor, -10);
                         fillColor = borderColor;
