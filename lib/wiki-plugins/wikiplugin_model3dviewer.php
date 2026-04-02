@@ -311,11 +311,12 @@ function resolve_model3dviewer_src($params, $absolute_links = false, $filename =
     global $tikidomain;
 
     if (! empty($params['fileId'])) {
-        $src = smarty_modifier_sefurl($params['fileId'], 'file');
-        $src = TikiLib::tikiUrl($src);
-        $src = $src . '&display&filename=' . $filename;
+        $src = smarty_modifier_sefurl($params['fileId'], 'display');
+        $src = html_entity_decode(TikiLib::tikiUrl($src), ENT_QUOTES, 'UTF-8');
+        $separator = str_contains($src, '?') ? '&' : '?';
+        $src .= $separator . 'filename=' . rawurlencode($filename);
     } elseif (! empty($params['src'])) {
-        $src = trim($params['src']);
+        $src = html_entity_decode(trim($params['src']), ENT_QUOTES, 'UTF-8');
         $src = str_replace(' ', '', $src);
 
         if (stripos($src, 'javascript:') !== false) {
