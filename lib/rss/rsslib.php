@@ -446,25 +446,29 @@ class RSSLib extends TikiDb_Bridge
 
     public function getRssProxy()
     {
-        return $this->proxy->fetchAll(numrows: 1)[0];
+        global $tikilib;
+        $rssProxyConfig = $tikilib->get_preference('rss_proxy_config', expectArray: true);
+        return $rssProxyConfig;
     }
 
     public function setRssProxy($host_name, $port, $usermane = "", $password = "")
     {
+        global $tikilib;
         $data = [
             'host_name' => $host_name,
             'port' => $port,
             'username' => $usermane,
             'password' => $password,
         ];
-        $this->proxy->insertOrUpdate($data, ['id' => 1]);
+        $tikilib->set_preference('rss_proxy_config', $data);
         return true;
     }
 
     /* Return true if there is a rss proxy in the db */
     public function checkRssProxy()
     {
-        return empty($this->proxy->fetchAll(numrows: 1)[0]) ? false : true;
+        global $tikilib;
+        return empty($tikilib->get_preference('rss_proxy_config', expectArray: true)) ? false : true;
     }
 
     /* remove rss feed from db */
