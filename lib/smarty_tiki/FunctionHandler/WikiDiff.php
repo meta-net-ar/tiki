@@ -103,7 +103,6 @@ class WikiDiff extends Base
             return $result;
         } else {
             // TODO for other types, e.g. tracker items
-
             return '<span class="text-danger">' . tra('wikidiff: Error - only wiki pages supported currently') . '</span>';
         }
     }

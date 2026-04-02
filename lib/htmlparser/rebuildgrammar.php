@@ -5,6 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //include ("common.inc");
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    header('location: index.php');
+    exit;
+}
 
 include("htmlgrammarparser.inc");
 $p = new HtmlGrammarParser("htmlgrammar.dat");

@@ -51,6 +51,12 @@ http://www.nusphere.com
  *    RFC 2617 HTTP Authentication: Basic and Digest Access Authentication
  */
 
+
+if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+    header("location: index.php");
+    die;
+}
+
 /* load classes
 
 // necessary classes
