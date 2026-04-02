@@ -2461,6 +2461,8 @@ class Comments extends TikiLib
 
         global $tiki_p_admin_comments, $prefs;
         $userlib = TikiLib::lib('user');
+        global $headerlib;
+        $headerlib->add_js_module('import "@jquery-tiki/tiki-comments_auto_save";');
 
         $orig_maxRecords = $maxRecords;
         $orig_offset = $offset;

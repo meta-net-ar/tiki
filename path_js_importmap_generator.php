@@ -115,6 +115,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/constants" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/constants.js",
                 "@jquery-tiki/cypht" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/cypht.js",
                 "@jquery-tiki/tiki-calendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-calendar.js",
+                "@jquery-tiki/tiki-comments_auto_save" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-comments_auto_save.js",
                 "@jquery-tiki/tiki-cookie-handler" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-cookie-handler.js",
                 "@jquery-tiki/tiki-editor_settings" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-editor_settings.js",
                 "@jquery-tiki/tiki-svgedit_draw" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-svgedit_draw.js",
