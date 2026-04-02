@@ -83,10 +83,8 @@ class SessionAwareApp implements MessageComponentInterface
         }
 
 
-        $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
-        $user_cookie_site = 'tiki-user-' . $cookie_site;
         $user = $_SESSION['u_info']['login'];
-        $_SESSION["$user_cookie_site"] = $user;
+        $_SESSION[\TikiLib::lib('user')->getRememberMeCookieName()] = $user;
 
         $tikilib->setSessionId(session_id());
 
