@@ -202,7 +202,6 @@ class Services_File_FinderController
             }
 
             return $fileInfos;
-
         } elseif ($input->cmd->text() === 'file') {
             // intercept download command and use tiki-download_file so the mime type and extension is correct
             $fileId = $elFinder->realpath($input->target->text());
