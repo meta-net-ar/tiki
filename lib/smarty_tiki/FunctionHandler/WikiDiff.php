@@ -76,7 +76,7 @@ class WikiDiff extends Base
 
             $html = $smarty->fetch('pagehistory.tpl');
             return $html;
-        } else if ($params['object_type'] === 'direct') {
+        } elseif ($params['object_type'] === 'direct') {
             $diff = DiffUtils::diff2($params['oldver'], $params['newver'], $params['diff_style']);
             $result = '';
 

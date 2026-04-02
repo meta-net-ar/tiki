@@ -85,7 +85,7 @@ $perspectivelib = TikiLib::lib('perspective');
 // Get cookie consent user preferences
 $cookieConsentPrefs = CookieConsentLib::getConsentPreferences();
 // Get all the existing cookie categories
-$cookieCategories = CookieConsentLib::getCookieCategories();
+$cookieCategories = CookieConsentLib::getRequestedCookieCategories();
 
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use PragmaRX\Google2FA\Google2FA;
