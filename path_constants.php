@@ -167,6 +167,7 @@ const COMPOSERLOCK_FILE_PATH = 'vendor_bundled/composer.lock';
 /* BEGIN - HTTP PATHS */
 const HTTP_PUBLIC_PATH = 'public';
 /* Javascript assets servable over http, including css generated from js files. */
+const PUBLIC_GENERATED_PATH = 'public/generated';
 const JS_ASSETS_PATH = 'public/generated/js';
 /** This is the path for JS vendor files that would normally be served by a content delivery network.  We both bundle these files in the tarball, and (usually) serve them locally. */
 const NODE_PUBLIC_DIST_PATH = 'public/generated/js/vendor_dist';
