@@ -22,7 +22,7 @@
                     href="{service controller='calendar' action='edit_item' calitemId=0 copy_from=$calitem.calitemId|escape modal=1 return_url='tiki-calendar.php'}"
                     class="btn btn-light edit-calendar-item-btn cleanable-false"
                     title="{tr}Create a new event based on this one{/tr}">
-                    {icon name='copy'} {tr}Copy{/tr}
+                    {icon name='copy'} {tr}Duplicate{/tr}
                 </a>
             {/if}
         </div>
