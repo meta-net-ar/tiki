@@ -145,5 +145,4 @@ class FakerTrackerCommand extends Command
         }
         return Command::SUCCESS;
     }
-
 }
