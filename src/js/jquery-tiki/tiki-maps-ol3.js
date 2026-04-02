@@ -289,20 +289,26 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 // Check for color on feature property
-                var featureColor = feature.get("color");
-                if (featureColor) {
+                const intent = feature.get("intent");
+                if (intent === "vectors") {
+                    let borderColor = feature.get("color") ?? "#999";
+                    let fillColor = feature.get("fillColor");
+
+                    if (! fillColor) {
+                        // from theme-customizer.js
+                        //fillColor = lightenDarkenColor(borderColor, -10);
+                        fillColor = borderColor;
+                        borderColor = "#666";
+                    }
+
                     return new ol.style.Style({
-                        geometry: feature.getGeometry(),
-                        image: new ol.style.Circle({
-                            radius: 10,
-                            fill: new ol.style.Fill({ color: featureColor }),
-                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                        }),
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: borderColor, width: 2 }),
                     });
                 }
 
                 // Check if it's a marker with icon
-                if (feature.get("intent") === "marker") {
+                if (intent === "marker") {
                     return new ol.style.Style({
                         geometry: feature.getGeometry(),
                         image: new ol.style.Icon({
@@ -1596,7 +1602,7 @@ import { defaults as defaultControls } from "ol/control";
                                                 try {
                                                     features = format.readFeatures(data, {
                                                         dataProjection: "EPSG:4326",
-                                                        featureProjection: "EPSG:900913",
+                                                        featureProjection: container.map.getView().getProjection(),
                                                     });
                                                 } catch (e) {
                                                     // Corrupted feature - display plain marker
