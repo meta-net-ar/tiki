@@ -90,12 +90,8 @@ if ($_REQUEST["save_proxy"]) {
 }
 
 if (isset($_REQUEST["remove_proxy"]) && $access->checkCsrf(true)) {
-    $result = $rsslib->removeRssProxy();
-    if ($result['item'] && $result['item']->numRows()) {
-        Feedback::success(tr('The proxy has been removed'));
-    } else {
-        Feedback::error(tr('The proxy has not been removed, please retry'));
-    }
+    $rsslib->removeRssProxy();
+    Feedback::success(tr('The proxy has been removed'));
 }
 
 $proxy_config = $rsslib->getRssProxy();

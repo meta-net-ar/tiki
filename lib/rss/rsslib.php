@@ -12,7 +12,6 @@ class RSSLib extends TikiDb_Bridge
     private $items;
     private $feeds;
     private $modules;
-    private $proxy;
     private bool $updateArticles = true;
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
@@ -39,7 +38,6 @@ class RSSLib extends TikiDb_Bridge
         $this->items = $this->table('tiki_rss_items');
         $this->feeds = $this->table('tiki_rss_feeds');
         $this->modules = $this->table('tiki_rss_modules');
-        $this->proxy = $this->table('tiki_rss_proxy');
     }
 
     /**
@@ -467,15 +465,15 @@ class RSSLib extends TikiDb_Bridge
     /* Return true if there is a rss proxy in the db */
     public function checkRssProxy()
     {
-        global $tikilib;
-        return empty($tikilib->get_preference('rss_proxy_config', expectArray: true)) ? false : true;
+        return empty($this->getRssProxy()) ? false : true;
     }
 
     /* remove rss feed from db */
     public function removeRssProxy()
     {
-        $resultItem = $this->proxy->delete([]);
-        return ['item' => $resultItem];
+        global $tikilib;
+        $tikilib->set_preference('rss_proxy_config', []);
+        return true;
     }
 
     /**
