@@ -7,6 +7,7 @@
 namespace Tiki;
 
 use Faker\Factory as FakerFactory;
+use Faker\Generator;
 use Tracker_Definition;
 use TikiLib;
 
@@ -19,7 +20,7 @@ use TikiLib;
  */
 class TrackerFaker
 {
-    protected $faker;
+    protected Generator $faker;
 
     protected array $fieldTypeMap = [
         'e' => 'tikiCategories', // Category
