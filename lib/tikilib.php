@@ -4423,6 +4423,15 @@ class TikiLib extends TikiDb_Bridge
     }
 
     /**
+     * This seems ridiculous for a public function.  The preference system has
+     * all the information to know the format, and default value, without the user
+     * doing it.  And this will return possibly completely incompatibe values if
+     * the preference isn't set, and the wrong default is provided.  And most current
+     * code use do not provide a value at all.
+     * different unserialize heuristic than PreferencesLib::getPreference()
+     * Maybe this was meant as some sort of performance optimization and is now
+     * lost to history.  See how PreferencesLib::getPreference() does it.
+     * benoitg - 2026-03-26
      * @param $name
      * @param string $default
      * @param bool $expectArray
