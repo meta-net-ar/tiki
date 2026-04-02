@@ -186,6 +186,11 @@ class ParserLib extends TikiDb_Bridge
             return $validationResult;
         }
 
+        // Apply separator processing for programmatic invocation
+        // This ensures parameters with separators are converted to arrays the same way
+        // as they would be during normal wiki parsing via plugin_apply_filters
+        $params = WikiPlugin_Helper::applySeparators($params, $info);
+
         // Call the plugin function
         $func = "wikiplugin_{$name}";
         if (function_exists($func)) {
