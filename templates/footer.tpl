@@ -33,17 +33,17 @@
 {if $module_pref_errors|default:null}
     <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} modules">
         {remarksbox type="warning" title="{tr}Module errors{/tr}"}
-            {tr}The following modules could not be loaded{/tr}
-            <form method="post" action="tiki-admin.php">
-                {ticket}
-                {foreach from=$module_pref_errors key=index item=pref_error}
-                    <p>{$pref_error.mod_name}:</p>
-                    {preference name=$pref_error.pref_name}
-                {/foreach}
-                <div class="submit">
+        {tr}The following modules could not be loaded{/tr}
+        <form method="post" action="tiki-admin.php">
+            {ticket}
+            {foreach from=$module_pref_errors key=index item=pref_error}
+                <p>{$pref_error.mod_name}:</p>
+                {preference name=$pref_error.pref_name}
+            {/foreach}
+            <div class="submit">
                     <input type="submit" class="btn btn-primary" value="{tr}Change{/tr}"/>
-                </div>
-            </form>
+            </div>
+        </form>
         {/remarksbox}
     </div>
 {/if}
@@ -53,12 +53,12 @@
     <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} errors-wrapper my-3">
         {button _ajax="n" _id="show-errors-button" _onclick="flip('errors');return false;" _text="{tr}Show PHP error messages{/tr}"}
         <div id="errors" class="alert alert-warning" style="display: {if (isset($smarty.session.tiki_cookie_jar.show_errors) and $smarty.session.tiki_cookie_jar.show_errors eq 'y')}block{else}none{/if};">
-            &nbsp;{listfilter selectors='#errors>div.rbox-data'}
-            {foreach item=err from=$phpErrors}
-                {$err}
-            {/foreach}
-        </div>
-    </div>
+                    &nbsp;{listfilter selectors='#errors>div.rbox-data'}
+                    {foreach item=err from=$phpErrors}
+                        {$err}
+                    {/foreach}
+                </div>
+            </div>
         {/if}
     {/if}
 
@@ -125,6 +125,27 @@
         });
     </script>
 {/if}
+
+{* Interactive Translation Box *}
+    <script type="text/javascript">
+        $(function() {
+            if ($("#intertrans-indicator").length > 0) {
+                $("header").addClass("navbar-with-intertrans");
+                $(".tiki-admin nav[role='banner']").addClass("navbar-with-intertrans");
+                $(".tiki-admin aside .navbar-wrapper.fixed-top").addClass("navbar-with-intertrans");
+                $(".tiki-admin .admin-content nav.admin-navbar").addClass("navbar-with-intertrans");
+                $("#middle_outer").addClass("middle-outer-with-intertrans");
+                $("[id*='bootstrap-modal'][role='dialog']").addClass("dialog-with-intertrans");
+            } else {
+                $("header").removeClass("navbar-with-intertrans");
+                $(".tiki-admin nav[role='banner']").removeClass("navbar-with-intertrans");
+                $(".tiki-admin aside .navbar-wrapper.fixed-top").removeClass("navbar-with-intertrans");
+                $(".tiki-admin .admin-content nav.admin-navbar").removeClass("navbar-with-intertrans");
+                $("#middle_outer").removeClass("middle-outer-with-intertrans");
+                $("[id*='bootstrap-modal'][role='dialog']").removeClass("dialog-with-intertrans");
+            }
+        });
+    </script>
 
 {* Include mautic snipet code with mautic *}
 {if $prefs.site_mautic_enable eq 'y' && $prefs.wikiplugin_mautic eq 'y' && $prefs.site_mautic_tracking_script_location eq 'embed'}
