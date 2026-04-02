@@ -14,4 +14,10 @@
  * explicitly in this file.
  *********************************************************/
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    header('location: index.php');
+    exit;
+}
+
+
  include_once('lib/diff/difflib.php');

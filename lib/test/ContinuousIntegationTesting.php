@@ -6,6 +6,11 @@
  * Just invoke it from a cron job.
  */
 
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
+
+
 $this_file_dir = __DIR__;
 $tiki_root_dir = $this_file_dir . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "..";
 
