@@ -228,7 +228,7 @@ class TikiLib extends TikiDb_Bridge
      * @param array $options
      * @return mixed|Laminas\Http\Client
      */
-    public function get_http_client($url = false, $options = null, $user = null, $rss_proxy = null)
+    public function get_http_client($url = false, $options = null, $user = null, $useRssProxy = false)
     {
         global $prefs;
 
@@ -251,14 +251,14 @@ class TikiLib extends TikiDb_Bridge
             $config['adapter'] = 'Laminas\Http\Client\Adapter\Curl';
         }
 
-        if (! empty($rss_proxy)) {
+        if ($useRssProxy) {
             $config['adapter'] = 'Laminas\Http\Client\Adapter\Proxy';
-            $config["proxy_host"] = $rss_proxy['host_name'];
-            $config["proxy_port"] = $rss_proxy['port'];
+            $config["proxy_host"] = $prefs['rssproxy_host'];
+            $config["proxy_port"] = $prefs['rssproxy_port'];
 
-            if ($rss_proxy['username'] || $rss_proxy['password']) {
-                $config["proxy_user"] = $rss_proxy['username'];
-                $config["proxy_pass"] = $rss_proxy['password'];
+            if ($prefs['rssproxy_user'] || $prefs['rssproxy_pass']) {
+                $config["proxy_user"] = $prefs['rssproxy_user'];
+                $config["proxy_pass"] = $prefs['rssproxy_pass'];
             }
         }
 
@@ -509,7 +509,7 @@ class TikiLib extends TikiDb_Bridge
      * @param string $reqmethod
      * @return bool
      */
-    public function httprequest($url, $reqmethod = "GET", $rss_proxy = null)
+    public function httprequest($url, $reqmethod = "GET", $useRssProxy = false)
     {
         // test url :
         // rewrite url if sloppy # added a case for https urls
@@ -521,7 +521,7 @@ class TikiLib extends TikiDb_Bridge
         }
 
         try {
-            $client = $this->get_http_client($url, rss_proxy: $rss_proxy);
+            $client = $this->get_http_client($url, useRssProxy: $useRssProxy);
             /* @var $response Laminas\Http\Response */
             $response = $this->http_perform_request($client);
 

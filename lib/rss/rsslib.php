@@ -442,40 +442,6 @@ class RSSLib extends TikiDb_Bridge
         return $this->modules->fetchFullRow(['rssId' => $rssId]);
     }
 
-    public function getRssProxy()
-    {
-        global $tikilib;
-        $rssProxyConfig = $tikilib->get_preference('rss_proxy_config', expectArray: true);
-        return $rssProxyConfig;
-    }
-
-    public function setRssProxy($host_name, $port, $usermane = "", $password = "")
-    {
-        global $tikilib;
-        $data = [
-            'host_name' => $host_name,
-            'port' => $port,
-            'username' => $usermane,
-            'password' => $password,
-        ];
-        $tikilib->set_preference('rss_proxy_config', $data);
-        return true;
-    }
-
-    /* Return true if there is a rss proxy in the db */
-    public function checkRssProxy()
-    {
-        return empty($this->getRssProxy()) ? false : true;
-    }
-
-    /* remove rss feed from db */
-    public function removeRssProxy()
-    {
-        global $tikilib;
-        $tikilib->set_preference('rss_proxy_config', []);
-        return true;
-    }
-
     /**
      * @param $rssId
      *
@@ -1106,12 +1072,10 @@ class RSSLib extends TikiDb_Bridge
 
     private function fetchFeed(string $url)
     {
-        global $tikilib;
-        $rsslib = TikiLib::lib('rss');
+        global $tikilib, $prefs;
         try {
-            if ($rsslib->checkRssProxy()) {
-                $proxy_config = $rsslib->getRssProxy();
-                $content = $tikilib->httprequest($url, rss_proxy: $proxy_config);
+            if (isset($prefs['use_rss_proxy']) && $prefs['use_rss_proxy'] == 'y') {
+                $content = $tikilib->httprequest($url, useRssProxy: true);
             } else {
                 $content = $tikilib->httprequest($url);
             }
