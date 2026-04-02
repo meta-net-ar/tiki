@@ -549,117 +549,112 @@ function tiki_fetch_tracker_messages($folder, $limit, $since, $keyword = '')
         return [];
     }
 
-    // Group Email Folder fields by tracker
-    $fieldsByTracker = [];
+    $fieldsById = [];
+    $fieldIds = [];
     foreach ($efFields as $field) {
-        $fieldsByTracker[(int) $field['trackerId']][] = $field;
+        $fieldId = (int) $field['fieldId'];
+        $fieldsById[$fieldId] = $field;
+        $fieldIds[] = $fieldId;
     }
 
-    foreach ($fieldsByTracker as $trackerId => $fields) {
-        // Get all open items from this tracker
-        $items = $trk->list_items($trackerId, 0, -1, 'lastModif_desc', '', '', '', 'o');
-        if (empty($items['data'])) {
+    if (! $fieldIds) {
+        return [];
+    }
+
+    // Prefilter to only email-folder fields that actually contain data on open tracker items.
+    $placeholders = implode(',', array_fill(0, count($fieldIds), '?'));
+    $query = "SELECT ttif.`itemId`, ttif.`fieldId`, ttif.`value`"
+        . " FROM `tiki_tracker_item_fields` ttif"
+        . " INNER JOIN `tiki_tracker_items` tti ON (tti.`itemId` = ttif.`itemId`)"
+        . " WHERE ttif.`fieldId` IN ($placeholders)"
+        . " AND ttif.`value` IS NOT NULL AND ttif.`value` != ''"
+        . " AND tti.`status` = ?";
+    $result = $trk->query($query, array_merge($fieldIds, ['o']));
+
+    $needle = mb_strtolower(trim((string) $keyword));
+    $sinceTs = strtotime($since);
+    $itemInfoCache = [];
+    while ($row = $result->fetchRow()) {
+        $itemId = (int) $row['itemId'];
+        $fieldId = (int) $row['fieldId'];
+        $rawValue = $row['value'];
+
+        if (! isset($fieldsById[$fieldId])) {
+            continue;
+        }
+        if (! $rawValue) {
             continue;
         }
 
-        foreach ($items['data'] as $itemRow) {
-            $itemId = (int) $itemRow['itemId'];
-            $itemInfo = $trk->get_item_info($itemId);
-            if (! $itemInfo) {
-                continue;
-            }
+        if (! array_key_exists($itemId, $itemInfoCache)) {
+            $itemInfoCache[$itemId] = $trk->get_item_info($itemId);
+        }
 
-            foreach ($fields as $field) {
-                $fieldId = (int) $field['fieldId'];
-                $rawValue = $trk->get_item_value($trackerId, $itemId, $fieldId);
+        if (! $itemInfoCache[$itemId]) {
+            continue;
+        }
 
-                if (! $rawValue) {
-                    continue;
-                }
+        $field = $fieldsById[$fieldId];
+        $trackerId = (int) $field['trackerId'];
+        $itemInfo = $itemInfoCache[$itemId];
+        $itemInfo[$fieldId] = $rawValue;
+        $handler = $trk->get_field_handler($field, $itemInfo);
+        if (! $handler) {
+            continue;
+        }
 
-                $itemInfo[$fieldId] = $rawValue;
-                $handler = $trk->get_field_handler($field, $itemInfo);
-                if (! $handler) {
-                    continue;
-                }
+        $data = $handler->getFieldData();
+        $emailsByFolder = $data['emails'];
 
-                $data = $handler->getFieldData();
-                $emailsByFolder = $data['emails'] ?? [];
-                if (! is_array($emailsByFolder)) {
-                    continue;
-                }
+        $foldersToProcess = $folder ? [$folder] : array_keys($emailsByFolder);
 
-                if ($folder) {
-                    $folderEmails = $emailsByFolder[$folder] ?? [];
-                    foreach ($folderEmails as $email) {
-                        $email['trackerId'] = $trackerId;
-                        $email['itemId'] = $itemId;
-                        $email['fieldId'] = $fieldId;
-                        $messages[] = $email;
+        foreach ($foldersToProcess as $folderName) {
+            $folderEmails = $emailsByFolder[$folderName] ?? [];
+            foreach ($folderEmails as $email) {
+                // If a keyword is provided, filter to only keep if it's found in from/to/subject
+                if ($needle !== '') {
+                    $fields = [
+                        $email['from'] ?? '',
+                        $email['to'] ?? '',
+                        $email['subject'] ?? '',
+                    ];
+
+                    $haystack = mb_strtolower(implode(' ', $fields));
+                    $needleNormalized = mb_strtolower($needle);
+
+                    if (mb_strpos($haystack, $needleNormalized) === false) {
+                        continue;
                     }
-                } else {
-                    foreach ($emailsByFolder as $folderName => $folderEmails) {
-                        foreach ($folderEmails as $email) {
-                            $email['trackerId'] = $trackerId;
-                            $email['itemId'] = $itemId;
-                            $email['fieldId'] = $fieldId;
-                            $email['folder'] = $folderName;
-                            $messages[] = $email;
-                        }
+                }
+
+                $rawDate = $email['date'] ?? false;
+                $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
+
+                // Filter to only keep if it's newer than $since
+                if ($ts !== false && $ts >= $sinceTs) {
+                    $email['trackerId'] = $trackerId;
+                    $email['itemId'] = $itemId;
+                    $email['fieldId'] = $fieldId;
+                    $email['folder'] = $folderName;
+
+                    // Transform to string date format as for imap messages for correct output
+                    $email['date'] = date('r', $ts);
+                    $messages[] = $email;
+
+                    // New item added, if limit reached, break all loops
+                    if (count($messages) >= $limit) {
+                        break 3;
                     }
                 }
             }
         }
     }
 
-    $needle = mb_strtolower(trim((string) $keyword));
-
-    $sinceTs = strtotime($since);
-    $formattedMessages = [];
-
-    foreach ($messages as $m) {
-        $rawDate = $m['date'] ?? false;
-        $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
-
-        if ($needle !== '') {
-            $fields = [
-                $m['from'] ?? '',
-                $m['to'] ?? '',
-                $m['subject'] ?? '',
-            ];
-
-            $haystack = mb_strtolower(implode(' ', $fields));
-            $needleNormalized = mb_strtolower($needle);
-
-            if (extension_loaded('intl')) {
-                $haystack = transliterator_transliterate(
-                    'NFD; [:Nonspacing Mark:] Remove; NFC;',
-                    $haystack
-                );
-                $needleNormalized = transliterator_transliterate(
-                    'NFD; [:Nonspacing Mark:] Remove; NFC;',
-                    $needleNormalized
-                );
-            }
-
-            if (mb_strpos($haystack, $needleNormalized) === false) {
-                continue;
-            }
-        }
-
-        // Filter to only keep if it's newer than $since
-        if ($ts !== false && $ts >= $sinceTs) {
-            // Transform to string date format as for imap messages for correct output
-            $m['date'] = date('r', $ts);
-            $formattedMessages[] = $m;
-        }
-    }
-
-    usort($formattedMessages, function ($a, $b) {
+    usort($messages, function ($a, $b) {
         return strtotime($b['date'] ?? '') <=> strtotime($a['date'] ?? '');
     });
 
-    return array_slice($formattedMessages, 0, (int) $limit);
+    return array_slice($messages, 0, (int) $limit);
 }
 
 /**

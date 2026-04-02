@@ -1380,7 +1380,7 @@ class Hm_Output_combined_trackers_link extends Hm_Output_Module
 {
     protected function output()
     {
-        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="page=message_list&list_path=trackers">';
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="?page=message_list&list_path=trackers">';
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-database account_icon"></i> ';
         }
