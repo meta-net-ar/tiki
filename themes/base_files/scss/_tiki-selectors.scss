@@ -87,10 +87,19 @@ a.ec-event:hover {
     color: color-contrast($secondary) !important;
 }
 
-button.ec-today,
+button.ec-today:not(:disabled),
 .ec-today .ec-day-head {
     background-color: var(--bs-secondary) !important;
     color: color-contrast($secondary) !important;
+}
+
+button.ec-today:disabled,
+button.ec-today[disabled] {
+    background-color: rgba(var(--bs-secondary-rgb), 0.35) !important;
+    color: rgba(var(--bs-body-color-rgb), 0.65) !important;
+    border-color: rgba(var(--bs-secondary-rgb), 0.35) !important;
+    box-shadow: none;
+    opacity: 1;
 }
 
 // tiki-categories.less - tiki-jquery.js - Doesn't show up in a search Apr 21 2024
