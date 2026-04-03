@@ -3,9 +3,9 @@ import singleSpaCss from "single-spa-css";
 import { createApp, h } from "vue";
 import App from "./App.vue";
 
-import "./lib/ui-predicate-vue3.css";
+import "ui-predicate-vue3/dist/ui-predicate-vue3.css";
 import "../custom.scss";
-import UIPredicate from "./lib/ui-predicate-vue3.es.js";
+import UIPredicate from "ui-predicate-vue3";
 
 const vueLifecycles = singleSpaVue({
     createApp,
