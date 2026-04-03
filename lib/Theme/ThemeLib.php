@@ -563,7 +563,6 @@ class ThemeLib extends TikiLib
 
         $themelib  = TikiLib::lib('theme');
         $headerlib = TikiLib::lib('header');
-        $smarty = TikiLib::lib('smarty');
 
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
 
