@@ -94,7 +94,7 @@ class UpdateCommand extends Command
             foreach (array_keys(Patch::getPatches([Patch::NEWLY_APPLIED])) as $patch) {
                 $output->writeln("<info>Installed: $patch</info>");
             }
-            foreach (array_keys(Patch::getPatches([Patch::NOT_APPLIED])) as $patch) {
+            foreach (array_keys(Patch::getPatches([Patch::FAILED])) as $patch) {
                 $output->writeln("<error>Failed: $patch</error>");
 
                 if ($autoRegister) {
