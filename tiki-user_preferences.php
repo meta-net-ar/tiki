@@ -15,7 +15,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
         'userId'                          => 'int',          //post
-        'view_user'                       => 'int',          //post
+        'view_user'                       => 'username',     //post
         'generate'                        => 'bool',         //post
         'tfagenerate'                     => 'bool',         //post
         'new_info'                        => 'bool',         //post
@@ -555,15 +555,51 @@ if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] =
     $smarty->assign('imageType', $imageType);
 }
 
-if (isset($_POST['deleteaccount']) && $tiki_p_delete_account == 'y' && $access->checkCsrf(true)) {
-    $userlib->remove_user($userwatch);
+if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
+    if (! isset($_POST['deleteaccountconfirm'])) {
+        $smarty->assign('msg', tra('Please check the confirmation box to delete the account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Determine the target user explicitly from the POST form data to prevent
+    // mismatch with $userwatch which is derived from $_REQUEST (GET+POST merged).
+    // Never fall back to $user to avoid accidentally deleting the logged-in admin.
+    if (empty($_POST['view_user'])) {
+        $smarty->assign('msg', tra('Invalid request: no target user specified.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $deleteUser = $_POST['view_user'];
+    if (empty($userlib->user_exists($deleteUser))) {
+        $smarty->assign('msg', tra('Unknown user'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Non-admin users can only delete their own account
+    if ($deleteUser !== $user && $tiki_p_admin_users !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete other accounts.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    if ($deleteUser === $user && $tiki_p_delete_account !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete your own account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Prevent deletion of the built-in admin account
+    if ($deleteUser === 'admin') {
+        $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $userlib->remove_user($deleteUser);
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-    $unifiedsearchlib->invalidateObject('user', $userwatch);
+    $unifiedsearchlib->invalidateObject('user', $deleteUser);
 
-    if ($user == $userwatch) {
+    if ($user === $deleteUser) {
         header('Location: tiki-logout.php');
-    } elseif ($tiki_p_admin_users == 'y') {
+    } elseif ($tiki_p_admin_users === 'y') {
         header('Location: tiki-adminusers.php');
     } else {
         header("Location: $base_url");
