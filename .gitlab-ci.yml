@@ -460,6 +460,22 @@ composer-could-update-lock:
       command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
       alias: mysql
 
+db-upgrade-30-mysql:
+  <<: *template-tiki-schema-upgrade-mysql8
+  variables:
+    DBFILE: ci_30.sql
+    DBVER: 30
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+    ENGINE: InnoDB
+
+db-upgrade-29-mysql:
+  <<: *template-tiki-schema-upgrade-mysql8
+  variables:
+    DBFILE: ci_29.sql
+    DBVER: 29
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+    ENGINE: InnoDB
+
 db-upgrade-28-mysql:
   <<: *template-tiki-schema-upgrade-mysql8
   variables:
