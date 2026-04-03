@@ -116,7 +116,7 @@ function wikiplugin_map_info()
                 'name' => tra('Tileset layers'),
                 'description' => tra('Tilesets to use for background layers, comma separated. Tileset groups can be added separated by a tilde character (requires Open Layers v3+, default is the geo_tilesets preference)'),
                 'since' => '20.1',
-                'default' => "86, 134, 200",
+                'default' => '',
                 'filter' => 'text',
                 'advanced' => true,
             ],
