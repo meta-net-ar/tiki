@@ -51,18 +51,22 @@ class MenuLib extends TikiLib
     public function replace_menu($menuId, $name, $description = '', $type = 'd', $icon = null, $use_items_icons = 'n', $parse = 'n')
     {
         // Check the name
-        if (isset($menuId) and $menuId > 0) {
+        if ($menuId > 0) {
             $query = "update `tiki_menus` set `name`=?,`description`=?,`type`=?, `icon`=?, `use_items_icons`=?, `parse`=? where `menuId`=?";
             $bindvars = [$name,$description,$type,$icon,$use_items_icons,$parse,(int) $menuId];
             $this->empty_menu_cache($menuId);
+            $result = $this->query($query, $bindvars);
+            return $menuId;
         } else {
             // was: replace into. probably we need a delete here
             $query = "insert into `tiki_menus` (`name`,`description`,`type`,`icon`,`use_items_icons`,`parse`) values(?,?,?,?,?,?)";
             $bindvars = [$name,$description,$type,$icon,$use_items_icons,$parse];
+            $result = $this->query($query, $bindvars);
+            if ($result && $result->numRows()) {
+                return $this->lastInsertId();
+            }
+            return false;
         }
-
-        $result = $this->query($query, $bindvars);
-        return true;
     }
 
     public function clone_menu($menuId, $name, $description = '')
