@@ -30,7 +30,7 @@ class ExternalLinksChecker
         'high' => [], // User visible (HIGH)
         'low' => [], // Source code (LOW)
     ];
-    private $allUrls = []; // Complete index for full liveness audit (Requirement 4)
+    private $allUrls = []; // Complete index for full liveness audit
     private $suppressed = []; // Links with @tiki-external-link-ok comments
     private $whitelistDomains = [];
     private $whitelistPatterns = [];
