@@ -21,11 +21,15 @@ use Exception;
  */
 class Installer extends TikiDb_Bridge implements SplSubject
 {
+    public const WARNING_THRESHOLD_PATCH = '20260301';
+
     public static $instance = null; // Singleton instance
     private $observers;
 
     public $scripts = [];
     public $executed = [];
+
+    private string $currentPatchName = '';
 
     public $queries = [
         'currentStmt' => '',
@@ -34,7 +38,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
         'total' => 0,
         'files' => [], //path of the files executed
         'successful' => [],
-        'failed' => []
+        'failed' => [],
+        'warnings' => []
     ];
 
     public $useInnoDB = true;
@@ -140,6 +145,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
         foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
+            } catch (MySQLWarningException $e) {
+                throw $e;
             } catch (Exception $e) {
                 if ($e->getCode() != 2) {
                     throw $e;
@@ -163,6 +170,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
      */
     public function installPatch($patch, $force = false)
     {
+        $this->currentPatchName = (string) $patch;
         if (! $force && isset(Patch::$list[$patch]) && Patch::$list[$patch]->isApplied()) {
             throw new Exception('Patch already applied', 3);
         }
@@ -202,10 +210,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
             } else {
                 try {
                     $status = $this->runFile($schema);
-                } catch (Exception $e) {
-                    if (str_contains($e->getMessage(), 'MySQL Warning(s) caught')) {
-                        throw $e;
-                    }
+                } catch (MySQLWarningException $e) {
+                    throw $e;
                 }
             }
 
@@ -225,6 +231,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         } else {
             Patch::$list[$patch]->record();
         }
+        $this->currentPatchName = '';
     }
 
     /**
@@ -352,41 +359,65 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $error = '';
         $result = $this->queryError($query, $error, $values);
 
+        if (stripos(trim($query), 'SHOW WARNINGS') === 0) {
+            return $result;
+        }
+
+        $isCI = ! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS');
+        $warnings = [];
+        $warnErr = '';
+        $warnResult = $this->queryError('SHOW WARNINGS', $warnErr);
+
+        if ($warnResult) {
+            $isIgnorableContext = empty($this->currentPatchName) || $this->currentPatchName < self::WARNING_THRESHOLD_PATCH;
+            while ($row = $warnResult->fetchRow()) {
+                if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                    if ($isIgnorableContext && in_array((int)$row['Code'], [124, 1060, 1061, 1062, 1091, 1681, 1831])) {
+                        // These are common warnings from old patches that we can safely skip.
+                        // 124: InnoDB rebuilding table (happens during fulltext index creation)
+                        // 1060: Duplicate column name
+                        // 1061: Duplicate key name
+                        // 1062: Duplicate entry
+                        // 1091: Can't DROP '...'; check that column/key exists
+                        // 1681: Integer display width is deprecated (display_width is deprecated since MySQL 8.0.17)
+                        // 1831: Duplicate index
+                        // These usually happen when we re-run the same patch more than once.
+                        continue;
+                    }
+                    $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
+                }
+            }
+        }
+
         if ($result && empty($error)) {
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
+            }
+
+            if (! empty($warnings)) {
+                $this->queries['warnings'][] = ['query' => $query, 'warnings' => $warnings];
+            }
+
             if ($countQueries) {
                 $this->queries['successful'][] = $query;
             }
-            if (! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS')) {
-                if (stripos(trim($query), 'SHOW WARNINGS') !== 0) {
-                    $warnErr = '';
-                    $warnResult = $this->queryError('SHOW WARNINGS', $warnErr);
-                    if ($warnResult) {
-                        $warnings = [];
-                        while ($row = $warnResult->fetchRow()) {
-                            if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
-                                if (in_array($row['Code'], [124, 1060, 1061, 1062, 1091, 1681, 1831])) {
-                                    // These are common warnings from old patches that we can safely skip.
-                                    // 124: InnoDB rebuilding table (happens during fulltext index creation)
-                                    // 1060: Duplicate column name
-                                    // 1061: Duplicate key name
-                                    // 1062: Duplicate entry
-                                    // 1091: Can't DROP '...'; check that column/key exists
-                                    // 1681: Integer display width is deprecated
-                                    // 1831: Duplicate index
-                                    // These usually happen when we re-run the same patch more than once.
-                                    continue;
-                                }
-                                $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
-                            }
-                        }
-                        if (! empty($warnings)) {
-                            throw new Exception("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
-                        }
-                    }
-                }
-            }
             return $result;
         } else {
+            // The query failed. Can we ignore it (for old patches)?
+            $isOldPatchContext = ! empty($this->currentPatchName) && $this->currentPatchName < self::WARNING_THRESHOLD_PATCH;
+            if ($isOldPatchContext && empty($warnings)) {
+                // All warnings/errors were filtered out (they were common/ignorable)
+                if ($countQueries) {
+                    $this->queries['successful'][] = $query;
+                }
+                return true; // Treat as success
+            }
+
+            // For NEW patches in CI, throw detailed exception even on failure
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Error/Warning(s) caught during upgrade in query:\n$query\nDetails:\n" . implode("\n", $warnings));
+            }
+
             if ($countQueries) {
                 $this->queries['failed'][] = [$query, $error, substr(basename($patch), 0, -4)];
             }
