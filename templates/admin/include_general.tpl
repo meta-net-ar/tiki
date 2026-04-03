@@ -234,6 +234,13 @@
                     {preference name=proxy_user}
                     {preference name=proxy_pass}
                 </div>
+                {preference name=use_rss_proxy}
+                <div class="adminoptionboxchild" id="use_rss_proxy_childcontainer">
+                    {preference name=rssproxy_host}
+                    {preference name=rssproxy_port}
+                    {preference name=rssproxy_user}
+                    {preference name=rssproxy_pass}
+                </div>
                 {preference name=http_skip_frameset}
                 {preference name=feature_loadbalancer}
                 {preference name=feature_port_rewriting}

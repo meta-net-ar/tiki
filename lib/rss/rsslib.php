@@ -1072,9 +1072,14 @@ class RSSLib extends TikiDb_Bridge
 
     private function fetchFeed(string $url)
     {
-        global $tikilib;
+        global $tikilib, $prefs;
         try {
-            $content = $tikilib->httprequest($url);
+            if (isset($prefs['use_rss_proxy']) && $prefs['use_rss_proxy'] == 'y') {
+                $content = $tikilib->httprequest($url, useRssProxy: true);
+            } else {
+                $content = $tikilib->httprequest($url);
+            }
+
             if ($content) {
                 return Laminas\Feed\Reader\Reader::importString($content);
             }
