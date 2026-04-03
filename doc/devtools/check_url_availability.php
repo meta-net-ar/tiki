@@ -5,7 +5,27 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+/**
+ * Standalone URL Availability Checker — Release Prep Tool
+ *
+ * Checks if external URLs found in the codebase are still reachable.
+ * Run manually by the Release Manager before a release.
+ *
+ * This is NOT part of CI. CI handles link governance via check_external_links.php.
+ *
+ * Usage:
+ *   php doc/devtools/check_url_availability.php
+ *   php doc/devtools/check_url_availability.php --severity=critical,high
+ */
+
 namespace TikiDevTools;
+
+if (PHP_SAPI !== 'cli') {
+    die('Only available through command-line.' . PHP_EOL);
+}
+
+require_once __DIR__ . '/vcscommons.php';
+require_once __DIR__ . '/check_external_links.php';
 
 /**
  * URL Availability Checker using curl_multi for parallel requests.
@@ -157,3 +177,90 @@ class UrlAvailabilityChecker
         curl_multi_close($multiHandle);
     }
 }
+
+// ── CLI Entry Point
+
+$dir = realpath(__DIR__ . '/../../');
+$paramList = $_SERVER['argv'] ?? [];
+$listFiles = [];
+$severityFilter = null;
+
+foreach ($paramList as $param) {
+    if (str_starts_with($param, '--severity=')) {
+        $severityValue = substr($param, strlen('--severity='));
+        $severityFilter = array_map('strtolower', array_map('trim', explode(',', $severityValue)));
+    } elseif (basename(__FILE__) !== basename($param)) {
+        $file = $dir . DIRECTORY_SEPARATOR . $param;
+        if (file_exists($file)) {
+            $listFiles[] = $param;
+        }
+    }
+}
+
+// Phase 1: Scan codebase for URLs using the existing ExternalLinksChecker
+info('Phase 1: Scanning for external URLs' . (empty($listFiles) ? ' (full project)...' : ' in specified files...'));
+$checker = new ExternalLinksChecker($dir);
+$checker->scan($listFiles);
+
+$urlsToCheck = $checker->getUrlsForAvailabilityCheck($severityFilter);
+$summary = $checker->getSummary();
+info($summary['files_scanned'] . ' files scanned, ' . count($urlsToCheck) . ' unique URLs to check');
+
+if (empty($urlsToCheck)) {
+    important('No URLs to check for availability (all filtered out).');
+    exit(0);
+}
+
+// Phase 2: Check availability
+echo PHP_EOL;
+info('Phase 2: Checking URL availability...');
+$availabilityChecker = new UrlAvailabilityChecker();
+$results = $availabilityChecker->checkUrls($urlsToCheck);
+
+$brokenUrls = $results['broken'];
+$uncertainUrls = $results['uncertain'];
+$activeUrls = $results['active'];
+
+// ── Output Results
+
+echo PHP_EOL;
+echo str_repeat('=', 70) . PHP_EOL;
+
+if (! empty($brokenUrls)) {
+    echo color('BROKEN URLs: ' . count($brokenUrls) . ' found', 'red') . PHP_EOL;
+    echo str_repeat('-', 70) . PHP_EOL;
+    foreach ($brokenUrls as $broken) {
+        echo color($broken['file'] . ':' . $broken['line'], 'yellow') . PHP_EOL;
+        echo '  URL:    ' . color($broken['url'], 'red') . PHP_EOL;
+        echo '  Reason: ' . $broken['reason'] . PHP_EOL;
+        echo PHP_EOL;
+    }
+}
+
+if (! empty($uncertainUrls)) {
+    echo color('UNCERTAIN URLs: ' . count($uncertainUrls) . ' (may need manual check)', 'yellow') . PHP_EOL;
+    echo str_repeat('-', 70) . PHP_EOL;
+    foreach ($uncertainUrls as $uncertain) {
+        echo $uncertain['file'] . ':' . $uncertain['line'] . PHP_EOL;
+        echo '  URL:    ' . $uncertain['url'] . PHP_EOL;
+        echo '  Reason: ' . $uncertain['reason'] . PHP_EOL;
+        echo PHP_EOL;
+    }
+}
+
+echo str_repeat('=', 70) . PHP_EOL;
+echo 'Summary:' . PHP_EOL;
+echo '  Active:    ' . color(count($activeUrls), 'green') . PHP_EOL;
+echo '  Broken:    ' . color(count($brokenUrls), 'red') . PHP_EOL;
+echo '  Uncertain: ' . color(count($uncertainUrls), 'yellow') . PHP_EOL;
+echo '  Total:     ' . count($urlsToCheck) . ' URLs checked' . PHP_EOL;
+echo str_repeat('=', 70) . PHP_EOL;
+
+if (empty($brokenUrls)) {
+    important('All URLs are reachable. Ready for release!');
+} else {
+    echo color(count($brokenUrls) . ' broken URL(s) detected. Please review before release.', 'red') . PHP_EOL;
+}
+
+echo PHP_EOL;
+exit(0);

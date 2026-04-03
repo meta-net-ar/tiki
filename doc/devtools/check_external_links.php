@@ -11,7 +11,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__ . '/../../path_constants.php';
-require __DIR__ . '/vcscommons.php';
+require_once __DIR__ . '/vcscommons.php';
 require_once __DIR__ . '/FileScanner.php';
 
 /**
@@ -30,6 +30,7 @@ class ExternalLinksChecker
         'high' => [], // User visible (HIGH)
         'low' => [], // Source code (LOW)
     ];
+    private $allUrls = []; // Complete index for full liveness audit (Requirement 4)
     private $suppressed = []; // Links with @tiki-external-link-ok comments
     private $whitelistDomains = [];
     private $whitelistPatterns = [];
@@ -392,27 +393,34 @@ class ExternalLinksChecker
 
             $categorized = $this->categorizeUrl('', $line, $filePath, $lineNumber, $content);
 
-            if ($categorized && ! $this->isWhitelisted($categorized['url'])) {
+            if ($categorized) {
+                $this->allUrls[] = array_merge($categorized, [
+                    'file' => $relativePath,
+                    'line' => $lineNumber,
+                ]);
+
+                if (! $this->isWhitelisted($categorized['url'])) {
                 // Check for inline suppression comment
-                $suppression = $this->hasSuppressionComment($content, $lineNumber);
-                if ($suppression['suppressed']) {
-                    $this->suppressed[] = [
+                    $suppression = $this->hasSuppressionComment($content, $lineNumber);
+                    if ($suppression['suppressed']) {
+                        $this->suppressed[] = [
                         'file' => $relativePath,
                         'line' => $lineNumber,
                         'url' => $categorized['url'],
                         'context' => $categorized['context'],
                         'reason' => $suppression['reason'],
-                    ];
-                    continue; // Skip flagging this link
-                }
+                        ];
+                        continue; // Skip flagging this link
+                    }
 
-                $this->severity[$categorized['severity']][] = [
+                    $this->severity[$categorized['severity']][] = [
                     'file' => $relativePath,
                     'line' => $lineNumber,
                     'url' => $categorized['url'],
                     'context' => $categorized['context'],
                     'code' => trim($line),
-                ];
+                    ];
+                }
             }
         }
     }
@@ -497,24 +505,22 @@ class ExternalLinksChecker
         $urls = [];
         $seenUrls = [];
 
-        foreach ($this->severity as $level => $findings) {
-            if ($severityFilter !== null && ! in_array($level, $severityFilter)) {
+        foreach ($this->allUrls as $finding) {
+            if ($severityFilter !== null && ! in_array($finding['severity'], $severityFilter)) {
                 continue;
             }
 
-            foreach ($findings as $finding) {
-                if ($this->shouldSkipUrl($finding, $seenUrls)) {
-                    continue;
-                }
-
-                $seenUrls[$finding['url']] = true;
-                $urls[] = [
-                    'url' => $finding['url'],
-                    'file' => $finding['file'],
-                    'line' => $finding['line'],
-                    'severity' => $level,
-                ];
+            if ($this->shouldSkipUrl($finding, $seenUrls)) {
+                continue;
             }
+
+            $seenUrls[$finding['url']] = true;
+            $urls[] = [
+                'url' => $finding['url'],
+                'file' => $finding['file'],
+                'line' => $finding['line'],
+                'severity' => $finding['severity'],
+            ];
         }
 
         return $urls;
@@ -634,23 +640,22 @@ class ExternalLinksChecker
     }
 }
 
-require_once __DIR__ . '/UrlAvailabilityChecker.php';
+
+
+// Only run CLI entry point when executed directly
+if (realpath(__FILE__) !== realpath($_SERVER['argv'][0] ?? '')) {
+    return;
+}
 
 $dir = realpath(__DIR__ . '/../../');
 $paramList = $_SERVER['argv'] ?? [];
 $listFiles = [];
 $ciMode = false;
-$checkActive = false;
-$severityFilter = null;
+
 
 foreach ($paramList as $param) {
     if ($param === '--ci') {
         $ciMode = true;
-    } elseif ($param === '--check-active') {
-        $checkActive = true;
-    } elseif (str_starts_with($param, '--severity=')) {
-        $severityValue = substr($param, strlen('--severity='));
-        $severityFilter = array_map('strtolower', array_map('trim', explode(',', $severityValue)));
     } elseif (basename(__FILE__) != basename($param)) {
         $file = $dir . DIRECTORY_SEPARATOR . $param;
         if (file_exists($file)) {
@@ -666,41 +671,13 @@ $summary = $checker->getSummary();
 $findings = $checker->getFindings();
 $suppressed = $checker->getSuppressed();
 
-// URL Availability Check (opt-in via --check-active)
-$brokenUrls = [];
-$uncertainUrls = [];
-if ($checkActive) {
-    $urlsToCheck = $checker->getUrlsForAvailabilityCheck($severityFilter);
-    if (empty($urlsToCheck)) {
-        echo "No URLs to check for availability (all filtered out)." . PHP_EOL;
-    } else {
-        $availabilityChecker = new UrlAvailabilityChecker();
-        $results = $availabilityChecker->checkUrls($urlsToCheck);
-        $brokenUrls = $results['broken'];
-        $uncertainUrls = $results['uncertain'];
-        echo count($results['active']) . " active, " . count($brokenUrls) . " broken, " . count($uncertainUrls) . " uncertain" . PHP_EOL;
-    }
-}
+
 
 echo PHP_EOL;
 info('Scanning for external links...');
 info($summary['files_scanned'] . ' files scanned' . PHP_EOL);
 
-if ($checker->hasIssues() || ! empty($brokenUrls)) {
-    // Show broken URLs first if --check-active was used
-    if (! empty($brokenUrls)) {
-        echo PHP_EOL;
-        echo color('BROKEN URLs: ' . count($brokenUrls) . ' found', 'red') . PHP_EOL;
-        echo str_repeat('=', 80) . PHP_EOL;
-        foreach ($brokenUrls as $broken) {
-            echo color($broken['file'] . ':' . $broken['line'], 'yellow') . PHP_EOL;
-            echo '  URL: ' . color($broken['url'], 'red') . PHP_EOL;
-            echo '  Reason: ' . $broken['reason'] . PHP_EOL;
-            echo '  Original Severity: ' . strtoupper($broken['severity']) . PHP_EOL;
-            echo PHP_EOL;
-        }
-    }
-
+if ($checker->hasIssues()) {
     if (! empty($findings['critical'])) {
         echo PHP_EOL;
         echo color('CRITICAL (External Code): ' . count($findings['critical']) . ' found', 'red') . PHP_EOL;
@@ -752,17 +729,12 @@ if ($checker->hasIssues() || ! empty($brokenUrls)) {
     if ($summary['suppressed_count'] > 0) {
         echo '  SUPPRESSED (with @tiki-external-link-ok): ' . color($summary['suppressed_count'], 'green') . PHP_EOL;
     }
-    if (! empty($brokenUrls)) {
-        echo '  BROKEN URLs: ' . color(count($brokenUrls), 'red') . PHP_EOL;
-    }
-    if (! empty($uncertainUrls)) {
-        echo '  UNCERTAIN URLs (bot protection/rate limit): ' . color(count($uncertainUrls), 'yellow') . PHP_EOL;
-    }
+
     echo '  Total flagged: ' . $summary['total'] . ' external links found' . PHP_EOL;
     echo PHP_EOL;
 
-    // Exit with error if CRITICAL issues or broken URLs found
-    if (! empty($findings['critical']) || ! empty($brokenUrls)) {
+    // Exit with error if CRITICAL issues found
+    if (! empty($findings['critical'])) {
         echo color('ERROR: CRITICAL external links detected. These must be fixed before merging.', 'red') . PHP_EOL;
         echo PHP_EOL;
         exit(1);
