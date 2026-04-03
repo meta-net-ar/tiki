@@ -32,7 +32,7 @@ class Tabset extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
-        global $prefs, $smarty_tabset_name, $smarty_tabset, $smarty_tabset_i_tab, $cookietab, $cookietabParam;
+        global $prefs, $smarty_tabset_name, $smarty_tabset, $smarty_tabset_i_tab, $cookietab, $cookietabTabset;
         $smarty = \TikiLib::lib('smarty');
         if ($smarty->getTemplateVars('print_page') == 'y' || $prefs['layout_tabs_optional'] === 'n') {
             $params['toggle'] = 'n';
@@ -56,7 +56,7 @@ class Tabset extends Base
 
             // If the tabset specifies the tab, override any kind of memory but only if not doing "no tabs" mode
             if (isset($params['cookietab']) && $cookietab !== 'n') {
-                $cookietabParam = $params['cookietab'];
+                $cookietabTabset = $params['cookietab'];
             }
 
             $smarty_tabset_i_tab = 1;
@@ -66,8 +66,8 @@ class Tabset extends Base
 
             return '';
         } else {
-            $tabsetCookietab = isset($params['cookietab']) && $cookietab !== 'n' ? $cookietabParam : $cookietab;
-            $cookietabParam = null;
+            $tabsetCookietab = isset($params['cookietab']) && $cookietab !== 'n' ? $cookietabTabset : $cookietab;
+            $cookietabTabset = null;
             $content = trim($content);
             if (empty($content)) {
                 return '';
