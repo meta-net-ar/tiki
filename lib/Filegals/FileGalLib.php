@@ -604,7 +604,7 @@ class FileGalLib extends TikiLib
             'direct' => null,
             'parentId' => $prefs['fgal_root_id'],
             'lockable' => 'n',
-            'archives' => $prefs['fgal_default_maximum_number_of_archives_for_each_file'],
+            'archives' => $prefs['fgal_file_max_archives'],
             'quota' => $prefs['fgal_quota_default'],
             'image_max_size_x' => $prefs['fgal_image_max_size_x'],
             'image_max_size_y' => $prefs['fgal_image_max_size_y'],
