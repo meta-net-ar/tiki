@@ -1076,7 +1076,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 'geo_located' => $typeFactory->identifier('y'),
                 'geo_file' => $typeFactory->identifier(implode(',', $urls)),
                 'geo_file_format' => $typeFactory->identifier($this->getOption('indexGeometry')),
-                $baseKey => $typeFactory->identifier($value),
+                "{$baseKey}_geo" => $typeFactory->identifier($value),
+                $baseKey => $typeFactory->sortable($value),
             ];
         } else {
             $fileIds = array_filter(explode(',', $value));
@@ -1106,7 +1107,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
     {
         $baseKey = $this->getBaseKey();
         if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return ['geo_located', 'geo_file', 'geo_file_format', $baseKey];
+            return ['geo_located', 'geo_file', 'geo_file_format', "{$baseKey}_geo"];
         } else {
             $fields = [
                 $baseKey,
@@ -1127,7 +1128,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 'geo_located' => 'identifier',
                 'geo_file' => 'identifier',
                 'geo_file_format' => 'identifier',
-                $baseKey => 'identifier'
+                "{$baseKey}_geo" => 'identifier',
+                $baseKey => 'sortable',
             ];
         } else {
             $baseKey = $this->getBaseKey();
