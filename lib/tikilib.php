@@ -739,16 +739,22 @@ class TikiLib extends TikiDb_Bridge
         return false;
     }
 
-    // $noteId 0 means create a new note
     /**
-     * @param $user
-     * @param $noteId
-     * @param $name
-     * @param $data
-     * @param null $parse_mode
-     * @return mixed
+     * Create or update a user note in the notepad.
+     *
+     * Inserts a new note when $noteId is null/0, or updates an existing note when $noteId is provided.
+     * Automatically converts absolute links to relative links before storing.
+     * Sets both created and lastModif timestamps to current time.
+     *
+     * @param string      $user       The username of the note owner
+     * @param int|null    $noteId     The note ID to update, or null/0 to create a new note
+     * @param string      $name       The title/name of the note
+     * @param string      $data       The note content
+     * @param string|null $parse_mode The parsing mode ('raw' for plain text, 'wiki' for wiki syntax), or null to use default
+     *
+     * @return int The note ID (newly created ID for inserts, or the provided ID for updates)
      */
-    public function replace_note($user, $noteId, $name, $data, $parse_mode = null)
+    public function replace_note(string $user, ?int $noteId, string $name, string $data, ?string $parse_mode = null): int
     {
         $data = $this->convertAbsoluteLinksToRelative($data);
         $size = strlen($data);
@@ -757,7 +763,6 @@ class TikiLib extends TikiDb_Bridge
             'user' => $user,
             'name' => $name,
             'data' => $data,
-            'created' => $this->now,
             'lastModif' => $this->now,
             'size' => (int) $size,
             'parse_mode' => $parse_mode,
@@ -765,8 +770,9 @@ class TikiLib extends TikiDb_Bridge
 
         $userNotes = $this->table('tiki_user_notes');
         if ($noteId) {
-            $userNotes->update($queryData, ['noteId' => (int) $noteId,]);
+            $userNotes->update($queryData, ['noteId' => (int) $noteId]);
         } else {
+            $queryData['created'] = $this->now;
             $noteId = $userNotes->insert($queryData);
         }
 
