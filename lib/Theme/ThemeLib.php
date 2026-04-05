@@ -775,12 +775,6 @@ class ThemeLib extends TikiLib
         } else {
             $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
         }
-        //8) produce $iconset to be used for generating icons
-        
-    
-        // and add js support file
-       
-
         $smarty->initializePaths();
     }
 
