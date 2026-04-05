@@ -20,7 +20,6 @@ class IconsetLib
     {
         global $prefs;
         $themelib = TikiLib::lib('theme');
-
         // start with the default base and merge in others which will generally be less complete
         $iconset = new Iconset($this->loadFile('themes/base_files/iconsets/default.php'));
 
