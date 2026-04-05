@@ -278,6 +278,7 @@
         "tijsverkoyen/css-to-inline-styles": "~2.3",
         "tikiwiki/ilp-client": "~1.0",
         "tikiwiki/text-wiki-mediawiki": "~0.2",
+        "vimeo/vimeo-api": "~3.0",
         "web-auth/webauthn-lib": "~4.9",
         "xemlock/htmlpurifier-html5": "~0.1.11",
         "zbateson/mail-mime-parser": "~3.0"
