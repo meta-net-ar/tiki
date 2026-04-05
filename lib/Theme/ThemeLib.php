@@ -561,9 +561,10 @@ class ThemeLib extends TikiLib
     {
         global $prefs;
 
-        $themelib  = TikiLib::lib('theme');
+        // Get themelib instance for theme path operations
+        $themelib = new self();
         $headerlib = TikiLib::lib('header');
-        
+
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
         //START loading theme related items
         //This bundle Loads bootstrap JS and popper JS
