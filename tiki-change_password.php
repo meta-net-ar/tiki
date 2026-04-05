@@ -11,13 +11,16 @@
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'user' => 'text',
-            'username' => 'text',
-            'pass' => 'none',
-            'passAgain' => 'none',
-            'oldpass' => 'none',
-            'change' => 'text',
-            'token' => 'text',
+            'user'          => 'striptags',
+            'pass'          => 'raw',
+            'passAgain'     => 'raw',
+            'oldpass'       => 'raw',
+            'actpass'       => 'raw',
+            'change'        => 'word',
+            'token'         => 'raw',
+            'email'         => 'email',
+            'newuser'       => 'alpha',
+            'new_user_validation'     => 'alpha'
         ],
     ],
 ];
