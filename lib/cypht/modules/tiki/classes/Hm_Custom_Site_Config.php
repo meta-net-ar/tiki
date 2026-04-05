@@ -5,6 +5,8 @@
  */
 class Hm_Custom_Site_Config extends Hm_Site_Config_File
 {
+    public $user_defaults = [];
+
     public function __construct()
     {
         parent::__construct();
