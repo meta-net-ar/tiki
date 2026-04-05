@@ -20,12 +20,14 @@ class IconsetLib
     {
         global $prefs;
         $themelib = TikiLib::lib('theme');
-
+        
         // start with the default base and merge in others which will generally be less complete
         $iconset = new Iconset($this->loadFile('themes/base_files/iconsets/default.php'));
 
         //override the default icons with theme specific icons or with site icon set setting
         if (isset($prefs['theme_iconset']) && $prefs['theme_iconset'] === 'theme_specific_iconset') {
+       
+
             $filename = $themelib->get_theme_path($theme, '', str_replace('-', '_', $theme) . '.php');
             if ($filename) {
                 $iconset1 = new Iconset($this->loadFile($filename));
@@ -37,6 +39,7 @@ class IconsetLib
                 $iconset->merge($iconset1);
             }
         } elseif (isset($prefs['theme_iconset']) && $prefs['theme_iconset'] !== 'default') {
+          
             $filename = "themes/base_files/iconsets/{$prefs['theme_iconset']}.php";
             $iconset1 = new Iconset($this->loadFile($filename));
             $iconset->merge($iconset1);
@@ -53,6 +56,7 @@ class IconsetLib
 
         //finally override with custom icons of the displayed theme
         $filename = $themelib->get_theme_path($theme, $theme_option, str_replace('-', '_', $theme_option) . '_custom.php', 'icons/');
+        
         if ($filename) {
             $iconset1 = new Iconset($this->loadFile($filename));
             $iconset->merge($iconset1);
