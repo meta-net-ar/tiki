@@ -2341,16 +2341,16 @@
         },
         {
             "name": "h5p/h5p-core",
-            "version": "1.27.0",
+            "version": "1.28.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/h5p/h5p-php-library.git",
-                "reference": "829524eaf81fe3f3a295d0e843812be4735f51fc"
+                "reference": "2aeb0b83fa603e331381b3a6b8bf42c3773ba140"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/829524eaf81fe3f3a295d0e843812be4735f51fc",
-                "reference": "829524eaf81fe3f3a295d0e843812be4735f51fc",
+                "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/2aeb0b83fa603e331381b3a6b8bf42c3773ba140",
+                "reference": "2aeb0b83fa603e331381b3a6b8bf42c3773ba140",
                 "shasum": ""
             },
             "require": {
@@ -2396,9 +2396,9 @@
             ],
             "support": {
                 "issues": "https://github.com/h5p/h5p-php-library/issues",
-                "source": "https://github.com/h5p/h5p-php-library/tree/1.27.0"
+                "source": "https://github.com/h5p/h5p-php-library/tree/1.28.0"
             },
-            "time": "2024-10-25T11:30:55+00:00"
+            "time": "2026-03-03T12:00:37+00:00"
         },
         {
             "name": "h5p/h5p-editor",
@@ -2627,16 +2627,16 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v3.12.2",
+            "version": "v3.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "c6184bf92404394e918353a0ea0d35a97ac3b0fe"
+                "reference": "5f799ed5fd35e21f06cf42310f9f6ed3f7bbe7df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/c6184bf92404394e918353a0ea0d35a97ac3b0fe",
-                "reference": "c6184bf92404394e918353a0ea0d35a97ac3b0fe",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/5f799ed5fd35e21f06cf42310f9f6ed3f7bbe7df",
+                "reference": "5f799ed5fd35e21f06cf42310f9f6ed3f7bbe7df",
                 "shasum": ""
             },
             "require": {
@@ -2683,9 +2683,9 @@
             "support": {
                 "gitter": "https://gitter.im/hybridauth/hybridauth",
                 "issues": "https://github.com/hybridauth/hybridauth/issues",
-                "source": "https://github.com/hybridauth/hybridauth/tree/v3.12.2"
+                "source": "https://github.com/hybridauth/hybridauth/tree/v3.13.0"
             },
-            "time": "2025-06-18T11:58:48+00:00"
+            "time": "2026-04-02T19:11:26+00:00"
         },
         {
             "name": "itsjavi/bootstrap-colorpicker",
@@ -6646,10 +6646,10 @@
         },
         {
             "name": "npm-asset/dompurify",
-            "version": "2.5.8",
+            "version": "2.5.9",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.8.tgz"
+                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.9.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -7695,7 +7695,6 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Console_Getopt",
                 "source": "https://github.com/pear/Console_Getopt"
             },
-            "abandoned": true,
             "time": "2019-11-20T18:27:48+00:00"
         },
         {
@@ -8473,16 +8472,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.51",
+            "version": "2.0.52",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "ed661e7cdaeb8c419e609e2f3203551a13c2ed48"
+                "reference": "2552c4001631d1cc844332faea6a08a49c964b28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/ed661e7cdaeb8c419e609e2f3203551a13c2ed48",
-                "reference": "ed661e7cdaeb8c419e609e2f3203551a13c2ed48",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/2552c4001631d1cc844332faea6a08a49c964b28",
+                "reference": "2552c4001631d1cc844332faea6a08a49c964b28",
                 "shasum": ""
             },
             "require": {
@@ -8490,7 +8489,7 @@
             },
             "require-dev": {
                 "phing/phing": "~2.7",
-                "phpunit/phpunit": "^4.8.35|^5.7|^6.0|^9.4",
+                "phpunit/phpunit": "^4.8.35|^5.7|^6.0|^8.5|^9.4",
                 "squizlabs/php_codesniffer": "~2.0"
             },
             "suggest": {
@@ -8563,7 +8562,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.51"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.52"
             },
             "funding": [
                 {
@@ -8579,7 +8578,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-27T09:11:52+00:00"
+            "time": "2026-03-19T02:54:44+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -9159,16 +9158,16 @@
         },
         {
             "name": "robrichards/xmlseclibs",
-            "version": "3.1.4",
+            "version": "3.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/robrichards/xmlseclibs.git",
-                "reference": "bc87389224c6de95802b505e5265b0ec2c5bcdbd"
+                "reference": "03062be78178cbb5e8f605cd255dc32a14981f92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/bc87389224c6de95802b505e5265b0ec2c5bcdbd",
-                "reference": "bc87389224c6de95802b505e5265b0ec2c5bcdbd",
+                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/03062be78178cbb5e8f605cd255dc32a14981f92",
+                "reference": "03062be78178cbb5e8f605cd255dc32a14981f92",
                 "shasum": ""
             },
             "require": {
@@ -9195,9 +9194,9 @@
             ],
             "support": {
                 "issues": "https://github.com/robrichards/xmlseclibs/issues",
-                "source": "https://github.com/robrichards/xmlseclibs/tree/3.1.4"
+                "source": "https://github.com/robrichards/xmlseclibs/tree/3.1.5"
             },
-            "time": "2025-12-08T11:57:53+00:00"
+            "time": "2026-03-13T10:31:56+00:00"
         },
         {
             "name": "rubix/extras",
@@ -13887,16 +13886,16 @@
     "packages-dev": [
         {
             "name": "composer/ca-bundle",
-            "version": "1.5.10",
+            "version": "1.5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "961a5e4056dd2e4a2eedcac7576075947c28bf63"
+                "reference": "68ff39175e8e94a4bb1d259407ce51a6a60f09e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/961a5e4056dd2e4a2eedcac7576075947c28bf63",
-                "reference": "961a5e4056dd2e4a2eedcac7576075947c28bf63",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/68ff39175e8e94a4bb1d259407ce51a6a60f09e6",
+                "reference": "68ff39175e8e94a4bb1d259407ce51a6a60f09e6",
                 "shasum": ""
             },
             "require": {
@@ -13943,7 +13942,7 @@
             "support": {
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/ca-bundle/issues",
-                "source": "https://github.com/composer/ca-bundle/tree/1.5.10"
+                "source": "https://github.com/composer/ca-bundle/tree/1.5.11"
             },
             "funding": [
                 {
@@ -13955,7 +13954,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-08T15:06:51+00:00"
+            "time": "2026-03-30T09:16:10+00:00"
         },
         {
             "name": "doctrine/instantiator",
