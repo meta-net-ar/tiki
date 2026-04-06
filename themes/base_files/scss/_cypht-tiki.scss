@@ -103,12 +103,11 @@
         .box-menu {
             .sm-nav-link, .sm-sub-link {
                 color: var(--bs-link-color);
-                &:hover { text-decoration: none; }
+                &:hover {
+                    color: var(--bs-dropdown-link-hover-color); text-decoration: none;
+                }
             }
-            .sm-sub-link:hover {
-                background-color: var(--bs-dropdown-link-hover-bg);
-                color: var(--bs-dropdown-link-color);
-            }
+            .sm-sub-link:hover { background-color: var(--bs-dropdown-link-hover-bg); }
         }
         .box-switch_theme {
             .el-select__placeholder {
@@ -158,7 +157,7 @@
             }
         }
     }
-    .folders .selected_menu a {
+    .folders .selected_menu:not(.menu_search) a {
         &, &:hover, i.bi { color: var(--bs-primary-text-emphasis) !important; }
     }
 
@@ -169,6 +168,8 @@
         background-color: $popover-bg;
         color: $popover-body-color;
     }
+    .sievefilters_settings > .p-3 { padding: 0; }
+    #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
 
     .mailbox_list_title { display: inline-block; }
     .move_to_location {
@@ -206,6 +207,7 @@
     .msg_text .content table { table-layout: fixed; }
     .msg_text #contact_info { white-space: unset; }
     .msg_text {
+        padding: calc(var(--bs-gutter-x) * .65);
         .js-header_subject { color: var(--bs-body-color); font-size: 1.4rem; }
         .header_event_addtocal el-select { width: auto; }
     }
@@ -228,9 +230,9 @@
     .msg_headers th:hover, .settings_subtitle,
     .server_section { color: inherit !important; }
 
-    .total_unread_count, .unread_count {
+    .total_unread_count, .total_unread_count.badge, .unread_count {
         padding-top: 2.5px; padding-bottom: 2px; line-height: normal;
-        background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1));
+        background-color: var(--bs-link-hover-color);
         color: var(--bs-body-bg);
     }
     .btn-outline-secondary:hover {
@@ -453,6 +455,7 @@
         .archive_link + .dropdown { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .block_sender_link { margin-right: 0; }
         .item_to_trackers { min-width: max-content; }
+        #extra-header-buttons { margin-top: 0; }
     }
 
     .advanced_search_form {
