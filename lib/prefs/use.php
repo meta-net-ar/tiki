@@ -22,6 +22,13 @@ function prefs_use_list()
             'perspective' => false,
             'default' => 'n',
         ],
+        'use_rss_proxy' => [
+            'name' => tra('Use RSS proxy'),
+            'description' => tra('Specify if external feeds requires a proxy to access the internet. If enabled, the proxy Host name (either with or without the http:// prefix), Port settings, Username, and Password can be specified.'),
+            'type' => 'flag',
+            'perspective' => false,
+            'default' => 'n',
+        ],
 
         // FIXME: These 2 have misleading names. Actions will use context menus even if (only) one is disabled. Do we really need to have 2 preferences for this? Surely if we have context menus they should have both icons and text. Chealer 2017-07-03
         'use_context_menu_icon' => [

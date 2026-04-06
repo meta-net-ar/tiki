@@ -200,6 +200,7 @@ function get_default_prefs()
             'shoutbox_autolink' => 'n',
             'show_comzone' => 'n',
             'use_proxy' => 'n',
+            'use_rss_proxy' => 'n',
             'webserverauth' => 'n',
 
             'feature_intertiki_imported_groups' => '',
