@@ -538,3 +538,307 @@ function find_relevant_tracker_items($keywords, $multivalueField = '', $searchAr
 
     return $resultSet->jsonSerialize()['result'];
 }
+
+function tiki_fetch_tracker_messages($folder, $limit, $since, $keyword = '')
+{
+    $trk = TikiLib::lib('trk');
+    $efFields = $trk->get_fields_by_type('EF');
+    $messages = [];
+
+    if (! $efFields) {
+        return [];
+    }
+
+    $fieldsById = [];
+    $fieldIds = [];
+    foreach ($efFields as $field) {
+        $fieldId = (int) $field['fieldId'];
+        $fieldsById[$fieldId] = $field;
+        $fieldIds[] = $fieldId;
+    }
+
+    if (! $fieldIds) {
+        return [];
+    }
+
+    // Prefilter to only email-folder fields that actually contain data on open tracker items.
+    $placeholders = implode(',', array_fill(0, count($fieldIds), '?'));
+    $query = "SELECT ttif.`itemId`, ttif.`fieldId`, ttif.`value`"
+        . " FROM `tiki_tracker_item_fields` ttif"
+        . " INNER JOIN `tiki_tracker_items` tti ON (tti.`itemId` = ttif.`itemId`)"
+        . " WHERE ttif.`fieldId` IN ($placeholders)"
+        . " AND ttif.`value` IS NOT NULL AND ttif.`value` != ''"
+        . " AND tti.`status` = ?";
+    $result = $trk->query($query, array_merge($fieldIds, ['o']));
+
+    $needle = mb_strtolower(trim((string) $keyword));
+    $sinceTs = strtotime($since);
+    $itemInfoCache = [];
+    while ($row = $result->fetchRow()) {
+        $itemId = (int) $row['itemId'];
+        $fieldId = (int) $row['fieldId'];
+        $rawValue = $row['value'];
+
+        if (! isset($fieldsById[$fieldId])) {
+            continue;
+        }
+        if (! $rawValue) {
+            continue;
+        }
+
+        if (! array_key_exists($itemId, $itemInfoCache)) {
+            $itemInfoCache[$itemId] = $trk->get_item_info($itemId);
+        }
+
+        if (! $itemInfoCache[$itemId]) {
+            continue;
+        }
+
+        $field = $fieldsById[$fieldId];
+        $trackerId = (int) $field['trackerId'];
+        $itemInfo = $itemInfoCache[$itemId];
+        $itemInfo[$fieldId] = $rawValue;
+        $handler = $trk->get_field_handler($field, $itemInfo);
+        if (! $handler) {
+            continue;
+        }
+
+        $data = $handler->getFieldData();
+        $emailsByFolder = $data['emails'];
+
+        $foldersToProcess = $folder ? [$folder] : array_keys($emailsByFolder);
+
+        foreach ($foldersToProcess as $folderName) {
+            $folderEmails = $emailsByFolder[$folderName] ?? [];
+            foreach ($folderEmails as $email) {
+                // If a keyword is provided, filter to only keep if it's found in from/to/subject
+                if ($needle !== '') {
+                    $fields = [
+                        $email['from'] ?? '',
+                        $email['to'] ?? '',
+                        $email['subject'] ?? '',
+                    ];
+
+                    $haystack = mb_strtolower(implode(' ', $fields));
+                    $needleNormalized = mb_strtolower($needle);
+
+                    if (mb_strpos($haystack, $needleNormalized) === false) {
+                        continue;
+                    }
+                }
+
+                $rawDate = $email['date'] ?? false;
+                $ts = is_numeric($rawDate) ? (int)$rawDate : strtotime($rawDate);
+
+                // Filter to only keep if it's newer than $since
+                if ($ts !== false && $ts >= $sinceTs) {
+                    $email['trackerId'] = $trackerId;
+                    $email['itemId'] = $itemId;
+                    $email['fieldId'] = $fieldId;
+                    $email['folder'] = $folderName;
+
+                    // Transform to string date format as for imap messages for correct output
+                    $email['date'] = date('r', $ts);
+                    $messages[] = $email;
+
+                    // New item added, if limit reached, break all loops
+                    if (count($messages) >= $limit) {
+                        break 3;
+                    }
+                }
+            }
+        }
+    }
+
+    usort($messages, function ($a, $b) {
+        return strtotime($b['date'] ?? '') <=> strtotime($a['date'] ?? '');
+    });
+
+    return array_slice($messages, 0, (int) $limit);
+}
+
+/**
+ * Format tracker folder emails for display in the message list
+ * @subpackage tiki/functions
+ * @param array $msg_list list of tracker emails
+ * @param object $output_module Hm_Output_Module
+ * @param string $parent_list parent list path (e.g., 'trackers' or specific tracker folder)
+ * @param string $style 'email' or 'news' layout style
+ * @return array formatted message rows
+ */
+function format_tracker_message_list($msg_list, $output_module, $parent_list = false, $style = 'email')
+{
+    $res = [];
+    if ($msg_list === [false] || empty($msg_list)) {
+        return $msg_list;
+    }
+
+    $show_icons = $output_module->get('msg_list_icons');
+    $list_page = $output_module->get('list_page', 0);
+    $list_sort = $output_module->get('list_sort', $output_module->get('default_sort_order'));
+    $list_filter = $output_module->get('list_filter');
+    $list_keyword = $output_module->get('list_keyword');
+
+    foreach ($msg_list as $msg) {
+        $row_class = 'email tracker';
+        $icon = 'env_open';
+
+        // Unique ID for this email: tracker_fileId_itemId_fieldId_trackerId
+        $id = sprintf("tracker_%s_%s_%s_%s", $msg['fileId'], $msg['itemId'], $msg['fieldId'], $msg['trackerId']);
+
+        // Set default subject
+        if (! trim($msg['subject'] ?? '')) {
+            $msg['subject'] = '[No Subject]';
+        }
+        $subject = $msg['subject'];
+        $preview_msg = $msg['preview_msg'] ?? "";
+        $type_msg = $msg['type_msg'] ?? "";
+
+        // Determine if this is from sent folder
+        $folder = $msg['folder'] ?? 'inbox';
+        if ($folder == 'sent') {
+            $icon = 'sent';
+            $from = $msg['to'] ?? '';
+        } else {
+            $from = $msg['from'] ?? '';
+        }
+
+        // Format the from field
+        $from = is_array($from) ? implode(', ', $from) : $from;
+        $from = format_imap_from_fld($from);
+        $nofrom = '';
+        if (! trim($from)) {
+            $from = '[No From]';
+            $nofrom = ' nofrom';
+        }
+
+        // Determine date display
+        if (isset($msg['date']) && ! empty($msg['date'])) {
+            $date = translate_time_str(human_readable_interval($msg['date']), $output_module);
+            $timestamp = strtotime($msg['date']);
+        } else {
+            $date = translate_time_str(human_readable_interval('now'), $output_module);
+            $timestamp = time();
+        }
+
+        $flags = [];
+
+        // Check for seen flag
+        if (! isset($msg['flags']) || ! array_key_exists('seen', $msg['flags'])) {
+            $flags[] = 'unseen';
+            if ($icon != 'sent') {
+                $icon = 'env_closed';
+            }
+        } else {
+            $row_class .= ' seen';
+        }
+
+        // Check for other common flags
+        foreach (['attachment', 'deleted', 'flagged', 'answered', 'draft'] as $flag) {
+            if (isset($msg['flags']) && array_key_exists($flag, $msg['flags'])) {
+                $flags[] = $flag;
+            }
+        }
+
+        // Build row classes
+        $source = sprintf('%s - %s', $msg['tracker_name'] ?? 'Tracker', $msg['field_name'] ?? 'Email Field');
+        $row_class .= ' ' . str_replace(' ', '_', $source);
+        $row_class .= ' ' . implode(' ', $flags);
+
+        if ($folder && $folder != 'inbox') {
+            $source .= ' - ' . ucfirst($folder);
+        }
+
+        // Build message URL
+        $url = '?page=message&uid=' . $msg['fileId'] . '&list_path=' .
+                sprintf('tracker_folder_%s_%s', $msg['itemId'], $msg['fieldId']) .
+                '&list_parent=' . sprintf('tracker_%s', $msg['trackerId']);
+
+        if ($list_page) {
+            $url .= '&list_page=' . $output_module->html_safe($list_page);
+        }
+        if ($list_sort) {
+            $url .= '&sort=' . $output_module->html_safe($list_sort);
+        }
+        if ($list_filter) {
+            $url .= '&filter=' . $output_module->html_safe($list_filter);
+        }
+        if ($list_keyword) {
+            $url .= '&keyword=' . $output_module->html_safe($list_keyword);
+        }
+
+        if (! $show_icons) {
+            $icon = false;
+        }
+
+        // Extract message ID and in-reply-to headers
+        $msgId = $msg['message_id'] ?? '';
+        $inReplyTo = $msg['in_reply_to'] ?? '';
+
+        if ($msgId) {
+            $msgId = str_replace(['<', '>'], '', trim($msgId));
+        }
+        if ($inReplyTo) {
+            $inReplyTo = str_replace(['<', '>'], '', trim($inReplyTo));
+        }
+
+        // Build message row based on style
+        if ($style == 'news') {
+            $res[$id] = message_list_row(
+                [
+                    ['checkbox_callback', $id],
+                    ['icon_callback', $flags],
+                    ['subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg],
+                    ['safe_output_callback', 'source', $source],
+                    ['safe_output_callback', 'from' . $nofrom, $from, null, str_replace([$from, '<', '>'], '', $msg['from'] ?? '')],
+                    ['date_callback', $date, $timestamp, false],
+                    ['dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''],
+                ],
+                $id,
+                $style,
+                $output_module,
+                $row_class,
+                $msgId,
+                $inReplyTo
+            );
+        } else {
+            $res[$id] = message_list_row(
+                [
+                    ['checkbox_callback', $id],
+                    ['safe_output_callback', 'source', $source, $icon],
+                    ['safe_output_callback', 'from' . $nofrom, $from, null, str_replace([$from, '<', '>'], '', $msg['from'] ?? '')],
+                    ['subject_callback', $subject, $url, $flags, null, $preview_msg, $type_msg],
+                    ['date_callback', $date, $timestamp, false],
+                    ['icon_callback', $flags],
+                    ['dates_holders_callback', $msg['date'] ?? '', $msg['date'] ?? ''],
+                ],
+                $id,
+                $style,
+                $output_module,
+                $row_class,
+                $msgId,
+                $inReplyTo
+            );
+        }
+    }
+
+    return $res;
+}
+
+/**
+ * Prepare tracker emails for display using format_tracker_message_list
+ * @subpackage tiki/functions
+ * @param array $msgs tracker message list
+ * @param object $mod Hm_Output_Module
+ * @param string $type list path type
+ * @return void
+ */
+function prepare_tracker_message_list($msgs, $mod, $type)
+{
+    $style = $mod->get('news_list_style') ? 'news' : 'email';
+    if ($mod->get('is_mobile')) {
+        $style = 'news';
+    }
+    $res = format_tracker_message_list($msgs, $mod, $type, $style);
+    $mod->out('formatted_message_list', $res);
+}
